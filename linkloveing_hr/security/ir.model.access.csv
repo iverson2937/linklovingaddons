@@ -1,0 +1,2 @@
+git sid,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_linklove_hr_linklove_hr,linklove_hr.linklove_hr,model_linklove_hr_linklove_hr,,1,0,0,0

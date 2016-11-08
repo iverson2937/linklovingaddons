@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- INHERITED FORM -->
+
+        <record id="view_inventory_form_linkloving" model="ir.ui.view">
+            <field name="name">partner.vendor.form</field>
+            <field name="model">stock.inventory</field>
+            <field name="inherit_id" ref="stock.view_inventory_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='line_ids']" position="replace">
+                    <field name="line_ids" string="Inventory Details"
+                           context="{'default_location_id': location_id,  'default_product_id': product_id, 'default_prod_lot_id': lot_id, 'default_package_id': package_id, 'default_partner_id': partner_id}">
+                        <tree string="Inventory Details" editable="bottom"
+                              colors="blue: product_qty != theoretical_qty; red: theoretical_qty &lt; 0">
+                            <field name="product_id" domain="[('type','=','product')]"
+                                   on_change="onchange_createline(location_id, product_id, product_uom_id, package_id, prod_lot_id, partner_id)"
+                                   options="{'no_open':True,'no_create':True}"/>
+                            <field name="product_uom_id" groups="product.group_uom" string="UoM"
+                                   on_change="onchange_createline(location_id, product_id, product_uom_id, package_id, prod_lot_id, partner_id)"/>
+                            <field name="location_id" domain="[('id', 'child_of', parent.location_id)]"
+                                   groups="stock.group_locations"
+                                   on_change="onchange_createline(location_id, product_id, product_uom_id, package_id, prod_lot_id, partner_id)"/>
+                            <field name="prod_lot_id"
+                                   on_change="onchange_createline(location_id, product_id, product_uom_id, package_id, prod_lot_id, partner_id)"
+                                   domain="[('product_id', '=', product_id)]"
+                                   context="{'default_product_id': product_id}" groups="stock.group_production_lot"/>
+                            <field name="package_id"
+                                   domain="['|', ('location_id','=', False), ('location_id', '=', location_id)]"
+                                   on_change="onchange_createline(location_id, product_id, product_uom_id, package_id, prod_lot_id, partner_id)"
+                                   groups="stock.group_tracking_lot"/>
+                            <field name="partner_id"
+                                   on_change="onchange_createline(location_id, product_id, product_uom_id, package_id, prod_lot_id, partner_id)"
+                                   groups="stock.group_tracking_owner"/>
+                            <field name="theoretical_qty" readonly="1"/>
+                            <field name="product_qty" string="Real Quantity"/>
+                            <field name="state" invisible="True"/>
+                        </tree>
+                    </field>
+                </xpath>
+
+
+            </field>
+        </record>
+
+        <record id="product_template_action" model="ir.actions.act_window">
+            <field name="name">Products</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">tree,form,kanban</field>
+            <field name="view_type">form</field>
+            <!--<field name="view_id" ref="product.product_template_kanban_view"/>-->
+            <field name="context">{}</field>
+        </record>
+
+        <record id="view_stock_picking_form_linkloving" model="ir.ui.view">
+            <field name="name">stock.picking.form</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='origin']" position="replace" string="PO">
+                    <field name="po_id"/>
+                </xpath>
+
+            </field>
+        </record>
+
+
+        <menuitem action="product_template_action" id="stock.menu_stock_products_menu" parent="stock.menu_stock_product"
+                  sequence="1"/>
+
+
+    </data>
+</openerp>

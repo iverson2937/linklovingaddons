@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!--<record id="customer_payment_action" model="ir.actions.act_window">-->
+            <!--<field name="name">客户付款</field>-->
+            <!--<field name="type">ir.actions.act_window</field>-->
+            <!--<field name="res_model">account.receive</field>-->
+            <!--<field name="view_mode">tree,form</field>-->
+            <!--<field name="view_type">form</field>-->
+            <!--<field name="domain">[]</field>-->
+            <!--<field name="context">{}</field>-->
+        <!--</record>-->
+
+        <!--<menuitem action="customer_payment_action"-->
+                  <!--id="menu_customer_payment"-->
+                  <!--name="收款查询"-->
+                  <!--parent='base.menu_invoiced'/>-->
+
+    </data>
+</openerp>

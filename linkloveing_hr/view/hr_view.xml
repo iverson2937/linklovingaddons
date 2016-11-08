@@ -1,0 +1,60 @@
+<openerp>
+    <data>
+        <!--<record id="hr.open_view_employee_list_my" model="ir.actions.act_window">-->
+            <!--<field name="name">Employees</field>-->
+            <!--<field name="type">ir.actions.act_window</field>-->
+            <!--<field name="res_model">hr.employee</field>-->
+            <!--<field name="view_type">form</field>-->
+            <!--<field name="view_mode">tree,kanban,form</field>-->
+            <!--<field name="domain">[]</field>-->
+            <!--<field name="context">{}</field>-->
+            <!--<field name="view_id" eval="False"/>-->
+            <!--<field name="search_view_id" ref="hr.view_employee_filter"/>-->
+            <!--<field name="help" type="html">-->
+              <!--<p class="oe_view_nocontent_create">-->
+                <!--Click to add a new employee.-->
+              <!--</p><p>-->
+                <!--With just a quick glance on the Odoo employee screen, you-->
+                <!--can easily find all the information you need for each person;-->
+                <!--contact data, job position, availability, etc.-->
+              <!--</p>-->
+            <!--</field>-->
+        <!--</record>-->
+
+        <!--<record id="linkloving_hr_expense_expense_form" model="ir.ui.view">-->
+			<!--<field name="model">hr.expense.expense</field>-->
+			<!--<field name="inherit_id" ref="hr_expense.view_expenses_form"/>-->
+			<!--<field name="arch" type="xml">-->
+                <!--<xpath expr="//field[@name='department_id']" position="after">-->
+                     <!--<field name="po_id" options="{'no_create':True}"/>-->
+                    <!--<field name="project_id" options="{'no_create':True}"/>-->
+                <!--</xpath>-->
+
+                <!--<xpath expr="//field[@name='product_id']" position="replace">-->
+                    <!--<field name="product_id" options="{'no_create':True}" on_change="onchange_product_id(product_id, context)" context="{'default_hr_expense_ok':1}"/>-->
+                <!--</xpath>-->
+			<!--</field>-->
+		<!--</record>-->
+
+        <!--<record id="linkloving_view_expenses_tree" model="ir.ui.view">-->
+            <!--<field name="model">hr.expense</field>-->
+            <!--<field name="inherit_id" ref="hr_expense.view_expenses_tree"/>-->
+            <!--<field name="arch" type="xml">-->
+                <!--<xpath expr="//field[@name='employee_id']" position="after">-->
+                    <!--<field name="code"/>-->
+                <!--</xpath>-->
+            <!--</field>-->
+        <!--</record>-->
+              <record id="linkloving_view_expenses_form" model="ir.ui.view">
+            <field name="model">hr.expense</field>
+            <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='employee_id']" position="after">
+                    <field name="department_id"/>
+                </xpath>
+            </field>
+        </record>
+
+
+    </data>
+</openerp>
