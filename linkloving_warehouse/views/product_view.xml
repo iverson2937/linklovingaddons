@@ -8,15 +8,13 @@
             <field name="model">product.product</field>
             <field name="inherit_id" ref="product.product_normal_form_view"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='loc_rack']" position="before">
+                <xpath expr="//field[@name='barcode']" position="before">
                     <field name="area_id"/>
                 </xpath>
-                  <xpath expr="//field[@name='lst_price']" position="after">
-                      <field name="product_specs"/>
+                  <xpath expr="//field[@name='barcode']" position="after">
+                      <field name="product_specs" string="产品规格"/>
                 </xpath>
-                <field name='email_template_id' position='replace'>
 
-                </field>
             </field>
         </record>
 
@@ -40,9 +38,11 @@
             <field name="model">product.template</field>
             <field name="inherit_id" ref="product.product_template_only_form_view"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='loc_rack']" position="before">
+                <xpath expr="//field[@name='barcode']" position="before">
                     <field name="area_id"/>
-
+                </xpath>
+                <xpath expr="//field[@name='barcode']" position="after">
+                    <field name="product_specs" string="产品规格"/>
                 </xpath>
             </field>
         </record>
