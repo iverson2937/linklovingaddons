@@ -17,21 +17,15 @@
                 <xpath expr="//field[@name='date_order']" position="before">
                   <field name="team_id"/>
                 </xpath>
-                <!--<xpath expr="//field[@name='partner_shipping_id']" position="after">-->
-                    <!--<field name="tax_id"-->
-                           <!--domain="[('parent_id','=',False),('type_tax_use','&lt;&gt;','purchase')]" string="税金" attrs="{'readonly': [('state', '!=', 'draft')]}"/>-->
-                <!--</xpath>-->
+                <xpath expr="//field[@name='partner_shipping_id']" position="after">
+                    <field name="tax_id"
+                           domain="[('type_tax_use','&lt;&gt;','purchase')]" string="税金" attrs="{'readonly': [('state', '!=', 'draft')]}" widget="many2many_tags"/>
+                </xpath>
                  <xpath expr="//group[@name='sale_total']" position="before">
                      <group>
                          <field name="product_count" readonly="1" string="总数量"/>
                      </group>
 
-                </xpath>
-                      <xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position='before'>
-                    <field name="sequence" />
-                </xpath>
-                      <xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position='before'>
-                    <field name="index" />
                 </xpath>
 
             </field>

@@ -22,7 +22,7 @@ class Partner(models.Model):
         (1, '1级'),
         (2, '2级'),
         (3, '3级')
-    ], string='客户等级')
+    ], string='客户等级',default=1)
 
 class ResPartnerSource(models.Model):
 

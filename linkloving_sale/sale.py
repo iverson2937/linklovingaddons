@@ -21,4 +21,4 @@ class SaleOrder(models.Model):
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
-    tax_id = fields.Many2many(related='order_id.tax_id', store=True)
+    tax_id = fields.Many2many('account.tax',related='order_id.tax_id')

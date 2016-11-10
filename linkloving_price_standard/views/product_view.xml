@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!--attrs="{'invisible': [('enable_filter','=',False)]}"-->
+        <record id="product_template_form" model="ir.ui.view">
+            <field name="name">product.template.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='sales']" position="after">
+                    <page string="Price List">
+                        <group>
+                            <group string="未税价">
+                                <field name="price1"/>
+                                <field name="price2"/>
+                                <field name="price3"/>
+                            </group>
+                            <group string="含税价">
+                                <field name="price1_tax"/>
+                                <field name="price2_tax"/>
+                                <field name="price3_tax"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+
+
+            </field>
+        </record>
+        <record id="product_product_form_view" model="ir.ui.view">
+            <field name="name">product.product.form</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                 <xpath expr="//page[@name='sales']" position="after">
+                    <page string="Price List">
+                        <group>
+                            <group string="未税价">
+                                <field name="price1"/>
+                                <field name="price2"/>
+                                <field name="price3"/>
+                            </group>
+                            <group string="含税价">
+                                <field name="price1_tax"/>
+                                <field name="price2_tax"/>
+                                <field name="price3_tax"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</openerp>
