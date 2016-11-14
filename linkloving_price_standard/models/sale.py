@@ -6,19 +6,19 @@ import time
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    @api.depends('product_uom_qty', 'discount', 'price_unit', 'order_id.tax_id')
-    def _compute_amount(self):
-        """
-        Compute the amounts of the SO line.
-        """
-        for line in self:
-            price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-            taxes = line.tax_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty, product=line.product_id, partner=line.order_id.partner_id)
-            line.update({
-                'price_tax': taxes['total_included'] - taxes['total_excluded'],
-                'price_total': taxes['total_included'],
-                'price_subtotal': taxes['total_excluded'],
-            })
+    # @api.depends('product_uom_qty', 'discount', 'price_unit', 'order_id.tax_id')
+    # def _compute_amount(self):
+    #     """
+    #     Compute the amounts of the SO line.
+    #     """
+    #     for line in self:
+    #         price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+    #         taxes = line.tax_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty, product=line.product_id, partner=line.order_id.partner_id)
+    #         line.update({
+    #             'price_tax': taxes['total_included'] - taxes['total_excluded'],
+    #             'price_total': taxes['total_included'],
+    #             'price_subtotal': taxes['total_excluded'],
+    #         })
 
 
     @api.multi
@@ -222,6 +222,7 @@ class SaleOrder(models.Model):
                 'amount_tax': amount_tax,
                 'amount_total': amount_untaxed + amount_tax,
             })
+            print order.amount_untaxed
 
 
     @api.onchange('tax_id')

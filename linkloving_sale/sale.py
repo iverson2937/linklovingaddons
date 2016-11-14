@@ -9,7 +9,7 @@ class SaleOrder(models.Model):
     """""
 
     _inherit = 'sale.order'
-    tax_id = fields.Many2many('account.tax', required=True)
+    tax_id = fields.Many2one('account.tax', required=True)
     product_count = fields.Float(compute='get_product_count')
 
     def get_product_count(self):
@@ -18,7 +18,3 @@ class SaleOrder(models.Model):
             count += line.product_uom_qty
         self.product_count = count
 
-
-class SaleOrderLine(models.Model):
-    _inherit = 'sale.order.line'
-    tax_id = fields.Many2many('account.tax',related='order_id.tax_id')
