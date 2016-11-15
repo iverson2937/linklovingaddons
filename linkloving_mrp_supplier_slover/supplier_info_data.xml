@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+        <record id="supplierinfo_eeeee" model="product.supplierinfo">
+            <field name="name" ref="res_partner_exception_supplier"/>
+        </record>
+        <record id="res_partner_exception_supplier" model="res.partner">
+            <field name="name">ExceptionSupplier</field>
+            <field name="supplier">1</field>
+            <field eval="0" name="customer"/>
+        </record>
+</odoo>
