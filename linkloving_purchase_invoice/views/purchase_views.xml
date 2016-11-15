@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+        <record id="purchase_order_form" model="ir.ui.view">
+            <field name="name">purchase.order.form</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_rfq_send']" position="attributes">
+                    <button name="%(action_view_purchase_advance_payment_inv)d" string="Create Invoice1"
+                            type="action" class="btn-primary"
+                            attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}"/>
+                    <button name="%(action_view_purchase_advance_payment_inv)d" string="Create Invoice2"
+                            type="action" context="{'default_advance_payment_method': 'percentage'}"
+                            attrs="{'invisible': ['|',('invoice_status', '!=', 'no'), ('state', '!=', 'purchase')]}"/>
+                </xpath>
+
+            </field>
+        </record>
+
+
+    </data>
+</openerp>

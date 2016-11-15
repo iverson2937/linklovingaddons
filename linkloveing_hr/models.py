@@ -19,3 +19,9 @@ class HrExpense(models.Model):
         if not expense_no:
             values['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense') or '/'
         return super(HrExpense, self).create(values)
+
+    @api.model
+    def create(self, vals):
+        if vals.get('expense_no', 'New') == 'New':
+            vals['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense') or '/'
+        return super(HrExpense, self).create(vals)
