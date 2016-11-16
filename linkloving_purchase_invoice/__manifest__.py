@@ -25,9 +25,10 @@
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
+        'wizard/purchase_make_invoice_advance_views.xml',
         'views/purchase_views.xml',
         'views/templates.xml',
-        'wizard/purchase_make_invoice_advance_views.xml'
+
     ],
     # only loaded in demonstration mode
     'demo': [
