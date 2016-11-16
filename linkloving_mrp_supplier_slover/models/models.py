@@ -12,7 +12,10 @@ class PurchaseOrder(models.Model):
     def write(self, vals):
         res = super(PurchaseOrder, self).write(vals)
         if 'state' not in vals.keys():
-            self.check_product_has_supplier()
+            is_exception_order = self.partner_id == self.env.ref(
+                'linkloving_mrp_supplier_slover.res_partner_exception_supplier')
+            if is_exception_order:
+                self.check_product_has_supplier()
         return res
 
     @api.depends('order_line.date_planned')
@@ -31,6 +34,7 @@ class PurchaseOrder(models.Model):
     def check_product_has_supplier(self):
         is_exception_order = self.partner_id == self.env.ref('linkloving_mrp_supplier_slover.res_partner_exception_supplier')
         if not is_exception_order:
+            raise UserError(_("此单据供应商不可做此操作！"))
             return
         for r in self.order_line:
             if r.product_id.seller_ids:
