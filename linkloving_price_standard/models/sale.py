@@ -6,19 +6,19 @@ import time
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    # @api.depends('product_uom_qty', 'discount', 'price_unit', 'order_id.tax_id')
-    # def _compute_amount(self):
-    #     """
-    #     Compute the amounts of the SO line.
-    #     """
-    #     for line in self:
-    #         price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-    #         taxes = line.tax_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty, product=line.product_id, partner=line.order_id.partner_id)
-    #         line.update({
-    #             'price_tax': taxes['total_included'] - taxes['total_excluded'],
-    #             'price_total': taxes['total_included'],
-    #             'price_subtotal': taxes['total_excluded'],
-    #         })
+    @api.depends('product_uom_qty', 'discount', 'price_unit', 'order_id.tax_id')
+    def _compute_amount(self):
+        """
+        Compute the amounts of the SO line.
+        """
+        for line in self:
+            price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+            taxes = line.tax_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty, product=line.product_id, partner=line.order_id.partner_id)
+            line.update({
+                'price_tax': taxes['total_included'] - taxes['total_excluded'],
+                'price_total': taxes['total_included'],
+                'price_subtotal': taxes['total_excluded'],
+            })
 
 
     @api.multi
@@ -54,7 +54,6 @@ class SaleOrderLine(models.Model):
         partner_id = self.order_id.partner_id
         product_id = self.product_id
         tax_id = self.tax_id
-        print tax_id
 
         discount_id = discount_obj.search(
             [('partner_id', '=', partner_id.id), ('product_id', '=', product_id.id)])
@@ -233,6 +232,7 @@ class SaleOrder(models.Model):
             for line in self.order_line:
                 discount_id = self.env['product.price.discount'].search(
                     [('partner_id', '=', self.partner_id.id), ('product_id', '=', line.product_id.id)], limit=1)
+                line.tax_id= [(6, 0, [self.tax_id.id])]
                 if discount_id:
                     discount = discount_id.price
                     discount_tax = discount_id.price_tax
