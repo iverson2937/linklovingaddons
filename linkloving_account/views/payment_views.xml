@@ -1,44 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <!--<record id="account_amount_receive_tree" model="ir.ui.view">-->
-            <!--<field name="name">account.receive.register.tree</field>-->
-            <!--<field name="model">account.receive.register</field>-->
-            <!--<field name="arch" type="xml">-->
-                <!--<tree colors="black:state=='draft';blue:state=='confirm';red:state=='deduct',gray:state in ('cancel','done')">-->
-                    <!--<field name="partner_id" string="合作伙伴"/>-->
-                    <!--<field name="amount"/>-->
-                    <!--<field name="bank_ids"/>-->
-                    <!--<field name="remark"/>-->
-                    <!--<field name="create_uid"/>-->
-                    <!--<field name="receive_date"/>-->
-                    <!--<field name="journal_id" string="账户" options='{ "no_create": True}' readonly="1"/>-->
-                    <!--<field name="state"/>-->
-                <!--</tree>-->
-            <!--</field>-->
-        <!--</record>-->
 
 
         <record id="account_receive_register_form" model="ir.ui.view">
             <field name="name">account.receive.register.form</field>
-            <field name="model">account.receive.register</field>
+            <field name="model">account.payment.register</field>
             <field name="arch" type="xml">
                 <form>
                     <header>
                         <button name="post" string="提交" type="object"
                                 class="oe_highlight" states="draft" groups="account.group_account_invoice"/>
                         <button name="reject" string="退回" type="object"
-                                states="draft" />
+                                states="draft"/>
                         <button name="confirm" string="确认" type="object"
-                                states="posted" />
-                        <button name="set_to_draft" type="object" string="设为草稿"
-                                attrs="{'invisible': [('state', '=', 'done')]}" groups="base.group_user"/>
+                                states="posted"/>
 
-                        <field name="state" widget="statusbar" statusbar_visible="draft,posted,done"/>
+
+                        <field name="state" widget="statusbar" statusbar_visible="draft,posted,confirm,done"/>
                     </header>
                     <sheet>
                         <h1>
-                            <label string="付款申请"></label>
+                            <label string="收款"></label>
                             <field name="name" class="oe_inline" readonly="1"/>
                         </h1>
                         <group>
@@ -55,12 +38,13 @@
                             <field name="remark" required="1" attrs="{'readonly': [('state', '=', 'done')]}"/>
                         </group>
                         <notebook colspan="4">
-                        <page string="Invoices" autofocus="autofocus">
-                            <group>
-                                <field name="invoice_ids"  domain="[('partner_id','=', partner_id),('state','=', 'open'),('remain_apply_balance','!=',0 )]"/>
-                            </group>
+                            <page string="Invoices" autofocus="autofocus">
+                                <group>
+                                    <field name="invoice_ids"
+                                           domain="[('partner_id','=', partner_id),('state','=', 'open'),('remain_apply_balance','!=',0 )]"/>
+                                </group>
 
-                                </page>
+                            </page>
                         </notebook>
                     </sheet>
                     <div class="oe_chatter">
@@ -73,28 +57,6 @@
             </field>
         </record>
 
-
-        <!--<record id="action_invoice_account_receive" model="ir.actions.act_window">-->
-            <!--<field name="name">收款</field>-->
-            <!--<field name="type">ir.actions.act_window</field>-->
-            <!--<field name="res_model">account.receive.register</field>-->
-            <!--<field name="view_type">form</field>-->
-            <!--<field name="view_mode">tree,form</field>-->
-            <!--<field name="domain">[('receive_type','!=','invoice')]</field>-->
-            <!--<field name="context">{}</field>-->
-            <!--<field name="help" type="html">-->
-                <!--<p class="oe_view_nocontent_create">-->
-                    <!--Click to add customer payment.-->
-                <!--</p>-->
-                <!--<p>-->
-                    <!--No customer payment!-->
-                <!--</p>-->
-            <!--</field>-->
-        <!--</record>-->
-
-
-        <!--<menuitem id="menu_finance_account_receive" action="action_invoice_account_receive" name="收款"-->
-                  <!--parent="menu_action_invoice_prepayment"/>-->
 
         <record id="action_view_supplier_account_invoice" model="ir.actions.act_window">
             <field name="name">供应商对账明细</field>
@@ -112,49 +74,54 @@
             <field name="arch" type="xml">
                 <form>
                     <header>
-                        <button name="apply" string="提交" type="object" states="draft"
-                                class="oe_highlight" groups="purchase.group_purchase_user"/>
-                        <button name="confirm" string="确认" type="object" states="posted"
-                                class="oe_highlight" groups="purchase.group_purchase_user"/>
-                        <button name="reject" string="退回" type="object" states="apply"
-                                class="oe_highlight" groups="account.group_account_invoice"/>
-                        <button name="set_to_apply" string="重置" type="object"
-                                class="oe_highlight" groups="base.group_erp_manager"/>
-                        <field name="state" widget="statusbar"/>
+                        <button name="post" string="提交" type="object"
+                                class="oe_highlight" states="draft" groups="account.group_account_invoice"/>
+                        <button name="reject" string="退回" type="object"
+                                states="draft"/>
+                        <button name="confirm" string="确认" type="object"
+                                states="posted"/>
+
+                        <field name="state" widget="statusbar" statusbar_visible="draft,posted,confirm,done"/>
                     </header>
                     <sheet>
                         <h1>
-                            <label string="付款申请"></label>
+                            <label string="付款"></label>
                             <field name="name" class="oe_inline" readonly="1"/>
                         </h1>
-
-
-                        <div class="oe_right oe_button_box" name="buttons">
-                            <button type="action" name="%(action_view_supplier_account_invoice)d" class="oe_stat_button"
-                                    icon="fa-dollar" string="对账明细" context="{'partner_id':partner_id}">
-                            </button>
-
-                        </div>
                         <group>
-                            <group>
-                                <!--<field name="po_id" string="PO" attrs="{'readonly':[('state','!=','draft')]}"/>-->
-                                <field name="partner_id" string="供应商" domain="[('supplier','=',True)]" required="1"
-                                />
-                                <field name="bank_id" domain="[('partner_id', '=', partner_id)]" required="1"/>
-                                <field name="amount" string="金额" required="1"
-                                       attrs="{'readonly':[('state','!=','draft')]}"/>
-                                <field name="invoice_ids" domain="[('partner_id','=',partner_id),('state','=','open')]"/>
-                                <!--<field name="tax_id"-->
-                                       <!--domain="[('parent_id','=',False),('type_tax_use','&lt;&gt;','purchase')]"/>-->
-                                <field name="description" string="描述"/>
-                            </group>
+                            <field name="partner_id" string="供应商"
+                                   attrs="{'required': [('state', '=', 'posted')],'readonly': [('state', '=', 'done')]}"
+                                   domain="[('supplier', '=', True),('is_company', '=', True)]"/>
+                            <field name="amount" attrs="{'readonly':[('state','!=','draft')]}" required="1"/>
+                            <field name="receive_date" required="1" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                            <field name="bank_ids"
+                                   attrs="{'readonly':[('state','!=','draft')],'readonly': [('state', '=', 'done')]}"
+                                   context="{'default_partner_id':partner_id}"/>
+                            <field name="journal_id" string="收入账户" required="1"
+                                   attrs="{'readonly': [('state', '=', 'done')]}"/>
+                            <field name="remark" required="1" attrs="{'readonly': [('state', '=', 'done')]}"/>
                         </group>
+                        <notebook colspan="4">
+                            <page string="Invoices" autofocus="autofocus">
+                                <group>
+                                    <field name="invoice_ids"
+                                           domain="[('partner_id','=', partner_id),('state','=', 'open'),('remain_apply_balance','!=',0 )]"/>
+                                </group>
+
+                            </page>
+                        </notebook>
                     </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+
+
                 </form>
             </field>
         </record>
 
-        <record id="purchase_pre_payment_tree" model="ir.ui.view">
+        <record id="account_payment_register_tree" model="ir.ui.view">
             <field name="name">account.payment.register.tree</field>
             <field name="model">account.payment.register</field>
             <field name="arch" type="xml">
@@ -164,15 +131,11 @@
                     <field name="partner_id"/>
                     <field name="create_uid"/>
                     <field name="create_date"/>
-                    <field name="description"/>
+                    <field name="remark"/>
                     <field name="state"/>
                 </tree>
             </field>
         </record>
-
-
-
-
 
 
         <record id="action_payment_register" model="ir.actions.act_window">
@@ -183,6 +146,9 @@
             <field name="view_mode">tree,form</field>
             <field name="domain">[]</field>
             <field name="context">{}</field>
+            <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'tree', 'view_id': ref('account_payment_register_tree')}),
+            (0,0,{'view_mode':'form', 'view_id': ref('purchase_account_payment_register_form')})]"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
                     Click to add a contact in your address book.
@@ -192,14 +158,17 @@
                 </p>
             </field>
         </record>
-             <record id="action_payment_received_register" model="ir.actions.act_window">
+        <record id="action_payment_received_register" model="ir.actions.act_window">
             <field name="name">收款登记</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">account.receive.register</field>
+            <field name="res_model">account.payment.register</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="domain">[]</field>
             <field name="context">{}</field>
+            <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'tree', 'view_id': ref('account_payment_register_tree')}),
+            (0,0,{'view_mode':'form', 'view_id': ref('account_receive_register_form')})]"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
                     点击添加收款
@@ -209,21 +178,23 @@
                 </p>
             </field>
         </record>
-        <menuitem id="payment_register_apply" action="action_payment_register" parent="purchase.menu_purchase_control" sequence="5"/>
-        <menuitem id="payment_received_register" action="action_payment_received_register" parent="account.menu_finance_receivables" sequence="5"/>
+        <menuitem id="payment_register_apply" action="action_payment_register" parent="purchase.menu_purchase_control"
+                  sequence="5"/>
+        <menuitem id="payment_received_register" action="action_payment_received_register"
+                  parent="account.menu_finance_receivables" sequence="5"/>
 
-              <record id="view_account_payment_invoice_form" model="ir.ui.view">
-			<field name="name">account.payment.invoice.form</field>
+        <record id="view_account_payment_invoice_form" model="ir.ui.view">
+            <field name="name">account.payment.invoice.form</field>
             <field name="model">account.payment</field>
-			<field name="inherit_id" ref="account.view_account_payment_invoice_form"/>
-			<field name="arch" type="xml">
+            <field name="inherit_id" ref="account.view_account_payment_invoice_form"/>
+            <field name="arch" type="xml">
 
 
                 <xpath expr="//field[@name='amount']" position="replace">
                     <field name="amount" readonly="1"/>
                 </xpath>
-			</field>
-		</record>
+            </field>
+        </record>
     </data>
 </openerp>
 

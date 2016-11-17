@@ -8,61 +8,19 @@ MAP_INVOICE_TYPE_PARTNER_TYPE = {
 from odoo import models, fields, api, _
 
 
-class AccountPaymentRegister(models.Model):
-    _name = 'account.payment.register'
-    _order = 'create_date desc'
-    _rec_name = 'amount'
-    name = fields.Char()
-    partner_id = fields.Many2one('res.partner')
-    bank_id = fields.Many2one('res.partner.bank')
-    tax_id = fields.Many2one('account.tax', string='税种')
-    invoice_ids = fields.One2many('account.invoice', 'payment_id')
-    apply_balance = fields.Float()
-
-    state = fields.Selection([
-        ('draft', u'草稿'),
-        ('posted', u'提交'),
-        ('confirm', u'审核'),
-        ('register', u'登记付款'),
-        ('done', u'付款完成'),
-        ('cancel', u'取消')
-    ], default='draft')
-    description = fields.Text(string='备注')
-    amount = fields.Float(string='Amount')
-    used_amount = fields.Float(string='Used')
-    _sql_constraints = {
-        ('name_uniq', 'unique(name)',
-         'Name must be unique!')
-    }
-
-    @api.multi
-    def apply(self):
-        self.state = 'posted'
-
-    @api.multi
-    def confirm(self):
-        self.state = 'confirm'
-
-    @api.model
-    def create(self, vals):
-        if 'name' not in vals or vals['name'] == _('New'):
-            vals['name'] = self.env['ir.sequence'].next_by_code('account.payment.register') or _('New')
-        return super(AccountPaymentRegister, self).create(vals)
-
-
-class AccountReceiveRegisterBalance(models.Model):
-    _name = 'account.receive.register.balance'
+class AccountPaymentRegisterBalance(models.Model):
+    _name = 'account.payment.register.balance'
     amount = fields.Float()
-    register_id = fields.Many2one('account.receive.register')
+    payment_id = fields.Many2one('account.payment.register')
     invoice_id = fields.Many2one('account.invoice')
 
 
-class AccountReceiveRegister(models.Model):
-    _name = 'account.receive.register'
+class AccountPaymentRegister(models.Model):
+    _name = 'account.payment.register'
     _order = 'create_date desc'
     _inherit = ['mail.thread', 'ir.needaction_mixin']
     name = fields.Char()
-    balance_ids = fields.One2many('account.receive.register.balance', 'register_id')
+    balance_ids = fields.One2many('account.payment.register.balance', 'payment_id')
     amount = fields.Float(string='金额')
     balance = fields.Float()
     bank_ids = fields.One2many(related='partner_id.bank_ids', string='客户账号')
@@ -120,10 +78,10 @@ class AccountReceiveRegister(models.Model):
 
         if 'name' not in vals or vals['name'] == _('New'):
             vals['name'] = self.env['ir.sequence'].next_by_code('account.receive.register') or _('New')
-        payment = super(AccountReceiveRegister, self).create(vals)
+        payment = super(AccountPaymentRegister, self).create(vals)
         balance = payment.amount
         for invoice in payment.invoice_ids:
-            self.env['account.receive.register.balance'].create({
+            self.env['account.payment.register.balance'].create({
                 'register_id': payment.id,
                 'invoice_id': invoice.id,
                 'amount': invoice.remain_apply_balance if balance >= invoice.amount_total else balance
@@ -136,7 +94,7 @@ class AccountReceiveRegister(models.Model):
         print self.invoice_ids
         print vals.get('invoice_ids')
 
-        return super(AccountReceiveRegister, self).write(vals)
+        return super(AccountPaymentRegister, self).write(vals)
 
 
 class account_payment(models.Model):

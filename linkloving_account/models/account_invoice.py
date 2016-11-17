@@ -6,8 +6,7 @@ from odoo import models, fields, api
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
     invoice = fields.Char(string='Invoice No')
-    balance_ids = fields.One2many('account.receive.register.balance', 'invoice_id')
-    payment_id = fields.Many2one('account.payment.register')
+    balance_ids = fields.One2many('account.payment.register.balance', 'invoice_id')
     remain_apply_balance = fields.Monetary(string='Total in Invoice Currency', currency_field='currency_id',
                                            store=True, readonly=True, compute='_compute_amount',
                                            help="Total amount in the currency of the invoice, negative for credit notes.")
