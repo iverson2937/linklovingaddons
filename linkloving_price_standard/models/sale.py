@@ -159,7 +159,8 @@ class SaleOrderLine(models.Model):
             #FIXme:
             try:
                 _, _, tax_id = vals.get('tax_id')[0]
-                tax_id=tax_id[0]
+                if tax_id:
+                    tax_id=tax_id[0]
             except Exception:
                 _,tax_id=vals.get('tax_id')[1]
             tax_id = self.env['account.tax'].browse(tax_id)
