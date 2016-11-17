@@ -65,7 +65,7 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
 
         account_id = False
         if self.product_id.id:
-            account_id = self.product_id.property_account_income_id.id
+            account_id = self.product_id.property_account_expense_id.id
         if not account_id:
             inc_acc = ir_property_obj.get('property_account_income_categ_id', 'product.category')
             account_id = order.fiscal_position_id.map_account(inc_acc).id if inc_acc else False
@@ -77,7 +77,7 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
         if self.amount <= 0.00:
             raise UserError(_('The value of the down payment amount must be positive.'))
         if self.advance_payment_method == 'percentage':
-            amount = order.amount_untaxed * self.amount / 100
+            amount = order.amount_total * self.amount / 100
             name = _("Down payment of %s%%") % (self.amount,)
         else:
             amount = self.amount
@@ -88,13 +88,13 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
             tax_ids = self.product_id.taxes_id.ids
 
         invoice = inv_obj.create({
-            'name': order.client_order_ref or order.name,
+            'name': order.name,
             'origin': order.name,
-            'type': 'out_invoice',
+            'type': 'in_invoice',
             'reference': False,
-            'account_id': order.partner_id.property_account_receivable_id.id,
-            'partner_id': order.partner_invoice_id.id,
-            'partner_shipping_id': order.partner_shipping_id.id,
+            'account_id': order.partner_id.property_account_payable_id.id,
+            'partner_id': order.partner_id.id,
+            # 'partner_shipping_id': order.partner_shipping_id.id,
             'invoice_line_ids': [(0, 0, {
                 'name': name,
                 'origin': order.name,
@@ -104,20 +104,20 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
                 'discount': 0.0,
                 'uom_id': self.product_id.uom_id.id,
                 'product_id': self.product_id.id,
-                'sale_line_ids': [(6, 0, [so_line.id])],
+                'purchase_line_id': so_line.id,
                 'invoice_line_tax_ids': [(6, 0, tax_ids)],
-                'account_analytic_id': order.project_id.id or False,
+                # 'account_analytic_id': order.project_id.id or False,
             })],
-            'currency_id': order.pricelist_id.currency_id.id,
+            # 'currency_id': order.pricelist_id.currency_id.id,
             'payment_term_id': order.payment_term_id.id,
             'fiscal_position_id': order.fiscal_position_id.id or order.partner_id.property_account_position_id.id,
-            'team_id': order.team_id.id,
-            'comment': order.note,
+            # 'team_id': order.team_id.id,
+            # 'comment': order.note,
         })
-        invoice.compute_taxes()
-        invoice.message_post_with_view('mail.message_origin_link',
-                    values={'self': invoice, 'origin': order},
-                    subtype_id=self.env.ref('mail.mt_note').id)
+        # invoice.compute_taxes()
+        # invoice.message_post_with_view('mail.message_origin_link',
+        #             values={'self': invoice, 'origin': order},
+        #             subtype_id=self.env.ref('mail.mt_note').id)
         return invoice
 
     @api.multi
@@ -135,7 +135,7 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
                 self.product_id = self.env['product.product'].create(vals)
                 self.env['ir.values'].sudo().set_default('sale.config.settings', 'deposit_product_id_setting', self.product_id.id)
 
-            sale_line_obj = self.env['sale.order.line']
+            sale_line_obj = self.env['purchase.order.line']
             for order in purchase_orders:
                 if self.advance_payment_method == 'percentage':
                     amount = order.amount_untaxed * self.amount / 100
@@ -155,6 +155,8 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
                     'product_uom_qty': 0.0,
                     'order_id': order.id,
                     'discount': 0.0,
+                    'product_qty':0,
+                    'date_planed':fields.Datetime.now(),
                     'product_uom': self.product_id.uom_id.id,
                     'product_id': self.product_id.id,
                     'tax_id': [(6, 0, tax_ids)],
