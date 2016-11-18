@@ -17,7 +17,7 @@ class AccountPaymentRegisterBalance(models.Model):
         (1, '已付'),
     ], default=0)
     amount = fields.Float()
-    payment_id = fields.Many2one('account.payment.register',ondelete='cascade')
+    payment_id = fields.Many2one('account.payment.register', ondelete='cascade')
     invoice_id = fields.Many2one('account.invoice')
 
 
@@ -28,7 +28,7 @@ class AccountPaymentRegister(models.Model):
     name = fields.Char()
     balance_ids = fields.One2many('account.payment.register.balance', 'payment_id')
     amount = fields.Float(string='金额')
-    balance = fields.Float()
+
     bank_ids = fields.One2many(related='partner_id.bank_ids', string='客户账号')
     invoice_ids = fields.Many2many('account.invoice')
     receive_date = fields.Date(string='收款日期', default=fields.date.today())
@@ -56,8 +56,6 @@ class AccountPaymentRegister(models.Model):
          'Name mast be unique!')
     }
 
-
-
     @api.multi
     def reject(self):
 
@@ -66,32 +64,19 @@ class AccountPaymentRegister(models.Model):
         self.state = 'draft'
 
 
-    def _check_receive_amount(self):
-        """ check receive amount must less or equal the total invoice amount """
-        for register in self:
-            total_amount = 0.0
-            for invoice in register.invoice_ids:
-                total_amount += invoice.remain_apply_balance
-            if register.amount > total_amount:
-                return False
 
-        return True
 
-    _constraints = [
-        (_check_receive_amount, '对账单总金额小于收款金额', []),
-    ]
 
     @api.multi
     def post(self):
         balance = self.amount
         for invoice in self.invoice_ids:
-            a=self.env['account.payment.register.balance'].create({
+            balance_id = self.env['account.payment.register.balance'].create({
                 'payment_id': self.id,
                 'invoice_id': invoice.id,
                 'amount': invoice.remain_apply_balance if balance >= invoice.remain_apply_balance else balance
             })
-            print a.amount
-            balance -= a.amount
+            balance -= balance_id.amount
         self.state = 'posted'
 
     @api.multi
@@ -100,18 +85,25 @@ class AccountPaymentRegister(models.Model):
 
     @api.model
     def create(self, vals):
+        amount=vals.get('amount')
+
+        total_amount = 0.0
+        for invoice in vals.get('invoice_ids'):
+            total_amount += invoice.remain_apply_balance
+        if amount > total_amount:
+            raise UserError('对账单总额小于收入金额')
 
         if 'name' not in vals or vals['name'] == _('New'):
             vals['name'] = self.env['ir.sequence'].next_by_code('account.receive.register') or _('New')
         payment = super(AccountPaymentRegister, self).create(vals)
         return payment
 
-    # @api.multi
-    # def write(self, vals):
-    #     print self.invoice_ids
-    #     print vals.get('invoice_ids')
-    #
-    #     return super(AccountPaymentRegister, self).write(vals)
+        # @api.multi
+        # def write(self, vals):
+        #     print self.invoice_ids
+        #     print vals.get('invoice_ids')
+        #
+        #     return super(AccountPaymentRegister, self).write(vals)
 
 
 class account_payment(models.Model):
