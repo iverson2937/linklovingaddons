@@ -30,7 +30,7 @@ from odoo import fields, models,_
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    product_specs = fields.Char(string='product specification')
+    product_specs = fields.Text(string='product specification')
     default_code = fields.Char(related='product_variant_ids.default_code')
     area_id = fields.Many2one(related='product_variant_ids.area_id', string='Area')
 
@@ -38,7 +38,7 @@ class ProductTemplate(models.Model):
 class ProductProduct(models.Model):
     _inherit = 'product.product'
     area_id = fields.Many2one('stock.location.area', string='Area')
-    product_specs = fields.Char(string='产品规格', related='product_tmpl_id.product_specs')
+    product_specs = fields.Text(string='产品规格', related='product_tmpl_id.product_specs')
     _sql_constraints = [
         ('default_code_uniq', 'unique (default_code)', 'The default code must be unique!')
     ]
