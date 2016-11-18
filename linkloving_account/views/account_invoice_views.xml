@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="account_invoice_tree">
+            <field name="name">account.invoice.tree</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_tree"/>
+            <field name="arch" type="xml">
+                <!-- add state field in header -->
+                <xpath expr="//field[@name='amount_total_signed']" position="after">
+                    <field name="remain_apply_balance"/>
+                </xpath>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="invoice_supplier_tree">
+            <field name="name">account.invoice.tree</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_tree"/>
+            <field name="arch" type="xml">
+                <!-- add state field in header -->
+                <xpath expr="//field[@name='amount_total_signed']" position="after">
+                    <field name="remain_apply_balance"/>
+                </xpath>
+            </field>
+        </record>
+
+
+    </data>
+</openerp>

@@ -1,20 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-          <record id="action_sale_orders_invoice" model="ir.actions.act_window">
-            <field name="name">供应商对账</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">account.invoice</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-            <field name="domain">[]</field>
-            <field name="context">{
-                }
-            </field>
-        </record>
 
-   <menuitem action="action_sale_orders_invoice"
-            id="menu_sale_orders_invoice" parent="sale.menu_sale_invoicing"
+   <menuitem action="account.action_invoice_tree1"
+            id="menu_sale_order_invoice" parent="sale.menu_sale_invoicing"
             sequence="2"/>
     </data>
 </openerp>

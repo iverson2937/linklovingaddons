@@ -7,7 +7,7 @@ class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
     invoice = fields.Char(string='Invoice No')
     balance_ids = fields.One2many('account.payment.register.balance', 'invoice_id')
-    remain_apply_balance = fields.Monetary(string='Total in Invoice Currency', currency_field='currency_id',
+    remain_apply_balance = fields.Monetary(string='To Apply', currency_field='currency_id',
                                            store=True, readonly=True, compute='_compute_amount',
                                            help="Total amount in the currency of the invoice, negative for credit notes.")
 
@@ -32,7 +32,6 @@ class AccountInvoice(models.Model):
             amount = 0.0
             for balance_id in self.balance_ids:
                 amount += balance_id.amount
-            print 'eeeeeeeeeeee',amount
             self.remain_apply_balance =  self.remain_apply_balance-amount
 
     @api.multi
