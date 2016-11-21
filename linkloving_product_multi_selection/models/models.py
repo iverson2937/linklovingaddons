@@ -8,19 +8,6 @@ from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 class linkloving_product_multi_selection(models.Model):
     _name = 'll_pro_multi_sel.ll_pro_multi_sel'
 
-
-    @api.model
-    def create(self, vals):
-        return super(linkloving_product_multi_selection, self).create(vals)
-
-    @api.model
-    def _count(self):
-        return len(self._context.get('active_ids', []))
-
-    @api.model
-    def write(self, vals):
-        return super(linkloving_product_multi_selection, self).write(vals)
-
     def create_order_by_active_model(self):
         if self._context.get('active_model') == 'purchase.order':
             self.create_purchase_order()
@@ -127,15 +114,9 @@ class linkloving_product_multi_selection(models.Model):
                 pur_lines.append(po_line.id)
         return pur_lines
 
-
-
-    count = fields.Integer(computed=_count, string='# of Products')
-    product_ids = fields.Many2many('product.template', string='Products to make Order',
-                                 )
+    product_ids = fields.Many2many('product.template', string='Products to make Order',                                 )
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user.id)
 
-    orign_active_ids = fields.Char('Orign active ids',)
-    
     
 class SaleOrderDefaultGet(models.Model):
     _inherit = 'sale.order'
@@ -167,9 +148,6 @@ class SaleOrderDefaultGet(models.Model):
 
 class PurchaseOrderDefaultGet(models.Model):
     _inherit = 'purchase.order'
-
-
-
 
     def open_multi_product_select_window(self):
         order_lines = self.order_line
