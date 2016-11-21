@@ -23,6 +23,7 @@ class Partner(models.Model):
         (3, '3级')
     ], string='客户等级', default=1)
     internal_code = fields.Char(string='No')
+    x_qq = fields.Char(string='即时通信')
 
     _sql_constraints = [
         ('internal_code_uniq', 'unique (internal_code)', 'The No must be unique!')
