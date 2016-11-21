@@ -50,6 +50,9 @@
                  <xpath expr="//field[@name='category_id']" position="after">
                     <field name="source_id" string="渠道" attrs="{'invisible': [('customer','!=', True)]}"/>
                 </xpath>
+                 <xpath expr="//field[@name='category_id']" position="after">
+                    <field name="internal_code"/>
+                </xpath>
                  <xpath expr="//field[@name='lang']" position="after">
                     <field name="level" string="客户等级" attrs="{'invisible': [('customer','!=', True)]}"/>
                 </xpath>
