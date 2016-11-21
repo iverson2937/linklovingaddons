@@ -69,6 +69,11 @@ class AccountPaymentRegister(models.Model):
 
     @api.multi
     def post(self):
+
+        self.state = 'posted'
+
+    @api.multi
+    def confirm(self):
         balance = self.amount
         for invoice in self.invoice_ids:
             balance_id = self.env['account.payment.register.balance'].create({
@@ -77,21 +82,25 @@ class AccountPaymentRegister(models.Model):
                 'amount': invoice.remain_apply_balance if balance >= invoice.remain_apply_balance else balance
             })
             balance -= balance_id.amount
-        self.state = 'posted'
+        self.state = 'confirm'
 
     @api.multi
-    def confirm(self):
-        self.state = 'posted'
+    def done(self):
+        for balance in self.balance_ids:
+            if balance.state:
+                raise UserError('有付款等级没有完成，不可以关闭次付款')
+
+        self.state = 'done'
 
     @api.model
     def create(self, vals):
         amount=vals.get('amount')
 
-        total_amount = 0.0
-        for invoice in vals.get('invoice_ids'):
-            total_amount += invoice.remain_apply_balance
-        if amount > total_amount:
-            raise UserError('对账单总额小于收入金额')
+        # total_amount = 0.0
+        # for invoice in vals.get('invoice_ids'):
+        #     total_amount += invoice.remain_apply_balance
+        # if amount > total_amount:
+        #     raise UserError('对账单总额小于收入金额')
 
         if 'name' not in vals or vals['name'] == _('New'):
             vals['name'] = self.env['ir.sequence'].next_by_code('account.receive.register') or _('New')

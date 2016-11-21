@@ -5,5 +5,14 @@
    <menuitem action="account.action_invoice_tree1"
             id="menu_sale_order_invoice" parent="sale.menu_sale_invoicing"
             sequence="2"/>
+         <menuitem action="action_payment_received_register"
+            id="menu_sale_order_invoice" parent="sale.menu_sale_invoicing"
+            sequence="2"/>
+
+
+        <menuitem  id="menu_product_normal_action_puchased" action="action_payment_register"
+          parent="account.menu_finance_payables" sequence="110"/>
     </data>
+
+
 </openerp>

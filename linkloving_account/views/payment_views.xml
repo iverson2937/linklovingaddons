@@ -15,6 +15,8 @@
                                 states="posted"/>
                         <button name="confirm" string="确认" type="object"
                                 states="posted"/>
+                        <button name="done" string="完成" type="object"
+                                states="confirm"/>
 
 
                         <field name="state" widget="statusbar" statusbar_visible="draft,posted,confirm,done"/>
@@ -80,6 +82,9 @@
                                 states="posted"/>
                         <button name="confirm" string="确认" type="object"
                                 states="posted"/>
+                           <button name="done" string="完成" type="object"
+                                states="confirm"/>
+
 
                         <field name="state" widget="statusbar" statusbar_visible="draft,posted,confirm,done"/>
                     </header>
