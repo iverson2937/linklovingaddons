@@ -3,10 +3,16 @@
 
 import time
 
+from datetime import datetime
+
 from odoo import api, fields, models, _
 import odoo.addons.decimal_precision as dp
 from odoo.exceptions import UserError
-
+DEFAULT_SERVER_DATE_FORMAT = "%Y-%m-%d"
+DEFAULT_SERVER_TIME_FORMAT = "%H:%M:%S"
+DEFAULT_SERVER_DATETIME_FORMAT = "%s %s" % (
+    DEFAULT_SERVER_DATE_FORMAT,
+    DEFAULT_SERVER_TIME_FORMAT)
 
 class PurchaseAdvancePaymentInv(models.TransientModel):
     _name = "purchase.advance.payment.inv"
@@ -135,7 +141,7 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
                 self.product_id = self.env['product.product'].create(vals)
                 self.env['ir.values'].sudo().set_default('sale.config.settings', 'deposit_product_id_setting', self.product_id.id)
 
-            sale_line_obj = self.env['purchase.order.line']
+            purchase_line_obj = self.env['purchase.order.line']
             for order in purchase_orders:
                 if self.advance_payment_method == 'percentage':
                     amount = order.amount_untaxed * self.amount / 100
@@ -149,19 +155,20 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
                     tax_ids = order.fiscal_position_id.map_tax(self.product_id.taxes_id).ids
                 else:
                     tax_ids = self.product_id.taxes_id.ids
-                so_line = sale_line_obj.create({
+                print datetime.today().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+                po_line = purchase_line_obj.create({
                     'name': _('Advance: %s') % (time.strftime('%m %Y'),),
                     'price_unit': amount,
                     'product_uom_qty': 0.0,
                     'order_id': order.id,
                     'discount': 0.0,
                     'product_qty':0,
-                    'date_planed':fields.Datetime.now(),
+                    'date_planed':datetime.today().strftime(DEFAULT_SERVER_DATETIME_FORMAT),
                     'product_uom': self.product_id.uom_id.id,
                     'product_id': self.product_id.id,
                     'tax_id': [(6, 0, tax_ids)],
                 })
-                self._create_invoice(order, so_line, amount)
+                self._create_invoice(order, po_line, amount)
         if self._context.get('open_invoices', False):
             return purchase_orders.action_view_invoice()
         return {'type': 'ir.actions.act_window_close'}

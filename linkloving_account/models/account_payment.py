@@ -13,8 +13,8 @@ from odoo import models, fields, api, _
 class AccountPaymentRegisterBalance(models.Model):
     _name = 'account.payment.register.balance'
     state = fields.Selection([
-        (0, '未付'),
-        (1, '已付'),
+        (0,u'未付'),
+        (1, u'已付'),
     ], default=0)
     amount = fields.Float()
     payment_id = fields.Many2one('account.payment.register', ondelete='cascade')
@@ -27,19 +27,19 @@ class AccountPaymentRegister(models.Model):
     _inherit = ['mail.thread', 'ir.needaction_mixin']
     name = fields.Char()
     balance_ids = fields.One2many('account.payment.register.balance', 'payment_id')
-    amount = fields.Float(string='金额')
+    amount = fields.Float(string=u'金额')
 
-    bank_ids = fields.One2many(related='partner_id.bank_ids', string='客户账号')
+    bank_ids = fields.One2many(related='partner_id.bank_ids', string=u'客户账号')
     invoice_ids = fields.Many2many('account.invoice')
-    receive_date = fields.Date(string='收款日期', default=fields.date.today())
-    remark = fields.Text(string='备注')
-    partner_id = fields.Many2one('res.partner', string='客户')
+    receive_date = fields.Date(string=u'收款日期', default=fields.date.today())
+    remark = fields.Text(string=u'备注')
+    partner_id = fields.Many2one('res.partner', string=u'客户')
     is_customer = fields.Boolean(related='partner_id.customer', store=True)
     receive_id = fields.Many2one('res.users')
     journal_id = fields.Many2one('account.journal', 'Salary Journal')
     type = fields.Selection([
-        (0, '收款'),
-        (1, '付款')
+        (0, u'收款'),
+        (1, u'付款')
     ])
 
     state = fields.Selection([

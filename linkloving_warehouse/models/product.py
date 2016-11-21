@@ -38,7 +38,7 @@ class ProductTemplate(models.Model):
 class ProductProduct(models.Model):
     _inherit = 'product.product'
     area_id = fields.Many2one('stock.location.area', string='Area')
-    product_specs = fields.Text(string='产品规格', related='product_tmpl_id.product_specs')
+    product_specs = fields.Text(string=u'产品规格', related='product_tmpl_id.product_specs')
     _sql_constraints = [
         ('default_code_uniq', 'unique (default_code)', 'The default code must be unique!')
     ]

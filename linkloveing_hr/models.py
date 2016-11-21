@@ -6,8 +6,8 @@ from odoo import models, fields, api, _
 class HrExpense(models.Model):
     _inherit = 'hr.expense'
 
-    department_id = fields.Many2one('hr.department', string='部门')
-    expense_no = fields.Char(string='报销编号')
+    department_id = fields.Many2one('hr.department', string=u'部门')
+    expense_no = fields.Char(string=u'报销编号')
 
     @api.depends('employee_id')
     def onchange_employee_id(self):

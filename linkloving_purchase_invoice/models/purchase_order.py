@@ -117,7 +117,6 @@ class PurchaseOrder(models.Model):
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
-    date_planned = fields.Datetime(string='Scheduled Date', required=False, index=True)
 
     @api.multi
     def invoice_line_create(self, invoice_id, qty):
