@@ -17,60 +17,60 @@
         <!--</record>-->
         <record id="linkloving_purchase_order_form" model="ir.ui.view">
             <field name="name">purchase.order.form</field>
-			<field name="model">purchase.order</field>
-			<field name="inherit_id" ref="purchase.purchase_order_form"/>
-			<field name="arch" type="xml">
-                 <xpath expr="//field[@name='partner_id']" position="attributes">
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']" position="attributes">
                     <attribute name="domain">[('supplier','=',True),('is_company','=',True)]</attribute>
                 </xpath>
 
 
-                  <xpath expr="//field[@name='order_line']" position="after">
-                     <group>
-                         <field name="product_count" readonly="1" string="总数量"/>
-                     </group>
+                <xpath expr="//field[@name='order_line']" position="after">
+                    <group>
+                        <field name="product_count" readonly="1" string="总数量"/>
+                    </group>
                 </xpath>
-                    <xpath expr="//field[@name='partner_ref']" position="replace">
-                     <group>
-                         <field name="picking_type_id"/>
-                     </group>
+                <xpath expr="//field[@name='date_order']" position="after">
+                        <field name="picking_type_id"/>
                 </xpath>
-			</field>
+                  <xpath expr="//field[@name='partner_ref']" position="replace">
+                        <field name="tax_id" domain="[('type_tax_use','&lt;&gt;','purchase')]"/>
+                </xpath>
+            </field>
         </record>
 
 
-
         <!--<record id="action_invoice_supplier" model="ir.actions.act_window">-->
-            <!--<field name="name">对账单</field>-->
-            <!--<field name="res_model">account.invoice</field>-->
-            <!--<field name="view_type">form</field>-->
-            <!--<field name="view_mode">tree,form,calendar,pivot,graph</field>-->
-            <!--<field eval="False" name="view_id"/>-->
-            <!--<field name="domain">[('type','=','in_invoice')]</field>-->
-            <!--<field name="context">{'default_type':'in_invoice', 'type':'in_invoice', 'journal_type': 'purchase'}</field>-->
-            <!--<field name="search_view_id" ref="account.view_account_invoice_filter"/>-->
-            <!--<field name="help" type="html">-->
-                <!--<p class="oe_view_nocontent_create">-->
-                    <!--Click to create a draft invoice.-->
-                <!--</p>-->
-                <!--<p>-->
-                    <!--Use this menu to control the invoices to be received from your-->
-                    <!--vendor. When registering a new bill, set the purchase order-->
-                    <!--and Odoo will fill the bill automatically according to ordered-->
-                    <!--or received quantities.-->
-                <!--</p>-->
-            <!--</field>-->
+        <!--<field name="name">对账单</field>-->
+        <!--<field name="res_model">account.invoice</field>-->
+        <!--<field name="view_type">form</field>-->
+        <!--<field name="view_mode">tree,form,calendar,pivot,graph</field>-->
+        <!--<field eval="False" name="view_id"/>-->
+        <!--<field name="domain">[('type','=','in_invoice')]</field>-->
+        <!--<field name="context">{'default_type':'in_invoice', 'type':'in_invoice', 'journal_type': 'purchase'}</field>-->
+        <!--<field name="search_view_id" ref="account.view_account_invoice_filter"/>-->
+        <!--<field name="help" type="html">-->
+        <!--<p class="oe_view_nocontent_create">-->
+        <!--Click to create a draft invoice.-->
+        <!--</p>-->
+        <!--<p>-->
+        <!--Use this menu to control the invoices to be received from your-->
+        <!--vendor. When registering a new bill, set the purchase order-->
+        <!--and Odoo will fill the bill automatically according to ordered-->
+        <!--or received quantities.-->
+        <!--</p>-->
+        <!--</field>-->
         <!--</record>-->
 
 
         <!--<menuitem-->
-                <!--id="purchase.menu_procurement_management_pending_invoice"-->
-                <!--action="action_invoice_supplier"-->
-                <!--name="对账单"-->
-                <!--parent="purchase.menu_procurement_management_invoice"-->
-                <!--sequence="13"/>-->
+        <!--id="purchase.menu_procurement_management_pending_invoice"-->
+        <!--action="action_invoice_supplier"-->
+        <!--name="对账单"-->
+        <!--parent="purchase.menu_procurement_management_invoice"-->
+        <!--sequence="13"/>-->
         <!--<menuitem id="purchase.menu_procurement_management_invoice" name="对账管理"-->
-                  <!--parent="base.menu_purchase_root" sequence="6"/>-->
+        <!--parent="base.menu_purchase_root" sequence="6"/>-->
 
 
     </data>
