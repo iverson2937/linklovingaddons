@@ -24,6 +24,7 @@
 
     # always loaded
     'data': [
+        'report/purchase_order_report.xml',
         'security/ir.model.access.csv',
         'views/supplier_view.xml',
         'views/purchase_view.xml',

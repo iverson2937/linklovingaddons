@@ -37,6 +37,9 @@ class PurchaseOrder(models.Model):
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
+
+    product_specs = fields.Text(string=u'产品规格', related='product_id.product_specs')
+
     # 重写默认税的选择
     @api.onchange('product_id')
     def onchange_product_id(self):
