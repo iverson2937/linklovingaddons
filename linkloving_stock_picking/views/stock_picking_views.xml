@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_stock_picking_form" model="ir.ui.view">
+            <field name="name">stock.picking.form</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='do_new_transfer']" position="before">
+                    <button name="action_post" string="提交" type="object" class="oe_highlight" states="post"
+                            groups="stock.group_stock_user"/>
+                </xpath>
+                <xpath expr="//button[@name='do_new_transfer']" position="replace">
+                    <button name="do_new_transfer" states="draft,partially_available,assigned" string="Validate"
+                            groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
+                    <button name="reject" states="draft,partially_available,assigned" string="退回"
+                            groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
+                </xpath>
+                <xpath expr="//button[@name='do_new_transfer']" position="after">
+                    <button name="action_check_pass" states="qc_check" string="品检完成" groups="stock.group_stock_user"
+                            type="object" class="oe_highlight"/>
+                    <button name="action_check_fail" states="qc_check" string="品检失败" groups="stock.group_stock_user"
+                            type="object"/>
+
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>

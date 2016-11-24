@@ -11,7 +11,7 @@ class StockPicking(models.Model):
         ('waiting', 'Waiting Another Operation'),
         ('confirmed', 'Waiting Availability'),
         ('partially_available', 'Partially Available'),
-        ('post',u'提交'),
+        ('post',u'入库'),
         ('qc_check', u'品检'),
         ('assigned', 'Available'), ('done', 'Done')], string='Status', compute='_compute_state',
         copy=False, index=True, readonly=True, store=True, track_visibility='onchange',
@@ -37,7 +37,7 @@ class StockPicking(models.Model):
           - otherwise in waiting or confirmed state
         '''
         if not self.move_lines and self.launch_pack_operations:
-            self.state = 'post'
+            self.state = 'draft'
         elif not self.move_lines:
             self.state = 'draft'
         elif any(move.state == 'draft' for move in self.move_lines):  # TDE FIXME: should be all ?
@@ -60,8 +60,9 @@ class StockPicking(models.Model):
             elif any(move.partially_available for move in filtered_moves):
                 self.state = 'partially_available'
             else:
-                ordered_moves = filtered_moves.sorted(key=lambda move: (move.state == 'assigned' and 2) or (move.state == 'waiting' and 1) or 0, reverse=True)
-                self.state = ordered_moves[0].state
+                self.state='post'
+                # ordered_moves = filtered_moves.sorted(key=lambda move: (move.state == 'assigned' and 2) or (move.state == 'waiting' and 1) or 0, reverse=True)
+                # self.state = ordered_moves[0].state
         print self.state
 
     @api.multi
@@ -69,5 +70,14 @@ class StockPicking(models.Model):
         self.state='qc_check'
 
     @api.multi
-    def action_check(self):
+    def action_check_pass(self):
         self.state='assigned'
+
+    @api.multi
+    def action_check_fail(self):
+        self.state='post'
+
+    @api.multi
+    def reject(self):
+        self.state = 'post'
+
