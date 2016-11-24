@@ -19,3 +19,8 @@ class SaleOrder(models.Model):
             count += line.product_uom_qty
         self.product_count = count
 
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    product_specs = fields.Text(string=u'产品规格', related='product_id.product_specs')
+
