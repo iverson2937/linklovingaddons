@@ -22,15 +22,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-
-
+from odoo import api
 from odoo import fields, models,_
 
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    product_specs = fields.Text(string='product specification')
+    product_specs = fields.Text(string=u'产品规格')
     default_code = fields.Char(related='product_variant_ids.default_code')
     area_id = fields.Many2one(related='product_variant_ids.area_id', string='Area')
 
