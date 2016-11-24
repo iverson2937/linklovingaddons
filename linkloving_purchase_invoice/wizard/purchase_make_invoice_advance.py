@@ -144,7 +144,7 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
             purchase_line_obj = self.env['purchase.order.line']
             for order in purchase_orders:
                 if self.advance_payment_method == 'percentage':
-                    amount = order.amount_untaxed * self.amount / 100
+                    amount = order.amount_total * self.amount / 100
                 else:
                     amount = self.amount
                 if self.product_id.invoice_policy != 'order':
@@ -155,7 +155,6 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
                     tax_ids = order.fiscal_position_id.map_tax(self.product_id.taxes_id).ids
                 else:
                     tax_ids = self.product_id.taxes_id.ids
-                print datetime.today().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
                 po_line = purchase_line_obj.create({
                     'name': _('Advance: %s') % (time.strftime('%m %Y'),),
                     'price_unit': amount,
@@ -163,7 +162,7 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
                     'order_id': order.id,
                     'discount': 0.0,
                     'product_qty':0,
-                    'date_planed':datetime.today().strftime(DEFAULT_SERVER_DATETIME_FORMAT),
+                    'date_planned':datetime.today().strftime(DEFAULT_SERVER_DATETIME_FORMAT),
                     'product_uom': self.product_id.uom_id.id,
                     'product_id': self.product_id.id,
                     'tax_id': [(6, 0, tax_ids)],

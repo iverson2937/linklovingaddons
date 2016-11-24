@@ -10,6 +10,7 @@ class PurchaseOrder(models.Model):
 
     partner_invoice_id = fields.Many2one('res.partner')
 
+
     @api.multi
     def action_invoice_create(self, grouped=False, final=False):
         """
@@ -92,13 +93,13 @@ class PurchaseOrder(models.Model):
         journal_id = self.env['account.invoice'].default_get(['journal_id'])['journal_id']
         if not journal_id:
             raise UserError(_('Please define an accounting sale journal for this company.'))
-        print self.payment_term_id.id,'self.payment_term_id.id'
+        print self.payment_term_id.id, 'self.payment_term_id.id'
         invoice_vals = {
             'name': self.name,
             'origin': self.name,
             'type': 'in_invoice',
             # need to checkout
-            'account_id':self.partner_id.property_account_payable_id.id,
+            'account_id': self.partner_id.property_account_payable_id.id,
             'partner_id': self.partner_id.id,
             # 'partner_shipping_id': self.partner_shipping_id.id,
             'journal_id': journal_id,
@@ -111,8 +112,6 @@ class PurchaseOrder(models.Model):
             # 'team_id': self.team_id.id
         }
         return invoice_vals
-
-
 
 
 class PurchaseOrderLine(models.Model):
@@ -131,7 +130,7 @@ class PurchaseOrderLine(models.Model):
         for line in self:
             if not float_is_zero(qty, precision_digits=precision):
                 vals = line._prepare_invoice_line(qty=qty)
-                vals.update({'invoice_id': invoice_id, 'purchase_line_id':line.id,'price_unit':self.price_unit})
+                vals.update({'invoice_id': invoice_id, 'purchase_line_id': line.id, 'price_unit': self.price_unit})
                 self.env['account.invoice.line'].create(vals)
 
     @api.multi
@@ -145,7 +144,8 @@ class PurchaseOrderLine(models.Model):
         res = {}
         account = self.product_id.property_account_income_id or self.product_id.categ_id.property_account_income_categ_id
         if not account:
-            raise UserError(_('Please define income account for this product: "%s" (id:%d) - or for its category: "%s".') %
+            raise UserError(
+                _('Please define income account for this product: "%s" (id:%d) - or for its category: "%s".') %
                 (self.product_id.name, self.product_id.id, self.product_id.categ_id.name))
 
         fpos = self.order_id.fiscal_position_id or self.order_id.partner_id.property_account_position_id
