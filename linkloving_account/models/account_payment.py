@@ -13,7 +13,7 @@ from odoo import models, fields, api, _
 class AccountPaymentRegisterBalance(models.Model):
     _name = 'account.payment.register.balance'
     state = fields.Selection([
-        (0,u'未付'),
+        (0, u'未付'),
         (1, u'已付'),
     ], default=0)
     amount = fields.Float()
@@ -37,7 +37,7 @@ class AccountPaymentRegister(models.Model):
     is_customer = fields.Boolean(related='partner_id.customer', store=True)
     receive_id = fields.Many2one('res.users')
     journal_id = fields.Many2one('account.journal', 'Salary Journal')
-    type = fields.Selection([
+    payment_type = fields.Selection([
         (0, u'收款'),
         (1, u'付款')
     ])
@@ -62,10 +62,6 @@ class AccountPaymentRegister(models.Model):
         for balance_id in self.balance_ids:
             balance_id.unlink()
         self.state = 'draft'
-
-
-
-
 
     @api.multi
     def post(self):
@@ -94,7 +90,8 @@ class AccountPaymentRegister(models.Model):
 
     @api.model
     def create(self, vals):
-        amount=vals.get('amount')
+        amount = vals.get('amount')
+        payment_type = vals.get('type')
 
         # total_amount = 0.0
         # for invoice in vals.get('invoice_ids'):
@@ -103,16 +100,11 @@ class AccountPaymentRegister(models.Model):
         #     raise UserError('对账单总额小于收入金额')
 
         if 'name' not in vals or vals['name'] == _('New'):
-            vals['name'] = self.env['ir.sequence'].next_by_code('account.receive.register') or _('New')
-        payment = super(AccountPaymentRegister, self).create(vals)
-        return payment
-
-        # @api.multi
-        # def write(self, vals):
-        #     print self.invoice_ids
-        #     print vals.get('invoice_ids')
-        #
-        #     return super(AccountPaymentRegister, self).write(vals)
+            if not payment_type:
+                vals['name'] = self.env['ir.sequence'].next_by_code('account.receive') or _('New')
+            else:
+                vals['name'] = self.env['ir.sequence'].next_by_code('account.pay') or _('New')
+        return super(AccountPaymentRegister, self).create(vals)
 
 
 class account_payment(models.Model):

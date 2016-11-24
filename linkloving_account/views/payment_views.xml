@@ -149,8 +149,8 @@
             <field name="res_model">account.payment.register</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[]</field>
-            <field name="context">{}</field>
+            <field name="domain">[('payment_type','=',1)]</field>
+            <field name="context">{'default_payment_type':1}</field>
             <field name="view_ids" eval="[(5,0,0),
             (0,0,{'view_mode':'tree', 'view_id': ref('account_payment_register_tree')}),
             (0,0,{'view_mode':'form', 'view_id': ref('purchase_account_payment_register_form')})]"/>
@@ -169,8 +169,8 @@
             <field name="res_model">account.payment.register</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[]</field>
-            <field name="context">{}</field>
+            <field name="domain">[('payment_type','=',0)]</field>
+            <field name="context">{'default_payment_type':0}</field>
             <field name="view_ids" eval="[(5,0,0),
             (0,0,{'view_mode':'tree', 'view_id': ref('account_payment_register_tree')}),
             (0,0,{'view_mode':'form', 'view_id': ref('account_receive_register_form')})]"/>
