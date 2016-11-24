@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from . import partner, qualifications_level, purchase_order
+from . import res_company,partner, qualifications_level, purchase_order,purchase_config_settings

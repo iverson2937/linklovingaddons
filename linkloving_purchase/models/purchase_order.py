@@ -16,6 +16,10 @@ class PurchaseOrder(models.Model):
 
     product_count = fields.Float(compute='get_product_count')
     tax_id = fields.Many2one('account.tax', string='Tax')
+    @api.model
+    def _default_notes(self):
+        return self.env.user.company_id.purchase_note
+    notes = fields.Text('Terms and conditions', default=_default_notes)
 
     @api.onchange('tax_id')
     def onchange_tax_id(self):
@@ -29,9 +33,7 @@ class PurchaseOrder(models.Model):
         self.product_count = count
 
 
-class StockPicking(models.Model):
-    _inherit = 'stock.picking'
-    po_id = fields.Many2one('purchase.order')
+
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
@@ -59,7 +61,6 @@ class PurchaseOrderLine(models.Model):
         fpos = self.order_id.fiscal_position_id
 
         self.taxes_id =self.order_id.tax_id
-        print self.taxes_id,'eeeeeeeeeeeeeee'
 
 
 
