@@ -6,6 +6,7 @@ from odoo import models, fields, api, _, SUPERUSER_ID
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
     po_id = fields.Many2one('purchase.order')
+    so_id=fields.Many2one('sale.order')
     state = fields.Selection([
         ('draft', 'Draft'), ('cancel', 'Cancelled'),
         ('waiting', 'Waiting Another Operation'),
@@ -60,9 +61,11 @@ class StockPicking(models.Model):
             elif any(move.partially_available for move in filtered_moves):
                 self.state = 'partially_available'
             else:
-                self.state='post'
-                # ordered_moves = filtered_moves.sorted(key=lambda move: (move.state == 'assigned' and 2) or (move.state == 'waiting' and 1) or 0, reverse=True)
-                # self.state = ordered_moves[0].state
+                if self.picking_type_code=='incoming':
+                    self.state='post'
+                else:
+                    ordered_moves = filtered_moves.sorted(key=lambda move: (move.state == 'assigned' and 2) or (move.state == 'waiting' and 1) or 0, reverse=True)
+                    self.state = ordered_moves[0].state
         print self.state
 
     @api.multi
