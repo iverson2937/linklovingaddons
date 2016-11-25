@@ -7,7 +7,7 @@ class HrExpense(models.Model):
     _inherit = 'hr.expense'
 
     department_id = fields.Many2one('hr.department', string=u'部门')
-    expense_no = fields.Char(string=u'报销编号')
+
 
     @api.depends('employee_id')
     def onchange_employee_id(self):
@@ -20,8 +20,13 @@ class HrExpense(models.Model):
             values['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense') or '/'
         return super(HrExpense, self).create(values)
 
+class HrExpenseSheet(models.Model):
+    _inherit = 'hr.expense.sheet'
+    expense_no = fields.Char(string=u'报销编号')
+
     @api.model
     def create(self, vals):
         if vals.get('expense_no', 'New') == 'New':
-            vals['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense') or '/'
-        return super(HrExpense, self).create(vals)
+            vals['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense.sheet') or '/'
+            print vals['expense_no']
+        return super(HrExpenseSheet, self).create(vals)
