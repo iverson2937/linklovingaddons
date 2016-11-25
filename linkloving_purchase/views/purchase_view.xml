@@ -39,7 +39,7 @@
                     <field name="product_specs"/>
                 </xpath>
 
-                <xpath expr="//field[@name='order_line']" position="after">
+                <xpath expr="//field[@name='partner_ref']" position="before">
                     <group>
                         <field name="product_count" readonly="1" string="总数量"/>
                     </group>

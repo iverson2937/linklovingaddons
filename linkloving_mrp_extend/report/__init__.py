@@ -1,0 +1,1 @@
+import mrp_bom_structure_report
