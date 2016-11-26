@@ -15,7 +15,7 @@
 
                 <xpath expr="//button[@name='do_new_transfer']" position="replace">
                     <button name="do_new_transfer" string="调拨"
-                            groups="purchase.group_purchase_user" type="object" class="oe_highlight"
+                            groups="purchase.group_stock_user" type="object" class="oe_highlight"
                             attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
                     />
                     <button name="do_new_transfer" string="调拨"
