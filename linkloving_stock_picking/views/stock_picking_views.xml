@@ -8,13 +8,21 @@
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='do_new_transfer']" position="before">
                     <button name="action_post" string="提交" type="object" class="oe_highlight"
-                            states="draft,partially_available,assigned"
+                            attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['draft','partially_available','assigned'])]}"
                             groups="stock.group_stock_user"/>
                 </xpath>
+
+
                 <xpath expr="//button[@name='do_new_transfer']" position="replace">
-                    <button name="do_new_transfer" states="validate" string="Validate"
+                    <button name="do_new_transfer" string="调拨"
+                            groups="purchase.group_purchase_user" type="object" class="oe_highlight"
+                            attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
+                    />
+                    <button name="do_new_transfer" string="调拨"
+                            attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['draft','partially_available','assigned'])]}"
                             groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
-                    <button name="reject" states="validate" string="退回"
+                    <button name="reject" string="退回"
+                            attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
                             groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
                 </xpath>
                 <xpath expr="//button[@name='do_new_transfer']" position="after">
@@ -24,6 +32,7 @@
                             type="object"/>
 
                 </xpath>
+
             </field>
         </record>
 
