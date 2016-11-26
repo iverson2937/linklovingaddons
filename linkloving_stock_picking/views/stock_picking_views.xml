@@ -7,13 +7,14 @@
             <field name="inherit_id" ref="stock.view_picking_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='do_new_transfer']" position="before">
-                    <button name="action_post" string="提交" type="object" class="oe_highlight" states="post"
+                    <button name="action_post" string="提交" type="object" class="oe_highlight"
+                            states="draft,partially_available,assigned"
                             groups="stock.group_stock_user"/>
                 </xpath>
                 <xpath expr="//button[@name='do_new_transfer']" position="replace">
-                    <button name="do_new_transfer" states="draft,partially_available,assigned" string="Validate"
+                    <button name="do_new_transfer" states="validate" string="Validate"
                             groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
-                    <button name="reject" states="draft,partially_available,assigned" string="退回"
+                    <button name="reject" states="validate" string="退回"
                             groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
                 </xpath>
                 <xpath expr="//button[@name='do_new_transfer']" position="after">
