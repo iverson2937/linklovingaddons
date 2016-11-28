@@ -1,14 +1,23 @@
 <openerp>
-  <data>
-       <record id="linkloving_mrp_bom_tree_view" model="ir.ui.view">
+    <data>
+        <record id="linkloving_mrp_bom_tree_view" model="ir.ui.view">
             <field name="name">mrp.bom.tree.inherit</field>
             <field name="model">mrp.bom</field>
             <field name="inherit_id" ref="mrp.mrp_bom_tree_view"/>
             <field name="arch" type="xml">
-              <xpath expr="//tree/field[@name='product_tmpl_id']" position="after">
-                <field name="product_specs"/>
-              </xpath>
+                <xpath expr="//tree/field[@name='product_tmpl_id']" position="after">
+                    <field name="product_specs"/>
+                </xpath>
             </field>
         </record>
-  </data>
+        <record id="linkloving_mrp_production_form_view" model="ir.ui.view">
+            <field name="name">mrp.bom.tree.inherit</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header/button[@name='open_produce_product'][2]" position="replace">
+                </xpath>
+            </field>
+        </record>
+    </data>
 </openerp>
