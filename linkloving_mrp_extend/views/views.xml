@@ -11,7 +11,7 @@
             </field>
         </record>
         <record id="linkloving_mrp_production_form_view" model="ir.ui.view">
-            <field name="name">mrp.bom.tree.inherit</field>
+            <field name="name">mrp.production.tree.inherit</field>
             <field name="model">mrp.production</field>
             <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
             <field name="arch" type="xml">
@@ -19,5 +19,15 @@
                 </xpath>
             </field>
         </record>
+        <record id="product_product_action" model="ir.actions.act_window">
+            <field name="name">ProductProduct</field>
+            <field name="res_model">product.product</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="context">{}</field>
+        </record>
+
+        <menuitem action="product_product_action" id="menu_stock_product_product_menu" parent="mrp.menu_mrp_bom"
+                  sequence="10"/>
     </data>
 </openerp>
