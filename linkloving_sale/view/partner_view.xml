@@ -45,7 +45,7 @@
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='category_id']" position="before">
-                    <field name="team_id" attrs="{'invisible': [('customer','!=', True)]}"/>
+                    <field name="team_id" attrs="{}"/>
                 </xpath>
                  <xpath expr="//field[@name='category_id']" position="after">
                     <field name="source_id" string="渠道" attrs="{'invisible': [('customer','!=', True)]}"/>
