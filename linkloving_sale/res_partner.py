@@ -15,7 +15,10 @@ class Partner(models.Model):
     def _get_default_team(self):
         return self.env['crm.team']._get_default_team_id()
 
-    team_id = fields.Many2one('crm.team', default=_get_default_team)
+    customer = fields.Boolean(string='Is a Customer', default=False,
+                              help="Check this box if this contact is a customer.")
+
+    team_id = fields.Many2one('crm.team')
     source_id = fields.Many2one('res.partner.source')
     level = fields.Selection([
         (1, u'1级'),
