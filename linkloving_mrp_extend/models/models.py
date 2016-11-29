@@ -7,6 +7,11 @@ class MrpBomExtend(models.Model):
 
     product_specs = fields.Text(string=u'产品规格', related='product_tmpl_id.product_specs')
 
+class StockMoveExtend(models.Model):
+    _inherit = 'stock.move'
+
+    qty_available = fields.Float(string='在手数量', related='product_id.qty_available')
+    virtual_available = fields.Float(string='预测数量', related='product_id.virtual_available')
 # class linkloving_mrp_extend(models.Model):
 #     _name = 'linkloving_mrp_extend.linkloving_mrp_extend'
 
