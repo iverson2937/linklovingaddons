@@ -30,6 +30,17 @@ class PurchaseOrder(models.Model):
             if min_date:
                 order.date_planned = min_date
 
+    @api.multi
+    def button_confirm(self):
+        is_exception_order = self.partner_id == self.env.ref('linkloving_mrp_supplier_slover.res_partner_exception_supplier')
+        if is_exception_order:
+            raise UserError(_("此为未设置供应商的产品列表，不可做此操作，请将下列产品设置供应商后，点击'检查供应商'按钮！"))
+            return
+        return super(PurchaseOrder, self).button_confirm()
+
+    def is_exception_order(self):
+        is_exception_order = self.partner_id == self.env.ref('linkloving_mrp_supplier_slover.res_partner_exception_supplier')
+        return is_exception_order
     @api.one
     def check_product_has_supplier(self):
         is_exception_order = self.partner_id == self.env.ref('linkloving_mrp_supplier_slover.res_partner_exception_supplier')

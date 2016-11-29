@@ -8,7 +8,7 @@
             <field name="model">res.company</field>
             <field name="inherit_id" ref="base.view_company_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//group[@name='account_grp']" position="after">
+                <xpath expr="//field[@name='website']" position="after">
                     <group name="official_seal" string="Official Seal">
                         <field name="official_seal" widget="image"/>
                     </group>

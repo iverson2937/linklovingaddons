@@ -25,7 +25,7 @@
                            domain="[('type_tax_use','&lt;&gt;','purchase')]" string="税金"
                            attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                 </xpath>
-                <xpath expr="//group[@name='sale_total']" position="before">
+                <xpath expr="//field[@name='note']" position="before">
                     <group>
                         <field name="product_count" readonly="1" string="总数量"/>
                     </group>

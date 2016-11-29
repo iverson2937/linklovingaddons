@@ -74,6 +74,7 @@
                         <thead>
                             <tr>
                                 <th><strong>Product</strong></th>
+                                <th><strong>生产规格</strong></th>
                                 <th class="text-right"><strong>Quantity</strong></th>
                                 <th class="text-center" groups="stock.group_stock_multi_locations">
                                     <strong>领料数量</strong>
@@ -95,6 +96,9 @@
                                     <td>
                                         <span t-field="line.product_id.code"/>
                                         <span t-field="line.product_id.name"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="line.product_id.product_specs"/>
                                     </td>
                                     <td class="text-right">
                                         <span t-field="line.product_uom_qty"/>

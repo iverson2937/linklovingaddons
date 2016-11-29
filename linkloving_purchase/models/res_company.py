@@ -13,3 +13,4 @@ class PurchaseOrder(models.Model):
     """
     _inherit = 'res.company'
     purchase_note = fields.Text(string='Default Terms and Conditions', translate=True)
+    official_seal = fields.Binary(string=u'公司公章')
