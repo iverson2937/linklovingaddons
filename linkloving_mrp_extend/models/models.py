@@ -7,6 +7,11 @@ class MrpBomExtend(models.Model):
 
     product_specs = fields.Text(string=u'产品规格', related='product_tmpl_id.product_specs')
 
+class MrpBomLineExtend(models.Model):
+    _inherit = 'mrp.bom.line'
+
+    product_specs = fields.Text(string=u'产品规格', related='product_id.product_specs')
+
 class StockMoveExtend(models.Model):
     _inherit = 'stock.move'
 
