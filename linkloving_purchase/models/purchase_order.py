@@ -4,7 +4,6 @@ from datetime import datetime
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo import models, fields, api, _, SUPERUSER_ID
 
-
 _logger = logging.getLogger(__name__)
 
 
@@ -16,9 +15,12 @@ class PurchaseOrder(models.Model):
 
     product_count = fields.Float(compute='get_product_count')
     tax_id = fields.Many2one('account.tax', string='Tax')
+    remark = fields.Text(string='Remark')
+
     @api.model
     def _default_notes(self):
         return self.env.user.company_id.purchase_note
+
     notes = fields.Text('Terms and conditions', default=_default_notes)
 
     @api.onchange('tax_id')
@@ -31,8 +33,6 @@ class PurchaseOrder(models.Model):
         for line in self.order_line:
             count += line.product_qty
         self.product_count = count
-
-
 
 
 class PurchaseOrderLine(models.Model):
@@ -63,9 +63,7 @@ class PurchaseOrderLine(models.Model):
 
         fpos = self.order_id.fiscal_position_id
 
-        self.taxes_id =self.order_id.tax_id
-
-
+        self.taxes_id = self.order_id.tax_id
 
         self._suggest_quantity()
         self._onchange_quantity()
