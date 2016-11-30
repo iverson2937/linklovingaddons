@@ -32,14 +32,18 @@ class ProductTemplate(models.Model):
     product_specs = fields.Text(string=u'产品规格')
     default_code = fields.Char(related='product_variant_ids.default_code')
     area_id = fields.Many2one(related='product_variant_ids.area_id', string='Area')
-
+    _sql_constraints = [
+        ('default_code_uniq1', 'unique (default_code)', '内部参考号已存在!'),
+        ('name_uniq', 'unique (name)', '产品名称已存在!')
+    ]
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
     area_id = fields.Many2one('stock.location.area', string='Area')
     product_specs = fields.Text(string=u'产品规格', related='product_tmpl_id.product_specs')
     _sql_constraints = [
-        ('default_code_uniq', 'unique (default_code)', 'The default code must be unique!')
+        ('default_code_uniq', 'unique (default_code)', '内部参考号已存在!'),
+        ('name_uniq', 'unique (name)', '产品名称已存在!')
     ]
 
 
