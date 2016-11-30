@@ -44,14 +44,18 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='mobile']" position="replace">
+                    <field name="mobile" required="1"/>
+                </xpath>
                 <xpath expr="//field[@name='category_id']" position="before">
-                    <field name="team_id" attrs="{}"/>
+                    <field name="team_id" attrs="{'invisible': [('supplier','=', True)]}"/>
                 </xpath>
                  <xpath expr="//field[@name='category_id']" position="after">
                     <field name="source_id" string="渠道" attrs="{'invisible': [('customer','!=', True)]}"/>
                 </xpath>
                  <xpath expr="//field[@name='category_id']" position="after">
-                    <field name="internal_code"/>
+                    <field name="internal_code" required="1"/>
                 </xpath>
                  <xpath expr="//field[@name='category_id']" position="after">
                     <field name="x_qq"/>
