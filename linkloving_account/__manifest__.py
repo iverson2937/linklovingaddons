@@ -27,7 +27,8 @@
         'security/ir.model.access.csv',
         'views/payment_views.xml',
         'views/account_invoice_views.xml',
-        'views/sale_views.xml'
+        'views/sale_views.xml',
+        'views/partner_views.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
