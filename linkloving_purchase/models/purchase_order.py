@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
 from datetime import datetime
+
+from odoo.exceptions import UserError
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo import models, fields, api, _, SUPERUSER_ID
 
@@ -69,3 +71,13 @@ class PurchaseOrderLine(models.Model):
         self._onchange_quantity()
 
         return result
+
+    @api.multi
+    def unlink(self):
+        for line in self:
+            if line.order_id.state in ['done']:
+                raise UserError(_('Cannot delete a purchase order line which is in state \'%s\'.') %(line.state,))
+            for proc in line.procurement_ids:
+                proc.message_post(body=_('Purchase order line deleted.'))
+            line.procurement_ids.filtered(lambda r: r.state != 'cancel').write({'state': 'exception'})
+        return super(PurchaseOrderLine, self).unlink()
