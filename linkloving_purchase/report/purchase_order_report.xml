@@ -122,6 +122,11 @@
     		<h5  t-field="o.partner_id.bank_ids[0].acc_number"/>
 
     		<h5  t-field="o.partner_id.bank_ids[0].bank_name"/>
+
+
+    	</div><div t-if="o.payment_term_id">
+    		<strong>付款方式</strong>
+    		<h5  t-field="o.payment_term_id"/>
     	</div>
 
             <div class="oe_structure" style="max-width:100;min-width:100;"/>
