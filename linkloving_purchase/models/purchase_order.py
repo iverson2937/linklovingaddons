@@ -71,15 +71,3 @@ class PurchaseOrderLine(models.Model):
         self._onchange_quantity()
 
         return result
-
-    @api.multi
-    def unlink(self):
-        for line in self:
-            print 'dddddddddddddddd'
-            if line.order_id.state in ['done']:
-                print 'dddddddddddddd'
-                raise UserError(_('Cannot delete a purchase order line which is in state \'%s\'.') %(line.state,))
-            for proc in line.procurement_ids:
-                proc.message_post(body=_('Purchase order line deleted.'))
-            line.procurement_ids.filtered(lambda r: r.state != 'cancel').write({'state': 'exception'})
-        return super(models.Model, self).unlink()
