@@ -17,7 +17,7 @@ class HrExpense(models.Model):
     def create(self, values):
         expense_no = values.get('expense_no')
         if not expense_no:
-            values['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense') or '/'
+            values['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense.sheet') or '/'
         return super(HrExpense, self).create(values)
 
 class HrExpenseSheet(models.Model):
