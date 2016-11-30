@@ -12,6 +12,8 @@ class ir_mail_server(models.Model):
     """发送邮件之前, 根据 smtp_from 查找对应的 smtp 服务器, 如果找不到对应,保留原状."""
     _inherit = "ir.mail_server"
 
+    smtp_host = fields.Char(string='SMTP Server', required=True, help="Hostname or IP of SMTP server", default=lambda self:self.env['ir.config_parameter'].get_param('smtp_sever_host'))
+
     @api.model
     def send_email(self, message, mail_server_id=None, smtp_server=None, smtp_port=None,
                    smtp_user=None, smtp_password=None, smtp_encryption=None, smtp_debug=False,):
