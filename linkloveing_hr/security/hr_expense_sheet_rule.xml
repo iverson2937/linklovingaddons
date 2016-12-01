@@ -2,12 +2,12 @@
 <openerp>
     <data noupdate="0">
 
-
         <record id="hr_expense_sheet_rule" model="ir.rule">
-            <field name="name">my exceptions deal</field>
+            <field name="name">HR Expense Sheet Rule</field>
             <field name="model_id" ref="hr_expense.model_hr_expense_sheet"/>
-            <field name="domain_force">['|',('sale_order_company_id','=', user.partner_id.ljwj_company_id.id), ('op_company_id', '=', user.partner_id.ljwj_company_id.id)]
+            <field name="domain_force">['|', '|', '|','|',('employee_id.department_id.manager_id.user_id.id','=', user.id),('manager1_id.id','=', user.id),('manager2_id.id','=', user.id),('manager3_id.id','=', user.id),('responsible_id.id','=', user.id)]
             </field>
+             <field name="groups" eval="[(4, ref('hr_expense.group_hr_expense_user'))]"/>
         </record>
     </data>
 </openerp>
