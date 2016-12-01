@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'sale','hr_expense'],
+    'depends': ['base', 'sale', 'hr_expense'],
 
     # always loaded
     'data': [
@@ -28,6 +28,7 @@
         'security/groups.xml',
         'security/hide_menu.xml',
         'security/hr_expense_sheet_rule.xml',
+        'view/hr_expense_views.xml',
         'view/hr_view.xml',
     ],
     # only loaded in demonstration mode

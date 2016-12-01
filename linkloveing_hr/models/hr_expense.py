@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 
 class HrExpense(models.Model):
@@ -20,9 +21,12 @@ class HrExpenseSheet(models.Model):
     manager2_id = fields.Many2one('res.users')
     manager3_id = fields.Many2one('res.users')
 
+    to_approve_id = fields.Many2one('res.users', readonly=True, track_visibility='onchange')
+
+
+
     @api.model
     def _compute_default_state(self):
-        state = 'submit'
         if self.user_has_groups('hr_expense.group_hr_expense_user'):
             state = 'manager2_approve'
         elif self.user_has_groups('hr_expense.group_hr_expense_manager'):
@@ -69,4 +73,9 @@ class HrExpenseSheet(models.Model):
         if vals.get('expense_no', 'New') == 'New':
             vals['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense.sheet') or '/'
             print vals['expense_no']
-        return super(HrExpenseSheet, self).create(vals)
+        exp = super(HrExpenseSheet, self).create(vals)
+        if exp.employee_id == exp.employee_id.department_id.manager_id:
+            exp.to_approve_id = exp.employee_id.department_id.parent_id.manager_id.user_id.id
+        else:
+            exp.to_approve_id = exp.employee_id.department_id.manager_id.user_id.id
+        return exp
