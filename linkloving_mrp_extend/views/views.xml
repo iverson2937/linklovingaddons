@@ -28,6 +28,9 @@
             <field name="model">mrp.production</field>
             <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
             <field name="arch" type="xml">
+
+                <xpath expr="//header/button[@name='open_produce_product'][2]" position="replace">
+                </xpath>
                 <xpath expr="//field[@name='move_raw_ids']/tree/field[@name='product_id']" position="after">
                     <field name="qty_available"/>
                     <field name="virtual_available"/>
@@ -46,7 +49,6 @@
 
         <menuitem action="product_product_action" id="menu_stock_product_product_menu" parent="mrp.menu_mrp_bom"
                   sequence="10"/>
-
 
     </data>
 </openerp>

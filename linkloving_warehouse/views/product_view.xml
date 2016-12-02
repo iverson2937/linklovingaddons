@@ -27,8 +27,7 @@
 
             </field>
         </record>
-
-              <record id="view_stock_area_form" model="ir.ui.view">
+        <record id="view_stock_area_form" model="ir.ui.view">
             <field name="name">product.product.form</field>
             <field name="model">stock.location.area</field>
             <field name="arch" type="xml">
