@@ -15,7 +15,8 @@
             <field name="res_model">hr.expense.sheet</field>
             <field name="view_mode">tree,kanban,form,pivot,graph</field>
             <field name="search_view_id" ref="hr_expense.view_hr_expense_sheet_filter"/>
-            <field name="domain">[]</field>
+            <field name="domain">[('to_approve_id','=',[uid])]</field>
+
             <field name="context">{}</field>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
@@ -27,9 +28,30 @@
             </field>
         </record>
 
+        <record id="action_hr_expense_sheet_all_to_approved" model="ir.actions.act_window">
+            <field name="name">Expense Reports to Approved</field>
+            <field name="res_model">hr.expense.sheet</field>
+            <field name="view_mode">tree,kanban,form,pivot,graph</field>
+            <field name="search_view_id" ref="hr_expense.view_hr_expense_sheet_filter"/>
+            <field name="domain">[('approve_ids','child_of',[uid])]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click here to create a new expense report.
+                </p>
+                <p>
+                    Once you have created your expense, submit it to your manager who will validate it.
+                </p>
+            </field>
+        </record>
+
+
         <menuitem id="hr_expense.menu_hr_expense_sheet_all_to_approve" name="Expense Reports To Approve" sequence="1"
                   parent="hr_expense.menu_hr_expense_to_approve"
                   action="hr_expense.action_hr_expense_sheet_all_to_approve"/>
+        <menuitem id="menu_hr_expense_sheet_all_to_approved" name="已审核" sequence="1"
+                  parent="hr_expense.menu_hr_expense_to_approve"
+                  action="action_hr_expense_sheet_all_to_approved"/>
 
 
     </data>

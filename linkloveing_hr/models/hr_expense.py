@@ -17,47 +17,52 @@ class HrExpense(models.Model):
 class HrExpenseSheet(models.Model):
     _inherit = 'hr.expense.sheet'
     expense_no = fields.Char(string=u'报销编号')
-    manager1_id = fields.Many2one('res.users')
-    manager2_id = fields.Many2one('res.users')
-    manager3_id = fields.Many2one('res.users')
+    approve_ids = fields.Many2many('res.users')
 
     to_approve_id = fields.Many2one('res.users', readonly=True, track_visibility='onchange')
 
-
-
-    @api.model
-    def _compute_default_state(self):
-        if self.user_has_groups('hr_expense.group_hr_expense_user'):
-            state = 'manager2_approve'
-        elif self.user_has_groups('hr_expense.group_hr_expense_manager'):
-            state = 'manager3_approve'
-        else:
-            state = 'submit'
-        return state
-
     state = fields.Selection([('submit', 'Submitted'),
-                              ('manager1_approve', '主管审核'),
-                              ('manager2_approve', '经理审核'),
+                              ('manager1_approve', '一级审核'),
+                              ('manager2_approve', '二级审核'),
                               ('manager3_approve', '总经理审核'),
                               ('approve', 'Approved'),
                               ('post', 'Posted'),
                               ('done', 'Paid'),
                               ('cancel', 'Refused')
                               ], string='Status', index=True, readonly=True, track_visibility='onchange', copy=False,
-                             default=_compute_default_state, required=True,
+                             default='submit', required=True,
                              help='Expense Report State')
 
     @api.multi
     def manager1_approve(self):
-        self.write({'state': 'manager2_approve', 'manager1_id': self.env.user.id})
+        # if self.employee_id == self.employee_id.department_id.manager_id:
+        #     self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
+        # else:
+        department = self.to_approve_id.employee_ids.department_id
+        if department.allow_amount and self.total_amount < department.allow_amount:
+            self.to_approve_id = False
+            self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
 
+        else:
+            self.to_approve_id = department.parent_id.manager_id.user_id.id
+
+            self.write({'state': 'manager1_approve', 'approve_ids': [(4, self.env.user.id)]})
     @api.multi
     def manager2_approve(self):
-        self.write({'state': 'manager3_approve', 'manager2_id': self.env.user.id})
+        department = self.to_approve_id.employee_ids.department_id
+        if department.allow_amount and self.total_amount < department.allow_amount:
+            self.to_approve_id = False
+            self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
+
+        else:
+            self.to_approve_id = department.parent_id.manager_id.user_id.id
+
+            self.write({'state': 'manager2_approve', 'approve_ids': [(4, self.env.user.id)]})
 
     @api.multi
     def manager3_approve(self):
-        self.write({'state': 'approve', 'responsible_id': self.env.user.id})
+
+        self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
 
     #
     # @api.multi
@@ -75,7 +80,17 @@ class HrExpenseSheet(models.Model):
             print vals['expense_no']
         exp = super(HrExpenseSheet, self).create(vals)
         if exp.employee_id == exp.employee_id.department_id.manager_id:
-            exp.to_approve_id = exp.employee_id.department_id.parent_id.manager_id.user_id.id
+            department = exp.to_approve_id.employee_ids.department_id
+            if department.allow_amount and self.total_amount > department.allow_amount:
+                exp.write({'state': 'approve'})
+            else:
+                exp.to_approve_id = exp.employee_id.department_id.parent_id.manager_id.user_id.id
         else:
             exp.to_approve_id = exp.employee_id.department_id.manager_id.user_id.id
         return exp
+
+    @api.multi
+    def write(self, vals):
+        if vals.get('state') == 'cancel':
+            self.to_approve_id = False
+        return super(HrExpenseSheet, self).write(vals)
