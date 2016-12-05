@@ -45,6 +45,21 @@
             </field>
         </record>
 
+               <record id="action_hr_expense_sheet_all" model="ir.actions.act_window">
+            <field name="name">Expense Reports to Approved</field>
+            <field name="res_model">hr.expense.sheet</field>
+            <field name="view_mode">tree,kanban,form,pivot,graph</field>
+            <field name="search_view_id" ref="hr_expense.view_hr_expense_sheet_filter"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click here to create a new expense report.
+                </p>
+                <p>
+                    Once you have created your expense, submit it to your manager who will validate it.
+                </p>
+            </field>
+        </record>
+
 
         <menuitem id="hr_expense.menu_hr_expense_sheet_all_to_approve" name="Expense Reports To Approve" sequence="1"
                   parent="hr_expense.menu_hr_expense_to_approve"
@@ -52,6 +67,11 @@
         <menuitem id="menu_hr_expense_sheet_all_to_approved" name="已审核" sequence="1"
                   parent="hr_expense.menu_hr_expense_to_approve"
                   action="action_hr_expense_sheet_all_to_approved"/>
+
+           <menuitem id="menu_hr_expense_sheet_all" name="所有报销单" sequence="1"
+                  parent="hr_expense.menu_hr_expense_to_approve"
+                     groups="base.group_erp_manager"
+                  action="action_hr_expense_sheet_all"/>
 
 
     </data>
