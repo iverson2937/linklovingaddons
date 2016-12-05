@@ -14,12 +14,12 @@
 
 
                 <xpath expr="//button[@name='do_new_transfer']" position="replace">
-                    <button name="do_new_transfer" string="调拨"
-                            groups="purchase.group_stock_user" type="object" class="oe_highlight"
+                    <button name="do_new_transfer" string="出库调拨"
+                            attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['assigned'])]}"
+                            groups="purchase.group_stock_user" type="object" class="oe_highlight"/>
+
+                    <button name="do_new_transfer" string="入库调拨"
                             attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
-                    />
-                    <button name="do_new_transfer" string="调拨"
-                            attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['draft','partially_available','assigned'])]}"
                             groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
                     <button name="reject" string="退回"
                             attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"

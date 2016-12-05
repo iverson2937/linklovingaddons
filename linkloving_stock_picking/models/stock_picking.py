@@ -15,7 +15,7 @@ class StockPicking(models.Model):
         ('assigned', 'Available'),
         ('post', u'入库'),
         ('qc_check', u'品检'),
-        ('validate', u'调拨'),
+        ('validate', u'等待调拨'),
         ('done', 'Done')], string='Status', compute='_compute_state',
         copy=False, index=True, readonly=True, store=True, track_visibility='onchange',
         help=" * Draft: not confirmed yet and will not be scheduled until confirmed\n"
