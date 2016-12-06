@@ -74,7 +74,7 @@
                 <xpath expr="//button[@name='approve_expense_sheets']" position="before">
                     <button name="manager1_approve" string="批准" type="object"
                             groups="hr_expense.group_hr_expense_user" class="oe_highlight o_expense_sheet_approve"
-                            attrs="{'invisible':[('is_show','=',False)]}"
+                            attrs="{'invisible':['|',('is_show','=',False),('state','!=','submit')]}"
                     />
                     <button name="manager2_approve" states="manager1_approve" string="批准" type="object"
                             groups="hr_expense.group_hr_expense_manager" class="oe_highlight o_expense_sheet_approve"/>

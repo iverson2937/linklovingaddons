@@ -103,3 +103,16 @@ class HrExpenseSheet(models.Model):
         if vals.get('state') == 'cancel':
             self.to_approve_id = False
         return super(HrExpenseSheet, self).write(vals)
+
+    @api.multi
+    def reset_expense_sheets(self):
+        if self.employee_id == self.employee_id.department_id.manager_id:
+            department = self.to_approve_id.employee_ids.department_id
+            if department.allow_amount and self.total_amount > department.allow_amount:
+                self.write({'state': 'approve'})
+            else:
+                self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
+        else:
+            self.to_approve_id = self.employee_id.department_id.manager_id.user_id.id
+
+        return self.write({'state': 'submit'})
