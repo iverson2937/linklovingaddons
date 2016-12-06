@@ -66,7 +66,7 @@
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//group[@name='sale_total']" position="before">
-                    <button name="open_multi_product_select_window" string="Add Items" type="object" class="btn-primary oe_edit_only"/>
+                    <button name="open_multi_product_select_window" string="批量添加项目" type="object" class="btn-primary oe_edit_only"/>
                 </xpath>
             </field>
         </record>
@@ -77,7 +77,7 @@
             <field name="inherit_id" ref="purchase.purchase_order_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='order_line']" position="after">
-                    <button name="open_multi_product_select_window" string="Add Items" type="object" class="btn-primary oe_edit_only"/>
+                    <button name="open_multi_product_select_window" string="批量添加项目" type="object" class="btn-primary oe_edit_only"/>
                 </xpath>
             </field>
         </record>
