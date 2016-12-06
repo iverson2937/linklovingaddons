@@ -19,6 +19,14 @@ class HrExpenseSheet(models.Model):
     expense_no = fields.Char(string=u'报销编号')
     approve_ids = fields.Many2many('res.users')
 
+    def _get_is_show(self):
+        if self._context.get('uid') == self.to_approve_id.id:
+            self.is_show = True
+        else:
+            self.is_show = False
+
+    is_show = fields.Boolean(compute=_get_is_show)
+
     to_approve_id = fields.Many2one('res.users', readonly=True, track_visibility='onchange')
 
     state = fields.Selection([('submit', 'Submitted'),
@@ -47,6 +55,7 @@ class HrExpenseSheet(models.Model):
             self.to_approve_id = department.parent_id.manager_id.user_id.id
 
             self.write({'state': 'manager1_approve', 'approve_ids': [(4, self.env.user.id)]})
+
     @api.multi
     def manager2_approve(self):
         department = self.to_approve_id.employee_ids.department_id

@@ -61,18 +61,24 @@
             <field name="model">hr.expense.sheet</field>
             <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='employee_id']" position="after">
+                  <field name="department_id"/>
+                  <xpath expr="//field[@name='department_id']" position="after">
                     <field name="department_id"/>
+
+                </xpath>
+                <xpath expr="//field[@name='employee_id']" position="after">
                     <field name="to_approve_id" string="待审批人"/>
-                    <!--<field name="approve_ids"/>-->
+                    <field name="is_show" invisible="1"/>
                 </xpath>
 
                 <xpath expr="//button[@name='approve_expense_sheets']" position="before">
-                    <button name="manager1_approve" states="submit" string="批准" type="object"
-                            groups="hr_expense.group_hr_expense_user" class="oe_highlight o_expense_sheet_approve"/>
+                    <button name="manager1_approve" string="批准" type="object"
+                            groups="hr_expense.group_hr_expense_user" class="oe_highlight o_expense_sheet_approve"
+                            attrs="{'invisible':[('is_show','=',False)]}"
+                    />
                     <button name="manager2_approve" states="manager1_approve" string="批准" type="object"
                             groups="hr_expense.group_hr_expense_manager" class="oe_highlight o_expense_sheet_approve"/>
-                    <button name="manager3_approve" states="manager2_approve" string="批准 " type="object"
+                    <button name="manager3_approve" states="manager2_approve" string="批准" type="object"
                             groups="linkloving_hr.group_hr_expense_manager"
                             class="oe_highlight o_expense_sheet_approve"/>
                 </xpath>
