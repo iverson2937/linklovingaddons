@@ -36,13 +36,27 @@
             </field>
         </record>
 
+
+
+
+
+                <record model="ir.ui.view" id="view_stock_picking_tree">
+        <field name="name">stock.picking.wave.inherit.tree</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="create_uid"/>
+            </xpath>
+        </field>
+        </record>
         <record id="action_stock_picking_confirm" model="ir.actions.act_window">
             <field name="name">入库确认</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">stock.picking</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[('picking_type_code','=','incoming')]</field>
+            <field name="domain">[('picking_type_code','=','incoming'),('state','=','validate')]</field>
             <field name="context">{}</field>
             <field name="help" type="html">
                 <p>

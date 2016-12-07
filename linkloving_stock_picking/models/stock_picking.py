@@ -4,7 +4,8 @@ from odoo import models, fields, api, _, SUPERUSER_ID
 
 
 class StockPicking(models.Model):
-    _inherit = 'stock.picking'
+    _name = 'stock.picking'
+    _inherit =['stock.picking','ir.needaction_mixin']
     po_id = fields.Many2one('purchase.order')
     so_id=fields.Many2one('sale.order')
     state = fields.Selection([
@@ -42,3 +43,10 @@ class StockPicking(models.Model):
     @api.multi
     def reject(self):
         self.state = 'assigned'
+
+    @api.model
+    def _needaction_domain_get(self):
+        """ Returns the domain to filter records that require an action
+            :return: domain or False is no action
+        """
+        return [('state', '=', 'validate'),('create_uid','=',self.env.user.id)]
