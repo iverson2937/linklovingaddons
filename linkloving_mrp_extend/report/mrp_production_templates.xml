@@ -73,6 +73,7 @@
                     <table class="table table-bordered table-condensed" t-if="o.move_raw_ids">
                         <thead>
                             <tr>
+                                <th><strong>序列号</strong></th>
                                 <th><strong>Product</strong></th>
                                 <th><strong>生产规格</strong></th>
                                 <th class="text-right"><strong>Quantity</strong></th>
@@ -92,7 +93,10 @@
                                 <tr>
                                     <td colspan="4"><strong>Products to Consume</strong></td>
                                 </tr>
+                                <t t-set="i" t-value="1"/>
                                 <tr t-foreach="o.move_raw_ids" t-as="line">
+                                      <td> <span t-esc="i"/> </td>
+                                    <t t-set="i" t-value="i+1"/>
                                     <td>
                                         <span t-field="line.product_id.code"/>
                                         <span t-field="line.product_id.name"/>
