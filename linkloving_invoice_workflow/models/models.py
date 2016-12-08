@@ -30,3 +30,13 @@ class AccountInvoice(models.Model):
     @api.multi
     def action_reject(self):
         self.state = 'draft'
+
+    @api.multi
+    def action_invoice_open(self):
+        # lots of duplicate calls to action_invoice_open, so we remove those already open
+        to_open_invoices = self.filtered(lambda inv: inv.state != 'open')
+        if to_open_invoices.filtered(lambda inv: inv.state not in ['proforma2', 'draft','validate']):
+            raise UserError(_("Invoice must be in draft or Pro-forma state in order to validate it."))
+        to_open_invoices.action_date_assign()
+        to_open_invoices.action_move_create()
+        return to_open_invoices.invoice_validate()
