@@ -18,6 +18,7 @@ class PurchaseOrder(models.Model):
     product_count = fields.Float(compute='get_product_count')
     tax_id = fields.Many2one('account.tax', string='Tax')
     remark = fields.Text(string='Remark')
+    handle_date = fields.Date(string=u'交货期')
 
     @api.model
     def _default_notes(self):

@@ -32,13 +32,13 @@
             <field name="inherit_id" ref="purchase.purchase_order_form"/>
             <field name="arch" type="xml">
                   <xpath expr="//notebook/page/field/tree/field[@name='name']" position="replace">
-
                 </xpath>
 
                 <xpath expr="//field[@name='partner_id']" position="attributes">
                     <attribute name="domain">[('supplier','=',True),('is_company','=',True)]</attribute>
                 </xpath>
                  <xpath expr="//field[@name='date_order']" position="after">
+                     <field name="handle_date"/>
                     <field name="remark" string="备注"/>
                 </xpath>
 
