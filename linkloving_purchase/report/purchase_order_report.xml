@@ -119,10 +119,9 @@
             <div class="oe_structure"/>
              <div t-if="o.partner_id.bank_ids">
     		<strong>付款信息</strong>
-    		<h5  t-field="o.partner_id.bank_ids[0].acc_number"/>
-
-    		<h5  t-field="o.partner_id.bank_ids[0].bank_name"/>
-
+                 <h5  t-field="o.partner_id.bank_ids[0].partner_id"/>
+    		     <h5  t-field="o.partner_id.bank_ids[0].acc_number"/>
+                 <h5  t-field="o.partner_id.bank_ids[0].bank_id"/>
 
     	</div><div t-if="o.payment_term_id">
     		<strong>付款方式</strong>
