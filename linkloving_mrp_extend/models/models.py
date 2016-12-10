@@ -4,7 +4,7 @@ import dp as dp
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from odoo.tools import float_compare
-from odoo.addons import decimal_precision as dp
+# from odoo.addons import decimal_precision as dp
 
 
 class MrpBomExtend(models.Model):
