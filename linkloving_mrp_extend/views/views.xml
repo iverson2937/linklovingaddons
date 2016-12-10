@@ -26,16 +26,16 @@
                 <!--</form>-->
             <!--</field>-->
         <!--</record>-->
-        <record id="linkloving_mrp_bom_tree_view" model="ir.ui.view">
-            <field name="name">mrp.bom.tree.inherit</field>
-            <field name="model">mrp.bom</field>
-            <field name="inherit_id" ref="mrp.mrp_bom_tree_view"/>
-            <field name="arch" type="xml">
+        <!--<record id="linkloving_mrp_bom_tree_view" model="ir.ui.view">-->
+            <!--<field name="name">mrp.bom.tree.inherit</field>-->
+            <!--<field name="model">mrp.bom</field>-->
+            <!--<field name="inherit_id" ref="mrp.mrp_bom_tree_view"/>-->
+            <!--<field name="arch" type="xml">-->
                 <!--<xpath expr="//tree/field[@name='product_tmpl_id']" position="after">-->
                     <!--<field name="product_specs"/>-->
                 <!--</xpath>-->
-            </field>
-        </record>
+            <!--</field>-->
+        <!--</record>-->
 
 
         <record id="linkloving_mrp_bom_form_view" model="ir.ui.view">
