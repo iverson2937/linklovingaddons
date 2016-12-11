@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import dp as dp
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
