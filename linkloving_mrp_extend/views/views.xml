@@ -77,10 +77,10 @@
                             <!--string="Update" states="confirmed,planned" class="oe_link"/>-->
                 <!--</xpath>-->
 
-                <!--<xpath expr="//field[@name='move_raw_ids']/tree/field[@name='product_id']" position="after">-->
-                    <!--<field name="qty_available"/>-->
-                    <!--<field name="virtual_available"/>-->
-                <!--</xpath>-->
+                <xpath expr="//field[@name='move_raw_ids']/tree/field[@name='product_id']" position="after">
+                    <field name="qty_available"/>
+                    <field name="virtual_available"/>
+                </xpath>
                 <xpath expr="//field[@name='state']" position="replace">
                     <field name="state" widget="statusbar" statusbar_visible="confirmed,waiting_material,already_picking,progress,done"/>
                 </xpath>
