@@ -18,6 +18,7 @@ class HrExpenseSheet(models.Model):
     _inherit = 'hr.expense.sheet'
     expense_no = fields.Char(string=u'报销编号')
     approve_ids = fields.Many2many('res.users')
+    pre_payment_reminding = fields.Float(string=u'暂支余额')
 
     def _get_is_show(self):
         if self._context.get('uid') == self.to_approve_id.id:
@@ -88,6 +89,7 @@ class HrExpenseSheet(models.Model):
             vals['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense.sheet') or '/'
             print vals['expense_no']
         exp = super(HrExpenseSheet, self).create(vals)
+        exp.pre_payment_reminding = -exp.employee_id.user_id.partner_id.debit
         if exp.employee_id == exp.employee_id.department_id.manager_id:
             department = exp.to_approve_id.employee_ids.department_id
             if department.allow_amount and self.total_amount > department.allow_amount:

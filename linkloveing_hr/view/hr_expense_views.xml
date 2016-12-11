@@ -103,10 +103,8 @@
                         </div>
                         <group>
                             <group>
-                                <field name="payment_type" widget="radio"
-                                       attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                                <field name="partner_type" nolabel="1" widget="selection" string=""
-                                       attrs="{'required': [('payment_type', 'in', ('inbound', 'outbound'))], 'invisible': [('payment_type', 'not in', ('inbound', 'outbound'))], 'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="payment_type" widget="radio" readonly="1"/>
+                                <field name="partner_type"/>
                                 <field name="partner_id"/>
                                 <field name="journal_id" widget="selection"
                                        attrs="{'readonly': [('state', '!=', 'draft')]}"/>
@@ -144,6 +142,10 @@
             <field name="view_ids" eval="[(5,0,0),
             (0,0,{'view_mode':'tree', 'view_id': ref('account.view_account_supplier_payment_tree')}),
             (0,0,{'view_mode':'form', 'view_id': ref('view_account_payment_form')})]"/>
+            <field name="context">{'default_payment_type':'outbound','default_partner_type':'employee'}</field>
+            <field name="domain">[('partner_type','=','employee')]</field>
+
+
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
                     Click here to create a new account payment.

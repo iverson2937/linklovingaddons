@@ -30,6 +30,7 @@
         # 'security/hr_expense_sheet_rule.xml',
         'view/hr_expense_views.xml',
         'view/hr_department_view.xml',
+        'view/partner_view.xml',
         'view/hr_view.xml',
     ],
     # only loaded in demonstration mode
