@@ -8,6 +8,9 @@
             <field name="date_order" position="before">
                 <field name="pi_number"/>
             </field>
+             <field name="date_order" position="after">
+                <field name="team_id"/>
+            </field>
         </field>
     </record>
 
