@@ -160,7 +160,7 @@
         <menuitem id="menu_hr_expense_sheet_pre_expense" name="暂支" sequence="10"
                   parent="hr_expense.menu_hr_expense_root"
         />
-        <menuitem id="menu_hr_expense_sheet_all" name="暂支" sequence="0"
+        <menuitem id="menu_hr_expense_sheet_pre_payment" name="暂支" sequence="0"
                   parent="menu_hr_expense_sheet_pre_expense"
                   action="action_hr_expense_sheet_pre_expense"/>
 

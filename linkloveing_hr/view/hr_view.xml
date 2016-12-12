@@ -1,50 +1,5 @@
 <openerp>
     <data>
-        <!--<record id="hr.open_view_employee_list_my" model="ir.actions.act_window">-->
-        <!--<field name="name">Employees</field>-->
-        <!--<field name="type">ir.actions.act_window</field>-->
-        <!--<field name="res_model">hr.employee</field>-->
-        <!--<field name="view_type">form</field>-->
-        <!--<field name="view_mode">tree,kanban,form</field>-->
-        <!--<field name="domain">[]</field>-->
-        <!--<field name="context">{}</field>-->
-        <!--<field name="view_id" eval="False"/>-->
-        <!--<field name="search_view_id" ref="hr.view_employee_filter"/>-->
-        <!--<field name="help" type="html">-->
-        <!--<p class="oe_view_nocontent_create">-->
-        <!--Click to add a new employee.-->
-        <!--</p><p>-->
-        <!--With just a quick glance on the Odoo employee screen, you-->
-        <!--can easily find all the information you need for each person;-->
-        <!--contact data, job position, availability, etc.-->
-        <!--</p>-->
-        <!--</field>-->
-        <!--</record>-->
-
-        <!--<record id="linkloving_hr_expense_expense_form" model="ir.ui.view">-->
-        <!--<field name="model">hr.expense.expense</field>-->
-        <!--<field name="inherit_id" ref="hr_expense.view_expenses_form"/>-->
-        <!--<field name="arch" type="xml">-->
-        <!--<xpath expr="//field[@name='department_id']" position="after">-->
-        <!--<field name="po_id" options="{'no_create':True}"/>-->
-        <!--<field name="project_id" options="{'no_create':True}"/>-->
-        <!--</xpath>-->
-
-        <!--<xpath expr="//field[@name='product_id']" position="replace">-->
-        <!--<field name="product_id" options="{'no_create':True}" on_change="onchange_product_id(product_id, context)" context="{'default_hr_expense_ok':1}"/>-->
-        <!--</xpath>-->
-        <!--</field>-->
-        <!--</record>-->
-
-        <!--<record id="linkloving_view_expenses_tree" model="ir.ui.view">-->
-        <!--<field name="model">hr.expense</field>-->
-        <!--<field name="inherit_id" ref="hr_expense.view_expenses_tree"/>-->
-        <!--<field name="arch" type="xml">-->
-        <!--<xpath expr="//field[@name='employee_id']" position="after">-->
-        <!--<field name="code"/>-->
-        <!--</xpath>-->
-        <!--</field>-->
-        <!--</record>-->
         <record id="hr_timesheet_employee_extd_form" model="ir.ui.view">
             <field name="name">hr.timesheet.employee.extd_form</field>
             <field name="model">hr.employee</field>
@@ -61,15 +16,23 @@
             <field name="model">hr.expense.sheet</field>
             <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_form"/>
             <field name="arch" type="xml">
-                  <field name="department_id"/>
-                  <xpath expr="//field[@name='department_id']" position="after">
+                <field name="department_id"/>
+                <xpath expr="//field[@name='department_id']" position="after">
                     <field name="department_id"/>
-
                 </xpath>
                 <xpath expr="//field[@name='employee_id']" position="after">
-                    <field name="pre_payment_reminding" attrs="{'invisible': [('pre_payment_reminding', '=', False)]}"/>
+                    <field name="pre_payment_reminding" attrs="{'invisible': [('pre_payment_reminding', '=', False)]}"
+                           readonly="1"/>
                     <field name="to_approve_id" string="待审批人"/>
                     <field name="is_show" invisible="1"/>
+                </xpath>
+                <xpath expr="//button[@name='%(hr_expense.hr_expense_register_payment_wizard_action)d']"
+                       position="replace">
+                    <button name="register_payment_action" type="object" string="登记付款"
+                            class="oe_highlight o_expense_sheet_pay" attrs="{'invisible': [('state', '!=', 'post')]}"
+                            context="{'default_amount': total_amount, 'partner_id': address_id}"
+                            groups="account.group_account_user"/>
+
                 </xpath>
 
                 <xpath expr="//button[@name='approve_expense_sheets']" position="before">

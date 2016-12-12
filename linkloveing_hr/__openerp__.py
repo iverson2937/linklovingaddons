@@ -32,6 +32,7 @@
         'view/hr_department_view.xml',
         'view/partner_view.xml',
         'view/hr_view.xml',
+        'wizard/hr_expense_register_payment.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
