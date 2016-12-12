@@ -1,41 +1,41 @@
 <openerp>
     <data>
                 <!--  confirm production model  -->
-    <!--<record id="action_confirm_production" model="ir.actions.act_window">-->
-            <!--<field name="name">Confirm Production</field>-->
-            <!--<field name="type">ir.actions.act_window</field>-->
-            <!--<field name="res_model">confirm.production</field>-->
-            <!--<field name="view_type">form</field>-->
-            <!--<field name="view_mode">form</field>-->
-            <!--<field name="target">new</field>-->
-        <!--</record>-->
+    <record id="action_confirm_production" model="ir.actions.act_window">
+            <field name="name">Confirm Production</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">confirm.production</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
 
-        <!--<record id="view_confirm_production_wizard" model="ir.ui.view">-->
-            <!--<field name="name">Confirm Production</field>-->
-            <!--<field name="model">confirm.production</field>-->
-            <!--<field name="arch" type="xml">-->
-                <!--<form string="Confirm Production">-->
-                    <!--<group>-->
-                        <!--<field name="product_qty"/>-->
-                    <!--</group>-->
-                    <!--<footer>-->
-                        <!--<button name="confirm_production" string="Confirm"-->
-                            <!--colspan="1" type="object" class="btn-primary"/>-->
-                        <!--<button string="Cancel" class="btn-default" special="cancel" />-->
-                    <!--</footer>-->
-                <!--</form>-->
-            <!--</field>-->
-        <!--</record>-->
-        <!--<record id="linkloving_mrp_bom_tree_view" model="ir.ui.view">-->
-            <!--<field name="name">mrp.bom.tree.inherit</field>-->
-            <!--<field name="model">mrp.bom</field>-->
-            <!--<field name="inherit_id" ref="mrp.mrp_bom_tree_view"/>-->
-            <!--<field name="arch" type="xml">-->
-                <!--<xpath expr="//tree/field[@name='product_tmpl_id']" position="after">-->
-                    <!--<field name="product_specs"/>-->
-                <!--</xpath>-->
-            <!--</field>-->
-        <!--</record>-->
+        <record id="view_confirm_production_wizard" model="ir.ui.view">
+            <field name="name">Confirm Production</field>
+            <field name="model">confirm.production</field>
+            <field name="arch" type="xml">
+                <form string="Confirm Production">
+                    <group>
+                        <field name="product_qty"/>
+                    </group>
+                    <footer>
+                        <button name="confirm_production" string="Confirm"
+                            colspan="1" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="linkloving_mrp_bom_tree_view" model="ir.ui.view">
+            <field name="name">mrp.bom.tree.inherit</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.mrp_bom_tree_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree/field[@name='product_tmpl_id']" position="after">
+                    <field name="product_specs"/>
+                </xpath>
+            </field>
+        </record>
 
 
         <record id="linkloving_mrp_bom_form_view" model="ir.ui.view">
@@ -57,37 +57,55 @@
             <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
             <field name="arch" type="xml">
 
-                <!--<xpath expr="//button[@name='button_plan']" position="after">-->
-                    <!--<button name="button_waiting_material" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'confirmed')]}" type="object" string="确认生产，准备领料" />-->
-                    <!--<button name="button_already_picking" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'waiting_material')]}" type="object" string="领料登记" />-->
-                    <!--<button name="button_fill_material" attrs="{'invisible': ['|',('state', '!=', 'progress')]}" type="object" string="补领料" />-->
-                    <!--<button name="button_return_material" attrs="{'invisible': ['|',('state', '!=', 'done')]}" type="object" string="退料" />-->
-                <!--</xpath>-->
+                <xpath expr="//button[@name='button_plan']" position="after">
+                    <button name="button_waiting_material" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'confirmed')]}" type="object" string="确认生产，准备领料" />
+                    <button name="button_start_prepare_material" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'waiting_material')]}" type="object" string="开始备料" />
+                    <button name="button_finish_prepare_material" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'prepare_material_ing')]}" type="object" string="完成备料" />
+                    <!--<button name="button_already_picking" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'finish_prepare_material')]}" type="object" string="已领料" />-->
+                    <button name="button_already_picking" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'finish_prepare_material')]}" type="object" string="领料登记" />
+                    <button name="button_start_produce" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'already_picking')]}" type="object" string="开始生产" />
+                    <button name="button_produce_finish" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'progress')]}" type="object" string="生产完成，送往品检" />
+                    <button name="button_start_quality_inspection" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'waiting_quality_inspection')]}" type="object" string="开始品检" />
+
+                    <button name="button_quality_inspection_success"  attrs="{'invisible': [('state', '!=', 'quality_inspection_ing')]}" type="object" string="品检通过" />
+                    <button name="button_quality_inspection_failed"  attrs="{'invisible': [('state', '!=', 'quality_inspection_ing')]}" type="object" string="品检不通过" />
+
+                    <button name="button_fill_material" attrs="{'invisible': ['|',('state', '!=', 'progress')]}" type="object" string="补领料" />
+                    <button name="button_return_material" attrs="{'invisible': ['|',('state', '!=', 'done')]}" type="object" string="退料" />
+                </xpath>
 
                 <xpath expr="//header/button[@name='open_produce_product'][2]" position="replace">
                 </xpath>
 
-                <!--<xpath expr="//header/button[@name='open_produce_product'][1]" position="replace">-->
-                    <!--<button name="open_produce_product" attrs="{'invisible': ['|', '|', '|', ('check_to_done', '=', True), ('availability', 'not in', ['partially_available', 'assigned']), ('state', 'not in', ('progress')), ('routing_id', '!=', False)]}" string="产出" type="object" class="oe_highlight"/>-->
-                <!--</xpath>-->
+                <xpath expr="//header/button[@name='open_produce_product'][1]" position="replace">
+                    <button name="open_produce_product" attrs="{'invisible': ['|', '|', '|', ('check_to_done', '=', True), ('availability', 'not in', ['partially_available', 'assigned']), ('state', 'not in', ('progress')), ('routing_id', '!=', False)]}" string="产出" type="object" class="oe_highlight"/>
+                </xpath>
 
-                <!--<xpath expr="//sheet/group/group/div/button[@type='action']" position="replace">-->
-                    <!--<button type="action"-->
-                            <!--name="%(mrp.action_change_production_qty)d"-->
-                            <!--string="Update" states="confirmed,planned" class="oe_link"/>-->
-                <!--</xpath>-->
+                <xpath expr="//sheet/group/group/div/button[@type='action']" position="replace">
+                    <button type="action"
+                            name="%(mrp.action_change_production_qty)d"
+                            string="Update" states="confirmed,planned" class="oe_link"/>
+                </xpath>
 
                 <xpath expr="//field[@name='move_raw_ids']/tree/field[@name='product_id']" position="after">
                     <field name="qty_available"/>
                     <field name="virtual_available"/>
                 </xpath>
                 <xpath expr="//field[@name='state']" position="replace">
-                    <field name="state" widget="statusbar" statusbar_visible="confirmed,waiting_material,already_picking,progress,done"/>
+                    <field name="state" widget="statusbar" statusbar_visible="confirmed,waiting_material,prepare_material_ing,finish_prepare_material,already_picking,progress,waiting_quality_inspection,quality_inspection_ing,waiting_post_inventory,done"/>
                 </xpath>
 
-                <!--<xpath expr="//button[@name='action_assign']" position="replace">-->
-                    <!--<button name="action_assign" attrs="{'invisible': ['|',('availability', 'in', ('assigned', 'none')),('state','in',('confirmed','waiting_material'))]}" string="Check availability" type="object" class="oe_highlight"/>-->
-                <!--</xpath>-->
+                <xpath expr="//button[@name='post_inventory']" position="replace">
+                    <button name="post_inventory" string="Post Inventory" type="object" class="oe_highlight" attrs="{'invisible': ['|', ('post_visible', '=', False),('state', 'not in', 'waiting_post_inventory')]}"/>
+                </xpath>
+
+                <xpath expr="//button[@name='button_mark_done']" position="replace">
+                    <button name="button_mark_done" attrs="{'invisible': ['|',('check_to_done', '=', False), ('state', 'not in', 'waiting_post_inventory')]}" string="Mark as Done" type="object" class="oe_highlight"/>
+                </xpath>
+
+                <xpath expr="//button[@name='action_assign']" position="replace">
+                    <button name="action_assign" attrs="{'invisible': ['|',('availability', 'in', ('assigned', 'none')),('state','not in',('confirmed'))]}" string="Check availability" type="object" class="oe_highlight"/>
+                </xpath>
             </field>
         </record>
         <record id="product_product_action" model="ir.actions.act_window">
@@ -121,65 +139,65 @@
         </record>
 
 
-        <!--<record id="picking_material_form" model="ir.ui.view">-->
-            <!--<field name="name">领料详情</field>-->
-            <!--<field name="model">mrp.production</field>-->
-            <!--<field name="arch" type="xml">-->
-                <!--<form string="领料详情">-->
-                    <!--<field name="state" invisible="1"/>-->
-                    <!--<field name="move_raw_ids" options="{'reload_on_button': True}">-->
-                                <!--<tree editable="bottom" delete="0" default_order="is_done desc,sequence" decoration-muted="is_done" decoration-warning="quantity_done&gt;product_uom_qty" decoration-success="quantity_done==product_uom_qty" decoration-danger="quantity_available &lt; product_uom_qty" create="0">-->
-                                    <!--<field name="product_id" required="1"/>-->
-                                    <!--<field name="product_uom" groups="product.group_uom"/>-->
-                                    <!--<field name="has_tracking" invisible="1"/>-->
-                                    <!--<field name="is_done" invisible="1"/>-->
-                                    <!--<field name="sequence" invisible="1"/>-->
-                                    <!--<field name="location_id" domain="[('id', 'child_of', parent.location_id)]" invisible="1"/>-->
-                                    <!--<field name="location_dest_id" domain="[('id', 'child_of', parent.location_dest_id)]" invisible="1"/>-->
-                                    <!--<field name="state" invisible="1"/>-->
-                                    <!--<field name="quantity_available" attrs="{'invisible': [('is_done', '=', True)]}"/>-->
-                                    <!--<field name="product_uom_qty" readonly="1" attrs="{'required': [('product_id', '!=', False)]}" string="To Consume"/>-->
-                                    <!--<field name="quantity_done" attrs="{'readonly': [ ('has_tracking', 'in', ['lot','serial'])]}" string="Consumed"/>-->
-                                    <!--<button name="split_move_lot" string="Register lots" type="object" icon="fa-list" attrs="{'invisible': [('has_tracking', 'not in', ['lot','serial'])]}"/>-->
-                                <!--</tree>-->
-                    <!--</field>-->
-                    <!--<footer>-->
-                        <!--<button name="picking_material" string="Confirm"-->
-                            <!--colspan="1" type="object" class="btn-primary"/>-->
-                        <!--<button string="Cancel" class="btn-default" special="cancel" />-->
-                    <!--</footer>-->
-                <!--</form>-->
-            <!--</field>-->
-        <!--</record>-->
+        <record id="picking_material_form" model="ir.ui.view">
+            <field name="name">领料详情</field>
+            <field name="model">mrp.production</field>
+            <field name="arch" type="xml">
+                <form string="领料详情">
+                    <field name="state" invisible="1"/>
+                    <field name="move_raw_ids" options="{'reload_on_button': True}">
+                                <tree editable="bottom" delete="0" default_order="is_done desc,sequence" decoration-muted="is_done" decoration-warning="quantity_done&gt;product_uom_qty" decoration-success="quantity_done==product_uom_qty" decoration-danger="quantity_available &lt; product_uom_qty" create="0">
+                                    <field name="product_id" required="1"/>
+                                    <field name="product_uom" groups="product.group_uom"/>
+                                    <field name="has_tracking" invisible="1"/>
+                                    <field name="is_done" invisible="1"/>
+                                    <field name="sequence" invisible="1"/>
+                                    <field name="location_id" domain="[('id', 'child_of', parent.location_id)]" invisible="1"/>
+                                    <field name="location_dest_id" domain="[('id', 'child_of', parent.location_dest_id)]" invisible="1"/>
+                                    <field name="state" invisible="1"/>
+                                    <field name="quantity_available" attrs="{'invisible': [('is_done', '=', True)]}"/>
+                                    <field name="product_uom_qty" readonly="1" attrs="{'required': [('product_id', '!=', False)]}" string="To Consume"/>
+                                    <field name="quantity_done" attrs="{'readonly': [ ('has_tracking', 'in', ['lot','serial'])]}" string="Consumed"/>
+                                    <button name="split_move_lot" string="Register lots" type="object" icon="fa-list" attrs="{'invisible': [('has_tracking', 'not in', ['lot','serial'])]}"/>
+                                </tree>
+                    </field>
+                    <footer>
+                        <button name="picking_material" string="Confirm"
+                            colspan="1" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
 
 
-        <!--<record id="stock_return_material_form_view2" model="ir.ui.view">-->
-            <!--<field name="name">mrp.return.material.form</field>-->
-            <!--<field name="model">mrp.return.material</field>-->
-            <!--<field name="arch" type="xml">-->
-                <!--<form string="Scrap">-->
-                    <!--<group>-->
-                        <!--<group>-->
-                            <!--<field name="state" invisible="1"/>-->
-                            <!--<field name="product_id" domain="[('id', 'in', context.get('product_ids', []))]"/>-->
-                            <!--<label for="return_qty"/>-->
-                            <!--<div class="o_row">-->
-                                <!--<field name="return_qty"/>-->
-                                <!--&lt;!&ndash;<field name="product_uom_id" groups="stock.product_group_uom"/>&ndash;&gt;-->
-                            <!--</div>-->
-                        <!--</group>-->
-                        <!--<group>-->
-                            <!--&lt;!&ndash;<field name="owner_id" groups="stock.group_tracking_owner"/>&ndash;&gt;-->
-                            <!--<field name="location_id" groups="stock.group_stock_multi_locations"/>-->
-                            <!--<field name="return_location_id" groups="stock.group_stock_multi_locations"/>-->
-                        <!--</group>-->
-                    <!--</group>-->
-                    <!--<footer>-->
-                        <!--<button name="action_done" string="Done" type="object" class="btn-primary"/>-->
-                        <!--<button string="Cancel" class="btn-default" special="cancel" />-->
-                    <!--</footer>-->
-                <!--</form>-->
-            <!--</field>-->
-        <!--</record>-->
+        <record id="stock_return_material_form_view2" model="ir.ui.view">
+            <field name="name">mrp.return.material.form</field>
+            <field name="model">mrp.return.material</field>
+            <field name="arch" type="xml">
+                <form string="退料">
+                    <group>
+                        <group>
+                            <field name="state" invisible="1"/>
+                            <field name="product_id" domain="[('id', 'in', context.get('product_ids', []))]"/>
+                            <label for="return_qty"/>
+                            <div class="o_row">
+                                <field name="return_qty"/>
+                                <!--<field name="product_uom_id" groups="stock.product_group_uom"/>-->
+                            </div>
+                        </group>
+                        <group>
+                            <!--<field name="owner_id" groups="stock.group_tracking_owner"/>-->
+                            <field name="location_id" groups="stock.group_stock_multi_locations"/>
+                            <field name="return_location_id" groups="stock.group_stock_multi_locations"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_done" string="Done" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
     </data>
 </openerp>
