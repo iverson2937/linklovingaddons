@@ -18,7 +18,12 @@ class PurchaseOrder(models.Model):
     product_count = fields.Float(compute='get_product_count')
     tax_id = fields.Many2one('account.tax', string='Tax')
     remark = fields.Text(string='Remark')
-    handle_date = fields.Date(string=u'交货期')
+    handle_date = fields.Datetime(string=u'交货期')
+
+    @api.onchange('handle_date')
+    def onchange_handle_date(self):
+        for line in self.order_line:
+            line.date_planned = self.handle_date
 
     @api.model
     def _default_notes(self):
@@ -71,4 +76,6 @@ class PurchaseOrderLine(models.Model):
         self._suggest_quantity()
         self._onchange_quantity()
 
+        if self.order_id.handle_date:
+            self.date_planned = self.order_id.handle_date
         return result
