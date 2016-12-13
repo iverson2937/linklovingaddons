@@ -18,6 +18,14 @@ class AccountPayment(models.Model):
 
 
     approve_ids = fields.Many2many('res.users')
+
+    def _get_is_show(self):
+        if self._context.get('uid') == self.to_approve_id.id:
+            self.is_show = True
+        else:
+            self.is_show = False
+
+    is_show = fields.Boolean(compute=_get_is_show)
     state = fields.Selection([('draft', 'Draft'),
                               ('confirm', u'确认'),
                               ('manager1_approve', u'一级审批'),

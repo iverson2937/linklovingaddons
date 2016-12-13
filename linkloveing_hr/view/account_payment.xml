@@ -12,13 +12,17 @@
                         <button name="post" class="oe_highlight" states="approve" string="确认付款" type="object"/>
                         <button name="submit" class="oe_highlight" states="draft" string="提交" type="object"/>
 
-                        <button name="manager1_approve" class="oe_highlight" states="submit" string="批准" type="object"/>
+                        <button name="manager1_approve" class="oe_highlight" states="confirm" string="批准" type="object"
+                                groups="hr_expense.group_hr_expense_user"/>
                         <button name="manager2_approve" class="oe_highlight" states="manager1_approve" string="批准"
+                                groups="hr_expense.group_hr_expense_manager"
                                 type="object"/>
                         <button name="manager3_approve" class="oe_highlight" states="manager2_approve" string="批准"
+                                groups="hr_expense.group_hr_expense_manager"
                                 type="object"/>
                         <button name="reject" class="oe_link"
-                                states="manager1_approve,manager2_approve,manager3_approve" string="批准"
+                                states="confirm,manager1_approve,manager2_approve,manager3_approve" string="批准"
+                                groups="hr_expense.group_hr_expense_user"
                                 type="object"/>
                         <field name="state" widget="statusbar"
                                statusbar_visible="draft,confirm,manager1_approve,manager2_approve,posted,reconciled"/>
@@ -43,6 +47,7 @@
                         </div>
                         <group>
                             <group>
+                                <!--<field name="is_show" invisible="1"/>-->
                                 <field name="payment_type" widget="radio" readonly="1"/>
                                 <field name="partner_type"/>
                                 <field name="partner_id"/>
@@ -164,7 +169,6 @@
 
         <menuitem id="menu_account_payment" name="暂支" sequence="10"
                   parent="hr_expense.menu_hr_expense_root"
-                  groups="base.group_user"
         />
 
         <menuitem id="menu_account_payment_wait_approve" name="待审核暂支" sequence="10"
