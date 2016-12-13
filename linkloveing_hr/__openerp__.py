@@ -28,6 +28,7 @@
         'security/groups.xml',
         'security/hide_menu.xml',
         # 'security/hr_expense_sheet_rule.xml',
+        'view/account_payment.xml',
         'view/hr_expense_views.xml',
         'view/hr_department_view.xml',
         'view/partner_view.xml',

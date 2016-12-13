@@ -1,0 +1,45 @@
+<openerp>
+    <data>
+        <record id="action_hr_expense_sheet_pre_expense" model="ir.actions.act_window">
+            <field name="name">暂支</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+
+            <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'tree', 'view_id': ref('account.view_account_supplier_payment_tree')}),
+            (0,0,{'view_mode':'form', 'view_id': ref('view_account_payment_form')})]"/>
+            <field name="context">{'default_payment_type':'outbound','default_partner_type':'employee'}</field>
+            <field name="domain">[('partner_type','=','employee')]</field>
+
+
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click here to create a new account payment.
+                </p>
+                <p>
+                    Once you have created your expense, submit it to your manager who will validate it.
+                </p>
+            </field>
+        </record>
+
+
+
+        <menuitem id="menu_account_payment_wait_approve" name="待审核暂支" sequence="10"
+                  parent="menu_account_payment"
+                  action="action_hr_expense_sheet_pre_expense"
+        />
+        <menuitem id="menu_account_payment_approved" name="已审核暂支" sequence="10"
+                  parent="menu_account_payment"
+                  action="action_hr_expense_sheet_pre_expense"
+        />
+        <menuitem id="menu_account_payment" name="暂支" sequence="10"
+                  parent="hr_expense.menu_hr_expense_root"
+        />
+        <menuitem id="menu_account_payment_apply" name="暂支申请" sequence="0"
+                  parent="menu_account_payment"
+                  action="action_hr_expense_sheet_pre_expense"/>
+
+
+    </data>
+</openerp>
+
