@@ -141,7 +141,7 @@ class account_payment(models.Model):
         """
         for rec in self:
 
-            if rec.state != 'draft':
+            if rec.state not in ['draft', 'approve']:
                 raise UserError(
                     _("Only a draft payment can be posted. Trying to post a payment in state %s.") % rec.state)
 
