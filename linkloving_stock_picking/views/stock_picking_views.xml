@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='do_new_transfer']" position="before">
                     <button name="action_post" string="提交" type="object" class="oe_highlight"
-                            attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['draft','partially_available','assigned'])]}"
+                            attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['partially_available','assigned'])]}"
                             groups="stock.group_stock_user"/>
                 </xpath>
 
