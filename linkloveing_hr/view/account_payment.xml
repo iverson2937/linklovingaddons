@@ -1,6 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+
+
+        <record id="view_account_payment_form" model="ir.ui.view">
+            <field name="name">account.payment.form</field>
+            <field name="model">account.payment</field>
+            <field name="arch" type="xml">
+                <form string="Register Payment" version="7">
+                    <header>
+                        <button name="post" class="oe_highlight" states="approve" string="确认付款" type="object"/>
+                        <button name="submit" class="oe_highlight" states="draft" string="提交" type="object"/>
+
+                        <button name="manager1_approve" class="oe_highlight" states="submit" string="批准" type="object"/>
+                        <button name="manager2_approve" class="oe_highlight" states="manager1_approve" string="批准"
+                                type="object"/>
+                        <button name="manager3_approve" class="oe_highlight" states="manager2_approve" string="批准"
+                                type="object"/>
+                        <button name="reject" class="oe_link"
+                                states="manager1_approve,manager2_approve,manager3_approve" string="批准"
+                                type="object"/>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,confirm,manager1_approve,manager2_approve,posted,reconciled"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" name="button_journal_entries"
+                                    string="Journal Items" type="object"
+                                    groups="account.group_account_manager"
+                                    attrs="{'invisible':[('move_line_ids','=',[])]}" icon="fa-bars"/>
+                            <field name="move_line_ids" invisible="1"/>
+                            <button class="oe_stat_button" name="button_invoices"
+                                    string="Invoices" type="object"
+                                    attrs="{'invisible':[('has_invoices','=',False)]}" icon="fa-bars"/>
+                            <field name="has_invoices" invisible="1"/>
+                        </div>
+                        <field name="id" invisible="1"/>
+                        <div class="oe_title" attrs="{'invisible': [('state', '=', 'draft')]}">
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="payment_type" widget="radio" readonly="1"/>
+                                <field name="partner_type"/>
+                                <field name="partner_id"/>
+                                <field name="to_approve_id" string="待审核" readonly="1"/>
+                                <field name="journal_id" widget="selection"
+                                       attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="destination_journal_id" widget="selection"
+                                       attrs="{'required': [('state', '=', 'approve')], 'invisible': [('payment_type', '!=', 'transfer')], 'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="hide_payment_method" invisible="1"/>
+                                <field name="payment_method_id" string=" " widget="radio"
+                                       attrs="{'invisible': [('hide_payment_method', '=', True)], 'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="payment_method_code" invisible="1"/>
+                                <label for="amount"/>
+                                <div name="amount_div" class="o_row">
+                                    <field name="amount" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                    <field name="currency_id" options="{'no_create': True, 'no_open': True}"
+                                           groups="base.group_multi_currency"
+                                           attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                </div>
+                            </group>
+                            <group>
+                                <field name="payment_date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="communication"
+                                       attrs="{'invisible': [('state', '!=', 'draft'), ('communication', '=', False)], 'readonly': [('state', '!=', 'draft')]}"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
         <record id="action_hr_expense_sheet_pre_expense" model="ir.actions.act_window">
+            <field name="name">暂支</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+
+            <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'tree', 'view_id': ref('account.view_account_supplier_payment_tree')}),
+            (0,0,{'view_mode':'form', 'view_id': ref('view_account_payment_form')})]"/>
+            <field name="context">{'default_payment_type':'outbound','default_partner_type':'employee'}</field>
+            <!--<field name="domain">[('partner_type','=','employee')]</field>-->
+            <field name="domain">[('partner_id.user_ids', '=', uid)]</field>
+
+
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click here to create a new account payment.
+                </p>
+                <p>
+                    Once you have created your expense, submit it to your manager who will validate it.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_account_payment_to_approve" model="ir.actions.act_window">
+            <field name="name">待审核</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+
+            <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'tree', 'view_id': ref('account.view_account_supplier_payment_tree')}),
+            (0,0,{'view_mode':'form', 'view_id': ref('view_account_payment_form')})]"/>
+            <field name="context">{'default_payment_type':'outbound','default_partner_type':'employee'}</field>
+            <field name="domain">[('to_approve_id','=',uid)]</field>
+
+
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click here to create a new account payment.
+                </p>
+                <p>
+                    Once you have created your expense, submit it to your manager who will validate it.
+                </p>
+            </field>
+        </record>
+
+
+        <record id="action_account_payment_to_approved" model="ir.actions.act_window">
+            <field name="name">暂支</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+
+            <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'tree', 'view_id': ref('account.view_account_supplier_payment_tree')}),
+            (0,0,{'view_mode':'form', 'view_id': ref('view_account_payment_form')})]"/>
+            <field name="context">{'default_payment_type':'outbound','default_partner_type':'employee'}</field>
+            <field name="domain">[('approve_ids','child_of',[uid])]</field>
+
+
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click here to create a new account payment.
+                </p>
+                <p>
+                    Once you have created your expense, submit it to your manager who will validate it.
+                </p>
+            </field>
+        </record>
+        <record id="action_account_payment_all" model="ir.actions.act_window">
             <field name="name">暂支</field>
             <field name="res_model">account.payment</field>
             <field name="view_mode">tree,form</field>
@@ -22,22 +162,30 @@
             </field>
         </record>
 
-
+        <menuitem id="menu_account_payment" name="暂支" sequence="10"
+                  parent="hr_expense.menu_hr_expense_root"
+                  groups="base.group_user"
+        />
 
         <menuitem id="menu_account_payment_wait_approve" name="待审核暂支" sequence="10"
                   parent="menu_account_payment"
-                  action="action_hr_expense_sheet_pre_expense"
+                  groups="hr_expense.group_hr_expense_user"
+                  action="action_account_payment_to_approve"
         />
         <menuitem id="menu_account_payment_approved" name="已审核暂支" sequence="10"
                   parent="menu_account_payment"
-                  action="action_hr_expense_sheet_pre_expense"
-        />
-        <menuitem id="menu_account_payment" name="暂支" sequence="10"
-                  parent="hr_expense.menu_hr_expense_root"
-        />
+                  groups="hr_expense.group_hr_expense_user"
+                  action="action_account_payment_to_approved"/>
+
         <menuitem id="menu_account_payment_apply" name="暂支申请" sequence="0"
                   parent="menu_account_payment"
+                  groups="base.group_user"
                   action="action_hr_expense_sheet_pre_expense"/>
+
+        <menuitem id="menu_account_payment_all" name="所有暂支" sequence="0"
+                  parent="menu_account_payment"
+                  groups="base.group_erp_manager"
+                  action="action_account_payment_all"/>
 
 
     </data>
