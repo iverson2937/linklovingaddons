@@ -12,11 +12,11 @@
                         <button name="post" string="提交" type="object"
                                 class="oe_highlight" states="draft" groups="purchase.group_purchase_user"/>
                         <button name="reject" string="退回" type="object"
-                                states="posted"/>
+                                states="posted" groups="purchase.group_purchase_manager"/>
                         <button name="confirm" string="确认" type="object"
-                                states="posted"/>
+                                states="posted" groups="purchase.group_purchase_manager"/>
                         <button name="done" string="完成" type="object"
-                                states="confirm"/>
+                                states="confirm" groups="purchase.group_purchase_manager"/>
 
 
                         <field name="state" widget="statusbar" statusbar_visible="draft,posted,confirm,done"/>
