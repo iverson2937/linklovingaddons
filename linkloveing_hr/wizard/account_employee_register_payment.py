@@ -65,7 +65,7 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
 
         # Create payment and post it
         payment = self.env['account.payment'].create({
-            'partner_type': 'supplier',
+            'partner_type': 'employee',
             'payment_type': 'outbound',
             'partner_id': self.partner_id.id,
             'journal_id': self.journal_id.id,

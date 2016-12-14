@@ -9,7 +9,7 @@
             <field name="arch" type="xml">
                 <form string="Register Payment" version="7">
                     <header>
-                        <button name="post" class="oe_highlight" states="approve" string="确认付款" type="object"/>
+                        <button name="post" class="oe_highlight" states="approve" string="确认付款" type="object" groups="account.group_account_user"/>
                         <button name="submit" class="oe_highlight" states="draft" string="提交" type="object"/>
 
                         <button name="manager1_approve" class="oe_highlight" states="confirm" string="批准" type="object"
@@ -30,13 +30,13 @@
                     <sheet>
                         <div class="oe_button_box" name="button_box">
                             <!--<button class="oe_stat_button" name="button_journal_entries"-->
-                                    <!--string="Journal Items" type="object"-->
-                                    <!--groups="account.group_account_manager"-->
-                                    <!--attrs="{'invisible':[('move_line_ids','=',[])]}" icon="fa-bars"/>-->
+                            <!--string="Journal Items" type="object"-->
+                            <!--groups="account.group_account_manager"-->
+                            <!--attrs="{'invisible':[('move_line_ids','=',[])]}" icon="fa-bars"/>-->
                             <!--<field name="move_line_ids" invisible="1"/>-->
                             <!--<button class="oe_stat_button" name="button_invoices"-->
-                                    <!--string="Invoices" type="object"-->
-                                    <!--attrs="{'invisible':[('has_invoices','=',False)]}" icon="fa-bars"/>-->
+                            <!--string="Invoices" type="object"-->
+                            <!--attrs="{'invisible':[('has_invoices','=',False)]}" icon="fa-bars"/>-->
                             <!--<field name="has_invoices" invisible="1"/>-->
                         </div>
                         <field name="id" invisible="1"/>
@@ -48,19 +48,43 @@
                         <group>
                             <group>
                                 <!--<field name="is_show" invisible="1"/>-->
-                                <field name="employee_id"/>
-                                <field name="department_id"/>
-                                <field name="to_approve_id" string="待审核" readonly="1"/>
-                              <field name="amount"/>
-
+                                <field name="employee_id" string="员工"/>
+                                <field name="department_id" string="部门" invisible="1"/>
+                                <field name="to_approve_id" string="待审核" readonly="1"
+                                       attrs="{'invisible': [('to_approve_id', '=', False)]}"/>
+                                <field name="amount" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="remark" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                             </group>
                             <group>
-                                <!--<field name="payment_date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>-->
+                                <field name="apply_date" attrs="{'readonly': [('state', '!=', 'draft')]}"
+                                       string="申请日期"/>
 
                             </group>
                         </group>
                     </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
                 </form>
+            </field>
+        </record>
+
+        <record id="view_account_employee_payment_tree" model="ir.ui.view">
+            <field name="name">account.payment.tre</field>
+            <field name="model">account.employee.payment</field>
+            <field name="arch" type="xml">
+                <tree string="Register Payment" version="7">
+                    <field name="employee_id" string="员工"/>
+                    <field name="department_id" string="部门" invisible="1"/>
+                    <field name="to_approve_id" string="待审核" readonly="1"
+                           attrs="{'invisible': [('to_approve_id', '=', False)]}"/>
+                    <field name="amount" />
+                    <field name="remark" />
+                    <field name="apply_date" string="申请日期"/>
+
+
+                </tree>
             </field>
         </record>
         <record id="action_account_employee_payment_apply" model="ir.actions.act_window">
@@ -70,7 +94,7 @@
 
 
             <!--<field name="domain">[('partner_type','=','employee')]</field>-->
-            <!--<field name="domain">[('partner_id.user_ids', '=', uid)]</field>-->
+            <field name="domain">[('employee_id.user_id', '=', uid)]</field>
 
 
             <field name="help" type="html">
@@ -83,6 +107,23 @@
             </field>
         </record>
 
+                <record id="action_account_payment_wait_pay" model="ir.actions.act_window">
+            <field name="name">待审核</field>
+            <field name="res_model">account.employee.payment</field>
+            <field name="view_mode">tree,form</field>
+
+            <field name="domain">[('state','=','approve')]</field>
+
+
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click here to create a new account payment.
+                </p>
+                <p>
+                    Once you have created your expense, submit it to your manager who will validate it.
+                </p>
+            </field>
+        </record>
         <record id="action_account_payment_to_approve" model="ir.actions.act_window">
             <field name="name">待审核</field>
             <field name="res_model">account.employee.payment</field>
@@ -90,7 +131,7 @@
 
 
             <!--<field name="context">{'default_payment_type':'outbound','default_partner_type':'employee'}</field>-->
-            <!--<field name="domain">[('to_approve_id','=',uid)]</field>-->
+            <field name="domain">[('to_approve_id','=',uid)]</field>
 
 
             <field name="help" type="html">
@@ -111,7 +152,7 @@
 
 
             <!--<field name="context">{'default_payment_type':'outbound','default_partner_type':'employee'}</field>-->
-            <!--<field name="domain">[('approve_ids','child_of',[uid])]</field>-->
+            <field name="domain">[('approve_ids','child_of',[uid])]</field>
 
 
             <field name="help" type="html">
@@ -165,11 +206,14 @@
                   action="action_account_payment_to_approved"/>
 
 
-
         <menuitem id="menu_account_payment_all" name="所有暂支" sequence="0"
                   parent="menu_account_payment"
                   groups="base.group_erp_manager"
                   action="action_account_payment_all"/>
+              <menuitem id="menu_account_payment_wait_pay" name="待付款暂支" sequence="0"
+                  parent="menu_account_payment"
+                  groups="account.group_account_user"
+                  action="action_account_payment_wait_pay"/>
 
 
     </data>

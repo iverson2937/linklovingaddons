@@ -24,7 +24,7 @@
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'security/groups.xml',
         'security/hide_menu.xml',
         # 'security/hr_expense_sheet_rule.xml',

@@ -7,12 +7,21 @@ from odoo.exceptions import UserError
 class AccountEmployeePayment(models.Model):
     _name = 'account.employee.payment'
     _inherit = ['mail.thread', 'ir.needaction_mixin']
+    _order = 'create_date desc'
     name = fields.Char()
-    employee_id = fields.Many2one('hr.employee')
+    employee_id = fields.Many2one('hr.employee',default=lambda self: self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1))
     department_id = fields.Many2one('hr.department')
-    to_approve_id = fields.Many2one('res.users')
+    to_approve_id = fields.Many2one('res.users', track_visibility='onchange')
     approve_ids = fields.Many2many('res.users')
-    amount=fields.Float(string='申请金额')
+    apply_date = fields.Date(default=fields.Date.context_today)
+    amount = fields.Float(string='申请金额')
+    remark = fields.Text(string='备注')
+    @api.one
+    @api.onchange('employee_id')
+    def _onchange_employee_id(self):
+        print 'ddddddddddddddd'
+
+        self.department_id = self.employee_id.department_id
 
     def _get_is_show(self):
         if self._context.get('uid') == self.to_approve_id.id:
@@ -28,7 +37,7 @@ class AccountEmployeePayment(models.Model):
                               ('manager3_approve', u'总经理审批'),
                               ('approve', u'批准'),
                               ('paid', 'Paid')],
-                             readonly=True, default='draft', copy=False, string="Status")
+                             readonly=True, default='draft', copy=False, string="Status", track_visibility='onchange')
 
     @api.multi
     def submit(self):
@@ -83,8 +92,7 @@ class AccountEmployeePayment(models.Model):
     @api.multi
     def post(self):
 
-
-        context = {'default_payment_type': 'inbound', 'default_amount': self.amount}
+        context = {'default_payment_type': 'employee', 'default_amount': self.amount}
 
         return {
             'name': _('payment'),
@@ -98,3 +106,9 @@ class AccountEmployeePayment(models.Model):
             'target': 'new',
         }
 
+    @api.model
+    def create(self, vals):
+        if not vals.get('name'):
+            vals['name'] = self.env['ir.sequence'].next_by_code('account.employee.payment') or '/'
+            print vals['name']
+        return super(AccountEmployeePayment, self).create(vals)

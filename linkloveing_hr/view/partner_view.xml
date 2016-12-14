@@ -10,6 +10,8 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='lang']" position="after">
                     <field name="employee"/>
+                    <field name="employee_payment_id"/>
+                    <field name="payment_balance"/>
                 </xpath>
             </field>
         </record>
