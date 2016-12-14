@@ -10,7 +10,7 @@
                 <form>
                     <header>
                         <button name="post" string="提交" type="object"
-                                class="oe_highlight" states="draft" groups="account.group_account_invoice"/>
+                                class="oe_highlight" states="draft" groups="purchase.group_purchase_user"/>
                         <button name="reject" string="退回" type="object"
                                 states="posted"/>
                         <button name="confirm" string="确认" type="object"
