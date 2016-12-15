@@ -53,7 +53,7 @@ class AccountPaymentRegister(models.Model):
 
     _sql_constraints = {
         ('name_uniq', 'unique(name)',
-         'Name mast be unique!')
+         'Name must be unique!')
     }
 
     @api.multi
@@ -105,6 +105,8 @@ class AccountPaymentRegister(models.Model):
             else:
                 vals['name'] = self.env['ir.sequence'].next_by_code('account.pay') or _('New')
         return super(AccountPaymentRegister, self).create(vals)
+
+
 
 
 class account_payment(models.Model):
