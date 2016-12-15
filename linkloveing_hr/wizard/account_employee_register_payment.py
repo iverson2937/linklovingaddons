@@ -61,7 +61,7 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
         self.ensure_one()
         context = dict(self._context or {})
         active_ids = context.get('active_ids', [])
-        # expense_sheet = self.env['hr.expense.sheet'].browse(active_ids)
+        employee_payment = self.env['account.employee.payment'].browse(active_ids)
 
         # Create payment and post it
         payment = self.env['account.payment'].create({
@@ -91,5 +91,5 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
         #     if line.account_id.internal_type == 'payable':
         #         account_move_lines_to_reconcile |= line
         # account_move_lines_to_reconcile.reconcile()
-
+        employee_payment.state='paid'
         return {'type': 'ir.actions.act_window_close'}

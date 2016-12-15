@@ -11,7 +11,7 @@
                 <xpath expr="//field[@name='lang']" position="after">
                     <field name="employee"/>
                     <field name="employee_payment_id"/>
-                    <field name="payment_balance"/>
+                    <field name="payment_balance" string="暂支款" attrs="{'invisible': [('employee', '=', False)]}"/>
                 </xpath>
             </field>
         </record>

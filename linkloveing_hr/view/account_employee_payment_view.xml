@@ -25,7 +25,7 @@
                                 groups="hr_expense.group_hr_expense_user"
                                 type="object"/>
                         <field name="state" widget="statusbar"
-                               statusbar_visible="draft,confirm,manager1_approve,manager2_approve"/>
+                               statusbar_visible="draft,confirm,manager1_approve,manager2_approve,paid"/>
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">

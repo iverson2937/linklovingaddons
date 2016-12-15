@@ -36,7 +36,7 @@ class AccountEmployeePayment(models.Model):
                               ('manager2_approve', u'二级审批'),
                               ('manager3_approve', u'总经理审批'),
                               ('approve', u'批准'),
-                              ('paid', 'Paid')],
+                              ('paid', u'已支付')],
                              readonly=True, default='draft', copy=False, string="Status", track_visibility='onchange')
 
     @api.multi
