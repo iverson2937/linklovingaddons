@@ -80,14 +80,5 @@ class PurchaseOrderLine(models.Model):
             self.date_planned = self.order_id.handle_date
         return result
 
-    @api.multi
-    def unlink(self):
-        for line in self:
-            if line.order_id.state in ['done']:
-                raise UserError(_('Cannot delete a purchase order line which is in state \'%s\'.') %(line.state,))
-            for proc in line.procurement_ids:
-                proc.message_post(body=_('Purchase order line deleted.'))
-            line.procurement_ids.filtered(lambda r: r.state != 'cancel').write({'state': 'exception'})
-        return super(models.Model, self).unlink()
 
 
