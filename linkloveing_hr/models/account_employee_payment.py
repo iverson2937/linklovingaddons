@@ -16,12 +16,8 @@ class AccountEmployeePayment(models.Model):
     apply_date = fields.Date(default=fields.Date.context_today)
     amount = fields.Float(string='申请金额')
     remark = fields.Text(string='备注')
-    @api.one
-    @api.onchange('employee_id')
-    def _onchange_employee_id(self):
-        print 'ddddddddddddddd'
 
-        self.department_id = self.employee_id.department_id
+
 
     def _get_is_show(self):
         if self._context.get('uid') == self.to_approve_id.id:
@@ -45,7 +41,7 @@ class AccountEmployeePayment(models.Model):
 
         if self.employee_id == self.employee_id.department_id.manager_id:
             department = self.to_approve_id.employee_ids.department_id
-            if department.allow_amount and self.total_amount > department.allow_amount:
+            if department.allow_amount and self.amount > department.allow_amount:
                 self.write({'state': 'approve'})
             else:
                 self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
@@ -58,7 +54,7 @@ class AccountEmployeePayment(models.Model):
         #     self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
         # else:
         department = self.to_approve_id.employee_ids.department_id
-        if department.allow_amount and self.total_amount < department.allow_amount:
+        if department.allow_amount and self.amount < department.allow_amount:
             self.to_approve_id = False
             self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
 

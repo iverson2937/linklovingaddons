@@ -31,11 +31,11 @@
         'view/account_employee_payment_view.xml',
         'view/hr_expense_views.xml',
         'view/hr_department_view.xml',
-        'view/partner_view.xml',
         'view/hr_expense_sheet_views.xml',
         'view/hr_employee.xml',
         'wizard/hr_expense_register_payment.xml',
-        'wizard/account_employee_register_payment_wizard.xml'
+        'wizard/account_employee_register_payment_wizard.xml',
+        'wizard/account_employee_payable_wizard.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
