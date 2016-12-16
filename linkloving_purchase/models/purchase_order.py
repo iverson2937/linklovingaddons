@@ -88,6 +88,6 @@ class PurchaseOrderLine(models.Model):
             for proc in line.procurement_ids:
                 proc.message_post(body=_('Purchase order line deleted.'))
             line.procurement_ids.filtered(lambda r: r.state != 'cancel').write({'state': 'exception'})
-        return super(PurchaseOrderLine, self).unlink()
+        return super(models.Model, self).unlink()
 
 
