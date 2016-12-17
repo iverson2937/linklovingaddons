@@ -13,8 +13,8 @@
                     <field name="journal_id"/>
                 </xpath>
                 <xpath expr="//field[@name='employee_id']" position="after">
-                    <!--<field name="pre_payment_reminding" attrs="{'invisible': [('pre_payment_reminding', '=', False)]}"-->
-                    <!--readonly="1"/>-->
+                    <field name="pre_payment_reminding" attrs="{'invisible': [('pre_payment_reminding', '=', False)]}"
+                    readonly="1"/>
                     <field name="to_approve_id" string="待审批人"/>
                     <field name="is_show" invisible="1"/>
                 </xpath>

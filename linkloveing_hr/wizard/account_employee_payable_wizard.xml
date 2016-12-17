@@ -14,10 +14,11 @@
                         <!--products later.  Do not create a backorder if you will not-->
                         <!--supply the remaining products.-->
                     <!--</p>-->
+                    <field name="sheet_id" invisible="1"/>
                 </group>
                 <footer>
                     <button name="process" string="是" type="object" class="oe_highlight"/>
-                    <button name="process_cancel_backorder" string="否" type="object" class="btn-primary"/>
+                    <button name="no_deduct_process" string="否" type="object" class="btn-primary"/>
                     <button string="_Cancel" class="btn-default" special="cancel" />
                 </footer>
             </form>

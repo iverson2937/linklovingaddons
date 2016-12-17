@@ -19,13 +19,13 @@ class HrExpenseSheet(models.Model):
     expense_no = fields.Char(string=u'报销编号')
     approve_ids = fields.Many2many('res.users')
 
-    # @api.one
-    # @api.depends('employee_id.user_id.partner_id.payment_balance')
-    # def _get_pre_payment_reminding_balance(self):
-    #
-    #         self.pre_payment_reminding = self.employee_id.user_id.partner_id.payment_balance
-    #
-    # pre_payment_reminding = fields.Float(string=u'暂支余额', compute=_get_pre_payment_reminding_balance)
+    @api.one
+    @api.depends('employee_id.user_id.partner_id.debit')
+    def _get_pre_payment_reminding_balance(self):
+
+            self.pre_payment_reminding = -self.employee_id.user_id.partner_id.debit
+
+    pre_payment_reminding = fields.Float(string=u'暂支余额', compute=_get_pre_payment_reminding_balance)
 
     @api.multi
     def action_sheet_move_create(self):
@@ -136,7 +136,23 @@ class HrExpenseSheet(models.Model):
         return self.write({'state': 'submit'})
 
     @api.multi
-    def action_sheet_move_create(self):
+    def deduct_payment(self):
+        if any(sheet.state != 'approve' for sheet in self):
+            raise UserError(_("You can only generate accounting entry for approved expense(s)."))
+
+        if any(not sheet.journal_id for sheet in self):
+            raise UserError(_("Expenses must have an expense journal specified to generate accounting entries."))
+
+
+        if self.pre_payment_reminding>=self.total_amount:
+            res = self.mapped('expense_line_ids').action_move_create()
+            self.write({'state': 'done'})
+        else:
+            self.write({'state': 'post'})
+        return res
+
+    @api.multi
+    def no_deduct_payment(self):
         if any(sheet.state != 'approve' for sheet in self):
             raise UserError(_("You can only generate accounting entry for approved expense(s)."))
 
@@ -144,23 +160,27 @@ class HrExpenseSheet(models.Model):
             raise UserError(_("Expenses must have an expense journal specified to generate accounting entries."))
 
         res = self.mapped('expense_line_ids').action_move_create()
-
-        if not self.accounting_date:
-            self.accounting_date = self.account_move_id.date
-
-        if self.payment_mode == 'own_account' and self.pre_payment_reminding < self.total_amount:
-            self.write({'state': 'post'})
-        else:
-            self.write({'state': 'done'})
+        self.write({'state': 'post'})
         return res
 
     @api.multi
     def to_do_journal_entry(self):
-        return {
-            'name': _('费用报销'),
-            'type': 'ir.actions.act_window',
-            'res_model':"account.employee.payable.wizard",
-            'view_mode': 'form',
-            'view_type': 'form',
-            'target':'new'
-        }
+        if self.pre_payment_reminding<=0:
+            if any(sheet.state != 'approve' for sheet in self):
+                raise UserError(_("You can only generate accounting entry for approved expense(s)."))
+
+            if any(not sheet.journal_id for sheet in self):
+                raise UserError(_("Expenses must have an expense journal specified to generate accounting entries."))
+
+            self.mapped('expense_line_ids').action_move_create()
+            self.write({'state': 'post'})
+        else:
+            return {
+                'name': _('费用报销'),
+                'type': 'ir.actions.act_window',
+                'res_model':"account.employee.payable.wizard",
+
+                'view_mode': 'form',
+                'view_type': 'form',
+                'target':'new'
+            }
