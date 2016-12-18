@@ -53,7 +53,7 @@
                 </xpath>
 
                 <xpath expr="//button[@name='action_sheet_move_create']" position="replace">
-                    <button name="to_do_journal_entry" states="approve" string="Post Journal Entries" type="object"
+                    <button name="to_do_journal_entry" states="approve" string="会计确认" type="object"
                             groups="account.group_account_user" class="oe_highlight o_expense_sheet_post"/>
                 </xpath>
 
