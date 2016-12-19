@@ -18,6 +18,7 @@ class HrExpenseSheet(models.Model):
     _inherit = 'hr.expense.sheet'
     expense_no = fields.Char(string=u'报销编号')
     approve_ids = fields.Many2many('res.users')
+    is_deduct_payment = fields.Boolean(default=False)
 
     @api.one
     @api.depends('employee_id.user_id.partner_id.debit')
@@ -145,11 +146,12 @@ class HrExpenseSheet(models.Model):
 
 
         if self.pre_payment_reminding>=self.total_amount:
-            res = self.mapped('expense_line_ids').action_move_create()
+
             self.write({'state': 'done'})
         else:
             self.write({'state': 'post'})
-        return res
+        self.write({'is_deduct_payment': True})
+        self.mapped('expense_line_ids').action_move_create()
 
     @api.multi
     def no_deduct_payment(self):
@@ -185,3 +187,24 @@ class HrExpenseSheet(models.Model):
                 'target':'new'
             }
 
+
+    @api.multi
+    def register_payment_action(self):
+        amount = self.total_amount
+        if self.is_deduct_payment:
+            amount = self.employee_id.user_id.partner_id.debit
+
+        context = {'default_payment_type': 'inbound', 'default_amount': amount}
+        print self.ids
+
+        return {
+            'name': _('付款'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            # 'view_id': False,
+            'res_model': 'hr.expense.register.payment.wizard',
+            'domain': [],
+            'context': dict(context, active_ids=self.ids),
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+        }
