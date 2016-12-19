@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <report
+                string="打印暂支申请单"
+                id="action_report_account_employee_payment"
+                model="account.employee.payment"
+                report_type="qweb-pdf"
+                name="linkloveing_hr.report_account_employee_payment"
+                file="linkloveing_hr.report_account_employee_payment"
+
+        />
+    </data>
+</openerp>
+
+
+        <!--<?xml version="1.0" encoding="utf-8"?>-->
+        <!--<openerp>-->
+        <!--<data>-->
+
+        <!--<report-->
+        <!--string="打印付款管理"-->
+        <!--id="action_report_payment_invoice"-->
+        <!--model="account.pool"-->
+        <!--report_type="qweb-pdf"-->
+        <!--name="linkloving_account.report_payment_invoice"-->
+        <!--file="linkloving_account.report_payment_invoice"-->
+        <!--/>-->
+
+
+        <!--</data>-->
+        <!--</openerp>-->

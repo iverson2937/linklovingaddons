@@ -35,7 +35,9 @@
         'view/hr_employee.xml',
         'wizard/hr_expense_register_payment.xml',
         'wizard/account_employee_register_payment_wizard.xml',
-        'wizard/account_employee_payable_wizard.xml'
+        'wizard/account_employee_payable_wizard.xml',
+        'report/report_template.xml',
+        'report/report.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

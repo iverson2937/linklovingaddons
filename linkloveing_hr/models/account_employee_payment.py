@@ -108,3 +108,16 @@ class AccountEmployeePayment(models.Model):
             vals['name'] = self.env['ir.sequence'].next_by_code('account.employee.payment') or '/'
             print vals['name']
         return super(AccountEmployeePayment, self).create(vals)
+
+
+    # @api.multi
+    # def get_state(self):
+    #     """
+    #     Returns this order lines classified by sale_layout_category and separated in
+    #     pages according to the category pagebreaks. Used to render the report.
+    #     """
+    #     self.ensure_one()
+    #     print 'dddddddddddddddddddddddddddddddddddfssddddddddddddddddddddddddddddddddddddddddd'
+    #     # raise UserError('DDDDDDDDDDDDDDDDDDDDDDDD')
+    #
+    #     return 'state'

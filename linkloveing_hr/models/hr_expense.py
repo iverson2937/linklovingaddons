@@ -184,3 +184,4 @@ class HrExpenseSheet(models.Model):
                 'view_type': 'form',
                 'target':'new'
             }
+
