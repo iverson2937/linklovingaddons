@@ -82,6 +82,7 @@
                     <field name="amount" />
                     <field name="remark" />
                     <field name="apply_date" string="申请日期"/>
+                    <field name="state"/>
 
 
                 </tree>
