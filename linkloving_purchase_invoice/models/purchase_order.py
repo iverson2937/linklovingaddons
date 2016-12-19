@@ -93,7 +93,6 @@ class PurchaseOrder(models.Model):
         journal_id = self.env['account.invoice'].default_get(['journal_id'])['journal_id']
         if not journal_id:
             raise UserError(_('Please define an accounting sale journal for this company.'))
-        print self.payment_term_id.id, 'self.payment_term_id.id'
         invoice_vals = {
             'name': self.name,
             'origin': self.name,
