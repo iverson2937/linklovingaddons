@@ -16,6 +16,8 @@ class AccountEmployeePayment(models.Model):
     apply_date = fields.Date(default=fields.Date.context_today)
     amount = fields.Float(string='申请金额')
     remark = fields.Text(string='备注')
+    address_home_id=fields.Many2one('res.partner',related='employee_id.address_home_id')
+    bank_account_id=fields.Many2one('res.partner.bank',related='employee_id.bank_account_id')
 
 
 

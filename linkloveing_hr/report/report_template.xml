@@ -9,25 +9,6 @@
                         <t t-call="report.internal_layout">
                             <div class="page">
                                 <div class="oe_structure"/>
-                                <!--<h2>Production Order N° : <span t-field="o.name"/></h2>-->
-
-                                <!--<div class="row">-->
-                                <!--<div class="col-xs-3">-->
-                                <!--<span t-field="o.employee_id.acc_number"></span>-->
-                                <!--&lt;!&ndash;<span t-raw="'%s &lt;br&gt;' % o.bank_id.name if o.bank_id.name else ''"/>&ndash;&gt;-->
-
-                                <!--</div>-->
-                                <!--<div class="col-xs-3">-->
-                                <!--<span t-field="o.employee_id.name"></span>-->
-                                <!--&lt;!&ndash;<span t-raw="'%s &lt;br&gt;' % o.bank_id.name if o.bank_id.name else ''"/>&ndash;&gt;-->
-
-                                <!--</div>-->
-                                <!--<div class="col-xs-3">-->
-                                <!--<span t-field="o.employee_id.bank_id"></span>-->
-                                <!--&lt;!&ndash;<span t-raw="'%s &lt;br&gt;' % o.bank_id.name if o.bank_id.name else ''"/>&ndash;&gt;-->
-
-                                <!--</div>-->
-                                <!--</div>-->
 
                                 <h2>暂支申请单</h2>
 
@@ -128,6 +109,7 @@
                                 </div>
                                 <div class="col-xs-3">
                                     <strong>制单人:</strong>
+                                    <span t-field="o.create_uid.name"></span>
                                 </div>
 
                                 <div class="oe_structure"/>

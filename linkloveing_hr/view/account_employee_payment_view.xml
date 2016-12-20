@@ -49,6 +49,8 @@
                             <group>
                                 <!--<field name="is_show" invisible="1"/>-->
                                 <field name="employee_id" string="员工"/>
+                                <field name="bank_account_id" string="银行账号" context="{'default_partner_id':address_home_id}"/>
+                                <field name="address_home_id" invisible="1" />
                                 <field name="department_id" string="部门" invisible="1"/>
                                 <field name="to_approve_id" string="待审核" readonly="1"
                                        attrs="{'invisible': [('to_approve_id', '=', False)]}"/>
@@ -76,6 +78,7 @@
             <field name="arch" type="xml">
                 <tree string="Register Payment" version="7">
                     <field name="employee_id" string="员工"/>
+                    <field name="bank_account_id"/>
                     <field name="department_id" string="部门" invisible="1"/>
                     <field name="to_approve_id" string="待审核" readonly="1"
                            attrs="{'invisible': [('to_approve_id', '=', False)]}"/>
