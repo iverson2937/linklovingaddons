@@ -87,5 +87,28 @@
         </field>
     </record>
 
+                <record id="sale.action_quotations" model="ir.actions.act_window">
+            <field name="name">Quotations</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="sale.view_quotation_tree"/>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+            <field name="search_view_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+            <field name="context">{'hide_sale': True}</field>
+                    <field name="domain">[('state','in',['draft','sent'])]</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Create a Quotation, the first step of a new sale.
+              </p><p>
+                Your next actions should flow efficiently: confirm the Quotation
+                to a Sale Order, then create the Invoice and collect the Payment.
+              </p><p>
+                Note that once a Quotation becomes a Sale Order, it will be moved
+                from the Quotations list to the Sales Order list.
+              </p>
+            </field>
+        </record>
+
     </data>
 </openerp>
