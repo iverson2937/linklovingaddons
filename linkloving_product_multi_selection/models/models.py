@@ -116,7 +116,8 @@ class linkloving_product_multi_selection(models.Model):
 
     product_ids = fields.Many2many('product.template', string='Products to make Order',                                 )
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user.id)
-
+    sale_ok = fields.Boolean()
+    purchase_ok = fields.Boolean()
     
 class SaleOrderDefaultGet(models.Model):
     _inherit = 'sale.order'
@@ -129,7 +130,7 @@ class SaleOrderDefaultGet(models.Model):
         return {'type': 'ir.actions.act_window',
                 'res_model': 'll_pro_multi_sel.ll_pro_multi_sel',
                 'view_mode': 'form',
-                'context': '{"order_id":%s, "default_product_ids": %s}' % (self.id, product_ids),
+                'context': '{"order_id":%s, "default_product_ids": %s,"sale_ok":True}' % (self.id, product_ids),
                 # 'res_id': self.product_tmpl_id.id,
                 'target': 'new'}
     
@@ -157,6 +158,28 @@ class PurchaseOrderDefaultGet(models.Model):
         return {'type': 'ir.actions.act_window',
                 'res_model': 'll_pro_multi_sel.ll_pro_multi_sel',
                 'view_mode': 'form',
-                'context': '{"order_id":%s, "default_product_ids": %s}' % (self.id, product_ids),
+                'context': '{"order_id":%s, "default_product_ids": %s,"purchase_ok":True}' % (self.id, product_ids),
                 # 'res_id': self.product_tmpl_id.id,
                 'target': 'new'}
+
+
+class ProductCategoryExtend(models.Model):
+    _inherit = 'product.category'
+
+    @api.multi
+    def name_get(self):
+        def get_names(cat):
+            """ Return the list [cat.name, cat.parent_id.name, ...] """
+            res = []
+            while cat:
+                name = cat.name[0:16].encode('utf-8')
+                if len(cat.name) > 16:
+                    new_name = unicode(name + '...', 'utf-8')
+                    res.append(new_name)
+                else:
+                    res.append(name)
+                break
+            return res
+
+        name = [(cat.id, " / ".join(reversed(get_names(cat)))) for cat in self]
+        return name

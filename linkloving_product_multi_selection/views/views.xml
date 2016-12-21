@@ -11,7 +11,7 @@
                     <group>
                         <!--<field name="count"/>-->
                         <!--<label for="product_ids"/>-->
-                        <field name="product_ids"  readonly="False">
+                            <field name="product_ids" context="{'search_default_filter_categ_id':1}"  readonly="False" domain="['|',('sale_ok','=',context.get('sale_ok')), ('purchase_ok', '=', context.get('purchase_ok'))]">
                             <tree>
                                 <field name="name"/>
                                 <field name="qty_available"/>
@@ -29,6 +29,21 @@
                 </form>
             </field>
         </record>
+
+
+
+      <record id="product_template_search_dd" model="ir.ui.view">
+        <field name="name">product.template.search.pos.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <field name="pricelist_id" position="after">
+               <group expand="0" name="group_by" string="Group By">
+                       <filter name="filter_categ_id" string="内部分类" domain="[]" context="{'group_by' : 'categ_id'}"/>
+                   </group>
+            </field>
+        </field>
+    </record>
 
         <!--<record id="action_view_create_order" model="ir.actions.act_window">-->
             <!--<field name="name">Create Order</field>-->
