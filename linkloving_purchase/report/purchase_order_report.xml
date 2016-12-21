@@ -42,6 +42,10 @@
                     <strong>Order Date:</strong>
                     <p t-field="o.date_order"/>
                 </div>
+                  <div t-if="o.remark" class="col-xs-3">
+                    <strong>备注:</strong>
+                    <p t-field="o.remark"/>
+                </div>
             </div>
 
             <table class="table table-bordered table-condensed">

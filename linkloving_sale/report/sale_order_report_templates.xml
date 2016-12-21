@@ -50,6 +50,10 @@
                     <p t-field="doc.payment_term_id"/>
                 </div>
             </div>
+            <div t-if="doc.pi_number">
+                <strong>PI No:</strong>
+                <p t-field="doc.pi_number"/>
+            </div>
 
             <!-- Is there a discount on at least one line? -->
             <t t-set="display_discount" t-value="any([l.discount for l in doc.order_line])"/>

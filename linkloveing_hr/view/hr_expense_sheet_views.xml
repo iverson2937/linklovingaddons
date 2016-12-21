@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="linkloving_view_expenses_form" model="ir.ui.view">
+            <field name="model">hr.expense.sheet</field>
+            <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_form"/>
+            <field name="arch" type="xml">
+                <field name="department_id"/>
+                <xpath expr="//field[@name='department_id']" position="after">
+                    <field name="department_id"/>
+                </xpath>
+                <xpath expr="//field[@name='journal_id']" position="replace">
+                    <field name="journal_id"/>
+                </xpath>
+                <xpath expr="//field[@name='employee_id']" position="after">
+                    <field name="pre_payment_reminding" attrs="{'invisible': [('pre_payment_reminding', '=', False)]}"
+                    readonly="1"/>
+                    <field name="to_approve_id" string="待审批人"/>
+                    <field name="is_show" invisible="1"/>
+                </xpath>
+                <xpath expr="//button[@name='%(hr_expense.hr_expense_register_payment_wizard_action)d']"
+                       position="replace">
+                    <button name="register_payment_action" type="object" string="登记付款"
+                            class="oe_highlight o_expense_sheet_pay" attrs="{'invisible': [('state', '!=', 'post')]}"
+                            context="{'default_amount': total_amount, 'partner_id': address_id}"
+                            groups="account.group_account_user"/>
+
+                </xpath>
+
+                <xpath expr="//button[@name='approve_expense_sheets']" position="before">
+                    <button name="manager1_approve" string="批准" type="object"
+                            groups="hr_expense.group_hr_expense_user" class="oe_highlight o_expense_sheet_approve"
+                            attrs="{'invisible':['|',('is_show','=',False),('state','!=','submit')]}"
+                    />
+                    <button name="manager2_approve" states="manager1_approve" string="批准" type="object"
+                            groups="hr_expense.group_hr_expense_manager" class="oe_highlight o_expense_sheet_approve"/>
+                    <button name="manager3_approve" states="manager2_approve" string="批准" type="object"
+                            groups="linkloving_hr.group_hr_expense_manager"
+                            class="oe_highlight o_expense_sheet_approve"/>
+                </xpath>
+                <xpath expr="//button[@name='approve_expense_sheets']" position="replace">
+                    <button name="approve_expense_sheets" states="submit" string="Approve" type="object"
+                            groups="base.group_erp_manager" class="oe_highlight o_expense_sheet_approve"/>
+                </xpath>
+                <xpath expr="//field[@name='state']" position="replace">
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submit,manager1_approve,manager2_approve,approve,post,done"/>
+                </xpath>
+                <xpath expr="//button[@name='%(hr_expense.hr_expense_refuse_wizard_action)d']" position="replace">
+                    <button name="%(hr_expense.hr_expense_refuse_wizard_action)d"
+                            states="submit,manager1_approve,manager2_approve,manager3_approve" string="Refuse"
+                            type="action" groups="hr_expense.group_hr_expense_user"/>
+                </xpath>
+
+                <xpath expr="//button[@name='action_sheet_move_create']" position="replace">
+                    <button name="to_do_journal_entry" states="approve" string="会计确认" type="object"
+                            groups="account.group_account_user" class="oe_highlight o_expense_sheet_post"/>
+                </xpath>
+
+
+            </field>
+        </record>
+
+
+        <record id="linkloving_view_expenses_tree" model="ir.ui.view">
+            <field name="model">hr.expense.sheet</field>
+            <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="before">
+                    <field name="expense_no" string="报销编号"/>
+                </xpath>
+            </field>
+        </record>
+
+
+    </data>
+</openerp>

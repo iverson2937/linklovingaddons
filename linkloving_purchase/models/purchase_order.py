@@ -79,3 +79,6 @@ class PurchaseOrderLine(models.Model):
         if self.order_id.handle_date:
             self.date_planned = self.order_id.handle_date
         return result
+
+
+

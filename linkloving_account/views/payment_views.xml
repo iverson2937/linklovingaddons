@@ -10,13 +10,13 @@
                 <form>
                     <header>
                         <button name="post" string="提交" type="object"
-                                class="oe_highlight" states="draft" groups="account.group_account_invoice"/>
+                                class="oe_highlight" states="draft" groups="purchase.group_purchase_user"/>
                         <button name="reject" string="退回" type="object"
-                                states="posted"/>
+                                states="posted" groups="purchase.group_purchase_manager"/>
                         <button name="confirm" string="确认" type="object"
-                                states="posted"/>
+                                states="posted" groups="purchase.group_purchase_manager"/>
                         <button name="done" string="完成" type="object"
-                                states="confirm"/>
+                                states="confirm" groups="purchase.group_purchase_manager"/>
 
 
                         <field name="state" widget="statusbar" statusbar_visible="draft,posted,confirm,done"/>
@@ -77,13 +77,13 @@
                 <form>
                     <header>
                         <button name="post" string="提交" type="object"
-                                class="oe_highlight" states="draft" groups="account.group_account_invoice"/>
+                                class="oe_highlight" states="draft" groups="purchase.group_purchase_user"/>
                         <button name="reject" string="退回" type="object"
-                                states="posted"/>
+                                states="posted"  groups="purchase.group_purchase_manager"/>
                         <button name="confirm" string="确认" type="object"
-                                states="posted"/>
+                                states="posted"  groups="purchase.group_purchase_manager"/>
                            <button name="done" string="完成" type="object"
-                                states="confirm"/>
+                                states="confirm" />
 
 
                         <field name="state" widget="statusbar" statusbar_visible="draft,posted,confirm,done"/>
@@ -99,19 +99,18 @@
                                    domain="[('supplier', '=', True),('is_company', '=', True)]"/>
                             <field name="amount" attrs="{'readonly':[('state','!=','draft')]}" required="1"/>
                             <field name="receive_date" required="1" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                            <field name="bank_ids"
+                            <field name="bank_ids" widget="many2many_tags"
                                    attrs="{'readonly':[('state','!=','draft')],'readonly': [('state', '=', 'done')]}"
                                    context="{'default_partner_id':partner_id}"/>
+
                             <field name="journal_id" string="收入账户" required="1"
                                    attrs="{'readonly': [('state', '=', 'done')]}"/>
                             <field name="remark" required="1" attrs="{'readonly': [('state', '=', 'done')]}"/>
                         </group>
                         <notebook colspan="4">
-                            <page string="Invoices" autofocus="autofocus">
-                                <group>
+                            <page string="对账单" autofocus="autofocus">
                                     <field name="invoice_ids"
                                            domain="[('partner_id','=', partner_id),('state','=', 'open'),('remain_apply_balance','!=',0 )]"/>
-                                </group>
 
                             </page>
                         </notebook>
