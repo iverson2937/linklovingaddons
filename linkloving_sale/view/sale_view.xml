@@ -21,9 +21,12 @@
             <field name="arch" type="xml">
                 <xpath expr="//tree/field[@name='analytic_tag_ids']" position="replace">
                 </xpath>
-                <xpath expr="//tree/field[@name='product_id']" position="after">
-                    <field name="product_specs"/>
+                <xpath expr="//tree/field[@name='name']" position="replace">
+                    <field name="name" invisible="1"/>
                 </xpath>
+                <!--<xpath expr="//tree/field[@name='product_id']" position="after">-->
+                    <!--<field name="product_specs"/>-->
+                <!--</xpath>-->
 
                 <xpath expr="//tree/field[@name='product_id']" position="replace">
                     <field name="product_id" options="{'no_create': True}"/>
