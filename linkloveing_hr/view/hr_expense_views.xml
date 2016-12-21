@@ -18,9 +18,9 @@
             <field name="view_mode">tree,kanban,form,pivot,graph</field>
             <field name="search_view_id" ref="hr_expense.view_hr_expense_sheet_filter"/>
             <field name="domain">[('to_approve_id','=',uid)]</field>
-            <field name="context">{'uid':uid}</field>
 
-            <field name="context">{}</field>
+            <field name="context">{'to_approve_id':True}</field>
+
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
                     Click here to create a new expense report.
@@ -37,7 +37,6 @@
             <field name="view_mode">tree,kanban,form,pivot,graph</field>
             <field name="search_view_id" ref="hr_expense.view_hr_expense_sheet_filter"/>
             <field name="domain">[('approve_ids','child_of',[uid])]</field>
-            <field name="context">{}</field>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
                     Click here to create a new expense report.
@@ -62,6 +61,23 @@
                 </p>
             </field>
         </record>
+
+        <record id="view_hr_expense_sheet_filter" model="ir.ui.view">
+        <field name="name">res.partner.geo.inherit.search</field>
+        <field name="model">hr.expense.sheet</field>
+        <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_filter"/>
+        <field name="arch" type="xml">
+            <filter name="approved" position="replace">
+                <filter domain="[('state', '=', 'post')]" string="To Pay" name="approved" help="Expenses to Invoice"/>
+            </filter>
+            <field name="name" position="after">
+                <field name="total_amount"/>
+            </field>
+        </field>
+    </record>
+
+
+
 
 
         <menuitem id="hr_expense.menu_hr_expense_sheet_all_to_approve" name="Expense Reports To Approve" sequence="1"
