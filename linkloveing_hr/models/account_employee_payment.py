@@ -112,14 +112,3 @@ class AccountEmployeePayment(models.Model):
         return super(AccountEmployeePayment, self).create(vals)
 
 
-    # @api.multi
-    # def get_state(self):
-    #     """
-    #     Returns this order lines classified by sale_layout_category and separated in
-    #     pages according to the category pagebreaks. Used to render the report.
-    #     """
-    #     self.ensure_one()
-    #     print 'dddddddddddddddddddddddddddddddddddfssddddddddddddddddddddddddddddddddddddddddd'
-    #     # raise UserError('DDDDDDDDDDDDDDDDDDDDDDDD')
-    #
-    #     return 'state'
