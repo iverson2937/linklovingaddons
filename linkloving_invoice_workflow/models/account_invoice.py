@@ -1,15 +1,25 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
+    def _get_po_number(self):
+        if self.origin:
+            po = self.env['purchase.order'].search([('name', '=', self.origin)])
+            self.po_id = po.id if po else None
+
+    po_id = fields.Many2one('purchase.order', compute=_get_po_number)
+    order_line = fields.One2many('purchase.order.line', related='po_id.order_line')
+    remark = fields.Text(string=u'备注')
+
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('post', '提交'),
-        ('validate', '确认'),
+        ('post', u'提交'),
+        ('validate', u'确认'),
         ('proforma', 'Pro-forma'),
         ('proforma2', 'Pro-forma'),
         ('open', 'Open'),
@@ -25,7 +35,7 @@ class AccountInvoice(models.Model):
 
     @api.multi
     def action_post(self):
-        self.state='validate'
+        self.state = 'validate'
 
     @api.multi
     def action_reject(self):
@@ -35,7 +45,7 @@ class AccountInvoice(models.Model):
     def action_invoice_open(self):
         # lots of duplicate calls to action_invoice_open, so we remove those already open
         to_open_invoices = self.filtered(lambda inv: inv.state != 'open')
-        if to_open_invoices.filtered(lambda inv: inv.state not in ['proforma2', 'draft','validate']):
+        if to_open_invoices.filtered(lambda inv: inv.state not in ['proforma2', 'draft', 'validate']):
             raise UserError(_("Invoice must be in draft or Pro-forma state in order to validate it."))
         to_open_invoices.action_date_assign()
         to_open_invoices.action_move_create()
