@@ -123,6 +123,11 @@ class SaleOrderLine(models.Model):
                 partner_id = line.order_id.partner_id
                 discount_obj = line.env['product.price.discount'].search(
                     [('partner_id', '=', partner_id.id), ('product_id', '=', product_id)])
+                if not discount_obj:
+                    discount_obj = self.env['product.price.discount'].create({
+                        'partner_id': partner_id.id,
+                        'product_id': product_id
+                    })
                 if partner_id.level == 1:
                     if not line.tax_id.amount:
                         price = line.product_id.price1
