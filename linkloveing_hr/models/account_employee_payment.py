@@ -111,4 +111,17 @@ class AccountEmployeePayment(models.Model):
             print vals['name']
         return super(AccountEmployeePayment, self).create(vals)
 
+    @api.model
+    def _needaction_domain_get(self):
+        """ Returns the domain to filter records that require an action
+            :return: domain or False is no action
+        """
+        if self._context.get('to_approve_id'):
+            return [('to_approve_id','=',self.env.user.id)]
+        if self._context.get('wait_pay'):
+            return [('state', '=', 'approve')]
+        if self._context.get('search_default_approved'):
+            return [('state', '=', 'post')]
+
+
 

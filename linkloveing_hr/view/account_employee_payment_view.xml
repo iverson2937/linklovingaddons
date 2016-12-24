@@ -101,6 +101,7 @@
             <field name="domain">[('employee_id.user_id', '=', uid)]</field>
 
 
+
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
                     Click here to create a new account payment.
@@ -111,12 +112,13 @@
             </field>
         </record>
 
-                <record id="action_account_payment_wait_pay" model="ir.actions.act_window">
-            <field name="name">待审核</field>
+        <record id="action_account_payment_wait_pay" model="ir.actions.act_window">
+            <field name="name">待付款</field>
             <field name="res_model">account.employee.payment</field>
             <field name="view_mode">tree,form</field>
 
             <field name="domain">[('state','=','approve')]</field>
+            <field name="context">{'wait_pay':True}</field>
 
 
             <field name="help" type="html">
@@ -136,6 +138,7 @@
 
             <!--<field name="context">{'default_payment_type':'outbound','default_partner_type':'employee'}</field>-->
             <field name="domain">[('to_approve_id','=',uid)]</field>
+            <field name="context">{'to_approve_id':True}</field>
 
 
             <field name="help" type="html">
