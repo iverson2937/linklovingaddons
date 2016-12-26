@@ -27,6 +27,8 @@
         # 'security/ir.model.access.csv',
         'views/fiscal_year.xml',
         'views/templates.xml',
+        'views/account_account.xml',
+        'views/account_move_line.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

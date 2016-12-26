@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="view_account_move_line_filter">
+            <field name="name">account.move.line</field>
+            <field name="model">account.move.line</field>
+            <field name="inherit_id" ref="account.view_account_move_line_filter"/>
+            <field name="arch" type="xml">
+                <field name="account_id" position="after">
+                    <field name="fiscalyear_id"/>
+                </field>
+            </field>
+        </record>
+
+
+        <!--明细 -->
+        <record id="view_account_move_line_tree" model="ir.ui.view">
+            <field name="name">account.move.line.tree</field>
+            <field name="model">account.move.line</field>
+            <field name="inherit_id" ref="account.view_move_line_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='date']" position="replace">
+                    <field name="period_id"/>
+                </xpath>
+
+            </field>
+        </record>
+
+
+        <record id="action_account_move_line_list" model="ir.actions.act_window">
+            <field name="name">明细</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.move.line</field>
+            <field name="context">{'search_default_account':1}</field>
+            <!--<field name="view_type">form</field>-->
+            <!--<field name="view_mode">form</field>-->
+            <!--<field name="view_id" ref="view_base_module_upgrade_install"/>-->
+            <!--<field name="target">new</field>-->
+        </record>
+
+
+        <menuitem id="menu_action_move_line_list" action="action_account_move_line_list"
+                  parent="account.menu_finance_entries"/>
+
+        <menuitem id="menu_action_move_line_list" action="action_account_move_line_list"
+                  parent="account.menu_finance_entries"/>
+
+
+    </data>
+</odoo>

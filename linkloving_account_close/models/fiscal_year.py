@@ -64,14 +64,16 @@ class AccountPeriod(models.Model):
 
 
 class AccountMoveLine(models.Model):
+    @api.one
     def _period_get(self):
+
 
         period_id = self.env['account.period'].search([('date_start', '<=', self.date),
                                                                      ('date_stop', '>=', self.date),
                                                                      ('company_id', '=', self.company_id.id)],
                                                       limit=1
                                                            )
-        return period_id
+        self.period_id=period_id
 
 
 
@@ -87,9 +89,9 @@ class AccountMoveLine(models.Model):
 
     _inherit = 'account.move.line'
 
-    period_id = fields.Many2one(_period_get, type='many2one', relation='account.period', store=True,
-                                string='Period')
-    fiscalyear_id = fields.Many2one('account.fiscalyear', compute=_fiscalyear_get, type='many2one', store=True,
+    period_id = fields.Many2one('account.period',compute=_period_get, store=False,
+                                string='会计区间')
+    fiscalyear_id = fields.Many2one('account.fiscalyear', compute=_fiscalyear_get, store=True,
                                     string='Fiscal Year')
 
 

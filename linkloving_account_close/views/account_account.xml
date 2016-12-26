@@ -3,14 +3,16 @@
 	<data>
 
 		<!-- 科目 -->
-        <record id="view_account_fiscalyear_tree" model="ir.ui.view">
+        <record id="view_account_account_tree" model="ir.ui.view">
             <field name="name">account.account.tree</field>
             <field name="model">account.account</field>
             <field name="inherit_id" ref="account.view_account_list"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='code']" position="after">
-                    <field name="balance"/>
+                <xpath expr="//field[@name='user_type_id']" position="replace">
 
+                    <field name="debit"/>
+                    <field name="credit"/>
+                    <field name="balance"/>
                 </xpath>
 
             </field>

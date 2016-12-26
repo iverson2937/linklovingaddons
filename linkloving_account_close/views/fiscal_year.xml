@@ -36,17 +36,17 @@
             </field>
         </record>
 
-        <record id="view_account_fiscalyear_tree" model="ir.ui.view">
-            <field name="name">account.fiscalyear.tree</field>
-            <field name="model">account.fiscalyear</field>
-            <field name="arch" type="xml">
-                <tree string="Fiscalyear">
-                    <field name="code"/>
-                    <field name="name"/>
-                    <field name="company_id" groups="base.group_multi_company"/>
-                </tree>
-            </field>
-        </record>
+        <!--<record id="view_account_fiscalyear_tree" model="ir.ui.view">-->
+            <!--<field name="name">account.fiscalyear.tree</field>-->
+            <!--<field name="model">account.fiscalyear</field>-->
+            <!--<field name="arch" type="xml">-->
+                <!--<tree string="Fiscalyear">-->
+                    <!--<field name="code"/>-->
+                    <!--<field name="name"/>-->
+                    <!--<field name="company_id" groups="base.group_multi_company"/>-->
+                <!--</tree>-->
+            <!--</field>-->
+        <!--</record>-->
 
         <record id="view_account_fiscalyear_search" model="ir.ui.view">
             <field name="name">account.fiscalyear.search</field>
