@@ -55,7 +55,7 @@ class HrExpenseSheet(models.Model):
 
     is_show = fields.Boolean(compute=_get_is_show)
 
-    to_approve_id = fields.Many2one('res.users', readonly=False, track_visibility='onchange')
+    to_approve_id = fields.Many2one('res.users', readonly=True, track_visibility='onchange')
 
     state = fields.Selection([('submit', 'Submitted'),
                               ('manager1_approve', '一级审核'),
