@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+
+           <!--总账 form-->
+        <record id="view_account_account_final_form" model="ir.ui.view">
+            <field name="name">account.account.final.form</field>
+            <field name="model">account.account.final</field>
+            <field name="arch" type="xml">
+                <form>
+                    <field name="fiscal_year_id"/>\
+                    <field name="period_id"/>
+                    <field name="account_id"/>
+                    <field name="debit"/>
+                    <field name="credit"/>
+                </form>
+            </field>
+        </record>
+
+        <!--总账 tree-->
+        <record id="view_account_account_final_tree" model="ir.ui.view">
+            <field name="name">final account</field>
+            <field name="model">account.account.final</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="fiscal_year_id"/>
+                    <field name="period_id"/>
+                    <field name="account_id"/>
+                    <field name="debit"/>
+                    <field name="credit"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="action_account_account_final" model="ir.actions.act_window">
+            <field name="name">final account</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.account.final</field>
+            <!--<field name="view_type">form</field>-->
+            <!--<field name="view_mode">form</field>-->
+            <!--<field name="view_id" ref="view_base_module_upgrade_install"/>-->
+            <!--<field name="target">new</field>-->
+        </record>
+
+
+        <menuitem id="menu_account_account_final" action="action_account_account_final"
+                  parent="account.menu_finance_entries"/>
+
+
+    </data>
+</odoo>
+

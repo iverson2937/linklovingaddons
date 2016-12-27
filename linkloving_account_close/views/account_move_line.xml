@@ -43,8 +43,6 @@
         <menuitem id="menu_action_move_line_list" action="action_account_move_line_list"
                   parent="account.menu_finance_entries"/>
 
-        <menuitem id="menu_action_move_line_list" action="action_account_move_line_list"
-                  parent="account.menu_finance_entries"/>
 
 
     </data>
