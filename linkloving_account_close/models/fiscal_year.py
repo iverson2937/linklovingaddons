@@ -9,13 +9,20 @@ from dateutil.relativedelta import relativedelta
 class account_fiscalyear(models.Model):
     _name = "account.fiscalyear"
     _description = "Fiscal Year"
+    _order = "date_start, id"
     name = fields.Char('Fiscal Year', required=True)
     code = fields.Char('Code', size=6, required=True)
-    company_id = fields.Many2one('res.company', 'Company', required=True,default=lambda self :self.env.user.company_id.id)
+    company_id = fields.Many2one('res.company', 'Company', required=True,
+                                 default=lambda self: self.env.user.company_id.id)
     date_start = fields.Date('Start Date', required=True)
     date_stop = fields.Date('End Date', required=True)
     period_ids = fields.One2many('account.period', 'fiscalyear_id', 'Periods')
-    _order = "date_start, id"
+
+    state = fields.Selection([
+        ('open', 'Open'),
+        ('done', 'Close')
+    ], default='open')
+
 
     @api.multi
     def create_period(self):
@@ -46,6 +53,10 @@ class account_fiscalyear(models.Model):
                 ds = ds + relativedelta(months=1)
         return True
 
+    @api.multi
+    def close_fiscal_year(self):
+        pass
+
 
 class AccountPeriod(models.Model):
     _name = 'account.period'
@@ -61,53 +72,34 @@ class AccountPeriod(models.Model):
     _sql_constraints = [
         ('name_company_uniq', 'unique(name, company_id)', 'The name of the period must be unique per company!'),
     ]
+    state = fields.Selection([
+        ('open', 'Open'),
+        ('done', 'Close')
+    ],default='open')
+
+    def close_period(self):
+        pass
 
 
 class AccountMoveLine(models.Model):
-    @api.one
-    def _period_get(self):
 
 
-        period_id = self.env['account.period'].search([('date_start', '<=', self.date),
-                                                                     ('date_stop', '>=', self.date),
-                                                                     ('company_id', '=', self.company_id.id)],
-                                                      limit=1
-                                                           )
-        self.period_id=period_id
-
-
-
-    @api.one
-    def _fiscalyear_get(self):
-
-        fiscalyear_id = self.env['account.fiscalyear'].search([('date_start', '<=', self.date),
-                                                                             ('date_stop', '>=', self.date),
-                                                                             ('company_id', '=',
-                                                                              self.company_id.id)], limit=1)
-
-        return fiscalyear_id
 
     _inherit = 'account.move.line'
 
-    period_id = fields.Many2one('account.period',compute=_period_get, store=False,
-                                string='会计区间')
-    fiscalyear_id = fields.Many2one('account.fiscalyear', compute=_fiscalyear_get, store=True,
-                                    string='Fiscal Year')
+    period_id = fields.Many2one('account.period', string=u'会计区间',
+                                domain=[('state', '!=', 'done')], copy=False,
+                                help="Keep empty to use the period of the validation(invoice) date.",
+                                readonly=True,default=13)
+    fiscalyear_id=fields.Many2one('account.fiscalyear',related='period_id.fiscalyear_id',store=True)
+
 
 
 class AccountInvoice(models.Model):
-    @api.multi
-    def _period_get(self):
-
-        period_id = self.env.get('account.period').search([('date_start', '<=', self.date),
-                                                           ('date_stop', '>=', self.date),
-                                                           (
-                                                               'company_id', '=',
-                                                               self.company_id.id)],
-                                                          limit=1
-                                                          )
-        return period_id
+    period_id = fields.Many2one('account.period', string='Force Period',
+                                domain=[('state', '!=', 'done')], copy=False,
+                                help="Keep empty to use the period of the validation(invoice) date.",
+                                readonly=True,default=13)
 
     _inherit = 'account.invoice'
 
-    period_id = fields.Many2one('account.period', compute=_period_get, store=True, string='Period')
