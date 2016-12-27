@@ -141,7 +141,7 @@ class PurchaseOrderLine(models.Model):
         """
         self.ensure_one()
         res = {}
-        account = self.product_id.property_account_income_id or self.product_id.categ_id.property_account_income_categ_id
+        account = self.product_id.property_account_expense_id or self.product_id.categ_id.property_account_expense_categ_id
         if not account:
             raise UserError(
                 _('Please define income account for this product: "%s" (id:%d) - or for its category: "%s".') %
@@ -163,7 +163,7 @@ class PurchaseOrderLine(models.Model):
             'product_id': self.product_id.id or False,
             # 'layout_category_id': self.layout_category_id and self.layout_category_id.id or False,
             'product_id': self.product_id.id or False,
-            # 'invoice_line_tax_ids': [(6, 0, self.tax_id.ids)],
+            'invoice_line_tax_ids': [(4, self.order_id.tax_id)],
             # 'account_analytic_id': self.order_id.project_id.id,
             # 'analytic_tag_ids': [(6, 0, self.analytic_tag_ids.ids)],
         }

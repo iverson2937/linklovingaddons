@@ -71,7 +71,7 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
 
         account_id = False
         if self.product_id.id:
-            account_id = self.product_id.property_account_expense_id.id
+            account_id = self.product_id.property_account_expense_id.id or self.product_id.categ_id.property_account_expense_categ_id.id
         if not account_id:
             inc_acc = ir_property_obj.get('property_account_income_categ_id', 'product.category')
             account_id = order.fiscal_position_id.map_account(inc_acc).id if inc_acc else False
@@ -88,10 +88,10 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
         else:
             amount = self.amount
             name = _('Down Payment')
-        if order.fiscal_position_id and self.product_id.taxes_id:
-            tax_ids = order.fiscal_position_id.map_tax(self.product_id.taxes_id).ids
-        else:
-            tax_ids = self.product_id.taxes_id.ids
+        # if order.fiscal_position_id and self.product_id.taxes_id:
+        #     tax_ids = order.fiscal_position_id.map_tax(self.product_id.taxes_id).ids
+        # else:
+        #     tax_ids = self.product_id.taxes_id.ids
 
         invoice = inv_obj.create({
             'name': order.name,
@@ -111,7 +111,7 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
                 'uom_id': self.product_id.uom_id.id,
                 'product_id': self.product_id.id,
                 'purchase_line_id': so_line.id,
-                'invoice_line_tax_ids': [(6, 0, tax_ids)],
+                'invoice_line_tax_ids': [(4, order.tax_id.id)],
                 # 'account_analytic_id': order.project_id.id or False,
             })],
             # 'currency_id': order.pricelist_id.currency_id.id,

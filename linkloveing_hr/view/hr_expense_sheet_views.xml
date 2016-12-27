@@ -34,9 +34,9 @@
                     />
                     <button name="manager2_approve" states="manager1_approve" string="批准" type="object"
                             groups="hr_expense.group_hr_expense_manager" class="oe_highlight o_expense_sheet_approve"/>
-                    <button name="manager3_approve" states="manager2_approve" string="批准" type="object"
-                            groups="linkloving_hr.group_hr_expense_manager"
-                            class="oe_highlight o_expense_sheet_approve"/>
+                      <button name="manager3_approve" states="manager2_approve" string="批准" type="object"
+                            groups="linkloveing_hr.group_hr_expense_president"
+                            class="oe_highlight"/>
                 </xpath>
                 <xpath expr="//button[@name='approve_expense_sheets']" position="replace">
                     <button name="approve_expense_sheets" states="submit" string="Approve" type="object"

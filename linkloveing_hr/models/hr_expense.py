@@ -24,7 +24,7 @@ class HrExpenseSheet(models.Model):
     @api.depends('employee_id.user_id.partner_id.debit')
     def _get_pre_payment_reminding_balance(self):
 
-            self.pre_payment_reminding = -self.employee_id.user_id.partner_id.debit
+        self.pre_payment_reminding = -self.employee_id.user_id.partner_id.debit
 
     pre_payment_reminding = fields.Float(string=u'暂支余额', compute=_get_pre_payment_reminding_balance)
 
@@ -98,6 +98,7 @@ class HrExpenseSheet(models.Model):
 
     @api.multi
     def manager3_approve(self):
+        self.to_approve_id = False
 
         self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
 
@@ -144,8 +145,7 @@ class HrExpenseSheet(models.Model):
         if any(not sheet.journal_id for sheet in self):
             raise UserError(_("Expenses must have an expense journal specified to generate accounting entries."))
 
-
-        if self.pre_payment_reminding>=self.total_amount:
+        if self.pre_payment_reminding >= self.total_amount:
 
             self.write({'state': 'done'})
         else:
@@ -167,7 +167,12 @@ class HrExpenseSheet(models.Model):
 
     @api.multi
     def to_do_journal_entry(self):
-        if self.pre_payment_reminding<=0:
+        if self.payment_mode == 'company_account':
+            self.mapped('expense_line_ids').action_move_create()
+            self.write({'state': 'done'})
+            return
+
+        if self.pre_payment_reminding <= 0:
             if any(sheet.state != 'approve' for sheet in self):
                 raise UserError(_("You can only generate accounting entry for approved expense(s)."))
 
@@ -180,13 +185,12 @@ class HrExpenseSheet(models.Model):
             return {
                 'name': _('费用报销'),
                 'type': 'ir.actions.act_window',
-                'res_model':"account.employee.payable.wizard",
+                'res_model': "account.employee.payable.wizard",
 
                 'view_mode': 'form',
                 'view_type': 'form',
-                'target':'new'
+                'target': 'new'
             }
-
 
     @api.multi
     def register_payment_action(self):
@@ -208,15 +212,15 @@ class HrExpenseSheet(models.Model):
             'type': 'ir.actions.act_window',
             'target': 'new',
         }
+
     @api.model
     def _needaction_domain_get(self):
         """ Returns the domain to filter records that require an action
             :return: domain or False is no action
         """
         if self._context.get('to_approve_id'):
-            return [('to_approve_id','=',self.env.user.id)]
+            return [('to_approve_id', '=', self.env.user.id)]
         if self._context.get('search_default_to_post'):
             return [('state', '=', 'approve')]
         if self._context.get('search_default_approved'):
             return [('state', '=', 'post')]
-
