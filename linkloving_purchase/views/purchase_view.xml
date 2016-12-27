@@ -61,7 +61,7 @@
                     </group>
                 </xpath>
                   <xpath expr="//field[@name='partner_ref']" position="replace">
-                        <field name="tax_id" domain="[('type_tax_use','&lt;&gt;','sale')]"/>
+                        <field name="tax_id" domain="[('type_tax_use','&lt;&gt;','sale')]" required="1"/>
                 </xpath>
             </field>
         </record>
