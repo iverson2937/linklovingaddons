@@ -40,7 +40,7 @@
                                     <field name="bank_id"/>
                                 </tree>
                             </field>
-                            <field name="account_id" string="收入账户" required="0"
+                            <field name="account_id" string="收入账户" required="0" invisible="1"
                                    attrs="{'readonly': [('state', '=', 'done')]}"/>
                             <field name="remark" required="1" attrs="{'readonly': [('state', '=', 'done')]}"/>
                         </group>
@@ -74,6 +74,27 @@
             <field name="domain">[('partner_id','=',context.get('partner_id'))]</field>
             <field name="context">{}</field>
         </record>
+        <!-- 付款申请search view -->
+        <!--<record id="view__filter" model="ir.ui.view">-->
+            <!--<field name="name">ir.module.module.list.select</field>-->
+            <!--<field name="model">ir.module.module</field>-->
+            <!--<field name="arch" type="xml">-->
+                <!--<search string="Search modules">-->
+                    <!--<field name="name" filter_domain="['|', '|', ('summary', 'ilike', self), ('shortdesc', 'ilike', self), ('name',-->
+                        <!--'ilike', self)]" string="Module"/>-->
+                    <!--<filter name="app" string="Apps" domain="[('application', '=', 1)]"/>-->
+                    <!--<filter name="extra" string="Extra" domain="[('application', '=', 0)]"/>-->
+                    <!--<separator/>-->
+                    <!--<filter name="installed" string="Installed" domain="[('state', 'in', ['installed', 'to upgrade', 'to remove'])]"/>-->
+                    <!--<filter string="Not Installed" domain="[('state', 'in', ['uninstalled', 'uninstallable', 'to install'])]"/>-->
+                    <!--<field name="category_id"/>-->
+                    <!--<group expand="0" string="Group By">-->
+                        <!--<filter string="Author" domain="[]" context="{'group_by':'author'}"/>-->
+                        <!--<filter string="Category" domain="[]" context="{'group_by':'category_id'}"/>-->
+                    <!--</group>-->
+               <!--</search>-->
+            <!--</field>-->
+        <!--</record>-->
 
         <record id="purchase_account_payment_register_form" model="ir.ui.view">
             <field name="name">account.payment.register.form</field>
@@ -85,10 +106,10 @@
                                 class="oe_highlight" states="draft" groups="purchase.group_purchase_user"/>
                         <button name="reject" string="退回" type="object"
                                 states="posted" groups="purchase.group_purchase_manager"/>
-                        <button name="confirm" string="确认" type="object"
+                        <button name="confirm" string="确认" type="object" class="oe_highlight"
                                 states="posted" groups="purchase.group_purchase_manager"/>
                         <button name="done" string="完成" type="object"
-                                states="confirm"/>
+                                states="confirm" groups="account.group_account_invoice"/>
 
 
                         <field name="state" widget="statusbar" statusbar_visible="draft,posted,confirm,done"/>
@@ -156,7 +177,27 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="domain">[('payment_type','=',1)]</field>
-            <field name="context">{'default_payment_type':1}</field>
+            <field name="context">{'default_payment_type':1,'posted':True}</field>
+            <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'tree', 'view_id': ref('account_payment_register_tree')}),
+            (0,0,{'view_mode':'form', 'view_id': ref('purchase_account_payment_register_form')})]"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to add a contact in your address book.
+                </p>
+                <p>
+                    No Invoice need to Prepayment!
+                </p>
+            </field>
+        </record>
+          <record id="action_payment_register_accounting" model="ir.actions.act_window">
+            <field name="name">付款申请</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.payment.register</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('payment_type','=',1),('state','in',['confirm','done'])]</field>
+            <field name="context">{'default_payment_type':1,'wait_pay':True}</field>
             <field name="view_ids" eval="[(5,0,0),
             (0,0,{'view_mode':'tree', 'view_id': ref('account_payment_register_tree')}),
             (0,0,{'view_mode':'form', 'view_id': ref('purchase_account_payment_register_form')})]"/>

@@ -45,7 +45,7 @@ class AccountPaymentRegister(models.Model):
     state = fields.Selection([
         ('draft', u'草稿'),
         ('posted', u'提交'),
-        ('confirm', u'销售确认'),
+        ('confirm', u'确认'),
         ('register', u'登记收款'),
         ('done', u'完成'),
         ('cancel', u'取消')
@@ -90,14 +90,7 @@ class AccountPaymentRegister(models.Model):
 
     @api.model
     def create(self, vals):
-        amount = vals.get('amount')
         payment_type = vals.get('type')
-
-        # total_amount = 0.0
-        # for invoice in vals.get('invoice_ids'):
-        #     total_amount += invoice.remain_apply_balance
-        # if amount > total_amount:
-        #     raise UserError('对账单总额小于收入金额')
 
         if 'name' not in vals or vals['name'] == _('New'):
             if not payment_type:
@@ -105,6 +98,17 @@ class AccountPaymentRegister(models.Model):
             else:
                 vals['name'] = self.env['ir.sequence'].next_by_code('account.pay') or _('New')
         return super(AccountPaymentRegister, self).create(vals)
+
+    @api.model
+    def _needaction_domain_get(self):
+        """ Returns the domain to filter records that require an action
+            :return: domain or False is no action
+        """
+
+        if self._context.get('wait_pay'):
+            return [('state', '=', 'confirm')]
+        if self._context.get('posted'):
+            return [('state', '=', 'posted')]
 
 
 
