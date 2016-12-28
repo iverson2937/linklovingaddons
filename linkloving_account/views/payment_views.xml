@@ -132,8 +132,8 @@
                                    string="付款日期"/>
 
                             <field name="account_id" string="收入账户" required="0"
-                                  attrs="{'readonly': [('state', 'in', ['confirm','done'])]}" ivisible="1"/>
-                            <field name="remark" required="1" attrs="{'readonly': [('state', 'in', ['confirm','done'])]}"/>
+                                  attrs="{'readonly': [('state', 'in', ['confirm','done'])]}" invisible="1"/>
+                            <field name="remark" required="0" attrs="{'readonly': [('state', 'in', ['confirm','done'])]}"/>
                         </group>
                         <notebook colspan="4">
                             <page string="对账单" autofocus="autofocus">
