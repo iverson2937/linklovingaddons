@@ -121,23 +121,23 @@
                         </h1>
                         <group>
                             <field name="partner_id" string="供应商"
-                                   attrs="{'required': [('state', '=', 'posted')],'readonly': [('state', '=', 'done')]}"
+                                   attrs="{'required': [('state', '=', 'posted')],'readonly': [('state', 'in', ['confirm','done'])]}"
                                    domain="[('supplier', '=', True),('is_company', '=', True)]"/>
                             <field name="bank_id"
-                                   attrs="{'readonly':[('state','!=','draft')],'readonly': [('state', '=', 'done')]}"
+                                   attrs="{'readonly':[('state','!=','draft')],'readonly': [('state', 'in', ['confirm','done'])]}"
                                    context="{'default_partner_id':partner_id}">
                             </field>
-                            <field name="amount" attrs="{'readonly':[('state','!=','draft')]}" required="1"/>
-                            <field name="receive_date" required="1" attrs="{'readonly': [('state', '=', 'done')]}"
+                            <field name="amount" attrs="{'readonly': [('state', 'in', ['confirm','done'])]}" required="1"/>
+                            <field name="receive_date" required="1" attrs="{'readonly': [('state', 'in', ['confirm','done'])]}"
                                    string="付款日期"/>
 
                             <field name="account_id" string="收入账户" required="0"
-                                   attrs="{'readonly': [('state', '=', 'done')]}" ivisible="1"/>
-                            <field name="remark" required="1" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                  attrs="{'readonly': [('state', 'in', ['confirm','done'])]}" ivisible="1"/>
+                            <field name="remark" required="1" attrs="{'readonly': [('state', 'in', ['confirm','done'])]}"/>
                         </group>
                         <notebook colspan="4">
                             <page string="对账单" autofocus="autofocus">
-                                <field name="invoice_ids"
+                                <field name="invoice_ids" attrs="{'readonly': [('state', 'in', ['confirm','done'])]}"
                                        domain="[('partner_id','=', partner_id),('state','=', 'open'),('remain_apply_balance','!=',0 )]"/>
 
                             </page>
