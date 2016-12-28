@@ -32,10 +32,15 @@
                                    domain="[('customer', '=', True),('is_company', '=', True)]"/>
                             <field name="amount" attrs="{'readonly':[('state','!=','draft')]}" required="1"/>
                             <field name="receive_date" required="1" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                            <field name="bank_ids"
+                            <field name="bank_id"
                                    attrs="{'readonly':[('state','!=','draft')],'readonly': [('state', '=', 'done')]}"
-                                   context="{'default_partner_id':partner_id}"/>
-                            <field name="journal_id" string="收入账户" required="1"
+                                   context="{'default_partner_id':partner_id}">
+                                <tree>
+                                    <field name="acc_number"/>
+                                    <field name="bank_id"/>
+                                </tree>
+                            </field>
+                            <field name="account_id" string="收入账户" required="0"
                                    attrs="{'readonly': [('state', '=', 'done')]}"/>
                             <field name="remark" required="1" attrs="{'readonly': [('state', '=', 'done')]}"/>
                         </group>
@@ -98,13 +103,18 @@
                                    attrs="{'required': [('state', '=', 'posted')],'readonly': [('state', '=', 'done')]}"
                                    domain="[('supplier', '=', True),('is_company', '=', True)]"/>
                             <field name="amount" attrs="{'readonly':[('state','!=','draft')]}" required="1"/>
-                            <field name="receive_date" required="1" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                            <field name="bank_ids" widget="many2many_tags"
+                            <field name="receive_date" required="1" attrs="{'readonly': [('state', '=', 'done')]}" string="付款日期"/>
+                            <field name="bank_id"
                                    attrs="{'readonly':[('state','!=','draft')],'readonly': [('state', '=', 'done')]}"
-                                   context="{'default_partner_id':partner_id}"/>
+                                   context="{'default_partner_id':partner_id}">
+                                <tree>
+                                    <field name="acc_number"/>
+                                    <field name="bank_id"/>
+                                </tree>
+                            </field>
 
-                            <field name="journal_id" string="收入账户" required="1"
-                                   attrs="{'readonly': [('state', '=', 'done')]}"/>
+                            <field name="account_id" string="收入账户" required="0"
+                                   attrs="{'readonly': [('state', '=', 'done')]}" ivisible="1"/>
                             <field name="remark" required="1" attrs="{'readonly': [('state', '=', 'done')]}"/>
                         </group>
                         <notebook colspan="4">

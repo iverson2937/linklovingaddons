@@ -29,14 +29,14 @@ class AccountPaymentRegister(models.Model):
     balance_ids = fields.One2many('account.payment.register.balance', 'payment_id')
     amount = fields.Float(string=u'金额')
 
-    bank_ids = fields.One2many(related='partner_id.bank_ids', string=u'客户账号')
+    bank_id = fields.Many2one('res.partner.bank', string=u'账号',domain="[('partner_id', '=', partner_id)]")
     invoice_ids = fields.Many2many('account.invoice')
     receive_date = fields.Date(string=u'收款日期', default=fields.date.today())
     remark = fields.Text(string=u'备注')
     partner_id = fields.Many2one('res.partner', string=u'客户')
     is_customer = fields.Boolean(related='partner_id.customer', store=True)
     receive_id = fields.Many2one('res.users')
-    journal_id = fields.Many2one('account.journal', 'Salary Journal')
+    account_id = fields.Many2one('account.account')
     payment_type = fields.Selection([
         (0, u'收款'),
         (1, u'付款')
