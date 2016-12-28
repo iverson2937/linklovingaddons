@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
- <record id="sale_action_partner_form" model="ir.actions.act_window">
+        <record id="sale_action_partner_form" model="ir.actions.act_window">
             <field name="name">Customers</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">res.partner</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,kanban,form</field>
             <field name="domain">[('customer','=','1'),('is_company','=',True)]</field>
-            <field name="context">{}</field>
+            <field name="context">{'default_customer':True}</field>
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="base.view_res_partner_filter"/>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to add a contact in your address book.
-              </p><p>
-                Odoo helps you easily track all activities related to
-                a customer; discussions, history of business opportunities,
-                documents, etc.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click to add a contact in your address book.
+                </p>
+                <p>
+                    Odoo helps you easily track all activities related to
+                    a customer; discussions, history of business opportunities,
+                    documents, etc.
+                </p>
             </field>
         </record>
-         <menuitem id="sales_team.menu_partner_form" parent="sales_team.menu_sales" action="sale_action_partner_form" sequence="2"/>
+        <menuitem id="sales_team.menu_partner_form" parent="sales_team.menu_sales" action="sale_action_partner_form"
+                  sequence="2"/>
 
         <record id="product_template_action" model="ir.actions.act_window">
             <field name="name">Products</field>
@@ -38,7 +40,6 @@
                   parent="sales_team.menu_sales" sequence="13"/>
 
 
-
         <record id="view_partner_form_linkloving" model="ir.ui.view">
             <field name="name">product.product.form</field>
             <field name="model">res.partner</field>
@@ -49,18 +50,18 @@
                     <field name="mobile" required="1"/>
                 </xpath>
                 <xpath expr="//field[@name='category_id']" position="before">
-                    <field name="team_id" attrs="{'invisible': [('supplier','=', True)]}"/>
+                    <field name="team_id" attrs="{'invisible': [('supplier','=', True)],'required':[('customer','=', True)]}"/>
                 </xpath>
-                 <xpath expr="//field[@name='category_id']" position="after">
+                <xpath expr="//field[@name='category_id']" position="after">
                     <field name="source_id" string="渠道" attrs="{'invisible': [('customer','!=', True)]}"/>
                 </xpath>
-                 <xpath expr="//field[@name='category_id']" position="after">
-                    <field name="internal_code" required="1"/>
+                <xpath expr="//field[@name='category_id']" position="after">
+                    <field name="internal_code" required="False"/>
                 </xpath>
-                 <xpath expr="//field[@name='category_id']" position="after">
+                <xpath expr="//field[@name='category_id']" position="after">
                     <field name="x_qq"/>
                 </xpath>
-                 <xpath expr="//field[@name='lang']" position="after">
+                <xpath expr="//field[@name='lang']" position="after">
                     <field name="level" string="客户等级" attrs="{'invisible': [('customer','!=', True)]}"/>
                 </xpath>
             </field>

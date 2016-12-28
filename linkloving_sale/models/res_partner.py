@@ -32,6 +32,15 @@ class Partner(models.Model):
         ('internal_code_uniq', 'unique (internal_code)', 'The No must be unique!')
     ]
 
+    @api.model
+    def create(self, vals):
+        res = super(Partner, self).create(vals)
+        if res.customer and res.team_id:
+            code = res.team_id.code if res.team_id.code else ''
+            internal_code = code + self.env['ir.sequence'].next_by_code('res.partner.customer') or '/'
+            res.internal_code = internal_code
+        return res
+
 
 class ResPartnerSource(models.Model):
     """

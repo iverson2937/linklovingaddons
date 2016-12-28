@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'sale', 'product'],
+    'depends': ['base', 'sale', 'product', 'sales_team'],
 
     # always loaded
     'data': [
@@ -28,6 +28,7 @@
         'view/sale_view.xml',
         'view/payment_view.xml',
         'view/partner_view.xml',
+        'view/crm_team.xml',
         'report/sale_order_report_templates.xml',
     ],
     # only loaded in demonstration mode
