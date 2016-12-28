@@ -106,7 +106,6 @@ class HrExpenseSheet(models.Model):
     def create(self, vals):
         if vals.get('expense_no', 'New') == 'New':
             vals['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense.sheet') or '/'
-            print vals['expense_no']
         exp = super(HrExpenseSheet, self).create(vals)
         if exp.employee_id == exp.employee_id.department_id.manager_id:
             department = exp.to_approve_id.employee_ids.department_id

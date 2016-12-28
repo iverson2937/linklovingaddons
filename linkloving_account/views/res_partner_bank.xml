@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!--
+                Res Patner Bank Extension
+          -->
+
+        <record id="view_res_partner_bank_form" model="ir.ui.view">
+            <field name="name">res.partner.bank.form.inherit</field>
+            <field name="model">res.partner.bank</field>
+            <field name="inherit_id" ref="base.view_partner_bank_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='acc_number']" position="after">
+                    <field name="owner"/>
+                    <field name="bank_description" stinng="银行名称"/>
+                </xpath>
+
+            </field>
+
+        </record>
+        <record id="view_res_partner_bank_tree" model="ir.ui.view">
+            <field name="name">res.partner.bank.tree.inherit</field>
+            <field name="model">res.partner.bank</field>
+            <field name="inherit_id" ref="base.view_partner_bank_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='acc_number']" position="after">
+                    <field name="owner"/>
+
+                </xpath>
+                  <xpath expr="//field[@name='bank_name']" position="replace">
+                   <field name="bank_description" stinng="银行名称"/>
+                </xpath>
+
+
+
+
+
+            </field>
+        </record>
+
+    </data>
+</openerp>

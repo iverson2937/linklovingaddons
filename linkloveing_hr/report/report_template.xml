@@ -38,7 +38,7 @@
 
                                     <!--</div>-->
                                 </div>
-                                <table class="table table-condensed">
+                                <table class="table table-condensed table-bordered">
                                     <thead>
                                         <tr>
                                             <th class="text-center">单号</th>

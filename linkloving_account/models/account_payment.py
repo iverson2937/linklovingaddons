@@ -29,14 +29,14 @@ class AccountPaymentRegister(models.Model):
     balance_ids = fields.One2many('account.payment.register.balance', 'payment_id')
     amount = fields.Float(string=u'金额')
 
-    bank_ids = fields.One2many(related='partner_id.bank_ids', string=u'客户账号')
+    bank_id = fields.Many2one('res.partner.bank', string=u'账号',domain="[('partner_id', '=', partner_id)]")
     invoice_ids = fields.Many2many('account.invoice')
     receive_date = fields.Date(string=u'收款日期', default=fields.date.today())
     remark = fields.Text(string=u'备注')
     partner_id = fields.Many2one('res.partner', string=u'客户')
     is_customer = fields.Boolean(related='partner_id.customer', store=True)
     receive_id = fields.Many2one('res.users')
-    journal_id = fields.Many2one('account.journal', 'Salary Journal')
+    account_id = fields.Many2one('account.account')
     payment_type = fields.Selection([
         (0, u'收款'),
         (1, u'付款')
@@ -45,7 +45,7 @@ class AccountPaymentRegister(models.Model):
     state = fields.Selection([
         ('draft', u'草稿'),
         ('posted', u'提交'),
-        ('confirm', u'销售确认'),
+        ('confirm', u'确认'),
         ('register', u'登记收款'),
         ('done', u'完成'),
         ('cancel', u'取消')
@@ -90,14 +90,7 @@ class AccountPaymentRegister(models.Model):
 
     @api.model
     def create(self, vals):
-        amount = vals.get('amount')
         payment_type = vals.get('type')
-
-        # total_amount = 0.0
-        # for invoice in vals.get('invoice_ids'):
-        #     total_amount += invoice.remain_apply_balance
-        # if amount > total_amount:
-        #     raise UserError('对账单总额小于收入金额')
 
         if 'name' not in vals or vals['name'] == _('New'):
             if not payment_type:
@@ -105,6 +98,17 @@ class AccountPaymentRegister(models.Model):
             else:
                 vals['name'] = self.env['ir.sequence'].next_by_code('account.pay') or _('New')
         return super(AccountPaymentRegister, self).create(vals)
+
+    @api.model
+    def _needaction_domain_get(self):
+        """ Returns the domain to filter records that require an action
+            :return: domain or False is no action
+        """
+
+        if self._context.get('wait_pay'):
+            return [('state', '=', 'confirm')]
+        if self._context.get('posted'):
+            return [('state', '=', 'posted')]
 
 
 
