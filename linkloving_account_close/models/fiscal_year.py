@@ -6,7 +6,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 
-class account_fiscalyear(models.Model):
+class AccountFiscalYear(models.Model):
     _name = "account.fiscalyear"
     _description = "Fiscal Year"
     _order = "date_start, id"
@@ -22,7 +22,6 @@ class account_fiscalyear(models.Model):
         ('open', 'Open'),
         ('done', 'Close')
     ], default='open')
-
 
     @api.multi
     def create_period(self):
@@ -75,31 +74,18 @@ class AccountPeriod(models.Model):
     state = fields.Selection([
         ('open', 'Open'),
         ('done', 'Close')
-    ],default='open')
+    ], default='open')
 
+    @api.multi
     def close_period(self):
-        pass
+        accounts = self.env['account.account'].search([])
+        for account in accounts:
+            self.env['account.account.final'].create({
+                'account_id': account.id,
+                'fiscal_year_id': self.fiscal_year_id.id,
+                'period_id': self.id,
+                'debit': account.debit,
+                'credit': account.credit
+            })
 
-
-class AccountMoveLine(models.Model):
-
-
-
-    _inherit = 'account.move.line'
-
-    period_id = fields.Many2one('account.period', string=u'会计区间',
-                                domain=[('state', '!=', 'done')], copy=False,
-                                help="Keep empty to use the period of the validation(invoice) date.",
-                                readonly=True,default=13)
-    fiscalyear_id=fields.Many2one('account.fiscalyear',related='period_id.fiscalyear_id',store=True)
-
-
-
-class AccountInvoice(models.Model):
-    period_id = fields.Many2one('account.period', string='Force Period',
-                                domain=[('state', '!=', 'done')], copy=False,
-                                help="Keep empty to use the period of the validation(invoice) date.",
-                                readonly=True,default=13)
-
-    _inherit = 'account.invoice'
-
+        self.state = 'done'
