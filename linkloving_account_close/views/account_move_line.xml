@@ -2,14 +2,18 @@
 <odoo>
     <data>
 
-        <record model="ir.ui.view" id="view_account_move_line_filter">
-            <field name="name">account.move.line</field>
-            <field name="model">account.move.line</field>
-            <field name="inherit_id" ref="account.view_account_move_line_filter"/>
+
+
+        <!--凭证 -->
+        <record id="view_account_move_form" model="ir.ui.view">
+            <field name="name">account.move.form</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
             <field name="arch" type="xml">
-                <field name="account_id" position="after">
-                    <field name="fiscalyear_id"/>
-                </field>
+                <xpath expr="//field[@name='date']" position="after">
+                    <field name="period_id"/>
+                </xpath>
+
             </field>
         </record>
 

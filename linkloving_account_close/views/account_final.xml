@@ -8,11 +8,10 @@
             <field name="model">account.account.final</field>
             <field name="arch" type="xml">
                 <form>
-                    <field name="fiscal_year_id"/>\
                     <field name="period_id"/>
                     <field name="account_id"/>
-                    <field name="debit"/>
-                    <field name="credit"/>
+                    <!--<field name="debit"/>-->
+                    <!--<field name="credit"/>-->
                 </form>
             </field>
         </record>
@@ -23,11 +22,10 @@
             <field name="model">account.account.final</field>
             <field name="arch" type="xml">
                 <tree>
-                    <field name="fiscal_year_id"/>
                     <field name="period_id"/>
                     <field name="account_id"/>
-                    <field name="debit"/>
-                    <field name="credit"/>
+                    <!--<field name="debit"/>-->
+                    <!--<field name="credit"/>-->
                 </tree>
             </field>
         </record>

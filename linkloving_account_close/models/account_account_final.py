@@ -10,7 +10,6 @@ class AccountAccountFinal(models.Model):
     name = fields.Char('Fiscal Year')
     account_id = fields.Many2one('account.account',string='科目')
     partner_id = fields.Many2one('res.partner')
-    fiscal_year_id = fields.Many2one('account.fiscalyear',string='年度')
     period_id = fields.Many2one('account.period',string='会计区间')
     company_id = fields.Many2one('res.company', 'Company', required=True,
                                  default=lambda self: self.env.user.company_id.id)
@@ -22,5 +21,4 @@ class AccountAccountFinal(models.Model):
     # year_credit = fields.Monetary(default=0.0)
     # end_debit = fields.Monetary(default=0.0)
     # end_credit = fields.Monetary(default=0.0)
-    debit = fields.Float(default=0.0)
-    credit = fields.Float(default=0.0)
+

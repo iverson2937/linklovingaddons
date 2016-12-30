@@ -78,56 +78,57 @@ class AccountPeriod(models.Model):
 
     @api.multi
     def close_period(self):
-        accounts = self.env['account.account'].search([])
-        for account in accounts:
-            self.env['account.account.final'].create({
-                'account_id': account.id,
-                # 'fiscal_year_id': self.fiscal_year_id.id,
-                'period_id': self.id,
-                'debit': account.debit,
-                'credit': account.credit
-            })
-
-        # self.state = 'done'
-        data={}
-        data['computed'] = {}
-
-        obj_partner = self.env['res.partner']
-        data['computed']['move_state'] = ['draft', 'posted']
-        # if data['form'].get('target_move', 'all') == 'posted':
-        data['computed']['move_state'] = ['posted']
-        # if result_selection == 'supplier':
-        #     data['computed']['ACCOUNT_TYPE'] = ['payable']
-        # elif result_selection == 'customer':
-        #     data['computed']['ACCOUNT_TYPE'] = ['receivable']
-        # else:
-        #查询所有
-        data['computed']['ACCOUNT_TYPE'] = ['payable', 'receivable']
-
-
-        self.env.cr.execute("""
-                    SELECT a.id
-                    FROM account_account a
-                    WHERE a.internal_type IN %s
-                    AND NOT a.deprecated""", (tuple(['payable', 'receivable']),))
-        data['computed']['account_ids'] = [a for (a,) in self.env.cr.fetchall()]
-        params = [tuple(data['computed']['move_state']), tuple(data['computed']['account_ids'])]
-        query = """
-                    SELECT DISTINCT "account_move_line".partner_id
-                    FROM "account_move_line", account_account AS account, account_move AS am
-                    WHERE "account_move_line".partner_id IS NOT NULL
-                        AND "account_move_line".account_id = account.id
-                        AND am.state IN %s
-                        AND "account_move_line".account_id IN %s
-                        AND NOT account.deprecated
-                        AND "account_move_line".reconciled = false"""
-        self.env.cr.execute(query, tuple(params))
-        partner_ids = [res['partner_id'] for res in self.env.cr.dictfetchall()]
-        partners = obj_partner.browse(partner_ids)
-        partners = sorted(partners, key=lambda x: (x.ref, x.name))
-        for partner in partners:
-            print partner.name
-            self._sum_partner(data, partner)
+        self.state='done'
+        # accounts = self.env['account.account'].search([])
+        # for account in accounts:
+        #     self.env['account.account.final'].create({
+        #         'account_id': account.id,
+        #         # 'fiscal_year_id': self.fiscal_year_id.id,
+        #         'period_id': self.id,
+        #         'debit': account.debit,
+        #         'credit': account.credit
+        #     })
+        #
+        # # self.state = 'done'
+        # data={}
+        # data['computed'] = {}
+        #
+        # obj_partner = self.env['res.partner']
+        #
+        # # if data['form'].get('target_move', 'all') == 'posted':
+        # data['computed']['move_state'] = ['posted']
+        # # if result_selection == 'supplier':
+        # #     data['computed']['ACCOUNT_TYPE'] = ['payable']
+        # # elif result_selection == 'customer':
+        # #     data['computed']['ACCOUNT_TYPE'] = ['receivable']
+        # # else:
+        # #查询所有
+        # data['computed']['ACCOUNT_TYPE'] = ['payable', 'receivable']
+        #
+        #
+        # self.env.cr.execute("""
+        #             SELECT a.id
+        #             FROM account_account a
+        #             WHERE a.internal_type IN %s
+        #             AND NOT a.deprecated""", (tuple(['payable', 'receivable']),))
+        # data['computed']['account_ids'] = [a for (a,) in self.env.cr.fetchall()]
+        # params = [tuple(data['computed']['move_state']), tuple(data['computed']['account_ids'])]
+        # query = """
+        #             SELECT DISTINCT "account_move_line".partner_id
+        #             FROM "account_move_line", account_account AS account, account_move AS am
+        #             WHERE "account_move_line".partner_id IS NOT NULL
+        #                 AND "account_move_line".account_id = account.id
+        #                 AND am.state IN %s
+        #                 AND "account_move_line".account_id IN %s
+        #                 AND NOT account.deprecated
+        #                 AND "account_move_line".reconciled = false"""
+        # self.env.cr.execute(query, tuple(params))
+        # partner_ids = [res['partner_id'] for res in self.env.cr.dictfetchall()]
+        # partners = obj_partner.browse(partner_ids)
+        # partners = sorted(partners, key=lambda x: (x.ref, x.name))
+        # for partner in partners:
+        #     print partner.name
+        #     self._sum_partner(data, partner)
 
 
 
@@ -140,7 +141,7 @@ class AccountPeriod(models.Model):
 
         params = [partner.id,  tuple(data['computed']['account_ids'])]
         query = """
-        SELECT sum(credit),sum(debit)
+        SELECT partner_id,period_id,sum(credit),sum(debit)
                 FROM "account_move_line"
                 WHERE "account_move_line".partner_id = %s
                     AND account_id IN %s
