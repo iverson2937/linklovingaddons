@@ -10,6 +10,9 @@
 from odoo import models, fields, api,_
 import odoo.addons.decimal_precision as dp
 
+from odoo.tools import safe_eval
+
+
 class OpenAccountChart(models.TransientModel):
     """
     For Chart of Accounts
