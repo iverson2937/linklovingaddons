@@ -31,8 +31,8 @@
                 <xpath expr="//tree/field[@name='product_id']" position="replace">
                     <field name="product_id" options="{'no_create': True}"/>
                 </xpath>
-                <xpath expr="//field[@name='partner_id']" position="attributes">
-                    <attribute name="domain">[('customer','=',True),('is_company','=',True)]</attribute>
+                <xpath expr="//field[@name='partner_id']" position="replace">
+                    <field name="partner_id"  domain="[('customer','=',True),('is_company','=',True)]" options="{'no_create': True}"/>
                 </xpath>
                 <xpath expr="//field[@name='partner_shipping_id']" position="attributes">
                     <attribute name="domain">[('parent_id','=',partner_id)]</attribute>
