@@ -120,7 +120,7 @@
             <field name="inherit_id" ref="sale.view_sales_order_filter"/>
             <field name="arch" type="xml">
                 <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
-                    <field name="pi_number" filter_domain="[('name','ilike',self)]"/>
+                    <field name="pi_number" filter_domain="[('pi_number','ilike',self)]"/>
                 </xpath>
             </field>
         </record>
