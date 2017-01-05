@@ -24,7 +24,7 @@
             <field name="model">account.move.line</field>
             <field name="inherit_id" ref="account.view_move_line_tree"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='date']" position="replace">
+                <xpath expr="//field[@name='date']" position="after">
                     <field name="period_id"/>
                 </xpath>
 
@@ -44,7 +44,7 @@
         </record>
 
 
-        <record id="view_account_move_line_tree" model="ir.ui.view">
+        <record id="view_account_move_line_form" model="ir.ui.view">
             <field name="name">account.move.line.tree</field>
             <field name="model">account.move.line</field>
             <field name="inherit_id" ref="account.view_move_line_form"/>
