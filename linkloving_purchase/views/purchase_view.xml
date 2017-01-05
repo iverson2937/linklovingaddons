@@ -108,7 +108,7 @@
             <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
             <field name="arch" type="xml">
                 <xpath expr="//filter[@name='approved']" position="after">
-                    <field name="remark" filter_domain="[('remark','ilike',self)]"/>
+                    <field name="remark" filter_domain="[('remark','ilike',self)]" string="备注"/>
                     <filter string="我的采购单" domain="[('create_uid','=',uid)]" name="my_purchase_orders_filter"/>
                 </xpath>
             </field>
