@@ -22,6 +22,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='invoice_status']" position="after">
                     <field name="create_uid"/>
+                    <field name="remark"/>
                 </xpath>
             </field>
         </record>
@@ -108,6 +109,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//filter[@name='approved']" position="after">
                     <field name="remark" filter_domain="[('remark','ilike',self)]"/>
+                    <filter string="我的采购单" domain="[('create_uid','=',uid)]" name="my_purchase_orders_filter"/>
                 </xpath>
             </field>
         </record>
