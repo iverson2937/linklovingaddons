@@ -221,11 +221,14 @@ class SaleOrder(models.Model):
             for line in order.order_line:
                 amount_untaxed += line.price_subtotal
                 amount_tax += line.price_tax
+            print amount_tax
             order.update({
                 'amount_untaxed': amount_untaxed,
                 'amount_tax': amount_tax,
                 'amount_total': amount_untaxed + amount_tax,
             })
+            print order.amount_untaxed
+
 
     @api.onchange('tax_id')
     def _onchange_tax_id(self):
