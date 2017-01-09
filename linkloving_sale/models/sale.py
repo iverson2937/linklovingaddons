@@ -19,11 +19,22 @@ class SaleOrder(models.Model):
             count += line.product_uom_qty
         self.product_count = count
 
+    @api.multi
+    def button_dummy(self):
+        self.mapped('order_line')._compute_amount()
 
+    @api.multi
+    def write(self, vals):
+
+        result=super(SaleOrder, self).write(vals)
+        self.mapped('order_line')._compute_amount()
+        return result
 
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     product_specs = fields.Text(string=u'产品规格', related='product_id.product_specs')
-
+    price_subtotal = fields.Monetary(string='Subtotal', readonly=True, store=True, compute=None)
+    price_tax = fields.Monetary(string='Taxes', readonly=True, store=True, compute=None)
+    price_total = fields.Monetary(string='Total', readonly=True, store=True, compute=None)
