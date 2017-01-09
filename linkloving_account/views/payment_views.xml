@@ -3,6 +3,8 @@
     <data>
 
 
+
+
         <record id="account_receive_register_form" model="ir.ui.view">
             <field name="name">account.receive.register.form</field>
             <field name="model">account.payment.register</field>
@@ -74,27 +76,19 @@
             <field name="domain">[('partner_id','=',context.get('partner_id'))]</field>
             <field name="context">{}</field>
         </record>
-        <!-- 付款申请search view -->
-        <!--<record id="view__filter" model="ir.ui.view">-->
-            <!--<field name="name">ir.module.module.list.select</field>-->
-            <!--<field name="model">ir.module.module</field>-->
-            <!--<field name="arch" type="xml">-->
-                <!--<search string="Search modules">-->
-                    <!--<field name="name" filter_domain="['|', '|', ('summary', 'ilike', self), ('shortdesc', 'ilike', self), ('name',-->
-                        <!--'ilike', self)]" string="Module"/>-->
-                    <!--<filter name="app" string="Apps" domain="[('application', '=', 1)]"/>-->
-                    <!--<filter name="extra" string="Extra" domain="[('application', '=', 0)]"/>-->
-                    <!--<separator/>-->
-                    <!--<filter name="installed" string="Installed" domain="[('state', 'in', ['installed', 'to upgrade', 'to remove'])]"/>-->
-                    <!--<filter string="Not Installed" domain="[('state', 'in', ['uninstalled', 'uninstallable', 'to install'])]"/>-->
-                    <!--<field name="category_id"/>-->
-                    <!--<group expand="0" string="Group By">-->
-                        <!--<filter string="Author" domain="[]" context="{'group_by':'author'}"/>-->
-                        <!--<filter string="Category" domain="[]" context="{'group_by':'category_id'}"/>-->
-                    <!--</group>-->
-               <!--</search>-->
-            <!--</field>-->
-        <!--</record>-->
+         <!--付款申请search view -->
+        <record id="view_account_payment_register_filter" model="ir.ui.view">
+            <field name="name">account.payment.register</field>
+            <field name="model">account.payment.register</field>
+            <field name="arch" type="xml">
+                <search string="Search">
+
+                    <field name="partner_id" filter_domain="[('partner_id', 'ilike', self)]" string="合作伙伴"/>
+                    <field name="amount" filter_domain="[('amount','ilike',self)]" string="金额"/>
+
+               </search>
+            </field>
+        </record>
 
         <record id="purchase_account_payment_register_form" model="ir.ui.view">
             <field name="name">account.payment.register.form</field>
