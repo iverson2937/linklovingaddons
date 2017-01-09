@@ -2,17 +2,17 @@
 <openerp>
     <data>
         <record id="linkloving_view_order_tree" model="ir.ui.view">
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_tree"/>
-        <field name="arch" type="xml">
-            <field name="date_order" position="before">
-                <field name="pi_number"/>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_tree"/>
+            <field name="arch" type="xml">
+                <field name="date_order" position="before">
+                    <field name="pi_number"/>
+                </field>
+                <field name="date_order" position="after">
+                    <field name="team_id"/>
+                </field>
             </field>
-             <field name="date_order" position="after">
-                <field name="team_id"/>
-            </field>
-        </field>
-    </record>
+        </record>
 
         <record id="linkloving_sale_order_form" model="ir.ui.view">
             <field name="name">sale.order.form</field>
@@ -25,21 +25,23 @@
                     <field name="name" invisible="1"/>
                 </xpath>
                 <!--<xpath expr="//tree/field[@name='product_id']" position="after">-->
-                    <!--<field name="product_specs"/>-->
+                <!--<field name="product_specs"/>-->
                 <!--</xpath>-->
 
                 <xpath expr="//tree/field[@name='product_id']" position="replace">
                     <field name="product_id" options="{'no_create': True}"/>
                 </xpath>
-                <xpath expr="//field[@name='partner_id']" position="attributes">
-                    <attribute name="domain">[('customer','=',True),('is_company','=',True)]</attribute>
+                <xpath expr="//tree/field[@name='tax_id']" position="attributes">
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="replace">
+                    <field name="partner_id" domain="[('customer','=',True),('is_company','=',True)]"
+                           options="{'no_create': True}"/>
                 </xpath>
                 <xpath expr="//field[@name='partner_shipping_id']" position="attributes">
                     <attribute name="domain">[('parent_id','=',partner_id)]</attribute>
                 </xpath>
-                <xpath expr="//field[@name='date_order']" position="before">
-                    <field name="team_id"/>
-                </xpath>
+
                 <xpath expr="//field[@name='partner_shipping_id']" position="after">
                     <field name="tax_id"
                            domain="[('type_tax_use','&lt;&gt;','purchase')]" string="税金"
@@ -60,19 +62,19 @@
 
 
         <!--<record model="ir.ui.view" id="website_crm_partner_assign.view_res_partner_filter_assign_tree">-->
-            <!--<field name="name">res.partner.tree.form.inherit</field>-->
-            <!--<field name="model">res.partner</field>-->
-            <!--<field name="inherit_id" ref="base_geolocalize.view_crm_partner_geo_form"/>-->
-            <!--<field name="arch" type="xml">-->
-                    <!--<field name="email" position="after">-->
-                        <!--<field name="internal_code"/>-->
-                        <!--<field name="team_id"/>-->
-                        <!--<field name="state_id"/>-->
-                    <!--</field>-->
-                        <!--&lt;!&ndash;<field name="date_review_next" position="replace"/>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<field name="level" position="replace"/>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<field name="activation" position="replace"/>&ndash;&gt;-->
-            <!--</field>-->
+        <!--<field name="name">res.partner.tree.form.inherit</field>-->
+        <!--<field name="model">res.partner</field>-->
+        <!--<field name="inherit_id" ref="base_geolocalize.view_crm_partner_geo_form"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<field name="email" position="after">-->
+        <!--<field name="internal_code"/>-->
+        <!--<field name="team_id"/>-->
+        <!--<field name="state_id"/>-->
+        <!--</field>-->
+        <!--&lt;!&ndash;<field name="date_review_next" position="replace"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;<field name="level" position="replace"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;<field name="activation" position="replace"/>&ndash;&gt;-->
+        <!--</field>-->
         <!--</record>-->
         <record id="linkloving_view_partner_tree" model="ir.ui.view">
             <field name="name">res.partner.tree</field>
@@ -80,17 +82,17 @@
             <field name="inherit_id" ref="base.view_partner_tree"/>
             <field name="arch" type="xml">
                 <field name="display_name" position="before">
-                        <field name="internal_code"/>
-                        <field name="team_id"/>
+                    <field name="internal_code"/>
+                    <field name="team_id"/>
                 </field>
                 <field name="email" position="after">
                     <field name="state_id"/>
                 </field>
 
-        </field>
-    </record>
+            </field>
+        </record>
 
-                <record id="sale.action_quotations" model="ir.actions.act_window">
+        <record id="sale.action_quotations" model="ir.actions.act_window">
             <field name="name">Quotations</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">sale.order</field>
@@ -99,17 +101,30 @@
             <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
             <field name="search_view_id" ref="sale.sale_order_view_search_inherit_quotation"/>
             <field name="context">{'hide_sale': True}</field>
-                    <field name="domain">[('state','in',['draft','sent'])]</field>
+            <field name="domain">[('state','in',['draft','sent'])]</field>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Create a Quotation, the first step of a new sale.
-              </p><p>
-                Your next actions should flow efficiently: confirm the Quotation
-                to a Sale Order, then create the Invoice and collect the Payment.
-              </p><p>
-                Note that once a Quotation becomes a Sale Order, it will be moved
-                from the Quotations list to the Sales Order list.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Create a Quotation, the first step of a new sale.
+                </p>
+                <p>
+                    Your next actions should flow efficiently: confirm the Quotation
+                    to a Sale Order, then create the Invoice and collect the Payment.
+                </p>
+                <p>
+                    Note that once a Quotation becomes a Sale Order, it will be moved
+                    from the Quotations list to the Sales Order list.
+                </p>
+            </field>
+        </record>
+
+        <record id="sale_order_view_search_inherit_pi_number" model="ir.ui.view">
+            <field name="name">sale.order.search.inherit.number</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
+                    <field name="pi_number" filter_domain="[('pi_number','ilike',self)]"/>
+                </xpath>
             </field>
         </record>
 
