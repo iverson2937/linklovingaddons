@@ -29,6 +29,7 @@
         'view/payment_view.xml',
         'view/partner_view.xml',
         'view/crm_team.xml',
+        'view/product_template.xml',
         'report/sale_order_report_templates.xml',
     ],
     # only loaded in demonstration mode
