@@ -42,6 +42,10 @@ class AccountPaymentRegister(models.Model):
         (2, u'收款')
     ])
 
+    @api.onchange('partner_id')
+    def change_partner_id(self):
+        self.invoice_ids=None
+
     state = fields.Selection([
         ('draft', u'草稿'),
         ('posted', u'提交'),
@@ -55,6 +59,7 @@ class AccountPaymentRegister(models.Model):
         ('name_uniq', 'unique(name)',
          'Name must be unique!')
     }
+
 
     @api.multi
     def reject(self):
@@ -71,6 +76,8 @@ class AccountPaymentRegister(models.Model):
     @api.multi
     def confirm(self):
         balance = self.amount
+        if self.payment_type==2 and balance>sum(self.mapped('invoice_ids.amount_total')):
+            raise UserError('对账单金额必须大于收到货款价格')
         for invoice in self.invoice_ids:
             balance_id = self.env['account.payment.register.balance'].create({
                 'payment_id': self.id,
@@ -90,7 +97,10 @@ class AccountPaymentRegister(models.Model):
 
     @api.model
     def create(self, vals):
-        payment_type = vals.get('payment_type')
+        if vals.get('amount')<=0:
+            raise UserError(u'金额必须大于0')
+
+        payment_type = self._context.get('default_payment_type')
 
         if 'name' not in vals or vals['name'] == _('New'):
             if  payment_type==2:
