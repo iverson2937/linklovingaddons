@@ -11,6 +11,8 @@ class AccountAccount(models.Model):
     debit = fields.Monetary(default=0.0, compute='_sum_debit_account')
     credit = fields.Monetary(default=0.0, compute='_sum_credit_account')
     balance = fields.Monetary(default=0.0,compute='_get_balance')
+
+
     @api.one
     def _get_balance(self):
         self.balance=self.debit-self.credit
