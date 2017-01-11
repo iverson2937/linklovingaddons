@@ -28,14 +28,14 @@ class AccountFiscalYear(models.Model):
         period_obj = self.env['account.period']
         for fy in self:
             ds = datetime.strptime(fy.date_start, '%Y-%m-%d')
-            period_obj.create({
-                'name': "%s %s" % (_('Opening Period'), ds.strftime('%Y')),
-                'code': ds.strftime('00/%Y'),
-                'date_start': ds,
-                'date_stop': ds,
-                'special': True,
-                'fiscalyear_id': fy.id,
-            })
+            # period_obj.create({
+            #     'name': "%s %s" % (_('Opening Period'), ds.strftime('%Y')),
+            #     'code': ds.strftime('00/%Y'),
+            #     'date_start': ds,
+            #     'date_stop': ds,
+            #     'special': True,
+            #     'fiscalyear_id': fy.id,
+            # })
             while ds.strftime('%Y-%m-%d') < fy.date_stop:
                 de = ds + relativedelta(months=1, days=-1)
 
