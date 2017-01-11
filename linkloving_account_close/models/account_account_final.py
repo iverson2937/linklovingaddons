@@ -6,7 +6,7 @@ from odoo import models, fields, api, _
 class AccountAccountFinal(models.Model):
     _name = "account.account.final"
     _description = "Final Account"
-    _order = "create_date desc"
+    _order = "period_id desc"
     account_id = fields.Many2one('account.account', string='科目')
     partner_id = fields.Many2one('res.partner')
     period_id = fields.Many2one('account.period', string='会计区间')

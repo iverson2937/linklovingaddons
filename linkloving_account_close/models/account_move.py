@@ -101,6 +101,7 @@ class AccountMoveLine(models.Model):
     period_id = fields.Many2one('account.period', string=u'会计区间',
                                 related='move_id.period_id',
                                 domain=[('state', '!=', 'done')], copy=False,
+                                store=True,
                                 required=True,
                                 default=_get_period,
                                 help="Keep empty to use the period of the validation(invoice) date.",

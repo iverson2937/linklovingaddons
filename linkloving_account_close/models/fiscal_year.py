@@ -63,6 +63,7 @@ class AccountPeriod(models.Model):
     _name = 'account.period'
 
     _description = "Account period"
+
     name = fields.Char('Period Name', required=True)
     code = fields.Char('Code', size=12)
     date_start = fields.Date('Start of Period', required=True)
@@ -80,12 +81,11 @@ class AccountPeriod(models.Model):
 
     @api.multi
     def unlink(self):
-        if self.env['account.move.line'].search([('period_id','=',self.id)]):
+        if self.env['account.move.line'].search([('period_id', '=', self.id)]):
             raise UserError(u'此会计区间已经有分录生产，不可以删除')
         return super(AccountPeriod, self).unlink()
 
-
-    def _get_accounts(self, accounts, display_account):
+    def _get_account_period_accounts(self, accounts, period_id):
         """ compute the balance, debit and credit for the provided accounts
             :Arguments:
                 `accounts`: list of accounts record,
@@ -100,19 +100,16 @@ class AccountPeriod(models.Model):
 
         account_result = {}
         # Prepare sql query base on selected parameters from wizard
-        tables, where_clause, where_params = self.env['account.move.line']._query_get()
-        tables = tables.replace('"', '')
-        if not tables:
-            tables = 'account_move_line'
-        wheres = [""]
-        if where_clause.strip():
-            wheres.append(where_clause.strip())
-        filters = " AND ".join(wheres)
         # compute the balance, debit and credit for the provided accounts
         request = (
-        "SELECT account_id AS id, SUM(debit) AS debit, SUM(credit) AS credit, (SUM(debit) - SUM(credit)) AS balance" + \
-        " FROM " + tables + " WHERE account_id IN %s " + filters + " GROUP BY account_id")
-        params = (tuple(accounts.ids),) + tuple(where_params)
+            "SELECT account_id AS id, SUM(debit) AS debit, SUM(credit) AS credit, (SUM(debit) - SUM(credit)) AS balance" + \
+            " FROM " + "account_move_line" + " WHERE account_id IN %s  "
+            + " AND period_id = %s "
+            +"GROUP BY account_id"
+
+
+        )
+        params = (tuple(accounts.ids),  str(period_id))
         self.env.cr.execute(request, params)
         for row in self.env.cr.dictfetchall():
             account_result[row.pop('id')] = row
@@ -123,66 +120,97 @@ class AccountPeriod(models.Model):
             currency = account.currency_id and account.currency_id or account.company_id.currency_id
             res['code'] = account.code
             res['name'] = account.name
+            res['id'] = account.id
             if account.id in account_result.keys():
                 res['debit'] = account_result[account.id].get('debit')
                 res['credit'] = account_result[account.id].get('credit')
                 res['balance'] = account_result[account.id].get('balance')
-            if display_account == 'all':
-                account_res.append(res)
-            if display_account in ['movement', 'not_zero'] and not currency.is_zero(res['balance']):
                 account_res.append(res)
         return account_res
 
-
     @api.multi
     def close_period(self):
-        accounts=self.env['account.account'].search([])
-
-
-        # self.state='done'
-        # # self.state = 'done'
-        # data={}
-        # data['computed'] = {}
-        #
-        # obj_partner = self.env['res.partner']
-        #
-        # # if data['form'].get('target_move', 'all') == 'posted':
-        # data['computed']['move_state'] = ['posted']
-        # # if result_selection == 'supplier':
-        # #     data['computed']['ACCOUNT_TYPE'] = ['payable']
-        # # elif result_selection == 'customer':
-        # #     data['computed']['ACCOUNT_TYPE'] = ['receivable']
-        # # else:
-        # #查询所有
-        # data['computed']['ACCOUNT_TYPE'] = ['payable', 'receivable']
-        #
-        #
-        # self.env.cr.execute("""
-        #             SELECT a.id
-        #             FROM account_account a
-        #             WHERE a.internal_type IN %s
-        #             AND NOT a.deprecated""", (tuple(['payable', 'receivable']),))
-        # data['computed']['account_ids'] = [a for (a,) in self.env.cr.fetchall()]
-        # params = [tuple(data['computed']['move_state']), tuple(data['computed']['account_ids'])]
-        # query = """
-        #             SELECT DISTINCT "account_move_line".partner_id
-        #             FROM "account_move_line", account_account AS account, account_move AS am
-        #             WHERE "account_move_line".partner_id IS NOT NULL
-        #                 AND "account_move_line".account_id = account.id
-        #                 AND am.state IN %s
-        #                 AND "account_move_line".account_id IN %s
-        #                 AND NOT account.deprecated
-        #                 AND "account_move_line".reconciled = false"""
-        # self.env.cr.execute(query, tuple(params))
-        # partner_ids = [res['partner_id'] for res in self.env.cr.dictfetchall()]
-        # partners = obj_partner.browse(partner_ids)
-        # partners = sorted(partners, key=lambda x: (x.ref, x.name))
-        # for partner in partners:
-        #     print partner.name
-        #     self._sum_partner(data, partner)
+        account_period_obj = self.env['account.period']
+        accounts = self.env['account.account'].search([])
+        account_res = self._get_account_period_accounts(accounts, self.id)
+        for account in account_res:
+            final_obj = self.env['account.account.final']
+            vals = {
+                'period_id': self.id,
+                'account_id': account['id'],
+                'credit': account['credit'],
+                'debit': account['debit']
+            }
+            period_data = final_obj.search([('account_id', '=', account['id']), ('period_id', '=', self.id)])
+            self.state = 'done'
+            if not period_data:
+                # 系统第一个会计区间没有数据
+                final_obj.create(vals)
+            else:
+                period_data.write({'credit': account['credit'],
+                                    'debit': account['debit']})
+            # 建立新的会计区间初始数据
+            ids = account_period_obj.search([('state', '!=', 'done')])
+            period_id = False
+            if not ids:
+                raise UserError(u'已经没有未关闭的会计区间，请建立新的财年和会计区间！')
+            period_id = ids[0]
+            final_obj.create({
+                'period_id': period_id.id,
+                'account_id': account['id'],
+                'start_credit': account['credit'] + period_data.start_credit,
+                'start_debit': account['debit'] + period_data.start_debit
+            })
 
 
 
+
+
+
+
+
+
+            # self.state='done'
+            # # self.state = 'done'
+            # data={}
+            # data['computed'] = {}
+            #
+            # obj_partner = self.env['res.partner']
+            #
+            # # if data['form'].get('target_move', 'all') == 'posted':
+            # data['computed']['move_state'] = ['posted']
+            # # if result_selection == 'supplier':
+            # #     data['computed']['ACCOUNT_TYPE'] = ['payable']
+            # # elif result_selection == 'customer':
+            # #     data['computed']['ACCOUNT_TYPE'] = ['receivable']
+            # # else:
+            # #查询所有
+            # data['computed']['ACCOUNT_TYPE'] = ['payable', 'receivable']
+            #
+            #
+            # self.env.cr.execute("""
+            #             SELECT a.id
+            #             FROM account_account a
+            #             WHERE a.internal_type IN %s
+            #             AND NOT a.deprecated""", (tuple(['payable', 'receivable']),))
+            # data['computed']['account_ids'] = [a for (a,) in self.env.cr.fetchall()]
+            # params = [tuple(data['computed']['move_state']), tuple(data['computed']['account_ids'])]
+            # query = """
+            #             SELECT DISTINCT "account_move_line".partner_id
+            #             FROM "account_move_line", account_account AS account, account_move AS am
+            #             WHERE "account_move_line".partner_id IS NOT NULL
+            #                 AND "account_move_line".account_id = account.id
+            #                 AND am.state IN %s
+            #                 AND "account_move_line".account_id IN %s
+            #                 AND NOT account.deprecated
+            #                 AND "account_move_line".reconciled = false"""
+            # self.env.cr.execute(query, tuple(params))
+            # partner_ids = [res['partner_id'] for res in self.env.cr.dictfetchall()]
+            # partners = obj_partner.browse(partner_ids)
+            # partners = sorted(partners, key=lambda x: (x.ref, x.name))
+            # for partner in partners:
+            #     print partner.name
+            #     self._sum_partner(data, partner)
 
     def _sum_partner(self, data, partner):
 
@@ -190,7 +218,7 @@ class AccountPeriod(models.Model):
         # query_get_data = self.env['account.move.line'].with_context(data['form'].get('used_context', {}))._query_get()
         # reconcile_clause = "" if data['form']['reconciled'] else ' AND "account_move_line".reconciled = false '
 
-        params = [partner.id,  tuple(data['computed']['account_ids'])]
+        params = [partner.id, tuple(data['computed']['account_ids'])]
         query = """
         SELECT partner_id,period_id,sum(credit),sum(debit)
                 FROM "account_move_line"
