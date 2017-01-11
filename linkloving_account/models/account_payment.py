@@ -38,9 +38,13 @@ class AccountPaymentRegister(models.Model):
     receive_id = fields.Many2one('res.users')
     account_id = fields.Many2one('account.account')
     payment_type = fields.Selection([
-        (0, u'收款'),
-        (1, u'付款')
+        (1, u'付款'),
+        (2, u'收款')
     ])
+
+    @api.onchange('partner_id')
+    def change_partner_id(self):
+        self.invoice_ids=None
 
     state = fields.Selection([
         ('draft', u'草稿'),
@@ -55,6 +59,7 @@ class AccountPaymentRegister(models.Model):
         ('name_uniq', 'unique(name)',
          'Name must be unique!')
     }
+
 
     @api.multi
     def reject(self):
@@ -71,6 +76,8 @@ class AccountPaymentRegister(models.Model):
     @api.multi
     def confirm(self):
         balance = self.amount
+        if self.payment_type==2 and balance>sum(self.mapped('invoice_ids.amount_total')):
+            raise UserError('对账单金额必须大于收到货款价格')
         for invoice in self.invoice_ids:
             balance_id = self.env['account.payment.register.balance'].create({
                 'payment_id': self.id,
@@ -83,17 +90,20 @@ class AccountPaymentRegister(models.Model):
     @api.multi
     def done(self):
         for balance in self.balance_ids:
-            if balance.state:
-                raise UserError('有付款等级没有完成，不可以关闭次付款')
+            if not balance.state:
+                raise UserError('有款型登记没有完成，不可以关闭次记录')
 
         self.state = 'done'
 
     @api.model
     def create(self, vals):
-        payment_type = vals.get('type')
+        if vals.get('amount')<=0:
+            raise UserError(u'金额必须大于0')
+
+        payment_type = self._context.get('default_payment_type')
 
         if 'name' not in vals or vals['name'] == _('New'):
-            if not payment_type:
+            if  payment_type==2:
                 vals['name'] = self.env['ir.sequence'].next_by_code('account.receive') or _('New')
             else:
                 vals['name'] = self.env['ir.sequence'].next_by_code('account.pay') or _('New')

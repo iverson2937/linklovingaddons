@@ -3,8 +3,7 @@
     <data>
 
 
-
-
+        <!--收款登记form-->
         <record id="account_receive_register_form" model="ir.ui.view">
             <field name="name">account.receive.register.form</field>
             <field name="model">account.payment.register</field>
@@ -12,46 +11,42 @@
                 <form>
                     <header>
                         <button name="post" string="提交" type="object"
-                                class="oe_highlight" states="draft" groups="purchase.group_purchase_user"/>
+                                class="oe_highlight" states="draft" groups="account.group_account_invoice"/>
                         <button name="reject" string="退回" type="object"
-                                states="posted" groups="purchase.group_purchase_manager"/>
+                                states="posted" groups="sale.sale_order_personal_rule"/>
                         <button name="confirm" string="确认" type="object"
-                                states="posted" groups="purchase.group_purchase_manager"/>
+                                states="posted" groups="sale.sale_order_personal_rule"/>
                         <button name="done" string="完成" type="object"
-                                states="confirm" groups="purchase.group_purchase_manager"/>
+                                states="confirm" groups="account.group_account_invoice"/>
 
 
                         <field name="state" widget="statusbar" statusbar_visible="draft,posted,confirm,done"/>
                     </header>
                     <sheet>
                         <h1>
-                            <label string="收款"></label>
+                            <field name="payment_type" invisible="0" nolabel="1" readonly="1" />
                             <field name="name" class="oe_inline" readonly="1"/>
                         </h1>
                         <group>
+
                             <field name="partner_id"
+                                   options="{'no_create':True}"
                                    attrs="{'required': [('state', '=', 'posted')],'readonly': [('state', '=', 'done')]}"
                                    domain="[('customer', '=', True),('is_company', '=', True)]"/>
+                            <field name="bank_id"
+                                   attrs="{'readonly': [('state', 'in', ['confirm','done'])]}"
+                                   context="{'default_partner_id':partner_id}"/>
                             <field name="amount" attrs="{'readonly':[('state','!=','draft')]}" required="1"/>
                             <field name="receive_date" required="1" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                            <field name="bank_id"
-                                   attrs="{'readonly':[('state','!=','draft')],'readonly': [('state', '=', 'done')]}"
-                                   context="{'default_partner_id':partner_id}">
-                                <tree>
-                                    <field name="acc_number"/>
-                                    <field name="bank_id"/>
-                                </tree>
-                            </field>
+
                             <field name="account_id" string="收入账户" required="0" invisible="1"
                                    attrs="{'readonly': [('state', '=', 'done')]}"/>
-                            <field name="remark" required="1" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                            <field name="remark"/>
                         </group>
                         <notebook colspan="4">
-                            <page string="Invoices" autofocus="autofocus">
-                                <group>
-                                    <field name="invoice_ids"
-                                           domain="[('partner_id','=', partner_id),('state','=', 'open'),('remain_apply_balance','!=',0 )]"/>
-                                </group>
+                            <page string="对账单" autofocus="autofocus">
+                                <field name="invoice_ids" attrs="{'required': [('state', '=', 'posted')],'readonly': [('state', 'in', ['confirm','done'])]}"
+                                       domain="[('partner_id','=', partner_id),('state','=', 'open'),('remain_apply_balance','!=',0 )]"/>
 
                             </page>
                         </notebook>
@@ -76,7 +71,7 @@
             <field name="domain">[('partner_id','=',context.get('partner_id'))]</field>
             <field name="context">{}</field>
         </record>
-         <!--付款申请search view -->
+        <!--付款申请search view -->
         <record id="view_account_payment_register_filter" model="ir.ui.view">
             <field name="name">account.payment.register</field>
             <field name="model">account.payment.register</field>
@@ -86,10 +81,11 @@
                     <field name="partner_id" filter_domain="[('partner_id', 'ilike', self)]" string="合作伙伴"/>
                     <field name="amount" filter_domain="[('amount','ilike',self)]" string="金额"/>
 
-               </search>
+                </search>
             </field>
         </record>
 
+        <!--付款申请form-->
         <record id="purchase_account_payment_register_form" model="ir.ui.view">
             <field name="name">account.payment.register.form</field>
             <field name="model">account.payment.register</field>
@@ -110,7 +106,7 @@
                     </header>
                     <sheet>
                         <h1>
-                            <label string="付款"></label>
+                           <field name="payment_type" invisible="0" nolabel="1" readonly="1"/>
                             <field name="name" class="oe_inline" readonly="1"/>
                         </h1>
                         <group>
@@ -121,13 +117,15 @@
                                    attrs="{'readonly':[('state','!=','draft')],'readonly': [('state', 'in', ['confirm','done'])]}"
                                    context="{'default_partner_id':partner_id}">
                             </field>
-                            <field name="amount" attrs="{'readonly': [('state', 'in', ['confirm','done'])]}" required="1"/>
-                            <field name="receive_date" required="1" attrs="{'readonly': [('state', 'in', ['confirm','done'])]}"
+                            <field name="amount" attrs="{'readonly': [('state', 'in', ['confirm','done'])]}"
+                                   required="1"/>
+                            <field name="receive_date" required="1"
+                                   attrs="{'readonly': [('state', 'in', ['confirm','done'])]}"
                                    string="付款日期"/>
 
                             <field name="account_id" string="收入账户" required="0"
-                                  attrs="{'readonly': [('state', 'in', ['confirm','done'])]}" invisible="1"/>
-                            <field name="remark" required="0" attrs="{'readonly': [('state', 'in', ['confirm','done'])]}"/>
+                                   attrs="{'readonly': [('state', 'in', ['confirm','done'])]}" invisible="1"/>
+                            <field name="remark" required="0" attrs="{'readonly': [('state', '=', 'done')]}"/>
                         </group>
                         <notebook colspan="4">
                             <page string="对账单" autofocus="autofocus">
@@ -184,7 +182,7 @@
                 </p>
             </field>
         </record>
-          <record id="action_payment_register_accounting" model="ir.actions.act_window">
+        <record id="action_payment_register_accounting" model="ir.actions.act_window">
             <field name="name">付款申请</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">account.payment.register</field>
@@ -204,14 +202,15 @@
                 </p>
             </field>
         </record>
+
         <record id="action_payment_received_register" model="ir.actions.act_window">
             <field name="name">收款登记</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">account.payment.register</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[('payment_type','=',0)]</field>
-            <field name="context">{'default_payment_type':0}</field>
+            <field name="domain">[('payment_type','=',2)]</field>
+            <field name="context">{'default_payment_type':2,'wait_pay':True}</field>
             <field name="view_ids" eval="[(5,0,0),
             (0,0,{'view_mode':'tree', 'view_id': ref('account_payment_register_tree')}),
             (0,0,{'view_mode':'form', 'view_id': ref('account_receive_register_form')})]"/>

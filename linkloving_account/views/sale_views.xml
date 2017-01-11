@@ -2,10 +2,49 @@
 <openerp>
     <data>
 
+        <record id="account_payment_register_tree_sale" model="ir.ui.view">
+            <field name="name">account.payment.register.tree</field>
+            <field name="model">account.payment.register</field>
+            <field name="arch" type="xml">
+                <tree create="0" delete="0">
+                    <field name="name"/>
+                    <field name="amount"/>
+                    <field name="partner_id"/>
+                    <field name="create_uid"/>
+                    <field name="create_date"/>
+                    <field name="remark"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+
+         <record id="action_payment_received_register_sale" model="ir.actions.act_window">
+            <field name="name">收款登记</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.payment.register</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('payment_type','=',2),('state','!=','draft')]</field>
+             <field name="context">{'posted':True}</field>
+            <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'tree', 'view_id': ref('account_payment_register_tree_sale')}),
+            (0,0,{'view_mode':'form', 'view_id': ref('account_receive_register_form')})]"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    点击添加收款
+                </p>
+                <p>
+                    没有收款记录!
+                </p>
+            </field>
+        </record>
+
    <menuitem action="account.action_invoice_tree1"
             id="menu_sale_order_invoice" parent="sale.menu_sale_invoicing"
             sequence="2"/>
-         <menuitem action="action_payment_received_register"
+
+         <menuitem action="action_payment_received_register_sale"
             id="menu_sale_order_invoice" parent="sale.menu_sale_invoicing"
             sequence="2"/>
 

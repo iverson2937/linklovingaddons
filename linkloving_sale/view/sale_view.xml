@@ -30,6 +30,8 @@
 
                 <xpath expr="//tree/field[@name='product_id']" position="replace">
                     <field name="product_id" options="{'no_create': True}"/>
+                    <field name="inner_code"/>
+                    <field name="inner_spec"/>
                 </xpath>
                 <xpath expr="//tree/field[@name='tax_id']" position="attributes">
                     <attribute name='invisible'>1</attribute>
