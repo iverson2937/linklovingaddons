@@ -3,6 +3,7 @@
 from odoo import fields, models, api, _, SUPERUSER_ID
 from itertools import groupby
 
+
 class SaleOrder(models.Model):
     """
 
@@ -12,7 +13,6 @@ class SaleOrder(models.Model):
     tax_id = fields.Many2one('account.tax', required=True)
     product_count = fields.Float(compute='get_product_count')
     pi_number = fields.Char(string='PI Number')
-
 
     def get_product_count(self):
         count = 0.0
@@ -27,6 +27,8 @@ class SaleOrder(models.Model):
     @api.multi
     def write(self, vals):
         result = super(SaleOrder, self).write(vals)
+        self.mapped('order_line')._compute_amount()
+        # FIXME: allen why first tim not worker properly
         self.mapped('order_line')._compute_amount()
         return result
 
@@ -48,7 +50,7 @@ class SaleOrder(models.Model):
                 'subtotal': category and category.subtotal,
                 'pagebreak': category and category.pagebreak,
                 'lines': list(lines),
-                'is_domestic':self.team_id.is_domestic if self.team_id else False
+                'is_domestic': self.team_id.is_domestic if self.team_id else False
             })
         print report_pages
 
