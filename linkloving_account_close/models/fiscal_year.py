@@ -171,11 +171,11 @@ class AccountPeriod(models.Model):
                 'credit': account['credit'],
                 'debit': account['debit']
             }
-            period_data = final_obj.search([('account_id', '=', account['id']), ('period_id', '=', self.id)])
+            period_data = final_obj.search([('account_id', '=', account['id']), ('partner_i', '=', account['id']),('period_id', '=', self.id)])
             # self.state = 'done'
             if not period_data:
                 # 系统第一个会计区间没有数据
-                final_obj.create(vals)
+                period_data=final_obj.create(vals)
             else:
                 period_data.write({'credit': account['credit'],
                                    'debit': account['debit']})
