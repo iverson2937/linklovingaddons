@@ -83,9 +83,9 @@ class AccountPeriod(models.Model):
         account_period_obj = self.env['account.period']
         ids = account_period_obj.search([('state', '!=', 'done')])
         period_id = False
-        if not ids:
+        if len(ids) == 1:
             raise UserError(u'已经没有未关闭的会计区间，请建立新的财年和会计区间！')
-        period_id = ids[0]
+        period_id = ids[1]
         return period_id
 
     @api.multi
@@ -241,5 +241,3 @@ class AccountPeriod(models.Model):
                 'start_credit': credit + period_partner_data.start_credit,
                 'start_debit': debit + period_partner_data.start_debit
             })
-
-            self.state = 'done'

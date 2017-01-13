@@ -29,6 +29,7 @@
         'views/templates.xml',
         'views/account_account.xml',
         'views/account_move_line.xml',
+        'views/account_move.xml',
         'views/account_final.xml',
     ],
     # only loaded in demonstration mode

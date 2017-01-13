@@ -3,21 +3,6 @@
     <data>
 
 
-
-        <!--凭证 -->
-        <record id="view_account_move_form" model="ir.ui.view">
-            <field name="name">account.move.form</field>
-            <field name="model">account.move</field>
-            <field name="inherit_id" ref="account.view_move_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='date']" position="after">
-                    <field name="period_id"/>
-                </xpath>
-
-            </field>
-        </record>
-
-
         <!--明细 -->
         <record id="view_account_move_line_tree" model="ir.ui.view">
             <field name="name">account.move.line.tree</field>
@@ -32,16 +17,16 @@
         </record>
 
 
-        <record id="action_account_move_line_list" model="ir.actions.act_window">
-            <field name="name">明细</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">account.move.line</field>
-            <field name="context">{'search_default_account':1}</field>
-            <!--<field name="view_type">form</field>-->
-            <!--<field name="view_mode">form</field>-->
-            <!--<field name="view_id" ref="view_base_module_upgrade_install"/>-->
-            <!--<field name="target">new</field>-->
-        </record>
+        <!--<record id="action_account_move_line_list" model="ir.actions.act_window">-->
+        <!--<field name="name">明细</field>-->
+        <!--<field name="type">ir.actions.act_window</field>-->
+        <!--<field name="res_model">account.move.line</field>-->
+        <!--<field name="context">{'search_default_account':1}</field>-->
+        <!--&lt;!&ndash;<field name="view_type">form</field>&ndash;&gt;-->
+        <!--&lt;!&ndash;<field name="view_mode">form</field>&ndash;&gt;-->
+        <!--&lt;!&ndash;<field name="view_id" ref="view_base_module_upgrade_install"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;<field name="target">new</field>&ndash;&gt;-->
+        <!--</record>-->
 
 
         <record id="view_account_move_line_form" model="ir.ui.view">
@@ -56,9 +41,20 @@
             </field>
         </record>
 
+        <record id="view_account_move_line_filter_inherit" model="ir.ui.view">
+            <field name="name">会计区间搜索</field>
+            <field name="model">account.move.line</field>
+            <field name="inherit_id" ref="account.view_account_move_line_filter"/>
+            <field name="arch" type="xml">
+                <field name="account_id" position="after">
+                    <field name="period"/>
+                </field>
+            </field>
+        </record>
 
-        <menuitem id="menu_action_move_line_list" action="action_account_move_line_list"
-                  parent="account.menu_finance_entries"/>
+
+        <!--<menuitem id="menu_action_move_line_list" action="action_account_move_line_list"-->
+        <!--parent="account.menu_finance_entries"/>-->
 
 
     </data>
