@@ -240,6 +240,18 @@
                 </xpath>
             </field>
         </record>
+        <record id="view_account_payment_form_inherit" model="ir.ui.view">
+            <field name="name">account.payment.form.inherit</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="customer" invisible="1"/>
+                    <field name="team_id" readonly="1" string="销售团队" attrs="{'invisible':[('customer','!=',True)]}"/>
+                </xpath>
+            </field>
+        </record>
     </data>
 </openerp>
 

@@ -29,7 +29,7 @@ class AccountPaymentRegister(models.Model):
     balance_ids = fields.One2many('account.payment.register.balance', 'payment_id')
     amount = fields.Float(string=u'金额')
 
-    bank_id = fields.Many2one('res.partner.bank', string=u'账号',domain="[('partner_id', '=', partner_id)]")
+    bank_id = fields.Many2one('res.partner.bank', string=u'账号', domain="[('partner_id', '=', partner_id)]")
     invoice_ids = fields.Many2many('account.invoice')
     receive_date = fields.Date(string=u'收款日期', default=fields.date.today())
     remark = fields.Text(string=u'备注')
@@ -44,7 +44,7 @@ class AccountPaymentRegister(models.Model):
 
     @api.onchange('partner_id')
     def change_partner_id(self):
-        self.invoice_ids=None
+        self.invoice_ids = None
 
     state = fields.Selection([
         ('draft', u'草稿'),
@@ -59,7 +59,6 @@ class AccountPaymentRegister(models.Model):
         ('name_uniq', 'unique(name)',
          'Name must be unique!')
     }
-
 
     @api.multi
     def reject(self):
@@ -76,7 +75,7 @@ class AccountPaymentRegister(models.Model):
     @api.multi
     def confirm(self):
         balance = self.amount
-        if self.payment_type==2 and balance>sum(self.mapped('invoice_ids.amount_total')):
+        if self.payment_type == 2 and balance > sum(self.mapped('invoice_ids.amount_total')):
             raise UserError('对账单金额必须大于收到货款价格')
         for invoice in self.invoice_ids:
             balance_id = self.env['account.payment.register.balance'].create({
@@ -97,13 +96,13 @@ class AccountPaymentRegister(models.Model):
 
     @api.model
     def create(self, vals):
-        if vals.get('amount')<=0:
+        if vals.get('amount') <= 0:
             raise UserError(u'金额必须大于0')
 
         payment_type = self._context.get('default_payment_type')
 
         if 'name' not in vals or vals['name'] == _('New'):
-            if  payment_type==2:
+            if payment_type == 2:
                 vals['name'] = self.env['ir.sequence'].next_by_code('account.receive') or _('New')
             else:
                 vals['name'] = self.env['ir.sequence'].next_by_code('account.pay') or _('New')
@@ -121,10 +120,10 @@ class AccountPaymentRegister(models.Model):
             return [('state', '=', 'posted')]
 
 
-
-
 class account_payment(models.Model):
     _inherit = 'account.payment'
+    team_id = fields.Many2one('crm.team', related='partner_id.team_id')
+    customer = fields.Boolean(related='partner_id.customer')
 
     @api.model
     def default_get(self, fields):
