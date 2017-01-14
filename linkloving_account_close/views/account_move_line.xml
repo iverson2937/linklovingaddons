@@ -47,7 +47,7 @@
             <field name="inherit_id" ref="account.view_account_move_line_filter"/>
             <field name="arch" type="xml">
                 <field name="account_id" position="after">
-                    <field name="period"/>
+                    <field name="period_id"/>
                 </field>
             </field>
         </record>
