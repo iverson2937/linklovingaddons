@@ -24,12 +24,14 @@
 
     # always loaded
     'data': [
+        'report/purchase_order_report_template.xml',
         'report/purchase_order_report.xml',
         'security/ir.model.access.csv',
         'views/supplier_view.xml',
         'views/purchase_view.xml',
         'views/purchase_config_view.xml',
         'views/partner_view.xml',
+        'wizard/purchase_order_wizard.xml',
         'templates.xml',
     ],
     # only loaded in demonstration mode
