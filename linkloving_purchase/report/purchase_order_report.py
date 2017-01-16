@@ -58,7 +58,7 @@ class report_purchase(http.Controller):
                 for line in record.get('line').itervalues():
                     data_sheet.write(current_row, 4, line.get('name') and line.get('name') or '', style)
                     data_sheet.write(current_row, 5, line.get('default_code') and line.get('default_code') or '', style)
-                    data_sheet.write(current_row, 6, line.get('product_specs') and line.get('product_specs') or 0,
+                    data_sheet.write(current_row, 6, line.get('product_specs') and line.get('product_specs') or '',
                                      style)
                     data_sheet.write(current_row, 7, line.get('price_unit') and line.get('price_unit') or 0, style)
                     data_sheet.write(current_row, 8, line.get('quantity') and line.get('quantity') or 0, style)
