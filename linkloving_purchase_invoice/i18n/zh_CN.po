@@ -1,0 +1,245 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* linkloving_purchase_invoice
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-16 08:21+0000\n"
+"PO-Revision-Date: 2017-01-16 08:21+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_advance_payment_inv_count
+msgid "# of PurchaseOrders"
+msgstr "# of PurchaseOrders"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model.fields,help:linkloving_purchase_invoice.field_purchase_advance_payment_inv_deposit_account_id
+msgid "Account used for deposits"
+msgstr "存款的科目"
+
+#. module: linkloving_purchase_invoice
+#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:159
+#, python-format
+msgid "Advance: %s"
+msgstr "预付款: %s"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.ui.view,arch_db:linkloving_purchase_invoice.view_sale_advance_payment_inv
+msgid "Cancel"
+msgstr "取消"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.ui.view,arch_db:linkloving_purchase_invoice.purchase_order_form
+msgid "Create Invoice1"
+msgstr "创建对账单"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.ui.view,arch_db:linkloving_purchase_invoice.purchase_order_form
+msgid "Create Invoice2"
+msgstr "Create Invoice2"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.ui.view,arch_db:linkloving_purchase_invoice.view_sale_advance_payment_inv
+msgid "Create Invoices"
+msgstr "创建对账单"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.ui.view,arch_db:linkloving_purchase_invoice.view_sale_advance_payment_inv
+msgid "Create and View Invoices"
+msgstr "创建并查看对账单"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_advance_payment_inv_create_uid
+msgid "Created by"
+msgstr "创建人"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_advance_payment_inv_create_date
+msgid "Created on"
+msgstr "创建时间"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_advance_payment_inv_deposit_taxes_id
+msgid "Customer Taxes"
+msgstr "客户税金"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_advance_payment_inv_display_name
+msgid "Display Name"
+msgstr "显示名称"
+
+#. module: linkloving_purchase_invoice
+#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:90
+#, python-format
+msgid "Down Payment"
+msgstr "预付款"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_advance_payment_inv_amount
+msgid "Down Payment Amount"
+msgstr "首付总额"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_advance_payment_inv_product_id
+msgid "Down Payment Product"
+msgstr "首付产品"
+
+#. module: linkloving_purchase_invoice
+#: selection:purchase.advance.payment.inv,advance_payment_method:0
+msgid "Down payment (fixed amount)"
+msgstr "预付款 (固定金额)"
+
+#. module: linkloving_purchase_invoice
+#: selection:purchase.advance.payment.inv,advance_payment_method:0
+msgid "Down payment (percentage)"
+msgstr "预付款 (百分比)"
+
+#. module: linkloving_purchase_invoice
+#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:87
+#, python-format
+msgid "Down payment of %s%%"
+msgstr "预付 of %s%%"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_advance_payment_inv_id
+msgid "ID"
+msgstr "ID"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_advance_payment_inv_deposit_account_id
+msgid "Income Account"
+msgstr "收入科目"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.actions.act_window,name:linkloving_purchase_invoice.action_view_purchase_advance_payment_inv
+msgid "Invoice Order"
+msgstr "开票订单"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.ui.view,arch_db:linkloving_purchase_invoice.view_sale_advance_payment_inv
+msgid "Invoice Sales Order"
+msgstr "销售订单开票"
+
+#. module: linkloving_purchase_invoice
+#: selection:purchase.advance.payment.inv,advance_payment_method:0
+msgid "Invoiceable lines"
+msgstr "已交货的订单行"
+
+#. module: linkloving_purchase_invoice
+#: selection:purchase.advance.payment.inv,advance_payment_method:0
+msgid "Invoiceable lines (deduct down payments)"
+msgstr "已交货的订单行 (扣除预付款)"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.ui.view,arch_db:linkloving_purchase_invoice.view_sale_advance_payment_inv
+msgid "Invoices will be created in draft so that you can review\n"
+"                        them before validation."
+msgstr "Invoices will be created in draft so that you can review\n"
+"                        them before validation."
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_advance_payment_inv___last_update
+msgid "Last Modified on"
+msgstr "最后修改日"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_advance_payment_inv_write_uid
+msgid "Last Updated by"
+msgstr "最后更新人"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_advance_payment_inv_write_date
+msgid "Last Updated on"
+msgstr "最后更新时间"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_order_partner_invoice_id
+msgid "Partner invoice id"
+msgstr "合作伙伴 invoice id"
+
+#. module: linkloving_purchase_invoice
+#: code:addons/linkloving_purchase_invoice/models/purchase_order.py:95
+#, python-format
+msgid "Please define an accounting sale journal for this company."
+msgstr "Please define an accounting sale journal for this company."
+
+#. module: linkloving_purchase_invoice
+#: code:addons/linkloving_purchase_invoice/models/purchase_order.py:147
+#, python-format
+msgid "Please define income account for this product: \"%s\" (id:%d) - or for its category: \"%s\"."
+msgstr "Please define income account for this product: \"%s\" (id:%d) - or for its category: \"%s\"."
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model,name:linkloving_purchase_invoice.model_purchase_advance_payment_inv
+msgid "Purchase Advance Payment Invoice"
+msgstr "采购预付对账单"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model,name:linkloving_purchase_invoice.model_purchase_order
+msgid "Purchase Order"
+msgstr "采购订单"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model,name:linkloving_purchase_invoice.model_purchase_order_line
+msgid "Purchase Order Line"
+msgstr "采购订单行"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model.fields,help:linkloving_purchase_invoice.field_purchase_advance_payment_inv_deposit_taxes_id
+msgid "Taxes used for deposits"
+msgstr "存款的税金"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model.fields,help:linkloving_purchase_invoice.field_purchase_advance_payment_inv_amount
+msgid "The amount to be invoiced in advance, taxes excluded."
+msgstr "预付款发票金额，不含税。"
+
+#. module: linkloving_purchase_invoice
+#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:153
+#, python-format
+msgid "The product used to invoice a down payment should be of type 'Service'. Please use another product or update this product."
+msgstr "The product used to invoice a down payment should be of type 'Service'. Please use another product or update this product."
+
+#. module: linkloving_purchase_invoice
+#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:151
+#, python-format
+msgid "The product used to invoice a down payment should have an invoice policy set to \"Ordered quantities\". Please update your deposit product to be able to create a deposit invoice."
+msgstr "The product used to invoice a down payment should have an invoice policy set to \"Ordered quantities\". Please update your deposit product to be able to create a deposit invoice."
+
+#. module: linkloving_purchase_invoice
+#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:84
+#, python-format
+msgid "The value of the down payment amount must be positive."
+msgstr "预付款金额必须大于0."
+
+#. module: linkloving_purchase_invoice
+#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:80
+#, python-format
+msgid "There is no income account defined for this product: \"%s\". You may have to install a chart of account from Accounting app, settings menu."
+msgstr "There is no income account defined for this product: \"%s\". You may have to install a chart of account from Accounting app, settings menu."
+
+#. module: linkloving_purchase_invoice
+#: code:addons/linkloving_purchase_invoice/models/purchase_order.py:47
+#: code:addons/linkloving_purchase_invoice/models/purchase_order.py:51
+#, python-format
+msgid "There is no invoicable line."
+msgstr "没有收到的货物."
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_order_line_qty_to_invoice
+msgid "To Invoice"
+msgstr "待对账"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_advance_payment_inv_advance_payment_method
+msgid "What do you want to invoice?"
+msgstr "你要开什么类型的对账单？"
+
