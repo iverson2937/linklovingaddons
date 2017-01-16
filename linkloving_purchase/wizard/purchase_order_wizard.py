@@ -7,7 +7,8 @@ from odoo import models, fields, api, _
 class PurchaseOrderListPrintWizard(models.TransientModel):
     _name = 'purchase.order.list.wizard'
 
-    start_date = fields.Date(u'订单开始日期',default=(datetime.date.today().replace(day=1) - datetime.timedelta(1)).replace(day=1))
+    start_date = fields.Date(u'订单开始日期',
+                             default=(datetime.date.today().replace(day=1) - datetime.timedelta(1)).replace(day=1))
     end_date = fields.Date(u'订单截至日期', default=datetime.datetime.now())
 
     def _get_data_by_purchase(self, date1, date2):
@@ -21,32 +22,25 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
 
         purchase_sequence = 1
         for purchase in purchase_ids:
-            delivery_price = 0
-            forecast_price = 0
-            print purchase.name
-            for delivery in purchase.picking_ids:
-                for d_line in delivery.move_lines:
-                    delivery_price += d_line.product_uom_qty * d_line.purchase_line_id.price_unit
-
-            print 'delivery_price', delivery_price
             returnDict[purchase.id] = {'data': {}, 'line': {}}
             returnDict[purchase.id]['data'] = {
                 'sequence': purchase_sequence,
                 'name': purchase.name,
                 'partner': purchase.partner_id.name,
-                'user': purchase.create_uid.name,
+                'create_uid': purchase.create_uid.name,
                 'date_order': purchase.date_order,
                 'order_price': purchase.amount_total,
             }
             for line in purchase.order_line:
-
-
                 returnDict[purchase.id]['line'].update({line.id: {
                     'name': line.product_id.name,
                     'default_code': line.product_id.default_code,
                     'price_unit': line.price_unit,
+                    'product_specs': line.product_specs,
                     'quantity': line.product_qty,
-                    'order_price': line.price_unit * line.product_qty,
+                    'qty_received': line.qty_received,
+                    'qty_invoiced': line.qty_invoiced,
+                    'price_subtotal': line.price_subtotal,
                 }})
         return returnDict
 

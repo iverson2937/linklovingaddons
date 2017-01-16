@@ -34,8 +34,8 @@ class report_purchase(http.Controller):
 
             header_list = [
                 u'采购单号', u'供应商', u'创建人', u'单据日期', u'产品',
-                u'材料编码', u'规格描述', u'单价', u'合同数', u'入库数',
-                u'合同金额', u'总合同金额', u'已报销金额', u'已付款金额'
+                u'材料编码', u'规格描述', u'单价', u'采购数量', u'入库数量',
+                u'开单数量', u'小计',u'总计'
 
             ]
 
@@ -47,9 +47,9 @@ class report_purchase(http.Controller):
 
                 data_sheet.write(current_row, 0, vals.get('name') and vals.get('name') or '', style)
                 data_sheet.write(current_row, 1, vals.get('partner') and vals.get('partner') or '', style)
-                data_sheet.write(current_row, 2, vals.get('user_name') and vals.get('user_name') or '', style)
+                data_sheet.write(current_row, 2, vals.get('create_uid') and vals.get('create_uid') or '', style)
                 data_sheet.write(current_row, 3, vals.get('date_order') and vals.get('date_order') or '', style)
-                data_sheet.write(current_row, 10, vals.get('order_price') and vals.get('order_price') or '', style)
+                data_sheet.write(current_row, 12, vals.get('order_price') and vals.get('order_price') or '', style)
 
                 if not record.get('line'):
                     current_row += 1
@@ -58,10 +58,13 @@ class report_purchase(http.Controller):
                 for line in record.get('line').itervalues():
                     data_sheet.write(current_row, 4, line.get('name') and line.get('name') or '', style)
                     data_sheet.write(current_row, 5, line.get('default_code') and line.get('default_code') or '', style)
-                    data_sheet.write(current_row, 6, line.get('price_unit') and line.get('price_unit') or 0, style)
-                    data_sheet.write(current_row, 7, line.get('quantity') and line.get('quantity') or 0, style)
-                    data_sheet.write(current_row, 8, line.get('delivery_qty') and line.get('delivery_qty') or 0, style)
-                    data_sheet.write(current_row, 9, line.get('order_price') and line.get('order_price') or 0, style)
+                    data_sheet.write(current_row, 6, line.get('product_specs') and line.get('product_specs') or 0,
+                                     style)
+                    data_sheet.write(current_row, 7, line.get('price_unit') and line.get('price_unit') or 0, style)
+                    data_sheet.write(current_row, 8, line.get('quantity') and line.get('quantity') or 0, style)
+                    data_sheet.write(current_row, 9, line.get('qty_received') and line.get('qty_received') or 0, style)
+                    data_sheet.write(current_row, 10, line.get('qty_invoiced') and line.get('qty_invoiced') or 0, style)
+                    data_sheet.write(current_row, 11, line.get('price_subtotal') and line.get('price_subtotal') or 0, style)
 
                     current_row += 1
 
