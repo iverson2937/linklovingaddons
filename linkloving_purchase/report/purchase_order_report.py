@@ -54,8 +54,14 @@ class report_purchase(http.Controller):
                 if not record.get('line'):
                     current_row += 1
                     continue
-
+                i = 0
                 for line in record.get('line').itervalues():
+
+                    if i>0:
+                        data_sheet.write(current_row, 0, vals.get('name') and vals.get('name') or '', style)
+                        data_sheet.write(current_row, 1, vals.get('partner') and vals.get('partner') or '', style)
+                        data_sheet.write(current_row, 2, vals.get('create_uid') and vals.get('create_uid') or '', style)
+                        data_sheet.write(current_row, 3, vals.get('date_order') and vals.get('date_order') or '', style)
                     data_sheet.write(current_row, 4, line.get('name') and line.get('name') or '', style)
                     data_sheet.write(current_row, 5, line.get('default_code') and line.get('default_code') or '', style)
                     data_sheet.write(current_row, 6, line.get('product_specs') and line.get('product_specs') or '',
@@ -67,6 +73,7 @@ class report_purchase(http.Controller):
                     data_sheet.write(current_row, 11, line.get('price_subtotal') and line.get('price_subtotal') or 0, style)
 
                     current_row += 1
+                    i+=1
 
             for x, i in enumerate([2, 2, 2, 2, 3, 3, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]):
                 data_sheet.col(x).width = 2560 * i
