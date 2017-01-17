@@ -41,6 +41,12 @@ class StockPicking(models.Model):
         self.state = 'assigned'
 
     @api.multi
+    def set_to_available(self):
+        self.state = 'assigned'
+
+
+
+    @api.multi
     def reject(self):
         self.state = 'assigned'
 

@@ -12,6 +12,12 @@
                             groups="stock.group_stock_user"/>
                 </xpath>
 
+                <xpath expr="//button[@name='action_confirm']" position="after">
+                    <button name="set_to_available" string="设置成可用"
+                            states="cancel"
+                           groups="base.group_erp_manager" type="object" class="oe_highlight"/>
+
+                </xpath>
 
                 <xpath expr="//button[@name='do_new_transfer']" position="replace">
                     <button name="do_new_transfer" string="出库调拨"
