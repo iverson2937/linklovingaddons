@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 8.0\n"
+"Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-22 03:35+0000\n"
-"PO-Revision-Date: 2016-09-22 03:35+0000\n"
+"POT-Creation-Date: 2017-01-16 08:17+0000\n"
+"PO-Revision-Date: 2017-01-16 08:17+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,127 +16,153 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: linkloving_purchase
-#: view:res.partner:linkloving_purchase.view_res_partner_supplier_filter
+#: model:ir.model,name:linkloving_purchase.model_res_company
 msgid "Companies"
 msgstr "公司"
 
 #. module: linkloving_purchase
-#: view:res.partner:linkloving_purchase.view_res_partner_supplier_filter
-msgid "Company"
-msgstr "公司"
-
-#. module: linkloving_purchase
-#: view:res.partner:linkloving_purchase.view_res_partner_supplier_filter
-msgid "Country"
-msgstr "国家"
-
-#. module: linkloving_purchase
-#: field:res.partner.level,create_uid:0
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_list_wizard_create_uid
+#: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_level_create_uid
 msgid "Created by"
-msgstr "Created by"
+msgstr "创建人"
 
 #. module: linkloving_purchase
-#: field:res.partner.level,create_date:0
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_list_wizard_create_date
+#: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_level_create_date
 msgid "Created on"
-msgstr "Created on"
+msgstr "创建时间"
 
 #. module: linkloving_purchase
-#: view:res.partner:linkloving_purchase.view_res_partner_supplier_filter
-msgid "Customer Partners"
-msgstr "客户业务伙伴"
+#: model:ir.model.fields,field_description:linkloving_purchase.field_res_company_purchase_note
+msgid "Default Terms and Conditions"
+msgstr "默认条款和条件"
 
 #. module: linkloving_purchase
-#: view:res.partner:linkloving_purchase.view_res_partner_supplier_filter
-msgid "Customers"
-msgstr "客户"
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_config_settings_purchase_note
+msgid "Default Terms and Conditions *"
+msgstr "默认条款和条件 *"
 
 #. module: linkloving_purchase
-#: field:res.partner.level,display_name:0
+#: code:addons/linkloving_purchase/models/qualifications_level.py:15
+#, python-format
+msgid "Description"
+msgstr "描述"
+
+#. module: linkloving_purchase
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_list_wizard_display_name
+#: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_level_display_name
 msgid "Display Name"
-msgstr "Display Name"
+msgstr "显示名称"
 
 #. module: linkloving_purchase
-#: view:res.partner:linkloving_purchase.view_res_partner_supplier_filter
-msgid "Group By"
-msgstr "分组按"
-
-#. module: linkloving_purchase
-#: field:res.partner.level,id:0
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_list_wizard_id
+#: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_level_id
 msgid "ID"
 msgstr "ID"
 
 #. module: linkloving_purchase
-#: field:res.partner.level,__last_update:0
+#: model:ir.actions.report.xml,name:linkloving_purchase.action_report_purchase
+msgid "Invoice"
+msgstr "Invoice"
+
+#. module: linkloving_purchase
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_list_wizard___last_update
+#: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_level___last_update
 msgid "Last Modified on"
-msgstr "Last Modified on"
+msgstr "最后修改日"
 
 #. module: linkloving_purchase
-#: field:res.partner.level,write_uid:0
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_list_wizard_write_uid
+#: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_level_write_uid
 msgid "Last Updated by"
-msgstr "Last Updated by"
+msgstr "最后更新人"
 
 #. module: linkloving_purchase
-#: field:res.partner.level,write_date:0
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_list_wizard_write_date
+#: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_level_write_date
 msgid "Last Updated on"
-msgstr "Last Updated on"
+msgstr "最后更新时间"
 
 #. module: linkloving_purchase
-#: view:res.partner:linkloving_purchase.view_res_partner_supplier_filter
-msgid "My Partners"
-msgstr "我的业务伙伴列表"
+#: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_level_level_type
+msgid "Level type"
+msgstr "Level type"
+
+#. module: linkloving_purchase
+#: model:ir.ui.view,arch_db:linkloving_purchase.official_seal_company
+msgid "Official Seal"
+msgstr "公章"
 
 #. module: linkloving_purchase
 #: model:ir.model,name:linkloving_purchase.model_res_partner
 msgid "Partner"
-msgstr "业务伙伴"
+msgstr "合作伙伴"
 
 #. module: linkloving_purchase
-#: view:res.partner:linkloving_purchase.view_res_partner_supplier_filter
-msgid "Persons"
-msgstr "个人"
+#: model:ir.model.fields,field_description:linkloving_purchase.field_stock_picking_po_id
+msgid "Po id"
+msgstr "Po id"
 
 #. module: linkloving_purchase
-#: model:ir.actions.act_window,name:linkloving_purchase.pre_payment_application
-#: model:ir.ui.menu,name:linkloving_purchase.menu_procurement_management_pre_payment
-msgid "Pre Payment Application"
-msgstr "预付款"
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_product_count
+msgid "Product count"
+msgstr "Product count"
 
 #. module: linkloving_purchase
-#: code:addons/linkloving_purchase/models/qualifications_level.py:12
-#: field:res.partner.level,name:0
+#: model:ir.model,name:linkloving_purchase.model_purchase_order
+msgid "Purchase Order"
+msgstr "采购订单"
+
+#. module: linkloving_purchase
+#: model:ir.model,name:linkloving_purchase.model_purchase_order_line
+msgid "Purchase Order Line"
+msgstr "采购订单行"
+
+#. module: linkloving_purchase
+#: code:addons/linkloving_purchase/models/qualifications_level.py:10
 #, python-format
 msgid "Qualification Level"
 msgstr "资质等级"
 
 #. module: linkloving_purchase
-#: view:res.partner:linkloving_purchase.view_res_partner_supplier_filter
-msgid "Salesperson"
-msgstr "销售员"
-
-#. module: linkloving_purchase
-#: view:res.partner:linkloving_purchase.view_res_partner_supplier_filter
-msgid "Search Partner"
-msgstr "搜索业务伙伴"
-
-#. module: linkloving_purchase
-#: view:res.partner:linkloving_purchase.view_res_partner_supplier_filter
-msgid "Supplier Partners"
-msgstr "供应商业务伙伴"
-
-#. module: linkloving_purchase
-#: view:res.partner:linkloving_purchase.view_res_partner_supplier_filter
-msgid "Suppliers"
-msgstr "供应商"
-
-#. module: linkloving_purchase
-#: view:res.partner:linkloving_purchase.view_res_partner_supplier_filter
-msgid "Tag"
-msgstr "标签"
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_remark
+msgid "Remark"
+msgstr "备注"
 
 #. module: linkloving_purchase
 #: code:addons/linkloving_purchase/models/partner.py:7
-#: field:res.partner,qualifications_level:0
+#: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_supplier_level
 #, python-format
-msgid "Vendor Level"
-msgstr "资质等级"
+msgid "Supplier Level"
+msgstr "供应商等级"
+
+#. module: linkloving_purchase
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_tax_id
+msgid "Tax"
+msgstr "税金"
+
+#. module: linkloving_purchase
+#: model:ir.model,name:linkloving_purchase.model_stock_picking
+msgid "Transfer"
+msgstr "调拨"
+
+#. module: linkloving_purchase
+#: model:ir.ui.view,arch_db:linkloving_purchase.purchase_order_list_wizard_form
+msgid "or"
+msgstr "或"
+
+#. module: linkloving_purchase
+#: model:ir.model,name:linkloving_purchase.model_purchase_config_settings
+msgid "purchase.config.settings"
+msgstr "purchase.config.settings"
+
+#. module: linkloving_purchase
+#: model:ir.model,name:linkloving_purchase.model_purchase_order_list_wizard
+msgid "purchase.order.list.wizard"
+msgstr "purchase.order.list.wizard"
+
+#. module: linkloving_purchase
+#: model:ir.model,name:linkloving_purchase.model_res_partner_level
+msgid "res.partner.level"
+msgstr "res.partner.level"
 

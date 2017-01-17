@@ -20,6 +20,19 @@ class PurchaseOrder(models.Model):
     remark = fields.Text(string='Remark')
     handle_date = fields.Datetime(string=u'交货期')
 
+    @api.depends('order_line.move_ids')
+    def _compute_picking(self):
+        for order in self:
+            pickings = self.env['stock.picking']
+            for line in order.order_line:
+                # We keep a limited scope on purpose. Ideally, we should also use move_orig_ids and
+                # do some recursive search, but that could be prohibitive if not done correctly.
+                moves = line.move_ids | line.move_ids.mapped('returned_move_ids')
+                # moves = moves.filtered(lambda r: r.state != 'cancel')
+                pickings |= moves.mapped('picking_id')
+            order.picking_ids = pickings
+            order.picking_count = len(pickings)
+
     @api.onchange('handle_date')
     def onchange_handle_date(self):
         for line in self.order_line:
