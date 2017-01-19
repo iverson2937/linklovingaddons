@@ -25,20 +25,15 @@ class AccountEmployeePayment(models.Model):
     @api.one
     @api.depends('sheet_ids')
     def _get_pre_payment_reminding_balance(self):
-        print 'dddddddddddddddddddddddd'
         pre_payment_reminding = 0
         if self.state == 'paid':
             if self.sheet_ids:
-                pre_payment_reminding = self.amount - sum([sheet.total_amount for sheet in self.sheet_ids])
+                pre_payment_reminding = self.amount - sum([sheet.deduct_amount for sheet in self.sheet_ids])
             else:
                 pre_payment_reminding = self.amount
         self.pre_payment_reminding = pre_payment_reminding
-        return
 
-        # 暂支余额如何显示???
-        # self.pre_payment_reminding = -self.employee_id.user_id.partner_id.debit
-
-    pre_payment_reminding = fields.Float(string=u'余额', compute=_get_pre_payment_reminding_balance, store=True)
+    pre_payment_reminding = fields.Float(string=u'余额', compute=_get_pre_payment_reminding_balance)
 
     def _get_is_show(self):
         if self._context.get('uid') == self.to_approve_id.id:
@@ -47,12 +42,6 @@ class AccountEmployeePayment(models.Model):
             self.is_show = False
 
     is_show = fields.Boolean(compute=_get_is_show)
-
-    @api.one
-    @api.depends('pre_payment_reminding')
-    def _get_status(self):
-        if not self.pre_payment_reminding and self.state == 'paid':
-            self.state = 'deduct'
 
     state = fields.Selection([('draft', 'Draft'),
                               ('confirm', u'确认'),
@@ -64,7 +53,7 @@ class AccountEmployeePayment(models.Model):
                               ('deduct', u'已抵扣'),
                               ],
                              readonly=True, default='draft', copy=False, string="Status", store=True,
-                             compute=_get_status, track_visibility='onchange')
+                             track_visibility='onchange')
 
     @api.multi
     def submit(self):
@@ -151,3 +140,9 @@ class AccountEmployeePayment(models.Model):
             return [('state', '=', 'approve')]
         if self._context.get('search_default_approved'):
             return [('state', '=', 'post')]
+
+    @api.multi
+    def unlink(self):
+        if self.state in ['paid', 'deduct']:
+            raise UserError('不能删除已经支付的暂支记录。')
+        return super(AccountEmployeePayment, self).unlink()

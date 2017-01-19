@@ -15,8 +15,9 @@
                         <!--supply the remaining products.-->
                     <!--</p>-->
                     <field name="sheet_id" invisible="1"/>
-                    <field name="employee_id"/>
-                    <field name="payment_id"/>
+                    <field name="employee_id" invisible="1"/>
+
+                    <field name="payment_id" invisible="1"/>
                 </group>
                 <footer>
                     <button name="process" string="是" type="object" class="oe_highlight"/>

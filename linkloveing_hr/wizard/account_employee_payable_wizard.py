@@ -31,7 +31,7 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
 
     @api.multi
     def process(self):
-        self.sheet_id.deduct_payment()
+        self.sheet_id.deduct_payment(self.payment_id.id)
 
     @api.multi
     def no_deduct_process(self):

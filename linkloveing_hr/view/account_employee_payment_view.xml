@@ -42,7 +42,7 @@
                         <field name="id" invisible="1"/>
                         <div class="oe_title" attrs="{'invisible': [('state', '=', 'draft')]}">
                             <h1>
-                                <field name="name"/>
+                                <field name="name" readonly="1"/>
                             </h1>
                         </div>
                         <group>
@@ -65,7 +65,17 @@
                         </group>
                                     <notebook colspan="4">
                             <page string='报销单' autofocus="autofocus">
-                                <!--<field name="sheet_ids"/>-->
+                                <field name="sheet_ids">
+                                    <tree create="false">
+                                        <field name="expense_no"/>
+                                        <field name="name"/>
+                                        <field name="create_date"/>
+                                        <field name="deduct_amount" string="暂支抵扣金额"/>
+                                        <field name="total_amount"/>
+
+                                    </tree>
+
+                                </field>
 
                             </page>
                         </notebook>

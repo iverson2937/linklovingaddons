@@ -9,7 +9,7 @@ class HrExpenseSheet(models.Model):
     expense_no = fields.Char(string=u'报销编号')
     approve_ids = fields.Many2many('res.users')
     is_deduct_payment = fields.Boolean(default=False)
-
+    deduct_amount = fields.Float()
     pre_payment_reminding = fields.Float(string=u'暂支余额', related='employee_id.pre_payment_reminding')
     payment_id = fields.Many2one('account.employee.payment')
 
@@ -124,7 +124,7 @@ class HrExpenseSheet(models.Model):
         return self.write({'state': 'submit'})
 
     @api.multi
-    def deduct_payment(self):
+    def deduct_payment(self, payment_id):
         if any(sheet.state != 'approve' for sheet in self):
             raise UserError(_("You can only generate accounting entry for approved expense(s)."))
 
@@ -133,10 +133,10 @@ class HrExpenseSheet(models.Model):
         vals = {}
         if self.pre_payment_reminding >= self.total_amount:
 
-            vals.update({'state': 'done'})
+            vals.update({'state': 'done','deduct_amount': self.total_amount})
         else:
-            vals.update({'state': 'post'})
-        vals.update({'is_deduct_payment': True})
+            vals.update({'state': 'post','deduct_amount': self.pre_payment_reminding})
+        vals.update({'is_deduct_payment': True, 'payment_id': payment_id})
         self.write(vals)
 
         self.mapped('expense_line_ids').action_move_create()
@@ -185,7 +185,7 @@ class HrExpenseSheet(models.Model):
     def register_payment_action(self):
         amount = self.total_amount
         if self.is_deduct_payment:
-            amount = self.employee_id.user_id.partner_id.debit
+            amount = self.total_amount-self.deduct_amount
 
         context = {'default_payment_type': 'inbound', 'default_amount': amount}
 
