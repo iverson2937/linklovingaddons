@@ -11,7 +11,7 @@
                     <field name="parent_id" options="{'no_create': True}"/>
                 </xpath>
                 <xpath expr="//field[@name='address_id']" position="after">
-                    <field name="pre_payment_reminding"/>
+                    <field name="pre_payment_reminding" string="暂支余额"/>
                 </xpath>
             </field>
         </record>
