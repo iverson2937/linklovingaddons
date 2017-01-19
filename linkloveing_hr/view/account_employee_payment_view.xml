@@ -63,6 +63,12 @@
 
                             </group>
                         </group>
+                                    <notebook colspan="4">
+                            <page string='报销单' autofocus="autofocus">
+                                <!--<field name="sheet_ids"/>-->
+
+                            </page>
+                        </notebook>
                     </sheet>
                     <div class="oe_chatter">
                         <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
@@ -86,6 +92,7 @@
                     <field name="remark" />
                     <field name="apply_date" string="申请日期"/>
                     <field name="state"/>
+                    <field name="pre_payment_reminding"/>
 
 
                 </tree>

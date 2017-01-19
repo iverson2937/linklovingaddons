@@ -57,6 +57,7 @@
 
                 <xpath expr="//button[@name='action_sheet_move_create']" position="replace">
                     <button name="to_do_journal_entry" states="approve" string="会计确认" type="object"
+                            context="{'employee_id':employee_id}"
                             groups="account.group_account_user" class="oe_highlight o_expense_sheet_post"/>
                 </xpath>
 
@@ -71,6 +72,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='name']" position="before">
                     <field name="expense_no" string="报销编号"/>
+                    <field name="create_date"/>
                 </xpath>
             </field>
         </record>
