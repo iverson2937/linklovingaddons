@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "linkloving_mrp_extend",
+    'name': "linkloving_app_api",
 
     'summary': """
         Short (1 phrase/line) summary of the module's purpose, used as
@@ -20,17 +20,13 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','mrp','sales_team'],
+    'depends': ['base'],
 
     # always loaded
     'data': [
-        'security/ir.model.access.csv',
+        # 'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
-        'report/mrp_bom_structure_report_templates.xml',
-        'report/mrp_production_templates.xml',
-        'security/mrp_groups.xml',
-
     ],
     # only loaded in demonstration mode
     'demo': [

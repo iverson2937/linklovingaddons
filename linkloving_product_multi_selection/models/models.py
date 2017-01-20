@@ -172,14 +172,14 @@ class ProductCategoryExtend(models.Model):
             """ Return the list [cat.name, cat.parent_id.name, ...] """
             res = []
             while cat:
-                name = cat.name[0:16].encode('utf-8')
-                if len(cat.name) > 16:
-                    new_name = unicode(name + '...', 'utf-8')
-                    res.append(new_name)
-                else:
-                    res.append(name)
-                break
-            return res
+                name = cat.name[0:14]#.encode('utf-8')
+                # if len(cat.name) > 16:
+                    # new_name = unicode(name + '...', 'utf-8')
+                    # res.append(new_name)
+                # else:
+                res.append(name)
+                cat = cat.parent_id
+            return res[0:2]
 
         name = [(cat.id, " / ".join(reversed(get_names(cat)))) for cat in self]
         return name
