@@ -80,9 +80,19 @@
                                         <field name="create_date"/>
                                         <field name="deduct_amount" string="暂支抵扣金额"/>
                                         <field name="total_amount"/>
-
                                     </tree>
+                                </field>
 
+                            </page>
+                        </notebook>
+                        <notebook colspan="4" attrs="{'invisible':[('return_ids','=',False)]}">
+                            <page string='还款记录' autofocus="autofocus">
+                                <field name="return_ids">
+                                    <tree create="false">
+                                        <field name="create_uid" string="创建人"/>
+                                        <field name="create_date"/>
+                                        <field name="amount"/>
+                                    </tree>
                                 </field>
 
                             </page>
@@ -112,8 +122,6 @@
                     <field name="apply_date" string="申请日期"/>
                     <field name="state"/>
                     <field name="pre_payment_reminding"/>
-
-
                 </tree>
             </field>
         </record>

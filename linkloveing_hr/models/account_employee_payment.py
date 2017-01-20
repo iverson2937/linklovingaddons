@@ -21,7 +21,15 @@ class AccountEmployeePayment(models.Model):
     address_home_id = fields.Many2one('res.partner', related='employee_id.address_home_id')
     bank_account_id = fields.Many2one('res.partner.bank', related='employee_id.bank_account_id')
     sheet_ids = fields.One2many('hr.expense.sheet', 'payment_id')
-    payment_return = fields.Float(string=u'还款金额')
+    return_ids = fields.One2many('account.employee.payment.return', 'payment_id')
+    @api.one
+    @api.depends('return_ids')
+    def _get_return_balance(self):
+        self.pre_payment_reminding = sum([return_id.amount for return_id in self.return_ids])
+    payment_return = fields.Float(string=u'还款金额',compute=_get_return_balance)
+
+
+
 
     @api.one
     @api.depends('sheet_ids')
@@ -31,7 +39,7 @@ class AccountEmployeePayment(models.Model):
             used_payment =sum([sheet.deduct_amount for sheet in self.sheet_ids])
         self.pre_payment_reminding = self.amount-used_payment-self.payment_return
 
-    pre_payment_reminding = fields.Float(string=u'余额', compute=_get_pre_payment_reminding_balance)
+    pre_payment_reminding = fields.Float(string=u'可用金额', compute=_get_pre_payment_reminding_balance)
 
     def _get_is_show(self):
         if self._context.get('uid') == self.to_approve_id.id:
