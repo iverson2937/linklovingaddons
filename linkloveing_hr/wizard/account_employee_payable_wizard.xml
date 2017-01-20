@@ -7,22 +7,24 @@
             <form string="Backorder creation">
                 <group>
                     <p>
-                       员工有未抵消暂支费用,是否用暂支抵扣？
+                        员工有未抵消暂支费用,是否用暂支抵扣？
                     </p>
                     <!--<p class="text-muted">-->
-                        <!--Create a backorder, if you expect to process the remaining-->
-                        <!--products later.  Do not create a backorder if you will not-->
-                        <!--supply the remaining products.-->
+                    <!--Create a backorder, if you expect to process the remaining-->
+                    <!--products later.  Do not create a backorder if you will not-->
+                    <!--supply the remaining products.-->
                     <!--</p>-->
                     <field name="sheet_id" invisible="1"/>
                     <field name="employee_id" invisible="1"/>
+                    <group>
+                        <field string="暂支编号" name="payment_id" readonly="0" domain="[('employee_id', '=', employee_id), ('pre_payment_reminding', '!=', False)]"/>
+                    </group>
 
-                    <field name="payment_id" invisible="1"/>
                 </group>
                 <footer>
                     <button name="process" string="是" type="object" class="oe_highlight"/>
                     <button name="no_deduct_process" string="否" type="object" class="btn-primary"/>
-                    <button string="_Cancel" class="btn-default" special="cancel" />
+                    <button string="_Cancel" class="btn-default" special="cancel"/>
                 </footer>
             </form>
         </field>

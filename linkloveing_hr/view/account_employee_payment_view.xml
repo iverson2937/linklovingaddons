@@ -9,8 +9,12 @@
             <field name="arch" type="xml">
                 <form string="Register Payment" version="7">
                     <header>
-                        <button name="post" class="oe_highlight" states="approve" string="确认付款" type="object" groups="account.group_account_user"/>
+                        <button name="post" class="oe_highlight" states="approve" string="确认付款" type="object"
+                                groups="account.group_account_user"/>
+                        <button name="return_payment" class="oe_highlight" states="paid" string="还款" type="object"
+                                groups="account.group_account_user" attrs="{'invisible': [('payment_return', '=', 0.00)]}"/>
                         <button name="submit" class="oe_highlight" states="draft" string="提交" type="object"/>
+
 
                         <button name="manager1_approve" class="oe_highlight" states="confirm" string="批准" type="object"
                                 groups="hr_expense.group_hr_expense_user"/>
@@ -49,12 +53,17 @@
                             <group>
                                 <!--<field name="is_show" invisible="1"/>-->
                                 <field name="employee_id" string="员工"/>
-                                <field name="bank_account_id" string="银行账号" context="{'default_partner_id':address_home_id}"/>
-                                <field name="address_home_id" invisible="1" />
+                                <field name="name"/>
+                                <field name="bank_account_id" string="银行账号"
+                                       context="{'default_partner_id':address_home_id}"/>
+                                <field name="address_home_id" invisible="1"/>
                                 <field name="department_id" string="部门" invisible="1"/>
                                 <field name="to_approve_id" string="待审核" readonly="1"
                                        attrs="{'invisible': [('to_approve_id', '=', False)]}"/>
                                 <field name="amount" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="pre_payment_reminding" readonly="1"/>
+                                <field name="payment_return" readonly="1"
+                                       attrs="{'invisible': [('payment_return', '=', False)]}"/>
                                 <field name="remark" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                             </group>
                             <group>
@@ -63,7 +72,7 @@
 
                             </group>
                         </group>
-                                    <notebook colspan="4">
+                        <notebook colspan="4">
                             <page string='报销单' autofocus="autofocus">
                                 <field name="sheet_ids">
                                     <tree create="false">
@@ -98,8 +107,8 @@
                     <field name="department_id" string="部门" invisible="1"/>
                     <field name="to_approve_id" string="待审核" readonly="1"
                            attrs="{'invisible': [('to_approve_id', '=', False)]}"/>
-                    <field name="amount" />
-                    <field name="remark" />
+                    <field name="amount"/>
+                    <field name="remark"/>
                     <field name="apply_date" string="申请日期"/>
                     <field name="state"/>
                     <field name="pre_payment_reminding"/>
@@ -116,7 +125,6 @@
 
             <!--<field name="domain">[('partner_type','=','employee')]</field>-->
             <field name="domain">[('employee_id.user_id', '=', uid)]</field>
-
 
 
             <field name="help" type="html">
@@ -234,7 +242,7 @@
                   parent="menu_account_payment"
                   groups="base.group_erp_manager"
                   action="action_account_payment_all"/>
-              <menuitem id="menu_account_payment_wait_pay" name="待付款暂支" sequence="0"
+        <menuitem id="menu_account_payment_wait_pay" name="待付款暂支" sequence="0"
                   parent="menu_account_payment"
                   groups="account.group_account_user"
                   action="action_account_payment_wait_pay"/>

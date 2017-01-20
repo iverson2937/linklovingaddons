@@ -187,10 +187,10 @@ class HrExpenseSheet(models.Model):
         if self.is_deduct_payment:
             amount = self.total_amount-self.deduct_amount
 
-        context = {'default_payment_type': 'inbound', 'default_amount': amount}
+        context = {'default_payment_type': 'outbound', 'default_amount': amount}
 
         return {
-            'name': _('付款'),
+            'name': _('Send Money'),
             'view_type': 'form',
             'view_mode': 'form',
             # 'view_id': False,
@@ -212,3 +212,11 @@ class HrExpenseSheet(models.Model):
             return [('state', '=', 'approve')]
         if self._context.get('search_default_approved'):
             return [('state', '=', 'post')]
+    @api.multi
+    def write(self, vals):
+        if vals.get('deduct_amount')!=self.pre_payment_reminding:
+            raise UserError('还款金额跟余额不符合')
+        return super(HrExpenseSheet, self).write(vals)
+
+
+

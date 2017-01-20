@@ -21,17 +21,15 @@ class AccountEmployeePayment(models.Model):
     address_home_id = fields.Many2one('res.partner', related='employee_id.address_home_id')
     bank_account_id = fields.Many2one('res.partner.bank', related='employee_id.bank_account_id')
     sheet_ids = fields.One2many('hr.expense.sheet', 'payment_id')
+    payment_return = fields.Float(string=u'还款金额')
 
     @api.one
     @api.depends('sheet_ids')
     def _get_pre_payment_reminding_balance(self):
-        pre_payment_reminding = 0
+        used_payment=0
         if self.state == 'paid':
-            if self.sheet_ids:
-                pre_payment_reminding = self.amount - sum([sheet.deduct_amount for sheet in self.sheet_ids])
-            else:
-                pre_payment_reminding = self.amount
-        self.pre_payment_reminding = pre_payment_reminding
+            used_payment =sum([sheet.deduct_amount for sheet in self.sheet_ids])
+        self.pre_payment_reminding = self.amount-used_payment-self.payment_return
 
     pre_payment_reminding = fields.Float(string=u'余额', compute=_get_pre_payment_reminding_balance)
 
@@ -51,6 +49,7 @@ class AccountEmployeePayment(models.Model):
                               ('approve', u'批准'),
                               ('paid', u'已支付'),
                               ('deduct', u'已抵扣'),
+                              ('returned', u'已还款')
                               ],
                              readonly=True, default='draft', copy=False, string="Status", store=True,
                              track_visibility='onchange')
@@ -60,7 +59,7 @@ class AccountEmployeePayment(models.Model):
         self.state = 'confirm'
 
         if self.employee_id == self.employee_id.department_id.manager_id:
-            department = self.to_approve_id.employee_ids.department_idstatus
+            department = self.to_approve_id.employee_ids.department_id
             if department.allow_amount and self.amount > department.allow_amount:
                 self.write({'state': 'approve'})
             else:
@@ -108,10 +107,27 @@ class AccountEmployeePayment(models.Model):
     @api.multi
     def post(self):
 
-        context = {'default_payment_type': 'employee', 'default_amount': self.amount}
+        context = {'default_payment_type': 'outbound', 'default_amount': self.amount}
 
         return {
             'name': _('payment'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            # 'view_id': False,
+            'res_model': 'account.employee.register.payment.wizard',
+            'domain': [],
+            'context': dict(context, active_ids=self.ids),
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+        }
+
+    @api.multi
+    def return_payment(self):
+
+        context = {'default_payment_type': 'inbound', 'default_amount': self.pre_payment_reminding}
+
+        return {
+            'name': _('还款'),
             'view_type': 'form',
             'view_mode': 'form',
             # 'view_id': False,

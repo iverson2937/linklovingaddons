@@ -62,11 +62,11 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
         context = dict(self._context or {})
         active_ids = context.get('active_ids', [])
         employee_payment = self.env['account.employee.payment'].browse(active_ids)
-
+        payment_type = context.get('default_payment_type')
         # Create payment and post it
         payment = self.env['account.payment'].create({
             'partner_type': 'employee',
-            'payment_type': 'outbound',
+            'payment_type': payment_type,
             'partner_id': self.partner_id.id,
             'journal_id': self.journal_id.id,
             'company_id': self.company_id.id,
@@ -91,5 +91,12 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
         #     if line.account_id.internal_type == 'payable':
         #         account_move_lines_to_reconcile |= line
         # account_move_lines_to_reconcile.reconcile()
-        employee_payment.state='paid'
+
+        if payment_type == 'inbound' and employee_payment:
+            employee_payment.write({'payment_return': self.amount,'state':'returned'})
+
+        else:
+            employee_payment.state = 'paid'
         return {'type': 'ir.actions.act_window_close'}
+
+
