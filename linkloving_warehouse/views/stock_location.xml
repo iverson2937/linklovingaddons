@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="view_stock_area_form" model="ir.ui.view">
+            <field name="name">product.product.form</field>
+            <field name="model">stock.location.area</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="description"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+
+    <record id="action_stock_location_area" model="ir.actions.act_window">
+        <field name="name">Stock Location Area</field>
+        <field name="res_model">stock.location.area</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <menuitem id="menu_stock_location_config" name="库位设置" parent="stock.menu_warehouse_config"
+              groups="stock.group_stock_manager"
+              action="action_stock_location_area"
+    />
+</openerp>
+
+
+
+
+
+
+
