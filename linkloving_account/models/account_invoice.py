@@ -10,13 +10,16 @@ class AccountInvoice(models.Model):
     remain_apply_balance = fields.Monetary(string='To Apply', currency_field='currency_id',
                                            store=True, readonly=True, compute='_compute_amount',
                                            help="Total amount in the currency of the invoice, negative for credit notes.")
-
+    @api.one
     @api.depends('invoice_line_ids.price_subtotal', 'tax_line_ids.amount', 'currency_id', 'company_id', 'date_invoice',
                  'balance_ids')
     def _compute_amount(self):
         self.amount_untaxed = sum(line.price_subtotal for line in self.invoice_line_ids)
+        self.amount_untaxed_o = sum(line.price_subtotal_o for line in self.invoice_line_ids)
         self.amount_tax = sum(line.amount for line in self.tax_line_ids)
         self.amount_total = self.amount_untaxed + self.amount_tax
+        self.amount_total_o = sum(line.price_subtotal_o for line in self.invoice_line_ids)
+        print 'self.amount_total_o ',self.amount_total_o
         self.remain_apply_balance = self.amount_total
         amount_total_company_signed = self.amount_total
         amount_untaxed_signed = self.amount_untaxed
@@ -32,9 +35,9 @@ class AccountInvoice(models.Model):
             amount = 0.0
             for balance_id in self.balance_ids:
                 amount += balance_id.amount
-            self.remain_apply_balance =  self.remain_apply_balance-amount
+            self.remain_apply_balance = self.remain_apply_balance - amount
 
-    @api.multi
-    def write(self, vals):
-
-        return super(AccountInvoice, self).write(vals)
+        # if self.deduct_amount and self.amount_total_o:
+        #     print 'ssssssssssssss'
+        #     self.tax_line_ids.amount=self.tax_line_ids.amount*(1-self.deduct_amount/self.amount_total_o)
+        #     print self.tax_line_ids.amount
