@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data >
+        <record forcecreate="True" id="decimal_price_deduct" model="decimal.precision">
+            <field name="name">Price Deduct</field>
+            <field name="digits">8</field>
+        </record>
+
+    </data>
+</odoo>

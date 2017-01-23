@@ -10,6 +10,7 @@ class AccountInvoice(models.Model):
 
     amount_total_o = fields.Monetary(string=u'对账金额',
                                      store=True, readonly=True, compute='_compute_amount', track_visibility='always')
+
     def _get_po_number(self):
         if self.origin:
             po = self.env['purchase.order'].search([('name', '=', self.origin)])
@@ -18,6 +19,14 @@ class AccountInvoice(models.Model):
     po_id = fields.Many2one('purchase.order', compute=_get_po_number)
     order_line = fields.One2many('purchase.order.line', related='po_id.order_line')
     deduct_amount = fields.Float(string=u'对账扣款')
+
+    @api.multi
+    @api.onchange('date_invoice')
+    def on_change_deduct_amount(self):
+        self.reference = 'ss'
+        print 'sssssssssssssssssssssssssssssss'
+        return
+
     deduct_rate = fields.Float()
     remark = fields.Text(string=u'备注')
 
@@ -53,8 +62,26 @@ class AccountInvoice(models.Model):
         self.state = 'validate'
 
     @api.multi
+    def write(self, vals):
+        deduct_amount = vals.get('deduct_amount')
+        if deduct_amount:
+            rate = deduct_amount / self.amount_total_o
+            for line in self.invoice_line_ids:
+                line.price_unit = line.price_unit_o * (1 - rate)
+        return super(AccountInvoice, self).write(vals)
+
+    @api.multi
     def action_reject(self):
         self.state = 'draft'
+
+    @api.multi
+    def button_reset_taxes(self):
+        for invoice in self:
+            self._cr.execute("DELETE FROM account_invoice_tax WHERE invoice_id=%s AND manual is False", (invoice.id,))
+            self.invalidate_cache()
+            self.compute_taxes()
+
+
 
     @api.multi
     def action_invoice_open(self):
@@ -70,36 +97,37 @@ class AccountInvoice(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
-    @api.one
-    @api.depends('invoice_id.deduct_amount','invoice_id.amount_total_o')
-    def _get_price_unit_actual(self):
-
-        print '111111111111111', self.invoice_id.amount_total_o
-        if self.invoice_id.amount_total_o:
-            self.price_unit_actual = self.price_unit * \
-                                     (1 - self.invoice_id.deduct_amount / self.invoice_id.amount_total_o)
-        print '2222222222222222222',self.invoice_id.amount_total_o,self.price_unit_actual
-
-    price_unit_actual = fields.Float(compute=_get_price_unit_actual, digits=dp.get_precision('Price Deduct'))
+    price_unit_o = fields.Float(digits=dp.get_precision('Price Deduct'))
     price_subtotal_o = fields.Monetary(string='Amount',
                                        store=True, readonly=True, compute='_compute_price')
 
+
+    #添加原始总价在invoice_line
     @api.one
     @api.depends('price_unit', 'discount', 'invoice_line_tax_ids', 'quantity', 'invoice_id.deduct_amount',
                  'product_id', 'invoice_id.partner_id', 'invoice_id.currency_id', 'invoice_id.company_id')
     def _compute_price(self):
         currency = self.invoice_id and self.invoice_id.currency_id or None
-
-        price = self.price_unit_actual * (1 - (self.discount or 0.0) / 100.0)
-        print self.price_unit_actual, 'ddddddddddddddddddddddddddddddddddd'
+        price = self.price_unit * (1 - (self.discount or 0.0) / 100.0)
         taxes = False
         if self.invoice_line_tax_ids:
             taxes = self.invoice_line_tax_ids.compute_all(price, currency, self.quantity, product=self.product_id,
                                                           partner=self.invoice_id.partner_id)
         self.price_subtotal = price_subtotal_signed = taxes['total_excluded'] if taxes else self.quantity * price
-        self.price_subtotal_o = self.quantity * self.price_unit
+        self.price_subtotal_o = self.quantity * self.price_unit_o
         if self.invoice_id.currency_id and self.invoice_id.company_id and self.invoice_id.currency_id != self.invoice_id.company_id.currency_id:
             price_subtotal_signed = self.invoice_id.currency_id.compute(price_subtotal_signed,
                                                                         self.invoice_id.company_id.currency_id)
         sign = self.invoice_id.type in ['in_refund', 'out_refund'] and -1 or 1
         self.price_subtotal_signed = price_subtotal_signed * sign
+
+    @api.multi
+    def create(self, vals):
+        """
+        原始单价存起来
+        :param vals:
+        :return:
+        """
+        res = super(AccountInvoiceLine, self).create(vals)
+        res.price_unit_o = res.price_unit
+        return res

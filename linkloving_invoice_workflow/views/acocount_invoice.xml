@@ -52,6 +52,7 @@
                         <group>
                             <group>
                                 <field string="Customer" name="partner_id"/>
+                                <field name="deduct_amount" string="客户扣款"/>
                             </group>
                             <group>
                                 <field name="origin" attrs="{'invisible': [('origin', '=', False)]}"/>
@@ -80,7 +81,8 @@
                                                widget="many2many_tags"/>
                                         <field name="quantity"/>
                                         <field name="uom_id" groups="product.group_uom"/>
-                                        <field name="price_unit"/>
+                                        <field name="price_unit_o" string="订单单价" readonly="1"/>
+                                        <field name="price_unit" readonly="1"/>
                                         <field name="discount" groups="sale.group_discount_per_so_line"/>
                                         <field name="invoice_line_tax_ids" widget="many2many_tags"
                                                context="{'type':parent.type}"
@@ -112,8 +114,15 @@
                                     </group>
                                     <group class="oe_subtotal_footer oe_right">
                                         <field name="amount_untaxed"/>
-                                        <field name="amount_tax"/>
+                                        <div>
+                                            <label for="amount_tax"/>
+                                               <button name="button_reset_taxes" states="draft,proforma2"
+                                        string="更新" class="oe_link oe_edit_only"
+                                        type="object" help="Recompute taxes and total"/>
+                                        </div>
+                                        <field name="amount_tax" nolabel="1"/>
                                         <field name="amount_total" class="oe_subtotal_footer_separator"/>
+                                        <field name="amount_total_o" invisible="1"/>
                                         <field name="payments_widget" colspan="2" nolabel="1" widget="payment"/>
                                         <field name="residual" class="oe_subtotal_footer_separator"
                                                attrs="{'invisible': [('state', '=', 'draft')]}"/>
@@ -224,12 +233,32 @@
                     <button name="action_invoice_open" type="object" states="validate" string="Validate"
                             class="oe_highlight" groups="sales_team.group_sale_salesman_all_leads,purchase.group_purchase_manager"/>
                 </xpath>
-                <xpath expr="//field[@name='reference']" position="after">
+                <xpath expr="//field[@name='date_due']" position="after">
                     <field name="remark"/>
                 </xpath>
                 <xpath expr="//field[@name='purchase_id']" position="replace">
+
+                    <field name="deduct_amount" attrs="{'readonly': [('state', 'in', ['open','paid'])]}"/>
                     <field name="po_id" string="采购单"/>
 
+                </xpath>
+                <xpath expr="//tree/field[@name='price_unit']" position="before">
+                    <field name="price_unit_o" string="原始单价" readonly="1"/>
+                </xpath>
+                <xpath expr="//tree/field[@name='price_unit']" position="attributes">
+                   <attrbute name="readonly">1</attrbute>
+                </xpath>
+                 <xpath expr="//field[@name='amount_total']" position="after">
+                    <field name="amount_total_o" string="总价" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='amount_tax']" position="replace">
+                    <div>
+                     <label for="amount_tax"/>
+                    <button name="button_reset_taxes" states="draft,proforma2"
+                                        string="更新" class="oe_link oe_edit_only"
+                                        type="object" help="Recompute taxes and total"/>
+                     </div>
+                    <field name="amount_tax" nolabel="1"/>
                 </xpath>
                 <xpath expr="//notebook/page[1]" position="after">
                     <page string="订单信息">
