@@ -22,22 +22,23 @@ class AccountEmployeePayment(models.Model):
     bank_account_id = fields.Many2one('res.partner.bank', related='employee_id.bank_account_id')
     sheet_ids = fields.One2many('hr.expense.sheet', 'payment_id')
     return_ids = fields.One2many('account.employee.payment.return', 'payment_id')
+
     @api.one
     @api.depends('return_ids')
     def _get_return_balance(self):
-        self.pre_payment_reminding = sum([return_id.amount for return_id in self.return_ids])
-    payment_return = fields.Float(string=u'还款金额',compute=_get_return_balance)
+        self.payment_return = sum([return_id.amount for return_id in self.return_ids])
 
-
-
+    payment_return = fields.Float(string=u'还款金额', compute=_get_return_balance)
+    return_count = fields.Integer(compute='_get_count')
+    sheet_count = fields.Integer(compute='_get_count')
 
     @api.one
-    @api.depends('sheet_ids')
+    @api.depends('sheet_ids', 'payment_return')
     def _get_pre_payment_reminding_balance(self):
-        used_payment=0
+        used_payment = 0
         if self.state == 'paid':
-            used_payment =sum([sheet.deduct_amount for sheet in self.sheet_ids])
-        self.pre_payment_reminding = self.amount-used_payment-self.payment_return
+            used_payment = sum([sheet.deduct_amount for sheet in self.sheet_ids])
+        self.pre_payment_reminding = self.amount - used_payment - self.payment_return
 
     pre_payment_reminding = fields.Float(string=u'可用金额', compute=_get_pre_payment_reminding_balance)
 
@@ -56,11 +57,20 @@ class AccountEmployeePayment(models.Model):
                               ('manager3_approve', u'总经理审批'),
                               ('approve', u'批准'),
                               ('paid', u'已支付'),
-                              ('deduct', u'已抵扣'),
-                              ('returned', u'已还款')
                               ],
                              readonly=True, default='draft', copy=False, string="Status", store=True,
                              track_visibility='onchange')
+
+    @api.depends('sheet_ids', 'return_ids')
+    def _get_count(self):
+        """
+
+        """
+        for payment in self:
+            payment.update({
+                'sheet_count': len(set(self.sheet_ids.ids)),
+                'return_count': len(set(self.return_ids.ids))
+            })
 
     @api.multi
     def submit(self):
