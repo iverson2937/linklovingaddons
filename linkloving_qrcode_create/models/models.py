@@ -59,7 +59,7 @@ class ProductTemplateExtend(models.Model):
         l2 = l1 + 50  # ２ｙ
         l3 = l2 + 50  # ３ｙ
         l4 = l3 + 50  # ４ｙ
-        font = ImageFont.truetype(ProductTemplateExtend.cur_file_dir()+'/linklovingaddons/linkloving_qrcode_create/models/simsun.ttc', font_size)
+        font = ImageFont.truetype(ProductTemplateExtend.cur_file_dir()+'/linklovingaddons/linkloving_qrcode_create/models/simhei.ttf', font_size, encoding='utf-8')
         draw = ImageDraw.Draw(img)
 
         draw.text(xy=(start_x, l1), text=u'料号:', font=font, fill='black')
