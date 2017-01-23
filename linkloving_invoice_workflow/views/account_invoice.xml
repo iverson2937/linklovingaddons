@@ -116,7 +116,7 @@
                                         <field name="amount_untaxed"/>
                                         <div>
                                             <label for="amount_tax"/>
-                                               <button name="button_reset_taxes" states="draft,proforma2"
+                                               <button name="button_reset_taxes" states="draft,validate"
                                         string="更新" class="oe_link oe_edit_only"
                                         type="object" help="Recompute taxes and total"/>
                                         </div>
@@ -254,7 +254,7 @@
                 <xpath expr="//field[@name='amount_tax']" position="replace">
                     <div>
                      <label for="amount_tax"/>
-                    <button name="button_reset_taxes" states="draft,proforma2"
+                    <button name="button_reset_taxes" states="draft,validate"
                                         string="更新" class="oe_link oe_edit_only"
                                         type="object" help="Recompute taxes and total"/>
                      </div>

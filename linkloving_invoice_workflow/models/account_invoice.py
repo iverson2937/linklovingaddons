@@ -19,15 +19,6 @@ class AccountInvoice(models.Model):
     po_id = fields.Many2one('purchase.order', compute=_get_po_number)
     order_line = fields.One2many('purchase.order.line', related='po_id.order_line')
     deduct_amount = fields.Float(string=u'对账扣款')
-
-    @api.multi
-    @api.onchange('date_invoice')
-    def on_change_deduct_amount(self):
-        self.reference = 'ss'
-        print 'sssssssssssssssssssssssssssssss'
-        return
-
-    deduct_rate = fields.Float()
     remark = fields.Text(string=u'备注')
 
     # def _check_deduct_amount(self):
@@ -63,11 +54,21 @@ class AccountInvoice(models.Model):
 
     @api.multi
     def write(self, vals):
+        print self.amount_total_o
+        if not self.amount_total_o:
+            amount_total_o = 0
+            for line in self.invoice_line_ids:
+                line.price_unit_o = line.price_unit
+                amount_total_o += line.price_unit
+            vals.update({'amount_total_o': amount_total_o})
         deduct_amount = vals.get('deduct_amount')
         if deduct_amount:
-            rate = deduct_amount / self.amount_total_o
+            rate = deduct_amount / (self.amount_total_o or vals.get('amount_total_o'))
             for line in self.invoice_line_ids:
-                line.price_unit = line.price_unit_o * (1 - rate)
+                if line.price_unit_o:
+                    line.price_unit = line.price_unit_o * (1 - rate)
+                else:
+                    line.price_unit = line.price_unit * (1 - rate)
         return super(AccountInvoice, self).write(vals)
 
     @api.multi
@@ -80,8 +81,6 @@ class AccountInvoice(models.Model):
             self._cr.execute("DELETE FROM account_invoice_tax WHERE invoice_id=%s AND manual is False", (invoice.id,))
             self.invalidate_cache()
             self.compute_taxes()
-
-
 
     @api.multi
     def action_invoice_open(self):
@@ -101,10 +100,9 @@ class AccountInvoiceLine(models.Model):
     price_subtotal_o = fields.Monetary(string='Amount',
                                        store=True, readonly=True, compute='_compute_price')
 
-
-    #添加原始总价在invoice_line
+    # 添加原始总价在invoice_line
     @api.one
-    @api.depends('price_unit', 'discount', 'invoice_line_tax_ids', 'quantity', 'invoice_id.deduct_amount',
+    @api.depends('price_unit', 'discount', 'invoice_line_tax_ids', 'quantity',
                  'product_id', 'invoice_id.partner_id', 'invoice_id.currency_id', 'invoice_id.company_id')
     def _compute_price(self):
         currency = self.invoice_id and self.invoice_id.currency_id or None
