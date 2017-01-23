@@ -12,6 +12,9 @@
                 <xpath expr="//field[@name='payment_mode']" position="attributes">
                     <attribute name="readonly">1</attribute>
                 </xpath>
+                   <xpath expr="//field[@name='employee_id']" position="after">
+                    <field name="department_id"/>
+                </xpath>
             </field>
         </record>
         <record id="linkloving_view_expenses_tree" model="ir.ui.view">
