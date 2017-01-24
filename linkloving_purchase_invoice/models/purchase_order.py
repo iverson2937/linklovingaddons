@@ -10,6 +10,13 @@ class PurchaseOrder(models.Model):
 
     partner_invoice_id = fields.Many2one('res.partner')
 
+    @api.multi
+    def check_invoice(self):
+        """
+        检查是否将要创建的invoice 金额超过订单金额
+        :return:
+        """
+        pass
 
     @api.multi
     def action_invoice_create(self, grouped=False, final=False):
@@ -187,3 +194,19 @@ class PurchaseOrderLine(models.Model):
     qty_to_invoice = fields.Float(
         compute='_get_to_invoice_qty', string='To Invoice', store=True, readonly=True,
         digits=dp.get_precision('Product Unit of Measure'))
+
+    @api.depends('invoice_lines.invoice_id.state')
+    def _compute_qty_invoiced(self):
+        """
+        modify by allen to recompute the invoiced qty
+        :return:
+        """
+        for line in self:
+            qty = 0.0
+            for inv_line in line.invoice_lines:
+                if inv_line.invoice_id.state not in ['cancel']:
+                    if inv_line.invoice_id.type == 'in_invoice':
+                        qty += inv_line.uom_id._compute_quantity(inv_line.quantity, line.product_uom)
+                    elif inv_line.invoice_id.type == 'in_refund':
+                        qty -= inv_line.uom_id._compute_quantity(inv_line.quantity, line.product_uom)
+            line.qty_invoiced = qty
