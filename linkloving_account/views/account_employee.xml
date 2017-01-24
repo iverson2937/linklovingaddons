@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+        <record model="ir.ui.view" id="view_account_employee_payment_tree">
+            <field name="name">account.payment.tree</field>
+            <field name="model">account.payment</field>
+            <field name="arch" type="xml">
+             <tree create="false">
+                 <field name="payment_date"/>
+                 <field name="name"/>
+                  <field name="partner_id" string="员工"/>
+                  <field name="payment_type"/>
+                  <field name="journal_id"/>
+                  <field name="amount"/>
+                  <field name="state"/>
+             </tree>
+            </field>
+        </record>
+
+        <record id="action_employee_payment_register" model="ir.actions.act_window">
+            <field name="name">员工交易记录</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="view_account_employee_payment_tree"/>
+            <field name="domain">[('partner_type','=','employee')]</field>
+        </record>
+
+        <menuitem id="menu_employee_entry" name="员工" parent="account.menu_finance" sequence="3"
+                  groups="account.group_account_invoice"/>
+
+        <menuitem id="menu_employee_payment" name='员工交易记录' parent="menu_employee_entry"
+                  groups="account.group_account_invoice" action="action_employee_payment_register"/>
+
+
+    </data>
+</openerp>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

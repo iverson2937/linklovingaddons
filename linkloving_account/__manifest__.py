@@ -32,7 +32,7 @@
         'views/res_partner_bank.xml',
         'views/account_move_line.xml',
         'views/account_journal.xml',
-
+        'views/account_employee.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
