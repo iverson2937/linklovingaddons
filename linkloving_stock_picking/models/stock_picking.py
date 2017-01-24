@@ -5,9 +5,9 @@ from odoo import models, fields, api, _, SUPERUSER_ID
 
 class StockPicking(models.Model):
     _name = 'stock.picking'
-    _inherit =['stock.picking','ir.needaction_mixin']
+    _inherit = ['stock.picking', 'ir.needaction_mixin']
     po_id = fields.Many2one('purchase.order')
-    so_id=fields.Many2one('sale.order')
+    so_id = fields.Many2one('sale.order')
     state = fields.Selection([
         ('draft', 'Draft'), ('cancel', 'Cancelled'),
         ('waiting', 'Waiting Another Operation'),
@@ -27,10 +27,9 @@ class StockPicking(models.Model):
              " * Transferred: has been processed, can't be modified or cancelled anymore\n"
              " * Cancelled: has been cancelled, can't be confirmed anymore")
 
-
     @api.multi
     def action_post(self):
-        self.state='qc_check'
+        self.state = 'qc_check'
 
     @api.multi
     def action_check_pass(self):
@@ -41,12 +40,6 @@ class StockPicking(models.Model):
         self.state = 'assigned'
 
     @api.multi
-    def set_to_available(self):
-        self.state = 'assigned'
-
-
-
-    @api.multi
     def reject(self):
         self.state = 'assigned'
 
@@ -55,4 +48,4 @@ class StockPicking(models.Model):
         """ Returns the domain to filter records that require an action
             :return: domain or False is no action
         """
-        return [('state', '=', 'validate'),('create_uid','=',self.env.user.id)]
+        return [('state', '=', 'validate'), ('create_uid', '=', self.env.user.id)]
