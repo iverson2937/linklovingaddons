@@ -100,6 +100,8 @@
                                 states="posted" groups="purchase.group_purchase_manager"/>
                         <button name="done" string="完成" type="object"
                                 states="confirm" groups="account.group_account_invoice"/>
+                        <button name="register_payment" string="登记付款" type="object"
+                                states="confirm" groups="account.group_account_invoice"/>
 
 
                         <field name="state" widget="statusbar" statusbar_visible="draft,posted,confirm,done"/>

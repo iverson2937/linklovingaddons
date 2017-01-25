@@ -32,7 +32,8 @@
         'views/res_partner_bank.xml',
         'views/account_move_line.xml',
         'views/account_journal.xml',
-        'views/account_employee.xml'
+        'views/account_employee.xml',
+        'wizard/account_supplier_payment_wizard.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

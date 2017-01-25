@@ -28,6 +28,24 @@ class AccountPaymentRegister(models.Model):
     name = fields.Char()
     balance_ids = fields.One2many('account.payment.register.balance', 'payment_id')
     amount = fields.Float(string=u'金额', compute='get_amount', store=True)
+    @api.multi
+    def register_payment(self):
+        amount = self.amount
+
+        context = {'default_payment_type': 'outbound', 'default_amount': amount,'default_partner_id':self.partner_id.id}
+
+        return {
+            'name': _('Payment'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            # 'view_id': False,
+            'res_model': 'account.supplier.payment.wizard',
+            'domain': [],
+            'context': dict(context, active_ids=self.ids),
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+        }
+
 
     @api.depends('invoice_ids')
     def get_amount(self):
