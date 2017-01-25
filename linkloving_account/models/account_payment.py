@@ -27,7 +27,14 @@ class AccountPaymentRegister(models.Model):
     _inherit = ['mail.thread', 'ir.needaction_mixin']
     name = fields.Char()
     balance_ids = fields.One2many('account.payment.register.balance', 'payment_id')
-    amount = fields.Float(string=u'金额')
+    amount = fields.Float(string=u'金额', compute='get_amount', store=True)
+
+    @api.depends('invoice_ids')
+    def get_amount(self):
+        amount = 0
+        for invoice in self.invoice_ids:
+            amount += invoice.remain_apply_balance
+        self.amount=amount
 
     bank_id = fields.Many2one('res.partner.bank', string=u'账号', domain="[('partner_id', '=', partner_id)]")
     invoice_ids = fields.Many2many('account.invoice')

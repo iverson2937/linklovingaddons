@@ -117,8 +117,8 @@
                                    attrs="{'readonly':[('state','!=','draft')],'readonly': [('state', 'in', ['confirm','done'])]}"
                                    context="{'default_partner_id':partner_id}">
                             </field>
-                            <field name="amount" attrs="{'readonly': [('state', 'in', ['confirm','done'])]}"
-                                   required="1"/>
+                            <field name="amount" readonly="1"
+                                   required="0"/>
                             <field name="receive_date" required="1"
                                    attrs="{'readonly': [('state', 'in', ['confirm','done'])]}"
                                    string="付款日期"/>

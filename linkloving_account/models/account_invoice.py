@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 
 class AccountInvoice(models.Model):
@@ -11,7 +12,6 @@ class AccountInvoice(models.Model):
                                            store=True, readonly=True, compute='_compute_amount',
                                            help="Total amount in the currency of the invoice, negative for credit notes.")
 
-
     @api.one
     @api.depends('invoice_line_ids.price_subtotal', 'tax_line_ids.amount', 'currency_id', 'company_id', 'date_invoice',
                  'balance_ids')
@@ -20,10 +20,8 @@ class AccountInvoice(models.Model):
         self.amount_untaxed_o = sum(line.price_subtotal_o for line in self.invoice_line_ids)
         self.amount_tax = sum(line.amount for line in self.tax_line_ids)
         self.amount_total = self.amount_untaxed + self.amount_tax
-        print self.amount_total_o,'33333333333'
-        print self.amount_total,'dddddddddd'
         self.amount_total_o = sum(line.price_subtotal_o for line in self.invoice_line_ids)
-        print 'self.amount_total_o ',self.amount_total_o
+        print 'self.amount_total_o ', self.amount_total_o
         self.remain_apply_balance = self.amount_total
         amount_total_company_signed = self.amount_total
         amount_untaxed_signed = self.amount_untaxed
@@ -41,7 +39,3 @@ class AccountInvoice(models.Model):
                 amount += balance_id.amount
             self.remain_apply_balance = self.remain_apply_balance - amount
 
-        # if self.deduct_amount and self.amount_total_o:
-        #     print 'ssssssssssssss'
-        #     self.tax_line_ids.amount=self.tax_line_ids.amount*(1-self.deduct_amount/self.amount_total_o)
-        #     print self.tax_line_ids.amount
