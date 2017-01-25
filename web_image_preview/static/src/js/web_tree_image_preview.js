@@ -19,7 +19,7 @@
             return this.unbind("mousewheel", a)
         }
     })
-})(jQuery)
+})(jQuery);
 
 
 odoo.define('web.tree_image_preview', function (require) {
@@ -238,6 +238,51 @@ odoo.define('w', function (require) {
                     return self.render_cell.apply(self, arguments);
                 }
             });
-        }
+        },
+        render: function () {
+            var self = this;
+            this.$current.html(
+                QWeb.render('ListView.rows', _.extend({}, this, {
+                    render_cell: function () {
+                        return self.render_cell.apply(self, arguments);
+                    }
+                })));
+            this.pad_table_to(4);
+        },
+
+        pad_table_to: function (count) {
+            if (this.records.length >= count ||
+                _(this.columns).any(function (column) {
+                    return column.meta;
+                })) {
+                return;
+            }
+            var cells = [];
+            if (this.options.selectable) {
+                cells.push('<td class="o_list_record_selector"></td>');
+            }else {
+                 //add by allen to clear blank if the row less than 4
+                 cells.push('<td></td>');
+            }
+
+            _(this.columns).each(function (column) {
+                if (column.invisible === '1') {
+                    return;
+                }
+                cells.push('<td title="' + column.string + '">&nbsp;</td>');
+            });
+            if (this.options.deletable) {
+                cells.push('<td class="o_list_record_delete"></td>');
+            }
+            cells.unshift('<tr>');
+            cells.push('</tr>');
+
+            var row = cells.join('');
+            this.$current
+                .children('tr:not([data-id])').remove().end()
+                .append(new Array(count - this.records.length + 1).join(row));
+        },
+
+
     });
 });
