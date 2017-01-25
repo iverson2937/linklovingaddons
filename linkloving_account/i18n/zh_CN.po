@@ -1,0 +1,220 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* linkloving_account
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-25 02:15+0000\n"
+"PO-Revision-Date: 2017-01-25 02:15+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_account_id
+msgid "Account id"
+msgstr "Account id"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_amount
+msgid "Amount"
+msgstr "金额"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_invoice_balance_ids
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_ids
+msgid "Balance ids"
+msgstr "Balance ids"
+
+#. module: linkloving_account
+#: model:ir.model,name:linkloving_account.model_res_partner_bank
+msgid "Bank Accounts"
+msgstr "银行帐户"
+
+#. module: linkloving_account
+#: model:ir.model.fields,help:linkloving_account.field_account_payment_customer
+#: model:ir.model.fields,help:linkloving_account.field_account_payment_register_is_customer
+msgid "Check this box if this contact is a customer."
+msgstr "如果该联系人是客户就选择这个框"
+
+#. module: linkloving_account
+#: model:ir.actions.act_window,help:linkloving_account.action_payment_register
+#: model:ir.actions.act_window,help:linkloving_account.action_payment_register_accounting
+msgid "Click to add a contact in your address book."
+msgstr "点击在你的地址簿添加联系人"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_create_uid
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_create_uid
+msgid "Created by"
+msgstr "创建人"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_create_date
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_create_date
+msgid "Created on"
+msgstr "创建时间"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_display_name
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_display_name
+msgid "Display Name"
+msgstr "显示名称"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_id
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_id
+msgid "ID"
+msgstr "ID"
+
+#. module: linkloving_account
+#: model:ir.model.fields,help:linkloving_account.field_account_payment_team_id
+msgid "If set, sale team used notably for sales and assignations related to this partner"
+msgstr "If set, sale team used notably for sales and assignations related to this partner"
+
+#. module: linkloving_account
+#: model:ir.model,name:linkloving_account.model_account_invoice
+msgid "Invoice"
+msgstr "发票"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_invoice_invoice
+msgid "Invoice No"
+msgstr "Invoice No"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_invoice_id
+msgid "Invoice id"
+msgstr "发票id"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_invoice_ids
+msgid "Invoice ids"
+msgstr "Invoice ids"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_customer
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_is_customer
+msgid "Is a Customer"
+msgstr "是客户"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register___last_update
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance___last_update
+msgid "Last Modified on"
+msgstr "最后修改日"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_write_uid
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_write_uid
+msgid "Last Updated by"
+msgstr "最后更新人"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_write_date
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_write_date
+msgid "Last Updated on"
+msgstr "最后更新时间"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_name
+msgid "Name"
+msgstr "名字"
+
+#. module: linkloving_account
+#: sql_constraint:account.payment.register:0
+msgid "Name must be unique!"
+msgstr "Name must be unique!"
+
+#. module: linkloving_account
+#: code:addons/linkloving_account/models/account_payment.py:111
+#: code:addons/linkloving_account/models/account_payment.py:113
+#: code:addons/linkloving_account/models/account_payment.py:115
+#, python-format
+msgid "New"
+msgstr "New"
+
+#. module: linkloving_account
+#: model:ir.actions.act_window,help:linkloving_account.action_payment_register
+#: model:ir.actions.act_window,help:linkloving_account.action_payment_register_accounting
+msgid "No Invoice need to Prepayment!"
+msgstr "No Invoice need to Prepayment!"
+
+#. module: linkloving_account
+#: code:addons/linkloving_account/models/account_payment.py:168
+#, python-format
+msgid "Only a draft payment can be posted. Trying to post a payment in state %s."
+msgstr "Only a draft payment can be posted. Trying to post a payment in state %s."
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_payment_id
+msgid "Payment id"
+msgstr "Payment id"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_payment_type
+msgid "Payment type"
+msgstr "付款类型"
+
+#. module: linkloving_account
+#: model:ir.model,name:linkloving_account.model_account_payment
+msgid "Payments"
+msgstr "付款"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_receive_id
+msgid "Receive id"
+msgstr "Receive id"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_team_id
+msgid "Sales Team"
+msgstr "销售团队"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.view_account_payment_register_filter
+msgid "Search"
+msgstr "搜索"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_state
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_state
+msgid "State"
+msgstr "省/ 州"
+
+#. module: linkloving_account
+#: code:addons/linkloving_account/models/account_payment.py:171
+#, python-format
+msgid "The payment cannot be processed because the invoice is not open!"
+msgstr "The payment cannot be processed because the invoice is not open!"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_invoice_remain_apply_balance
+msgid "To Apply"
+msgstr "待申请付款金额"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.invoice_supplier_tree
+msgid "Total amount"
+msgstr "合计金额"
+
+#. module: linkloving_account
+#: model:ir.model.fields,help:linkloving_account.field_account_invoice_remain_apply_balance
+msgid "Total amount in the currency of the invoice, negative for credit notes."
+msgstr "发票中币种的总数量, 贷方是负数."
+
+#. module: linkloving_account
+#: model:ir.model,name:linkloving_account.model_account_payment_register
+msgid "account.payment.register"
+msgstr "account.payment.register"
+
+#. module: linkloving_account
+#: model:ir.model,name:linkloving_account.model_account_payment_register_balance
+msgid "account.payment.register.balance"
+msgstr "account.payment.register.balance"
+
