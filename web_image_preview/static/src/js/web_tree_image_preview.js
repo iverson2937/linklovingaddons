@@ -227,7 +227,6 @@ odoo.define('w', function (require) {
         render_record: function (record) {
             var self = this;
             var index = this.records.indexOf(record);
-            console.log(index);
             return QWeb.render('ListView.row', {
                 columns: this.columns,
                 options: this.options,

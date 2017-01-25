@@ -14,6 +14,7 @@
                         <t t-esc="column.string"/>
                     </th>
                 </t>
+                <!--add by allen-->
                 <th t-if="!options.selectable"></th>
                 <th t-if="options.selectable" class="o_list_record_selector" width="1">
                     <div class="o_checkbox">
@@ -32,10 +33,11 @@
         </thead>
         <tfoot>
             <tr>
-                <td t-if="options.selectable"/>
+                <!--add by allen-->
+                <td></td>
+
                 <td t-foreach="aggregate_columns" t-as="column" t-att-data-field="column.id" t-att-title="column.label">
                 </td>
-                <td t-if="!options.selectable"></td>
                 <td t-if="options.deletable" class="o_list_record_delete"/>
             </tr>
         </tfoot>
