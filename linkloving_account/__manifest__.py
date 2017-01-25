@@ -33,7 +33,9 @@
         'views/account_move_line.xml',
         'views/account_journal.xml',
         'views/account_employee.xml',
-        'wizard/account_supplier_payment_wizard.xml'
+        'wizard/account_supplier_payment_wizard.xml',
+        'report/report_payment_application.xml',
+        'report/report.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
