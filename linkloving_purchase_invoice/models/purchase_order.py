@@ -11,14 +11,6 @@ class PurchaseOrder(models.Model):
     partner_invoice_id = fields.Many2one('res.partner')
 
     @api.multi
-    def check_invoice(self):
-        """
-        检查是否将要创建的invoice 金额超过订单金额
-        :return:
-        """
-        pass
-
-    @api.multi
     def action_invoice_create(self, grouped=False, final=False):
         """
         Create the invoice associated to the PO.
@@ -118,6 +110,11 @@ class PurchaseOrder(models.Model):
             # 'team_id': self.team_id.id
         }
         return invoice_vals
+
+    @api.multi
+    def write(self, vals):
+        print vals,'ddddddddddddddddddddddddddddddddddddd'
+        return super(PurchaseOrder, self).write(vals)
 
 
 class PurchaseOrderLine(models.Model):

@@ -8,11 +8,13 @@ from datetime import datetime
 from odoo import api, fields, models, _
 import odoo.addons.decimal_precision as dp
 from odoo.exceptions import UserError
+
 DEFAULT_SERVER_DATE_FORMAT = "%Y-%m-%d"
 DEFAULT_SERVER_TIME_FORMAT = "%H:%M:%S"
 DEFAULT_SERVER_DATETIME_FORMAT = "%s %s" % (
     DEFAULT_SERVER_DATE_FORMAT,
     DEFAULT_SERVER_TIME_FORMAT)
+
 
 class PurchaseAdvancePaymentInv(models.TransientModel):
     _name = "purchase.advance.payment.inv"
@@ -49,14 +51,17 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
         ('all', 'Invoiceable lines (deduct down payments)'),
         ('percentage', 'Down payment (percentage)'),
         ('fixed', 'Down payment (fixed amount)')
-        ], string='What do you want to invoice?', default=_get_advance_payment_method, required=True)
+    ], string='What do you want to invoice?', default=_get_advance_payment_method, required=True)
     product_id = fields.Many2one('product.product', string='Down Payment Product', domain=[('type', '=', 'service')],
-        default=_default_product_id)
+                                 default=_default_product_id)
     count = fields.Integer(default=_count, string='# of PurchaseOrders')
-    amount = fields.Float('Down Payment Amount', digits=dp.get_precision('Account'), help="The amount to be invoiced in advance, taxes excluded.")
-    deposit_account_id = fields.Many2one("account.account", string="Income Account", domain=[('deprecated', '=', False)],
-        help="Account used for deposits", default=_default_deposit_account_id)
-    deposit_taxes_id = fields.Many2many("account.tax", string="Customer Taxes", help="Taxes used for deposits", default=_default_deposit_taxes_id)
+    amount = fields.Float('Down Payment Amount', digits=dp.get_precision('Account'),
+                          help="The amount to be invoiced in advance, taxes excluded.")
+    deposit_account_id = fields.Many2one("account.account", string="Income Account",
+                                         domain=[('deprecated', '=', False)],
+                                         help="Account used for deposits", default=_default_deposit_account_id)
+    deposit_taxes_id = fields.Many2many("account.tax", string="Customer Taxes", help="Taxes used for deposits",
+                                        default=_default_deposit_taxes_id)
 
     @api.onchange('advance_payment_method')
     def onchange_advance_payment_method(self):
@@ -77,7 +82,8 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
             account_id = order.fiscal_position_id.map_account(inc_acc).id if inc_acc else False
         if not account_id:
             raise UserError(
-                _('There is no income account defined for this product: "%s". You may have to install a chart of account from Accounting app, settings menu.') %
+                _(
+                    'There is no income account defined for this product: "%s". You may have to install a chart of account from Accounting app, settings menu.') %
                 (self.product_id.name,))
 
         if self.amount <= 0.00:
@@ -139,30 +145,41 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
             if not self.product_id:
                 vals = self._prepare_deposit_product()
                 self.product_id = self.env['product.product'].create(vals)
-                self.env['ir.values'].sudo().set_default('sale.config.settings', 'deposit_product_id_setting', self.product_id.id)
+                self.env['ir.values'].sudo().set_default('sale.config.settings', 'deposit_product_id_setting',
+                                                         self.product_id.id)
 
             purchase_line_obj = self.env['purchase.order.line']
             for order in purchase_orders:
+                amount = 0
+                for line in order.order_line:
+                    if line.product_id.type == 'service' and line.qty_to_invoice < 0:
+                        amount += line.price_unit
+                if self.amount>order.amount_total-amount:
+                    raise UserError(u'预付款金额不能大于订单金额。')
+
                 if self.advance_payment_method == 'percentage':
                     amount = order.amount_total * self.amount / 100
                 else:
                     amount = self.amount
                 if self.product_id.invoice_policy != 'order':
-                    raise UserError(_('The product used to invoice a down payment should have an invoice policy set to "Ordered quantities". Please update your deposit product to be able to create a deposit invoice.'))
+                    raise UserError(_(
+                        'The product used to invoice a down payment should have an invoice policy set to "Ordered quantities". Please update your deposit product to be able to create a deposit invoice.'))
                 if self.product_id.type != 'service':
-                    raise UserError(_("The product used to invoice a down payment should be of type 'Service'. Please use another product or update this product."))
+                    raise UserError(_(
+                        "The product used to invoice a down payment should be of type 'Service'. Please use another product or update this product."))
                 if order.fiscal_position_id and self.product_id.taxes_id:
                     tax_ids = order.fiscal_position_id.map_tax(self.product_id.taxes_id).ids
                 else:
                     tax_ids = self.product_id.taxes_id.ids
+
                 po_line = purchase_line_obj.create({
                     'name': _('Advance: %s') % (time.strftime('%m %Y'),),
                     'price_unit': amount,
                     'product_uom_qty': 0.0,
                     'order_id': order.id,
                     'discount': 0.0,
-                    'product_qty':0,
-                    'date_planned':datetime.today().strftime(DEFAULT_SERVER_DATETIME_FORMAT),
+                    'product_qty': 0,
+                    'date_planned': datetime.today().strftime(DEFAULT_SERVER_DATETIME_FORMAT),
                     'product_uom': self.product_id.uom_id.id,
                     'product_id': self.product_id.id,
                     'tax_id': [(6, 0, tax_ids)],
@@ -180,6 +197,7 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
             'property_account_income_id': self.deposit_account_id.id,
             'taxes_id': [(6, 0, self.deposit_taxes_id.ids)],
         }
+
     @api.multi
     def action_view_invoice(self):
         invoice_ids = self.mapped('invoice_ids')
@@ -192,7 +210,8 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
             'name': action.name,
             'help': action.help,
             'type': action.type,
-            'views': [[list_view_id, 'tree'], [form_view_id, 'form'], [False, 'graph'], [False, 'kanban'], [False, 'calendar'], [False, 'pivot']],
+            'views': [[list_view_id, 'tree'], [form_view_id, 'form'], [False, 'graph'], [False, 'kanban'],
+                      [False, 'calendar'], [False, 'pivot']],
             'target': action.target,
             'context': action.context,
             'res_model': action.res_model,
