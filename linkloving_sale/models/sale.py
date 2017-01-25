@@ -3,6 +3,8 @@
 from odoo import fields, models, api, _, SUPERUSER_ID
 from itertools import groupby
 
+from odoo.tools import float_compare
+
 
 class SaleOrder(models.Model):
     """
@@ -52,9 +54,23 @@ class SaleOrder(models.Model):
                 'lines': list(lines),
                 'is_domestic': self.team_id.is_domestic if self.team_id else False
             })
-        print report_pages
 
         return report_pages
+
+    # FIXME:allen  how to remove this
+    @api.onchange('product_uom_qty', 'product_uom', 'route_id')
+    def _onchange_product_id_check_availability(self):
+        if not self.product_id or not self.product_uom_qty or not self.product_uom:
+            self.product_packaging = False
+            return {}
+        if self.product_id.type == 'product':
+            precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+            product_qty = self.product_uom._compute_quantity(self.product_uom_qty, self.product_id.uom_id)
+            if float_compare(self.product_id.virtual_available, product_qty, precision_digits=precision) == -1:
+                is_available = self._check_routing()
+                if not is_available:
+                    pass
+        return {}
 
 
 class SaleOrderLine(models.Model):
