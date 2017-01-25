@@ -116,9 +116,9 @@
                                         <field name="amount_untaxed"/>
                                         <div>
                                             <label for="amount_tax"/>
-                                               <button name="button_reset_taxes" states="draft,validate"
-                                        string="更新" class="oe_link oe_edit_only"
-                                        type="object" help="Recompute taxes and total"/>
+                                            <button name="button_reset_taxes" states="draft,validate"
+                                                    string="更新" class="oe_link oe_edit_only"
+                                                    type="object" help="Recompute taxes and total"/>
                                         </div>
                                         <field name="amount_tax" nolabel="1"/>
                                         <field name="amount_total" class="oe_subtotal_footer_separator"/>
@@ -179,18 +179,18 @@
             <field name="model">account.invoice</field>
             <field name="arch" type="xml">
                 <tree>
-                <field name="partner_id" groups="base.group_user" string="Customer"/>
-                <field name="date_invoice"/>
-                <field name="number"/>
-                <field name="commercial_partner_id" invisible="1"/>
-                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
-                <field name="date_due"/>
-                <field name="origin"/>
-                <field name="amount_total_signed" string="Total" sum="Total"/>
-                <field name="residual_signed" string="To Pay" sum="To pay" groups="account.group_account_invoice"/>
-                <field name="currency_id" invisible="1"/>
-                <field name="company_currency_id" invisible="1"/>
-                <field name="state"/>
+                    <field name="partner_id" groups="base.group_user" string="Customer"/>
+                    <field name="date_invoice"/>
+                    <field name="number"/>
+                    <field name="commercial_partner_id" invisible="1"/>
+                    <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                    <field name="date_due"/>
+                    <field name="origin"/>
+                    <field name="amount_total_signed" string="Total" sum="Total"/>
+                    <field name="residual_signed" string="To Pay" sum="To pay" groups="account.group_account_invoice"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="company_currency_id" invisible="1"/>
+                    <field name="state"/>
                 </tree>
             </field>
 
@@ -225,13 +225,22 @@
             <field name="model">account.invoice</field>
             <field name="inherit_id" ref="account.invoice_supplier_form"/>
             <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_invoice_draft']" position="replace">
+                      <button name="action_invoice_cancel" type="object" states="draft,proforma2" string="Cancel Bill" groups="purchase.group_purchase_user"/>
+                </xpath>
+                <xpath expr="//button[@name='action_invoice_cancel']" position="replace">
+                    <button name="action_invoice_draft" states="cancel" string="Set to Draft" type="object"
+                            groups="purchase.group_purchase_user"/>
+
+                </xpath>
                 <xpath expr="//button[@name='action_invoice_open']" position="replace">
                     <button name="action_post" type="object" states="draft,proforma2" string="提交" class="oe_highlight"
                             groups="sale.sale_order_personal_rule,purchase.group_purchase_user"/>
                     <button name="action_reject" type="object" states="validate" string="退回"
                             groups="sales_team.group_sale_salesman_all_leads,purchase.group_purchase_manager"/>
                     <button name="action_invoice_open" type="object" states="validate" string="Validate"
-                            class="oe_highlight" groups="sales_team.group_sale_salesman_all_leads,purchase.group_purchase_manager"/>
+                            class="oe_highlight"
+                            groups="sales_team.group_sale_salesman_all_leads,purchase.group_purchase_manager"/>
                 </xpath>
                 <xpath expr="//field[@name='date_due']" position="after">
                     <field name="remark"/>
@@ -246,23 +255,23 @@
                     <field name="price_unit_o" string="原始单价" readonly="1"/>
                 </xpath>
                 <xpath expr="//tree/field[@name='price_unit']" position="attributes">
-                   <attrbute name="readonly">1</attrbute>
+                    <attrbute name="readonly">1</attrbute>
                 </xpath>
-                 <xpath expr="//field[@name='amount_total']" position="after">
+                <xpath expr="//field[@name='amount_total']" position="after">
                     <field name="amount_total_o" string="总价" invisible="1"/>
                 </xpath>
                 <xpath expr="//field[@name='amount_tax']" position="replace">
                     <div>
-                     <label for="amount_tax"/>
-                    <button name="button_reset_taxes" states="draft,validate"
-                                        string="更新" class="oe_link oe_edit_only"
-                                        type="object" help="Recompute taxes and total"/>
-                     </div>
+                        <label for="amount_tax"/>
+                        <button name="button_reset_taxes" states="draft,validate"
+                                string="更新" class="oe_link oe_edit_only"
+                                type="object" help="Recompute taxes and total"/>
+                    </div>
                     <field name="amount_tax" nolabel="1"/>
                 </xpath>
                 <xpath expr="//notebook/page[1]" position="after">
                     <page string="订单信息">
-                         <field name="order_line"/>
+                        <field name="order_line"/>
                     </page>
 
                 </xpath>
