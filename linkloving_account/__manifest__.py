@@ -28,7 +28,7 @@
         'views/payment_views.xml',
         'views/account_invoice_views.xml',
         'views/sale_views.xml',
-        'views/partner_views.xml',
+        # 'views/partner_views.xml',
         'views/res_partner_bank.xml',
         'views/account_move_line.xml',
         'views/account_journal.xml',
