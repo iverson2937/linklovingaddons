@@ -209,6 +209,7 @@ class LinklovingAppApi(http.Controller):
     #修改工人状态
     @http.route('/linkloving_app_api/change_worker_state', type='json', auth='none', csrf=False)
     def change_worker_state(self, **kw):
+        # worker_line_id =
         new_state = request.jsonrequest.get('state')
 
 
