@@ -95,7 +95,7 @@
                         <button name="post" string="提交" type="object"
                                 class="oe_highlight" states="draft" groups="purchase.group_purchase_user"/>
                         <button name="reject" string="退回" type="object"
-                                states="posted" groups="purchase.group_purchase_manager"/>
+                                states="posted,confirm" groups="purchase.group_purchase_manager"/>
                         <button name="confirm" string="确认" type="object" class="oe_highlight"
                                 states="posted" groups="purchase.group_purchase_manager"/>
                         <button name="done" string="完成" type="object"

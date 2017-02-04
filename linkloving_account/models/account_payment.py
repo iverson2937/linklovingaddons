@@ -59,7 +59,7 @@ class AccountPaymentRegister(models.Model):
     invoice_ids = fields.Many2many('account.invoice')
     receive_date = fields.Date(string=u'收款日期', default=fields.date.today())
     remark = fields.Text(string=u'备注')
-    partner_id = fields.Many2one('res.partner', string=u'客户')
+    partner_id = fields.Many2one('res.partner', string=u'合作伙伴')
     is_customer = fields.Boolean(related='partner_id.customer', store=True)
     receive_id = fields.Many2one('res.users')
     account_id = fields.Many2one('account.account')
