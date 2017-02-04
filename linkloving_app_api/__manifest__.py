@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "linkloving_account",
+    'name': "linkloving_app_api",
 
     'summary': """
         Short (1 phrase/line) summary of the module's purpose, used as
@@ -20,22 +20,13 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'account', 'purchase', 'linkloving_invoice_workflow', 'sale'],
+    'depends': ['base'],
 
     # always loaded
     'data': [
-        'security/ir.model.access.csv',
-        'views/payment_views.xml',
-        'views/account_invoice_views.xml',
-        'views/sale_views.xml',
-        # 'views/partner_views.xml',
-        'views/res_partner_bank.xml',
-        'views/account_move_line.xml',
-        'views/account_journal.xml',
-        'views/account_employee.xml',
-        'wizard/account_supplier_payment_wizard.xml',
-        'report/report_payment_application.xml',
-        'report/report.xml'
+        # 'security/ir.model.access.csv',
+        'views/views.xml',
+        'views/templates.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
