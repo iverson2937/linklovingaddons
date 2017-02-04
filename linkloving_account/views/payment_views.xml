@@ -79,7 +79,14 @@
                 <search string="Search">
 
                     <field name="partner_id" filter_domain="[('partner_id', 'ilike', self)]" string="合作伙伴"/>
+                    <field name="name"/>
+                    <field name="state"/>
                     <field name="amount" filter_domain="[('amount','ilike',self)]" string="金额"/>
+                    <separator/>
+                    <filter string="待确认" name="confirm" domain="[('state', '=', 'posted')]"/>
+                    <filter string="待付款" name="register" domain="[('state', '=', 'confirm')]"/>
+                    <filter string="已完成" name="register" domain="[('state', '=', 'done')]"/>
+                    <separator/>
 
                 </search>
             </field>
@@ -151,7 +158,7 @@
             <field name="name">account.payment.register.tree</field>
             <field name="model">account.payment.register</field>
             <field name="arch" type="xml">
-                <tree>
+                <tree decoration-danger ="state=='posted'" decoration-muted="state == 'done'">
                     <field name="name"/>
                     <field name="amount"/>
                     <field name="partner_id"/>

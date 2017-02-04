@@ -123,7 +123,7 @@ class AccountPaymentRegister(models.Model):
     def done(self):
         for balance in self.balance_ids:
             if not balance.state:
-                raise UserError('有款型登记没有完成，不可以关闭次记录')
+                raise UserError('有付款登记没有完成，不可以关闭此次记录')
 
         self.state = 'done'
 
