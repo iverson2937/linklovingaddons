@@ -44,9 +44,10 @@
             id="menu_sale_order_invoice" parent="sale.menu_sale_invoicing"
             sequence="2"/>
 
-         <menuitem action="action_payment_received_register_sale"
-            id="menu_sale_order_invoice" parent="sale.menu_sale_invoicing"
-            sequence="2"/>
+          <!--收款登记 add by allen-->
+         <!--<menuitem action="action_payment_received_register_sale"-->
+            <!--id="menu_sale_order_invoice" parent="sale.menu_sale_invoicing"-->
+            <!--sequence="2"/>-->
 
 
         <menuitem  id="menu_product_normal_action_puchased" action="action_payment_register_accounting"
