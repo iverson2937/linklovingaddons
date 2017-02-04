@@ -121,9 +121,6 @@ class AccountPaymentRegister(models.Model):
 
     @api.model
     def create(self, vals):
-        if vals.get('amount') <= 0:
-            raise UserError(u'金额必须大于0')
-
         payment_type = self._context.get('default_payment_type')
 
         if 'name' not in vals or vals['name'] == _('New'):
