@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import base64
+import logging
 import os
 
 import sys
@@ -24,6 +25,7 @@ import qrcode
 #         self.value2 = float(self.value) / 100
 import cStringIO
 
+_logger = logging.getLogger(__name__)
 class ProductTemplateExtend(models.Model):
     _inherit = 'product.template'
 
@@ -59,7 +61,10 @@ class ProductTemplateExtend(models.Model):
         l2 = l1 + 50  # ２ｙ
         l3 = l2 + 50  # ３ｙ
         l4 = l3 + 50  # ４ｙ
-        font = ImageFont.truetype(ProductTemplateExtend.cur_file_dir()+'/linklovingaddons/linkloving_qrcode_create/models/simhei.ttf', font_size, encoding='utf-8')
+        path = ProductTemplateExtend.cur_file_dir()+'/linklovingaddons/linkloving_qrcode_create/models/simhei.ttf'
+        _logger.warning(path)
+
+        font = ImageFont.truetype(path, font_size, encoding='utf-8')
         draw = ImageDraw.Draw(img)
 
         draw.text(xy=(start_x, l1), text=u'料号:', font=font, fill='black')
@@ -109,8 +114,12 @@ class ProductTemplateExtend(models.Model):
     def cur_file_dir(cls):
         # 获取脚本路径
         path = sys.path[0]
+        _logger.warning(path)
+        print os.getcwd()
+        print os.path.abspath(os.curdir)
         # 判断为脚本文件还是py2exe编译后的文件，如果是脚本文件，则返回的是脚本的目录，如果是py2exe编译后的文件，则返回的是编译后的文件路径
-        if os.path.isdir(path):
-            return path
-        elif os.path.isfile(path):
-            return os.path.dirname(path)
+        return os.path.abspath(os.curdir)
+        # if os.path.isdir(path):
+        #     return path
+        # elif os.path.isfile(path):
+        #     return os.path.dirname(path)
