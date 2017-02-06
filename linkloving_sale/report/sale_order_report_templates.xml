@@ -25,10 +25,10 @@
                             </p>
                         </div>
                     </div>
-                    <div class="col-xs-5 col-xs-offset-1">
-                        <div t-field="doc.partner_id"
-                             t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
-                    </div>
+                    <!--<div class="col-xs-5 col-xs-offset-1">-->
+                        <!--<div t-field="doc.partner_id"-->
+                             <!--t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>-->
+                    <!--</div>-->
                 </div>
 
                 <h2>
@@ -169,7 +169,7 @@
                     <div class="col-xs-6">
 
                     </div>
-                    <div class="col-xs-2">
+                    <div class="col-xs-">
                        <strong> 总数量：</strong>
                         <strong>
                              <span t-field="doc.product_count"/>
