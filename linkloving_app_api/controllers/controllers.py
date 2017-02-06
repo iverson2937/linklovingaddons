@@ -587,8 +587,8 @@ class LinklovingAppApi(http.Controller):
             product_obj = LinklovingAppApi.get_model_by_id(line['product']['id'],request,'product.product')
             line['product_uom_id'] = product_obj.uom_id.id
             product_obj.area_id = line['product']['area']['id']
-            image_str = line['product']['image_medium']
-            if image_str:
+            if line['product'].get('image_medium'):
+                image_str = line['product'].get('image_medium')
                 product_obj.product_tmpl_id.image_medium = image_str
             location_id = request.env.ref('stock.stock_location_stock', raise_if_not_found=False).id
 
