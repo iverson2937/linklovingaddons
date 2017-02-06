@@ -197,13 +197,13 @@
         </record>
 
         <record id="customer_invoice_pending" model="ir.actions.act_window">
-            <field name="name">客户对账单</field>
+            <field name="name">客户账单</field>
             <field name="res_model">account.invoice</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
             <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('invoice_customer_tree')}),
-                (0, 0, {'view_mode': 'form', 'view_id': ref('invoice_customer_form')})]"/>
+                (0, 0, {'view_mode': 'form', 'view_id': ref('account.invoice_form')})]"/>
             <field name="domain">[('type','=','out_invoice')]</field>
             <field name="context">{'default_type':'out_invoice', 'type':'out_invoice'}</field>
             <field name="search_view_id" ref="account.view_account_invoice_filter"/>
