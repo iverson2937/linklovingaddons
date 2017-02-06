@@ -115,8 +115,10 @@ class ProductTemplateExtend(models.Model):
         # 获取脚本路径
         path = sys.path[0]
         _logger.warning(path)
+        print os.getcwd()
+        print os.path.abspath(os.curdir)
         # 判断为脚本文件还是py2exe编译后的文件，如果是脚本文件，则返回的是脚本的目录，如果是py2exe编译后的文件，则返回的是编译后的文件路径
-        return path
+        return os.path.abspath(os.curdir)
         # if os.path.isdir(path):
         #     return path
         # elif os.path.isfile(path):
