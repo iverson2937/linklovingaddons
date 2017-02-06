@@ -166,6 +166,15 @@
                 </t>
 
                 <div class="row" name="total">
+                    <div class="col-xs-6">
+
+                    </div>
+                    <div class="col-xs-2">
+                       <strong> 总数量：</strong>
+                        <strong>
+                             <span t-field="doc.product_count"/>
+                        </strong>
+                    </div>
                     <div class="col-xs-4 pull-right">
                         <table class="table table-condensed">
                             <tr class="border-black">
