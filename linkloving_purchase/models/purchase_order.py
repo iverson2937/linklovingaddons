@@ -56,6 +56,13 @@ class PurchaseOrder(models.Model):
             count += line.product_qty
         self.product_count = count
 
+    @api.multi
+    def unlink(self):
+        for order in self:
+            if order.state not in ['draft','cancel']:
+                raise UserError(_('只可以删除草稿或者取消的报价单.'))
+        return super(models.Model, self).unlink()
+
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
