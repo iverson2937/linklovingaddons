@@ -20,7 +20,10 @@
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='partner_invoice_id']" position="attributes">
-                    <attribute name="domain">[('parent_id','=',partner_id)]</attribute>
+                    <attribute name="domain">[('parent_id','=',partner_id),('type','=','invoice')]</attribute>
+                </xpath>
+                 <xpath expr="//field[@name='partner_invoice_id']" position="attributes">
+                    <attribute name="options">{'no_create': True}</attribute>
                 </xpath>
                 <xpath expr="//tree/field[@name='analytic_tag_ids']" position="replace">
                 </xpath>
@@ -44,7 +47,10 @@
                            options="{'no_create': True}"/>
                 </xpath>
                 <xpath expr="//field[@name='partner_shipping_id']" position="attributes">
-                    <attribute name="domain">[('parent_id','=',partner_id)]</attribute>
+                    <attribute name="domain">[('parent_id','=',partner_id),('type','=','delivery')]</attribute>
+                </xpath>
+                 <xpath expr="//field[@name='partner_shipping_id']" position="attributes">
+                    <attribute name="options">{'no_create': True}</attribute>
                 </xpath>
 
                 <xpath expr="//field[@name='partner_shipping_id']" position="after">
