@@ -155,6 +155,14 @@ class AccountPayment(models.Model):
     team_id = fields.Many2one('crm.team', related='partner_id.team_id')
     customer = fields.Boolean(related='partner_id.customer')
 
+    @api.onchange('partner_type')
+    def _onchange_partner_type(self):
+        # Set partner_id domain
+        if self.partner_type=='employee':
+            return {'domain': {'partner_id': [(self.partner_type, '=', True)]}}
+        else:
+            return {'domain': {'partner_id': [(self.partner_type, '=', True),('is_company','=',True)]}}
+
     @api.model
     def default_get(self, fields):
         rec = super(AccountPayment, self).default_get(fields)
