@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import base64
+import logging
 import os
 
 import sys
@@ -24,6 +25,7 @@ import qrcode
 #         self.value2 = float(self.value) / 100
 import cStringIO
 
+_logger = logging.getLogger(__name__)
 class ProductTemplateExtend(models.Model):
     _inherit = 'product.template'
 
@@ -60,7 +62,8 @@ class ProductTemplateExtend(models.Model):
         l3 = l2 + 50  # ３ｙ
         l4 = l3 + 50  # ４ｙ
         path = ProductTemplateExtend.cur_file_dir()+'/linklovingaddons/linkloving_qrcode_create/models/simhei.ttf'
-        print path
+        _logger.warning(path)
+
         font = ImageFont.truetype(path, font_size, encoding='utf-8')
         draw = ImageDraw.Draw(img)
 
