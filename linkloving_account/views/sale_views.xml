@@ -50,7 +50,7 @@
 
 
         <menuitem  id="menu_product_normal_action_puchased" action="action_payment_register_accounting"
-          parent="account.menu_finance_payables" sequence="110"/>
+          parent="account.menu_finance_payables" sequence="0"/>
     </data>
 
 

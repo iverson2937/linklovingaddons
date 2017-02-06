@@ -79,7 +79,14 @@
                 <search string="Search">
 
                     <field name="partner_id" filter_domain="[('partner_id', 'ilike', self)]" string="合作伙伴"/>
+                    <field name="name"/>
+                    <field name="state"/>
                     <field name="amount" filter_domain="[('amount','ilike',self)]" string="金额"/>
+                    <separator/>
+                    <filter string="待确认" name="confirm" domain="[('state', '=', 'posted')]"/>
+                    <filter string="待付款" name="register" domain="[('state', '=', 'confirm')]"/>
+                    <filter string="已完成" name="register" domain="[('state', '=', 'done')]"/>
+                    <separator/>
 
                 </search>
             </field>
@@ -95,7 +102,7 @@
                         <button name="post" string="提交" type="object"
                                 class="oe_highlight" states="draft" groups="purchase.group_purchase_user"/>
                         <button name="reject" string="退回" type="object"
-                                states="posted" groups="purchase.group_purchase_manager"/>
+                                states="posted,confirm" groups="purchase.group_purchase_manager"/>
                         <button name="confirm" string="确认" type="object" class="oe_highlight"
                                 states="posted" groups="purchase.group_purchase_manager"/>
                         <button name="done" string="完成" type="object"
@@ -151,7 +158,7 @@
             <field name="name">account.payment.register.tree</field>
             <field name="model">account.payment.register</field>
             <field name="arch" type="xml">
-                <tree>
+                <tree decoration-danger ="state=='posted'" decoration-muted="state == 'done'">
                     <field name="name"/>
                     <field name="amount"/>
                     <field name="partner_id"/>
@@ -226,8 +233,11 @@
             </field>
         </record>
         <menuitem id="payment_register_apply" action="action_payment_register" parent="purchase.menu_purchase_control"
-                  sequence="5"/>
+                  sequence="0"/>
+
+        <!--收款登记add by allen 暂时性隐藏-->
         <menuitem id="payment_received_register" action="action_payment_received_register"
+                   groups="base.group_no_one"
                   parent="account.menu_finance_receivables" sequence="5"/>
 
         <record id="view_account_payment_invoice_form" model="ir.ui.view">
