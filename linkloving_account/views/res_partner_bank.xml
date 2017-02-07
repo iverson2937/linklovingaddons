@@ -13,7 +13,6 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='acc_number']" position="after">
                     <field name="owner"/>
-                    <field name="bank_description" stinng="银行名称"/>
                 </xpath>
 
             </field>
@@ -28,12 +27,6 @@
                     <field name="owner"/>
 
                 </xpath>
-                  <xpath expr="//field[@name='bank_name']" position="replace">
-                   <field name="bank_description" stinng="银行名称"/>
-                </xpath>
-
-
-
 
 
             </field>
