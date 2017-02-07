@@ -39,7 +39,7 @@ class ProductTemplateExtend(models.Model):
             'type': 'ir.actions.act_url',
             'url': '/web/binary/download_qrcode?model=product.template&field=qrcode_img&id=%s&filename=%s.png' % (
             self.id, self.default_code.replace('.', '_')),
-            'target': 'self',
+            'target': 'new',
         }
     def action_qrcode_download1(self):
         pass
