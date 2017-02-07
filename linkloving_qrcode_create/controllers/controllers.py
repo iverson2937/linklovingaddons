@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import base64
+import json
 
 from odoo import http
 
@@ -35,6 +36,21 @@ class Binary(http.Controller):
         else:
             return request.make_response(filecontent,
                                      [('Content-Type', 'image/png'),
+                                      ('Content-Disposition', content_disposition(filename))])
+
+
+    @http.route('/web/binary/download_multi_qrcode', type='http', auth="public", csrf=False)
+    def download_multi_qrcode(self,model,field,ids,filename=None, **kw):
+        idss = json.loads(ids)
+        Model = request.env[model]
+        product_objs = Model.sudo().search([('id', 'in', idss)])
+        content = product_objs.multi_create_qrcode()
+        filecontent = content.getvalue()
+        if not filecontent:
+            return request.not_found()
+        else:
+            return request.make_response(filecontent,
+                                     [('Content-Type', 'application/octet-stream'),
                                       ('Content-Disposition', content_disposition(filename))])
 
 

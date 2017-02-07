@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 import base64
+import gzip
 import logging
 import os
 
 import sys
 import textwrap
+import zipfile
 
+import zlib
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
@@ -60,7 +63,27 @@ class ProductTemplateExtend(models.Model):
             img_str = base64.b64encode(buffer.getvalue())
             return img_str
             # self.qrcode_img = img_str
-
+    @api.multi
+    def multi_create_qrcode(self):
+        zip_buffer = cStringIO.StringIO()
+        f = zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED)
+        for product in self:
+            str_to_code = product.default_code
+            qr = qrcode.QRCode(
+                version=2,
+                error_correction=qrcode.constants.ERROR_CORRECT_H,
+                box_size=8,
+                border=2
+            )
+            qr.add_data(str_to_code)
+            img = qr.make_image()
+            new_img = ProductTemplateExtend.create_product_info_image(product, img)
+            buffer = cStringIO.StringIO()
+            new_img.save(buffer, format='PNG')
+            img_str = base64.b64encode(buffer.getvalue())
+            f.writestr(str_to_code.replace('.', '_')+'.png', buffer.getvalue())
+        f.close()
+        return zip_buffer
     #create a new image white bg to contain qrcode and spec
     # def create_bg_image(self):
 
@@ -88,14 +111,13 @@ class ProductTemplateExtend(models.Model):
 
         draw.text(xy=(line_start_x, l1), text=product_tmpl.default_code, font=font, fill='black')
 
-        lines = textwrap.wrap(product_tmpl.name, width=10)
-        y_text = l2 - (len(lines) -1) * font_size
-        for line in lines:
-            width, height = font.getsize(line)
-            draw.text((line_start_x, y_text), line, font=font, fill='black')
-            y_text += height
+        ProductTemplateExtend.auto_spilt_lines(draw,
+                                               product_tmpl.name,
+                                               line_start_x,
+                                               l2,
+                                               font_size,
+                                               font)
 
-        # draw.text(xy=(line_start_x, l2), text=product_tmpl.name, font=font, fill='black')
         ProductTemplateExtend.auto_spilt_lines(draw,
                                                product_tmpl.product_specs,
                                                line_start_x,
@@ -115,7 +137,7 @@ class ProductTemplateExtend(models.Model):
 
     @classmethod
     def auto_spilt_lines(cls, draw, text, x, y, font_size, font):
-        lines3 = textwrap.wrap(text, width=13)
+        lines3 = textwrap.wrap(text, width=11)
         if len(lines3) > 3:
             lines3 = lines3[0:3]
         y_text3 = y - (len(lines3) - 1) * font_size
@@ -137,3 +159,34 @@ class ProductTemplateExtend(models.Model):
         #     return path
         # elif os.path.isfile(path):
         #     return os.path.dirname(path)
+
+class MultiCreateQRCode(models.TransientModel):
+    _name = 'multi.create.qrcode'
+
+    @api.multi
+    def action_create_qrcode(self):
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+        return {
+            'type': 'ir.actions.act_url',
+            'url': '/web/binary/download_multi_qrcode?model=product.template&field=qrcode_img&ids=%s&filename=%s' % (
+            active_ids, 'qrcode.zip'),
+            'target': 'new',
+        }
+
+# buffer1 = cStringIO.StringIO()
+# zip = zipfile.ZipFile('C:\\ac.zip', 'w',zipfile.ZIP_DEFLATED)
+# qr = qrcode.QRCode(
+#     version=2,
+#     error_correction=qrcode.constants.ERROR_CORRECT_H,
+#     box_size=8,
+#     border=2
+# )
+# qr.add_data('123')
+# img = qr.make_image()
+# buffer = cStringIO.StringIO()
+# img.save(buffer, format='PNG')
+# img_str = base64.b64encode(buffer.getvalue())
+# zip.writestr('ddd.png', buffer.getvalue())
+#
+# zip.close()
