@@ -139,5 +139,29 @@
         </record>
 
 
+        <record id="account_invoice_confirm_view" model="ir.ui.view">
+            <field name="name">purchase.order.cancel.form</field>
+            <field name="model">purchase.order.cancel</field>
+            <field name="arch" type="xml">
+                <form string="Confirm Draft Invoices">
+                    <p class="oe_grey">
+                        确定取消选定的报价单？
+                    </p>
+                    <footer>
+                        <button string="确定取消" name="order_cancel" type="object" default_focus="1"
+                                class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+        <act_window id="action_purchase_order_cancel"
+                    multi="True"
+                    key2="client_action_multi" name="取消报价单"
+                    res_model="purchase.order.cancel" src_model="purchase.order"
+                    view_mode="form" target="new" view_type="form"/>
+
     </data>
 </openerp>
