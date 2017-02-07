@@ -25,13 +25,26 @@ import qrcode
 #         self.value2 = float(self.value) / 100
 import cStringIO
 
+from odoo.http import request, Response
+
 _logger = logging.getLogger(__name__)
 class ProductTemplateExtend(models.Model):
     _inherit = 'product.template'
 
-    qrcode_img = fields.Binary(u'二维码图片', compute='_create_qrcode')
+    # qrcode_img = fields.Binary(u'二维码图片')
 
-    def _create_qrcode(self):
+    @api.multi
+    def get_product_qrcode(self):
+        return {
+            'type': 'ir.actions.act_url',
+            'url': '/web/binary/download_qrcode?model=product.template&field=qrcode_img&id=%s&filename=%s.png' % (
+            self.id, self.default_code.replace('.', '_')),
+            'target': 'self',
+        }
+    def action_qrcode_download1(self):
+        pass
+    # @api.multi
+    def action_qrcode_download(self):
             str_to_code = self.default_code
             qr = qrcode.QRCode(
                 version=2,
@@ -45,7 +58,8 @@ class ProductTemplateExtend(models.Model):
             buffer = cStringIO.StringIO()
             new_img.save(buffer, format='PNG')
             img_str = base64.b64encode(buffer.getvalue())
-            self.qrcode_img = img_str
+            return img_str
+            # self.qrcode_img = img_str
 
     #create a new image white bg to contain qrcode and spec
     # def create_bg_image(self):
