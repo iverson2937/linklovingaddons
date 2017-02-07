@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!--重写会计页面的客户按钮-->
+
+        <menuitem id="account.menu_account_customer" name="Customers"
+                  parent="account.menu_finance_receivables"
+                  action="linkloving_sale.sale_action_partner_form"/>
+
+    </data>
+</openerp>
+
+
