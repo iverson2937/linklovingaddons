@@ -79,8 +79,9 @@ class LinklovingAppApi(http.Controller):
     #获取菜单列表
     @http.route('/linkloving_app_api/get_menu_list', type='http', auth="none", csrf=False)
     def get_menu_list(self, **kw):
-        request.uid = request.session.uid
-        context = request.env['ir.http'].webclient_rendering_context()
+        if request.session.uid:
+            request.uid = request.session.uid
+        context = request.env['ir.http'].sudo().webclient_rendering_context()
         menu_data = context.get('menu_data').get('children')
         for menu in menu_data:
             menu['user_id'] = request.uid
@@ -622,7 +623,7 @@ class LinklovingAppApi(http.Controller):
                 c = {
                     'id' :  line['product_id'][0] ,
                     'product_name' :  line['product_id'][1],
-                    'image_medium' : request.env['product.product'].sudo().browse(line['product_id'][0])[0],
+                    'image_medium' : LinklovingAppApi.get_product_image_url(request.env['product.product'].sudo().browse(line['product_id'][0])[0]),
                     'area' : {
                     'id': area.id,
                     'area_name': area.name
