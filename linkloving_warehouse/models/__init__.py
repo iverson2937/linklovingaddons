@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from . import location, product
+from . import location, product, mrp_production_cancel
