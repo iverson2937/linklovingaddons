@@ -9,10 +9,10 @@
             <field name="inherit_id" ref="purchase.purchase_order_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='action_rfq_send']" position="before">
-                    <button name="%(action_view_purchase_advance_payment_inv)d" string="Create Invoice1"
+                    <button name="%(action_view_purchase_advance_payment_inv)d" string="Create Invoice"
                             type="action" class="btn-primary"
                             attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}"/>
-                    <button name="%(action_view_purchase_advance_payment_inv)d" string="Create Invoice2"
+                    <button name="%(action_view_purchase_advance_payment_inv)d" string="Create Invoice"
                             type="action" context="{'default_advance_payment_method': 'percentage'}"
                             attrs="{'invisible': ['|',('invoice_status', '!=', 'no'), ('state', '!=', 'purchase')]}"/>
                 </xpath>
