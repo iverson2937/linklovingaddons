@@ -63,7 +63,6 @@ class Partner(models.Model):
             if self._context.get('html_format'):
                 name = name.replace('\n', '<br/>')
             res.append((partner.id, name))
-        print res
         return res
 
 

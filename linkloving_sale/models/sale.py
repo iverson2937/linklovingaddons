@@ -57,6 +57,17 @@ class SaleOrder(models.Model):
 
         return report_pages
 
+
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    product_specs = fields.Text(string=u'产品规格', related='product_id.product_specs')
+    inner_spec = fields.Char(related='product_id.inner_spec', string=u'国内型号')
+    inner_code = fields.Char(related='product_id.inner_code', string=u'国内简称')
+    price_subtotal = fields.Monetary(string='Subtotal', readonly=True, store=True, compute=None)
+    price_tax = fields.Monetary(string='Taxes', readonly=True, store=True, compute=None)
+    price_total = fields.Monetary(string='Total', readonly=True, store=True, compute=None)
+
     # FIXME:allen  how to remove this
     @api.onchange('product_uom_qty', 'product_uom', 'route_id')
     def _onchange_product_id_check_availability(self):
@@ -69,16 +80,5 @@ class SaleOrder(models.Model):
             if float_compare(self.product_id.virtual_available, product_qty, precision_digits=precision) == -1:
                 is_available = self._check_routing()
                 if not is_available:
-                    pass
+                    return {}
         return {}
-
-
-class SaleOrderLine(models.Model):
-    _inherit = 'sale.order.line'
-
-    product_specs = fields.Text(string=u'产品规格', related='product_id.product_specs')
-    inner_spec = fields.Char(related='product_id.inner_spec', string=u'国内型号')
-    inner_code = fields.Char(related='product_id.inner_code', string=u'国内简称')
-    price_subtotal = fields.Monetary(string='Subtotal', readonly=True, store=True, compute=None)
-    price_tax = fields.Monetary(string='Taxes', readonly=True, store=True, compute=None)
-    price_total = fields.Monetary(string='Total', readonly=True, store=True, compute=None)
