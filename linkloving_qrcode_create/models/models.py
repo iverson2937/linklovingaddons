@@ -137,6 +137,8 @@ class ProductTemplateExtend(models.Model):
 
     @classmethod
     def auto_spilt_lines(cls, draw, text, x, y, font_size, font):
+        if not text:
+            text = ''
         lines3 = textwrap.wrap(text, width=11)
         if len(lines3) > 3:
             lines3 = lines3[0:3]
