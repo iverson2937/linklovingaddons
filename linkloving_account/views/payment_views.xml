@@ -24,7 +24,7 @@
                     </header>
                     <sheet>
                         <h1>
-                            <field name="payment_type" invisible="0" nolabel="1" readonly="1" />
+                            <field name="payment_type" invisible="0" nolabel="1" readonly="1"/>
                             <field name="name" class="oe_inline" readonly="1"/>
                         </h1>
                         <group>
@@ -45,7 +45,8 @@
                         </group>
                         <notebook colspan="4">
                             <page string="对账单" autofocus="autofocus">
-                                <field name="invoice_ids" attrs="{'required': [('state', '=', 'posted')],'readonly': [('state', 'in', ['confirm','done'])]}"
+                                <field name="invoice_ids"
+                                       attrs="{'required': [('state', '=', 'posted')],'readonly': [('state', 'in', ['confirm','done'])]}"
                                        domain="[('partner_id','=', partner_id),('state','=', 'open'),('remain_apply_balance','!=',0 )]"/>
 
                             </page>
@@ -115,7 +116,7 @@
                     </header>
                     <sheet>
                         <h1>
-                           <field name="payment_type" invisible="0" nolabel="1" readonly="1"/>
+                            <field name="payment_type" invisible="0" nolabel="1" readonly="1"/>
                             <field name="name" class="oe_inline" readonly="1"/>
                         </h1>
                         <group>
@@ -158,7 +159,7 @@
             <field name="name">account.payment.register.tree</field>
             <field name="model">account.payment.register</field>
             <field name="arch" type="xml">
-                <tree decoration-danger ="state=='posted'" decoration-muted="state == 'done'">
+                <tree decoration-danger="state=='posted'" decoration-muted="state == 'done'">
                     <field name="name"/>
                     <field name="amount"/>
                     <field name="partner_id"/>
@@ -238,7 +239,7 @@
 
         <!--收款登记add by allen 暂时性隐藏-->
         <menuitem id="payment_received_register" action="action_payment_received_register"
-                   groups="base.group_no_one"
+                  groups="base.group_no_one"
                   parent="account.menu_finance_receivables" sequence="5"/>
 
         <record id="view_account_payment_invoice_form" model="ir.ui.view">
@@ -260,11 +261,15 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='partner_id']" position="attributes">
                     <attribute name="options">{'no_create':True}</attribute>
-                        </xpath>
+                </xpath>
+                <xpath expr="//field[@name='payment_date']" position="replace">
+                    <field name="payment_date"/>
+                </xpath>
 
                 <xpath expr="//field[@name='partner_id']" position="after">
                     <field name="customer" invisible="1"/>
-                    <field name="team_id" readonly="1" string="销售团队" attrs="{'invisible':[('customer','!=',True)]}" options="{'no_create':True}"/>
+                    <field name="team_id" readonly="1" string="销售团队" attrs="{'invisible':[('customer','!=',True)]}"
+                           options="{'no_create':True}"/>
                 </xpath>
             </field>
         </record>
