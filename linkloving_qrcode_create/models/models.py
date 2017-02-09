@@ -50,10 +50,10 @@ class ProductTemplateExtend(models.Model):
     def action_qrcode_download(self):
             str_to_code = self.default_code
             qr = qrcode.QRCode(
-                version=2,
+                version=1,
                 error_correction=qrcode.constants.ERROR_CORRECT_H,
-                box_size=8,
-                border=2
+                box_size=4,
+                border=1
             )
             qr.add_data(str_to_code)
             img = qr.make_image()
@@ -70,10 +70,10 @@ class ProductTemplateExtend(models.Model):
         for product in self:
             str_to_code = product.default_code
             qr = qrcode.QRCode(
-                version=2,
+                version=1,
                 error_correction=qrcode.constants.ERROR_CORRECT_H,
-                box_size=8,
-                border=2
+                box_size=4,
+                border=1
             )
             qr.add_data(str_to_code)
             img = qr.make_image()
@@ -89,15 +89,15 @@ class ProductTemplateExtend(models.Model):
 
     @classmethod
     def create_product_info_image(cls, product_tmpl, qr_img):
-        img = Image.new("RGB", (450, 250), (255, 255, 255))
-        font_size = 13  # 字体大小
-        start_x = 250  # 文字起始位置
-        line_start_x = 300  # 直线起始位置
-        line_width = 120
-        l1 = 50  # 第一行ｙ
-        l2 = l1 + 50  # ２ｙ
-        l3 = l2 + 50  # ３ｙ
-        l4 = l3 + 50  # ４ｙ
+        img = Image.new("RGB", (450, 230), (255, 255, 255))
+        font_size = 25  # 字体大小
+        start_x = 140  # 文字起始位置
+        line_start_x = 200  # 直线起始位置
+        line_width = 220
+        l1 = 35  # 第一行ｙ
+        l2 = l1 + 80  # ２ｙ
+        l3 = l2 + 80  # ３ｙ
+        l4 = l3  # ４ｙ
         path = ProductTemplateExtend.cur_file_dir()+'/linklovingaddons/linkloving_qrcode_create/models/simhei.ttf'
         _logger.warning(path)
 
@@ -106,7 +106,7 @@ class ProductTemplateExtend(models.Model):
 
         draw.text(xy=(start_x, l1), text=u'料号:', font=font, fill='black')
         draw.text(xy=(start_x, l2), text=u'品名:', font=font, fill='black')
-        draw.text(xy=(start_x, l3), text=u'规格:', font=font, fill='black')
+        # draw.text(xy=(start_x, l3), text=u'规格:', font=font, fill='black')
         draw.text(xy=(start_x, l4), text=u'位置:', font=font, fill='black')
 
         draw.text(xy=(line_start_x, l1), text=product_tmpl.default_code, font=font, fill='black')
@@ -118,12 +118,12 @@ class ProductTemplateExtend(models.Model):
                                                font_size,
                                                font)
 
-        ProductTemplateExtend.auto_spilt_lines(draw,
-                                               product_tmpl.product_specs,
-                                               line_start_x,
-                                               l3,
-                                               font_size,
-                                               font)
+        # ProductTemplateExtend.auto_spilt_lines(draw,
+        #                                        product_tmpl.product_specs,
+        #                                        line_start_x,
+        #                                        l3,
+        #                                        font_size,
+        #                                        font)
         # draw.text(xy=(line_start_x, l3), text=product_tmpl.product_specs, font=font, fill='black')
         draw.text(xy=(line_start_x, l4), text=product_tmpl.area_id.name if product_tmpl.area_id else '' , font=font, fill='black')
 
@@ -132,14 +132,14 @@ class ProductTemplateExtend(models.Model):
         draw.line(((line_start_x, l3 + font_size), (line_start_x + line_width, l3 + font_size)), fill='black', width=1)
         draw.line(((line_start_x, l4 + font_size), (line_start_x + line_width, l4 + font_size)), fill='black', width=1)
 
-        img.paste(qr_img, (0, 0))
+        img.paste(qr_img, (10,(img.size[1] - qr_img.size[1])/2))
         return img
 
     @classmethod
     def auto_spilt_lines(cls, draw, text, x, y, font_size, font):
         if not text:
             text = ''
-        lines3 = textwrap.wrap(text, width=11)
+        lines3 = textwrap.wrap(text, width=15)
         if len(lines3) > 3:
             lines3 = lines3[0:3]
         y_text3 = y - (len(lines3) - 1) * font_size
