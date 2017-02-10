@@ -48,9 +48,6 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
     def print_report(self):
         for report in self:
             datas = self._get_data_by_purchase(report.start_date, report.end_date)
-            print report.start_date
-            print report.end_date
-            print datas
             report_name = 'linkloving_purchase.report_purchase'
 
             return self.env['report'].get_action(self, report_name, datas)
