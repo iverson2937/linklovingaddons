@@ -590,7 +590,11 @@ class LinklovingAppApi(http.Controller):
             product_obj.area_id = line['product']['area']['id']
             if line['product'].get('image_medium'):
                 image_str = line['product'].get('image_medium')
-                product_obj.product_tmpl_id.image_medium = image_str
+                print 'image_str:%s' % image_str[0:16]
+                try:
+                    product_obj.product_tmpl_id.image_medium = image_str
+                except Exception, e:
+                    print "exception catch %s" % image_str[0:16]
             location_id = request.env.ref('stock.stock_location_stock', raise_if_not_found=False).id
 
             new_line = {
@@ -702,3 +706,74 @@ class LinklovingAppApi(http.Controller):
         dictheaders = dict(headers)
         dictheaders['Content-Type'] = contenttype
         return dictheaders.items()
+
+
+
+#产品模块
+#根据条件查找产品
+    @http.route('/linkloving_app_api/get_product_list', type='json', auth='none', csrf=False)
+    def get_product_list(self, **kw):
+        condition_dic = request.jsonrequest.get('condition')
+        limit = request.jsonrequest.get('limit')
+        offset = request.jsonrequest.get('offset')
+        product_type = request.jsonrequest.get('product_type')
+        def convert_product_type(type):
+            if type == 'all':
+                return ()
+            elif type == 'purchase':
+                return ('purchase_ok', '=', True)
+            elif type == 'sale':
+                return ('sale_ok', '=', True)
+            elif type == 'expensed':
+                return ('can_be_expensed', '=', True)
+            else:
+                return ()
+
+        if not condition_dic:
+            list = request.env['product.template'].sudo().search([convert_product_type(product_type)], limit=limit, offset=offset)
+
+        domain = []
+        for key in condition_dic.keys():
+            domain.append((key, 'in', [condition_dic[key]]))
+        sudo_model = request.env['product.product'].sudo()
+        product_s = sudo_model.search(domain)
+        if product_s:
+            data = {
+                'theoretical_qty' : product_s.qty_available,
+                'product_qty' : 0,
+                'product' : {
+                    'id' : product_s.id,
+                    'product_name' : product_s.name,
+                    'image_medium' : LinklovingAppApi.get_product_image_url(product_s),
+                    'area' : {
+                        'id' : product_s.area_id.id,
+                        'name' : product_s.area_id.name,
+                    }
+                }
+            }
+            return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=data)
+        else:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={'error' : u'未找到该产品'})
+
+
+    @classmethod
+    def product_template_obj_to_json(cls, product_tmpl):
+        data = {
+            'product_id': product_tmpl.id,
+            'default_code': product_tmpl.default_code,
+            'type': product_tmpl.type,
+            'inner_code': product_tmpl.inner_code,
+            'inner_spec': product_tmpl.inner_spec,
+            'area_id': {
+                'name': product_tmpl.area_id.name,
+                'id': product_tmpl.area_id.id
+            },
+            'product_specs': product_tmpl.product_specs,
+            'image_medium' : product_tmpl.image_medium,
+            'qty_available' : product_tmpl.qty_available,
+            'virtual_available' : product_tmpl.virtual_available,
+            'categ_id' : product_tmpl.categ_id.name,
+        }
+        return data
