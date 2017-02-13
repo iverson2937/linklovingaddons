@@ -6,8 +6,21 @@ from odoo import models, fields, api, _, SUPERUSER_ID
 class StockPicking(models.Model):
     _name = 'stock.picking'
     _inherit = ['stock.picking', 'ir.needaction_mixin']
-    po_id = fields.Many2one('purchase.order')
-    so_id = fields.Many2one('sale.order')
+
+    def _get_po_number(self):
+        if self.origin:
+            po = self.env['purchase.order'].search([('name', '=', self.origin)])
+            self.po_id = po.id if po else None
+    po_id = fields.Many2one('purchase.order',compute=_get_po_number)
+
+    def _get_so_number(self):
+        if self.origin:
+            so = self.env['sale.order'].search([('name', '=', self.origin)])
+            self.so_id = so.id if so else None
+    po_id = fields.Many2one('purchase.order',compute=_get_so_number)
+
+
+    so_id = fields.Many2one('sale.order',compute=_get_so_number)
     state = fields.Selection([
         ('draft', 'Draft'), ('cancel', 'Cancelled'),
         ('waiting', 'Waiting Another Operation'),
