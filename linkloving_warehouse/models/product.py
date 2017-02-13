@@ -25,7 +25,6 @@
 from odoo import api
 from odoo import fields, models,_
 
-
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
@@ -34,7 +33,7 @@ class ProductTemplate(models.Model):
     area_id = fields.Many2one(related='product_variant_ids.area_id', string='Area')
     _sql_constraints = [
         ('default_code_uniq1', 'unique (default_code)', u'内部参考号已存在!'),
-        ('name_uniq', 'unique (name)', u'产品名称已存在!')
+        # ('name_uniq', 'unique (name)', u'产品名称已存在!')
     ]
 
 class ProductProduct(models.Model):
@@ -43,5 +42,5 @@ class ProductProduct(models.Model):
     product_specs = fields.Text(string=u'产品规格', related='product_tmpl_id.product_specs')
     _sql_constraints = [
         ('default_code_uniq', 'unique (default_code)', u'内部参考号已存在!'),
-        ('name_uniq', 'unique (name)', u'产品名称已存在!')
+        # ('name_uniq', 'unique (name)', u'产品名称已存在!')
     ]
