@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id='sale_order_list_wizard_form' model='ir.ui.view'>
+            <field name='name'>sale.order.list.wizard.form</field>
+            <field name='model'>sale.order.list.wizard</field>
+            <field name='type'>form</field>
+            <field name='arch' type='xml'>
+                <form name='打印报表'>
+                    <group>
+                        <group>
+                            <field name='start_date' required='1'/>
+                        </group>
+                        <group>
+                            <field name='end_date' required='1'/>
+                        </group>
+                    </group>
+                    <group>
+                          <field name="team_ids" widget="many2many_tags"  string="销售团队"/>
+                    </group>
+
+                    <footer>
+                        <button name='print_report' type='object' string='打印报表' class='oe_highlight'/>
+                        or
+                        <button string='取消' class='oe_link' special='cancel'/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id='action_sale_order_wizard' model='ir.actions.act_window'>
+            <field name='name'>汇总销售报表</field>
+            <field name='res_model'>sale.order.list.wizard</field>
+            <field name='view_type'>form</field>
+            <field name='view_mode'>form</field>
+            <field name="view_id" ref="sale_order_list_wizard_form"/>
+
+            <field name='target'>new</field>
+        </record>
+
+
+        <menuitem id="menu_sale_order_list_export" name="报表" parent="sales_team.menu_base_partner"
+                  action="action_sale_order_wizard"/>
+    </data>
+</openerp>
