@@ -46,6 +46,27 @@ class LinklovingAppApi(http.Controller):
     def get_db_list(self, **kw):
         return JsonResponse.send_response(STATUS_CODE_OK, res_data= http.db_list(), jsonRequest=False)
 
+    @http.route('/linkloving_app_api/test', type='json', auth='none', csrf=False)
+    def test(self, **kw):
+        sudo_model = request.env['product.product'].sudo()
+        product_s = sudo_model.search([], limit=1)
+        if product_s:
+            data = {
+                'theoretical_qty': product_s.qty_available,
+                'product_qty': 0,
+                'product': {
+                    'id': product_s.id,
+                    'product_name': product_s.name,
+                    'image_medium': LinklovingAppApi.get_product_image_url(product_s, model='product.product'),
+                    'product_spec': product_s.product_specs,
+                    'area': {
+                        'id': product_s.area_id.id,
+                        'name': product_s.area_id.name,
+                    }
+                }
+            }
+            return json.dumps(data)
+
     #登录
     @http.route('/linkloving_app_api/login', type='json', auth="none", csrf=False)
     def login(self, **kw):
@@ -754,6 +775,37 @@ class LinklovingAppApi(http.Controller):
                                           res_data=product_json_list)
 
 
+    @http.route('/linkloving_app_api/get_stock_moves_by_product_id', type='json', auth='none', csrf=False)
+    def get_stock_moves_by_product_id(self, **kw):
+        product_id = request.jsonrequest.get('product_id')
+        limit = request.jsonrequest.get('limit')
+        offset = request.jsonrequest.get('offset')
+        if not limit:
+            limit = 80
+        if not offset:
+            offset = 0
+        stock_moves = request.env['stock.move'].sudo().search([('product_tmpl_id', '=', product_id)], limit=limit, offset=offset)
+        stock_move_json_list = []
+        for stock_move in stock_moves:
+            stock_move_json_list.append(LinklovingAppApi.stock_move_obj_to_json(stock_move))
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=stock_move_json_list)
+
+
+    @classmethod
+    def stock_move_obj_to_json(cls, stock_move):
+        data = {
+            'name' : stock_move.name,
+            'product_id' : {
+                'product_name' : stock_move.product_tmpl_id.display_name,
+                'id' :stock_move.product_tmpl_id.id,
+            },
+            'product_uom_qty' : stock_move.product_uom_qty,
+            'state' : stock_move.state,
+            'location': stock_move.location_id.display_name,
+            'location_dest' : stock_move.location_dest_id.display_name,
+        }
+        return data
     @classmethod
     def product_template_obj_to_json(cls, product_tmpl):
         data = {
@@ -774,3 +826,4 @@ class LinklovingAppApi(http.Controller):
             'categ_id' : product_tmpl.categ_id.name,
         }
         return data
+
