@@ -531,7 +531,8 @@ class LinklovingAppApi(http.Controller):
                 'product' : {
                     'id' : product_s.id,
                     'product_name' : product_s.name,
-                    'image_medium' : LinklovingAppApi.get_product_image_url(product_s),
+                    'image_medium' : LinklovingAppApi.get_product_image_url(product_s, model='product.product'),
+                    'product_spec' : product_s.product_specs,
                     'area' : {
                         'id' : product_s.area_id.id,
                         'name' : product_s.area_id.name,
@@ -627,7 +628,7 @@ class LinklovingAppApi(http.Controller):
                 c = {
                     'id' :  line['product_id'][0] ,
                     'product_name' :  line['product_id'][1],
-                    'image_medium' : LinklovingAppApi.get_product_image_url(request.env['product.product'].sudo().browse(line['product_id'][0])[0]),
+                    'image_medium' : LinklovingAppApi.get_product_image_url(request.env['product.product'].sudo().browse(line['product_id'][0])[0], model='product.product'),
                     'area' : {
                     'id': area.id,
                     'area_name': area.name
@@ -653,10 +654,12 @@ class LinklovingAppApi(http.Controller):
         return data
 
     @classmethod
-    def get_product_image_url(cls, product_product):
+    def get_product_image_url(cls, product_product, model):
         DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
-        url = request.httprequest.host_url  \
-              + 'linkloving_app_api/get_product_image?product_id='+str(product_product.product_tmpl_id.id)
+        if model == 'product.template':
+            url = '%slinkloving_app_api/get_product_image?product_id=%s&model=%s' % (request.httprequest.host_url, str(product_product.id), model)
+        else:
+            url = '%slinkloving_app_api/get_product_image?product_id=%s&model=%s' % (request.httprequest.host_url, str(product_product.product_tmpl_id.id), model)
         if not url:
             return ''
         return url
@@ -666,7 +669,6 @@ class LinklovingAppApi(http.Controller):
     def get_product_image(self, **kw):
         DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
         product_id =kw.get('product_id')
-
         status, headers, content = request.registry['ir.http'].binary_content(xmlid=None, model='product.template', id=product_id, field='image_medium', unique=time.strftime(DEFAULT_SERVER_DATE_FORMAT, time.localtime()),
                                                                                                                                                   default_mimetype='image/png',
                                                                                                                                                   env=request.env(user=SUPERUSER_ID))
@@ -719,7 +721,7 @@ class LinklovingAppApi(http.Controller):
         product_type = request.jsonrequest.get('product_type')
         def convert_product_type(type):
             if type == 'all':
-                return ()
+                return
             elif type == 'purchase':
                 return ('purchase_ok', '=', True)
             elif type == 'sale':
@@ -727,35 +729,29 @@ class LinklovingAppApi(http.Controller):
             elif type == 'expensed':
                 return ('can_be_expensed', '=', True)
             else:
-                return ()
-
-        if not condition_dic:
-            list = request.env['product.template'].sudo().search([convert_product_type(product_type)], limit=limit, offset=offset)
+                return
 
         domain = []
-        for key in condition_dic.keys():
-            domain.append((key, 'in', [condition_dic[key]]))
-        sudo_model = request.env['product.product'].sudo()
-        product_s = sudo_model.search(domain)
-        if product_s:
-            data = {
-                'theoretical_qty' : product_s.qty_available,
-                'product_qty' : 0,
-                'product' : {
-                    'id' : product_s.id,
-                    'product_name' : product_s.name,
-                    'image_medium' : LinklovingAppApi.get_product_image_url(product_s),
-                    'area' : {
-                        'id' : product_s.area_id.id,
-                        'name' : product_s.area_id.name,
-                    }
-                }
-            }
-            return JsonResponse.send_response(STATUS_CODE_OK,
-                                          res_data=data)
+        if condition_dic:
+            for key in condition_dic.keys():
+                if condition_dic[key] != '' or not condition_dic[key]:
+                    domain.append((key, 'ilike', condition_dic[key]))
+
+        product_json_list = []
+        if product_type == 'all':
+            list = request.env['product.template'].sudo().search(domain, limit=limit, offset=offset)
+            for product in list:
+                product_json_list.append(LinklovingAppApi.product_template_obj_to_json(product))
+
+
         else:
-            return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error' : u'未找到该产品'})
+            domain.append(convert_product_type(product_type))
+            list = request.env['product.template'].sudo().search(domain, limit=limit, offset=offset)
+            for product in list:
+                product_json_list.append(LinklovingAppApi.product_template_obj_to_json(product))
+
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=product_json_list)
 
 
     @classmethod
@@ -763,6 +759,7 @@ class LinklovingAppApi(http.Controller):
         data = {
             'product_id': product_tmpl.id,
             'default_code': product_tmpl.default_code,
+            'product_name' : product_tmpl.name,
             'type': product_tmpl.type,
             'inner_code': product_tmpl.inner_code,
             'inner_spec': product_tmpl.inner_spec,
@@ -771,7 +768,7 @@ class LinklovingAppApi(http.Controller):
                 'id': product_tmpl.area_id.id
             },
             'product_specs': product_tmpl.product_specs,
-            'image_medium' : product_tmpl.image_medium,
+            'image_medium' : LinklovingAppApi.get_product_image_url(product_tmpl, model='product.template'),
             'qty_available' : product_tmpl.qty_available,
             'virtual_available' : product_tmpl.virtual_available,
             'categ_id' : product_tmpl.categ_id.name,
