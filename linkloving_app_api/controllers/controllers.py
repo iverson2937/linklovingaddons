@@ -147,26 +147,6 @@ class LinklovingAppApi(http.Controller):
     def get_order_detail(self, **kw):
         order_id = request.jsonrequest.get('order_id')
         mrp_production = request.env['mrp.production'].sudo()
-        production = mrp_production.search([('id','=',order_id)], limit=1)
-
-        # stock_move = request.env['sim.stock.move'].sudo().search_read([('id', 'in', production.sim_stock_move_lines.ids)], fields=['product_id', 'over_picking_qty', 'qty_available', 'quantitty_available', 'quantity_done', 'return_qty','virtual_available', 'quantity_ready', 'product_uom_qty', 'suggest_qty'])
-        # for l in stock_move:
-        #     # dic = LinklovingAppApi.search(request,'product.product',[('id','=',l['product_id'][0])], ['display_name'])
-        #     l['product_id'] = request.env['product.product'].sudo().search([('id','=',l['product_id'][0])]).display_name
-        # data = {
-        #     'order_id' : production.id,
-        #     'display_name' : production.display_name,
-        #     'product_name' : production.product_id.display_name,
-        #     'date_planned_start' : production.date_planned_start,
-        #     'bom_name' : production.bom_id.display_name,
-        #     'state' : production.state,
-        #     'product_qty' : production.product_qty,
-        #     'production_order_type' : production.production_order_type,
-        #     'user_id' : production.user_id.name,
-        #     'origin' : production.origin,
-        #     'cur_location': None,
-        #     'stock_move_lines' : stock_move,
-        # }
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
     #确认订单
