@@ -34,21 +34,21 @@
 
                 </xpath>
 
-                <xpath expr="//notebook/page[1]" position="after">
-                    <page string="采购单信息">
-                        <field name="purchase_order_line"/>
-                    </page>
-                </xpath>
-                <xpath expr="//notebook/page[1]" position="after">
-                    <page string="销售单信息">
-                        <field name="sale_order_line"/>
-                    </page>
-                </xpath>
-                <xpath expr="//notebook/page[1]" position="after">
-                    <page string="采购单信息">
-                        <field name="order_line"/>
-                    </page>
-                </xpath>
+                <!--<xpath expr="//notebook/page[1]" position="after">-->
+                    <!--<page string="采购单信息">-->
+                        <!--<field name="purchase_order_line"/>-->
+                    <!--</page>-->
+                <!--</xpath>-->
+                <!--<xpath expr="//notebook/page[1]" position="after">-->
+                    <!--<page string="销售单信息">-->
+                        <!--<field name="sale_order_line"/>-->
+                    <!--</page>-->
+                <!--</xpath>-->
+                <!--<xpath expr="//notebook/page[1]" position="after">-->
+                    <!--<page string="采购单信息">-->
+                        <!--<field name="order_line"/>-->
+                    <!--</page>-->
+                <!--</xpath>-->
 
             </field>
         </record>
