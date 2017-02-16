@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'purchase','linkloving_account'],
+    'depends': ['base', 'purchase','linkloving_account','sale'],
 
     # always loaded
     'data': [
@@ -31,6 +31,7 @@
         'views/purchase_view.xml',
         'views/purchase_config_view.xml',
         'views/partner_view.xml',
+        'views/sale_view.xml',
         'wizard/purchase_order_wizard.xml',
         'templates.xml',
     ],
