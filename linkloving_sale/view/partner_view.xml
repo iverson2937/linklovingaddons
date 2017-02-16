@@ -47,7 +47,7 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//field[@name='mobile']" position="replace">
-                    <field name="mobile" required="1"/>
+                    <field name="mobile" required="0/>
                 </xpath>
                 <xpath expr="//field[@name='category_id']" position="before">
                     <field name="team_id" attrs="{'invisible': [('supplier','=', True)],'required':[('customer','=', True)]}"/>

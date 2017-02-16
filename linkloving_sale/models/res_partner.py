@@ -35,7 +35,7 @@ class Partner(models.Model):
     @api.model
     def create(self, vals):
         res = super(Partner, self).create(vals)
-        if res.customer and res.team_id:
+        if not res.internal_code and res.customer and res.team_id:
             code = res.team_id.code if res.team_id.code else ''
             internal_code = code + self.env['ir.sequence'].next_by_code('res.partner.customer') or '/'
             res.internal_code = internal_code
