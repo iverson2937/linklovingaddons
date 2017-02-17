@@ -46,27 +46,6 @@ class LinklovingAppApi(http.Controller):
     def get_db_list(self, **kw):
         return JsonResponse.send_response(STATUS_CODE_OK, res_data= http.db_list(), jsonRequest=False)
 
-    @http.route('/linkloving_app_api/test', type='json', auth='none', csrf=False)
-    def test(self, **kw):
-        sudo_model = request.env['product.product'].sudo()
-        product_s = sudo_model.search([], limit=1)
-        if product_s:
-            data = {
-                'theoretical_qty': product_s.qty_available,
-                'product_qty': 0,
-                'product': {
-                    'id': product_s.id,
-                    'product_name': product_s.name,
-                    'image_medium': LinklovingAppApi.get_product_image_url(product_s, model='product.product'),
-                    'product_spec': product_s.product_specs,
-                    'area': {
-                        'id': product_s.area_id.id,
-                        'name': product_s.area_id.name,
-                    }
-                }
-            }
-            return json.dumps(data)
-
     #登录
     @http.route('/linkloving_app_api/login', type='json', auth="none", csrf=False)
     def login(self, **kw):
@@ -807,3 +786,39 @@ class LinklovingAppApi(http.Controller):
         }
         return data
 
+    @http.route('/linkloving_app_api/get_group_by_list', type='json', auth='none', csrf=False)
+    def get_group_by_list(self, **kw):
+        groupby = request.jsonrequest.get('groupby')
+        model = request.jsonrequest.get('model')
+        domain = []
+        if groupby == 'state':
+            picking_type_id = request.jsonrequest.get('picking_type_id')
+            domain.append(('picking_type_id', '=', picking_type_id))
+        group_list = request.env[model].sudo().read_group(domain, fields=[groupby], groupby=[groupby])
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=group_list)
+
+    @http.route('/linkloving_app_api/get_stock_picking_list', type='json', auth='none', csrf=False)
+    def get_stock_picking_list(self, **kw):
+        limit = request.jsonrequest.get('limit')
+        offset = request.jsonrequest.get('offset')
+        picking_type_id = request.jsonrequest.get('picking_type_id')
+        state = request.jsonrequest.get("state")
+        domain = []
+        domain.append(('picking_type_id', '=', picking_type_id))
+        domain.append(('state', '=', state))
+        picking_list = request.env['stock.picking'].sudo().search(domain, limit=limit, offset=offset)
+        json_list = []
+        for picking in picking_list:
+            json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    @classmethod
+    def stock_picking_to_json(cls, stock_picking_obj):
+        data = {
+            'name': stock_picking_obj.name,
+            'parnter_id' : stock_picking_obj.name,
+            'origin' : stock_picking_obj.origin,
+            'state' : stock_picking_obj.state,
+            'min_date' : stock_picking_obj.min_date,
+        }
+        return data
