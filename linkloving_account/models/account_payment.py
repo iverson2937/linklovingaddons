@@ -215,7 +215,7 @@ class AccountPayment(models.Model):
                         sequence_code = 'account.payment.supplier.refund'
                     if rec.payment_type == 'outbound':
                         sequence_code = 'account.payment.supplier.invoice'
-                else:
+                if rec.partner_type=='employee':
                     sequence_code = 'account.payment.employee'
             rec.name = self.env['ir.sequence'].with_context(ir_sequence_date=rec.payment_date).next_by_code(
                 sequence_code)
