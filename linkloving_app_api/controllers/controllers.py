@@ -46,6 +46,27 @@ class LinklovingAppApi(http.Controller):
     def get_db_list(self, **kw):
         return JsonResponse.send_response(STATUS_CODE_OK, res_data= http.db_list(), jsonRequest=False)
 
+    @http.route('/linkloving_app_api/test', type='json', auth='none', csrf=False)
+    def test(self, **kw):
+        sudo_model = request.env['product.product'].sudo()
+        product_s = sudo_model.search([], limit=1)
+        if product_s:
+            data = {
+                'theoretical_qty': product_s.qty_available,
+                'product_qty': 0,
+                'product': {
+                    'id': product_s.id,
+                    'product_name': product_s.name,
+                    'image_medium': LinklovingAppApi.get_product_image_url(product_s, model='product.product'),
+                    'product_spec': product_s.product_specs,
+                    'area': {
+                        'id': product_s.area_id.id,
+                        'name': product_s.area_id.name,
+                    }
+                }
+            }
+            return json.dumps(data)
+
     #登录
     @http.route('/linkloving_app_api/login', type='json', auth="none", csrf=False)
     def login(self, **kw):
@@ -79,8 +100,9 @@ class LinklovingAppApi(http.Controller):
     #获取菜单列表
     @http.route('/linkloving_app_api/get_menu_list', type='http', auth="none", csrf=False)
     def get_menu_list(self, **kw):
-        request.uid = request.session.uid
-        context = request.env['ir.http'].webclient_rendering_context()
+        if request.session.uid:
+            request.uid = request.session.uid
+        context = request.env['ir.http'].sudo().webclient_rendering_context()
         menu_data = context.get('menu_data').get('children')
         for menu in menu_data:
             menu['user_id'] = request.uid
@@ -125,26 +147,6 @@ class LinklovingAppApi(http.Controller):
     def get_order_detail(self, **kw):
         order_id = request.jsonrequest.get('order_id')
         mrp_production = request.env['mrp.production'].sudo()
-        production = mrp_production.search([('id','=',order_id)], limit=1)
-
-        # stock_move = request.env['sim.stock.move'].sudo().search_read([('id', 'in', production.sim_stock_move_lines.ids)], fields=['product_id', 'over_picking_qty', 'qty_available', 'quantitty_available', 'quantity_done', 'return_qty','virtual_available', 'quantity_ready', 'product_uom_qty', 'suggest_qty'])
-        # for l in stock_move:
-        #     # dic = LinklovingAppApi.search(request,'product.product',[('id','=',l['product_id'][0])], ['display_name'])
-        #     l['product_id'] = request.env['product.product'].sudo().search([('id','=',l['product_id'][0])]).display_name
-        # data = {
-        #     'order_id' : production.id,
-        #     'display_name' : production.display_name,
-        #     'product_name' : production.product_id.display_name,
-        #     'date_planned_start' : production.date_planned_start,
-        #     'bom_name' : production.bom_id.display_name,
-        #     'state' : production.state,
-        #     'product_qty' : production.product_qty,
-        #     'production_order_type' : production.production_order_type,
-        #     'user_id' : production.user_id.name,
-        #     'origin' : production.origin,
-        #     'cur_location': None,
-        #     'stock_move_lines' : stock_move,
-        # }
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
     #确认订单
@@ -530,7 +532,8 @@ class LinklovingAppApi(http.Controller):
                 'product' : {
                     'id' : product_s.id,
                     'product_name' : product_s.name,
-                    'image_medium' : LinklovingAppApi.get_product_image_url(product_s),
+                    'image_medium' : LinklovingAppApi.get_product_image_url(product_s, model='product.product'),
+                    'product_spec' : product_s.product_specs,
                     'area' : {
                         'id' : product_s.area_id.id,
                         'name' : product_s.area_id.name,
@@ -587,9 +590,13 @@ class LinklovingAppApi(http.Controller):
             product_obj = LinklovingAppApi.get_model_by_id(line['product']['id'],request,'product.product')
             line['product_uom_id'] = product_obj.uom_id.id
             product_obj.area_id = line['product']['area']['id']
-            image_str = line['product']['image_medium']
-            if image_str:
-                product_obj.product_tmpl_id.image_medium = image_str
+            if line['product'].get('image_medium'):
+                image_str = line['product'].get('image_medium')
+                print 'image_str:%s' % image_str[0:16]
+                try:
+                    product_obj.product_tmpl_id.image_medium = image_str
+                except Exception, e:
+                    print "exception catch %s" % image_str[0:16]
             location_id = request.env.ref('stock.stock_location_stock', raise_if_not_found=False).id
 
             new_line = {
@@ -622,7 +629,7 @@ class LinklovingAppApi(http.Controller):
                 c = {
                     'id' :  line['product_id'][0] ,
                     'product_name' :  line['product_id'][1],
-                    'image_medium' : request.env['product.product'].sudo().browse(line['product_id'][0])[0],
+                    'image_medium' : LinklovingAppApi.get_product_image_url(request.env['product.product'].sudo().browse(line['product_id'][0])[0], model='product.product'),
                     'area' : {
                     'id': area.id,
                     'area_name': area.name
@@ -648,10 +655,12 @@ class LinklovingAppApi(http.Controller):
         return data
 
     @classmethod
-    def get_product_image_url(cls, product_product):
+    def get_product_image_url(cls, product_product, model):
         DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
-        url = request.httprequest.host_url  \
-              + 'linkloving_app_api/get_product_image?product_id='+str(product_product.product_tmpl_id.id)
+        if model == 'product.template':
+            url = '%slinkloving_app_api/get_product_image?product_id=%s&model=%s' % (request.httprequest.host_url, str(product_product.id), model)
+        else:
+            url = '%slinkloving_app_api/get_product_image?product_id=%s&model=%s' % (request.httprequest.host_url, str(product_product.product_tmpl_id.id), model)
         if not url:
             return ''
         return url
@@ -661,7 +670,6 @@ class LinklovingAppApi(http.Controller):
     def get_product_image(self, **kw):
         DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
         product_id =kw.get('product_id')
-
         status, headers, content = request.registry['ir.http'].binary_content(xmlid=None, model='product.template', id=product_id, field='image_medium', unique=time.strftime(DEFAULT_SERVER_DATE_FORMAT, time.localtime()),
                                                                                                                                                   default_mimetype='image/png',
                                                                                                                                                   env=request.env(user=SUPERUSER_ID))
@@ -701,3 +709,101 @@ class LinklovingAppApi(http.Controller):
         dictheaders = dict(headers)
         dictheaders['Content-Type'] = contenttype
         return dictheaders.items()
+
+
+
+#产品模块
+#根据条件查找产品
+    @http.route('/linkloving_app_api/get_product_list', type='json', auth='none', csrf=False)
+    def get_product_list(self, **kw):
+        condition_dic = request.jsonrequest.get('condition')
+        limit = request.jsonrequest.get('limit')
+        offset = request.jsonrequest.get('offset')
+        product_type = request.jsonrequest.get('product_type')
+        def convert_product_type(type):
+            if type == 'all':
+                return
+            elif type == 'purchase':
+                return ('purchase_ok', '=', True)
+            elif type == 'sale':
+                return ('sale_ok', '=', True)
+            elif type == 'expensed':
+                return ('can_be_expensed', '=', True)
+            else:
+                return
+
+        domain = []
+        if condition_dic:
+            for key in condition_dic.keys():
+                if condition_dic[key] != '' or not condition_dic[key]:
+                    domain.append((key, 'ilike', condition_dic[key]))
+
+        product_json_list = []
+        if product_type == 'all':
+            list = request.env['product.template'].sudo().search(domain, limit=limit, offset=offset)
+            for product in list:
+                product_json_list.append(LinklovingAppApi.product_template_obj_to_json(product))
+
+
+        else:
+            domain.append(convert_product_type(product_type))
+            list = request.env['product.template'].sudo().search(domain, limit=limit, offset=offset)
+            for product in list:
+                product_json_list.append(LinklovingAppApi.product_template_obj_to_json(product))
+
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=product_json_list)
+
+
+    @http.route('/linkloving_app_api/get_stock_moves_by_product_id', type='json', auth='none', csrf=False)
+    def get_stock_moves_by_product_id(self, **kw):
+        product_id = request.jsonrequest.get('product_id')
+        limit = request.jsonrequest.get('limit')
+        offset = request.jsonrequest.get('offset')
+        if not limit:
+            limit = 80
+        if not offset:
+            offset = 0
+        stock_moves = request.env['stock.move'].sudo().search([('product_tmpl_id', '=', product_id)], limit=limit, offset=offset)
+        stock_move_json_list = []
+        for stock_move in stock_moves:
+            stock_move_json_list.append(LinklovingAppApi.stock_move_obj_to_json(stock_move))
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=stock_move_json_list)
+
+
+    @classmethod
+    def stock_move_obj_to_json(cls, stock_move):
+        data = {
+            'name' : stock_move.name,
+            'product_id' : {
+                'product_name' : stock_move.product_tmpl_id.display_name,
+                'id' :stock_move.product_tmpl_id.id,
+            },
+            'product_uom_qty' : stock_move.product_uom_qty,
+            'state' : stock_move.state,
+            'location': stock_move.location_id.display_name,
+            'location_dest' : stock_move.location_dest_id.display_name,
+        }
+        return data
+    @classmethod
+    def product_template_obj_to_json(cls, product_tmpl):
+        data = {
+            'product_id': product_tmpl.id,
+            'default_code': product_tmpl.default_code,
+            'product_name' : product_tmpl.name,
+            'type': product_tmpl.type,
+            'inner_code': product_tmpl.inner_code,
+            'inner_spec': product_tmpl.inner_spec,
+            'area_id': {
+                'name': product_tmpl.area_id.name,
+                'id': product_tmpl.area_id.id
+            },
+            'product_specs': product_tmpl.product_specs,
+            'image_medium' : LinklovingAppApi.get_product_image_url(product_tmpl, model='product.template'),
+            'qty_available' : product_tmpl.qty_available,
+            'virtual_available' : product_tmpl.virtual_available,
+            'categ_id' : product_tmpl.categ_id.name,
+        }
+        return data
+

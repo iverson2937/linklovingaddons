@@ -24,13 +24,12 @@
 
     # always loaded
     'data': [
+        'security/mrp_groups.xml',
         'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
         'report/mrp_bom_structure_report_templates.xml',
         'report/mrp_production_templates.xml',
-        'security/mrp_groups.xml',
-
     ],
     # only loaded in demonstration mode
     'demo': [
