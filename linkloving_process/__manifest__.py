@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','mrp'],
+    'depends': ['base', 'mrp'],
 
     # always loaded
     'data': [
@@ -28,6 +28,7 @@
         'views/views.xml',
         'views/mrp_process.xml',
         'views/mrp_bom.xml',
+        'views/mrp_production.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

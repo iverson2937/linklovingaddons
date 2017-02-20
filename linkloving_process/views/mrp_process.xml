@@ -19,6 +19,7 @@
                     <sheet>
                         <group>
                             <field name="name"/>
+                            <field name="unit_price"/>
                             <field name="description"/>
                             <field name="partner_id"/>
                         </group>

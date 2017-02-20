@@ -8,7 +8,7 @@
                 <xpath expr="//field[@name='product_tmpl_id']" position="after">
                     <field name="process_id" options="{'no_create':True}" string="工序"/>
                     <field name="mo_type" widget="radio" string="计价类型"/>
-                    <field name="unit_price" attrs="{'invisible':[('mo_type', '==', 'time')]}"/>
+                    <!--<field name="unit_price" attrs="{'invisible':[('mo_type', '==', 'time')]}"/>-->
                 </xpath>
             </field>
         </record>
