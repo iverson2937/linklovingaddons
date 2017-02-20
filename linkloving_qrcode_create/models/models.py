@@ -109,10 +109,10 @@ class ProductTemplateExtend(models.Model):
         # draw.text(xy=(start_x, l3), text=u'规格:', font=font, fill='black')
         draw.text(xy=(start_x, l4), text=u'位置:', font=font, fill='black')
 
-        draw.text(xy=(line_start_x, l1), text=product_tmpl.default_code, font=font, fill='black')
+        draw.text(xy=(line_start_x, l1), text=product_tmpl.default_code or '', font=font, fill='black')
 
         ProductTemplateExtend.auto_spilt_lines(draw,
-                                               product_tmpl.name,
+                                               product_tmpl.name or '',
                                                line_start_x,
                                                l2,
                                                font_size,
