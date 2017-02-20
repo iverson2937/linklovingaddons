@@ -786,6 +786,7 @@ class LinklovingAppApi(http.Controller):
         }
         return data
 
+#产品出入库部分
     @http.route('/linkloving_app_api/get_group_by_list', type='json', auth='none', csrf=False)
     def get_group_by_list(self, **kw):
         groupby = request.jsonrequest.get('groupby')
@@ -812,6 +813,32 @@ class LinklovingAppApi(http.Controller):
             json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
 
+    @http.route('/linkloving_app_api/change_stock_picking_state', type='json', auth='none', csrf=False)
+    def change_stock_picking_state(self, **kw):
+        state = request.jsonrequest.get('state')  # 状态
+        picking_id = request.jsonrequest.get('picking_id')  # 订单id
+
+        picking_obj = request.env['stock.picking'].sudo().search([('id', '=', picking_id)])
+        if state == 'confirm':#确认 标记为代办
+            pass
+        elif state == 'post':#提交
+            pass
+        elif state == 'cancel':#取消
+            pass
+        elif state == 'qc_ok':#品检完成
+            pass
+        elif state == 'qc_failed':#品检失败
+            pass
+        elif state == 'reject':#退回
+            pass
+        elif state == 'process':#创建欠单
+            pass
+        elif state == 'cancel_backorder':#取消欠单\
+            pass
+
+
+
+
     @classmethod
     def stock_picking_to_json(cls, stock_picking_obj):
         data = {
@@ -822,3 +849,4 @@ class LinklovingAppApi(http.Controller):
             'min_date' : stock_picking_obj.min_date,
         }
         return data
+

@@ -603,11 +603,23 @@ class LLWorkerLine(models.Model):
 
     worker_id = fields.Many2one('hr.employee')
     production_id = fields.Many2one('mrp.production', u'生产单')
-    join_time = fields.Datetime(default=fields.datetime.now())
+    unit_price = fields.Float(related='production_id.unit_price', string=u'单价')
     line_state = fields.Selection(
         [
             ('online',u'正常'),
             ('offline', u'请假'),
     ('outline', u'已退出'),
     ], default='online')
+
+class LLWorkerTimeLine(models.Model):
+    _name = 'worker.time.line'
+
+    start_time = fields.Datetime(default=fields.datetime.now())
+    end_time = fields.Datetime()
+    worker_id = fields.Many2one('hr.employee')
+    xishu = fields.Float(default=1.0)
+    production_id = fields.Many2one('mrp.production', string=u'生产单')
+    amount_of_money = fields.Float(default=0)
+
+
 
