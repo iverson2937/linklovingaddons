@@ -1,0 +1,60 @@
+<openerp>
+  <data>
+        <record id="ll_product_template_only_form_view" model="ir.ui.view">
+        <field name="name">product.template.product.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <!--<xpath expr="//field[@name='type']" position="after">-->
+                <!--<field name="qrcode_img" />-->
+            <!--</xpath>-->
+            <div name="button_box" position="inside">
+                        <button string="二维码下载" type="object" name="get_product_qrcode" class="oe_stat_button" icon="fa-qrcode">
+                            <!--<field name="qrcode_img"/>-->
+                        </button>
+            </div>
+        </field>
+    </record>
+
+        <record id="account_multi_create_qrcode_form_view" model="ir.ui.view">
+            <field name="name">multi.create.qrcode.form</field>
+            <field name="model">multi.create.qrcode</field>
+            <field name="arch" type="xml">
+                <form string="Confirm Draft Invoices">
+                    <p class="oe_grey">
+                        确定批量生成选定的产品的二维码？
+                    </p>
+                    <footer>
+                        <button string="确定生成" name="action_create_qrcode" type="object" default_focus="1"
+                                class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+        <act_window id="action_multi_create_qrcode"
+                    multi="True"
+                    key2="client_action_multi" name="批量生成二维码"
+                    res_model="multi.create.qrcode" src_model="product.template"
+                    view_mode="form" target="new" view_type="form"/>
+
+    <!-- Top menu item -->
+    <!--
+    <menuitem name="linkloving_qrcode_create" id="linkloving_qrcode_create.menu_root"/>
+    -->
+    <!-- menu categories -->
+    <!--
+    <menuitem name="Menu 1" id="linkloving_qrcode_create.menu_1" parent="linkloving_qrcode_create.menu_root"/>
+    <menuitem name="Menu 2" id="linkloving_qrcode_create.menu_2" parent="linkloving_qrcode_create.menu_root"/>
+    -->
+    <!-- actions -->
+    <!--
+    <menuitem name="List" id="linkloving_qrcode_create.menu_1_list" parent="linkloving_qrcode_create.menu_1"
+              action="linkloving_qrcode_create.action_window"/>
+    <menuitem name="Server to list" id="linkloving_qrcode_create" parent="linkloving_qrcode_create.menu_2"
+              action="linkloving_qrcode_create.action_server"/>
+    -->
+  </data>
+</openerp>
