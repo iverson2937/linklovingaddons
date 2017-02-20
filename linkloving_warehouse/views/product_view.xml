@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-                <!-- INHERITED TREE -->
+        <!-- INHERITED TREE -->
         <record id="view_product_template_tree" model="ir.ui.view">
             <field name="name">product.template.tree.inherit</field>
             <field name="model">product.template</field>
@@ -19,24 +19,35 @@
             <field name="inherit_id" ref="product.product_normal_form_view"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='barcode']" position="before">
-                    <field name="area_id"/>
+                    <label for="street" string="库存位置"/>
+                    <div class="o_address_format">
+                        <field name="area_id" class="o_address_city"/>
+                        <field name="location_x" class="o_address_state"/>
+                        <field name="location_y" class="o_address_state"/>
+                    </div>
+
                 </xpath>
-                  <xpath expr="//field[@name='barcode']" position="after">
-                      <field name="product_specs" string="产品规格"/>
+                <xpath expr="//field[@name='barcode']" position="after">
+                    <field name="product_specs" string="产品规格"/>
                 </xpath>
 
             </field>
         </record>
 
 
-
-      <record id="view_product_template_form_linkloving" model="ir.ui.view">
+        <record id="view_product_template_form_linkloving" model="ir.ui.view">
             <field name="name">product.template.form</field>
             <field name="model">product.template</field>
             <field name="inherit_id" ref="product.product_template_only_form_view"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='barcode']" position="before">
-                    <field name="area_id" options="{'no_create':True}" string="库存位置"/>
+                    <label for="street" string="库存位置"/>
+                    <div class="o_address_format">
+                        <field name="area_id" class="o_address_city"/>
+                        <field name="location_x" class="o_address_state"/>
+                        <field name="location_y" class="o_address_state"/>
+                    </div>
+
                 </xpath>
                 <xpath expr="//field[@name='barcode']" position="after">
                     <field name="product_specs" string="产品规格"/>

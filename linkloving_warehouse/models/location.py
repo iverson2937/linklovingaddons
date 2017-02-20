@@ -34,5 +34,8 @@ class StockLocation(models.Model):
     _name = 'stock.location.area'
     name = fields.Char(string="Name")
     description = fields.Text(string='Description')
+    _sql_constraints = [
+        ('name_uniq', 'unique (default_code)', u'名字已存在!'),
+    ]
 
 
