@@ -603,7 +603,7 @@ class LLWorkerLine(models.Model):
 
     worker_id = fields.Many2one('hr.employee')
     production_id = fields.Many2one('mrp.production', u'生产单')
-    unit_price = fields.Float(related='production_id.unit_price', string=u'单价')
+    # unit_price = fields.Float(related='production_id.unit_price', string=u'单价')
     line_state = fields.Selection(
         [
             ('online',u'正常'),
