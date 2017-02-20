@@ -1,0 +1,44 @@
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="mrp_process_tree">
+            <field name="name">mrp.process.tree</field>
+            <field name="model">mrp.process</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="mrp_process_form">
+            <field name="name">mrp.process.form</field>
+            <field name="model">mrp.process</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="description"/>
+                            <field name="partner_id"/>
+                        </group>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="action_mrp_process" model="ir.actions.act_window">
+            <field name="name">mrp.process</field>
+            <field name="res_model">mrp.process</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_process_config" name="工序" parent="mrp.menu_mrp_configuration" sequence="30"
+                  action="action_mrp_process"/>
+
+
+    </data>
+</odoo>
