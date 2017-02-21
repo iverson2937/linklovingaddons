@@ -26,6 +26,19 @@ from odoo import api
 from odoo import fields, models, _
 
 
+class ProductProduct(models.Model):
+    _inherit = 'product.product'
+    area_id = fields.Many2one('stock.location.area', string='Area')
+    location_x = fields.Char()
+    location_y = fields.Char()
+
+    product_specs = fields.Text(string=u'产品规格', related='product_tmpl_id.product_specs')
+    _sql_constraints = [
+        ('default_code_uniq', 'unique (default_code)', u'内部参考号已存在!'),
+        # ('name_uniq', 'unique (name)', u'产品名称已存在!')
+    ]
+
+
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
@@ -37,18 +50,5 @@ class ProductTemplate(models.Model):
     name = fields.Char('Name', index=True, required=True, translate=False)
     _sql_constraints = [
         ('default_code_uniq1', 'unique (default_code)', u'内部参考号已存在!'),
-        # ('name_uniq', 'unique (name)', u'产品名称已存在!')
-    ]
-
-
-class ProductProduct(models.Model):
-    _inherit = 'product.product'
-    area_id = fields.Many2one('stock.location.area', string='Area')
-    location_x = fields.Char()
-    location_y = fields.Char()
-
-    product_specs = fields.Text(string=u'产品规格', related='product_tmpl_id.product_specs')
-    _sql_constraints = [
-        ('default_code_uniq', 'unique (default_code)', u'内部参考号已存在!'),
         # ('name_uniq', 'unique (name)', u'产品名称已存在!')
     ]
