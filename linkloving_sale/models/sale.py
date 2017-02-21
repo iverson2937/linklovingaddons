@@ -15,6 +15,13 @@ class SaleOrder(models.Model):
     tax_id = fields.Many2one('account.tax', required=True)
     product_count = fields.Float(compute='get_product_count')
     pi_number = fields.Char(string='PI Number')
+    is_emergency = fields.Boolean(string=u'是否加急')
+
+    @api.onchange('is_emergency')
+    def onchange_is_emergency(self):
+        print 'ddddddddddddddddddd'
+        for picking_id in self.picking_ids:
+            picking_id.write({'is_emergency': self.is_emergency})
 
     def get_product_count(self):
         count = 0.0
