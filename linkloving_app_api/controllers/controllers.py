@@ -170,10 +170,15 @@ class LinklovingAppApi(http.Controller):
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error":u"找不到此员工"})
         else:
+            if worker.now_mo_id:#是否正在另一条产线，就退出那一条
+                working_now = request.env['worker.line'].sudo().search([('id', '=', worker.id),('production_id', '=', worker.now_mo_id)])
+                working_now.change_worker_state('outline')
             worker_line = request.env['worker.line'].sudo().create({
                 'production_id' : order_id,
                 'worker_id' : worker.id
             })
+            worker.now_mo_id = order_id
+            worker_line.create_time_line()
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=self.get_worker_line_dict(worker_line))
 
@@ -184,15 +189,37 @@ class LinklovingAppApi(http.Controller):
                 'id': obj.worker_id.id,
                 'name': obj.worker_id.name
             },
-            'join_time': obj.join_time,
+            'worker_time_line_ids':{
+                'start_time' : obj.worker_time_line_ids.start_time,
+                'end_time': obj.worker_time_line_ids.end_time,
+                'state' : obj.worker_time_line_ids.state,
+            },
             'line_state': obj.line_state,
+            'unit_price' : obj.unit_price,
+            'xishu' : obj.xishu,
+            'amount_of_money' : obj.amount_of_money,
+
         }
     #修改工人状态
     @http.route('/linkloving_app_api/change_worker_state', type='json', auth='none', csrf=False)
     def change_worker_state(self, **kw):
-        # worker_line_id =
+        is_all_pending = request.jsonrequest.get('is_all_pending')
+        worker_line_id = request.jsonrequest.get('worker_line_id')
         new_state = request.jsonrequest.get('state')
 
+        if is_all_pending:#如果是批量暂停
+            worker_lines = request.env['worker.line'].sudo().search(['id', 'in', worker_line_id])
+            worker_lines.change_worker_state(new_state)
+            json_list = []
+            for line in worker_lines:
+                json_list.append(self.get_worker_line_dict(line))
+            return JsonResponse.send_response(STATUS_CODE_OK,
+                                              res_data=json_list)
+
+        worker_line = request.env['worker.line'].sudo().search(['id', '=', worker_line_id])
+        worker_line.change_worker_state(new_state)
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=self.get_worker_line_dict(worker_line))
 
     #取消订单
     @http.route('/linkloving_app_api/cancel_order', type='json', auth='none', csrf=False)
@@ -836,9 +863,6 @@ class LinklovingAppApi(http.Controller):
         elif state == 'cancel_backorder':#取消欠单\
             pass
 
-
-
-
     @classmethod
     def stock_picking_to_json(cls, stock_picking_obj):
         data = {
@@ -850,3 +874,25 @@ class LinklovingAppApi(http.Controller):
         }
         return data
 
+#搜索供应商
+    @http.route('/linkloving_app_api/search_supplier', type='json', auth='none', csrf=False)
+    def search_supplier(self, **kw):
+        name = request.jsonrequest.get('name')
+        partner_type = request.jsonrequest.get('type') # supplier or customer
+        domain = []
+        if name:
+            domain.append(('name', 'ilkie', name))
+        if partner_type:
+            domain.append((partner_type, '=', True))
+        lists = request.env['res.partner'].sudo().search(domain)
+
+    @classmethod
+    def res_partner_to_json(cls, res_partner):
+        data = {
+            'name' : res_partner.name,
+            'phone' : res_partner.phone,
+            'comment' : res_partner.comment,
+            'x_qq' : res_partner.x_qq,
+
+        }
+        return data

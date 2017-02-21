@@ -206,6 +206,8 @@ class MrpProductionExtend(models.Model):
         if not self.check_to_done and self.production_order_type == 'ordering':
             raise UserError(u'此生产单为订单制，需要产成所有数量的产品才能送往品检！')
         else:
+            #生产完成 结算工时
+            self.worker_line_ids.change_worker_state('outline')
             self.write({'state': 'waiting_quality_inspection'})
 
 
@@ -596,30 +598,79 @@ class HrEmployeeExtend(models.Model):
     _inherit = 'hr.employee'
 
     is_worker = fields.Boolean(u'是否是工人', default=False)
+    now_mo_id =fields.Many2one('mrp.production')
 
 #每个工人所处在的生产线
 class LLWorkerLine(models.Model):
     _name = 'worker.line'
 
+    def _compute_amount_of_money(self):
+        self.amount_of_money = self.unit_price * self.xishu
+
+    def _compute_line_state(self):
+        if self.worker_time_line_ids:
+            worker_time_line_ids_sorted = sorted(self.worker_time_line_ids, key=lambda d: d.start_time)
+            self.line_state = worker_time_line_ids_sorted[0].state
+        else:
+            self.line_state = 'online'
+
+
     worker_id = fields.Many2one('hr.employee')
     production_id = fields.Many2one('mrp.production', u'生产单')
-    # unit_price = fields.Float(related='production_id.unit_price', string=u'单价')
+    unit_price = fields.Float(related='production_id.unit_price', string=u'单价')
+    mo_type = fields.Selection(related='production_id.mo_type', string=u'mo类型')
+    xishu = fields.Float(default=1.0)
+    amount_of_money = fields.Float(compute=_compute_amount_of_money)
+    worker_time_line_ids = fields.One2many('worker.time.line', 'worker_line_id')
     line_state = fields.Selection(
         [
             ('online',u'正常'),
             ('offline', u'请假'),
-    ('outline', u'已退出'),
-    ], default='online')
+        ('outline', u'已退出'),
+        ], default='online', compute=_compute_line_state)
+
+    def create_time_line(self):
+         self.env['worker.time.line'].create({
+                'worker_line_id' : self.id,
+            })
+
+    def get_newest_time_line(self):
+        worker_time_line_ids_sorted = sorted(self.worker_time_line_ids, key=lambda d: d.start_time)
+        return worker_time_line_ids_sorted[0]
+
+    @api.multi
+    def change_worker_state(self, state):
+        for line in self:
+            if not line.worker_time_line_ids:
+                return False
+            else:
+                new_time_line = line.get_newest_time_line()
+                if new_time_line.state != state:#若状态改变
+                    new_time_line.offline_set_time()
+                    self.env['worker.time.line'].create({
+                    'worker_line_id' : line.id,
+                        'state' : state,
+                    })
+
+            return True
+
+
 
 class LLWorkerTimeLine(models.Model):
     _name = 'worker.time.line'
 
     start_time = fields.Datetime(default=fields.datetime.now())
     end_time = fields.Datetime()
-    worker_id = fields.Many2one('hr.employee')
-    xishu = fields.Float(default=1.0)
-    production_id = fields.Many2one('mrp.production', string=u'生产单')
-    amount_of_money = fields.Float(default=0)
+    state = fields.Selection(
+        [
+            ('online',u'正常'),
+            ('offline', u'请假'),
+        ('outline', u'已退出'),
+        ], default='online')
 
+    worker_line_id = fields.Many2one('worker.line')
+    worker_id = fields.Many2one(related='worker_line_id.worker_id')
+    production_id = fields.Many2one(related='worker_line_id.production_id', string=u'生产单')
 
-
+    def offline_set_time(self):
+        self.end_time = fields.datetime.now()
