@@ -22,8 +22,8 @@
                     <label for="street" string="库存位置"/>
                     <div class="o_address_format">
                         <field name="area_id" class="o_address_city"/>
-                        <field name="location_x" class="o_address_state"/>
-                        <field name="location_y" class="o_address_state"/>
+                        <field name="location_x" class="o_address_state" placeholder=""/>
+                        <field name="location_y" class="o_address_state" placeholder=""/>
                     </div>
 
                 </xpath>
