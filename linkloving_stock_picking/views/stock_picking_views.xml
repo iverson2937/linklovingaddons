@@ -13,10 +13,15 @@
                 </xpath>
 
 
-
                 <xpath expr="//button[@name='do_new_transfer']" position="replace">
                     <button name="do_new_transfer" string="出库调拨"
+                            attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['post'])]}"
+                            groups="sales_team.group_sale_salesman" type="object" class="oe_highlight"/>
+                    <button name="start_prepare_stock" string="开始备货"
                             attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['assigned'])]}"
+                            groups="stock.group_stock_user" type="object" class="oe_highlight"/>
+                    <button name="stock_ready" string="备货完成"
+                            attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['prepare'])]}"
                             groups="stock.group_stock_user" type="object" class="oe_highlight"/>
 
                     <button name="do_new_transfer" string="入库调拨"
@@ -34,25 +39,25 @@
 
                 </xpath>
 
-                  <xpath expr="//field[@name='location_id']" position="after">
-                   <field name="tracking_number" string="快递单号"/>
+                <xpath expr="//field[@name='location_id']" position="after">
+                    <field name="tracking_number" string="快递单号"/>
 
                 </xpath>
 
                 <!--<xpath expr="//notebook/page[1]" position="after">-->
-                    <!--<page string="采购单信息">-->
-                        <!--<field name="purchase_order_line"/>-->
-                    <!--</page>-->
+                <!--<page string="采购单信息">-->
+                <!--<field name="purchase_order_line"/>-->
+                <!--</page>-->
                 <!--</xpath>-->
                 <!--<xpath expr="//notebook/page[1]" position="after">-->
-                    <!--<page string="销售单信息">-->
-                        <!--<field name="sale_order_line"/>-->
-                    <!--</page>-->
+                <!--<page string="销售单信息">-->
+                <!--<field name="sale_order_line"/>-->
+                <!--</page>-->
                 <!--</xpath>-->
                 <!--<xpath expr="//notebook/page[1]" position="after">-->
-                    <!--<page string="采购单信息">-->
-                        <!--<field name="order_line"/>-->
-                    <!--</page>-->
+                <!--<page string="采购单信息">-->
+                <!--<field name="order_line"/>-->
+                <!--</page>-->
                 <!--</xpath>-->
 
             </field>
@@ -93,21 +98,22 @@
             <field name="view_mode">tree,kanban,form,calendar</field>
             <field name="domain"></field>
             <field name="context">{
-                    'contact_display': 'partner_address',
-                    'search_default_picking_state' : 1,
-                    'search_default_picking_type' : 1,
-            }
+                'contact_display': 'partner_address',
+                'search_default_picking_state' : 1,
+                'search_default_picking_type' : 1,
+                }
             </field>
             <field name="search_view_id" ref="view_picking_internal_search_inherit"/>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click here to create a new transfer.
-              </p><p>
-                You can either do it immediately or mark it as Todo for future processing. Use your scanner to validate the transferred quantity quicker.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click here to create a new transfer.
+                </p>
+                <p>
+                    You can either do it immediately or mark it as Todo for future processing. Use your scanner to
+                    validate the transferred quantity quicker.
+                </p>
             </field>
         </record>
-
 
 
         <record model="ir.ui.view" id="view_picking_internal_search_inherit">
@@ -116,10 +122,10 @@
             <field name="inherit_id" ref="stock.view_picking_internal_search"/>
             <field name="arch" type="xml">
                 <xpath expr="//group/filter[1]" position="replace">
-            </xpath>
-            <xpath expr="//filter[@name='picking_type']" position="after">
-                <filter name="picking_state" string="Status" domain="[]" context="{'group_by':'state'}"/>
-            </xpath>
+                </xpath>
+                <xpath expr="//filter[@name='picking_type']" position="after">
+                    <filter name="picking_state" string="Status" domain="[]" context="{'group_by':'state'}"/>
+                </xpath>
                 <xpath expr="//field[@name='partner_id']" position="after">
                     <field name="origin"/>
                 </xpath>
