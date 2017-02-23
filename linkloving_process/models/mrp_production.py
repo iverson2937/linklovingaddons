@@ -12,6 +12,7 @@ class MrpProduction(models.Model):
         ('time', u'计时计价'),
     ], default='unit')
     hour_price = fields.Float(string=u'时薪')
+    in_charge_id = fields.Many2one('res.partner')
 
     @api.onchange('bom_id')
     def on_change_bom_id(self):
@@ -19,3 +20,4 @@ class MrpProduction(models.Model):
         self.unit_price = self.process_id.unit_price
         self.mo_type = self.bom_id.mo_type
         self.hour_price = self.bom_id.hour_price
+        self.in_charge_id = self.process_id.partner_id
