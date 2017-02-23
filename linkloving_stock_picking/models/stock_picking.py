@@ -33,7 +33,7 @@ class StockPicking(models.Model):
         ('post', u'备货完成'),
         ('qc_check', u'品检'),
         ('validate', u'待采购确认'),
-        ('waiting_in',u'待入库'),
+        ('waiting_in', u'待入库'),
         ('waiting_out', u'待出库'),
         ('done', 'Done'),
     ], string='Status', compute='_compute_state',
@@ -79,13 +79,14 @@ class StockPicking(models.Model):
         """ Returns the domain to filter records that require an action
             :return: domain or False is no action
         """
-        if self.picking_type_code == 'incoming':
+        if self._context.get('picking_type_code') == 'incoming':
 
             return [('state', '=', 'validate'), ('create_uid', '=', self.env.user.id)]
-        else:
+        elif self._context.get('picking_type_code') == 'outgoing':
             return [('state', '=', 'post'), ('create_uid', '=', self.env.user.id)]
 
-    @api.depends('move_type', 'launch_pack_operations', 'move_lines.state', 'move_lines.picking_id', 'move_lines.partially_available')
+    @api.depends('move_type', 'launch_pack_operations', 'move_lines.state', 'move_lines.picking_id',
+                 'move_lines.partially_available')
     @api.one
     def _compute_state(self):
         ''' State of a picking depends on the state of its related stock.move
@@ -110,16 +111,17 @@ class StockPicking(models.Model):
             if self.picking_type_code == 'incoming':
                 self.state = 'waiting_in'
             else:
-                self.state='waiting_out'
+                self.state = 'waiting_out'
         else:
             # We sort our moves by importance of state: "confirmed" should be first, then we'll have
             # "waiting" and finally "assigned" at the end.
-            moves_todo = self.move_lines\
-                .filtered(lambda move: move.state not in ['cancel', 'done'])\
+            moves_todo = self.move_lines \
+                .filtered(lambda move: move.state not in ['cancel', 'done']) \
                 .sorted(key=lambda move: (move.state == 'assigned' and 2) or (move.state == 'waiting' and 1) or 0)
             if self.move_type == 'one':
                 self.state = moves_todo[0].state
-            elif moves_todo[0].state != 'assigned' and any(x.partially_available or x.state == 'assigned' for x in moves_todo):
+            elif moves_todo[0].state != 'assigned' and any(
+                            x.partially_available or x.state == 'assigned' for x in moves_todo):
                 self.state = 'partially_available'
             else:
                 self.state = moves_todo[-1].state
