@@ -9,6 +9,7 @@ class MrpProduction(models.Model):
     _inherit = 'mrp.bom'
     process_id = fields.Many2one('mrp.process')
     unit_price = fields.Float()
+
     mo_type = fields.Selection([
         ('unit', u'计件计价'),
         ('time', u'计时计价'),

@@ -11,10 +11,11 @@ class MrpProduction(models.Model):
         ('unit', u'计件计价'),
         ('time', u'计时计价'),
     ], default='unit')
+    hour_price = fields.Float(string=u'时薪')
 
     @api.onchange('bom_id')
     def on_change_bom_id(self):
         self.process_id = self.bom_id.process_id
-        if self.mo_type == 'unit':
-            self.unit_price = self.process_id.unit_price
+        self.unit_price = self.process_id.unit_price
         self.mo_type = self.bom_id.mo_type
+        self.hour_price = self.bom_id.hour_price

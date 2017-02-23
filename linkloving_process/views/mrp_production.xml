@@ -11,6 +11,7 @@
                     <field name="process_id" options="{'no_create':True}" string="工序"/>
                     <field name="mo_type" widget="radio" string="计价类型"/>
                     <field name="unit_price" attrs="{'invisible':[('mo_type', '==', 'time')],'readonly':[('state', '!=', 'confirmed')]}" string="单价"/>
+                    <field name="hour_price" attrs="{'invisible':[('mo_type', '==', 'unit')],'readonly':[('state', '!=', 'confirmed')]}" string="时薪"/>
                 </xpath>
             </field>
         </record>
