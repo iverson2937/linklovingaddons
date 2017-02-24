@@ -431,7 +431,7 @@ msgstr "等待品检的订单"
 #: model:ir.actions.act_window,name:linkloving_mrp_extend.mrp_waiting_inventory_material
 #: model:ir.ui.menu,name:linkloving_mrp_extend.menu_mrp_waiting_inventory_material
 msgid "Waiting Inventory Orders"
-msgstr "等待清点物料的订单"
+msgstr "等待清点退料的订单"
 
 #. module: linkloving_mrp_extend
 #: model:ir.actions.act_window,name:linkloving_mrp_extend.mrp_waiting_material

@@ -3,6 +3,8 @@
 from odoo import fields, models, api, _, SUPERUSER_ID
 from itertools import groupby
 
+from odoo.tools import float_compare
+
 
 class SaleOrder(models.Model):
     """
@@ -13,6 +15,13 @@ class SaleOrder(models.Model):
     tax_id = fields.Many2one('account.tax', required=True)
     product_count = fields.Float(compute='get_product_count')
     pi_number = fields.Char(string='PI Number')
+    is_emergency = fields.Boolean(string=u'是否加急')
+
+    @api.onchange('is_emergency')
+    def onchange_is_emergency(self):
+        print 'ddddddddddddddddddd'
+        for picking_id in self.picking_ids:
+            picking_id.write({'is_emergency': self.is_emergency})
 
     def get_product_count(self):
         count = 0.0
@@ -52,7 +61,6 @@ class SaleOrder(models.Model):
                 'lines': list(lines),
                 'is_domestic': self.team_id.is_domestic if self.team_id else False
             })
-        print report_pages
 
         return report_pages
 
@@ -66,3 +74,18 @@ class SaleOrderLine(models.Model):
     price_subtotal = fields.Monetary(string='Subtotal', readonly=True, store=True, compute=None)
     price_tax = fields.Monetary(string='Taxes', readonly=True, store=True, compute=None)
     price_total = fields.Monetary(string='Total', readonly=True, store=True, compute=None)
+
+    # FIXME:allen  how to remove this
+    @api.onchange('product_uom_qty', 'product_uom', 'route_id')
+    def _onchange_product_id_check_availability(self):
+        if not self.product_id or not self.product_uom_qty or not self.product_uom:
+            self.product_packaging = False
+            return {}
+        if self.product_id.type == 'product':
+            precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+            product_qty = self.product_uom._compute_quantity(self.product_uom_qty, self.product_id.uom_id)
+            if float_compare(self.product_id.virtual_available, product_qty, precision_digits=precision) == -1:
+                is_available = self._check_routing()
+                if not is_available:
+                    return {}
+        return {}

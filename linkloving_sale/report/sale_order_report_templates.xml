@@ -12,14 +12,14 @@
                         </strong>
                         <strong t-if="doc.partner_shipping_id != doc.partner_invoice_id">Invoicing address:</strong>
                         <div t-field="doc.partner_invoice_id"
-                             t-options='{"widget": "contact", "fields": ["address", "name", "phone", "fax"], "no_marker": True, "phone_icons": True}'/>
+                             t-options='{"widget": "contact", "fields": [ "name", "phone","mobile", "fax"], "no_marker": True, "phone_icons": True}'/>
                         <p t-if="doc.partner_id.vat">VAT:
                             <span t-field="doc.partner_id.vat"/>
                         </p>
                         <div t-if="doc.partner_shipping_id != doc.partner_invoice_id" class="mt8">
                             <strong>Shipping address:</strong>
                             <div t-field="doc.partner_shipping_id"
-                                 t-options='{"widget": "contact", "fields": ["address", "name", "phone", "fax"], "no_marker": True, "phone_icons": True}'/>
+                                 t-options='{"widget": "contact", "fields": ["name", "phone","mobile", "fax"], "no_marker": True, "phone_icons": True}'/>
                             <p t-if="doc.partner_id.vat">VAT:
                                 <span t-field="doc.partner_id.vat"/>
                             </p>
@@ -166,6 +166,15 @@
                 </t>
 
                 <div class="row" name="total">
+                    <div class="col-xs-6">
+
+                    </div>
+                    <div class="col-xs-">
+                       <strong> 总数量：</strong>
+                        <strong>
+                             <span t-field="doc.product_count"/>
+                        </strong>
+                    </div>
                     <div class="col-xs-4 pull-right">
                         <table class="table table-condensed">
                             <tr class="border-black">

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 
+import datetime
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
@@ -134,7 +135,8 @@ class MrpProductionExtend(models.Model):
         domain=[('scrapped', '=', False), ('is_return_material','=',False), ('is_over_picking', '=', False)])
 
     production_order_type = fields.Selection([('stockup',u'备货制（不需要产出全部数量）'),('ordering',u'订单制')], string=u'生产单类型', default='stockup',help=u'备货制：可产出任意数量的产品，便可完成生产，送往品检。\r\n订单制：必须产出生产单所需产品数量，才能进行下一步操作')
-
+    total_spent_time = fields.Float(default=0, compute='_compute_total_spent_time', string=u'总耗时', )
+    total_spent_money = fields.Float(default=0, compute='_compute_total_spent_money', string=u'生产总成本', )
     state = fields.Selection([
         ('confirmed', 'Confirmed'),
         ('waiting_material',u'等待备料'),
@@ -145,15 +147,28 @@ class MrpProductionExtend(models.Model):
         ('progress', 'In Progress'),
         ('waiting_quality_inspection',u'等待品检'),
         ('quality_inspection_ing', u'品检中'),
-        ('waiting_inventory_material',u'等待清点物料'),
-        ('waiting_warehouse_inspection', u'等待检验物料'),
+        ('waiting_inventory_material',u'等待清点退料'),
+        ('waiting_warehouse_inspection', u'等待检验退料'),
         ('waiting_post_inventory',u'等待入库'),
         ('done', 'Done'),
         ('cancel', 'Cancelled')], string='State',
         copy=False, default='confirmed', track_visibility='onchange')
 
 
-    # #添加工人
+    #计算所有工人总共花的工时
+    def _compute_total_spent_time(self):
+        spent = 0
+        for line in self.worker_line_ids:
+            spent += line.cal_worker_spent_time()
+        self.total_spent_time = spent / 3600.0
+
+    #计算生产总成本
+    def _compute_total_spent_money(self):
+        if self.mo_type == 'unit':#计件
+            self.total_spent_money = self.qty_produced * self.unit_price
+        elif self.mo_type == 'time':#计时
+            self.total_spent_money = self.total_spent_time * self.hour_price
+            # #添加工人
     # @api.multi
     # def add_worker(self):
 
@@ -208,8 +223,8 @@ class MrpProductionExtend(models.Model):
         else:
             #生产完成 结算工时
             self.worker_line_ids.change_worker_state('outline')
-            self.write({'state': 'waiting_quality_inspection'})
 
+            self.write({'state': 'waiting_quality_inspection'})
 
     #开始品检
     def button_start_quality_inspection(self):
@@ -496,7 +511,7 @@ class ReturnOfMaterial(models.Model):
 class ProductProductExtend(models.Model):
     _inherit = 'product.product'
 
-    return_qty = fields.Float(string=u'退料数量',default=0 )
+    return_qty = fields.Float(string=u'退料数量',default=0)
 
 class WareHouseArea(models.Model):
     _name = 'warehouse.area'
@@ -604,16 +619,23 @@ class HrEmployeeExtend(models.Model):
 class LLWorkerLine(models.Model):
     _name = 'worker.line'
 
+    @api.multi
     def _compute_amount_of_money(self):
-        self.amount_of_money = self.unit_price * self.xishu
+        for one in self:
+            one.amount_of_money = one.unit_price * one.xishu
 
+    @api.multi
     def _compute_line_state(self):
-        if self.worker_time_line_ids:
-            worker_time_line_ids_sorted = sorted(self.worker_time_line_ids, key=lambda d: d.start_time)
-            self.line_state = worker_time_line_ids_sorted[0].state
-        else:
-            self.line_state = 'online'
-
+        for line in self:
+            if line.worker_time_line_ids:
+                worker_time_line_ids_sorted = sorted(line.worker_time_line_ids, key=lambda d: d.start_time)
+                line.line_state = worker_time_line_ids_sorted[len(worker_time_line_ids_sorted)-1].state
+            else:
+                line.line_state = 'online'
+    @api.multi
+    def _compute_spent_time(self):
+        for line in self:
+            line.spent_time = line.cal_worker_spent_time() / 3600.0
 
     worker_id = fields.Many2one('hr.employee')
     production_id = fields.Many2one('mrp.production', u'生产单')
@@ -622,38 +644,53 @@ class LLWorkerLine(models.Model):
     xishu = fields.Float(default=1.0)
     amount_of_money = fields.Float(compute=_compute_amount_of_money)
     worker_time_line_ids = fields.One2many('worker.time.line', 'worker_line_id')
+    spent_time = fields.Float(compute='_compute_spent_time')
     line_state = fields.Selection(
         [
             ('online',u'正常'),
             ('offline', u'请假'),
-        ('outline', u'已退出'),
-        ], default='online', compute=_compute_line_state)
+            ('outline', u'已退出'),
+        ], compute=_compute_line_state)
 
     def create_time_line(self):
          self.env['worker.time.line'].create({
                 'worker_line_id' : self.id,
-            })
+                'start_time': fields.datetime.now(),
+         })
 
     def get_newest_time_line(self):
         worker_time_line_ids_sorted = sorted(self.worker_time_line_ids, key=lambda d: d.start_time)
-        return worker_time_line_ids_sorted[0]
+        return worker_time_line_ids_sorted[len(worker_time_line_ids_sorted)-1]
 
     @api.multi
     def change_worker_state(self, state):
         for line in self:
             if not line.worker_time_line_ids:
-                return False
+                continue
             else:
                 new_time_line = line.get_newest_time_line()
                 if new_time_line.state != state:#若状态改变
+                    if state == 'outline':
+                        new_time_line.worker_id.now_mo_id = None
+                    else:
+                        new_time_line.worker_id.now_mo_id = new_time_line.production_id.id
                     new_time_line.offline_set_time()
                     self.env['worker.time.line'].create({
+                    'start_time' : fields.datetime.now(),
                     'worker_line_id' : line.id,
-                        'state' : state,
+                    'state' : state,
                     })
 
-            return True
+    #计算每个工人的所花费的时间
+    # @api.multi
+    def cal_worker_spent_time(self):
+        # for worker_line in self:
+            sum_time = 0
+            for time_line in self.worker_time_line_ids:
+                if time_line.state == 'online' and time_line.end_time:
+                    sum_time += time_line.cal_interval_of_time_line()
 
+            return sum_time
 
 
 class LLWorkerTimeLine(models.Model):
@@ -665,7 +702,7 @@ class LLWorkerTimeLine(models.Model):
         [
             ('online',u'正常'),
             ('offline', u'请假'),
-        ('outline', u'已退出'),
+            ('outline', u'已退出'),
         ], default='online')
 
     worker_line_id = fields.Many2one('worker.line')
@@ -674,3 +711,8 @@ class LLWorkerTimeLine(models.Model):
 
     def offline_set_time(self):
         self.end_time = fields.datetime.now()
+
+    def cal_interval_of_time_line(self):
+        return (fields.Datetime.from_string(self.end_time) - fields.Datetime.from_string(self.start_time)).seconds
+
+

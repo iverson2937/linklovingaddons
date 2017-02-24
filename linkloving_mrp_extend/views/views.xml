@@ -106,6 +106,50 @@
                     <field name="production_order_type" widget="radio"/>
                 </xpath>
 
+                <xpath expr="//notebook/page[3]" position="after">
+                    <page string="生产结果">
+                        <group colspan="4">
+                            <group>
+                                <label for="total_spent_time"/>
+                                <div>
+                                    <field name="total_spent_time" widget="float_time" class="oe_inline"/> <!--widget="float_time" class="inline"-->
+                                    分钟
+                                </div>
+                                <field name="total_spent_money"/>
+
+                            </group>
+                                <field name="worker_line_ids" readonly="1">
+                            <tree>
+                                <field name="worker_id"/>
+                                <field name="line_state"/>
+
+                                <!--<label for="spent_time"/>-->
+                                <!--<div>-->
+                                <field name="spent_time" string="耗时" widget="float_time" class="oe_inline"/>
+                                    <!--分钟-->
+                                <!--</div>-->
+                            </tree>
+                            <form>
+                                <group>
+                                    <field name="worker_id" string="员工"/>
+                                    <field name="mo_type" string="计价类型"/>
+                                    <field name="spent_time" string="耗时" widget="float_time"/>
+                                    <field name="worker_time_line_ids" string="">
+                                        <tree>
+                                            <field name="start_time" string="开始时间"/>
+                                            <field name="end_time" string="结束时间"/>
+                                            <field name="state" string="状态"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                            </form>
+                        </field>
+
+                        </group>
+
+                    </page>
+                </xpath>
+
                 <xpath expr="//field[@name='move_raw_ids']" position="replace">
                     <field name="sim_stock_move_lines">
                         <tree editable="bottom" delete="0"  decoration-warning="quantity_done&gt;product_uom_qty" decoration-success="quantity_done>=product_uom_qty"  create="0">
