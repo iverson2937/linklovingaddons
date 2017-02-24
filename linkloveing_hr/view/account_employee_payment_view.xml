@@ -255,7 +255,7 @@
 
         <menuitem id="menu_account_payment_all" name="所有暂支" sequence="0"
                   parent="menu_account_payment"
-                  groups="base.group_account_user"
+                  groups="account.group_account_user"
                   action="action_account_payment_all"/>
         <menuitem id="menu_account_payment_wait_pay" name="待付款暂支" sequence="0"
                   parent="menu_account_payment"
