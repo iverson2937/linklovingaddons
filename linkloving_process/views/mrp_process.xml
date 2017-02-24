@@ -22,7 +22,7 @@
                             <field name="unit_price"/>
                             <field name="hour_price"/>
                             <field name="description"/>
-                            <field name="partner_id"/>
+                            <field name="partner_id" domain="[('employee','=', True)]" options="{'no_create':True}"/>
                         </group>
 
                     </sheet>
