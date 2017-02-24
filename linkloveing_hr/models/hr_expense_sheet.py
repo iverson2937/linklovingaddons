@@ -12,6 +12,7 @@ class HrExpenseSheet(models.Model):
     deduct_amount = fields.Float()
     pre_payment_reminding = fields.Float(string=u'暂支余额', related='employee_id.pre_payment_reminding')
     payment_id = fields.Many2one('account.employee.payment')
+    income_journal_id = fields.Many2one('account.journal')
 
     @api.multi
     def action_sheet_move_create(self):
@@ -62,11 +63,16 @@ class HrExpenseSheet(models.Model):
         #     self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
         # else:
         department = self.to_approve_id.employee_ids.department_id
+        if not department:
+            UserError(u'请设置该员工部门')
+        if not department.manager_id:
+            UserError(u'该员工所在部门未设置经理(审核人)')
         if department.allow_amount and self.total_amount < department.allow_amount:
             self.to_approve_id = False
             self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
 
         else:
+
             self.to_approve_id = department.parent_id.manager_id.user_id.id
 
             self.write({'state': 'manager1_approve', 'approve_ids': [(4, self.env.user.id)]})
@@ -133,9 +139,9 @@ class HrExpenseSheet(models.Model):
         vals = {}
         if self.pre_payment_reminding >= self.total_amount:
 
-            vals.update({'state': 'done','deduct_amount': self.total_amount})
+            vals.update({'state': 'done', 'deduct_amount': self.total_amount})
         else:
-            vals.update({'state': 'post','deduct_amount': self.pre_payment_reminding})
+            vals.update({'state': 'post', 'deduct_amount': self.pre_payment_reminding})
         vals.update({'is_deduct_payment': True, 'payment_id': payment_id})
         self.write(vals)
 
@@ -185,7 +191,7 @@ class HrExpenseSheet(models.Model):
     def register_payment_action(self):
         amount = self.total_amount
         if self.is_deduct_payment:
-            amount = self.total_amount-self.deduct_amount
+            amount = self.total_amount - self.deduct_amount
 
         context = {'default_payment_type': 'outbound', 'default_amount': amount}
 
@@ -212,7 +218,3 @@ class HrExpenseSheet(models.Model):
             return [('state', '=', 'approve')]
         if self._context.get('search_default_approved'):
             return [('state', '=', 'post')]
-
-
-
-

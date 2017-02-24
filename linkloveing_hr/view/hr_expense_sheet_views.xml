@@ -20,7 +20,7 @@
                 </xpath>
                 <xpath expr="//field[@name='employee_id']" position="after">
                     <field name="pre_payment_reminding" attrs="{'invisible': [('pre_payment_reminding', '=', False)]}"
-                    readonly="1"/>
+                           readonly="1"/>
                     <field name="to_approve_id" string="待审批人"/>
                     <field name="is_show" invisible="1"/>
                 </xpath>
@@ -40,7 +40,7 @@
                     />
                     <button name="manager2_approve" states="manager1_approve" string="批准" type="object"
                             groups="hr_expense.group_hr_expense_manager" class="oe_highlight o_expense_sheet_approve"/>
-                      <button name="manager3_approve" states="manager2_approve" string="批准" type="object"
+                    <button name="manager3_approve" states="manager2_approve" string="批准" type="object"
                             groups="linkloveing_hr.group_hr_expense_president"
                             class="oe_highlight"/>
                 </xpath>
@@ -79,6 +79,191 @@
                 </xpath>
             </field>
         </record>
+
+        <record id="hr_expense.hr_expense_form_view" model="ir.ui.view">
+            <field name="name">hr.expense.form</field>
+            <field name="model">hr.expense</field>
+            <field eval="25" name="priority"/>
+            <field name="arch" type="xml">
+                <form string="Expenses">
+                    <header>
+                        <button name="submit_expenses" states="draft" string="Submit to Manager" type="object"
+                                class="oe_highlight o_expense_submit"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,reported,done"/>
+                        <button name="view_sheet" type="object" string="View Report" class="oe_highlight"
+                                attrs="{'invisible': [('state', '=','draft')]}"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box">
+                            <button name="action_get_attachment_view"
+                                    class="oe_stat_button"
+                                    icon="fa-book"
+                                    type="object">
+                                <field name="attachment_number" widget="statinfo" string="Documents"/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <label for="name"/>
+                            <h1>
+                                <field name="name" placeholder="e.g. Lunch with Customer"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="product_id" context="{'default_can_be_expensed': 1}" attrs="{}"/>
+                                <field name="unit_amount" required="1" widget="monetary"
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <label for="quantity"/>
+                                <div>
+                                    <field name="quantity" class="oe_inline"/>
+                                    <field name="product_uom_id" widget="selection" class="oe_inline"
+                                           groups="product.group_uom"/>
+                                </div>
+                                <field name="tax_ids" domain="[('type_tax_use', '=', 'purchase')]"
+                                       widget="many2many_tags" groups="base.group_no_one"/>
+                            </group>
+                            <group>
+                                <field name="reference"/>
+                                <field name="date"/>
+                                <field name="account_id"/>
+                                <field name="employee_id"/>
+                                <field name="sheet_id" invisible="1"/>
+                                <field name="currency_id" groups="base.group_multi_currency"/>
+                                <field name="analytic_account_id" groups="analytic.group_analytic_accounting"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                            <group>
+                                <field name="total_amount" widget='monetary'
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <label for="payment_mode"/>
+                                <div>
+                                    <field name="payment_mode" widget="radio"/>
+                                </div>
+                            </group>
+
+                        </group>
+                        <div>
+                            <field name="description" placeholder="Notes..."/>
+                        </div>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_hr_expense_sheet_income_form" model="ir.ui.view">
+            <field name="name">hr.expense.sheet.form</field>
+            <field name="model">hr.expense.sheet</field>
+            <field eval="25" name="priority"/>
+            <field name="arch" type="xml">
+                <form string="Expense Reports" class="o_expense_sheet">
+                    <header>
+                        <button name="approve_expense_sheets" states="submit" string="Approve" type="object"
+                                groups="hr_expense.group_hr_expense_user" class="oe_highlight o_expense_sheet_approve"/>
+                        <button name="action_sheet_move_create" states="approve" string="Post Journal Entries"
+                                type="object" groups="account.group_account_user"
+                                class="oe_highlight o_expense_sheet_post"/>
+                        <button name="%(hr_expense.hr_expense_register_payment_wizard_action)d" type="action"
+                                string="Register Payment" class="oe_highlight o_expense_sheet_pay"
+                                attrs="{'invisible': [('state', '!=', 'post')]}"
+                                context="{'default_amount': total_amount, 'partner_id': address_id}"
+                                groups="account.group_account_user"/>
+                        <button name="reset_expense_sheets" states="cancel" string="Resubmit" type="object"/>
+                        <button name="%(hr_expense.hr_expense_refuse_wizard_action)d" states="submit" string="Refuse"
+                                type="action" groups="hr_expense.group_hr_expense_user"/>
+                        <button name="%(hr_expense.hr_expense_refuse_wizard_action)d" states="approve" string="Refuse"
+                                type="action" groups="account.group_account_user"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,submit,approve,post,done"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box">
+                            <button name="action_get_attachment_view"
+                                    class="oe_stat_button"
+                                    icon="fa-book"
+                                    type="object">
+                                <field name="attachment_number" widget="statinfo" string="Documents"/>
+                            </button>
+                            <button name="action_open_journal_entries"
+                                    class="oe_stat_button"
+                                    icon="fa-book"
+                                    string="Accounting Entries"
+                                    attrs="{'invisible': [('account_move_id', '=', False)]}"
+                                    type="object">
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" placeholder="e.g. Trip to NY"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="state"/>
+                                <field name="employee_id"/>
+                                <field name="payment_mode" invisible="1"/>
+                                <field name="responsible_id" invisible="1"/>
+                                <field name="total_amount" invisible="1"/>
+                                <field name="currency_id" invisible="1"/>
+                                <field name="address_id" invisible="1"/>
+                                <field name="department_id" invisible="1"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                            <group>
+                                <field name="income_journal_id" domain="[('type', '=', 'sale')]"
+                                       groups="account.group_account_user"
+                                       options="{'no_open': True, 'no_create': True}"/>
+                                <field name="bank_journal_id" groups="account.group_account_user"
+                                       options="{'no_open': True, 'no_create': True}"
+                                       domain="[('type', 'in', ['cash', 'bank'])]"/>
+                                <field name="accounting_date" groups="account.group_account_user"
+                                       attrs="{'invisible': [('state', 'not in', ['approve', 'post', 'done'])]}"/>
+                                <field name="account_move_id" invisible="1"/>
+                            </group>
+                        </group>
+                        <field name="expense_line_ids" nolabel="1"
+                               context="{'form_view_ref':'linkloveing_hr.hr_expense_form_view1'}">
+                            <tree>
+                                <field name="date"/>
+                                <field name="name"/>
+                                <field name="state" invisible="1"/>
+                                <field name="analytic_account_id" groups="analytic.group_analytic_accounting"/>
+                                <field name="message_unread" invisible="1"/>
+                                <field name="attachment_number" invisible="1"/>
+                                <field name="attachment_number" string=" "/>
+                                <button name="action_get_attachment_view" string="View Attachments" type="object"
+                                        icon="fa-paperclip"/>
+                                <field name="tax_ids" widget="many2many_tags"/>
+                                <field name="total_amount" sum="Total Amount" widget="monetary"/>
+                            </tree>
+                        </field>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_hr_expense_sheet_to_receive" model="ir.actions.act_window">
+            <field name="name">hr.expense.sheet.received</field>
+            <field name="res_model">hr.expense.sheet</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('hr_expense.view_hr_expense_sheet_tree')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('linkloveing_hr.view_hr_expense_sheet_income_form')})]"/>
+
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <menuitem id="menu_hr_expense_sheet_to_receive" name="财务专用收入入口" sequence="5"
+                  parent="hr_expense.menu_hr_expense_accountant"
+                  action="action_hr_expense_sheet_to_receive"/>
 
 
     </data>
