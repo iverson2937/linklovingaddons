@@ -12,7 +12,6 @@ class HrExpenseSheet(models.Model):
     deduct_amount = fields.Float()
     pre_payment_reminding = fields.Float(string=u'暂支余额', related='employee_id.pre_payment_reminding')
     payment_id = fields.Many2one('account.employee.payment')
-    income_journal_id = fields.Many2one('account.journal')
 
     @api.multi
     def action_sheet_move_create(self):

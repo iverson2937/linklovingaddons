@@ -7,6 +7,7 @@ class HrExpense(models.Model):
     _inherit = 'hr.expense'
 
     department_id = fields.Many2one('hr.department', string=u'部门')
+    payment_mode = fields.Selection(selection_add=[('receive', 'Received')])
 
     @api.onchange('employee_id')
     def onchange_employee_id(self):
