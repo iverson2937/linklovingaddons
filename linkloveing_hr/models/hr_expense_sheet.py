@@ -13,6 +13,7 @@ class HrExpenseSheet(models.Model):
     pre_payment_reminding = fields.Float(string=u'暂支余额', related='employee_id.pre_payment_reminding')
     payment_id = fields.Many2one('account.employee.payment')
     income = fields.Boolean()
+    partner_id = fields.Many2one('res.partner')
 
     @api.multi
     def action_sheet_move_create(self):
@@ -211,14 +212,14 @@ class HrExpenseSheet(models.Model):
     def action_receive_payment(self):
         amount = self.total_amount
 
-        context = {'default_payment_type': 'inbound', 'default_amount': amount}
+        context = {'default_payment_type': 'inbound', 'default_amount': amount, 'default_partner_id': self.partner_id.id}
 
         return {
             'name': _('收钱'),
             'view_type': 'form',
             'view_mode': 'form',
             # 'view_id': False,
-            'res_model': 'account.supplier.payment.wizard',
+            'res_model': 'hr.expense.receive.wizard',
             'domain': [],
             'context': dict(context, active_ids=self.ids),
             'type': 'ir.actions.act_window',
