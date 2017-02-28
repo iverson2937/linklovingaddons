@@ -17,6 +17,7 @@ class HrExpenseReceiveWizard(models.TransientModel):
         return payment.id
 
     sheet_id = fields.Many2one('hr.expense.sheet', required=1, default=_default_sheet_id)
+    account_id = fields.Many2one('account.account')
 
     partner_id = fields.Many2one('res.partner', string='Partner', required=True)
     journal_id = fields.Many2one('account.journal', string='Payment Method', required=True,
@@ -67,8 +68,9 @@ class HrExpenseReceiveWizard(models.TransientModel):
 
         # Create payment and post it
         payment = self.env['account.payment'].create({
-            'partner_type': 'customer',
+            'partner_type': 'other',
             'payment_type': 'inbound',
+            'receive_account_id': self.account_id.id,
             'partner_id': self.partner_id.id,
             'journal_id': self.journal_id.id,
             'company_id': self.company_id.id,

@@ -211,8 +211,12 @@ class HrExpenseSheet(models.Model):
     @api.multi
     def action_receive_payment(self):
         amount = self.total_amount
+        account_id = self.expense_line_ids.product_id.property_account_income_id
+        if not account_id:
+            raise UserError('请设置产品的收入科目')
 
-        context = {'default_payment_type': 'inbound', 'default_amount': amount, 'default_partner_id': self.partner_id.id}
+        context = {'default_payment_type': 'inbound', 'default_amount': amount,
+                   'default_partner_id': self.partner_id.id, 'default_account_id': account_id.id}
 
         return {
             'name': _('收钱'),
