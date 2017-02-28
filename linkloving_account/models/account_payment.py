@@ -202,6 +202,7 @@ class AccountPayment(models.Model):
                 raise ValidationError(_("The payment cannot be processed because the invoice is not open!"))
 
             # Use the right sequence to set the name
+            sequence_code = 'account.payment.employee'
             if rec.payment_type == 'transfer':
                 sequence_code = 'account.payment.transfer'
             else:
@@ -210,13 +211,11 @@ class AccountPayment(models.Model):
                         sequence_code = 'account.payment.customer.invoice'
                     if rec.payment_type == 'outbound':
                         sequence_code = 'account.payment.customer.refund'
-                if rec.partner_type == 'supplier':
+                elif rec.partner_type == 'supplier':
                     if rec.payment_type == 'inbound':
                         sequence_code = 'account.payment.supplier.refund'
                     if rec.payment_type == 'outbound':
                         sequence_code = 'account.payment.supplier.invoice'
-                if rec.partner_type=='employee':
-                    sequence_code = 'account.payment.employee'
             rec.name = self.env['ir.sequence'].with_context(ir_sequence_date=rec.payment_date).next_by_code(
                 sequence_code)
 
