@@ -8,16 +8,16 @@
                     <sheet>
                         <field name="id" invisible="1"/>
                         <div class="oe_title">
-                            <h1>Draft Payment</h1>
+                            <h1></h1>
                         </div>
                         <group>
                             <group>
-                                <field name="partner_id" required="1" context="{'default_is_company': True, 'default_supplier': True}" string="合作伙伴"/>
+                                <field name="partner_id" required="1" context="{'default_is_company': True, 'default_supplier': True}" string="来源"/>
                                 <field name="journal_id" widget="selection"/>
-                                <field name="account_id"/>
+                                <field name="account_id" string="收入科目" />
                                 <field name="hide_payment_method" invisible="1"/>
-                                <field name="payment_method_id" widget="radio" attrs="{'invisible': [('hide_payment_method', '=', True)]}"/>
-                                <label for="amount"/>
+                                <field name="payment_method_id" widget="radio" attrs="{'invisible': [('hide_payment_method', '=', True)]}" string="支出账户"/>
+                                <label for="amount" string="金额"/>
                                 <div name="amount_div" class="o_row">
                                     <field name="amount"/>
                                     <field name="currency_id" options="{'no_create': True, 'no_open': True}" groups="base.group_multi_currency"/>
