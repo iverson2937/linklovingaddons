@@ -48,7 +48,7 @@ class PurchaseOrder(models.Model):
     @api.onchange('tax_id')
     def onchange_tax_id(self):
         for line in self.order_line:
-            line.tax_ids = [(6, 0, [self.tax_id.id])]
+            line.taxes_id = [(6, 0, [self.tax_id.id])]
 
     def get_product_count(self):
         count = 0.0
