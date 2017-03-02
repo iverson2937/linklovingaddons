@@ -32,8 +32,13 @@
                             groups="account.group_account_user"/>
 
                 </xpath>
+                   <xpath expr="//field[@name='expense_line_ids']" position="attributes">
+                    <attribute name="domain">[('state', '=', 'draft'),('create_uid','=',uid)]</attribute>
+                </xpath>
 
                 <xpath expr="//button[@name='approve_expense_sheets']" position="replace">
+                    <button name="approve_expense_sheets" states="submit" string="Approve" type="object"
+                            groups="base.group_erp_manager" class="oe_highlight o_expense_sheet_approve"/>
                     <button name="manager1_approve" string="批准" type="object"
                             groups="hr_expense.group_hr_expense_user" class="oe_highlight o_expense_sheet_approve"
                             attrs="{'invisible':['|',('is_show','=',False),('state','!=','submit')]}"
@@ -43,10 +48,6 @@
                     <button name="manager3_approve" states="manager2_approve" string="批准" type="object"
                             groups="linkloveing_hr.group_hr_expense_president"
                             class="oe_highlight"/>
-                </xpath>
-                <xpath expr="//button[@name='approve_expense_sheets']" position="replace">
-                    <button name="approve_expense_sheets" states="submit" string="Approve" type="object"
-                            groups="base.group_erp_manager" class="oe_highlight o_expense_sheet_approve"/>
                 </xpath>
                 <xpath expr="//field[@name='state']" position="replace">
                     <field name="state" widget="statusbar"
@@ -210,7 +211,8 @@
                         </div>
                         <group>
                             <group>
-                                <field name="partner_id" domain="[('customer','=',True),('is_company','=',True)]" string="来源" options="{'no_create': True}"/>
+                                <field name="partner_id" domain="[('customer','=',True),('is_company','=',True)]"
+                                       string="来源" options="{'no_create': True}"/>
                                 <field name="employee_id"/>
                                 <field name="to_approve_id" string="待审核人"/>
                                 <field name="is_show" invisible="1"/>
@@ -243,7 +245,8 @@
                                 <field name="product_id"/>
                                 <field name="name"/>
                                 <field name="state" invisible="1"/>
-                                <field name="analytic_account_id" groups="analytic.group_analytic_accounting" invisible="1"/>
+                                <field name="analytic_account_id" groups="analytic.group_analytic_accounting"
+                                       invisible="1"/>
                                 <field name="message_unread" invisible="1"/>
                                 <field name="attachment_number" invisible="1"/>
                                 <field name="unit_amount"/>
