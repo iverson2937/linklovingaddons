@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="UserMenu" t-extend="UserMenu">
+      <t t-jquery="ul.dropdown-menu" t-operation="inner">
+          <li><a href="#" data-menu="settings">设定</a></li>
+          <li><a href="#" data-menu="bill">公司钱包</a></li>
+          <li class="divider"/>
+          <li><a href="#" data-menu="logout">登出</a></li>
+      </t>
+    </t>
+
+    <t t-name="announcement_bar" t-extend="WebClient.announcement_bar" >
+        <t t-jquery="td.announcement_bar" t-operation="replace">
+        </t>
+    </t>
+</templates>

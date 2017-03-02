@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+		<template id="assets_backend_ljwj_web_login" name="ljwj_web_login" inherit_id="web.assets_backend">
+			<xpath expr="." position="inside">
+				<script type="text/javascript" src="/linkloving_web/static/src/js/web_login_style.js"/>
+			</xpath>
+		</template>
+
+
+
+			<template id="layout" inherit_id="web.layout" name="Layout Inherit">
+
+			<xpath expr="//head//link" position="after">
+				 <link rel="shortcut icon" href="/linkloving_web/static/src/img/favicon.ico" type="image/x-icon"/>
+    		</xpath>
+    	</template>
+
+
+    </data>
+</openerp>
