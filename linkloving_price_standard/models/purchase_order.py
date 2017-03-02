@@ -145,51 +145,49 @@ class PurchaseOrderLine(models.Model):
         order_id = self.env['purchase.order'].browse(vals.get('order_id'))
 
         taxes_id = self.resolve_2many_commands('taxes_id', vals.get('taxes_id'))
-        if not taxes_id:
-            raise UserError('请设置税率')
-        amount = taxes_id[0].get('amount')
+        if taxes_id:
+            amount = taxes_id[0].get('amount')
+            price_unit = vals.get('price_unit')
+            price = 0.0
+            product_id = self.env['product.product'].browse(vals.get('product_id'))
+            if price_unit:
+                partner_id = order_id.partner_id
+                discount_obj = self.env['product.price.discount'].search(
+                    [('partner_id', '=', partner_id.id), ('product_id', '=', product_id.id)])
+                if not discount_obj:
+                    discount_obj = self.env['product.price.discount'].create({
+                        'partner_id': partner_id.id,
+                        'product_id': product_id.id
+                    })
 
-        price_unit = vals.get('price_unit')
-        price = 0.0
-        product_id = self.env['product.product'].browse(vals.get('product_id'))
-        if price_unit:
-            partner_id = order_id.partner_id
-            discount_obj = self.env['product.price.discount'].search(
-                [('partner_id', '=', partner_id.id), ('product_id', '=', product_id.id)])
-            if not discount_obj:
-                discount_obj = self.env['product.price.discount'].create({
-                    'partner_id': partner_id.id,
-                    'product_id': product_id.id
-                })
-
-            if partner_id.level == 1:
-                if not amount:
-                    if not product_id.price1:
-                        product_id.price1 = price_unit
+                if partner_id.level == 1:
+                    if not amount:
+                        if not product_id.price1:
+                            product_id.price1 = price_unit
+                        else:
+                            price = product_id.price1
                     else:
-                        price = product_id.price1
-                else:
-                    if not product_id.price1_tax:
-                        product_id.price1_tax = price_unit
-            elif partner_id.level == 2:
-                if not amount:
-                    if not product_id.price2:
-                        product_id.price2 = price_unit
-                else:
-                    if not product_id.price2_tax:
-                        product_id.price2_tax = price_unit
-            elif partner_id.level == 3:
-                if not amount:
-                    if not product_id.price3:
-                        product_id.price3 = price_unit
-                else:
-                    if not product_id.price3_tax:
-                        product_id.price3_tax = price_unit
-            if price and not amount and price_unit <> price:
-                discount = price_unit / price
-                discount_obj.price = discount
-            elif price and amount and price_unit <> price:
-                discount_tax = price_unit / price
-                discount_obj.price_tax = discount_tax
+                        if not product_id.price1_tax:
+                            product_id.price1_tax = price_unit
+                elif partner_id.level == 2:
+                    if not amount:
+                        if not product_id.price2:
+                            product_id.price2 = price_unit
+                    else:
+                        if not product_id.price2_tax:
+                            product_id.price2_tax = price_unit
+                elif partner_id.level == 3:
+                    if not amount:
+                        if not product_id.price3:
+                            product_id.price3 = price_unit
+                    else:
+                        if not product_id.price3_tax:
+                            product_id.price3_tax = price_unit
+                if price and not amount and price_unit <> price:
+                    discount = price_unit / price
+                    discount_obj.price = discount
+                elif price and amount and price_unit <> price:
+                    discount_tax = price_unit / price
+                    discount_obj.price_tax = discount_tax
 
         return super(PurchaseOrderLine, self).create(vals)
