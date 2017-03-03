@@ -10,7 +10,7 @@ class AccountInvoice(models.Model):
 
     amount_total_o = fields.Monetary(string=u'对账金额',
                                      store=True, readonly=True, compute='_compute_amount', track_visibility='always')
-
+    @api.one
     def _get_po_number(self):
         if self.origin:
             po = self.env['purchase.order'].search([('name', '=', self.origin)])
