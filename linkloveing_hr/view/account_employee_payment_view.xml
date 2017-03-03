@@ -11,9 +11,9 @@
                     <header>
                         <button name="post" class="oe_highlight" states="approve" string="确认付款" type="object"
                                 groups="account.group_account_user"/>
-                        <button name="return_payment" class="oe_highlight" states="paid" string="还款" type="object"
+                        <button name="return_payment" class="oe_highlight"  string="还款" type="object"
                                 groups="account.group_account_user"
-                                attrs="{'invisible': [('payment_return', '=', 0.00)]}"/>
+                                attrs="{'invisible': [('can_return', '=', False)]}"/>
                         <button name="submit" class="oe_highlight" states="draft" string="提交" type="object"/>
 
 
@@ -54,6 +54,7 @@
                             <group>
                                 <!--<field name="is_show" invisible="1"/>-->
                                 <field name="employee_id" string="员工"/>
+                                <field name="can_return" invisible="1"/>
                                 <field name="bank_account_id" string="银行账号"
                                        context="{'default_partner_id':address_home_id}"/>
                                 <field name="address_home_id" invisible="1"/>

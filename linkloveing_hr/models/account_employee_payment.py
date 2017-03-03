@@ -42,6 +42,15 @@ class AccountEmployeePayment(models.Model):
 
     pre_payment_reminding = fields.Float(string=u'可用金额', compute=_get_pre_payment_reminding_balance)
 
+    @api.depends('pre_payment_reminding', 'state')
+    def _is_can_return(self):
+        if self.pre_payment_reminding and self.state == 'paid':
+            self.can_return = True
+        else:
+            self.can_return = False
+
+    can_return = fields.Boolean(compute=_is_can_return)
+
     def _get_is_show(self):
         if self._context.get('uid') == self.to_approve_id.id:
             self.is_show = True
@@ -50,7 +59,7 @@ class AccountEmployeePayment(models.Model):
 
     is_show = fields.Boolean(compute=_get_is_show)
 
-    state = fields.Selection([('draft', 'Draft'),
+    state = fields.Selection([('draft', u'草稿'),
                               ('confirm', u'确认'),
                               ('manager1_approve', u'一级审批'),
                               ('manager2_approve', u'二级审批'),

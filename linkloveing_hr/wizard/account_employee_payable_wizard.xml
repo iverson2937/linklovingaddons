@@ -5,7 +5,8 @@
         <field name="model">account.employee.payable.wizard</field>
         <field name="arch" type="xml">
             <form string="Backorder creation">
-                <group>
+
+
                     <p>
                         员工有未抵消暂支费用,是否用暂支抵扣？
                     </p>
@@ -16,14 +17,20 @@
                     <!--</p>-->
                     <field name="sheet_id" invisible="1"/>
                     <field name="employee_id" invisible="1"/>
-                    <group>
-                        <field string="暂支编号" name="payment_id" readonly="0" domain="[('employee_id', '=', employee_id), ('pre_payment_reminding', '!=', False)]"/>
-                    </group>
 
-                </group>
+                    <field name="payment_ids" readonly="0" widdget="many2many" domain="[]">
+                        <tree>
+                            <field name="name"/>
+                            <field name="apply_date"/>
+                            <field name="amount"/>
+                            <field name="remark"/>
+                            <field name="pre_payment_reminding"  sum="Total Amount" widget="monetary"/>
+
+                        </tree>
+                    </field>
                 <footer>
                     <button name="process" string="是" type="object" class="oe_highlight"/>
-                    <button name="no_deduct_process" string="否" type="object" class="btn-primary"/>
+                    <button name="no_deduct_process" string="否" type="object" class="btn-primary pull-right"/>
                     <button string="_Cancel" class="btn-default" special="cancel"/>
                 </footer>
             </form>
