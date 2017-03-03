@@ -27,23 +27,38 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
             return payment_ids[0]
 
     payment_ids = fields.Many2many('account.employee.payment', readonly=1)
+
     @api.depends('payment_ids')
     def _compute_deduct_amount(self):
-        amount=0.0
+        amount = 0.0
         for payment_id in self.payment_ids:
-            amount+=payment_id.pre_payment_reminding
-        self.deduct_amount=amount
+            amount += payment_id.pre_payment_reminding
+        self.deduct_amount = amount
 
-
-
-    deduct_amount=fields.Float(compute=_compute_deduct_amount)
+    deduct_amount = fields.Float(compute=_compute_deduct_amount)
 
     @api.multi
     def process(self):
-        if self.sheet_id.total_amount > self.payment_id.pre_payment_reminding:
-            raise UserError('此笔暂支余额不够')
-        self.sheet_id.deduct_payment(self.payment_id.id)
+        if not self.payment_ids:
+            raise UserError('你还未选择暂支单')
+        total_amount = self.sheet_id.total_amount
+        for payment_id in self.payment_ids:
+            if total_amount:
+                line_id = self.env['account.employee.payment.line'].create({
+                    'payment_id': payment_id.id,
+                    'sheet_id': self.sheet_id.id,
+                    'amount': payment_id.pre_payment_reminding if payment_id.pre_payment_reminding <= total_amount else total_amount
+                })
+                total_amount -= line_id.amount
+        #报销单金额大于所以暂支单金额
+        self.sheet_id.process()
+        if total_amount > 0:
+
+            self.sheet_id.state = 'post'
+
+        else:
+            self.sheet_id.state = 'done'
 
     @api.multi
     def no_deduct_process(self):
-        self.sheet_id.no_deduct_payment()
+        self.sheet_id.process()

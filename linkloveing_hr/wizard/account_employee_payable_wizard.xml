@@ -18,13 +18,15 @@
                     <field name="sheet_id" invisible="1"/>
                     <field name="employee_id" invisible="1"/>
 
-                    <field name="payment_ids" readonly="0" widdget="many2many" domain="[]">
+                    <field name="payment_ids" readonly="0" widdget="many2many" domain="[('employee_id','=',employee_id),('can_return','=',True)]">
                         <tree>
                             <field name="name"/>
                             <field name="apply_date"/>
                             <field name="amount"/>
                             <field name="remark"/>
                             <field name="pre_payment_reminding"  sum="Total Amount" widget="monetary"/>
+                            <field name="can_return"/>
+
 
                         </tree>
                     </field>

@@ -31,25 +31,31 @@ class AccountEmployeePayment(models.Model):
     payment_return = fields.Float(string=u'还款金额', compute=_get_return_balance)
     return_count = fields.Integer(compute='_get_count')
     sheet_count = fields.Integer(compute='_get_count')
+    payment_line_ids = fields.One2many('account.employee.payment.line', 'payment_id')
 
     @api.one
     @api.depends('sheet_ids', 'payment_return')
     def _get_pre_payment_reminding_balance(self):
+        self.pre_payment_reminding = 0.0
         used_payment = 0
         if self.state == 'paid':
-            used_payment = sum([sheet.deduct_amount for sheet in self.sheet_ids])
-        self.pre_payment_reminding = self.amount - used_payment - self.payment_return
+            used_payment = sum([payment.amount for payment in self.payment_line_ids])
+            self.pre_payment_reminding = self.amount - used_payment - self.payment_return
 
     pre_payment_reminding = fields.Float(string=u'可用金额', compute=_get_pre_payment_reminding_balance)
 
-    @api.depends('pre_payment_reminding', 'state')
+    @api.one
+    @api.depends('state', 'return_ids', 'payment_line_ids')
     def _is_can_return(self):
-        if self.pre_payment_reminding and self.state == 'paid':
+        if self.state == 'paid':
             self.can_return = True
-        else:
+        payment_return = sum([return_id.amount for return_id in self.return_ids])
+        used_payment = sum([payment.amount for payment in self.payment_line_ids])
+        remaining = self.amount - used_payment - payment_return
+        if not remaining:
             self.can_return = False
 
-    can_return = fields.Boolean(compute=_is_can_return)
+    can_return = fields.Boolean(compute=_is_can_return, store=True)
 
     def _get_is_show(self):
         if self._context.get('uid') == self.to_approve_id.id:

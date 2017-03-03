@@ -71,14 +71,11 @@
                             </group>
                         </group>
                         <notebook colspan="1">
-                            <page string='报销单' autofocus="autofocus" attrs="{'invisible':[('sheet_count','=',0)]}">
-                                <field name="sheet_ids">
+                            <page string='报销记录' autofocus="autofocus" attrs="{}">
+                                <field name="payment_line_ids">
                                     <tree create="false">
-                                        <field name="expense_no"/>
-                                        <field name="name"/>
-                                        <field name="create_date"/>
-                                        <field name="deduct_amount" string="暂支抵扣金额"/>
-                                        <field name="total_amount"/>
+                                        <field name="sheet_id"/>
+                                        <field name="amount"/>
                                     </tree>
                                 </field>
                             </page>
@@ -92,9 +89,8 @@
                                 </field>
 
                             </page>
-                            <page string='其他信息'  attrs="{'invisible':[('return_count','=',0),('sheet_count','=',0)]}">
+                            <page string='其他信息'  attrs="{}">
                                 <group>
-                                    <field name="sheet_count"/>
                                     <field name="return_count"/>
                                     <field name="pre_payment_reminding" readonly="1"/>
                                     <field name="payment_return" readonly="1"
@@ -129,6 +125,7 @@
                     <field name="remark"/>
                     <field name="apply_date" string="申请日期"/>
                     <field name="state"/>
+                    <field name="can_return" invisible="0"/>
                     <field name="pre_payment_reminding"/>
                 </tree>
             </field>
