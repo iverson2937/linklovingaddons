@@ -11,5 +11,7 @@ class HrEmployee(models.Model):
     @api.one
     @api.depends('payment_ids')
     def _get_pre_payment_reminding(self):
-        self.pre_payment_reminding=sum([payment_id.pre_payment_reminding if payment_id.state =='paid' else 0 for payment_id in self.payment_ids])
+        self.pre_payment_reminding = sum(
+            [payment_id.pre_payment_reminding if payment_id.state == 'paid' else 0 for payment_id in self.payment_ids])
+
     pre_payment_reminding = fields.Float(compute=_get_pre_payment_reminding)
