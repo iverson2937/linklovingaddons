@@ -54,7 +54,7 @@
                             <group>
                                 <!--<field name="is_show" invisible="1"/>-->
                                 <field name="employee_id" string="员工"/>
-                                <field name="can_return" invisible="1"/>
+                                <field name="can_return" invisible="0"/>
                                 <field name="bank_account_id" string="银行账号"
                                        context="{'default_partner_id':address_home_id}"/>
                                 <field name="address_home_id" invisible="1"/>
