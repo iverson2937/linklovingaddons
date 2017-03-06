@@ -73,7 +73,7 @@
                         <notebook colspan="1">
                             <page string='报销记录' autofocus="autofocus" attrs="{}">
                                 <field name="payment_line_ids">
-                                    <tree create="false">
+                                    <tree create="True">
                                         <field name="expense_no"/>
                                         <field name="name"/>
                                         <field name="accounting_date"/>
