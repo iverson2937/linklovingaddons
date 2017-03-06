@@ -5,11 +5,11 @@ from odoo import models, fields, api, _
 
 class MrpProduction(models.Model):
     _inherit = 'mrp.production'
-    process_id = fields.Many2one('mrp.process', string=u'工序')
+    process_id = fields.Many2one('mrp.process', string=u'Process')
     unit_price = fields.Float()
     mo_type = fields.Selection([
-        ('unit', u'计件计价'),
-        ('time', u'计时计价'),
+        ('unit', u'Base on Unit'),
+        ('time', u'Base on Time'),
     ], default='unit')
 
     @api.onchange('bom_id')

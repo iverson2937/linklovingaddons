@@ -1,0 +1,151 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* linkloving_price_standard
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-03-06 08:12+0000\n"
+"PO-Revision-Date: 2017-03-06 08:12+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: linkloving_price_standard
+#: model:ir.model.fields,field_description:linkloving_price_standard.field_product_template_price1
+msgid "1st no tax price"
+msgstr "1级未税价"
+
+#. module: linkloving_price_standard
+#: model:ir.model.fields,field_description:linkloving_price_standard.field_product_template_price1_tax
+msgid "1st tax included price"
+msgstr "1级含税价"
+
+#. module: linkloving_price_standard
+#: model:ir.model.fields,field_description:linkloving_price_standard.field_product_template_price2
+msgid "2nd no tax price"
+msgstr "2级未税价"
+
+#. module: linkloving_price_standard
+#: model:ir.model.fields,field_description:linkloving_price_standard.field_product_template_price2_tax
+msgid "2nd tax included price"
+msgstr "2级含税价"
+
+#. module: linkloving_price_standard
+#: model:ir.model.fields,field_description:linkloving_price_standard.field_product_template_price3
+msgid "3rd no tax price"
+msgstr "3级未税价"
+
+#. module: linkloving_price_standard
+#: model:ir.model.fields,field_description:linkloving_price_standard.field_product_template_price3_tax
+msgid "3rd tax included price"
+msgstr "3级含税价"
+
+#. module: linkloving_price_standard
+#: model:ir.model.fields,field_description:linkloving_price_standard.field_product_price_discount_create_uid
+msgid "Created by"
+msgstr "创建人"
+
+#. module: linkloving_price_standard
+#: model:ir.model.fields,field_description:linkloving_price_standard.field_product_price_discount_create_date
+msgid "Created on"
+msgstr "创建时间"
+
+#. module: linkloving_price_standard
+#: model:ir.model.fields,field_description:linkloving_price_standard.field_product_price_discount_display_name
+msgid "Display Name"
+msgstr "显示名称"
+
+#. module: linkloving_price_standard
+#: model:ir.model.fields,field_description:linkloving_price_standard.field_product_price_discount_id
+msgid "ID"
+msgstr "ID"
+
+#. module: linkloving_price_standard
+#: model:ir.model.fields,field_description:linkloving_price_standard.field_product_price_discount___last_update
+msgid "Last Modified on"
+msgstr "最后修改日"
+
+#. module: linkloving_price_standard
+#: model:ir.model.fields,field_description:linkloving_price_standard.field_product_price_discount_write_uid
+msgid "Last Updated by"
+msgstr "最后更新人"
+
+#. module: linkloving_price_standard
+#: model:ir.model.fields,field_description:linkloving_price_standard.field_product_price_discount_write_date
+msgid "Last Updated on"
+msgstr "最后更新时间"
+
+#. module: linkloving_price_standard
+#: model:ir.ui.view,arch_db:linkloving_price_standard.product_product_form_view
+#: model:ir.ui.view,arch_db:linkloving_price_standard.product_template_form
+msgid "No tax price"
+msgstr "未税价"
+
+#. module: linkloving_price_standard
+#: model:ir.model.fields,field_description:linkloving_price_standard.field_product_price_discount_partner_id
+msgid "Partner id"
+msgstr "Partner id"
+
+#. module: linkloving_price_standard
+#: model:ir.model.fields,field_description:linkloving_price_standard.field_product_price_discount_price
+msgid "Price"
+msgstr "价格"
+
+#. module: linkloving_price_standard
+#: model:ir.ui.view,arch_db:linkloving_price_standard.product_product_form_view
+#: model:ir.ui.view,arch_db:linkloving_price_standard.product_template_form
+msgid "Price List"
+msgstr "价格表"
+
+#. module: linkloving_price_standard
+#: model:ir.model.fields,field_description:linkloving_price_standard.field_product_price_discount_price_tax
+msgid "Price tax"
+msgstr "含税价"
+
+#. module: linkloving_price_standard
+#: model:ir.model,name:linkloving_price_standard.model_product_template
+msgid "Product Template"
+msgstr "产品模板"
+
+#. module: linkloving_price_standard
+#: model:ir.model.fields,field_description:linkloving_price_standard.field_product_price_discount_product_id
+msgid "Product id"
+msgstr "Product id"
+
+#. module: linkloving_price_standard
+#: model:ir.model,name:linkloving_price_standard.model_purchase_order_line
+msgid "Purchase Order Line"
+msgstr "采购订单行"
+
+#. module: linkloving_price_standard
+#: model:ir.model,name:linkloving_price_standard.model_sale_order
+msgid "Sales Order"
+msgstr "销售订单"
+
+#. module: linkloving_price_standard
+#: model:ir.model,name:linkloving_price_standard.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "销售订单行"
+
+#. module: linkloving_price_standard
+#: model:ir.ui.view,arch_db:linkloving_price_standard.product_product_form_view
+#: model:ir.ui.view,arch_db:linkloving_price_standard.product_template_form
+msgid "Tax included price"
+msgstr "含税价"
+
+#. module: linkloving_price_standard
+#: code:addons/linkloving_price_standard/models/sale.py:89
+#, python-format
+msgid "Warning for %s"
+msgstr "Warning for %s"
+
+#. module: linkloving_price_standard
+#: model:ir.model,name:linkloving_price_standard.model_product_price_discount
+msgid "product.price.discount"
+msgstr "product.price.discount"
+

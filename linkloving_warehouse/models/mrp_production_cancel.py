@@ -18,6 +18,6 @@ class MrpProductionCancel(models.TransientModel):
 
         for record in self.env['mrp.production'].browse(active_ids):
             if record.state != 'confirmed':
-                raise UserError(_("只能取消确定状态的MO"))
+                raise UserError(_("Only can cancel draft MO"))
             record.action_cancel()
         return {'type': 'ir.actions.act_window_close'}

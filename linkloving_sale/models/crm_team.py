@@ -8,6 +8,6 @@ from odoo import fields, api, models
 
 class CrmTeam(models.Model):
     _inherit = "crm.team"
-    code = fields.Char(string=u'简码')
+    code = fields.Char(string=u'Simple code')
     #for inner_code
-    is_domestic=fields.Boolean(string=u'是否国内团队')
+    is_domestic=fields.Boolean(string=u'Is Domestic team')

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-16 08:17+0000\n"
-"PO-Revision-Date: 2017-01-16 08:17+0000\n"
+"POT-Creation-Date: 2017-03-06 08:42+0000\n"
+"PO-Revision-Date: 2017-03-06 08:42+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,17 +16,61 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: linkloving_purchase
+#: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_payment_count
+msgid "# Payment"
+msgstr "# Payment"
+
+#. module: linkloving_purchase
+#: model:ir.ui.view,arch_db:linkloving_purchase.account_invoice_confirm_view
+msgid "Are you sure to cancel the order？"
+msgstr "确定取消报价单？"
+
+#. module: linkloving_purchase
+#: model:ir.ui.view,arch_db:linkloving_purchase.account_invoice_confirm_view
+#: model:ir.ui.view,arch_db:linkloving_purchase.purchase_order_list_wizard_form
+msgid "Cancel"
+msgstr "取消"
+
+#. module: linkloving_purchase
+#: model:ir.actions.act_window,name:linkloving_purchase.action_purchase_order_cancel
+msgid "Cancel Draft Purchase Order"
+msgstr "取消报价单"
+
+#. module: linkloving_purchase
 #: model:ir.model,name:linkloving_purchase.model_res_company
 msgid "Companies"
 msgstr "公司"
 
 #. module: linkloving_purchase
+#: model:ir.ui.view,arch_db:linkloving_purchase.account_invoice_confirm_view
+msgid "Confirm"
+msgstr "确认"
+
+#. module: linkloving_purchase
+#: model:ir.ui.view,arch_db:linkloving_purchase.account_invoice_confirm_view
+msgid "Confirm Draft Invoices"
+msgstr "确认草稿发票"
+
+#. module: linkloving_purchase
+#: model:ir.model,name:linkloving_purchase.model_purchase_order_cancel
+msgid "Confirm the selected purchase orders"
+msgstr "确认选中的采购单"
+
+#. module: linkloving_purchase
+#: code:addons/linkloving_purchase/report/purchase_order_report.py:36
+#, python-format
+msgid "Create By"
+msgstr "创建人"
+
+#. module: linkloving_purchase
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_cancel_create_uid
 #: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_list_wizard_create_uid
 #: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_level_create_uid
 msgid "Created by"
 msgstr "创建人"
 
 #. module: linkloving_purchase
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_cancel_create_date
 #: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_list_wizard_create_date
 #: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_level_create_date
 msgid "Created on"
@@ -49,16 +93,45 @@ msgid "Description"
 msgstr "描述"
 
 #. module: linkloving_purchase
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_cancel_display_name
 #: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_list_wizard_display_name
 #: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_level_display_name
 msgid "Display Name"
 msgstr "显示名称"
 
 #. module: linkloving_purchase
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_list_wizard_end_date
+msgid "End Date"
+msgstr "订单结束日期"
+
+#. module: linkloving_purchase
+#: code:addons/linkloving_purchase/report/purchase_order_report.py:95
+#, python-format
+msgid "Error!"
+msgstr "错误!"
+
+#. module: linkloving_purchase
+#: model:ir.ui.view,arch_db:linkloving_purchase.purchase_order_list_wizard_form
+msgid "Export Excel Reports"
+msgstr "导出Excel报表"
+
+#. module: linkloving_purchase
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_handle_date
+msgid "Handle date"
+msgstr "安排的日期"
+
+#. module: linkloving_purchase
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_cancel_id
 #: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_list_wizard_id
 #: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_level_id
 msgid "ID"
 msgstr "ID"
+
+#. module: linkloving_purchase
+#: code:addons/linkloving_purchase/report/purchase_order_report.py:37
+#, python-format
+msgid "Inner Code"
+msgstr "内部参考"
 
 #. module: linkloving_purchase
 #: model:ir.actions.report.xml,name:linkloving_purchase.action_report_purchase
@@ -66,18 +139,27 @@ msgid "Invoice"
 msgstr "Invoice"
 
 #. module: linkloving_purchase
+#: code:addons/linkloving_purchase/report/purchase_order_report.py:38
+#, python-format
+msgid "Invoiced qty"
+msgstr "开单数量"
+
+#. module: linkloving_purchase
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_cancel___last_update
 #: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_list_wizard___last_update
 #: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_level___last_update
 msgid "Last Modified on"
 msgstr "最后修改日"
 
 #. module: linkloving_purchase
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_cancel_write_uid
 #: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_list_wizard_write_uid
 #: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_level_write_uid
 msgid "Last Updated by"
 msgstr "最后更新人"
 
 #. module: linkloving_purchase
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_cancel_write_date
 #: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_list_wizard_write_date
 #: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_level_write_date
 msgid "Last Updated on"
@@ -89,9 +171,48 @@ msgid "Level type"
 msgstr "Level type"
 
 #. module: linkloving_purchase
+#: model:ir.ui.view,arch_db:linkloving_purchase.sale_order_view_search_inherit_remark
+msgid "My Purchase Order"
+msgstr "我的采购单"
+
+#. module: linkloving_purchase
+#: model:ir.ui.view,arch_db:linkloving_purchase.res_partner_supplier_tree
+msgid "Name"
+msgstr "名字"
+
+#. module: linkloving_purchase
 #: model:ir.ui.view,arch_db:linkloving_purchase.official_seal_company
 msgid "Official Seal"
 msgstr "公章"
+
+#. module: linkloving_purchase
+#: model:ir.model.fields,field_description:linkloving_purchase.field_res_company_official_seal
+msgid "Official seal"
+msgstr "公章"
+
+#. module: linkloving_purchase
+#: code:addons/linkloving_purchase/models/purchase_order_cancel.py:21
+#, python-format
+msgid "Only can delete the draft orders"
+msgstr "只可删除草稿状态的报价单"
+
+#. module: linkloving_purchase
+#: code:addons/linkloving_purchase/report/purchase_order_report.py:36
+#, python-format
+msgid "Order Date"
+msgstr "开单日期"
+
+#. module: linkloving_purchase
+#: code:addons/linkloving_purchase/report/purchase_order_report.py:36
+#, python-format
+msgid "Order No"
+msgstr "订单号"
+
+#. module: linkloving_purchase
+#: code:addons/linkloving_purchase/report/purchase_order_report.py:37
+#, python-format
+msgid "Order qty"
+msgstr "开单数量"
 
 #. module: linkloving_purchase
 #: model:ir.model,name:linkloving_purchase.model_res_partner
@@ -99,14 +220,30 @@ msgid "Partner"
 msgstr "合作伙伴"
 
 #. module: linkloving_purchase
+#: model:ir.ui.view,arch_db:linkloving_purchase.view_partner_supplier_form
+msgid "Payment Applications"
+msgstr "付款申请单"
+
+#. module: linkloving_purchase
+#: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_payment_ids
+msgid "Payment ids"
+msgstr "Payment ids"
+
+#. module: linkloving_purchase
 #: model:ir.model.fields,field_description:linkloving_purchase.field_stock_picking_po_id
 msgid "Po id"
-msgstr "Po id"
+msgstr "采购单"
+
+#. module: linkloving_purchase
+#: code:addons/linkloving_purchase/report/purchase_order_report.py:36
+#, python-format
+msgid "Product"
+msgstr "产品"
 
 #. module: linkloving_purchase
 #: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_product_count
 msgid "Product count"
-msgstr "Product count"
+msgstr "产品数量"
 
 #. module: linkloving_purchase
 #: model:ir.model,name:linkloving_purchase.model_purchase_order
@@ -119,19 +256,66 @@ msgid "Purchase Order Line"
 msgstr "采购订单行"
 
 #. module: linkloving_purchase
+#: model:ir.actions.act_window,name:linkloving_purchase.action_purchase_order_wizard
+msgid "Purchase Order Lists"
+msgstr "采购订单汇总"
+
+#. module: linkloving_purchase
 #: code:addons/linkloving_purchase/models/qualifications_level.py:10
 #, python-format
 msgid "Qualification Level"
 msgstr "资质等级"
 
 #. module: linkloving_purchase
+#: code:addons/linkloving_purchase/report/purchase_order_report.py:37
+#, python-format
+msgid "Receive qty"
+msgstr "入库数量"
+
+#. module: linkloving_purchase
 #: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_remark
+#: model:ir.ui.view,arch_db:linkloving_purchase.linkloving_purchase_order_form
+#: model:ir.ui.view,arch_db:linkloving_purchase.sale_order_view_search_inherit_remark
 msgid "Remark"
 msgstr "备注"
 
 #. module: linkloving_purchase
+#: model:ir.ui.menu,name:linkloving_purchase.menu_purchase_order_list_export
+msgid "Reports"
+msgstr "报告"
+
+#. module: linkloving_purchase
+#: model:ir.ui.menu,name:linkloving_purchase.menu_sale_order_list
+msgid "Sales Orders"
+msgstr "销售订单"
+
+#. module: linkloving_purchase
+#: code:addons/linkloving_purchase/report/purchase_order_report.py:37
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_line_product_specs
+#, python-format
+msgid "Specification"
+msgstr "产品规格"
+
+#. module: linkloving_purchase
+#: model:ir.model.fields,field_description:linkloving_purchase.field_purchase_order_list_wizard_start_date
+msgid "Start Dare"
+msgstr "订单开始日期"
+
+#. module: linkloving_purchase
+#: code:addons/linkloving_purchase/report/purchase_order_report.py:38
+#, python-format
+msgid "Sub Total"
+msgstr "小计"
+
+#. module: linkloving_purchase
+#: code:addons/linkloving_purchase/report/purchase_order_report.py:36
+#: model:ir.ui.view,arch_db:linkloving_purchase.res_partner_supplier_tree
+#, python-format
+msgid "Supplier"
+msgstr "供应商"
+
+#. module: linkloving_purchase
 #: code:addons/linkloving_purchase/models/partner.py:7
-#: model:ir.model.fields,field_description:linkloving_purchase.field_res_partner_supplier_level
 #, python-format
 msgid "Supplier Level"
 msgstr "供应商等级"
@@ -142,9 +326,28 @@ msgid "Tax"
 msgstr "税金"
 
 #. module: linkloving_purchase
+#: code:addons/linkloving_purchase/report/purchase_order_report.py:95
+#, python-format
+msgid "These are no records no this period."
+msgstr "此区间没有采购订单数据"
+
+#. module: linkloving_purchase
+#: code:addons/linkloving_purchase/report/purchase_order_report.py:38
+#: model:ir.ui.view,arch_db:linkloving_purchase.linkloving_purchase_order_form
+#, python-format
+msgid "Total Amount"
+msgstr "金额总计"
+
+#. module: linkloving_purchase
 #: model:ir.model,name:linkloving_purchase.model_stock_picking
 msgid "Transfer"
 msgstr "调拨"
+
+#. module: linkloving_purchase
+#: code:addons/linkloving_purchase/report/purchase_order_report.py:37
+#, python-format
+msgid "Unit Price"
+msgstr "单价"
 
 #. module: linkloving_purchase
 #: model:ir.ui.view,arch_db:linkloving_purchase.purchase_order_list_wizard_form
@@ -154,29 +357,15 @@ msgstr "或"
 #. module: linkloving_purchase
 #: model:ir.model,name:linkloving_purchase.model_purchase_config_settings
 msgid "purchase.config.settings"
-msgstr "purchase.config.settings"
+msgstr "采购订单配置"
 
 #. module: linkloving_purchase
 #: model:ir.model,name:linkloving_purchase.model_purchase_order_list_wizard
 msgid "purchase.order.list.wizard"
-msgstr "purchase.order.list.wizard"
+msgstr "采购订单"
 
 #. module: linkloving_purchase
 #: model:ir.model,name:linkloving_purchase.model_res_partner_level
 msgid "res.partner.level"
-msgstr "res.partner.level"
-
-#. module: stock
-#: model:ir.ui.view,arch_db:stock.view_immediate_transfer
-msgid ""
-"You haven't set processed (<i>done</i>) quantities. Click <i>apply</i> and\n"
-"                        Odoo will process all quantities to do."
-msgstr "你没有设置此批次收货的数量,点击<i>应用</i>系统默认提交所有未收货数量。"
-
-#. module: purchase
-#: model:ir.ui.view,arch_db:purchase.view_purchase_order_filter
-#: selection:purchase.order,invoice_status:0
-msgid "Waiting Bills"
-msgstr "等待开单"
-
+msgstr "等级"
 

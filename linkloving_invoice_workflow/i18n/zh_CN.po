@@ -1,0 +1,201 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* linkloving_invoice_workflow
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-03-06 07:47+0000\n"
+"PO-Revision-Date: 2017-03-06 07:47+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+msgid "Additional notes..."
+msgstr "额外的备注..."
+
+#. module: linkloving_invoice_workflow
+#: model:ir.model.fields,field_description:linkloving_invoice_workflow.field_account_invoice_line_price_subtotal_o
+msgid "Amount"
+msgstr "金额"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+msgid "Ask Refund"
+msgstr "要求退款"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+msgid "Auto-detect"
+msgstr "自动检测"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+msgid "Bill"
+msgstr "账单"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.view_invoice_supplier_form
+msgid "Cancel Bill"
+msgstr "取消账单"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.actions.act_window,help:linkloving_invoice_workflow.customer_invoice_pending
+msgid "Click to create a vendor bill."
+msgstr "点击创建供应商账单"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_tree
+msgid "Customer"
+msgstr "客户"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+msgid "Customer Invoice"
+msgstr "客户账单"
+
+#. module: linkloving_invoice_workflow
+#: code:addons/linkloving_invoice_workflow/models/account_invoice.py:67
+#, python-format
+msgid "Deduct Amount can not larger than invoice Amount"
+msgstr "扣款金额不能大于账单金额"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+msgid "Draft Refund"
+msgstr "草稿退款"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.model,name:linkloving_invoice_workflow.model_account_invoice
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+msgid "Invoice"
+msgstr "发票"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+msgid "Invoice Date"
+msgstr "开票日期"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.model,name:linkloving_invoice_workflow.model_account_invoice_line
+msgid "Invoice Line"
+msgstr "发票行"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+msgid "Invoice lines"
+msgstr "账单明细"
+
+#. module: linkloving_invoice_workflow
+#: code:addons/linkloving_invoice_workflow/models/account_invoice.py:92
+#, python-format
+msgid "Invoice must be in draft or Pro-forma state in order to validate it."
+msgstr "Invoice must be in draft or Pro-forma state in order to validate it."
+
+#. module: linkloving_invoice_workflow
+#: model:ir.model.fields,field_description:linkloving_invoice_workflow.field_account_invoice_order_line
+msgid "Order Lines"
+msgstr "订单行"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+msgid "Other Info"
+msgstr "其他信息"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.model.fields,field_description:linkloving_invoice_workflow.field_account_invoice_po_id
+msgid "Po id"
+msgstr "采购单号"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.model.fields,field_description:linkloving_invoice_workflow.field_account_invoice_line_price_unit_o
+msgid "Price unit o"
+msgstr "原始单价"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.view_invoice_supplier_form
+msgid "Recompute taxes and total"
+msgstr "Recompute taxes and total"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+msgid "Refund"
+msgstr "退款"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+msgid "Register Payment"
+msgstr "登记付款"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+msgid "Responsible"
+msgstr "负责人"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.view_invoice_supplier_form
+msgid "Set to Draft"
+msgstr "设为草稿"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+msgid "Taxes"
+msgstr "税金"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_tree
+msgid "To Pay"
+msgstr "待支付"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_tree
+msgid "To pay"
+msgstr "待付款"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_tree
+msgid "Total"
+msgstr "总计"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.actions.act_window,help:linkloving_invoice_workflow.customer_invoice_pending
+msgid "Use this menu to control the invoices to be received from your\n"
+"                    vendors. When registering a new bill, set the purchase order\n"
+"                    and Odoo will fill the bill automatically according to ordered\n"
+"                    or received quantities."
+msgstr "Use this menu to control the invoices to be received from your\n"
+"                    vendors. When registering a new bill, set the purchase order\n"
+"                    and Odoo will fill the bill automatically according to ordered\n"
+"                    or received quantities."
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.view_invoice_supplier_form
+msgid "Validate"
+msgstr "验证"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+msgid "You have"
+msgstr "你有"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+msgid "for this supplier. You can allocate them to mark this bill as paid."
+msgstr "对于这个供应商，你可以将它们分配为标记此账单已支付。"
+
+#. module: linkloving_invoice_workflow
+#: model:ir.ui.view,arch_db:linkloving_invoice_workflow.invoice_customer_form
+msgid "outstanding debits"
+msgstr "未完借方"
+

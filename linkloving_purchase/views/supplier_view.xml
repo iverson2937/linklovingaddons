@@ -15,7 +15,7 @@
                             context="{'search_default_partner_id': active_id, 'default_partner_id': active_id}" icon="fa-tasks"
                     groups="purchase.group_purchase_user,account.group_account_invoice"
                     >
-                        <field string="付款申请单" name="payment_count" widget="statinfo"/>
+                        <field string="Payment Applications" name="payment_count" widget="statinfo"/>
                     </button>
                 </div>
             </field>

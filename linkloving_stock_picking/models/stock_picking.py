@@ -6,7 +6,7 @@ from odoo import models, fields, api, _, SUPERUSER_ID
 class StockPicking(models.Model):
     _name = 'stock.picking'
     _inherit = ['stock.picking', 'ir.needaction_mixin']
-    tracking_number=fields.Char(string=u'快递单号')
+    tracking_number=fields.Char(string=u'Tracking Number')
 
     def _get_po_number(self):
         if self.origin:
@@ -29,9 +29,9 @@ class StockPicking(models.Model):
         ('confirmed', 'Waiting Availability'),
         ('partially_available', 'Partially Available'),
         ('assigned', 'Available'),
-        ('post', u'入库'),
-        ('qc_check', u'品检'),
-        ('validate', u'等待调拨'),
+        ('post', u'Post'),
+        ('qc_check', u'Quality Check'),
+        ('validate', u'Waiting for Confirm'),
         ('done', 'Done')], string='Status', compute='_compute_state',
         copy=False, index=True, readonly=True, store=True, track_visibility='onchange',
         help=" * Draft: not confirmed yet and will not be scheduled until confirmed\n"

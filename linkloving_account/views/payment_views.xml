@@ -10,13 +10,13 @@
             <field name="arch" type="xml">
                 <form>
                     <header>
-                        <button name="post" string="提交" type="object"
+                        <button name="post" string="Post" type="object"
                                 class="oe_highlight" states="draft" groups="account.group_account_invoice"/>
-                        <button name="reject" string="退回" type="object"
+                        <button name="reject" string="Reject" type="object"
                                 states="posted" groups="sale.sale_order_personal_rule"/>
-                        <button name="confirm" string="确认" type="object"
+                        <button name="confirm" string="Confirm" type="object"
                                 states="posted" groups="sale.sale_order_personal_rule"/>
-                        <button name="done" string="完成" type="object"
+                        <button name="done" string="Done" type="object"
                                 states="confirm" groups="account.group_account_invoice"/>
 
 
@@ -39,12 +39,12 @@
                             <field name="amount" attrs="{'readonly':[('state','!=','draft')]}" required="1"/>
                             <field name="receive_date" required="1" attrs="{'readonly': [('state', '=', 'done')]}"/>
 
-                            <field name="account_id" string="收入账户" required="0" invisible="1"
+                            <field name="account_id" string="Income Account" required="0" invisible="1"
                                    attrs="{'readonly': [('state', '=', 'done')]}"/>
                             <field name="remark"/>
                         </group>
                         <notebook colspan="4">
-                            <page string="对账单" autofocus="autofocus">
+                            <page string="Supplier Invoice" autofocus="autofocus">
                                 <field name="invoice_ids"
                                        attrs="{'required': [('state', '=', 'posted')],'readonly': [('state', 'in', ['confirm','done'])]}"
                                        domain="[('partner_id','=', partner_id),('state','=', 'open'),('remain_apply_balance','!=',0 )]"/>
@@ -64,7 +64,7 @@
 
 
         <record id="action_view_supplier_account_invoice" model="ir.actions.act_window">
-            <field name="name">供应商对账明细</field>
+            <field name="name">Supplier Invoices</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">account.invoice</field>
             <field name="view_mode">tree,form</field>
@@ -79,14 +79,14 @@
             <field name="arch" type="xml">
                 <search string="Search">
 
-                    <field name="partner_id" filter_domain="[('partner_id', 'ilike', self)]" string="合作伙伴"/>
+                    <field name="partner_id" filter_domain="[('partner_id', 'ilike', self)]" string="Partner"/>
                     <field name="name"/>
                     <field name="state"/>
-                    <field name="amount" filter_domain="[('amount','ilike',self)]" string="金额"/>
+                    <field name="amount" filter_domain="[('amount','ilike',self)]" string="Amount"/>
                     <separator/>
-                    <filter string="待确认" name="confirm" domain="[('state', '=', 'posted')]"/>
-                    <filter string="待付款" name="register" domain="[('state', '=', 'confirm')]"/>
-                    <filter string="已完成" name="register" domain="[('state', '=', 'done')]"/>
+                    <filter string="Waiting Confirm" name="confirm" domain="[('state', '=', 'posted')]"/>
+                    <filter string="Waiting Payment" name="register" domain="[('state', '=', 'confirm')]"/>
+                    <filter string="Done" name="register" domain="[('state', '=', 'done')]"/>
                     <separator/>
 
                 </search>
@@ -100,15 +100,15 @@
             <field name="arch" type="xml">
                 <form>
                     <header>
-                        <button name="post" string="提交" type="object"
+                        <button name="post" string="Post" type="object"
                                 class="oe_highlight" states="draft" groups="purchase.group_purchase_user"/>
-                        <button name="reject" string="退回" type="object"
+                        <button name="reject" string="Reject" type="object"
                                 states="posted,confirm" groups="purchase.group_purchase_manager"/>
-                        <button name="confirm" string="确认" type="object" class="oe_highlight"
+                        <button name="confirm" string="Confirm" type="object" class="oe_highlight"
                                 states="posted" groups="purchase.group_purchase_manager"/>
-                        <button name="done" string="完成" type="object"
+                        <button name="done" string="Done" type="object"
                                 states="confirm" groups="account.group_account_invoice"/>
-                        <button name="register_payment" string="登记付款" type="object"
+                        <button name="register_payment" string="Register Payment" type="object"
                                 states="confirm" groups="account.group_account_invoice"/>
 
 
@@ -120,7 +120,7 @@
                             <field name="name" class="oe_inline" readonly="1"/>
                         </h1>
                         <group>
-                            <field name="partner_id" string="供应商"
+                            <field name="partner_id" string="Supplier"
                                    attrs="{'required': [('state', '=', 'posted')],'readonly': [('state', 'in', ['confirm','done'])]}"
                                    domain="[('supplier', '=', True),('is_company', '=', True)]"/>
                             <field name="bank_id"
@@ -131,14 +131,14 @@
                                    required="0"/>
                             <field name="receive_date" required="1"
                                    attrs="{'readonly': [('state', 'in', ['confirm','done'])]}"
-                                   string="付款日期"/>
+                                   string="Payment Date"/>
 
-                            <field name="account_id" string="收入账户" required="0"
+                            <field name="account_id" string="Income Account" required="0"
                                    attrs="{'readonly': [('state', 'in', ['confirm','done'])]}" invisible="1"/>
                             <field name="remark" required="0" attrs="{'readonly': [('state', '=', 'done')]}"/>
                         </group>
                         <notebook colspan="4">
-                            <page string="对账单" autofocus="autofocus">
+                            <page string="Supplier Invoice" autofocus="autofocus">
                                 <field name="invoice_ids" attrs="{'readonly': [('state', 'in', ['confirm','done'])]}"
                                        domain="[('partner_id','=', partner_id),('state','=', 'open'),('remain_apply_balance','!=',0 )]"/>
 
@@ -173,7 +173,7 @@
 
 
         <record id="action_payment_register" model="ir.actions.act_window">
-            <field name="name">付款申请</field>
+            <field name="name">Payment Application</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">account.payment.register</field>
             <field name="view_type">form</field>
@@ -193,7 +193,7 @@
             </field>
         </record>
         <record id="action_payment_register_accounting" model="ir.actions.act_window">
-            <field name="name">付款申请</field>
+            <field name="name">Payment Application</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">account.payment.register</field>
             <field name="view_type">form</field>
@@ -205,7 +205,7 @@
             (0,0,{'view_mode':'form', 'view_id': ref('purchase_account_payment_register_form')})]"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
-                    Click to add a contact in your address book.
+                    Click to add payment application.
                 </p>
                 <p>
                     No Invoice need to Prepayment!
@@ -215,7 +215,7 @@
 
 
         <record id="action_payment_received_register" model="ir.actions.act_window">
-            <field name="name">收款登记</field>
+            <field name="name">Receipts</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">account.payment.register</field>
             <field name="view_type">form</field>
@@ -227,10 +227,10 @@
             (0,0,{'view_mode':'form', 'view_id': ref('account_receive_register_form')})]"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
-                    点击添加收款
+                    Click to add Receipts.
                 </p>
                 <p>
-                    没有收款记录!
+                    No records Found!
                 </p>
             </field>
         </record>
@@ -268,7 +268,7 @@
 
                 <xpath expr="//field[@name='partner_id']" position="after">
                     <field name="customer" invisible="1"/>
-                    <field name="team_id" readonly="1" string="销售团队" attrs="{'invisible':[('customer','!=',True)]}"
+                    <field name="team_id" readonly="1" string="Sale Team" attrs="{'invisible':[('customer','!=',True)]}"
                            options="{'no_create':True}"/>
                 </xpath>
             </field>

@@ -9,7 +9,7 @@
                             <div class="oe_structure"/>
 
 
-                            <h2 class="text-center">付款申请单</h2>
+                            <h2 class="text-center">Payment Application</h2>
 
                             <h2>
                                 <p t-field="o.name"/>
@@ -17,21 +17,21 @@
 
                             <div class="row mt32 mb32">
                                 <div class="col-xs-2">
-                                    <strong>公司全称:</strong>
+                                    <strong>Company Name:</strong>
                                     <p t-field="o.partner_id.name"/>
                                 </div>
                                 <t t-if="o.bank_id">
 
                                     <div class="col-xs-2">
-                                        <strong>收款人:</strong>
+                                        <strong>Payee:</strong>
                                         <p t-field="o.bank_id.owner"/>
                                     </div>
                                     <div class="col-xs-2">
-                                        <strong>收款账户:</strong>
+                                        <strong>Account receivable:</strong>
                                         <p t-field="o.bank_id.acc_number"/>
                                     </div>
                                     <div class="col-xs-2">
-                                        <strong>收款银行:</strong>
+                                        <strong>Due bank:</strong>
                                         <t t-if="o.bank_id.bank_id">
                                             <p t-field="o.bank_id.bank_id.name"/>
                                         </t>
@@ -41,7 +41,7 @@
 
 
                                 <div class="col-xs-2">
-                                    <strong>申请日期:</strong>
+                                    <strong>Apply Date:</strong>
                                     <p t-field="o.receive_date"/>
                                 </div>
 
@@ -53,19 +53,19 @@
                                 <!--</div>-->
 
                                 <div class="col-xs-12">
-                                    <strong>备注:</strong>
+                                    <strong>Remark:</strong>
                                     <p t-field="o.remark"/>
 
                                 </div>
                             </div>
-                            <strong>对账付款明细:</strong>
+                            <strong>Invoices:</strong>
                             <table class="table table-condensed">
                                 <thead>
                                     <tr>
-                                        <th>对账日期</th>
-                                        <th class="text-center">对账单号</th>
-                                        <th class="text-center">订单号</th>
-                                        <th class="text-center">金额</th>
+                                        <th>Invoice Date</th>
+                                        <th class="text-center">Invoice No</th>
+                                        <th class="text-center">Order No</th>
+                                        <th class="text-center">Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -106,7 +106,7 @@
                                     <table class="table table-condensed">
                                         <tr class="border-black">
                                             <td>
-                                                <strong>总额:</strong>
+                                                <strong>Total Amount:</strong>
                                             </td>
                                             <td class="text-right">
                                                 <strong t-esc="o.amount"></strong>
@@ -121,16 +121,16 @@
                             </div>
 
                             <div class="col-xs-3">
-                                <strong>总经理:</strong>
+                                <strong>Manager:</strong>
                             </div>
                             <div class="col-xs-3">
-                                <strong>财务:</strong>
+                                <strong>Accounting:</strong>
                             </div>
                             <div class="col-xs-3">
-                                <strong>部门主管:</strong>
+                                <strong>Supervisor:</strong>
                             </div>
                             <div class="col-xs-3">
-                                <strong>制单人:</strong>
+                                <strong>Write by:</strong>
                                 <p t-field="o.create_uid.name"/>
                             </div>
 

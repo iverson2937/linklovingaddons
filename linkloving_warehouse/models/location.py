@@ -23,7 +23,7 @@
 #
 ##############################################################################
 
-from odoo import  fields, models
+from odoo import  fields, models,_
 
 
 class StockLocation(models.Model):
@@ -35,7 +35,7 @@ class StockLocation(models.Model):
     name = fields.Char(string="Name")
     description = fields.Text(string='Description')
     _sql_constraints = [
-        ('name_uniq', 'unique (default_code)', u'名字已存在!'),
+        ('name_uniq', 'unique (default_code)',   _('Name must unique!')),
     ]
 
 

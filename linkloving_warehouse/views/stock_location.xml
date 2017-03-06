@@ -26,7 +26,7 @@
     </record>
 
 
-    <menuitem id="menu_stock_location_config" name="库位设置" parent="stock.menu_warehouse_config"
+    <menuitem id="menu_stock_location_config" name="Stock Location Config" parent="stock.menu_warehouse_config"
               groups="stock.group_stock_manager"
               action="action_stock_location_area"
     />

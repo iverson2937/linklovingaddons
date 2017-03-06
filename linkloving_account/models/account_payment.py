@@ -27,7 +27,7 @@ class AccountPaymentRegister(models.Model):
     _inherit = ['mail.thread', 'ir.needaction_mixin']
     name = fields.Char()
     balance_ids = fields.One2many('account.payment.register.balance', 'payment_id')
-    amount = fields.Float(string=u'金额', compute='get_amount', store=True)
+    amount = fields.Float(string=u'Amount', compute='get_amount', store=True)
 
     @api.multi
     def register_payment(self):
@@ -55,11 +55,11 @@ class AccountPaymentRegister(models.Model):
             amount += invoice.remain_apply_balance
         self.amount = amount
 
-    bank_id = fields.Many2one('res.partner.bank', string=u'账号', domain="[('partner_id', '=', partner_id)]")
+    bank_id = fields.Many2one('res.partner.bank', string=u'Account', domain="[('partner_id', '=', partner_id)]")
     invoice_ids = fields.Many2many('account.invoice')
-    receive_date = fields.Date(string=u'收款日期', default=fields.date.today())
-    remark = fields.Text(string=u'备注')
-    partner_id = fields.Many2one('res.partner', string=u'合作伙伴')
+    receive_date = fields.Date(string=u'Receive Date', default=fields.date.today())
+    remark = fields.Text(string=u'Remark')
+    partner_id = fields.Many2one('res.partner', string=u'Partner')
     is_customer = fields.Boolean(related='partner_id.customer', store=True)
     receive_id = fields.Many2one('res.users')
     account_id = fields.Many2one('account.account')
@@ -73,12 +73,12 @@ class AccountPaymentRegister(models.Model):
         self.invoice_ids = None
 
     state = fields.Selection([
-        ('draft', u'草稿'),
-        ('posted', u'提交'),
-        ('confirm', u'确认'),
-        ('register', u'登记收款'),
-        ('done', u'完成'),
-        ('cancel', u'取消')
+        ('draft', u'Draft'),
+        ('posted', u'Post'),
+        ('confirm', u'Confirm'),
+        ('register', u'Register'),
+        ('done', u'Done'),
+        ('cancel', u'Cancel')
     ], 'State', readonly=True, default='draft')
 
     _sql_constraints = {
@@ -96,7 +96,7 @@ class AccountPaymentRegister(models.Model):
     @api.multi
     def unlink(self):
         if self.state not in ['draft', 'posted']:
-            raise UserError('只能删除草稿和提交状态的付款申请')
+            raise UserError(_('Only can delete records state in Draft and Post'))
 
         return super(AccountPaymentRegister, self).unlink()
 
@@ -109,7 +109,7 @@ class AccountPaymentRegister(models.Model):
     def confirm(self):
         balance = self.amount
         if self.payment_type == 2 and balance > sum(self.mapped('invoice_ids.amount_total')):
-            raise UserError('对账单金额必须大于收到货款价格')
+            raise UserError(_('Apply Amount cannot less than Invoices Amount'))
         for invoice in self.invoice_ids:
             balance_id = self.env['account.payment.register.balance'].create({
                 'payment_id': self.id,
@@ -123,7 +123,7 @@ class AccountPaymentRegister(models.Model):
     def done(self):
         for balance in self.balance_ids:
             if not balance.state:
-                raise UserError('有付款登记没有完成，不可以关闭此次记录')
+                raise UserError(_('These is unclosed Payment，Can not close this Record'))
 
         self.state = 'done'
 
@@ -158,10 +158,10 @@ class AccountPayment(models.Model):
     @api.onchange('partner_type')
     def _onchange_partner_type(self):
         # Set partner_id domain
-        if self.partner_type=='employee':
+        if self.partner_type == 'employee':
             return {'domain': {'partner_id': [(self.partner_type, '=', True)]}}
         else:
-            return {'domain': {'partner_id': [(self.partner_type, '=', True),('is_company','=',True)]}}
+            return {'domain': {'partner_id': [(self.partner_type, '=', True), ('is_company', '=', True)]}}
 
     @api.model
     def default_get(self, fields):

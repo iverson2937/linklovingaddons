@@ -8,7 +8,7 @@ import odoo.addons.decimal_precision as dp
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
-    amount_total_o = fields.Monetary(string=u'对账金额',
+    amount_total_o = fields.Monetary(string=u'Invoice Amount',
                                      store=True, readonly=True, compute='_compute_amount', track_visibility='always')
     @api.one
     def _get_po_number(self):
@@ -18,8 +18,8 @@ class AccountInvoice(models.Model):
 
     po_id = fields.Many2one('purchase.order', compute=_get_po_number)
     order_line = fields.One2many('purchase.order.line', related='po_id.order_line')
-    deduct_amount = fields.Float(string=u'对账扣款')
-    remark = fields.Text(string=u'备注')
+    deduct_amount = fields.Float(string=u'Deduct Amount')
+    remark = fields.Text(string=u'Remark')
 
     # def _check_deduct_amount(self):
     #     for invoice in self:
@@ -33,8 +33,8 @@ class AccountInvoice(models.Model):
 
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('post', u'提交'),
-        ('validate', u'确认'),
+        ('post', u'Post'),
+        ('validate', u'Confirm'),
         ('proforma', 'Pro-forma'),
         ('proforma2', 'Pro-forma'),
         ('open', 'Open'),
@@ -64,7 +64,7 @@ class AccountInvoice(models.Model):
         deduct_amount = vals.get('deduct_amount')
         if deduct_amount:
             if deduct_amount>(self.amount_total_o or vals.get('amount_total_o')):
-                raise UserError(u'扣款金额不能大于对账单金额')
+                raise UserError(_('Deduct Amount can not larger than Invoice Amount'))
             rate = deduct_amount / (self.amount_total_o or vals.get('amount_total_o'))
             for line in self.invoice_line_ids:
                 if line.price_unit_o:

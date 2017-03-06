@@ -7,9 +7,9 @@
             <field name="arch" type="xml">
                 <form string="Customer Invoice">
                     <header>
-                        <button name="action_post" type="object" states="draft,proforma2" string="提交"
+                        <button name="action_post" type="object" states="draft,proforma2" string="Post"
                                 class="oe_highlight" groups="sale.sale_order_personal_rule"/>
-                        <button name="action_reject" type="object" states="validate" string="退回"
+                        <button name="action_reject" type="object" states="validate" string="Reject"
                                 groups="sales_team.group_sale_manager"/>
                         <button name="action_invoice_open" type="object" states="validate" string="Validate"
                                 class="oe_highlight" groups="sales_team.group_sale_manager"/>
@@ -52,7 +52,7 @@
                         <group>
                             <group>
                                 <field string="Customer" name="partner_id"/>
-                                <field name="deduct_amount" string="客户扣款"/>
+                                <field name="deduct_amount" string="Deduction"/>
                             </group>
                             <group>
                                 <field name="origin" attrs="{'invisible': [('origin', '=', False)]}"/>
@@ -81,7 +81,7 @@
                                                widget="many2many_tags"/>
                                         <field name="quantity"/>
                                         <field name="uom_id" groups="product.group_uom"/>
-                                        <field name="price_unit_o" string="订单单价" readonly="1"/>
+                                        <field name="price_unit_o" string="Original Price Unit" readonly="1"/>
                                         <field name="price_unit" readonly="1"/>
                                         <field name="discount" groups="sale.group_discount_per_so_line"/>
                                         <field name="invoice_line_tax_ids" widget="many2many_tags"
@@ -117,7 +117,7 @@
                                         <div>
                                             <label for="amount_tax"/>
                                             <button name="button_reset_taxes" states="draft,validate"
-                                                    string="更新" class="oe_link oe_edit_only"
+                                                    string="Update" class="oe_link oe_edit_only"
                                                     type="object" help="Recompute taxes and total"/>
                                         </div>
                                         <field name="amount_tax" nolabel="1"/>
@@ -180,7 +180,7 @@
             <field name="inherit_id" ref="account.invoice_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='partner_shipping_id']" position="after">
-                    <field name="deduct_amount" attrs="{'readonly': [('state', 'in', ['open','paid'])]}" string="客户扣款" />
+                    <field name="deduct_amount" attrs="{'readonly': [('state', 'in', ['open','paid'])]}" string="Deduction" />
                     <field name="remark"/>
                 </xpath>
             </field>
@@ -211,7 +211,7 @@
         </record>
 
         <record id="customer_invoice_pending" model="ir.actions.act_window">
-            <field name="name">客户账单</field>
+            <field name="name">Customer Invoice</field>
             <field name="res_model">account.invoice</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
@@ -267,25 +267,25 @@
 
                 </xpath>
                 <xpath expr="//tree/field[@name='price_unit']" position="before">
-                    <field name="price_unit_o" string="原始单价" readonly="1"/>
+                    <field name="price_unit_o" string="Original Price" readonly="1"/>
                 </xpath>
                 <xpath expr="//tree/field[@name='price_unit']" position="attributes">
                     <attrbute name="readonly">1</attrbute>
                 </xpath>
                 <xpath expr="//field[@name='amount_total']" position="after">
-                    <field name="amount_total_o" string="总价" invisible="1"/>
+                    <field name="amount_total_o" string="Total Amount" invisible="1"/>
                 </xpath>
                 <xpath expr="//field[@name='amount_tax']" position="replace">
                     <div>
                         <label for="amount_tax"/>
                         <button name="button_reset_taxes" states="draft,validate"
-                                string="更新" class="oe_link oe_edit_only"
+                                string="Update" class="oe_link oe_edit_only"
                                 type="object" help="Recompute taxes and total"/>
                     </div>
                     <field name="amount_tax" nolabel="1"/>
                 </xpath>
                 <xpath expr="//notebook/page[1]" position="after">
-                    <page string="订单信息">
+                    <page string="Order Lines">
                         <field name="order_line"/>
                     </page>
 

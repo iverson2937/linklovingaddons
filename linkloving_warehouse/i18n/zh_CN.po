@@ -1,0 +1,223 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* linkloving_warehouse
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-03-06 10:50+0000\n"
+"PO-Revision-Date: 2017-03-06 10:50+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_product_product_price1
+msgid "1st no tax price"
+msgstr "1级未税价"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_product_product_price1_tax
+msgid "1st tax included price"
+msgstr "1级含税价"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_product_product_price2
+msgid "2nd no tax price"
+msgstr "2级未税价"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_product_product_price2_tax
+msgid "2nd tax included price"
+msgstr "2级含税价"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_product_product_price3
+msgid "3rd no tax price"
+msgstr "3级未税价"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_product_product_price3_tax
+msgid "3rd tax included price"
+msgstr "3级含税价"
+
+#. module: linkloving_warehouse
+#: model:ir.ui.view,arch_db:linkloving_warehouse.account_mrp_production_cancel_form_view
+msgid "Are you sure to delete selected MO？"
+msgstr "确定删除选中的 MO？"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_product_product_area_id
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_product_template_area_id
+msgid "Area"
+msgstr "区域"
+
+#. module: linkloving_warehouse
+#: model:ir.actions.act_window,name:linkloving_warehouse.action_mrp_production_cancel
+#: model:ir.ui.view,arch_db:linkloving_warehouse.account_mrp_production_cancel_form_view
+msgid "Cancel"
+msgstr "取消"
+
+#. module: linkloving_warehouse
+#: model:ir.ui.view,arch_db:linkloving_warehouse.account_mrp_production_cancel_form_view
+msgid "Confirm"
+msgstr "确认"
+
+#. module: linkloving_warehouse
+#: model:ir.ui.view,arch_db:linkloving_warehouse.account_mrp_production_cancel_form_view
+msgid "Confirm Draft Invoices"
+msgstr "确认草稿发票"
+
+#. module: linkloving_warehouse
+#: model:ir.model,name:linkloving_warehouse.model_mrp_production_cancel
+msgid "Confirm cancel the selected mo"
+msgstr "确定取消选中的mo"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_mrp_production_cancel_create_uid
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_stock_location_area_create_uid
+msgid "Created by"
+msgstr "创建人"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_mrp_production_cancel_create_date
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_stock_location_area_create_date
+msgid "Created on"
+msgstr "创建时间"
+
+#. module: linkloving_warehouse
+#: code:addons/linkloving_warehouse/models/product.py:37
+#: code:addons/linkloving_warehouse/models/product.py:52
+#: sql_constraint:product.product:0
+#: sql_constraint:product.template:0
+#, python-format
+msgid "Default Code already exist!"
+msgstr "内部参考号已经存在!"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_stock_location_area_description
+msgid "Description"
+msgstr "说明"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_mrp_production_cancel_display_name
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_stock_location_area_display_name
+msgid "Display Name"
+msgstr "显示名称"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_product_product_hs_code
+msgid "HS Code"
+msgstr "危险品代码"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_mrp_production_cancel_id
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_stock_location_area_id
+msgid "ID"
+msgstr "ID"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_mrp_production_cancel___last_update
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_stock_location_area___last_update
+msgid "Last Modified on"
+msgstr "最后修改日"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_mrp_production_cancel_write_uid
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_stock_location_area_write_uid
+msgid "Last Updated by"
+msgstr "最后更新人"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_mrp_production_cancel_write_date
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_stock_location_area_write_date
+msgid "Last Updated on"
+msgstr "最后更新时间"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_product_product_location_x
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_product_template_location_x
+msgid "Location x"
+msgstr "Location x"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_product_product_location_y
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_product_template_location_y
+msgid "Location y"
+msgstr "Location y"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_stock_location_area_name
+msgid "Name"
+msgstr "名字"
+
+#. module: linkloving_warehouse
+#: code:addons/linkloving_warehouse/models/location.py:38
+#: sql_constraint:stock.location.area:0
+#, python-format
+msgid "Name must unique!"
+msgstr "名称必须唯一!"
+
+#. module: linkloving_warehouse
+#: code:addons/linkloving_warehouse/models/mrp_production_cancel.py:21
+#, python-format
+msgid "Only can cancel draft MO"
+msgstr "只可以取消草稿 MO"
+
+#. module: linkloving_warehouse
+#: model:ir.model,name:linkloving_warehouse.model_product_product
+msgid "Product"
+msgstr "产品"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_product_product_product_specs
+#: model:ir.model.fields,field_description:linkloving_warehouse.field_product_template_product_specs
+msgid "Product Specification"
+msgstr "产品规格"
+
+#. module: linkloving_warehouse
+#: model:ir.model,name:linkloving_warehouse.model_product_template
+msgid "Product Template"
+msgstr "产品模板"
+
+#. module: linkloving_warehouse
+#: model:ir.model.fields,help:linkloving_warehouse.field_product_product_hs_code
+msgid "Standardized code for international shipping and goods declaration"
+msgstr "国际航运和货物申报代码规范"
+
+#. module: linkloving_warehouse
+#: model:ir.ui.view,arch_db:linkloving_warehouse.view_product_form_linkloving
+#: model:ir.ui.view,arch_db:linkloving_warehouse.view_product_template_form_linkloving
+msgid "Stock Location"
+msgstr "库存位置"
+
+#. module: linkloving_warehouse
+#: model:ir.actions.act_window,name:linkloving_warehouse.action_stock_location_area
+msgid "Stock Location Area"
+msgstr "库存位置"
+
+#. module: linkloving_warehouse
+#: model:ir.ui.menu,name:linkloving_warehouse.menu_stock_location_config
+msgid "Stock Location Config"
+msgstr "库存位置配置"
+
+#. module: linkloving_warehouse
+#: model:ir.model,name:linkloving_warehouse.model_stock_move
+msgid "Stock Move"
+msgstr "库存移动"
+
+#. module: linkloving_warehouse
+#: code:addons/linkloving_warehouse/models/stock_move.py:39
+#, python-format
+msgid "You cannot cancel a stock move that has been set to 'Done'."
+msgstr "你不能取消已经完成的库存移动."
+
+#. module: linkloving_warehouse
+#: model:ir.model,name:linkloving_warehouse.model_stock_location_area
+msgid "stock.location.area"
+msgstr "库存位置"
+

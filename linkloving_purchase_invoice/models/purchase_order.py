@@ -113,7 +113,6 @@ class PurchaseOrder(models.Model):
 
     @api.multi
     def write(self, vals):
-        print vals,'ddddddddddddddddddddddddddddddddddddd'
         return super(PurchaseOrder, self).write(vals)
 
 

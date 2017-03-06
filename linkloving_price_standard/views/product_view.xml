@@ -13,12 +13,12 @@
                 <xpath expr="//page[@name='sales']" position="after">
                     <page string="Price List">
                         <group>
-                            <group string="未税价">
+                            <group string="No tax price">
                                 <field name="price1"/>
                                 <field name="price2"/>
                                 <field name="price3"/>
                             </group>
-                            <group string="含税价">
+                            <group string="Tax included price">
                                 <field name="price1_tax"/>
                                 <field name="price2_tax"/>
                                 <field name="price3_tax"/>
@@ -38,12 +38,12 @@
                  <xpath expr="//page[@name='sales']" position="after">
                     <page string="Price List">
                         <group>
-                            <group string="未税价">
+                            <group string="No tax price">
                                 <field name="price1"/>
                                 <field name="price2"/>
                                 <field name="price3"/>
                             </group>
-                            <group string="含税价">
+                            <group string="Tax included price">
                                 <field name="price1_tax"/>
                                 <field name="price2_tax"/>
                                 <field name="price3_tax"/>

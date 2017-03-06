@@ -15,11 +15,10 @@ class SaleOrder(models.Model):
     tax_id = fields.Many2one('account.tax', required=True)
     product_count = fields.Float(compute='get_product_count')
     pi_number = fields.Char(string='PI Number')
-    is_emergency = fields.Boolean(string=u'是否加急')
+    is_emergency = fields.Boolean(string=u'Is Emergency')
 
     @api.onchange('is_emergency')
     def onchange_is_emergency(self):
-        print 'ddddddddddddddddddd'
         for picking_id in self.picking_ids:
             picking_id.write({'is_emergency': self.is_emergency})
 
@@ -68,9 +67,9 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    product_specs = fields.Text(string=u'产品规格', related='product_id.product_specs')
-    inner_spec = fields.Char(related='product_id.inner_spec', string=u'国内型号')
-    inner_code = fields.Char(related='product_id.inner_code', string=u'国内简称')
+    product_specs = fields.Text(string=u'Product Specification', related='product_id.product_specs')
+    inner_spec = fields.Char(related='product_id.inner_spec')
+    inner_code = fields.Char(related='product_id.inner_code')
     price_subtotal = fields.Monetary(string='Subtotal', readonly=True, store=True, compute=None)
     price_tax = fields.Monetary(string='Taxes', readonly=True, store=True, compute=None)
     price_total = fields.Monetary(string='Total', readonly=True, store=True, compute=None)

@@ -18,7 +18,7 @@ class PurchaseOrder(models.Model):
     product_count = fields.Float(compute='get_product_count')
     tax_id = fields.Many2one('account.tax', string='Tax')
     remark = fields.Text(string='Remark')
-    handle_date = fields.Datetime(string=u'交货期')
+    handle_date = fields.Datetime()
 
     @api.depends('order_line.move_ids')
     def _compute_picking(self):
@@ -60,7 +60,7 @@ class PurchaseOrder(models.Model):
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
-    product_specs = fields.Text(string=u'产品规格', related='product_id.product_specs')
+    product_specs = fields.Text(string=u'Specification', related='product_id.product_specs')
 
     # 重写默认税的选择
     @api.onchange('product_id')

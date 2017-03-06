@@ -13,13 +13,13 @@ class SaleOrderLine(models.Model):
         """
         for line in self:
             price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-            taxes = line.tax_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty, product=line.product_id, partner=line.order_id.partner_id)
+            taxes = line.tax_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty,
+                                            product=line.product_id, partner=line.order_id.partner_id)
             line.update({
                 'price_tax': taxes['total_included'] - taxes['total_excluded'],
                 'price_total': taxes['total_included'],
                 'price_subtotal': taxes['total_excluded'],
             })
-
 
     @api.multi
     @api.onchange('product_id')
@@ -111,7 +111,6 @@ class SaleOrderLine(models.Model):
                 fiscal_position=self.env.context.get('fiscal_position')
             )
 
-
     @api.multi
     def write(self, vals):
         for line in self:
@@ -161,13 +160,13 @@ class SaleOrderLine(models.Model):
     def create(self, vals):
         order_id = self.env['sale.order'].browse(vals.get('order_id'))
         if vals.get('tax_id'):
-            #FIXme:
+            # FIXme:
             try:
                 _, _, tax_id = vals.get('tax_id')[0]
                 if tax_id:
-                    tax_id=tax_id[0]
+                    tax_id = tax_id[0]
             except Exception:
-                _,tax_id=vals.get('tax_id')[1]
+                _, tax_id = vals.get('tax_id')[1]
             tax_id = self.env['account.tax'].browse(tax_id)
 
         price_unit = vals.get('price_unit')
@@ -235,7 +234,7 @@ class SaleOrder(models.Model):
             for line in self.order_line:
                 discount_id = self.env['product.price.discount'].search(
                     [('partner_id', '=', self.partner_id.id), ('product_id', '=', line.product_id.id)], limit=1)
-                line.tax_id= [(6, 0, [self.tax_id.id])]
+                line.tax_id = [(6, 0, [self.tax_id.id])]
                 if discount_id:
                     discount = discount_id.price
                     discount_tax = discount_id.price_tax

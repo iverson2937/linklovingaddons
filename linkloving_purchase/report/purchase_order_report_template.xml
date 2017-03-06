@@ -26,7 +26,7 @@
                 </div>
             </div>
 
-            <h2 t-if="o.state != 'draft'">采购订单 <span t-field="o.name"/></h2>
+            <h2 t-if="o.state != 'draft'">Purchase Order <span t-field="o.name"/></h2>
             <h2 t-if="o.state == 'draft'">Request for Quotation #<span t-field="o.name"/></h2>
 
             <div class="row mt32 mb32">
@@ -43,7 +43,7 @@
                     <p t-field="o.date_order"/>
                 </div>
                   <div t-if="o.remark" class="col-xs-3">
-                    <strong>备注:</strong>
+                    <strong>Remark:</strong>
                     <p t-field="o.remark"/>
                 </div>
             </div>
@@ -52,8 +52,8 @@
                 <thead>
                     <tr>
                         <th><strong>Description</strong></th>
-                        <th><strong>产品规格</strong></th>
-                        <th><strong>安排的日期</strong></th>
+                        <th><strong>Specification</strong></th>
+                        <th><strong>Handle Date</strong></th>
                         <!--<th class="text-center"><strong>Date Req.</strong></th>-->
                         <th class="text-right"><strong>Qty</strong></th>
                         <th class="text-right"><strong>Unit Price</strong></th>
@@ -122,13 +122,13 @@
             <p t-field="o.notes"/>
             <div class="oe_structure"/>
              <div t-if="o.partner_id.bank_ids">
-    		<strong>付款信息</strong>
+    		<strong>Payment Information</strong>
                  <h5  t-field="o.partner_id.bank_ids[0].bank_id"/>
     		     <h5  t-field="o.partner_id.bank_ids[0].acc_number"/>
                  <h5  t-field="o.partner_id.bank_ids[0].owner"/>
 
     	</div><div t-if="o.payment_term_id">
-    		<strong>付款方式</strong>
+    		<strong>Payment Term</strong>
     		<h5  t-field="o.payment_term_id"/>
     	</div>
 
@@ -136,20 +136,20 @@
         		<br/>
                        <div class="col-xs-12">
                            <div class="col-xs-6 text-left" style="padding:40px;"  >
-                             <strong>经办人:</strong>
+                             <strong>Write By:</strong>
                               <img t-if="o.company_id.official_seal" t-att-src="'data:image/png;base64,%s' % o.company_id.official_seal" style="position:absolute; z-index:2;" />
                             </div>
                             <div class="col-xs-6 text-left" style="padding:40px;" >
-                             <strong>厂商销售:</strong>
+                             <strong>Supplier:</strong>
                             </div>
 
                         </div>
                         <div class="col-xs-12">
                                <div class="col-xs-6 text-left" style="padding:40px;" >
-                             <strong>审核:</strong>
+                             <strong>Approve By:</strong>
                             </div>
                             <div class="col-xs-6 text-left" style="padding:40px;" >
-                             <strong>审核:</strong>
+                             <strong>Approve By:</strong>
                             </div>
                         </div>
                         <br/>

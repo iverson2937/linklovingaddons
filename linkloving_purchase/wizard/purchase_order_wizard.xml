@@ -7,7 +7,7 @@
             <field name='model'>purchase.order.list.wizard</field>
             <field name='type'>form</field>
             <field name='arch' type='xml'>
-                <form name='打印报表'>
+                <form name='Print Reports'>
                     <group>
                         <group>
                             <field name='start_date' required='1'/>
@@ -16,15 +16,15 @@
                     </group>
 
                     <footer>
-                        <button name='print_report' type='object' string='打印报表' class='oe_highlight'/>
+                        <button name='print_report' type='object' string='Export Excel Reports' class='oe_highlight'/>
                         or
-                        <button string='取消' class='oe_link' special='cancel'/>
+                        <button string='Cancel' class='oe_link' special='cancel'/>
                     </footer>
                 </form>
             </field>
         </record>
         <record id='action_purchase_order_wizard' model='ir.actions.act_window'>
-            <field name='name'>汇总采购报表</field>
+            <field name='name'>Purchase Order Lists</field>
             <field name='res_model'>purchase.order.list.wizard</field>
             <field name='view_type'>form</field>
             <field name='view_mode'>form</field>
@@ -34,7 +34,7 @@
         </record>
 
 
-        <menuitem id="menu_purchase_order_list_export" name="报表" parent="purchase.menu_purchase_root"
+        <menuitem id="menu_purchase_order_list_export" name="Reports" parent="purchase.menu_purchase_root"
                   action="action_purchase_order_wizard"/>
     </data>
 </openerp>

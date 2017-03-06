@@ -12,8 +12,8 @@
             <field name="inherit_id" ref="account.view_account_move_line_filter"/>
             <field name="arch" type="xml">
                <xpath expr="//filter[@name='payable']" position="after">
-                    <filter string="客户明细" domain="[('partner_id.customer','=',True)]" name="customer_filter"/>
-                   <filter string="供应商明细" domain="[('partner_id.supplier','=',True)]" name="vendor_filter"/>
+                    <filter string="Customer" domain="[('partner_id.customer','=',True)]" name="customer_filter"/>
+                   <filter string="Supplier" domain="[('partner_id.supplier','=',True)]" name="vendor_filter"/>
                 </xpath>
             </field>
 

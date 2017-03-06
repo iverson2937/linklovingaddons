@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 8.0\n"
+"Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-22 05:15+0000\n"
-"PO-Revision-Date: 2016-09-22 05:15+0000\n"
+"POT-Creation-Date: 2017-03-06 09:40+0000\n"
+"PO-Revision-Date: 2017-03-06 09:40+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,30 +16,40 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: linkloving_sale
-#: model:ir.actions.act_window,help:linkloving_sale.action_partner_form_CN
-#: model:ir.actions.act_window,help:linkloving_sale.action_partner_form_EN
-#: model:ir.actions.act_window,help:linkloving_sale.sale_action_partner_form
-msgid "<p class=\"oe_view_nocontent_create\">\n"
-"                Click to add a contact in your address book.\n"
-"              </p><p>\n"
-"                Odoo helps you easily track all activities related to\n"
-"                a customer; discussions, history of business opportunities,\n"
-"                documents, etc.\n"
-"              </p>\n"
-"            "
-msgstr " \n"
-"          单击添加联系人到你的地址簿。\n"
-"        </p><p> \n"
-"             Odoo帮助你方便地跟踪客户的所有相关活动，\n"
-"            包括各类研讨、商机、\n"
-"            文档等。\n"
-"          </p>        "
+#: selection:res.partner,level:0
+msgid "2nd"
+msgstr "2nd"
 
 #. module: linkloving_sale
-#: model:ir.actions.act_window,name:linkloving_sale.action_partner_form_CN
-#: model:ir.ui.menu,name:linkloving_sale.menu_customer_CN
-msgid "CN Customers"
-msgstr "国内客户"
+#: selection:res.partner,level:0
+msgid "3rd"
+msgstr "3rd"
+
+#. module: linkloving_sale
+#: code:addons/linkloving_sale/wizard/sale_make_invoice_advance.py:44
+#, python-format
+msgid "Advance: %s"
+msgstr "Advance: %s"
+
+#. module: linkloving_sale
+#: model:ir.actions.act_window,help:linkloving_sale.sale_action_partner_form
+msgid "Click to add a contact in your address book."
+msgstr "点击在你的地址簿添加联系人"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_res_partner_source_create_uid
+msgid "Created by"
+msgstr "创建人"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_res_partner_source_create_date
+msgid "Created on"
+msgstr "创建时间"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_res_partner_level
+msgid "Customer Level"
+msgstr "客户等级"
 
 #. module: linkloving_sale
 #: model:ir.actions.act_window,name:linkloving_sale.sale_action_partner_form
@@ -47,24 +57,209 @@ msgid "Customers"
 msgstr "客户"
 
 #. module: linkloving_sale
-#: model:ir.actions.act_window,name:linkloving_sale.action_partner_form_EN
-#: model:ir.ui.menu,name:linkloving_sale.menu_customer_EN
-msgid "EN Customers"
-msgstr "国外客户"
+#: model:ir.model.fields,field_description:linkloving_sale.field_res_partner_source_description
+msgid "Description"
+msgstr "说明"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_res_partner_source_display_name
+msgid "Display Name"
+msgstr "显示名称"
+
+#. module: linkloving_sale
+#: code:addons/linkloving_sale/wizard/sale_make_invoice_advance.py:81
+#, python-format
+msgid "Down Payment"
+msgstr "预收款"
+
+#. module: linkloving_sale
+#: code:addons/linkloving_sale/wizard/sale_make_invoice_advance.py:78
+#, python-format
+msgid "Down payment of %s%%"
+msgstr "预收 of %s%%"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_stock_picking_is_emergency
+msgid "Emergency"
+msgstr "加急"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_res_partner_source_id_7257
+msgid "ID"
+msgstr "ID"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_res_partner_x_qq
+msgid "Instant Messaging"
+msgstr "即时通信"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_product_template_inner_code
+#: model:ir.model.fields,field_description:linkloving_sale.field_sale_order_line_inner_code
+msgid "Internal Code"
+msgstr "编号"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_product_template_inner_spec
+#: model:ir.model.fields,field_description:linkloving_sale.field_sale_order_line_inner_spec
+msgid "Internal Specification"
+msgstr "国内型号"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_crm_team_is_domestic
+msgid "Is Domestic team"
+msgstr "是否国内团队"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_sale_order_is_emergency
+msgid "Is Emergency"
+msgstr "是否加急"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_res_partner_source___last_update
+msgid "Last Modified on"
+msgstr "最后修改日"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_res_partner_source_write_uid
+msgid "Last Updated by"
+msgstr "最后更新人"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_res_partner_source_write_date
+msgid "Last Updated on"
+msgstr "最后更新时间"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_res_partner_source_name
+msgid "Name"
+msgstr "名字"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_res_partner_internal_code
+msgid "No"
+msgstr "No"
+
+#. module: linkloving_sale
+#: model:ir.actions.act_window,help:linkloving_sale.sale_action_partner_form
+msgid "Odoo helps you easily track all activities related to\n"
+"                    a customer; discussions, history of business opportunities,\n"
+"                    documents, etc."
+msgstr "Odoo helps you easily track all activities related to\n"
+"                    a customer; discussions, history of business opportunities,\n"
+"                    documents, etc."
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_sale_order_pi_number
+msgid "PI Number"
+msgstr "PI 号码"
 
 #. module: linkloving_sale
 #: model:ir.model,name:linkloving_sale.model_res_partner
 msgid "Partner"
-msgstr "业务伙伴"
+msgstr "合作伙伴"
 
 #. module: linkloving_sale
-#: field:res.partner,is_abroad:0
-msgid "country"
-msgstr "国外客户"
+#: model:ir.model.fields,field_description:linkloving_sale.field_sale_order_line_product_specs
+msgid "Product Specification"
+msgstr "产品规格"
 
+#. module: linkloving_sale
+#: model:ir.model,name:linkloving_sale.model_product_template
+msgid "Product Template"
+msgstr "产品模板"
 
-#. module: partner_internal_code
-#: field:res.partner,internal_code:0
-msgid "Internal Code"
-msgstr "编号"
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_sale_order_product_count
+msgid "Product count"
+msgstr "产品数量"
+
+#. module: linkloving_sale
+#: model:ir.actions.act_window,name:linkloving_sale.product_template_action
+msgid "Products"
+msgstr "产品"
+
+#. module: linkloving_sale
+#: model:ir.model,name:linkloving_sale.model_sale_order
+msgid "Sales Order"
+msgstr "销售订单"
+
+#. module: linkloving_sale
+#: model:ir.model,name:linkloving_sale.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "销售订单行"
+
+#. module: linkloving_sale
+#: model:ir.model,name:linkloving_sale.model_crm_team
+msgid "Sales Team"
+msgstr "销售团队"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_crm_team_code
+msgid "Simple code"
+msgstr "简码"
+
+#. module: linkloving_sale
+#: model:ir.ui.view,arch_db:linkloving_sale.view_partner_form_linkloving
+msgid "Source"
+msgstr "渠道"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_res_partner_source_id
+msgid "Source id"
+msgstr "渠道"
+
+#. module: linkloving_sale
+#: model:ir.model.fields,field_description:linkloving_sale.field_sale_order_tax_id
+msgid "Tax id"
+msgstr "Tax id"
+
+#. module: linkloving_sale
+#: sql_constraint:res.partner:0
+msgid "The No must be unique!"
+msgstr "The No must be unique!"
+
+#. module: linkloving_sale
+#: code:addons/linkloving_sale/wizard/sale_make_invoice_advance.py:38
+#, python-format
+msgid "The product used to invoice a down payment should be of type 'Service'. Please use another product or update this product."
+msgstr "The product used to invoice a down payment should be of type 'Service'. Please use another product or update this product."
+
+#. module: linkloving_sale
+#: code:addons/linkloving_sale/wizard/sale_make_invoice_advance.py:36
+#, python-format
+msgid "The product used to invoice a down payment should have an invoice policy set to \"Ordered quantities\". Please update your deposit product to be able to create a deposit invoice."
+msgstr "The product used to invoice a down payment should have an invoice policy set to \"Ordered quantities\". Please update your deposit product to be able to create a deposit invoice."
+
+#. module: linkloving_sale
+#: code:addons/linkloving_sale/wizard/sale_make_invoice_advance.py:75
+#, python-format
+msgid "The value of the down payment amount must be positive."
+msgstr "预付款金额必须大于0."
+
+#. module: linkloving_sale
+#: code:addons/linkloving_sale/wizard/sale_make_invoice_advance.py:71
+#, python-format
+msgid "There is no income account defined for this product: \"%s\". You may have to install a chart of account from Accounting app, settings menu."
+msgstr "There is no income account defined for this product: \"%s\". You may have to install a chart of account from Accounting app, settings menu."
+
+#. module: linkloving_sale
+#: model:ir.ui.view,arch_db:linkloving_sale.linkloving_sale_order_form
+msgid "Total Amount"
+msgstr "金额总计"
+
+#. module: linkloving_sale
+#: model:ir.model,name:linkloving_sale.model_stock_picking
+msgid "Transfer"
+msgstr "调拨"
+
+#. module: linkloving_sale
+#: selection:res.partner,level:0
+msgid "lst"
+msgstr "lst"
+
+#. module: linkloving_sale
+#: model:ir.model,name:linkloving_sale.model_res_partner_source
+msgid "res.partner.source"
+msgstr "渠道"
 

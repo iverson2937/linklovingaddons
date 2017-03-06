@@ -5,7 +5,7 @@ from odoo.exceptions import UserError, ValidationError
 
 class ResPartnerBank(models.Model):
     _inherit = 'res.partner.bank'
-    owner = fields.Char(string=u'账户姓名')
+    owner = fields.Char(string=u'Name')
 
     @api.multi
     @api.depends('acc_number', 'bank_id', 'owner')

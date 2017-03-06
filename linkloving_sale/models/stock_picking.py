@@ -12,7 +12,7 @@ class StockPicking(models.Model):
     """""
 
     _inherit = 'stock.picking'
-    is_emergency = fields.Boolean(string=u'加急')
+    is_emergency = fields.Boolean(string=u'Emergency')
 
 
 

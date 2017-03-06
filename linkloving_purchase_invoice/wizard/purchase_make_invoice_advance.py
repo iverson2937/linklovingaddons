@@ -156,8 +156,8 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
                 for line in order.order_line:
                     if line.product_id.type == 'service' and line.qty_to_invoice < 0:
                         amount += line.price_unit
-                if self.amount>order.amount_total-amount:
-                    raise UserError(u'预付款金额不能大于订单金额。')
+                if self.amount > order.amount_total - amount:
+                    raise UserError(_('Payment Amount cannot larger than order total amount。'))
 
                 if self.advance_payment_method == 'percentage':
                     amount = order.amount_total * self.amount / 100

@@ -32,9 +32,9 @@ class ProductProduct(models.Model):
     location_x = fields.Char()
     location_y = fields.Char()
 
-    product_specs = fields.Text(string=u'产品规格', related='product_tmpl_id.product_specs')
+    product_specs = fields.Text(string=u'Product Specification', related='product_tmpl_id.product_specs')
     _sql_constraints = [
-        ('default_code_uniq', 'unique (default_code)', u'内部参考号已存在!'),
+        ('default_code_uniq', 'unique (default_code)', _('Default Code already exist!')),
         # ('name_uniq', 'unique (name)', u'产品名称已存在!')
     ]
 
@@ -42,13 +42,13 @@ class ProductProduct(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    product_specs = fields.Text(string=u'产品规格')
+    product_specs = fields.Text(string=u'Product Specification')
     default_code = fields.Char(related='product_variant_ids.default_code')
     area_id = fields.Many2one(related='product_variant_ids.area_id', string='Area')
     location_x = fields.Char(related='product_variant_ids.location_x')
     location_y = fields.Char(related='product_variant_ids.location_y')
     name = fields.Char('Name', index=True, required=True, translate=False)
     _sql_constraints = [
-        ('default_code_uniq1', 'unique (default_code)', u'内部参考号已存在!'),
+        ('default_code_uniq1', 'unique (default_code)', _('Default Code already exist!')),
         # ('name_uniq', 'unique (name)', u'产品名称已存在!')
     ]

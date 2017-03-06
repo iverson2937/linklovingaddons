@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="stock.view_picking_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='do_new_transfer']" position="before">
-                    <button name="action_post" string="提交" type="object" class="oe_highlight"
+                    <button name="action_post" string="Post" type="object" class="oe_highlight"
                             attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['partially_available','assigned'])]}"
                             groups="stock.group_stock_user"/>
                 </xpath>
@@ -15,27 +15,27 @@
 
 
                 <xpath expr="//button[@name='do_new_transfer']" position="replace">
-                    <button name="do_new_transfer" string="出库调拨"
+                    <button name="do_new_transfer" string="Validate Receive"
                             attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['assigned'])]}"
                             groups="stock.group_stock_user" type="object" class="oe_highlight"/>
 
-                    <button name="do_new_transfer" string="入库调拨"
+                    <button name="do_new_transfer" string="Validate Shipment"
                             attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
                             groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
-                    <button name="reject" string="退回"
+                    <button name="reject" string="Reject"
                             attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
                             groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
                 </xpath>
                 <xpath expr="//button[@name='do_new_transfer']" position="after">
-                    <button name="action_check_pass" states="qc_check" string="品检完成" groups="stock.group_stock_user"
+                    <button name="action_check_pass" states="qc_check" string="Quality Check Pass" groups="stock.group_stock_user"
                             type="object" class="oe_highlight"/>
-                    <button name="action_check_fail" states="qc_check" string="品检失败" groups="stock.group_stock_user"
+                    <button name="action_check_fail" states="qc_check" string="Quality Check Fail" groups="stock.group_stock_user"
                             type="object"/>
 
                 </xpath>
 
                   <xpath expr="//field[@name='location_id']" position="after">
-                   <field name="tracking_number" string="快递单号"/>
+                   <field name="tracking_number" string="Tracking Number"/>
 
                 </xpath>
 
@@ -70,7 +70,7 @@
             </field>
         </record>
         <record id="action_stock_picking_confirm" model="ir.actions.act_window">
-            <field name="name">入库确认</field>
+            <field name="name">Stock Confirm</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">stock.picking</field>
             <field name="view_type">form</field>
@@ -79,7 +79,7 @@
             <field name="context">{}</field>
             <field name="help" type="html">
                 <p>
-                    没有要确认的入库记录
+                    No Stock Move to confirm.
                 </p>
             </field>
         </record>

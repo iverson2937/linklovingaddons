@@ -6,7 +6,7 @@ from odoo.addons.base.ir.ir_mail_server import extract_rfc2822_addresses
 class ResUserExtend(models.Model):
     _inherit = 'res.users'
 
-    mail_server = fields.Many2one('ir.mail_server', string=u'发件服务器')
+    mail_server = fields.Many2one('ir.mail_server', string=u'Mail Server')
 
 class ir_mail_server(models.Model):
     """发送邮件之前, 根据 smtp_from 查找对应的 smtp 服务器, 如果找不到对应,保留原状."""

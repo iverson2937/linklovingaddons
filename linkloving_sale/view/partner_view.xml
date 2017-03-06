@@ -53,7 +53,7 @@
                     <field name="team_id" attrs="{'invisible': [('supplier','=', True)],'required':[('customer','=', True)]}"/>
                 </xpath>
                 <xpath expr="//field[@name='category_id']" position="after">
-                    <field name="source_id" string="渠道" attrs="{'invisible': [('customer','!=', True)]}"/>
+                    <field name="source_id" string="Source" attrs="{'invisible': [('customer','!=', True)]}"/>
                 </xpath>
                 <xpath expr="//field[@name='category_id']" position="after">
                     <field name="internal_code" required="False"/>
@@ -62,7 +62,7 @@
                     <field name="x_qq"/>
                 </xpath>
                 <xpath expr="//field[@name='lang']" position="after">
-                    <field name="level" string="客户等级" attrs="{'invisible': [('customer','!=', True)]}"/>
+                    <field name="level" attrs="{'invisible': [('customer','!=', True)]}"/>
                 </xpath>
             </field>
         </record>

@@ -7,9 +7,9 @@ from odoo import models, fields, api, _
 class PurchaseOrderListPrintWizard(models.TransientModel):
     _name = 'purchase.order.list.wizard'
 
-    start_date = fields.Date(u'订单开始日期',
+    start_date = fields.Date(u'Start Dare',
                              default=(datetime.date.today().replace(day=1) - datetime.timedelta(1)).replace(day=1))
-    end_date = fields.Date(u'订单截至日期', default=datetime.datetime.now())
+    end_date = fields.Date(u'End Date', default=datetime.datetime.now())
 
     def _get_data_by_purchase(self, date1, date2):
         returnDict = {}

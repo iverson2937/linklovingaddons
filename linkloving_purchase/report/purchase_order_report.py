@@ -6,7 +6,7 @@ import xlwt
 import StringIO
 from pprint import pprint
 
-from odoo import http
+from odoo import http, _
 from odoo.exceptions import UserError
 from odoo.http import request
 
@@ -33,9 +33,9 @@ class report_purchase(http.Controller):
             )
 
             header_list = [
-                u'采购单号', u'供应商', u'创建人', u'单据日期', u'产品',
-                u'材料编码', u'规格描述', u'单价', u'采购数量', u'入库数量',
-                u'开单数量', u'小计',u'总计'
+                _('Order No'), _('Supplier'), _('Create By'), _('Order Date'), _('Product'),
+                _('Inner Code'), _('Specification'), _('Unit Price'), _('Order qty'), _('Receive qty'),
+                _('Invoiced qty'), _('Sub Total'), _('Total Amount')
 
             ]
 
@@ -57,7 +57,7 @@ class report_purchase(http.Controller):
                 i = 0
                 for line in record.get('line').itervalues():
 
-                    if i>0:
+                    if i > 0:
                         data_sheet.write(current_row, 0, vals.get('name') and vals.get('name') or '', style)
                         data_sheet.write(current_row, 1, vals.get('partner') and vals.get('partner') or '', style)
                         data_sheet.write(current_row, 2, vals.get('create_uid') and vals.get('create_uid') or '', style)
@@ -70,10 +70,11 @@ class report_purchase(http.Controller):
                     data_sheet.write(current_row, 8, line.get('quantity') and line.get('quantity') or 0, style)
                     data_sheet.write(current_row, 9, line.get('qty_received') and line.get('qty_received') or 0, style)
                     data_sheet.write(current_row, 10, line.get('qty_invoiced') and line.get('qty_invoiced') or 0, style)
-                    data_sheet.write(current_row, 11, line.get('price_subtotal') and line.get('price_subtotal') or 0, style)
+                    data_sheet.write(current_row, 11, line.get('price_subtotal') and line.get('price_subtotal') or 0,
+                                     style)
 
                     current_row += 1
-                    i+=1
+                    i += 1
 
             for x, i in enumerate([2, 2, 2, 2, 3, 3, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]):
                 data_sheet.col(x).width = 2560 * i
@@ -91,4 +92,4 @@ class report_purchase(http.Controller):
                 ('Content-Disposition', 'attachment; filename=purchase_order_sum.xls;')
             ])
         else:
-            raise UserError(u'错误!', u'该截至日期之前不存在使用订单')
+            raise UserError(_('Error!'), _('These are no records no this period.'))

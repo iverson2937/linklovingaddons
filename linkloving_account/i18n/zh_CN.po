@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-25 02:15+0000\n"
-"PO-Revision-Date: 2017-01-25 02:15+0000\n"
+"POT-Creation-Date: 2017-03-06 07:25+0000\n"
+"PO-Revision-Date: 2017-03-06 07:25+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,14 +16,93 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
+msgid "<strong>Account receivable:</strong>"
+msgstr "<strong>Account receivable:</strong>"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
+msgid "<strong>Accounting:</strong>"
+msgstr "<strong>Accounting:</strong>"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
+msgid "<strong>Apply Date:</strong>"
+msgstr "<strong>Apply Date:</strong>"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
+msgid "<strong>Company Name:</strong>"
+msgstr "<strong>Company Name:</strong>"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
+msgid "<strong>Due bank:</strong>"
+msgstr "<strong>Due bank:</strong>"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
+msgid "<strong>Invoices:</strong>"
+msgstr "<strong>Invoices:</strong>"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
+msgid "<strong>Manager:</strong>"
+msgstr "<strong>Manager:</strong>"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
+msgid "<strong>Payee:</strong>"
+msgstr "<strong>Payee:</strong>"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
+msgid "<strong>Remark:</strong>"
+msgstr "<strong>Remark:</strong>"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
+msgid "<strong>Supervisor:</strong>"
+msgstr "<strong>Supervisor:</strong>"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
+msgid "<strong>Total Amount:</strong>"
+msgstr "<strong>Total Amount:</strong>"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
+msgid "<strong>Write by:</strong>"
+msgstr "<strong>Write by:</strong>"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_bank_id
+msgid "Account"
+msgstr "科目"
+
+#. module: linkloving_account
+#: model:ir.model,name:linkloving_account.model_account_supplier_payment_wizard
+msgid "Account Supplier Payment Wizard"
+msgstr "Account Supplier Payment Wizard"
+
+#. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_account_id
 msgid "Account id"
 msgstr "Account id"
 
 #. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_amount
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_amount
+#: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
+#: model:ir.ui.view,arch_db:linkloving_account.view_account_payment_register_filter
 msgid "Amount"
 msgstr "金额"
+
+#. module: linkloving_account
+#: code:addons/linkloving_account/models/account_payment.py:112
+#, python-format
+msgid "Apply Amount cannot less than Invoices Amount"
+msgstr "Apply Amount cannot less than Invoices Amount"
 
 #. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_invoice_balance_ids
@@ -37,38 +116,121 @@ msgid "Bank Accounts"
 msgstr "银行帐户"
 
 #. module: linkloving_account
+#: selection:account.payment.register,state:0
+#: model:ir.ui.view,arch_db:linkloving_account.account_employee_register_payment_view_form
+msgid "Cancel"
+msgstr "取消"
+
+#. module: linkloving_account
 #: model:ir.model.fields,help:linkloving_account.field_account_payment_customer
 #: model:ir.model.fields,help:linkloving_account.field_account_payment_register_is_customer
 msgid "Check this box if this contact is a customer."
 msgstr "如果该联系人是客户就选择这个框"
 
 #. module: linkloving_account
+#: model:ir.actions.act_window,help:linkloving_account.action_payment_received_register
+msgid "Click to add Receipts."
+msgstr "点击添加收款."
+
+#. module: linkloving_account
 #: model:ir.actions.act_window,help:linkloving_account.action_payment_register
-#: model:ir.actions.act_window,help:linkloving_account.action_payment_register_accounting
 msgid "Click to add a contact in your address book."
 msgstr "点击在你的地址簿添加联系人"
 
 #. module: linkloving_account
+#: model:ir.actions.act_window,help:linkloving_account.action_payment_register_accounting
+msgid "Click to add payment application."
+msgstr "点击添加付款申请."
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_supplier_payment_wizard_company_id
+msgid "Company"
+msgstr "公司"
+
+#. module: linkloving_account
+#: model:ir.model.fields,help:linkloving_account.field_account_supplier_payment_wizard_company_id
+msgid "Company related to this journal"
+msgstr "日记账相关的公司"
+
+#. module: linkloving_account
+#: selection:account.payment.register,state:0
+#: model:ir.ui.view,arch_db:linkloving_account.account_receive_register_form
+#: model:ir.ui.view,arch_db:linkloving_account.purchase_account_payment_register_form
+msgid "Confirm"
+msgstr "确认"
+
+#. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_create_uid
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_create_uid
+#: model:ir.model.fields,field_description:linkloving_account.field_account_supplier_payment_wizard_create_uid
 msgid "Created by"
 msgstr "创建人"
 
 #. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_create_date
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_create_date
+#: model:ir.model.fields,field_description:linkloving_account.field_account_supplier_payment_wizard_create_date
 msgid "Created on"
 msgstr "创建时间"
 
 #. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_supplier_payment_wizard_currency_id
+msgid "Currency"
+msgstr "币种"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.view_account_move_line_filter_inherit
+msgid "Customer"
+msgstr "客户"
+
+#. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_display_name
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_display_name
+#: model:ir.model.fields,field_description:linkloving_account.field_account_supplier_payment_wizard_display_name
+#: model:ir.model.fields,field_description:linkloving_account.field_report_payment_application_display_name
 msgid "Display Name"
 msgstr "显示名称"
 
 #. module: linkloving_account
+#: selection:account.payment.register,state:0
+#: model:ir.ui.view,arch_db:linkloving_account.account_receive_register_form
+#: model:ir.ui.view,arch_db:linkloving_account.purchase_account_payment_register_form
+#: model:ir.ui.view,arch_db:linkloving_account.view_account_payment_register_filter
+msgid "Done"
+msgstr "完成"
+
+#. module: linkloving_account
+#: selection:account.payment.register,state:0
+msgid "Draft"
+msgstr "草稿"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.account_employee_register_payment_view_form
+msgid "Draft Payment"
+msgstr "草稿付款"
+
+#. module: linkloving_account
+#: model:ir.ui.menu,name:linkloving_account.menu_employee_entry
+#: model:ir.ui.view,arch_db:linkloving_account.view_account_employee_payment_tree
+msgid "Employee"
+msgstr "员工"
+
+#. module: linkloving_account
+#: model:ir.actions.act_window,name:linkloving_account.action_employee_payment_register
+#: model:ir.ui.menu,name:linkloving_account.menu_employee_payment
+msgid "Employee Payment Register"
+msgstr "员工付款记录"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_supplier_payment_wizard_hide_payment_method
+msgid "Hide payment method"
+msgstr "隐藏付款方式"
+
+#. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_id
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_id
+#: model:ir.model.fields,field_description:linkloving_account.field_account_supplier_payment_wizard_id
+#: model:ir.model.fields,field_description:linkloving_account.field_report_payment_application_id
 msgid "ID"
 msgstr "ID"
 
@@ -78,14 +240,26 @@ msgid "If set, sale team used notably for sales and assignations related to this
 msgstr "If set, sale team used notably for sales and assignations related to this partner"
 
 #. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.account_receive_register_form
+#: model:ir.ui.view,arch_db:linkloving_account.purchase_account_payment_register_form
+msgid "Income Account"
+msgstr "收入科目"
+
+#. module: linkloving_account
 #: model:ir.model,name:linkloving_account.model_account_invoice
 msgid "Invoice"
 msgstr "发票"
 
 #. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
+msgid "Invoice Date"
+msgstr "开票日期"
+
+#. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_invoice_invoice
+#: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
 msgid "Invoice No"
-msgstr "Invoice No"
+msgstr "对账单号"
 
 #. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_invoice_id
@@ -95,7 +269,7 @@ msgstr "发票id"
 #. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_invoice_ids
 msgid "Invoice ids"
-msgstr "Invoice ids"
+msgstr "对账单"
 
 #. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_customer
@@ -106,23 +280,33 @@ msgstr "是客户"
 #. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register___last_update
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance___last_update
+#: model:ir.model.fields,field_description:linkloving_account.field_account_supplier_payment_wizard___last_update
+#: model:ir.model.fields,field_description:linkloving_account.field_report_payment_application___last_update
 msgid "Last Modified on"
 msgstr "最后修改日"
 
 #. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_write_uid
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_write_uid
+#: model:ir.model.fields,field_description:linkloving_account.field_account_supplier_payment_wizard_write_uid
 msgid "Last Updated by"
 msgstr "最后更新人"
 
 #. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_write_date
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_write_date
+#: model:ir.model.fields,field_description:linkloving_account.field_account_supplier_payment_wizard_write_date
 msgid "Last Updated on"
 msgstr "最后更新时间"
 
 #. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_supplier_payment_wizard_communication
+msgid "Memo"
+msgstr "备忘录"
+
+#. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_name
+#: model:ir.model.fields,field_description:linkloving_account.field_res_partner_bank_owner
 msgid "Name"
 msgstr "名字"
 
@@ -132,9 +316,9 @@ msgid "Name must be unique!"
 msgstr "Name must be unique!"
 
 #. module: linkloving_account
-#: code:addons/linkloving_account/models/account_payment.py:111
-#: code:addons/linkloving_account/models/account_payment.py:113
-#: code:addons/linkloving_account/models/account_payment.py:115
+#: code:addons/linkloving_account/models/account_payment.py:134
+#: code:addons/linkloving_account/models/account_payment.py:136
+#: code:addons/linkloving_account/models/account_payment.py:138
 #, python-format
 msgid "New"
 msgstr "New"
@@ -146,10 +330,69 @@ msgid "No Invoice need to Prepayment!"
 msgstr "No Invoice need to Prepayment!"
 
 #. module: linkloving_account
-#: code:addons/linkloving_account/models/account_payment.py:168
+#: model:ir.actions.act_window,help:linkloving_account.action_payment_received_register
+msgid "No records Found!"
+msgstr "没有记录!"
+
+#. module: linkloving_account
+#: code:addons/linkloving_account/models/account_payment.py:199
 #, python-format
 msgid "Only a draft payment can be posted. Trying to post a payment in state %s."
 msgstr "Only a draft payment can be posted. Trying to post a payment in state %s."
+
+#. module: linkloving_account
+#: code:addons/linkloving_account/models/account_payment.py:99
+#, python-format
+msgid "Only can delete records state in Draft and Post"
+msgstr "只可以删除草稿或者提交状态的付款申请"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
+msgid "Order No"
+msgstr "订单号"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_partner_id
+#: model:ir.model.fields,field_description:linkloving_account.field_account_supplier_payment_wizard_partner_id
+#: model:ir.ui.view,arch_db:linkloving_account.view_account_payment_register_filter
+msgid "Partner"
+msgstr "合作伙伴"
+
+#. module: linkloving_account
+#: code:addons/linkloving_account/models/account_payment.py:40
+#, python-format
+msgid "Payment"
+msgstr "Payment"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_supplier_payment_wizard_amount
+msgid "Payment Amount"
+msgstr "付款总额"
+
+#. module: linkloving_account
+#: model:ir.actions.act_window,name:linkloving_account.action_payment_register
+#: model:ir.actions.act_window,name:linkloving_account.action_payment_register_accounting
+#: model:ir.ui.menu,name:linkloving_account.menu_product_normal_action_puchased
+#: model:ir.ui.menu,name:linkloving_account.payment_register_apply
+#: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
+msgid "Payment Application"
+msgstr "付款申请"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_supplier_payment_wizard_payment_date
+#: model:ir.ui.view,arch_db:linkloving_account.purchase_account_payment_register_form
+msgid "Payment Date"
+msgstr "付款日期"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_supplier_payment_wizard_journal_id
+msgid "Payment Method"
+msgstr "付款方式"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_supplier_payment_wizard_payment_method_id
+msgid "Payment Type"
+msgstr "付款类型"
 
 #. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_balance_payment_id
@@ -167,9 +410,64 @@ msgid "Payments"
 msgstr "付款"
 
 #. module: linkloving_account
+#: selection:account.payment.register,state:0
+#: model:ir.ui.view,arch_db:linkloving_account.account_receive_register_form
+#: model:ir.ui.view,arch_db:linkloving_account.purchase_account_payment_register_form
+msgid "Post"
+msgstr "提交"
+
+#. module: linkloving_account
+#: model:ir.actions.report.xml,name:linkloving_account.action_report_supplier_payment_application
+msgid "Print Payment Register"
+msgstr "打印付款申请单"
+
+#. module: linkloving_account
+#: model:ir.actions.act_window,name:linkloving_account.action_payment_received_register
+#: model:ir.ui.menu,name:linkloving_account.payment_received_register
+msgid "Receipts"
+msgstr "收货"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_receive_date
+msgid "Receive Date"
+msgstr "收款日期"
+
+#. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_receive_id
 msgid "Receive id"
 msgstr "Receive id"
+
+#. module: linkloving_account
+#: selection:account.payment.register,state:0
+msgid "Register"
+msgstr "Register"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.account_employee_register_payment_view_form
+#: model:ir.ui.view,arch_db:linkloving_account.purchase_account_payment_register_form
+msgid "Register Payment"
+msgstr "登记付款"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_supplier_payment_wizard_register_id
+msgid "Register id"
+msgstr "Register id"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.account_receive_register_form
+#: model:ir.ui.view,arch_db:linkloving_account.purchase_account_payment_register_form
+msgid "Reject"
+msgstr "拒绝"
+
+#. module: linkloving_account
+#: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_remark
+msgid "Remark"
+msgstr "备注"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.view_account_payment_form_inherit
+msgid "Sale Team"
+msgstr "销售团队"
 
 #. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_team_id
@@ -188,13 +486,42 @@ msgid "State"
 msgstr "省/ 州"
 
 #. module: linkloving_account
-#: code:addons/linkloving_account/models/account_payment.py:171
+#: model:ir.ui.view,arch_db:linkloving_account.purchase_account_payment_register_form
+#: model:ir.ui.view,arch_db:linkloving_account.view_account_move_line_filter_inherit
+msgid "Supplier"
+msgstr "供应商"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.account_receive_register_form
+#: model:ir.ui.view,arch_db:linkloving_account.purchase_account_payment_register_form
+msgid "Supplier Invoice"
+msgstr "供应商对账单"
+
+#. module: linkloving_account
+#: model:ir.actions.act_window,name:linkloving_account.action_view_supplier_account_invoice
+msgid "Supplier Invoices"
+msgstr "供应商对账单"
+
+#. module: linkloving_account
+#: model:ir.model.fields,help:linkloving_account.field_account_supplier_payment_wizard_hide_payment_method
+msgid "Technical field used to hide the payment method if the selected journal has only one available which is 'manual'"
+msgstr "技术领域用于隐藏的付款方法，如果选择的日记账只有一个可用的是“手动”"
+
+#. module: linkloving_account
+#: code:addons/linkloving_account/models/account_payment.py:202
 #, python-format
 msgid "The payment cannot be processed because the invoice is not open!"
 msgstr "The payment cannot be processed because the invoice is not open!"
 
 #. module: linkloving_account
+#: code:addons/linkloving_account/models/account_payment.py:126
+#, python-format
+msgid "These is unclosed Payment，Can not close this Record"
+msgstr "有未付款的记录，不可以关闭此付款申请"
+
+#. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_invoice_remain_apply_balance
+#: model:ir.ui.view,arch_db:linkloving_account.invoice_supplier_tree
 msgid "To Apply"
 msgstr "待申请付款金额"
 
@@ -209,12 +536,32 @@ msgid "Total amount in the currency of the invoice, negative for credit notes."
 msgstr "发票中币种的总数量, 贷方是负数."
 
 #. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.account_employee_register_payment_view_form
+msgid "Validate"
+msgstr "验证"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.view_account_payment_register_filter
+msgid "Waiting Confirm"
+msgstr "待确认"
+
+#. module: linkloving_account
+#: model:ir.ui.view,arch_db:linkloving_account.view_account_payment_register_filter
+msgid "Waiting Payment"
+msgstr "待付款"
+
+#. module: linkloving_account
 #: model:ir.model,name:linkloving_account.model_account_payment_register
 msgid "account.payment.register"
-msgstr "account.payment.register"
+msgstr "付款申请"
 
 #. module: linkloving_account
 #: model:ir.model,name:linkloving_account.model_account_payment_register_balance
 msgid "account.payment.register.balance"
-msgstr "account.payment.register.balance"
+msgstr "付款申请账"
+
+#. module: linkloving_account
+#: model:ir.model,name:linkloving_account.model_report_payment_application
+msgid "report.payment.application"
+msgstr "付款申请单"
 

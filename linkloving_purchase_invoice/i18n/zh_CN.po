@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-16 08:21+0000\n"
-"PO-Revision-Date: 2017-01-16 08:21+0000\n"
+"POT-Creation-Date: 2017-03-06 09:13+0000\n"
+"PO-Revision-Date: 2017-03-06 09:13+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -26,7 +26,7 @@ msgid "Account used for deposits"
 msgstr "存款的科目"
 
 #. module: linkloving_purchase_invoice
-#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:159
+#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:178
 #, python-format
 msgid "Advance: %s"
 msgstr "预付款: %s"
@@ -38,23 +38,18 @@ msgstr "取消"
 
 #. module: linkloving_purchase_invoice
 #: model:ir.ui.view,arch_db:linkloving_purchase_invoice.purchase_order_form
-msgid "Create Invoice1"
-msgstr "创建对账单"
-
-#. module: linkloving_purchase_invoice
-#: model:ir.ui.view,arch_db:linkloving_purchase_invoice.purchase_order_form
-msgid "Create Invoice2"
-msgstr "创建对账单"
+msgid "Create Invoice"
+msgstr "创建发票"
 
 #. module: linkloving_purchase_invoice
 #: model:ir.ui.view,arch_db:linkloving_purchase_invoice.view_sale_advance_payment_inv
 msgid "Create Invoices"
-msgstr "创建对账单"
+msgstr "创建发票"
 
 #. module: linkloving_purchase_invoice
 #: model:ir.ui.view,arch_db:linkloving_purchase_invoice.view_sale_advance_payment_inv
 msgid "Create and View Invoices"
-msgstr "创建并查看对账单"
+msgstr "创建并查看发票"
 
 #. module: linkloving_purchase_invoice
 #: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_advance_payment_inv_create_uid
@@ -77,7 +72,7 @@ msgid "Display Name"
 msgstr "显示名称"
 
 #. module: linkloving_purchase_invoice
-#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:90
+#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:98
 #, python-format
 msgid "Down Payment"
 msgstr "预付款"
@@ -103,10 +98,15 @@ msgid "Down payment (percentage)"
 msgstr "预付款 (百分比)"
 
 #. module: linkloving_purchase_invoice
-#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:87
+#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:95
 #, python-format
 msgid "Down payment of %s%%"
 msgstr "预付 of %s%%"
+
+#. module: linkloving_purchase_invoice
+#: model:ir.model,name:linkloving_purchase_invoice.model_mail_compose_message
+msgid "Email composition wizard"
+msgstr "Email撰写向导"
 
 #. module: linkloving_purchase_invoice
 #: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_advance_payment_inv_id
@@ -166,13 +166,19 @@ msgid "Partner invoice id"
 msgstr "合作伙伴 invoice id"
 
 #. module: linkloving_purchase_invoice
-#: code:addons/linkloving_purchase_invoice/models/purchase_order.py:95
+#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:160
+#, python-format
+msgid "Payment Amount cannot larger than order total amount。"
+msgstr "预付款金额不能大于订单金额。"
+
+#. module: linkloving_purchase_invoice
+#: code:addons/linkloving_purchase_invoice/models/purchase_order.py:94
 #, python-format
 msgid "Please define an accounting sale journal for this company."
 msgstr "Please define an accounting sale journal for this company."
 
 #. module: linkloving_purchase_invoice
-#: code:addons/linkloving_purchase_invoice/models/purchase_order.py:147
+#: code:addons/linkloving_purchase_invoice/models/purchase_order.py:150
 #, python-format
 msgid "Please define income account for this product: \"%s\" (id:%d) - or for its category: \"%s\"."
 msgstr "Please define income account for this product: \"%s\" (id:%d) - or for its category: \"%s\"."
@@ -203,32 +209,32 @@ msgid "The amount to be invoiced in advance, taxes excluded."
 msgstr "预付款发票金额，不含税。"
 
 #. module: linkloving_purchase_invoice
-#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:153
+#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:170
 #, python-format
 msgid "The product used to invoice a down payment should be of type 'Service'. Please use another product or update this product."
 msgstr "The product used to invoice a down payment should be of type 'Service'. Please use another product or update this product."
 
 #. module: linkloving_purchase_invoice
-#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:151
+#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:167
 #, python-format
 msgid "The product used to invoice a down payment should have an invoice policy set to \"Ordered quantities\". Please update your deposit product to be able to create a deposit invoice."
 msgstr "The product used to invoice a down payment should have an invoice policy set to \"Ordered quantities\". Please update your deposit product to be able to create a deposit invoice."
 
 #. module: linkloving_purchase_invoice
-#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:84
+#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:92
 #, python-format
 msgid "The value of the down payment amount must be positive."
 msgstr "预付款金额必须大于0."
 
 #. module: linkloving_purchase_invoice
-#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:80
+#: code:addons/linkloving_purchase_invoice/wizard/purchase_make_invoice_advance.py:87
 #, python-format
 msgid "There is no income account defined for this product: \"%s\". You may have to install a chart of account from Accounting app, settings menu."
 msgstr "There is no income account defined for this product: \"%s\". You may have to install a chart of account from Accounting app, settings menu."
 
 #. module: linkloving_purchase_invoice
-#: code:addons/linkloving_purchase_invoice/models/purchase_order.py:47
-#: code:addons/linkloving_purchase_invoice/models/purchase_order.py:51
+#: code:addons/linkloving_purchase_invoice/models/purchase_order.py:46
+#: code:addons/linkloving_purchase_invoice/models/purchase_order.py:50
 #, python-format
 msgid "There is no invoicable line."
 msgstr "没有收到的货物."
@@ -236,10 +242,10 @@ msgstr "没有收到的货物."
 #. module: linkloving_purchase_invoice
 #: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_order_line_qty_to_invoice
 msgid "To Invoice"
-msgstr "待对账"
+msgstr "待开票"
 
 #. module: linkloving_purchase_invoice
 #: model:ir.model.fields,field_description:linkloving_purchase_invoice.field_purchase_advance_payment_inv_advance_payment_method
 msgid "What do you want to invoice?"
-msgstr "你要开什么类型的对账单？"
+msgstr "你要开什么发票？"
 

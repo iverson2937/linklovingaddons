@@ -68,15 +68,15 @@
                     <table class="table table-condensed table-boarded">
                         <thead>
                             <tr>
-                                <th>序列号</th>
+                                <th>Serical Number</th>
                                 <t t-if="not page[0]['is_domestic']">
                                     <th>Description</th>
                                 </t>
                                 <t t-if="page[0]['is_domestic']">
-                                    <th>产品名称</th>
+                                    <th>Product Name</th>
                                 </t>
                                 <t t-if="page[0]['is_domestic']">
-                                    <th>型号规格</th>
+                                    <th>Product Specification</th>
                                 </t>
                                 <th class="text-right">Quantity</th>
                                 <th class="text-right">Unit Price</th>
@@ -170,7 +170,7 @@
 
                     </div>
                     <div class="col-xs-">
-                       <strong> 总数量：</strong>
+                       <strong> Total Amount：</strong>
                         <strong>
                              <span t-field="doc.product_count"/>
                         </strong>

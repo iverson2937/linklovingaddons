@@ -2,7 +2,7 @@
 <openerp>
     <data>
         <report
-                string="打印付款申请单"
+                string="Print Payment Register"
                 id="action_report_supplier_payment_application"
                 model="account.payment.register"
                 report_type="qweb-pdf"

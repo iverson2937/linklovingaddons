@@ -21,7 +21,6 @@ class AccountInvoice(models.Model):
         self.amount_tax = sum(line.amount for line in self.tax_line_ids)
         self.amount_total = self.amount_untaxed + self.amount_tax
         self.amount_total_o = sum(line.price_subtotal_o for line in self.invoice_line_ids)
-        print 'self.amount_total_o ', self.amount_total_o
         self.remain_apply_balance = self.amount_total
         amount_total_company_signed = self.amount_total
         amount_untaxed_signed = self.amount_untaxed

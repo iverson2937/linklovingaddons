@@ -21,12 +21,12 @@ class Partner(models.Model):
     team_id = fields.Many2one('crm.team')
     source_id = fields.Many2one('res.partner.source')
     level = fields.Selection([
-        (1, u'1级'),
-        (2, u'2级'),
-        (3, u'3级')
-    ], string=u'客户等级', default=1)
+        (1, u'lst'),
+        (2, u'2nd'),
+        (3, u'3rd')
+    ], string=u'Customer Level', default=1)
     internal_code = fields.Char(string='No')
-    x_qq = fields.Char(string=u'即时通信')
+    x_qq = fields.Char(string=u'Instant Messaging')
 
     _sql_constraints = [
         ('internal_code_uniq', 'unique (internal_code)', 'The No must be unique!')

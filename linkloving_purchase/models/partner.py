@@ -13,6 +13,4 @@ class Partner(models.Model):
             partner.payment_count = len(partner.payment_ids)
 
 
-class Company(models.Model):
-    _inherit = 'res.company'
-    official_seal = fields.Binary(string=u'公司公章')
+

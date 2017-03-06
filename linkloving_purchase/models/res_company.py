@@ -7,10 +7,7 @@ from odoo import models, fields, api, _, SUPERUSER_ID
 _logger = logging.getLogger(__name__)
 
 
-class PurchaseOrder(models.Model):
-    """
-    采购单
-    """
+class Company(models.Model):
     _inherit = 'res.company'
+    official_seal = fields.Binary(string=u'Official seal')
     purchase_note = fields.Text(string='Default Terms and Conditions', translate=True)
-    official_seal = fields.Binary(string=u'公司公章')

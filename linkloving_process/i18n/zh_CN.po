@@ -1,0 +1,122 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* linkloving_process
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-03-06 08:16+0000\n"
+"PO-Revision-Date: 2017-03-06 08:16+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: linkloving_process
+#: selection:mrp.bom,mo_type:0
+#: selection:mrp.production,mo_type:0
+msgid "Base on Time"
+msgstr "计时计价"
+
+#. module: linkloving_process
+#: selection:mrp.bom,mo_type:0
+#: selection:mrp.production,mo_type:0
+msgid "Base on Unit"
+msgstr "B计件计价"
+
+#. module: linkloving_process
+#: model:ir.model,name:linkloving_process.model_mrp_bom
+msgid "Bill of Material"
+msgstr "物料清单"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_create_uid
+msgid "Created by"
+msgstr "创建人"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_create_date
+msgid "Created on"
+msgstr "创建时间"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_description
+msgid "Description"
+msgstr "说明"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_display_name
+msgid "Display Name"
+msgstr "显示名称"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_id
+msgid "ID"
+msgstr "ID"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process___last_update
+msgid "Last Modified on"
+msgstr "最后修改日"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_write_uid
+msgid "Last Updated by"
+msgstr "最后更新人"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_write_date
+msgid "Last Updated on"
+msgstr "最后更新时间"
+
+#. module: linkloving_process
+#: model:ir.model,name:linkloving_process.model_mrp_production
+msgid "Manufacturing Order"
+msgstr "Manufacturing Order"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_bom_mo_type
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_production_mo_type
+msgid "Mo type"
+msgstr "类型"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_name
+msgid "Name"
+msgstr "名字"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_unit_price
+msgid "Price Unit"
+msgstr "单价"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_production_process_id
+msgid "Process"
+msgstr "工序"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_bom_process_id
+msgid "Process id"
+msgstr "工序"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_partner_id
+msgid "Responsible By"
+msgstr "负责人"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_bom_unit_price
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_production_unit_price
+msgid "Unit price"
+msgstr "单价"
+
+#. module: linkloving_process
+#: model:ir.actions.act_window,name:linkloving_process.action_mrp_process
+#: model:ir.model,name:linkloving_process.model_mrp_process
+msgid "mrp.process"
+msgstr "工序"
+

@@ -18,6 +18,6 @@ class PurchaseOrderCancel(models.TransientModel):
 
         for record in self.env['purchase.order'].browse(active_ids):
             if record.state != 'draft':
-                raise UserError(_("只能取消草稿状态的采购单"))
+                raise UserError(_("Only can delete the draft orders"))
             record.button_cancel()
         return {'type': 'ir.actions.act_window_close'}
