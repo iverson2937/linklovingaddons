@@ -73,7 +73,7 @@
                         <notebook colspan="1">
                             <page string='报销记录' autofocus="autofocus" attrs="{}">
                                 <field name="payment_line_ids">
-                                    <tree create="True">
+                                    <tree create="1">
                                         <field name="expense_no"/>
                                         <field name="name"/>
                                         <field name="accounting_date"/>
@@ -83,7 +83,7 @@
                             </page>
                             <page string='还款记录' attrs="{'invisible':[('return_count','=',0)]}">
                                 <field name="return_ids">
-                                    <tree create="True">
+                                    <tree create="0">
                                         <field name="create_uid" string="创建人"/>
                                         <field name="create_date" string="还款日期"/>
                                         <field name="amount"/>
