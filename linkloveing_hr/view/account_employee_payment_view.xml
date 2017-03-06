@@ -11,9 +11,9 @@
                     <header>
                         <button name="post" class="oe_highlight" states="approve" string="确认付款" type="object"
                                 groups="account.group_account_user"/>
-                        <button name="return_payment" class="oe_highlight" states="paid" string="还款" type="object"
+                        <button name="return_payment" class="oe_highlight"  string="还款" type="object"
                                 groups="account.group_account_user"
-                                attrs="{'invisible': [('payment_return', '=', 0.00)]}"/>
+                                attrs="{'invisible': [('can_return', '=', False)]}"/>
                         <button name="submit" class="oe_highlight" states="draft" string="提交" type="object"/>
 
 
@@ -54,6 +54,7 @@
                             <group>
                                 <!--<field name="is_show" invisible="1"/>-->
                                 <field name="employee_id" string="员工"/>
+                                <field name="can_return" invisible="1"/>
                                 <field name="bank_account_id" string="银行账号"
                                        context="{'default_partner_id':address_home_id}"/>
                                 <field name="address_home_id" invisible="1"/>
@@ -70,14 +71,13 @@
                             </group>
                         </group>
                         <notebook colspan="1">
-                            <page string='报销单' autofocus="autofocus" attrs="{'invisible':[('sheet_count','=',0)]}">
-                                <field name="sheet_ids">
+                            <page string='报销记录' autofocus="autofocus" attrs="{}">
+                                <field name="payment_line_ids">
                                     <tree create="false">
                                         <field name="expense_no"/>
                                         <field name="name"/>
-                                        <field name="create_date"/>
-                                        <field name="deduct_amount" string="暂支抵扣金额"/>
-                                        <field name="total_amount"/>
+                                        <field name="accounting_date"/>
+                                        <field name="amount"/>
                                     </tree>
                                 </field>
                             </page>
@@ -91,9 +91,8 @@
                                 </field>
 
                             </page>
-                            <page string='其他信息'  attrs="{'invisible':[('return_count','=',0),('sheet_count','=',0)]}">
+                            <page string='其他信息'  attrs="{}">
                                 <group>
-                                    <field name="sheet_count"/>
                                     <field name="return_count"/>
                                     <field name="pre_payment_reminding" readonly="1"/>
                                     <field name="payment_return" readonly="1"
@@ -128,6 +127,7 @@
                     <field name="remark"/>
                     <field name="apply_date" string="申请日期"/>
                     <field name="state"/>
+                    <field name="can_return" invisible="0"/>
                     <field name="pre_payment_reminding"/>
                 </tree>
             </field>
