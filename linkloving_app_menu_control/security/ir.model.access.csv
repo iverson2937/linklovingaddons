@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_linkloving_app_menu_control_linkloving_app_menu_control,linkloving_app_menu_control.linkloving_app_menu_control,model_linkloving_app_menu_control_linkloving_app_menu_control,,1,0,0,0
