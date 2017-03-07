@@ -26,7 +26,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/views.xml',
-        'views/mrp_process.xml',
+        # 'views/mrp_process.xml',
         'views/mrp_bom.xml',
         'views/mrp_production.xml',
     ],
