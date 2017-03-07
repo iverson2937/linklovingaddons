@@ -763,3 +763,13 @@ class MrpQcFeedBack(models.Model):
 
     product_id = fields.Many2one('production_id.product_id')
 
+class MultiHandleWorker(models.TransientModel):
+    _name = 'multi.handle.worker'
+
+    @api.multi
+    def action_ok(self):
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+        employees = self.env['hr.employee'].search([('id','in', active_ids)])
+        for em in employees:
+            em.is_worker = True
