@@ -20,4 +20,4 @@ class MrpProduction(models.Model):
         self.unit_price = self.process_id.unit_price
         self.mo_type = self.bom_id.mo_type
         self.hour_price = self.bom_id.hour_price
-        self.in_charge_id = self.process_id.partner_id
+        self.in_charge_id = self.process_id.partner_ids[0] if self.process_id.partner_ids else False
