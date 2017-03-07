@@ -1,2 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_linkloving_mrp_extend_linkloving_mrp_extend,linkloving_mrp_extend.linkloving_mrp_extend,model_linkloving_mrp_extend_linkloving_mrp_extend,,1,0,0,0
+access_linkloving_mrp_extend_sim_stock_move,linkloving_mrp_extend.sim_stock_move,model_sim_stock_move,,1,1,1,1
+access_linkloving_mrp_extend_return_material_line,linkloving_mrp_extend.return_material_line,model_return_material_line,,1,1,1,1
+access_linkloving_mrp_extend_mrp_return_material,linkloving_mrp_extend.mrp_return_material,model_mrp_return_material,,1,1,1,1
+access_warehouse_area,access_warehouse_area,model_warehouse_area,,1,1,1,1
+access_worker_line,access_worker_line,model_worker_line,,1,1,1,1
+access_worker_time_line,access_worker_time_line,model_worker_time_line,,1,1,1,1

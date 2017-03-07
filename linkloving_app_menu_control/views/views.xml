@@ -1,0 +1,133 @@
+<openerp>
+  <data>
+      <record id="base.edit_menu_access" model="ir.ui.view">
+            <field name="model">ir.ui.menu</field>
+            <field name="arch" type="xml">
+                <form string="Menu">
+                  <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="is_show_on_app"/>
+                            <field name="parent_id" groups="base.group_no_one"/>
+                            <field name="sequence" groups="base.group_no_one"/>
+                        </group>
+                        <group groups="base.group_no_one">
+                            <field name="complete_name"/>
+                            <field name="action"/>
+                            <field name="web_icon"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Access Rights">
+                            <field name="groups_id"/>
+                        </page>
+                        <page string="Submenus" groups="base.group_no_one">
+                            <!-- Note: make sure you have 'ir.ui.menu.full_list'
+                                 in the context to see all submenus! -->
+                            <field name="child_id"
+                                    context="{'default_parent_id': active_id}">
+                                <tree string="Menu">
+                                    <field name="sequence"/>
+                                    <field icon="icon" name="name" string="Menu"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                   </sheet>
+                </form>
+            </field>
+        </record>
+
+
+              <record id="account_multi_create_qrcode_form_view" model="ir.ui.view">
+            <field name="name">multi.handle.menu.form</field>
+            <field name="model">multi.handle.menu</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <p class="oe_grey">
+                        是否将所选项目批量显示在app菜单中？
+                    </p>
+                    <footer>
+                        <button string="确定" name="action_handle_menu" type="object" default_focus="1"
+                                class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+        <act_window id="action_multi_handle_menu"
+                    multi="True"
+                    key2="client_action_multi" name="批量处理菜单"
+                    res_model="multi.handle.menu" src_model="ir.ui.menu"
+                    view_mode="form" target="new" view_type="form"/>
+
+     <!--<record id="linkloving_edit_menu_access" model="ir.ui.view">-->
+       <!--<field name="model">ir.ui.menu</field>-->
+       <!--<field name="inherit_id" ref="base.edit_menu_access"/>-->
+       <!--<field name="arch" type="xml">-->
+         <!--<xpath expr="//field=[@name='name']" position="after">-->
+            <!--<field name="is_show_on_app"></field>-->
+         <!--</xpath>-->
+       <!--</field>-->
+    <!--</record>-->
+    <!--<menuitem id="app_menu_control" name="App Menu Control" parent="menu_custom"/>-->
+    <!-- explicit list view definition -->
+    <!--
+    <record model="ir.ui.view" id="linkloving_app_menu_control.list">
+      <field name="name">linkloving_app_menu_control list</field>
+      <field name="model">linkloving_app_menu_control.linkloving_app_menu_control</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="value"/>
+          <field name="value2"/>
+        </tree>
+      </field>
+    </record>
+    -->
+
+    <!-- actions opening views on models -->
+    <!--
+    <record model="ir.actions.act_window" id="linkloving_app_menu_control.action_window">
+      <field name="name">linkloving_app_menu_control window</field>
+      <field name="res_model">linkloving_app_menu_control.linkloving_app_menu_control</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    -->
+
+    <!-- server action to the one above -->
+    <!--
+    <record model="ir.actions.server" id="linkloving_app_menu_control.action_server">
+      <field name="name">linkloving_app_menu_control server</field>
+      <field name="model_id" ref="model_linkloving_app_menu_control_linkloving_app_menu_control"/>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "tree,form",
+          "res_model": self._name,
+        }
+      </field>
+    </record>
+    -->
+
+    <!-- Top menu item -->
+    <!--
+    <menuitem name="linkloving_app_menu_control" id="linkloving_app_menu_control.menu_root"/>
+    -->
+    <!-- menu categories -->
+    <!--
+    <menuitem name="Menu 1" id="linkloving_app_menu_control.menu_1" parent="linkloving_app_menu_control.menu_root"/>
+    <menuitem name="Menu 2" id="linkloving_app_menu_control.menu_2" parent="linkloving_app_menu_control.menu_root"/>
+    -->
+    <!-- actions -->
+    <!--
+    <menuitem name="List" id="linkloving_app_menu_control.menu_1_list" parent="linkloving_app_menu_control.menu_1"
+              action="linkloving_app_menu_control.action_window"/>
+    <menuitem name="Server to list" id="linkloving_app_menu_control" parent="linkloving_app_menu_control.menu_2"
+              action="linkloving_app_menu_control.action_server"/>
+    -->
+  </data>
+</openerp>
