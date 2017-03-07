@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_linkloving_process_linkloving_process,linkloving_process.mrp_process,model_mrp_process,,1,1,1,1

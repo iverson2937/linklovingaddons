@@ -1,0 +1,22 @@
+
+
+<odoo>
+    <data>
+    <record id="mrp_production_form_view_ll" model="ir.ui.view">
+            <field name="name">mrp.production.form</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='origin']" position="after">
+                    <field name="process_id" options="{'no_create':True}" string="工序"/>
+                    <field name="mo_type" widget="radio" string="计价类型"/>
+                    <field name="unit_price" attrs="{'invisible':[('mo_type', '==', 'time')],'readonly':[('state', '!=', 'confirmed')]}" string="单价"/>
+                    <field name="hour_price" attrs="{'invisible':[('mo_type', '==', 'unit')],'readonly':[('state', '!=', 'confirmed')]}" string="时薪"/>
+                </xpath>
+                  <xpath expr="//field[@name='user_id']" position="replace">
+                      <field name="in_charge_id" string="负责人"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
