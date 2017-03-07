@@ -127,6 +127,21 @@ class MrpProductionExtend(models.Model):
             'product_id': value,
             'production_id': self.id
         }
+
+    #备料信息
+    prepare_material_img = fields.Binary(u'备料位置信息图片')
+    prepare_material_area_id = fields.Many2one('stock.location.area', string='Area')
+    #########
+    #送完品检时的信息
+    to_qc_img = fields.Binary(u'位置图片')
+    to_qc_area_id = fields.Many2one('stock.location.area', string='Area')
+    #####
+    #品检反馈单
+    qc_feedback_id = fields.Many2one('mrp.qc.feedback', string=u'品检反馈单')
+    ####
+    #是否暂停
+    is_pending = fields.Boolean()
+    ####
     worker_line_ids = fields.One2many('worker.line', 'production_id')
     sim_stock_move_lines = fields.One2many('sim.stock.move', 'production_id')
     move_finished_ids = fields.One2many(
@@ -147,6 +162,8 @@ class MrpProductionExtend(models.Model):
         ('progress', 'In Progress'),
         ('waiting_quality_inspection',u'等待品检'),
         ('quality_inspection_ing', u'品检中'),
+        ('waiting_rework',u'等待返工'),
+        ('rework_ing',u'返工中'),
         ('waiting_inventory_material',u'等待清点退料'),
         ('waiting_warehouse_inspection', u'等待检验退料'),
         ('waiting_post_inventory',u'等待入库'),
@@ -240,9 +257,12 @@ class MrpProductionExtend(models.Model):
     #仓库清点物料
     def button_check_inventory_material(self):
         return self.button_return_material(need_create_one=False)
-    #品检失败
+    #品检失败,变为等待返工中
     def button_quality_inspection_failed(self):
-        self.write({'state': 'progress'})
+        self.write({'state': 'waiting_rework'})
+     #开始返工   ,返工中
+    def button_start_rework(self):
+        self.write({'state': 'rework_ing'})
 
     def picking_material(self):
         for move in self.sim_stock_move_lines:
@@ -599,7 +619,7 @@ class SimStockMove(models.Model):
     return_qty = fields.Float(compute=_compute_return_qty)
     over_picking_qty = fields.Float()
     quantity_ready = fields.Float()
-
+    area_id = fields.Many2one(related='product_id.area_id')
 
 class ReturnMaterialLine(models.Model):
     _name = 'return.material.line'
@@ -681,6 +701,7 @@ class LLWorkerLine(models.Model):
                     'state' : state,
                     })
 
+
     #计算每个工人的所花费的时间
     # @api.multi
     def cal_worker_spent_time(self):
@@ -715,4 +736,30 @@ class LLWorkerTimeLine(models.Model):
     def cal_interval_of_time_line(self):
         return (fields.Datetime.from_string(self.end_time) - fields.Datetime.from_string(self.start_time)).seconds
 
+
+class MrpQcFeedBack(models.Model):
+    _name = 'mrp.qc.feedback'
+
+    @api.multi
+    def _compute_qc_rate(self):
+        for qc in self:
+            if qc.qty_produced:
+                qc.qc_rate = qc.qc_test_qty / qc.qty_produced * 100
+            else:
+                qc.qc_rate = 0
+
+    @api.multi
+    def _compute_qc_fail_rate(self):
+        for qc in self:
+            qc.qc_fail_rate = qc.qc_fail_qty / qc.qc_test_qty * 100
+    production_id = fields.Many2one('mrp.production')
+    qty_produced = fields.Float(related='production_id.qty_produced')
+    qc_test_qty = fields.Float(u'抽样数量')
+    qc_rate = fields.Float(compute='_compute_qc_rate')
+    qc_fail_qty = fields.Float(u'不良品数量')
+    qc_fail_rate = fields.Float(u'不良品率', compute='_compute_qc_fail_rate')
+    qc_note = fields.Text(u'批注')
+    qc_img = fields.Binary(u'品检图片')
+
+    product_id = fields.Many2one('production_id.product_id')
 

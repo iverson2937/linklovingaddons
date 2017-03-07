@@ -93,7 +93,7 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
         # account_move_lines_to_reconcile.reconcile()
 
         if payment_type == 'inbound' and employee_payment:
-            self.env['account_employee_payment_return.py'].create({
+            self.env['account.employee.payment.return'].create({
             'payment_id':employee_payment.id,
             'amount':self.amount
             })

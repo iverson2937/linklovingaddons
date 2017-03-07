@@ -15,6 +15,9 @@
                 <xpath expr="//field[@name='employee_id']" position="before">
                     <field name="expense_no" readonly="1"/>
                 </xpath>
+                <xpath expr="//tree/field[@name='name']" position="after">
+                    <field name="account_id"/>
+                </xpath>
                 <xpath expr="//field[@name='employee_id']" position="after">
                     <field name="pre_payment_reminding" attrs="{'invisible': [('pre_payment_reminding', '=', False)]}"
                     readonly="1"/>

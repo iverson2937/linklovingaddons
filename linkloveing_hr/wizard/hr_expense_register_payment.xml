@@ -7,8 +7,8 @@
             <field name="model">hr.expense.register.payment.wizard</field>
             <field name="inherit_id" ref="hr_expense.hr_expense_register_payment_view_form" />
             <field name="arch" type="xml">
-                <field name="amount" position="replace">
-                    <field name="amount" readonly="1"/>
+                <field name="amount" position="attributes">
+                    <attribute name="readonly">1</attribute>
                 </field>
             </field>
         </record>

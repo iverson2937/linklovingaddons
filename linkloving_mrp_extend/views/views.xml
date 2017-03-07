@@ -643,6 +643,71 @@
           sequence="31"
         groups="group_charge_produce"/>
 
+        <record id="mrp_waiting_rework" model="ir.actions.act_window">
+            <field name="name">Waiting Rework Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">mrp.production</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph,gantt</field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="view_mrp_production_filter"/>
+            <field name="domain">[('state','=', 'waiting_rework')]</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create a manufacturing order.
+              </p><p>
+                A manufacturing order, based on a bill of materials, will
+                consume raw materials and produce finished products.
+              </p><p>
+                Manufacturing orders are usually proposed automatically based
+                on customer requirements or automated rules like the minimum
+                stock rule.
+              </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_mrp_waiting_rework"
+          name="Waiting Rework Orders"
+          parent="mrp.menu_mrp_manufacturing"
+          action="mrp_waiting_rework"
+          sequence="31"
+        groups="group_charge_produce"/>
+
+
+
+        <record id="mrp_rework_ing" model="ir.actions.act_window">
+            <field name="name">Reworking Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">mrp.production</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph,gantt</field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="view_mrp_production_filter"/>
+            <field name="domain">[('state','=', 'rework_ing')]</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create a manufacturing order.
+              </p><p>
+                A manufacturing order, based on a bill of materials, will
+                consume raw materials and produce finished products.
+              </p><p>
+                Manufacturing orders are usually proposed automatically based
+                on customer requirements or automated rules like the minimum
+                stock rule.
+              </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_mrp_rework_ing"
+          name="Reworking Orders"
+          parent="mrp.menu_mrp_manufacturing"
+          action="mrp_rework_ing"
+          sequence="31"
+        groups="group_charge_produce"/>
+
+
+
+
         <record id="mrp_done" model="ir.actions.act_window">
             <field name="name">Done Orders</field>
             <field name="type">ir.actions.act_window</field>
@@ -700,6 +765,64 @@
           sequence="32"/>
 
 
+        <record id="action_picking_tree_outgoing" model="ir.actions.act_window">
+            <field name="name">出库调拨</field>
+            <field name="res_model">stock.picking</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <field name="domain">[('picking_type_code','=', 'outgoing')]</field>
+            <field name="context">{
+                    'contact_display': 'partner_address',
+            }
+            </field>
+            <field name="search_view_id" ref="stock.view_picking_internal_search"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click here to create a new transfer.
+              </p><p>
+                You can either do it immediately or mark it as Todo for future processing. Use your scanner to validate the transferred quantity quicker.
+              </p>
+            </field>
+        </record>
 
+        <record id="action_picking_tree_incoming" model="ir.actions.act_window">
+            <field name="name">入库调拨</field>
+            <field name="res_model">stock.picking</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <field name="domain">[('picking_type_code','=', 'incoming')]</field>
+            <field name="context">{
+                    'contact_display': 'partner_address',
+            }
+            </field>
+            <field name="search_view_id" ref="stock.view_picking_internal_search"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click here to create a new transfer.
+              </p><p>
+                You can either do it immediately or mark it as Todo for future processing. Use your scanner to validate the transferred quantity quicker.
+              </p>
+            </field>
+        </record>
+
+         <menuitem id="outgoing_picking" name="出库调拨" parent="stock.menu_stock_warehouse_mgmt" sequence="3" action="action_picking_tree_outgoing" groups="stock.group_stock_manager,stock.group_stock_user"/>
+         <menuitem id="incoming_picking" name="入库调拨" parent="stock.menu_stock_warehouse_mgmt" sequence="4" action="action_picking_tree_incoming" groups="stock.group_stock_manager,stock.group_stock_user"/>
+
+
+
+        <record id="hr_hr_employee_view_form_worker" model="ir.ui.view">
+            <field name="name">hr.hr.employee.view.form2</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='category_ids']" position="before">
+                    <group>
+                        <field name="is_worker" string="是否是产线工人"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
     </data>
 </openerp>
