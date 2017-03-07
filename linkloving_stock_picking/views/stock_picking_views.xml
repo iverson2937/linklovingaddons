@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="stock.view_picking_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='do_new_transfer']" position="before">
-                    <button name="action_post" string="Post" type="object" class="oe_highlight"
+                    <button name="action_post" string="Submit" type="object" class="oe_highlight"
                             attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['partially_available','assigned'])]}"
                             groups="stock.group_stock_user"/>
                 </xpath>
@@ -15,11 +15,11 @@
 
 
                 <xpath expr="//button[@name='do_new_transfer']" position="replace">
-                    <button name="do_new_transfer" string="Validate Receive"
+                    <button name="do_new_transfer" string="Confirm Receipts"
                             attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['assigned'])]}"
                             groups="stock.group_stock_user" type="object" class="oe_highlight"/>
 
-                    <button name="do_new_transfer" string="Validate Shipment"
+                    <button name="do_new_transfer" string="Confirm Delivery"
                             attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
                             groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
                     <button name="reject" string="Reject"
