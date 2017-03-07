@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'mrp','linkloving_account'],
+    'depends': ['base', 'mrp', 'linkloving_account'],
 
     # always loaded
     'data': [
@@ -29,6 +29,7 @@
         'views/mrp_process.xml',
         'views/mrp_bom.xml',
         'views/mrp_production.xml',
+        'views/res_partner.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
