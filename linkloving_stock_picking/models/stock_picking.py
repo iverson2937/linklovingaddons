@@ -29,9 +29,9 @@ class StockPicking(models.Model):
         ('confirmed', 'Waiting Availability'),
         ('partially_available', 'Partially Available'),
         ('assigned', 'Available'),
-        ('post', u'Post'),
-        ('qc_check', u'Quality Check'),
-        ('validate', u'Waiting for Confirm'),
+        ('post', 'Post'),
+        ('qc_check', _('Quality Check')),
+        ('validate', _('Waiting for Confirm')),
         ('done', 'Done')], string='Status', compute='_compute_state',
         copy=False, index=True, readonly=True, store=True, track_visibility='onchange',
         help=" * Draft: not confirmed yet and will not be scheduled until confirmed\n"

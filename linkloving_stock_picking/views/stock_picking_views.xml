@@ -15,11 +15,11 @@
 
 
                 <xpath expr="//button[@name='do_new_transfer']" position="replace">
-                    <button name="do_new_transfer" string="Confirm Receipts"
+                    <button name="do_new_transfer" string="Confirm Delivery"
                             attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['assigned'])]}"
                             groups="stock.group_stock_user" type="object" class="oe_highlight"/>
 
-                    <button name="do_new_transfer" string="Confirm Delivery"
+                    <button name="do_new_transfer" string="Confirm Receipts"
                             attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
                             groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
                     <button name="reject" string="Reject"
@@ -70,7 +70,7 @@
             </field>
         </record>
         <record id="action_stock_picking_confirm" model="ir.actions.act_window">
-            <field name="name">Stock Confirm</field>
+            <field name="name">Confirm Receipts</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">stock.picking</field>
             <field name="view_type">form</field>
