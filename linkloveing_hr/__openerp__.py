@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'sale', 'hr_expense', 'account', 'purchase', 'linkloving_account'],
+    'depends': ['base', 'sale', 'hr_expense', 'account', 'purchase', 'linkloving_account','hr'],
 
     # always loaded
     'data': [

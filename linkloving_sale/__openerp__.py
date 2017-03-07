@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'sale', 'product', 'sales_team', 'sale_stock'],
+    'depends': ['base', 'sale', 'product', 'sales_team', 'sale_stock','linkloving_stock_picking'],
 
     # always loaded
     'data': [

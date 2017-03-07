@@ -1,14 +1,25 @@
 <odoo>
     <data>
-    <record id="mrp_bom_form_view" model="ir.ui.view">
+        <record id="mrp_bom_form_view" model="ir.ui.view">
             <field name="name">mrp.bom.form</field>
             <field name="model">mrp.bom</field>
             <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='product_tmpl_id']" position="after">
-                    <field name="process_id" options="{'no_create':True}" string="工序"/>
-                    <field name="mo_type" widget="radio" string="计价类型"/>
+                    <field name="process_id" options="{'no_create':True}"/>
+
+                      <label for="cycle_time" />
+                            <div class="o_row">
+                                <field name="cycle_time"/>
+                                <field name="cycle_time_time_unit" options="{'no_open':True,'no_create':True}"/>
+                            </div>
+
+                    <field name="hour_price"/>
+                    <field name="cost"/>
                     <!--<field name="unit_price" attrs="{'invisible':[('mo_type', '==', 'time')]}"/>-->
+                </xpath>
+                     <xpath expr="//field[@name='type']" position="after">
+                    <field name="mo_type" widget="radio"/>
                 </xpath>
             </field>
         </record>
