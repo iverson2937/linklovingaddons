@@ -21,12 +21,12 @@
                 <xpath expr="//field[@name='employee_id']" position="after">
                     <field name="pre_payment_reminding" attrs="{'invisible': [('pre_payment_reminding', '=', False)]}"
                            readonly="1"/>
-                    <field name="to_approve_id" string="待审批人"/>
+                    <field name="to_approve_id" string="Waiting Approve By"/>
                     <field name="is_show" invisible="1"/>
                 </xpath>
                 <xpath expr="//button[@name='%(hr_expense.hr_expense_register_payment_wizard_action)d']"
                        position="replace">
-                    <button name="register_payment_action" type="object" string="登记付款"
+                    <button name="register_payment_action" type="object" string="Register Payment"
                             class="oe_highlight o_expense_sheet_pay" attrs="{'invisible': [('state', '!=', 'post')]}"
                             context="{'default_amount': total_amount, 'partner_id': address_id}"
                             groups="account.group_account_user"/>
@@ -39,13 +39,13 @@
                 <xpath expr="//button[@name='approve_expense_sheets']" position="replace">
                     <button name="approve_expense_sheets" states="submit" string="Approve" type="object"
                             groups="base.group_erp_manager" class="oe_highlight o_expense_sheet_approve"/>
-                    <button name="manager1_approve" string="批准" type="object"
+                    <button name="manager1_approve" string="Approve" type="object"
                             groups="hr_expense.group_hr_expense_user" class="oe_highlight o_expense_sheet_approve"
                             attrs="{'invisible':['|',('is_show','=',False),('state','!=','submit')]}"
                     />
-                    <button name="manager2_approve" states="manager1_approve" string="批准" type="object"
+                    <button name="manager2_approve" states="manager1_approve" string="Approve" type="object"
                             groups="hr_expense.group_hr_expense_manager" class="oe_highlight o_expense_sheet_approve"/>
-                    <button name="manager3_approve" states="manager2_approve" string="批准" type="object"
+                    <button name="manager3_approve" states="manager2_approve" string="Approve" type="object"
                             groups="linkloveing_hr.group_hr_expense_president"
                             class="oe_highlight"/>
                 </xpath>
@@ -60,7 +60,7 @@
                 </xpath>
 
                 <xpath expr="//button[@name='action_sheet_move_create']" position="replace">
-                    <button name="to_do_journal_entry" states="approve" string="会计确认" type="object"
+                    <button name="to_do_journal_entry" states="approve" string="Confirm" type="object"
                             context="{'employee_id':employee_id}"
                             groups="account.group_account_user" class="oe_highlight o_expense_sheet_post"/>
                 </xpath>
@@ -75,7 +75,7 @@
             <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_tree"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='name']" position="before">
-                    <field name="expense_no" string="报销编号"/>
+                    <field name="expense_no" string="Expense No"/>
                     <field name="create_date"/>
                 </xpath>
             </field>
@@ -163,17 +163,17 @@
             <field name="arch" type="xml">
                 <form string="Expense Reports" class="o_expense_sheet">
                     <header>
-                        <button name="manager1_approve" string="提交" type="object"
+                        <button name="manager1_approve" string="Post" type="object"
                                 groups="hr_expense.group_hr_expense_user" class="oe_highlight o_expense_sheet_approve"
                                 attrs="{'invisible':[('state','!=','submit')]}"
                         />
-                        <button name="manager2_approve" states="manager1_approve" string="批准" type="object"
+                        <button name="manager2_approve" states="manager1_approve" string="Approve" type="object"
                                 groups="hr_expense.group_hr_expense_manager"
                                 class="oe_highlight o_expense_sheet_approve"/>
-                        <button name="manager3_approve" states="manager2_approve" string="批准" type="object"
+                        <button name="manager3_approve" states="manager2_approve" string="Approve" type="object"
                                 groups="linkloveing_hr.group_hr_expense_president"
                                 class="oe_highlight"/>
-                        <button name="action_receive_payment" states="approve" string="收款" type="object"
+                        <button name="action_receive_payment" states="approve" string="Receivable Payment" type="object"
                                 groups="account.group_account_user" class="oe_highlight o_expense_sheet_post"/>
                         <button name="%(hr_expense.hr_expense_register_payment_wizard_action)d" type="action"
                                 string="Register Payment" class="oe_highlight o_expense_sheet_pay"
@@ -212,9 +212,9 @@
                         <group>
                             <group>
                                 <field name="partner_id" domain="[('customer','=',True),('is_company','=',True)]"
-                                       string="来源" options="{'no_create': True}"/>
+                                       string="Source" options="{'no_create': True}"/>
                                 <field name="employee_id"/>
-                                <field name="to_approve_id" string="待审核人"/>
+                                <field name="to_approve_id" string="Waiting Approve By"/>
                                 <field name="is_show" invisible="1"/>
                                 <field name="payment_mode"/>
                                 <field name="responsible_id" invisible="1"/>
@@ -280,7 +280,7 @@
         </record>
 
 
-        <menuitem id="menu_hr_expense_sheet_to_receive" name="财务专用收入入口" sequence="5"
+        <menuitem id="menu_hr_expense_sheet_to_receive" name="Accounting Use Only" sequence="5"
                   parent="hr_expense.menu_hr_expense_accountant"
                   action="action_hr_expense_sheet_to_receive"/>
 

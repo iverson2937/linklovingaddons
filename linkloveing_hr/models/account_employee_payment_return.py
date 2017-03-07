@@ -12,4 +12,4 @@ class AccountEmployeePaymentReturn(models.Model):
     _order = 'create_date desc'
     employee_id = fields.Many2one('hr.employee')
     payment_id = fields.Many2one('account.employee.payment')
-    amount = fields.Float(string=u'还款金额')
+    amount = fields.Float(string=u'Return Amount')

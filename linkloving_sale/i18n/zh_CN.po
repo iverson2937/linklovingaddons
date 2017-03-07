@@ -18,12 +18,12 @@ msgstr ""
 #. module: linkloving_sale
 #: selection:res.partner,level:0
 msgid "2nd"
-msgstr "2nd"
+msgstr "二级客户"
 
 #. module: linkloving_sale
 #: selection:res.partner,level:0
 msgid "3rd"
-msgstr "3rd"
+msgstr "三级客户"
 
 #. module: linkloving_sale
 #: code:addons/linkloving_sale/wizard/sale_make_invoice_advance.py:44
@@ -256,7 +256,7 @@ msgstr "调拨"
 #. module: linkloving_sale
 #: selection:res.partner,level:0
 msgid "lst"
-msgstr "lst"
+msgstr "一级客户"
 
 #. module: linkloving_sale
 #: model:ir.model,name:linkloving_sale.model_res_partner_source

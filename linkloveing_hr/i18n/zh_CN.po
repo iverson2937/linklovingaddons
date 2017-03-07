@@ -1,13 +1,13 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-#	* linklove_hr
+#	* linkloveing_hr
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 8.0\n"
+"Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-28 05:35+0000\n"
-"PO-Revision-Date: 2016-09-28 05:35+0000\n"
+"POT-Creation-Date: 2017-03-06 13:07+0000\n"
+"PO-Revision-Date: 2017-03-06 13:07+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -15,20 +15,963 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
 
-#. module: linklove_hr
-#: model:ir.model,name:linklove_hr.model_hr_expense_expense
+#. module: linkloveing_hr
+#: selection:account.employee.payment,state:0
+msgid "1st Approved"
+msgstr "1级审核"
+
+#. module: linkloveing_hr
+#: selection:account.employee.payment,state:0
+msgid "2nd Approved"
+msgstr "2级审核"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.report_account_employee_payment
+msgid "<strong>Total</strong>"
+msgstr "<strong>总计</strong>"
+
+#. module: linkloveing_hr
+#: code:addons/linkloveing_hr/wizard/hr_expense_register_payment_wizard.py:35
+#, python-format
+msgid "A payment of %s %s with the reference <a href='/mail/view?%s'>%s</a> related to your expense %s has been made."
+msgstr "A payment of %s %s with the reference <a href='/mail/view?%s'>%s</a> related to your expense %s has been made."
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_receive_wizard_account_id
+msgid "Account id"
+msgstr "Account id"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_line_accounting_date
+msgid "Accounting Date"
+msgstr "会计日期"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_hr_expense_sheet_income_form
+msgid "Accounting Entries"
+msgstr "会计分录"
+
+#. module: linkloveing_hr
+#: model:ir.ui.menu,name:linkloveing_hr.menu_hr_expense_sheet_to_receive
+msgid "Accounting Use Only"
+msgstr "会计专用收入入口"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_account_voucher
+msgid "Accounting Voucher"
+msgstr "会计凭单"
+
+#. module: linkloveing_hr
+#: model:ir.ui.menu,name:linkloveing_hr.menu_hr_expense_sheet_all
+msgid "All Expense Sheet"
+msgstr "所有报销单"
+
+#. module: linkloveing_hr
+#: model:ir.ui.menu,name:linkloveing_hr.menu_account_payment_all
+msgid "All Loan"
+msgstr "所有暂支"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_line_amount
+#: model:ir.ui.view,arch_db:linkloveing_hr.hr_expense_receive_wizard_form
+msgid "Amount"
+msgstr "金额"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_account_analytic_account
+msgid "Analytic Account"
+msgstr "分析账户"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_amount
+msgid "Apply Amount"
+msgstr "申请金额"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_form
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_tree
+msgid "Apply Date"
+msgstr "申请日期"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_apply_date
+msgid "Apply date"
+msgstr "申请日期"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.linkloving_view_expenses_form
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_form
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_hr_expense_sheet_income_form
+msgid "Approve"
+msgstr "批准"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_approve_ids
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_sheet_approve_ids
+msgid "Approve ids"
+msgstr "Approve ids"
+
+#. module: linkloveing_hr
+#: selection:account.employee.payment,state:0
+msgid "Approved"
+msgstr "批准"
+
+#. module: linkloveing_hr
+#: model:ir.ui.menu,name:linkloveing_hr.menu_hr_expense_sheet_all_to_approved
+msgid "Approved Expense Sheet"
+msgstr "已审核暂支"
+
+#. module: linkloveing_hr
+#: model:ir.ui.menu,name:linkloveing_hr.menu_account_payment_approved
+msgid "Approved Loan"
+msgstr "已审核暂支"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_account_asset_asset
+msgid "Asset/Revenue Recognition"
+msgstr "资产/收入识别"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_pre_payment_reminding
+msgid "Available amount"
+msgstr "可用金额"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.account_employee_payable_wizard
+msgid "Backorder creation"
+msgstr "欠单创建"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_form
+msgid "Bank Account"
+msgstr "银行账户"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_bank_account_id
+msgid "Bank Account Number"
+msgstr "银行账户号码"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_account_bank_statement
+msgid "Bank Statement"
+msgstr "银行对账单"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_mrp_bom
+msgid "Bill of Material"
+msgstr "物料清单"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_crossovered_budget
+msgid "Budget"
+msgstr "预算"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_project_project_crossovered_budget_line
+msgid "Budget Lines"
+msgstr "预算明细"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_can_return
+msgid "Can return"
+msgstr "Can return"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.account_employee_register_payment_view_form
+#: model:ir.ui.view,arch_db:linkloveing_hr.hr_expense_receive_wizard_form
+msgid "Cancel"
+msgstr "取消"
+
+#. module: linkloveing_hr
+#: model:ir.actions.act_window,help:linkloveing_hr.action_account_employee_payment_apply
+#: model:ir.actions.act_window,help:linkloveing_hr.action_account_payment_all
+#: model:ir.actions.act_window,help:linkloveing_hr.action_account_payment_to_approve
+#: model:ir.actions.act_window,help:linkloveing_hr.action_account_payment_to_approved
+#: model:ir.actions.act_window,help:linkloveing_hr.action_account_payment_wait_pay
+msgid "Click here to create a new account payment."
+msgstr "Click here to create a new account payment."
+
+#. module: linkloveing_hr
+#: model:ir.actions.act_window,help:linkloveing_hr.action_hr_expense_sheet_all
+#: model:ir.actions.act_window,help:linkloveing_hr.action_hr_expense_sheet_all_to_approved
+msgid "Click here to create a new expense report."
+msgstr "点击这里创建新费用报告"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_register_payment_wizard_company_id
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_receive_wizard_company_id
+msgid "Company"
+msgstr "公司"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,help:linkloveing_hr.field_account_employee_register_payment_wizard_company_id
+#: model:ir.model.fields,help:linkloveing_hr.field_hr_expense_receive_wizard_company_id
+msgid "Company related to this journal"
+msgstr "日记账相关的公司"
+
+#. module: linkloveing_hr
+#: selection:account.employee.payment,state:0
+#: model:ir.ui.view,arch_db:linkloveing_hr.linkloving_view_expenses_form
+msgid "Confirm"
+msgstr "确认"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_form
+msgid "Confirm Payment"
+msgstr "确定付款"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_form
+msgid "Created By"
+msgstr "创建人"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payable_wizard_create_uid
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_create_uid
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_line_create_uid
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_return_create_uid
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_register_payment_wizard_create_uid
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_receive_wizard_create_uid
+msgid "Created by"
+msgstr "创建人"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payable_wizard_create_date
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_create_date
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_line_create_date
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_return_create_date
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_register_payment_wizard_create_date
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_receive_wizard_create_date
+msgid "Created on"
+msgstr "创建时间"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_register_payment_wizard_currency_id
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_receive_wizard_currency_id
+msgid "Currency"
+msgstr "币种"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payable_wizard_deduct_amount
+msgid "Deduct amount"
+msgstr "Deduct amount"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_form
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_tree
+msgid "Department"
+msgstr "部门"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_department_id
+msgid "Department id"
+msgstr "部门"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_mail_channel
+msgid "Discussion channel"
+msgstr "讨论频道"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payable_wizard_display_name
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_display_name
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_line_display_name
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_return_display_name
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_register_payment_wizard_display_name
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_receive_wizard_display_name
+msgid "Display Name"
+msgstr "显示名称"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_hr_expense_sheet_income_form
+msgid "Documents"
+msgstr "文档"
+
+#. module: linkloveing_hr
+#: selection:account.employee.payment,state:0
+msgid "Draft"
+msgstr "草稿"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.account_employee_register_payment_view_form
+msgid "Draft Payment"
+msgstr "草稿付款"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_mail_thread
+msgid "Email Thread"
+msgstr "电子邮件线程"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_hr_employee
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_form
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_search
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_tree
+msgid "Employee"
+msgstr "员工"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_hr_contract
+msgid "Employee Contract"
+msgstr "员工合约"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,help:linkloveing_hr.field_account_employee_payment_bank_account_id
+msgid "Employee bank salary account"
+msgstr "员工银行工资账户"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payable_wizard_employee_id
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_employee_id
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_return_employee_id
+msgid "Employee id"
+msgstr "员工"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_calendar_event
+msgid "Event"
+msgstr "活动"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_hr_expense
 msgid "Expense"
 msgstr "费用"
 
-#. module: linklove_hr
-#: code:addons/linklove_hr/models.py:12
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.linkloving_view_expenses_tree
+msgid "Expense No"
+msgstr "报销单号"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_hr_expense_sheet
+msgid "Expense Report"
+msgstr "费用报告"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_line_name
+msgid "Expense Report Summary"
+msgstr "费用报告摘要"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_hr_expense_sheet_income_form
+msgid "Expense Reports"
+msgstr "费用报告"
+
+#. module: linkloveing_hr
+#: model:ir.actions.act_window,name:linkloveing_hr.action_hr_expense_sheet_all
+#: model:ir.actions.act_window,name:linkloveing_hr.action_hr_expense_sheet_all_to_approved
+msgid "Expense Reports to Approved"
+msgstr "待审核报销单"
+
+#. module: linkloveing_hr
+#: code:addons/linkloveing_hr/models/hr_expense_sheet.py:167
 #, python-format
+msgid "Expense Sheet"
+msgstr "报销单"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_form
+msgid "Expense Sheets"
+msgstr "报销单"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_line_expense_no
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_sheet_expense_no
+msgid "Expense no"
+msgstr "报销单号"
+
+#. module: linkloveing_hr
+#: code:addons/linkloveing_hr/models/hr_expense_sheet.py:24
+#: code:addons/linkloveing_hr/models/hr_expense_sheet.py:142
+#: code:addons/linkloveing_hr/models/hr_expense_sheet.py:161
+#, python-format
+msgid "Expenses must have an expense journal specified to generate accounting entries."
+msgstr "Expenses must have an expense journal specified to generate accounting entries."
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_hr_expense_sheet_filter
+msgid "Expenses to Invoice"
+msgstr "待开票的费用"
+
+#. module: linkloveing_hr
+#: selection:account.employee.payment,state:0
+msgid "General Manager Approve"
+msgstr "General Manager Approve"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_register_payment_wizard_hide_payment_method
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_receive_wizard_hide_payment_method
+msgid "Hide payment method"
+msgstr "隐藏付款方式"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_address_home_id
+msgid "Home Address"
+msgstr "家庭地址"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_hr_department
+msgid "Hr Department"
+msgstr "部门"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_account_employee_payable_wizard
+#: model:ir.model,name:linkloveing_hr.model_account_employee_register_payment_wizard
+#: model:ir.model,name:linkloveing_hr.model_hr_expense_register_payment_wizard
+msgid "Hr Expense Register Payment wizard"
+msgstr "HR费用登记付款向导"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_hr_expense_receive_wizard
+msgid "Hr Expense receive Payment wizard"
+msgstr "Hr Expense receive Payment wizard"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payable_wizard_id
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_id
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_line_id
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_return_id
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_register_payment_wizard_id
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_receive_wizard_id
+msgid "ID"
+msgstr "ID"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_sheet_income
+msgid "Income"
+msgstr "收入"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.hr_expense_receive_wizard_form
+msgid "Income Account"
+msgstr "收入科目"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_product_product_inner_code
+msgid "Internal Code"
+msgstr "编号"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_product_product_inner_spec
+msgid "Internal Specification"
+msgstr "国内型号"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_account_invoice
+msgid "Invoice"
+msgstr "发票"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_sheet_is_deduct_payment
+msgid "Is deduct payment"
+msgstr "Is deduct payment"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_is_show
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_sheet_is_show
+msgid "Is show"
+msgstr "Is show"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_hr_job
+msgid "Job Position"
+msgstr "工作岗位"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payable_wizard___last_update
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment___last_update
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_line___last_update
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_return___last_update
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_register_payment_wizard___last_update
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_receive_wizard___last_update
+msgid "Last Modified on"
+msgstr "最后修改日"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payable_wizard_write_uid
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_line_write_uid
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_return_write_uid
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_write_uid
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_register_payment_wizard_write_uid
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_receive_wizard_write_uid
+msgid "Last Updated by"
+msgstr "最后更新人"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payable_wizard_write_date
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_line_write_date
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_return_write_date
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_write_date
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_register_payment_wizard_write_date
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_receive_wizard_write_date
+msgid "Last Updated on"
+msgstr "最后更新时间"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_crm_lead
+msgid "Lead/Opportunity"
+msgstr "线索/商机"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_hr_holidays
+msgid "Leave"
+msgstr "休假"
+
+#. module: linkloveing_hr
+#: model:ir.actions.act_window,name:linkloveing_hr.action_account_payment_all
+#: model:ir.actions.act_window,name:linkloveing_hr.action_account_payment_to_approved
+#: model:ir.ui.menu,name:linkloveing_hr.menu_account_payment
+msgid "Loan"
+msgstr "暂支"
+
+#. module: linkloveing_hr
+#: model:ir.actions.act_window,name:linkloveing_hr.action_account_employee_payment_apply
+#: model:ir.ui.menu,name:linkloveing_hr.menu_account_payment_apply
+msgid "Loan Application"
+msgstr "暂支申请"
+
+#. module: linkloveing_hr
+#: model:ir.ui.menu,name:linkloveing_hr.menu_account_payment_wait_approve
+msgid "Loan to Approved"
+msgstr "待审核暂支"
+
+#. module: linkloveing_hr
+#: model:ir.ui.menu,name:linkloveing_hr.menu_account_payment_wait_pay
+msgid "Loan to Payment"
+msgstr "待付款暂支"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_stock_production_lot
+msgid "Lot/Serial"
+msgstr "批次/序列号"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_mrp_production
+msgid "Manufacturing Order"
+msgstr "Manufacturing Order"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_register_payment_wizard_communication
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_receive_wizard_communication
+msgid "Memo"
+msgstr "备忘录"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_name
+msgid "Name"
+msgstr "名字"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.account_employee_payable_wizard
+msgid "No"
+msgstr "No"
+
+#. module: linkloveing_hr
+#: model:ir.actions.act_window,help:linkloveing_hr.action_account_employee_payment_apply
+#: model:ir.actions.act_window,help:linkloveing_hr.action_account_payment_all
+#: model:ir.actions.act_window,help:linkloveing_hr.action_account_payment_to_approve
+#: model:ir.actions.act_window,help:linkloveing_hr.action_account_payment_to_approved
+#: model:ir.actions.act_window,help:linkloveing_hr.action_account_payment_wait_pay
+#: model:ir.actions.act_window,help:linkloveing_hr.action_hr_expense_sheet_all
+#: model:ir.actions.act_window,help:linkloveing_hr.action_hr_expense_sheet_all_to_approved
+msgid "Once you have created your expense, submit it to your manager who will validate it."
+msgstr "当你生成了你的费用申请，发送给你的经理，他会验证。"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_form
+msgid "Other Info"
+msgstr "其他信息"
+
+#. module: linkloveing_hr
+#: selection:account.employee.payment,state:0
+msgid "Paid"
+msgstr "已支付"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_res_partner
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_register_payment_wizard_partner_id
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_receive_wizard_partner_id
+msgid "Partner"
+msgstr "合作伙伴"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_sheet_partner_id
+msgid "Partner id"
+msgstr "Partner id"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.hr_expense_receive_wizard_form
+msgid "Payment Account"
+msgstr "付款账户"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_register_payment_wizard_amount
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_receive_wizard_amount
+msgid "Payment Amount"
+msgstr "付款总额"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_register_payment_wizard_payment_date
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_receive_wizard_payment_date
+msgid "Payment Date"
+msgstr "付款日期"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_register_payment_wizard_journal_id
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_receive_wizard_journal_id
+msgid "Payment Method"
+msgstr "付款方式"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_register_payment_wizard_payment_method_id
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_receive_wizard_payment_method_id
+msgid "Payment Type"
+msgstr "付款类型"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_line_payment_id
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_return_payment_id
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_sheet_payment_id
+msgid "Payment id"
+msgstr "Payment id"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payable_wizard_payment_ids
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_employee_payment_ids
+msgid "Payment ids"
+msgstr "Payment ids"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_payment_line_ids
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_sheet_payment_line_ids
+msgid "Payment line ids"
+msgstr "Payment line ids"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_account_payment
+msgid "Payments"
+msgstr "付款"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_form
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_hr_expense_sheet_income_form
+msgid "Post"
+msgstr "提交"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_employee_pre_payment_reminding
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_sheet_pre_payment_reminding
+msgid "Pre payment reminding"
+msgstr "暂支余额"
+
+#. module: linkloveing_hr
+#: model:res.groups,name:linkloveing_hr.group_hr_expense_president
+msgid "President"
+msgstr "总监"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_procurement_order
+msgid "Procurement"
+msgstr "补货"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_product_product
+msgid "Product"
+msgstr "产品"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_product_template
+msgid "Product Template"
+msgstr "产品模板"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_project_project
 msgid "Project"
 msgstr "项目"
 
-#. module: linklove_hr
-#: code:addons/linklove_hr/models.py:11
-#, python-format
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_purchase_order
 msgid "Purchase Order"
-msgstr "PO"
+msgstr "采购订单"
+
+#. module: linkloveing_hr
+#: code:addons/linkloveing_hr/models/hr_expense_sheet.py:206
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_hr_expense_sheet_income_form
+#, python-format
+msgid "Receivable Payment"
+msgstr "收款"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_payment_receive_account_id
+msgid "Receive account id"
+msgstr "收入账户"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.linkloving_view_expenses_form
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_hr_expense_sheet_income_form
+msgid "Refuse"
+msgstr "拒绝"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.account_employee_register_payment_view_form
+#: model:ir.ui.view,arch_db:linkloveing_hr.hr_expense_receive_wizard_form
+#: model:ir.ui.view,arch_db:linkloveing_hr.linkloving_view_expenses_form
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_form
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_tree
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_hr_expense_sheet_income_form
+msgid "Register Payment"
+msgstr "登记付款"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_form
+msgid "Reject"
+msgstr "拒绝"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.hr_timesheet_employee_extd_form
+msgid "Remaining"
+msgstr "剩余暂支"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_remark
+msgid "Remark"
+msgstr "备注"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_hr_expense_sheet_income_form
+msgid "Resubmit"
+msgstr "重新提交"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_return_amount
+msgid "Return Amount"
+msgstr "还款金额"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_form
+msgid "Return Date"
+msgstr "还款日期"
+
+#. module: linkloveing_hr
+#: code:addons/linkloveing_hr/models/account_employee_payment.py:163
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_form
+#, python-format
+msgid "Return Payment"
+msgstr "还款"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_payment_return
+msgid "Return amount"
+msgstr "还款金额"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_return_count
+msgid "Return count"
+msgstr "还款次数"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_return_ids
+msgid "Return ids"
+msgstr "还款记录"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_form
+msgid "Return records"
+msgstr "还款记录"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_search
+msgid "SN"
+msgstr "SN"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_sale_order
+msgid "Sales Order"
+msgstr "销售订单"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_crm_team
+msgid "Sales Team"
+msgstr "销售团队"
+
+#. module: linkloveing_hr
+#: code:addons/linkloveing_hr/models/hr_expense_sheet.py:184
+#, python-format
+msgid "Send Money"
+msgstr "收款"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_sheet_count
+msgid "Sheet count"
+msgstr "报销单数量"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payable_wizard_sheet_id
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_line_sheet_id
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_receive_wizard_sheet_id
+msgid "Sheet id"
+msgstr "报销单号"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_sheet_ids
+msgid "Sheet ids"
+msgstr "报销单"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.hr_expense_receive_wizard_form
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_hr_expense_sheet_income_form
+msgid "Source"
+msgstr "来源"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_state
+msgid "Status"
+msgstr "状态"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_project_task
+msgid "Task"
+msgstr "任务"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,help:linkloveing_hr.field_account_employee_register_payment_wizard_hide_payment_method
+#: model:ir.model.fields,help:linkloveing_hr.field_hr_expense_receive_wizard_hide_payment_method
+msgid "Technical field used to hide the payment method if the selected journal has only one available which is 'manual'"
+msgstr "技术领域用于隐藏的付款方法，如果选择的日记账只有一个可用的是“手动”"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_mail_test
+msgid "Test Mail Model"
+msgstr "Test Mail Model"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.account_employee_payable_wizard
+msgid "This employee has loan form Company,Do you want to deduct it ?"
+msgstr "员工有未抵扣暂支，是否抵扣?"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_hr_expense_sheet_filter
+msgid "To Pay"
+msgstr "待支付"
+
+#. module: linkloveing_hr
+#: model:ir.model.fields,field_description:linkloveing_hr.field_account_employee_payment_to_approve_id
+#: model:ir.model.fields,field_description:linkloveing_hr.field_hr_expense_sheet_to_approve_id
+msgid "To approve id"
+msgstr "待审核人"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.account_employee_payable_wizard
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_hr_expense_sheet_income_form
+msgid "Total Amount"
+msgstr "金额总计"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_stock_picking
+msgid "Transfer"
+msgstr "调拨"
+
+#. module: linkloveing_hr
+#: code:addons/linkloveing_hr/models/account_payment.py:20
+#, python-format
+msgid "Transfer account not defined on the company."
+msgstr "Transfer account not defined on the company."
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_mrp_unbuild
+msgid "Unbuild Order"
+msgstr "拆解单"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.account_employee_register_payment_view_form
+#: model:ir.ui.view,arch_db:linkloveing_hr.hr_expense_receive_wizard_form
+msgid "Validate"
+msgstr "验证"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_hr_expense_sheet_income_form
+msgid "View Attachments"
+msgstr "查看附件"
+
+#. module: linkloveing_hr
+#: model:ir.actions.act_window,name:linkloveing_hr.action_account_payment_to_approve
+msgid "Waiting Approve"
+msgstr "待审核"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.linkloving_view_expenses_form
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_form
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_account_employee_payment_tree
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_hr_expense_sheet_income_form
+msgid "Waiting Approve By"
+msgstr "待审核"
+
+#. module: linkloveing_hr
+#: model:ir.actions.act_window,name:linkloveing_hr.action_account_payment_wait_pay
+msgid "Waiting Payment"
+msgstr "待付款"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_mrp_workorder
+msgid "Work Order"
+msgstr "工单"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.account_employee_payable_wizard
+msgid "YES"
+msgstr "YES"
+
+#. module: linkloveing_hr
+#: code:addons/linkloveing_hr/models/hr_expense_sheet.py:21
+#: code:addons/linkloveing_hr/models/hr_expense_sheet.py:139
+#: code:addons/linkloveing_hr/models/hr_expense_sheet.py:158
+#, python-format
+msgid "You can only generate accounting entry for approved expense(s)."
+msgstr "You can only generate accounting entry for approved expense(s)."
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.account_employee_payable_wizard
+msgid "_Cancel"
+msgstr "取消(_C)"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_account_employee_payment
+msgid "account.employee.payment"
+msgstr "员工付款"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_account_employee_payment_line
+msgid "account.employee.payment.line"
+msgstr "报销记录"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_account_employee_payment_return
+msgid "account.employee.payment.return"
+msgstr "员工还款"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_account_payment_register
+msgid "account.payment.register"
+msgstr "account.payment.register"
+
+#. module: linkloveing_hr
+#: model:ir.ui.view,arch_db:linkloveing_hr.view_hr_expense_sheet_income_form
+msgid "e.g. Trip to NY"
+msgstr "e.g. Trip to NY"
+
+#. module: linkloveing_hr
+#: model:ir.actions.act_window,name:linkloveing_hr.action_hr_expense_sheet_to_receive
+msgid "hr.expense.sheet.received"
+msgstr "会计收款"
+
+#. module: linkloveing_hr
+#: model:ir.model,name:linkloveing_hr.model_ir_ui_menu
+msgid "ir.ui.menu"
+msgstr "ir.ui.menu"
+
+#. module: linkloveing_hr
+#: code:addons/linkloveing_hr/models/account_employee_payment.py:146
+#, python-format
+msgid "payment"
+msgstr "付款"
 

@@ -25,7 +25,7 @@
             <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_tree"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='name']" position="before">
-                    <field name="expense_no" string="报销编号"/>
+                    <field name="expense_no" string="Expense No"/>
                 </xpath>
             </field>
         </record>
@@ -102,11 +102,11 @@
         <menuitem id="hr_expense.menu_hr_expense_sheet_all_to_approve" name="Expense Reports To Approve" sequence="1"
                   parent="hr_expense.menu_hr_expense_to_approve"
                   action="hr_expense.action_hr_expense_sheet_all_to_approve"/>
-        <menuitem id="menu_hr_expense_sheet_all_to_approved" name="已审核的费用报告" sequence="1"
+        <menuitem id="menu_hr_expense_sheet_all_to_approved" name="Approved Expense Sheet" sequence="1"
                   parent="hr_expense.menu_hr_expense_to_approve"
                   action="action_hr_expense_sheet_all_to_approved"/>
 
-        <menuitem id="menu_hr_expense_sheet_all" name="所有报销单" sequence="1"
+        <menuitem id="menu_hr_expense_sheet_all" name="All Expense Sheet" sequence="1"
                   parent="hr_expense.menu_hr_expense_to_approve"
                   groups="base.group_erp_manager"
                   action="action_hr_expense_sheet_all"/>

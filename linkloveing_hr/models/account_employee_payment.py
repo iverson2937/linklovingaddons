@@ -16,8 +16,8 @@ class AccountEmployeePayment(models.Model):
     to_approve_id = fields.Many2one('res.users', track_visibility='onchange')
     approve_ids = fields.Many2many('res.users')
     apply_date = fields.Date(default=fields.Date.context_today)
-    amount = fields.Float(string=u'申请金额')
-    remark = fields.Text(string=u'备注')
+    amount = fields.Float(string='Apply Amount')
+    remark = fields.Text(string='Remark')
     address_home_id = fields.Many2one('res.partner', related='employee_id.address_home_id')
     bank_account_id = fields.Many2one('res.partner.bank', related='employee_id.bank_account_id')
     sheet_ids = fields.One2many('hr.expense.sheet', 'payment_id')
@@ -28,7 +28,7 @@ class AccountEmployeePayment(models.Model):
     def _get_return_balance(self):
         self.payment_return = sum([return_id.amount for return_id in self.return_ids])
 
-    payment_return = fields.Float(string=u'还款金额', compute=_get_return_balance)
+    payment_return = fields.Float(string='Return amount', compute=_get_return_balance)
     return_count = fields.Integer(compute='_get_count')
     sheet_count = fields.Integer(compute='_get_count')
     payment_line_ids = fields.One2many('account.employee.payment.line', 'payment_id')
@@ -42,7 +42,7 @@ class AccountEmployeePayment(models.Model):
             used_payment = sum([payment.amount for payment in self.payment_line_ids])
             self.pre_payment_reminding = self.amount - used_payment - self.payment_return
 
-    pre_payment_reminding = fields.Float(string=u'可用金额', compute=_get_pre_payment_reminding_balance)
+    pre_payment_reminding = fields.Float(string='Available amount', compute=_get_pre_payment_reminding_balance)
 
     @api.one
     @api.depends('state', 'return_ids', 'payment_line_ids')
@@ -65,13 +65,13 @@ class AccountEmployeePayment(models.Model):
 
     is_show = fields.Boolean(compute=_get_is_show)
 
-    state = fields.Selection([('draft', u'草稿'),
-                              ('confirm', u'确认'),
-                              ('manager1_approve', u'一级审批'),
-                              ('manager2_approve', u'二级审批'),
-                              ('manager3_approve', u'总经理审批'),
-                              ('approve', u'批准'),
-                              ('paid', u'已支付'),
+    state = fields.Selection([('draft', 'Draft'),
+                              ('confirm', u'Confirm'),
+                              ('manager1_approve', u'1st Approved'),
+                              ('manager2_approve', u'2nd Approved'),
+                              ('manager3_approve', u'General Manager Approve'),
+                              ('approve', u'Approved'),
+                              ('paid', u'Paid'),
                               ],
                              readonly=True, default='draft', copy=False, string="Status", store=True,
                              track_visibility='onchange')
@@ -160,7 +160,7 @@ class AccountEmployeePayment(models.Model):
         context = {'default_payment_type': 'inbound', 'default_amount': self.pre_payment_reminding}
 
         return {
-            'name': _('还款'),
+            'name': _('Return Payment'),
             'view_type': 'form',
             'view_mode': 'form',
             # 'view_id': False,
@@ -193,5 +193,5 @@ class AccountEmployeePayment(models.Model):
     @api.multi
     def unlink(self):
         if self.state in ['paid', 'deduct']:
-            raise UserError('不能删除已经支付的暂支记录。')
+            raise UserError('Can not delete the Expense Sheet which already paid.')
         return super(AccountEmployeePayment, self).unlink()

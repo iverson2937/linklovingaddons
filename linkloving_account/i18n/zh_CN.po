@@ -28,52 +28,52 @@ msgstr "<strong>Accounting:</strong>"
 #. module: linkloving_account
 #: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
 msgid "<strong>Apply Date:</strong>"
-msgstr "<strong>Apply Date:</strong>"
+msgstr "<strong>申请日期:</strong>"
 
 #. module: linkloving_account
 #: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
 msgid "<strong>Company Name:</strong>"
-msgstr "<strong>Company Name:</strong>"
+msgstr "<strong>公司名称:</strong>"
 
 #. module: linkloving_account
 #: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
 msgid "<strong>Due bank:</strong>"
-msgstr "<strong>Due bank:</strong>"
+msgstr "<strong>收款银行:</strong>"
 
 #. module: linkloving_account
 #: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
 msgid "<strong>Invoices:</strong>"
-msgstr "<strong>Invoices:</strong>"
+msgstr "<strong>对账付款明细:</strong>"
 
 #. module: linkloving_account
 #: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
 msgid "<strong>Manager:</strong>"
-msgstr "<strong>Manager:</strong>"
+msgstr "<strong>总经理:</strong>"
 
 #. module: linkloving_account
 #: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
 msgid "<strong>Payee:</strong>"
-msgstr "<strong>Payee:</strong>"
+msgstr "<strong>收款人:</strong>"
 
 #. module: linkloving_account
 #: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
 msgid "<strong>Remark:</strong>"
-msgstr "<strong>Remark:</strong>"
+msgstr "<strong>备注:</strong>"
 
 #. module: linkloving_account
 #: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
 msgid "<strong>Supervisor:</strong>"
-msgstr "<strong>Supervisor:</strong>"
+msgstr "<strong>部门主管:</strong>"
 
 #. module: linkloving_account
 #: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
 msgid "<strong>Total Amount:</strong>"
-msgstr "<strong>Total Amount:</strong>"
+msgstr "<strong>总额:</strong>"
 
 #. module: linkloving_account
 #: model:ir.ui.view,arch_db:linkloving_account.report_payment_application
 msgid "<strong>Write by:</strong>"
-msgstr "<strong>Write by:</strong>"
+msgstr "<strong>制单人:</strong>"
 
 #. module: linkloving_account
 #: model:ir.model.fields,field_description:linkloving_account.field_account_payment_register_bank_id

@@ -9,7 +9,7 @@ class AccountEmployeePaymentLine(models.Model):
     sheet_id = fields.Many2one('hr.expense.sheet')
     expense_no = fields.Char(related='sheet_id.expense_no')
     accounting_date = fields.Date(related='sheet_id.accounting_date')
-    name=fields.Char(related='sheet_id.name')
+    name = fields.Char(related='sheet_id.name')
 
     amount = fields.Float()
     payment_id = fields.Many2one('account.employee.payment')

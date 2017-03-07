@@ -9,24 +9,24 @@
             <field name="arch" type="xml">
                 <form string="Register Payment" version="7">
                     <header>
-                        <button name="post" class="oe_highlight" states="approve" string="确认付款" type="object"
+                        <button name="post" class="oe_highlight" states="approve" string="Confirm Payment" type="object"
                                 groups="account.group_account_user"/>
-                        <button name="return_payment" class="oe_highlight" string="还款" type="object"
+                        <button name="return_payment" class="oe_highlight" string="Return Payment" type="object"
                                 groups="account.group_account_user"
                                 attrs="{'invisible': [('can_return', '=', False)]}"/>
-                        <button name="submit" class="oe_highlight" states="draft" string="提交" type="object"/>
+                        <button name="submit" class="oe_highlight" states="draft" string="Post" type="object"/>
 
 
-                        <button name="manager1_approve" class="oe_highlight" states="confirm" string="批准" type="object"
+                        <button name="manager1_approve" class="oe_highlight" states="confirm" string="Approve" type="object"
                                 groups="hr_expense.group_hr_expense_user"/>
-                        <button name="manager2_approve" class="oe_highlight" states="manager1_approve" string="批准"
+                        <button name="manager2_approve" class="oe_highlight" states="manager1_approve" string="Approve"
                                 groups="hr_expense.group_hr_expense_manager"
                                 type="object"/>
-                        <button name="manager3_approve" class="oe_highlight" states="manager2_approve" string="批准"
+                        <button name="manager3_approve" class="oe_highlight" states="manager2_approve" string="Approve"
                                 groups="hr_expense.group_hr_expense_manager"
                                 type="object"/>
                         <button name="reject" class="oe_link"
-                                states="confirm,manager1_approve,manager2_approve,manager3_approve" string="退回"
+                                states="confirm,manager1_approve,manager2_approve,manager3_approve" string="Reject"
                                 groups="hr_expense.group_hr_expense_user"
                                 type="object"/>
                         <field name="state" widget="statusbar"
@@ -53,25 +53,25 @@
                         <group>
                             <group>
                                 <!--<field name="is_show" invisible="1"/>-->
-                                <field name="employee_id" string="员工"/>
+                                <field name="employee_id" string="Employee"/>
                                 <field name="can_return" invisible="1"/>
-                                <field name="bank_account_id" string="银行账号"
+                                <field name="bank_account_id" string="Bank Account"
                                        context="{'default_partner_id':address_home_id}"/>
                                 <field name="address_home_id" invisible="1"/>
-                                <field name="department_id" string="部门" invisible="1"/>
-                                <field name="to_approve_id" string="待审核" readonly="1"
+                                <field name="department_id" string="Department" invisible="1"/>
+                                <field name="to_approve_id" string="Waiting Approve By" readonly="1"
                                        attrs="{'invisible': [('to_approve_id', '=', False)]}"/>
                                 <field name="amount" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name="remark" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                             </group>
                             <group>
                                 <field name="apply_date" attrs="{'readonly': [('state', '!=', 'draft')]}"
-                                       string="申请日期"/>
+                                       string="Apply Date"/>
 
                             </group>
                         </group>
                         <notebook colspan="1">
-                            <page string='报销记录' autofocus="autofocus" attrs="{}">
+                            <page string='Expense Sheets' autofocus="autofocus" attrs="{}">
                                 <field name="payment_line_ids">
                                     <tree create="0">
                                         <field name="expense_no"/>
@@ -81,17 +81,17 @@
                                     </tree>
                                 </field>
                             </page>
-                            <page string='还款记录' attrs="{'invisible':[('return_count','=',0)]}">
+                            <page string='Return records' attrs="{'invisible':[('return_count','=',0)]}">
                                 <field name="return_ids">
                                     <tree create="0">
-                                        <field name="create_uid" string="创建人"/>
-                                        <field name="create_date" string="还款日期"/>
+                                        <field name="create_uid" string="Created By"/>
+                                        <field name="create_date" string="Return Date"/>
                                         <field name="amount"/>
                                     </tree>
                                 </field>
 
                             </page>
-                            <page string='其他信息' attrs="{}">
+                            <page string='Other Info' attrs="{}">
                                 <group>
                                     <field name="return_count"/>
                                     <field name="pre_payment_reminding" readonly="1"/>
@@ -117,15 +117,15 @@
             <field name="model">account.employee.payment</field>
             <field name="arch" type="xml">
                 <tree string="Register Payment" version="7">
-                    <field name="employee_id" string="员工"/>
+                    <field name="employee_id" string="Employee"/>
                     <field name="name"/>
                     <field name="bank_account_id"/>
-                    <field name="department_id" string="部门" invisible="1"/>
-                    <field name="to_approve_id" string="待审核" readonly="1"
+                    <field name="department_id" string="Department" invisible="1"/>
+                    <field name="to_approve_id" string="Waiting Approve By" readonly="1"
                            attrs="{'invisible': [('to_approve_id', '=', False)]}"/>
                     <field name="amount"/>
                     <field name="remark"/>
-                    <field name="apply_date" string="申请日期"/>
+                    <field name="apply_date" string="Apply Date"/>
                     <field name="state"/>
                     <field name="can_return" invisible="0"/>
                     <field name="pre_payment_reminding"/>
@@ -144,7 +144,7 @@
             </field>
         </record>
         <record id="action_account_employee_payment_apply" model="ir.actions.act_window">
-            <field name="name">暂支申请</field>
+            <field name="name">Loan Application</field>
             <field name="res_model">account.employee.payment</field>
             <field name="view_mode">tree,form</field>
 
@@ -164,7 +164,7 @@
         </record>
 
         <record id="action_account_payment_wait_pay" model="ir.actions.act_window">
-            <field name="name">待付款</field>
+            <field name="name">Waiting Payment</field>
             <field name="res_model">account.employee.payment</field>
             <field name="view_mode">tree,form</field>
 
@@ -182,7 +182,7 @@
             </field>
         </record>
         <record id="action_account_payment_to_approve" model="ir.actions.act_window">
-            <field name="name">待审核</field>
+            <field name="name">Waiting Approve</field>
             <field name="res_model">account.employee.payment</field>
             <field name="view_mode">tree,form</field>
 
@@ -204,7 +204,7 @@
 
 
         <record id="action_account_payment_to_approved" model="ir.actions.act_window">
-            <field name="name">暂支</field>
+            <field name="name">Loan</field>
             <field name="res_model">account.employee.payment</field>
             <field name="view_mode">tree,form</field>
 
@@ -223,7 +223,7 @@
             </field>
         </record>
         <record id="action_account_payment_all" model="ir.actions.act_window">
-            <field name="name">暂支</field>
+            <field name="name">Loan</field>
             <field name="res_model">account.employee.payment</field>
             <field name="view_mode">tree,form</field>
 
@@ -244,31 +244,31 @@
             </field>
         </record>
 
-        <menuitem id="menu_account_payment" name="暂支" sequence="10"
+        <menuitem id="menu_account_payment" name="Loan" sequence="10"
                   parent="hr_expense.menu_hr_expense_root"
 
         />
-        <menuitem id="menu_account_payment_apply" name="暂支申请" sequence="0"
+        <menuitem id="menu_account_payment_apply" name="Loan Application" sequence="0"
                   parent="menu_account_payment"
                   groups="base.group_user"
                   action="action_account_employee_payment_apply"/>
 
-        <menuitem id="menu_account_payment_wait_approve" name="待审核暂支" sequence="10"
+        <menuitem id="menu_account_payment_wait_approve" name="Loan to Approved" sequence="10"
                   parent="menu_account_payment"
                   groups="hr_expense.group_hr_expense_user"
                   action="action_account_payment_to_approve"
         />
-        <menuitem id="menu_account_payment_approved" name="已审核暂支" sequence="10"
+        <menuitem id="menu_account_payment_approved" name="Approved Loan" sequence="10"
                   parent="menu_account_payment"
                   groups="hr_expense.group_hr_expense_user"
                   action="action_account_payment_to_approved"/>
 
 
-        <menuitem id="menu_account_payment_all" name="所有暂支" sequence="0"
+        <menuitem id="menu_account_payment_all" name="All Loan" sequence="0"
                   parent="menu_account_payment"
                   groups="account.group_account_user"
                   action="action_account_payment_all"/>
-        <menuitem id="menu_account_payment_wait_pay" name="待付款暂支" sequence="0"
+        <menuitem id="menu_account_payment_wait_pay" name="Loan to Payment" sequence="0"
                   parent="menu_account_payment"
                   groups="account.group_account_user"
                   action="action_account_payment_wait_pay"/>

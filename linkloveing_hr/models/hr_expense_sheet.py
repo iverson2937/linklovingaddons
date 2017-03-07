@@ -6,10 +6,10 @@ from odoo.exceptions import UserError
 
 class HrExpenseSheet(models.Model):
     _inherit = 'hr.expense.sheet'
-    expense_no = fields.Char(string=u'报销编号')
+    expense_no = fields.Char()
     approve_ids = fields.Many2many('res.users')
     is_deduct_payment = fields.Boolean(default=False)
-    pre_payment_reminding = fields.Float(string=u'暂支余额', related='employee_id.pre_payment_reminding')
+    pre_payment_reminding = fields.Float(related='employee_id.pre_payment_reminding')
     payment_id = fields.Many2one('account.employee.payment')
     income = fields.Boolean()
     partner_id = fields.Many2one('res.partner')
@@ -47,9 +47,9 @@ class HrExpenseSheet(models.Model):
     to_approve_id = fields.Many2one('res.users', readonly=True, track_visibility='onchange')
 
     state = fields.Selection([('submit', 'Submitted'),
-                              ('manager1_approve', '一级审核'),
-                              ('manager2_approve', '二级审核'),
-                              ('manager3_approve', '总经理审核'),
+                              ('manager1_approve', '1st Approved'),
+                              ('manager2_approve', '2nd Approved'),
+                              ('manager3_approve', 'General Manager Approved'),
                               ('approve', 'Approved'),
                               ('post', 'Posted'),
                               ('done', 'Paid'),
@@ -164,7 +164,7 @@ class HrExpenseSheet(models.Model):
             self.write({'state': 'post'})
         else:
             return {
-                'name': _('费用报销'),
+                'name': _('Expense Sheet'),
                 'type': 'ir.actions.act_window',
                 'res_model': "account.employee.payable.wizard",
                 'view_mode': 'form',
@@ -203,7 +203,7 @@ class HrExpenseSheet(models.Model):
                    'default_partner_id': self.partner_id.id, 'default_account_id': account_id.id}
 
         return {
-            'name': _('收钱'),
+            'name': _('Receivable Payment'),
             'view_type': 'form',
             'view_mode': 'form',
             # 'view_id': False,
