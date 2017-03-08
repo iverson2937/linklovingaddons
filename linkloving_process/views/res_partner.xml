@@ -9,8 +9,8 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//field[@name='category_id']" position="before">
-                    <field name="employee"/>
-                    <field name="process_id"/>
+                    <field name="is_in_charge"/>
+                    <!--<field name="process_id"/>-->
                 </xpath>
 
             </field>

@@ -16,7 +16,7 @@
                            />
                 </xpath>
                 <xpath expr="//field[@name='user_id']" position="replace">
-                    <field name="in_charge_id"/>
+                    <field name="in_charge_id" domain="[('is_in_charge','=',True)]"/>
                 </xpath>
             </field>
         </record>

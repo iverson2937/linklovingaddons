@@ -21,8 +21,8 @@
                             <group>
                                 <field name="name"/>
                                 <field name="description"/>
-                                <field name="partner_ids" domain="[('employee','=', True)]" options="{'no_create':True}"
-                                       widget="many2many_tags"/>
+                                <field name="partner_id" options="{'no_create':True}"
+                                     />
                             </group>
                             <group>
                                 <field name="unit_price"/>
