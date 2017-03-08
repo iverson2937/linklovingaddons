@@ -8,5 +8,6 @@ class MrpProcess(models.Model):
     name = fields.Char(string=u'Name')
     description = fields.Text(string=u'Description')
     unit_price = fields.Float(string=u'Price Unit')
-    partner_ids = fields.One2many('res.partner', 'process_id', string=u'Responsible By')
+    partner_id = fields.Many2one('res.partner', string=u'Responsible By',
+                                 domain="[('is_in_charge','=',True)]")
     hour_price = fields.Float(string=u'Price Per Hour')

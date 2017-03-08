@@ -32,7 +32,7 @@ class StockPicking(models.Model):
         ('prepare', u'备货中'),
         ('post', u'备货完成'),
         ('qc_check', u'品检'),
-        ('validate', u'待采购确认'),
+        ('validate', u'待确认'),
         ('waiting_in', u'待入库'),
         ('waiting_out', u'待出库'),
         ('done', 'Done'),
