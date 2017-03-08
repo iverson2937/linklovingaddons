@@ -97,7 +97,7 @@ class LinklovingAppApi(http.Controller):
         if request.jsonrequest.get('state'):
             domain = [('state','=',request.jsonrequest['state'])]
         if partner_id:
-            domain.append(('in_charge_id', '=', partner_id))
+            domain.append('|',('in_charge_id', '=', partner_id),('create_uid', '=', partner_id))
         if condition and condition[condition.keys()[0]]:
             domain = (condition.keys()[0], 'like', condition[condition.keys()[0]])
 
@@ -469,6 +469,7 @@ class LinklovingAppApi(http.Controller):
     #品检结果
     @http.route('/linkloving_app_api/inspection_result', type='json', auth='none', csrf=False)
     def inspection_result(self, **kw):
+
         order_id = request.jsonrequest.get('order_id')  # get paramter
         result = request.jsonrequest.get('result')
 
@@ -1069,12 +1070,32 @@ class LinklovingAppApi(http.Controller):
         partner_id = request.jsonrequest.get('partner_id')
         if partner_id:
             domain.append(('partner_id', '=', partner_id))
-        if groupby == 'state':
-            picking_type_id = request.jsonrequest.get('picking_type_id')
-            domain.append(('picking_type_id', '=', picking_type_id))
-
+        # if groupby == 'state':
+        #     picking_type_id = request.jsonrequest.get('picking_type_id')
+        #     domain.append(('picking_type_id', '=', picking_type_id))
         group_list = request.env[model].sudo().read_group(domain, fields=[groupby], groupby=[groupby])
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data=group_list)
+        group_new_list = []
+        if groupby == 'picking_type_id':
+            for group in group_list:
+                group_id = group.get('picking_type_id')[0]
+                group_obj = request.env['stock.picking.type'].sudo().search([('id','=',group_id)])[0]
+                temp_domain = []
+                temp_domain.append(('picking_type_id','=',group_id))
+                if partner_id:
+                    temp_domain.append(('partner_id', '=', partner_id))
+
+                state_group_list = request.env[model].sudo().read_group(temp_domain, fields=['state'], groupby=['state'])
+                new_group = {
+                    'picking_type_id' : group_id,
+                    'picking_type_name' : group.get('picking_type_id')[1],
+                    'picking_type_code' : group_obj.code,
+                    'picking_type_id_count' : group.get('picking_type_id_count'),
+                    'states' : state_group_list,
+                }
+                group_new_list.append(new_group)
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=group_new_list)
+
 #获取stock.PICKING列表
     @http.route('/linkloving_app_api/get_stock_picking_list', type='json', auth='none', csrf=False)
     def get_stock_picking_list(self, **kw):
@@ -1142,10 +1163,15 @@ class LinklovingAppApi(http.Controller):
             picking_obj.action_post()
         elif state == 'cancel':#取消
             picking_obj.action_cancel()
-        elif state == 'qc_ok':#品检完成
+        elif state == 'qc_ok' or state == 'qc_failed':#品检结果
+            qc_note = request.jsonrequest.get('qc_note')
+            qc_img = request.jsonrequest.get('qc_img')
+            picking_obj.qc_note = qc_note
+            picking_obj.qc_img = qc_img
+            # if state == 'qc_ok':
             picking_obj.action_check_pass()
-        elif state == 'qc_failed':#品检失败
-            picking_obj.action_check_fail()
+            # else:
+            #     picking_obj.action_check_fail()
         elif state == 'reject':#退回
             picking_obj.reject()
         elif state == 'process':#创建欠单
@@ -1172,9 +1198,11 @@ class LinklovingAppApi(http.Controller):
                 'product_id':{
                     'id': pack.product_id.id,
                     'name': pack.product_id.name,
+                    'area_id' : {
+                        'area_id' : pack.product_id.area_id.id,
+                        'name' : pack.product_id.area_id.name or '',
+                    }
                 },
-                'from_loc': pack.from_loc,
-                'to_loc' : pack.to_loc,
                 'product_qty' : pack.product_qty,
                 'qty_done' : pack.qty_done,
             })
@@ -1187,8 +1215,19 @@ class LinklovingAppApi(http.Controller):
             'state' : stock_picking_obj.state,
             'min_date' : stock_picking_obj.min_date,
             'pack_operation_product_ids' : pack_list,
+            'qc_note' : stock_picking_obj.qc_note,
+            'qc_img' : LinklovingAppApi.get_stock_picking_qc_img_url(stock_picking_obj.id)
         }
         return data
+
+    @classmethod
+    def get_stock_picking_qc_img_url(cls, picking_id):
+        DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
+        url = '%slinkloving_app_api/get_worker_image?worker_id=%s&model=%s&field=%s' % (
+            request.httprequest.host_url, str(picking_id), 'stock.picking', 'qc_img')
+        if not url:
+            return ''
+        return url
 
 #搜索供应商
     @http.route('/linkloving_app_api/search_supplier', type='json', auth='none', csrf=False)

@@ -773,3 +773,10 @@ class MultiHandleWorker(models.TransientModel):
         employees = self.env['hr.employee'].search([('id','in', active_ids)])
         for em in employees:
             em.is_worker = True
+
+
+class StcokPickingExtend(models.Model):
+    _inherit = 'stock.picking'
+
+    qc_note = fields.Text(u'品检备注')
+    qc_img = fields.Binary()
