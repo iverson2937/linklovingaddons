@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="hr_attendance.print_employee_badge">
+        <t t-call="report.html_container">
+            <div class="page">
+                <t t-foreach="docs" t-as="employee">
+                    <div class="col-sm-12" align="center" valign="center">
+                        <table style="width:153pt; height:243pt; border: 1pt solid black; border-collapse:separate; border-radius:8pt; margin:5pt">
+                            <tr>
+                                <td colspan="2" class="text-center">
+                                    <img t-if="employee.company_id and employee.company_id.logo"
+                                         t-att-src="'data:image/png;base64,%s' % (employee.company_id.logo,)"
+                                         style="max-height:45pt;max-width:90%" alt="Company Logo"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="text-center">
+                                    <img t-if="employee.image" align="center" valign="center"
+                                         t-att-src="'data:image/png;base64,%s' % (employee.image,)"
+                                         style="max-height:85pt;max-width:90%;margin-bottom:3pt;margin-top:3pt"
+                                         alt="Employee Image"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">
+                                    姓名：
+                                </td>
+                                <td class="text-center">
+                                    <t t-esc="employee.name"/>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td class="text-center">
+                                    职称：
+                                </td>
+                                <td class="text-center">
+                                    <t t-esc="employee.job_id.name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">
+                                    工号：
+                                </td>
+                                <td class="text-center">
+                                    <t t-esc="employee.barcode"/>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="2" class="text-center">
+                                    <img t-if="employee.barcode"
+                                         t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('QR', employee.barcode, 100, 100)"
+                                         style="max-height:50pt;max-width:100%;"/>
+                                </td>
+                            </tr>
+
+
+                        </table>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+</odoo>
