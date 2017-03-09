@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_linklovinr_hr_attendance_linklovinr_hr_attendance,linklovinr_hr_attendance.linklovinr_hr_attendance,model_linklovinr_hr_attendance_linklovinr_hr_attendance,,1,0,0,0
