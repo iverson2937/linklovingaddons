@@ -265,6 +265,14 @@ class MrpProductionExtend(models.Model):
         self.write({'state': 'rework_ing'})
 
     def picking_material(self):
+        if self._context.get('picking_mode') == 'first_picking':
+            is_all_0 = True #是否全部为0，没有填写备料数量
+            for move in self.sim_stock_move_lines:
+                if move.quantity_ready != 0:
+                    is_all_0 = False
+
+            if is_all_0:
+                raise UserError('请填写备料数量！')
         for move in self.sim_stock_move_lines:
             if move.over_picking_qty != 0:#如果超领数量不等于0
                 new_move = move.stock_moves[0].copy(default={'quantity_done': move.over_picking_qty, 'product_uom_qty': move.over_picking_qty, 'production_id': move.production_id.id,
@@ -780,3 +788,5 @@ class StcokPickingExtend(models.Model):
 
     qc_note = fields.Text(u'品检备注')
     qc_img = fields.Binary()
+    post_img = fields.Binary()
+    post_area_id = fields.Many2one('stock.location.area')
