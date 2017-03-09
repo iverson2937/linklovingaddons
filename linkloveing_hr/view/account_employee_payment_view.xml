@@ -73,7 +73,7 @@
                         <notebook colspan="1">
                             <page string='Expense Sheets' autofocus="autofocus" attrs="{}">
                                 <field name="payment_line_ids">
-                                    <tree create="0">
+                                    <tree create="1">
                                         <field name="expense_no"/>
                                         <field name="name"/>
                                         <field name="accounting_date"/>
