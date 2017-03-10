@@ -135,12 +135,14 @@ class LinklovingAppApi(http.Controller):
         mrp_production = request.env['mrp.production'].sudo()
         partner_id = request.jsonrequest.get('partner_id')
         domain = []
-        if request.jsonrequest.get('state'):
-            domain = [('state','=',request.jsonrequest['state'])]
         if partner_id:
             domain.append('|')
             domain.append(('in_charge_id', '=', partner_id))
             domain.append(('create_uid', '=', partner_id))
+
+        if request.jsonrequest.get('state'):
+            domain.append(('state','=',request.jsonrequest['state']))
+
         if condition and condition[condition.keys()[0]]:
             domain = (condition.keys()[0], 'like', condition[condition.keys()[0]])
 
@@ -945,13 +947,17 @@ class LinklovingAppApi(http.Controller):
             }
             new_lines.append((0, 0, new_line))
 
+        try:
+            inventory = request.env['stock.inventory'].sudo().create({
+                'name': name,
+                'filter': 'partial',
+                'line_ids': new_lines
+            })
+            inventory.action_done()
+        except UserError,e:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={"error":e.name})
 
-        inventory = request.env['stock.inventory'].sudo().create({
-            'name': name,
-            'filter': 'partial',
-            'line_ids': new_lines
-        })
-        inventory.action_done()
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data={})
     @classmethod
