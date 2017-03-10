@@ -20,7 +20,7 @@
             <field name="name">mrp.production process user</field>
             <field name="model_id" search="[('model','=','mrp.production')]" model="ir.model"/>
             <field name="groups" eval="[(4, ref('mrp.group_mrp_user'))]"/>
-            <field name="domain_force">["|",('in_charge_id','=',user.partner_id.id),('create_uid','=',user.id)]</field>
+            <field name="domain_force">["|","|",('in_charge_id','=',user.partner_id.id),('create_uid','=',user.id),('state', 'in', ['waiting_material','prepare_material_ing','waiting_quality_inspection','quality_inspection_ing','waiting_warehouse_inspection','waiting_post_inventory'])]</field>
 
         </record>
             <record model="ir.rule" id="mrp_production_rule_manager">
