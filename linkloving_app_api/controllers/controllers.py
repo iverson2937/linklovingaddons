@@ -945,13 +945,17 @@ class LinklovingAppApi(http.Controller):
             }
             new_lines.append((0, 0, new_line))
 
+        try:
+            inventory = request.env['stock.inventory'].sudo().create({
+                'name': name,
+                'filter': 'partial',
+                'line_ids': new_lines
+            })
+            inventory.action_done()
+        except UserError,e:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={"error":e.name})
 
-        inventory = request.env['stock.inventory'].sudo().create({
-            'name': name,
-            'filter': 'partial',
-            'line_ids': new_lines
-        })
-        inventory.action_done()
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data={})
     @classmethod
