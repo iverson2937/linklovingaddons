@@ -92,6 +92,9 @@
             <field name="name" position="after">
                 <field name="total_amount"/>
             </field>
+            <field name="name" position="after">
+                <field name="expense_no" string="Expense No" filter_domain="[('expense_no','ilike',self)]"/>
+            </field>
         </field>
     </record>
 
