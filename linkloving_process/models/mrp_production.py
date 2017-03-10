@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
+from odoo.addons import decimal_precision as dp
 
 
 class MrpProduction(models.Model):
@@ -13,6 +14,11 @@ class MrpProduction(models.Model):
     ], default='unit')
     hour_price = fields.Float(string=u'Price Per Hour')
     in_charge_id = fields.Many2one('res.partner')
+    product_qty = fields.Float(
+        _('Quantity To Produce'),
+        default=1.0, digits=dp.get_precision('Payroll'),
+        readonly=True, required=True,
+        states={'confirmed': [('readonly', False)]})
 
     @api.onchange('bom_id')
     def on_change_bom_id(self):
