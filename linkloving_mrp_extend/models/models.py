@@ -390,6 +390,37 @@ class MrpProductionExtend(models.Model):
         else:
             self._generate_raw_move(bom_line, line_data)
 
+
+    @api.model
+    def _needaction_domain_get(self):
+        """ Returns the domain to filter records that require an action
+            :return: domain or False is no action
+
+        """
+        #
+        # ('confirmed', 'Confirmed'),
+        # ('waiting_material',u'等待备料'),
+        # ('prepare_material_ing',u'备料中...'),
+        # ('finish_prepare_material', u'备料完成'),
+        # ('already_picking', u'已领料'),
+        # ('planned', 'Planned'),
+        # ('progress', 'In Progress'),
+        # ('waiting_quality_inspection',u'等待品检'),
+        # ('quality_inspection_ing', u'品检中'),
+        # ('waiting_rework',u'等待返工'),
+        # ('rework_ing',u'返工中'),
+        # ('waiting_inventory_material',u'等待清点退料'),
+        # ('waiting_warehouse_inspection', u'等待检验退料'),
+        # ('waiting_post_inventory',u'等待入库'),
+        state=self._context.get('state')
+        if state:
+            return [('state', '=', state)]
+
+
+
+
+
+
 class ChangeProductionQty(models.TransientModel):
     _inherit = 'change.production.qty'
 

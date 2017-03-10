@@ -336,6 +336,7 @@
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="view_mrp_production_filter"/>
             <field name="domain">[('state','=', 'confirmed')]</field>
+            <field name="context">{'state':'confirmed'}</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to create a manufacturing order.
@@ -365,6 +366,7 @@
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="view_mrp_production_filter"/>
             <field name="domain">[('state','=', 'waiting_material')]</field>
+            <field name="context">{'state':'waiting_material'}</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to create a manufacturing order.
@@ -394,6 +396,7 @@
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="view_mrp_production_filter"/>
             <field name="domain">[('state','=', 'prepare_material_ing')]</field>
+            <field name="context">{'state':'prepare_material_ing'}</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to create a manufacturing order.
@@ -423,6 +426,7 @@
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="view_mrp_production_filter"/>
             <field name="domain">[('state','=', 'finish_prepare_material')]</field>
+            <field name="context">{'state':'finish_prepare_material'}</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to create a manufacturing order.
@@ -452,6 +456,8 @@
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="view_mrp_production_filter"/>
             <field name="domain">[('state','=', 'already_picking')]</field>
+            <field name="context">{'state':'already_picking'}</field>
+
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to create a manufacturing order.
@@ -481,6 +487,7 @@
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="view_mrp_production_filter"/>
             <field name="domain">[('state','=', 'progress')]</field>
+             <field name="context">{'state':'progress'}</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to create a manufacturing order.
@@ -510,6 +517,7 @@
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="view_mrp_production_filter"/>
             <field name="domain">[('state','=', 'waiting_quality_inspection')]</field>
+             <field name="context">{'state':'waiting_quality_inspection'}</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to create a manufacturing order.
@@ -540,6 +548,7 @@
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="view_mrp_production_filter"/>
             <field name="domain">[('state','=', 'quality_inspection_ing')]</field>
+            <field name="context">{'state':'quality_inspection_ing'}</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to create a manufacturing order.
@@ -569,6 +578,7 @@
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="view_mrp_production_filter"/>
             <field name="domain">[('state','=', 'waiting_inventory_material')]</field>
+            <field name="context">{'state':'waiting_inventory_material'}</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to create a manufacturing order.
@@ -598,6 +608,7 @@
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="view_mrp_production_filter"/>
             <field name="domain">[('state','=', 'waiting_warehouse_inspection')]</field>
+            <field name="context">{'state':'waiting_warehouse_inspection'}</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to create a manufacturing order.
@@ -627,6 +638,7 @@
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="view_mrp_production_filter"/>
             <field name="domain">[('state','=', 'waiting_post_inventory')]</field>
+            <field name="context">{'state':'waiting_post_inventory'}</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to create a manufacturing order.
@@ -656,6 +668,7 @@
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="view_mrp_production_filter"/>
             <field name="domain">[('state','=', 'waiting_rework')]</field>
+            <field name="context">{'state':'waiting_rework'}</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to create a manufacturing order.
@@ -688,6 +701,7 @@
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="view_mrp_production_filter"/>
             <field name="domain">[('state','=', 'rework_ing')]</field>
+            <field name="context">{'state':'rework_ing'}</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to create a manufacturing order.
