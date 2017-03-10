@@ -9,6 +9,8 @@ import time
 import operator
 
 import datetime
+
+import jpush
 from pip import download
 
 import odoo
@@ -28,6 +30,40 @@ from odoo.http import content_disposition, dispatch_rpc, request, \
 from odoo.exceptions import AccessError, UserError
 from odoo.models import check_method_name
 
+
+app_key = "6e6ce8723531335ce45edd34"
+master_secret = "64ec88028aac4dda6286400e"
+_jpush = jpush.JPush(app_key, master_secret)
+push = _jpush.create_push()
+_jpush.set_logging("DEBUG")
+
+need_sound = "a.caf"
+apns_production = False
+class JPushExtend:
+    @classmethod
+    def send_notification_push(cls, platform=jpush.all_, audience=None, notification=None, body='', message=None, apns_production=False):
+        push.audience = audience
+        ios = jpush.ios(alert={"title":notification,
+                                       "body":body,
+                                       }, sound=need_sound)
+        android = jpush.android(alert={"title":notification,
+                                       "body":body,
+                                       }, priority=1, style=1)
+        push.notification = jpush.notification(ios=ios, android=android)
+        push.options = {"apns_production":apns_production,}
+        push.platform = platform
+        try:
+            response = push.send()
+        except jpush.common.Unauthorized:
+            raise jpush.common.Unauthorized("Unauthorized")
+        except jpush.common.APIConnectionException:
+            raise jpush.common.APIConnectionException("conn")
+        except jpush.common.JPushFailure:
+            print ("JPushFailure")
+        except:
+            print ("Exception")
+
+
 STATUS_CODE_OK = 1
 STATUS_CODE_ERROR = -1
 
@@ -43,7 +79,9 @@ class JsonResponse(object):
             return data_dic
         return json.dumps(data_dic)
 
+
 class LinklovingAppApi(http.Controller):
+
     odoo10 = None
     #获取数据库列表
     @http.route('/linkloving_app_api/get_db_list',type='http', auth='none')
@@ -381,6 +419,11 @@ class LinklovingAppApi(http.Controller):
         mrp_production_model = request.env['mrp.production']
         mrp_production = mrp_production_model.sudo().search([('id', '=', order_id)])[0]
         mrp_production.write({'state': 'prepare_material_ing'})
+
+        JPushExtend.send_notification_push(audience=jpush.audience(
+            jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
+        ),notification=mrp_production.product_id.name,body=u"数量:%d,已经开始备料！" % (mrp_production.product_qty))
+
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
@@ -418,6 +461,11 @@ class LinklovingAppApi(http.Controller):
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error":e.name})
         mrp_production.write({'state': 'finish_prepare_material'})
+
+        JPushExtend.send_notification_push(audience=jpush.audience(
+            jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
+        ),notification=mrp_production.product_id.name,body=u"数量:%d,已经完成备料！" % (mrp_production.product_qty))
+
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
@@ -506,6 +554,10 @@ class LinklovingAppApi(http.Controller):
             mrp_production.worker_line_ids.change_worker_state('outline')
             mrp_production.write({'state': 'waiting_quality_inspection'})
 
+        JPushExtend.send_notification_push(audience=jpush.audience(
+            jpush.tag(LinklovingAppApi.get_jpush_tags("qc"))
+        ),notification=mrp_production.product_id.name,body=u"数量:%d,已生产完成，送往品检！" % (mrp_production.qty_produced))
+
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
@@ -518,6 +570,10 @@ class LinklovingAppApi(http.Controller):
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error' : u'未找到对应的生产单'})
         mrp_production.write({'state': 'quality_inspection_ing'})
+
+        JPushExtend.send_notification_push(audience=jpush.audience(
+            jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
+        ),notification=mrp_production.product_id.name,body=u"数量:%d,开始品检！" % (mrp_production.qty_produced))
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
@@ -551,6 +607,10 @@ class LinklovingAppApi(http.Controller):
             mrp_production.write({'state': 'waiting_inventory_material'})
         else:
             mrp_production.write({'state': 'waiting_rework'})
+
+        JPushExtend.send_notification_push(audience=jpush.audience(
+            jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
+        ),notification=mrp_production.product_id.name,body=u"数量:%d,品检结束，请查看详细单据." % (mrp_production.qty_produced))
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
@@ -676,6 +736,11 @@ class LinklovingAppApi(http.Controller):
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error' : u'未找到对应的生产单'})
         mrp_production.button_mark_done()
+
+        JPushExtend.send_notification_push(audience=jpush.audience(
+            jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
+        ),notification=mrp_production.product_id.name,body=u"数量:%d,已入库" % (mrp_production.qty_produced))
+
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
@@ -860,9 +925,9 @@ class LinklovingAppApi(http.Controller):
         name = request.jsonrequest.get('name')
         new_lines = []
         for line in stock_inventory_lines:
-            product_obj = LinklovingAppApi.get_model_by_id(line['product']['id'],request,'product.product')
+            product_obj = LinklovingAppApi.get_model_by_id(line['product']['product_id'],request,'product.product')
             line['product_uom_id'] = product_obj.uom_id.id
-            product_obj.area_id = line['product']['area']['id']
+            product_obj.area_id = line['product']['area']['area_id']
             if line['product'].get('image_medium'):
                 image_str = line['product'].get('image_medium')
                 print 'image_str:%s' % image_str[0:16]
@@ -1370,3 +1435,17 @@ class LinklovingAppApi(http.Controller):
             menu_item.setdefault('children', []).sort(key=operator.itemgetter('sequence'))
 
         return menu_root
+
+
+    @classmethod
+    def get_jpush_tags(cls, type):
+        if type == 'qc':#品检组 tag
+            return 'group_charge_inspection'
+        elif type == 'warehouse':#仓库组
+            return 'group_charge_warehouse'
+        elif type == 'produce':#生产组
+            return 'group_charge_produce'
+        elif type == 'purchase_user':#采购用户
+            return 'group_purchase_user'
+        elif type == 'purchase_manager':
+            return 'group_purchase_manager'

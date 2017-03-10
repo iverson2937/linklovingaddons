@@ -11,14 +11,17 @@ need_sound = "a.caf"
 apns_production = False
 class JPushExtend:
     @classmethod
-    def send_push(cls, platform=jpush.all_, audience=None, notification=None, message=None, apns_production=False):
+    def send_notification_push(cls, platform=jpush.all_, audience=None, notification=None, body='', message=None, apns_production=False):
         push.audience = audience
-        ios = jpush.ios(alert=notification, sound=need_sound)
-        android = jpush.android(alert=notification, priority=1, style=1)
+        ios = jpush.ios(alert={"title":notification,
+                                       "body":body,
+                                       }, sound=need_sound)
+        android = jpush.android(alert={"title":notification,
+                                       "body":body,
+                                       }, priority=1, style=1)
         push.notification = jpush.notification(ios=ios, android=android)
         push.options = {"apns_production":apns_production,}
         push.platform = platform
-        # push.message = message
         try:
             response = push.send()
         except jpush.common.Unauthorized:
@@ -29,7 +32,4 @@ class JPushExtend:
             print ("JPushFailure")
         except:
             print ("Exception")
-
-
-
-# JPushExtend.send_push(platform=jpush.all_, audience= "all", notification="My First Push")
+# JPushExtend.send_push(platform=jpush.all_, audience= "all", notification="My First Push\nMy First Push\nMy First Push\nMy First Push")

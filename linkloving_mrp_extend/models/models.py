@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 import json
-
 import datetime
+import jpush
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from odoo.tools import float_compare
 from odoo.addons import decimal_precision as dp
-
 class MrpBomExtend(models.Model):
     _inherit = 'mrp.bom'
 
@@ -219,6 +218,10 @@ class MrpProductionExtend(models.Model):
             'product_qty': self.product_qty,
         })
         qty_wizard.change_prod_qty()
+        # from linkloving_app_api.models.models import JPushExtend
+        # JPushExtend.send_push(audience=jpush.audience(
+        #     jpush.tag(LinklovingAppApi.get_jpush_tags("warehouse"))
+        # ),notification=u"此订单已经可以开始备料")
 
     #开始备料
     def button_start_prepare_material(self):
