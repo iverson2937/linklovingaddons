@@ -9,7 +9,7 @@
 
                  <xpath expr="//field[@name='category_ids']" position="before">
                     <group>
-                        <field name="is_in_charge" string="是否是工序负责人"/>
+                        <field name="is_in_charge"/>
                     </group>
                 </xpath>
             </field>
