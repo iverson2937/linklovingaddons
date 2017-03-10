@@ -100,7 +100,9 @@ class LinklovingAppApi(http.Controller):
         if request.jsonrequest.get('state'):
             domain = [('state','=',request.jsonrequest['state'])]
         if partner_id:
-            domain.append('|',('in_charge_id', '=', partner_id),('create_uid', '=', partner_id))
+            domain.append('|')
+            domain.append(('in_charge_id', '=', partner_id))
+            domain.append(('create_uid', '=', partner_id))
         if condition and condition[condition.keys()[0]]:
             domain = (condition.keys()[0], 'like', condition[condition.keys()[0]])
 
