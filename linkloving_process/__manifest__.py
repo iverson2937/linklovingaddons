@@ -25,12 +25,12 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
-        'views/views.xml',
         'views/mrp_process.xml',
         'views/mrp_bom.xml',
         'views/mrp_production.xml',
         'views/res_partner.xml',
-        'views/hr_employee.xml'
+        'views/hr_employee.xml',
+        'views/dashboard.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

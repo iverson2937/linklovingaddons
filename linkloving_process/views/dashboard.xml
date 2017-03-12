@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="hr_timesheet_employee_extd_form" model="ir.ui.view">
+            <field name="name">hr.timesheet.employee.extd_form</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='category_ids']" position="before">
+                    <group>
+                        <field name="is_in_charge"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="mrp_process_action" model="ir.actions.act_window">
+            <field name="name">Dashboard</field>
+            <field name="res_model">mrp.process</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">kanban,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a new process.
+                </p>
+                <p>
+
+                </p>
+            </field>
+        </record>
+        <record id="stock_picking_type_kanban" model="ir.ui.view">
+            <field name="name">mrp.process.kanban</field>
+            <field name="model">mrp.process</field>
+            <field name="arch" type="xml">
+                <kanban class="oe_background_grey o_kanban_dashboard o_stock_kanban" create="0">
+                    <field name="color"/>
+                    <!--<field name="code"/>-->
+                    <field name="count_process_ready"/>
+                    <field name="count_process_today"/>
+                    <field name="count_process_tomorrow"/>
+                    <field name="count_process_other"/>
+                    <!--<field name="count_picking_backorders"/>-->
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div
+                                    name="stock_picking">
+                                <div t-attf-class="#{kanban_color(record.color.raw_value)}">
+                                    <div class="o_kanban_card_header">
+                                        <div class="o_kanban_card_header_title">
+                                            <div class="o_primary">
+                                                <a type="object" name="get_action_mrp_production_tree_to_confirm">
+                                                    <field name="name"/>
+                                                </a>
+                                            </div>
+                                            <div class="o_secondary">
+                                                <field class="o_secondary" name="partner_id"/>
+                                            </div>
+                                        </div>
+                                        <div class="o_kanban_manage_button_section">
+                                            <a class="o_kanban_manage_toggle_button" href="#">More
+                                                <i class="fa fa-caret-down"/>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="container o_kanban_card_content o_visible">
+                                    <div class="row">
+                                        <div class="col-xs-6 o_kanban_primary_left">
+                                            <button class="btn btn-primary" name="get_action_mrp_production_tree_to_confirm"
+                                                    type="object">
+                                                <span>
+                                                    <t t-esc="record.count_process_ready.value"/>
+                                                    待确认
+                                                </span>
+
+                                            </button>
+                                        </div>
+                                        <div class="col-xs-6 o_kanban_primary_right">
+                                            <div t-if="record.count_process_ready.raw_value > 0" class="row">
+                                            </div>
+
+                                            <div t-if="record.count_process_ready.raw_value > 0" class="row">
+                                                <div class="col-xs-9">
+                                                    <a name="count_process_ready" type="object">
+                                                        今天生产
+                                                    </a>
+                                                </div>
+                                                <div class="col-xs-3">
+                                                    <field name="count_process_ready"/>
+                                                </div>
+                                            </div>
+
+                                            <div t-if="record.count_process_ready.raw_value > 0" class="row">
+                                                <div class="col-xs-9">
+                                                    <a class="oe_kanban_stock_picking_type_list"
+                                                       name="get_action_picking_tree_late" type="object">
+                                                        明天生产
+                                                    </a>
+                                                </div>
+                                                <div class="col-xs-3">
+                                                    <field name="count_process_ready"/>
+                                                </div>
+                                            </div>
+                                            <div t-if="record.count_process_ready.raw_value > 0" class="row">
+                                                <div class="col-xs-9">
+                                                    <a class="oe_kanban_stock_picking_type_list"
+                                                       name="get_action_picking_tree_late" type="object">
+                                                        后天生产
+                                                    </a>
+                                                </div>
+                                                <div class="col-xs-3">
+                                                    <field name="count_process_ready"/>
+                                                </div>
+                                            </div>
+                                            <div t-if="record.count_process_ready.raw_value > 0" class="row">
+                                                <div class="col-xs-9">
+                                                    <a class="oe_kanban_stock_picking_type_list"
+                                                       name="get_action_picking_tree_late" type="object">
+                                                        其他
+                                                    </a>
+                                                </div>
+                                                <div class="col-xs-3">
+                                                    <field name="count_process_ready"/>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </t>
+
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+
+        <menuitem
+                action="mrp_process_action"
+                id="mrp_process_dashboard_menu"
+                parent="mrp.menu_mrp_root" sequence="0"
+                name="Dashboard"/>
+
+    </data>
+</openerp>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
