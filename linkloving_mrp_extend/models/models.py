@@ -237,7 +237,10 @@ class MrpProductionExtend(models.Model):
         # JPushExtend.send_push(audience=jpush.audience(
         #     jpush.tag(LinklovingAppApi.get_jpush_tags("warehouse"))
         # ),notification=u"此订单已经可以开始备料")
-
+    @api.multi
+    def button_action_confirm_draft(self):
+        for production in self:
+            production.write({'state':'confirmed'})
     #开始备料
     def button_start_prepare_material(self):
         self.write({'state': 'prepare_material_ing'})
