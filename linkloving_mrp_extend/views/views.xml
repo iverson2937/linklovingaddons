@@ -58,6 +58,7 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//button[@name='button_plan']" position="after">
+                    <button name="button_action_confirm_draft" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'draft')]}" type="object" groups="linkloving_mrp_extend.group_charge_produce" string="确定加入生产排程"/>
                     <button name="button_waiting_material" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'confirmed')]}" type="object" groups="linkloving_mrp_extend.group_charge_produce" string="确认生产，准备领料" />
                     <button name="button_start_prepare_material" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'waiting_material')]}" type="object" string="开始备料" groups="linkloving_mrp_extend.group_charge_warehouse"/>
                     <button name="button_finish_prepare_material" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'prepare_material_ing')]}" type="object" string="完成备料" groups="linkloving_mrp_extend.group_charge_warehouse"/>
