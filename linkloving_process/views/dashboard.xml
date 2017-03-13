@@ -37,10 +37,11 @@
                 <kanban class="oe_background_grey o_kanban_dashboard o_stock_kanban" create="0">
                     <field name="color"/>
                     <!--<field name="code"/>-->
-                    <field name="count_process_ready"/>
-                    <field name="count_process_today"/>
-                    <field name="count_process_tomorrow"/>
-                    <field name="count_process_other"/>
+                    <field name="count_mo_draft"/>
+                    <field name="count_mo_today"/>
+                    <field name="count_mo_tomorrow"/>
+                    <field name="count_mo_after_tomorrow"/>
+                    <field name="count_mo_others"/>
                     <!--<field name="count_picking_backorders"/>-->
                     <templates>
                         <t t-name="kanban-box">
@@ -71,58 +72,58 @@
                                             <button class="btn btn-primary" name="get_action_mrp_production_tree_to_confirm"
                                                     type="object">
                                                 <span>
-                                                    <t t-esc="record.count_process_ready.value"/>
+                                                    <t t-esc="record.count_mo_draft.value"/>
                                                     待确认
                                                 </span>
 
                                             </button>
                                         </div>
                                         <div class="col-xs-6 o_kanban_primary_right">
-                                            <div t-if="record.count_process_ready.raw_value > 0" class="row">
+                                            <div  class="row">
                                             </div>
 
-                                            <div t-if="record.count_process_ready.raw_value > 0" class="row">
+                                            <div  class="row">
                                                 <div class="col-xs-9">
-                                                    <a name="count_process_ready" type="object">
-                                                        今天生产
+                                                    <a name="get_action_mrp_production_today" type="object">
+                                                        今天及以前生产
                                                     </a>
                                                 </div>
                                                 <div class="col-xs-3">
-                                                    <field name="count_process_ready"/>
+                                                    <field name="count_mo_today"/>
                                                 </div>
                                             </div>
 
-                                            <div t-if="record.count_process_ready.raw_value > 0" class="row">
+                                            <div  class="row">
                                                 <div class="col-xs-9">
                                                     <a class="oe_kanban_stock_picking_type_list"
-                                                       name="get_action_picking_tree_late" type="object">
+                                                       name="get_action_mrp_production_tomorrow" type="object">
                                                         明天生产
                                                     </a>
                                                 </div>
                                                 <div class="col-xs-3">
-                                                    <field name="count_process_ready"/>
+                                                    <field name="count_mo_tomorrow"/>
                                                 </div>
                                             </div>
-                                            <div t-if="record.count_process_ready.raw_value > 0" class="row">
+                                            <div class="row">
                                                 <div class="col-xs-9">
                                                     <a class="oe_kanban_stock_picking_type_list"
-                                                       name="get_action_picking_tree_late" type="object">
+                                                       name="get_action_mrp_production_after_tomorrow" type="object">
                                                         后天生产
                                                     </a>
                                                 </div>
                                                 <div class="col-xs-3">
-                                                    <field name="count_process_ready"/>
+                                                    <field name="count_mo_after_tomorrow"/>
                                                 </div>
                                             </div>
-                                            <div t-if="record.count_process_ready.raw_value > 0" class="row">
+                                            <div  class="row">
                                                 <div class="col-xs-9">
                                                     <a class="oe_kanban_stock_picking_type_list"
-                                                       name="get_action_picking_tree_late" type="object">
+                                                       name="get_action_mrp_production_others" type="object">
                                                         其他
                                                     </a>
                                                 </div>
                                                 <div class="col-xs-3">
-                                                    <field name="count_process_ready"/>
+                                                    <field name="count_mo_others"/>
                                                 </div>
                                             </div>
 

@@ -16,12 +16,11 @@ class MrpProcess(models.Model):
                                  domain="[('is_in_charge','=',True)]")
     hour_price = fields.Float(string=u'Price Per Hour')
     color = fields.Integer("Color Index")
-    count_process_ready=fields.Integer()
-    count_process_draft = fields.Integer(compute='_compute_process_count')
-    count_process_today = fields.Integer(compute='_compute_process_count')
-    count_process_tomorrow = fields.Integer(compute='_compute_process_count')
-    count_process_after_tomorrow = fields.Integer(compute='_compute_process_count')
-    count_process_other = fields.Integer(compute='_compute_process_count')
+    count_mo_draft = fields.Integer(compute='_compute_process_count')
+    count_mo_today = fields.Integer(compute='_compute_process_count')
+    count_mo_tomorrow = fields.Integer(compute='_compute_process_count')
+    count_mo_after_tomorrow = fields.Integer(compute='_compute_process_count')
+    count_mo_others = fields.Integer(compute='_compute_process_count')
     def getYesterday(self):  #
         today = datetime.date.today()
         oneday = datetime.timedelta(days=1)
@@ -32,32 +31,30 @@ class MrpProcess(models.Model):
     def _compute_process_count(self):
         # TDE TODO count picking can be done using previous two\
 
-        today_time = fields.datetime.strptime(self.getYesterday(), '%Y-%m-%d')
-        after_day=datetime.timedelta(days=1)
+        # today_time = fields.datetime.strptime(self.getYesterday(), '%Y-%m-%d')
+        # after_day=datetime.timedelta(days=1)
+        today = self.getYesterday()
+        today_time = fields.datetime.strptime(today, '%Y-%m-%d')
 
         domains = {
-            'count_process_draft': [('state', '=', 'draft')],
-            'count_process_today': [('date_planned_start', '>', today_time.strftime('%Y-%m-%d %H:%M:%S')),('date_planned_start', '<', after_day.strftime('%Y-%m-%d %H:%M:%S'))],
-            'count_process_tomorrow': 1,
-            'count_process_after_tomorrow': 1,
-            'count_process_other': 1,
+            'count_process_draft': [('state', '=', 'confirmed')],
+            'count_process_today': [('date_planned_start', '<', today_time.strftime('%Y-%m-%d %H:%M:%S'))],
+            'count_process_tomorrow': [('state', '=', 'draft')],
+            'count_process_after_tomorrow': [('state', '=', 'draft')],
+            'count_process_other': [('state', '=', 'draft')],
 
         }
         for field in domains:
             data = self.env['mrp.production'].read_group(domains[field] +
                                                         [('state', 'not in', ('done', 'cancel')),
-                                                         ('picking_type_id', 'in', self.ids)],
+                                                         ('process_id', 'in', self.ids)],['process_id'], ['process_id']
                                                  )
             count = dict(
-                map(lambda x: (x['picking_type_id'] and x['picking_type_id'][0], x['picking_type_id_count']), data))
+                map(lambda x: (x['process_id'] and x['process_id'][0], x['process_id_count']), data))
             for record in self:
                 record[field] = count.get(record.id, 0)
 
-        # datetime.datetime.today() + datetime.timedelta(days=2)
-        self.count_process_ready = 1
-        self.count_process_ready = 1
-        self.count_process_tomorrow = 1
-        self.count_process_other = 1
+
 
     @api.multi
     def get_action_mrp_production_tree_to_confirm(self):
