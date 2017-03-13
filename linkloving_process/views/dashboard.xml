@@ -42,7 +42,6 @@
                     <field name="count_mo_tomorrow"/>
                     <field name="count_mo_after_tomorrow"/>
                     <field name="count_mo_others"/>
-                    <!--<field name="count_picking_backorders"/>-->
                     <templates>
                         <t t-name="kanban-box">
                             <div

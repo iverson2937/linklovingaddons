@@ -78,7 +78,7 @@ class MrpProcess(models.Model):
             'name': _('Create Backorder?'),
             'type': 'ir.actions.act_window',
             'view_type': 'form',
-            'view_mode': 'tree',
+            'view_mode': 'tree,form',
             'res_model': 'mrp.production',
             'target': 'current',
             'domain': domain,
@@ -86,14 +86,14 @@ class MrpProcess(models.Model):
 
     @api.multi
     def get_action_mrp_production_tomorrow(self):
-        domain = [('date_planned_start', '>', self._today), ('date_planned_start', '<', self._tomorrow),
+        domain = [('date_planned_start', '>', self._today()), ('date_planned_start', '<', self._tomorrow()),
                   ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel'))]
 
         return {
             'name': _('Create Backorder?'),
             'type': 'ir.actions.act_window',
             'view_type': 'form',
-            'view_mode': 'tree',
+            'view_mode': 'tree,form',
             'res_model': 'mrp.production',
             'target': 'current',
             'domain': domain,
@@ -108,14 +108,14 @@ class MrpProcess(models.Model):
             'name': _(''),
             'type': 'ir.actions.act_window',
             'view_type': 'form',
-            'view_mode': 'tree',
+            'view_mode': 'tree,form',
             'res_model': 'mrp.production',
             'target': 'current',
             'domain': domain,
         }
 
     @api.multi
-    def get_action_mrp_production_after_others(self):
+    def get_action_mrp_production_others(self):
         domain = [('date_planned_start', '>', self._after_tomorrow()),
                   ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel'))]
 
@@ -123,7 +123,7 @@ class MrpProcess(models.Model):
             'name': _(''),
             'type': 'ir.actions.act_window',
             'view_type': 'form',
-            'view_mode': 'tree',
+            'view_mode': 'tree,form',
             'res_model': 'mrp.production',
             'target': 'current',
             'domain': domain,
