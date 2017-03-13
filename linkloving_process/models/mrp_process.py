@@ -21,11 +21,6 @@ class MrpProcess(models.Model):
     count_mo_tomorrow = fields.Integer(compute='_compute_process_count')
     count_mo_after_tomorrow = fields.Integer(compute='_compute_process_count')
     count_mo_others = fields.Integer(compute='_compute_process_count')
-    def getYesterday(self):  #
-        today = datetime.date.today()
-        oneday = datetime.timedelta(days=1)
-        yesterday = today + oneday
-        return str(yesterday)
 
     @api.multi
     def _compute_process_count(self):
@@ -33,15 +28,16 @@ class MrpProcess(models.Model):
 
         # today_time = fields.datetime.strptime(self.getYesterday(), '%Y-%m-%d')
         # after_day=datetime.timedelta(days=1)
-        today = self.getYesterday()
-        today_time = fields.datetime.strptime(today, '%Y-%m-%d')
+        today=(datetime.date.today()+datetime.timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')
+        tomorrow=(datetime.date.today()+datetime.timedelta(days=2)).strftime('%Y-%m-%d %H:%M:%S')
+        after_tomorrow = (datetime.date.today() + datetime.timedelta(days=3)).strftime('%Y-%m-%d %H:%M:%S')
 
         domains = {
-            'count_process_draft': [('state', '=', 'confirmed')],
-            'count_process_today': [('date_planned_start', '<', today_time.strftime('%Y-%m-%d %H:%M:%S'))],
-            'count_process_tomorrow': [('state', '=', 'draft')],
-            'count_process_after_tomorrow': [('state', '=', 'draft')],
-            'count_process_other': [('state', '=', 'draft')],
+            'count_mo_draft': [('state', '=', 'confirmed')],
+            'count_mo_today': [('date_planned_start', '<', today)],
+            'count_mo_tomorrow': [('date_planned_start', '>', today),('date_planned_start', '<', tomorrow)],
+            'count_mo_after_tomorrow': [('date_planned_start', '<', datetime.date.today().strftime('%Y-%m-%d %H:%M:%S'))],
+            'count_mo_others': [('date_planned_start', '<', datetime.date.today().strftime('%Y-%m-%d %H:%M:%S'))],
 
         }
         for field in domains:
