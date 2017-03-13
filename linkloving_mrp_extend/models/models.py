@@ -141,6 +141,20 @@ class MrpProductionExtend(models.Model):
     #是否暂停
     is_pending = fields.Boolean()
     ####
+
+    #sale_order_id
+    origin_sale_order_id = fields.Many2one('sale.order', compute='_compute_origin_sale_order_id')
+
+    @api.multi
+    def _compute_origin_sale_order_id(self):
+        def get_parent_move(move):
+            if move.move_dest_id:
+                return get_parent_move(move.move_dest_id)
+            return move
+        for production in self:
+            move = get_parent_move(production.move_finished_ids[0])
+            production.origin_sale_order_id = move.procurement_id and move.procurement_id.sale_line_id and move.procurement_id.sale_line_id.order_id.id or False
+    #####
     worker_line_ids = fields.One2many('worker.line', 'production_id')
     sim_stock_move_lines = fields.One2many('sim.stock.move', 'production_id')
     move_finished_ids = fields.One2many(
@@ -152,6 +166,7 @@ class MrpProductionExtend(models.Model):
     total_spent_time = fields.Float(default=0, compute='_compute_total_spent_time', string=u'总耗时', )
     total_spent_money = fields.Float(default=0, compute='_compute_total_spent_money', string=u'生产总成本', )
     state = fields.Selection([
+        ('draft', 'Draft'),
         ('confirmed', 'Confirmed'),
         ('waiting_material',u'等待备料'),
         ('prepare_material_ing',u'备料中...'),
@@ -824,3 +839,12 @@ class StcokPickingExtend(models.Model):
     qc_img = fields.Binary()
     post_img = fields.Binary()
     post_area_id = fields.Many2one('stock.location.area')
+
+
+class ProcurementOrderExtend(models.Model):
+    _inherit = 'procurement.order'
+
+    def _prepare_mo_vals(self, bom):
+        res = super(ProcurementOrderExtend, self)._prepare_mo_vals(bom)
+        res.update({'state':'draft'})
+        return res

@@ -1289,12 +1289,12 @@ class LinklovingAppApi(http.Controller):
         elif state == 'post':#提交
             post_img = request.jsonrequest.get('post_img')
             post_area_name = request.jsonrequest.get('post_area_name')
-            area = request.env['stock.location.area'].sudo().search([('name', '=',post_area_name)])[0]
+            area = request.env['stock.location.area'].sudo().search([('name', '=',post_area_name)])
             if not area:
                 return JsonResponse.send_response(STATUS_CODE_ERROR,
                                                   res_data={'error': u'请选择正确的位置!'})
             picking_obj.post_img = post_img
-            picking_obj.post_area_id = area.id
+            picking_obj.post_area_id = area[0].id
 
             picking_obj.action_post()
         elif state == 'cancel':#取消
