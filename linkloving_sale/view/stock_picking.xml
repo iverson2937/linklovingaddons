@@ -2,7 +2,7 @@
 <openerp>
     <data>
         <record id="action_stock_picking_confirm" model="ir.actions.act_window">
-            <field name="name">出货确认</field>
+            <field name="name">Confirm Shipment</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">stock.picking</field>
             <field name="view_type">form</field>

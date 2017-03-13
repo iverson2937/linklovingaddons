@@ -68,7 +68,7 @@
                     <table class="table table-condensed table-boarded">
                         <thead>
                             <tr>
-                                <th>Serical Number</th>
+                                <th>No</th>
                                 <t t-if="not page[0]['is_domestic']">
                                     <th>Description</th>
                                 </t>
