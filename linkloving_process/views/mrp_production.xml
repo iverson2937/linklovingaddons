@@ -79,6 +79,7 @@
             <field name="domain">[('state','in',['draft','confirmed','waiting_material'])]</field>
             <field name="context">{
                 'search_default_process_id': active_id,
+                'group_by':'product_id',
                 }
             </field>
             <field name="help" type="html">

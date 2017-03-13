@@ -36,7 +36,7 @@
             <field name="arch" type="xml">
                 <kanban class="oe_background_grey o_kanban_dashboard o_stock_kanban" create="0">
                     <field name="color"/>
-                    <!--<field name="code"/>-->
+                    <field name="count_mo_waiting"/>
                     <field name="count_mo_draft"/>
                     <field name="count_mo_today"/>
                     <field name="count_mo_tomorrow"/>
@@ -72,8 +72,8 @@
                                             <button class="btn btn-primary" name="get_action_mrp_production_tree_to_combine"
                                                     type="object">
                                                 <span>
-                                                    <t t-esc="record.count_mo_draft.value"/>
-                                                    所有待生产MO
+                                                    <t t-esc="record.count_mo_waiting.value"/>
+                                                    待生产MO
                                                 </span>
 
                                             </button>

@@ -16,6 +16,7 @@ class MrpProcess(models.Model):
                                  domain="[('is_in_charge','=',True)]")
     hour_price = fields.Float(string=u'Price Per Hour')
     color = fields.Integer("Color Index")
+    count_mo_waiting = fields.Integer(compute='_compute_process_count')
     count_mo_draft = fields.Integer(compute='_compute_process_count')
     count_mo_today = fields.Integer(compute='_compute_process_count')
     count_mo_tomorrow = fields.Integer(compute='_compute_process_count')
@@ -40,6 +41,7 @@ class MrpProcess(models.Model):
 
         domains = {
             'count_mo_draft': [('state', '=', 'draft')],
+            'count_mo_waiting': [('state', 'in', ['draft', 'confirmed', 'waiting_material'])],
             'count_mo_today': [('date_planned_start', '<', self._today())],
             'count_mo_tomorrow': [('date_planned_start', '>', self._today()),
                                   ('date_planned_start', '<', self._tomorrow())],
@@ -65,8 +67,6 @@ class MrpProcess(models.Model):
     @api.multi
     def get_action_mrp_production_tree_to_combine(self):
         return self._get_action('linkloving_process.get_action_mrp_production_tree_to_combine')
-
-
 
     @api.multi
     def get_action_mrp_production_today(self):
