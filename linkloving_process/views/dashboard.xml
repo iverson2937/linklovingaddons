@@ -69,17 +69,25 @@
                                 <div class="container o_kanban_card_content o_visible">
                                     <div class="row">
                                         <div class="col-xs-6 o_kanban_primary_left">
-                                            <button class="btn btn-primary" name="get_action_mrp_production_tree_to_confirm"
+                                            <button class="btn btn-primary" name="get_action_mrp_production_tree_to_combine"
                                                     type="object">
                                                 <span>
                                                     <t t-esc="record.count_mo_draft.value"/>
-                                                    待确认
+                                                    所有待生产MO
                                                 </span>
 
                                             </button>
                                         </div>
                                         <div class="col-xs-6 o_kanban_primary_right">
-                                            <div  class="row">
+                                               <div  class="row">
+                                                <div class="col-xs-9">
+                                                    <a name="get_action_mrp_production_tree_to_confirm" type="object">
+                                                        MRP 生成的MO
+                                                    </a>
+                                                </div>
+                                                <div class="col-xs-3">
+                                                    <field name="count_mo_draft"/>
+                                                </div>
                                             </div>
 
                                             <div  class="row">

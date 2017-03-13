@@ -22,39 +22,112 @@ class MrpProcess(models.Model):
     count_mo_after_tomorrow = fields.Integer(compute='_compute_process_count')
     count_mo_others = fields.Integer(compute='_compute_process_count')
 
+    def _today(self):
+        return (datetime.date.today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')
+
+    def _tomorrow(self):
+        return (datetime.date.today() + datetime.timedelta(days=2)).strftime('%Y-%m-%d %H:%M:%S')
+
+    def _after_tomorrow(self):
+        return (datetime.date.today() + datetime.timedelta(days=3)).strftime('%Y-%m-%d %H:%M:%S')
+
     @api.multi
     def _compute_process_count(self):
         # TDE TODO count picking can be done using previous two\
 
         # today_time = fields.datetime.strptime(self.getYesterday(), '%Y-%m-%d')
         # after_day=datetime.timedelta(days=1)
-        today=(datetime.date.today()+datetime.timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')
-        tomorrow=(datetime.date.today()+datetime.timedelta(days=2)).strftime('%Y-%m-%d %H:%M:%S')
-        after_tomorrow = (datetime.date.today() + datetime.timedelta(days=3)).strftime('%Y-%m-%d %H:%M:%S')
 
         domains = {
-            'count_mo_draft': [('state', '=', 'confirmed')],
-            'count_mo_today': [('date_planned_start', '<', today)],
-            'count_mo_tomorrow': [('date_planned_start', '>', today),('date_planned_start', '<', tomorrow)],
-            'count_mo_after_tomorrow': [('date_planned_start', '<', datetime.date.today().strftime('%Y-%m-%d %H:%M:%S'))],
-            'count_mo_others': [('date_planned_start', '<', datetime.date.today().strftime('%Y-%m-%d %H:%M:%S'))],
-
+            'count_mo_draft': [('state', '=', 'draft')],
+            'count_mo_today': [('date_planned_start', '<', self._today())],
+            'count_mo_tomorrow': [('date_planned_start', '>', self._today()),
+                                  ('date_planned_start', '<', self._tomorrow())],
+            'count_mo_after_tomorrow': [('date_planned_start', '>', self._tomorrow()),
+                                        ('date_planned_start', '<', self._after_tomorrow())],
+            'count_mo_others': [('date_planned_start', '>', self._after_tomorrow())],
         }
         for field in domains:
             data = self.env['mrp.production'].read_group(domains[field] +
-                                                        [('state', 'not in', ('done', 'cancel')),
-                                                         ('process_id', 'in', self.ids)],['process_id'], ['process_id']
-                                                 )
+                                                         [('state', 'not in', ('done', 'cancel')),
+                                                          ('process_id', 'in', self.ids)], ['process_id'],
+                                                         ['process_id']
+                                                         )
             count = dict(
                 map(lambda x: (x['process_id'] and x['process_id'][0], x['process_id_count']), data))
             for record in self:
                 record[field] = count.get(record.id, 0)
 
-
-
     @api.multi
     def get_action_mrp_production_tree_to_confirm(self):
         return self._get_action('linkloving_process.action_mrp_production_tree_to_confirm')
+
+    @api.multi
+    def get_action_mrp_production_tree_to_combine(self):
+        return self._get_action('linkloving_process.get_action_mrp_production_tree_to_combine')
+
+
+
+    @api.multi
+    def get_action_mrp_production_today(self):
+        domain = [('date_planned_start', '<',
+                   (datetime.date.today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')),
+                  ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel'))]
+
+        return {
+            'name': _('Create Backorder?'),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'mrp.production',
+            'target': 'current',
+            'domain': domain,
+        }
+
+    @api.multi
+    def get_action_mrp_production_tomorrow(self):
+        domain = [('date_planned_start', '>', self._today), ('date_planned_start', '<', self._tomorrow),
+                  ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel'))]
+
+        return {
+            'name': _('Create Backorder?'),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'mrp.production',
+            'target': 'current',
+            'domain': domain,
+        }
+
+    @api.multi
+    def get_action_mrp_production_after_tomorrow(self):
+        domain = [('date_planned_start', '>', self._tomorrow()), ('date_planned_start', '<', self._after_tomorrow()),
+                  ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel'))]
+
+        return {
+            'name': _(''),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'mrp.production',
+            'target': 'current',
+            'domain': domain,
+        }
+
+    @api.multi
+    def get_action_mrp_production_after_others(self):
+        domain = [('date_planned_start', '>', self._after_tomorrow()),
+                  ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel'))]
+
+        return {
+            'name': _(''),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'mrp.production',
+            'target': 'current',
+            'domain': domain,
+        }
 
     @api.multi
     def _get_action(self, action_xmlid):

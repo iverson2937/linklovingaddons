@@ -57,7 +57,7 @@
             <field name="view_mode">tree,form</field>
             <field name="domain">[('state','=','draft')]</field>
             <field name="context">{
-                'default_process_id': active_id,
+                'search_default_process_id': active_id,
                 }
             </field>
             <field name="help" type="html">
@@ -70,6 +70,28 @@
                 </p>
             </field>
         </record>
+                <record id="get_action_mrp_production_tree_to_combine" model="ir.actions.act_window">
+            <field name="name">To Do</field>
+            <field name="res_model">mrp.production</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state','in',['draft','confirmed','waiting_material'])]</field>
+            <field name="context">{
+                'search_default_process_id': active_id,
+                }
+            </field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click here to create a new transfer.
+                </p>
+                <p>
+                    You can either do it immediately or mark it as Todo for future processing. Use your scanner to
+                    validate the transferred quantity quicker.
+                </p>
+            </field>
+        </record>
+
 
 
     </data>
