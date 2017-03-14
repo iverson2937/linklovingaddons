@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'product', 'mrp','linkloving_process'],
+    'depends': ['base', 'product', 'mrp'],
 
     # always loaded
     'data': [
