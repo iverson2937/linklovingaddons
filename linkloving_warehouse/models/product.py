@@ -24,6 +24,7 @@
 ##############################################################################
 from odoo import api
 from odoo import fields, models, _
+from odoo.exceptions import UserError
 
 
 class ProductProduct(models.Model):
@@ -39,6 +40,8 @@ class ProductProduct(models.Model):
     ]
 
 
+
+
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
@@ -52,3 +55,11 @@ class ProductTemplate(models.Model):
         ('default_code_uniq1', 'unique (default_code)', _('Default Code already exist!')),
         # ('name_uniq', 'unique (name)', u'产品名称已存在!')
     ]
+    @api.multi
+    def write(self, vals):
+        if 'uom_id' in vals:
+            new_uom = self.env['product.uom'].browse(vals['uom_id'])
+            updated = self.filtered(lambda template: template.uom_id != new_uom)
+            done_moves = self.env['stock.move'].search([('product_id', 'in', updated.mapped('product_variant_ids').ids)], limit=1)
+
+        return super(models.Model, self).write(vals)

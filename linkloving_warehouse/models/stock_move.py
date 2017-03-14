@@ -28,7 +28,7 @@ from odoo import fields, models,api,_
 from odoo.exceptions import UserError
 
 
-class StockPicking(models.Model):
+class StockMove(models.Model):
     _inherit = 'stock.move'
 
     @api.multi
@@ -60,3 +60,4 @@ class StockPicking(models.Model):
         if procurements:
             procurements.check()
         return True
+
