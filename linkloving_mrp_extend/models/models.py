@@ -10,7 +10,7 @@ from odoo.addons import decimal_precision as dp
 class MrpBomExtend(models.Model):
     _inherit = 'mrp.bom'
 
-    product_specs = fields.Text(string=u'产品规格', related='product_tmpl_id.product_specs')
+    product_specs = fields.Text(string=u'Product Specification', related='product_tmpl_id.product_specs')
 
     def explode(self, product, quantity, picking_type=False):
         """
@@ -47,8 +47,8 @@ class MrpBomExtend(models.Model):
 class MrpBomLineExtend(models.Model):
     _inherit = 'mrp.bom.line'
 
-    product_specs = fields.Text(string=u'产品规格', related='product_id.product_specs')
-    scrap_rate = fields.Float(string=u'报废率(%)', default=3, )
+    product_specs = fields.Text(string='Product Specification', related='product_id.product_specs')
+    scrap_rate = fields.Float(string='Scrap Rate(%)', default=3, )
 
 
     @api.multi
@@ -57,7 +57,7 @@ class MrpBomLineExtend(models.Model):
         bom_form_view = self.env.ref('linkloving_mrp_extend.linkloving_mrp_bom_form_view')
 
         return {
-            'name': _('逆展'),
+            'name': _('Reverse Exhibition'),
             'res_model': 'mrp.bom',
             'type': 'ir.actions.act_window',
             'view_id': bom_tree_view.id,
@@ -73,10 +73,10 @@ class MrpBomLineExtend(models.Model):
 class StockMoveExtend(models.Model):
     _inherit = 'stock.move'
 
-    qty_available = fields.Float(string=u'在手数量', related='product_id.qty_available')
-    virtual_available = fields.Float(string=u'预测数量', related='product_id.virtual_available')
-    suggest_qty =  fields.Float(string=u'建议数量', help=u'建议数量 = 实际数量 + 预计报废数量', )
-    over_picking_qty = fields.Float(string=u'超领数量', )
+    qty_available = fields.Float(string='On Hand', related='product_id.qty_available')
+    virtual_available = fields.Float(string='Forecast Quantity', related='product_id.virtual_available')
+    suggest_qty =  fields.Float(string='Suggest Quantity', help=u'建议数量 = 实际数量 + 预计报废数量', )
+    over_picking_qty = fields.Float(string='Excess Quantity ', )
     is_return_material = fields.Boolean(default=False)
     is_over_picking = fields.Boolean(default=False)
     # @api.multi
@@ -128,15 +128,15 @@ class MrpProductionExtend(models.Model):
         }
 
     #备料信息
-    prepare_material_img = fields.Binary(u'备料位置信息图片')
+    prepare_material_img = fields.Binary(string='Stock Image')
     prepare_material_area_id = fields.Many2one('stock.location.area', string='Area')
     #########
     #送完品检时的信息
-    to_qc_img = fields.Binary(u'位置图片')
+    to_qc_img = fields.Binary(string='Location Image')
     to_qc_area_id = fields.Many2one('stock.location.area', string='Area')
     #####
     #品检反馈单
-    qc_feedback_id = fields.Many2one('mrp.qc.feedback', string=u'品检反馈单')
+    qc_feedback_id = fields.Many2one('mrp.qc.feedback', string='QC Report')
     ####
     #是否暂停
     is_pending = fields.Boolean()
@@ -162,25 +162,25 @@ class MrpProductionExtend(models.Model):
         copy=False, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]},
         domain=[('scrapped', '=', False), ('is_return_material','=',False), ('is_over_picking', '=', False)])
 
-    production_order_type = fields.Selection([('stockup',u'备货制（不需要产出全部数量）'),('ordering',u'订单制')], string=u'生产单类型', default='stockup',help=u'备货制：可产出任意数量的产品，便可完成生产，送往品检。\r\n订单制：必须产出生产单所需产品数量，才能进行下一步操作')
-    total_spent_time = fields.Float(default=0, compute='_compute_total_spent_time', string=u'总耗时', )
-    total_spent_money = fields.Float(default=0, compute='_compute_total_spent_money', string=u'生产总成本', )
+    production_order_type = fields.Selection([('stockup','By Stock（Unnecessary to output all quantity）'),('ordering',u'By Order')], string=u'Order Type', default='stockup',help=u'By Stock：Can sent to QC check without complete  the Order。\nBy order：have to completed the Order then send to the QC station')
+    total_spent_time = fields.Float(default=0, compute='_compute_total_spent_time', string='Time taken', )
+    total_spent_money = fields.Float(default=0, compute='_compute_total_spent_money', string='Total Cost', )
     state = fields.Selection([
-        ('draft', 'Draft'),
+        ('draft', _('Draft')),
         ('confirmed', 'Confirmed'),
-        ('waiting_material',u'等待备料'),
-        ('prepare_material_ing',u'备料中...'),
-        ('finish_prepare_material', u'备料完成'),
-        ('already_picking', u'已领料'),
+        ('waiting_material',_('Waiting Prepare Material')),
+        ('prepare_material_ing',_('Material Preparing')),
+        ('finish_prepare_material', _('Material Ready')),
+        ('already_picking', _('Already Picking Material')),
         ('planned', 'Planned'),
         ('progress', 'In Progress'),
-        ('waiting_quality_inspection',u'等待品检'),
-        ('quality_inspection_ing', u'品检中'),
-        ('waiting_rework',u'等待返工'),
-        ('rework_ing',u'返工中'),
-        ('waiting_inventory_material',u'等待清点退料'),
-        ('waiting_warehouse_inspection', u'等待检验退料'),
-        ('waiting_post_inventory',u'等待入库'),
+        ('waiting_quality_inspection',_('Waiting Quality Inspection')),
+        ('quality_inspection_ing', _('Under Quality Inspection')),
+        ('waiting_rework',_('Waiting Rework')),
+        ('rework_ing',_('Under Rework')),
+        ('waiting_inventory_material',_('Waiting Inventory Material')),
+        ('waiting_warehouse_inspection', _('Waiting Check Return Material')),
+        ('waiting_post_inventory',_('Waiting Stock Transfers')),
         ('done', 'Done'),
         ('cancel', 'Cancelled')], string='State',
         copy=False, default='confirmed', track_visibility='onchange')
@@ -255,9 +255,9 @@ class MrpProductionExtend(models.Model):
     #生产完成 等待品检
     def button_produce_finish(self):
         if self.qty_produced == 0:
-            raise UserError(u'您还未产出任何产品，不可做此操作！')
+            raise UserError(_('These is not output,can not finish the order!'))
         if not self.check_to_done and self.production_order_type == 'ordering':
-            raise UserError(u'此生产单为订单制，需要产成所有数量的产品才能送往品检！')
+            raise UserError(_('You have to complete the order before close it!'))
         else:
             #生产完成 结算工时
             self.worker_line_ids.change_worker_state('outline')
@@ -293,7 +293,7 @@ class MrpProductionExtend(models.Model):
                     is_all_0 = False
 
             if is_all_0:
-                raise UserError('请填写备料数量！')
+                raise UserError(_('Please fill in the quantity！'))
         for move in self.sim_stock_move_lines:
             if move.over_picking_qty != 0:#如果超领数量不等于0
                 new_move = move.stock_moves[0].copy(default={'quantity_done': move.over_picking_qty, 'product_uom_qty': move.over_picking_qty, 'production_id': move.production_id.id,
@@ -415,21 +415,6 @@ class MrpProductionExtend(models.Model):
             :return: domain or False is no action
 
         """
-        #
-        # ('confirmed', 'Confirmed'),
-        # ('waiting_material',u'等待备料'),
-        # ('prepare_material_ing',u'备料中...'),
-        # ('finish_prepare_material', u'备料完成'),
-        # ('already_picking', u'已领料'),
-        # ('planned', 'Planned'),
-        # ('progress', 'In Progress'),
-        # ('waiting_quality_inspection',u'等待品检'),
-        # ('quality_inspection_ing', u'品检中'),
-        # ('waiting_rework',u'等待返工'),
-        # ('rework_ing',u'返工中'),
-        # ('waiting_inventory_material',u'等待清点退料'),
-        # ('waiting_warehouse_inspection', u'等待检验退料'),
-        # ('waiting_post_inventory',u'等待入库'),
         state=self._context.get('state')
         if state:
             return [('state', '=', state)]
@@ -536,8 +521,8 @@ class ReturnOfMaterial(models.Model):
         'stock.location', 'Location', domain="[('usage', '=', 'production')]",
         required=True, default=_get_default_location_id)
     return_location_id = fields.Many2one(
-        'stock.location', u'退料至...位置', default=_get_default_return_location_id,domain="[('usage', '=', 'internal')]",)
-    return_qty = fields.Float(u'退料数量', default=0.0, required=True)
+        'stock.location', 'Return Location', default=_get_default_return_location_id,domain="[('usage', '=', 'internal')]",)
+    return_qty = fields.Float('Return Quantity', default=0.0, required=True)
     state = fields.Selection([
         ('draft', 'Draft'),
         ('done', 'Done')], string='Status', default="draft")
@@ -582,7 +567,7 @@ class ReturnOfMaterial(models.Model):
             'location_dest_id': self.return_location_id.id,
             'production_id' : self.production_id.id,
             'state': 'confirmed',
-            'origin' : u'退料 %s' % self.production_id.name,
+            'origin' : 'Return %s' % self.production_id.name,
             'is_return_material' : True,
             # 'restrict_partner_id': self.owner_id.id,
             # 'picking_id': self.picking_id.id
@@ -591,12 +576,12 @@ class ReturnOfMaterial(models.Model):
 class ProductProductExtend(models.Model):
     _inherit = 'product.product'
 
-    return_qty = fields.Float(string=u'退料数量',default=0)
+    return_qty = fields.Float(string='Return Quantity',default=0)
 
 class WareHouseArea(models.Model):
     _name = 'warehouse.area'
 
-    name = fields.Char(u'位置描述')
+    name = fields.Char('Location Description')
 
 
 class SimStockMove(models.Model):
@@ -685,14 +670,14 @@ class ReturnMaterialLine(models.Model):
     _name = 'return.material.line'
 
     product_id = fields.Many2one('product.product')
-    return_qty = fields.Float(u'退料数量', readonly=False)
+    return_qty = fields.Float('Return Quantity', readonly=False)
     return_id = fields.Many2one('mrp.return.material' )
 
 
 class HrEmployeeExtend(models.Model):
     _inherit = 'hr.employee'
 
-    is_worker = fields.Boolean(u'是否是工人', default=False)
+    is_worker = fields.Boolean('Is Worker', default=False)
     now_mo_id =fields.Many2one('mrp.production')
 
 #每个工人所处在的生产线
@@ -718,18 +703,18 @@ class LLWorkerLine(models.Model):
             line.spent_time = line.cal_worker_spent_time() / 3600.0
 
     worker_id = fields.Many2one('hr.employee')
-    production_id = fields.Many2one('mrp.production', u'生产单')
-    unit_price = fields.Float(related='production_id.unit_price', string=u'单价')
-    mo_type = fields.Selection(related='production_id.mo_type', string=u'mo类型')
-    xishu = fields.Float(default=1.0)
+    production_id = fields.Many2one('mrp.production', 'Manufacturing Order')
+    unit_price = fields.Float(related='production_id.unit_price', string='Unit Price')
+    mo_type = fields.Selection(related='production_id.mo_type', string='Mo Type')
+    xishu = fields.Float(default=1.0,string='Rate')
     amount_of_money = fields.Float(compute=_compute_amount_of_money)
     worker_time_line_ids = fields.One2many('worker.time.line', 'worker_line_id')
     spent_time = fields.Float(compute='_compute_spent_time')
     line_state = fields.Selection(
         [
-            ('online',u'正常'),
-            ('offline', u'请假'),
-            ('outline', u'已退出'),
+            ('online','Normal'),
+            ('offline', 'On Leave'),
+            ('outline', 'Exit'),
         ], compute=_compute_line_state)
 
     def create_time_line(self):
@@ -781,14 +766,14 @@ class LLWorkerTimeLine(models.Model):
     end_time = fields.Datetime()
     state = fields.Selection(
         [
-            ('online',u'正常'),
-            ('offline', u'请假'),
-            ('outline', u'已退出'),
+            ('online','Normal'),
+            ('offline', 'On leave'),
+            ('outline', 'Exit'),
         ], default='online')
 
     worker_line_id = fields.Many2one('worker.line')
-    worker_id = fields.Many2one(related='worker_line_id.worker_id')
-    production_id = fields.Many2one(related='worker_line_id.production_id', string=u'生产单')
+    worker_id = fields.Many2one(related='worker_line_id.worker_id' ,string="Worker")
+    production_id = fields.Many2one(related='worker_line_id.production_id', string='Manufacturing Order')
 
     def offline_set_time(self):
         self.end_time = fields.datetime.now()
@@ -814,12 +799,12 @@ class MrpQcFeedBack(models.Model):
             qc.qc_fail_rate = qc.qc_fail_qty / qc.qc_test_qty * 100
     production_id = fields.Many2one('mrp.production')
     qty_produced = fields.Float(related='production_id.qty_produced')
-    qc_test_qty = fields.Float(u'抽样数量')
+    qc_test_qty = fields.Float(string='Sampling Quantity')
     qc_rate = fields.Float(compute='_compute_qc_rate')
-    qc_fail_qty = fields.Float(u'不良品数量')
-    qc_fail_rate = fields.Float(u'不良品率', compute='_compute_qc_fail_rate')
-    qc_note = fields.Text(u'批注')
-    qc_img = fields.Binary(u'品检图片')
+    qc_fail_qty = fields.Float('NG Quantity')
+    qc_fail_rate = fields.Float('Defect Rate', compute='_compute_qc_fail_rate')
+    qc_note = fields.Text(string='Note')
+    qc_img = fields.Binary(string='Quality Inspection Image')
 
     product_id = fields.Many2one('production_id.product_id')
 
@@ -838,7 +823,7 @@ class MultiHandleWorker(models.TransientModel):
 class StcokPickingExtend(models.Model):
     _inherit = 'stock.picking'
 
-    qc_note = fields.Text(u'品检备注')
+    qc_note = fields.Text(string='Quality Inspection Image')
     qc_img = fields.Binary()
     post_img = fields.Binary()
     post_area_id = fields.Many2one('stock.location.area')

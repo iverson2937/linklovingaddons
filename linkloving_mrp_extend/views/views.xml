@@ -58,32 +58,32 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//button[@name='button_plan']" position="after">
-                    <button name="button_action_confirm_draft" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'draft')]}" type="object" groups="linkloving_mrp_extend.group_charge_produce" string="确定加入生产排程"/>
-                    <button name="button_waiting_material" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'confirmed')]}" type="object" groups="linkloving_mrp_extend.group_charge_produce" string="确认生产，准备领料" />
-                    <button name="button_start_prepare_material" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'waiting_material')]}" type="object" string="开始备料" groups="linkloving_mrp_extend.group_charge_warehouse"/>
-                    <button name="button_finish_prepare_material" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'prepare_material_ing')]}" type="object" string="完成备料" groups="linkloving_mrp_extend.group_charge_warehouse"/>
+                    <button name="button_action_confirm_draft" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'draft')]}" type="object" groups="linkloving_mrp_extend.group_charge_produce" string="Confirm the Schedule"/>
+                    <button name="button_waiting_material" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'confirmed')]}" type="object" groups="linkloving_mrp_extend.group_charge_produce" string="Confirm Order,Prepare Material" />
+                    <button name="button_start_prepare_material" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'waiting_material')]}" type="object" string="Start Prepare Material" groups="linkloving_mrp_extend.group_charge_warehouse"/>
+                    <button name="button_finish_prepare_material" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'prepare_material_ing')]}" type="object" string="Material Ready" groups="linkloving_mrp_extend.group_charge_warehouse"/>
                     <!--<button name="button_already_picking" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'finish_prepare_material')]}" type="object" string="已领料" />-->
-                    <button name="button_already_picking" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'finish_prepare_material')]}" type="object" string="领料登记" groups="linkloving_mrp_extend.group_charge_produce"/>
-                    <button name="button_start_produce" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'already_picking')]}" type="object" string="开始生产" groups="linkloving_mrp_extend.group_charge_produce"/>
-                    <button name="button_produce_finish" class="oe_highlight" attrs="{'invisible': [ '|', ('availability', 'not in', ['partially_available', 'assigned']),('state', '!=', 'progress')]}" type="object" string="生产完成，送往品检" groups="linkloving_mrp_extend.group_charge_produce"/>
-                    <button name="button_start_quality_inspection" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'waiting_quality_inspection')]}" type="object" string="开始品检" groups="linkloving_mrp_extend.group_charge_inspection"/>
+                    <button name="button_already_picking" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'finish_prepare_material')]}" type="object" string="Receive Material Register" groups="linkloving_mrp_extend.group_charge_produce"/>
+                    <button name="button_start_produce" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'already_picking')]}" type="object" string="Start" groups="linkloving_mrp_extend.group_charge_produce"/>
+                    <button name="button_produce_finish" class="oe_highlight" attrs="{'invisible': [ '|', ('availability', 'not in', ['partially_available', 'assigned']),('state', '!=', 'progress')]}" type="object" string="Production Complete,Send to Inspection" groups="linkloving_mrp_extend.group_charge_produce"/>
+                    <button name="button_start_quality_inspection" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'waiting_quality_inspection')]}" type="object" string="Start Inspection" groups="linkloving_mrp_extend.group_charge_inspection"/>
 
-                    <button name="button_quality_inspection_success"  attrs="{'invisible': [('state', '!=', 'quality_inspection_ing')]}" type="object" string="品检通过" groups="linkloving_mrp_extend.group_charge_inspection"/>
-                    <button name="button_quality_inspection_failed"  attrs="{'invisible': [('state', '!=', 'quality_inspection_ing')]}" type="object" string="品检不通过" groups="linkloving_mrp_extend.group_charge_inspection"/>
+                    <button name="button_quality_inspection_success"  attrs="{'invisible': [('state', '!=', 'quality_inspection_ing')]}" type="object" string="Quality Inspection Pass" groups="linkloving_mrp_extend.group_charge_inspection"/>
+                    <button name="button_quality_inspection_failed"  attrs="{'invisible': [('state', '!=', 'quality_inspection_ing')]}" type="object" string="Quality Inspection Fail" groups="linkloving_mrp_extend.group_charge_inspection"/>
 
-                    <button name="button_inventory_material"  attrs="{'invisible': [('state', 'not in', ('waiting_inventory_material'))]}" type="object" string="清点物料" groups="linkloving_mrp_extend.group_charge_produce"/>
-                    <button name="button_check_inventory_material" context="{'is_checking':True}"  attrs="{'invisible': [('state', 'not in', ('waiting_warehouse_inspection'))]}" type="object" string="仓库确认物料" groups="linkloving_mrp_extend.group_charge_warehouse"/>
+                    <button name="button_inventory_material"  attrs="{'invisible': [('state', 'not in', ('waiting_inventory_material'))]}" type="object" string="Count Material" groups="linkloving_mrp_extend.group_charge_produce"/>
+                    <button name="button_check_inventory_material" context="{'is_checking':True}"  attrs="{'invisible': [('state', 'not in', ('waiting_warehouse_inspection'))]}" type="object" string="Warehouse Confirm Material" groups="linkloving_mrp_extend.group_charge_warehouse"/>
 
-                    <button name="button_fill_material" attrs="{'invisible': ['|',('state', '!=', 'progress')]}" type="object" string="补领料" groups="linkloving_mrp_extend.group_charge_produce"/>
-                    <button name="button_return_material" attrs="{'invisible': ['|',('state', '!=', 'done')]}" type="object" string="退料" />
+                    <button name="button_fill_material" attrs="{'invisible': ['|',('state', '!=', 'progress')]}" type="object" string="Extra Picking Material" groups="linkloving_mrp_extend.group_charge_produce"/>
+                    <button name="button_return_material" attrs="{'invisible': ['|',('state', '!=', 'done')]}" type="object" string="Return Material" />
                 </xpath>
 
                 <xpath expr="//header/button[@name='button_scrap']" position="replace">
-                    <button name="button_scrap" type="object" string="报废" attrs="{'invisible': True}"/>
+                    <button name="button_scrap" type="object" string="Scrap" attrs="{'invisible': True}"/>
                 </xpath>
 
                 <xpath expr="//header/button[@name='action_cancel']" position="replace">
-                    <button name="action_cancel" type="object" string="取消" attrs="{'invisible': [('state', 'not in', ('confirmed','waiting_material', 'prepare_material_ing'))]}" groups="linkloving_mrp_extend.group_charge_produce"/>
+                    <button name="action_cancel" type="object" string="Cancel" attrs="{'invisible': [('state', 'not in', ('confirmed','waiting_material', 'prepare_material_ing'))]}" groups="linkloving_mrp_extend.group_charge_produce"/>
                 </xpath>
 
                 <xpath expr="//header/button[@name='button_unreserve']" position="replace">
@@ -108,13 +108,13 @@
                 </xpath>
 
                 <xpath expr="//notebook/page[3]" position="after">
-                    <page string="生产结果">
+                    <page string="Result">
                         <group colspan="4">
                             <group>
                                 <label for="total_spent_time"/>
                                 <div>
                                     <field name="total_spent_time" widget="float_time" class="oe_inline"/> <!--widget="float_time" class="inline"-->
-                                    分钟
+                                    Mins
                                 </div>
                                 <field name="total_spent_money"/>
 
@@ -126,20 +126,20 @@
 
                                 <!--<label for="spent_time"/>-->
                                 <!--<div>-->
-                                <field name="spent_time" string="耗时" widget="float_time" class="oe_inline"/>
+                                <field name="spent_time" string="Time Taken" widget="float_time" class="oe_inline"/>
                                     <!--分钟-->
                                 <!--</div>-->
                             </tree>
                             <form>
                                 <group>
-                                    <field name="worker_id" string="员工"/>
-                                    <field name="mo_type" string="计价类型"/>
-                                    <field name="spent_time" string="耗时" widget="float_time"/>
-                                    <field name="worker_time_line_ids" string="">
+                                    <field name="worker_id" />
+                                    <field name="mo_type" />
+                                    <field name="spent_time"  widget="float_time"/>
+                                    <field name="worker_time_line_ids" string="Time Taken Detail">
                                         <tree>
-                                            <field name="start_time" string="开始时间"/>
-                                            <field name="end_time" string="结束时间"/>
-                                            <field name="state" string="状态"/>
+                                            <field name="start_time"/>
+                                            <field name="end_time" />
+                                            <field name="state" />
                                         </tree>
                                     </field>
                                 </group>
@@ -154,14 +154,14 @@
                 <xpath expr="//field[@name='move_raw_ids']" position="replace">
                     <field name="sim_stock_move_lines">
                         <tree editable="bottom" delete="0"  decoration-warning="quantity_done&gt;product_uom_qty" decoration-success="quantity_done>=product_uom_qty"  create="0">
-                            <field name="product_id" string="产品"/>
-                            <field name="qty_available" string="在手数量"/>
-                            <field name="virtual_available" string="预测数量"/>
-                            <field name="suggest_qty" string="建议数量"/>
-                            <field name="quantity_available" string="可用数量"/>
-                            <field name="product_uom_qty" string="待消耗"/>
-                            <field name="quantity_done" string="消耗数量"/>
-                            <field name="return_qty"  readonly="1" string="退料数量"/>
+                            <field name="product_id" string="Product"/>
+                            <field name="qty_available" string="On Hand"/>
+                            <field name="virtual_available" string="Forecast Quantity"/>
+                            <field name="suggest_qty" string="Suggest Quantity"/>
+                            <field name="quantity_available" string="Quantity Available"/>
+                            <field name="product_uom_qty" string="To Consume"/>
+                            <field name="quantity_done" string="Used Quantity"/>
+                            <field name="return_qty"  readonly="1" string="Return Quantity"/>
                         </tree>
                     </field>
                 </xpath>
@@ -174,11 +174,11 @@
                 </xpath>
 
                 <xpath expr="//button[@name='button_mark_done']" position="replace">
-                    <button name="button_mark_done" attrs="{'invisible': [ ('state', 'not in', 'waiting_post_inventory')]}" string="标记已完成" type="object" class="oe_highlight" groups="linkloving_mrp_extend.group_charge_produce"/>
+                    <button name="button_mark_done" attrs="{'invisible': [ ('state', 'not in', 'waiting_post_inventory')]}"  type="object" class="oe_highlight" groups="linkloving_mrp_extend.group_charge_produce"/>
                 </xpath>
 
                 <xpath expr="//button[@name='action_assign']" position="replace">
-                    <button name="action_assign" attrs="{'invisible': ['|',('availability', 'in', ('assigned', 'none')),('state','not in',('progress'))]}" string="检查可用性" type="object" groups="linkloving_mrp_extend.group_charge_produce"/>
+                    <button name="action_assign" attrs="{'invisible': ['|',('availability', 'in', ('assigned', 'none')),('state','not in',('progress'))]}" type="object" groups="linkloving_mrp_extend.group_charge_produce"/>
                 </xpath>
             </field>
         </record>
@@ -214,21 +214,21 @@
 
 
         <record id="picking_material_form" model="ir.ui.view">
-            <field name="name">领料详情</field>
+            <field name="name">Picking Material Detail</field>
             <field name="model">mrp.production</field>
             <field name="arch" type="xml">
-                <form string="领料详情">
+                <form string="Picking material detail">
                     <field name="sim_stock_move_lines" options="{'reload_on_button': True}">
                         <tree editable="bottom" delete="0"  decoration-warning="quantity_ready&gt;product_uom_qty" decoration-success="quantity_ready>=product_uom_qty"  create="0">
                             <field name="production_state" readonly="1" invisible="1" autofocus="autofocus"/>
-                            <field name="product_id" readonly="1" string="产品"/>
-                            <field name="qty_available" string="在手数量"/>
-                            <field name="virtual_available" string="预测数量"/>
-                            <field name="suggest_qty" readonly="1" string="建议数量"/>
-                            <field name="quantity_available" string="可用数量"/>
-                            <field name="product_uom_qty" string="待消耗"/>
-                            <field name="quantity_ready" readonly="context.get('quantity_ready_invisible')"  string="备料数量"/>
-                            <field name="over_picking_qty" invisible="context.get('overpicking_invisible')" string="超领数量"/>
+                            <field name="product_id" readonly="1"/>
+                            <field name="qty_available" />
+                            <field name="virtual_available" />
+                            <field name="suggest_qty" readonly="1" />
+                            <field name="quantity_available" />
+                            <field name="product_uom_qty" />
+                            <field name="quantity_ready" readonly="context.get('quantity_ready_invisible')" />
+                            <field name="over_picking_qty" invisible="context.get('overpicking_invisible')"/>
                             <!--<field name="return_qty"  invisible="[('production_state', 'not in', ('waiting_inventory_material','waiting_warehouse_inspection'))]" string="退料数量"/>-->
                         </tree>
                     </field>
@@ -264,7 +264,7 @@
             <field name="name">mrp.return.material.form</field>
             <field name="model">mrp.return.material</field>
             <field name="arch" type="xml">
-                <form string="退料">
+                <form string="Return Material">
                     <group>
                         <!--<group>-->
                             <!--&lt;!&ndash;<label for="return_qty"/>&ndash;&gt;-->
@@ -313,13 +313,13 @@
                     <attribute name="domain">[('state','not in',['cancel','done'])]</attribute>
                         </xpath>
                 <xpath expr="//filter[@name='waiting']" position="after">
-                    <filter string="等待备料" name="waiting_material" domain="[('state', '=', 'waiting_material')]"/>
-                    <filter string="备料中" name="prepare_material_ing" domain="[('state', '=', 'prepare_material_ing')]"/>
-                    <filter string="备料完成" name="finish_prepare_material" domain="[('state', '=', 'finish_prepare_material')]"/>
-                    <filter string="已领料" name="already_picking" domain="[('state', '=', 'already_picking')]"/>
-                    <filter string="等待品检" name="waiting_quality_inspection" domain="[('state', '=', 'waiting_quality_inspection')]"/>
-                    <filter string="品检中" name="quality_inspection_ing" domain="[('state', '=', 'quality_inspection_ing')]"/>
-                    <filter string="等待入库" name="waiting_post_inventory" domain="[('state', '=', 'waiting_post_inventory')]"/>
+                    <filter string="Waiting Prepare Material" name="waiting_material" domain="[('state', '=', 'waiting_material')]"/>
+                    <filter string="Under Preparing" name="prepare_material_ing" domain="[('state', '=', 'prepare_material_ing')]"/>
+                    <filter string="Material Ready" name="finish_prepare_material" domain="[('state', '=', 'finish_prepare_material')]"/>
+                    <filter string="Already Picking Material" name="already_picking" domain="[('state', '=', 'already_picking')]"/>
+                    <filter string="Waiting Quality Inspection" name="waiting_quality_inspection" domain="[('state', '=', 'waiting_quality_inspection')]"/>
+                    <filter string="Under Quality Inspection" name="quality_inspection_ing" domain="[('state', '=', 'quality_inspection_ing')]"/>
+                    <filter string="Waiting Transfer In Stock" name="waiting_post_inventory" domain="[('state', '=', 'waiting_post_inventory')]"/>
                 </xpath>
             </field>
         </record>
@@ -785,7 +785,7 @@
 
 
         <record id="action_picking_tree_outgoing" model="ir.actions.act_window">
-            <field name="name">出库调拨</field>
+            <field name="name">Transfer Out</field>
             <field name="res_model">stock.picking</field>
             <field name="type">ir.actions.act_window</field>
             <field name="view_type">form</field>
@@ -806,7 +806,7 @@
         </record>
 
         <record id="action_picking_tree_incoming" model="ir.actions.act_window">
-            <field name="name">入库调拨</field>
+            <field name="name">Transfer In</field>
             <field name="res_model">stock.picking</field>
             <field name="type">ir.actions.act_window</field>
             <field name="view_type">form</field>
@@ -826,8 +826,8 @@
             </field>
         </record>
 
-         <menuitem id="outgoing_picking" name="出库调拨" parent="stock.menu_stock_warehouse_mgmt" sequence="3" action="action_picking_tree_outgoing" groups="stock.group_stock_manager,stock.group_stock_user"/>
-         <menuitem id="incoming_picking" name="入库调拨" parent="stock.menu_stock_warehouse_mgmt" sequence="4" action="action_picking_tree_incoming" groups="stock.group_stock_manager,stock.group_stock_user"/>
+         <menuitem id="outgoing_picking" name="Transfer Out" parent="stock.menu_stock_warehouse_mgmt" sequence="3" action="action_picking_tree_outgoing" groups="stock.group_stock_manager,stock.group_stock_user"/>
+         <menuitem id="incoming_picking" name="Transfer In" parent="stock.menu_stock_warehouse_mgmt" sequence="4" action="action_picking_tree_incoming" groups="stock.group_stock_manager,stock.group_stock_user"/>
 
 
 
@@ -838,7 +838,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='category_ids']" position="before">
                     <group>
-                        <field name="is_worker" string="是否是产线工人"/>
+                        <field name="is_worker" string="Is Worker"/>
                     </group>
                 </xpath>
             </field>
