@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-10 00:56+0000\n"
-"PO-Revision-Date: 2017-03-10 00:56+0000\n"
+"POT-Creation-Date: 2017-03-16 07:52+0000\n"
+"PO-Revision-Date: 2017-03-16 07:52+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,14 +16,14 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: linkloving_process
-#: code:addons/linkloving_process/models/mrp_production.py:13
+#: code:addons/linkloving_process/models/mrp_production.py:29
 #: selection:mrp.bom,mo_type:0
 #, python-format
 msgid "Base on Time"
 msgstr "计时计价"
 
 #. module: linkloving_process
-#: code:addons/linkloving_process/models/mrp_production.py:12
+#: code:addons/linkloving_process/models/mrp_production.py:28
 #: selection:mrp.bom,mo_type:0
 #, python-format
 msgid "Base on Unit"
@@ -35,14 +35,91 @@ msgid "Bill of Material"
 msgstr "物料清单"
 
 #. module: linkloving_process
+#: model:ir.ui.view,arch_db:linkloving_process.mrp_production_query_wizard
+msgid "Cancel"
+msgstr "取消"
+
+#. module: linkloving_process
+#: model:ir.actions.act_window,help:linkloving_process.action_mrp_production_tree_to_confirm
+#: model:ir.actions.act_window,help:linkloving_process.get_action_mrp_production_tree_to_combine
+msgid "Click here to create a new transfer."
+msgstr "点击这里创建一个新的调拨"
+
+#. module: linkloving_process
+#: model:ir.actions.act_window,help:linkloving_process.mrp_process_action
+msgid "Click to create a new process."
+msgstr "Click to create a new process."
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_color
+msgid "Color Index"
+msgstr "颜色索引"
+
+#. module: linkloving_process
+#: model:ir.ui.view,arch_db:linkloving_process.mrp_production_query_wizard
+msgid "Confirm"
+msgstr "确认"
+
+#. module: linkloving_process
 #: model:ir.model.fields,field_description:linkloving_process.field_mrp_bom_cost
 msgid "Cost"
 msgstr "成本"
 
 #. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_count_mo_after_tomorrow
+msgid "Count mo after tomorrow"
+msgstr "后天生产单数量"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_count_mo_delay
+msgid "Count mo delay"
+msgstr "延期生产单数量"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_count_mo_draft
+msgid "Count mo draft"
+msgstr "草稿生产单数量"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_count_mo_others
+msgid "Count mo others"
+msgstr "其他生产单数量"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_count_mo_today
+msgid "Count mo today"
+msgstr "今天生产单数量"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_count_mo_tomorrow
+msgid "Count mo tomorrow"
+msgstr "明天生产单数量"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_count_mo_waiting
+msgid "Count mo waiting"
+msgstr "等待中的生产单数量"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_production_query_wizard_create_uid
+msgid "Created by"
+msgstr "创建人"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_production_query_wizard_create_date
+msgid "Created on"
+msgstr "创建时间"
+
+#. module: linkloving_process
 #: model:ir.model.fields,field_description:linkloving_process.field_mrp_bom_currency_id
 msgid "Currency"
 msgstr "币种"
+
+#. module: linkloving_process
+#: code:addons/linkloving_process/models/mrp_production.py:59
+#, python-format
+msgid "Current Day Mrp Production"
+msgstr "当天生产单"
 
 #. module: linkloving_process
 #: model:ir.model.fields,field_description:linkloving_process.field_mrp_bom_cycle_time
@@ -55,12 +132,30 @@ msgid "Cycle time time unit"
 msgstr "Cycle time time unit"
 
 #. module: linkloving_process
+#: model:ir.actions.act_window,name:linkloving_process.mrp_process_action
+#: model:ir.ui.menu,name:linkloving_process.mrp_process_dashboard_menu
+msgid "Dashboard"
+msgstr "仪表板"
+
+#. module: linkloving_process
+#: model:ir.ui.view,arch_db:linkloving_process.stock_picking_type_kanban
+msgid "Delay MO"
+msgstr "延期生产单"
+
+#. module: linkloving_process
+#: code:addons/linkloving_process/models/mrp_process.py:96
+#, python-format
+msgid "Delay Mo"
+msgstr "延期生产单"
+
+#. module: linkloving_process
 #: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_description
 msgid "Description"
 msgstr "说明"
 
 #. module: linkloving_process
 #: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_display_name
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_production_query_wizard_display_name
 msgid "Display Name"
 msgstr "显示名称"
 
@@ -68,6 +163,16 @@ msgstr "显示名称"
 #: model:ir.model,name:linkloving_process.model_hr_employee
 msgid "Employee"
 msgstr "员工"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_production_query_wizard_end_date
+msgid "End Date"
+msgstr "结束日期"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_production_query_wizard_id
+msgid "ID"
+msgstr "ID"
 
 #. module: linkloving_process
 #: model:ir.model.fields,field_description:linkloving_process.field_mrp_production_in_charge_id
@@ -82,13 +187,36 @@ msgstr "是否为工序负责人"
 
 #. module: linkloving_process
 #: model:ir.model.fields,field_description:linkloving_process.field_mrp_process___last_update
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_production_query_wizard___last_update
 msgid "Last Modified on"
 msgstr "最后修改日"
 
 #. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_production_query_wizard_write_uid
+msgid "Last Updated by"
+msgstr "最后更新人"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_production_query_wizard_write_date
+msgid "Last Updated on"
+msgstr "最后更新时间"
+
+#. module: linkloving_process
+#: model:ir.ui.view,arch_db:linkloving_process.mrp_production_form_view_ll
+msgid "MO count"
+msgstr "生产单数量"
+
+#. module: linkloving_process
+#: code:addons/linkloving_process/wizard/mrp_production_query_wizard.py:33
 #: model:ir.model,name:linkloving_process.model_mrp_production
+#, python-format
 msgid "Manufacturing Order"
-msgstr "Manufacturing Order"
+msgstr "生产单"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_production_mo_count
+msgid "Mo count"
+msgstr "生产单数量"
 
 #. module: linkloving_process
 #: model:ir.model.fields,field_description:linkloving_process.field_mrp_bom_mo_type
@@ -120,6 +248,7 @@ msgstr "单价"
 
 #. module: linkloving_process
 #: model:ir.model.fields,field_description:linkloving_process.field_mrp_production_process_id
+#: model:ir.ui.menu,name:linkloving_process.menu_process_config
 #: model:ir.ui.view,arch_db:linkloving_process.mrp_production_form_view_ll
 #: model:ir.ui.view,arch_db:linkloving_process.view_mrp_bom_filter_ll
 #: model:ir.ui.view,arch_db:linkloving_process.view_mrp_production_filter_ll
@@ -128,15 +257,22 @@ msgstr "工序"
 
 #. module: linkloving_process
 #: model:ir.model.fields,field_description:linkloving_process.field_mrp_bom_process_id
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_production_query_wizard_process_id
 #: model:ir.model.fields,field_description:linkloving_process.field_res_partner_process_id
 msgid "Process id"
 msgstr "工序"
 
 #. module: linkloving_process
-#: code:addons/linkloving_process/models/mrp_production.py:18
+#: code:addons/linkloving_process/models/mrp_production.py:34
 #, python-format
 msgid "Quantity To Produce"
 msgstr "计划生产数量"
+
+#. module: linkloving_process
+#: code:addons/linkloving_process/models/mrp_process.py:178
+#, python-format
+msgid "Query"
+msgstr "查询"
 
 #. module: linkloving_process
 #: model:ir.model.fields,field_description:linkloving_process.field_mrp_process_partner_id
@@ -144,9 +280,58 @@ msgid "Responsible By"
 msgstr "负责人"
 
 #. module: linkloving_process
+#: model:ir.ui.view,arch_db:linkloving_process.stock_picking_type_kanban
+msgid "Schedule"
+msgstr "排程"
+
+#. module: linkloving_process
+#: model:ir.model.fields,field_description:linkloving_process.field_mrp_production_query_wizard_start_date
+msgid "Start Date"
+msgstr "开始日期"
+
+#. module: linkloving_process
 #: model:ir.ui.view,arch_db:linkloving_process.mrp_production_tree_view_ll
 msgid "Status"
 msgstr "状态"
+
+#. module: linkloving_process
+#: model:ir.ui.view,arch_db:linkloving_process.stock_picking_type_kanban
+msgid "The after Tomorrow"
+msgstr "后天"
+
+#. module: linkloving_process
+#: code:addons/linkloving_process/models/mrp_process.py:126
+#, python-format
+msgid "The day after tomorrow MO"
+msgstr "后天生产单"
+
+#. module: linkloving_process
+#: model:ir.actions.act_window,name:linkloving_process.action_mrp_production_tree_to_confirm
+#: model:ir.actions.act_window,name:linkloving_process.get_action_mrp_production_tree_to_combine
+msgid "To Do"
+msgstr "待办"
+
+#. module: linkloving_process
+#: model:ir.ui.view,arch_db:linkloving_process.stock_picking_type_kanban
+msgid "Today MO"
+msgstr "今日生产单"
+
+#. module: linkloving_process
+#: code:addons/linkloving_process/models/mrp_process.py:82
+#, python-format
+msgid "Today Mrp Production"
+msgstr "今日生产单"
+
+#. module: linkloving_process
+#: model:ir.ui.view,arch_db:linkloving_process.stock_picking_type_kanban
+msgid "Tomorrow MO"
+msgstr "明日生产单"
+
+#. module: linkloving_process
+#: code:addons/linkloving_process/models/mrp_process.py:111
+#, python-format
+msgid "Tomorrow Mo"
+msgstr "明日生产单"
 
 #. module: linkloving_process
 #: model:ir.ui.view,arch_db:linkloving_process.mrp_production_form_view_ll
@@ -160,8 +345,25 @@ msgid "Unit price"
 msgstr "单价"
 
 #. module: linkloving_process
+#: model:ir.actions.act_window,help:linkloving_process.action_mrp_production_tree_to_confirm
+#: model:ir.actions.act_window,help:linkloving_process.get_action_mrp_production_tree_to_combine
+msgid "You can either do it immediately or mark it as Todo for future processing. Use your scanner to\n"
+"                    validate the transferred quantity quicker."
+msgstr "你可以立即完成调拨，也可以新建后将其标记为待办以便下一步处理。扫描枪可以帮助您更加高效地验证进出库数量。"
+
+#. module: linkloving_process
 #: model:ir.actions.act_window,name:linkloving_process.action_mrp_process
 #: model:ir.model,name:linkloving_process.model_mrp_process
 msgid "mrp.process"
 msgstr "工序"
+
+#. module: linkloving_process
+#: model:ir.model,name:linkloving_process.model_mrp_production_query_wizard
+msgid "mrp.production.query.wizard"
+msgstr "mrp.production.query.wizard"
+
+#. module: linkloving_process
+#: model:ir.ui.view,arch_db:linkloving_process.mrp_production_query_wizard
+msgid "or"
+msgstr "或"
 
