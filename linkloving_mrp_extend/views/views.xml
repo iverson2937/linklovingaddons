@@ -155,12 +155,12 @@
                     <field name="sim_stock_move_lines">
                         <tree editable="bottom" delete="0"  decoration-warning="quantity_done&gt;product_uom_qty" decoration-success="quantity_done>=product_uom_qty"  create="0">
                             <field name="product_id" string="Product"/>
-                            <field name="qty_available" string="On Hand"/>
+                            <field name="qty_available" string="Actual Stock"/>
                             <field name="virtual_available" string="Forecast Quantity"/>
                             <field name="suggest_qty" string="Suggest Quantity"/>
                             <field name="quantity_available" string="Quantity Available"/>
-                            <field name="product_uom_qty" string="To Consume"/>
-                            <field name="quantity_done" string="Used Quantity"/>
+                            <field name="product_uom_qty" string="Demand Quantity"/>
+                            <field name="quantity_done" string="Actual Used Quantity"/>
                             <field name="return_qty"  readonly="1" string="Return Quantity"/>
                         </tree>
                     </field>

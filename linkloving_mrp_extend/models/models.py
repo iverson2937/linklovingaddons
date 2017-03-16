@@ -92,6 +92,13 @@ class StockMoveExtend(models.Model):
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 
+    availability = fields.Selection([
+        ('assigned', _('Available')),
+        ('partially_available', _('Partially Available')),
+        ('waiting', _('Waiting')),
+        ('none', 'None')], string=_('Material Status'),
+        compute='_compute_availability', store=True)
+
     @api.model
     def create(self, vals):
         res = super(MrpProductionExtend, self).create(vals)

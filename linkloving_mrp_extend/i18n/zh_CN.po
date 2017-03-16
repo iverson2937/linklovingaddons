@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-14 09:51+0000\n"
-"PO-Revision-Date: 2017-03-14 09:51+0000\n"
+"POT-Creation-Date: 2017-03-16 08:47+0000\n"
+"PO-Revision-Date: 2017-03-16 08:47+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -36,7 +36,17 @@ msgid "A manufacturing order, based on a bill of materials, will\n"
 msgstr "生产单基于物料清单，消耗预定义的原材料并产出产成品。"
 
 #. module: linkloving_mrp_extend
-#: code:addons/linkloving_mrp_extend/models/models.py:174
+#: model:ir.ui.view,arch_db:linkloving_mrp_extend.linkloving_mrp_production_form_view
+msgid "Actual Stock"
+msgstr "实际库存"
+
+#. module: linkloving_mrp_extend
+#: model:ir.ui.view,arch_db:linkloving_mrp_extend.linkloving_mrp_production_form_view
+msgid "Actual Used Quantity"
+msgstr "已消耗数量"
+
+#. module: linkloving_mrp_extend
+#: code:addons/linkloving_mrp_extend/models/models.py:181
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.view_mrp_production_filter
 #, python-format
 msgid "Already Picking Material"
@@ -58,7 +68,13 @@ msgstr "Amount of money"
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_production_to_qc_area_id
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_sim_stock_move_area_id
 msgid "Area"
-msgstr "区域"
+msgstr "Area"
+
+#. module: linkloving_mrp_extend
+#: code:addons/linkloving_mrp_extend/models/models.py:96
+#, python-format
+msgid "Available"
+msgstr "已备齐"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model,name:linkloving_mrp_extend.model_mrp_bom
@@ -89,6 +105,7 @@ msgstr "备货制：可产生任意数量的产品，便可完成生产，送往
 
 #. module: linkloving_mrp_extend
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.account_multi_handle_worker_form_view
+#: model:ir.ui.view,arch_db:linkloving_mrp_extend.account_multi_set_mto
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.linkloving_mrp_production_form_view
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.picking_material_form
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.stock_return_material_form_view2
@@ -133,6 +150,11 @@ msgid "Click to create a manufacturing order."
 msgstr "单击创建一个制造订单."
 
 #. module: linkloving_mrp_extend
+#: model:ir.actions.act_window,help:linkloving_mrp_extend.make_by_mrp_purchase_form_action
+msgid "Click to create a quotation that will be converted into a purchase order."
+msgstr "点击创建一张询价单然后转化为采购单"
+
+#. module: linkloving_mrp_extend
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.picking_material_form
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.view_confirm_production_wizard
 msgid "Confirm"
@@ -170,6 +192,7 @@ msgstr "清点物料"
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_qc_feedback_create_uid
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_return_material_create_uid
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_multi_handle_worker_create_uid
+#: model:ir.model.fields,field_description:linkloving_mrp_extend.field_multi_set_mto_create_uid
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_return_material_line_create_uid
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_sim_stock_move_create_uid
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_warehouse_area_create_uid
@@ -183,6 +206,7 @@ msgstr "创建人"
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_qc_feedback_create_date
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_return_material_create_date
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_multi_handle_worker_create_date
+#: model:ir.model.fields,field_description:linkloving_mrp_extend.field_multi_set_mto_create_date
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_return_material_line_create_date
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_sim_stock_move_create_date
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_warehouse_area_create_date
@@ -209,10 +233,16 @@ msgid "Defect Rate"
 msgstr "不良率"
 
 #. module: linkloving_mrp_extend
+#: model:ir.ui.view,arch_db:linkloving_mrp_extend.linkloving_mrp_production_form_view
+msgid "Demand Quantity"
+msgstr "需求数量"
+
+#. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_confirm_production_display_name
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_qc_feedback_display_name
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_return_material_display_name
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_multi_handle_worker_display_name
+#: model:ir.model.fields,field_description:linkloving_mrp_extend.field_multi_set_mto_display_name
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_return_material_line_display_name
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_sim_stock_move_display_name
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_warehouse_area_display_name
@@ -234,7 +264,7 @@ msgid "Done Orders"
 msgstr "已完成的订单"
 
 #. module: linkloving_mrp_extend
-#: code:addons/linkloving_mrp_extend/models/models.py:169
+#: code:addons/linkloving_mrp_extend/models/models.py:176
 #: selection:mrp.return.material,state:0
 #, python-format
 msgid "Draft"
@@ -248,7 +278,7 @@ msgstr "员工"
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_worker_time_line_end_time
 msgid "End time"
-msgstr "结束时间"
+msgstr "End time"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_stock_move_over_picking_qty
@@ -294,6 +324,7 @@ msgstr "预测数量(计算为 在手数量 - 出货 + 进货) \n"
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_qc_feedback_id
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_return_material_id
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_multi_handle_worker_id
+#: model:ir.model.fields,field_description:linkloving_mrp_extend.field_multi_set_mto_id
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_return_material_line_id
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_sim_stock_move_id
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_warehouse_area_id
@@ -334,6 +365,7 @@ msgstr "是否退料"
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_qc_feedback___last_update
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_return_material___last_update
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_multi_handle_worker___last_update
+#: model:ir.model.fields,field_description:linkloving_mrp_extend.field_multi_set_mto___last_update
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_return_material_line___last_update
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_sim_stock_move___last_update
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_warehouse_area___last_update
@@ -347,6 +379,7 @@ msgstr "最后修改日"
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_qc_feedback_write_uid
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_return_material_write_uid
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_multi_handle_worker_write_uid
+#: model:ir.model.fields,field_description:linkloving_mrp_extend.field_multi_set_mto_write_uid
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_return_material_line_write_uid
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_sim_stock_move_write_uid
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_warehouse_area_write_uid
@@ -360,6 +393,7 @@ msgstr "最后更新人"
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_qc_feedback_write_date
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_return_material_write_date
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_multi_handle_worker_write_date
+#: model:ir.model.fields,field_description:linkloving_mrp_extend.field_multi_set_mto_write_date
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_return_material_line_write_date
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_sim_stock_move_write_date
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_warehouse_area_write_date
@@ -371,10 +405,10 @@ msgstr "最后更新时间"
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_worker_line_line_state
 msgid "Line state"
-msgstr "状态"
+msgstr "Line state"
 
 #. module: linkloving_mrp_extend
-#: code:addons/linkloving_mrp_extend/models/models.py:404
+#: code:addons/linkloving_mrp_extend/models/models.py:411
 #, python-format
 msgid "Lines need to be deleted, but can not as you still have some quantities to consume in them. "
 msgstr "Lines need to be deleted, but can not as you still have some quantities to consume in them. "
@@ -387,12 +421,12 @@ msgstr "地点"
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_warehouse_area_name
 msgid "Location Description"
-msgstr "位置描述"
+msgstr "Location Description"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_production_to_qc_img
 msgid "Location Image"
-msgstr "位置图片"
+msgstr "Location Image"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model,name:linkloving_mrp_extend.model_mrp_production
@@ -424,18 +458,24 @@ msgid "Manufacturing orders are usually proposed automatically based\n"
 msgstr "生产订单通常被设定为自动产生，例如顾客需求或者最小库存规则"
 
 #. module: linkloving_mrp_extend
-#: code:addons/linkloving_mrp_extend/models/models.py:172
+#: code:addons/linkloving_mrp_extend/models/models.py:179
 #, python-format
 msgid "Material Preparing"
 msgstr "备料中..."
 
 #. module: linkloving_mrp_extend
-#: code:addons/linkloving_mrp_extend/models/models.py:173
+#: code:addons/linkloving_mrp_extend/models/models.py:180
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.linkloving_mrp_production_form_view
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.view_mrp_production_filter
 #, python-format
 msgid "Material Ready"
 msgstr "备料完成"
+
+#. module: linkloving_mrp_extend
+#: code:addons/linkloving_mrp_extend/models/models.py:99
+#, python-format
+msgid "Material Status"
+msgstr "物料状况"
 
 #. module: linkloving_mrp_extend
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.linkloving_mrp_production_form_view
@@ -453,7 +493,7 @@ msgid "NG Quantity"
 msgstr "不良数量"
 
 #. module: linkloving_mrp_extend
-#: code:addons/linkloving_mrp_extend/models/models.py:515
+#: code:addons/linkloving_mrp_extend/models/models.py:522
 #, python-format
 msgid "New"
 msgstr "新建"
@@ -476,24 +516,29 @@ msgstr "Now mo id"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_stock_move_qty_available
-#: model:ir.ui.view,arch_db:linkloving_mrp_extend.linkloving_mrp_production_form_view
 msgid "On Hand"
 msgstr "在手数量"
 
 #. module: linkloving_mrp_extend
 #: selection:worker.line,line_state:0
 msgid "On Leave"
-msgstr "请假"
+msgstr "On Leave"
 
 #. module: linkloving_mrp_extend
 #: selection:worker.time.line,state:0
 msgid "On leave"
-msgstr "请假"
+msgstr "On leave"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_production_production_order_type
 msgid "Order Type"
-msgstr "订单类型"
+msgstr "Order Type"
+
+#. module: linkloving_mrp_extend
+#: model:ir.actions.act_window,name:linkloving_mrp_extend.make_by_mrp_purchase_form_action
+#: model:ir.ui.menu,name:linkloving_mrp_extend.menu_purchase_make_by_mrp
+msgid "Orders Make By MRP"
+msgstr "Orders Make By MRP"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_production_origin_sale_order_id
@@ -511,15 +556,21 @@ msgid "Owner"
 msgstr "所有者"
 
 #. module: linkloving_mrp_extend
+#: code:addons/linkloving_mrp_extend/models/models.py:97
+#, python-format
+msgid "Partially Available"
+msgstr "缺料中"
+
+#. module: linkloving_mrp_extend
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.picking_material_form
 msgid "Picking material detail"
 msgstr "领料详情"
 
 #. module: linkloving_mrp_extend
-#: code:addons/linkloving_mrp_extend/models/models.py:296
+#: code:addons/linkloving_mrp_extend/models/models.py:303
 #, python-format
 msgid "Please fill in the quantity！"
-msgstr "请填写数量！"
+msgstr "Please fill in the quantity！"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_stock_picking_post_area_id
@@ -560,18 +611,18 @@ msgstr "产品规格"
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_return_material_line_product_id
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_sim_stock_move_product_id
 msgid "Product id"
-msgstr "产品"
+msgstr "Product id"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_sim_stock_move_product_uom_qty
 msgid "Product uom qty"
-msgstr "待消耗"
+msgstr "Product uom qty"
 
 #. module: linkloving_mrp_extend
 #: model:ir.actions.act_window,name:linkloving_mrp_extend.product_product_action
 #: model:ir.ui.menu,name:linkloving_mrp_extend.menu_stock_product_product_menu
 msgid "ProductProduct"
-msgstr "产品变型"
+msgstr "ProductProduct"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_return_material_production_id
@@ -624,7 +675,7 @@ msgstr "品检失败"
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_qc_feedback_qc_img
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_stock_picking_qc_note
 msgid "Quality Inspection Image"
-msgstr "品检图片"
+msgstr "Quality Inspection Image"
 
 #. module: linkloving_mrp_extend
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.linkloving_mrp_production_form_view
@@ -649,7 +700,7 @@ msgstr "生产的数量"
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_sim_stock_move_quantity_available
 msgid "Quantity available"
-msgstr "可用数量"
+msgstr "Quantity available"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_sim_stock_move_quantity_done
@@ -659,7 +710,7 @@ msgstr "Quantity done"
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_sim_stock_move_quantity_ready
 msgid "Quantity ready"
-msgstr "备料数量"
+msgstr "Quantity ready"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_worker_line_xishu
@@ -746,7 +797,7 @@ msgstr "返工中的订单"
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_qc_feedback_qc_test_qty
 msgid "Sampling Quantity"
-msgstr "抽检数量"
+msgstr "Sampling Quantity"
 
 #. module: linkloving_mrp_extend
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.linkloving_mrp_production_form_view
@@ -776,7 +827,7 @@ msgstr "Spent time"
 #. module: linkloving_mrp_extend
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.linkloving_mrp_production_form_view
 msgid "Start"
-msgstr "开始生产"
+msgstr "开始"
 
 #. module: linkloving_mrp_extend
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.linkloving_mrp_production_form_view
@@ -791,13 +842,13 @@ msgstr "开始备料"
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_worker_time_line_start_time
 msgid "Start time"
-msgstr "开始时间"
+msgstr "Start time"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_sim_stock_move_production_state
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_worker_time_line_state
 msgid "State"
-msgstr "状态"
+msgstr "省/ 州"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_return_material_state
@@ -807,7 +858,7 @@ msgstr "状态"
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_production_prepare_material_img
 msgid "Stock Image"
-msgstr "库存图片"
+msgstr "Stock Image"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model,name:linkloving_mrp_extend.model_stock_move
@@ -831,7 +882,7 @@ msgid "Suggest qty"
 msgstr "建议数量"
 
 #. module: linkloving_mrp_extend
-#: code:addons/linkloving_mrp_extend/models/models.py:258
+#: code:addons/linkloving_mrp_extend/models/models.py:265
 #, python-format
 msgid "These is not output,can not finish the order!"
 msgstr "没有产出，不能完成制作单!"
@@ -850,11 +901,6 @@ msgstr "工时详细"
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_production_total_spent_time
 msgid "Time taken"
 msgstr "耗时"
-
-#. module: linkloving_mrp_extend
-#: model:ir.ui.view,arch_db:linkloving_mrp_extend.linkloving_mrp_production_form_view
-msgid "To Consume"
-msgstr "待投料"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_production_total_spent_money
@@ -884,14 +930,14 @@ msgid "Under Preparing"
 msgstr "备料中"
 
 #. module: linkloving_mrp_extend
-#: code:addons/linkloving_mrp_extend/models/models.py:178
+#: code:addons/linkloving_mrp_extend/models/models.py:185
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.view_mrp_production_filter
 #, python-format
 msgid "Under Quality Inspection"
 msgstr "品检中"
 
 #. module: linkloving_mrp_extend
-#: code:addons/linkloving_mrp_extend/models/models.py:180
+#: code:addons/linkloving_mrp_extend/models/models.py:187
 #, python-format
 msgid "Under Rework"
 msgstr "返工中"
@@ -907,9 +953,15 @@ msgid "Update"
 msgstr "更新"
 
 #. module: linkloving_mrp_extend
-#: model:ir.ui.view,arch_db:linkloving_mrp_extend.linkloving_mrp_production_form_view
-msgid "Used Quantity"
-msgstr "消耗数量"
+#: model:ir.actions.act_window,help:linkloving_mrp_extend.make_by_mrp_purchase_form_action
+msgid "Use this menu to search within your purchase orders by\n"
+"                    references, vendor, products, etc. For each purchase order,\n"
+"                    you can track the related discussion with the vendor, control\n"
+"                    the products received and control the vendor bills."
+msgstr "Use this menu to search within your purchase orders by\n"
+"                    references, vendor, products, etc. For each purchase order,\n"
+"                    you can track the related discussion with the vendor, control\n"
+"                    the products received and control the vendor bills."
 
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_sim_stock_move_virtual_available
@@ -917,7 +969,13 @@ msgid "Virtual available"
 msgstr "预测数量"
 
 #. module: linkloving_mrp_extend
-#: code:addons/linkloving_mrp_extend/models/models.py:182
+#: code:addons/linkloving_mrp_extend/models/models.py:98
+#, python-format
+msgid "Waiting"
+msgstr "等待材料"
+
+#. module: linkloving_mrp_extend
+#: code:addons/linkloving_mrp_extend/models/models.py:189
 #, python-format
 msgid "Waiting Check Return Material"
 msgstr "等待检验退料"
@@ -929,7 +987,7 @@ msgid "Waiting Inspection Orders"
 msgstr "等待品检的订单"
 
 #. module: linkloving_mrp_extend
-#: code:addons/linkloving_mrp_extend/models/models.py:181
+#: code:addons/linkloving_mrp_extend/models/models.py:188
 #, python-format
 msgid "Waiting Inventory Material"
 msgstr "等待清点退料"
@@ -953,21 +1011,21 @@ msgid "Waiting Post Orders"
 msgstr "等待入库的订单"
 
 #. module: linkloving_mrp_extend
-#: code:addons/linkloving_mrp_extend/models/models.py:171
+#: code:addons/linkloving_mrp_extend/models/models.py:178
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.view_mrp_production_filter
 #, python-format
 msgid "Waiting Prepare Material"
 msgstr "等待备料"
 
 #. module: linkloving_mrp_extend
-#: code:addons/linkloving_mrp_extend/models/models.py:177
+#: code:addons/linkloving_mrp_extend/models/models.py:184
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.view_mrp_production_filter
 #, python-format
 msgid "Waiting Quality Inspection"
 msgstr "等待品检"
 
 #. module: linkloving_mrp_extend
-#: code:addons/linkloving_mrp_extend/models/models.py:179
+#: code:addons/linkloving_mrp_extend/models/models.py:186
 #, python-format
 msgid "Waiting Rework"
 msgstr "等待返工"
@@ -979,7 +1037,7 @@ msgid "Waiting Rework Orders"
 msgstr "等待返工的订单"
 
 #. module: linkloving_mrp_extend
-#: code:addons/linkloving_mrp_extend/models/models.py:183
+#: code:addons/linkloving_mrp_extend/models/models.py:190
 #, python-format
 msgid "Waiting Stock Transfers"
 msgstr "等待入库"
@@ -1032,13 +1090,13 @@ msgid "You can either do it immediately or mark it as Todo for future processing
 msgstr "你可以立即完成调拨，也可以新建后将其标记为待办以便下一步处理。扫描枪可以帮助您更加高效地验证进出库数量。"
 
 #. module: linkloving_mrp_extend
-#: code:addons/linkloving_mrp_extend/models/models.py:260
+#: code:addons/linkloving_mrp_extend/models/models.py:267
 #, python-format
 msgid "You have to complete the order before close it!"
 msgstr "此生产单为订单制，需要产成所有数量的产品才能送往品检！"
 
 #. module: linkloving_mrp_extend
-#: code:addons/linkloving_mrp_extend/models/models.py:471
+#: code:addons/linkloving_mrp_extend/models/models.py:478
 #, python-format
 msgid "You should at least produce some quantity"
 msgstr "You should at least produce some quantity"
@@ -1067,6 +1125,11 @@ msgstr "mrp.return.material"
 #: model:ir.model,name:linkloving_mrp_extend.model_multi_handle_worker
 msgid "multi.handle.worker"
 msgstr "multi.handle.worker"
+
+#. module: linkloving_mrp_extend
+#: model:ir.model,name:linkloving_mrp_extend.model_multi_set_mto
+msgid "multi.set.mto"
+msgstr "multi.set.mto"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model,name:linkloving_mrp_extend.model_report_mrp_report_mrpbomstructure
