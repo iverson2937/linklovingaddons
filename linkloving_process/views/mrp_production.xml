@@ -5,6 +5,13 @@
             <field name="model">mrp.production</field>
             <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
             <field name="arch" type="xml">
+                <div name="button_box" position="inside">
+                    <button class="oe_stat_button" name="action_view_mrp_productions"
+                            type="object" icon="fa-list-alt">
+                        <field name="mo_count" string="数量" widget="statinfo"/>
+
+                    </button>
+                </div>
                 <xpath expr="//field[@name='origin']" position="after">
                     <field name="process_id" options="{'no_create':True}" string="Process"/>
                     <field name="mo_type" widget="radio" string="Type"/>
@@ -70,7 +77,7 @@
                 </p>
             </field>
         </record>
-                <record id="get_action_mrp_production_tree_to_combine" model="ir.actions.act_window">
+        <record id="get_action_mrp_production_tree_to_combine" model="ir.actions.act_window">
             <field name="name">To Do</field>
             <field name="res_model">mrp.production</field>
             <field name="type">ir.actions.act_window</field>
@@ -92,7 +99,6 @@
                 </p>
             </field>
         </record>
-
 
 
     </data>

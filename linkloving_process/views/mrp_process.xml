@@ -43,7 +43,7 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-        <menuitem id="menu_process_config" name="工序" parent="mrp.menu_mrp_configuration" sequence="30"
+        <menuitem id="menu_process_config" name="Process" parent="mrp.menu_mrp_configuration" sequence="30"
                   action="action_mrp_process"/>
 
 

@@ -17,6 +17,7 @@ class MrpProcess(models.Model):
     hour_price = fields.Float(string=u'Price Per Hour')
     color = fields.Integer("Color Index")
     count_mo_waiting = fields.Integer(compute='_compute_process_count')
+    count_mo_delay = fields.Integer(compute='_compute_process_count')
     count_mo_draft = fields.Integer(compute='_compute_process_count')
     count_mo_today = fields.Integer(compute='_compute_process_count')
     count_mo_tomorrow = fields.Integer(compute='_compute_process_count')
@@ -24,6 +25,7 @@ class MrpProcess(models.Model):
     count_mo_others = fields.Integer(compute='_compute_process_count')
 
     def _today(self):
+        print (datetime.date.today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')
         return (datetime.date.today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')
 
     def _tomorrow(self):
@@ -41,8 +43,10 @@ class MrpProcess(models.Model):
 
         domains = {
             'count_mo_draft': [('state', '=', 'draft')],
+            'count_mo_delay': [('date_planned_start', '<', datetime.date.today().strftime('%Y-%m-%d %H:%M:%S'))],
             'count_mo_waiting': [('state', 'in', ['draft', 'confirmed', 'waiting_material'])],
-            'count_mo_today': [('date_planned_start', '<', self._today())],
+            'count_mo_today': [('date_planned_start', '>', datetime.date.today().strftime('%Y-%m-%d %H:%M:%S')),
+                               ('date_planned_start', '<', self._today())],
             'count_mo_tomorrow': [('date_planned_start', '>', self._today()),
                                   ('date_planned_start', '<', self._tomorrow())],
             'count_mo_after_tomorrow': [('date_planned_start', '>', self._tomorrow()),
@@ -70,12 +74,26 @@ class MrpProcess(models.Model):
 
     @api.multi
     def get_action_mrp_production_today(self):
-        domain = [('date_planned_start', '<',
-                   (datetime.date.today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')),
-                  ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel'))]
+        domain = [('date_planned_start', '>', datetime.date.today().strftime('%Y-%m-%d %H:%M:%S')),
+                  ('date_planned_start', '<', self._today()),
+                  ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel', 'draft'))]
 
         return {
-            'name': _('Create Backorder?'),
+            'name': _('Today Mrp Production'),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'mrp.production',
+            'target': 'current',
+            'domain': domain,
+        }
+
+    @api.multi
+    def get_action_mrp_production_tree_delay(self):
+        domain = [('date_planned_start', '<', datetime.date.today().strftime('%Y-%m-%d %H:%M:%S')),
+                  ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel', 'draft'))]
+        return {
+            'name': _('Delay Mo'),
             'type': 'ir.actions.act_window',
             'view_type': 'form',
             'view_mode': 'tree,form',
@@ -87,10 +105,10 @@ class MrpProcess(models.Model):
     @api.multi
     def get_action_mrp_production_tomorrow(self):
         domain = [('date_planned_start', '>', self._today()), ('date_planned_start', '<', self._tomorrow()),
-                  ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel'))]
+                  ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel', 'draft'))]
 
         return {
-            'name': _('Create Backorder?'),
+            'name': _('Tomorrow Mo'),
             'type': 'ir.actions.act_window',
             'view_type': 'form',
             'view_mode': 'tree,form',
@@ -102,10 +120,10 @@ class MrpProcess(models.Model):
     @api.multi
     def get_action_mrp_production_after_tomorrow(self):
         domain = [('date_planned_start', '>', self._tomorrow()), ('date_planned_start', '<', self._after_tomorrow()),
-                  ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel'))]
+                  ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel', 'draft'))]
 
         return {
-            'name': _(''),
+            'name': _('The day after tomorrow MO'),
             'type': 'ir.actions.act_window',
             'view_type': 'form',
             'view_mode': 'tree,form',
@@ -117,7 +135,7 @@ class MrpProcess(models.Model):
     @api.multi
     def get_action_mrp_production_others(self):
         domain = [('date_planned_start', '>', self._after_tomorrow()),
-                  ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel'))]
+                  ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel', 'draft'))]
 
         return {
             'name': _(''),
@@ -153,3 +171,14 @@ class MrpProcess(models.Model):
         # for record in self:
         #     record.rate_picking_late = record.count_picking and record.count_picking_late * 100 / record.count_picking or 0
         #     record.rate_picking_backorders = record.count_picking and record.count_picking_backorders * 100 / record.count_picking or 0
+
+    @api.multi
+    def mo_schedule_query(self):
+        return {
+            'name': _('Query'),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'mrp.production.query.wizard',
+            'target': 'new',
+        }

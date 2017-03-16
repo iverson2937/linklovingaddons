@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'mrp', 'linkloving_account','hr','linkloving_warehouse'],
+    'depends': ['base', 'mrp', 'linkloving_account', 'hr', 'linkloving_warehouse'],
 
     # always loaded
     'data': [
@@ -31,8 +31,10 @@
         'views/res_partner.xml',
         'views/hr_employee.xml',
         'views/dashboard.xml',
+        'wizard/mrp_production_query_wizard.xml'
     ],
     # only loaded in demonstration mode
+
     'demo': [
         'demo/demo.xml',
     ],
