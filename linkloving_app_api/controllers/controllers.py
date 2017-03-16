@@ -109,7 +109,16 @@ class LinklovingAppApi(http.Controller):
                 user = LinklovingAppApi.get_model_by_id(uid, request, 'res.users')
                 values['partner_id'] = user.partner_id.id
                 group_names = request.env['ir.model.data'].sudo().search_read([('res_id', 'in', user.groups_id.ids),('model','=','res.groups')], fields=['name'])
+                #转换中英文标志位
+                if user.lang == "zh_CN":
+                    values['lang'] = "zh-Hans"
+                elif user.lang == "en_US":
+                    values['lang'] = "en"
+                else:
+                    values['lang'] = "zh-Hans"
+
                 values['groups'] = group_names
+                values['user_ava'] = LinklovingAppApi.get_img_url(cur_user.id, "res.users", "image_medium")
                 values['login_success'] = True
                 return JsonResponse.send_response(STATUS_CODE_OK, res_data=values)
             else:
@@ -118,6 +127,14 @@ class LinklovingAppApi(http.Controller):
         else:
             values['error'] = _("Wrong Request Method")
         return JsonResponse.send_response(STATUS_CODE_ERROR, res_data=values)
+
+    @classmethod
+    def get_img_url(cls, id, model, field):
+        url = '%slinkloving_app_api/get_worker_image?worker_id=%s&model=%s&field=%s&time=%s' % (
+            request.httprequest.host_url, str(id), model, field, str(time.mktime(datetime.datetime.now().timetuple())))
+        if not url:
+            return ''
+        return url
 
     #获取菜单列表
     @http.route('/linkloving_app_api/get_menu_list', type='http', auth="none", csrf=False)
@@ -131,8 +148,8 @@ class LinklovingAppApi(http.Controller):
     @classmethod
     def get_app_menu_icon_img_url(cls, id, field):
         DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
-        url = '%slinkloving_app_api/get_worker_image?worker_id=%s&model=%s&field=%s' % (
-            request.httprequest.host_url, str(id), 'ir.ui.menu', field)
+        url = '%slinkloving_app_api/get_worker_image?worker_id=%s&model=%s&field=%s&time=%s' % (
+            request.httprequest.host_url, str(id), 'ir.ui.menu', field, str(time.mktime(datetime.datetime.now().timetuple())))
         if not url:
             return ''
         return url
@@ -627,7 +644,7 @@ class LinklovingAppApi(http.Controller):
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
     @classmethod
     def get_qc_img_url(cls, worker_id, ):
-        DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
+        # DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
         url = '%slinkloving_app_api/get_worker_image?worker_id=%s&model=%s&field=%s' % (
             request.httprequest.host_url, str(worker_id), 'mrp.qc.feedback', 'qc_img')
         if not url:
