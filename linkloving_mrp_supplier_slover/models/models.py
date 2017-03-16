@@ -8,6 +8,8 @@ from odoo.osv import osv
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
+    state = fields.Selection(selection_add=[('make_by_mrp', u'由MRP生成')])
+
     @api.one
     def write(self, vals):
         res = super(PurchaseOrder, self).write(vals)
@@ -87,7 +89,7 @@ class linkloving_procurement_order(models.Model):
 
             domain = (
                 ('partner_id', '=', partner.id),
-                ('state', '=', 'draft'),
+                ('state', '=', 'make_by_mrp'),
                 ('picking_type_id', '=', procurement.rule_id.picking_type_id.id),
                 ('company_id', '=', procurement.company_id.id),
                 ('dest_address_id', '=', procurement.partner_dest_id.id))
@@ -102,6 +104,7 @@ class linkloving_procurement_order(models.Model):
                 cache[domain] = po
             if not po:
                 vals = procurement._prepare_purchase_order(partner)
+                vals['state'] = "make_by_mrp"
                 po = self.env['purchase.order'].create(vals)
                 name = (procurement.group_id and (procurement.group_id.name + ":") or "") + (
                 procurement.name != "/" and procurement.name or procurement.move_dest_id.raw_material_production_id and procurement.move_dest_id.raw_material_production_id.name or "")

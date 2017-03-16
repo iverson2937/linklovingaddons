@@ -834,5 +834,21 @@ class ProcurementOrderExtend(models.Model):
 
     def _prepare_mo_vals(self, bom):
         res = super(ProcurementOrderExtend, self)._prepare_mo_vals(bom)
-        res.update({'state':'draft'})
+        res.update({'state' : 'draft',
+                    'process_id' : bom.process_id.id,
+                    'unit_price' : bom.process_id.unit_price,
+                    'mo_type' : bom.mo_type,
+                    'hour_price' : bom.hour_price,
+                    'in_charge_id' : bom.process_id.partner_id.id
+                    })
         return res
+
+class MultiSetMTO(models.TransientModel):
+    _name = 'multi.set.mto'
+
+    def action_ok(self):
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+        products = self.env['product.template'].search([('id','in', active_ids)])
+        for product in products:
+            product.route_ids = [(2 ,self.env.ref('stock.route_warehouse0_mto').id)]
