@@ -367,3 +367,8 @@ msgstr "mrp.production.query.wizard"
 msgid "or"
 msgstr "或"
 
+#. module: linkloving_process
+#: model:ir.ui.view,arch_db:linkloving_process.stock_picking_type_kanban
+msgid "Manufacturing order Query"
+msgstr "制造订单查询"
+
