@@ -9,6 +9,7 @@
                         <group>
                             <field name="name"/>
                             <field name="is_show_on_app"/>
+                            <field name="app_menu_icon"/>
                             <field name="parent_id" groups="base.group_no_one"/>
                             <field name="sequence" groups="base.group_no_one"/>
                         </group>

@@ -128,6 +128,15 @@ class LinklovingAppApi(http.Controller):
         menu_data = LinklovingAppApi.loadMenus().get('children')
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=menu_data,jsonRequest=False)
 
+    @classmethod
+    def get_app_menu_icon_img_url(cls, id, field):
+        DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
+        url = '%slinkloving_app_api/get_worker_image?worker_id=%s&model=%s&field=%s' % (
+            request.httprequest.host_url, str(id), 'ir.ui.menu', field)
+        if not url:
+            return ''
+        return url
+
     #获取生产单列表
     @http.route('/linkloving_app_api/get_mrp_production', type='json', auth='none', csrf=False)
     def get_mrp_production(self, **kw):
@@ -1420,13 +1429,21 @@ class LinklovingAppApi(http.Controller):
         # menus are loaded fully unlike a regular tree view, cause there are a
         # limited number of items (752 when all 6.1 addons are installed)
         menus = menu_model.search([('id', 'child_of', menu_roots.ids), ('is_show_on_app', '=', True)])
-        menu_items = menus.read(fields)
 
+        xml_names = request.env['ir.model.data'].sudo().search_read(
+            [('res_id', 'in', menus.ids), ('model', '=', 'ir.ui.menu')],fields=['complete_name', 'res_id'])
+        menu_items = menus.read(fields)
+        for menu in menu_items:
+            menu["app_icon"] = LinklovingAppApi.get_app_menu_icon_img_url(menu['id'], "app_menu_icon")
+            for xml in xml_names:
+                if menu['id'] == xml['res_id']:
+                    menu['xml_name'] = xml['complete_name']
+                    break
         # add roots at the end of the sequence, so that they will overwrite
         # equivalent menu items from full menu read when put into id:item
         # mapping, resulting in children being correctly set on the roots.
         menu_items.extend(menu_roots_data)
-        menu_root['all_menu_ids'] = menus.ids  # includes menu_roots!
+        menu_root['all_menu_ids'] = menus.ids  # includes menu_roots !
 
         # make a tree using parent_id
         menu_items_map = {menu_item["id"]: menu_item for menu_item in menu_items}

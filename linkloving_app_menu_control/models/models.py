@@ -17,8 +17,8 @@ from odoo import models, fields, api
 class IrMenuExtend(models.Model):
     _inherit = 'ir.ui.menu'
 
-    is_show_on_app = fields.Boolean("is show on app", default=False, help=u"是否在app中显示该菜单")
-
+    is_show_on_app = fields.Boolean("Show On App Or Not", default=False, help=u"是否在app中显示该菜单")
+    app_menu_icon = fields.Binary("App Menu Icon")
     @api.onchange('is_show_on_app')
     def onchange_is_show_on_app(self):
         if self.is_show_on_app:
