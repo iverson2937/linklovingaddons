@@ -317,7 +317,7 @@ class LinklovingAppApi(http.Controller):
                                               res_data=self.get_worker_dict(workers[0]))
         if not workers:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={"error":u"找不到此员工"})
+                                              res_data={"error":_("The operator not found")})
         else:
             for worker in workers:
                 if worker.now_mo_id and worker.now_mo_id.id != order_id:#是否正在另一条产线，就退出那一条
@@ -450,7 +450,7 @@ class LinklovingAppApi(http.Controller):
 
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
-        ),notification=mrp_production.product_id.name,body=u"数量:%d,已经开始备料！" % (mrp_production.product_qty))
+        ),notification=mrp_production.product_id.name,body=_("Qty:%d,Already start picking！") % (mrp_production.product_qty))
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
@@ -492,7 +492,7 @@ class LinklovingAppApi(http.Controller):
 
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
-        ),notification=mrp_production.product_id.name,body=u"数量:%d,已经完成备料！" % (mrp_production.product_qty))
+        ),notification=mrp_production.product_id.name,body=_("Qty:%d,Finish picking！") % (mrp_production.product_qty))
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
@@ -526,7 +526,7 @@ class LinklovingAppApi(http.Controller):
             move = LinklovingAppApi.get_model_by_id(l['stock_move_lines_id'], request, 'sim.stock.move')
             if not move:
                 return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                                  res_data={'error': u'未找到对应的Move单'})
+                                                  res_data={'error': _("Stock move not found")})
             if l['over_picking_qty'] != 0:#如果超领数量不等于0
                 new_move = move.stock_moves[0].copy(default={'quantity_done': l['over_picking_qty'], 'product_uom_qty':  l['over_picking_qty'], 'production_id': move.production_id.id,
                                                              'raw_material_production_id': move.raw_material_production_id.id,
@@ -546,7 +546,7 @@ class LinklovingAppApi(http.Controller):
         mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
         if not mrp_production:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error' : u'未找到对应的生产单'})
+                                              res_data={'error' : _("The MO not found")})
         produce_qty = request.jsonrequest.get('produce_qty')
 
         try:
@@ -560,7 +560,7 @@ class LinklovingAppApi(http.Controller):
             produce.do_produce()
         except:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error':'do produce error'})
+                                              res_data={'error':_('do produce error')})
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
@@ -571,20 +571,20 @@ class LinklovingAppApi(http.Controller):
         mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
         if not mrp_production:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error' : u'未找到对应的生产单'})
+                                              res_data={'error' : _("The MO not found")})
         if mrp_production.qty_produced == 0:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error':u'您还未产出任何产品，不可做此操作！'})
+                                              res_data={'error':_("Product qty can not be 0 ")})
         if not mrp_production.check_to_done and mrp_production.production_order_type == 'ordering':
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error': u'此生产单为订单制，需要产成所有数量的产品才能送往品检！'})
+                                              res_data={'error': _("Ordering MO need to produce all the products")})
         else:
             mrp_production.worker_line_ids.change_worker_state('outline')
             mrp_production.write({'state': 'waiting_quality_inspection'})
 
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.tag(LinklovingAppApi.get_jpush_tags("qc"))
-        ),notification=mrp_production.product_id.name,body=u"数量:%d,已生产完成，送往品检！" % (mrp_production.qty_produced))
+        ),notification=mrp_production.product_id.name,body=_("Qty:%d,Produce finish,To QC")% (mrp_production.qty_produced))
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
@@ -596,12 +596,12 @@ class LinklovingAppApi(http.Controller):
         mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
         if not mrp_production:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error' : u'未找到对应的生产单'})
+                                              res_data={'error' : _("MO not found")})
         mrp_production.write({'state': 'quality_inspection_ing'})
 
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
-        ),notification=mrp_production.product_id.name,body=u"数量:%d,开始品检！" % (mrp_production.qty_produced))
+        ),notification=mrp_production.product_id.name,body=_("Qty:%d,QC start") % (mrp_production.qty_produced))
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
@@ -629,7 +629,7 @@ class LinklovingAppApi(http.Controller):
 
         if not mrp_production:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error' : u'未找到对应的生产单'})
+                                              res_data={'error' : _("MO not found")})
 
         if result == True:
             mrp_production.write({'state': 'waiting_inventory_material'})
@@ -638,7 +638,7 @@ class LinklovingAppApi(http.Controller):
 
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
-        ),notification=mrp_production.product_id.name,body=u"数量:%d,品检结束，请查看详细单据." % (mrp_production.qty_produced))
+        ),notification=mrp_production.product_id.name,body=_("Qty:%d,QC finish") % (mrp_production.qty_produced))
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
@@ -667,7 +667,7 @@ class LinklovingAppApi(http.Controller):
         mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
         if not mrp_production:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error' : u'未找到对应的生产单'})
+                                              res_data={'error' : _("MO not found")})
         return_lines = []
 
         if not is_check:
@@ -697,7 +697,7 @@ class LinklovingAppApi(http.Controller):
             returun_material_obj = return_material_model.sudo().search([('production_id', '=', order_id)])
             if not returun_material_obj:
                 return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                                  res_data={'error' : u'暂无退料信息'})
+                                                  res_data={'error' : _("Order of return material not found")})
             returun_material_obj.state = 'done'
             #退料信息 已经确认
             for r in returun_material_obj.return_ids:
@@ -739,7 +739,7 @@ class LinklovingAppApi(http.Controller):
         production_order = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
         if not production_order:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error':u'未找到对应的生产单'})
+                                              res_data={'error':_("MO not found")})
         # if not production_order.qc_feedback_id:
 
         data = {
@@ -762,12 +762,12 @@ class LinklovingAppApi(http.Controller):
         mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
         if not mrp_production:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error' : u'未找到对应的生产单'})
+                                              res_data={'error' : _("MO not found")})
         mrp_production.button_mark_done()
 
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
-        ),notification=mrp_production.product_id.name,body=u"数量:%d,已入库" % (mrp_production.qty_produced))
+        ),notification=mrp_production.product_id.name,body=_("Qty:%d,Post Inventory Finish") % (mrp_production.qty_produced))
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
@@ -789,7 +789,6 @@ class LinklovingAppApi(http.Controller):
 
         stock_move = request.env['sim.stock.move'].sudo().search_read([('id', 'in', production.sim_stock_move_lines.ids)],
                                                                       fields=['product_id',
-                                                                              'product_tmpl_id',
                                                                               'over_picking_qty',
                                                                               'qty_available',
                                                                               'quantity_available',
@@ -804,8 +803,9 @@ class LinklovingAppApi(http.Controller):
                                                                               ])
         for l in stock_move:
             # dic = LinklovingAppApi.search(request,'product.product',[('id','=',l['product_id'][0])], ['display_name'])
-            l['product_tmpl_id'] = l['product_id'][0] #request.env['product.product'].sudo().search([('id','=',l['product_id'][0])]).id
-            l['product_id'] = l['product_id'][1]
+            if l.get("product_id"):
+                l['product_tmpl_id'] = l['product_id'][0] #request.env['product.product'].sudo().search([('id','=',l['product_id'][0])]).id
+                l['product_id'] = l['product_id'][1]
             if l.get('area_id'):
                 l['area_id'] = {
                     'area_id': l.get('area_id')[0] or 0,
@@ -886,7 +886,7 @@ class LinklovingAppApi(http.Controller):
                                               res_data=data)
         else:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error' : u'未找到该产品'})
+                                              res_data={'error' : _("Product not found")})
     #获取盘点单列表
     @http.route('/linkloving_app_api/get_stock_inventory_list', type='json', auth='none', csrf=False)
     def get_stock_inventory_list(self, **kw):
@@ -910,7 +910,7 @@ class LinklovingAppApi(http.Controller):
                                               res_data=LinklovingAppApi.stock_inventory_model_to_dict(inventory[0], is_detail=True))
         else:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error' : u'未找到对应的单子',})
+                                              res_data={'error' : _("Order not found")})
 
         #stock.location.area 处理部分
     #获取仓库位置列表
@@ -937,12 +937,12 @@ class LinklovingAppApi(http.Controller):
             area = request.env['stock.location.area'].sudo().search([('name', '=', area_name)])
             if not area:
                 return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                                  res_data={'error' :u'位置信息有误，请重新选择'})
+                                                  res_data={'error' : _("Location error!")})
             mrp_order.prepare_material_area_id = area.id
             mrp_order.prepare_material_img = img
         else:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error': u'没有对应的状态类型'})
+                                              res_data={'error': _("Wrong status")})
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data={})
 
@@ -1305,7 +1305,7 @@ class LinklovingAppApi(http.Controller):
 
             if not pack_list:
                 return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                                  res_data={'error': u'未找到对应的pack单'})
+                                                  res_data={'error':_("Pack Order not found")})
 
             map(x, pack_list, qty_done_map)
 
@@ -1318,7 +1318,7 @@ class LinklovingAppApi(http.Controller):
             area = request.env['stock.location.area'].sudo().search([('name', '=',post_area_name)])
             if not area:
                 return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                                  res_data={'error': u'请选择正确的位置!'})
+                                                  res_data={'error': _("Please choose the right location")})
             picking_obj.post_img = post_img
             picking_obj.post_area_id = area[0].id
 

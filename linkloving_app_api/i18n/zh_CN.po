@@ -1,0 +1,154 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* linkloving_app_api
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-03-17 01:24+0000\n"
+"PO-Revision-Date: 2017-03-17 01:24+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:940
+#, python-format
+msgid "Location error!"
+msgstr "位置信息错误!"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:599
+#: code:addons/linkloving_app_api/controllers/controllers.py:632
+#: code:addons/linkloving_app_api/controllers/controllers.py:670
+#: code:addons/linkloving_app_api/controllers/controllers.py:742
+#: code:addons/linkloving_app_api/controllers/controllers.py:765
+#, python-format
+msgid "MO not found"
+msgstr "找不到该生产单"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:913
+#, python-format
+msgid "Order not found"
+msgstr "找不到该单据"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:700
+#, python-format
+msgid "Order of return material not found"
+msgstr "未找到退料信息"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:580
+#, python-format
+msgid "Ordering MO need to produce all the products"
+msgstr "订单制订单，须生产完所有数量的产品"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:1308
+#, python-format
+msgid "Pack Order not found"
+msgstr "未找到对应的pack单"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:1321
+#, python-format
+msgid "Please choose the right location"
+msgstr "请选择正确的位置信息"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:889
+#, python-format
+msgid "Product not found"
+msgstr "产品未找到"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:577
+#, python-format
+msgid "Product qty can not be 0 "
+msgstr "拼成品数量为0"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:453
+#, python-format
+msgid "Qty:%d,Already start picking！"
+msgstr "数量:%d,已经开始备料！"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:495
+#, python-format
+msgid "Qty:%d,Finish picking！"
+msgstr "数量:%d,已完成备料！"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:770
+#, python-format
+msgid "Qty:%d,Post Inventory Finish"
+msgstr "数量:%d,已完成入库"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:587
+#, python-format
+msgid "Qty:%d,Produce finish,To QC"
+msgstr "数量:%d,生产完成，送完品检"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:641
+#, python-format
+msgid "Qty:%d,QC finish"
+msgstr "数量:%d,品检完成"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:604
+#, python-format
+msgid "Qty:%d,QC start"
+msgstr "数量:%d,开始品检"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:529
+#, python-format
+msgid "Stock move not found"
+msgstr "未找到Stock move"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:549
+#: code:addons/linkloving_app_api/controllers/controllers.py:574
+#, python-format
+msgid "The MO not found"
+msgstr "未找到生产单"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:320
+#, python-format
+msgid "The operator not found"
+msgstr "未找到该员工"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:128
+#, python-format
+msgid "Wrong Request Method"
+msgstr "错误的请求方式"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:126
+#, python-format
+msgid "Wrong login/password"
+msgstr "用户名/密码错误"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:945
+#, python-format
+msgid "Wrong status"
+msgstr "错误的订单状态"
+
+#. module: linkloving_app_api
+#: code:addons/linkloving_app_api/controllers/controllers.py:563
+#, python-format
+msgid "do produce error"
+msgstr "完成生产操作出现异常"
+
