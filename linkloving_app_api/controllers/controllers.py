@@ -1487,5 +1487,5 @@ class LinklovingAppApi(http.Controller):
             return 'group_charge_produce'
         elif type == 'purchase_user':#采购用户
             return 'group_purchase_user'
-        elif type == 'purchase_manager':
+        elif type == 'purchase_manager':#采购管理员
             return 'group_purchase_manager'
