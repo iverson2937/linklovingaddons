@@ -1,2 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_linkloving_eb_linkloving_eb,linkloving_eb.linkloving_eb,model_linkloving_eb_linkloving_eb,,1,0,0,0
+access_linkloving_eb_linkloving_eb_order_line,linkloving_eb.eb_order_line,model_eb_order_line,,1,1,1,1
+access_linkloving_eb_eb_order,linkloving_eb.eb_order,model_eb_order,,1,1,1,1
+access_linkloving_eb_multi_create_order,linkloving_eb.multi_create_order,model_multi_create_order,,1,1,1,1

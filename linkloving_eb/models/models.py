@@ -15,6 +15,15 @@ class linkloving_eb_temporary_order_line(models.Model):
 class linkloving_eb_temporary_order(models.Model):
     _name = 'eb.order'
 
+    @api.multi
+    def _compute_is_finsish_transfer(self):
+        for order in self:
+            order.is_finish_transfer = "yes"
+            for picking in order.stock_picking_ids:
+                if picking.state != "done":
+                    order.is_finish_transfer = "no"
+                    break
+
     name = fields.Char(string=_('Order Name'), require=True)
     eb_order_line_ids = fields.One2many('eb.order.line', 'eb_order_id')
     state = fields.Selection([("draft", _("Draft")),
@@ -24,7 +33,7 @@ class linkloving_eb_temporary_order(models.Model):
 
     stock_picking_ids = fields.One2many("stock.picking","eb_order_id")
     sale_order_id = fields.Many2one("sale.order")
-
+    is_finish_transfer = fields.Selection([('yes','已完成'),("no","未完成")],"是否已经出货", compute="_compute_is_finsish_transfer")
 
     @api.multi
     def action_confirm(self):
@@ -104,9 +113,9 @@ class MultiCreateOrder(models.TransientModel):
             if order.state == "transfered":
                 raise UserError(_("选择的条目中，包含了已经生成销售订单的单据"))
 
-            for picking in order.stock_picking_ids:
-                if picking.state != "done":
-                    raise UserError(_("请确认选择的条目中，出库调拨都已完成"))
+            # for picking in order.stock_picking_ids:
+                if order.is_finish_transfer != "yes":
+                    raise UserError(_("请确认选择的条目中，出库调拨是否都已完成"))
 
             eb_order_lines += order.eb_order_line_ids
 
@@ -136,7 +145,7 @@ class MultiCreateOrder(models.TransientModel):
 
         action = self.env.ref('linkloving_eb.action_eb_picking_tree_outgoing').read()[0]
 
-        action['views'] = [(self.env.ref('sale.view_order_tree').id, 'form')]
+        action['views'] = [(self.env.ref('linkloving_sale.linkloving_view_order_tree').id, 'form')]
         action['res_id'] = order_id
         return action
         return {"type" : "ir.window.act_close"}
