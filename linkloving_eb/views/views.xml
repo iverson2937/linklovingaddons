@@ -58,6 +58,29 @@
           </field>
       </record>
 
+      <record id="action_show_sale_order" model="ir.actions.act_window">
+            <field name="name">Sale Orders</field>
+            <field name="res_model">sale.order</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <!--<field name="domain">[('picking_type_code','=', 'incoming')]</field>-->
+            <!--<field name="context">{-->
+                    <!--'contact_display': 'partner_address',-->
+            <!--}-->
+            <!--</field>-->
+            <!--<field name="search_view_id" ref="stock.view_picking_internal_search"/>-->
+                <field name="help" type="html">
+                <!--<field name="search_view_id" ref="sale.sale_order_view_search_inherit_sale"/>-->
+              <p class="oe_view_nocontent_create">
+                Click here to create a new transfer.
+              </p><p>
+                You can either do it immediately or mark it as Todo for future processing. Use your scanner to validate the transferred quantity quicker.
+              </p>
+            </field>
+        </record>
+
+
       <record id="action_eb_picking_tree_outgoing" model="ir.actions.act_window">
             <field name="name">EB Transfer Out</field>
             <field name="res_model">eb.order</field>

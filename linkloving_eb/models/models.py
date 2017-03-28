@@ -143,10 +143,20 @@ class MultiCreateOrder(models.TransientModel):
 
     def action_view_sale_order(self, order_id):
 
-        action = self.env.ref('linkloving_eb.action_eb_picking_tree_outgoing').read()[0]
+        action = self.env.ref('linkloving_eb.action_show_sale_order').read()[0]
 
-        action['views'] = [(self.env.ref('linkloving_sale.linkloving_view_order_tree').id, 'form')]
+        action['views'] = [(self.env.ref('sale.view_order_form').id, 'form')]
         action['res_id'] = order_id
+
+
+        # return {
+        #     'type': 'ir.actions.act_window',
+        #     'res_model': 'sale.order',
+        #     'view_type': 'form',
+        #     'view_mode': 'form',
+        #     "res_id" : order_id,
+        #     'target': 'new',
+        # }
         return action
         return {"type" : "ir.window.act_close"}
 
