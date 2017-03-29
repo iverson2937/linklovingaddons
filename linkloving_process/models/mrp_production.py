@@ -10,7 +10,7 @@ class MrpProduction(models.Model):
     _inherit = 'mrp.production'
     process_id = fields.Many2one('mrp.process', string=u'Process')
     is_outside = fields.Boolean(related='process_id.is_outside', store=True)
-    supplier_id = fields.Many2one('res.partner', domain=[('is_out_supplier', '=', True)], string=u'加工商')
+    supplier_id = fields.Many2one('res.partner', domain=[('supplier', '=', True)], string=u'加工商')
     unit_price = fields.Float()
 
     @api.multi
