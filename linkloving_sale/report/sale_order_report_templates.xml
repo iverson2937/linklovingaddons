@@ -35,6 +35,8 @@
                     <span t-if="doc.state not in ['draft','sent']">Order #</span>
                     <span t-if="doc.state in ['draft','sent']">Quotation #</span>
                     <span t-field="doc.name"/>
+                    <span t-if="doc.validity_date"># 交货日期</span>
+                    <span t-field="doc.validity_date"/>
                 </h2>
 
                 <div class="row mt32 mb32" id="informations">

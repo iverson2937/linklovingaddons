@@ -51,6 +51,13 @@
                             <span t-esc="'sale_name' in o and o.sale_name"/>
                         </div>
                     </div>
+                    <div class="row mt32 mb32">
+                        <div class="col-xs-12">
+                            <strong>规格说明:</strong><br/>
+                            <span t-field="o.product_id.product_specs"/>
+                        </div>
+
+                    </div>
 
                     <div t-if="o.workorder_ids">
                         <strong>Work Orders</strong>
