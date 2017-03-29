@@ -21,6 +21,11 @@
                            attrs="{'invisible':[('mo_type', '==', 'unit')],'readonly':[('state', '!=', 'confirmed')]}"
                     />
                 </xpath>
+                <xpath expr="//field[@name='bom_id']" position="after">
+                    <field name="is_outside" invisible="1"/>
+                    <field name="supplier_id" attrs="{'invisible': [('is_outside', '=', False)]}"/>
+
+                </xpath>
                 <xpath expr="//field[@name='user_id']" position="replace">
                     <field name="in_charge_id" domain="[('is_in_charge','=',True)]" options="{'no_create':True}"/>
                 </xpath>

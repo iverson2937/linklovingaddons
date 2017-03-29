@@ -3,12 +3,59 @@ import datetime
 
 from odoo import models, fields, api, _
 from odoo.addons import decimal_precision as dp
+from odoo.exceptions import UserError
 
 
 class MrpProduction(models.Model):
     _inherit = 'mrp.production'
     process_id = fields.Many2one('mrp.process', string=u'Process')
+    is_outside = fields.Boolean(related='process_id.is_outside', store=True)
+    supplier_id = fields.Many2one('res.partner', domain=[('is_out_supplier', '=', True)])
     unit_price = fields.Float()
+
+    @api.multi
+    def _prepare_invoice(self):
+        inv_obj = self.env['account.invoice']
+
+        account_id = False
+        if self.product_id.id:
+            account_id = self.product_id.property_account_income_id.id or self.product_id.categ_id.property_account_income_categ_id.id
+
+        if not account_id:
+            raise UserError(
+                _(
+                    'There is no income account defined for this product: "%s". You may have to install a chart of account from Accounting app, settings menu.') %
+                (self.supplier_id.name,))
+
+        print account_id,'account_id'
+        invoice = inv_obj.create({
+            'origin': self.name,
+            'type': 'in_invoice',
+            'reference': False,
+            'account_id': account_id,
+            'partner_id': self.supplier_id.id,
+            # 'partner_shipping_id': order.partner_shipping_id.id,
+            'invoice_line_ids': [(0, 0, {
+                'name': self.name,
+                'origin': self.name,
+                'price_unit': self.unit_price,
+                'quantity': self.qty_produced,
+                'uom_id': self.product_id.uom_id.id,
+                'product_id': self.product_id.id,
+                # 'invoice_line_tax_ids': [(4, order.tax_id.id)],
+                # 'account_analytic_id': order.project_id.id or False,
+            })],
+            # 'currency_id': order.pricelist_id.currency_id.id,
+            # 'team_id': order.team_id.id,
+            # 'comment': order.note,
+        })
+        # invoice.compute_taxes()
+        # invoice.message_post_with_view('mail.message_origin_link',
+        #             values={'self': invoice, 'origin': order},
+        #             subtype_id=self.env.ref('mail.mt_note').id)
+        return invoice
+
+
 
     @api.one
     def get_mo_count(self):
@@ -21,7 +68,7 @@ class MrpProduction(models.Model):
                   ('date_planned_start', '<', end),
                   ('process_id', '=', self.process_id.id), ('state', 'not in', ('done', 'cancel', 'draft'))]
 
-        self.mo_count= len(self.env['mrp.production'].search(domain).ids)
+        self.mo_count = len(self.env['mrp.production'].search(domain).ids)
 
     mo_count = fields.Integer(compute=get_mo_count)
     mo_type = fields.Selection([
@@ -64,3 +111,9 @@ class MrpProduction(models.Model):
             'target': 'current',
             'domain': domain,
         }
+
+    @api.multi
+    def button_mark_done(self):
+        if self.is_outside:
+            self._prepare_invoice()
+        return super(MrpProduction, self).button_mark_done()

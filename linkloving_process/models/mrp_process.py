@@ -23,6 +23,7 @@ class MrpProcess(models.Model):
     count_mo_tomorrow = fields.Integer(compute='_compute_process_count')
     count_mo_after_tomorrow = fields.Integer(compute='_compute_process_count')
     count_mo_others = fields.Integer(compute='_compute_process_count')
+    is_outside = fields.Boolean(string=u'是否为委外')
 
     def _today(self):
         print (datetime.date.today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')
