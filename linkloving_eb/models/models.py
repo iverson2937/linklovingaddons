@@ -97,8 +97,7 @@ class linkloving_eb_stock_picking(models.Model):
     _inherit = "stock.picking"
 
     eb_order_id = fields.Many2one('eb.order')
-
-
+    eb_refund_order_id = fields.Many2one("eb.refund.order")
 class MultiCreateOrder(models.TransientModel):
     _name = "multi.create.order"
 
@@ -160,34 +159,76 @@ class MultiCreateOrder(models.TransientModel):
         return action
         return {"type" : "ir.window.act_close"}
 
-    # def action_view_sale_order(self):
-    #     self.ensure_one()
-    #     # sale.view_order_form
-    #     view = self.env.ref('sale.view_order_form')
-    #     # product_ids = self.product_variant_ids.ids
-    #
-    #     action = self.env.ref('linkloving_eb.action_product_sale_order').read()[0]
-    #     action['views'] = [(self.env.ref('sale.view_order_tree').id, 'form')]
-    #     action['res_id'] = 2097
-    #
-    #     return action
-        # return {
-        #     'type': 'ir.actions.act_window',
-        #     'res_model': 'sale.order',
-        #     'view_type': 'form',
-        #     'view_mode': 'form',
-        #     "res_id" : 2097,
-        #     'target': 'new',
-        # }
 
-    # {
-    #     'name': _('Payment'),
-    #     'view_type': 'form',
-    #     'view_mode': 'form',
-    #     # 'view_id': False,
-    #     'res_model': 'account.supplier.payment.wizard',
-    #     'domain': [],
-    #     'context': dict(context, active_ids=self.ids),
-    #     'type': 'ir.actions.act_window',
-    #     'target': 'new',
-    # }
+
+class Linkloving_eb_refunds_order(models.Model):
+    _name = "eb.refund.order"
+
+    tracking_num = fields.Char("快递单号")
+
+    eb_refund_order_line_ids = fields.One2many('eb.refund.order.line', 'eb_refund_order_id')
+
+    refund_img = fields.Binary("退货图片")
+    state = fields.Selection([("draft", _("Draft")),#草稿
+                              ("waiting_sale_confirm", _("等待销售确认")),#等待销售确认
+                            ("confirmed", _("已确认")),  #销售已经确认
+                            ], default="draft")
+
+    stock_picking_ids = fields.One2many("stock.picking","eb_refund_order_id")
+
+
+    @api.multi
+    def action_confirm(self):#入库，并提交给销售确认
+        self.refund_to_wh()
+
+    @api.multi
+    def action_ok(self):#已录入至后台
+        for order in self:
+            order.state = "confirmed"
+
+    @api.multi
+    def refund_to_wh(self):
+        for line in self:
+            picking_out_2 = self.env['stock.picking'].create({
+                'picking_type_id': self.env.ref('stock.picking_type_in').id,
+                'location_id': self.env.ref('stock.stock_location_customers').id,
+                'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+                'eb_refund_order_id': line.id,
+            })
+            for one_line in line.eb_refund_order_line_ids:
+                self.env['stock.move'].create({
+                    'name': 'another move',
+                    'product_id': one_line.product_id.id,
+                    'product_uom_qty': one_line.qty,
+                    'product_uom': one_line.product_id.uom_id.id,
+                    'picking_id': picking_out_2.id,
+                    'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+                    'location_id': self.env.ref('stock.stock_location_customers').id})
+
+            picking_out_2.action_confirm()
+            picking_out_2.force_assign()
+            picking_out_2.do_transfer()
+            picking_out_2.to_stock()
+
+            line.state = "waiting_sale_confirm"
+
+    def action_view_delivery(self):
+
+        action = self.env.ref('stock.action_picking_tree_all').read()[0]
+
+        pickings = self.mapped('stock_picking_ids')
+        if len(pickings) > 1:
+            action['domain'] = [('id', 'in', pickings.ids)]
+        elif pickings:
+            action['views'] = [(self.env.ref('stock.view_picking_form').id, 'form')]
+            action['res_id'] = pickings.id
+        return action
+
+
+class linkloving_eb_refunds_order_line(models.Model):
+    _name = 'eb.refund.order.line'
+
+    eb_refund_order_id = fields.Many2one('eb.refund.order')
+    qty = fields.Float(string=_("Quantity"))
+    product_id = fields.Many2one('product.product', string='Product', domain=[('sale_ok', '=', True)], change_default=True,
+                             ondelete='restrict', required=True)

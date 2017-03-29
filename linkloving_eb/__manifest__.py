@@ -27,6 +27,7 @@
         'security/ir.model.access.csv',
         'security/stock_location.xml',
         'views/views.xml',
+        'views/eb_refund_order.xml',
         'views/templates.xml',
     ],
     # only loaded in demonstration mode
