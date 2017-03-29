@@ -7,19 +7,29 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='product_tmpl_id']" position="after">
                     <field name="process_id" options="{'no_create':True}"/>
-
-                    <label for="cycle_time"/>
-                    <div class="o_row">
-                        <field name="cycle_time"/>
-                        <field name="cycle_time_time_unit" options="{'no_open':True,'no_create':True}"/>
-                    </div>
-
-                    <field name="hour_price"/>
-                    <field name="cost"/>
-                    <!--<field name="unit_price" attrs="{'invisible':[('mo_type', '==', 'time')]}"/>-->
+                    <field name="unit_price" attrs="{'invisible':[('mo_type', '==', 'time')]}"/>
                 </xpath>
                 <xpath expr="//field[@name='type']" position="after">
                     <field name="mo_type" widget="radio"/>
+                </xpath>
+                <xpath expr="//notebook/page[1]" position="after">
+                    <page string="理论成本">
+                        <group colspan="4">
+                            <group>
+                                <label for="cycle_time"/>
+                                <div class="o_row">
+                                    <field name="cycle_time"/>
+                                    <field name="cycle_time_time_unit" options="{'no_open':True,'no_create':True}"/>
+                                </div>
+                                <field name="hour_price"/>
+                                <field name="cost"/>
+
+                            </group>
+
+
+                        </group>
+
+                    </page>
                 </xpath>
             </field>
         </record>
@@ -35,7 +45,7 @@
             </field>
         </record>
 
-            <record id="view_mrp_bom_filter_ll" model="ir.ui.view">
+        <record id="view_mrp_bom_filter_ll" model="ir.ui.view">
             <field name="name">mrp.production.filter</field>
             <field name="model">mrp.production</field>
             <field name="inherit_id" ref="mrp.view_mrp_production_filter"/>

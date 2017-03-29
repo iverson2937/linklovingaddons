@@ -10,24 +10,20 @@ class MrpProduction(models.Model):
     _inherit = 'mrp.production'
     process_id = fields.Many2one('mrp.process', string=u'Process')
     is_outside = fields.Boolean(related='process_id.is_outside', store=True)
-    supplier_id = fields.Many2one('res.partner', domain=[('is_out_supplier', '=', True)])
+    supplier_id = fields.Many2one('res.partner', domain=[('is_out_supplier', '=', True)], string=u'加工商')
     unit_price = fields.Float()
 
     @api.multi
     def _prepare_invoice(self):
         inv_obj = self.env['account.invoice']
 
-        account_id = False
-        if self.product_id.id:
-            account_id = self.product_id.property_account_income_id.id or self.product_id.categ_id.property_account_income_categ_id.id
-
+        account_id = self.supplier_id.property_account_payable_id.id
         if not account_id:
             raise UserError(
                 _(
                     'There is no income account defined for this product: "%s". You may have to install a chart of account from Accounting app, settings menu.') %
                 (self.supplier_id.name,))
 
-        print account_id,'account_id'
         invoice = inv_obj.create({
             'origin': self.name,
             'type': 'in_invoice',
@@ -39,6 +35,7 @@ class MrpProduction(models.Model):
                 'name': self.name,
                 'origin': self.name,
                 'price_unit': self.unit_price,
+                'account_id': 15,
                 'quantity': self.qty_produced,
                 'uom_id': self.product_id.uom_id.id,
                 'product_id': self.product_id.id,
@@ -55,8 +52,6 @@ class MrpProduction(models.Model):
         #             subtype_id=self.env.ref('mail.mt_note').id)
         return invoice
 
-
-
     @api.one
     def get_mo_count(self):
         date_planned_start = datetime.datetime.strptime(self.date_planned_start, "%Y-%m-%d %H:%M:%S").strftime(
@@ -70,7 +65,14 @@ class MrpProduction(models.Model):
 
         self.mo_count = len(self.env['mrp.production'].search(domain).ids)
 
+    @api.one
+    def get_mo_inovice(self):
+
+        self.mo_invoice_count = len(self.env['account.invoice'].search([('origin', '=', self.name)]).ids)
+
     mo_count = fields.Integer(compute=get_mo_count)
+
+    mo_invoice_count = fields.Integer(compute=get_mo_inovice)
     mo_type = fields.Selection([
         ('unit', _('Base on Unit')),
         ('time', _('Base on Time')),
@@ -86,7 +88,7 @@ class MrpProduction(models.Model):
     @api.onchange('bom_id')
     def on_change_bom_id(self):
         self.process_id = self.bom_id.process_id
-        self.unit_price = self.process_id.unit_price
+        self.unit_price = self.bom_id.unit_price
         self.mo_type = self.bom_id.mo_type
         self.hour_price = self.bom_id.hour_price
         self.in_charge_id = self.process_id.partner_id
@@ -113,7 +115,23 @@ class MrpProduction(models.Model):
         }
 
     @api.multi
+    def action_view_mrp_invoice(self):
+        print self.env['account.invoice'].search([('origin', '=', self.name)]).ids
+
+
+        return {
+            'name': _('对账单'),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'account.invoice',
+            'target': 'current',
+            'res_id': self.env['account.invoice'].search([('origin', '=', self.name)]).ids[0],
+        }
+
+    @api.multi
     def button_mark_done(self):
+        print 'is_outside', self.is_outside
         if self.is_outside:
             self._prepare_invoice()
         return super(MrpProduction, self).button_mark_done()

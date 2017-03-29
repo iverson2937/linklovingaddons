@@ -10,6 +10,12 @@
                             type="object" icon="fa-list-alt">
                         <field name="mo_count" string="MO count" widget="statinfo"/>
                     </button>
+                    <button class="oe_stat_button" name="action_view_mrp_invoice"
+                            attrs="{'invisible': [('mo_invoice_count', '=', 0)]}"
+                            type="object" icon="fa-list-alt">
+
+                        <field name="mo_invoice_count" string="对账单" widget="statinfo"/>
+                    </button>
                 </div>
                 <xpath expr="//field[@name='origin']" position="after">
                     <field name="process_id" options="{'no_create':True}" string="Process"/>
