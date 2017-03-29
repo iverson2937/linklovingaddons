@@ -20,7 +20,7 @@
                 <xpath expr="//field[@name='origin']" position="after">
                     <field name="process_id" options="{'no_create':True}" string="Process"/>
                     <field name="mo_type" widget="radio" string="Type"/>
-                    <field name="unit_price"
+                    <field name="unit_price" string="单价/委外加工单价"
                            attrs="{'invisible':[('mo_type', '==', 'time')],'readonly':[('state', '!=', 'confirmed')]}"
                     />
                     <field name="hour_price"
@@ -29,7 +29,9 @@
                 </xpath>
                 <xpath expr="//field[@name='bom_id']" position="after">
                     <field name="is_outside" invisible="1"/>
-                    <field name="supplier_id" attrs="{'invisible': [('is_outside', '=', False)]}"/>
+                    <field name="supplier_id" attrs="{'invisible': [('is_outside', '=', False)],'required':[('is_outside','=',True)]}" string="委外供应商"
+                     options="{'no_create': True}"
+                    />
 
                 </xpath>
                 <xpath expr="//field[@name='user_id']" position="replace">
@@ -43,6 +45,10 @@
             <field name="model">mrp.production</field>
             <field name="inherit_id" ref="mrp.mrp_production_tree_view"/>
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='product_qty']" position="replace">
+                    <field name="product_qty" sum="Total Qty" string="安排数量"/>
+                    <field name="qty_produced" sum="Total Qty" string="产出数量"/>
+                </xpath>
                 <xpath expr="//field[@name='product_id']" position="after">
                     <field name="process_id"/>
                     <field name="in_charge_id"/>

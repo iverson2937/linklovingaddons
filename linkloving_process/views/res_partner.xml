@@ -16,7 +16,7 @@
             </field>
         </record>
         <record id='action_suppliers' model='ir.actions.act_window'>
-            <field name="name">委外加工商</field>
+            <field name="name">委外供应商</field>
             <field name="res_model">res.partner</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
@@ -29,7 +29,7 @@
             </field>
         </record>
 
-        <menuitem id="menu_supplier_config" name="委外加工商" parent="mrp.menu_mrp_configuration" sequence="31"
+        <menuitem id="menu_supplier_config" name="委外供应商" parent="mrp.menu_mrp_configuration" sequence="31"
                   action="action_suppliers"/>
 
 
