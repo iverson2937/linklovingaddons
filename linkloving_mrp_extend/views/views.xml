@@ -1,7 +1,7 @@
 <openerp>
     <data>
-                <!--  confirm production model  -->
-    <record id="action_confirm_production" model="ir.actions.act_window">
+        <!--  confirm production model  -->
+        <record id="action_confirm_production" model="ir.actions.act_window">
             <field name="name">Confirm Production</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">confirm.production</field>
@@ -20,8 +20,8 @@
                     </group>
                     <footer>
                         <button name="confirm_production" string="Confirm"
-                            colspan="1" type="object" class="btn-primary"/>
-                        <button string="Cancel" class="btn-default" special="cancel" />
+                                colspan="1" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
                     </footer>
                 </form>
             </field>
@@ -58,24 +58,53 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//button[@name='button_plan']" position="after">
-                    <button name="button_action_confirm_draft" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'draft')]}" type="object" groups="linkloving_mrp_extend.group_charge_produce" string="Confirm the Schedule"/>
-                    <button name="button_waiting_material" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'confirmed')]}" type="object" groups="linkloving_mrp_extend.group_charge_produce" string="Confirm Order,Prepare Material" />
-                    <button name="button_start_prepare_material" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'waiting_material')]}" type="object" string="Start Prepare Material" groups="linkloving_mrp_extend.group_charge_warehouse"/>
-                    <button name="button_finish_prepare_material" class="oe_highlight" attrs="{'invisible': [('state', 'not in', 'prepare_material_ing')]}" type="object" string="Material Ready" groups="linkloving_mrp_extend.group_charge_warehouse"/>
+                    <button name="button_action_confirm_draft" class="oe_highlight"
+                            attrs="{'invisible': [('state', 'not in', 'draft')]}" type="object"
+                            groups="linkloving_mrp_extend.group_charge_produce" string="Confirm the Schedule"/>
+                    <button name="button_waiting_material" class="oe_highlight"
+                            attrs="{'invisible': [('state', 'not in', 'confirmed')]}" type="object"
+                            groups="linkloving_mrp_extend.group_charge_produce"
+                            string="Confirm Order,Prepare Material"/>
+                    <button name="button_start_prepare_material" class="oe_highlight"
+                            attrs="{'invisible': [('state', 'not in', 'waiting_material')]}" type="object"
+                            string="Start Prepare Material" groups="linkloving_mrp_extend.group_charge_warehouse"/>
+                    <button name="button_finish_prepare_material" class="oe_highlight"
+                            attrs="{'invisible': [('state', 'not in', 'prepare_material_ing')]}" type="object"
+                            string="Material Ready" groups="linkloving_mrp_extend.group_charge_warehouse"/>
                     <!--<button name="button_already_picking" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'finish_prepare_material')]}" type="object" string="已领料" />-->
-                    <button name="button_already_picking" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'finish_prepare_material')]}" type="object" string="Receive Material Register" groups="linkloving_mrp_extend.group_charge_produce"/>
-                    <button name="button_start_produce" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'already_picking')]}" type="object" string="Start" groups="linkloving_mrp_extend.group_charge_produce"/>
-                    <button name="button_produce_finish" class="oe_highlight" attrs="{'invisible': [ '|', ('availability', 'not in', ['partially_available', 'assigned']),('state', '!=', 'progress')]}" type="object" string="Production Complete,Send to Inspection" groups="linkloving_mrp_extend.group_charge_produce"/>
-                    <button name="button_start_quality_inspection" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'waiting_quality_inspection')]}" type="object" string="Start Inspection" groups="linkloving_mrp_extend.group_charge_inspection"/>
+                    <button name="button_already_picking" class="oe_highlight"
+                            attrs="{'invisible': [('state', '!=', 'finish_prepare_material')]}" type="object"
+                            string="Receive Material Register" groups="linkloving_mrp_extend.group_charge_produce"/>
+                    <button name="button_start_produce" class="oe_highlight"
+                            attrs="{'invisible': [('state', '!=', 'already_picking')]}" type="object" string="Start"
+                            groups="linkloving_mrp_extend.group_charge_produce"/>
+                    <button name="button_produce_finish" class="oe_highlight"
+                            attrs="{'invisible': [ '|', ('availability', 'not in', ['partially_available', 'assigned']),('state', '!=', 'progress')]}"
+                            type="object" string="Production Complete,Send to Inspection"
+                            groups="linkloving_mrp_extend.group_charge_produce"/>
+                    <button name="button_start_quality_inspection" class="oe_highlight"
+                            attrs="{'invisible': [('state', '!=', 'waiting_quality_inspection')]}" type="object"
+                            string="Start Inspection" groups="linkloving_mrp_extend.group_charge_inspection"/>
 
-                    <button name="button_quality_inspection_success"  attrs="{'invisible': [('state', '!=', 'quality_inspection_ing')]}" type="object" string="Quality Inspection Pass" groups="linkloving_mrp_extend.group_charge_inspection"/>
-                    <button name="button_quality_inspection_failed"  attrs="{'invisible': [('state', '!=', 'quality_inspection_ing')]}" type="object" string="Quality Inspection Fail" groups="linkloving_mrp_extend.group_charge_inspection"/>
+                    <button name="button_quality_inspection_success"
+                            attrs="{'invisible': [('state', '!=', 'quality_inspection_ing')]}" type="object"
+                            string="Quality Inspection Pass" groups="linkloving_mrp_extend.group_charge_inspection"/>
+                    <button name="button_quality_inspection_failed"
+                            attrs="{'invisible': [('state', '!=', 'quality_inspection_ing')]}" type="object"
+                            string="Quality Inspection Fail" groups="linkloving_mrp_extend.group_charge_inspection"/>
 
-                    <button name="button_inventory_material"  attrs="{'invisible': [('state', 'not in', ('waiting_inventory_material'))]}" type="object" string="Count Material" groups="linkloving_mrp_extend.group_charge_produce"/>
-                    <button name="button_check_inventory_material" context="{'is_checking':True}"  attrs="{'invisible': [('state', 'not in', ('waiting_warehouse_inspection'))]}" type="object" string="Warehouse Confirm Material" groups="linkloving_mrp_extend.group_charge_warehouse"/>
+                    <button name="button_inventory_material"
+                            attrs="{'invisible': [('state', 'not in', ('waiting_inventory_material'))]}" type="object"
+                            string="Count Material" groups="linkloving_mrp_extend.group_charge_produce"/>
+                    <button name="button_check_inventory_material" context="{'is_checking':True}"
+                            attrs="{'invisible': [('state', 'not in', ('waiting_warehouse_inspection'))]}" type="object"
+                            string="Warehouse Confirm Material" groups="linkloving_mrp_extend.group_charge_warehouse"/>
 
-                    <button name="button_fill_material" attrs="{'invisible': ['|',('state', '!=', 'progress')]}" type="object" string="Extra Picking Material" groups="linkloving_mrp_extend.group_charge_produce"/>
-                    <button name="button_return_material" attrs="{'invisible': ['|',('state', '!=', 'done')]}" type="object" string="Return Material" />
+                    <button name="button_fill_material" attrs="{'invisible': ['|',('state', '!=', 'progress')]}"
+                            type="object" string="Extra Picking Material"
+                            groups="linkloving_mrp_extend.group_charge_produce"/>
+                    <button name="button_return_material" attrs="{'invisible': ['|',('state', '!=', 'done')]}"
+                            type="object" string="Return Material"/>
                 </xpath>
 
                 <xpath expr="//header/button[@name='button_scrap']" position="replace">
@@ -83,7 +112,9 @@
                 </xpath>
 
                 <xpath expr="//header/button[@name='action_cancel']" position="replace">
-                    <button name="action_cancel" type="object" string="Cancel" attrs="{'invisible': [('state', 'not in', ('confirmed','waiting_material', 'prepare_material_ing'))]}" groups="linkloving_mrp_extend.group_charge_produce"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            attrs="{'invisible': [('state', 'not in', ('confirmed','waiting_material', 'prepare_material_ing'))]}"
+                            groups="linkloving_mrp_extend.group_charge_produce"/>
                 </xpath>
 
                 <xpath expr="//header/button[@name='button_unreserve']" position="replace">
@@ -93,7 +124,10 @@
                 </xpath>
 
                 <xpath expr="//header/button[@name='open_produce_product'][1]" position="replace">
-                    <button name="open_produce_product" attrs="{'invisible': ['|', '|', '|', ('check_to_done', '=', True), ('availability', 'not in', ['partially_available', 'assigned']), ('state', 'not in', ('progress')), ('routing_id', '!=', False)]}" string="产出" type="object" class="oe_highlight" groups="linkloving_mrp_extend.group_charge_produce"/>
+                    <button name="open_produce_product"
+                            attrs="{'invisible': ['|', '|', '|', ('check_to_done', '=', True), ('availability', 'not in', ['partially_available', 'assigned']), ('state', 'not in', ('progress')), ('routing_id', '!=', False)]}"
+                            string="产出" type="object" class="oe_highlight"
+                            groups="linkloving_mrp_extend.group_charge_produce"/>
                 </xpath>
 
                 <xpath expr="//sheet/group/group/div/button[@type='action']" position="replace">
@@ -113,38 +147,39 @@
                             <group>
                                 <label for="total_spent_time"/>
                                 <div>
-                                    <field name="total_spent_time" widget="float_time" class="oe_inline"/> <!--widget="float_time" class="inline"-->
+                                    <field name="total_spent_time" widget="float_time"
+                                           class="oe_inline"/> <!--widget="float_time" class="inline"-->
                                     Mins
                                 </div>
                                 <field name="total_spent_money"/>
 
                             </group>
-                                <field name="worker_line_ids" readonly="1">
-                            <tree>
-                                <field name="worker_id"/>
-                                <field name="line_state"/>
+                            <field name="worker_line_ids" readonly="1">
+                                <tree>
+                                    <field name="worker_id"/>
+                                    <field name="line_state"/>
 
-                                <!--<label for="spent_time"/>-->
-                                <!--<div>-->
-                                <field name="spent_time" string="Time Taken" widget="float_time" class="oe_inline"/>
+                                    <!--<label for="spent_time"/>-->
+                                    <!--<div>-->
+                                    <field name="spent_time" string="Time Taken" widget="float_time" class="oe_inline"/>
                                     <!--分钟-->
-                                <!--</div>-->
-                            </tree>
-                            <form>
-                                <group>
-                                    <field name="worker_id" />
-                                    <field name="mo_type" />
-                                    <field name="spent_time"  widget="float_time"/>
-                                    <field name="worker_time_line_ids" string="Time Taken Detail">
-                                        <tree>
-                                            <field name="start_time"/>
-                                            <field name="end_time" />
-                                            <field name="state" />
-                                        </tree>
-                                    </field>
-                                </group>
-                            </form>
-                        </field>
+                                    <!--</div>-->
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="worker_id"/>
+                                        <field name="mo_type"/>
+                                        <field name="spent_time" widget="float_time"/>
+                                        <field name="worker_time_line_ids" string="Time Taken Detail">
+                                            <tree>
+                                                <field name="start_time"/>
+                                                <field name="end_time"/>
+                                                <field name="state"/>
+                                            </tree>
+                                        </field>
+                                    </group>
+                                </form>
+                            </field>
 
                         </group>
 
@@ -153,20 +188,22 @@
 
                 <xpath expr="//field[@name='move_raw_ids']" position="replace">
                     <field name="sim_stock_move_lines">
-                        <tree editable="bottom" delete="0"  decoration-warning="quantity_done&gt;product_uom_qty" decoration-success="quantity_done>=product_uom_qty"  create="0">
+                        <tree editable="bottom" delete="0" decoration-warning="quantity_done&gt;product_uom_qty"
+                              decoration-success="quantity_done>=product_uom_qty" create="0">
                             <field name="product_id" string="Product"/>
                             <field name="qty_available" string="Actual Stock"/>
                             <field name="virtual_available" string="Forecast Quantity"/>
                             <field name="suggest_qty" string="Suggest Quantity"/>
-                            <field name="quantity_available" string="Quantity Available"/>
+                            <field name="quantity_available" string="系统可用"/>
                             <field name="product_uom_qty" string="Demand Quantity"/>
-                            <field name="quantity_done" string="Actual Used Quantity"/>
-                            <field name="return_qty"  readonly="1" string="Return Quantity"/>
+                            <field name="quantity_done" string="备料数量"/>
+                            <field name="return_qty" readonly="1" string="Return Quantity"/>
                         </tree>
                     </field>
                 </xpath>
                 <xpath expr="//field[@name='state']" position="replace">
-                    <field name="state" widget="statusbar" statusbar_visible="confirmed,waiting_material,prepare_material_ing,finish_prepare_material,already_picking,progress,waiting_quality_inspection,quality_inspection_ing,waiting_post_inventory,done"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="confirmed,waiting_material,prepare_material_ing,finish_prepare_material,already_picking,progress,waiting_quality_inspection,quality_inspection_ing,waiting_post_inventory,done"/>
                 </xpath>
 
                 <xpath expr="//button[@name='post_inventory']" position="replace">
@@ -174,11 +211,15 @@
                 </xpath>
 
                 <xpath expr="//button[@name='button_mark_done']" position="replace">
-                    <button name="button_mark_done" attrs="{'invisible': [ ('state', 'not in', 'waiting_post_inventory')]}"  type="object" class="oe_highlight" groups="linkloving_mrp_extend.group_charge_produce"/>
+                    <button name="button_mark_done"
+                            attrs="{'invisible': [ ('state', 'not in', 'waiting_post_inventory')]}" type="object"
+                            class="oe_highlight" groups="linkloving_mrp_extend.group_charge_produce"/>
                 </xpath>
 
                 <xpath expr="//button[@name='action_assign']" position="replace">
-                    <button name="action_assign" attrs="{'invisible': ['|',('availability', 'in', ('assigned', 'none')),('state','not in',('progress'))]}" type="object" groups="linkloving_mrp_extend.group_charge_produce"/>
+                    <button name="action_assign"
+                            attrs="{'invisible': ['|',('availability', 'in', ('assigned', 'none')),('state','not in',('progress'))]}"
+                            type="object" groups="linkloving_mrp_extend.group_charge_produce"/>
                 </xpath>
             </field>
         </record>
@@ -197,7 +238,8 @@
             <field name="name">product.template.procurement</field>
             <field name="model">product.template</field>
             <field name="inherit_id" ref="product.product_template_only_form_view"/>
-            <field name="groups_id" eval="[(4, ref('mrp.group_mrp_user')),(4, ref('sales_team.group_sale_salesman')),(4, ref('purchase.group_purchase_user'))]"/>
+            <field name="groups_id"
+                   eval="[(4, ref('mrp.group_mrp_user')),(4, ref('sales_team.group_sale_salesman')),(4, ref('purchase.group_purchase_user'))]"/>
             <field name="arch" type="xml">
                 <div name="button_box" position="inside">
                     <button class="oe_stat_button" name="%(mrp.template_open_bom)d" type="action"
@@ -219,41 +261,42 @@
             <field name="arch" type="xml">
                 <form string="Picking material detail">
                     <field name="sim_stock_move_lines" options="{'reload_on_button': True}">
-                        <tree editable="bottom" delete="0"  decoration-warning="quantity_ready&gt;product_uom_qty" decoration-success="quantity_ready>=product_uom_qty"  create="0">
+                        <tree editable="bottom" delete="0" decoration-warning="quantity_ready&gt;product_uom_qty"
+                              decoration-success="quantity_ready>=product_uom_qty" create="0">
                             <field name="production_state" readonly="1" invisible="1" autofocus="autofocus"/>
                             <field name="product_id" readonly="1"/>
-                            <field name="qty_available" />
-                            <field name="virtual_available" />
-                            <field name="suggest_qty" readonly="1" />
-                            <field name="quantity_available" />
-                            <field name="product_uom_qty" />
-                            <field name="quantity_ready" readonly="context.get('quantity_ready_invisible')" />
-                            <field name="over_picking_qty" invisible="context.get('overpicking_invisible')"/>
+                            <field name="qty_available" string="库存数量"/>
+                            <field name="virtual_available" string="预测数量"/>
+                            <field name="suggest_qty" readonly="1" string="建议数量"/>
+                            <field name="quantity_available" string="系统可用"/>
+                            <field name="product_uom_qty" string="实际需求物料数量"/>
+                            <field name="quantity_ready" readonly="context.get('quantity_ready_invisible')" string="备料数量"/>
+                            <field name="over_picking_qty" invisible="context.get('overpicking_invisible')" string="超领数量"/>
                             <!--<field name="return_qty"  invisible="[('production_state', 'not in', ('waiting_inventory_material','waiting_warehouse_inspection'))]" string="退料数量"/>-->
                         </tree>
                     </field>
                     <!--<field name="move_raw_ids" options="{'reload_on_button': True}">-->
-                                <!--<tree editable="bottom" delete="0" default_order="is_done desc,sequence" decoration-muted="is_done" decoration-warning="quantity_done&gt;product_uom_qty" decoration-success="quantity_done==product_uom_qty" decoration-danger="quantity_available &lt; product_uom_qty" create="0">-->
-                                    <!--<field name="product_id" required="1"/>-->
-                                    <!--<field name="product_uom" groups="product.group_uom"/>-->
-                                    <!--<field name="has_tracking" invisible="1"/>-->
-                                    <!--<field name="is_done" invisible="1"/>-->
-                                    <!--<field name="sequence" invisible="1"/>-->
-                                    <!--<field name="location_id" domain="[('id', 'child_of', parent.location_id)]" invisible="1"/>-->
-                                    <!--<field name="location_dest_id" domain="[('id', 'child_of', parent.location_dest_id)]" invisible="1"/>-->
-                                    <!--<field name="state" invisible="1"/>-->
-                                    <!--<field name="suggest_qty" readonly="1"/>-->
-                                    <!--<field name="quantity_available" attrs="{'invisible': [('is_done', '=', True)]}"/>-->
-                                    <!--<field name="product_uom_qty" readonly="1" attrs="{'required': [('product_id', '!=', False)]}" string="To Consume"/>-->
-                                    <!--<field name="quantity_done" attrs="{'readonly': [ '|', ('is_done', '=', True),('has_tracking', 'in', ['lot','serial'])]}" string="Consumed"/>-->
-                                    <!--<field name="over_picking_qty" invisible="context.get('overpicking_invisible')"/>-->
-                                    <!--<button name="split_move_lot" string="Register lots" type="object" icon="fa-list" attrs="{'invisible': [('has_tracking', 'not in', ['lot','serial'])]}"/>-->
-                                <!--</tree>-->
+                    <!--<tree editable="bottom" delete="0" default_order="is_done desc,sequence" decoration-muted="is_done" decoration-warning="quantity_done&gt;product_uom_qty" decoration-success="quantity_done==product_uom_qty" decoration-danger="quantity_available &lt; product_uom_qty" create="0">-->
+                    <!--<field name="product_id" required="1"/>-->
+                    <!--<field name="product_uom" groups="product.group_uom"/>-->
+                    <!--<field name="has_tracking" invisible="1"/>-->
+                    <!--<field name="is_done" invisible="1"/>-->
+                    <!--<field name="sequence" invisible="1"/>-->
+                    <!--<field name="location_id" domain="[('id', 'child_of', parent.location_id)]" invisible="1"/>-->
+                    <!--<field name="location_dest_id" domain="[('id', 'child_of', parent.location_dest_id)]" invisible="1"/>-->
+                    <!--<field name="state" invisible="1"/>-->
+                    <!--<field name="suggest_qty" readonly="1"/>-->
+                    <!--<field name="quantity_available" attrs="{'invisible': [('is_done', '=', True)]}"/>-->
+                    <!--<field name="product_uom_qty" readonly="1" attrs="{'required': [('product_id', '!=', False)]}" string="To Consume"/>-->
+                    <!--<field name="quantity_done" attrs="{'readonly': [ '|', ('is_done', '=', True),('has_tracking', 'in', ['lot','serial'])]}" string="Consumed"/>-->
+                    <!--<field name="over_picking_qty" invisible="context.get('overpicking_invisible')"/>-->
+                    <!--<button name="split_move_lot" string="Register lots" type="object" icon="fa-list" attrs="{'invisible': [('has_tracking', 'not in', ['lot','serial'])]}"/>-->
+                    <!--</tree>-->
                     <!--</field>-->
                     <footer>
                         <button name="picking_material" string="Confirm"
-                            colspan="1" type="object" class="btn-primary"/>
-                        <button string="Cancel" class="btn-default" special="cancel" />
+                                colspan="1" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
                     </footer>
                 </form>
             </field>
@@ -267,17 +310,17 @@
                 <form string="Return Material">
                     <group>
                         <!--<group>-->
-                            <!--&lt;!&ndash;<label for="return_qty"/>&ndash;&gt;-->
-                            <!--&lt;!&ndash;<div class="o_row">&ndash;&gt;-->
-                                <!--&lt;!&ndash;<field name="return_qty"/>&ndash;&gt;-->
-                                <!--&lt;!&ndash;&lt;!&ndash;<field name="product_uom_id" groups="stock.product_group_uom"/>&ndash;&gt;&ndash;&gt;-->
-                            <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<label for="return_qty"/>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<div class="o_row">&ndash;&gt;-->
+                        <!--&lt;!&ndash;<field name="return_qty"/>&ndash;&gt;-->
+                        <!--&lt;!&ndash;&lt;!&ndash;<field name="product_uom_id" groups="stock.product_group_uom"/>&ndash;&gt;&ndash;&gt;-->
+                        <!--&lt;!&ndash;</div>&ndash;&gt;-->
                         <!--</group>-->
                         <field name="state" invisible="1"/>
                         <!--<group>-->
-                            <!--&lt;!&ndash;<field name="owner_id" groups="stock.group_tracking_owner"/>&ndash;&gt;-->
-                            <!--<field name="product_id" readonly="1"/>-->
-                            <!--<field name="product_produced_qty"/>-->
+                        <!--&lt;!&ndash;<field name="owner_id" groups="stock.group_tracking_owner"/>&ndash;&gt;-->
+                        <!--<field name="product_id" readonly="1"/>-->
+                        <!--<field name="product_produced_qty"/>-->
                         <!--</group>-->
                         <group>
                             <field name="location_id" groups="stock.group_stock_multi_locations"/>
@@ -288,7 +331,7 @@
                         <page>
                             <field name="return_ids">
                                 <tree editable="bottom" create="false" delete="false">
-                                    <field name="product_id" readonly="1" />
+                                    <field name="product_id" readonly="1"/>
                                     <field name="return_qty"/>
                                 </tree>
                             </field>
@@ -296,7 +339,7 @@
                     </notebook>
                     <footer>
                         <button name="action_done" string="Done" type="object" class="btn-primary"/>
-                        <button string="Cancel" class="btn-default" special="cancel" />
+                        <button string="Cancel" class="btn-default" special="cancel"/>
                     </footer>
                 </form>
             </field>
@@ -311,21 +354,25 @@
                 <xpath expr="//filter[@name='todo']" position="attributes">
 
                     <attribute name="domain">[('state','not in',['cancel','done'])]</attribute>
-                        </xpath>
+                </xpath>
                 <xpath expr="//filter[@name='waiting']" position="after">
-                    <filter string="Waiting Prepare Material" name="waiting_material" domain="[('state', '=', 'waiting_material')]"/>
-                    <filter string="Under Preparing" name="prepare_material_ing" domain="[('state', '=', 'prepare_material_ing')]"/>
-                    <filter string="Material Ready" name="finish_prepare_material" domain="[('state', '=', 'finish_prepare_material')]"/>
-                    <filter string="Already Picking Material" name="already_picking" domain="[('state', '=', 'already_picking')]"/>
-                    <filter string="Waiting Quality Inspection" name="waiting_quality_inspection" domain="[('state', '=', 'waiting_quality_inspection')]"/>
-                    <filter string="Under Quality Inspection" name="quality_inspection_ing" domain="[('state', '=', 'quality_inspection_ing')]"/>
-                    <filter string="Waiting Transfer In Stock" name="waiting_post_inventory" domain="[('state', '=', 'waiting_post_inventory')]"/>
+                    <filter string="Waiting Prepare Material" name="waiting_material"
+                            domain="[('state', '=', 'waiting_material')]"/>
+                    <filter string="Under Preparing" name="prepare_material_ing"
+                            domain="[('state', '=', 'prepare_material_ing')]"/>
+                    <filter string="Material Ready" name="finish_prepare_material"
+                            domain="[('state', '=', 'finish_prepare_material')]"/>
+                    <filter string="Already Picking Material" name="already_picking"
+                            domain="[('state', '=', 'already_picking')]"/>
+                    <filter string="Waiting Quality Inspection" name="waiting_quality_inspection"
+                            domain="[('state', '=', 'waiting_quality_inspection')]"/>
+                    <filter string="Under Quality Inspection" name="quality_inspection_ing"
+                            domain="[('state', '=', 'quality_inspection_ing')]"/>
+                    <filter string="Waiting Transfer In Stock" name="waiting_post_inventory"
+                            domain="[('state', '=', 'waiting_post_inventory')]"/>
                 </xpath>
             </field>
         </record>
-
-
-
 
 
         <record id="mrp_confirmed" model="ir.actions.act_window">
@@ -339,23 +386,25 @@
             <field name="domain">[('state','=', 'confirmed')]</field>
             <field name="context">{'state':'confirmed'}</field>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to create a manufacturing order.
-              </p><p>
-                A manufacturing order, based on a bill of materials, will
-                consume raw materials and produce finished products.
-              </p><p>
-                Manufacturing orders are usually proposed automatically based
-                on customer requirements or automated rules like the minimum
-                stock rule.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+                <p>
+                    A manufacturing order, based on a bill of materials, will
+                    consume raw materials and produce finished products.
+                </p>
+                <p>
+                    Manufacturing orders are usually proposed automatically based
+                    on customer requirements or automated rules like the minimum
+                    stock rule.
+                </p>
             </field>
         </record>
         <menuitem id="menu_mrp_confirmed"
-          name="Confirmed Orders"
-          parent="mrp.menu_mrp_manufacturing"
-          action="mrp_confirmed"
-          sequence="21"
+                  name="Confirmed Orders"
+                  parent="mrp.menu_mrp_manufacturing"
+                  action="mrp_confirmed"
+                  sequence="21"
                   groups="group_charge_produce"/>
 
         <record id="mrp_waiting_material" model="ir.actions.act_window">
@@ -369,24 +418,26 @@
             <field name="domain">[('state','=', 'waiting_material')]</field>
             <field name="context">{'state':'waiting_material'}</field>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to create a manufacturing order.
-              </p><p>
-                A manufacturing order, based on a bill of materials, will
-                consume raw materials and produce finished products.
-              </p><p>
-                Manufacturing orders are usually proposed automatically based
-                on customer requirements or automated rules like the minimum
-                stock rule.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+                <p>
+                    A manufacturing order, based on a bill of materials, will
+                    consume raw materials and produce finished products.
+                </p>
+                <p>
+                    Manufacturing orders are usually proposed automatically based
+                    on customer requirements or automated rules like the minimum
+                    stock rule.
+                </p>
             </field>
         </record>
         <menuitem id="menu_mrp_waiting_material"
-          name="Waiting Material Orders"
-          parent="mrp.menu_mrp_manufacturing"
-          action="mrp_waiting_material"
-          sequence="22"
-        groups="group_charge_warehouse"/>
+                  name="Waiting Material Orders"
+                  parent="mrp.menu_mrp_manufacturing"
+                  action="mrp_waiting_material"
+                  sequence="22"
+                  groups="group_charge_warehouse"/>
 
         <record id="mrp_prepare_material_ing" model="ir.actions.act_window">
             <field name="name">Prepare Material ing Orders</field>
@@ -399,24 +450,26 @@
             <field name="domain">[('state','=', 'prepare_material_ing')]</field>
             <field name="context">{'state':'prepare_material_ing'}</field>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to create a manufacturing order.
-              </p><p>
-                A manufacturing order, based on a bill of materials, will
-                consume raw materials and produce finished products.
-              </p><p>
-                Manufacturing orders are usually proposed automatically based
-                on customer requirements or automated rules like the minimum
-                stock rule.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+                <p>
+                    A manufacturing order, based on a bill of materials, will
+                    consume raw materials and produce finished products.
+                </p>
+                <p>
+                    Manufacturing orders are usually proposed automatically based
+                    on customer requirements or automated rules like the minimum
+                    stock rule.
+                </p>
             </field>
         </record>
         <menuitem id="menu_mrp_prepare_material_ing"
-          name="Prepare Material ing Orders"
-          parent="mrp.menu_mrp_manufacturing"
-          action="mrp_prepare_material_ing"
-          sequence="23"
-        groups="group_charge_warehouse"/>
+                  name="Prepare Material ing Orders"
+                  parent="mrp.menu_mrp_manufacturing"
+                  action="mrp_prepare_material_ing"
+                  sequence="23"
+                  groups="group_charge_warehouse"/>
 
         <record id="mrp_finish_prepare_material" model="ir.actions.act_window">
             <field name="name">Finish Prepare Material Orders</field>
@@ -429,24 +482,26 @@
             <field name="domain">[('state','=', 'finish_prepare_material')]</field>
             <field name="context">{'state':'finish_prepare_material'}</field>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to create a manufacturing order.
-              </p><p>
-                A manufacturing order, based on a bill of materials, will
-                consume raw materials and produce finished products.
-              </p><p>
-                Manufacturing orders are usually proposed automatically based
-                on customer requirements or automated rules like the minimum
-                stock rule.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+                <p>
+                    A manufacturing order, based on a bill of materials, will
+                    consume raw materials and produce finished products.
+                </p>
+                <p>
+                    Manufacturing orders are usually proposed automatically based
+                    on customer requirements or automated rules like the minimum
+                    stock rule.
+                </p>
             </field>
         </record>
         <menuitem id="menu_mrp_finish_prepare_material"
-          name="Finish Prepare Material Orders"
-          parent="mrp.menu_mrp_manufacturing"
-          action="mrp_finish_prepare_material"
-          sequence="24"
-        groups="group_charge_produce"/>
+                  name="Finish Prepare Material Orders"
+                  parent="mrp.menu_mrp_manufacturing"
+                  action="mrp_finish_prepare_material"
+                  sequence="24"
+                  groups="group_charge_produce"/>
 
         <record id="mrp_already_picking" model="ir.actions.act_window">
             <field name="name">Already Picking Orders</field>
@@ -460,24 +515,26 @@
             <field name="context">{'state':'already_picking'}</field>
 
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to create a manufacturing order.
-              </p><p>
-                A manufacturing order, based on a bill of materials, will
-                consume raw materials and produce finished products.
-              </p><p>
-                Manufacturing orders are usually proposed automatically based
-                on customer requirements or automated rules like the minimum
-                stock rule.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+                <p>
+                    A manufacturing order, based on a bill of materials, will
+                    consume raw materials and produce finished products.
+                </p>
+                <p>
+                    Manufacturing orders are usually proposed automatically based
+                    on customer requirements or automated rules like the minimum
+                    stock rule.
+                </p>
             </field>
         </record>
         <menuitem id="menu_mrp_already_picking"
-          name="Already Picking Orders"
-          parent="mrp.menu_mrp_manufacturing"
-          action="mrp_already_picking"
-          sequence="25"
-        groups="group_charge_produce"/>
+                  name="Already Picking Orders"
+                  parent="mrp.menu_mrp_manufacturing"
+                  action="mrp_already_picking"
+                  sequence="25"
+                  groups="group_charge_produce"/>
 
         <record id="mrp_progress" model="ir.actions.act_window">
             <field name="name">Progress Orders</field>
@@ -488,28 +545,30 @@
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="view_mrp_production_filter"/>
             <field name="domain">[('state','=', 'progress')]</field>
-             <field name="context">{'state':'progress'}</field>
+            <field name="context">{'state':'progress'}</field>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to create a manufacturing order.
-              </p><p>
-                A manufacturing order, based on a bill of materials, will
-                consume raw materials and produce finished products.
-              </p><p>
-                Manufacturing orders are usually proposed automatically based
-                on customer requirements or automated rules like the minimum
-                stock rule.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+                <p>
+                    A manufacturing order, based on a bill of materials, will
+                    consume raw materials and produce finished products.
+                </p>
+                <p>
+                    Manufacturing orders are usually proposed automatically based
+                    on customer requirements or automated rules like the minimum
+                    stock rule.
+                </p>
             </field>
         </record>
         <menuitem id="menu_mrp_progress"
-          name="Progress Orders"
-          parent="mrp.menu_mrp_manufacturing"
-          action="mrp_progress"
-          sequence="26"
-        groups="group_charge_produce"/>
+                  name="Progress Orders"
+                  parent="mrp.menu_mrp_manufacturing"
+                  action="mrp_progress"
+                  sequence="26"
+                  groups="group_charge_produce"/>
 
-         <record id="mrp_waiting_quality_inspection" model="ir.actions.act_window">
+        <record id="mrp_waiting_quality_inspection" model="ir.actions.act_window">
             <field name="name">Waiting Inspection Orders</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">mrp.production</field>
@@ -518,26 +577,28 @@
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="view_mrp_production_filter"/>
             <field name="domain">[('state','=', 'waiting_quality_inspection')]</field>
-             <field name="context">{'state':'waiting_quality_inspection'}</field>
+            <field name="context">{'state':'waiting_quality_inspection'}</field>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to create a manufacturing order.
-              </p><p>
-                A manufacturing order, based on a bill of materials, will
-                consume raw materials and produce finished products.
-              </p><p>
-                Manufacturing orders are usually proposed automatically based
-                on customer requirements or automated rules like the minimum
-                stock rule.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+                <p>
+                    A manufacturing order, based on a bill of materials, will
+                    consume raw materials and produce finished products.
+                </p>
+                <p>
+                    Manufacturing orders are usually proposed automatically based
+                    on customer requirements or automated rules like the minimum
+                    stock rule.
+                </p>
             </field>
         </record>
         <menuitem id="menu_mrp_waiting_quality_inspection"
-          name="Waiting Inspection Orders"
-          parent="mrp.menu_mrp_manufacturing"
-          action="mrp_waiting_quality_inspection"
-          sequence="27"
-        groups="group_charge_inspection"/>
+                  name="Waiting Inspection Orders"
+                  parent="mrp.menu_mrp_manufacturing"
+                  action="mrp_waiting_quality_inspection"
+                  sequence="27"
+                  groups="group_charge_inspection"/>
 
 
         <record id="mrp_quality_inspection_ing" model="ir.actions.act_window">
@@ -551,24 +612,26 @@
             <field name="domain">[('state','=', 'quality_inspection_ing')]</field>
             <field name="context">{'state':'quality_inspection_ing'}</field>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to create a manufacturing order.
-              </p><p>
-                A manufacturing order, based on a bill of materials, will
-                consume raw materials and produce finished products.
-              </p><p>
-                Manufacturing orders are usually proposed automatically based
-                on customer requirements or automated rules like the minimum
-                stock rule.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+                <p>
+                    A manufacturing order, based on a bill of materials, will
+                    consume raw materials and produce finished products.
+                </p>
+                <p>
+                    Manufacturing orders are usually proposed automatically based
+                    on customer requirements or automated rules like the minimum
+                    stock rule.
+                </p>
             </field>
         </record>
         <menuitem id="menu_mrp_quality_inspection_ing"
-          name="Inspection ing Orders"
-          parent="mrp.menu_mrp_manufacturing"
-          action="mrp_quality_inspection_ing"
-          sequence="28"
-        groups="group_charge_inspection"/>
+                  name="Inspection ing Orders"
+                  parent="mrp.menu_mrp_manufacturing"
+                  action="mrp_quality_inspection_ing"
+                  sequence="28"
+                  groups="group_charge_inspection"/>
 
         <record id="mrp_waiting_inventory_material" model="ir.actions.act_window">
             <field name="name">Waiting Inventory Orders</field>
@@ -581,24 +644,26 @@
             <field name="domain">[('state','=', 'waiting_inventory_material')]</field>
             <field name="context">{'state':'waiting_inventory_material'}</field>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to create a manufacturing order.
-              </p><p>
-                A manufacturing order, based on a bill of materials, will
-                consume raw materials and produce finished products.
-              </p><p>
-                Manufacturing orders are usually proposed automatically based
-                on customer requirements or automated rules like the minimum
-                stock rule.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+                <p>
+                    A manufacturing order, based on a bill of materials, will
+                    consume raw materials and produce finished products.
+                </p>
+                <p>
+                    Manufacturing orders are usually proposed automatically based
+                    on customer requirements or automated rules like the minimum
+                    stock rule.
+                </p>
             </field>
         </record>
         <menuitem id="menu_mrp_waiting_inventory_material"
-          name="Waiting Inventory Orders"
-          parent="mrp.menu_mrp_manufacturing"
-          action="mrp_waiting_inventory_material"
-          sequence="29"
-        groups="group_charge_produce"/>
+                  name="Waiting Inventory Orders"
+                  parent="mrp.menu_mrp_manufacturing"
+                  action="mrp_waiting_inventory_material"
+                  sequence="29"
+                  groups="group_charge_produce"/>
 
         <record id="mrp_waiting_warehouse_inspection" model="ir.actions.act_window">
             <field name="name">Waiting Warehouse Insepcetion Orders</field>
@@ -611,24 +676,26 @@
             <field name="domain">[('state','=', 'waiting_warehouse_inspection')]</field>
             <field name="context">{'state':'waiting_warehouse_inspection'}</field>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to create a manufacturing order.
-              </p><p>
-                A manufacturing order, based on a bill of materials, will
-                consume raw materials and produce finished products.
-              </p><p>
-                Manufacturing orders are usually proposed automatically based
-                on customer requirements or automated rules like the minimum
-                stock rule.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+                <p>
+                    A manufacturing order, based on a bill of materials, will
+                    consume raw materials and produce finished products.
+                </p>
+                <p>
+                    Manufacturing orders are usually proposed automatically based
+                    on customer requirements or automated rules like the minimum
+                    stock rule.
+                </p>
             </field>
         </record>
         <menuitem id="menu_mrp_waiting_warehouse_inspection"
-          name="Waiting Warehouse Insepcetion Orders"
-          parent="mrp.menu_mrp_manufacturing"
-          action="mrp_waiting_warehouse_inspection"
-          sequence="30"
-        groups="group_charge_warehouse"/>
+                  name="Waiting Warehouse Insepcetion Orders"
+                  parent="mrp.menu_mrp_manufacturing"
+                  action="mrp_waiting_warehouse_inspection"
+                  sequence="30"
+                  groups="group_charge_warehouse"/>
 
         <record id="mrp_waiting_post_inventory" model="ir.actions.act_window">
             <field name="name">Waiting Post Orders</field>
@@ -641,24 +708,26 @@
             <field name="domain">[('state','=', 'waiting_post_inventory')]</field>
             <field name="context">{'state':'waiting_post_inventory'}</field>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to create a manufacturing order.
-              </p><p>
-                A manufacturing order, based on a bill of materials, will
-                consume raw materials and produce finished products.
-              </p><p>
-                Manufacturing orders are usually proposed automatically based
-                on customer requirements or automated rules like the minimum
-                stock rule.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+                <p>
+                    A manufacturing order, based on a bill of materials, will
+                    consume raw materials and produce finished products.
+                </p>
+                <p>
+                    Manufacturing orders are usually proposed automatically based
+                    on customer requirements or automated rules like the minimum
+                    stock rule.
+                </p>
             </field>
         </record>
         <menuitem id="menu_mrp_waiting_post_inventory"
-          name="Waiting Post Orders"
-          parent="mrp.menu_mrp_manufacturing"
-          action="mrp_waiting_post_inventory"
-          sequence="31"
-        groups="group_charge_produce"/>
+                  name="Waiting Post Orders"
+                  parent="mrp.menu_mrp_manufacturing"
+                  action="mrp_waiting_post_inventory"
+                  sequence="31"
+                  groups="group_charge_produce"/>
 
         <record id="mrp_waiting_rework" model="ir.actions.act_window">
             <field name="name">Waiting Rework Orders</field>
@@ -671,26 +740,27 @@
             <field name="domain">[('state','=', 'waiting_rework')]</field>
             <field name="context">{'state':'waiting_rework'}</field>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to create a manufacturing order.
-              </p><p>
-                A manufacturing order, based on a bill of materials, will
-                consume raw materials and produce finished products.
-              </p><p>
-                Manufacturing orders are usually proposed automatically based
-                on customer requirements or automated rules like the minimum
-                stock rule.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+                <p>
+                    A manufacturing order, based on a bill of materials, will
+                    consume raw materials and produce finished products.
+                </p>
+                <p>
+                    Manufacturing orders are usually proposed automatically based
+                    on customer requirements or automated rules like the minimum
+                    stock rule.
+                </p>
             </field>
         </record>
 
         <menuitem id="menu_mrp_waiting_rework"
-          name="Waiting Rework Orders"
-          parent="mrp.menu_mrp_manufacturing"
-          action="mrp_waiting_rework"
-          sequence="31"
-        groups="group_charge_produce"/>
-
+                  name="Waiting Rework Orders"
+                  parent="mrp.menu_mrp_manufacturing"
+                  action="mrp_waiting_rework"
+                  sequence="31"
+                  groups="group_charge_produce"/>
 
 
         <record id="mrp_rework_ing" model="ir.actions.act_window">
@@ -704,27 +774,27 @@
             <field name="domain">[('state','=', 'rework_ing')]</field>
             <field name="context">{'state':'rework_ing'}</field>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to create a manufacturing order.
-              </p><p>
-                A manufacturing order, based on a bill of materials, will
-                consume raw materials and produce finished products.
-              </p><p>
-                Manufacturing orders are usually proposed automatically based
-                on customer requirements or automated rules like the minimum
-                stock rule.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+                <p>
+                    A manufacturing order, based on a bill of materials, will
+                    consume raw materials and produce finished products.
+                </p>
+                <p>
+                    Manufacturing orders are usually proposed automatically based
+                    on customer requirements or automated rules like the minimum
+                    stock rule.
+                </p>
             </field>
         </record>
 
         <menuitem id="menu_mrp_rework_ing"
-          name="Reworking Orders"
-          parent="mrp.menu_mrp_manufacturing"
-          action="mrp_rework_ing"
-          sequence="31"
-        groups="group_charge_produce"/>
-
-
+                  name="Reworking Orders"
+                  parent="mrp.menu_mrp_manufacturing"
+                  action="mrp_rework_ing"
+                  sequence="31"
+                  groups="group_charge_produce"/>
 
 
         <record id="mrp_done" model="ir.actions.act_window">
@@ -737,23 +807,25 @@
             <field name="search_view_id" ref="view_mrp_production_filter"/>
             <field name="domain">[('state','=', 'done')]</field>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to create a manufacturing order.
-              </p><p>
-                A manufacturing order, based on a bill of materials, will
-                consume raw materials and produce finished products.
-              </p><p>
-                Manufacturing orders are usually proposed automatically based
-                on customer requirements or automated rules like the minimum
-                stock rule.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+                <p>
+                    A manufacturing order, based on a bill of materials, will
+                    consume raw materials and produce finished products.
+                </p>
+                <p>
+                    Manufacturing orders are usually proposed automatically based
+                    on customer requirements or automated rules like the minimum
+                    stock rule.
+                </p>
             </field>
         </record>
         <menuitem id="menu_mrp_done"
-          name="Done Orders"
-          parent="mrp.menu_mrp_manufacturing"
-          action="mrp_done"
-          sequence="32"/>
+                  name="Done Orders"
+                  parent="mrp.menu_mrp_manufacturing"
+                  action="mrp_done"
+                  sequence="32"/>
 
         <record id="mrp_cancelled" model="ir.actions.act_window">
             <field name="name">Cancelled Orders</field>
@@ -765,23 +837,25 @@
             <field name="search_view_id" ref="view_mrp_production_filter"/>
             <field name="domain">[('state','=', 'cancel')]</field>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to create a manufacturing order.
-              </p><p>
-                A manufacturing order, based on a bill of materials, will
-                consume raw materials and produce finished products.
-              </p><p>
-                Manufacturing orders are usually proposed automatically based
-                on customer requirements or automated rules like the minimum
-                stock rule.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+                <p>
+                    A manufacturing order, based on a bill of materials, will
+                    consume raw materials and produce finished products.
+                </p>
+                <p>
+                    Manufacturing orders are usually proposed automatically based
+                    on customer requirements or automated rules like the minimum
+                    stock rule.
+                </p>
             </field>
         </record>
         <menuitem id="menu_mrp_cancelled"
-          name="Cancelled Orders"
-          parent="mrp.menu_mrp_manufacturing"
-          action="mrp_cancelled"
-          sequence="32"/>
+                  name="Cancelled Orders"
+                  parent="mrp.menu_mrp_manufacturing"
+                  action="mrp_cancelled"
+                  sequence="32"/>
 
 
         <record id="action_picking_tree_outgoing" model="ir.actions.act_window">
@@ -792,16 +866,18 @@
             <field name="view_mode">tree,kanban,form,calendar</field>
             <field name="domain">[('picking_type_code','=', 'outgoing')]</field>
             <field name="context">{
-                    'contact_display': 'partner_address',
-            }
+                'contact_display': 'partner_address',
+                }
             </field>
             <field name="search_view_id" ref="stock.view_picking_internal_search"/>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click here to create a new transfer.
-              </p><p>
-                You can either do it immediately or mark it as Todo for future processing. Use your scanner to validate the transferred quantity quicker.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click here to create a new transfer.
+                </p>
+                <p>
+                    You can either do it immediately or mark it as Todo for future processing. Use your scanner to
+                    validate the transferred quantity quicker.
+                </p>
             </field>
         </record>
 
@@ -813,22 +889,25 @@
             <field name="view_mode">tree,kanban,form,calendar</field>
             <field name="domain">[('picking_type_code','=', 'incoming')]</field>
             <field name="context">{
-                    'contact_display': 'partner_address',
-            }
+                'contact_display': 'partner_address',
+                }
             </field>
             <field name="search_view_id" ref="stock.view_picking_internal_search"/>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click here to create a new transfer.
-              </p><p>
-                You can either do it immediately or mark it as Todo for future processing. Use your scanner to validate the transferred quantity quicker.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click here to create a new transfer.
+                </p>
+                <p>
+                    You can either do it immediately or mark it as Todo for future processing. Use your scanner to
+                    validate the transferred quantity quicker.
+                </p>
             </field>
         </record>
 
-         <menuitem id="outgoing_picking" name="Transfer Out" parent="stock.menu_stock_warehouse_mgmt" sequence="3" action="action_picking_tree_outgoing" groups="stock.group_stock_manager,stock.group_stock_user"/>
-         <menuitem id="incoming_picking" name="Transfer In" parent="stock.menu_stock_warehouse_mgmt" sequence="4" action="action_picking_tree_incoming" groups="stock.group_stock_manager,stock.group_stock_user"/>
-
+        <menuitem id="outgoing_picking" name="Transfer Out" parent="stock.menu_stock_warehouse_mgmt" sequence="3"
+                  action="action_picking_tree_outgoing" groups="stock.group_stock_manager,stock.group_stock_user"/>
+        <menuitem id="incoming_picking" name="Transfer In" parent="stock.menu_stock_warehouse_mgmt" sequence="4"
+                  action="action_picking_tree_incoming" groups="stock.group_stock_manager,stock.group_stock_user"/>
 
 
         <record id="hr_hr_employee_view_form_worker" model="ir.ui.view">
@@ -843,7 +922,6 @@
                 </xpath>
             </field>
         </record>
-
 
 
         <record id="account_multi_handle_worker_form_view" model="ir.ui.view">
@@ -871,7 +949,7 @@
                     view_mode="form" target="new" view_type="form"/>
 
 
-         <record id="account_multi_set_mto" model="ir.ui.view">
+        <record id="account_multi_set_mto" model="ir.ui.view">
             <field name="name">multi.set.mto.form</field>
             <field name="model">multi.set.mto</field>
             <field name="arch" type="xml">
@@ -896,27 +974,47 @@
                     view_mode="form" target="new" view_type="form"/>
 
 
-            <record id="make_by_mrp_purchase_form_action" model="ir.actions.act_window">
-                <field name="name">Orders Make By MRP</field>
-                <field name="type">ir.actions.act_window</field>
-                <field name="res_model">purchase.order</field>
-                <field name="view_mode">tree,kanban,form,pivot,graph,calendar</field>
-                <field name="domain">[('state','=',('make_by_mrp'))]</field>
-                <field name="search_view_id" ref="purchase.view_purchase_order_filter"/>
-                <field name="help" type="html">
-                  <p class="oe_view_nocontent_create">
+        <record id="make_by_mrp_purchase_form_action" model="ir.actions.act_window">
+            <field name="name">Orders Make By MRP</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">purchase.order</field>
+            <field name="view_mode">tree,kanban,form,pivot,graph,calendar</field>
+            <field name="domain">[('state','=',('make_by_mrp'))]</field>
+            <field name="search_view_id" ref="purchase.view_purchase_order_filter"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
                     Click to create a quotation that will be converted into a purchase order.
-                  </p><p>
+                </p>
+                <p>
                     Use this menu to search within your purchase orders by
                     references, vendor, products, etc. For each purchase order,
                     you can track the related discussion with the vendor, control
                     the products received and control the vendor bills.
-                  </p>
-                </field>
-            </record>
+                </p>
+            </field>
+        </record>
 
-                <menuitem
-           action="make_by_mrp_purchase_form_action" id="menu_purchase_make_by_mrp"
-           parent="purchase.menu_procurement_management" string="Orders Make By MRP" sequence="16"/>
+        <menuitem
+                action="make_by_mrp_purchase_form_action" id="menu_purchase_make_by_mrp"
+                parent="purchase.menu_procurement_management" string="Orders Make By MRP" sequence="16"/>
+
+
+        <record id="mrp_production_tree_view_ll" model="ir.ui.view">
+            <field name="name">mrp.production.tree</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="mrp.mrp_production_tree_view"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='product_uom_id']" position="replace">
+                </xpath>
+
+                <xpath expr="//field[@name='availability']" position="replace">
+                    <field name="availability" string="材料状况"/>
+                </xpath>
+                <xpath expr="//field[@name='origin']" position="replace">
+                    <field name="total_spent_money" string="加工总费用"/>
+                </xpath>
+            </field>
+        </record>
     </data>
 </openerp>

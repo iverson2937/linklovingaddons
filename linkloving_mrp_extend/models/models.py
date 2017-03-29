@@ -201,6 +201,7 @@ class MrpProductionExtend(models.Model):
         self.total_spent_time = spent / 3600.0
 
     #计算生产总成本
+    @api.one
     def _compute_total_spent_money(self):
         if self.mo_type == 'unit':#计件
             self.total_spent_money = self.qty_produced * self.unit_price
