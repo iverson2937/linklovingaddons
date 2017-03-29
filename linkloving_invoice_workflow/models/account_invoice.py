@@ -10,6 +10,7 @@ class AccountInvoice(models.Model):
 
     amount_total_o = fields.Monetary(string=u'Invoice Amount',
                                      store=True, readonly=True, compute='_compute_amount', track_visibility='always')
+
     @api.one
     def _get_po_number(self):
         if self.origin:
@@ -18,8 +19,8 @@ class AccountInvoice(models.Model):
 
     po_id = fields.Many2one('purchase.order', compute=_get_po_number)
     order_line = fields.One2many('purchase.order.line', related='po_id.order_line')
-    deduct_amount = fields.Float(string=u'Deduct Amount')
-    remark = fields.Text(string=u'Remark')
+    deduct_amount = fields.Float(string=u'扣款')
+    remark = fields.Text(string=u'备注')
 
     # def _check_deduct_amount(self):
     #     for invoice in self:
@@ -63,7 +64,7 @@ class AccountInvoice(models.Model):
             vals.update({'amount_total_o': amount_total_o})
         deduct_amount = vals.get('deduct_amount')
         if deduct_amount:
-            if deduct_amount>(self.amount_total_o or vals.get('amount_total_o')):
+            if deduct_amount > (self.amount_total_o or vals.get('amount_total_o')):
                 raise UserError(_('Deduct Amount can not larger than Invoice Amount'))
             rate = deduct_amount / (self.amount_total_o or vals.get('amount_total_o'))
             for line in self.invoice_line_ids:
@@ -98,7 +99,7 @@ class AccountInvoice(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
-    price_unit_o = fields.Float(digits=dp.get_precision('Price Deduct'))
+    price_unit_o = fields.Float(digits=dp.get_precision('Price Deduct'), string=u'原始单价')
     price_subtotal_o = fields.Monetary(string='Amount',
                                        store=True, readonly=True, compute='_compute_price')
 
