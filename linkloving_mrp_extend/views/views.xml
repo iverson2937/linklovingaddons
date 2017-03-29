@@ -212,6 +212,7 @@
 
                 <xpath expr="//button[@name='button_mark_done']" position="replace">
                     <button name="button_mark_done"
+                            string="标记为完成"
                             attrs="{'invisible': [ ('state', 'not in', 'waiting_post_inventory')]}" type="object"
                             class="oe_highlight" groups="linkloving_mrp_extend.group_charge_produce"/>
                 </xpath>
