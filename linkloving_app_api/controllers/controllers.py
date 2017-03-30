@@ -1197,6 +1197,7 @@ class LinklovingAppApi(http.Controller):
     def product_template_obj_to_json(cls, product_tmpl):
         data = {
             'product_id': product_tmpl.id,
+            'product_product_id' : product_tmpl.product_variant_id.id,
             'default_code': product_tmpl.default_code,
             'product_name' : product_tmpl.name,
             'type': product_tmpl.type,

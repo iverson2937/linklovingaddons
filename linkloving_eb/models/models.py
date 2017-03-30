@@ -18,6 +18,9 @@ class linkloving_eb_temporary_order(models.Model):
     @api.multi
     def _compute_is_finsish_transfer(self):
         for order in self:
+            if order.state == "draft":
+                order.is_finish_transfer = "no"
+                continue
             order.is_finish_transfer = "yes"
             for picking in order.stock_picking_ids:
                 if picking.state != "done":
@@ -33,7 +36,7 @@ class linkloving_eb_temporary_order(models.Model):
 
     stock_picking_ids = fields.One2many("stock.picking","eb_order_id")
     sale_order_id = fields.Many2one("sale.order")
-    is_finish_transfer = fields.Selection([('yes','已完成'),("no","未完成")],"是否已经出货", compute="_compute_is_finsish_transfer")
+    is_finish_transfer = fields.Selection([('yes', '已完成'),("no", "未完成")],"是否已经出货", compute="_compute_is_finsish_transfer")
 
     @api.multi
     def action_confirm(self):
