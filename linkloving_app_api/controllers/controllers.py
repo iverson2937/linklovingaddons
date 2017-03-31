@@ -1197,6 +1197,7 @@ class LinklovingAppApi(http.Controller):
     def product_template_obj_to_json(cls, product_tmpl):
         data = {
             'product_id': product_tmpl.id,
+            'product_product_id' : product_tmpl.product_variant_id.id,
             'default_code': product_tmpl.default_code,
             'product_name' : product_tmpl.name,
             'type': product_tmpl.type,
@@ -1487,5 +1488,5 @@ class LinklovingAppApi(http.Controller):
             return 'group_charge_produce'
         elif type == 'purchase_user':#采购用户
             return 'group_purchase_user'
-        elif type == 'purchase_manager':
+        elif type == 'purchase_manager':#采购管理员
             return 'group_purchase_manager'

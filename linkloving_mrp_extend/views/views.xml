@@ -218,7 +218,7 @@
                 </xpath>
 
                 <xpath expr="//button[@name='action_assign']" position="replace">
-                    <button name="action_assign"
+                    <button name="action_assign" string="检查可用性"
                             attrs="{'invisible': ['|',('availability', 'in', ('assigned', 'none')),('state','not in',('progress'))]}"
                             type="object" groups="linkloving_mrp_extend.group_charge_produce"/>
                 </xpath>
