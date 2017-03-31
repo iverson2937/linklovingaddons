@@ -88,3 +88,10 @@ class SaleOrderLine(models.Model):
                 if not is_available:
                     return {}
         return {}
+
+    invoice_status = fields.Selection([
+        ('upselling', u'超售商机'),
+        ('invoiced', u'已对账完成'),
+        ('to invoice', u'待对账'),
+        ('no', u'待出货')
+    ], string=u'对账单状态', compute='_compute_invoice_status', store=True, readonly=True, default='no')
