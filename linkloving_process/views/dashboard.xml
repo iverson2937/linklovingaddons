@@ -126,17 +126,13 @@
                                         </div>
                                         <div class="col-xs-12 o_kanban_primary_bottom text-center">
                                             <button name="mo_schedule_query" class="o_inline_link oe_high_light"
-                                                    type="object">排程查询
+                                                    type="object">Manufacturing order Query
                                             </button>
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
-
-
                         </t>
-
                     </templates>
                 </kanban>
             </field>
