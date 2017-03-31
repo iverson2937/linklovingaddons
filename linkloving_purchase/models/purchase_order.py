@@ -94,5 +94,8 @@ class PurchaseOrderLine(models.Model):
             self.date_planned = self.order_id.handle_date
         return result
 
-
-
+    invoice_status = fields.Selection([
+        ('no', u'待出货'),
+        ('to invoice', u'待对账'),
+        ('invoiced', u'已对账完成'),
+    ], string=u'对账单状态', compute='_get_invoiced', store=True, readonly=True, copy=False, default='no')
