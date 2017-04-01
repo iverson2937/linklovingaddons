@@ -466,6 +466,8 @@ class LinklovingAppApi(http.Controller):
         stock_move_lines = []
         for move in stock_moves:
             sim_stock_move = LinklovingAppApi.get_model_by_id(move['stock_move_lines_id'], request, 'sim.stock.move')
+            if not sim_stock_move.stock_moves:
+                continue
             rounding = sim_stock_move.stock_moves[0].product_uom.rounding
             if float_compare(move['quantity_ready'], sim_stock_move.stock_moves[0].product_uom_qty, precision_rounding=rounding) > 0:
                 qty_split = sim_stock_move.stock_moves[0].product_uom._compute_quantity(
@@ -1232,7 +1234,9 @@ class LinklovingAppApi(http.Controller):
         if groupby == 'picking_type_id':
             for group in group_list:
                 group_id = group.get('picking_type_id')[0]
-                group_obj = request.env['stock.picking.type'].sudo().search([('id','=',group_id)])[0]
+                group_ret = request.env['stock.picking.type'].sudo().search([('id','=',group_id)], limit=1)
+                if group_ret:
+                    group_obj = group_ret[0]
                 temp_domain = []
                 temp_domain.append(('picking_type_id','=',group_id))
                 if partner_id:
