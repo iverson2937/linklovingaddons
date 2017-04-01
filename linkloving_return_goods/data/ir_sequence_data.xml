@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- Sequences for sale.order -->
+        <record id="seq_sale_order" model="ir.sequence">
+            <field name="name">Return Goods</field>
+            <field name="code">return.goods</field>
+            <field name="prefix">RMA</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+</odoo>
