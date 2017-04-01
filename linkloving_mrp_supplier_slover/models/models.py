@@ -135,7 +135,7 @@ class linkloving_procurement_order(models.Model):
             po_line = False
             for line in po.order_line:
                 if line.product_id == procurement.product_id and line.product_uom == procurement.product_id.uom_po_id:
-                    procurement_uom_po_qty = procurement.product_uom._compute_quantity(procurement.product_qty,
+                    procurement_uom_po_qty = procurement.product_uom._compute_quantity(procurement.get_actual_require_qty(),
                                                                                        procurement.product_id.uom_po_id)
                     seller = procurement.product_id._select_seller(
                         partner_id=partner,

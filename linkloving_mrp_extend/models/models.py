@@ -311,6 +311,8 @@ class MrpProductionExtend(models.Model):
                 move.over_picking_qty = 0
                 new_move.write({'state':'assigned',})
             if self._context.get('picking_mode') == 'first_picking':#如果备料数量不等于0
+                if not move.stock_moves:
+                    continue
                 rounding = move.stock_moves[0].product_uom.rounding
                 if float_compare(move.quantity_ready, move.stock_moves[0].product_uom_qty, precision_rounding=rounding) > 0:
                     qty_split =  move.stock_moves[0].product_uom._compute_quantity(move.quantity_ready - move.stock_moves[0].product_uom_qty,
@@ -846,9 +848,41 @@ class ProcurementOrderExtend(models.Model):
                     'unit_price' : bom.process_id.unit_price,
                     'mo_type' : bom.mo_type,
                     'hour_price' : bom.hour_price,
-                    'in_charge_id' : bom.process_id.partner_id.id
+                    'in_charge_id' : bom.process_id.partner_id.id,
+                    'product_qty' : self.get_actual_require_qty(),
                     })
         return res
+
+    @api.multi
+    def _prepare_purchase_order_line(self, po, supplier):
+        product_new_qty = self.get_actual_require_qty()
+        procurement_uom_po_qty = self.product_uom._compute_quantity(product_new_qty, self.product_id.uom_po_id)
+        res = super(ProcurementOrderExtend, self)._prepare_purchase_order_line(po, supplier)
+        res.update({
+            "product_qty" : procurement_uom_po_qty
+        })
+        return res
+    def get_actual_require_qty(self):
+        out_in = self.product_id.outgoing_qty - self.product_id.incoming_qty   # 需求数量A out - in
+        new_out_in = out_in + self.product_qty #减去本次销售的需求数量
+        stock_qty = self.product_id.qty_available  # 库存数量
+
+        actual_need_qty = 0
+        if new_out_in > 0:#如果大于0 代表需要补货
+            if new_out_in > stock_qty:#   库-A  库存不够
+                if stock_qty > out_in: # 上次库存够了,本次不够
+                    actual_need_qty = self.product_qty - stock_qty
+                else:
+                    actual_need_qty = self.product_qty
+        # else:
+        #     pass #不需要补货
+        #
+        # actual_need_qty = 0
+        # if ori_require_qty > stock_qty and real_require_qty > stock_qty:  # 初始需求 > 库存  并且 现有需求 > 库存
+        #     actual_need_qty = self.product_qty
+        # elif ori_require_qty <= stock_qty and real_require_qty > stock_qty:
+        #     actual_need_qty = self.product_qty - stock_qty
+        return actual_need_qty
 
 class MultiSetMTO(models.TransientModel):
     _name = 'multi.set.mto'
