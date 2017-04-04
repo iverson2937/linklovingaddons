@@ -8,10 +8,10 @@ import odoo.addons.decimal_precision as dp
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
-    return_id = fields.Many2one('return.goods')
+    rma_id = fields.Many2one('return.goods')
 
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
-    return_line_id = fields.Many2one('return.goods.line')
+    rma_line_id = fields.Many2one('return.goods.line')

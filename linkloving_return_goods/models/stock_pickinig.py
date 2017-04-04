@@ -12,9 +12,14 @@ class StockPicking(models.Model):
     """""
 
     _inherit = 'stock.picking'
-    return_id = fields.Many2one('return.goods')
+    rma_id = fields.Many2one('return.goods')
 
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
-    return_line_id = fields.Many2one('return.goods.line')
+    rma_line_id = fields.Many2one('return.goods.line')
+
+    @api.one
+    def action_done(self):
+        super(StockMove, self).action_done()
+        self.rma_line_id._get_qty_delivered()
