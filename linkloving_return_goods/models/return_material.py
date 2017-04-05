@@ -12,19 +12,31 @@ class ReturnMaterial(models.Model):
     _order = 'create_date desc'
 
     name = fields.Char()
-    partner_id = fields.Many2one('res.partner')
-    partner_invoice_id = fields.Many2one('res.partner', string=u'开票地址', readonly=False, required=False,
+    partner_id = fields.Many2one('res.partner', states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
+    customer = fields.Boolean(related='partner_id.customer', store=True)
+    supplier = fields.Boolean(relaetd='partner_id.supplier', store=True)
+    partner_invoice_id = fields.Many2one('res.partner', string=u'开票地址',
+                                         states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
+                                         required=False,
                                          help="Invoice address for current sales order.")
     partner_shipping_id = fields.Many2one('res.partner', string=u'退货地址', readonly=False, required=False,
-                                          help="Delivery address for current sales order.")
-    so_id = fields.Many2one('sale.order')
+                                          help="Delivery address for current sales order.",
+                                          states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
+    so_id = fields.Many2one('sale.order', states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
+    purchase_id = fields.Many2one('purchase.order')
     tax_id = fields.Many2one('account.tax')
     picking_ids = fields.One2many('stock.picking', 'rma_id')
-    invoice_ids = fields.One2many('account.invoice', 'rma_id')
+    invoice_ids = fields.One2many('account.invoice', compute='_get_invoiced')
     invoice_count = fields.Integer(compute='_get_invoiced')
 
+    @api.multi
+    def unlink(self):
+        if self.state != 'draft':
+            UserError(u'只可删除草稿状态的退货单')
+        return super(ReturnMaterial, self).unlink()
+
     @api.onchange('tax_id')
-    def onchang_tax_id(self):
+    def onchange_tax_id(self):
         for line in self.line_ids:
             line.tax_id = self.tax_id.id
 
@@ -94,9 +106,7 @@ class ReturnMaterial(models.Model):
             # Search for refunds as well
             line_invoice_status = [line.invoice_status for line in order.line_ids]
 
-            if order.state not in ('sale', 'done'):
-                invoice_status = 'no'
-            elif any(invoice_status == 'to invoice' for invoice_status in line_invoice_status):
+            if all(invoice_status == 'to invoice' for invoice_status in line_invoice_status):
                 invoice_status = 'to invoice'
             elif all(invoice_status == 'invoiced' for invoice_status in line_invoice_status):
                 invoice_status = 'invoiced'
@@ -108,6 +118,20 @@ class ReturnMaterial(models.Model):
                 'invoice_ids': invoice_ids.ids,
                 'invoice_status': invoice_status
             })
+
+    @api.multi
+    def action_view_invoice(self):
+        return {
+            'name': _('退货对账单'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            # 'view_id': False,
+            'res_model': 'account.invoice',
+            'domain': [],
+            'type': 'ir.actions.act_window',
+            'target': 'current',
+            'res_id': self.invoice_ids.ids[0]
+        }
 
     def action_view_delivery(self):
 
@@ -148,8 +172,7 @@ class ReturnMaterial(models.Model):
     state = fields.Selection([
         ('draft', u'草稿'),
         ('confirm', u'确认'),
-        ('order', u'退货单'),
-        ('done', u'完成')
+        ('order', u'退货单')
     ], default='draft')
 
     @api.model
@@ -217,11 +240,17 @@ class ReturnMaterial(models.Model):
         journal_id = self.env['account.invoice'].default_get(['journal_id'])['journal_id']
         if not journal_id:
             raise UserError(_('Please define an accounting sale journal for this company.'))
+        if self.customer:
+            invoice_type = 'out_refund'
+            account_id = self.partner_invoice_id.property_account_receivable_id.id,
+        else:
+            invoice_type = 'in_refund'
+            account_id = self.partner_invoice_id.property_account_payable_id.id,
         invoice_vals = {
             'name': '',
             'origin': self.name,
-            'type': 'out_invoice',
-            'account_id': self.partner_invoice_id.property_account_payable_id.id,
+            'type': invoice_type,
+            'account_id': account_id,
             'partner_id': self.partner_invoice_id.id,
             'partner_shipping_id': self.partner_shipping_id.id,
             'journal_id': journal_id,
@@ -229,24 +258,36 @@ class ReturnMaterial(models.Model):
         return invoice_vals
 
     def write(self, vals):
-        if vals.get('tracking_numbner'):
+        if vals.get('tracking_number'):
             for line in self.line_ids:
                 for move in line.move_ids:
-                    move.picking_id.tracking_number = vals.get('tracking_numbner')
+                    move.picking_id.tracking_number = vals.get('tracking_number')
         return super(ReturnMaterial, self).write(vals)
 
     @api.multi
     def return_confirm(self):
-        picking_type = self.env.ref('stock.picking_type_in')
+        if not self.line_ids:
+            raise UserError(u'至少含有一条退货明细')
+        if self.customer:
+            picking_type = self.env.ref('stock.picking_type_in')
+            origin = self.so_id.name if self.so_id else u'客户批量的退货'
+            location_id = self.partner_id.property_stock_customer.id,
+            location_dest_id = picking_type.default_location_dest_id.id,
+        else:
+            picking_type = self.env.ref('stock.picking_type_out')
+            origin = self.purchase_id.name if self.so_id else u'批量退货供应商'
+            location_id = picking_type.default_location_src_id.id,
+            location_dest_id = self.partner_id.property_stock_supplier.id
+        print location_dest_id, ''''ddd'''
 
         picking_id = self.env['stock.picking'].create({
             'picking_type_id': picking_type.id,
             'partner_id': self.partner_id.id,
             'rma_id': self.id,
-            'location_id': self.partner_id.property_stock_customer.id,
-            'location_dest_id': picking_type.default_location_dest_id.id,
-            'origin': self.so_id.name if self.so_id else u'客户批量' + u'的退货',
-            'tracking_number': self.tracking_number
+            'location_id': location_id,
+            'location_dest_id': location_dest_id,
+            'origin': origin,
+            'tracking_number': self.tracking_number if self.tracking_number else ''
         })
         for line in self.line_ids:
             self.env['stock.move'].create({
@@ -267,7 +308,7 @@ class ReturnMaterial(models.Model):
 class ReturnMaterialLine(models.Model):
     _name = 'return.goods.line'
     rma_id = fields.Many2one('return.goods', on_delete="cascade")
-    product_id = fields.Many2one('product.product', string='Product', domain=[('sale_ok', '=', True)],
+    product_id = fields.Many2one('product.product', string='Product',
                                  change_default=True, ondelete='restrict', required=True)
     product_uom_qty = fields.Float(string='Quantity', required=True,
                                    default=1.0)
@@ -307,17 +348,8 @@ class ReturnMaterialLine(models.Model):
     def _compute_invoice_status(self):
 
         """
-        Compute the invoice status of a SO line. Possible statuses:
-        - no: if the SO is not in status 'sale' or 'done', we consider that there is nothing to
-          invoice. This is also hte default value if the conditions of no other status is met.
-        - to invoice: we refer to the quantity to invoice of the line. Refer to method
-          `_get_to_invoice_qty()` for more information on how this quantity is calculated.
-        - upselling: this is possible only for a product invoiced on ordered quantities for which
-          we delivered more than expected. The could arise if, for example, a project took more
-          time than expected but we decided not to invoice the extra cost to the client. This
-          occurs onyl in state 'sale', so that when a SO is set to done, the upselling opportunity
-          is removed from the list.
-        - invoiced: the quantity invoiced is larger or equal to the quantity ordered.
+        TBD
+
         """
 
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
@@ -347,7 +379,7 @@ class ReturnMaterialLine(models.Model):
             invoice_line.invoice_id.state != 'cancel')
 
     qty_to_invoice = fields.Float(
-        compute='_get_to_invoice_qty', string='To Invoice', store=True, readonly=True,
+        compute='_get_to_invoice_qty', string='待对账数量', store=True, readonly=True,
         digits=dp.get_precision('Product Unit of Measure'))
     qty_invoiced = fields.Float(
         compute='_get_invoice_qty', string='Invoiced', store=True, readonly=True,
@@ -374,10 +406,8 @@ class ReturnMaterialLine(models.Model):
             qty_invoiced = 0.0
             for invoice_line in line.invoice_lines:
                 if invoice_line.invoice_id.state != 'cancel':
-                    if invoice_line.invoice_id.type == 'out_invoice':
-                        qty_invoiced += invoice_line.uom_id._compute_quantity(invoice_line.quantity, line.product_uom)
-                    elif invoice_line.invoice_id.type == 'out_refund':
-                        qty_invoiced -= invoice_line.uom_id._compute_quantity(invoice_line.quantity, line.product_uom)
+                    qty_invoiced += invoice_line.uom_id._compute_quantity(invoice_line.quantity, line.product_uom)
+
             line.qty_invoiced = qty_invoiced
 
     @api.onchange('product_id')
@@ -411,7 +441,11 @@ class ReturnMaterialLine(models.Model):
         """
         self.ensure_one()
         res = {}
-        account = self.product_id.property_account_expense_id or self.product_id.categ_id.property_account_expense_categ_id
+        if self.rma_id.customer:
+            account = self.product_id.property_account_income_id or self.product_id.categ_id.property_account_income_categ_id
+        else:
+            account = self.product_id.property_account_expense_id or self.product_id.categ_id.property_account_expense_categ_id
+
         if not account:
             raise UserError(
                 _('Please define income account for this product: "%s" (id:%d) - or for its category: "%s".') % \
@@ -425,6 +459,7 @@ class ReturnMaterialLine(models.Model):
             'quantity': qty,
             'uom_id': self.product_uom.id,
             'product_id': self.product_id.id or False,
-            'invoice_line_tax_ids': [(6, 0, [self.tax_id.id])],
+            'invoice_line_tax_ids': [(4, self.tax_id.id)]
+
         }
         return res

@@ -5,12 +5,6 @@ from odoo.exceptions import UserError
 import odoo.addons.decimal_precision as dp
 
 
-class AccountInvoice(models.Model):
-    _inherit = 'account.invoice'
-
-    rma_id = fields.Many2one('return.goods')
-
-
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
