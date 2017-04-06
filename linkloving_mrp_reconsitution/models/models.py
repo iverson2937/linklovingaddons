@@ -413,7 +413,7 @@ class linkloving_sale_order_line_extend(models.Model):
             pos = self.env["purchase.order"].search([("origin", "ilike", self.order_id.name)])
             for po in pos:#SO2017040301269:MO/2017040322133, SO2017040301271:MO/2017040322137,
                 for line in po.order_line:
-                    if line.product_id == self.order_line.product_id and line.product_uom == self.order_id.product_id.uom_po_id:
+                    if line.product_id == self.product_id and line.product_uom == self.product_id.uom_po_id:
                         #找到原有的po_line 减掉数量
                         if line.product_qty > qty:
                             po_line = line.write({
