@@ -10,6 +10,4 @@ class MrpProduction(models.Model):
     @api.onchange('process_id')
     def onchange_process_id(self):
         if self.process_id.is_rework:
-            return {
-                'name'
-            }
+            pass
