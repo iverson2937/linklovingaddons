@@ -259,6 +259,7 @@
         <record id="picking_material_form" model="ir.ui.view">
             <field name="name">Picking Material Detail</field>
             <field name="model">mrp.production</field>
+            <field name="priority" eval="100"/>
             <field name="arch" type="xml">
                 <form string="Picking material detail">
                     <field name="sim_stock_move_lines" options="{'reload_on_button': True}">

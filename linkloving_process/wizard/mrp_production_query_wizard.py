@@ -27,7 +27,6 @@ class MrpProductionWizard(models.TransientModel):
         domain = [('date_planned_start', '>', start_date),
                   ('date_planned_start', '<', end_date), ('process_id', '=', self.process_id.id),
                   ('state', 'not in', ['cancel', 'draft', 'done'])]
-        print self.env['mrp.production'].search(domain).ids
 
         return {
             'name': _('Manufacturing Order'),

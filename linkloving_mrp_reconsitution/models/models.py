@@ -1,8 +1,68 @@
-# # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # from dateutil.relativedelta import relativedelta
-#
-# from odoo import models, fields, api
-#
+
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
+
+
+class StockBackorderConfirmation(models.TransientModel):
+    _inherit = 'stock.backorder.confirmation'
+
+    @api.one
+    def _process(self, cancel_backorder=False):
+        for pack in self.pick_id.pack_operation_ids:
+            if cancel_backorder:#如果取消欠单,就扣除剩余的所有数量
+                pack.product_id.qty_require -= pack.product_qty
+            else:
+                if pack.product_qty < pack.qty_done:#如果待办小于已完成 代表多出货
+                    pack.product_id.qty_require -= pack.product_qty
+                else:
+                    pack.product_id.qty_require -= pack.qty_done
+        return super(StockBackorderConfirmation, self)._process(cancel_backorder)
+
+
+class linkloving_product_extend(models.Model):
+    _inherit = "product.product"
+
+    qty_require = fields.Float(u"需求数量")
+
+class linkloving_production_extend1(models.Model):
+    _inherit = "mrp.production"
+
+    origin_sale_id = fields.Many2one("sale.order", string=u"源销售单据名称")
+    origin_mo_id = fields.Many2one("mrp.production", string=u"源生产单据名称")
+
+class linkloving_purchase_order_extend(models.Model):
+    _inherit = "purchase.order"
+
+    origin_sale_order_id = fields.Many2one("sale.order", string=u"源销售单据名称")
+    origin_mo_id = fields.Many2one("mrp.production", string=u"源生产单据名称")
+
+
+class linkloving_procurement_order_extend(models.Model):
+    _inherit = "procurement.order"
+
+    @api.multi
+    def make_mo(self):
+        """ Create production orders from procurements """
+        res = {}
+        Production = self.env['mrp.production']
+        for procurement in self:
+            ProductionSudo = Production.sudo().with_context(force_company=procurement.company_id.id)
+            bom = procurement._get_matching_bom()
+            if bom:
+                # create the MO as SUPERUSER because the current user may not have the rights to do it (mto product launched by a sale for example)
+                vals = procurement._prepare_mo_vals(bom)
+                if vals["product_qty"] == 0:
+                    print("dont need create mo")
+                    return {procurement.id : 1}
+                production = ProductionSudo.create(vals)
+                res[procurement.id] = production.id
+                procurement.message_post(body=_("Manufacturing Order <em>%s</em> created.") % (production.name))
+            else:
+                res[procurement.id] = False
+                procurement.message_post(body=_("No BoM exists for this product!"))
+        return res
 # # class linkloving_mrp_reconsitution(models.Model):
 # #     _name = 'linkloving_mrp_reconsitution.linkloving_mrp_reconsitution'
 #
@@ -13,7 +73,8 @@
 # #
 # #     @api.depends('value')
 # #     def _value_pc(self):
-# #         self.value2 = float(self.value) / 100
+# #         self.value2 = float(self.
+# ) / 100
 #
 # #需求量
 # from odoo.exceptions import UserError
@@ -282,19 +343,111 @@
 #     mrp_requirement_ids = fields.One2many("mrp.requirement", "product_id")
 #     require_qty = fields.Float(u"需求数量", compute="_compute_requirement_qty")
 #
-# class linkloving_sale_extend(models.Model):
-#     _inherit = "sale.order"
+class linkloving_sale_extend(models.Model):
+    _inherit = "sale.order"
+
+    def action_confirm(self):
+        self.order_line.set_qty_require()
+        return super(linkloving_sale_extend, self).action_confirm()
+
+    def action_cancel(self):
+        if self.state == "sale":
+            #剪掉需求量
+            self.order_line.rollback_qty_require()
+class linkloving_sale_order_line_extend(models.Model):
+    _inherit = "sale.order.line"
+
+    @api.multi
+    def rollback_qty_require(self):
+        for line in self:
+            bom = self.env['mrp.bom'].with_context(
+                    company_id=self.env.user.company_id.id, force_company=self.env.user.company_id.id
+                    )._bom_find(product=self.product_id)
+            boms, lines = bom.explode(line.product_id, line.get_actual_require_qty(line.product_id, line.product_qty), picking_type=bom.picking_type_id)
+            line.product_id.qty_require -= line.product_qty #先减少成品需求量,子阶的减不掉, 不知道上次需求量是多少
+            def recursion_bom(bom_lines, order_line):
+                    for b_line, data in bom_lines:
+                        if b_line.product_id.qty_require < data.get("qty"): #如果需求小于这次销售的数量
+                            b_line.product_id.qty_require = 0#增加bom的需求量  不是完全添加 得看父阶bom需求量多少
+                        else:
+                            b_line.product_id.qty_require -= data.get("qty")
+
+                        self.delete_mo_orders_mrp_made(data.get("qty"))
+                        self.update_po_ordes_mrp_made(data.get("qty"))
+
+                        print"%s : %d" % (b_line.product_id.name, b_line.product_id.qty_require)
+                        child_bom = b_line.child_bom_id
+                        if child_bom:
+                            boms, lines = child_bom.explode(child_bom.product_id, data.get("qty"), picking_type=child_bom.picking_type_id)
+                            recursion_bom(lines, line)
+            recursion_bom(lines, line)#递归bom
+
+
+    def delete_mo_orders_mrp_made(self, qty):# 删除所有由so生成的单据 mo,po..
+        if self.order_id:
+            mos = self.env["mrp.production"].search([("origin_sale_id", "=", self.order_id.id)])
+            for mo in mos:
+                if mo.state == "cancel":
+                    after_conbine_mo = self.env["mrp.production"].search([("source_mo_id", "=", mo.id)])#找到合并后的mo但
+                    if after_conbine_mo.state not in ["draft", "confirmed"]:
+                        raise UserError("该单据已经开始进入生产状态")
+                    else:
+                        qty_wizard = self.env['change.production.qty'].sudo().create({
+                                    'mo_id': after_conbine_mo.id,
+                                    'product_qty': qty,
+                                        })
+                        qty_wizard.change_prod_qty()
+            mos.action_cancel()#批量取消所有的生产订单
+        else:
+            raise UserError("重大错误")
+
+    def update_po_ordes_mrp_made(self, qty):
+        if self.order_id:
+            pos = self.env["purchase.order"].search([("origin", "ilike", self.order_id.name)])
+            for po in pos:#SO2017040301269:MO/2017040322133, SO2017040301271:MO/2017040322137,
+                for line in po.order_line:
+                    if line.product_id == self.order_line.product_id and line.product_uom == self.order_id.product_id.uom_po_id:
+                        #找到原有的po_line 减掉数量
+                        if line.product_qty > qty:
+                            po_line = line.write({
+                                'product_qty':  line.product_qty - qty,
+                                })
+                        else:
+                            line.unlink()
+
+    @api.multi
+    def set_qty_require(self):
+        for line in self:
+            bom = self.env['mrp.bom'].with_context(
+                    company_id=self.env.user.company_id.id, force_company=self.env.user.company_id.id
+                    )._bom_find(product=self.product_id)
+            boms, lines = bom.explode(line.product_id, line.get_actual_require_qty(line.product_id, line.product_qty), picking_type=bom.picking_type_id)
+            line.product_id.qty_require += line.product_qty #先增加成品需求量
+            def recursion_bom(bom_lines, order_line):
+                    for b_line, data in bom_lines:
+                        real_need = order_line.get_actual_require_qty(b_line.product_id, data.get("qty"))
+                        if real_need > 0:
+                            b_line.product_id.qty_require += real_need#增加bom的需求量  不是完全添加 得看父阶bom需求量多少
+                        print"%s : %d" % (b_line.product_id.name, b_line.product_id.qty_require)
+                        child_bom = b_line.child_bom_id
+                        if child_bom:
+                            boms, lines = child_bom.explode(child_bom.product_id, real_need, picking_type=child_bom.picking_type_id)
+                            recursion_bom(lines, line)
+            recursion_bom(lines, line)#递归bom
+
+    def get_actual_require_qty(self,product_id, require_qty_this_time):
+        ori_require_qty = product_id.qty_require  # 初始需求数量
+        real_require_qty = product_id.qty_require + require_qty_this_time   # 加上本次销售的需求数量
+        stock_qty = product_id.qty_available  # 库存数量
+
+        actual_need_qty = 0
+        if ori_require_qty > stock_qty and real_require_qty > stock_qty:  # 初始需求 > 库存  并且 现有需求 > 库存
+            actual_need_qty = require_qty_this_time
+        elif ori_require_qty <= stock_qty and real_require_qty > stock_qty:
+            actual_need_qty = real_require_qty - stock_qty
+
+        return actual_need_qty
 #
-#     def action_confirm(self):
-#         requirements = self.order_line._create_requirement_order()
-#         if requirements:
-#             for require in requirements:
-#                 require.run()
-#         return super(linkloving_sale_extend, self).action_confirm()
-#
-#
-# class linkloving_sale_order_line_extend(models.Model):
-#     _inherit = "sale.order.line"
 #
 #     @api.multi
 #     def _create_requirement_order(self):

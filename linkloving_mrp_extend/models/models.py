@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
 import datetime
+import types
+
 import jpush
 
 from odoo import models, fields, api, _
@@ -149,18 +151,16 @@ class MrpProductionExtend(models.Model):
     is_pending = fields.Boolean()
     ####
 
-    #sale_order_id
-    origin_sale_order_id = fields.Many2one('sale.order', compute='_compute_origin_sale_order_id')
 
-    @api.multi
-    def _compute_origin_sale_order_id(self):
-        def get_parent_move(move):
-            if move.move_dest_id:
-                return get_parent_move(move.move_dest_id)
-            return move
-        for production in self:
-            move = get_parent_move(production.move_finished_ids[0])
-            production.origin_sale_order_id = move.procurement_id and move.procurement_id.sale_line_id and move.procurement_id.sale_line_id.order_id.id or False
+    # @api.multi
+    # def _compute_origin_sale_order_id(self):
+    #     def get_parent_move(move):
+    #         if move.move_dest_id:
+    #             return get_parent_move(move.move_dest_id)
+    #         return move
+    #     for production in self:
+    #         move = get_parent_move(production.move_finished_ids[0])
+    #         production.origin_sale_order_id = move.procurement_id and move.procurement_id.sale_line_id and move.procurement_id.sale_line_id.order_id.id or False
     #####
     worker_line_ids = fields.One2many('worker.line', 'production_id')
     sim_stock_move_lines = fields.One2many('sim.stock.move', 'production_id')
@@ -330,6 +330,9 @@ class MrpProductionExtend(models.Model):
                     move.stock_moves[0].quantity_done = move.stock_moves[0].product_uom_qty
                 else:
                     move.stock_moves[0].quantity_done = move.quantity_ready
+
+                #备料完成,减去需求量
+                move.product_id.qty_require -= move.stock_moves[0].product_uom_qty
 
 
 
@@ -844,6 +847,9 @@ class ProcurementOrderExtend(models.Model):
 
     def _prepare_mo_vals(self, bom):
         res = super(ProcurementOrderExtend, self)._prepare_mo_vals(bom)
+        #解析原单据
+        self.parse_origin_and_update_dic(res)
+
         res.update({'state' : 'draft',
                     'process_id' : bom.process_id.id,
                     'unit_price' : bom.process_id.unit_price,
@@ -854,35 +860,40 @@ class ProcurementOrderExtend(models.Model):
                     })
         return res
 
+    def parse_origin_and_update_dic(self, dict):
+        #解析原单据
+        origin_names = self.origin.split(":")
+        sale_ret = self.env["sale.order"].search([("name", "in", origin_names)], limit=1)
+        mo_ret = self.env["mrp.production"].search([("name", "in", origin_names)], limit=1)
+
+        if sale_ret:
+            dict.update({'origin_order_id' : sale_ret.id})
+        if mo_ret:
+            dict.update({'origin_mo_id' : mo_ret.id})
+
     @api.multi
     def _prepare_purchase_order_line(self, po, supplier):
         product_new_qty = self.get_actual_require_qty()
         procurement_uom_po_qty = self.product_uom._compute_quantity(product_new_qty, self.product_id.uom_po_id)
         res = super(ProcurementOrderExtend, self)._prepare_purchase_order_line(po, supplier)
+
+        self.parse_origin_and_update_dic(res)
         res.update({
             "product_qty" : procurement_uom_po_qty
         })
         return res
+
     def get_actual_require_qty(self):
-        out_in = self.product_id.outgoing_qty - self.product_id.incoming_qty   # 需求数量A out - in
-        new_out_in = out_in + self.product_qty #减去本次销售的需求数量
+        ori_require_qty = self.product_id.qty_require - self.product_qty # 初始需求数量
+        real_require_qty = self.product_id.qty_require    # 加上本次销售的需求数量
         stock_qty = self.product_id.qty_available  # 库存数量
 
         actual_need_qty = 0
-        if new_out_in > 0:#如果大于0 代表需要补货
-            if new_out_in > stock_qty:#   库-A  库存不够
-                if stock_qty > out_in: # 上次库存够了,本次不够
-                    actual_need_qty = self.product_qty - stock_qty
-                else:
-                    actual_need_qty = self.product_qty
-        # else:
-        #     pass #不需要补货
-        #
-        # actual_need_qty = 0
-        # if ori_require_qty > stock_qty and real_require_qty > stock_qty:  # 初始需求 > 库存  并且 现有需求 > 库存
-        #     actual_need_qty = self.product_qty
-        # elif ori_require_qty <= stock_qty and real_require_qty > stock_qty:
-        #     actual_need_qty = self.product_qty - stock_qty
+        if ori_require_qty > stock_qty and real_require_qty > stock_qty:  # 初始需求 > 库存  并且 现有需求 > 库存
+            actual_need_qty = self.product_qty
+        elif ori_require_qty <= stock_qty and real_require_qty > stock_qty:
+            actual_need_qty = real_require_qty - stock_qty
+
         return actual_need_qty
 
 class MultiSetMTO(models.TransientModel):
