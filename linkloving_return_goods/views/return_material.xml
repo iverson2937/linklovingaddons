@@ -69,7 +69,7 @@
                                         </group>
                                     </form>
                                     <tree string="Sales Order Lines" editable="bottom">
-                                        <field name="product_id" string="产品"/>
+                                        <field name="product_id" string="产品" domain="[('sale_ok', '=', True)]"/>
                                         <field name="product_uom_qty" string="退货数量"/>
                                         <field name="qty_delivered" string="收到数量"/>
                                         <field name="product_uom" string="单位"/>
@@ -220,7 +220,7 @@
                                         </group>
                                     </form>
                                     <tree string="退货明细" editable="bottom">
-                                        <field name="product_id" string="产品"/>
+                                        <field name="product_id" string="产品" domain="[('purchase_ok', '=', True)]"/>
                                         <field name="product_uom_qty" string="退货数量"/>
                                         <field name="qty_delivered" string="收到数量"/>
                                         <field name="product_uom" string="单位"/>
