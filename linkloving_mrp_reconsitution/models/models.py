@@ -57,7 +57,8 @@ class linkloving_procurement_order_extend(models.Model):
             ProductionSudo = Production.sudo().with_context(force_company=procurement.company_id.id)
             bom = procurement._get_matching_bom()
             if bom:
-                # create the MO as SUPERUSER because the current user may not have the rights to do it (mto product launched by a sale for example)
+                # create the MO as SUPERUSER because the current user may not have the rights to do it
+                # (mto product launched by a sale for example)
                 vals = procurement._prepare_mo_vals(bom)
                 if vals["product_qty"] == 0:
                     print("dont need create mo")
@@ -69,6 +70,7 @@ class linkloving_procurement_order_extend(models.Model):
                 res[procurement.id] = False
                 procurement.message_post(body=_("No BoM exists for this product!"))
         return res
+
 # # class linkloving_mrp_reconsitution(models.Model):
 # #     _name = 'linkloving_mrp_reconsitution.linkloving_mrp_reconsitution'
 #
@@ -434,7 +436,6 @@ class linkloving_sale_order_line_extend(models.Model):
                         real_need = order_line.get_actual_require_qty(b_line.product_id, data.get("qty"))
                         if real_need > 0:
                             b_line.product_id.qty_require += real_need#增加bom的需求量  不是完全添加 得看父阶bom需求量多少
-                        print"%s : %d" % (b_line.product_id.name, b_line.product_id.qty_require)
                         child_bom = b_line.child_bom_id
                         if child_bom:
                             boms, lines = child_bom.explode(child_bom.product_id, real_need, picking_type=child_bom.picking_type_id)
