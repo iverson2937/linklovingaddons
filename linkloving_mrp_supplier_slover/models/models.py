@@ -157,7 +157,8 @@ class linkloving_procurement_order(models.Model):
                     break
             if not po_line:
                 vals = procurement._prepare_purchase_order_line(po, supplier)
-                self.env['purchase.order.line'].create(vals)
+                if vals.get("qty") > 0:
+                    self.env['purchase.order.line'].create(vals)
         return res
 
 

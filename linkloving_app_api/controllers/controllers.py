@@ -485,6 +485,10 @@ class LinklovingAppApi(http.Controller):
                 sim_stock_move.stock_moves[0].quantity_done = sim_stock_move.stock_moves[0].product_uom_qty
             else:
                 sim_stock_move.stock_moves[0].quantity_done = move['quantity_ready']
+
+            #备料完成,减去需求量
+            move.product_id.qty_require -= move.stock_moves[0].product_uom_qty
+
         try:
             mrp_production.post_inventory()
         except UserError, e:
