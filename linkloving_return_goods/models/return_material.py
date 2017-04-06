@@ -228,6 +228,24 @@ class ReturnMaterial(models.Model):
             if references.get(invoices.get(group_key)):
                 if order not in references[invoices[group_key]]:
                     references[invoice] = references[invoice] | order
+            for invoice in invoices.values():
+                if not invoice.invoice_line_ids:
+                    raise UserError(_('There is no invoicable line.'))
+                # If invoice is negative, do a refund invoice instead
+                if invoice.amount_untaxed < 0:
+                    invoice.type = 'out_refund'
+                    for line in invoice.invoice_line_ids:
+                        line.quantity = -line.quantity
+                # Use additional field helper function (for account extensions)
+                for line in invoice.invoice_line_ids:
+                    line._set_additional_fields(invoice)
+                # Necessary to force computation of taxes. In account_invoice, they are triggered
+                # by onchanges, which are not triggered when doing a create.
+                invoice.compute_taxes()
+                invoice.message_post_with_view('mail.message_origin_link',
+                                               values={'self': invoice, 'origin': references[invoice]},
+                                               subtype_id=self.env.ref('mail.mt_note').id)
+            return [inv.id for inv in invoices.values()]
 
     @api.multi
     def _prepare_invoice(self):
