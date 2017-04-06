@@ -867,7 +867,7 @@ class ProcurementOrderExtend(models.Model):
         mo_ret = self.env["mrp.production"].search([("name", "in", origin_names)], limit=1)
 
         if sale_ret:
-            dict.update({'origin_order_id' : sale_ret.id})
+            dict.update({'origin_sale_id' : sale_ret.id})
         if mo_ret:
             dict.update({'origin_mo_id' : mo_ret.id})
 
