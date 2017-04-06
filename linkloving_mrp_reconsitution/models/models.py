@@ -383,7 +383,6 @@ class linkloving_sale_order_line_extend(models.Model):
                         self.delete_mo_orders_mrp_made(data.get("qty"))
                         self.update_po_ordes_mrp_made(data.get("qty"))
 
-                        print"%s : %d" % (b_line.product_id.name, b_line.product_id.qty_require)
                         child_bom = b_line.child_bom_id
                         if child_bom:
                             boms, lines = child_bom.explode(child_bom.product_id, data.get("qty"), picking_type=child_bom.picking_type_id)
