@@ -26,6 +26,11 @@ class linkloving_product_extend(models.Model):
 
     qty_require = fields.Float(u"需求数量")
 
+class linkloving_product_product_extend(models.Model):
+    _inherit = "product.template"
+
+    qty_require = fields.Float(related="product_variant_id.qty_require")
+
 class linkloving_production_extend1(models.Model):
     _inherit = "mrp.production"
 
