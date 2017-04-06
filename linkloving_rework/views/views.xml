@@ -1,0 +1,59 @@
+<odoo>
+    <data>
+        <!-- explicit list view definition -->
+        <!--
+        <record model="ir.ui.view" id="linkloving_rework.list">
+          <field name="name">linkloving_rework list</field>
+          <field name="model">linkloving_rework.linkloving_rework</field>
+          <field name="arch" type="xml">
+            <tree>
+              <field name="name"/>
+              <field name="value"/>
+              <field name="value2"/>
+            </tree>
+          </field>
+        </record>
+        -->
+
+        <!-- actions opening views on models -->
+        <!--
+        <record model="ir.actions.act_window" id="linkloving_rework.action_window">
+          <field name="name">linkloving_rework window</field>
+          <field name="res_model">linkloving_rework.linkloving_rework</field>
+          <field name="view_mode">tree,form</field>
+        </record>
+        -->
+
+        <!-- server action to the one above -->
+        <!--
+        <record model="ir.actions.server" id="linkloving_rework.action_server">
+          <field name="name">linkloving_rework server</field>
+          <field name="model_id" ref="model_linkloving_rework_linkloving_rework"/>
+          <field name="code">
+            action = {
+              "type": "ir.actions.act_window",
+              "view_mode": "tree,form",
+              "res_model": self._name,
+            }
+          </field>
+        </record>
+        -->
+
+        <!-- Top menu item -->
+        <!--
+        <menuitem name="linkloving_rework" id="linkloving_rework.menu_root"/>
+        -->
+        <!-- menu categories -->
+        <!--
+        <menuitem name="Menu 1" id="linkloving_rework.menu_1" parent="linkloving_rework.menu_root"/>
+        <menuitem name="Menu 2" id="linkloving_rework.menu_2" parent="linkloving_rework.menu_root"/>
+        -->
+        <!-- actions -->
+        <!--
+        <menuitem name="List" id="linkloving_rework.menu_1_list" parent="linkloving_rework.menu_1"
+                  action="linkloving_rework.action_window"/>
+        <menuitem name="Server to list" id="linkloving_rework" parent="linkloving_rework.menu_2"
+                  action="linkloving_rework.action_server"/>
+        -->
+    </data>
+</odoo>

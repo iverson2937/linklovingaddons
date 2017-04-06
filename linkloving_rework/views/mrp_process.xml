@@ -1,0 +1,19 @@
+<odoo>
+    <data>
+
+
+        <record model="ir.ui.view" id="mrp_process_form">
+            <field name="name">mrp.process.form</field>
+            <field name="model">mrp.process</field>
+            <field name="inherit_id" ref="linkloving_process.mrp_process_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='is_outside']" position="after">
+                    <field name="is_rework"/>
+                </xpath>
+            </field>
+
+        </record>
+
+
+    </data>
+</odoo>
