@@ -509,7 +509,7 @@ class linkloving_sale_order_line_extend(models.Model):
                         [("state", "not in", ("cancel", "done"))])
                 qty_in_procure = 0
                 for mo in mos:
-                    qty += mo.product_qty
+                    qty_in_procure += mo.product_qty
                 if qty - qty_in_procure > 0:  # 需求量+最小存货-库存-在产数量
                     actual_need_qty = xuqiul + max(OrderPoint.product_min_qty,
                                                    OrderPoint.product_max_qty) - product_id.qty_available - qty_in_procure
