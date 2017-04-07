@@ -18,7 +18,8 @@
                     </button>
                 </div>
                 <xpath expr="//field[@name='origin']" position="after">
-                    <field name="process_id" options="{'no_create':True}" string="Process"/>
+                    <field name="process_id" options="{'no_create':True}" string="Process"
+                           attrs="{'readonly': [('has_moves', '=', True)]}"/>
                     <field name="mo_type" widget="radio" string="Type"/>
                     <field name="unit_price" string="单价/委外加工单价"
                            attrs="{'invisible':[('mo_type', '==', 'time')],'readonly':[('state', '!=', 'confirmed')]}"
