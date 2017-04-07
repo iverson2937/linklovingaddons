@@ -107,9 +107,9 @@ class ReturnMaterial(models.Model):
             # Search for refunds as well
             line_invoice_status = [line.invoice_status for line in order.line_ids]
 
-            if all(invoice_status == 'to invoice' for invoice_status in line_invoice_status):
+            if line_invoice_status and all(invoice_status == 'to invoice' for invoice_status in line_invoice_status):
                 invoice_status = 'to invoice'
-            elif all(invoice_status == 'invoiced' for invoice_status in line_invoice_status):
+            elif line_invoice_status and all(invoice_status == 'invoiced' for invoice_status in line_invoice_status):
                 invoice_status = 'invoiced'
             else:
                 invoice_status = 'no'
@@ -376,7 +376,7 @@ class ReturnMaterialLine(models.Model):
 
             if float_compare(line.qty_invoiced, line.product_uom_qty, precision_digits=precision) >= 0:
                 line.invoice_status = 'invoiced'
-            elif not float_is_zero(line.qty_to_invoice, precision_digits=precision):
+            elif line.qty_to_invoice and not float_is_zero(line.qty_to_invoice, precision_digits=precision):
                 line.invoice_status = 'to invoice'
             else:
                 line.invoice_status = 'no'

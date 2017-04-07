@@ -40,7 +40,8 @@
                                        options='{"no_create": True}' string="客户"/>
                                 <field name="partner_invoice_id" required='False'/>
                                 <field name="partner_shipping_id" required="False"/>
-                                <field name="so_id" string="参考订单号"/>
+                                <field name="so_id" string="参考订单号" options="{'no_create':True}"
+                                       domain="[('partner_id','=',partner_id)]"/>
                                 <field name="tracking_number" required="0"/>
                             </group>
                             <group>
@@ -190,7 +191,8 @@
                                        options='{"no_create": True}' string="供应商"/>
                                 <field name="partner_invoice_id" required='False'/>
                                 <field name="partner_shipping_id" required="False"/>
-                                <field name="purchase_id" string="参考订单号"/>
+                                <field name="purchase_id" string="参考订单号" options="{'no_create':True}"
+                                       domain="[('partner_id','=',partner_id)]"/>
                                 <field name="tracking_number" required="0"/>
                             </group>
                             <group>
@@ -295,7 +297,7 @@
                   sequence="14"/>
 
 
-        <record id="customer_invoice_refund" model="ir.actions.act_window">
+        <record id="action_customer_invoice_refund" model="ir.actions.act_window">
             <field name="name">退货对账单</field>
             <field name="res_model">account.invoice</field>
             <field name="view_type">form</field>
@@ -320,8 +322,36 @@
         </record>
 
 
-        <menuitem id="customer_invoice_refund" action="customer_invoice_refund"
+        <menuitem id="menu_customer_invoice_refund" action="action_customer_invoice_refund"
                   parent="sale.menu_sale_invoicing" sequence="2"/>
+
+        <record id="action_vendor_refund_bill" model="ir.actions.act_window">
+            <field name="name">退货对账单</field>
+            <field name="res_model">account.invoice</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+            <field eval="False" name="view_id"/>
+            <field name="domain">[('type','=','in_refund')]</field>
+            <field name="context">{'default_type':'in_invoice', 'type':'in_invoice', 'journal_type': 'purchase'}</field>
+            <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a vendor bill.
+                </p>
+                <p>
+                    Use this menu to control the invoices to be received from your
+                    vendors. When registering a new bill, set the purchase order
+                    and Odoo will fill the bill automatically according to ordered
+                    or received quantities.
+                </p>
+            </field>
+        </record>
+
+        <menuitem
+                id="menu_vendor_refund_bill"
+                action="action_vendor_refund_bill"
+                parent="purchase.menu_purchase_control"
+                sequence="14"/>
 
     </data>
 </odoo>

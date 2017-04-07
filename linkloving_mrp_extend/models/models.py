@@ -181,8 +181,8 @@ class MrpProductionExtend(models.Model):
         ('finish_prepare_material', _('Material Ready')),
         ('already_picking', _('Already Picking Material')),
         ('planned', 'Planned'),
-        ('progress', 'In Progress'),
-        ('waiting_quality_inspection',_('Waiting Quality Inspection')),
+        ('progress', '生产中'),
+        ('waiting_quality_inspection', _('Waiting Quality Inspection')),
         ('quality_inspection_ing', _('Under Quality Inspection')),
         ('waiting_rework',_('Waiting Rework')),
         ('rework_ing',_('Under Rework')),
@@ -261,7 +261,18 @@ class MrpProductionExtend(models.Model):
     def button_start_produce(self):
         self.write({'state': 'progress'})
 
-    #生产完成 等待品检
+    # 给委外供应商发料
+    def button_send_material_to_vendor(self):
+        return {
+            'name': u'填写物流单号',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'tracking.number.wizard',
+            'target': 'new',
+        }
+
+        # 生产完成 等待品检
+
     def button_produce_finish(self):
         if self.qty_produced == 0:
             raise UserError(_('These is not output,can not finish the order!'))
