@@ -438,6 +438,8 @@ class linkloving_sale_order_line_extend(models.Model):
             for mo in mos:
                 if mo.state == "cancel":
                     after_conbine_mo = self.env["mrp.production"].search([("source_mo_id", "=", mo.id)])#找到合并后的mo但
+                    if not after_conbine_mo:
+                        continue
                     if after_conbine_mo.state not in ["draft", "confirmed"]:
                         raise UserError("该单据已经开始进入生产状态")
                     else:
