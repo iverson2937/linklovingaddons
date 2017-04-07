@@ -31,8 +31,8 @@
                 <xpath expr="//field[@name='bom_id']" position="after">
                     <field name="is_outside" invisible="1"/>
                     <field name="supplier_id" attrs="{'invisible': [('is_outside', '=', False)],'required':[('is_outside','=',True)]}" string="委外供应商"
-                     options="{'no_create': True}"
-                    />
+                           options="{'no_create': True}"/>
+                    <field name="tracking_number" attrs="{'invisible': [('tracking_number', '=', False)]}"/>
 
                 </xpath>
                 <xpath expr="//field[@name='user_id']" position="replace">
