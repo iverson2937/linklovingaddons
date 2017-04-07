@@ -69,7 +69,12 @@ class linkloving_procurement_order(models.Model):
     def make_po(self):
         cache = {}
         res = []
+
         for procurement in self:
+            product_new_qty = self.get_actual_require_qty()
+            procurement_uom_po_qty = self.product_uom._compute_quantity(product_new_qty, self.product_id.uom_po_id)
+            if procurement_uom_po_qty <= 0:
+                continue
             suppliers = procurement.product_id.seller_ids.filtered(
                 lambda r: not r.product_id or r.product_id == procurement.product_id)
             supplier = None
@@ -160,9 +165,6 @@ class linkloving_procurement_order(models.Model):
                 vals = procurement._prepare_purchase_order_line(po, supplier)
                 if vals.get("product_qty") > 0:
                     self.env['purchase.order.line'].create(vals)
-                else:
-                    if not po.order_line:
-                        po.unlink()
         return res
 
 
