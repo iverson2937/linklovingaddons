@@ -950,3 +950,12 @@ class MultiSetMTO(models.TransientModel):
         products = self.env['product.template'].search([('id', 'in', active_ids)])
         for product in products:
             product.route_ids = [(2, self.env.ref('stock.route_warehouse0_mto').id)]
+
+
+class purchase_order_extend(models.Model):
+    _inherit = "purchase.order"
+
+    @api.multi
+    def change_state_to_rfq(self):
+        for po in self:
+            po.state = "draft"

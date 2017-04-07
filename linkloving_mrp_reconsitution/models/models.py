@@ -362,6 +362,7 @@ class linkloving_sale_extend(models.Model):
         if self.state == "sale":
             #剪掉需求量
             self.order_line.rollback_qty_require()
+        return super(linkloving_sale_extend, self).action_cancel()
 class linkloving_sale_order_line_extend(models.Model):
     _inherit = "sale.order.line"
 
@@ -383,7 +384,6 @@ class linkloving_sale_order_line_extend(models.Model):
                         self.delete_mo_orders_mrp_made(data.get("qty"))
                         self.update_po_ordes_mrp_made(data.get("qty"))
 
-                        print"%s : %d" % (b_line.product_id.name, b_line.product_id.qty_require)
                         child_bom = b_line.child_bom_id
                         if child_bom:
                             boms, lines = child_bom.explode(child_bom.product_id, data.get("qty"), picking_type=child_bom.picking_type_id)
@@ -414,7 +414,7 @@ class linkloving_sale_order_line_extend(models.Model):
             pos = self.env["purchase.order"].search([("origin", "ilike", self.order_id.name)])
             for po in pos:#SO2017040301269:MO/2017040322133, SO2017040301271:MO/2017040322137,
                 for line in po.order_line:
-                    if line.product_id == self.order_line.product_id and line.product_uom == self.order_id.product_id.uom_po_id:
+                    if line.product_id == self.product_id and line.product_uom == self.product_id.uom_po_id:
                         #找到原有的po_line 减掉数量
                         if line.product_qty > qty:
                             po_line = line.write({
@@ -428,7 +428,7 @@ class linkloving_sale_order_line_extend(models.Model):
         for line in self:
             bom = self.env['mrp.bom'].with_context(
                     company_id=self.env.user.company_id.id, force_company=self.env.user.company_id.id
-                    )._bom_find(product=self.product_id)
+                    )._bom_find(product=line.product_id)
             boms, lines = bom.explode(line.product_id, line.get_actual_require_qty(line.product_id, line.product_qty), picking_type=bom.picking_type_id)
             line.product_id.qty_require += line.product_qty #先增加成品需求量
             def recursion_bom(bom_lines, order_line):
