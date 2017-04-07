@@ -1053,7 +1053,8 @@
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='action_rfq_send']" position="after">
                     <button name="change_state_to_rfq" string="确认生成采购询价单" type="object"
-                            class="btn-primary oe_highlight" attrs="{'invisible':[('state', 'not in', ('make_by_mrp'))]}/>
+                            class="btn-primary oe_highlight"
+                            attrs="{'invisible':[('state', 'not in', ('make_by_mrp'))]}"/>
                 </xpath>
             </field>
         </record>

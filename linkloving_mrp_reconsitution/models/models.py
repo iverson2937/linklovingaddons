@@ -476,7 +476,7 @@ class linkloving_sale_order_line_extend(models.Model):
                     for b_line, data in bom_lines:
                         real_need = order_line.get_actual_require_qty(b_line.product_id, data.get("qty"))
                         if real_need > 0:
-                            b_line.product_id.qty_require += real_need#增加bom的需求量  不是完全添加 得看父阶bom需求量多少
+                            b_line.product_id.qty_require += data.get("qty")  # 增加bom的需求量  不是完全添加 得看父阶bom需求量多少
                         child_bom = b_line.child_bom_id
                         if child_bom:
                             boms, lines = child_bom.explode(child_bom.product_id, real_need, picking_type=child_bom.picking_type_id)
