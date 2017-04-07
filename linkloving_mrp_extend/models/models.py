@@ -901,14 +901,28 @@ class ProcurementOrderExtend(models.Model):
         all_parent_location_ids = self._find_parent_locations()
         rule = self._search_suitable_rule([('location_id', 'in', all_parent_location_ids.ids)])
         if rule.action == "manufacture":
-            ori_require_qty = self.product_id.qty_require - self.product_qty # 初始需求数量
-            real_require_qty = self.product_id.qty_require    # 加上本次销售的需求数量
-            stock_qty = self.product_id.qty_available  # 库存数量
+            if rule.procure_method == "make_to_order":
+                ori_require_qty = self.product_id.qty_require - self.product_qty  # 初始需求数量
+                real_require_qty = self.product_id.qty_require  # 加上本次销售的需求数量
+                stock_qty = self.product_id.qty_available  # 库存数量
 
-            if ori_require_qty > stock_qty and real_require_qty > stock_qty:  # 初始需求 > 库存  并且 现有需求 > 库存
-                actual_need_qty = self.product_qty
-            elif ori_require_qty <= stock_qty and real_require_qty > stock_qty:
-                actual_need_qty = real_require_qty - stock_qty
+                if ori_require_qty > stock_qty and real_require_qty > stock_qty:  # 初始需求 > 库存  并且 现有需求 > 库存
+                    actual_need_qty = self.product_qty
+                elif ori_require_qty <= stock_qty and real_require_qty > stock_qty:
+                    actual_need_qty = real_require_qty - stock_qty
+            else:
+                xuqiul = self.product_id.qty_require
+                OrderPoint = self.env['stock.warehouse.orderpoint'].search([("product_id", "=", self.product_id.id)],
+                                                                           limit=1)
+                qty = xuqiul + OrderPoint.product_min_qty - self.product_id.qty_available
+                mos = self.env["mrp.production"].search(
+                        [("product_id", "=", self.product_id.id), ("state", "not in", ("cancel", "done"))])
+                qty_in_procure = 0
+                for mo in mos:
+                    qty += mo.product_qty
+                if qty - qty_in_procure > 0:  # 需求量+最小存货-库存-在产数量
+                    actual_need_qty = xuqiul + max(OrderPoint.product_min_qty,
+                                                   OrderPoint.product_max_qty) - self.product_id.qty_available - qty_in_procure
 
         elif rule.action == "buy":
             xuqiul = self.product_id.qty_require
