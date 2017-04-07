@@ -506,7 +506,7 @@ class linkloving_sale_order_line_extend(models.Model):
                                                                            limit=1)
                 qty = xuqiul + OrderPoint.product_min_qty - product_id.qty_available
                 mos = self.env["mrp.production"].search(
-                        [("product_id", "=", product_id.id), ("state", "not in", ("cancel", "done"))])
+                        [("state", "not in", ("cancel", "done"))])
                 qty_in_procure = 0
                 for mo in mos:
                     qty += mo.product_qty
