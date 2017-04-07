@@ -186,7 +186,7 @@
                     </page>
                 </xpath>
 
-                <xpath expr="//field[@name='move_raw_ids']" position="replace">
+                <xpath expr="//field[@name='move_raw_ids']" position="before">
                     <field name="sim_stock_move_lines">
                         <tree editable="bottom" delete="0" decoration-warning="quantity_done&gt;product_uom_qty"
                               decoration-success="quantity_done>=product_uom_qty" create="0">
