@@ -469,7 +469,7 @@ class linkloving_sale_order_line_extend(models.Model):
         for line in self:
             bom = self.env['mrp.bom'].with_context(
                     company_id=self.env.user.company_id.id, force_company=self.env.user.company_id.id
-                    )._bom_find(product=line.product_id)
+            )._bom_find(product=line.product_id)
             boms, lines = bom.explode(line.product_id, line.get_actual_require_qty(line.product_id, line.product_qty), picking_type=bom.picking_type_id)
             line.product_id.qty_require += line.product_qty #先增加成品需求量
             def recursion_bom(bom_lines, order_line):

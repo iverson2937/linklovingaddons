@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','mrp','sales_team', 'linkloving_process', 'stock'],
+    'depends': ['base', 'mrp', 'sales_team', 'linkloving_process', 'stock'],
 
     # always loaded
     'data': [
@@ -30,6 +30,7 @@
         'views/templates.xml',
         'report/mrp_bom_structure_report_templates.xml',
         'report/mrp_production_templates.xml',
+        'wizard/tracking_number_wizard.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

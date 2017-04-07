@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-
-import datetime
-import time
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.addons import decimal_precision as dp
 
 

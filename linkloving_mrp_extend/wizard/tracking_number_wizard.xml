@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+        <record id="tracking_number_wizard_form_view" model="ir.ui.view">
+            <field name="name">tracking.number.wizard.form</field>
+            <field name="model">tracking.number.wizard</field>
+            <field name="arch" type="xml">
+                <form string="填写物流单号">
+                    <group>
+                        <field name="tracking_number" required="1"/>
+                    </group>
+                    <footer>
+                        <button string="确定" name="action_confirm" type="object" default_focus="1"
+                                class="btn-primary"/>
+                        <button string="取消" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+        <act_window id="action_mrp_production_combine"
+                    multi="True"
+                    key2="client_action_multi" name="Combine MO"
+                    res_model="mrp.production.combine" src_model="mrp.production"
+                    view_mode="form" target="new" view_type="form"/>
+
+    </data>
+</openerp>

@@ -67,6 +67,7 @@ class ReturnMaterial(models.Model):
 
     currency_id = fields.Many2one('res.currency', 'Currency', default=_get_default_currency_id, required=True)
 
+    @api.one
     @api.depends('line_ids.price_total')
     def _amount_all(self):
         """

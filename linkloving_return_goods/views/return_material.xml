@@ -294,5 +294,34 @@
                   id="menu_rma_purchase" parent="purchase.menu_procurement_management"
                   sequence="14"/>
 
+
+        <record id="customer_invoice_refund" model="ir.actions.act_window">
+            <field name="name">退货对账单</field>
+            <field name="res_model">account.invoice</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('linkloving_invoice_workflow.invoice_customer_tree')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('account.invoice_form')})]"/>
+            <field name="domain">[('type','=','out_refund')]</field>
+            <field name="context">{'default_type':'out_refund', 'type':'out_refund'}</field>
+            <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a vendor bill.
+                </p>
+                <p>
+                    Use this menu to control the invoices to be received from your
+                    vendors. When registering a new bill, set the purchase order
+                    and Odoo will fill the bill automatically according to ordered
+                    or received quantities.
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem id="customer_invoice_refund" action="customer_invoice_refund"
+                  parent="sale.menu_sale_invoicing" sequence="2"/>
+
     </data>
 </odoo>

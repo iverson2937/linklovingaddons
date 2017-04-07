@@ -11,6 +11,7 @@ class MrpProduction(models.Model):
     process_id = fields.Many2one('mrp.process', string=u'Process')
     is_outside = fields.Boolean(related='process_id.is_outside', store=True)
     supplier_id = fields.Many2one('res.partner', domain=[('supplier', '=', True)], string=u'加工商')
+    tracking_number = fields.Char(string=u'物料单号')
     unit_price = fields.Float()
 
     @api.multi
@@ -35,7 +36,7 @@ class MrpProduction(models.Model):
                 'name': self.name,
                 'origin': self.name,
                 'price_unit': self.unit_price,
-                'account_id': 15,
+                'account_id': 47,
                 'quantity': self.qty_produced,
                 'uom_id': self.product_id.uom_id.id,
                 'product_id': self.product_id.id,
