@@ -211,7 +211,7 @@
         </record>
 
         <record id="customer_invoice_pending" model="ir.actions.act_window">
-            <field name="name">Customer Invoice</field>
+            <field name="name">客户对账单</field>
             <field name="res_model">account.invoice</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
