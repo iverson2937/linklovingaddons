@@ -8,7 +8,8 @@
           <xpath expr="//form/header/button[@name='button_cancel']" position="before">
               <button name="check_product_has_supplier" class="oe_edit_only" string="Check Suppliers"
                       type="object" attrs="{'invisible':[('state', 'not in', ('draft', 'make_by_mrp'))]}"/>
-                </xpath>
+
+          </xpath>
             <xpath expr="//page/group/group/div/field[@name='date_planned']" position="replace">
               <field name="date_planned"  attrs="{'readonly': [('state', 'not in', ('draft', 'sent'))]}"/>
             </xpath>
