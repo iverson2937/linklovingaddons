@@ -3,6 +3,7 @@
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+from odoo.osv import expression
 
 
 class StockBackorderConfirmation(models.TransientModel):
@@ -366,6 +367,46 @@ class linkloving_sale_extend(models.Model):
 class linkloving_sale_order_line_extend(models.Model):
     _inherit = "sale.order.line"
 
+
+    def _search_suitable_rule(self, product_id, domain):
+        """ First find a rule among the ones defined on the procurement order
+        group; then try on the routes defined for the product; finally fallback
+        on the default behavior """
+        if self.get_warehouse():
+            domain = expression.AND([['|', ('warehouse_id', '=', self.get_warehouse().id), ('warehouse_id', '=', False)], domain])
+        Pull = self.env['procurement.rule']
+        res = self.env['procurement.rule']
+        if product_id.route_ids:
+            res = Pull.search(expression.AND([[('route_id', 'in', product_id.route_ids.ids)], domain]), order='route_sequence, sequence', limit=1)
+        if not res:
+            product_routes = product_id.route_ids | product_id.categ_id.total_route_ids
+            if product_routes:
+                res = Pull.search(expression.AND([[('route_id', 'in', product_routes.ids)], domain]), order='route_sequence, sequence', limit=1)
+        if not res:
+            warehouse_routes = self.get_warehouse().route_ids
+            if warehouse_routes:
+                res = Pull.search(expression.AND([[('route_id', 'in', warehouse_routes.ids)], domain]), order='route_sequence, sequence', limit=1)
+        if not res:
+            res = Pull.search(expression.AND([[('route_id', '=', False)], domain]), order='sequence', limit=1)
+        return res
+
+    def get_warehouse(self):
+        warehouse_ids = self.env['stock.warehouse'].search([('company_id', '=', self.env.user.company_id.id)], limit=1)
+        return warehouse_ids
+
+    def _find_parent_locations(self):
+        parent_locations = self.env['stock.location']
+        location = self.get_warehouse().lot_stock_id
+        while location:
+            parent_locations |= location
+            location = location.location_id
+        return parent_locations
+
+    def get_suitable_rule(self, product_id):
+        all_parent_location_ids = self._find_parent_locations()
+        rule = self._search_suitable_rule(product_id ,[('location_id', 'in', all_parent_location_ids.ids)])
+        return rule
+
     @api.multi
     def rollback_qty_require(self):
         for line in self:
@@ -414,7 +455,7 @@ class linkloving_sale_order_line_extend(models.Model):
             pos = self.env["purchase.order"].search([("origin", "ilike", self.order_id.name)])
             for po in pos:#SO2017040301269:MO/2017040322133, SO2017040301271:MO/2017040322137,
                 for line in po.order_line:
-                    if line.product_id == self.product_id and line.product_uom == self.product_id.uom_po_id:
+                    if line.product_id == self.product_id:
                         #找到原有的po_line 减掉数量
                         if line.product_qty > qty:
                             po_line = line.write({
@@ -443,18 +484,35 @@ class linkloving_sale_order_line_extend(models.Model):
             recursion_bom(lines, line)#递归bom
 
     def get_actual_require_qty(self,product_id, require_qty_this_time):
-        ori_require_qty = product_id.qty_require  # 初始需求数量
-        real_require_qty = product_id.qty_require + require_qty_this_time   # 加上本次销售的需求数量
-        stock_qty = product_id.qty_available  # 库存数量
-
         actual_need_qty = 0
-        if ori_require_qty > stock_qty and real_require_qty > stock_qty:  # 初始需求 > 库存  并且 现有需求 > 库存
-            actual_need_qty = require_qty_this_time
-        elif ori_require_qty <= stock_qty and real_require_qty > stock_qty:
-            actual_need_qty = real_require_qty - stock_qty
+
+        rule = self.get_suitable_rule(product_id)
+        if rule.action == "manufacture":
+            ori_require_qty = product_id.qty_require  # 初始需求数量
+            real_require_qty = product_id.qty_require + require_qty_this_time   # 加上本次销售的需求数量
+            stock_qty = product_id.qty_available  # 库存数量
+
+            if ori_require_qty > stock_qty and real_require_qty > stock_qty:  # 初始需求 > 库存  并且 现有需求 > 库存
+                actual_need_qty = require_qty_this_time
+            elif ori_require_qty <= stock_qty and real_require_qty > stock_qty:
+                actual_need_qty = real_require_qty - stock_qty
+
+        elif rule.action == "buy":
+            xuqiul = product_id.qty_require + require_qty_this_time
+            pos = self.env["purchase.order"].search([("state", "=", ("make_by_mrp","draft"))])
+            chose_po_lines = self.env["purchase.order.line"]
+            total_draft_order_qty = 0
+            for po in pos:
+                for po_line in po.order_line:
+                    if po_line.product_id.id == product_id.id:
+                        chose_po_lines += po_line
+                        total_draft_order_qty += po_line.product_qty
+                        break
+            if total_draft_order_qty + product_id.incoming_qty + product_id.qty_available - xuqiul < 0:
+                actual_need_qty = xuqiul - (total_draft_order_qty + product_id.incoming_qty + product_id.qty_available)
 
         return actual_need_qty
-#
+
 #
 #     @api.multi
 #     def _create_requirement_order(self):
