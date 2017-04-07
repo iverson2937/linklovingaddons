@@ -19,7 +19,8 @@ class StockMove(models.Model):
     _inherit = 'stock.move'
     rma_line_id = fields.Many2one('return.goods.line')
 
-    @api.one
+    @api.multi
     def action_done(self):
         super(StockMove, self).action_done()
-        self.rma_line_id._get_qty_delivered()
+        for move in self:
+            move.rma_line_id._get_qty_delivered()

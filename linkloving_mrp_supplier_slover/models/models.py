@@ -104,8 +104,9 @@ class linkloving_procurement_order(models.Model):
                 cache[domain] = po
             if not po:
                 vals = procurement._prepare_purchase_order(partner)
-                vals['state'] = "make_by_mrp"
+                # vals['state'] = "make_by_mrp"
                 po = self.env['purchase.order'].create(vals)
+                po.state = "make_by_mrp"
                 name = (procurement.group_id and (procurement.group_id.name + ":") or "") + (
                 procurement.name != "/" and procurement.name or procurement.move_dest_id.raw_material_production_id and procurement.move_dest_id.raw_material_production_id.name or "")
                 message = _(
@@ -159,6 +160,9 @@ class linkloving_procurement_order(models.Model):
                 vals = procurement._prepare_purchase_order_line(po, supplier)
                 if vals.get("product_qty") > 0:
                     self.env['purchase.order.line'].create(vals)
+                else:
+                    if not po.order_line:
+                        po.unlink()
         return res
 
 
