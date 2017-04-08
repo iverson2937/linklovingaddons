@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 # from dateutil.relativedelta import relativedelta
+from collections import defaultdict
 
-from odoo import models, fields, api, _
+from psycopg2._psycopg import OperationalError
+
+from odoo import models, fields, api, _, registry
 from odoo.exceptions import UserError
 from odoo.osv import expression
+from odoo.tools import float_compare, float_round, DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class StockBackorderConfirmation(models.TransientModel):
@@ -26,12 +30,13 @@ class linkloving_product_extend(models.Model):
     _inherit = "product.product"
 
     qty_require = fields.Float(u"需求数量")
-
+    is_trigger_by_so = fields.Boolean(default=False)
 
 class linkloving_product_product_extend(models.Model):
     _inherit = "product.template"
 
     qty_require = fields.Float(related="product_variant_id.qty_require")
+    is_trigger_by_so = fields.Boolean(default=False, related="product_variant_id.is_trigger_by_so")
 
 class linkloving_production_extend1(models.Model):
     _inherit = "mrp.production"
@@ -48,6 +53,228 @@ class linkloving_purchase_order_extend(models.Model):
 
 class linkloving_procurement_order_extend(models.Model):
     _inherit = "procurement.order"
+
+    def _search_suitable_rule_new(self, product_id, domain):
+        """ First find a rule among the ones defined on the procurement order
+        group; then try on the routes defined for the product; finally fallback
+        on the default behavior """
+        if self.get_warehouse():
+            domain = expression.AND(
+                    [['|', ('warehouse_id', '=', self.get_warehouse().id), ('warehouse_id', '=', False)], domain])
+        Pull = self.env['procurement.rule']
+        res = self.env['procurement.rule']
+        if product_id.route_ids:
+            res = Pull.search(expression.AND([[('route_id', 'in', product_id.route_ids.ids)], domain]),
+                              order='route_sequence, sequence', limit=1)
+        if not res:
+            product_routes = product_id.route_ids | product_id.categ_id.total_route_ids
+            if product_routes:
+                res = Pull.search(expression.AND([[('route_id', 'in', product_routes.ids)], domain]),
+                                  order='route_sequence, sequence', limit=1)
+        if not res:
+            warehouse_routes = self.get_warehouse().route_ids
+            if warehouse_routes:
+                res = Pull.search(expression.AND([[('route_id', 'in', warehouse_routes.ids)], domain]),
+                                  order='route_sequence, sequence', limit=1)
+        if not res:
+            res = Pull.search(expression.AND([[('route_id', '=', False)], domain]), order='sequence', limit=1)
+        return res
+
+    def get_warehouse(self):
+        warehouse_ids = self.env['stock.warehouse'].search([('company_id', '=', self.env.user.company_id.id)], limit=1)
+        return warehouse_ids
+
+    def _find_parent_locations_new(self):
+        parent_locations = self.env['stock.location']
+        location = self.get_warehouse().lot_stock_id
+        while location:
+            parent_locations |= location
+            location = location.location_id
+        return parent_locations
+
+    def get_suitable_rule(self, product_id):
+        all_parent_location_ids = self._find_parent_locations_new()
+        rule = self._search_suitable_rule_new(product_id, [('location_id', 'in', all_parent_location_ids.ids)])
+        return rule
+
+    def get_actual_require_qty_with_param(self, product_id, require_qty_this_time):
+        actual_need_qty = 0
+
+        rule = self.get_suitable_rule(product_id)
+
+        if rule.action == "manufacture":
+            if rule.procure_method == "make_to_order":
+                ori_require_qty = product_id.qty_require  # 初始需求数量
+                real_require_qty = product_id.qty_require + require_qty_this_time  # 加上本次销售的需求数量
+                stock_qty = product_id.qty_available  # 库存数量
+
+                if ori_require_qty > stock_qty and real_require_qty > stock_qty:  # 初始需求 > 库存  并且 现有需求 > 库存
+                    actual_need_qty = require_qty_this_time
+                elif ori_require_qty <= stock_qty and real_require_qty > stock_qty:
+                    actual_need_qty = real_require_qty - stock_qty
+            else:
+                product_id.is_trigger_by_so = True
+                xuqiul = product_id.qty_require + require_qty_this_time
+                OrderPoint = self.env['stock.warehouse.orderpoint'].search([("product_id", "=", product_id.id)],
+                                                                           limit=1)
+                qty = xuqiul + OrderPoint.product_min_qty - product_id.qty_available
+                mos = self.env["mrp.production"].search(
+                        [("product_id", "=", product_id.id), ("state", "not in", ("cancel", "done"))])
+                qty_in_procure = 0
+                for mo in mos:
+                    qty_in_procure += mo.product_qty
+                if qty - qty_in_procure > 0:  # 需求量+最小存货-库存-在产数量
+                    actual_need_qty = xuqiul + max(OrderPoint.product_min_qty,
+                                                   OrderPoint.product_max_qty) - product_id.qty_available - qty_in_procure
+
+        elif rule.action == "buy":
+            xuqiul = product_id.qty_require + require_qty_this_time
+            pos = self.env["purchase.order"].search([("state", "=", ("make_by_mrp", "draft"))])
+            chose_po_lines = self.env["purchase.order.line"]
+            total_draft_order_qty = 0
+            for po in pos:
+                for po_line in po.order_line:
+                    if po_line.product_id.id == product_id.id:
+                        chose_po_lines += po_line
+                        total_draft_order_qty += po_line.product_qty
+                        break
+            if total_draft_order_qty + product_id.incoming_qty + product_id.qty_available - xuqiul < 0:
+                actual_need_qty = xuqiul - (total_draft_order_qty + product_id.incoming_qty + product_id.qty_available)
+
+        return actual_need_qty
+
+    @api.model
+    def _procure_orderpoint_confirm(self, use_new_cursor=False, company_id=False):
+        """ Create procurements based on orderpoints.
+        :param bool use_new_cursor: if set, use a dedicated cursor and auto-commit after processing each procurement.
+            This is appropriate for batch jobs only.
+        """
+        if use_new_cursor:
+            cr = registry(self._cr.dbname).cursor()
+            self = self.with_env(self.env(cr=cr))
+
+        OrderPoint = self.env['stock.warehouse.orderpoint']
+        Procurement = self.env['procurement.order']
+        ProcurementAutorundefer = Procurement.with_context(procurement_autorun_defer=True)
+        procurement_list = []
+
+        orderpoints_noprefetch = OrderPoint.with_context(prefetch_fields=False).search(
+                company_id and [('company_id', '=', company_id)] or [],
+                order=self._procurement_from_orderpoint_get_order())
+        while orderpoints_noprefetch:
+            orderpoints = OrderPoint.browse(orderpoints_noprefetch[:1000].ids)
+            orderpoints_noprefetch = orderpoints_noprefetch[1000:]
+            orderpoint_need_recal = self.env['stock.warehouse.orderpoint']
+            # Calculate groups that can be executed together
+            location_data = defaultdict(
+                lambda: dict(products=self.env['product.product'], orderpoints=self.env['stock.warehouse.orderpoint'],
+                             groups=list()))
+            for orderpoint in orderpoints:
+                key = self._procurement_from_orderpoint_get_grouping_key([orderpoint.id])
+                location_data[key]['products'] += orderpoint.product_id
+                location_data[key]['orderpoints'] += orderpoint
+                location_data[key]['groups'] = self._procurement_from_orderpoint_get_groups([orderpoint.id])
+
+            for location_id, location_data in location_data.iteritems():
+                location_orderpoints = location_data['orderpoints']
+                product_context = dict(self._context, location=location_orderpoints[0].location_id.id)
+                substract_quantity = location_orderpoints.subtract_procurements_from_orderpoints()
+
+                for group in location_data['groups']:
+                    if group['to_date']:
+                        product_context['to_date'] = group['to_date'].strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+                    product_quantity = location_data['products'].with_context(product_context)._product_available()
+                    for orderpoint in location_orderpoints:
+                        try:
+                            op_product_virtual = product_quantity[orderpoint.product_id.id]['virtual_available']
+                            if op_product_virtual is None:
+                                continue
+                            if float_compare(op_product_virtual, orderpoint.product_min_qty,
+                                             precision_rounding=orderpoint.product_uom.rounding) <= 0:
+                                qty = max(orderpoint.product_min_qty, orderpoint.product_max_qty) - op_product_virtual
+                                remainder = orderpoint.qty_multiple > 0 and qty % orderpoint.qty_multiple or 0.0
+
+                                if float_compare(remainder, 0.0,
+                                                 precision_rounding=orderpoint.product_uom.rounding) > 0:
+                                    qty += orderpoint.qty_multiple - remainder
+
+                                if float_compare(qty, 0.0, precision_rounding=orderpoint.product_uom.rounding) < 0:
+                                    continue
+
+                                qty -= substract_quantity[orderpoint.id]
+                                qty_rounded = float_round(qty, precision_rounding=orderpoint.product_uom.rounding)
+                                if qty_rounded > 0:
+                                    new_procurement = ProcurementAutorundefer.create(
+                                            orderpoint._prepare_procurement_values(qty_rounded,
+                                                                                   **group['procurement_values']))
+                                    procurement_list.append(new_procurement)
+                                    if not orderpoint.product_id.is_trigger_by_so:  # 如果不是由so触发的最小存货规则
+                                        orderpoint_need_recal += orderpoint
+                                        orderpoint.product_id.is_trigger_by_so = False
+                                        bom = self.env['mrp.bom'].with_context(
+                                                company_id=self.env.user.company_id.id,
+                                                force_company=self.env.user.company_id.id
+                                        )._bom_find(product=orderpoint.product_id)
+
+                                        boms, lines = bom.explode(orderpoint.product_id, qty_rounded,
+                                                                  picking_type=bom.picking_type_id)
+
+                                        # orderpoint.product_id.qty_require += qty_rounded #先减少成品需求量,子阶的减不掉, 不知道上次需求量是多少
+                                        def recursion_bom(bom_lines):
+                                            for b_line, data in bom_lines:
+                                                real_need = self.get_actual_require_qty_with_param(b_line.product_id,
+                                                                                                   data.get("qty"))
+                                                if real_need > 0:
+                                                    b_line.product_id.qty_require += data.get("qty")
+                                                child_bom = b_line.child_bom_id
+                                                if child_bom:
+                                                    boms, lines = child_bom.explode(child_bom.product_id, real_need,
+                                                                                    picking_type=child_bom.picking_type_id)
+                                                    recursion_bom(lines)
+
+                                        recursion_bom(lines)  # 递归bom
+
+                                    new_procurement.message_post_with_view('mail.message_origin_link',
+                                                                           values={'self': new_procurement,
+                                                                                   'origin': orderpoint},
+                                                                           subtype_id=self.env.ref('mail.mt_note').id)
+                                    self._procurement_from_orderpoint_post_process([orderpoint.id])
+                                if use_new_cursor:
+                                    cr.commit()
+
+                        except OperationalError:
+                            if use_new_cursor:
+                                orderpoints_noprefetch += orderpoint.id
+                                cr.rollback()
+                                continue
+                            else:
+                                raise
+
+            try:
+                # TDE CLEANME: use record set ?
+                procurement_list.reverse()
+                procurements = self.env['procurement.order']
+                orderpoints_noprefetch += orderpoint_need_recal  # 重新
+                for p in procurement_list:
+                    procurements += p
+                procurements.run()
+                if use_new_cursor:
+                    cr.commit()
+            except OperationalError:
+                if use_new_cursor:
+                    cr.rollback()
+                    continue
+                else:
+                    raise
+
+            if use_new_cursor:
+                cr.commit()
+
+        if use_new_cursor:
+            cr.commit()
+            cr.close()
+        return {}
+
 
     @api.multi
     def make_mo(self):
@@ -422,8 +649,8 @@ class linkloving_sale_order_line_extend(models.Model):
                         else:
                             b_line.product_id.qty_require -= data.get("qty")
 
-                        self.delete_mo_orders_mrp_made(data.get("qty"))
                         self.update_po_ordes_mrp_made(data.get("qty"))
+                        self.delete_mo_orders_mrp_made(data.get("qty"))
 
                         child_bom = b_line.child_bom_id
                         if child_bom:
@@ -452,6 +679,23 @@ class linkloving_sale_order_line_extend(models.Model):
         else:
             raise UserError("重大错误")
 
+    # def get_yuan_cailiao(self):
+    #
+    #     def recursion_bom(bom_lines, order_line):
+    #                 for b_line, data in bom_lines:
+    #                     if b_line.product_id.qty_require < data.get("qty"): #如果需求小于这次销售的数量
+    #                         b_line.product_id.qty_require = 0#增加bom的需求量  不是完全添加 得看父阶bom需求量多少
+    #                     else:
+    #                         b_line.product_id.qty_require -= data.get("qty")
+    #
+    #                     self.update_po_ordes_mrp_made(data.get("qty"))
+    #                     self.delete_mo_orders_mrp_made(data.get("qty"))
+    #
+    #                     child_bom = b_line.child_bom_id
+    #                     if child_bom:
+    #                         boms, lines = child_bom.explode(child_bom.product_id, data.get("qty"), picking_type=child_bom.picking_type_id)
+    #                         recursion_bom(lines, line)
+    #
     def update_po_ordes_mrp_made(self, qty):
         if self.order_id:
             pos = self.env["purchase.order"].search([("origin", "ilike", self.order_id.name)])
@@ -501,6 +745,7 @@ class linkloving_sale_order_line_extend(models.Model):
                 elif ori_require_qty <= stock_qty and real_require_qty > stock_qty:
                     actual_need_qty = real_require_qty - stock_qty
             else:
+                product_id.is_trigger_by_so = True
                 xuqiul = product_id.qty_require + require_qty_this_time
                 OrderPoint = self.env['stock.warehouse.orderpoint'].search([("product_id", "=", product_id.id)],
                                                                            limit=1)
