@@ -27,6 +27,7 @@
         # 'security/ir.model.access.csv',
         'views/return_material.xml',
         'views/templates.xml',
+        'views/stock_picking.xml',
         'data/ir_sequence_data.xml'
     ],
     # only loaded in demonstration mode

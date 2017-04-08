@@ -1,0 +1,48 @@
+<odoo>
+    <data>
+
+        <record id="action_return_stock_picking_confirm" model="ir.actions.act_window">
+            <field name="name">退货入库确认</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">stock.picking</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('picking_type_code','=','incoming'),('state','=','validate'),('rma_id','!=',False)]
+            </field>
+            <field name="context">{'picking_type_code':'incoming'}</field>
+            <field name="help" type="html">
+                <p>
+                    没有要确认的退货入库确认。
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem action="action_return_stock_picking_confirm"
+                  id="menu_stock_picking_return_confirm" parent="sales_team.menu_sales"
+                  sequence="14"/>
+
+        <record id="action_stock_picking_confirm_outgoing_return" model="ir.actions.act_window">
+            <field name="name">退货出库确认</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">stock.picking</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('picking_type_code','=','outgoing'),('state','=','post'),('rma_id','!=',False)]
+            </field>
+            <field name="context">{'picking_type_code':'incoming'}</field>
+            <field name="help" type="html">
+                <p>
+                    没有要确认的退货出库确认。
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_stock_picking_confirm_outgoing_return" action="action_stock_picking_confirm_outgoing_return"
+                  parent="purchase.menu_purchase_control"
+                  sequence="6"/>
+
+    </data>
+</odoo>
+
+
