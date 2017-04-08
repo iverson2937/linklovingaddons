@@ -482,3 +482,9 @@ class ReturnMaterialLine(models.Model):
 
         }
         return res
+
+    @api.model
+    def default_get(self, fields):
+        res = super(ReturnMaterialLine, self).default_get(fields)
+        print res, 'ddddddddddddddddddd'
+        return res

@@ -10,7 +10,7 @@ class ReworkMaterialLine(models.Model):
     def _get_default_product_uom_id(self):
         return self.env['product.uom'].search([], limit=1, order='id').id
 
-    mo_id = fields.Many2one('mrp.production')
+    mo_id = fields.Many2one('mrp.production', on_delete="cascade")
 
     product_id = fields.Many2one(
         'product.product', 'Product', required=True)
