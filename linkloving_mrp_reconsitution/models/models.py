@@ -583,7 +583,7 @@ class linkloving_sale_extend(models.Model):
     _inherit = "sale.order"
 
     def action_confirm(self):
-        self.order_line.set_qty_require()
+        # self.order_line.set_qty_require()
         return super(linkloving_sale_extend, self).action_confirm()
 
     def action_cancel(self):
