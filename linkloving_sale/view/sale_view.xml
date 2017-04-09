@@ -22,6 +22,11 @@
                 <xpath expr="//field[@name='partner_invoice_id']" position="attributes">
                     <attribute name="domain">[('parent_id','=',partner_id),('type','=','invoice')]</attribute>
                 </xpath>
+                <xpath expr="//button[@name='action_cancel']" position="replace">
+                    <button name="action_cancel" states="draft,sent,sale" type="object" string="取消订单"
+                            confirm="确定取消订单吗？"/>
+                </xpath>
+
 
                 <xpath expr="//field[@name='validity_date']" position="replace">
                     <field name="validity_date" string="交货日期"/>
