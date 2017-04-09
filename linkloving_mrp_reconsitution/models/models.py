@@ -587,9 +587,9 @@ class linkloving_sale_extend(models.Model):
         return super(linkloving_sale_extend, self).action_confirm()
 
     def action_cancel(self):
-        if self.state == "sale":
+        # if self.state == "sale":
             #剪掉需求量
-            self.order_line.rollback_qty_require()
+        # self.order_line.rollback_qty_require()
         return super(linkloving_sale_extend, self).action_cancel()
 class linkloving_sale_order_line_extend(models.Model):
     _inherit = "sale.order.line"
