@@ -203,37 +203,15 @@ class linkloving_procurement_order_extend(models.Model):
 
                                 qty -= substract_quantity[orderpoint.id]
                                 qty_rounded = float_round(qty, precision_rounding=orderpoint.product_uom.rounding)
+                                rule = self.get_suitable_rule(orderpoint.product_id)
+                                if rule.action == "buy":
+                                    total_draft_order_qty = self.get_draft_po_qty(orderpoint.product_id)
+                                    qty_rounded -= total_draft_order_qty
                                 if qty_rounded > 0:
                                     new_procurement = ProcurementAutorundefer.create(
                                             orderpoint._prepare_procurement_values(qty_rounded,
                                                                                    **group['procurement_values']))
                                     procurement_list.append(new_procurement)
-                                    if not orderpoint.product_id.is_trigger_by_so:  # 如果不是由so触发的最小存货规则
-                                        orderpoint_need_recal += orderpoint
-                                        orderpoint.product_id.is_trigger_by_so = False
-                                        bom = self.env['mrp.bom'].with_context(
-                                                company_id=self.env.user.company_id.id,
-                                                force_company=self.env.user.company_id.id
-                                        )._bom_find(product=orderpoint.product_id)
-
-                                        boms, lines = bom.explode(orderpoint.product_id, qty_rounded,
-                                                                  picking_type=bom.picking_type_id)
-
-                                        # orderpoint.product_id.qty_require += qty_rounded #先减少成品需求量,子阶的减不掉, 不知道上次需求量是多少
-                                        def recursion_bom(bom_lines):
-                                            for b_line, data in bom_lines:
-                                                real_need = self.get_actual_require_qty_with_param(b_line.product_id,
-                                                                                                   data.get("qty"))
-                                                if real_need > 0:
-                                                    b_line.product_id.qty_require += data.get("qty")
-                                                child_bom = b_line.child_bom_id
-                                                if child_bom:
-                                                    boms, lines = child_bom.explode(child_bom.product_id, real_need,
-                                                                                    picking_type=child_bom.picking_type_id)
-                                                    recursion_bom(lines)
-
-                                        recursion_bom(lines)  # 递归bom
-
                                     new_procurement.message_post_with_view('mail.message_origin_link',
                                                                            values={'self': new_procurement,
                                                                                    'origin': orderpoint},
@@ -588,7 +566,7 @@ class linkloving_sale_extend(models.Model):
 
     def action_cancel(self):
         # if self.state == "sale":
-            #剪掉需求量
+        # 剪掉需求
         # self.order_line.rollback_qty_require()
         return super(linkloving_sale_extend, self).action_cancel()
 class linkloving_sale_order_line_extend(models.Model):

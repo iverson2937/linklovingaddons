@@ -977,6 +977,16 @@ class ProcurementOrderExtend(models.Model):
         })
         return res
 
+    def get_draft_po_qty(self, product_id):
+        pos = self.env["purchase.order"].search([("state", "in", ("make_by_mrp", "draft"))])
+        chose_po_lines = self.env["purchase.order.line"]
+        total_draft_order_qty = 0
+        for po in pos:
+            for po_line in po.order_line:
+                if po_line.product_id.id == product_id.id:
+                    chose_po_lines += po_line
+                    total_draft_order_qty += po_line.product_qty
+        return total_draft_order_qty
     def get_actual_require_qty(self):
         if not self.rule_id:
             all_parent_location_ids = self._find_parent_locations()
@@ -988,15 +998,7 @@ class ProcurementOrderExtend(models.Model):
             if OrderPoint.product_min_qty != 0 or OrderPoint.product_max_qty != 0:
                 extra_qty = self.product_id.outgoing_qty - self.product_id.incoming_qty - self.product_id.qty_available
         elif self.rule_id.action == "buy":
-            pos = self.env["purchase.order"].search([("state", "in", ("make_by_mrp", "draft"))])
-            chose_po_lines = self.env["purchase.order.line"]
-            total_draft_order_qty = 0
-            for po in pos:
-                for po_line in po.order_line:
-                    if po_line.product_id.id == self.product_id.id:
-                        chose_po_lines += po_line
-                        total_draft_order_qty += po_line.product_qty
-            extra_qty = total_draft_order_qty
+            extra_qty = self.get_draft_po_qty(self.product_id)
         sss = self.product_qty + self.product_id.outgoing_qty - self.product_id.incoming_qty - self.product_id.qty_available - extra_qty
         actual_need_qty = 0
         if sss > 0:
