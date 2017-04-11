@@ -17,7 +17,7 @@ class MrpProductionCancel(models.TransientModel):
         active_ids = context.get('active_ids', []) or []
 
         for record in self.env['mrp.production'].browse(active_ids):
-            if record.state in ['cancel','done']:
-                raise UserError(_("Only can cancel draft MO"))
+            # if record.state in ['cancel','done']:
+            #     raise UserError(_("Only can cancel draft MO"))
             record.action_cancel()
         return {'type': 'ir.actions.act_window_close'}
