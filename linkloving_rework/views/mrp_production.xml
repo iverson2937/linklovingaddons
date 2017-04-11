@@ -5,10 +5,13 @@
             <field name="model">mrp.production</field>
             <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
             <field name="arch" type="xml">
-
+                <xpath expr="//field[@name='product_qty']" position="after">
+                    <field name="is_rework" invisible="1"/>
+                </xpath>
                 <xpath expr="//notebook/page[1]" position="before">
-                    <page string="返工物料">
+                    <page string="返工物料" attrs="{'invisible': [('is_rework', '!=', True)]}">
                         <field name="rework_material_line_ids">
+
                             <tree editable="bottom">
                                 <field name="product_id" string="产品" domain="[]"/>
                                 <field name="product_uom_id" string="单位"/>
