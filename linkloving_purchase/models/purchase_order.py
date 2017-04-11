@@ -20,6 +20,12 @@ class PurchaseOrder(models.Model):
     remark = fields.Text(string='Remark')
     handle_date = fields.Datetime()
 
+    invoice_status = fields.Selection([
+        ('no', u'待出货'),
+        ('to invoice', u'待对账'),
+        ('invoiced', u'已对账完成'),
+    ], string=u'对账单状态', compute='_get_invoiced', store=True, readonly=True, copy=False, default='no')
+
     @api.depends('order_line.move_ids')
     def _compute_picking(self):
         for order in self:
