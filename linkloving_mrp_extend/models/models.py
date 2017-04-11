@@ -175,7 +175,7 @@ class MrpProductionExtend(models.Model):
     total_spent_money = fields.Float(default=0, compute='_compute_total_spent_money', string='Total Cost', )
     state = fields.Selection([
         ('draft', _('Draft')),
-        ('confirmed', 'Confirmed'),
+        ('confirmed', u'已排产'),
         ('waiting_material',_('Waiting Prepare Material')),
         ('prepare_material_ing',_('Material Preparing')),
         ('finish_prepare_material', _('Material Ready')),

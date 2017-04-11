@@ -9,7 +9,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//sheet" position="before">
                     <header>
-                        <button name="action_" type="object" states="draft" string="提交"
+                        <button name="action_post" type="object" states="draft" string="提交"
                                 class="oe_highlight"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,post,done" readonly="1"/>
                     </header>

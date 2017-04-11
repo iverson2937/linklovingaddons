@@ -11,3 +11,7 @@ class MrpBom(models.Model):
         ('post', u'提交'),
         ('done', u'正式')
     ], string=u'状态', default='draft')
+
+    @api.multi
+    def action_post(self):
+        self.state = 'done'
