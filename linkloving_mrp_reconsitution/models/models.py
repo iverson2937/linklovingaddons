@@ -47,9 +47,8 @@ class linkloving_production_extend1(models.Model):
 class linkloving_purchase_order_extend(models.Model):
     _inherit = "purchase.order"
 
-    origin_sale_order_id = fields.Many2one("sale.order", string=u"源销售单据名称")
+    origin_sale_id = fields.Many2one("sale.order", string=u"源销售单据名称")
     origin_mo_id = fields.Many2one("mrp.production", string=u"源生产单据名称")
-
 
 class linkloving_procurement_order_extend(models.Model):
     _inherit = "procurement.order"
@@ -200,7 +199,6 @@ class linkloving_procurement_order_extend(models.Model):
 
                                 if float_compare(qty, 0.0, precision_rounding=orderpoint.product_uom.rounding) < 0:
                                     continue
-
                                 qty -= substract_quantity[orderpoint.id]
                                 qty_rounded = float_round(qty, precision_rounding=orderpoint.product_uom.rounding)
                                 rule = self.get_suitable_rule(orderpoint.product_id)
