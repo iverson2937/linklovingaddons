@@ -1015,10 +1015,12 @@ class LinklovingAppApi(http.Controller):
                                                                                                                         'theoretical_qty',
                                                                                                                         ])
             for line in line_ids:
-                area = request.env['product.product'].sudo().browse(line['product_id'][0]).area_id
+                product_n = request.env['product.product'].sudo().browse(line['product_id'][0])
+                area = product_n.area_id
                 c = {
                     'id' :  line['product_id'][0] ,
                     'product_name' :  line['product_id'][1],
+                    'product_spec': product_n.product_specs,
                     'image_medium' : LinklovingAppApi.get_product_image_url(request.env['product.product'].sudo().browse(line['product_id'][0])[0], model='product.product'),
                     'area' : {
                         'id': area.id,
@@ -1227,7 +1229,7 @@ class LinklovingAppApi(http.Controller):
                 'name': product_tmpl.area_id.name,
                 'id': product_tmpl.area_id.id
             },
-            'product_specs': product_tmpl.product_specs,
+            'product_spec': product_tmpl.product_specs,
             'image_medium' : LinklovingAppApi.get_product_image_url(product_tmpl, model='product.template'),
             'qty_available' : product_tmpl.qty_available,
             'virtual_available' : product_tmpl.virtual_available,

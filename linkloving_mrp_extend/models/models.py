@@ -606,8 +606,9 @@ class ReturnOfMaterial(models.Model):
     def _default_return_line(self):
         if self._context.get('active_id'):
             mrp_production_order = self.env['mrp.production'].browse(self._context['active_id'])
-            product_ids = mrp_production_order.product_id.bom_ids[0].bom_line_ids.mapped(
-            'product_id').ids
+            if mrp_production_order.product_id.bom_ids:
+                product_ids = mrp_production_order.product_id.bom_ids[0].bom_line_ids.mapped(
+                        'product_id').ids
             lines = []
             for l in product_ids:
                 obj = self.env['return.material.line'].create({
@@ -1059,9 +1060,11 @@ class MultiSetMTO(models.TransientModel):
     def action_ok(self):
         context = dict(self._context or {})
         active_ids = context.get('active_ids', []) or []
+        is_checked = context.get('is_checked', [])
         products = self.env['product.template'].search([('id','in', active_ids)])
+        insert_type = 4 if is_checked else 2
         for product in products:
-            product.route_ids = [(2 ,self.env.ref('stock.route_warehouse0_mto').id)]
+            product.route_ids = [(insert_type, self.env.ref('stock.route_warehouse0_mto').id)]
 
 
 

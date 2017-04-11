@@ -965,7 +965,11 @@
                         是否将产品批量设置成 按订单生成
                     </p>
                     <footer>
-                        <button string="确定" name="action_ok" type="object" default_focus="1"
+                        <button string="打勾按订单生成" name="action_ok" type="object" default_focus="1"
+                                context="{'is_checked':1}"
+                                class="btn-primary"/>
+                        <button string="取消按订单生成" name="action_ok" type="object" default_focus="1"
+                                context="{'is_checked':0}"
                                 class="btn-primary"/>
                         <button string="Cancel" class="btn-default" special="cancel"/>
                     </footer>
