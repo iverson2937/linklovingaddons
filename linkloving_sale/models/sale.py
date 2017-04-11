@@ -40,6 +40,13 @@ class SaleOrder(models.Model):
         self.mapped('order_line')._compute_amount()
         return result
 
+    invoice_status = fields.Selection([
+        ('upselling', u'超售商机'),
+        ('invoiced', u'已对账完成'),
+        ('to invoice', u'待对账'),
+        ('no', u'待出货')
+    ], string=u'对账单状态', compute='_get_invoiced', store=True, readonly=True)
+
     @api.multi
     def order_lines_layouted(self):
         """
