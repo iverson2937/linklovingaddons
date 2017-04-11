@@ -926,10 +926,20 @@ class LinklovingAppApi(http.Controller):
         domain = []
         if condition:
             domain.append(('name', 'ilike', condition))
-        areas = request.env['stock.location.area'].sudo().search_read(domain)
-
+        areas = request.env['stock.location.area'].sudo().search(domain)
+        areas_json = []
+        for area in areas:
+            areas_json.append(LinklovingAppApi.get_area_json(area))
         return JsonResponse.send_response(STATUS_CODE_OK,
-                                          res_data=areas)
+                                          res_data=areas_json)
+
+    @classmethod
+    def get_area_json(cls, area):
+        data = {
+            "area_id": area.id,
+            "area_name": area.name
+        }
+        return data
 
     #所有关于交接信息的处理
     @http.route('/linkloving_app_api/upload_note_info', type='json', auth='none', csrf=False)
@@ -958,27 +968,31 @@ class LinklovingAppApi(http.Controller):
         stock_inventory_lines = request.jsonrequest.get('line_ids')
         name = request.jsonrequest.get('name')
         new_lines = []
-        for line in stock_inventory_lines:
-            product_obj = LinklovingAppApi.get_model_by_id(line['product']['product_id'],request,'product.product')
-            line['product_uom_id'] = product_obj.uom_id.id
-            product_obj.area_id = line['product']['area']['area_id']
-            if line['product'].get('image_medium'):
-                image_str = line['product'].get('image_medium')
-                print 'image_str:%s' % image_str[0:16]
-                try:
-                    product_obj.product_tmpl_id.image_medium = image_str
-                except Exception, e:
-                    print "exception catch %s" % image_str[0:16]
-            location_id = request.env.ref('stock.stock_location_stock', raise_if_not_found=False).id
+        try:
+            for line in stock_inventory_lines:
+                product_obj = LinklovingAppApi.get_model_by_id(line['product']['product_id'], request,
+                                                               'product.product')
+                line['product_uom_id'] = product_obj.uom_id.id
+                product_obj.area_id = line['product']['area']['area_id']
+                if line['product'].get('image_medium'):
+                    image_str = line['product'].get('image_medium')
+                    print 'image_str:%s' % image_str[0:16]
+                    try:
+                        product_obj.product_tmpl_id.image_medium = image_str
+                    except Exception, e:
+                        print "exception catch %s" % image_str[0:16]
+                location_id = request.env.ref('stock.stock_location_stock', raise_if_not_found=False).id
 
-            new_line = {
-                'product_id' : product_obj.id,
-                'product_uom_id' : product_obj.uom_id.id,
-                'location_id' : location_id,
-                'product_qty' : line['product_qty']
-            }
-            new_lines.append((0, 0, new_line))
-
+                new_line = {
+                    'product_id': product_obj.id,
+                    'product_uom_id': product_obj.uom_id.id,
+                    'location_id': location_id,
+                    'product_qty': line['product_qty']
+                }
+                new_lines.append((0, 0, new_line))
+        except:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={"error": "数据提交异常"})
         try:
             inventory = request.env['stock.inventory'].sudo().create({
                 'name': name,
