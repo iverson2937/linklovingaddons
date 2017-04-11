@@ -197,28 +197,42 @@ class LinklovingAppApi(http.Controller):
         # user_data = LinklovingAppApi.odoo10.execute('res.users', 'read', [LinklovingAppApi.odoo10.env.user.id])
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
+    @http.route('/linkloving_app_api/get_process_list', type='json', auth='none', csrf=False)
+    def get_process_list(self, **kw):
+        process_list = request.env['mrp.process'].sudo().search([])
+        process_json = []
+        for process in process_list:
+            process_json.append(LinklovingAppApi.get_process_json(process))
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=process_json)
+
+    @classmethod
+    def get_process_json(cls, process):
+        return {"process_id": process.id,
+                "name": process.name}
+
     @http.route('/linkloving_app_api/get_recent_production_order', type='json', auth='none', csrf=False)
     def get_recent_production_order(self, **kw):
         # today_time = fields.datetime.now()
-        limit = request.jsonrequest.get('limit')
-        offset = request.jsonrequest.get('offset')
-        is_tomorrow = request.jsonrequest.get('is_tomorrow')
-        today = self.getYesterday()
-        today_time = fields.datetime.strptime(today, '%Y-%m-%d')
+        # limit = request.jsonrequest.get('limit')
+        # offset = request.jsonrequest.get('offset')
+        date_to_show = request.jsonrequest.get("date")
+        process_id = request.jsonrequest.get("process_id")
         one_days_after = datetime.timedelta(days=1)
-        after_day = None
-        if is_tomorrow:#如果取得是明天的
-            one_millisec_before = datetime.timedelta(milliseconds=1)  #
-            today_time = today_time - one_millisec_before  # 今天的最后一秒
-            after_day = today_time + one_days_after
-        else:
-            one_millisec_before = datetime.timedelta(milliseconds=-1, days=1)  #
-            today_time = today_time + one_millisec_before  # 今天的最后一秒
-            after_day = today_time + one_days_after
+        today_time = fields.datetime.strptime(date_to_show, '%Y-%m-%d')
+        one_millisec_before = datetime.timedelta(milliseconds=1)  #
+        today_time = today_time - one_millisec_before  # 今天的最后一秒
+        after_day = today_time + one_days_after
 
         timez = fields.datetime.now() - fields.datetime.utcnow()
+        if not process_id:
+            return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "未找到工序id"})
 
-        orders = request.env['mrp.production'].sudo().search([('date_planned_start', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')), ('state', '=', 'waiting_material')], limit=limit, offset=offset)
+        orders = request.env['mrp.production'].sudo().search([
+            ('date_planned_start', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
+            ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
+            ('state', '=', 'waiting_material'),
+            ('process_id', '=', process_id)])
         data = []
         for production in orders:
             dict = {
@@ -242,7 +256,7 @@ class LinklovingAppApi(http.Controller):
 
     def getYesterday(self):  #
         today = datetime.date.today()
-        oneday = datetime.timedelta(days=1)
+        oneday = datetime.timedelta(seconds=1)
         yesterday = today + oneday
         return str(yesterday)
 
