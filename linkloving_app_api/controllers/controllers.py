@@ -815,7 +815,7 @@ class LinklovingAppApi(http.Controller):
             if l.get('area_id'):
                 l['area_id'] = {
                     'area_id': l.get('area_id')[0] or 0,
-                    'name' : l.get('area_id')[1] or '',
+                    'area_name': l.get('area_id')[1] or '',
                 }
             else:
                 l.pop('area_id')
@@ -830,7 +830,7 @@ class LinklovingAppApi(http.Controller):
                 'product_name' : production.product_id.display_name,
                 'area_id' : {
                     'area_id' : production.product_id.area_id.id,
-                    'name' : production.product_id.area_id.name,
+                    'area_name': production.product_id.area_id.name,
                 }
             },
             'date_planned_start' : production.date_planned_start,
@@ -849,7 +849,7 @@ class LinklovingAppApi(http.Controller):
             },
             'prepare_material_area_id' : {
                 'area_id' : production.prepare_material_area_id.id,
-                'name' : production.prepare_material_area_id.name,
+                'area_name': production.prepare_material_area_id.name,
             },
             'prepare_material_img': LinklovingAppApi.get_prepare_material_img_url(production.id),
             'is_pending' :  production.is_pending,
@@ -884,7 +884,7 @@ class LinklovingAppApi(http.Controller):
                     'product_spec' : product_s.product_specs,
                     'area' : {
                         'area_id' : product_s.area_id.id,
-                        'name' : product_s.area_id.name,
+                        'area_name': product_s.area_id.name,
                     }
                 }
             }
@@ -1023,7 +1023,7 @@ class LinklovingAppApi(http.Controller):
                     'product_spec': product_n.product_specs,
                     'image_medium' : LinklovingAppApi.get_product_image_url(request.env['product.product'].sudo().browse(line['product_id'][0])[0], model='product.product'),
                     'area' : {
-                        'id': area.id,
+                        'area_id': area.id,
                         'area_name': area.name
                     }
                 }
@@ -1226,8 +1226,8 @@ class LinklovingAppApi(http.Controller):
             'inner_code': product_tmpl.inner_code,
             'inner_spec': product_tmpl.inner_spec,
             'area_id': {
-                'name': product_tmpl.area_id.name,
-                'id': product_tmpl.area_id.id
+                'area_name': product_tmpl.area_id.name,
+                'area_id': product_tmpl.area_id.id
             },
             'product_spec': product_tmpl.product_specs,
             'image_medium' : LinklovingAppApi.get_product_image_url(product_tmpl, model='product.template'),
@@ -1387,7 +1387,7 @@ class LinklovingAppApi(http.Controller):
                     'name': pack.product_id.name,
                     'area_id' : {
                         'area_id' : pack.product_id.area_id.id,
-                        'name' : pack.product_id.area_id.name or '',
+                        'area_name': pack.product_id.area_id.name or '',
                     }
                 },
                 'product_qty' : pack.product_qty,
@@ -1408,7 +1408,7 @@ class LinklovingAppApi(http.Controller):
             'post_area_id':
                 {
                     'area_id' : stock_picking_obj.post_area_id.id,
-                    'name' : stock_picking_obj.post_area_id.name,
+                    'area_name': stock_picking_obj.post_area_id.name,
                 }
         }
         return data
