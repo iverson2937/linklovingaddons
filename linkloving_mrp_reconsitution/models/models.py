@@ -9,23 +9,6 @@ from odoo.exceptions import UserError
 from odoo.osv import expression
 from odoo.tools import float_compare, float_round, DEFAULT_SERVER_DATETIME_FORMAT
 
-
-class StockBackorderConfirmation(models.TransientModel):
-    _inherit = 'stock.backorder.confirmation'
-
-    @api.one
-    def _process(self, cancel_backorder=False):
-        for pack in self.pick_id.pack_operation_ids:
-            if cancel_backorder:#如果取消欠单,就扣除剩余的所有数量
-                pack.product_id.qty_require -= pack.product_qty
-            else:
-                if pack.product_qty < pack.qty_done:#如果待办小于已完成 代表多出货
-                    pack.product_id.qty_require -= pack.product_qty
-                else:
-                    pack.product_id.qty_require -= pack.qty_done
-        return super(StockBackorderConfirmation, self)._process(cancel_backorder)
-
-
 class linkloving_product_extend(models.Model):
     _inherit = "product.product"
 
