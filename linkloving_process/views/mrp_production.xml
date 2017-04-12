@@ -28,6 +28,10 @@
                            attrs="{'invisible':[('mo_type', '==', 'unit')],'readonly':[('state', '!=', 'confirmed')]}"
                     />
                 </xpath>
+
+                <xpath expr="//field[@name='date_planned_start']" position="attributes">
+                    <attribute name="string">交期</attribute>
+                </xpath>
                 <xpath expr="//field[@name='bom_id']" position="after">
                     <field name="is_outside" invisible="1"/>
                     <field name="supplier_id" attrs="{'invisible': [('is_outside', '=', False)],'required':[('is_outside','=',True)]}" string="委外供应商"
@@ -56,6 +60,11 @@
                 </xpath>
                 <xpath expr="//field[@name='state']" position="replace">
                     <field name="state" string="Status"/>
+                </xpath>
+
+
+                <xpath expr="//field[@name='date_planned_start']" position="attributes">
+                    <attribute name="string">交期</attribute>
                 </xpath>
 
             </field>
