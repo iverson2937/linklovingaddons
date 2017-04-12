@@ -10,6 +10,9 @@
                 <field name="name" position="after">
                     <field name="product_specs"/>
                 </field>
+                <xpath expr="//field[@name='default_code']" position="attributes">
+                    <attribute name="string">料号</attribute>
+                </xpath>
             </field>
         </record>
         <!-- INHERITED FORM -->
@@ -29,6 +32,7 @@
                 </xpath>
                 <xpath expr="//field[@name='barcode']" position="after">
                     <field name="product_specs"/>
+                    <field name="description"/>
                 </xpath>
 
             </field>
