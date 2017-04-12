@@ -33,3 +33,7 @@ class CreateOrderPointWizard(models.TransientModel):
     def action_create_in_aboard_rule(self):
         products = self.env["product.product"].search([("inner_spec", "!=", False)])
         products.create_reorder_rule()
+
+
+class ProductTemplateExtend(models.Model):
+    _inherit = "product.template"

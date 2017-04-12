@@ -1526,3 +1526,16 @@ class LinklovingAppApi(http.Controller):
             return 'group_purchase_user'
         elif type == 'purchase_manager':#采购管理员
             return 'group_purchase_manager'
+
+    @http.route('/linkloving_app_api/load_needaction', type='json', auth="none", csrf=False)
+    def ll_load_needaction(self):
+        """ Loads needaction counters for specific menu ids.
+
+            :return: needaction data
+            :rtype: dict(menu_id: {'needaction_enabled': boolean, 'needaction_counter': int})
+        """
+        menu_ids = request.jsonrequest.get("menu_ids")
+        if menu_ids:
+            needaction_data = request.env['ir.ui.menu'].browse(menu_ids).get_needaction_data()
+            return JsonResponse.send_response(STATUS_CODE_OK,
+                                              res_data=needaction_data)
