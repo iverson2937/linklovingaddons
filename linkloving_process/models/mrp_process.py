@@ -9,6 +9,7 @@ from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 class MrpProcess(models.Model):
     _name = 'mrp.process'
+    _order = 'sequence , name'
     name = fields.Char(string=u'Name')
     description = fields.Text(string=u'Description')
     unit_price = fields.Float(string=u'Price Unit')
@@ -24,6 +25,7 @@ class MrpProcess(models.Model):
     count_mo_after_tomorrow = fields.Integer(compute='_compute_process_count')
     count_mo_others = fields.Integer(compute='_compute_process_count')
     is_outside = fields.Boolean(string=u'是否为委外')
+    sequence = fields.Integer()
 
     def _today(self):
         print (datetime.date.today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')

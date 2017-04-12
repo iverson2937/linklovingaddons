@@ -21,6 +21,7 @@
                         <group>
                             <group>
                                 <field name="name"/>
+                                <field name="sequence" string="序号"/>
                                 <field name="description"/>
                                 <field name="is_outside"/>
                                 <field name="partner_id" options="{'no_create':True}"
