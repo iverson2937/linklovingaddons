@@ -839,6 +839,7 @@ class LinklovingAppApi(http.Controller):
             'product_id' : {
                 'product_id' : production.product_id.id,
                 'product_name' : production.product_id.display_name,
+                'product_ll_type': production.product_id.product_ll_type or '',
                 'area_id' : {
                     'area_id' : production.product_id.area_id.id,
                     'area_name': production.product_id.area_id.name,

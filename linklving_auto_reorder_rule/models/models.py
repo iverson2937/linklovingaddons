@@ -25,18 +25,27 @@ class ProductProduct(models.Model):
                 for reorder_rule in reorder_rules:
                     reorder_rule.write(reorder_vals)
 
-    @api.model
-    def create(self, vals):
 
-        return_create = super(ProductProduct, self).create(vals)
+                    # @api.model
+                    # def create(self, vals):
+                    #
+                    #     return_create = super(ProductProduct, self).create(vals)
+                    #
+                    #     if return_create:
+                    #         return_create.create_reorder_rule()
+                    #
+                    #         return return_create
+                    #
+                    # @api.multi
+                    # def write(self, vals):
+                    #     res = super(ProductProduct, self).write(vals)
+                    #     self.create_reorder_rule()
+                    #     return res
 
-        if return_create:
-            return_create.create_reorder_rule()
 
-            return return_create
+class CreateOrderPointWizard(models.TransientModel):
+    _name = "create.order.point"
 
-    @api.multi
-    def write(self, vals):
-        res = super(ProductProduct, self).write(vals)
-        self.create_reorder_rule()
-        return res
+    def action_create_in_aboard_rule(self):
+        products = self.env["product.product"].search([("inner_spec", "!=", False)])
+        products.create_reorder_rule()

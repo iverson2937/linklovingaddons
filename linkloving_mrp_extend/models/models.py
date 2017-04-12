@@ -989,6 +989,8 @@ class ProcurementOrderExtend(models.Model):
                     total_draft_order_qty += po_line.product_qty
         return total_draft_order_qty
     def get_actual_require_qty(self):
+        cur = datetime.datetime.now()
+        print "-------------start time: %s" % cur
         if not self.rule_id:
             all_parent_location_ids = self._find_parent_locations()
             self.rule_id = self._search_suitable_rule([('location_id', 'in', all_parent_location_ids.ids)])
@@ -1004,6 +1006,9 @@ class ProcurementOrderExtend(models.Model):
         actual_need_qty = 0
         if sss > 0:
             actual_need_qty = sss
+
+        cur = datetime.datetime.now()
+        print "-------------end time: %s" % cur
         return actual_need_qty
         all_parent_location_ids = self._find_parent_locations()
         rule = self._search_suitable_rule([('location_id', 'in', all_parent_location_ids.ids)])
