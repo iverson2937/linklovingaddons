@@ -52,8 +52,8 @@ class ProductTemplateExtend(models.Model):
             qr = qrcode.QRCode(
                 version=1,
                 error_correction=qrcode.constants.ERROR_CORRECT_H,
-                box_size=4,
-                border=1
+                    box_size=8,
+                    border=2
             )
             qr.add_data(str_to_code)
             img = qr.make_image()
@@ -89,14 +89,14 @@ class ProductTemplateExtend(models.Model):
 
     @classmethod
     def create_product_info_image(cls, product_tmpl, qr_img):
-        img = Image.new("RGB", (450, 230), (255, 255, 255))
-        font_size = 25  # 字体大小
-        start_x = 140  # 文字起始位置
-        line_start_x = 200  # 直线起始位置
-        line_width = 220
-        l1 = 35  # 第一行ｙ
-        l2 = l1 + 80  # ２ｙ
-        l3 = l2 + 80  # ３ｙ
+        img = Image.new("RGB", (900, 460), (255, 255, 255))
+        font_size = 50  # 字体大小
+        start_x = 280  # 文字起始位置
+        line_start_x = 400  # 直线起始位置
+        line_width = 400
+        l1 = 70  # 第一行ｙ
+        l2 = l1 + 160  # ２ｙ
+        l3 = l2 + 160  # ３ｙ
         l4 = l3  # ４ｙ
         path = ProductTemplateExtend.cur_file_dir()+'/linklovingaddons/linkloving_qrcode_create/models/simhei.ttf'
         _logger.warning(path)
@@ -139,7 +139,7 @@ class ProductTemplateExtend(models.Model):
     def auto_spilt_lines(cls, draw, text, x, y, font_size, font):
         if not text:
             text = ''
-        lines3 = textwrap.wrap(text, width=15)
+        lines3 = textwrap.wrap(text, width=11)
         if len(lines3) > 3:
             lines3 = lines3[0:3]
         y_text3 = y - (len(lines3) - 1) * font_size
