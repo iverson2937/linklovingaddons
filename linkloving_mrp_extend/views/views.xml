@@ -196,7 +196,7 @@
                         <tree editable="bottom" delete="0" decoration-warning="quantity_done&gt;product_uom_qty"
                               decoration-success="quantity_done>=product_uom_qty" create="0">
                             <field name="product_id" string="Product"/>
-                            <field name="qty_available" string="Actual Stock"/>
+                            <field name="qty_available" string="库存"/>
                             <field name="virtual_available" string="Forecast Quantity"/>
                             <field name="suggest_qty" string="Suggest Quantity"/>
                             <field name="quantity_available" string="系统可用"/>
@@ -272,7 +272,7 @@
                               decoration-success="quantity_ready>=product_uom_qty" create="0">
                             <field name="production_state" readonly="1" invisible="1" autofocus="autofocus"/>
                             <field name="product_id" readonly="1"/>
-                            <field name="qty_available" string="库存数量"/>
+                            <field name="qty_available" string="库存"/>
                             <field name="virtual_available" string="预测数量"/>
                             <field name="suggest_qty" readonly="1" string="建议数量"/>
                             <field name="quantity_available" string="系统可用"/>
