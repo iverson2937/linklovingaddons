@@ -313,7 +313,7 @@ class MrpProductionExtend(models.Model):
                     is_all_0 = False
 
             if is_all_0:
-                raise UserError(_('Please fill in the quantity！'))
+                raise UserError(u"请填写备料数量")
         for move in self.sim_stock_move_lines:
             if move.over_picking_qty != 0:#如果超领数量不等于0
                 new_move = move.stock_moves[0].copy(default={'quantity_done': move.over_picking_qty, 'product_uom_qty': move.over_picking_qty, 'production_id': move.production_id.id,
