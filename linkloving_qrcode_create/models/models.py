@@ -72,8 +72,8 @@ class ProductTemplateExtend(models.Model):
             qr = qrcode.QRCode(
                 version=1,
                 error_correction=qrcode.constants.ERROR_CORRECT_H,
-                box_size=4,
-                border=1
+                    box_size=8,
+                    border=2
             )
             qr.add_data(str_to_code)
             img = qr.make_image()
