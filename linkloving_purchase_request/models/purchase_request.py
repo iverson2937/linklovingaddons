@@ -42,18 +42,18 @@ class PurchaseRequest(models.Model):
             res[req.id] = po_ids
         return res
 
-    name = fields.Char('Requisition#', size=32, required=True),
+    name = fields.Char('Requisition#', size=32, required=True)
     warehouse_id = fields.Many2one('stock.warehouse', 'Warehouse', required=True, readonly=True,
-                                   states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]}),
+                                   states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]})
     user_id = fields.Many2one('res.users', 'Requester', required=True, readonly=True,
-                              states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]}),
-    date_request = fields.datetime('Requisition Date', required=True, readonly=True,
-                                   states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]}),
+                              states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]})
+    date_request = fields.Datetime('Requisition Date', required=True, readonly=True,
+                                   states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]})
     remark = fields.Text('Remark'),
     company_id = fields.Many2one('res.company', 'Company', required=True, readonly=True,
-                                 states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]}),
+                                 states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]})
     line_ids = fields.One2many('pur.req.line', 'req_id', 'Products to Purchase', readonly=True,
-                               states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]}),
+                               states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]})
     state = fields.Selection(
         [('draft', 'New'),
          ('confirmed', 'Confirmed'),
@@ -172,57 +172,52 @@ class PurchaseRequestLine(models.Model):
             res[req_line.id]['po_info'] = po_qty_str
         return res
 
-    req_id = fields.Many2one('pur.req', 'Purchase Requisition', ondelete='cascade'),
-    product_id = fields.Many2one('product.product', 'Product', required=True),
+    req_id = fields.Many2one('purchase.request', 'Purchase Requisition', ondelete='cascade')
+    product_id = fields.Many2one('product.product', 'Product', required=True)
     product_qty = fields.Many2one('Quantity', digits_compute=dp.get_precision('Product Unit of Measure'),
-                                  required=True),
-    product_uom_id = fields.many2one('product.uom', 'Product UOM', required=True),
+                                  required=True)
+    product_uom_id = fields.Many2one('product.uom', 'Product UOM', required=True)
     nv_uom_id = fields.Many2one('product.uom', relation='product.uom',
-                                string='Inventory UOM', readonly=True),
-    date_required = fields.Date('Date Required', required=True),
-    inv_qty = fields.Float('Inventory'),
-    req_emp_id = fields.Many2one('hr.employee', 'Employee'),
+                                string='Inventory UOM', readonly=True)
+    date_required = fields.Date('Date Required', required=True)
+    inv_qty = fields.Float('Inventory')
+    req_emp_id = fields.Many2one('hr.employee', 'Employee')
     req_dept_id = fields.Many2one('hr.department', string='Department', readonly=True)
     req_reason = fields.Char('Reason and use'),
-    company_id = fields.Char('req_id', 'company_id', type='many2one', relation='res.company', String='Company',
-                             store=True, readonly=True),
-    po_lines_ids = fields.One2many('purchase.order.line', 'req_line_id', 'Purchase Order Lines', readonly=True),
-    generated_po = fields.Boolean(_po_info, multi='po_info', string='PO Generated', type='boolean',
-                                  help="It indicates that this products has PO generated"),
-    product_qty_remain = fields.Float(_po_info, multi='po_info', string='Qty Remaining', type='float',
-                                      digits_compute=dp.get_precision('Product Unit of Measure')),
-    procurement_ids = fields.One2many("procurement.order", 'pur_req_line_id', 'Procurements'),
-    po_info = fields.Char(_po_info, multi='po_info', type='char', string='PO Quantity', readonly=True),
-    req_ticket_no = fields.Char('Requisition Ticket#', size=10),
-    order_warehouse_id = fields.Many2one('req_id', 'warehouse_id', type='many2one', relation='stock.warehouse',
-                                         string='Warehouse', readonly=True),
-    order_user_id = fields.Many2one('req_id', 'user_id', relation='res.users', string='Requester',
-                                    readonly=True),
-    order_date_request = fields.Datetime('req_id', 'date_request', type='datetime', string='Requisition Date',
-                                         readonly=True),
+    # company_id = fields.Many2one('req_id', 'company_id', type='many2one', relation='res.company', String='Company',
+    #                          store=True, readonly=True)
+    po_lines_ids = fields.One2many('purchase.order.line', 'req_line_id', 'Purchase Order Lines', readonly=True)
+    # generated_po = fields.Boolean(_po_info, multi='po_info', string='PO Generated', type='boolean',
+    #                               help="It indicates that this products has PO generated")
+    # product_qty_remain = fields.Float(_po_info, multi='po_info', string='Qty Remaining', type='float',
+    #                                   digits_compute=dp.get_precision('Product Unit of Measure'))
+    procurement_ids = fields.One2many("procurement.order", 'pur_req_line_id', 'Procurements')
+    # po_info = fields.Char(_po_info, multi='po_info', type='char', string='PO Quantity', readonly=True)
+    req_ticket_no = fields.Char('Requisition Ticket#', size=10)
+
     order_state = fields.Selection(related='order_id.state', string='Status', readonly=True,
                                    selection=[('draft', 'New'), ('confirmed', 'Confirmed'), ('approved', 'Approved'),
                                               ('rejected', 'Rejected'), ('in_purchase', 'In Purchasing'),
-                                              ('done', 'Purchase Done'), ('cancel', 'Cancelled')]),
+                                              ('done', 'Purchase Done'), ('cancel', 'Cancelled')])
 
     _rec_name = 'product_id'
 
-    def onchange_product_id(self, cr, uid, ids, product_id, context=None):
+    @api.multi
+    def onchange_product_id(self):
         """ Changes UoM,inv_qty if product_id changes.
         @param product_id: Changed product_id
         @return:  Dictionary of changed values
         """
         value = {'product_uom_id': '', 'inv_qty': ''}
         res = {}
-        if product_id:
-            prod = self.pool.get('product.product').browse(cr, uid, product_id, context=context)
-            value = {'product_qty': 1.0, 'inv_qty': prod.qty_available}
-            uom = prod.uom_po_id or prod.uom_id
-            value.update({'product_uom_id': uom.id, 'inv_uom_id': prod.uom_id.id})
-            # - set a domain on product_uom
-            domain = {'product_uom_id': [('category_id', '=', uom.category_id.id)]}
-            res['domain'] = domain
-            res['value'] = value
+        prod = self.product_id
+        value = {'product_qty': 1.0, 'inv_qty': prod.qty_available}
+        uom = prod.uom_po_id or prod.uom_id
+        value.update({'product_uom_id': uom.id, 'inv_uom_id': prod.uom_id.id})
+        # - set a domain on product_uom
+        domain = {'product_uom_id': [('category_id', '=', uom.category_id.id)]}
+        res['domain'] = domain
+        res['value'] = value
         return res
 
     def onchange_product_uom(self, cr, uid, ids, product_id, uom_id, context=None):
