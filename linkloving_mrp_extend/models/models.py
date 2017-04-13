@@ -487,8 +487,11 @@ class MrpProductionExtend(models.Model):
 
         """
         state = self._context.get('state')
-        if state:
+        if state and state in ['finish_prepare_material', 'already_picking', 'progress', 'waiting_rework', 'rework_ing',
+                               'waiting_inventory_material']:
             return [('state', '=', state), ('in_charge_id', '=', self.env.user.partner_id.id)]
+        else:
+            return [('state', '=', state)]
 
 
 class ChangeProductionQty(models.TransientModel):
