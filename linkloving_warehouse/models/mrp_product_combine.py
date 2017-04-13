@@ -17,12 +17,14 @@ class MrpProductionCombine(models.TransientModel):
         active_ids = context.get('active_ids', []) or []
         qty = 0
         product_id = []
+        ids = []
         origin = ''
         for record in self.env['mrp.production'].browse(active_ids):
             if record.state not in ['draft', 'confirmed', 'waiting_material']:
                 raise UserError(_("Only draft MO can combine."))
 
             product_id.append(record.product_id)
+            ids.append(record.id)
             qty += record.product_qty
             origin = origin + '; ' + record.origin if record.origin else ''
             record.action_cancel()
@@ -36,11 +38,13 @@ class MrpProductionCombine(models.TransientModel):
             'product_uom_id': product_id[0].uom_id.id,
             'state': 'draft',
             'origin': origin,
+
             'process_id': bom_id.process_id.id,
             'unit_price': bom_id.process_id.unit_price,
             'hour_price': bom_id.hour_price,
             'in_charge_id': bom_id.process_id.partner_id.id
         })
+        mo_id.source_mo_ids = ids
 
         return {
             'name': mo_id.name,
