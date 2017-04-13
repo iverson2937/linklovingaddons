@@ -208,6 +208,7 @@ class MrpProductionExtend(models.Model):
         copy=False, default='confirmed', track_visibility='onchange')
 
     # 计算所有工人总共花的工时
+    @api.one
     def _compute_total_spent_time(self):
         spent = 0
         for line in self.worker_line_ids:
