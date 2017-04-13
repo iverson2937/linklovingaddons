@@ -183,9 +183,8 @@ class PurchaseRequestLine(models.Model):
     order_warehouse_id = fields.Many2one('stock.warehouse')
     req_id = fields.Many2one('purchase.request', 'Purchase Requisition', ondelete='cascade')
     product_id = fields.Many2one('product.product', 'Product', required=True)
-    product_qty = fields.Many2one('Quantity', digits_compute=dp.get_precision('Product Unit of Measure'),
-                                  required=True)
-    inv_uom_id = fields.Many2one('product.uom')
+    product_qty = fields.Float('Quantity', digits_compute=dp.get_precision('Product Unit of Measure'),
+                               required=True)
     product_uom_id = fields.Many2one('product.uom', 'Product UOM', required=True)
     nv_uom_id = fields.Many2one('product.uom', relation='product.uom',
                                 string='Inventory UOM', readonly=True)
