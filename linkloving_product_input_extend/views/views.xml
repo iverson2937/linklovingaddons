@@ -7,6 +7,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='type']" position="before">
                     <field name="product_ll_type" required="1"/>
+                    <field name="order_ll_type" attrs="{'invisible': [('product_ll_type', '!=', 'finished')]}"/>
                 </xpath>
             </field>
         </record>

@@ -18,11 +18,19 @@ from odoo import models, fields, api
 class linklpving_product_product(models.Model):
     _inherit = 'product.product'
 
-    product_ll_type = fields.Selection(relate="product_tmpl.product_ll_type", string="类型",
+    product_ll_type = fields.Selection(related="product_tmpl_id.product_ll_type",
+                                       string="类型",
                                        selection=[('raw material', '原料'),
                                                   ('semi-finished', '半成品'),
                                                   ('finished', '成品')])
+    order_ll_type = fields.Selection(related="product_tmpl_id.order_ll_type",
+                                     string="订单类型", selection=[('ordering', '订单制'),
+                                                               ('stock', '备货制')],
+                                     help="订单制:路线自动选中按订单生成项,备货制:需要填写最大最小存货数量")
 
+    @api.multi
+    def write(self, vals):
+        return super(linklpving_product_product, self).write(vals)
 
 class linkloving_product_input_extend(models.Model):
     _inherit = 'product.template'
@@ -31,8 +39,14 @@ class linkloving_product_input_extend(models.Model):
                                                                  ('semi-finished', '半成品'),
                                                                  ('finished', '成品')])
 
+    order_ll_type = fields.Selection(string="订单类型",
+                                     selection=[('ordering', '订单制'),
+                                                ('stock', '备货制')], help="订单制:路线自动选中按订单生成项,备货制:需要填写最大最小存货数量")
+
+
     @api.onchange('product_ll_type')
     def _onchange_product_ll_type(self):
+        self.product_ll_type = self.product_ll_type
         if self.product_ll_type == "raw material":  # 原料
             self.sale_ok = False
             self.purchase_ok = True
@@ -47,5 +61,3 @@ class linkloving_product_input_extend(models.Model):
             self.sale_ok = True
             self.purchase_ok = False
             self.route_ids = [(6, 0, [self.env.ref('mrp.route_warehouse0_manufacture').id, ])]
-
-            ###stock.route_warehouse0_mto  mrp.route_warehouse0_manufacture purchase.route_warehouse0_buy

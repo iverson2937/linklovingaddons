@@ -596,12 +596,22 @@ class LinklovingAppApi(http.Controller):
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error': _("Ordering MO need to produce all the products")})
         else:
-            mrp_production.worker_line_ids.change_worker_state('outline')
-            mrp_production.write({'state': 'waiting_quality_inspection'})
-
-        JPushExtend.send_notification_push(audience=jpush.audience(
+            if mrp_production.product_id.product_ll_type == "semi-finished":
+                mrp_production.write({'state': 'waiting_inventory_material'})
+                JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.tag(LinklovingAppApi.get_jpush_tags("qc"))
+                ), notification=mrp_production.product_id.name,
+                        body=_("数量:%d,半成品已生产完成") % (mrp_production.qty_produced))
+            elif mrp_production.product_id.product_ll_type == "finished":
+                mrp_production.write({'state': 'waiting_quality_inspection'})
+                JPushExtend.send_notification_push(audience=jpush.audience(
+                        jpush.tag(LinklovingAppApi.get_jpush_tags("qc"))
         ),notification=mrp_production.product_id.name,body=_("Qty:%d,Produce finish,To QC")% (mrp_production.qty_produced))
+            else:
+                return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                                  res_data={"error": "该产品未设置物料类型,请设置"})
+
+            mrp_production.worker_line_ids.change_worker_state('outline')
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
@@ -1536,6 +1546,6 @@ class LinklovingAppApi(http.Controller):
         """
         menu_ids = request.jsonrequest.get("menu_ids")
         if menu_ids:
-            needaction_data = request.env['ir.ui.menu'].browse(menu_ids).get_needaction_data()
+            needaction_data = request.env['ir.ui.menu'].sudo().browse(menu_ids).get_needaction_data()
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=needaction_data)
