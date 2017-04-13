@@ -2,20 +2,20 @@
 <openerp>
     <data>
 
-        <record model="ir.ui.view" id="purchase_order_form_req">
-            <field name="name">purchase.order.form.req</field>
-            <field name="model">purchase.order</field>
-            <field name="inherit_id" ref="purchase.purchase_order_form"/>
-            <field name="arch" type="xml">
-                <field name="validator" position="before">
-                    <field name="req_id"/>
-                </field>
-            </field>
-        </record>
+        <!--<record model="ir.ui.view" id="purchase_order_form_req">-->
+        <!--<field name="name">purchase.order.form.req</field>-->
+        <!--<field name="model">purchase.order</field>-->
+        <!--<field name="inherit_id" ref="purchase.purchase_order_form"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<field name="validator" position="before">-->
+        <!--<field name="req_id"/>-->
+        <!--</field>-->
+        <!--</field>-->
+        <!--</record>-->
 
         <record model="ir.ui.view" id="view_pur_req_form">
-            <field name="name">pur.req.form</field>
-            <field name="model">pur.req</field>
+            <field name="name">purchase.request.form</field>
+            <field name="model">purchase.request</field>
             <field name="arch" type="xml">
                 <form string="Purchase Requisition" version="7.0">
                     <header>
@@ -24,9 +24,7 @@
                         />
                         <button name="pur_req_reject" states="confirmed" string="Reject"
                         />
-                        <button name="%(act_pur_req_po)d" string="Generate PO" type="action"
 
-                                attrs="{'invisible': [('state','!=','approved')]}" class="oe_highlight"/>
                         <button name="pur_req_done" string="Done"
                                 attrs="{'invisible': [('state','!=','in_purchase')]}" class="oe_highlight"/>
                         <button name="pur_req_cancel" states="draft,confirmed,approved,rejected,in_purchase"
@@ -74,7 +72,7 @@
                             <form string="Products" version="7.0">
                                 <group>
                                     <group>
-                                        <field name="product_id" on_change="onchange_product_id(product_id)"/>
+                                        <field name="product_id"/>
                                         <field name="product_qty"/>
                                         <field name="product_uom_id"/>
                                         <field name="date_required"/>
@@ -105,8 +103,8 @@
             </field>
         </record>
         <record model="ir.ui.view" id="view_pur_req_tree">
-            <field name="name">pur.req.tree</field>
-            <field name="model">pur.req</field>
+            <field name="name">purchase.request.tree</field>
+            <field name="model">purchase.request</field>
             <field name="arch" type="xml">
                 <tree fonts="bold:message_unread==True"
                       colors="blue:state == 'confirmed';green:state == 'in_purchase';grey:state == 'cancel';"
@@ -124,8 +122,8 @@
         </record>
 
         <record id="view_pur_req_filter" model="ir.ui.view">
-            <field name="name">pur.req.list.select</field>
-            <field name="model">pur.req</field>
+            <field name="name">purchase.request.list.select</field>
+            <field name="model">purchase.request</field>
             <field name="arch" type="xml">
                 <search string="Search Purchase Requisition">
                     <field name="name" string="Purchase Requisition"/>
@@ -159,7 +157,7 @@
         <record model="ir.actions.act_window" id="action_pur_req">
             <field name="name">Purchase Requisitions</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">pur.req</field>
+            <field name="res_model">purchase.request</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="search_view_id" ref="view_pur_req_filter"/>
@@ -170,12 +168,12 @@
                 sequence="9"
                 parent="purchase.menu_procurement_management"
                 action="action_pur_req"
-                groups="base.group_user,ydit_pur_req.group_pur_req_requester,ydit_pur_req.group_pur_req_checker,ydit_pur_req.group_pur_req_buyer"/>
+        />
 
         <!-- pur request line -->
         <record model="ir.ui.view" id="view_pur_req_line_full_tree">
-            <field name="name">pur.req.line.tree</field>
-            <field name="model">pur.req.line</field>
+            <field name="name">purchase.request.line.tree</field>
+            <field name="model">purchase.request.line</field>
             <field name="arch" type="xml">
                 <tree fonts="bold:generated_po==True"
                       colors="red:(generated_po==True and po_info != product_qty);green:generated_po==True;blue:order_state == 'confirmed';green:order_state == 'in_purchase';grey:order_state == 'cancel';"
@@ -193,7 +191,7 @@
                     <field name="req_reason"/>
                     <field name="req_ticket_no"/>
                     <field name="order_warehouse_id"/>
-                    <field name="order_user_id"/>
+                    <!--<field name="order_user_id"/>-->
                     <field name="order_date_request"/>
                     <field name="order_state"/>
                 </tree>
@@ -201,14 +199,14 @@
         </record>
         <record model="ir.ui.view" id="view_pur_req_line_full_form">
             <field name="name">view_pur_req_line_full_form</field>
-            <field name="model">pur.req.line</field>
+            <field name="model">purchase.request.line</field>
             <field name="arch" type="xml">
                 <form string="Products" version="7.0">
                     <group>
                         <group>
                             <field name="req_id" readonly="1"/>
                             <field name="order_warehouse_id"/>
-                            <field name="order_user_id"/>
+                            <!--<field name="order_user_id"/>-->
                             <field name="order_date_request"/>
                             <field name="order_state"/>
                             <field name="req_emp_id" readonly="1"/>
@@ -233,8 +231,8 @@
             </field>
         </record>
         <record id="view_pur_req_line_full_filter" model="ir.ui.view">
-            <field name="name">pur.req.list.select</field>
-            <field name="model">pur.req.line</field>
+            <field name="name">purchase.request.list.select</field>
+            <field name="model">purchase.request.line</field>
             <field name="arch" type="xml">
                 <search string="Search Purchase Requisition Lines">
                     <field name="product_id" string="Purducts"/>
@@ -250,10 +248,10 @@
                     <filter icon="terp-personal-" string="Cancelled" domain="[('order_state','=', 'cancel')]"
                             help="Canceled  Requisition"/>
                     <field name="order_warehouse_id"/>
-                    <field name="order_user_id"/>
+                    <!--<field name="order_user_id"/>-->
                     <group expand="0" string="Group By...">
-                        <filter string="Requester" icon="terp-personal" domain="[]"
-                                context="{'group_by':'order_user_id'}"/>
+                        <!--<filter string="Requester" icon="terp-personal" domain="[]"-->
+                        <!--context="{'group_by':'order_user_id'}"/>-->
                         <filter string="Warehouse" icon="terp-gtk-jump-to-rtl" domain="[]"
                                 context="{'group_by':'order_warehouse_id'}"/>
                         <filter string="Requisition Date" icon="terp-go-month" domain="[]"
@@ -267,7 +265,7 @@
         <record model="ir.actions.act_window" id="action_pur_req_line_full">
             <field name="name">Purchase Requisition Products</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">pur.req.line</field>
+            <field name="res_model">purchase.request.line</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="search_view_id" ref="view_pur_req_line_full_filter"/>
@@ -289,7 +287,7 @@
                 sequence="10"
                 parent="purchase.menu_procurement_management"
                 action="action_pur_req_line_full"
-                groups="ydit_pur_req.group_pur_req_requester,ydit_pur_req.group_pur_req_checker,ydit_pur_req.group_pur_req_buyer"/>
+        />
 
     </data>
 </openerp>
