@@ -34,7 +34,6 @@ class ProductProduct(models.Model):
     location_y = fields.Char()
 
     product_specs = fields.Text(string=u'Product Specification', related='product_tmpl_id.product_specs')
-    product_ll_type = fields.Char(related='product_tmpl_id.product_ll_type')
     _sql_constraints = [
         ('default_code_uniq', 'unique (default_code)', _('Default Code already exist!')),
         # ('name_uniq', 'unique (name)', u'产品名称已存在!')
@@ -50,7 +49,6 @@ class ProductTemplate(models.Model):
     location_x = fields.Char(related='product_variant_ids.location_x')
     location_y = fields.Char(related='product_variant_ids.location_y')
     name = fields.Char('Name', index=True, required=True, translate=False)
-    product_ll_type = fields.Char()
     _sql_constraints = [
         ('default_code_uniq1', 'unique (default_code)', _('Default Code already exist!')),
         # ('name_uniq', 'unique (name)', u'产品名称已存在!')
