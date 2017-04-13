@@ -1545,7 +1545,8 @@ class LinklovingAppApi(http.Controller):
             :rtype: dict(menu_id: {'needaction_enabled': boolean, 'needaction_counter': int})
         """
         menu_ids = request.jsonrequest.get("menu_ids")
+        user_id = request.jsonrequest.get("user_id")
         if menu_ids:
-            needaction_data = request.env['ir.ui.menu'].sudo().browse(menu_ids).get_needaction_data()
+            needaction_data = request.env['ir.ui.menu'].sudo(user_id).browse(menu_ids).get_needaction_data()
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=needaction_data)

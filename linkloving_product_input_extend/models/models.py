@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 
 
 # class linkloving_product_input_extend(models.Model):
@@ -43,6 +43,20 @@ class linkloving_product_input_extend(models.Model):
                                      selection=[('ordering', '订单制'),
                                                 ('stock', '备货制')], help="订单制:路线自动选中按订单生成项,备货制:需要填写最大最小存货数量")
 
+    @api.onchange('order_ll_type')
+    def _onchange_order_ll_type(self):
+        self.order_ll_type = self.order_ll_type
+        if self.order_ll_type == "ordering":  # 订单制
+            self.route_ids = [(6, 0, [self.env.ref('mrp.route_warehouse0_manufacture').id,
+                                      self.env.ref('stock.route_warehouse0_mto').id])]
+        elif self.order_ll_type == "stock":  # 备货制
+            self.route_ids = [(6, 0, [self.env.ref('mrp.route_warehouse0_manufacture').id])]
+            return {'warning': {
+                'title': "请创建存货规则",
+                'message': "具体最大最小存货数量,请点击右上方 '订货规则'按钮进行创建!"
+            }
+            }
+
 
     @api.onchange('product_ll_type')
     def _onchange_product_ll_type(self):
@@ -61,3 +75,10 @@ class linkloving_product_input_extend(models.Model):
             self.sale_ok = True
             self.purchase_ok = False
             self.route_ids = [(6, 0, [self.env.ref('mrp.route_warehouse0_manufacture').id, ])]
+
+
+class StockOrdering(models.TransientModel):
+    _name = "stock.ordering"
+
+    max_qty = fields.Float("最大存货数量")
+    min_qty = fields.Float("最小存货数量")
