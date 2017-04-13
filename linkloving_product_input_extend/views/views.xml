@@ -1,0 +1,14 @@
+<openerp>
+    <data>
+        <record id="aaa_view_product_template_extend" model="ir.ui.view">
+            <field name="name">product.template.inherit</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='type']" position="before">
+                    <field name="product_ll_type" required="1"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>
