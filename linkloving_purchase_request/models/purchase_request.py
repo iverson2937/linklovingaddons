@@ -45,6 +45,7 @@ class PurchaseRequest(models.Model):
     name = fields.Char('Requisition#', size=32, required=True)
     warehouse_id = fields.Many2one('stock.warehouse', 'Warehouse', required=True, readonly=True,
                                    states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]})
+    order_id = fields.Many2one('purchase.order')
     user_id = fields.Many2one('res.users', 'Requester', required=True, readonly=True,
                               states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]})
     date_request = fields.Datetime('Requisition Date', required=True, readonly=True,
@@ -52,7 +53,7 @@ class PurchaseRequest(models.Model):
     remark = fields.Text('Remark'),
     company_id = fields.Many2one('res.company', 'Company', required=True, readonly=True,
                                  states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]})
-    line_ids = fields.One2many('pur.req.line', 'req_id', 'Products to Purchase', readonly=True,
+    line_ids = fields.One2many('purchase.request.line', 'req_id', 'Products to Purchase', readonly=True,
                                states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]})
     state = fields.Selection(
         [('draft', 'New'),
@@ -186,12 +187,12 @@ class PurchaseRequestLine(models.Model):
     req_reason = fields.Char('Reason and use'),
     # company_id = fields.Many2one('req_id', 'company_id', type='many2one', relation='res.company', String='Company',
     #                          store=True, readonly=True)
-    po_lines_ids = fields.One2many('purchase.order.line', 'req_line_id', 'Purchase Order Lines', readonly=True)
+    # po_lines_ids = fields.One2many('purchase.order.line', 'req_line_id', 'Purchase Order Lines', readonly=True)
     # generated_po = fields.Boolean(_po_info, multi='po_info', string='PO Generated', type='boolean',
     #                               help="It indicates that this products has PO generated")
     # product_qty_remain = fields.Float(_po_info, multi='po_info', string='Qty Remaining', type='float',
     #                                   digits_compute=dp.get_precision('Product Unit of Measure'))
-    procurement_ids = fields.One2many("procurement.order", 'pur_req_line_id', 'Procurements')
+    # procurement_ids = fields.One2many("procurement.order", 'pur_req_line_id', 'Procurements')
     # po_info = fields.Char(_po_info, multi='po_info', type='char', string='PO Quantity', readonly=True)
     req_ticket_no = fields.Char('Requisition Ticket#', size=10)
 
