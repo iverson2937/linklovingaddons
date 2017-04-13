@@ -7,7 +7,6 @@ import jpush
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-from odoo.osv import expression
 from odoo.tools import float_compare, math
 from odoo.addons import decimal_precision as dp
 
