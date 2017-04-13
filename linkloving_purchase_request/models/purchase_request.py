@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from email import utils
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.tools import float_compare
+import odoo.addons.decimal_precision as dp
 
 
 class PurchaseRequest(models.Model):
@@ -43,7 +45,7 @@ class PurchaseRequest(models.Model):
     name = fields.Char('Requisition#', size=32, required=True),
     warehouse_id = fields.Many2one('stock.warehouse', 'Warehouse', required=True, readonly=True,
                                    states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]}),
-    user_id = fields.many2one('res.users', 'Requester', required=True, readonly=True,
+    user_id = fields.Many2one('res.users', 'Requester', required=True, readonly=True,
                               states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]}),
     date_request = fields.datetime('Requisition Date', required=True, readonly=True,
                                    states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]}),
@@ -114,6 +116,154 @@ class PurchaseRequest(models.Model):
 
 
 class PurchaseRequestLine(models.Model):
-    _name = 'purchase.request.line'
-    _inherit = ['mail.thread', 'ir.needaction_mixin']
-    _order = "name desc"
+    _name = "purchase.request.line"
+    _description = "Purchase Requisition Line"
+    _rec_name = 'product_id'
+
+    def _generated_po(self, cursor, user, ids, name, arg, context=None):
+        res = {}
+        for req_line in self.browse(cursor, user, ids, context=context):
+            generated_po = False
+            if req_line.po_lines_ids:
+                for po_line in req_line.po_lines_ids:
+                    if po_line.state != 'cancel':
+                        generated_po = True
+                        break
+            res[req_line.id] = generated_po
+        return res
+
+    def _po_info(self, cr, uid, ids, field_names=None, arg=False, context=None):
+        """ Finds the requisition related PO info.
+        @return: Dictionary of values
+        """
+        if not field_names:
+            field_names = []
+        if context is None:
+            context = {}
+        res = {}
+        for id in ids:
+            res[id] = {}.fromkeys(field_names, 0.0)
+        for req_line in self.browse(cr, uid, ids, context=context):
+            generated_po = False
+            req_qty = req_line.product_qty
+            po_qty = 0
+            product_qty_remain = req_line.product_qty
+            po_qty_str = ''
+            if req_line.po_lines_ids:
+                uom_obj = self.pool.get('product.uom')
+                for po_line in req_line.po_lines_ids:
+                    if po_line.state != 'cancel':
+                        ctx_uom = context.copy()
+                        ctx_uom['raise-exception'] = False
+                        uom_po_qty = uom_obj._compute_qty_obj(cr, uid, po_line.product_uom, po_line.product_qty, \
+                                                              req_line.product_uom_id, context=ctx_uom)
+                        po_qty += uom_po_qty
+                        po_qty_str += ((po_qty_str or '') and '; ') + '%s(%s)@%s' % (
+                            po_line.product_qty, uom_po_qty, po_line.order_id.name)
+                        #                po_finished = float_compare(po_qty, req_qty, precision_rounding=req_line.product_uom_id.rounding)
+                po_finished = float_compare(req_qty, po_qty, precision_rounding=1)
+                generated_po = (po_finished <= 0)
+                if generated_po:
+                    product_qty_remain = 0
+                else:
+                    product_qty_remain = req_qty - po_qty
+            res[req_line.id]['generated_po'] = generated_po
+            res[req_line.id]['product_qty_remain'] = product_qty_remain
+            res[req_line.id]['po_info'] = po_qty_str
+        return res
+
+    req_id = fields.Many2one('pur.req', 'Purchase Requisition', ondelete='cascade'),
+    product_id = fields.Many2one('product.product', 'Product', required=True),
+    product_qty = fields.Many2one('Quantity', digits_compute=dp.get_precision('Product Unit of Measure'),
+                                  required=True),
+    product_uom_id = fields.many2one('product.uom', 'Product UOM', required=True),
+    nv_uom_id = fields.Many2one('product.uom', relation='product.uom',
+                                string='Inventory UOM', readonly=True),
+    date_required = fields.Date('Date Required', required=True),
+    inv_qty = fields.Float('Inventory'),
+    req_emp_id = fields.Many2one('hr.employee', 'Employee'),
+    req_dept_id = fields.Many2one('hr.department', string='Department', readonly=True)
+    req_reason = fields.Char('Reason and use'),
+    company_id = fields.Char('req_id', 'company_id', type='many2one', relation='res.company', String='Company',
+                             store=True, readonly=True),
+    po_lines_ids = fields.One2many('purchase.order.line', 'req_line_id', 'Purchase Order Lines', readonly=True),
+    generated_po = fields.Boolean(_po_info, multi='po_info', string='PO Generated', type='boolean',
+                                  help="It indicates that this products has PO generated"),
+    product_qty_remain = fields.Float(_po_info, multi='po_info', string='Qty Remaining', type='float',
+                                      digits_compute=dp.get_precision('Product Unit of Measure')),
+    procurement_ids = fields.One2many("procurement.order", 'pur_req_line_id', 'Procurements'),
+    po_info = fields.Char(_po_info, multi='po_info', type='char', string='PO Quantity', readonly=True),
+    req_ticket_no = fields.Char('Requisition Ticket#', size=10),
+    order_warehouse_id = fields.Many2one('req_id', 'warehouse_id', type='many2one', relation='stock.warehouse',
+                                         string='Warehouse', readonly=True),
+    order_user_id = fields.Many2one('req_id', 'user_id', relation='res.users', string='Requester',
+                                    readonly=True),
+    order_date_request = fields.Datetime('req_id', 'date_request', type='datetime', string='Requisition Date',
+                                         readonly=True),
+    order_state = fields.Selection(related='order_id.state', string='Status', readonly=True,
+                                   selection=[('draft', 'New'), ('confirmed', 'Confirmed'), ('approved', 'Approved'),
+                                              ('rejected', 'Rejected'), ('in_purchase', 'In Purchasing'),
+                                              ('done', 'Purchase Done'), ('cancel', 'Cancelled')]),
+
+    _rec_name = 'product_id'
+
+    def onchange_product_id(self, cr, uid, ids, product_id, context=None):
+        """ Changes UoM,inv_qty if product_id changes.
+        @param product_id: Changed product_id
+        @return:  Dictionary of changed values
+        """
+        value = {'product_uom_id': '', 'inv_qty': ''}
+        res = {}
+        if product_id:
+            prod = self.pool.get('product.product').browse(cr, uid, product_id, context=context)
+            value = {'product_qty': 1.0, 'inv_qty': prod.qty_available}
+            uom = prod.uom_po_id or prod.uom_id
+            value.update({'product_uom_id': uom.id, 'inv_uom_id': prod.uom_id.id})
+            # - set a domain on product_uom
+            domain = {'product_uom_id': [('category_id', '=', uom.category_id.id)]}
+            res['domain'] = domain
+            res['value'] = value
+        return res
+
+    def onchange_product_uom(self, cr, uid, ids, product_id, uom_id, context=None):
+        """
+        onchange handler of product_uom.
+        """
+        res = {}
+        if not uom_id:
+            return {'value': {'product_uom_id': False}}
+        # - check that uom and product uom belong to the same category
+        product = self.pool.get('product.product').browse(cr, uid, product_id, context=context)
+        prod_uom = product.uom_po_id or product.uom_id
+        uom = self.pool.get('product.uom').browse(cr, uid, uom_id, context=context)
+        if prod_uom.category_id.id != uom.category_id.id:
+            if self._check_product_uom_group(cr, uid, context=context):
+                res['warning'] = {'title': _('Warning!'), 'message': _(
+                    'Selected Unit of Measure does not belong to the same category as the product Unit of Measure.')}
+            uom_id = prod_uom.id
+
+        # - set a domain on product_uom
+        domain = {'product_uom_id': [('category_id', '=', prod_uom.category_id.id)]}
+        res['domain'] = domain
+        res['value'] = {'product_uom_id': uom_id}
+        return res
+
+    def _check_product_uom_group(self, cr, uid, context=None):
+        group_uom = self.pool.get('ir.model.data').get_object(cr, uid, 'product', 'group_uom')
+        res = [user for user in group_uom.users if user.id == uid]
+        return len(res) and True or False
+
+    def copy_data(self, cr, uid, id, default=None, context=None):
+        if not default:
+            default = {}
+        default.update({
+            'po_lines_ids': [],
+        })
+        res = super(PurchaseRequestLine, self).copy_data(default)
+        return res
+
+    def unlink(self):
+        ids = []
+        procurement_ids = self.env('procurement.order').search([('pur_req_line_id', 'in', ids)])
+        self.env['procurement.order'].action_cancel(procurement_ids)
+        return super(PurchaseRequestLine, self).unlink()

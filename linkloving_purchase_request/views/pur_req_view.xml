@@ -21,13 +21,13 @@
                     <header>
                         <button name="pur_req_confirm" states="draft,rejected" string="Confirm" class="oe_highlight"/>
                         <button name="pur_req_approve" states="confirmed" string="Approve" class="oe_highlight"
-                                groups="ydit_pur_req.group_pur_req_checker"/>
+                        />
                         <button name="pur_req_reject" states="confirmed" string="Reject"
-                                groups="ydit_pur_req.group_pur_req_checker"/>
+                        />
                         <button name="%(act_pur_req_po)d" string="Generate PO" type="action"
-                                groups="ydit_pur_req.group_pur_req_buyer"
+
                                 attrs="{'invisible': [('state','!=','approved')]}" class="oe_highlight"/>
-                        <button name="pur_req_done" string="Done" groups="ydit_pur_req.group_pur_req_buyer"
+                        <button name="pur_req_done" string="Done"
                                 attrs="{'invisible': [('state','!=','in_purchase')]}" class="oe_highlight"/>
                         <button name="pur_req_cancel" states="draft,confirmed,approved,rejected,in_purchase"
                                 string="Cancel"/>
@@ -58,12 +58,11 @@
                         <separator string="Prodcuts"/>
                         <field name="line_ids">
                             <tree string="Products">
-                                <field name="product_id" on_change="onchange_product_id(product_id,contexxt)"/>
+                                <field name="product_id"/>
                                 <field name="product_qty"/>
                                 <field name="po_info"/>
                                 <field name="product_qty_remain" readonly="1"/>
-                                <field name="product_uom_id"
-                                       on_change="onchange_product_uom(product_id,product_uom_id,context)"/>
+                                <field name="product_uom_id"/>
                                 <field name="date_required"/>
                                 <field name="inv_qty"/>
                                 <field name="inv_uom_id"/>
@@ -77,8 +76,7 @@
                                     <group>
                                         <field name="product_id" on_change="onchange_product_id(product_id)"/>
                                         <field name="product_qty"/>
-                                        <field name="product_uom_id"
-                                               on_change="onchange_product_uom(product_id,product_uom_id,context)"/>
+                                        <field name="product_uom_id"/>
                                         <field name="date_required"/>
                                         <field name="inv_qty"/>
                                         <field name="inv_uom_id"/>
