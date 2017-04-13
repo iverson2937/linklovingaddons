@@ -10,6 +10,8 @@ from odoo.exceptions import UserError
 from odoo.osv import expression
 from odoo.tools import float_compare, math
 from odoo.addons import decimal_precision as dp
+
+
 class MrpBomExtend(models.Model):
     _inherit = 'mrp.bom'
 
@@ -33,26 +35,34 @@ class MrpBomExtend(models.Model):
             if current_line._skip_bom_line(current_product):
                 continue
             if current_line.product_id.product_tmpl_id in templates_done:
-                raise UserError(_('Recursion error!  A product with a Bill of Material should not have itself in its BoM or child BoMs!'))
+                raise UserError(_(
+                    'Recursion error!  A product with a Bill of Material should not have itself in its BoM or child BoMs!'))
 
-            line_quantity = current_qty * current_line.product_qty #* (1 + bom_line.scrap_rate /100)
-            bom = self._bom_find(product=current_line.product_id, picking_type=picking_type or self.picking_type_id, company_id=self.company_id.id)
+            line_quantity = current_qty * current_line.product_qty  # * (1 + bom_line.scrap_rate /100)
+            bom = self._bom_find(product=current_line.product_id, picking_type=picking_type or self.picking_type_id,
+                                 company_id=self.company_id.id)
             if bom.type == 'phantom':
-                converted_line_quantity = current_line.product_uom_id._compute_quantity(line_quantity / bom.product_qty, bom.product_uom_id)
-                bom_lines = [(line, current_line.product_id, converted_line_quantity, current_line) for line in bom.bom_line_ids] + bom_lines
+                converted_line_quantity = current_line.product_uom_id._compute_quantity(line_quantity / bom.product_qty,
+                                                                                        bom.product_uom_id)
+                bom_lines = [(line, current_line.product_id, converted_line_quantity, current_line) for line in
+                             bom.bom_line_ids] + bom_lines
                 templates_done |= current_line.product_id.product_tmpl_id
-                boms_done.append((bom, {'qty': converted_line_quantity, 'product': current_product, 'original_qty': quantity, 'parent_line': current_line}))
+                boms_done.append((bom,
+                                  {'qty': converted_line_quantity, 'product': current_product, 'original_qty': quantity,
+                                   'parent_line': current_line}))
             else:
-                    lines_done.append((current_line, {'suggest_qty': line_quantity * (1 + bom_line.scrap_rate /100),'qty': line_quantity, 'product': current_product, 'original_qty': quantity, 'parent_line': parent_line}))
+                lines_done.append((current_line, {'suggest_qty': line_quantity * (1 + bom_line.scrap_rate / 100),
+                                                  'qty': line_quantity, 'product': current_product,
+                                                  'original_qty': quantity, 'parent_line': parent_line}))
 
         return boms_done, lines_done
+
 
 class MrpBomLineExtend(models.Model):
     _inherit = 'mrp.bom.line'
 
     product_specs = fields.Text(string='Product Specification', related='product_id.product_specs')
     scrap_rate = fields.Float(string='Scrap Rate(%)', default=3, )
-
 
     @api.multi
     def action_see_bom_structure_reverse(self):
@@ -69,7 +79,7 @@ class MrpBomLineExtend(models.Model):
             # 'view_type': 'form',
             'limit': 80,
             'context': {
-            'search_default_bom_line_ids': self.product_id.default_code,}
+                'search_default_bom_line_ids': self.product_id.default_code, }
         }
 
 
@@ -78,7 +88,7 @@ class StockMoveExtend(models.Model):
 
     qty_available = fields.Float(string='On Hand', related='product_id.qty_available')
     virtual_available = fields.Float(string='Forecast Quantity', related='product_id.virtual_available')
-    suggest_qty =  fields.Float(string='Suggest Quantity', help=u'建议数量 = 实际数量 + 预计报废数量', )
+    suggest_qty = fields.Float(string='Suggest Quantity', help=u'建议数量 = 实际数量 + 预计报废数量', )
     over_picking_qty = fields.Float(string='Excess Quantity ', )
     is_return_material = fields.Boolean(default=False)
     is_over_picking = fields.Boolean(default=False)
@@ -113,7 +123,7 @@ class MrpProductionExtend(models.Model):
         list = []
         for move in new_pr.move_raw_ids:
             list.append(move.product_id.id)
-        a = set(list) #不重复的set集合
+        a = set(list)  # 不重复的set集合
         res_list = []
         sim_stock_move_lines = self.env["sim.stock.move"].search([("production_id", "=", new_pr.id)])
         if not sim_stock_move_lines:
@@ -124,31 +134,32 @@ class MrpProductionExtend(models.Model):
                 new_pr.sim_stock_move_lines = res_list
         else:
             new_pr.sim_stock_move_lines = sim_stock_move_lines
-        # else:
-        #     for r in a:
-        #         if r.product_id not in self.sim_stock_move_lines.mapped('product_id'):
-        #             dict = self._prepare_sim_stock_move_values(r)
-        #             res = self.env['sim.stock.move'].create(dict)
-        #             self.sim_stock_move_lines |= res
-        # return
-    def _prepare_sim_stock_move_values(self,value):
+            # else:
+            #     for r in a:
+            #         if r.product_id not in self.sim_stock_move_lines.mapped('product_id'):
+            #             dict = self._prepare_sim_stock_move_values(r)
+            #             res = self.env['sim.stock.move'].create(dict)
+            #             self.sim_stock_move_lines |= res
+            # return
+
+    def _prepare_sim_stock_move_values(self, value):
         return {
             'product_id': value,
             'production_id': self.id
         }
 
-    #备料信息
+    # 备料信息
     prepare_material_img = fields.Binary(string='Stock Image')
     prepare_material_area_id = fields.Many2one('stock.location.area', string='Area')
     #########
-    #送完品检时的信息
+    # 送完品检时的信息
     to_qc_img = fields.Binary(string='Location Image')
     to_qc_area_id = fields.Many2one('stock.location.area', string='Area')
     #####
-    #品检反馈单
+    # 品检反馈单
     qc_feedback_id = fields.Many2one('mrp.qc.feedback', string='QC Report')
     ####
-    #是否暂停
+    # 是否暂停
     is_pending = fields.Boolean()
     ####
 
@@ -168,47 +179,50 @@ class MrpProductionExtend(models.Model):
     move_finished_ids = fields.One2many(
         'stock.move', 'production_id', 'Finished Products',
         copy=False, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]},
-        domain=[('scrapped', '=', False), ('is_return_material','=',False), ('is_over_picking', '=', False)])
+        domain=[('scrapped', '=', False), ('is_return_material', '=', False), ('is_over_picking', '=', False)])
 
-    production_order_type = fields.Selection([('stockup','By Stock（Unnecessary to output all quantity）'),('ordering',u'By Order')], string=u'Order Type', default='stockup',help=u'By Stock：Can sent to QC check without complete  the Order。\nBy order：have to completed the Order then send to the QC station')
+    production_order_type = fields.Selection(
+        [('stockup', 'By Stock（Unnecessary to output all quantity）'), ('ordering', u'By Order')], string=u'Order Type',
+        default='stockup',
+        help=u'By Stock：Can sent to QC check without complete  the Order。\nBy order：have to completed the Order then send to the QC station')
     total_spent_time = fields.Float(default=0, compute='_compute_total_spent_time', string='Time taken', )
     total_spent_money = fields.Float(default=0, compute='_compute_total_spent_money', string='Total Cost', )
     state = fields.Selection([
         ('draft', _('Draft')),
         ('confirmed', u'已排产'),
-        ('waiting_material',_('Waiting Prepare Material')),
-        ('prepare_material_ing',_('Material Preparing')),
+        ('waiting_material', _('Waiting Prepare Material')),
+        ('prepare_material_ing', _('Material Preparing')),
         ('finish_prepare_material', _('Material Ready')),
         ('already_picking', _('Already Picking Material')),
         ('planned', 'Planned'),
         ('progress', '生产中'),
         ('waiting_quality_inspection', _('Waiting Quality Inspection')),
         ('quality_inspection_ing', _('Under Quality Inspection')),
-        ('waiting_rework',_('Waiting Rework')),
-        ('rework_ing',_('Under Rework')),
-        ('waiting_inventory_material',_('Waiting Inventory Material')),
+        ('waiting_rework', _('Waiting Rework')),
+        ('rework_ing', _('Under Rework')),
+        ('waiting_inventory_material', _('Waiting Inventory Material')),
         ('waiting_warehouse_inspection', _('Waiting Check Return Material')),
-        ('waiting_post_inventory',_('Waiting Stock Transfers')),
+        ('waiting_post_inventory', _('Waiting Stock Transfers')),
         ('done', 'Done'),
         ('cancel', 'Cancelled')], string='State',
         copy=False, default='confirmed', track_visibility='onchange')
 
-
-    #计算所有工人总共花的工时
+    # 计算所有工人总共花的工时
     def _compute_total_spent_time(self):
         spent = 0
         for line in self.worker_line_ids:
             spent += line.cal_worker_spent_time()
         self.total_spent_time = spent / 3600.0
 
-    #计算生产总成本
+    # 计算生产总成本
     @api.one
     def _compute_total_spent_money(self):
-        if self.mo_type == 'unit':#计件
+        if self.mo_type == 'unit':  # 计件
             self.total_spent_money = self.qty_produced * self.unit_price
-        elif self.mo_type == 'time':#计时
+        elif self.mo_type == 'time':  # 计时
             self.total_spent_money = self.total_spent_time * self.hour_price
             # #添加工人
+
     # @api.multi
     # def add_worker(self):
 
@@ -221,7 +235,7 @@ class MrpProductionExtend(models.Model):
                    'res_model': 'mrp.return.material',
                    'view_mode': 'form',
                    'view_id': view.id,
-                   'res_id' : return_obj.id,
+                   'res_id': return_obj.id,
                    'target': 'new'
                    }
         else:
@@ -231,10 +245,10 @@ class MrpProductionExtend(models.Model):
                    'view_id': view.id,
                    'target': 'new'}
             res['context'] = {'default_production_id': self.id,
-                          'return_ids.product_ids': self.move_raw_ids.mapped('product_id').ids}
+                              'return_ids.product_ids': self.move_raw_ids.mapped('product_id').ids}
         return res
 
-    #确认生产 等待备料
+    # 确认生产 等待备料
     def button_waiting_material(self):
         self.write({'state': 'waiting_material'})
         qty_wizard = self.env['change.production.qty'].create({
@@ -246,18 +260,22 @@ class MrpProductionExtend(models.Model):
         # JPushExtend.send_push(audience=jpush.audience(
         #     jpush.tag(LinklovingAppApi.get_jpush_tags("warehouse"))
         # ),notification=u"此订单已经可以开始备料")
+
     @api.multi
     def button_action_confirm_draft(self):
         for production in self:
-            production.write({'state':'confirmed'})
-    #开始备料
+            production.write({'state': 'confirmed'})
+
+    # 开始备料
     def button_start_prepare_material(self):
         self.write({'state': 'prepare_material_ing'})
-    #备料完成
+
+    # 备料完成
     def button_finish_prepare_material(self):
-        return self._show_picking_view(picking_mode='first_picking',invisible_options={'overpicking_invisible':True})
+        return self._show_picking_view(picking_mode='first_picking', invisible_options={'overpicking_invisible': True})
         # self.write({'state': 'finish_prepare_material'})
-    #开始生产
+
+    # 开始生产
     def button_start_produce(self):
         self.write({'state': 'progress'})
 
@@ -279,35 +297,39 @@ class MrpProductionExtend(models.Model):
         if not self.check_to_done and self.production_order_type == 'ordering':
             raise UserError(_('You have to complete the order before close it!'))
         else:
-            #生产完成 结算工时
+            # 生产完成 结算工时
             self.worker_line_ids.change_worker_state('outline')
 
             self.write({'state': 'waiting_quality_inspection'})
 
-    #开始品检
+    # 开始品检
     def button_start_quality_inspection(self):
         self.write({'state': 'quality_inspection_ing'})
 
-    #品检通过
+    # 品检通过
     def button_quality_inspection_success(self):
         self.write({'state': 'waiting_inventory_material'})
         # self.write({'state': 'waiting_post_inventory'}
-    #清点物料
+
+    # 清点物料
     def button_inventory_material(self):
         return self.button_return_material(need_create_one=True)
-    #仓库清点物料
+
+    # 仓库清点物料
     def button_check_inventory_material(self):
         return self.button_return_material(need_create_one=False)
-    #品检失败,变为等待返工中
+
+    # 品检失败,变为等待返工中
     def button_quality_inspection_failed(self):
         self.write({'state': 'waiting_rework'})
-     #开始返工   ,返工中
+        # 开始返工   ,返工中
+
     def button_start_rework(self):
         self.write({'state': 'rework_ing'})
 
     def picking_material(self):
         if self._context.get('picking_mode') == 'first_picking':
-            is_all_0 = True #是否全部为0，没有填写备料数量
+            is_all_0 = True  # 是否全部为0，没有填写备料数量
             for move in self.sim_stock_move_lines:
                 if move.quantity_ready != 0:
                     is_all_0 = False
@@ -315,24 +337,28 @@ class MrpProductionExtend(models.Model):
             if is_all_0:
                 raise UserError(u"请填写备料数量")
         for move in self.sim_stock_move_lines:
-            if move.over_picking_qty != 0:#如果超领数量不等于0
-                new_move = move.stock_moves[0].copy(default={'quantity_done': move.over_picking_qty, 'product_uom_qty': move.over_picking_qty, 'production_id': move.production_id.id,
-                                            'raw_material_production_id': move.raw_material_production_id.id,
-                                            'procurement_id': move.procurement_id.id or False,
-                                            'is_over_picking': True})
-                move.production_id.move_raw_ids =  move.production_id.move_raw_ids + new_move
+            if move.over_picking_qty != 0:  # 如果超领数量不等于0
+                new_move = move.stock_moves[0].copy(
+                    default={'quantity_done': move.over_picking_qty, 'product_uom_qty': move.over_picking_qty,
+                             'production_id': move.production_id.id,
+                             'raw_material_production_id': move.raw_material_production_id.id,
+                             'procurement_id': move.procurement_id.id or False,
+                             'is_over_picking': True})
+                move.production_id.move_raw_ids = move.production_id.move_raw_ids + new_move
                 move.over_picking_qty = 0
-                new_move.write({'state':'assigned',})
-            if self._context.get('picking_mode') == 'first_picking':#如果备料数量不等于0
+                new_move.write({'state': 'assigned', })
+            if self._context.get('picking_mode') == 'first_picking':  # 如果备料数量不等于0
                 if not move.stock_moves:
                     continue
                 rounding = move.stock_moves[0].product_uom.rounding
-                if float_compare(move.quantity_ready, move.stock_moves[0].product_uom_qty, precision_rounding=rounding) > 0:
-                    qty_split =  move.stock_moves[0].product_uom._compute_quantity(move.quantity_ready - move.stock_moves[0].product_uom_qty,
-                                                                   move.stock_moves[0].product_id.uom_id)
+                if float_compare(move.quantity_ready, move.stock_moves[0].product_uom_qty,
+                                 precision_rounding=rounding) > 0:
+                    qty_split = move.stock_moves[0].product_uom._compute_quantity(
+                        move.quantity_ready - move.stock_moves[0].product_uom_qty,
+                        move.stock_moves[0].product_id.uom_id)
 
                     split_move = move.stock_moves[0].copy(
-                        default={'quantity_done': qty_split, 'product_uom_qty':qty_split,
+                        default={'quantity_done': qty_split, 'product_uom_qty': qty_split,
                                  'production_id': move.production_id.id,
                                  'raw_material_production_id': move.raw_material_production_id.id,
                                  'procurement_id': move.procurement_id.id or False,
@@ -343,37 +369,37 @@ class MrpProductionExtend(models.Model):
                 else:
                     move.stock_moves[0].quantity_done = move.quantity_ready
 
-                #备料完成,减去需求量
+                # 备料完成,减去需求量
                 move.product_id.qty_require -= move.stock_moves[0].product_uom_qty
-
-
 
         self.post_inventory()
         if self._context.get('picking_mode') == 'first_picking':
             self.write({'state': 'finish_prepare_material'})
             # elif self._context.get('picking_mode') == 'second_picking':
             # self.write({'state': 'already_picking'})
-        return {'type' : 'ir.actions.act_window_close'}
+        return {'type': 'ir.actions.act_window_close'}
 
     def button_fill_material(self):
-        return self._show_picking_view(picking_mode='second_picking', invisible_options={'quantity_ready_invisible':True})
+        return self._show_picking_view(picking_mode='second_picking',
+                                       invisible_options={'quantity_ready_invisible': True})
 
-    #领料登记
+    # 领料登记
     def button_already_picking(self):
         self.write({'state': 'already_picking'})
+
     # return self._show_picking_view(picking_mode='first_picking')
 
-    def _show_picking_view(self, picking_mode,invisible_options):
+    def _show_picking_view(self, picking_mode, invisible_options):
         view = self.env.ref('linkloving_mrp_extend.picking_material_form')
-        overpicking_invisible = invisible_options.get('overpicking_invisible',False)
-        quantity_ready_invisible = invisible_options.get('quantity_ready_invisible',False)
+        overpicking_invisible = invisible_options.get('overpicking_invisible', False)
+        quantity_ready_invisible = invisible_options.get('quantity_ready_invisible', False)
 
         return {'type': 'ir.actions.act_window',
                 'res_model': 'mrp.production',
                 'view_mode': 'form',
                 'view_id': view.id,
                 'res_id': self.id,
-                'context': {'picking_mode' : picking_mode,
+                'context': {'picking_mode': picking_mode,
                             'overpicking_invisible': overpicking_invisible,
                             'quantity_ready_invisible': quantity_ready_invisible},
                 'target': 'new'}
@@ -412,7 +438,7 @@ class MrpProductionExtend(models.Model):
             'group_id': self.procurement_group_id.id,
             'propagate': self.propagate,
             'unit_factor': quantity / original_quantity,
-            'suggest_qty':  line_data['suggest_qty'],
+            'suggest_qty': line_data['suggest_qty'],
         }
         return self.env['stock.move'].create(data)
 
@@ -438,20 +464,21 @@ class MrpProductionExtend(models.Model):
     def _update_raw_move(self, bom_line, line_data):
         quantity = line_data['qty']
         self.ensure_one()
-        move = self.move_raw_ids.filtered(lambda x: x.bom_line_id.id == bom_line.id and x.state not in ('done', 'cancel'))
+        move = self.move_raw_ids.filtered(
+            lambda x: x.bom_line_id.id == bom_line.id and x.state not in ('done', 'cancel'))
         if move:
             if quantity > 0:
                 move[0].write({'product_uom_qty': quantity,
                                'suggest_qty': line_data['suggest_qty']})
             else:
                 if move[0].quantity_done > 0:
-                    raise UserError(_('Lines need to be deleted, but can not as you still have some quantities to consume in them. '))
+                    raise UserError(_(
+                        'Lines need to be deleted, but can not as you still have some quantities to consume in them. '))
                 move[0].action_cancel()
                 move[0].unlink()
             return move
         else:
             self._generate_raw_move(bom_line, line_data)
-
 
     @api.model
     def _needaction_domain_get(self):
@@ -459,13 +486,9 @@ class MrpProductionExtend(models.Model):
             :return: domain or False is no action
 
         """
-        state=self._context.get('state')
+        state = self._context.get('state')
         if state:
-            return [('state', '=', state)]
-
-
-
-
+            return [('state', '=', state), ('in_charge_id', '=', self.env.user.partner_id.id)]
 
 
 class ChangeProductionQty(models.TransientModel):
@@ -534,10 +557,11 @@ class ChangeProductionQty(models.TransientModel):
                     wo._generate_lot_ids()
         return {}
 
-    # @api.multi
-    # def change_prod_qty(self):
-    #     # self.mo_id.write({'state': 'waiting_material'})
-    #     return super(ChangeProductionQty, self).change_prod_qty()
+        # @api.multi
+        # def change_prod_qty(self):
+        #     # self.mo_id.write({'state': 'waiting_material'})
+        #     return super(ChangeProductionQty, self).change_prod_qty()
+
 
 class ConfirmProduction(models.TransientModel):
     _name = 'confirm.production'
@@ -565,9 +589,9 @@ class ConfirmProduction(models.TransientModel):
         })
         qty_wizard.change_prod_qty()
 
+
 class MrpProductionProduceExtend(models.TransientModel):
     _inherit = 'mrp.product.produce'
-
 
     @api.multi
     def do_produce(self):
@@ -593,6 +617,7 @@ class MrpProductionProduceExtend(models.TransientModel):
             self.production_id.state = 'progress'
         return {'type': 'ir.actions.act_window_close'}
 
+
 class ReturnOfMaterial(models.Model):
     _name = 'mrp.return.material'
 
@@ -600,7 +625,7 @@ class ReturnOfMaterial(models.Model):
         return self.env.ref('stock.stock_location_stock', raise_if_not_found=False)
 
     def _get_default_location_id(self):
-        return self.env['stock.location'].search([('usage', '=', 'production')],limit=1)
+        return self.env['stock.location'].search([('usage', '=', 'production')], limit=1)
 
     @api.model
     def _default_return_line(self):
@@ -608,28 +633,29 @@ class ReturnOfMaterial(models.Model):
             mrp_production_order = self.env['mrp.production'].browse(self._context['active_id'])
             if mrp_production_order.product_id.bom_ids:
                 product_ids = mrp_production_order.product_id.bom_ids[0].bom_line_ids.mapped(
-                        'product_id').ids
+                    'product_id').ids
             lines = []
             for l in product_ids:
                 obj = self.env['return.material.line'].create({
-                    'return_qty' : 0,
-                    'product_id' : l,
-                    })
+                    'return_qty': 0,
+                    'product_id': l,
+                })
                 lines.append(obj.id)
             return lines
 
-    return_ids = fields.One2many('return.material.line','return_id', default=_default_return_line)
+    return_ids = fields.One2many('return.material.line', 'return_id', default=_default_return_line)
     name = fields.Char(
-        'Reference',  default=lambda self: _('New'),
-        copy=False, readonly=True, required=True,)
-    owner_id = fields.Many2one('res.partner', 'Owner',)
+        'Reference', default=lambda self: _('New'),
+        copy=False, readonly=True, required=True, )
+    owner_id = fields.Many2one('res.partner', 'Owner', )
     move_id = fields.Many2one('stock.move', 'Scrap Move', readonly=True)
     # picking_id = fields.Many2one('stock.picking', 'Picking', states={'done': [('readonly', True)]})
     location_id = fields.Many2one(
         'stock.location', 'Location', domain="[('usage', '=', 'production')]",
         required=True, default=_get_default_location_id)
     return_location_id = fields.Many2one(
-        'stock.location', 'Return Location', default=_get_default_return_location_id,domain="[('usage', '=', 'internal')]",)
+        'stock.location', 'Return Location', default=_get_default_return_location_id,
+        domain="[('usage', '=', 'internal')]", )
     return_qty = fields.Float('Return Quantity', default=0.0, required=True)
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -651,6 +677,7 @@ class ReturnOfMaterial(models.Model):
         else:
             self.production_id.write({'state': 'waiting_warehouse_inspection'})
         return True
+
     @api.model
     def create(self, vals):
         obj = super(ReturnOfMaterial, self).create(vals)
@@ -661,7 +688,7 @@ class ReturnOfMaterial(models.Model):
 
     def action_done(self):
         self.do_return()
-        return {'type':'ir.actions.act_window_close'}
+        return {'type': 'ir.actions.act_window_close'}
 
     def _prepare_move_values(self, product):
         self.ensure_one()
@@ -670,21 +697,23 @@ class ReturnOfMaterial(models.Model):
             'product_id': product.product_id.id,
             'product_uom': product.product_id.uom_id.id,
             'product_uom_qty': product.return_qty,
-            'quantity_done' : product.return_qty,
+            'quantity_done': product.return_qty,
             'location_id': self.location_id.id,
             'location_dest_id': self.return_location_id.id,
-            'production_id' : self.production_id.id,
+            'production_id': self.production_id.id,
             'state': 'confirmed',
-            'origin' : 'Return %s' % self.production_id.name,
-            'is_return_material' : True,
+            'origin': 'Return %s' % self.production_id.name,
+            'is_return_material': True,
             # 'restrict_partner_id': self.owner_id.id,
             # 'picking_id': self.picking_id.id
         }
 
+
 class ProductProductExtend(models.Model):
     _inherit = 'product.product'
 
-    return_qty = fields.Float(string='Return Quantity',default=0)
+    return_qty = fields.Float(string='Return Quantity', default=0)
+
 
 class WareHouseArea(models.Model):
     _name = 'warehouse.area'
@@ -744,7 +773,7 @@ class SimStockMove(models.Model):
             sim_move.return_qty = 0
             for move in move_to_return:
                 if move.product_id == sim_move.product_id and move.is_return_material:
-                        sim_move.return_qty += move.product_qty
+                    sim_move.return_qty += move.product_qty
 
     def _compute_raw_material_production_id(self):
         for sim_move in self:
@@ -756,14 +785,14 @@ class SimStockMove(models.Model):
             if sim_move.stock_moves:
                 sim_move.raw_material_production_id = sim_move.stock_moves[0].raw_material_production_id
 
-    product_id = fields.Many2one('product.product',)
+    product_id = fields.Many2one('product.product', )
     production_id = fields.Many2one('mrp.production')
     stock_moves = fields.One2many('stock.move', compute=_compute_stock_moves)
-    raw_material_production_id = fields.Many2one('mrp.production',compute=_compute_raw_material_production_id)
+    raw_material_production_id = fields.Many2one('mrp.production', compute=_compute_raw_material_production_id)
     procurement_id = fields.Many2one('procurement.order', 'Procurement', compute=_compute_procurement_id)
     production_state = fields.Selection(related='production_id.state', readonly=True)
 
-    quantity_done = fields.Float(default=0,compute=_compute_quantity_done)
+    quantity_done = fields.Float(default=0, compute=_compute_quantity_done)
     product_uom_qty = fields.Float(compute=_default_product_uom_qty)
     qty_available = fields.Float(compute=_default_qty_available)
     virtual_available = fields.Float(compute=_default_virtual_available)
@@ -774,21 +803,23 @@ class SimStockMove(models.Model):
     quantity_ready = fields.Float()
     area_id = fields.Many2one(related='product_id.area_id')
 
+
 class ReturnMaterialLine(models.Model):
     _name = 'return.material.line'
 
     product_id = fields.Many2one('product.product')
     return_qty = fields.Float('Return Quantity', readonly=False)
-    return_id = fields.Many2one('mrp.return.material' )
+    return_id = fields.Many2one('mrp.return.material')
 
 
 class HrEmployeeExtend(models.Model):
     _inherit = 'hr.employee'
 
     is_worker = fields.Boolean('Is Worker', default=False)
-    now_mo_id =fields.Many2one('mrp.production')
+    now_mo_id = fields.Many2one('mrp.production')
 
-#每个工人所处在的生产线
+
+# 每个工人所处在的生产线
 class LLWorkerLine(models.Model):
     _name = 'worker.line'
 
@@ -802,9 +833,10 @@ class LLWorkerLine(models.Model):
         for line in self:
             if line.worker_time_line_ids:
                 worker_time_line_ids_sorted = sorted(line.worker_time_line_ids, key=lambda d: d.start_time)
-                line.line_state = worker_time_line_ids_sorted[len(worker_time_line_ids_sorted)-1].state
+                line.line_state = worker_time_line_ids_sorted[len(worker_time_line_ids_sorted) - 1].state
             else:
                 line.line_state = 'online'
+
     @api.multi
     def _compute_spent_time(self):
         for line in self:
@@ -814,26 +846,26 @@ class LLWorkerLine(models.Model):
     production_id = fields.Many2one('mrp.production', 'Manufacturing Order')
     unit_price = fields.Float(related='production_id.unit_price', string='Unit Price')
     mo_type = fields.Selection(related='production_id.mo_type', string='Mo Type')
-    xishu = fields.Float(default=1.0,string='Rate')
+    xishu = fields.Float(default=1.0, string='Rate')
     amount_of_money = fields.Float(compute=_compute_amount_of_money)
     worker_time_line_ids = fields.One2many('worker.time.line', 'worker_line_id')
     spent_time = fields.Float(compute='_compute_spent_time')
     line_state = fields.Selection(
         [
-            ('online','Normal'),
+            ('online', 'Normal'),
             ('offline', 'On Leave'),
             ('outline', 'Exit'),
         ], compute=_compute_line_state)
 
     def create_time_line(self):
-         self.env['worker.time.line'].create({
-                'worker_line_id' : self.id,
-                'start_time': fields.datetime.now(),
-         })
+        self.env['worker.time.line'].create({
+            'worker_line_id': self.id,
+            'start_time': fields.datetime.now(),
+        })
 
     def get_newest_time_line(self):
         worker_time_line_ids_sorted = sorted(self.worker_time_line_ids, key=lambda d: d.start_time)
-        return worker_time_line_ids_sorted[len(worker_time_line_ids_sorted)-1]
+        return worker_time_line_ids_sorted[len(worker_time_line_ids_sorted) - 1]
 
     @api.multi
     def change_worker_state(self, state):
@@ -842,29 +874,28 @@ class LLWorkerLine(models.Model):
                 continue
             else:
                 new_time_line = line.get_newest_time_line()
-                if new_time_line.state != state:#若状态改变
+                if new_time_line.state != state:  # 若状态改变
                     if state == 'outline':
                         new_time_line.worker_id.now_mo_id = None
                     else:
                         new_time_line.worker_id.now_mo_id = new_time_line.production_id.id
                     new_time_line.offline_set_time()
                     self.env['worker.time.line'].create({
-                    'start_time' : fields.datetime.now(),
-                    'worker_line_id' : line.id,
-                    'state' : state,
+                        'start_time': fields.datetime.now(),
+                        'worker_line_id': line.id,
+                        'state': state,
                     })
 
-
-    #计算每个工人的所花费的时间
+    # 计算每个工人的所花费的时间
     # @api.multi
     def cal_worker_spent_time(self):
         # for worker_line in self:
-            sum_time = 0
-            for time_line in self.worker_time_line_ids:
-                if time_line.state == 'online' and time_line.end_time:
-                    sum_time += time_line.cal_interval_of_time_line()
+        sum_time = 0
+        for time_line in self.worker_time_line_ids:
+            if time_line.state == 'online' and time_line.end_time:
+                sum_time += time_line.cal_interval_of_time_line()
 
-            return sum_time
+        return sum_time
 
 
 class LLWorkerTimeLine(models.Model):
@@ -874,13 +905,13 @@ class LLWorkerTimeLine(models.Model):
     end_time = fields.Datetime()
     state = fields.Selection(
         [
-            ('online','Normal'),
+            ('online', 'Normal'),
             ('offline', 'On leave'),
             ('outline', 'Exit'),
         ], default='online')
 
     worker_line_id = fields.Many2one('worker.line')
-    worker_id = fields.Many2one(related='worker_line_id.worker_id' ,string="Worker")
+    worker_id = fields.Many2one(related='worker_line_id.worker_id', string="Worker")
     production_id = fields.Many2one(related='worker_line_id.production_id', string='Manufacturing Order')
 
     def offline_set_time(self):
@@ -905,6 +936,7 @@ class MrpQcFeedBack(models.Model):
     def _compute_qc_fail_rate(self):
         for qc in self:
             qc.qc_fail_rate = qc.qc_fail_qty / qc.qc_test_qty * 100
+
     production_id = fields.Many2one('mrp.production')
     qty_produced = fields.Float(related='production_id.qty_produced')
     qc_test_qty = fields.Float(string='Sampling Quantity')
@@ -916,6 +948,7 @@ class MrpQcFeedBack(models.Model):
 
     product_id = fields.Many2one('production_id.product_id')
 
+
 class MultiHandleWorker(models.TransientModel):
     _name = 'multi.handle.worker'
 
@@ -923,7 +956,7 @@ class MultiHandleWorker(models.TransientModel):
     def action_ok(self):
         context = dict(self._context or {})
         active_ids = context.get('active_ids', []) or []
-        employees = self.env['hr.employee'].search([('id','in', active_ids)])
+        employees = self.env['hr.employee'].search([('id', 'in', active_ids)])
         for em in employees:
             em.is_worker = True
 
@@ -942,29 +975,29 @@ class ProcurementOrderExtend(models.Model):
 
     def _prepare_mo_vals(self, bom):
         res = super(ProcurementOrderExtend, self)._prepare_mo_vals(bom)
-        #解析原单据
+        # 解析原单据
         self.parse_origin_and_update_dic(res)
 
-        res.update({'state' : 'draft',
-                    'process_id' : bom.process_id.id,
-                    'unit_price' : bom.process_id.unit_price,
-                    'mo_type' : bom.mo_type,
-                    'hour_price' : bom.hour_price,
-                    'in_charge_id' : bom.process_id.partner_id.id,
-                    'product_qty' : self.get_actual_require_qty(),
+        res.update({'state': 'draft',
+                    'process_id': bom.process_id.id,
+                    'unit_price': bom.process_id.unit_price,
+                    'mo_type': bom.mo_type,
+                    'hour_price': bom.hour_price,
+                    'in_charge_id': bom.process_id.partner_id.id,
+                    'product_qty': self.get_actual_require_qty(),
                     })
         return res
 
     def parse_origin_and_update_dic(self, dict):
-        #解析原单据
+        # 解析原单据
         origin_names = self.origin.split(":")
         sale_ret = self.env["sale.order"].search([("name", "in", origin_names)], limit=1)
         mo_ret = self.env["mrp.production"].search([("name", "in", origin_names)], limit=1)
 
         if sale_ret:
-            dict.update({'origin_sale_id' : sale_ret.id})
+            dict.update({'origin_sale_id': sale_ret.id})
         if mo_ret:
-            dict.update({'origin_mo_id' : mo_ret.id})
+            dict.update({'origin_mo_id': mo_ret.id})
 
     @api.multi
     def _prepare_purchase_order_line(self, po, supplier):
@@ -974,7 +1007,7 @@ class ProcurementOrderExtend(models.Model):
 
         self.parse_origin_and_update_dic(res)
         res.update({
-            "product_qty" : procurement_uom_po_qty
+            "product_qty": procurement_uom_po_qty
         })
         return res
 
@@ -988,6 +1021,7 @@ class ProcurementOrderExtend(models.Model):
                     chose_po_lines += po_line
                     total_draft_order_qty += po_line.product_qty
         return total_draft_order_qty
+
     def get_actual_require_qty(self):
         cur = datetime.datetime.now()
         print "-------------start time: %s" % cur
@@ -1042,7 +1076,7 @@ class ProcurementOrderExtend(models.Model):
             xuqiul = self.product_id.qty_require
             if need_add_require:
                 xuqiul += self.product_qty
-            pos = self.env["purchase.order"].search([("state", "in", ("make_by_mrp","draft"))])
+            pos = self.env["purchase.order"].search([("state", "in", ("make_by_mrp", "draft"))])
             chose_po_lines = self.env["purchase.order.line"]
             total_draft_order_qty = 0
             for po in pos:
@@ -1052,11 +1086,11 @@ class ProcurementOrderExtend(models.Model):
                         total_draft_order_qty += po_line.product_qty
                         break
             if total_draft_order_qty + self.product_id.incoming_qty + self.product_id.qty_available - xuqiul < 0:
-                actual_need_qty = xuqiul - (total_draft_order_qty + self.product_id.incoming_qty + self.product_id.qty_available)
+                actual_need_qty = xuqiul - (
+                    total_draft_order_qty + self.product_id.incoming_qty + self.product_id.qty_available)
                 if need_add_require:
                     self.product_id.qty_require += actual_need_qty
         return actual_need_qty
-
 
 
 class MultiSetMTO(models.TransientModel):
@@ -1066,16 +1100,14 @@ class MultiSetMTO(models.TransientModel):
         context = dict(self._context or {})
         active_ids = context.get('active_ids', []) or []
         is_checked = context.get('is_checked', [])
-        products = self.env['product.template'].search([('id','in', active_ids)])
+        products = self.env['product.template'].search([('id', 'in', active_ids)])
         insert_type = 4 if is_checked else 2
         for product in products:
             product.route_ids = [(insert_type, self.env.ref('stock.route_warehouse0_mto').id)]
 
 
-
 class purchase_order_extend(models.Model):
     _inherit = "purchase.order"
-
 
     @api.multi
     def change_state_to_rfq(self):
