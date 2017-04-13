@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_pur_req_user,pur.req user,model_pur_req,base.group_user,1,1,1,1
+access_pur_req_line_user,pur.req.line user,model_pur_req_line,base.group_user,1,1,1,1
+access_pur_req_buyer,pur.req buyer,model_pur_req,ydit_pur_req.group_pur_req_buyer,1,1,0,0
+access_pur_req_line_buyer,pur.req.line buyer,model_pur_req_line,ydit_pur_req.group_pur_req_buyer,1,1,0,0
+access_pur_req_checker,pur.req checker,model_pur_req,ydit_pur_req.group_pur_req_checker,1,1,0,0
+access_pur_req_line_checker,pur.req.line checker,model_pur_req_line,ydit_pur_req.group_pur_req_checker,1,1,0,0

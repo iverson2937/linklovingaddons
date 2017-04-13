@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_procurement_form_po_req" model="ir.ui.view">
+            <field name="name">view_procurement_form_po_req</field>
+            <field name="model">procurement.order</field>
+            <field name="inherit_id" ref="procurement.procurement_form_view"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//field[@name='move_id']" position="after">
+                        <field name="pur_req_line_id" readonly="1"/>
+                        <field name="pur_req_id" readonly="1"/>
+                    </xpath>
+                    <field name='origin' position='before'>
+                        <field name="id"/>
+                    </field>
+                </data>
+            </field>
+        </record>
+        <record id="procurement_tree_view_po_req" model="ir.ui.view">
+            <field name="name">procurement_tree_view_po_req</field>
+            <field name="model">procurement.order</field>
+            <field name="inherit_id" ref="procurement.procurement_tree_view"/>
+            <field name="arch" type="xml">
+                <data>
+                    <field name='date_planned' position='before'>
+                        <field name="id"/>
+                    </field>
+                    <xpath expr="//field[@name='procure_method']" position="after">
+                        <field name="move_id" readonly="1"/>
+                        <field name="pur_req_line_id" readonly="1"/>
+                        <field name="pur_req_id" readonly="1"/>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+    </data>
+</openerp>

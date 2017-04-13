@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <!-- Sequences for purchase.order -->
+        <record id="seq_type_pur_req" model="ir.sequence.type">
+            <field name="name">Purchase Requisition</field>
+            <field name="code">pur.req</field>
+        </record>
+        <record id="seq_purchase_requisition" model="ir.sequence">
+            <field name="name">Purchase Requisition</field>
+            <field name="code">pur.req</field>
+            <field name="prefix">PR</field>
+            <field name="padding">5</field>
+        </record>
+    </data>
+</openerp>

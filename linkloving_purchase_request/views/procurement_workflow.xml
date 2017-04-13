@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- Procurement
+            Redirect the procurement purchase to purchae requisition
+        -->
+        <record id="purchase.act_buy" model="workflow.activity">
+            <field name="wkf_id" ref="procurement.wkf_procurement"/>
+            <field name="name">buy</field>
+            <field name="kind">function</field>
+            <field name="subflow_id">False</field>
+            <field name="action">action_pur_req_assign()</field>
+        </record>
+
+        <record id="purchase.trans_confirm_mto_purchase" model="workflow.transition">
+            <field name="act_from" ref="procurement.act_confirm_mto"/>
+            <field name="act_to" ref="purchase.act_buy"/>
+            <field name="condition">check_buy()</field>
+        </record>
+
+        <record id="purchase.trans_buy_make_done" model="workflow.transition">
+            <field name="act_from" ref="purchase.act_buy"/>
+            <field name="act_to" ref="procurement.act_make_done"/>
+            <field name="signal">pur_req_done</field>
+        </record>
+
+        <record id="purchase.trans_buy_cancel" model="workflow.transition">
+            <field name="act_from" ref="purchase.act_buy"/>
+            <field name="act_to" ref="procurement.act_cancel"/>
+            <field name="signal">pur_req_cancel</field>
+        </record>
+
+    </data>
+</openerp>

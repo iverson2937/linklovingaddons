@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+
+        <record model="ir.module.category" id="module_category_pur_req">
+            <field name="name">Purchase Requisition</field>
+            <field name="parent_id" ref="base.module_category_purchase_management"/>
+            <field name="sequence">1001</field>
+        </record>
+
+        <record id="group_pur_req_requester" model="res.groups">
+            <field name="name">Requester</field>
+            <field name="category_id" ref="module_category_pur_req"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        <record id="group_pur_req_checker" model="res.groups">
+            <field name="name">Checker</field>
+            <field name="category_id" ref="module_category_pur_req"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        <record id="group_pur_req_buyer" model="res.groups">
+            <field name="name">Buyer</field>
+            <field name="category_id" ref="module_category_pur_req"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="group_pur_req_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="category_id" ref="module_category_pur_req"/>
+            <field name="implied_ids"
+                   eval="[(4, ref('group_pur_req_requester')),(4, ref('group_pur_req_checker')),(4, ref('group_pur_req_buyer'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        </record>
+
+        <record model="ir.rule" id="pur_req_own">
+            <field name="name">User can see only Own purchase requisition</field>
+            <field name="model_id" ref="model_pur_req"/>
+            <field name="domain_force">[('user_id', 'in', [user.id])]</field>
+            <field name="groups" eval="[(4,ref('base.group_user'))]"/>
+        </record>
+        <record model="ir.rule" id="pur_req_company_checker">
+            <field name="name">Checker can see all confirmed purchase requisitions</field>
+            <field name="model_id" ref="model_pur_req"/>
+            <field name="domain_force">[('state','not
+                in',('draft','cancel')),'|','|',('company_id','child_of',[user.company_id.id]),('company_id','=',False),
+                ('company_id','in', [c.id for c in user.company_ids])]
+            </field>
+            <field name="groups" eval="[(4,ref('ydit_pur_req.group_pur_req_checker'))]"/>
+        </record>
+        <record model="ir.rule" id="pur_req_company_buyer">
+            <field name="name">BUyser can see the approved purchase requisition</field>
+            <field name="model_id" ref="model_pur_req"/>
+            <field name="domain_force">[('state','not
+                in',('draft','cancel','confirmed')),'|','|',('company_id','child_of',[user.company_id.id]),('company_id','=',False),
+                ('company_id','in', [c.id for c in user.company_ids])]
+            </field>
+            <field name="groups" eval="[(4,ref('ydit_pur_req.group_pur_req_buyer'))]"/>
+        </record>
+        <record model="ir.rule" id="pur_req_company_pur_manager">
+            <field name="name">Manager can see all purchase requisition</field>
+            <field name="model_id" ref="model_pur_req"/>
+            <field name="domain_force">['|','|',('company_id','child_of',[user.company_id.id]),('company_id','=',False),
+                ('company_id','in', [c.id for c in user.company_ids])]
+            </field>
+            <field name="groups" eval="[(4,ref('ydit_pur_req.group_pur_req_manager'))]"/>
+        </record>
+
+    </data>
+</openerp>

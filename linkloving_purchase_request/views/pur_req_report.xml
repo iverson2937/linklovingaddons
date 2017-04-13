@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <report auto="False" id="report_pur_req" model="pur.req" name="pur.req" rml="ydit_pur_req/report/pur_req.rml"
+                string="Purchase Requisition"/>
+    </data>
+</openerp>

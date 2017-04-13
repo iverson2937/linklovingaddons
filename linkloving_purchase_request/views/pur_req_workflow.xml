@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="pur_req" model="workflow">
+            <field name="name">Purchase Requisition Workflow</field>
+            <field name="osv">pur.req</field>
+            <field name="on_create">True</field>
+        </record>
+        <record id="act_draft" model="workflow.activity">
+            <field name="wkf_id" ref="pur_req"/>
+            <field name="flow_start">True</field>
+            <field name="name">draft</field>
+        </record>
+        <record id="act_confirmed" model="workflow.activity">
+            <field name="wkf_id" ref="pur_req"/>
+            <field name="name">confirmed</field>
+            <field name="split_mode">OR</field>
+            <field name="kind">function</field>
+            <field name="action">wkf_confirm_req()
+                _email_notify('confirmed')
+            </field>
+        </record>
+        <record id="act_approved" model="workflow.activity">
+            <field name="wkf_id" ref="pur_req"/>
+            <field name="name">approved</field>
+            <field name="split_mode">OR</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'approved'})
+                _email_notify('approved')
+            </field>
+        </record>
+        <record id="act_rejected" model="workflow.activity">
+            <field name="wkf_id" ref="pur_req"/>
+            <field name="name">rejected</field>
+            <field name="split_mode">OR</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'rejected'})
+                _email_notify('rejected')
+            </field>
+        </record>
+        <record id="act_in_purchase" model="workflow.activity">
+            <field name="wkf_id" ref="pur_req"/>
+            <field name="name">in_purchase</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'in_purchase'})
+                _email_notify('in_purchase')
+            </field>
+        </record>
+        <record id="act_done" model="workflow.activity">
+            <field name="wkf_id" ref="pur_req"/>
+            <field name="name">done</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'done'})
+                _email_notify('done')
+            </field>
+            <field name="flow_stop">True</field>
+            <field name="join_mode">AND</field>
+        </record>
+        <record id="act_cancel" model="workflow.activity">
+            <field name="wkf_id" ref="pur_req"/>
+            <field name="name">cancel</field>
+            <field name="kind">function</field>
+            <field name="flow_stop">True</field>
+            <field name="action">wkf_cancel_req()
+                _email_notify('cancel')
+            </field>
+        </record>
+        <!-- transition -->
+        <record id="trans_draft_confirmed" model="workflow.transition">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_confirmed"/>
+            <field name="signal">pur_req_confirm</field>
+        </record>
+        <record id="trans_req_rejected_confirmed" model="workflow.transition">
+            <field name="act_from" ref="act_rejected"/>
+            <field name="act_to" ref="act_confirmed"/>
+            <field name="signal">pur_req_confirm</field>
+        </record>
+        <!--         <record id="trans_confirmed_purchase" model="workflow.transition">
+                    <field name="act_from" ref="act_confirmed"/>
+                    <field name="act_to" ref="act_in_purchase"/>
+                    <field name="signal">pur_req_purchase</field>
+                </record> -->
+        <record id="trans_confirmed_approved" model="workflow.transition">
+            <field name="act_from" ref="act_confirmed"/>
+            <field name="act_to" ref="act_approved"/>
+            <field name="signal">pur_req_approve</field>
+        </record>
+        <record id="trans_confirmed_rejected" model="workflow.transition">
+            <field name="act_from" ref="act_confirmed"/>
+            <field name="act_to" ref="act_rejected"/>
+            <field name="signal">pur_req_reject</field>
+        </record>
+        <record id="trans_approved_purchase" model="workflow.transition">
+            <field name="act_from" ref="act_approved"/>
+            <field name="act_to" ref="act_in_purchase"/>
+            <field name="signal">pur_req_purchase</field>
+        </record>
+        <record id="trans_purchase_done" model="workflow.transition">
+            <field name="act_from" ref="act_in_purchase"/>
+            <field name="act_to" ref="act_done"/>
+            <field name="signal">pur_req_done</field>
+        </record>
+        <record id="trans_draft_cancel" model="workflow.transition">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">pur_req_cancel</field>
+        </record>
+        <record id="trans_confirmed_cancel" model="workflow.transition">
+            <field name="act_from" ref="act_confirmed"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">pur_req_cancel</field>
+        </record>
+        <record id="trans_approved_cancel" model="workflow.transition">
+            <field name="act_from" ref="act_approved"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">pur_req_cancel</field>
+        </record>
+        <record id="trans_rejected_cancel" model="workflow.transition">
+            <field name="act_from" ref="act_rejected"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">pur_req_cancel</field>
+        </record>
+        <record id="trans_purchase_cancel" model="workflow.transition">
+            <field name="act_from" ref="act_in_purchase"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">pur_req_cancel</field>
+        </record>
+    </data>
+</openerp>
