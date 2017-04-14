@@ -626,7 +626,8 @@ class linkloving_sale_order_line_extend(models.Model):
             mos = self.env["mrp.production"].search([("origin_sale_id", "=", self.order_id.id)])
             for mo in mos:
                 if mo.state == "cancel":
-                    after_conbine_mo = self.env["mrp.production"].search([("source_mo_id", "=", mo.id)])#找到合并后的mo但
+                    after_conbine_mo = self.env["mrp.production"].search(
+                            [([mo.id], "in", "source_mo_ids")])  # 找到合并后的mo但
                     if not after_conbine_mo:
                         continue
                     if after_conbine_mo.state not in ["draft", "confirmed"]:

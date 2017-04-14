@@ -9,7 +9,7 @@
                       <field name="name" require="1"/>
                       <field name="is_finish_transfer"/>
                       <field name="state"/>
-                      <field name="create_date"/>
+                      <field name="my_create_date"/>
                   </tree>
           </field>
       </record>
