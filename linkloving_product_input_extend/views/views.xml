@@ -7,8 +7,30 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='type']" position="before">
                     <field name="product_ll_type" required="1"/>
-                    <field name="order_ll_type" attrs="{'invisible': [('product_ll_type', '!=', 'finished')]}"/>
+
+                    <field name="order_ll_type"
+                           attrs="{'invisible': [('product_ll_type', '!=', 'finished')],'required':[('product_ll_type', '=', 'finished')]}"/>
                 </xpath>
+            </field>
+        </record>
+
+        <record id="view_stock_ordering" model="ir.ui.view">
+            <field name="name">stock.ordering.form</field>
+            <field name="model">stock.ordering</field>
+            <field name="arch" type="xml">
+                <form string="设置存货规则数量">
+                    <sheet>
+                        <group>
+                            <field name="min_qty"/>
+                            <field name="max_qty"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button string="确定" name="action_ok" type="object" default_focus="1"
+                                class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
             </field>
         </record>
     </data>

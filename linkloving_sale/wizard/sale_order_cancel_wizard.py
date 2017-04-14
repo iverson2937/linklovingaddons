@@ -17,7 +17,7 @@ class SaleOrderCancel(models.TransientModel):
         active_ids = context.get('active_ids', []) or []
 
         for record in self.env['sale.order'].browse(active_ids):
-            if record.invoice_status != 'no':
+            if record.invoice_status not in ['no', 'to invoice']:
                 raise UserError(u"只可删除待发货状态的销售单")
             record.action_cancel()
         return {'type': 'ir.actions.act_window_close'}
