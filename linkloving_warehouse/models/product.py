@@ -63,3 +63,11 @@ class ProductTemplate(models.Model):
                 [('product_id', 'in', updated.mapped('product_variant_ids').ids)], limit=1)
 
         return super(models.Model, self).write(vals)
+
+    @api.multi
+    def toggle_active(self):
+        """ Inverse the value of the field ``active`` on the records in ``self``. """
+        for record in self:
+            record.active = not record.active
+            for product in record.product_variant_ids:
+                product.active = not product.active
