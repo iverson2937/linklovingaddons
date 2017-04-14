@@ -542,7 +542,10 @@ class linkloving_sale_extend(models.Model):
     _inherit = "sale.order"
 
     def action_confirm(self):
-        # self.order_line.set_qty_require()
+        self.ensure_one()
+        for line in self.order_line:
+            if not line.product_id.bom_ids:
+                raise UserError(u"%s 未找到对应的Bom" % line.product_id.display_name)
         return super(linkloving_sale_extend, self).action_confirm()
 
     def action_cancel(self):
