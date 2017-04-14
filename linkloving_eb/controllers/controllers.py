@@ -42,15 +42,47 @@ class LinklovingEb(http.Controller):
         return JsonResponse.send_response(res_code=STATUS_CODE_OK,
                                           res_data=orders_json)
 
+    @http.route('/linkloving_app_api/eb_order/get_today_eb_order', auth='none', type="json", crsf=False)
+    def get_today_eb_order(self, **kw):
+        eb_order = request.env["eb.order"].sudo().search(
+                [("my_create_date", "=", datetime.date.today().strftime('%Y-%m-%d')), ("state", "=", "draft")], limit=1)
+        if not eb_order:
+            eb_order = request.env["eb.order"].sudo().create({})
+        return JsonResponse.send_response(res_code=STATUS_CODE_OK,
+                                          res_data=LinklovingEb.convert_eb_order_to_json(eb_order))
+
+    @http.route('/linkloving_app_api/eb_order/delete_eb_order_line', auth='none', type="json", crsf=False)
+    def delete_eb_order_line(self, **kw):
+        line_id = request.jsonrequest.get("line_id")
+        line = request.env["eb.order.line"].sudo().search([("id", "=", line_id)], limit=1)
+        if line:
+            line.unlink()
+        else:
+            return JsonResponse.send_response(res_code=STATUS_CODE_ERROR,
+                                              res_data={"error": u"条目id错误"})
+        return JsonResponse.send_response(res_code=STATUS_CODE_OK,
+                                          res_data={})
 
     @http.route('/linkloving_app_api/eb_order/create_eb_order', auth='none', type="json", crsf=False)
     def create_eb_order(self, **kw):
         eb_order_dic = request.jsonrequest.get("eb_order")
+        order_id = eb_order_dic.get("order_id")
 
-        if not eb_order_dic:
+        if not eb_order_dic or not order_id:
             return JsonResponse.send_response(res_code=STATUS_CODE_ERROR,
                                               res_data={"error" : "请检查参数"})
-        eb_order = request.env["eb.order"].sudo().create(self.prepare_eb_order_values(eb_order_dic))
+        eb_order = request.env["eb.order"].sudo().search([("id", "=", order_id)], limit=1)
+        if eb_order:
+            for line in eb_order_dic.get("eb_order_line_ids"):
+                request.env["eb.order.line"].sudo().create({
+                    "qty": line.get("qty"),
+                    "product_id": line.get("product_id").get("product_product_id"),
+                    "eb_order_id": eb_order.id
+                })
+        else:
+            return JsonResponse.send_response(res_code=STATUS_CODE_ERROR,
+                                              res_data={"error": "未找到今日的电商出货单"})
+
         return JsonResponse.send_response(res_code=STATUS_CODE_OK,
                                               res_data=LinklovingEb.convert_eb_order_to_json(eb_order))
 
@@ -68,8 +100,9 @@ class LinklovingEb(http.Controller):
     def prepare_eb_order_values(self, dic):
 
         vals = {
-            "name" : dic.get("order_name") or "",
-            "eb_order_line_ids" : [(0, 0, {"qty" : line.get("qty"), "product_id" : line.get("product_id").get("product_product_id")}) for line in dic.get("eb_order_line_ids")]
+            "eb_order_line_ids": [
+                (1, {"qty": line.get("qty"), "product_id": line.get("product_id").get("product_product_id")}) for line
+                in dic.get("eb_order_line_ids")]
         }
         return vals
 

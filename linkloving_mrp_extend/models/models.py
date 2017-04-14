@@ -1062,53 +1062,6 @@ class ProcurementOrderExtend(models.Model):
         cur = datetime.datetime.now()
         print "-------------end time: %s" % cur
         return actual_need_qty
-        all_parent_location_ids = self._find_parent_locations()
-        rule = self._search_suitable_rule([('location_id', 'in', all_parent_location_ids.ids)])
-        if rule.action == "manufacture":
-            # if rule.procure_method == "make_to_order":
-            ori_require_qty = self.product_id.qty_require  # 初始需求数量
-            real_require_qty = self.product_id.qty_require + self.product_qty  # 加上本次销售的需求数量
-            if need_add_require:
-                self.product_id.qty_require = real_require_qty
-                stock_qty = self.product_id.qty_available  # 库存数量
-
-                if ori_require_qty > stock_qty and real_require_qty > stock_qty:  # 初始需求 > 库存  并且 现有需求 > 库存
-                    actual_need_qty = self.product_qty
-                elif ori_require_qty <= stock_qty and real_require_qty > stock_qty:
-                    actual_need_qty = real_require_qty - stock_qty
-                    # else:
-                    #     xuqiul = self.product_id.qty_require
-                    #     OrderPoint = self.env['stock.warehouse.orderpoint'].search([("product_id", "=", self.product_id.id)],
-                    #                                                                limit=1)
-                    #     qty = xuqiul + OrderPoint.product_min_qty - self.product_id.qty_available
-                    #     mos = self.env["mrp.production"].search(
-                    #             [("product_id", "=", self.product_id.id), ("state", "not in", ("cancel", "done"))])
-                    #     qty_in_procure = 0
-                    #     for mo in mos:
-                    #         qty_in_procure += mo.product_qty
-                    #     if qty - qty_in_procure > 0:  # 需求量+最小存货-库存-在产数量
-                    #         actual_need_qty = xuqiul + max(OrderPoint.product_min_qty,
-                    #                                        OrderPoint.product_max_qty) - self.product_id.qty_available - qty_in_procure
-
-        elif rule.action == "buy":
-            xuqiul = self.product_id.qty_require
-            if need_add_require:
-                xuqiul += self.product_qty
-            pos = self.env["purchase.order"].search([("state", "in", ("make_by_mrp", "draft"))])
-            chose_po_lines = self.env["purchase.order.line"]
-            total_draft_order_qty = 0
-            for po in pos:
-                for po_line in po.order_line:
-                    if po_line.product_id.id == self.product_id.id:
-                        chose_po_lines += po_line
-                        total_draft_order_qty += po_line.product_qty
-                        break
-            if total_draft_order_qty + self.product_id.incoming_qty + self.product_id.qty_available - xuqiul < 0:
-                actual_need_qty = xuqiul - (
-                    total_draft_order_qty + self.product_id.incoming_qty + self.product_id.qty_available)
-                if need_add_require:
-                    self.product_id.qty_require += actual_need_qty
-        return actual_need_qty
 
 
 class MultiSetMTO(models.TransientModel):

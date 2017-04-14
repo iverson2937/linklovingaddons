@@ -16,11 +16,13 @@
             <field eval="1" name="customer"/>
         </record>
 
-    <!--<record id="warehouse_eb" model="stock.warehouse">-->
-            <!--<field name="partner_id" ref="base.main_partner"/>-->
-            <!--<field name="code">DS</field>-->
-            <!--<field name="name">dd电商中转仓库1</field>-->
-            <!--<field name="lot_stock_id" ref="stock_location_eb_transfer"/>-->
-        <!--</record>-->
+    <!-- Sequences for sale.order -->
+    <record id="seq_eb_order" model="ir.sequence">
+        <field name="name">EB Orders</field>
+        <field name="code">eb.order</field>
+        <field name="prefix">EBO</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
 </data>
 </odoo>

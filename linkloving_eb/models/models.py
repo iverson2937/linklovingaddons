@@ -34,6 +34,7 @@ class linkloving_eb_temporary_order(models.Model):
                               ("transfered", _("Transfered")),#已经合并成销售订单的
                              ], default="draft")
 
+    my_create_date = fields.Date(string="创建时间", default=fields.datetime.now())
     stock_picking_ids = fields.One2many("stock.picking","eb_order_id")
     sale_order_id = fields.Many2one("sale.order")
     is_finish_transfer = fields.Selection([('yes', '已完成'),("no", "未完成")],"是否已经出货", compute="_compute_is_finsish_transfer")
@@ -95,6 +96,13 @@ class linkloving_eb_temporary_order(models.Model):
             picking_out_2.do_transfer()
             picking_out_2.to_stock()
 
+    @api.model
+    def create(self, vals):
+        if not vals.get('name'):
+            vals['name'] = self.env['ir.sequence'].next_by_code('eb.order') or '/'
+
+        return super(linkloving_eb_temporary_order, self).create(vals)
+    
 
 class linkloving_eb_stock_picking(models.Model):
     _inherit = "stock.picking"
