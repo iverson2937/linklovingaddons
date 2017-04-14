@@ -20,12 +20,5 @@
             </field>
         </record>
 
-
-        <act_window id="action_mrp_production_combine"
-                    multi="True"
-                    key2="client_action_multi" name="Combine MO"
-                    res_model="mrp.production.combine" src_model="mrp.production"
-                    view_mode="form" target="new" view_type="form"/>
-
     </data>
 </openerp>

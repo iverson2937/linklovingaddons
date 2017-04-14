@@ -27,5 +27,32 @@
                     res_model="mrp.production.combine" src_model="mrp.production"
                     view_mode="form" target="new" view_type="form"/>
 
+        <record id="mrp_production_form_view_ll" model="ir.ui.view">
+            <field name="name">mrp.production.form</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+            <field name="arch" type="xml">
+
+
+                <xpath expr="//notebook/page[3]" position="after" attrs="{'invisible':[('source_mo_ids','=',False)]}">
+                    <page string="原制造单">
+                        <field name="source_mo_ids">
+                            <tree editable="bottom" delete="0" create="0">
+                                <field name="name" string="编号"/>
+                                <field name="date_planned_start" string="交期"/>
+                                <field name="product_id"/>
+                                <field name="product_qty"/>
+                                <field name="product_uom_id"/>
+                                <field name="origin"/>
+                                <field name="state" string="状态"/>
+
+                            </tree>
+                        </field>
+
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
     </data>
 </openerp>
