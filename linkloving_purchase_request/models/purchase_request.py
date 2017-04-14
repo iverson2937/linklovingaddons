@@ -42,7 +42,7 @@ class PurchaseRequest(models.Model):
             res[req.id] = po_ids
         return res
 
-    name = fields.Char(u'采购申请', size=32, required=True)
+    name = fields.Char(u'采购申请', size=32, required=False)
     warehouse_id = fields.Many2one('stock.warehouse', 'Warehouse', required=True, readonly=True,
                                    states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]})
     order_id = fields.Many2one('purchase.order')
@@ -51,7 +51,7 @@ class PurchaseRequest(models.Model):
                               default=lambda self: self.env.user.id, string=u'请购人')
     date_request = fields.Date(required=True, readonly=True,
                                states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]},
-                               default=fields.Date.context_today, string=u'请购日期')
+                               default=fields.Date.today(), string=u'请购日期')
     remark = fields.Text(u'备注')
     company_id = fields.Many2one('res.company', 'Company', required=True, readonly=True,
                                  states={'draft': [('readonly', False)], 'rejected': [('readonly', False)]},
@@ -72,6 +72,14 @@ class PurchaseRequest(models.Model):
     _sql_constraints = [
         ('name_uniq', 'unique(name)', 'Order Reference must be unique!'),
     ]
+
+    @api.model
+    def create(self, vals):
+        print vals, 'dddddddddddddddddddddddddddddddddd'
+        if not vals.get('name'):
+            vals['name'] = self.env['ir.sequence'].next_by_code('purchase.request') or '/'
+            print vals['name']
+        return super(PurchaseRequest, self).create(vals)
 
     def cancel_req_procurements(self):
         # get related procurement ids
@@ -184,13 +192,15 @@ class PurchaseRequestLine(models.Model):
     req_id = fields.Many2one('purchase.request', 'Purchase Requisition', ondelete='cascade')
     product_id = fields.Many2one('product.product', 'Product', required=True)
     product_qty = fields.Float('Quantity', digits_compute=dp.get_precision('Product Unit of Measure'),
-                               required=True)
+                               required=True, default=1.0)
     product_uom_id = fields.Many2one('product.uom', 'Product UOM', required=True)
     nv_uom_id = fields.Many2one('product.uom', relation='product.uom',
                                 string='Inventory UOM', readonly=True)
     date_required = fields.Date('Date Required', required=True)
     inv_qty = fields.Float('Inventory')
-    req_emp_id = fields.Many2one('hr.employee', 'Employee')
+    req_emp_id = fields.Many2one('hr.employee', 'Employee',
+                                 default=lambda self: self.env['hr.employee'].search([('user_id', '=', self.env.uid)],
+                                                                                     limit=1))
     req_dept_id = fields.Many2one('hr.department', string='Department', readonly=True)
     req_reason = fields.Char('Reason and use')
     # company_id = fields.Many2one('req_id', 'company_id', type='many2one', relation='res.company', String='Company',
@@ -201,12 +211,20 @@ class PurchaseRequestLine(models.Model):
     product_qty_remain = fields.Float()
     # procurement_ids = fields.One2many("procurement.order", 'pur_req_line_id', 'Procurements')
     po_info = fields.Char()
-    req_ticket_no = fields.Char('Requisition Ticket#', size=10)
 
     order_state = fields.Selection(related='order_id.state', string='Status', readonly=True,
                                    selection=[('draft', 'New'), ('confirmed', 'Confirmed'), ('approved', 'Approved'),
                                               ('rejected', 'Rejected'), ('in_purchase', 'In Purchasing'),
                                               ('done', 'Purchase Done'), ('cancel', 'Cancelled')])
+
+    @api.onchange('employee_id')
+    def _onchange_employee_id(self):
+        self.req_dept_id = self.req_emp_id.department_id
+
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        self.product_uom_id = self.product_id.uom_id.id
+        self.inv_qty = self.product_id.qty_available
 
     _rec_name = 'product_id'
 

@@ -1,70 +1,47 @@
 # -*- coding: utf-8 -*-
-##############################################################################
-#
-#    OpenERP, Open Source Management Solution
-#    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as
-#    published by the Free Software Foundation, either version 3 of the
-#    License, or (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU Affero General Public License for more details.
-#
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-##############################################################################
+from email import utils
 
-from openerp import netsvc
-import time
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-from openerp.osv import osv, fields
-from openerp.tools.translate import _
-import openerp.addons.decimal_precision as dp
-from openerp.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT, DATETIME_FORMATS_MAP
+import datetime
+
+from odoo import models, fields, api, _
+from odoo.tools import float_compare, DEFAULT_SERVER_DATE_FORMAT
+import odoo.addons.decimal_precision as dp
 
 
-class pur_req_po_line(osv.osv_memory):
+class pur_req_po_line(models.TransientModel):
     _name = "pur.req.po.line"
     _rec_name = 'product_id'
 
-    _columns = {
-        'wizard_id': fields.many2one('pur.req.po', string="Wizard"),
-        'product_id': fields.many2one('product.product', 'Product', required=True),
-        'product_qty': fields.float('Quantity', digits_compute=dp.get_precision('Product Unit of Measure'),
-                                    required=True),
-        'product_qty_remain': fields.float('Quantity Remain',
-                                           digits_compute=dp.get_precision('Product Unit of Measure'), required=True),
-        'price_unit': fields.float('Unit Price', digits_compute=dp.get_precision('Product Price')),
-        'product_uom_id': fields.many2one('product.uom', 'Product Unit of Measure', required=True),
-        'date_required': fields.date('Date Required', required=True),
-        'inv_qty': fields.float('Inventory'),
-        'req_reason': fields.char('Reason and use', size=64),
-        'req_line_id': fields.many2one('pur.req.line', 'Purchase Requisition'),
+    wizard_id = fields.Ma('pur.req.po', string="Wizard")
+    product_id = fields.Many2one('product.product', 'Product', required=True)
+    product_qty = fields.Float('Quantity', digits_compute=dp.get_precision('Product Unit of Measure'),
+                               required=True)
+    product_qty_remain = fields.Float('Quantity Remain',
+                                      digits_compute=dp.get_precision('Product Unit of Measure'), required=True)
+    price_unit = fields.Float('Unit Price', digits_compute=dp.get_precision('Product Price'))
+    product_uom_id = fields.Many2one('product.uom', 'Product Unit of Measure', required=True)
+    date_required = fields.Date('Date Required', required=True)
+    inv_qty = fields.Float('Inventory')
+    req_reason = fields.Char('Reason and use', size=64)
+    req_line_id = fields.Many2one('pur.req.line', 'Purchase Requisition')
 
-        'uom_po_qty': fields.float('PO Quantity', digits_compute=dp.get_precision('Product Unit of Measure'),
-                                   required=True),
-        'uom_po_qty_remain': fields.float('PO Quantity Remain',
-                                          digits_compute=dp.get_precision('Product Unit of Measure'), required=True),
-        'uom_po_price': fields.float('PO Unit Price', digits_compute=dp.get_precision('Product Price')),
-        'uom_po_id': fields.many2one('product.uom', 'PO Unit of Measure', required=True, ),
-        'uom_po_factor': fields.float('UOM Ratio', digits=(12, 4), ),
+    uom_po_qty = fields.Float('PO Quantity', digits_compute=dp.get_precision('Product Unit of Measure'),
+                              required=True)
+    uom_po_qty_remain = fields.Float('PO Quantity Remain',
+                                     digits_compute=dp.get_precision('Product Unit of Measure'), required=True)
+    uom_po_price = fields.Float('PO Unit Price', digits_compute=dp.get_precision('Product Price'))
+    uom_po_id = fields.Many2one('product.uom', 'PO Unit of Measure', required=True)
+    uom_po_factor = fields.Float('UOM Ratio', digits=(12, 4))
 
-        'supplier_prod_name': fields.char(string='Supplier Product Name'),
-    }
+    supplier_prod_name = fields.Char(string='Supplier Product Name')
 
-    def _check_product_qty(self, cursor, user, ids, context=None):
-        for line in self.browse(cursor, user, ids, context=context):
+    @api.multi
+    def _check_product_qty(self):
+        for line in self:
             #            if line.product_qty > line.product_qty_remain:
             #                raise osv.except_osv(_('Warning!'), _("Product '%s' max po quantity is %s, you can not purchae %s"%(line.product_id.default_code + '-' + line.product_id.name, line.product_qty_remain, line.product_qty)))
             if line.uom_po_qty > line.uom_po_qty_remain:
-                raise osv.except_osv(_('Warning!'), _("Product '%s' max po quantity is %s, you can not purchae %s" % (
-                line.product_id.default_code + '-' + line.product_id.name, line.uom_po_qty_remain, line.uom_po_qty)))
+                pass
         return True
 
     _constraints = [(_check_product_qty, 'Product quantity exceeds the remaining quantity', ['product_qty'])]
@@ -83,26 +60,9 @@ class pur_req_po_line(osv.osv_memory):
             res['value'].update({'date_required': date_required})
         return res
 
-    def create(self, cr, user, vals, context=None):
-        resu = super(pur_req_po_line, self).create(cr, user, vals, context=context)
-        # if price_unit changed then update it to product_product.standard_price
-        if vals.has_key('price_unit'):
-            self.pool.get('product.product').write(cr, user, [vals['product_id']],
-                                                   {'standard_price': vals['price_unit']}, context=context)
-        return resu
-
-    def write(self, cr, uid, ids, vals, context=None):
-        if not ids:
-            return True
-        resu = super(pur_req_po_line, self).write(cr, uid, ids, vals, context=context)
-        # if price_unit changed then update it to product_product.standard_price
-        if vals.has_key('price_unit'):
-            self.pool.get('product.product').write(cr, uid, [pur_req_po_line.product_id.id],
-                                                   {'standard_price': vals['price_unit']}, context=context)
-        return resu
 
 
-pur_req_po_line()
+
 
 
 class pur_req_po(osv.osv_memory):
@@ -257,4 +217,4 @@ class pur_req_po(osv.osv_memory):
         self._create_po(cr, uid, ids, context=context)
         return {'type': 'ir.actions.act_window_close'}
 
-    # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+        # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

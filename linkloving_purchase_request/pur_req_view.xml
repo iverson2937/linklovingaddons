@@ -66,11 +66,9 @@
                                        on_change="onchange_product_uom(product_id,product_uom_id,context)"/>
                                 <field name="date_required"/>
                                 <field name="inv_qty"/>
-                                <field name="inv_uom_id"/>
                                 <field name="req_emp_id"/>
                                 <field name="req_dept_id"/>
                                 <field name="req_reason"/>
-                                <field name="req_ticket_no"/>
                             </tree>
                             <form string="Products" version="7.0">
                                 <group>
@@ -81,13 +79,11 @@
                                                on_change="onchange_product_uom(product_id,product_uom_id,context)"/>
                                         <field name="date_required"/>
                                         <field name="inv_qty"/>
-                                        <field name="inv_uom_id"/>
                                     </group>
                                     <group>
                                         <field name="req_emp_id"/>
                                         <field name="req_dept_id"/>
                                         <field name="req_reason"/>
-                                        <field name="req_ticket_no"/>
                                         <field name="product_qty_remain" readonly="1"/>
                                         <field name="generated_po"/>
                                     </group>
@@ -193,7 +189,6 @@
                     <field name="req_emp_id"/>
                     <field name="req_dept_id"/>
                     <field name="req_reason"/>
-                    <field name="req_ticket_no"/>
                     <field name="order_warehouse_id"/>
                     <field name="order_user_id"/>
                     <field name="order_date_request"/>
@@ -214,7 +209,6 @@
                             <field name="order_date_request"/>
                             <field name="order_state"/>
                             <field name="req_emp_id" readonly="1"/>
-                            <field name="req_ticket_no" readonly="1"/>
                             <field name="req_reason" readonly="1"/>
                         </group>
                         <group>
