@@ -145,6 +145,9 @@
                 <xpath expr="//field[@name='origin']" position="after">
                     <field name="production_order_type" widget="radio"/>
                 </xpath>
+                <xpath expr="//group" position="after">
+                    <field name="output_rate"/>
+                </xpath>
 
                 <xpath expr="//notebook/page[3]" position="after">
                     <page string="Result">
