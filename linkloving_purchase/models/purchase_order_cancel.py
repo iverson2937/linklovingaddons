@@ -17,7 +17,7 @@ class PurchaseOrderCancel(models.TransientModel):
         active_ids = context.get('active_ids', []) or []
 
         for record in self.env['purchase.order'].browse(active_ids):
-            if record.state != 'draft':
+            if record.state not in ['draft', 'make_by_mrp']:
                 raise UserError(_("Only can delete the draft orders"))
             record.button_cancel()
         return {'type': 'ir.actions.act_window_close'}

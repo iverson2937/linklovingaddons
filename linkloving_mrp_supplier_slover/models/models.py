@@ -188,4 +188,4 @@ class LinklovingPurchaseOrderLine(models.Model):
                 # if not self.order_id.order_line:
                 #     self.order_id.unlink()
             else:
-                raise osv.except_osv(_('Error!'),_('产品还未设置供应商，不可从订单中删除'))
+                raise UserError(_('产品还未设置供应商，不可从订单中删除'))
