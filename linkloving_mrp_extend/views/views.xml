@@ -1042,9 +1042,6 @@
             <field name="model">mrp.production</field>
             <field name="inherit_id" ref="mrp.mrp_production_tree_view"/>
             <field name="arch" type="xml">
-                <xpath expr="//tree" position="attributes">
-                    <attribute name="create">false</attribute>
-                </xpath>
 
                 <xpath expr="//field[@name='product_uom_id']" position="replace">
                 </xpath>
