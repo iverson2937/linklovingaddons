@@ -68,6 +68,11 @@ class ProductTemplate(models.Model):
     def toggle_active(self):
         """ Inverse the value of the field ``active`` on the records in ``self``. """
         for record in self:
+
             record.active = not record.active
-            for product in record.product_variant_ids:
+            active = not record.active
+            products = self.env['product.product'].search(
+                [('product_tmpl_id', '=', record.id), ('active', '=', active)])
+            print products, 'psssssssss'
+            for product in products:
                 product.active = not product.active
