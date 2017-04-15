@@ -252,7 +252,7 @@
 
         <menuitem action="product_template_deactive" id="menu_stock_product_template_deactive_menu"
                   parent="mrp.menu_mrp_bom"
-                  groups="base.group_system,base.group_no_one" string="归档的产品"
+                  string="归档的产品"
                   sequence="10"/>
 
         <menuitem action="product_product_action" id="menu_stock_product_product_menu" parent="mrp.menu_mrp_bom"
