@@ -600,98 +600,47 @@ class linkloving_sale_order_line_extend(models.Model):
     @api.multi
     def rollback_qty_require(self):
         for line in self:
-            bom = self.env['mrp.bom'].with_context(
-                    company_id=self.env.user.company_id.id, force_company=self.env.user.company_id.id
-                    )._bom_find(product=self.product_id)
-            boms, lines = bom.explode(line.product_id, line.get_actual_require_qty(line.product_id, line.product_qty), picking_type=bom.picking_type_id)
-            line.product_id.qty_require -= line.product_qty #先减少成品需求量,子阶的减不掉, 不知道上次需求量是多少
-            def recursion_bom(bom_lines, order_line):
-                    for b_line, data in bom_lines:
-                        if b_line.product_id.qty_require < data.get("qty"): #如果需求小于这次销售的数量
-                            b_line.product_id.qty_require = 0#增加bom的需求量  不是完全添加 得看父阶bom需求量多少
-                        else:
-                            b_line.product_id.qty_require -= data.get("qty")
+            line.update_po_ordes_mrp_made()
 
-                        self.update_po_ordes_mrp_made(data.get("qty"))
-                        self.delete_mo_orders_mrp_made(data.get("qty"))
-
-                        child_bom = b_line.child_bom_id
-                        if child_bom:
-                            boms, lines = child_bom.explode(child_bom.product_id, data.get("qty"), picking_type=child_bom.picking_type_id)
-                            recursion_bom(lines, line)
-            recursion_bom(lines, line)#递归bom
-
-
-    def delete_mo_orders_mrp_made(self, qty):# 删除所有由so生成的单据 mo,po..
-        if self.order_id:
-            mos = self.env["mrp.production"].search([("origin_sale_id", "=", self.order_id.id)])
-            for mo in mos:
-                if mo.state == "cancel":
-                    after_conbine_mo = self.env["mrp.production"].search(
-                            [([mo.id], "in", "source_mo_ids")])  # 找到合并后的mo但
-                    if not after_conbine_mo:
-                        continue
-                    if after_conbine_mo.state not in ["draft", "confirmed"]:
-                        raise UserError("该单据已经开始进入生产状态")
-                    else:
-                        qty_wizard = self.env['change.production.qty'].sudo().create({
-                                    'mo_id': after_conbine_mo.id,
-                                    'product_qty': qty,
-                                        })
-                        qty_wizard.change_prod_qty()
-            mos.action_cancel()#批量取消所有的生产订单
-        else:
-            raise UserError("重大错误")
-
-    # def get_yuan_cailiao(self):
-    #
-    #     def recursion_bom(bom_lines, order_line):
-    #                 for b_line, data in bom_lines:
-    #                     if b_line.product_id.qty_require < data.get("qty"): #如果需求小于这次销售的数量
-    #                         b_line.product_id.qty_require = 0#增加bom的需求量  不是完全添加 得看父阶bom需求量多少
-    #                     else:
-    #                         b_line.product_id.qty_require -= data.get("qty")
-    #
-    #                     self.update_po_ordes_mrp_made(data.get("qty"))
-    #                     self.delete_mo_orders_mrp_made(data.get("qty"))
-    #
-    #                     child_bom = b_line.child_bom_id
-    #                     if child_bom:
-    #                         boms, lines = child_bom.explode(child_bom.product_id, data.get("qty"), picking_type=child_bom.picking_type_id)
-    #                         recursion_bom(lines, line)
-    #
-    def update_po_ordes_mrp_made(self, qty):
+    def update_po_ordes_mrp_made(self):
         if self.order_id:
             pos = self.env["purchase.order"].search([("origin", "ilike", self.order_id.name)])
             for po in pos:#SO2017040301269:MO/2017040322133, SO2017040301271:MO/2017040322137,
                 for line in po.order_line:
-                    if line.product_id == self.product_id:
-                        #找到原有的po_line 减掉数量
-                        if line.product_qty > qty:
-                            po_line = line.write({
-                                'product_qty':  line.product_qty - qty,
+                    yl_list = self.get_boms()  # 原材料
+                    for yl in yl_list:
+                        if line.product_id.id == yl.get("product_id").id:
+                            # 找到原有的po_line 减掉数量
+                            if line.product_qty > yl.get("qty"):
+                                po_line = line.write({
+                                    'product_qty': line.product_qty - yl.get("qty"),
                                 })
-                        else:
-                            line.unlink()
+                            else:
+                                try:
+                                    line.unlink()
+                                except UserError, e:
+                                    raise UserError(u"'%s' 订单中含有产品未设置供应商不能删除" % po.name)
 
-    @api.multi
-    def set_qty_require(self):
-        for line in self:
-            bom = self.env['mrp.bom'].with_context(
-                    company_id=self.env.user.company_id.id, force_company=self.env.user.company_id.id
-            )._bom_find(product=line.product_id)
-            boms, lines = bom.explode(line.product_id, line.get_actual_require_qty(line.product_id, line.product_qty), picking_type=bom.picking_type_id)
-            line.product_id.qty_require += line.product_qty #先增加成品需求量
-            def recursion_bom(bom_lines, order_line):
-                    for b_line, data in bom_lines:
-                        real_need = order_line.get_actual_require_qty(b_line.product_id, data.get("qty"))
-                        if real_need > 0:
-                            b_line.product_id.qty_require += data.get("qty")  # 增加bom的需求量  不是完全添加 得看父阶bom需求量多少
-                        child_bom = b_line.child_bom_id
-                        if child_bom:
-                            boms, lines = child_bom.explode(child_bom.product_id, real_need, picking_type=child_bom.picking_type_id)
-                            recursion_bom(lines, line)
-            recursion_bom(lines, line)#递归bom
+    def get_boms(self):
+        self.ensure_one()
+        bom = self.env['mrp.bom'].with_context(
+                company_id=self.env.user.company_id.id, force_company=self.env.user.company_id.id
+        )._bom_find(product=self.product_id)
+        boms, lines = bom.explode(self.product_id, self.product_qty, picking_type=bom.picking_type_id)
+        yl_list = []
+
+        def recursion_bom(bom_lines, order_line, yl_list):
+            for b_line, data in bom_lines:
+                child_bom = b_line.child_bom_id
+                if b_line.product_id:
+                    yl_list.append({"product_id": b_line.product_id, "qty": data.get("qty")})
+                if child_bom:
+                    boms, lines = child_bom.explode(child_bom.product_id, data.get("qty"),
+                                                    picking_type=child_bom.picking_type_id)
+                    recursion_bom(lines, order_line, yl_list)
+
+        recursion_bom(lines, self, yl_list)  # 递归bom
+        return yl_list
 
     def get_actual_require_qty(self,product_id, require_qty_this_time):
         actual_need_qty = 0
