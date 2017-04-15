@@ -109,7 +109,7 @@ class linkloving_procurement_order(models.Model):
                 po = self.env['purchase.order'].search([dom for dom in domain])
                 po = po[0] if po else False
                 cache[domain] = po
-            if not po:
+            if True:
                 vals = procurement._prepare_purchase_order(partner)
                 # vals['state'] = "make_by_mrp"
                 po = self.env['purchase.order'].create(vals)

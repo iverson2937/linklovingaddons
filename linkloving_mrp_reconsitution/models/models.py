@@ -213,7 +213,6 @@ class linkloving_procurement_order_extend(models.Model):
                 # TDE CLEANME: use record set ?
                 procurement_list.reverse()
                 procurements = self.env['procurement.order']
-                orderpoints_noprefetch += orderpoint_need_recal  # 重新
                 for p in procurement_list:
                     procurements += p
                 procurements.run()
