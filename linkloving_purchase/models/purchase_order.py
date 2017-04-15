@@ -34,7 +34,7 @@ class PurchaseOrder(models.Model):
                 # We keep a limited scope on purpose. Ideally, we should also use move_orig_ids and
                 # do some recursive search, but that could be prohibitive if not done correctly.
                 moves = line.move_ids | line.move_ids.mapped('returned_move_ids')
-                #modify by allen 显示隐藏的
+                # modify by allen 显示隐藏的
                 # moves = moves.filtered(lambda r: r.state != 'cancel')
                 pickings |= moves.mapped('picking_id')
             order.picking_ids = pickings
@@ -67,6 +67,32 @@ class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
     product_specs = fields.Text(string=u'Specification', related='product_id.product_specs')
+
+    def get_draft_po_qty(self, product_id):
+        pos = self.env["purchase.order"].search([("state", "in", ("make_by_mrp", "draft"))])
+        chose_po_lines = self.env["purchase.order.line"]
+        total_draft_order_qty = 0
+        for po in pos:
+            for po_line in po.order_line:
+                if po_line.product_id.id == product_id.id:
+                    chose_po_lines += po_line
+                    total_draft_order_qty += po_line.product_qty
+        return total_draft_order_qty
+
+    @api.depends('product_id.outgoing_qty', 'product_id.incoming_qty', 'product_id.qty_available')
+    def _get_output_rate(self):
+        on_way_qty = self.get_draft_po_qty(self.product_id) + self.product_id.incoming_qty
+        if self.product_id.outgoing_qty:
+            rate = ((self.product_id.incoming_qty + self.product_id.qty_available) / self.product_id.outgoing_qty)
+            rate = round(rate, 2)
+
+            self.output_rate = (u"( 在途量: " + "%s " + u"+库存:" + "%s ) /"u" 需求量：" + "%s = %s") % (
+                on_way_qty, self.product_id.qty_available, self.product_id.outgoing_qty, rate)
+        else:
+            self.output_rate = (u" 在途量: " + "%s  " + u"库存:" + "%s  "u" 需求量：" + "%s  ") % (
+                on_way_qty, self.product_id.qty_available, self.product_id.outgoing_qty)
+
+    output_rate = fields.Char(compute=_get_output_rate, string=u'生产参考')
 
     # 重写默认税的选择
     @api.onchange('product_id')

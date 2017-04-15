@@ -145,6 +145,9 @@
                 <xpath expr="//field[@name='origin']" position="after">
                     <field name="production_order_type" widget="radio"/>
                 </xpath>
+                <xpath expr="//group" position="after">
+                    <field name="output_rate"/>
+                </xpath>
 
                 <xpath expr="//notebook/page[3]" position="after">
                     <page string="Result">
@@ -230,7 +233,7 @@
             </field>
         </record>
         <record id="product_product_action" model="ir.actions.act_window">
-            <field name="name">ProductProduct</field>
+            <field name="name">产品变型</field>
             <field name="res_model">product.product</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,kanban,form</field>
@@ -238,6 +241,7 @@
         </record>
 
         <menuitem action="product_product_action" id="menu_stock_product_product_menu" parent="mrp.menu_mrp_bom"
+                  groups="base.group_no_one"
                   sequence="10"/>
 
         <record id="mrp.product_template_form_view_bom_button" model="ir.ui.view">
