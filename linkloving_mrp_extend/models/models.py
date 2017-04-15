@@ -1009,14 +1009,15 @@ class ProcurementOrderExtend(models.Model):
 
     def parse_origin_and_update_dic(self, dict):
         # 解析原单据
-        origin_names = self.origin.split(":")
-        sale_ret = self.env["sale.order"].search([("name", "in", origin_names)], limit=1)
-        mo_ret = self.env["mrp.production"].search([("name", "in", origin_names)], limit=1)
+        if self.origin:
+            origin_names = self.origin.split(":")
+            sale_ret = self.env["sale.order"].search([("name", "in", origin_names)], limit=1)
+            mo_ret = self.env["mrp.production"].search([("name", "in", origin_names)], limit=1)
 
-        if sale_ret:
-            dict.update({'origin_sale_id': sale_ret.id})
-        if mo_ret:
-            dict.update({'origin_mo_id': mo_ret.id})
+            if sale_ret:
+                dict.update({'origin_sale_id': sale_ret.id})
+            if mo_ret:
+                dict.update({'origin_mo_id': mo_ret.id})
 
     @api.multi
     def _prepare_purchase_order_line(self, po, supplier):
