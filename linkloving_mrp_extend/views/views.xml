@@ -281,8 +281,10 @@
                             <field name="suggest_qty" readonly="1" string="建议数量"/>
                             <field name="quantity_available" string="系统可用"/>
                             <field name="product_uom_qty" string="实际需求物料数量"/>
-                            <field name="quantity_ready" readonly="context.get('quantity_ready_invisible')" string="备料数量"/>
-                            <field name="over_picking_qty" invisible="context.get('overpicking_invisible')" string="超领数量"/>
+                            <field name="quantity_ready" readonly="context.get('quantity_ready_invisible')"
+                                   string="备料数量"/>
+                            <field name="over_picking_qty" invisible="context.get('overpicking_invisible')"
+                                   string="超领数量"/>
                             <!--<field name="return_qty"  invisible="[('production_state', 'not in', ('waiting_inventory_material','waiting_warehouse_inspection'))]" string="退料数量"/>-->
                         </tree>
                     </field>
@@ -1019,6 +1021,9 @@
             <field name="model">mrp.production</field>
             <field name="inherit_id" ref="mrp.mrp_production_tree_view"/>
             <field name="arch" type="xml">
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="create">false</attribute>
+                </xpath>
 
                 <xpath expr="//field[@name='product_uom_id']" position="replace">
                 </xpath>
