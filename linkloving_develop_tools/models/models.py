@@ -10,6 +10,11 @@ class ProductProduct(models.Model):
     def create_reorder_rule(self, min_qty=0.0, max_qty=0.0, qty_multiple=1.0, overwrite=False):
         swo_obj = self.env['stock.warehouse.orderpoint']
         for rec in self:
+            rec.product_tmpl_id.sale_ok = True
+            rec.product_tmpl_id.purchase_ok = False
+            rec.product_tmpl_id.product_ll_type = "finished"
+            rec.product_tmpl_id.order_ll_type = "stock"
+            rec.product_tmpl_id.route_ids = [(6, 0, [self.env.ref('mrp.route_warehouse0_manufacture').id])]
             reorder_rules = swo_obj.search([('product_id', '=', rec.id)])
             reorder_vals = {
                 'product_id': rec.id,
