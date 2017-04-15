@@ -63,6 +63,7 @@ class MrpBomLineExtend(models.Model):
 
     product_specs = fields.Text(string='Product Specification', related='product_id.product_specs')
     scrap_rate = fields.Float(string='Scrap Rate(%)', default=3, )
+    active1 = fields.Boolean(related='product_id.active')
 
     @api.multi
     def action_see_bom_structure_reverse(self):

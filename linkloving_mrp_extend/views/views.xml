@@ -43,11 +43,17 @@
             <field name="model">mrp.bom</field>
             <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
             <field name="arch" type="xml">
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="decoration-danger">active1==False</attribute>
+                </xpath>
                 <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_id']" position="after">
                     <field name="product_specs"/>
                     <field name="scrap_rate"/>
+                    <field name="active1" invisible="1"/>
                     <button name="action_see_bom_structure_reverse" type="object" string="Bom逆展"/>
                 </xpath>
+
+
             </field>
         </record>
 
