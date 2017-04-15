@@ -544,8 +544,8 @@ class linkloving_sale_extend(models.Model):
     def action_confirm(self):
         self.ensure_one()
         for line in self.order_line:
-            if line.product_id.route_ids in [
-                self.env.ref("mrp.route_warehouse0_manufacture")] and not line.product_id.bom_ids:
+            if self.env.ref(
+                    "mrp.route_warehouse0_manufacture") in line.product_id.route_ids and not line.product_id.bom_ids:
                 raise UserError(u"%s 未找到对应的Bom" % line.product_id.display_name)
         return super(linkloving_sale_extend, self).action_confirm()
 

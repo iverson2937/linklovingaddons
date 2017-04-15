@@ -13,9 +13,12 @@ class ProductProduct(models.Model):
             rec.product_tmpl_id.sale_ok = True
             rec.product_tmpl_id.purchase_ok = False
             rec.product_tmpl_id.product_ll_type = "finished"
-            rec.product_tmpl_id.order_ll_type = "stock"
-            rec.product_tmpl_id.route_ids = [(6, 0, [self.env.ref('mrp.route_warehouse0_manufacture').id])]
+            rec.product_tmpl_id.order_ll_type = "ordering"
+            rec.product_tmpl_id.route_ids = [(6, 0, [self.env.ref('mrp.route_warehouse0_manufacture').id,
+                                                     self.env.ref('stock.route_warehouse0_mto').id])]
             reorder_rules = swo_obj.search([('product_id', '=', rec.id)])
+            reorder_rules.unlink()
+            continue
             reorder_vals = {
                 'product_id': rec.id,
                 'product_min_qty': min_qty,
@@ -37,16 +40,12 @@ class CreateOrderPointWizard(models.TransientModel):
 
     def action_create_in_aboard_rule(self):
         # products = self.env["product.product"].search([("inner_spec", "!=", False)])
+        # products = self.env["product.product"].search(
+        #         ['|', ("default_code", "=ilike", "99.%"), ("default_code", "=ilike", "98.%")])
+
         products = self.env["product.product"].search(
-                ['|', ("default_code", "=ilike", "99.%"), ("default_code", "=ilike", "98.%")])
-        products.create_reorder_rule()
+                [("default_code", "=ilike", "98.%")])
 
-
-class CreateOrderPointWizard(models.TransientModel):
-    _name = "create.order.point.one"
-
-    def action_create_in_aboard_rule(self):
-        products = self.env["product.product"].search([("default_code", "=like", "99.%")])
         products.create_reorder_rule()
 
 
