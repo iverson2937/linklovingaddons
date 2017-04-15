@@ -31,7 +31,17 @@ class CreateOrderPointWizard(models.TransientModel):
     _name = "create.order.point"
 
     def action_create_in_aboard_rule(self):
-        products = self.env["product.product"].search([("inner_spec", "!=", False)])
+        # products = self.env["product.product"].search([("inner_spec", "!=", False)])
+        products = self.env["product.product"].search(
+                ['|', ("default_code", "=ilike", "99.%"), ("default_code", "=ilike", "98.%")])
+        products.create_reorder_rule()
+
+
+class CreateOrderPointWizard(models.TransientModel):
+    _name = "create.order.point.one"
+
+    def action_create_in_aboard_rule(self):
+        products = self.env["product.product"].search([("default_code", "=like", "99.%")])
         products.create_reorder_rule()
 
 
