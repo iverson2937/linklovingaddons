@@ -76,6 +76,7 @@ class linkloving_procurement_order(models.Model):
             product_new_qty = self.get_actual_require_qty()
             procurement_uom_po_qty = self.product_uom._compute_quantity(product_new_qty, self.product_id.uom_po_id)
             if procurement_uom_po_qty <= 0:
+                res += [procurement.id]
                 continue
             suppliers = procurement.product_id.seller_ids.filtered(
                 lambda r: not r.product_id or r.product_id == procurement.product_id)
