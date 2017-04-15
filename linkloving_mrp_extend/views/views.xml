@@ -240,8 +240,23 @@
             <field name="context">{}</field>
         </record>
 
+        <record id="product_template_deactive" model="ir.actions.act_window">
+            <field name="name">归档的产品</field>
+            <field name="res_model">product.template</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="domain">[('active','=',False)]</field>
+
+            <field name="context">{}</field>
+        </record>
+
+        <menuitem action="product_template_deactive" id="menu_stock_product_template_deactive_menu"
+                  parent="mrp.menu_mrp_bom"
+                  groups="base.group_system,base.group_no_one" string="归档的产品"
+                  sequence="10"/>
+
         <menuitem action="product_product_action" id="menu_stock_product_product_menu" parent="mrp.menu_mrp_bom"
-                  groups="base.group_no_one"
+                  groups="base.group_no_one,base.group_system" string="产品变型"
                   sequence="10"/>
 
         <record id="mrp.product_template_form_view_bom_button" model="ir.ui.view">
