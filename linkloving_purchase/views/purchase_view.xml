@@ -24,9 +24,7 @@
                     <field name="create_uid"/>
                     <field name="remark"/>
                 </xpath>
-                <xpath expr="//tree" position="attributes">
-                    <attribute name="create">false</attribute>
-                </xpath>
+
             </field>
         </record>
 
