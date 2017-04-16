@@ -73,6 +73,5 @@ class ProductTemplate(models.Model):
             active = not record.active
             products = self.env['product.product'].search(
                 [('product_tmpl_id', '=', record.id), ('active', '=', active)])
-            print products, 'psssssssss'
             for product in products:
                 product.active = not product.active
