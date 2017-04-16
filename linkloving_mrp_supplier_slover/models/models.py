@@ -177,7 +177,7 @@ class LinklovingPurchaseOrderLine(models.Model):
     @api.multi
     def unlink(self):
         is_exception_order = self.order_id.partner_id == self.sudo().env.ref('linkloving_mrp_supplier_slover.res_partner_exception_supplier')
-        if not is_exception_order:
+        if True:
             return super(LinklovingPurchaseOrderLine, self).unlink()
         else:
             if self.product_id.seller_ids:
