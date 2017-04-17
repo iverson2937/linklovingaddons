@@ -9,7 +9,11 @@
                         为国内产品创建重订货规则？
                     </p>
                     <footer>
-                        <button string="确定创建" name="action_create_in_aboard_rule" type="object" default_focus="1"
+                        <button string="99 98阶生成存货规则" name="action_create_in_aboard_rule" type="object"
+                                default_focus="1"
+                                class="btn-primary"/>
+                        <button string="合并make_by_mrp生成的采购单" name="action_combine_purchase_order" type="object"
+                                default_focus="1"
                                 class="btn-primary"/>
                         <button string="Cancel" class="btn-default" special="cancel"/>
                     </footer>

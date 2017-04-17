@@ -96,7 +96,6 @@ class linkloving_procurement_order(models.Model):
                     (gpo == 'propagate' and procurement.group_id) or False
 
             domain = (
-                ('partner_id', '=', partner.id),
                 ('state', '=', 'make_by_mrp'),
                 ('picking_type_id', '=', procurement.rule_id.picking_type_id.id),
                 ('company_id', '=', procurement.company_id.id),
@@ -107,14 +106,23 @@ class linkloving_procurement_order(models.Model):
             if domain in cache:
                 po = cache[domain]
             else:
-                po = self.env['purchase.order'].search([dom for dom in domain])
-                po = po[0] if po else False
-                cache[domain] = po
+                po = None
+                pos = self.env['purchase.order'].search([dom for dom in domain])
+                for po1 in pos:
+                    for line in po1.order_line:
+                        if line.product_id.id == self.product_id.id:
+                            po = po1  #
+                            break
+                if po:
+                    cache[domain] = po
+
+
             if True:
                 vals = procurement._prepare_purchase_order(partner)
-                # vals['state'] = "make_by_mrp"
+                # tax_id = self.env["account.tax"].search([('type_tax_use', '<>', "purchase")], limit=1)[0].id
+                # vals["tax"]
+                vals['state'] = "make_by_mrp"
                 po = self.env['purchase.order'].create(vals)
-                po.state = "make_by_mrp"
                 name = (procurement.group_id and (procurement.group_id.name + ":") or "") + (
                 procurement.name != "/" and procurement.name or procurement.move_dest_id.raw_material_production_id and procurement.move_dest_id.raw_material_production_id.name or "")
                 message = _(
