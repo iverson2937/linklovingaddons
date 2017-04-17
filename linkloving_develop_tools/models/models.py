@@ -48,6 +48,28 @@ class CreateOrderPointWizard(models.TransientModel):
 
         products.create_reorder_rule()
 
+    def action_combine_purchase_order(self):
+        pos = self.env["purchase.order"].search([("state", "=", "make_by_mrp")])
+        same_origin = {}
+        for po in pos:
+            if len(po.order_line) > 1:
+                continue
+            if po.order_line[0].product_id.id in same_origin.keys():
+                same_origin[po.order_line[0].product_id.id].append(po)
+            else:
+                same_origin[po.order_line[0].product_id.id] = [po]
 
-class ProductTemplateExtend(models.Model):
-    _inherit = "product.template"
+        for key in same_origin.keys():
+            po_group = same_origin[key]
+            total_qty = 0
+            procurements = self.env["procurement.order"]
+            for po in po_group:
+                total_qty += po.order_line[0].product_qty
+                procurements += po.order_line[0].procurement_ids
+
+            # 生成薪的po单 在po0的基础上
+            po_group[0].order_line[0].product_qty = total_qty
+            po_group[0].order_line[0].procurement_ids = procurements
+
+            for po in po_group[1:]:
+                po.button_cancel()
