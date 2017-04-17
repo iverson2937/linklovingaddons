@@ -19,6 +19,7 @@ class PurchaseOrder(models.Model):
     tax_id = fields.Many2one('account.tax', string='Tax')
     remark = fields.Text(string='Remark')
     handle_date = fields.Datetime()
+    product_id = fields.Many2one(related='order_line.product_id')
 
     invoice_status = fields.Selection([
         ('no', u'待出货'),
