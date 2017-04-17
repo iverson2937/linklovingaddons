@@ -54,15 +54,15 @@ class ProductTemplate(models.Model):
         # ('name_uniq', 'unique (name)', u'产品名称已存在!')
     ]
 
-    @api.multi
-    def write(self, vals):
-        if 'uom_id' in vals:
-            new_uom = self.env['product.uom'].browse(vals['uom_id'])
-            updated = self.filtered(lambda template: template.uom_id != new_uom)
-            done_moves = self.env['stock.move'].search(
-                [('product_id', 'in', updated.mapped('product_variant_ids').ids)], limit=1)
-
-        return super(models.Model, self).write(vals)
+    # @api.multi
+    # def write(self, vals):
+    #     if 'uom_id' in vals:
+    #         new_uom = self.env['product.uom'].browse(vals['uom_id'])
+    #         updated = self.filtered(lambda template: template.uom_id != new_uom)
+    #         done_moves = self.env['stock.move'].search(
+    #             [('product_id', 'in', updated.mapped('product_variant_ids').ids)], limit=1)
+    #
+    #     return super(models.Model, self).write(vals)
 
     @api.multi
     def toggle_active(self):
