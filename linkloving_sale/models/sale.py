@@ -16,6 +16,7 @@ class SaleOrder(models.Model):
     product_count = fields.Float(compute='get_product_count')
     pi_number = fields.Char(string='PI Number')
     is_emergency = fields.Boolean(string=u'Is Emergency')
+    remark = fields.Text(string=u'备注')
 
     @api.onchange('is_emergency')
     def onchange_is_emergency(self):

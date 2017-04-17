@@ -84,6 +84,10 @@
                 <xpath expr="//field[@name='partner_shipping_id']" position="attributes">
                     <attribute name="options">{'no_create': True}</attribute>
                 </xpath>
+                <xpath expr="//div[@name='carrier_selection']" position="after">
+                    <field name="remark"/>
+                </xpath>
+
 
                 <xpath expr="//field[@name='partner_shipping_id']" position="after">
                     <field name="tax_id"
@@ -97,7 +101,7 @@
                 </xpath>
                 <field name="partner_shipping_id" position="after">
                     <field name="pi_number"/>
-                    <field name="is_emergency" attrs="{'readonly': [('state', '==', 'done')]}"/>
+                    <field name="is_emergency" attrs="{'readonly': [('state', '==', 'done')]}" invisible="1"/>
                 </field>
                 <xpath expr="//tree/field[@name='sequence']" position="replace">
                 </xpath>
