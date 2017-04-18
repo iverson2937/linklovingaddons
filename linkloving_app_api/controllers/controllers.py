@@ -1313,6 +1313,7 @@ class LinklovingAppApi(http.Controller):
         picking_list = request.env['stock.picking'].sudo().search(domain, limit=limit, offset=offset, order='name desc')
         json_list = []
         for picking in picking_list:
+
             json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
 
@@ -1395,8 +1396,26 @@ class LinklovingAppApi(http.Controller):
             picking_obj.start_prepare_stock()
         elif state == 'stock_ready':#备货完成
             picking_obj.stock_ready()
+        elif state == 'upload_img':
+            express_img = request.jsonrequest.get('qc_img')
+            picking_obj.express_img = express_img
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.stock_picking_to_json(picking_obj))
+
+    # def add_file_to_attachment(self, ufile):
+    #     Model = request.env['ir.attachment']
+    #     out = """<script language="javascript" type="text/javascript">
+    #                 var win = window.top.window;
+    #                 win.jQuery(win).trigger(%s, %s);
+    #             </script>"""
+    #     try:
+    #         attachment = Model.create({
+    #             'name': ufile.filename,
+    #             'datas': base64.encodestring(ufile.read()),
+    #             'datas_fname': ufile.filename,
+    #             'res_model': model,
+    #             'res_id': int(id)
+    #         })
 
     @classmethod
     def stock_picking_to_json(cls, stock_picking_obj):
@@ -1406,7 +1425,9 @@ class LinklovingAppApi(http.Controller):
                 'pack_id': pack.id,
                 'product_id':{
                     'id': pack.product_id.id,
-                    'name': pack.product_id.name,
+                    'name': pack.product_id.display_name,
+                    'default_code': pack.product_id.default_code,
+                    'qty_available': pack.product_id.qty_available,
                     'area_id' : {
                         'area_id' : pack.product_id.area_id.id,
                         'area_name': pack.product_id.area_id.name or '',
