@@ -5,10 +5,11 @@ from odoo.exceptions import UserError
 import odoo.addons.decimal_precision as dp
 
 
-class MrpProduction(models.Model):
+class MrpBom(models.Model):
     _inherit = 'mrp.bom'
     process_id = fields.Many2one('mrp.process', string=u'工序')
     unit_price = fields.Float(string=u'计件单价')
+
     mo_type = fields.Selection([
         ('unit', u'Base on Unit'),
         ('time', u'Base on Time'),
@@ -28,3 +29,13 @@ class MrpProduction(models.Model):
     @api.onchange('process_id')
     def on_change_price(self):
         self.hour_price = self.process_id.hour_price
+
+    class MrpBomLine(models.Model):
+        _inherit = 'mrp.bom.line'
+
+        def get_process_id(self):
+            for line in self:
+                bom_id = line.product_id.product_tmpl_id.bom_ids[0] if line.product_id.product_tmpl_id.bom_ids else None
+                line.process_id = bom_id.process_id.id if bom_id else None
+
+        process_id = fields.Many2one('mrp.process', compute=get_process_id)
