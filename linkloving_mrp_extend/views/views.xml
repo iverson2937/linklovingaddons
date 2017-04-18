@@ -37,7 +37,6 @@
             </field>
         </record>
 
-
         <record id="linkloving_mrp_bom_form_view" model="ir.ui.view">
             <field name="name">mrp.bom.form.inherit</field>
             <field name="model">mrp.bom</field>
@@ -265,6 +264,20 @@
                   groups="base.group_no_one,base.group_system" string="产品变型"
                   sequence="10"/>
 
+        <record id="product_normal_form_view" model="ir.ui.view">
+            <field name="name">product.product.inhert</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+
+            <field name="arch" type="xml">
+                <div name="button_box" position="inside">
+                    <button class="oe_stat_button" name="action_see_bom_structure_reverse" type="object"
+                            icon="fa-tasks" string="Bom 逆展">
+                    </button>
+                </div>
+            </field>
+        </record>
+
         <record id="mrp.product_template_form_view_bom_button" model="ir.ui.view">
             <field name="name">product.template.procurement</field>
             <field name="model">product.template</field>
@@ -277,6 +290,10 @@
                             attrs="{'invisible':[('type', 'not in', ['product', 'consu'])]}" icon="fa-flask">
                         <field string="Bill of Materials" name="bom_count" widget="statinfo"/>
                     </button>
+                    <button class="oe_stat_button" name="action_see_bom_structure_reverse" type="object"
+                            icon="fa-tasks" string="Bom 逆展">
+                    </button>
+
                     <button class="oe_stat_button" name="action_view_mos" type="object"
                             attrs="{'invisible':[('type', 'not in', ['product', 'consu'])]}" icon="fa-list-alt">
                         <field string="Manufacturing" name="mo_count" widget="statinfo"/>

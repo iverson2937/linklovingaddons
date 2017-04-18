@@ -84,6 +84,50 @@ class MrpBomLineExtend(models.Model):
         }
 
 
+class ProductProductExtend(models.Model):
+    _inherit = 'product.product'
+
+    @api.multi
+    def action_see_bom_structure_reverse(self):
+        bom_tree_view = self.env.ref('linkloving_mrp_extend.linkloving_mrp_bom_tree_view')
+        bom_form_view = self.env.ref('linkloving_mrp_extend.linkloving_mrp_bom_form_view')
+
+        return {
+            'name': _('Reverse Exhibition'),
+            'res_model': 'mrp.bom',
+            'type': 'ir.actions.act_window',
+            'view_id': bom_tree_view.id,
+            'views': [(bom_tree_view.id, 'tree'), (bom_form_view.id, 'form')],
+            'view_mode': 'tree',
+            # 'view_type': 'form',
+            'limit': 80,
+            'context': {
+                'search_default_bom_line_ids': self.product_tmpl_id.default_code, }
+        }
+
+
+class ProductTemplateExtend(models.Model):
+    _inherit = 'product.template'
+
+    @api.multi
+    def action_see_bom_structure_reverse(self):
+        bom_tree_view = self.env.ref('linkloving_mrp_extend.linkloving_mrp_bom_tree_view')
+        bom_form_view = self.env.ref('linkloving_mrp_extend.linkloving_mrp_bom_form_view')
+
+        return {
+            'name': _('Reverse Exhibition'),
+            'res_model': 'mrp.bom',
+            'type': 'ir.actions.act_window',
+            'view_id': bom_tree_view.id,
+            'views': [(bom_tree_view.id, 'tree'), (bom_form_view.id, 'form')],
+            'view_mode': 'tree',
+            # 'view_type': 'form',
+            'limit': 80,
+            'context': {
+                'search_default_bom_line_ids': self.default_code, }
+        }
+
+
 class StockMoveExtend(models.Model):
     _inherit = 'stock.move'
 
