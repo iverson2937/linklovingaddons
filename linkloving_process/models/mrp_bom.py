@@ -30,6 +30,19 @@ class MrpBom(models.Model):
     def on_change_price(self):
         self.hour_price = self.process_id.hour_price
 
+    @api.multi
+    def bom_structure_view(self):
+        return {'name': u'物料清单结构',
+                'type': 'ir.actions.act_window',
+                'view_mode': 'tree',
+                'view_type': 'tree',
+                'view_id': self.env.ref('mrp.mrp_bom_line_tree_view').id,
+                'res_id': self.id,
+                'domain': [('bom_id', '=', self.id)],
+                'res_model': 'mrp.bom.line',
+                'target': 'new',
+                }
+
     class MrpBomLine(models.Model):
         _inherit = 'mrp.bom.line'
 
