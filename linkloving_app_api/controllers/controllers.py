@@ -1311,12 +1311,17 @@ class LinklovingAppApi(http.Controller):
             domain.append(('partner_id', '=', partner_id))
 
         picking_list = request.env['stock.picking'].sudo().search(domain, limit=limit, offset=offset, order='name desc')
-        if state in ["waiting", "partially_available", "assigned"]:
-            picking_list.action_assign()
         json_list = []
         for picking in picking_list:
             json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    @http.route('/linkloving_app_api/action_assign_stock_picking', type='json', auth='none', csrf=False)
+    def action_assign_stock_picking(self, **kw):
+        picking_id = request.jsonrequest.get("picking_id")
+        picking = request.env["stock.picking"].sudo().search([("id", "=", picking_id)])
+        picking.action_assign()
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.stock_picking_to_json(picking))
 
     #根据销售还是采购来获取stock.picking 出入库
     @http.route('/linkloving_app_api/get_incoming_outgoing_stock_picking', type='json', auth='none', csrf=False)
