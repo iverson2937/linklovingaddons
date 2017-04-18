@@ -21,7 +21,6 @@ class StockPicking(models.Model):
             self.so_id = so.id if so else None
 
     po_id = fields.Many2one('purchase.order', compute=_get_so_number)
-
     so_id = fields.Many2one('sale.order', compute=_get_so_number)
     state = fields.Selection([
         ('draft', 'Draft'), ('cancel', 'Cancelled'),
@@ -125,3 +124,12 @@ class StockPicking(models.Model):
                 self.state = 'partially_available'
             else:
                 self.state = moves_todo[-1].state
+
+
+class SaleOrderExtend(models.Model):
+    _inherit = "sale.order"
+
+    delivery_rule = fields.Selection(string="交货规则", selection=[('delivery_once', '一次性发齐货'),
+                                                               ('create_backorder', '允许部分发货,并产生欠单'),
+                                                               ('cancel_backorder', '允许部分发货,不产生欠单')],
+                                     required=False, default="delivery_once")

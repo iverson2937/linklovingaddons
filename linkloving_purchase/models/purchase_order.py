@@ -133,3 +133,33 @@ class PurchaseOrderLine(models.Model):
         ('to invoice', u'待对账'),
         ('invoiced', u'已对账完成'),
     ], string=u'对账单状态', compute='_get_invoiced', store=True, readonly=True, copy=False, default='no')
+
+
+class manual_combine_po(models.TransientModel):
+    _name = "manual.combine.po"
+
+    @api.one
+    def action_confirm(self):
+        ids = self._context.get("active_ids")
+        pos = self.env[self._context.get("active_model")].search([("id", "in", ids)])
+        if len(pos.mapped("partner_id").ids) != 1:  # 如果相等 代表不重复
+            raise UserError("请选择相同供应商的采购单进行合并.")
+        else:
+            po_first = pos[0]
+            for po in pos[1:]:
+                for line in po.order_line:
+                    line.order_id = po_first.id
+                self.combine_origin(po_first, po)
+                po.button_cancel()
+                po.unlink()
+
+    def combine_origin(self, po, po_to_combine):
+        if po_to_combine.origin not in po.origin.split(', '):
+            # Keep track of all procurements
+            if po.origin:
+                if po_to_combine.origin:
+                    po.write({'origin': po.origin + ', ' + po_to_combine.origin})
+                else:
+                    po.write({'origin': po.origin})
+            else:
+                po.write({'origin': po_to_combine.origin})

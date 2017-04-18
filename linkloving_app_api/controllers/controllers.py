@@ -1311,9 +1311,10 @@ class LinklovingAppApi(http.Controller):
             domain.append(('partner_id', '=', partner_id))
 
         picking_list = request.env['stock.picking'].sudo().search(domain, limit=limit, offset=offset, order='name desc')
+        if state in ["waiting", "partially_available", "assigned"]:
+            picking_list.action_assign()
         json_list = []
         for picking in picking_list:
-
             json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
 
@@ -1386,36 +1387,48 @@ class LinklovingAppApi(http.Controller):
             picking_obj.reject()
         elif state == 'process':#创建欠单
             wiz = request.env['stock.backorder.confirmation'].sudo().create({'pick_id': picking_id})
-            wiz.process()
-        elif state == 'cancel_backorder':#取消欠单\
-            wiz = request.env['stock.backorder.confirmation'].sudo().create({'pick_id': picking_id})
-            wiz.process_cancel_backorder()
+            is_yes = request.jsonrequest.get("qc_note")  # 货是否齐
+            if picking_obj.sale_id:
+                if (
+                        picking_obj.sale_id.delivery_rule == "delivery_once" or not picking_obj.sale_id.delivery_rule) and is_yes != "yes":
+                    return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                                      res_data={"error": "该销售单需要一次性发完货,请等待货齐后再发"})
+                elif picking_obj.sale_id.delivery_rule == "cancel_backorder" or is_yes == "yes":
+                    picking_obj.stock_ready()
+                    wiz.process_cancel_backorder()
+                    picking_obj.to_stock()
+
+                elif picking_obj.sale_id.delivery_rule == "create_backorder":
+                    picking_obj.stock_ready()
+                    wiz.process()
+                    picking_obj.to_stock()
+            else:
+                return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                                  res_data={"error": "此单据未关联任何销售单!"})
         elif state == 'transfer':#入库
             picking_obj.to_stock()
         elif state == 'start_prepare_stock': #开始备货
             picking_obj.start_prepare_stock()
-        elif state == 'stock_ready':#备货完成
-            picking_obj.stock_ready()
+        # elif state == 'stock_ready':#备货完成
+        #     picking_obj.stock_ready()
         elif state == 'upload_img':
             express_img = request.jsonrequest.get('qc_img')
-            picking_obj.express_img = express_img
-
+            DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
+            self.add_file_to_attachment(express_img,
+                                        "express_img_%s" % time.strftime(DEFAULT_SERVER_DATE_FORMAT, time.localtime()),
+                                        "stock.picking", picking_id)
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.stock_picking_to_json(picking_obj))
 
-    # def add_file_to_attachment(self, ufile):
-    #     Model = request.env['ir.attachment']
-    #     out = """<script language="javascript" type="text/javascript">
-    #                 var win = window.top.window;
-    #                 win.jQuery(win).trigger(%s, %s);
-    #             </script>"""
-    #     try:
-    #         attachment = Model.create({
-    #             'name': ufile.filename,
-    #             'datas': base64.encodestring(ufile.read()),
-    #             'datas_fname': ufile.filename,
-    #             'res_model': model,
-    #             'res_id': int(id)
-    #         })
+    def add_file_to_attachment(self, ufile, file_name, model, id):
+        Model = request.env['ir.attachment'].sudo()
+        attachment = Model.create({
+            'name': file_name,
+            'datas': ufile,
+            'datas_fname': file_name,
+            'res_model': model,
+            'res_id': id
+        })
+        return attachment
 
     @classmethod
     def stock_picking_to_json(cls, stock_picking_obj):
