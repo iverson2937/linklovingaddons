@@ -23,14 +23,14 @@
                             attrs="{'invisible': [('state','not in',['waiting_in'])]}"
                             groups="stock.group_stock_user"/>
                     <button name="do_new_transfer" string="出库调拨"
-                            attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['post'])]}"
-                            groups="sales_team.group_sale_salesman" type="object" class="oe_highlight"/>
-                    <button name="start_prepare_stock" string="开始备货"
                             attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['assigned'])]}"
-                            groups="stock.group_stock_user" type="object" class="oe_highlight"/>
-                    <button name="stock_ready" string="备货完成"
-                            attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['prepare'])]}"
-                            groups="stock.group_stock_user" type="object" class="oe_highlight"/>
+                            groups="sales_team.group_sale_salesman" type="object" class="oe_highlight"/>
+                    <!--<button name="start_prepare_stock" string="开始备货"-->
+                    <!--attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['assigned'])]}"-->
+                    <!--groups="stock.group_stock_user" type="object" class="oe_highlight"/>-->
+                    <!--<button name="stock_ready" string="备货完成"-->
+                    <!--attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['prepare'])]}"-->
+                    <!--groups="stock.group_stock_user" type="object" class="oe_highlight"/>-->
 
                     <button name="do_new_transfer" string="Confirm Receipts"
                             attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
