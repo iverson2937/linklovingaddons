@@ -20,6 +20,7 @@ class PurchaseOrder(models.Model):
     remark = fields.Text(string='Remark')
     handle_date = fields.Datetime()
     product_id = fields.Many2one(related='order_line.product_id')
+    product_qty = fields.Float(related='order_line.product_qty')
 
     invoice_status = fields.Selection([
         ('no', u'待出货'),
@@ -43,8 +44,9 @@ class PurchaseOrder(models.Model):
 
     @api.onchange('handle_date')
     def onchange_handle_date(self):
-        for line in self.order_line:
-            line.date_planned = self.handle_date
+        for order in self:
+            for line in order.order_line:
+                line.date_planned = order.handle_date
 
     @api.model
     def _default_notes(self):
@@ -58,10 +60,11 @@ class PurchaseOrder(models.Model):
             line.taxes_id = [(6, 0, [self.tax_id.id])]
 
     def get_product_count(self):
-        count = 0.0
-        for line in self.order_line:
-            count += line.product_qty
-        self.product_count = count
+        for order in self:
+            count = 0.0
+            for line in order.order_line:
+                count += line.product_qty
+            order.product_count = count
 
 
 class PurchaseOrderLine(models.Model):

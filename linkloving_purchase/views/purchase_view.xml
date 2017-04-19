@@ -15,18 +15,48 @@
 
         <!--</field>-->
         <!--</record>-->
-        <record id="linkloving_purchase_order_tree" model="ir.ui.view">
+        <record id="purchase.purchase_order_tree" model="ir.ui.view">
             <field name="name">purchase.order.tree.inherit</field>
             <field name="model">purchase.order</field>
-            <field name="inherit_id" ref="purchase.purchase_order_tree"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='invoice_status']" position="after">
+                <tree fonts="bold:message_unread==True"
+                      colors="grey:state=='cancel';blue:state in ('wait','confirmed');red:state in ('except_invoice','except_picking')"
+                      string="采购单">
+                    <field name="message_unread" invisible="1"/>
+                    <field name="name" string="单号"/>
+                    <field name="date_order" widget="date"/>
+                    <field name="partner_id"/>
+                    <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                    <field name="date_planned" invisible="context.get('quotation_only', False)" widget="date"/>
+                    <field name="origin"/>
+                    <field name="amount_untaxed" sum="Total Untaxed amount" string="未税金额" widget="monetary"/>
+                    <field name="amount_total" sum="Total amount" widget="monetary"/>
+                    <field name="state"/>
+                    <field name="invoice_status" invisible="not context.get('show_purchase', False)"/>
                     <field name="create_uid"/>
                     <field name="remark"/>
-                </xpath>
-                <xpath expr="//field[@name='origin']" position="after">
+                </tree>
+
+            </field>
+        </record>
+
+        <record id="purchase_order_tree_ll" model="ir.ui.view">
+            <field name="name">purchase.order.tree.inherit</field>
+            <field name="model">purchase.order</field>
+            <field name="arch" type="xml">
+                <tree fonts="bold:message_unread==True"
+                      colors="grey:state=='cancel';blue:state in ('wait','confirmed');red:state in ('except_invoice','except_picking')"
+                      string="采购单">
+                    <field name="message_unread" invisible="1"/>
                     <field name="product_id"/>
-                </xpath>
+                    <field name="name" string="单号"/>
+                    <field name="date_order" widget="date"/>
+                    <field name="partner_id" widget="date"/>
+                    <field name="origin"/>
+                    <field name="product_qty" string="数量"/>
+                    <field name="state"/>
+                    <field name="create_uid"/>
+                </tree>
             </field>
         </record>
 
