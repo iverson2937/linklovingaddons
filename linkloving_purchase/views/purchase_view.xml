@@ -91,7 +91,7 @@
 
                 <xpath expr="//field[@name='notes']" position="before">
                     <group>
-                        <field name="product_count" readonly="1" string="Total Amount"/>
+                        <field name="product_count" readonly="1" string="总数量"/>
                     </group>
                 </xpath>
                 <xpath expr="//field[@name='partner_ref']" position="replace">
