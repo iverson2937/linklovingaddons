@@ -159,15 +159,16 @@ class MrpProductionExtend(models.Model):
 
     @api.depends('product_id.outgoing_qty', 'product_id.incoming_qty', 'product_id.qty_available')
     def _get_output_rate(self):
-        if self.product_id.outgoing_qty:
-            rate = ((self.product_id.incoming_qty + self.product_id.qty_available) / self.product_id.outgoing_qty)
-            rate = round(rate, 2)
+        for mo in self:
+            if mo.product_id.outgoing_qty:
+                rate = ((mo.product_id.incoming_qty + mo.product_id.qty_available) / mo.product_id.outgoing_qty)
+                rate = round(rate, 2)
 
-            self.output_rate = (u"( 在制造量: " + "%s " + u"+库存:" + "%s ) /"u" 需求量：" + "%s = %s") % (
-                self.product_id.incoming_qty, self.product_id.qty_available, self.product_id.outgoing_qty, rate)
-        else:
-            self.output_rate = (u" 在制造量: " + "%s  " + u"库存:" + "%s  "u" 需求量：" + "%s  ") % (
-                self.product_id.incoming_qty, self.product_id.qty_available, self.product_id.outgoing_qty)
+                mo.output_rate = (u"( 在制造量: " + "%s " + u"+库存:" + "%s ) /"u" 需求量：" + "%s = %s") % (
+                    mo.product_id.incoming_qty, mo.product_id.qty_available, mo.product_id.outgoing_qty, rate)
+            else:
+                mo.output_rate = (u" 在制造量: " + "%s  " + u"库存:" + "%s  "u" 需求量：" + "%s  ") % (
+                    mo.product_id.incoming_qty, mo.product_id.qty_available, mo.product_id.outgoing_qty)
 
     output_rate = fields.Char(compute=_get_output_rate, string=u'生产参考')
 
