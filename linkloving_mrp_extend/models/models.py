@@ -4,6 +4,7 @@ import datetime
 import types
 
 import jpush
+from dateutil.relativedelta import relativedelta
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
@@ -1049,8 +1050,15 @@ class ProcurementOrderExtend(models.Model):
                     'hour_price': bom.hour_price,
                     'in_charge_id': bom.process_id.partner_id.id,
                     'product_qty': self.get_actual_require_qty(),
+                    'date_planned_start': fields.Datetime.to_string(self._get_date_planned_from_today()),
                     })
         return res
+
+    def _get_date_planned_from_today(self):
+        format_date_planned = fields.Datetime.from_string(fields.Datetime.now())
+        date_planned = format_date_planned - relativedelta(days=self.product_id.produce_delay or 0.0)
+        date_planned = date_planned - relativedelta(days=self.company_id.manufacturing_lead)
+        return date_planned
 
     def parse_origin_and_update_dic(self, dict):
         # 解析原单据

@@ -1428,12 +1428,10 @@ class LinklovingAppApi(http.Controller):
                     return JsonResponse.send_response(STATUS_CODE_ERROR,
                                                       res_data={"error": u"该销售单需要一次性发完货,请等待货齐后再发"})
                 elif picking_obj.sale_id.delivery_rule == "cancel_backorder" or is_yes == "yes":
-                    picking_obj.stock_ready()
                     wiz.process_cancel_backorder()
                     picking_obj.to_stock()
 
                 elif picking_obj.sale_id.delivery_rule == "create_backorder":
-                    picking_obj.stock_ready()
                     wiz.process()
                     picking_obj.to_stock()
             else:
