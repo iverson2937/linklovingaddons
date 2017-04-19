@@ -1034,7 +1034,6 @@ class StcokPickingExtend(models.Model):
     post_area_id = fields.Many2one('stock.location.area')
     express_img = fields.Binary("物流图片")
 
-
 class ProcurementOrderExtend(models.Model):
     _inherit = 'procurement.order'
 

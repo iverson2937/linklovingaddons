@@ -156,6 +156,9 @@ class manual_combine_po(models.TransientModel):
                 po.button_cancel()
                 po.unlink()
 
+                # for po_line in po_first:
+
+
     def combine_origin(self, po, po_to_combine):
         if po_to_combine.origin not in po.origin.split(', '):
             # Keep track of all procurements
@@ -166,3 +169,27 @@ class manual_combine_po(models.TransientModel):
                     po.write({'origin': po.origin})
             else:
                 po.write({'origin': po_to_combine.origin})
+
+                #
+                # def  combine_aaa:
+                #     for line in po.order_line:
+                #             if line.product_id == procurement.product_id and line.product_uom == procurement.product_id.uom_po_id:
+                #                 procurement_uom_po_qty = procurement.product_uom._compute_quantity(product_new_qty,
+                #                                                                                    procurement.product_id.uom_po_id)
+                #                 seller = procurement.product_id._select_seller(
+                #                         partner_id=partner,
+                #                         quantity=line.product_qty + procurement_uom_po_qty,
+                #                         date=po.date_order and po.date_order[:10],
+                #                         uom_id=procurement.product_id.uom_po_id)
+                #
+                #                 price_unit = self.env['account.tax']._fix_tax_included_price(seller.price,
+                #                                                                              line.product_id.supplier_taxes_id,
+                #                                                                              line.taxes_id) if seller else 0.0
+                #                 if price_unit and seller and po.currency_id and seller.currency_id != po.currency_id:
+                #                     price_unit = seller.currency_id.compute(price_unit, po.currency_id)
+                #
+                #                 po_line = line.write({
+                #                     'product_qty': line.product_qty + procurement_uom_po_qty,
+                #                     'price_unit': price_unit,
+                #                     'procurement_ids': [(4, procurement.id)]
+                #                 })
