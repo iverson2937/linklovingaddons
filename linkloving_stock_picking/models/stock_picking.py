@@ -20,6 +20,19 @@ class StockPicking(models.Model):
             so = self.env['sale.order'].search([('name', '=', self.origin)])
             self.so_id = so.id if so else None
 
+    @api.multi
+    def _compute_delivery_rule(self):
+        for picking in self:
+            for move in picking.move_lines:
+                if move.procurement_id.sale_line_id:
+                    sale_id = move.procurement_id.sale_line_id.order_id
+                    picking.delivery_rule = sale_id.delivery_rule
+                    break
+
+    delivery_rule = fields.Selection(compute="_compute_delivery_rule", selection=[('delivery_once', '一次性发齐货'),
+                                                                                  ('create_backorder', '允许部分发货,并产生欠单'),
+                                                                                  ('cancel_backorder', '允许部分发货,不产生欠单')],
+                                     )
     po_id = fields.Many2one('purchase.order', compute=_get_so_number)
     so_id = fields.Many2one('sale.order', compute=_get_so_number)
     state = fields.Selection([

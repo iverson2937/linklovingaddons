@@ -1259,6 +1259,17 @@ class LinklovingAppApi(http.Controller):
         }
         return data
 
+    @http.route('/linkloving_app_api/get_stock_picking_by_origin', type='json', auth='none', csrf=False)
+    def get_stock_picking_by_origin(self, **kw):
+        order_name = request.jsonrequest.get("order_name")
+        type = request.jsonrequest.get("type")
+        if order_name:
+            pickings = request.env["stock.picking"].sudo().search([('origin', 'like', order_name)])
+            json_list = []
+            for picking in pickings:
+                json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
     #产品出入库部分
     @http.route('/linkloving_app_api/get_group_by_list', type='json', auth='none', csrf=False)
     def get_group_by_list(self, **kw):
@@ -1319,8 +1330,19 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/action_assign_stock_picking', type='json', auth='none', csrf=False)
     def action_assign_stock_picking(self, **kw):
         picking_id = request.jsonrequest.get("picking_id")
+        is_check_all = request.jsonrequest.get("check_all")
+        if is_check_all:
+            pickings = request.env["stock.picking"].sudo().search(
+                    [("state", "in", ["waiting", "partially_available", "assigned"]),
+                     ("picking_type_code", "=", "outgoing")])
+            pickings.action_assign()
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data={})
+
         picking = request.env["stock.picking"].sudo().search([("id", "=", picking_id)])
-        picking.action_assign()
+        try:
+            picking.action_assign()
+        except UserError:
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.stock_picking_to_json(picking))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.stock_picking_to_json(picking))
 
     #根据销售还是采购来获取stock.picking 出入库
@@ -1347,21 +1369,21 @@ class LinklovingAppApi(http.Controller):
         state = request.jsonrequest.get('state')  # 状态
         picking_id = request.jsonrequest.get('picking_id')  # 订单id
 
-        #仓库或者采购修改了数量
         pack_operation_product_ids = request.jsonrequest.get('pack_operation_product_ids')  # 修改
-        if pack_operation_product_ids and len(pack_operation_product_ids) > 0:
-            pack_list = request.env['stock.pack.operation'].sudo().search(
+
+        pack_list = request.env['stock.pack.operation'].sudo().search(
                 [('id', 'in', map(lambda a: a['pack_id'], pack_operation_product_ids))])
-            qty_done_map = map(lambda a: a['qty_done'], pack_operation_product_ids)
+        # 仓库或者采购修改了数量
+        qty_done_map = map(lambda a: a['qty_done'], pack_operation_product_ids)
 
-            def x(a, b):
-                a.qty_done = b
+        def x(a, b):
+            a.qty_done = b
 
-            if not pack_list:
-                return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                                  res_data={'error':_("Pack Order not found")})
+        if not pack_list:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={'error': _("Pack Order not found")})
+        map(x, pack_list, qty_done_map)
 
-            map(x, pack_list, qty_done_map)
 
         picking_obj = request.env['stock.picking'].sudo().search([('id', '=', picking_id)])
         if state == 'confirm':#确认 标记为代办
@@ -1391,13 +1413,20 @@ class LinklovingAppApi(http.Controller):
         elif state == 'reject':#退回
             picking_obj.reject()
         elif state == 'process':#创建欠单
+            ####判断库存是否不够
+            for pack in pack_list:
+                if pack.qty_done > pack.product_id.qty_available:
+                    return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                                      res_data={
+                                                          "error": u"%s 产品库存不足,无法完成出货" % pack.product_id.display_name})
+
             wiz = request.env['stock.backorder.confirmation'].sudo().create({'pick_id': picking_id})
             is_yes = request.jsonrequest.get("qc_note")  # 货是否齐
             if picking_obj.sale_id:
                 if (
                         picking_obj.sale_id.delivery_rule == "delivery_once" or not picking_obj.sale_id.delivery_rule) and is_yes != "yes":
                     return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                                      res_data={"error": "该销售单需要一次性发完货,请等待货齐后再发"})
+                                                      res_data={"error": u"该销售单需要一次性发完货,请等待货齐后再发"})
                 elif picking_obj.sale_id.delivery_rule == "cancel_backorder" or is_yes == "yes":
                     picking_obj.stock_ready()
                     wiz.process_cancel_backorder()
@@ -1456,6 +1485,7 @@ class LinklovingAppApi(http.Controller):
             })
         data = {
             'picking_id' : stock_picking_obj.id,
+            'delivery_rule': stock_picking_obj.delivery_rule or None,
             'picking_type_code' : stock_picking_obj.picking_type_code,
             'name': stock_picking_obj.name,
             'parnter_id' : stock_picking_obj.partner_id.name,

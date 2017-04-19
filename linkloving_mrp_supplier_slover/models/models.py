@@ -116,8 +116,7 @@ class linkloving_procurement_order(models.Model):
                 if po:
                     cache[domain] = po
 
-
-            if True:
+            if not po:
                 vals = procurement._prepare_purchase_order(partner)
                 # tax_id = self.env["account.tax"].search([('type_tax_use', '<>', "purchase")], limit=1)[0].id
                 # vals["tax"]
