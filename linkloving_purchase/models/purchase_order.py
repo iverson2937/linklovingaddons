@@ -156,7 +156,27 @@ class manual_combine_po(models.TransientModel):
                 po.button_cancel()
                 po.unlink()
 
-                # for po_line in po_first:
+        same_origin = {}
+        for po_line in po_first.order_line:
+            if po_line.product_id.id in same_origin.keys():
+                same_origin[po_line.product_id.id].append(po_line)
+            else:
+                same_origin[po_line.product_id.id] = [po_line]
+
+        for key in same_origin.keys():
+            po_group = same_origin[key]
+            total_qty = 0
+            procurements = self.env["procurement.order"]
+            for po_line in po_group:
+                total_qty += po_line.product_qty
+                procurements += po_line.procurement_ids
+
+            # 生成薪的po单 在po0的基础上
+            po_group[0].product_qty = total_qty
+            po_group[0].procurement_ids = procurements
+
+            for po_line in po_group[1:]:
+                po_line.unlink()
 
 
     def combine_origin(self, po, po_to_combine):
