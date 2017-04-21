@@ -3,7 +3,7 @@
 from odoo import fields, models, api, _, SUPERUSER_ID
 from itertools import groupby
 
-from odoo.tools import float_compare
+from odoo.tools import float_compare, float_is_zero
 
 
 class SaleOrder(models.Model):
@@ -14,6 +14,15 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
     tax_id = fields.Many2one('account.tax', required=True)
     product_count = fields.Float(compute='get_product_count')
+
+    def _compute_shipping_rate(self):
+        for r in self:
+            if not r.seats:
+                r.taken_seats = 0.0
+            else:
+                r.taken_seats = 100.0 * len(r.attendee_ids) / r.seats
+
+    shipping_rate = fields.Float(string=u"出货率", compute='_compute_shipping_rate')
     pi_number = fields.Char(string='PI Number')
     is_emergency = fields.Boolean(string=u'Is Emergency')
     remark = fields.Text(string=u'备注')
@@ -47,6 +56,11 @@ class SaleOrder(models.Model):
         ('to invoice', u'待对账'),
         ('no', u'待出货')
     ], string=u'对账单状态', compute='_get_invoiced', store=True, readonly=True)
+    shipping_status = fields.Selection([
+        ('no', u'待出货'),
+        ('part_shipping', u'部分出货'),
+        ('done', u'出货完成'),
+    ])
 
     @api.multi
     def order_lines_layouted(self):
@@ -101,5 +115,92 @@ class SaleOrderLine(models.Model):
         ('upselling', u'超售商机'),
         ('invoiced', u'已对账完成'),
         ('to invoice', u'待对账'),
-        ('no', u'待出货')
+        ('no', u'未发货')
     ], string=u'对账单状态', compute='_compute_invoice_status', store=True, readonly=True, default='no')
+    shipping_status = fields.Selection([
+        ('no', u'待出货'),
+        ('part_shipping', u'部分出货'),
+        ('done', u'出货完成'),
+    ], default='no', compute='_compute_shipping_status', store=True, readonly=True)
+
+    @api.depends('state', 'product_uom_qty', 'qty_delivered', 'qty_to_invoice', 'qty_invoiced')
+    def _compute_shipping_status(self):
+        """
+        Compute the invoice status of a SO line. Possible statuses:
+        - no: if the SO is not in status 'sale' or 'done', we consider that there is nothing to
+          invoice. This is also hte default value if the conditions of no other status is met.
+        - to invoice: we refer to the quantity to invoice of the line. Refer to method
+          `_get_to_invoice_qty()` for more information on how this quantity is calculated.
+        - upselling: this is possible only for a product invoiced on ordered quantities for which
+          we delivered more than expected. The could arise if, for example, a project took more
+          time than expected but we decided not to invoice the extra cost to the client. This
+          occurs onyl in state 'sale', so that when a SO is set to done, the upselling opportunity
+          is removed from the list.
+        - invoiced: the quantity invoiced is larger or equal to the quantity ordered.
+        """
+        precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+        print 'ssssssssssssssssssssssssssss'
+        print self
+
+        for line in self:
+            print float_compare(line.qty_delivered, line.product_uom_qty, precision_digits=precision)
+            print float_compare(line.qty_delivered, line.product_uom_qty, precision_digits=precision) >= 0
+            print float_compare(line.qty_delivered, line.product_uom_qty, precision_digits=precision) == 0
+
+            if float_is_zero(line.qty_delivered, precision_digits=precision) and line.product_id.type in (
+                    'consu', 'product'):
+                line.shipping_status = 'no'
+            elif float_compare(line.qty_delivered, line.product_uom_qty, precision_digits=precision) < 0:
+                line.shipping_status = 'part_shipping'
+
+            elif float_compare(line.qty_delivered, line.product_uom_qty, precision_digits=precision) == 0:
+                line.shipping_status = 'done'
+            elif line.product_id.type not in ('consu', 'product'):
+                line.shipping_status = 'done'
+            else:
+                line.shipping_status = 'no'
+
+    @api.depends('qty_invoiced', 'qty_delivered', 'product_uom_qty', 'order_id.state')
+    def _get_to_invoice_qty(self):
+        """
+        Compute the quantity to invoice. If the invoice policy is order, the quantity to invoice is
+        calculated from the ordered quantity. Otherwise, the quantity delivered is used.
+        """
+        for line in self:
+            if line.order_id.state in ['sale', 'done']:
+                if line.product_id.invoice_policy == 'order':
+                    line.qty_to_invoice = line.product_uom_qty - line.qty_invoiced
+                else:
+                    line.qty_to_invoice = line.qty_delivered - line.qty_invoiced
+            else:
+                line.qty_to_invoice = 0
+
+    @api.depends('state', 'product_uom_qty', 'qty_delivered', 'qty_to_invoice', 'qty_invoiced')
+    def _compute_invoice_status(self):
+        """
+        Compute the invoice status of a SO line. Possible statuses:
+        - no: if the SO is not in status 'sale' or 'done', we consider that there is nothing to
+          invoice. This is also hte default value if the conditions of no other status is met.
+        - to invoice: we refer to the quantity to invoice of the line. Refer to method
+          `_get_to_invoice_qty()` for more information on how this quantity is calculated.
+        - upselling: this is possible only for a product invoiced on ordered quantities for which
+          we delivered more than expected. The could arise if, for example, a project took more
+          time than expected but we decided not to invoice the extra cost to the client. This
+          occurs onyl in state 'sale', so that when a SO is set to done, the upselling opportunity
+          is removed from the list.
+        - invoiced: the quantity invoiced is larger or equal to the quantity ordered.
+        """
+        precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+        for line in self:
+            if line.state not in ('sale', 'done'):
+                line.invoice_status = 'no'
+            elif not float_is_zero(line.qty_to_invoice, precision_digits=precision) and line.product_id.type in (
+                    'consu', 'product'):
+                line.invoice_status = 'to invoice'
+            elif line.state == 'sale' and line.product_id.invoice_policy == 'order' and \
+                            float_compare(line.qty_delivered, line.product_uom_qty, precision_digits=precision) == 1:
+                line.invoice_status = 'upselling'
+            elif float_compare(line.qty_invoiced, line.product_uom_qty, precision_digits=precision) >= 0:
+                line.invoice_status = 'invoiced'
+            else:
+                line.invoice_status = 'no'

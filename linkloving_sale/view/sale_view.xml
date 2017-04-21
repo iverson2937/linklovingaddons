@@ -5,11 +5,17 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_tree"/>
             <field name="arch" type="xml">
-                <field name="date_order" position="before">
+                <field name="date_order" position="replace">
                     <field name="pi_number"/>
-                </field>
-                <field name="date_order" position="after">
                     <field name="team_id"/>
+                    <field name="validity_date" widget="date" string="交货日期"/>
+                </field>
+
+                <field name="invoice_status" position="attributes">
+                    <attribute name="string">对账状态</attribute>
+                </field>
+                <field name="invoice_status" position="before">
+                    <field name="shipping_status" string="出货状态"/>
                 </field>
             </field>
         </record>
@@ -58,6 +64,9 @@
                 </xpath>
 
                 <xpath expr="//tree/field[@name='analytic_tag_ids']" position="replace">
+                </xpath>
+                <xpath expr="//tree/field[@name='price_unit']" position="after">
+                    <field name="shipping_status"/>
                 </xpath>
                 <xpath expr="//tree/field[@name='name']" position="replace">
                     <field name="name" invisible="1"/>
