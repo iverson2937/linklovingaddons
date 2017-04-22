@@ -73,3 +73,8 @@ class CreateOrderPointWizard(models.TransientModel):
 
             for po in po_group[1:]:
                 po.button_cancel()
+
+    def action_unreserved_stock_picking(self):
+        pickings = self.env["stock.picking"].search([("state", "in", ["partially_available", "assigned"]),
+                                                     ("picking_type_code", "=", "outgoing")])
+        pickings.do_unreserve()

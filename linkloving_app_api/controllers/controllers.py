@@ -1440,7 +1440,7 @@ class LinklovingAppApi(http.Controller):
             domain = expression.AND([domain, [("state", "=", state)]])
         if partner_id:
             domain = expression.AND([domain, [("partner_id", "=", partner_id)]])
-        if (complete_rate == 100 or complete_rate == 0) and state is None:
+        if complete_rate == 100 or complete_rate == 0:
             domain = expression.AND([domain, [("complete_rate", "=", int(complete_rate)),
                                               ("state", "in", ["partially_available", "assigned", "confirmed"])]])
             request.env["stock.picking"].sudo().search(domain)._compute_complete_rate()
