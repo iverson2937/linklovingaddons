@@ -1139,3 +1139,9 @@ class purchase_order_extend(models.Model):
     def change_state_to_rfq(self):
         for po in self:
             po.state = "draft"
+
+    def unlink_cancel_po(self):
+        po_canceled = self.env["purchase.order"].search([("state", "=", "cancel")])
+        mo_canceled = self.env["mrp.production"].search([("state", "=", "cancel")])
+        po_canceled.unlink()
+        mo_canceled.unlink()

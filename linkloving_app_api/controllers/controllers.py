@@ -11,6 +11,7 @@ import operator
 import datetime
 
 import jpush
+import pytz
 from pip import download
 
 import odoo
@@ -20,6 +21,7 @@ from odoo.addons.web.controllers.main import ensure_db
 from odoo import fields
 from odoo.api import call_kw, Environment
 from odoo.modules import get_resource_path
+from odoo.osv import expression
 from odoo.tools import float_compare, SUPERUSER_ID, werkzeug, os
 from odoo.tools import topological_sort
 from odoo.tools.translate import _
@@ -211,15 +213,79 @@ class LinklovingAppApi(http.Controller):
         return {"process_id": process.id,
                 "name": process.name}
 
+    @http.route('/linkloving_app_api/get_date_uncomplete_orders', type='json', auth='none', csrf=False)
+    def get_date_uncomplete_orders(self, **kw):
+        process_id = request.jsonrequest.get("process_id")
+        date_to_show = fields.datetime.now()
+        one_days_after = datetime.timedelta(days=1)
+        today_time = fields.datetime.strptime(fields.datetime.strftime(date_to_show, '%Y-%m-%d'),
+                                              '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
+        timez = fields.datetime.now() - fields.datetime.utcnow()
+        after_day = today_time + one_days_after
+        domain_before = [('date_planned_start', '<', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                         ('state', 'in', ['waiting_material', 'prepare_material_ing']),
+                         ('process_id', '=', process_id)]
+        order_delay = request.env["mrp.production"].sudo().read_group(
+                [('date_planned_start', '<', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
+
+                 ('state', 'in', ['waiting_material', 'prepare_material_ing']),
+
+                 ('process_id', '=', process_id)]
+                , fields=["date_planned_start"],
+                groupby=["date_planned_start"])
+
+        domain = [('date_planned_start', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                  ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                  ('state', 'in', ['waiting_material', 'prepare_material_ing']),
+                  ('process_id', '=', process_id)]
+        today_time = today_time + one_days_after
+        after_day = after_day + one_days_after
+        domain_tommorrow = [('date_planned_start', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                            ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                            ('state', 'in', ['waiting_material', 'prepare_material_ing']),
+                            ('process_id', '=', process_id)]
+        today_time = today_time + one_days_after
+        after_day = after_day + one_days_after
+        domain_after_day = [('date_planned_start', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                            ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                            ('state', 'in', ['waiting_material', 'prepare_material_ing']),
+                            ('process_id', '=', process_id)]
+
+        order_today = request.env["mrp.production"].sudo().read_group(domain, fields=["date_planned_start"],
+                                                                      groupby=["date_planned_start"])
+        order_tomorrow = request.env["mrp.production"].sudo().read_group(domain_tommorrow,
+                                                                         fields=["date_planned_start"],
+                                                                         groupby=["date_planned_start"])
+        order_after = request.env["mrp.production"].sudo().read_group(domain_after_day, fields=["date_planned_start"],
+                                                                      groupby=["date_planned_start"])
+
+        list = []
+        if order_delay:
+            list.append({"state": "delay",
+                         "count": order_delay[0].get("date_planned_start_count")})
+        if order_today:
+            list.append({"state": "today",
+                         "count": order_today[0].get("date_planned_start_count")})
+        if order_tomorrow:
+            list.append({"state": "tomorrow",
+                         "count": order_tomorrow[0].get("date_planned_start_count")})
+        if order_after:
+            list.append({"state": "after",
+                         "count": order_after[0].get("date_planned_start_count")})
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=list)
+
+
     @http.route('/linkloving_app_api/get_recent_production_order', type='json', auth='none', csrf=False)
     def get_recent_production_order(self, **kw):
-        # today_time = fields.datetime.now()
+        today_time = fields.datetime.now()
         # limit = request.jsonrequest.get('limit')
         # offset = request.jsonrequest.get('offset')
         date_to_show = request.jsonrequest.get("date")
         process_id = request.jsonrequest.get("process_id")
         one_days_after = datetime.timedelta(days=1)
-        today_time = fields.datetime.strptime(date_to_show, '%Y-%m-%d')
+        if date_to_show != "delay":
+            today_time = fields.datetime.strptime(date_to_show, '%Y-%m-%d')
         one_millisec_before = datetime.timedelta(milliseconds=1)  #
         today_time = today_time - one_millisec_before  # 今天的最后一秒
         after_day = today_time + one_days_after
@@ -228,13 +294,21 @@ class LinklovingAppApi(http.Controller):
         if not process_id:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "未找到工序id"})
 
-        orders = request.env['mrp.production'].sudo().search([
+        if date_to_show == "delay":
+            domain = [('date_planned_start', '<=', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                      ('state', 'in', ['waiting_material', 'prepare_material_ing']),
+                      ('process_id', '=', process_id)]
+        else:
+            domain = [
             ('date_planned_start', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
             ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
-            ('state', '=', 'waiting_material'),
-            ('process_id', '=', process_id)])
+                ('state', 'in', ['waiting_material', 'prepare_material_ing']),
+                ('process_id', '=', process_id)]
+
+        orders_today = request.env['mrp.production'].sudo().search(domain)
+
         data = []
-        for production in orders:
+        for production in orders_today:
             dict = {
                 'order_id': production.id,
                 'display_name': production.display_name,
@@ -1307,6 +1381,82 @@ class LinklovingAppApi(http.Controller):
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=group_new_list)
 
+    @http.route('/linkloving_app_api/get_outgoing_stock_picking', type='json', auth='none', csrf=False)
+    def get_outgoing_stock_picking(self, **kw):
+        partner_id = request.jsonrequest.get('partner_id')
+        domain = [("state", "in", ("partially_available", "assigned", "confirmed")),
+                  ("picking_type_code", "=", "outgoing")]
+        domain_complete = [("state", "=", "done"), ("picking_type_code", "=", "outgoing")]
+
+        if partner_id:
+            domain = expression.AND([domain, [("partner_id", "=", partner_id)]])
+            domain_complete = expression.AND([domain_complete, [("partner_id", "=", partner_id)]])
+
+        request.env["stock.picking"].sudo().search([("state", "in", ("partially_available", "assigned", "confirmed")),
+                                                    ("picking_type_code", "=", "outgoing")])._compute_complete_rate()
+        group_list = request.env["stock.picking"].sudo().read_group(domain,
+                                                                    fields=["complete_rate"],
+                                                                    groupby=["complete_rate"])
+
+        group_complete = request.env["stock.picking"].sudo().read_group(domain_complete,
+                                                                        fields=["state"],
+                                                                        groupby=["state"])
+        complete_rate = 99
+        complete_rate_count = 0
+        new_group = []
+        for group in group_list:
+            group.pop("__domain")
+            if group.get("complete_rate") > 0 and group.get("complete_rate") < 100:
+                complete_rate_count += group.get("complete_rate_count")
+            else:
+                new_group.append(group)
+
+        new_group.append({"complete_rate": complete_rate,
+                          "complete_rate_count": complete_rate_count})
+        # group_complete[0].pop("__domain")
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"complete_rate": new_group,
+                                                                    "state": group_complete[0]})
+
+    @http.route('/linkloving_app_api/do_unreserve_action', type='json', auth='none', csrf=False)
+    def do_unreserve_action(self, **kw):
+        picking_id = request.jsonrequest.get("picking_id")
+        picking = request.env["stock.picking"].sudo().search([("id", "=", picking_id)])
+        if picking:
+            picking.do_unreserve()
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.stock_picking_to_json(picking))
+
+    @http.route('/linkloving_app_api/get_outgoing_stock_picking_list', type='json', auth='none', csrf=False)
+    def get_outgoing_stock_picking_list(self, **kw):
+        limit = request.jsonrequest.get('limit')
+        offset = request.jsonrequest.get('offset')
+        state = request.jsonrequest.get("state")
+        complete_rate = request.jsonrequest.get("complete_rate")
+        partner_id = request.jsonrequest.get('partner_id')
+        domain = [("picking_type_code", "=", "outgoing")]
+        request.env["stock.picking"].sudo().search([("state", "in", ("partially_available", "assigned", "confirmed")),
+                                                    ("picking_type_code", "=", "outgoing")])._compute_complete_rate()
+        if state:
+            domain = expression.AND([domain, [("state", "=", state)]])
+        if partner_id:
+            domain = expression.AND([domain, [("partner_id", "=", partner_id)]])
+        if (complete_rate == 100 or complete_rate == 0) and state is None:
+            domain = expression.AND([domain, [("complete_rate", "=", int(complete_rate)),
+                                              ("state", "in", ["partially_available", "assigned", "confirmed"])]])
+            request.env["stock.picking"].sudo().search(domain)._compute_complete_rate()
+
+        if complete_rate == 99:
+            domain = expression.AND([domain, [("complete_rate", "<", 100), ("complete_rate", ">", 0),
+                                              ("state", "in", ["partially_available", "assigned", "confirmed"])]])
+        picking_list = request.env['stock.picking'].sudo().search(domain,
+                                                                  limit=limit,
+                                                                  offset=offset,
+                                                                  order='name desc')
+
+        json_list = []
+        for picking in picking_list:
+            json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
     #获取stock.PICKING列表
     @http.route('/linkloving_app_api/get_stock_picking_list', type='json', auth='none', csrf=False)
     def get_stock_picking_list(self, **kw):
@@ -1333,7 +1483,7 @@ class LinklovingAppApi(http.Controller):
         is_check_all = request.jsonrequest.get("check_all")
         if is_check_all:
             pickings = request.env["stock.picking"].sudo().search(
-                    [("state", "in", ["waiting", "partially_available", "assigned"]),
+                    [("state", "in", ["partially_available", "assigned", "confirmed"]),
                      ("picking_type_code", "=", "outgoing")])
             pickings.action_assign()
             return JsonResponse.send_response(STATUS_CODE_OK, res_data={})
@@ -1343,6 +1493,23 @@ class LinklovingAppApi(http.Controller):
             picking.action_assign()
         except UserError:
             return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.stock_picking_to_json(picking))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.stock_picking_to_json(picking))
+
+    @http.route('/linkloving_app_api/force_assign', type='json', auth='none', csrf=False)
+    def force_assign(self, **kw):
+        picking_id = request.jsonrequest.get("picking_id")
+        picking = request.env["stock.picking"].sudo().search([("id", "=", picking_id)])
+        if picking:
+            # pickings = request.env["stock.picking"].sudo().search(
+            #         [("state", "in", ["partially_available", "assigned"]),
+            #          ("picking_type_code", "=", "outgoing")])
+            # picking_un_start_prepare = pickings.is_start_prepare()
+            # move_line_available = picking.move_lines.filtered(lambda move: move.state not in [("state", "not in", ["done", "cancel", "assigned"])])
+            # # for move_line in move_line_available:
+            #     # picking_contain = picking_un_start_prepare.contain_product(move_line.)
+            picking.force_assign()
+        else:
+            return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "找不到对应id的单据"})
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.stock_picking_to_json(picking))
 
     #根据销售还是采购来获取stock.picking 出入库
@@ -1440,6 +1607,9 @@ class LinklovingAppApi(http.Controller):
             elif picking_obj.picking_type_code == "incoming":
                 wiz = request.env['stock.backorder.confirmation'].sudo().create({'pick_id': picking_id})
                 wiz.process()
+        elif state == 'cancel_backorder':  # 取消欠单\
+            wiz = request.env['stock.backorder.confirmation'].sudo().create({'pick_id': picking_id})
+            wiz.process_cancel_backorder()
         elif state == 'transfer':#入库
             picking_obj.to_stock()
         elif state == 'start_prepare_stock': #开始备货
@@ -1471,15 +1641,14 @@ class LinklovingAppApi(http.Controller):
         for pack in stock_picking_obj.pack_operation_product_ids:
             pack_list.append({
                 'pack_id': pack.id,
-                'sale_note': stock_picking_obj.sale_id.remark,
                 'product_id':{
                     'id': pack.product_id.id,
                     'name': pack.product_id.display_name,
                     'default_code': pack.product_id.default_code,
                     'qty_available': pack.product_id.qty_available,
-                    'area_id' : {
-                        'area_id' : pack.product_id.area_id.id,
-                        'area_name': pack.product_id.area_id.name or '',
+                    'area_id': {
+                        'area_id': pack.product_id.area_id.id or None,
+                        'area_name': pack.product_id.area_id.name or None,
                     }
                 },
                 'product_qty' : pack.product_qty,
@@ -1487,6 +1656,8 @@ class LinklovingAppApi(http.Controller):
             })
         data = {
             'picking_id' : stock_picking_obj.id,
+            'complete_rate': stock_picking_obj.complete_rate,
+            'sale_note': stock_picking_obj.sale_id.remark ,
             'delivery_rule': stock_picking_obj.delivery_rule or None,
             'picking_type_code' : stock_picking_obj.picking_type_code,
             'name': stock_picking_obj.name,
@@ -1500,8 +1671,8 @@ class LinklovingAppApi(http.Controller):
             'post_img' : LinklovingAppApi.get_stock_picking_img_url(stock_picking_obj.id, 'post_img'),
             'post_area_id':
                 {
-                    'area_id' : stock_picking_obj.post_area_id.id,
-                    'area_name': stock_picking_obj.post_area_id.name,
+                    'area_id': stock_picking_obj.post_area_id.id or None,
+                    'area_name': stock_picking_obj.post_area_id.name or None,
                 }
         }
         return data

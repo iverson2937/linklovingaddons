@@ -33,6 +33,10 @@ class StockPicking(models.Model):
                                                                                   ('create_backorder', '允许部分发货,并产生欠单'),
                                                                                   ('cancel_backorder', '允许部分发货,不产生欠单')],
                                      )
+
+    # actual_state = fields.Selection(string="", selection=[('', ''), ('', ''), ], required=False, )
+    complete_rate = fields.Integer("可用产品比率")
+
     po_id = fields.Many2one('purchase.order', compute=_get_so_number)
     so_id = fields.Many2one('sale.order', compute=_get_so_number)
     state = fields.Selection([
@@ -127,6 +131,46 @@ class StockPicking(models.Model):
             else:
                 self.state = moves_todo[-1].state
 
+    @api.multi
+    def _compute_complete_rate(self):
+        computed_result = {}
+        # pickings = self.env["stock.picking"].search([("state", "in", ["waiting", "partially_available", "assigned"])])
+        pickings = self.filtered(lambda move: move.state not in [
+            ("state", "in", ["waiting", "partially_available", "assigned", "confirmed"])])
+        for picking in pickings:
+
+            if picking.move_lines:
+                require_qty = 0
+                stock_qty = 0
+                for move in picking.move_lines:
+                    if move.state in ["cancel", "done"]:
+                        continue
+                    if move.product_id.qty_available > move.product_uom_qty:
+                        require_qty += move.product_uom_qty
+                        stock_qty += move.product_uom_qty
+                    else:
+                        require_qty += move.product_uom_qty
+                        stock_qty += move.product_id.qty_available
+                if require_qty != 0:
+                    picking.complete_rate = stock_qty * 100 / require_qty
+                else:
+                    picking.complete_rate = 0
+
+    @api.multi
+    def is_start_prepare(self):
+        picking_un_start_prepare = self.env["stock.picking"]
+        for pick in self:
+            if sum(pick.pack_operation_product_ids.mapped("qty_done")) == 0:  # 已经备货 不能取消保留
+                picking_un_start_prepare += pick
+        return picking_un_start_prepare
+
+    @api.multi
+    def contain_product(self, product):
+        picking_contain = self.env["stock.picking"]
+        for pick in self:
+            if product.id in pick.move_lines.mapped("product_id").ids:
+                picking_contain += pick
+        return picking_contain
 
 class SaleOrderExtend(models.Model):
     _inherit = "sale.order"

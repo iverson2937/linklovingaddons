@@ -180,6 +180,8 @@ class manual_combine_po(models.TransientModel):
 
 
     def combine_origin(self, po, po_to_combine):
+        if not po.origin:
+            return
         if po_to_combine.origin not in po.origin.split(', '):
             # Keep track of all procurements
             if po.origin:
