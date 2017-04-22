@@ -52,7 +52,8 @@ class MrpBomExtend(models.Model):
                                   {'qty': converted_line_quantity, 'product': current_product, 'original_qty': quantity,
                                    'parent_line': current_line}))
             else:
-                lines_done.append((current_line, {'suggest_qty': line_quantity * (1 + bom_line.scrap_rate / 100),
+                lines_done.append(
+                        (current_line, {'suggest_qty': math.ceil(line_quantity * (1 + bom_line.scrap_rate / 100)),
                                                   'qty': line_quantity, 'product': current_product,
                                                   'original_qty': quantity, 'parent_line': parent_line}))
 
@@ -134,7 +135,7 @@ class StockMoveExtend(models.Model):
 
     qty_available = fields.Float(string='On Hand', related='product_id.qty_available')
     virtual_available = fields.Float(string='Forecast Quantity', related='product_id.virtual_available')
-    suggest_qty = fields.Float(string='Suggest Quantity', help=u'建议数量 = 实际数量 + 预计报废数量', )
+    suggest_qty = fields.Integer(string='Suggest Quantity', help=u'建议数量 = 实际数量 + 预计报废数量', )
     over_picking_qty = fields.Float(string='Excess Quantity ', )
     is_return_material = fields.Boolean(default=False)
     is_over_picking = fields.Boolean(default=False)
@@ -513,7 +514,7 @@ class MrpProductionExtend(models.Model):
         if move:
             if quantity > 0:
                 move[0].write({'product_uom_qty': quantity * qty,
-                               'suggest_qty': quantity * qty})
+                               'suggest_qty': math.ceil(quantity * qty)})
             else:
                 if move[0].quantity_done > 0:
                     raise UserError(_(
@@ -810,7 +811,8 @@ class SimStockMove(models.Model):
                 for l in sim_move.stock_moves:
                     if l.is_over_picking or l.is_return_material:
                         continue
-                    sim_move.product_uom_qty += l.product_uom_qty
+                    if l.state != "cancel":
+                        sim_move.product_uom_qty += l.product_uom_qty
 
     def _default_qty_available(self):
         for sim_move in self:
@@ -861,7 +863,7 @@ class SimStockMove(models.Model):
     product_uom_qty = fields.Float(compute=_default_product_uom_qty)
     qty_available = fields.Float(compute=_default_qty_available)
     virtual_available = fields.Float(compute=_default_virtual_available)
-    suggest_qty = fields.Float(compute=_default_suggest_qty)
+    suggest_qty = fields.Integer(compute=_default_suggest_qty)
     quantity_available = fields.Float(compute=_compute_quantity_available, )
     return_qty = fields.Float(compute=_compute_return_qty)
     over_picking_qty = fields.Float()
