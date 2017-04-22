@@ -1338,7 +1338,8 @@ class LinklovingAppApi(http.Controller):
         order_name = request.jsonrequest.get("order_name")
         type = request.jsonrequest.get("type")
         if order_name:
-            pickings = request.env["stock.picking"].sudo().search([('origin', 'like', order_name)])
+            pickings = request.env["stock.picking"].sudo().search([('origin', 'like', order_name),
+                                                                   ('picking_type_code', '=', 'outgoing')])
             json_list = []
             for picking in pickings:
                 json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
