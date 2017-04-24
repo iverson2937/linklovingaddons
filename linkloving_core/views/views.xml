@@ -4,16 +4,20 @@
         <template id="core_static" name="linkloving_core_assets" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
 
-                <script type="text/javascript" src="/linkloving_core/static/src/js/product_kanban.js"/>
+
                 <script type="text/javascript" src="/linkloving_core/static/src/js/product.js"/>
+                <script type="text/javascript" src="/linkloving_core/static/src/js/product_kanban.js"/>
                 <link rel="stylesheet" href="/linkloving_core/static/src/css/petstore.css"/>
 
             </xpath>
         </template>
         <record id="action_product_detail" model="ir.actions.client">
             <field name="name">产品详细页面</field>
-            <field name="tag">linkloving_core.product</field>
+            <field name="tag">product_detail</field>
         </record>
+        <menuitem id="home_page_petstore_menu" name="产品详细页面" parent="stock.menu_stock_inventory_control"
+                  action="action_product_detail"/>
+
 
     </data>
 
