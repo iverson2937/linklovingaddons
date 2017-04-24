@@ -110,7 +110,9 @@ class LinklovingAppApi(http.Controller):
                 #get group ids
                 user = LinklovingAppApi.get_model_by_id(uid, request, 'res.users')
                 values['partner_id'] = user.partner_id.id
-                group_names = request.env['ir.model.data'].sudo().search_read([('res_id', 'in', user.groups_id.ids),('model','=','res.groups')], fields=['name'])
+                group_names = request.env['ir.model.data'].sudo().search_read([('res_id', 'in', user.groups_id.ids),
+                                                                               ('model', '=', 'res.groups')],
+                                                                              fields=['name'])
                 #转换中英文标志位
                 if user.lang == "zh_CN":
                     values['lang'] = "zh-Hans"
@@ -409,7 +411,9 @@ class LinklovingAppApi(http.Controller):
         else:
             for worker in workers:
                 if worker.now_mo_id and worker.now_mo_id.id != order_id:#是否正在另一条产线，就退出那一条
-                    working_now = request.env['worker.line'].sudo().search([('worker_id', '=', worker.id),('production_id', '=', worker.now_mo_id.id)])
+                    working_now = request.env['worker.line'].sudo().search([('worker_id', '=', worker.id),
+                                                                            (
+                                                                            'production_id', '=', worker.now_mo_id.id)])
                     working_now.change_worker_state('outline')
                     worker.now_mo_id = None
                 elif worker.now_mo_id.id == order_id:#防止重复添加
@@ -619,7 +623,9 @@ class LinklovingAppApi(http.Controller):
                 return JsonResponse.send_response(STATUS_CODE_ERROR,
                                                   res_data={'error': _("Stock move not found")})
             if l['over_picking_qty'] != 0:#如果超领数量不等于0
-                new_move = move.stock_moves[0].copy(default={'quantity_done': l['over_picking_qty'], 'product_uom_qty':  l['over_picking_qty'], 'production_id': move.production_id.id,
+                new_move = move.stock_moves[0].copy(default={'quantity_done': l['over_picking_qty'],
+                                                             'product_uom_qty': l['over_picking_qty'],
+                                                             'production_id': move.production_id.id,
                                                              'raw_material_production_id': move.raw_material_production_id.id,
                                                              'procurement_id': move.procurement_id.id or False,
                                                              'is_over_picking': True})
@@ -1117,7 +1123,9 @@ class LinklovingAppApi(http.Controller):
                     'id' :  line['product_id'][0] ,
                     'product_name' :  line['product_id'][1],
                     'product_spec': product_n.product_specs,
-                    'image_medium' : LinklovingAppApi.get_product_image_url(request.env['product.product'].sudo().browse(line['product_id'][0])[0], model='product.product'),
+                    'image_medium': LinklovingAppApi.get_product_image_url(
+                            request.env['product.product'].sudo().browse(line['product_id'][0])[0],
+                            model='product.product'),
                     'area' : {
                         'area_id': area.id,
                         'area_name': area.name
@@ -1146,9 +1154,11 @@ class LinklovingAppApi(http.Controller):
     def get_product_image_url(cls, product_product, model):
         DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
         if model == 'product.template':
-            url = '%slinkloving_app_api/get_product_image?product_id=%s&model=%s' % (request.httprequest.host_url, str(product_product.id), model)
+            url = '%slinkloving_app_api/get_product_image?product_id=%s&model=%s' % \
+                  (request.httprequest.host_url, str(product_product.id), model)
         else:
-            url = '%slinkloving_app_api/get_product_image?product_id=%s&model=%s' % (request.httprequest.host_url, str(product_product.product_tmpl_id.id), model)
+            url = '%slinkloving_app_api/get_product_image?product_id=%s&model=%s' % \
+                  (request.httprequest.host_url, str(product_product.product_tmpl_id.id), model)
         if not url:
             return ''
         return url
@@ -1157,7 +1167,13 @@ class LinklovingAppApi(http.Controller):
     def get_product_image(self, **kw):
         DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
         product_id =kw.get('product_id')
-        status, headers, content = request.registry['ir.http'].binary_content(xmlid=None, model='product.template', id=product_id, field='image_medium', unique=time.strftime(DEFAULT_SERVER_DATE_FORMAT, time.localtime()),
+        status, headers, content = request.registry['ir.http'].binary_content(xmlid=None,
+                                                                              model='product.template',
+                                                                              id=product_id,
+                                                                              field='image_medium',
+                                                                              unique=time.strftime(
+                                                                                  DEFAULT_SERVER_DATE_FORMAT,
+                                                                                  time.localtime()),
                                                                               default_mimetype='image/png',
                                                                               env=request.env(user=SUPERUSER_ID))
         if status == 304:
@@ -1368,7 +1384,7 @@ class LinklovingAppApi(http.Controller):
                 temp_domain = []
                 temp_domain.append(('picking_type_id','=',group_id))
                 if partner_id:
-                    temp_domain.append(('partner_id', '=', partner_id))
+                    temp_domain.append(('partner_id', 'child_of', partner_id))
 
                 state_group_list = request.env[model].sudo().read_group(temp_domain, fields=['state'], groupby=['state'])
                 new_group = {
@@ -1390,8 +1406,9 @@ class LinklovingAppApi(http.Controller):
         domain_complete = [("state", "=", "done"), ("picking_type_code", "=", "outgoing")]
 
         if partner_id:
-            domain = expression.AND([domain, [("partner_id", "=", partner_id)]])
-            domain_complete = expression.AND([domain_complete, [("partner_id", "=", partner_id)]])
+            domain = expression.AND([domain, [("partner_id", "child_of", partner_id)]])
+            domain_complete = expression.AND([domain_complete, [("partner_id", "child_of", partner_id)]])
+
 
         request.env["stock.picking"].sudo().search([("state", "in", ("partially_available", "assigned", "confirmed")),
                                                     ("picking_type_code", "=", "outgoing")])._compute_complete_rate()
@@ -1407,7 +1424,7 @@ class LinklovingAppApi(http.Controller):
         new_group = []
         for group in group_list:
             group.pop("__domain")
-            if group.get("complete_rate") > 0 and group.get("complete_rate") < 100:
+            if group.get("complete_rate") > 0 and group.get("complete_rate") < 100 or group.get("complete_rate") < 0:
                 complete_rate_count += group.get("complete_rate_count")
             else:
                 new_group.append(group)
@@ -1415,8 +1432,11 @@ class LinklovingAppApi(http.Controller):
         new_group.append({"complete_rate": complete_rate,
                           "complete_rate_count": complete_rate_count})
         # group_complete[0].pop("__domain")
+        group_done = {}
+        if group_complete:
+            group_done = group_complete[0]
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"complete_rate": new_group,
-                                                                    "state": group_complete[0]})
+                                                                    "state": group_done})
 
     @http.route('/linkloving_app_api/do_unreserve_action', type='json', auth='none', csrf=False)
     def do_unreserve_action(self, **kw):
@@ -1434,20 +1454,23 @@ class LinklovingAppApi(http.Controller):
         complete_rate = request.jsonrequest.get("complete_rate")
         partner_id = request.jsonrequest.get('partner_id')
         domain = [("picking_type_code", "=", "outgoing")]
-        request.env["stock.picking"].sudo().search([("state", "in", ("partially_available", "assigned", "confirmed")),
-                                                    ("picking_type_code", "=", "outgoing")])._compute_complete_rate()
+        # request.env["stock.picking"].sudo().search([("state", "in", ("partially_available", "assigned", "confirmed")),
+        #                                             ("picking_type_code", "=", "outgoing")])._compute_complete_rate()
         if state:
             domain = expression.AND([domain, [("state", "=", state)]])
+        else:
+            if complete_rate == 100 or complete_rate == 0:
+                domain = expression.AND([domain, [("complete_rate", "=", int(complete_rate)),
+                                                  ("state", "in", ["partially_available", "assigned", "confirmed"])]])
+            if complete_rate == 99:
+                domain = expression.AND([domain, [("complete_rate", "<", 100), ("complete_rate", ">", 0),
+                                                  ("state", "in", ["partially_available", "assigned", "confirmed"])]])
+                domain = expression.OR([domain, [("complete_rate", "<", 0)]])
         if partner_id:
-            domain = expression.AND([domain, [("partner_id", "=", partner_id)]])
-        if complete_rate == 100 or complete_rate == 0:
-            domain = expression.AND([domain, [("complete_rate", "=", int(complete_rate)),
-                                              ("state", "in", ["partially_available", "assigned", "confirmed"])]])
-            request.env["stock.picking"].sudo().search(domain)._compute_complete_rate()
+            domain = expression.AND([domain, [("partner_id", "child_of", partner_id)]])
 
-        if complete_rate == 99:
-            domain = expression.AND([domain, [("complete_rate", "<", 100), ("complete_rate", ">", 0),
-                                              ("state", "in", ["partially_available", "assigned", "confirmed"])]])
+        request.env["stock.picking"].sudo().search(domain)._compute_complete_rate()
+
         picking_list = request.env['stock.picking'].sudo().search(domain,
                                                                   limit=limit,
                                                                   offset=offset,
@@ -1470,7 +1493,7 @@ class LinklovingAppApi(http.Controller):
         domain.append(('picking_type_id', '=', picking_type_id))
         domain.append(('state', '=', state))
         if partner_id:
-            domain.append(('partner_id', '=', partner_id))
+            domain.append(('partner_id', 'child_of', partner_id))
 
         picking_list = request.env['stock.picking'].sudo().search(domain, limit=limit, offset=offset, order='name desc')
         json_list = []
@@ -1591,15 +1614,21 @@ class LinklovingAppApi(http.Controller):
                 wiz = request.env['stock.backorder.confirmation'].sudo().create({'pick_id': picking_id})
                 is_yes = request.jsonrequest.get("qc_note")  # 货是否齐
                 if picking_obj.sale_id:
-                    if (
-                            picking_obj.sale_id.delivery_rule == "delivery_once" or not picking_obj.sale_id.delivery_rule) and is_yes != "yes":
+                    if (picking_obj.sale_id.delivery_rule == "delivery_once" or not picking_obj.sale_id.delivery_rule) \
+                            and is_yes != "yes":
                         return JsonResponse.send_response(STATUS_CODE_ERROR,
                                                           res_data={"error": u"该销售单需要一次性发完货,请等待货齐后再发"})
-                    elif picking_obj.sale_id.delivery_rule == "cancel_backorder" or is_yes == "yes":
+                    elif picking_obj.sale_id.delivery_rule == "delivery_once" and picking_obj.state != "assigned":
+                        return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                                          res_data={"error": u"该单据为部分可用,请等待货齐后再发"})
+                    elif picking_obj.sale_id.delivery_rule == "cancel_backorder":  # 取消欠单
                         wiz.process_cancel_backorder()
                         picking_obj.to_stock()
 
-                    elif picking_obj.sale_id.delivery_rule == "create_backorder":
+                    elif picking_obj.sale_id.delivery_rule == "create_backorder":  #创建欠单
+                        wiz.process()
+                        picking_obj.to_stock()
+                    elif picking_obj.sale_id.delivery_rule == "delivery_once" and is_yes == "yes" and picking_obj.state == "assigned":  # 一次性出货并备货完成
                         wiz.process()
                         picking_obj.to_stock()
                 else:
@@ -1621,7 +1650,8 @@ class LinklovingAppApi(http.Controller):
             express_img = request.jsonrequest.get('qc_img')
             DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
             self.add_file_to_attachment(express_img,
-                                        "express_img_%s" % time.strftime(DEFAULT_SERVER_DATE_FORMAT, time.localtime()),
+                                        "express_img_%s.png" % time.strftime(DEFAULT_SERVER_DATE_FORMAT,
+                                                                             time.localtime()),
                                         "stock.picking", picking_id)
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.stock_picking_to_json(picking_obj))
 
@@ -1662,14 +1692,14 @@ class LinklovingAppApi(http.Controller):
             'delivery_rule': stock_picking_obj.delivery_rule or None,
             'picking_type_code' : stock_picking_obj.picking_type_code,
             'name': stock_picking_obj.name,
-            'parnter_id' : stock_picking_obj.partner_id.name,
-            'origin' : stock_picking_obj.origin,
-            'state' : stock_picking_obj.state,
-            'min_date' : stock_picking_obj.min_date,
-            'pack_operation_product_ids' : pack_list,
-            'qc_note' : stock_picking_obj.qc_note,
-            'qc_img' : LinklovingAppApi.get_stock_picking_img_url(stock_picking_obj.id, 'qc_img'),
-            'post_img' : LinklovingAppApi.get_stock_picking_img_url(stock_picking_obj.id, 'post_img'),
+            'parnter_id': stock_picking_obj.partner_id.display_name,
+            'origin': stock_picking_obj.origin,
+            'state': stock_picking_obj.state,
+            'min_date': stock_picking_obj.min_date,
+            'pack_operation_product_ids': pack_list,
+            'qc_note': stock_picking_obj.qc_note,
+            'qc_img': LinklovingAppApi.get_stock_picking_img_url(stock_picking_obj.id, 'qc_img'),
+            'post_img': LinklovingAppApi.get_stock_picking_img_url(stock_picking_obj.id, 'post_img'),
             'post_area_id':
                 {
                     'area_id': stock_picking_obj.post_area_id.id or None,
@@ -1680,7 +1710,6 @@ class LinklovingAppApi(http.Controller):
 
     @classmethod
     def get_stock_picking_img_url(cls, picking_id, field):
-        DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
         url = '%slinkloving_app_api/get_worker_image?worker_id=%s&model=%s&field=%s' % (
             request.httprequest.host_url, str(picking_id), 'stock.picking', field)
         if not url:
