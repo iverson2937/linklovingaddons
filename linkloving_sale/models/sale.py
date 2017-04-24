@@ -15,12 +15,11 @@ class SaleOrder(models.Model):
     tax_id = fields.Many2one('account.tax', required=True)
     product_count = fields.Float(compute='get_product_count')
 
+    @api.depends('product_count', 'order_line.qty_delivered')
     def _compute_shipping_rate(self):
         for r in self:
-            if not r.seats:
-                r.taken_seats = 0.0
-            else:
-                r.taken_seats = 100.0 * len(r.attendee_ids) / r.seats
+            qtys = sum(line.qty_delivered for line in r.order_line)
+            r.shipping_rate = (qtys / r.product_count) * 100.0
 
     shipping_rate = fields.Float(string=u"出货率", compute='_compute_shipping_rate')
     pi_number = fields.Char(string='PI Number')
@@ -33,10 +32,15 @@ class SaleOrder(models.Model):
             picking_id.write({'is_emergency': self.is_emergency})
 
     def get_product_count(self):
-        count = 0.0
-        for line in self.order_line:
-            count += line.product_uom_qty
-        self.product_count = count
+        for order in self:
+            count = 0.0
+            for line in order.order_line:
+                if line.product_id.type in ['product', 'consu']:
+                    qty = line.product_uom_qty
+                else:
+                    qty = 0
+                count += qty
+            order.product_count = count
 
     @api.multi
     def button_dummy(self):
@@ -54,13 +58,25 @@ class SaleOrder(models.Model):
         ('upselling', u'超售商机'),
         ('invoiced', u'已对账完成'),
         ('to invoice', u'待对账'),
-        ('no', u'待出货')
+        ('no', u'没有要对账的')
     ], string=u'对账单状态', compute='_get_invoiced', store=True, readonly=True)
     shipping_status = fields.Selection([
         ('no', u'待出货'),
         ('part_shipping', u'部分出货'),
         ('done', u'出货完成'),
-    ])
+    ], compute='_get_shipping_status', default='no')
+
+    @api.one
+    @api.depends('order_line.shipping_status')
+    def _get_shipping_status(self):
+        for order in self:
+
+            if order.state == 'sale' and all(line.shipping_status == 'done' for line in self.order_line):
+                order.shipping_status = 'done'
+            elif order.state == 'sale' and any(line.shipping_status == 'part_shipping' for line in self.order_line):
+                order.shipping_status = 'part_shipping'
+            else:
+                order.shipping_status = 'no'
 
     @api.multi
     def order_lines_layouted(self):

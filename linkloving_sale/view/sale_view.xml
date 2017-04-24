@@ -16,6 +16,7 @@
                 </field>
                 <field name="invoice_status" position="before">
                     <field name="shipping_status" string="出货状态"/>
+                    <field name="shipping_rate" widget="progressbar"/>
                 </field>
             </field>
         </record>
