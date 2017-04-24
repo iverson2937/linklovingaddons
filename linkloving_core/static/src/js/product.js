@@ -32,7 +32,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
         start: function () {
             var self = this;
             return new Model("product.template")
-                .call("get_detail", [{'partner_id': 'ssss'}])
+                .call("get_detail", [54115])
                 .then(function (result) {
                     console.log(typeof result.bom_lines)
                     _(result).each(function (items) {
