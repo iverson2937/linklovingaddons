@@ -10,111 +10,42 @@ odoo.define('linkloving_core.product_detail', function (require) {
 
 
     var KioskConfirm = Widget.extend({
+        template: "HomePage",
         events: {
-            "click .o_hr_attendance_back_button": function () {
-                this.do_action(this.next_action, {clear_breadcrumbs: true});
-            },
-            "click .o_hr_attendance_sign_in_out_icon": function () {
-            var self = this;
-                this.$('.o_hr_attendance_sign_in_out_icon').attr("disabled", "disabled");
-                var hr_employee = new Model('hr.employee');
-                hr_employee.call('attendance_manual', [[this.employee_id], this.next_action])
-                    .then(function (result) {
-                        if (result.action) {
-                            self.do_action(result.action);
-                        } else if (result.warning) {
-                            self.do_warn(result.warning);
-                            self.$('.o_hr_attendance_sign_in_out_icon').removeAttr("disabled");
-                        }
-                    });
+            'click .level-top': 'zhankai',
         },
-            'click .o_hr_attendance_pin_pad_button_0': function () {
-                this.$('.o_hr_attendance_PINbox').val(this.$('.o_hr_attendance_PINbox').val() + 0);
-            },
-            'click .o_hr_attendance_pin_pad_button_1': function () {
-                this.$('.o_hr_attendance_PINbox').val(this.$('.o_hr_attendance_PINbox').val() + 1);
-            },
-            'click .o_hr_attendance_pin_pad_button_2': function () {
-                this.$('.o_hr_attendance_PINbox').val(this.$('.o_hr_attendance_PINbox').val() + 2);
-            },
-            'click .o_hr_attendance_pin_pad_button_3': function () {
-                this.$('.o_hr_attendance_PINbox').val(this.$('.o_hr_attendance_PINbox').val() + 3);
-            },
-            'click .o_hr_attendance_pin_pad_button_4': function () {
-                this.$('.o_hr_attendance_PINbox').val(this.$('.o_hr_attendance_PINbox').val() + 4);
-            },
-            'click .o_hr_attendance_pin_pad_button_5': function () {
-                this.$('.o_hr_attendance_PINbox').val(this.$('.o_hr_attendance_PINbox').val() + 5);
-            },
-            'click .o_hr_attendance_pin_pad_button_6': function () {
-                this.$('.o_hr_attendance_PINbox').val(this.$('.o_hr_attendance_PINbox').val() + 6);
-            },
-            'click .o_hr_attendance_pin_pad_button_7': function () {
-                this.$('.o_hr_attendance_PINbox').val(this.$('.o_hr_attendance_PINbox').val() + 7);
-            },
-            'click .o_hr_attendance_pin_pad_button_8': function () {
-                this.$('.o_hr_attendance_PINbox').val(this.$('.o_hr_attendance_PINbox').val() + 8);
-            },
-            'click .o_hr_attendance_pin_pad_button_9': function () {
-                this.$('.o_hr_attendance_PINbox').val(this.$('.o_hr_attendance_PINbox').val() + 9);
-            },
-            'click .o_hr_attendance_pin_pad_button_C': function () {
-                this.$('.o_hr_attendance_PINbox').val('');
-            },
-            'click .o_hr_attendance_pin_pad_button_ok': function () {
-            var self = this;
-                this.$('.o_hr_attendance_pin_pad_button_ok').attr("disabled", "disabled");
-                var hr_employee = new Model('hr.employee');
-                hr_employee.call('attendance_manual', [[this.employee_id], this.next_action, this.$('.o_hr_attendance_PINbox').val()])
-                    .then(function (result) {
-                        if (result.action) {
-                            self.do_action(result.action);
-                        } else if (result.warning) {
-                            self.do_warn(result.warning);
-                            setTimeout(function () {
-                                self.$('.o_hr_attendance_pin_pad_button_ok').removeAttr("disabled");
-                            }, 500);
-                        }
-                    });
-        },
-        },
+        zhankai: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            if (target.classList.contains("fa-caret-right")) {
+                console.log(target.className);
+                target.classList.remove("fa-caret-right");
+                target.classList.add("fa-caret-down");
+                $(".ceshi").show()
+            } else if (target.classList.contains("fa-caret-down")) {
+                target.classList.remove("fa-caret-down");
+                target.classList.add("fa-caret-right");
+                $(".ceshi").hide()
+            }
 
-        init: function (parent, action) {
-            this._super.apply(this, arguments);
-            this.next_action = 'hr_attendance.hr_attendance_action_kiosk_mode';
-            this.employee_id = action.employee_id;
-            this.employee_name = action.employee_name;
-            this.employee_state = action.employee_state;
-            var self = this;
         },
-
         start: function () {
+            // return $.when(
+            // new local.PetToysList(this).appendTo(this.$('.oe_petstore_homepage_left')),
+            // new local.MessageOfTheDay(this).appendTo(this.$('.oe_petstore_homepage_right')),
+            // new local.OpenTheTree(this).appendTo(this.$(".oe_petstore_homepage_right"))
+            // );
+
             var self = this;
-            self.session.user_has_group('hr_attendance.group_hr_attendance_use_pin').then(function (has_group) {
-                self.use_pin = has_group;
-                self.$el.html(QWeb.render("HrAttendanceKioskConfirm", {widget: self}));
-                self.start_clock();
-            });
-            return self._super.apply(this, arguments);
-        },
+            return new Model("product.template")
+                .call("get_detail", [{'partner_id': 'ssss'}])
+                .then(function (result) {
+                    console.log(result)
+                    _(result).each(function (items) {
+                        self.$(".bodys").append(QWeb.render('xx', {items: items}));
+                    })
+                });
 
-        start_clock: function () {
-            this.clock_start = setInterval(function () {
-                this.$(".o_hr_attendance_clock").text(new Date().toLocaleTimeString(navigator.language, {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }));
-            }, 500);
-            // First clock refresh before interval to avoid delay
-            this.$(".o_hr_attendance_clock").text(new Date().toLocaleTimeString(navigator.language, {
-                hour: '2-digit',
-                minute: '2-digit'
-            }));
-        },
-
-        destroy: function () {
-            clearInterval(this.clock_start);
-            this._super.apply(this, arguments);
         },
     });
 

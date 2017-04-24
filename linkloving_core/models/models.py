@@ -3,13 +3,17 @@
 from odoo import models, fields, api
 
 
-class ProductProduct(models.Model):
-    _inherit = 'product.product'
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
 
     @api.multi
-    def check_detail(self):
-        print 'ssssssssssssss'
-        {
-            "type": "ir.actions.client",
-            "tag": "petstore.homepage"
+    def get_detail(self):
+        product_id = self.env['product.template'].browse(45964);
+        return {
+            'name': product_id.name,
+            'bom_lines': [
+                {'name': 'product2'},
+                {'name': 'product'},
+                {'name': 'product3'}
+            ]
         }
