@@ -1628,7 +1628,7 @@ class LinklovingAppApi(http.Controller):
                     elif picking_obj.sale_id.delivery_rule == "create_backorder":  #创建欠单
                         wiz.process()
                         picking_obj.to_stock()
-                    elif picking_obj.sale_id.delivery_rule == "delivery_once" and is_yes == "yes":  # 一次性出货并备货完成
+                    elif picking_obj.sale_id.delivery_rule == "delivery_once" and is_yes == "yes" and picking_obj.state == "assigned":  # 一次性出货并备货完成
                         wiz.process()
                         picking_obj.to_stock()
                 else:
