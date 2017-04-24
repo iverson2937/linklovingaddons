@@ -1164,3 +1164,10 @@ class purchase_order_extend(models.Model):
         mo_canceled = self.env["mrp.production"].search([("state", "=", "cancel")])
         po_canceled.unlink()
         mo_canceled.unlink()
+
+    @api.multi
+    def unlink(self):
+        for order in self:
+            if not order.state in ["cancel", "make_by_mrp"]:
+                raise UserError(_('In order to delete a purchase order, you must cancel it first.'))
+        return super(purchase_order_extend, self).unlink()
