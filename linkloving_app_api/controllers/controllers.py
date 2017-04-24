@@ -1409,6 +1409,7 @@ class LinklovingAppApi(http.Controller):
             domain = expression.AND([domain, [("partner_id", "child_of", partner_id)]])
             domain_complete = expression.AND([domain_complete, [("partner_id", "child_of", partner_id)]])
 
+
         request.env["stock.picking"].sudo().search([("state", "in", ("partially_available", "assigned", "confirmed")),
                                                     ("picking_type_code", "=", "outgoing")])._compute_complete_rate()
         group_list = request.env["stock.picking"].sudo().read_group(domain,
@@ -1423,7 +1424,7 @@ class LinklovingAppApi(http.Controller):
         new_group = []
         for group in group_list:
             group.pop("__domain")
-            if group.get("complete_rate") > 0 and group.get("complete_rate") < 100:
+            if group.get("complete_rate") > 0 and group.get("complete_rate") < 100 or group.get("complete_rate") < 0:
                 complete_rate_count += group.get("complete_rate_count")
             else:
                 new_group.append(group)
@@ -1453,22 +1454,23 @@ class LinklovingAppApi(http.Controller):
         complete_rate = request.jsonrequest.get("complete_rate")
         partner_id = request.jsonrequest.get('partner_id')
         domain = [("picking_type_code", "=", "outgoing")]
-        request.env["stock.picking"].sudo().search([("state", "in", ("partially_available", "assigned", "confirmed")),
-                                                    ("picking_type_code", "=", "outgoing")])._compute_complete_rate()
+        # request.env["stock.picking"].sudo().search([("state", "in", ("partially_available", "assigned", "confirmed")),
+        #                                             ("picking_type_code", "=", "outgoing")])._compute_complete_rate()
         if state:
             domain = expression.AND([domain, [("state", "=", state)]])
         else:
             if complete_rate == 100 or complete_rate == 0:
                 domain = expression.AND([domain, [("complete_rate", "=", int(complete_rate)),
                                                   ("state", "in", ["partially_available", "assigned", "confirmed"])]])
-                request.env["stock.picking"].sudo().search(domain)._compute_complete_rate()
-
             if complete_rate == 99:
                 domain = expression.AND([domain, [("complete_rate", "<", 100), ("complete_rate", ">", 0),
                                                   ("state", "in", ["partially_available", "assigned", "confirmed"])]])
-
+                domain = expression.OR([domain, [("complete_rate", "<", 0)]])
         if partner_id:
             domain = expression.AND([domain, [("partner_id", "child_of", partner_id)]])
+
+        request.env["stock.picking"].sudo().search(domain)._compute_complete_rate()
+
         picking_list = request.env['stock.picking'].sudo().search(domain,
                                                                   limit=limit,
                                                                   offset=offset,

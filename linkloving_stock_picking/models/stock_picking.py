@@ -35,7 +35,7 @@ class StockPicking(models.Model):
                                      )
 
     # actual_state = fields.Selection(string="", selection=[('', ''), ('', ''), ], required=False, )
-    complete_rate = fields.Integer("可用产品比率")
+    complete_rate = fields.Integer("可用产品比率", compute="_compute_complete_rate", store=True)
 
     po_id = fields.Many2one('purchase.order', compute=_get_so_number)
     so_id = fields.Many2one('sale.order', compute=_get_so_number)
@@ -136,7 +136,7 @@ class StockPicking(models.Model):
         computed_result = {}
         # pickings = self.env["stock.picking"].search([("state", "in", ["waiting", "partially_available", "assigned"])])
         pickings = self.filtered(lambda move: move.state not in [
-            ("state", "in", ["waiting", "partially_available", "assigned", "confirmed"])])
+            ("state", "in", ["waiting", "partially_available", "assigned"])])
         for picking in pickings:
 
             if picking.move_lines:
@@ -152,7 +152,7 @@ class StockPicking(models.Model):
                         require_qty += move.product_uom_qty
                         stock_qty += move.product_id.qty_available
                 if require_qty != 0:
-                    picking.complete_rate = stock_qty * 100 / require_qty
+                    picking.complete_rate = int(stock_qty * 100 / require_qty)
                 else:
                     picking.complete_rate = 0
 
