@@ -1,5 +1,13 @@
 <odoo>
   <data>
+    <template id="core_static" name="petstore_assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" href="/linkloving_core/static/src/css/petstore.css"/>
+            <script type="text/javascript" src="/linkloving_core/static/src/js/petstore.js"/>
+        </xpath>
+    </template>
+
+
     <!-- explicit list view definition -->
     <!--
     <record model="ir.ui.view" id="linkloving_core.list">
