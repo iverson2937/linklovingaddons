@@ -1,67 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-  <data>
-    <template id="core_static" name="petstore_assets" inherit_id="web.assets_backend">
-        <xpath expr="." position="inside">
-            <link rel="stylesheet" href="/linkloving_core/static/src/css/petstore.css"/>
-            <script type="text/javascript" src="/linkloving_core/static/src/js/petstore.js"/>
-        </xpath>
-    </template>
+    <data>
+        <template id="core_static" name="linkloving_core_assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+
+                <script type="text/javascript" src="/linkloving_core/static/src/js/product_kanban.js"/>
+                <script type="text/javascript" src="/linkloving_core/static/src/js/product.js"/>
+                <link rel="stylesheet" href="/linkloving_core/static/src/css/petstore.css"/>
+
+            </xpath>
+        </template>
+        <record id="action_product_detail" model="ir.actions.client">
+            <field name="name">产品详细页面</field>
+            <field name="tag">linkloving_core.product</field>
+        </record>
+
+    </data>
 
 
-    <!-- explicit list view definition -->
-    <!--
-    <record model="ir.ui.view" id="linkloving_core.list">
-      <field name="name">linkloving_core list</field>
-      <field name="model">linkloving_core.linkloving_core</field>
-      <field name="arch" type="xml">
-        <tree>
-          <field name="name"/>
-          <field name="value"/>
-          <field name="value2"/>
-        </tree>
-      </field>
-    </record>
-    -->
-
-    <!-- actions opening views on models -->
-    <!--
-    <record model="ir.actions.act_window" id="linkloving_core.action_window">
-      <field name="name">linkloving_core window</field>
-      <field name="res_model">linkloving_core.linkloving_core</field>
-      <field name="view_mode">tree,form</field>
-    </record>
-    -->
-
-    <!-- server action to the one above -->
-    <!--
-    <record model="ir.actions.server" id="linkloving_core.action_server">
-      <field name="name">linkloving_core server</field>
-      <field name="model_id" ref="model_linkloving_core_linkloving_core"/>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "tree,form",
-          "res_model": self._name,
-        }
-      </field>
-    </record>
-    -->
-
-    <!-- Top menu item -->
-    <!--
-    <menuitem name="linkloving_core" id="linkloving_core.menu_root"/>
-    -->
-    <!-- menu categories -->
-    <!--
-    <menuitem name="Menu 1" id="linkloving_core.menu_1" parent="linkloving_core.menu_root"/>
-    <menuitem name="Menu 2" id="linkloving_core.menu_2" parent="linkloving_core.menu_root"/>
-    -->
-    <!-- actions -->
-    <!--
-    <menuitem name="List" id="linkloving_core.menu_1_list" parent="linkloving_core.menu_1"
-              action="linkloving_core.action_window"/>
-    <menuitem name="Server to list" id="linkloving_core" parent="linkloving_core.menu_2"
-              action="linkloving_core.action_server"/>
-    -->
-  </data>
 </odoo>

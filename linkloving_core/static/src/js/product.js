@@ -1,4 +1,4 @@
-openerp.oepetstore = function(instance, local) {
+openerp.oepetstore = function (instance, local) {
     var _t = instance.web._t,
         _lt = instance.web._lt;
     var QWeb = instance.web.qweb;
@@ -8,74 +8,75 @@ openerp.oepetstore = function(instance, local) {
         events: {
             'click .level-top': 'zhankai',
         },
-        zhankai : function (e) {
+        zhankai: function (e) {
             // $el.removeClass("fa-caret-right")
-           // $(this).addClass("jjjjj")
-           // console.log("ppp")
-           //  console.log($(this).html())
+            // $(this).addClass("jjjjj")
+            // console.log("ppp")
+            //  console.log($(this).html())
 
-            var e = e||window.event;
+            var e = e || window.event;
             var target = e.target || e.srcElement;
-            if(target.classList.contains("fa-caret-right")){
+            if (target.classList.contains("fa-caret-right")) {
                 console.log(target.className);
                 target.classList.remove("fa-caret-right");
                 target.classList.add("fa-caret-down");
                 $(".ceshi").show()
-            }else if(target.classList.contains("fa-caret-down")) {
+            } else if (target.classList.contains("fa-caret-down")) {
                 target.classList.remove("fa-caret-down");
                 target.classList.add("fa-caret-right");
-                 $(".ceshi").hide()
+                $(".ceshi").hide()
             }
 
         },
-        start: function() {
-             // return $.when(
-                // new local.PetToysList(this).appendTo(this.$('.oe_petstore_homepage_left')),
-                // new local.MessageOfTheDay(this).appendTo(this.$('.oe_petstore_homepage_right')),
-                // new local.OpenTheTree(this).appendTo(this.$(".oe_petstore_homepage_right"))
+        start: function () {
+            // return $.when(
+            // new local.PetToysList(this).appendTo(this.$('.oe_petstore_homepage_left')),
+            // new local.MessageOfTheDay(this).appendTo(this.$('.oe_petstore_homepage_right')),
+            // new local.OpenTheTree(this).appendTo(this.$(".oe_petstore_homepage_right"))
             // );
 
+
             var self = this;
-            return new instance.web.Model("oepetstore.message_of_the_day")
-                .query(["message"])
+            return new instance.web.Model("product.product")
+                .query(["id"])
                 .order_by('-create_date', '-id')
                 .limit(7)
                 .all()
-                .then(function(result) {
+                .then(function (result) {
                     console.log(result)
                     // self.$(".oe_mywidget_message_of_the_day").text(result.message);
                     _(result).each(function (items) {
-                         self.$(".bodys").append(QWeb.render('xx', {items: items}));
+                        self.$(".bodys").append(QWeb.render('xx', {items: items}));
                     })
                 });
 
         },
     });
 
-    instance.web.client_actions.add('petstore.homepage', 'instance.oepetstore.HomePage');
+    instance.web.client_actions.add('linkloving_core.product', 'instance.oepetstore.HomePage');
 
     local.OpenTheTree = instance.Widget.extend({
-         start:function () {
-             var self = this;
-             this.$el.append(QWeb.render("OpenTree"));
+        start: function () {
+            var self = this;
+            this.$el.append(QWeb.render("OpenTree"));
         },
     });
 
 
     local.MessageOfTheDay = instance.Widget.extend({
         template: "MessageOfTheDay",
-        start: function() {
+        start: function () {
             var self = this;
             return new instance.web.Model("oepetstore.message_of_the_day")
                 .query(["message"])
                 .order_by('-create_date', '-id')
                 .limit(5)
                 .all()
-                .then(function(result) {
+                .then(function (result) {
                     console.log(result[0].message)
                     // self.$(".oe_mywidget_message_of_the_day").text(result.message);
                     _(result).each(function (items) {
-                         self.$el.append(QWeb.render('xx', {items: items}));
+                        self.$el.append(QWeb.render('xx', {items: items}));
                     })
                 });
 
@@ -112,10 +113,10 @@ openerp.oepetstore = function(instance, local) {
     });
 
     var MyClass = instance.web.Class.extend({
-        init: function(name) {
+        init: function (name) {
             this.name = name;
         },
-        say_hello: function() {
+        say_hello: function () {
             // console.log("jsjsjs");
         },
     });
