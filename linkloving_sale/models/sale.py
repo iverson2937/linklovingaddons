@@ -155,9 +155,6 @@ class SaleOrderLine(models.Model):
         - invoiced: the quantity invoiced is larger or equal to the quantity ordered.
         """
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
-        print 'ssssssssssssssssssssssssssss'
-        print self
-
         for line in self:
             print float_compare(line.qty_delivered, line.product_uom_qty, precision_digits=precision)
             print float_compare(line.qty_delivered, line.product_uom_qty, precision_digits=precision) >= 0
@@ -166,7 +163,8 @@ class SaleOrderLine(models.Model):
             if float_is_zero(line.qty_delivered, precision_digits=precision) and line.product_id.type in (
                     'consu', 'product'):
                 line.shipping_status = 'no'
-            elif float_compare(line.qty_delivered, line.product_uom_qty, precision_digits=precision) < 0:
+            elif float_compare(line.qty_delivered, line.product_uom_qty,
+                               precision_digits=precision) < 0 and line.product_id.type in ('consu', 'product'):
                 line.shipping_status = 'part_shipping'
 
             elif float_compare(line.qty_delivered, line.product_uom_qty, precision_digits=precision) == 0:
