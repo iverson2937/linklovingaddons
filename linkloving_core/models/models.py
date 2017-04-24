@@ -24,11 +24,11 @@ class ProductTemplate(models.Model):
                     'name': line.product_id.name,
                     'product_qty': line.product_qty
                 })
-            bom_lines.append(res)
+                bom_lines.append(res)
 
-        return json.dump({
+        return {
             'name': self.name,
             'level': level,
             'bom_lines': bom_lines,
             'product_id': self.id,
-        })
+        }

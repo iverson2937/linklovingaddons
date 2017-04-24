@@ -24,16 +24,16 @@
                     </thead>
                     <tbody class="bodys">
                         <!--<tr style="color:red">-->
-                            <!--<td class="fa fa-caret-right level-top" style="cursor:pointer"></td>-->
-                            <!--<td style="color:red">a</td>-->
-                            <!--<td>b</td>-->
-                            <!--<td>c</td>-->
+                        <!--<td class="fa fa-caret-right level-top" style="cursor:pointer"></td>-->
+                        <!--<td style="color:red">a</td>-->
+                        <!--<td>b</td>-->
+                        <!--<td>c</td>-->
                         <!--</tr>-->
-                         <!--<tr class="tr_level_top" style="display:none;">-->
-                            <!--<td></td>-->
-                            <!--<td style="padding-left:20px">d</td>-->
-                            <!--<td>e</td>-->
-                            <!--<td>f</td>-->
+                        <!--<tr class="tr_level_top" style="display:none;">-->
+                        <!--<td></td>-->
+                        <!--<td style="padding-left:20px">d</td>-->
+                        <!--<td>e</td>-->
+                        <!--<td>f</td>-->
                         <!--</tr>-->
                         <!--<t t-call="xx"/>-->
                     </tbody>
@@ -58,13 +58,14 @@
     </t>
 
 
-    <t t-name="show_bom_line_tr" t-foreach="items.bom_lines" t-as="item">
+    <t t-name="show_bom_line_tr" t-foreach="bom_lines" t-as="item">
         <tr class="te">
-            <td><t t-esc="item"/></td>
+                <td><t t-esc="item.name"/></td>
+
             <!--<td><t t-esc="item.name"/></td>-->
         </tr>
         <!--<script type="text/javascript">-->
-           <!--&lt;!&ndash;$(".bodys").append($(".te"));&ndash;&gt;-->
+        <!--&lt;!&ndash;$(".bodys").append($(".te"));&ndash;&gt;-->
         <!--</script>-->
     </t>
 
