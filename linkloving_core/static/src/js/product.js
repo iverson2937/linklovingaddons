@@ -34,9 +34,10 @@ odoo.define('linkloving_core.product_detail', function (require) {
             return new Model("product.template")
                 .call("get_detail", [{'partner_id': 'ssss'}])
                 .then(function (result) {
-                    console.log(result)
+                    console.log(typeof result.bom_lines)
                     _(result).each(function (items) {
-                        self.$(".bodys").append(QWeb.render('show_bom_line_tr', {items: items}));
+                        self.$(".bodys").append(QWeb.render('show_bom_line_tr', {items: items,'bom_lines':items.bom_lines}));
+                        self.$(".show_product_name").html(result.name)
                     })
                 });
 

@@ -7,31 +7,34 @@
             <!--<div class="oe_petstore_homepage_right"></div>-->
 
             <div class="oe_petstore_top">
-                <div>顶部</div>
+                <div>
+                    <span>产品:</span>
+                    <span class="show_product_name"></span>
+                </div>
             </div>
             <div class="tables">
                 <table class="table table-striped">
                     <thead>
                         <tr>
                             <td></td>
-                            <th>1</th>
-                            <th>2</th>
+                            <th>产品</th>
+                            <th>配比</th>
                             <th>3</th>
                         </tr>
                     </thead>
                     <tbody class="bodys">
-                        <tr style="color:red">
-                            <td class="fa fa-caret-right level-top" style="cursor:pointer"></td>
-                            <td style="color:red">a</td>
-                            <td>b</td>
-                            <td>c</td>
-                        </tr>
-                         <tr class="tr_level_top" style="display:none;">
-                            <td></td>
-                            <td style="padding-left:20px">d</td>
-                            <td>e</td>
-                            <td>f</td>
-                        </tr>
+                        <!--<tr style="color:red">-->
+                            <!--<td class="fa fa-caret-right level-top" style="cursor:pointer"></td>-->
+                            <!--<td style="color:red">a</td>-->
+                            <!--<td>b</td>-->
+                            <!--<td>c</td>-->
+                        <!--</tr>-->
+                         <!--<tr class="tr_level_top" style="display:none;">-->
+                            <!--<td></td>-->
+                            <!--<td style="padding-left:20px">d</td>-->
+                            <!--<td>e</td>-->
+                            <!--<td>f</td>-->
+                        <!--</tr>-->
                         <!--<t t-call="xx"/>-->
                     </tbody>
                 </table>
@@ -55,12 +58,10 @@
     </t>
 
 
-    <t t-name="show_bom_line_tr">
+    <t t-name="show_bom_line_tr" t-foreach="items.bom_lines" t-as="item">
         <tr class="te">
-            <td></td>
-            <td><t t-esc="items.id"/></td>
-            <td><t t-esc="items.message"/></td>
-            <td>vvv</td>
+            <td><t t-esc="item"/></td>
+            <!--<td><t t-esc="item.name"/></td>-->
         </tr>
         <!--<script type="text/javascript">-->
            <!--&lt;!&ndash;$(".bodys").append($(".te"));&ndash;&gt;-->
