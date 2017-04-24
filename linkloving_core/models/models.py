@@ -18,7 +18,6 @@ class ProductTemplate(models.Model):
                 res = {}
                 res.update({
                     'name': line.product_id.name,
-                    'product_specs': line.product_id.product_specs,
                     'product_qty': line.product_qty
                 })
             bom_lines.append(res)
