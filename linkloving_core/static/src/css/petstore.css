@@ -5,3 +5,20 @@
     border: 1px solid black;
     border-radius: 3px;
 }
+.oe_petstore_top{
+    border:2px solid red;
+    font-size: 22px;
+    text-align: center;
+    margin: 50px;
+}
+.tables{
+    margin:0 auto;
+    margin-top: 100px;
+    width: 70%;
+}
+.tables thead tr th{
+    background-color: #5B899E;
+}
+.tables tbody tr td:nth-child(1){
+    width: 30px;
+}

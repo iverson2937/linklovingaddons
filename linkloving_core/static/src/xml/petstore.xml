@@ -26,7 +26,7 @@
                             <td>b</td>
                             <td>c</td>
                         </tr>
-                         <tr class="ceshi" style="display:none;">
+                         <tr class="tr_level_top" style="display:none;">
                             <td></td>
                             <td style="padding-left:20px">d</td>
                             <td>e</td>
@@ -55,7 +55,7 @@
     </t>
 
 
-    <t t-name="xx">
+    <t t-name="show_bom_line_tr">
         <tr class="te">
             <td></td>
             <td><t t-esc="items.id"/></td>

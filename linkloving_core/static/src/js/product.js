@@ -21,28 +21,22 @@ odoo.define('linkloving_core.product_detail', function (require) {
                 console.log(target.className);
                 target.classList.remove("fa-caret-right");
                 target.classList.add("fa-caret-down");
-                $(".ceshi").show()
+                $(".tr_level_top").show()
             } else if (target.classList.contains("fa-caret-down")) {
                 target.classList.remove("fa-caret-down");
                 target.classList.add("fa-caret-right");
-                $(".ceshi").hide()
+                $(".tr_level_top").hide()
             }
 
         },
         start: function () {
-            // return $.when(
-            // new local.PetToysList(this).appendTo(this.$('.oe_petstore_homepage_left')),
-            // new local.MessageOfTheDay(this).appendTo(this.$('.oe_petstore_homepage_right')),
-            // new local.OpenTheTree(this).appendTo(this.$(".oe_petstore_homepage_right"))
-            // );
-
             var self = this;
             return new Model("product.template")
                 .call("get_detail", [{'partner_id': 'ssss'}])
                 .then(function (result) {
                     console.log(result)
                     _(result).each(function (items) {
-                        self.$(".bodys").append(QWeb.render('xx', {items: items}));
+                        self.$(".bodys").append(QWeb.render('show_bom_line_tr', {items: items}));
                     })
                 });
 
