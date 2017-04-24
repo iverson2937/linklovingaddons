@@ -1618,11 +1618,17 @@ class LinklovingAppApi(http.Controller):
                             and is_yes != "yes":
                         return JsonResponse.send_response(STATUS_CODE_ERROR,
                                                           res_data={"error": u"该销售单需要一次性发完货,请等待货齐后再发"})
-                    elif picking_obj.sale_id.delivery_rule == "cancel_backorder":
+                    elif picking_obj.sale_id.delivery_rule == "delivery_once" and picking_obj.state != "assigned":
+                        return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                                          res_data={"error": u"该单据为部分可用,请等待货齐后再发"})
+                    elif picking_obj.sale_id.delivery_rule == "cancel_backorder":  # 取消欠单
                         wiz.process_cancel_backorder()
                         picking_obj.to_stock()
 
-                    elif picking_obj.sale_id.delivery_rule == "create_backorder":
+                    elif picking_obj.sale_id.delivery_rule == "create_backorder":  #创建欠单
+                        wiz.process()
+                        picking_obj.to_stock()
+                    elif picking_obj.sale_id.delivery_rule == "delivery_once" and is_yes == "yes" and picking_obj.state == "assigned":  # 一次性出货并备货完成
                         wiz.process()
                         picking_obj.to_stock()
                 else:
