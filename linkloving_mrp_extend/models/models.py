@@ -17,6 +17,10 @@ class MrpBomExtend(models.Model):
     _inherit = 'mrp.bom'
 
     product_specs = fields.Text(string=u'Product Specification', related='product_tmpl_id.product_specs')
+    product_id = fields.Many2one(
+        'product.product', 'Product Variant',
+        domain="['&', ('product_tmpl_id', '=', product_tmpl_id), ('type', 'in', ['product', 'consu'])]",
+        help="If a product variant is defined the BOM is available only for this product.", copy=False)
 
     def explode(self, product, quantity, picking_type=False):
         """
@@ -53,9 +57,9 @@ class MrpBomExtend(models.Model):
                                    'parent_line': current_line}))
             else:
                 lines_done.append(
-                        (current_line, {'suggest_qty': math.ceil(line_quantity * (1 + bom_line.scrap_rate / 100)),
-                                                  'qty': line_quantity, 'product': current_product,
-                                                  'original_qty': quantity, 'parent_line': parent_line}))
+                    (current_line, {'suggest_qty': math.ceil(line_quantity * (1 + bom_line.scrap_rate / 100)),
+                                    'qty': line_quantity, 'product': current_product,
+                                    'original_qty': quantity, 'parent_line': parent_line}))
 
         return boms_done, lines_done
 
@@ -1048,6 +1052,7 @@ class StcokPickingExtend(models.Model):
     post_img = fields.Binary()
     post_area_id = fields.Many2one('stock.location.area')
     express_img = fields.Binary("物流图片")
+
 
 class ProcurementOrderExtend(models.Model):
     _inherit = 'procurement.order'
