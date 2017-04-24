@@ -12,9 +12,9 @@ odoo.define('linkloving_core.product_detail', function (require) {
     var KioskConfirm = Widget.extend({
         template: "HomePage",
         events: {
-            'click .level-top': 'zhankai',
+            'click .level-top': 'show_bom_line',
         },
-        zhankai: function (e) {
+        show_bom_line: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             if (target.classList.contains("fa-caret-right")) {
