@@ -907,7 +907,10 @@ class LinklovingAppApi(http.Controller):
                                                                               'quantity_available',
                                                                               'suggest_qty',
                                                                               'area_id',
+                                                                              'product_type'
                                                                               ])
+        # semi_finish = []
+        # material = []
         for l in stock_move:
             # dic = LinklovingAppApi.search(request,'product.product',[('id','=',l['product_id'][0])], ['display_name'])
             if l.get("product_id"):
@@ -921,6 +924,10 @@ class LinklovingAppApi(http.Controller):
             else:
                 l.pop('area_id')
             l['order_id'] = order_id
+            # if l.get("product_type") == "semi_finish":#如果是半成品
+            #     semi_finish.append(l)
+            # else:
+            #     material.append(l)
 
         data = {
             'order_id' : production.id,

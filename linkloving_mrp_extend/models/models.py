@@ -852,6 +852,17 @@ class SimStockMove(models.Model):
             if sim_move.stock_moves:
                 sim_move.raw_material_production_id = sim_move.stock_moves[0].raw_material_production_id
 
+    @api.multi
+    def _compute_product_type(self):
+        location = self.env["stock.location"].search([("name", "=", "半成品流转库")], limit=1)
+        if location and location.putaway_strategy_id and location.putaway_strategy_id.fixed_location_ids:
+            fixed_location_ids = location.putaway_strategy_id.fixed_location_ids
+        for sim in self:
+            if sim.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:
+                sim.product_type = "semi-finished"
+            else:
+                sim.product_type = "material"
+
     product_id = fields.Many2one('product.product', )
     production_id = fields.Many2one('mrp.production')
     stock_moves = fields.One2many('stock.move', compute=_compute_stock_moves)
@@ -869,7 +880,8 @@ class SimStockMove(models.Model):
     over_picking_qty = fields.Float()
     quantity_ready = fields.Float()
     area_id = fields.Many2one(related='product_id.area_id')
-
+    product_type = fields.Selection(string="物料类型", selection=[('semi-finished', '半成品'), ('material', '原材料'), ],
+                                    required=False, compute="_compute_product_type")
 
 class ReturnMaterialLine(models.Model):
     _name = 'return.material.line'

@@ -86,13 +86,16 @@ class PurchaseOrderLine(models.Model):
     @api.depends('product_id.outgoing_qty', 'product_id.incoming_qty', 'product_id.qty_available')
     def _get_output_rate(self):
         for line in self:
-            on_way_qty = line.get_draft_po_qty(line.product_id) + line.product_id.incoming_qty
+            draft_qty = line.get_draft_po_qty(line.product_id)
+            on_way_qty = draft_qty + line.product_id.incoming_qty
             if line.product_id.outgoing_qty:
-                rate = ((line.product_id.incoming_qty + line.product_id.qty_available) / line.product_id.outgoing_qty)
+                rate = ((
+                        draft_qty + line.product_id.incoming_qty + line.product_id.qty_available) / line.product_id.outgoing_qty)
                 rate = round(rate, 2)
 
-                line.output_rate = (u"( 在途量: " + "%s " + u"+库存:" + "%s ) /"u" 需求量：" + "%s = %s") % (
-                    on_way_qty, line.product_id.qty_available, line.product_id.outgoing_qty, rate)
+                line.output_rate = (u"(草稿量: %s+在途量: " + "%s " + u"+库存:" + "%s ) /"u" 需求量：" + "%s = %s") % (
+                    draft_qty, line.product_id.incoming_qty, line.product_id.qty_available,
+                    line.product_id.outgoing_qty, rate)
             else:
                 line.output_rate = (u" 在途量: " + "%s  " + u"库存:" + "%s  "u" 需求量：" + "%s  ") % (
                     on_way_qty, line.product_id.qty_available, line.product_id.outgoing_qty)
