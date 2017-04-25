@@ -11,9 +11,9 @@ odoo.define('linkloving_core.employee_kanban_view_handler', function (require) {
                 // needed to diffentiate : check in/out kanban view of employees <-> standard employee kanban view
                 var action = {
                     type: 'ir.actions.client',
-                    tag: 'product_detail'
+                    tag: 'product_detail',
                     // tag: 'hr_attendance_kiosk_confirm',
-                    // employee_id: this.record.id.raw_value,
+                    product_id: this.record.id.raw_value,
                     // employee_name: this.record.name.raw_value,
                     // employee_state: this.record.attendance_state.raw_value,
                 };

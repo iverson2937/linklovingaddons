@@ -14,6 +14,12 @@ odoo.define('linkloving_core.product_detail', function (require) {
         events: {
             'click .level-top': 'show_bom_line',
         },
+
+        init: function (parent, action) {
+            this._super.apply(this, arguments);
+            this.product_id = action.product_id;
+            var self = this;
+        },
         show_bom_line: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
@@ -32,9 +38,10 @@ odoo.define('linkloving_core.product_detail', function (require) {
         start: function () {
             var self = this;
             return new Model("product.template")
-                .call("get_detail", [54115])
+                .call("get_detail", [this.product_id])
                 .then(function (result) {
-                    self.$(".bodys").append(QWeb.render('show_bom_line_tr', {items: result}));
+                    console.log(result);
+                    self.$(".bodys").append(QWeb.render('show_bom_line_tr', {bom_lines: result.bom_lines}));
                     self.$(".show_product_name").html(result.name)
 
                 });
