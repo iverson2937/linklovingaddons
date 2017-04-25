@@ -14,13 +14,13 @@
                 <link rel="shortcut icon" href="/linkloving_web/static/src/img/favicon.ico" type="image/x-icon"/>
             </xpath>
         </template>
+        <template id="layout_footer_copyright" inherit_id="website.layout_footer_copyright" name="Footer Copyright">
+            <xpath expr="//div[@class='pull-left text-muted']" position="replace">
+                <div class="text-center text-muted" itemscope="itemscope" itemtype="http://schema.org/Organization">
+                    Copyright@ 2017 苏州工业园区若态科技有限公司 robotime若态保留所有权利。苏ICP备14005617号-2
+                </div>
+            </xpath>
 
-        <template id="layout_footer_copyright" inherit_id="website.layout" name="Footer Copyright">
-            <!--<xpath expr="//div[@class='pull-left text-muted']" position="replace">-->
-            <!--<div class="text-center text-muted" itemscope="itemscope" itemtype="http://schema.org/Organization">-->
-            <!--Copyright@ 2017 苏州工业园区若态科技有限公司 robotime若态保留所有权利。苏ICP备14005617号-2-->
-            <!--</div>-->
-            <!--</xpath>-->
         </template>
 
 
