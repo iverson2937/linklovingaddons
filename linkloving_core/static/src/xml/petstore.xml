@@ -12,11 +12,11 @@
                     <span class="show_product_name"></span>
                 </div>
             </div>
-            <div class="tables">
+            <div class="tables petstore_table">
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <td></td>
+                            <th> </th>
                             <th>产品</th>
                             <th>配比</th>
                             <th>3</th>
@@ -59,10 +59,11 @@
 
 
     <t t-name="show_bom_line_tr" t-foreach="bom_lines" t-as="item">
-        <tr class="te">
-                <td><t t-esc="item.name"/></td>
-
-            <!--<td><t t-esc="item.name"/></td>-->
+        <tr class="te" t-att-data-id="item.product_id">
+            <td class="fa fa-caret-right level-top" style="cursor:pointer"></td>
+            <td><t t-esc="item.name"/></td>
+            <td><t t-esc="item.product_qty"/></td>
+            <td>ddd</td>
         </tr>
         <!--<script type="text/javascript">-->
         <!--&lt;!&ndash;$(".bodys").append($(".te"));&ndash;&gt;-->
