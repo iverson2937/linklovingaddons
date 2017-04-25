@@ -9,7 +9,6 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def get_detail(self):
-        print self
         bom_ids = self.bom_ids
         bom_lines = []
 
