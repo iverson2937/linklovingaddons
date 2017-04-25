@@ -24,14 +24,15 @@ odoo.define('linkloving_core.product_detail', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             if (target.classList.contains("fa-caret-right")) {
-                console.log(target.className);
                 target.classList.remove("fa-caret-right");
                 target.classList.add("fa-caret-down");
-                $(".tr_level_top").show()
+                console.log(target.parentNode.getAttribute("data-id"));
+
+                $(".tr_level_top").show();
             } else if (target.classList.contains("fa-caret-down")) {
                 target.classList.remove("fa-caret-down");
                 target.classList.add("fa-caret-right");
-                $(".tr_level_top").hide()
+                $(".tr_level_top").hide();
             }
 
         },
@@ -40,10 +41,13 @@ odoo.define('linkloving_core.product_detail', function (require) {
             return new Model("product.template")
                 .call("get_detail", [this.product_id])
                 .then(function (result) {
-                    console.log(result);
-                    self.$(".bodys").append(QWeb.render('show_bom_line_tr', {bom_lines: result.bom_lines}));
+                    console.log(result.bom_lines.length);
+                    if(result.bom_lines.length!=0){
+                        self.$(".bodys").append(QWeb.render('show_bom_line_tr', {bom_lines: result.bom_lines}));
+                    }else {
+                        self.$(".petstore_table").hide();
+                    }
                     self.$(".show_product_name").html(result.name)
-
                 });
 
         },
