@@ -12,7 +12,7 @@ class ProductTemplate(models.Model):
         print self
         bom_ids = self.bom_ids
         bom_lines = []
-        level = False
+
         mo_ids = []
         po_lines = []
 
@@ -20,16 +20,19 @@ class ProductTemplate(models.Model):
             lines = bom_ids[0].bom_line_ids
             for line in lines:
                 res = {}
+                level = False
+                if line.product_id.bom_ids:
+                    level = True
                 res.update({
                     'product_id': line.product_id.id,
                     'name': line.product_id.name,
+                    'level': level,
                     'product_qty': line.product_qty
                 })
                 bom_lines.append(res)
 
         return {
             'name': self.name,
-            'level': level,
             'bom_lines': bom_lines,
             'product_id': self.id,
         }
