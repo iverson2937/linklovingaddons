@@ -21,6 +21,10 @@
                 </div>
             </xpath>
 
+            <xpath expr="//div[@class='pull-right']" position="replace">
+
+            </xpath>
+
         </template>
 
 
