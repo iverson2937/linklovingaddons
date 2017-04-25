@@ -41,7 +41,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
             return new Model("product.template")
                 .call("get_detail", [this.product_id])
                 .then(function (result) {
-                    console.log(result.bom_lines.length);
+                    console.log(result);
                     if(result.bom_lines.length!=0){
                         self.$(".bodys").append(QWeb.render('show_bom_line_tr', {bom_lines: result.bom_lines}));
                     }else {
