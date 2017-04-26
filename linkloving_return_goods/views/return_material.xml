@@ -294,7 +294,7 @@
 
         <menuitem action="action_rma_purchase"
                   id="menu_rma_purchase" parent="purchase.menu_procurement_management"
-                  sequence="14"/>
+                  sequence="13"/>
 
 
         <record id="action_customer_invoice_refund" model="ir.actions.act_window">

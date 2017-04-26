@@ -20,7 +20,7 @@
 
         <menuitem action="action_return_stock_picking_confirm"
                   id="menu_stock_picking_return_confirm" parent="sales_team.menu_sales"
-                  sequence="14"/>
+                  sequence="15"/>
 
         <record id="action_stock_picking_confirm_outgoing_return" model="ir.actions.act_window">
             <field name="name">退货出库确认</field>
