@@ -54,7 +54,7 @@ class ProductTemplate(models.Model):
             'bom_lines': bom_lines,
             'product_id': self.id,
             'process': process,
-            'type': self.product_ll_type,
+            'type': '',
             'service': service,
             'mo_ids': ids,
         }

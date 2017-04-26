@@ -27,3 +27,7 @@
 .oe_petstore_homepage .te .fa{
     display: table-cell !important;
 }
+
+#accordion{
+    margin-top: 50px;
+}

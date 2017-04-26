@@ -2,73 +2,109 @@
 
 <templates xml:space="preserve">
     <t t-name="HomePage">
-        <div class="oe_petstore_homepage">
-            <!--<div class="oe_petstore_homepage_left"></div>-->
-            <!--<div class="oe_petstore_homepage_right"></div>-->
 
-            <div class="oe_petstore_top">
-                <div>
-                    <span>产品:</span>
-                    <span class="show_product_name"></span>
+        <div class="panel-group" id="accordion">
+
+        </div>
+        <!--<div class="oe_petstore_homepage">-->
+            <!--<div class="oe_petstore_top">-->
+                <!--<div>-->
+                    <!--<span>产品:</span>-->
+                    <!--<span class="show_product_name"></span>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="tables petstore_table">-->
+                <!--<table class="table table-striped">-->
+                    <!--<thead>-->
+                        <!--<tr>-->
+                            <!--<th> </th>-->
+                            <!--<th>产品</th>-->
+                            <!--<th>配比</th>-->
+                            <!--<th>3</th>-->
+                        <!--</tr>-->
+                    <!--</thead>-->
+                    <!--<tbody class="bodys">-->
+                        <!--&lt;!&ndash;<tr style="color:red">&ndash;&gt;-->
+                        <!--&lt;!&ndash;<td class="fa fa-caret-right level-top" style="cursor:pointer"></td>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<td style="color:red">a</td>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<td>b</td>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<td>c</td>&ndash;&gt;-->
+                        <!--&lt;!&ndash;</tr>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<tr class="tr_level_top" style="display:none;">&ndash;&gt;-->
+                        <!--&lt;!&ndash;<td></td>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<td style="padding-left:20px">d</td>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<td>e</td>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<td>f</td>&ndash;&gt;-->
+                        <!--&lt;!&ndash;</tr>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<t t-call="xx"/>&ndash;&gt;-->
+                    <!--</tbody>-->
+                <!--</table>-->
+            <!--</div>-->
+        <!--</div>-->
+    </t>
+
+
+    <t t-name="show_bom_line_tr">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" class="click_tag_a"
+                       href="#name">
+                       <span class="fa fa-caret-right"></span>
+                       <t t-esc="p_name"/>
+                    </a>
+                </h4>
+            </div>
+            <div id="name" class="panel-collapse collapse in">
+                <div class="panel-body">
+                    <t t-foreach="bom_lines" t-as="item">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#name" t-att-href="'#'+item.product_id" class="click_tag_a">
+                                        <t t-if="item.level">
+                                            <span class="fa fa-caret-right"></span>
+                                        </t>
+                                        <t t-esc="item.name"/>
+                                    </a>
+                                </h4>
+                            </div>
+                            <t t-if="item.level">
+                                <div t-att-id="item.product_id" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        Nihil anim keffiyeh helvetica, craft beer labore wes anderson
+                                        cred nesciunt sapiente ea proident. Ad vegan excepteur butcher
+                                        vice lomo.
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
                 </div>
             </div>
-            <div class="tables petstore_table">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th> </th>
-                            <th>产品</th>
-                            <th>配比</th>
-                            <th>3</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bodys">
-                        <!--<tr style="color:red">-->
-                        <!--<td class="fa fa-caret-right level-top" style="cursor:pointer"></td>-->
-                        <!--<td style="color:red">a</td>-->
-                        <!--<td>b</td>-->
-                        <!--<td>c</td>-->
-                        <!--</tr>-->
-                        <!--<tr class="tr_level_top" style="display:none;">-->
-                        <!--<td></td>-->
-                        <!--<td style="padding-left:20px">d</td>-->
-                        <!--<td>e</td>-->
-                        <!--<td>f</td>-->
-                        <!--</tr>-->
-                        <!--<t t-call="xx"/>-->
-                    </tbody>
-                </table>
-            </div>
         </div>
-    </t>
-    <t t-name="MessageOfTheDay">
-        <div class="oe_petstore_motd">
-            <p class="oe_mywidget_message_of_the_day"></p>
-        </div>
-    </t>
-    <t t-name="PetToysList">
-        <div class="oe_petstore_pettoyslist">
-        </div>
-    </t>
-    <t t-name="PetToy">
-        <div class="oe_petstore_pettoy" t-att-data-id="item.id">
-            <p><t t-esc="item.name"/></p>
-            <p><img t-attf-src="data:image/jpg;base64,{{item.image}}"/></p>
-        </div>
+
     </t>
 
 
-    <t t-name="show_bom_line_tr" t-foreach="bom_lines" t-as="item">
-        <tr class="te" t-att-data-id="item.product_id">
-            <td class="fa fa-caret-right level-top" style="cursor:pointer"></td>
+    <t t-name="show_bom_line_tr_add" t-foreach="bom_lines" t-as="item">
+        <tr class="te" t-att-data-id="item.product_id" t-att-parent-id="pid">
+            <t t-if="item.level">
+                <td class="fa fa-caret-right level-top" style="cursor:pointer"></td>
+            </t>
+            <t t-elif="!item.level">
+                 <td></td>
+            </t>
             <td><t t-esc="item.name"/></td>
             <td><t t-esc="item.product_qty"/></td>
             <td>ddd</td>
         </tr>
-        <!--<script type="text/javascript">-->
-        <!--&lt;!&ndash;$(".bodys").append($(".te"));&ndash;&gt;-->
-        <!--</script>-->
     </t>
+
+
+
+
+
 
 
     <t t-name="OpenTree">
