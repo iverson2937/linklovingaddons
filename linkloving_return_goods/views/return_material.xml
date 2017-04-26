@@ -146,7 +146,7 @@
 
         <menuitem action="action_rma_sales"
                   id="menu_rma_sales" parent="sales_team.menu_sales"
-                  sequence="14"/>
+                  sequence="100"/>
 
         <record id="view_return_material_form" model="ir.ui.view">
             <field name="name">return.goods.sales.form</field>
@@ -294,7 +294,7 @@
 
         <menuitem action="action_rma_purchase"
                   id="menu_rma_purchase" parent="purchase.menu_procurement_management"
-                  sequence="13"/>
+                  sequence="100"/>
 
 
         <record id="action_customer_invoice_refund" model="ir.actions.act_window">
