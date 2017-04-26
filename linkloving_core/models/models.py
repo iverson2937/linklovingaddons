@@ -42,8 +42,8 @@ class ProductTemplate(models.Model):
                 if line.product_id.bom_ids:
                     level = True
                 res.update({
-                    'product_id': line.product_id.id,
-                    'name': line.product_id.name,
+                    'product_id': line.product_id.product_tmpl_id.id,
+                    'name': line.product_id.product_tmpl_id.name,
                     'level': level,
                     'product_qty': line.product_qty
                 })
