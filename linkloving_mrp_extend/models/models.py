@@ -57,7 +57,7 @@ class MrpBomExtend(models.Model):
                                    'parent_line': current_line}))
             else:
                 lines_done.append(
-                    (current_line, {'suggest_qty': math.ceil(line_quantity * (1 + bom_line.scrap_rate / 100)),
+                        (current_line, {'suggest_qty': round(line_quantity * (1 + bom_line.scrap_rate / 100)),
                                     'qty': line_quantity, 'product': current_product,
                                     'original_qty': quantity, 'parent_line': parent_line}))
 
@@ -239,7 +239,10 @@ class MrpProductionExtend(models.Model):
     #     for production in self:
     #         move = get_parent_move(production.move_finished_ids[0])
     #         production.origin_sale_order_id = move.procurement_id and move.procurement_id.sale_line_id and move.procurement_id.sale_line_id.order_id.id or False
-    #####
+    #####生产完成 提交信息
+    produce_img = fields.Binary(u"图片信息")
+    produce_area_id = fields.Many2one('stock.location.area')
+
     worker_line_ids = fields.One2many('worker.line', 'production_id')
     sim_stock_move_lines = fields.One2many('sim.stock.move', 'production_id')
     move_finished_ids = fields.One2many(
@@ -405,15 +408,21 @@ class MrpProductionExtend(models.Model):
                 raise UserError(u"请填写备料数量")
         for move in self.sim_stock_move_lines:
             if move.over_picking_qty != 0:  # 如果超领数量不等于0
-                new_move = move.stock_moves[0].copy(
-                    default={'quantity_done': move.over_picking_qty, 'product_uom_qty': move.over_picking_qty,
-                             'production_id': move.production_id.id,
-                             'raw_material_production_id': move.raw_material_production_id.id,
-                             'procurement_id': move.procurement_id.id or False,
-                             'is_over_picking': True})
-                move.production_id.move_raw_ids = move.production_id.move_raw_ids + new_move
-                move.over_picking_qty = 0
-                new_move.write({'state': 'assigned', })
+                moves_to_do = move.stock_moves.filtered(lambda x: x.state not in ('done', 'cancel'))
+                if moves_to_do:
+                    moves_to_do[0].quantity_done += move.over_picking_qty
+                    moves_to_do[0].action_done()
+                else:
+                    new_move = move.stock_moves[0].copy(
+                            default={'quantity_done': move.over_picking_qty, 'product_uom_qty': move.over_picking_qty,
+                                     'production_id': move.production_id.id,
+                                     'raw_material_production_id': move.raw_material_production_id.id,
+                                     'procurement_id': move.procurement_id.id or False,
+                                     'is_over_picking': True})
+                    move.production_id.move_raw_ids = move.production_id.move_raw_ids + new_move
+                    move.over_picking_qty = 0
+                    new_move.write({'state': 'assigned',})
+                    new_move.action_done()
             if self._context.get('picking_mode') == 'first_picking':  # 如果备料数量不等于0
                 if not move.stock_moves:
                     continue
@@ -433,13 +442,13 @@ class MrpProductionExtend(models.Model):
                     move.production_id.move_raw_ids = move.production_id.move_raw_ids + split_move
                     split_move.write({'state': 'assigned', })
                     move.stock_moves[0].quantity_done = move.stock_moves[0].product_uom_qty
+                    split_move.action_done()
+                    move.stock_moves[0].action_done()
                 else:
+                    move.stock_moves[0].quantity_done_store = move.quantity_ready
                     move.stock_moves[0].quantity_done = move.quantity_ready
+                    move.stock_moves[0].action_done()
 
-                # 备料完成,减去需求量
-                move.product_id.qty_require -= move.stock_moves[0].product_uom_qty
-
-        self.post_inventory()
         if self._context.get('picking_mode') == 'first_picking':
             self.write({'state': 'finish_prepare_material'})
             # elif self._context.get('picking_mode') == 'second_picking':
@@ -518,7 +527,7 @@ class MrpProductionExtend(models.Model):
         if move:
             if quantity > 0:
                 move[0].write({'product_uom_qty': quantity * qty,
-                               'suggest_qty': math.ceil(quantity * qty)})
+                               'suggest_qty': round(quantity * qty)})
             else:
                 if move[0].quantity_done > 0:
                     raise UserError(_(
@@ -672,7 +681,12 @@ class MrpProductionProduceExtend(models.TransientModel):
             raise UserError(_('You should at least produce some quantity'))
         for move in moves.filtered(lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel')):
             if move.unit_factor:
-                move.quantity_done_store += quantity * move.unit_factor
+                qty = quantity * move.unit_factor
+                if qty > move.product_uom_qty:
+                    move.quantity_done_store += move.product_uom_qty
+                else:
+                    move.quantity_done_store += qty
+                move.action_done()
                 # if move.product_id.virtual_available < 0:
                 #     move.quantity_done_store = move.quantity_done_store / (1 + move.bom_line_id.scrap_rate / 100)
         moves = self.production_id.move_finished_ids.filtered(
@@ -806,7 +820,7 @@ class SimStockMove(models.Model):
             # move_to_fill = self.env['stock.move'].search([('production_id', '=', sim_move.production_id.id)])
             sim_move.quantity_done = 0
             for move in sim_move.production_id.move_raw_ids:
-                if move.product_id == sim_move.product_id and not move.is_return_material:
+                if move.product_id == sim_move.product_id and not move.is_return_material and move.state == "done":
                     sim_move.quantity_done += move.quantity_done
 
     def _default_product_uom_qty(self):
@@ -878,7 +892,7 @@ class SimStockMove(models.Model):
     product_uom_qty = fields.Float(compute=_default_product_uom_qty)
     qty_available = fields.Float(compute=_default_qty_available)
     virtual_available = fields.Float(compute=_default_virtual_available)
-    suggest_qty = fields.Integer(compute=_default_suggest_qty)
+    suggest_qty = fields.Float(compute=_default_suggest_qty)
     quantity_available = fields.Float(compute=_compute_quantity_available, )
     return_qty = fields.Float(compute=_compute_return_qty)
     over_picking_qty = fields.Float()
@@ -1160,10 +1174,16 @@ class purchase_order_extend(models.Model):
             po.state = "draft"
 
     def unlink_cancel_po(self):
-        po_canceled = self.env["purchase.order"].search([("state", "=", "cancel")])
-        mo_canceled = self.env["mrp.production"].search([("state", "=", "cancel")])
-        po_canceled.unlink()
-        mo_canceled.unlink()
+        # po_canceled = self.env["purchase.order"].search([("state", "=", "cancel")])
+        # mo_canceled = self.env["mrp.production"].search([("state", "=", "cancel")])
+        # po_canceled.unlink()
+        # mo_canceled.unlink()
+        self._cr.execute("select count(id) from stock_move where state ='cancel'")
+        row = self._cr.fetchone()
+        # self._cr.execute("delete from stock_move where state = 'cancel'")
+        # row1 = self._cr.fetchone()
+        stock_moves = self.env["stock.move"].search([("state", "=", "cancel")], limit=10000, offset=0)
+        stock_moves.unlink()
 
     @api.multi
     def unlink(self):

@@ -78,3 +78,4 @@ class CreateOrderPointWizard(models.TransientModel):
         pickings = self.env["stock.picking"].search([("state", "in", ["partially_available", "assigned"]),
                                                      ("picking_type_code", "=", "outgoing")])
         pickings.do_unreserve()
+

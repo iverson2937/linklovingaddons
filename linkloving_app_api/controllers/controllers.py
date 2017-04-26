@@ -224,9 +224,6 @@ class LinklovingAppApi(http.Controller):
                                               '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
         timez = fields.datetime.now() - fields.datetime.utcnow()
         after_day = today_time + one_days_after
-        domain_before = [('date_planned_start', '<', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
-                         ('state', 'in', ['waiting_material', 'prepare_material_ing']),
-                         ('process_id', '=', process_id)]
         order_delay = request.env["mrp.production"].sudo().read_group(
                 [('date_planned_start', '<', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
 
@@ -276,6 +273,67 @@ class LinklovingAppApi(http.Controller):
                          "count": order_after[0].get("date_planned_start_count")})
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=list)
+
+    @http.route('/linkloving_app_api/get_order_count_by_process', type='json', auth='none', csrf=False)
+    def get_order_count_by_process(self, **kw):
+        process_ids = request.jsonrequest.get("process_ids")
+        date_to_show = fields.datetime.now()
+        one_days_after = datetime.timedelta(days=1)
+        today_time = fields.datetime.strptime(fields.datetime.strftime(date_to_show, '%Y-%m-%d'),
+                                              '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
+        timez = fields.datetime.now() - fields.datetime.utcnow()
+        after_day = today_time + one_days_after
+        after_2_day = after_day + one_days_after
+        after_3_day = after_2_day + one_days_after
+        process_count_dict = {}
+        for process_id in process_ids:
+            order_delay = request.env["mrp.production"].sudo().read_group(
+                    [('date_planned_start', '<', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
+
+                     ('state', 'in', ['waiting_material', 'prepare_material_ing']),
+
+                     ('process_id', '=', process_id)]
+                    , fields=["date_planned_start"],
+                    groupby=["date_planned_start"])
+
+            domain = [('date_planned_start', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                      ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                      ('state', 'in', ['waiting_material', 'prepare_material_ing']),
+                      ('process_id', '=', process_id)]
+            domain_tommorrow = [('date_planned_start', '>', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                                ('date_planned_start', '<', (after_2_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                                ('state', 'in', ['waiting_material', 'prepare_material_ing']),
+                                ('process_id', '=', process_id)]
+            domain_after_day = [('date_planned_start', '>', (after_2_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                                ('date_planned_start', '<', (after_3_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                                ('state', 'in', ['waiting_material', 'prepare_material_ing']),
+                                ('process_id', '=', process_id)]
+
+            order_today = request.env["mrp.production"].sudo().read_group(domain, fields=["date_planned_start"],
+                                                                          groupby=["date_planned_start"])
+            order_tomorrow = request.env["mrp.production"].sudo().read_group(domain_tommorrow,
+                                                                             fields=["date_planned_start"],
+                                                                             groupby=["date_planned_start"])
+            order_after = request.env["mrp.production"].sudo().read_group(domain_after_day,
+                                                                          fields=["date_planned_start"],
+                                                                          groupby=["date_planned_start"])
+
+            list = []
+            if order_delay:
+                list.append({"state": "delay",
+                             "count": order_delay[0].get("date_planned_start_count")})
+            if order_today:
+                list.append({"state": "today",
+                             "count": order_today[0].get("date_planned_start_count")})
+            if order_tomorrow:
+                list.append({"state": "tomorrow",
+                             "count": order_tomorrow[0].get("date_planned_start_count")})
+            if order_after:
+                list.append({"state": "after",
+                             "count": order_after[0].get("date_planned_start_count")})
+            process_count_dict[process_id] = list
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=process_count_dict)
+
 
 
     @http.route('/linkloving_app_api/get_recent_production_order', type='json', auth='none', csrf=False)
@@ -547,6 +605,16 @@ class LinklovingAppApi(http.Controller):
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
+    # 保存物料数据
+    @http.route('/linkloving_app_api/saving_material_data', type='json', auth='none', csrf=False)
+    def saving_material_data(self, **kw):
+        # order_id = request.jsonrequest.get('order_id') #get paramter
+        stock_moves = request.jsonrequest.get('stock_moves')  # get paramter
+        for stock_move in stock_moves:
+            sim_move_obj = request.env["sim.stock.move"].sudo().browse(stock_move["stock_move_lines_id"])
+            sim_move_obj.quantity_ready = stock_move['quantity_ready']
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data={})
     #备料完成
     @http.route('/linkloving_app_api/finish_prepare_material', type='json', auth='none', csrf=False)
     def finish_prepare_material(self, **kw):
@@ -575,14 +643,18 @@ class LinklovingAppApi(http.Controller):
                 sim_stock_move.production_id.move_raw_ids = sim_stock_move.production_id.move_raw_ids + split_move
                 split_move.write({'state': 'assigned', })
                 sim_stock_move.stock_moves[0].quantity_done = sim_stock_move.stock_moves[0].product_uom_qty
+                split_move.action_done()
+                sim_stock_move.stock_moves[0].action_done()
             else:
+                sim_stock_move.stock_moves[0].quantity_done_store = move['quantity_ready']
                 sim_stock_move.stock_moves[0].quantity_done = move['quantity_ready']
+                sim_stock_move.stock_moves[0].action_done()
 
-        try:
-            mrp_production.post_inventory()
-        except UserError, e:
-            return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={"error":e.name})
+        # try:
+        #     mrp_production.post_inventory()
+        # except UserError, e:
+        #     return JsonResponse.send_response(STATUS_CODE_ERROR,
+        #                                       res_data={"error":e.name})
         mrp_production.write({'state': 'finish_prepare_material'})
 
         JPushExtend.send_notification_push(audience=jpush.audience(
@@ -597,6 +669,41 @@ class LinklovingAppApi(http.Controller):
     def already_picking(self, **kw):
         order_id = request.jsonrequest.get('order_id') #get paramter
         mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
+        stock_moves = request.jsonrequest.get('stock_moves')  # get paramter
+
+        for move in stock_moves:
+            sim_stock_move = LinklovingAppApi.get_model_by_id(move['stock_move_lines_id'], request, 'sim.stock.move')
+            if not sim_stock_move.stock_moves:
+                continue
+            rounding = sim_stock_move.stock_moves[0].product_uom.rounding
+            if float_compare(move['quantity_ready'], sim_stock_move.stock_moves[0].product_uom_qty,
+                             precision_rounding=rounding) > 0:
+                qty_split = sim_stock_move.stock_moves[0].product_uom._compute_quantity(
+                        move['quantity_ready'] - sim_stock_move.stock_moves[0].product_uom_qty,
+                        sim_stock_move.stock_moves[0].product_id.uom_id)
+
+                split_move = sim_stock_move.stock_moves[0].copy(
+                        default={'quantity_done': qty_split, 'product_uom_qty': qty_split,
+                                 'production_id': sim_stock_move.production_id.id,
+                                 'raw_material_production_id': sim_stock_move.raw_material_production_id.id,
+                                 'procurement_id': sim_stock_move.procurement_id.id or False,
+                                 'is_over_picking': True})
+                sim_stock_move.production_id.move_raw_ids = sim_stock_move.production_id.move_raw_ids + split_move
+                split_move.write({'state': 'assigned',})
+                sim_stock_move.stock_moves[0].quantity_done = sim_stock_move.stock_moves[0].product_uom_qty
+                split_move.action_done()
+                sim_stock_move.stock_moves[0].action_done()
+            else:
+                sim_stock_move.stock_moves[0].quantity_done_store = move['quantity_ready']
+                sim_stock_move.stock_moves[0].quantity_done = move['quantity_ready']
+                sim_stock_move.stock_moves[0].action_done()
+
+        # try:
+        #     mrp_production.post_inventory()
+        # except UserError, e:
+        #     return JsonResponse.send_response(STATUS_CODE_ERROR,
+        #                                       res_data={"error":e.name})
+
         mrp_production.write({'state': 'already_picking'})
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
@@ -623,16 +730,22 @@ class LinklovingAppApi(http.Controller):
                 return JsonResponse.send_response(STATUS_CODE_ERROR,
                                                   res_data={'error': _("Stock move not found")})
             if l['over_picking_qty'] != 0:#如果超领数量不等于0
-                new_move = move.stock_moves[0].copy(default={'quantity_done': l['over_picking_qty'],
-                                                             'product_uom_qty': l['over_picking_qty'],
-                                                             'production_id': move.production_id.id,
-                                                             'raw_material_production_id': move.raw_material_production_id.id,
-                                                             'procurement_id': move.procurement_id.id or False,
-                                                             'is_over_picking': True})
-                move.production_id.move_raw_ids =  move.production_id.move_raw_ids + new_move
-                move.over_picking_qty = 0
-                new_move.write({'state':'assigned',})
-        mrp_production.post_inventory()
+                moves_to_do = move.stock_moves.filtered(lambda x: x.state not in ('done', 'cancel'))
+                if moves_to_do:
+                    moves_to_do[0].quantity_done += l['over_picking_qty']
+                    moves_to_do[0].action_done()
+                else:
+                    new_move = move.stock_moves[0].copy(default={'quantity_done': l['over_picking_qty'],
+                                                                 'product_uom_qty': l['over_picking_qty'],
+                                                                 'production_id': move.production_id.id,
+                                                                 'raw_material_production_id': move.raw_material_production_id.id,
+                                                                 'procurement_id': move.procurement_id.id or False,
+                                                                 'is_over_picking': True})
+
+                    move.production_id.move_raw_ids = move.production_id.move_raw_ids + new_move
+                    move.over_picking_qty = 0
+                    new_move.write({'state': 'assigned'})
+                    new_move.action_done()
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
@@ -676,26 +789,69 @@ class LinklovingAppApi(http.Controller):
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error': _("Ordering MO need to produce all the products")})
         else:
-            if mrp_production.product_id.product_ll_type == "semi-finished":
-                mrp_production.write({'state': 'waiting_inventory_material'})
-                JPushExtend.send_notification_push(audience=jpush.audience(
-            jpush.tag(LinklovingAppApi.get_jpush_tags("qc"))
-                ), notification=mrp_production.product_id.name,
-                        body=_("数量:%d,半成品已生产完成") % (mrp_production.qty_produced))
-            elif mrp_production.product_id.product_ll_type == "finished":
+            location = request.env["stock.location"].sudo().search([("name", "=", "半成品流转库")], limit=1)
+            if location and location.putaway_strategy_id and location.putaway_strategy_id.fixed_location_ids:
+                fixed_location_ids = location.putaway_strategy_id.fixed_location_ids
+
+                if mrp_production.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:  # 半成品入库
+                    mrp_production.button_mark_done()
+                    JPushExtend.send_notification_push(audience=jpush.audience(
+                            jpush.tag(LinklovingAppApi.get_jpush_tags("qc"))
+                    ), notification=mrp_production.product_id.name,
+                            body=_("数量:%d,半成品已生产完成") % (mrp_production.qty_produced))
+                else:
+                    mrp_production.write({'state': 'waiting_quality_inspection'})
+                    JPushExtend.send_notification_push(audience=jpush.audience(
+                            jpush.tag(LinklovingAppApi.get_jpush_tags("qc"))
+                    ), notification=mrp_production.product_id.name,
+                            body=_("Qty:%d,Produce finish,To QC") % (mrp_production.qty_produced))
+
+            else:
                 mrp_production.write({'state': 'waiting_quality_inspection'})
                 JPushExtend.send_notification_push(audience=jpush.audience(
                         jpush.tag(LinklovingAppApi.get_jpush_tags("qc"))
         ),notification=mrp_production.product_id.name,body=_("Qty:%d,Produce finish,To QC")% (mrp_production.qty_produced))
-            else:
-                return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                                  res_data={"error": "该产品未设置物料类型,请设置"})
+            # else:
+            #     return JsonResponse.send_response(STATUS_CODE_ERROR,
+            #                                       res_data={"error": "该产品未设置物料类型,请设置"})
 
             mrp_production.worker_line_ids.change_worker_state('outline')
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
+    @http.route('/linkloving_app_api/review_procure_info', type='json', auth='none', csrf=False)
+    def review_procure_info(self, **kw):
+        order_id = request.jsonrequest.get('order_id')  # get paramter
+        order = request.env["mrp.production"].sudo().browse(order_id)
+        if order:
+            return JsonResponse.send_response(STATUS_CODE_OK,
+                                              res_data={"produce_img": LinklovingAppApi.get_img_url(order_id,
+                                                                                                    'mrp.production',
+                                                                                                    'produce_img'),
+                                                        "produce_area_id": {
+                                                            "area_id": order.produce_area_id.id,
+                                                            "area_name": order.produce_area_id.name
+                                                        }})
+
+    # 生产完成,填写成品位置信息
+    @http.route('/linkloving_app_api/upload_procure_info', type='json', auth='none', csrf=False)
+    def upload_procure_info(self, **kw):
+        order_id = request.jsonrequest.get('order_id')  # get paramter
+        procure_img = request.jsonrequest.get('procure_img')
+        area_name = request.jsonrequest.get('area_name')
+        order = request.env["mrp.production"].sudo().browse(order_id)
+        area = request.env['stock.location.area'].sudo().search([('name', '=', area_name)])
+        if not order:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={'error': u"找不到对应的mo单"})
+        if not area:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={'error': _("Please choose the right location")})
+        order.produce_img = procure_img
+        order.produce_area_id = area[0].id
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data={})
     #开始品检
     @http.route('/linkloving_app_api/start_quality_inspection', type='json', auth='none', csrf=False)
     def start_quality_inspection(self, **kw):
@@ -776,7 +932,10 @@ class LinklovingAppApi(http.Controller):
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error' : _("MO not found")})
         return_lines = []
-
+        if all(stock_move.get("return_qty") == 0 for stock_move in stock_move_ids):
+            mrp_production.write({'state': 'waiting_post_inventory'})
+            return JsonResponse.send_response(STATUS_CODE_OK,
+                                              res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
         if not is_check:
 
             for l in stock_move_ids:
