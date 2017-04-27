@@ -1178,16 +1178,18 @@ class purchase_order_extend(models.Model):
             po.state = "draft"
 
     def unlink_cancel_po(self):
-        # po_canceled = self.env["purchase.order"].search([("state", "=", "cancel")])
-        # mo_canceled = self.env["mrp.production"].search([("state", "=", "cancel")])
-        # po_canceled.unlink()
-        # mo_canceled.unlink()
-        self._cr.execute("select count(id) from stock_move where state ='cancel'")
-        row = self._cr.fetchone()
-        # self._cr.execute("delete from stock_move where state = 'cancel'")
+        po_canceled = self.env["purchase.order"].search([("state", "=", "cancel")])
+        mo_canceled = self.env["mrp.production"].search([("state", "=", "cancel")])
+        po_canceled.unlink()
+        mo_canceled.unlink()
+        # self._cr.execute("select count(id) from stock_move where state ='cancel'")
+        # row = self._cr.fetchone()
+        # self._cr.execute("delete from stock_move where state = 'cancel' limit 10")
         # row1 = self._cr.fetchone()
+        # print datetime.datetime.now()
         stock_moves = self.env["stock.move"].search([("state", "=", "cancel")], limit=10000, offset=0)
         stock_moves.unlink()
+        # print datetime.datetime.now()
 
     @api.multi
     def unlink(self):
