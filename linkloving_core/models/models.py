@@ -68,7 +68,7 @@ class ProductTemplate(models.Model):
             for line in lines:
                 res = {}
                 level = False
-                if line.product_id.bom_ids or po_lines:
+                if line.product_id.bom_ids or line_ids:
                     level = True
                 res.update({
                     'product_id': line.product_id.product_tmpl_id.id,
