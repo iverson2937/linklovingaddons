@@ -48,10 +48,16 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" class="click_tag_a"
+                    <a data-toggle="collapse" data-parent="#accordion" class="click_tag_a" data-level="true"
                        href="#name">
-                       <span class="fa fa-caret-right"></span>
-                       <t t-esc="p_name"/>
+                       <span class="fa fa-caret-down open-sign"></span>
+                       <t t-esc="result.name"/>
+                       <t t-if="result.process">
+                           <span class="show_bom_line_process" style="margin-left:30px">  <t t-esc="result.process"/> </span>
+                       </t>
+                       <t t-if="result.service">
+                           <span class="show_bom_line_service" style="margin-left:15px"> <t t-esc="result.service"/> </span>
+                       </t>
                     </a>
                 </h4>
             </div>
@@ -61,20 +67,24 @@
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h4 class="panel-title">
-                                    <a data-toggle="collapse" data-parent="#name" t-att-href="'#'+item.product_id" class="click_tag_a">
+                                    <a data-toggle="collapse" data-parent="#name" t-att-data-level="item.level" t-att-href="'#'+item.product_id" class="click_tag_a" t-att-data-product-id="item.product_id">
                                         <t t-if="item.level">
-                                            <span class="fa fa-caret-right"></span>
+                                            <span class="fa fa-caret-right open-sign"></span>
                                         </t>
                                         <t t-esc="item.name"/>
+                                        <t t-if="result.process">
+                                            <span class="show_bom_line_process" style="margin-left:30px">  <t t-esc="result.process"/> </span>
+                                        </t>
+                                        <t t-if="result.service">
+                                            <span class="show_bom_line_service" style="margin-left:15px"> <t t-esc="result.service"/> </span>
+                                        </t>
                                     </a>
                                 </h4>
                             </div>
                             <t t-if="item.level">
                                 <div t-att-id="item.product_id" class="panel-collapse collapse">
                                     <div class="panel-body">
-                                        Nihil anim keffiyeh helvetica, craft beer labore wes anderson
-                                        cred nesciunt sapiente ea proident. Ad vegan excepteur butcher
-                                        vice lomo.
+
                                     </div>
                                 </div>
                             </t>
@@ -87,18 +97,40 @@
     </t>
 
 
-    <t t-name="show_bom_line_tr_add" t-foreach="bom_lines" t-as="item">
-        <tr class="te" t-att-data-id="item.product_id" t-att-parent-id="pid">
-            <t t-if="item.level">
-                <td class="fa fa-caret-right level-top" style="cursor:pointer"></td>
-            </t>
-            <t t-elif="!item.level">
-                 <td></td>
-            </t>
-            <td><t t-esc="item.name"/></td>
-            <td><t t-esc="item.product_qty"/></td>
-            <td>ddd</td>
-        </tr>
+    <t t-name="show_bom_line_tr_add">
+        <div class="panel panel-default">
+            <div id="name" class="panel-collapse collapse in">
+                <div class="panel-body">
+                    <t t-foreach="bom_lines" t-as="item">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#name" t-att-data-level="item.level" t-att-href="'#'+item.product_id" class="click_tag_a" t-att-data-product-id="item.product_id">
+                                        <t t-if="item.level">
+                                            <span class="fa fa-caret-right open-sign"></span>
+                                        </t>
+                                        <t t-esc="item.name"/>
+                                        <t t-if="result.process">
+                                            <span class="show_bom_line_process" style="margin-left:30px">  <t t-esc="result.process"/> </span>
+                                        </t>
+                                        <t t-if="result.service">
+                                            <span class="show_bom_line_service" style="margin-left:15px"> <t t-esc="result.service"/> </span>
+                                        </t>
+                                    </a>
+                                </h4>
+                            </div>
+                            <t t-if="item.level">
+                                <div t-att-id="item.product_id" class="panel-collapse collapse">
+                                    <div class="panel-body">
+
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </div>
     </t>
 
 
