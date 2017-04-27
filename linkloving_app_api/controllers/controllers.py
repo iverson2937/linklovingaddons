@@ -13,6 +13,7 @@ import datetime
 import jpush
 import pytz
 from pip import download
+from serial import tools
 
 import odoo
 import odoo.modules.registry
@@ -22,7 +23,7 @@ from odoo import fields
 from odoo.api import call_kw, Environment
 from odoo.modules import get_resource_path
 from odoo.osv import expression
-from odoo.tools import float_compare, SUPERUSER_ID, werkzeug, os
+from odoo.tools import float_compare, SUPERUSER_ID, werkzeug, os, safe_eval
 from odoo.tools import topological_sort
 from odoo.tools.translate import _
 from odoo.tools.misc import str2bool, xlwt
@@ -921,6 +922,66 @@ class LinklovingAppApi(http.Controller):
         mrp_production.button_start_rework()
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
+
+    @http.route('/linkloving_app_api/semi_finished_return_material', type='json', auth='none', csrf=False)
+    def semi_finished_return_material(self, **kw):
+        order_id = request.jsonrequest.get('order_id')  # get paramter
+        stock_move_ids = request.jsonrequest.get('stock_moves')
+        is_check = request.jsonrequest.get('is_check')
+        mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
+        if not mrp_production:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={'error': _("MO not found")})
+        return_lines = []
+        if all(stock_move.get("return_qty") == 0 for stock_move in stock_move_ids):
+            mrp_production.write({'state': 'done'})
+            return JsonResponse.send_response(STATUS_CODE_OK,
+                                              res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
+        if not is_check:
+
+            for l in stock_move_ids:
+                product_id = l['product_tmpl_id']
+                obj = request.env['return.material.line'].sudo().create({
+                    'return_qty': l['return_qty'],
+                    'product_id': product_id,
+                })
+                return_lines.append(obj.id)
+
+            return_material_model = request.env['mrp.return.material']
+            returun_material_obj = return_material_model.sudo().search([('production_id', '=', order_id)])
+            if not returun_material_obj:  # 如果没生成过就生成一遍， 防止出现多条记录
+                returun_material_obj = return_material_model.sudo().create({
+                    'production_id': mrp_production.id,
+                })
+
+            else:
+                returun_material_obj.production_id = mrp_production.id
+
+            returun_material_obj.return_ids = return_lines
+            mrp_production.write({'state': 'waiting_warehouse_inspection'})
+        else:
+            return_material_model = request.env['mrp.return.material']
+            returun_material_obj = return_material_model.sudo().search([('production_id', '=', order_id)])
+            if not returun_material_obj:
+                return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                                  res_data={'error': _("Order of return material not found")})
+            returun_material_obj.state = 'done'
+            # 退料信息 已经确认
+            for r in returun_material_obj.return_ids:
+                for new_qty_dic in stock_move_ids:
+                    if r.product_id.id == new_qty_dic['product_tmpl_id']:
+                        r.return_qty = new_qty_dic['return_qty']
+                if r.return_qty == 0:
+                    continue
+                move = request.env['stock.move'].sudo().create(returun_material_obj._prepare_move_values(r))
+                move.action_done()
+            mrp_production.write({'state': 'done'})
+
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
+
+
+
     #退料
     @http.route('/linkloving_app_api/return_material', type='json', auth='none', csrf=False)
     def return_material(self, **kw):
@@ -1632,10 +1693,12 @@ class LinklovingAppApi(http.Controller):
                 domain = expression.AND([domain, [("complete_rate", "<", 100), ("complete_rate", ">", 0),
                                                   ("state", "in", ["partially_available", "assigned", "confirmed"])]])
                 domain = expression.OR([domain, [("complete_rate", "<", 0)]])
+
         if partner_id:
             domain = expression.AND([domain, [("partner_id", "child_of", partner_id)]])
 
-        request.env["stock.picking"].sudo().search(domain)._compute_complete_rate()
+        if not state:
+            request.env["stock.picking"].sudo().search(domain)._compute_complete_rate()
 
         picking_list = request.env['stock.picking'].sudo().search(domain,
                                                                   limit=limit,
@@ -1833,6 +1896,16 @@ class LinklovingAppApi(http.Controller):
         return attachment
 
     @classmethod
+    def is_has_attachment(self, res_id, res_model):
+        Model = request.env['ir.attachment'].sudo()
+        attach = Model.search([("res_id", "=", res_id),
+                               ("res_model", "=", res_model)])
+        # http://localhost:8069/web/content/1826?download=true
+        if attach:
+            return True
+        else:
+            return False
+    @classmethod
     def stock_picking_to_json(cls, stock_picking_obj):
         pack_list = []
         for pack in stock_picking_obj.pack_operation_product_ids:
@@ -1854,6 +1927,7 @@ class LinklovingAppApi(http.Controller):
         data = {
             'picking_id' : stock_picking_obj.id,
             'complete_rate': stock_picking_obj.complete_rate,
+            'has_attachment': LinklovingAppApi.is_has_attachment(stock_picking_obj.id, 'stock.picking'),
             'sale_note': stock_picking_obj.sale_id.remark ,
             'delivery_rule': stock_picking_obj.delivery_rule or None,
             'picking_type_code' : stock_picking_obj.picking_type_code,
@@ -1982,9 +2056,59 @@ class LinklovingAppApi(http.Controller):
             :return: needaction data
             :rtype: dict(menu_id: {'needaction_enabled': boolean, 'needaction_counter': int})
         """
-        menu_ids = request.jsonrequest.get("menu_ids")
+        # menu_ids = request.jsonrequest.get("menu_ids")
         user_id = request.jsonrequest.get("user_id")
-        if menu_ids:
-            needaction_data = request.env['ir.ui.menu'].sudo(user_id).browse(menu_ids).get_needaction_data()
+        xml_names = request.jsonrequest.get("xml_names")
+        if xml_names:
+            # needaction_data = request.env['ir.ui.menu'].sudo(user_id).browse(menu_ids).get_needaction_data()
+            # needaction_data = request.env['ir.ui.menu'].sudo(user_id).search([("", "", )]).get_needaction_data()
+            menu_ids = []
+            for xml_name in xml_names:
+                list = xml_name.split(".")
+                menu_id = request.env['ir.model.data'].sudo().search_read(
+                        [('name', '=', list[1]),
+                         ('module', '=', list[0]),
+                         ('model', '=', 'ir.ui.menu')], fields=['res_id'])
+                if menu_id:
+                    menu_ids.append(menu_id[0]["res_id"])
+
+            needaction_menus = request.env['ir.ui.menu'].sudo(user_id).browse(menu_ids)
+            needaction_data = LinklovingAppApi.get_needaction_data(needaction_menus, user_id)
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=needaction_data)
+
+    @classmethod
+    def get_needaction_data(cls, needaction_menus, uid):
+        """ Return for each menu entry in ``self``:
+            - whether it uses the needaction mechanism (needaction_enabled)
+            - the needaction counter of the related action, taking into account
+              the action domain
+        """
+        menu_ids = set()
+        for menu in needaction_menus:
+            menu_ids.add(menu.id)
+        res = {}
+        for menu in request.env["ir.ui.menu"].sudo(user=uid).browse(menu_ids):
+            res[menu.action.xml_id] = {
+                'needaction_enabled': False,
+                'needaction_counter': False,
+            }
+            if menu.action and menu.action.type in (
+                    'ir.actions.act_window', 'ir.actions.client') and menu.action.res_model:
+                model = request.env[menu.action.res_model].sudo(user=uid)
+                if menu.action.context != u'{}':
+                    try:
+                        model = request.env[menu.action.res_model].sudo(user=uid).with_context(
+                            **eval(menu.action.context.strip()))
+                    except Exception:
+                        pass
+
+                if model._needaction:
+                    if menu.action.type == 'ir.actions.act_window':
+                        eval_context = request.env['ir.actions.act_window'].sudo(user=uid)._get_eval_context()
+                        dom = safe_eval(menu.action.domain or '[]', eval_context)
+                    else:
+                        dom = safe_eval(menu.action.params_store or '{}', {'uid': uid}).get('domain')
+                    res[menu.action.xml_id]['needaction_enabled'] = model._needaction
+                    res[menu.action.xml_id]['needaction_counter'] = model._needaction_count(dom)
+        return res
