@@ -63,8 +63,7 @@ class ProductTemplate(models.Model):
             for line in lines:
                 res = {}
                 level = False
-                if line.product_id.bom_ids or self.env['purchase.order.line'].search(
-                        [('product_id', '=', line.product_id.id), ('state', 'not in', ['cancel'])]):
+                if line.product_id.bom_ids or po_lines:
                     level = True
                 res.update({
                     'product_id': line.product_id.product_tmpl_id.id,
