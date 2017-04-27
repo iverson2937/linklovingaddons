@@ -13,8 +13,8 @@ class ReturnMaterial(models.Model):
 
     name = fields.Char()
     partner_id = fields.Many2one('res.partner', states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
-    customer = fields.Boolean(related='partner_id.customer', store=True)
-    supplier = fields.Boolean(relaetd='partner_id.supplier', store=True)
+    customer = fields.Boolean()
+    supplier = fields.Boolean()
     partner_invoice_id = fields.Many2one('res.partner', string=u'开票地址',
                                          states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
                                          required=False,
@@ -179,7 +179,10 @@ class ReturnMaterial(models.Model):
     @api.model
     def create(self, vals):
         if vals.get('name', 'New') == 'New':
-            vals['name'] = self.env['ir.sequence'].next_by_code('return.goods') or 'New'
+            if vals.get('customer'):
+                vals['name'] = self.env['ir.sequence'].next_by_code('return.goods.customer') or 'New'
+            else:
+                vals['name'] = self.env['ir.sequence'].next_by_code('return.goods.supplier') or 'New'
 
         result = super(ReturnMaterial, self).create(vals)
         return result

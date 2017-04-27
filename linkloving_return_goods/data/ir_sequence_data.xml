@@ -3,10 +3,18 @@
     <data noupdate="0">
 
         <!-- Sequences for sale.order -->
-        <record id="seq_sale_order" model="ir.sequence">
+        <record id="seq_return_goods_customer" model="ir.sequence">
             <field name="name">Return Goods</field>
-            <field name="code">return.goods</field>
-            <field name="prefix">RMA</field>
+            <field name="code">return.goods.customer</field>
+            <field name="prefix">SRMA%(year)s</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <!-- Sequences for sale.order -->
+        <record id="seq_return_goods_supplier" model="ir.sequence">
+            <field name="name">Return Goods</field>
+            <field name="code">return.goods.supplier</field>
+            <field name="prefix">PRMA%(year)s</field>
             <field name="padding">4</field>
             <field name="company_id" eval="False"/>
         </record>
