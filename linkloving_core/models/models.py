@@ -81,7 +81,7 @@ class ProductTemplate(models.Model):
             'mo_ids': ids,
             'po_lines': line_ids,
             'on_produce': self.incoming_qty,
-            'draft': self.get_draft_po_qty(self.self.product_variant_ids[0].id),
+            'draft': self.get_draft_po_qty(self.product_variant_ids[0]),
             'stock': self.qty_available,
             'require': self.outgoing_qty
         }

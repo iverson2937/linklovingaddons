@@ -58,7 +58,8 @@
                        <t t-if="result.service">
                            <span class="show_bom_line_service" style="margin-left:15px;margin-right:15px"> <t t-esc="result.service"/> </span>
                        </t>
-                        <span>[库存:<t t-esc="result.stock"/> 在产:<t t-esc="result.on_produce"/> 需求:<t t-esc="result.require"/> ]</span>
+                       <span>[库存:<t t-esc="result.stock"/> 在产:<t t-esc="result.on_produce"/> 需求:<t t-esc="result.require"/> ]</span>
+                       <span style="margin-left:15px">采购草稿:<t t-esc="result.draft"/> </span>
                     </a>
                 </h4>
             </div>
@@ -83,6 +84,7 @@
                                             <span class="show_bom_line_service" style="margin-left:15px;margin-right:15px"> <t t-esc="result.service"/> </span>
                                         </t>
                                         <span>[库存:<t t-esc="result.stock"/> 在产:<t t-esc="result.on_produce"/> 需求:<t t-esc="result.require"/> ]</span>
+                                        <span style="margin-left:15px">采购草稿:<t t-esc="result.draft"/> </span>
                                     </a>
                                 </h4>
                             </div>
@@ -153,6 +155,7 @@
                                             <span class="show_bom_line_service" style="margin-left:15px;margin-right:15px"> <t t-esc="result.service"/> </span>
                                         </t>
                                         <span>[库存:<t t-esc="result.stock"/> 在产:<t t-esc="result.on_produce"/> 需求:<t t-esc="result.require"/> ]</span>
+                                        <span style="margin-left:15px">采购草稿:<t t-esc="result.draft"/> </span>
                                     </a>
                                 </h4>
                             </div>
