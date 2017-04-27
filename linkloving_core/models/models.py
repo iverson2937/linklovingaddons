@@ -81,3 +81,24 @@ class ProductTemplate(models.Model):
             'mo_ids': ids,
             'po_lines': line_ids
         }
+
+    @api.multi
+    def show_detail(self):
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'product_detail',
+            'product_id': self.id
+
+        }
+
+    class ProductTemplate(models.Model):
+        _inherit = 'product.product'
+
+        @api.multi
+        def show_detail(self):
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'product_detail',
+                'product_id': self.product_tmpl_id.id
+
+            }
