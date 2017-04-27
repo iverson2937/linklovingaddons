@@ -3,6 +3,12 @@ import json
 
 from odoo import models, fields, api
 
+dict = {
+    'Buy': u'采购',
+    'Make To Order': u'按订单生产',
+    'Manufacture': u'制造'
+}
+
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
@@ -15,7 +21,7 @@ class ProductTemplate(models.Model):
         service = ''
         if self.route_ids:
             for route in self.route_ids:
-                service += route.name + ' '
+                service += dict[route.name]
         po_lines = self.env['purchase.order.line'].search(
             [('product_id', '=', self.product_variant_ids[0].id), ('state', 'not in', ['cancel'])])
         line_ids = []
