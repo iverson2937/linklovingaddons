@@ -31,3 +31,6 @@
 #accordion{
     margin-top: 50px;
 }
+#accordion h4,#accordion a,#accordion span{
+    font-size: 14px!important;
+}

@@ -72,8 +72,11 @@
                                             <span class="fa fa-caret-right open-sign"></span>
                                         </t>
                                         <t t-esc="item.name"/>
+                                        <t t-if="result.type">
+                                            <span class="show_bom_line_type" style="margin-left:30px">  <t t-esc="result.type"/> </span>
+                                        </t>
                                         <t t-if="result.process">
-                                            <span class="show_bom_line_process" style="margin-left:30px">  <t t-esc="result.process"/> </span>
+                                            <span class="show_bom_line_process" style="margin-left:15px">  <t t-esc="result.process"/> </span>
                                         </t>
                                         <t t-if="result.service">
                                             <span class="show_bom_line_service" style="margin-left:15px"> <t t-esc="result.service"/> </span>
@@ -93,7 +96,22 @@
                 </div>
             </div>
         </div>
+    </t>
 
+    <!--MO的QWeb-->
+    <t t-name="show_bom_line_mo">
+        <t t-foreach="mo" t-as="item">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#name">
+                            <span><t t-esc="item.date"/> </span>
+                            <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+                        </a>
+                    </h4>
+                </div>
+            </div>
+        </t>
     </t>
 
 

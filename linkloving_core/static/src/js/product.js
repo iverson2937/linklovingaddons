@@ -23,10 +23,11 @@ odoo.define('linkloving_core.product_detail', function (require) {
         show_bom_line: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
-            //小三角的变化
-            if(target.classList.contains('show_bom_line_process')||target.classList.contains('show_bom_line_service')){
+            //若点击的是
+            if(target.classList.contains('show_bom_line_process')||target.classList.contains('show_bom_line_service')||target.classList.contains('show_bom_line_type')){
                 target = target.parentNode;
             }
+            //小三角的变化
             if(target.childNodes.length > 1){
                 if(target.childNodes[1].classList.contains("fa-caret-right")){
                     target.childNodes[1].classList.remove("fa-caret-right")
@@ -58,6 +59,9 @@ odoo.define('linkloving_core.product_detail', function (require) {
                                 // console.log(self.$("#"+product_id+">.panel-body").html());
                                 self.$("#"+product_id+">.panel-body").html(" ");
                                 self.$("#"+product_id+">.panel-body").append(QWeb.render('show_bom_line_tr_add', {bom_lines: result.bom_lines,result:result}));
+                                if(result.mo_ids.length>0){
+                                    self.$("#"+product_id+">.panel-body").prepend(QWeb.render('show_bom_line_mo',{mo:result.mo_ids}));
+                                }
                             });
                  }
             }
@@ -68,7 +72,12 @@ odoo.define('linkloving_core.product_detail', function (require) {
                 .call("get_detail", [this.product_id])
                 .then(function (result) {
                     console.log(result);
+                    console.log(result.mo_ids.length);
                     self.$el.append(QWeb.render('show_bom_line_tr', {bom_lines: result.bom_lines,result:result}));
+                    if(result.mo_ids.length>0){
+                        self.$('.panel-body').prepend(QWeb.render('show_bom_line_mo',{mo:result.mo_ids}));
+                    }
+
                 });
 
         },
