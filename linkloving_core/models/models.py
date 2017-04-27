@@ -5,8 +5,14 @@ from odoo import models, fields, api
 
 dict = {
     'Buy': u'采购',
-    'Make To Order': u'按订单生产',
+    'Make To Order': u'按订单生成',
     'Manufacture': u'制造'
+}
+
+PRODUCT_TYPE = {
+    'raw material': u'原料',
+    'semi-finished': u'半成品',
+    'finished': u'成品',
 }
 
 
@@ -21,7 +27,7 @@ class ProductTemplate(models.Model):
         service = ''
         if self.route_ids:
             for route in self.route_ids:
-                service += dict[route.name]
+                service += dict[route.name] + ','
         po_lines = self.env['purchase.order.line'].search(
             [('product_id', '=', self.product_variant_ids[0].id), ('state', 'not in', ['cancel'])])
         line_ids = []
@@ -54,7 +60,8 @@ class ProductTemplate(models.Model):
             for line in lines:
                 res = {}
                 level = False
-                if line.product_id.bom_ids:
+                if line.product_id.bom_ids or self.env['purchase.order.line'].search(
+                        [('product_id', '=', line.product_id.id), ('state', 'not in', ['cancel'])]):
                     level = True
                 res.update({
                     'product_id': line.product_id.product_tmpl_id.id,
@@ -69,7 +76,7 @@ class ProductTemplate(models.Model):
             'bom_lines': bom_lines,
             'product_id': self.id,
             'process': process,
-            'type': self.product_ll_type,
+            'type': PRODUCT_TYPE.get(self.product_ll_type),
             'service': service,
             'mo_ids': ids,
             'po_lines': line_ids
