@@ -24,8 +24,9 @@ odoo.define('linkloving_core.product_detail', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             //若点击的是
-            if(target.classList.contains('show_bom_line_process')||target.classList.contains('show_bom_line_service')||target.classList.contains('show_bom_line_type')){
+            if(target.classList.contains('show_bom_line_one')||target.classList.contains('show_bom_line_two')){
                 target = target.parentNode;
+                console.log('sss')
             }
             //小三角的变化
             if(target.childNodes.length > 1){
@@ -68,6 +69,9 @@ odoo.define('linkloving_core.product_detail', function (require) {
                                     self.$("#"+product_id+">.panel-body").prepend(QWeb.render('show_bom_line_mo',{mo:result.mo_ids}));
                                 }
                                  if(result.po_lines.length>0){
+                                    for(var i=0;i<result.po_lines.length;i++){
+                                        result.po_lines[i].date_planned = result.po_lines[i].date_planned.substr(0,10);
+                                    }
                                     self.$("#"+product_id+">.panel-body").prepend(QWeb.render('show_bom_line_po',{po:result.po_lines}));
                                 }
                             });
@@ -89,6 +93,9 @@ odoo.define('linkloving_core.product_detail', function (require) {
                         self.$('.panel-body').prepend(QWeb.render('show_bom_line_mo',{mo:result.mo_ids}));
                     }
                     if(result.po_lines.length>0){
+                        for(var i=0;i<result.po_lines.length;i++){
+                            result.po_lines[i].date_planned = result.po_lines[i].date_planned.substr(0,10);
+                        }
                         self.$('.panel-body').prepend(QWeb.render('show_bom_line_po',{po:result.po_lines}));
                     }
 
