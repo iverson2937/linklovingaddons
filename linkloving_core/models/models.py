@@ -14,6 +14,11 @@ PRODUCT_TYPE = {
     'semi-finished': u'半成品',
     'finished': u'成品',
 }
+PURCHASE_TYPE = {
+    '': '',
+    '': '',
+    '': ''
+}
 
 
 class ProductTemplate(models.Model):
@@ -29,7 +34,7 @@ class ProductTemplate(models.Model):
             for route in self.route_ids:
                 service += dict[route.name] + ','
         po_lines = self.env['purchase.order.line'].search(
-            [('product_id', '=', self.product_variant_ids[0].id), ('state', 'not in', ['cancel'])])
+            [('product_id', '=', self.product_variant_ids[0].id), ('state', 'not in', ['cancel', 'done'])])
         line_ids = []
         for line in po_lines:
             if line.product_qty > line.qty_received:
