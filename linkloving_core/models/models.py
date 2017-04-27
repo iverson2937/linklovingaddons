@@ -16,7 +16,15 @@ class ProductTemplate(models.Model):
         if self.route_ids:
             for route in self.route_ids:
                 service += route.name + ' '
-        po_lines = []
+        po_lines = self.env['purchase.order.line'].search(
+            [('product_id', '=', self.product_variant_ids[0].id), ('state', 'not in', ['cancel'])])
+        line_ids = []
+        for line in po_lines:
+            line_ids.append({
+                'name': line.order_id.name,
+                'id': line.order_id.id,
+                'qty': line.product_qty,
+            })
 
         mo_ids = self.env['mrp.production'].search(
             [('product_tmpl_id', '=', self.id), ('state', 'not in', ['cancel', 'done'])])
@@ -25,6 +33,7 @@ class ProductTemplate(models.Model):
             for mo in mo_ids:
                 ids.append({
                     'id': mo.id,
+                    'name': mo.name,
                     'qty': mo.product_qty,
                     'state': mo.state,
                     'date': mo.date_planned_start,
@@ -54,7 +63,8 @@ class ProductTemplate(models.Model):
             'bom_lines': bom_lines,
             'product_id': self.id,
             'process': process,
-            'type': '',
+            'type': self.product_ll_type,
             'service': service,
             'mo_ids': ids,
+            'po_lines': line_ids
         }
