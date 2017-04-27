@@ -80,9 +80,9 @@ class ProductTemplate(models.Model):
             'service': service,
             'mo_ids': ids,
             'po_lines': line_ids,
-            'on_produce': self.product_id.incoming_qty,
-            'stock': self.product_id.qty_available,
-            'require': self.product_id.outgoing_qty
+            'on_produce': self.incoming_qty,
+            'stock': self.qty_available,
+            'require': self.outgoing_qty
         }
 
     @api.multi
