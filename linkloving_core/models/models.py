@@ -32,7 +32,7 @@ class ProductTemplate(models.Model):
         service = ''
         if self.route_ids:
             for route in self.route_ids:
-                service += dict[route.name] + ','
+                service += dict[route.name]
         po_lines = self.env['purchase.order.line'].search(
             [('product_id', '=', self.product_variant_ids[0].id), ('state', 'not in', ['cancel', 'done'])])
         line_ids = []
@@ -47,7 +47,8 @@ class ProductTemplate(models.Model):
                 })
 
         mo_ids = self.env['mrp.production'].search(
-            [('product_tmpl_id', '=', self.id), ('state', 'not in', ['cancel', 'done'])])
+            [('product_tmpl_id', '=', self.id), ('state', 'not in', ['cancel', 'done']),
+             ])
         ids = []
         if mo_ids:
             for mo in mo_ids:
@@ -68,7 +69,13 @@ class ProductTemplate(models.Model):
             for line in lines:
                 res = {}
                 level = False
-                if line.product_id.bom_ids or line_ids:
+                purchase_line_ids = self.env['purchase.order.line'].search(
+                    [('product_id', '=', line.product_id.id), ('state', 'not in', ['cancel', 'done'])])
+                has_purchase = False
+                for purchase_line in purchase_line_ids:
+                    if purchase_line.product_qty > purchase_line.qty_received:
+                        has_purchase = True
+                if line.product_id.bom_ids or has_purchase:
                     level = True
                 res.update({
                     'product_id': line.product_id.product_tmpl_id.id,
