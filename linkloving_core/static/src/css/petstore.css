@@ -1,0 +1,48 @@
+.oe_products_item {
+    display: inline-block;
+    padding: 3px;
+    margin: 5px;
+    border: 1px solid black;
+    border-radius: 3px;
+}
+.oe_petstore_top{
+    padding: 30px;
+    border:1px solid #c8c8d3;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    font-size: 22px;
+    margin: 50px;
+}
+.tables{
+    margin:0 auto;
+    margin-top: 100px;
+    width: 70%;
+}
+.tables thead tr th{
+    background-color: #5B899E;
+}
+.tables tbody tr td:nth-child(1){
+    width: 30px;
+}
+
+.oe_petstore_homepage .te .fa{
+    display: table-cell !important;
+}
+
+#accordion{
+    margin-top: 50px;
+}
+#accordion h4,#accordion a,#accordion span{
+    font-size: 14px!important;
+}
+#accordion .panel{
+    border:none!important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+}
+#accordion .panel-body{
+    padding-top: 3px;
+    padding-bottom: 1px;
+}
+#accordion>.panel>.panel-collapse>.panel-body{
+    padding-bottom: 50px;
+}
