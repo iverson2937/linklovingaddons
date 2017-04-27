@@ -32,11 +32,14 @@ class ProductTemplate(models.Model):
             [('product_id', '=', self.product_variant_ids[0].id), ('state', 'not in', ['cancel'])])
         line_ids = []
         for line in po_lines:
-            line_ids.append({
-                'name': line.order_id.name,
-                'id': line.order_id.id,
-                'qty': line.product_qty,
-            })
+            if line.product_qty > line.qty_received:
+                line_ids.append({
+                    'name': line.order_id.name,
+                    'id': line.order_id.id,
+                    'qty': line.product_qty,
+                    'date_planned': line.date_planned,
+                    'state': line.order_id.state
+                })
 
         mo_ids = self.env['mrp.production'].search(
             [('product_tmpl_id', '=', self.id), ('state', 'not in', ['cancel', 'done'])])
