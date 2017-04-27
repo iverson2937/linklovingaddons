@@ -83,10 +83,10 @@ class ProductTemplate(models.Model):
             'service': service,
             'mo_ids': ids,
             'po_lines': line_ids,
-            'on_produce': self.product_id.incoming_qty,
+            'on_produce': self.incoming_qty,
             'draft': self.get_draft_po_qty(self.self.product_variant_ids[0].id),
-            'stock': self.product_id.qty_available,
-            'require': self.product_id.outgoing_qty
+            'stock': self.qty_available,
+            'require': self.outgoing_qty
         }
 
     def get_draft_po_qty(self, product_id):
