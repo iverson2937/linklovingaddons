@@ -81,9 +81,21 @@ class ProductTemplate(models.Model):
             'mo_ids': ids,
             'po_lines': line_ids,
             'on_produce': self.product_id.incoming_qty,
+            'draft': self.get_draft_po_qty(self.self.product_variant_ids[0].id),
             'stock': self.product_id.qty_available,
             'require': self.product_id.outgoing_qty
         }
+
+    def get_draft_po_qty(self, product_id):
+        pos = self.env["purchase.order"].search([("state", "in", ("make_by_mrp", "draft"))])
+        chose_po_lines = self.env["purchase.order.line"]
+        total_draft_order_qty = 0
+        for po in pos:
+            for po_line in po.order_line:
+                if po_line.product_id.id == product_id.id:
+                    chose_po_lines += po_line
+                    total_draft_order_qty += po_line.product_qty
+        return total_draft_order_qty
 
     @api.multi
     def show_detail(self):
