@@ -9,7 +9,7 @@
                     <field name="is_rework" invisible="1"/>
                 </xpath>
                 <xpath expr="//notebook/page[1]" position="before">
-                    <page string="返工物料" attrs="{'invisible': [('is_rework', '!=', True)]}">
+                    <page string="需求物料" attrs="{'invisible': [('is_rework', '!=', True)]}">
                         <field name="rework_material_line_ids">
 
                             <tree editable="bottom">
