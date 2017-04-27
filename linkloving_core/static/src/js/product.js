@@ -80,7 +80,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
                 return new Model("product.template")
                 .call("get_detail", [this.product_id])
                 .then(function (result) {
-                    // console.log(result);
+                    console.log(result);
                     self.$el.append(QWeb.render('show_bom_line_tr', {bom_lines: result.bom_lines,result:result}));
                     if(result.mo_ids.length>0){
                         for(var i=0;i<result.mo_ids.length;i++){
