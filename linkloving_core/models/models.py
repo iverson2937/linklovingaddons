@@ -79,7 +79,10 @@ class ProductTemplate(models.Model):
             'type': PRODUCT_TYPE.get(self.product_ll_type),
             'service': service,
             'mo_ids': ids,
-            'po_lines': line_ids
+            'po_lines': line_ids,
+            'on_produce': self.product_id.incoming_qty,
+            'stock': self.product_id.qty_available,
+            'require': self.product_id.outgoing_qty
         }
 
     @api.multi
@@ -100,5 +103,4 @@ class ProductTemplate(models.Model):
                 'type': 'ir.actions.client',
                 'tag': 'product_detail',
                 'product_id': self.product_tmpl_id.id
-
             }
