@@ -57,7 +57,7 @@ class MrpBomExtend(models.Model):
                                    'parent_line': current_line}))
             else:
                 lines_done.append(
-                        (current_line, {'suggest_qty': round(line_quantity * (1 + bom_line.scrap_rate / 100)),
+                    (current_line, {'suggest_qty': round(line_quantity * (1 + bom_line.scrap_rate / 100)),
                                     'qty': line_quantity, 'product': current_product,
                                     'original_qty': quantity, 'parent_line': parent_line}))
 
@@ -414,14 +414,14 @@ class MrpProductionExtend(models.Model):
                     moves_to_do[0].action_done()
                 else:
                     new_move = move.stock_moves[0].copy(
-                            default={'quantity_done': move.over_picking_qty, 'product_uom_qty': move.over_picking_qty,
-                                     'production_id': move.production_id.id,
-                                     'raw_material_production_id': move.raw_material_production_id.id,
-                                     'procurement_id': move.procurement_id.id or False,
-                                     'is_over_picking': True})
+                        default={'quantity_done': move.over_picking_qty, 'product_uom_qty': move.over_picking_qty,
+                                 'production_id': move.production_id.id,
+                                 'raw_material_production_id': move.raw_material_production_id.id,
+                                 'procurement_id': move.procurement_id.id or False,
+                                 'is_over_picking': True})
                     move.production_id.move_raw_ids = move.production_id.move_raw_ids + new_move
                     move.over_picking_qty = 0
-                    new_move.write({'state': 'assigned',})
+                    new_move.write({'state': 'assigned', })
                     new_move.action_done()
             if self._context.get('picking_mode') == 'first_picking':  # 如果备料数量不等于0
                 if not move.stock_moves:
@@ -718,6 +718,9 @@ class ReturnOfMaterial(models.Model):
             if mrp_production_order.product_id.bom_ids:
                 product_ids = mrp_production_order.product_id.bom_ids[0].bom_line_ids.mapped(
                     'product_id').ids
+            if mrp_production_order.process_id.is_rework:
+                product_ids = mrp_production_order.rework_material_line_ids.mapped(
+                    'product_id').ids
             lines = []
             for l in product_ids:
                 obj = self.env['return.material.line'].create({
@@ -900,6 +903,7 @@ class SimStockMove(models.Model):
     area_id = fields.Many2one(related='product_id.area_id')
     product_type = fields.Selection(string="物料类型", selection=[('semi-finished', '半成品'), ('material', '原材料'), ],
                                     required=False, compute="_compute_product_type")
+
 
 class ReturnMaterialLine(models.Model):
     _name = 'return.material.line'
