@@ -105,7 +105,8 @@
                 <div class="panel-heading">
                     <h4 class="panel-title">
                         <a data-toggle="collapse" data-parent="#name">
-                            <span><t t-esc="item.date"/> </span>
+                            <span><t t-esc="item.name"/> </span>
+                            <span style="margin-left:15px"><t t-esc="item.date"/> </span>
                             <span style="margin-left:15px"><t t-esc="item.state"/> </span>
                         </a>
                     </h4>
@@ -114,6 +115,21 @@
         </t>
     </t>
 
+    <!--PO的QWeb-->
+    <t t-name="show_bom_line_po">
+        <t t-foreach="po" t-as="item">
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#name">
+                            <span t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
+                            <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
+                        </a>
+                    </h4>
+                </div>
+            </div>
+        </t>
+    </t>
 
     <t t-name="show_bom_line_tr_add">
         <div class="panel panel-default">

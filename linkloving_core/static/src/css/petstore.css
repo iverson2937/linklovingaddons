@@ -34,3 +34,15 @@
 #accordion h4,#accordion a,#accordion span{
     font-size: 14px!important;
 }
+#accordion .panel{
+    border:none!important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+}
+#accordion .panel-body{
+    padding-top: 3px;
+    padding-bottom: 1px;
+}
+#accordion>.panel>.panel-collapse>.panel-body{
+    padding-bottom: 50px;
+}

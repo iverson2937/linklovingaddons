@@ -30,20 +30,20 @@ odoo.define('linkloving_core.product_detail', function (require) {
             //小三角的变化
             if(target.childNodes.length > 1){
                 if(target.childNodes[1].classList.contains("fa-caret-right")){
-                    target.childNodes[1].classList.remove("fa-caret-right")
-                    target.childNodes[1].classList.add("fa-caret-down")
+                    target.childNodes[1].classList.remove("fa-caret-right");
+                    target.childNodes[1].classList.add("fa-caret-down");
                 }else if(target.childNodes[1].classList.contains("fa-caret-down")){
-                    target.childNodes[1].classList.remove("fa-caret-down")
-                    target.childNodes[1].classList.add("fa-caret-right")
+                    target.childNodes[1].classList.remove("fa-caret-down");
+                    target.childNodes[1].classList.add("fa-caret-right");
                 }
             }
             if(target.classList.contains('open-sign')){
                 if(target.classList.contains("fa-caret-right")){
-                    target.classList.remove("fa-caret-right")
-                    target.classList.add("fa-caret-down")
+                    target.classList.remove("fa-caret-right");
+                    target.classList.add("fa-caret-down");
                 }else if(target.classList.contains("fa-caret-down")){
-                    target.classList.remove("fa-caret-down")
-                    target.classList.add("fa-caret-right")
+                    target.classList.remove("fa-caret-down");
+                    target.classList.add("fa-caret-right");
                 }
                 target = target.parentNode;
             }
@@ -58,9 +58,17 @@ odoo.define('linkloving_core.product_detail', function (require) {
                                 console.log(result);
                                 // console.log(self.$("#"+product_id+">.panel-body").html());
                                 self.$("#"+product_id+">.panel-body").html(" ");
-                                self.$("#"+product_id+">.panel-body").append(QWeb.render('show_bom_line_tr_add', {bom_lines: result.bom_lines,result:result}));
+                                if(result.bom_lines.length>0){
+                                    self.$("#"+product_id+">.panel-body").append(QWeb.render('show_bom_line_tr_add', {bom_lines: result.bom_lines,result:result}));
+                                }
                                 if(result.mo_ids.length>0){
+                                    for(var i=0;i<result.mo_ids.length;i++){
+                                        result.mo_ids[i].date = result.mo_ids[i].date.substr(0,10);
+                                    }
                                     self.$("#"+product_id+">.panel-body").prepend(QWeb.render('show_bom_line_mo',{mo:result.mo_ids}));
+                                }
+                                 if(result.po_lines.length>0){
+                                    self.$("#"+product_id+">.panel-body").prepend(QWeb.render('show_bom_line_po',{po:result.po_lines}));
                                 }
                             });
                  }
@@ -68,18 +76,24 @@ odoo.define('linkloving_core.product_detail', function (require) {
         },
         start: function () {
             var self = this;
-            return new Model("product.template")
+            if(this.product_id){
+                return new Model("product.template")
                 .call("get_detail", [this.product_id])
                 .then(function (result) {
-                    console.log(result);
-                    console.log(result.mo_ids.length);
+                    // console.log(result);
                     self.$el.append(QWeb.render('show_bom_line_tr', {bom_lines: result.bom_lines,result:result}));
                     if(result.mo_ids.length>0){
+                        for(var i=0;i<result.mo_ids.length;i++){
+                            result.mo_ids[i].date = result.mo_ids[i].date.substr(0,10);
+                        }
                         self.$('.panel-body').prepend(QWeb.render('show_bom_line_mo',{mo:result.mo_ids}));
+                    }
+                    if(result.po_lines.length>0){
+                        self.$('.panel-body').prepend(QWeb.render('show_bom_line_po',{po:result.po_lines}));
                     }
 
                 });
-
+            }
         },
     });
 
