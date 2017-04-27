@@ -2084,12 +2084,19 @@ class LinklovingAppApi(http.Controller):
             - the needaction counter of the related action, taking into account
               the action domain
         """
-        menu_ids = set()
-        for menu in needaction_menus:
-            menu_ids.add(menu.id)
+        # menu_ids = set()
+        # for menu in needaction_menus:
+        #     menu_ids.add(menu.id)
         res = {}
-        for menu in request.env["ir.ui.menu"].sudo(user=uid).browse(menu_ids):
-            res[menu.action.xml_id] = {
+        xml_names = request.env['ir.model.data'].sudo().search_read(
+                [('res_id', 'in', needaction_menus.ids), ('model', '=', 'ir.ui.menu')],
+                fields=['complete_name', 'res_id'])
+        for menu in needaction_menus:
+            xml_name = None
+            for item in xml_names:
+                if item["res_id"] == menu.id:
+                    xml_name = item["complete_name"]
+            res[xml_name] = {
                 'needaction_enabled': False,
                 'needaction_counter': False,
             }
@@ -2109,6 +2116,6 @@ class LinklovingAppApi(http.Controller):
                         dom = safe_eval(menu.action.domain or '[]', eval_context)
                     else:
                         dom = safe_eval(menu.action.params_store or '{}', {'uid': uid}).get('domain')
-                    res[menu.action.xml_id]['needaction_enabled'] = model._needaction
-                    res[menu.action.xml_id]['needaction_counter'] = model._needaction_count(dom)
+                    res[xml_name]['needaction_enabled'] = model._needaction
+                    res[xml_name]['needaction_counter'] = model._needaction_count(dom)
         return res
