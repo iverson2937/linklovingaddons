@@ -17,7 +17,8 @@ PRODUCT_TYPE = {
 PURCHASE_TYPE = {
     'draft': u'草稿',
     'to approve': u'待审核',
-    'purchase': u'采购订单'
+    'purchase': u'采购订单',
+    'make_by_mrp': u'MRP生成'
 }
 MO_STATE = {
     'draft': u'草稿',
