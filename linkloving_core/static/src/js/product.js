@@ -21,7 +21,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
             var act_id = target.getAttribute("data-id");
             act_id = parseInt(act_id);
             var action = {
-                name:"rest",
+                name:"采购订单",
                 type: 'ir.actions.act_window',
                 res_model:'purchase.order',
                 view_type: 'form',
