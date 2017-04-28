@@ -71,7 +71,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
                 }
                 target = target.parentNode;
             }
-            if(target.attributes['data-level'] && target.attributes['data-level'].nodeValue=='true'){
+            // if(target.attributes['data-level'] && target.attributes['data-level'].nodeValue=='true'){
                 if(target.attributes['data-product-id']){
                      var product_id = target.attributes['data-product-id'].nodeValue;
                         product_id = parseInt(product_id);
@@ -80,26 +80,30 @@ odoo.define('linkloving_core.product_detail', function (require) {
                             .call("get_detail", [product_id])
                             .then(function (result) {
                                 console.log(result);
-                                // console.log(self.$("#"+product_id+">.panel-body").html());
+                                var po_length = result.po_lines.length;
+                                var bom_length = result.bom_lines.length;
+                                var mo_length = result.mo_ids.length;
                                 self.$("#"+product_id+">.panel-body").html(" ");
-                                if(result.bom_lines.length>0){
-                                    self.$("#"+product_id+">.panel-body").append(QWeb.render('show_bom_line_tr_add', {bom_lines: result.bom_lines,result:result}));
+                                 if(result.po_lines.length>0){
+                                    for(var i=0;i<result.po_lines.length;i++){
+                                        result.po_lines[i].date_planned = result.po_lines[i].date_planned.substr(0,10);
+                                    }
+                                    // self.$("#"+product_id+">.panel-body").prepend(QWeb.render('show_bom_line_po',{po:result.po_lines}));
                                 }
                                 if(result.mo_ids.length>0){
                                     for(var i=0;i<result.mo_ids.length;i++){
                                         result.mo_ids[i].date = result.mo_ids[i].date.substr(0,10);
                                     }
-                                    self.$("#"+product_id+">.panel-body").prepend(QWeb.render('show_bom_line_mo',{mo:result.mo_ids}));
+                                    // self.$("#"+product_id+">.panel-body").prepend(QWeb.render('show_bom_line_mo',{mo:result.mo_ids}));
                                 }
-                                 if(result.po_lines.length>0){
-                                    for(var i=0;i<result.po_lines.length;i++){
-                                        result.po_lines[i].date_planned = result.po_lines[i].date_planned.substr(0,10);
-                                    }
-                                    self.$("#"+product_id+">.panel-body").prepend(QWeb.render('show_bom_line_po',{po:result.po_lines}));
-                                }
+                                // if(result.bom_lines.length>0){
+                                    self.$("#"+product_id+">.panel-body").append(QWeb.render('show_bom_line_tr_add', {bom_lines: result.bom_lines,result:result,po_length:po_length,bom_length:bom_length,mo_length: mo_length}));
+                                // }
+
+
                             });
                  }
-            }
+            // }
         },
         start: function () {
             var self = this;
@@ -108,18 +112,22 @@ odoo.define('linkloving_core.product_detail', function (require) {
                 .call("get_detail", [this.product_id])
                 .then(function (result) {
                     console.log(result);
-                    self.$el.append(QWeb.render('show_bom_line_tr', {bom_lines: result.bom_lines,result:result}));
+                    var po_length = result.po_lines.length;
+                    var bom_length = result.bom_lines.length;
+                    var mo_length = result.mo_ids.length;
+                    console.log(mo_length)
+                    self.$el.append(QWeb.render('show_bom_line_tr', {bom_lines: result.bom_lines,result:result,po_length:po_length,bom_length:bom_length,mo_length: mo_length}));
                     if(result.mo_ids.length>0){
                         for(var i=0;i<result.mo_ids.length;i++){
                             result.mo_ids[i].date = result.mo_ids[i].date.substr(0,10);
                         }
-                        self.$('.panel-body').prepend(QWeb.render('show_bom_line_mo',{mo:result.mo_ids}));
+                        // self.$('.panel-body').prepend(QWeb.render('show_bom_line_mo',{mo:result.mo_ids}));
                     }
                     if(result.po_lines.length>0){
                         for(var i=0;i<result.po_lines.length;i++){
                             result.po_lines[i].date_planned = result.po_lines[i].date_planned.substr(0,10);
                         }
-                        self.$('.panel-body').prepend(QWeb.render('show_bom_line_po',{po:result.po_lines}));
+                        // self.$('.panel-body').prepend(QWeb.render('show_bom_line_po',{po:result.po_lines}));
                     }
 
                 });

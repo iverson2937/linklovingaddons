@@ -64,20 +64,52 @@
                                 <t t-esc="result.service"/>
                             </t>]
                         </span>
-                       <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
+                       <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                     </a>
                 </h4>
             </div>
             <div id="name" class="panel-collapse collapse in">
                 <div class="panel-body">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#name" t-att-href="'#mo'+result.product_id">
+                                    制造单[<t t-esc="mo_length"/>]
+                                    <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
+                                </a>
+                            </h4>
+                        </div>
+                        <t t-if="mo_length!=0">
+                            <div t-att-id="'mo'+result.product_id" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <t t-foreach="result.mo_ids" t-as="item">
+                                        <div class="panel panel-success">
+                                            <div class="panel-heading">
+                                                <h4 class="panel-title">
+                                                    <a data-toggle="collapse" data-parent="#name">
+                                                        <span><t t-esc="item.name"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.date"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.origin"/> </span>
+                                                    </a>
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+
                     <t t-foreach="bom_lines" t-as="item">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h4 class="panel-title">
                                     <a data-toggle="collapse" data-parent="#name" t-att-data-level="item.level" t-att-href="'#'+item.product_id" class="click_tag_a" t-att-data-product-id="item.product_id">
-                                        <t t-if="item.level">
+                                        <!--<t t-if="item.level">-->
                                             <span class="fa fa-caret-right open-sign"></span>
-                                        </t>
+                                        <!--</t>-->
                                         <t t-esc="item.name"/>
                                          <span class="show_bom_line_one" style="margin-left:15px">
                                              [
@@ -91,19 +123,51 @@
                                                 <t t-esc="item.service"/>
                                             </t>]
                                         </span>
-                                       <span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>
+                                       <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
                                     </a>
                                 </h4>
                             </div>
-                            <t t-if="item.level">
+                            <!--<t t-if="item.level">-->
                                 <div t-att-id="item.product_id" class="panel-collapse collapse">
                                     <div class="panel-body">
 
                                     </div>
                                 </div>
-                            </t>
+                            <!--</t>-->
                         </div>
                     </t>
+
+                    <div class="panel panel-warning">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#name" t-att-href="'#po'+result.product_id">
+                                    PO单[<t t-esc="po_length"/>]
+                                    <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
+                                </a>
+                            </h4>
+                        </div>
+                        <t t-if="po_length!=0">
+                            <div t-att-id="'po'+result.product_id" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <t t-foreach="result.po_lines" t-as="item">
+                                        <div class="panel panel-success">
+                                            <div class="panel-heading">
+                                                <h4 class="panel-title">
+                                                    <a data-toggle="collapse" data-parent="#name">
+                                                        <span><t t-esc="item.name"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
+                                                    </a>
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -150,14 +214,47 @@
         <div class="panel panel-default">
             <div id="name" class="panel-collapse collapse in">
                 <div class="panel-body">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#name" t-att-href="'#mo'+result.product_id">
+                                    制造单[<t t-esc="mo_length"/>]
+                                    <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
+                                </a>
+                            </h4>
+                        </div>
+                        <t t-if="mo_length!=0">
+                            <div t-att-id="'mo'+result.product_id" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <t t-foreach="result.mo_ids" t-as="item">
+                                        <div class="panel panel-success">
+                                            <div class="panel-heading">
+                                                <h4 class="panel-title">
+                                                    <a data-toggle="collapse" data-parent="#name">
+                                                        <span><t t-esc="item.name"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.date"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.origin"/> </span>
+                                                    </a>
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+
+
                     <t t-foreach="bom_lines" t-as="item">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h4 class="panel-title">
                                     <a data-toggle="collapse" data-parent="#name" t-att-data-level="item.level" t-att-href="'#'+item.product_id" class="click_tag_a" t-att-data-product-id="item.product_id">
-                                        <t t-if="item.level">
+                                        <!--<t t-if="item.level">-->
                                             <span class="fa fa-caret-right open-sign"></span>
-                                        </t>
+                                        <!--</t>-->
                                         <t t-esc="item.name"/>
                                          <span class="show_bom_line_one" style="margin-left:15px">
                                              [
@@ -171,56 +268,53 @@
                                                 <t t-esc="item.service"/>
                                             </t>]
                                         </span>
-                                       <span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>
+                                       <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
                                     </a>
                                 </h4>
                             </div>
-                            <t t-if="item.level">
+                            <!--<t t-if="item.level">-->
                                 <div t-att-id="item.product_id" class="panel-collapse collapse">
                                     <div class="panel-body">
 
                                     </div>
                                 </div>
-                            </t>
+                            <!--</t>-->
                         </div>
                     </t>
+
+                    <div class="panel panel-warning">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#name" t-att-href="'#po'+result.product_id">
+                                    PO单[<t t-esc="po_length"/>]
+                                    <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
+                                </a>
+                            </h4>
+                        </div>
+                        <t t-if="po_length!=0">
+                            <div t-att-id="'po'+result.product_id" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <t t-foreach="result.po_lines" t-as="item">
+                                        <div class="panel panel-success">
+                                            <div class="panel-heading">
+                                                <h4 class="panel-title">
+                                                    <a data-toggle="collapse" data-parent="#name">
+                                                        <span><t t-esc="item.name"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
+                                                    </a>
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
                 </div>
             </div>
         </div>
     </t>
 
-
-
-
-
-
-
-    <t t-name="OpenTree">
-        <div class="st_tree">
-            <ul>
-                <li><a href="#" ref="hyjm">欢迎界面</a></li>
-                <li><a href="#" ref="xtgl">系统管理</a></li>
-                <ul show="true">
-                    <li class="hahaha"><a href="#" ref="yhgl">用户管理</a></li>
-                    <li><a href="#" ref="rzck">日志查看</a></li>
-                </ul>
-                <li><a href="#" ref="ckgl">仓库管理</a></li>
-                <ul>
-                    <li><a href="#" ref="kcgl">库存管理</a></li>
-                    <li><a href="#" ref="shgl">收货管理</a></li>
-                    <li><a href="#" ref="fhgl">发货管理</a></li>
-                    <ul>
-                        <li><a href="#" ref="yhgl">用户管理</a></li>
-                        <li><a href="#" ref="rzck">日志查看</a></li>
-                    </ul>
-                </ul>
-            </ul>
-        </div>
-        <script type="text/javascript">
-			$(".st_tree").SimpleTree({
-
-	        });
-            $(".hahaha").append("<p>xxxxxxxxx</p>")
-		</script>
-    </t>
 </templates>
