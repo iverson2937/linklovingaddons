@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="linkloving_sale_order_form" model="ir.ui.view">
+            <field name="name">sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//tree/field[@name='product_id']" position="after">
+                    <button name="show_product_detail" type="object" string="详细"/>
+                </xpath>
+
+            </field>
+        </record>
+
+
+        <!--<record model="ir.ui.view" id="website_crm_partner_assign.view_res_partner_filter_assign_tree">-->
+        <!--<field name="name">res.partner.tree.form.inherit</field>-->
+        <!--<field name="model">res.partner</field>-->
+        <!--<field name="inherit_id" ref="base_geolocalize.view_crm_partner_geo_form"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<field name="email" position="after">-->
+        <!--<field name="internal_code"/>-->
+        <!--<field name="team_id"/>-->
+        <!--<field name="state_id"/>-->
+        <!--</field>-->
+        <!--&lt;!&ndash;<field name="date_review_next" position="replace"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;<field name="level" position="replace"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;<field name="activation" position="replace"/>&ndash;&gt;-->
+        <!--</field>-->
+        <!--</record>-->
+
+
+    </data>
+</openerp>
