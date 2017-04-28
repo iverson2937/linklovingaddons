@@ -6,41 +6,7 @@
         <div class="panel-group" id="accordion">
 
         </div>
-        <!--<div class="oe_petstore_homepage">-->
-            <!--<div class="oe_petstore_top">-->
-                <!--<div>-->
-                    <!--<span>产品:</span>-->
-                    <!--<span class="show_product_name"></span>-->
-                <!--</div>-->
-            <!--</div>-->
-            <!--<div class="tables petstore_table">-->
-                <!--<table class="table table-striped">-->
-                    <!--<thead>-->
-                        <!--<tr>-->
-                            <!--<th> </th>-->
-                            <!--<th>产品</th>-->
-                            <!--<th>配比</th>-->
-                            <!--<th>3</th>-->
-                        <!--</tr>-->
-                    <!--</thead>-->
-                    <!--<tbody class="bodys">-->
-                        <!--&lt;!&ndash;<tr style="color:red">&ndash;&gt;-->
-                        <!--&lt;!&ndash;<td class="fa fa-caret-right level-top" style="cursor:pointer"></td>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<td style="color:red">a</td>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<td>b</td>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<td>c</td>&ndash;&gt;-->
-                        <!--&lt;!&ndash;</tr>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<tr class="tr_level_top" style="display:none;">&ndash;&gt;-->
-                        <!--&lt;!&ndash;<td></td>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<td style="padding-left:20px">d</td>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<td>e</td>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<td>f</td>&ndash;&gt;-->
-                        <!--&lt;!&ndash;</tr>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<t t-call="xx"/>&ndash;&gt;-->
-                    <!--</tbody>-->
-                <!--</table>-->
-            <!--</div>-->
-        <!--</div>-->
+
     </t>
 
 
@@ -54,11 +20,11 @@
                        <t t-esc="result.name"/>
                        <span class="show_bom_line_one" style="margin-left:15px">
                              [
+                           <t t-if="result.process">
+                                  <t t-esc="result.process"/>
+                            </t>/
                             <t t-if="result.type">
                                   <t t-esc="result.type"/>
-                            </t>/
-                            <t t-if="result.process">
-                                  <t t-esc="result.process"/>
                             </t>/
                             <t t-if="result.service">
                                 <t t-esc="result.service"/>
@@ -87,7 +53,7 @@
                                             <div class="panel-heading">
                                                 <h4 class="panel-title">
                                                     <a data-toggle="collapse" data-parent="#name">
-                                                        <span><t t-esc="item.name"/> </span>
+                                                        <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.date"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.state"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
@@ -113,11 +79,11 @@
                                         <t t-esc="item.name"/>
                                          <span class="show_bom_line_one" style="margin-left:15px">
                                              [
+                                             <t t-if="result.process">
+                                                  <t t-esc="result.process"/>
+                                            </t>/
                                             <t t-if="result.type">
                                                   <t t-esc="item.type"/>
-                                            </t>/
-                                            <t t-if="result.process">
-                                                  <t t-esc="item.process"/>
                                             </t>/
                                             <t t-if="result.service">
                                                 <t t-esc="item.service"/>
@@ -154,7 +120,7 @@
                                             <div class="panel-heading">
                                                 <h4 class="panel-title">
                                                     <a data-toggle="collapse" data-parent="#name">
-                                                        <span><t t-esc="item.name"/> </span>
+                                                        <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.state"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
@@ -231,7 +197,7 @@
                                             <div class="panel-heading">
                                                 <h4 class="panel-title">
                                                     <a data-toggle="collapse" data-parent="#name">
-                                                        <span><t t-esc="item.name"/> </span>
+                                                        <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.date"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.state"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
@@ -258,11 +224,11 @@
                                         <t t-esc="item.name"/>
                                          <span class="show_bom_line_one" style="margin-left:15px">
                                              [
+                                             <t t-if="result.process">
+                                                  <t t-esc="result.process"/>
+                                            </t>/
                                             <t t-if="result.type">
                                                   <t t-esc="item.type"/>
-                                            </t>/
-                                            <t t-if="result.process">
-                                                  <t t-esc="item.process"/>
                                             </t>/
                                             <t t-if="result.service">
                                                 <t t-esc="item.service"/>
@@ -299,7 +265,7 @@
                                             <div class="panel-heading">
                                                 <h4 class="panel-title">
                                                     <a data-toggle="collapse" data-parent="#name">
-                                                        <span><t t-esc="item.name"/> </span>
+                                                        <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.state"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
