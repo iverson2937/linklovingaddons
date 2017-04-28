@@ -19,6 +19,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var act_id = target.getAttribute("data-id");
+            act_id = parseInt(act_id);
             var action = {
                 name:"rest",
                 type: 'ir.actions.act_window',

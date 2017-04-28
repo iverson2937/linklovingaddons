@@ -82,16 +82,16 @@
                                          <span class="show_bom_line_one" style="margin-left:15px">
                                              [
                                             <t t-if="result.type">
-                                                  <t t-esc="result.type"/>
+                                                  <t t-esc="item.type"/>
                                             </t>/
                                             <t t-if="result.process">
-                                                  <t t-esc="result.process"/>
+                                                  <t t-esc="item.process"/>
                                             </t>/
                                             <t t-if="result.service">
-                                                <t t-esc="result.service"/>
+                                                <t t-esc="item.service"/>
                                             </t>]
                                         </span>
-                                       <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
+                                       <span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>
                                     </a>
                                 </h4>
                             </div>
@@ -162,16 +162,16 @@
                                          <span class="show_bom_line_one" style="margin-left:15px">
                                              [
                                             <t t-if="result.type">
-                                                  <t t-esc="result.type"/>
+                                                  <t t-esc="item.type"/>
                                             </t>/
                                             <t t-if="result.process">
-                                                  <t t-esc="result.process"/>
+                                                  <t t-esc="item.process"/>
                                             </t>/
                                             <t t-if="result.service">
-                                                <t t-esc="result.service"/>
+                                                <t t-esc="item.service"/>
                                             </t>]
                                         </span>
-                                       <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
+                                       <span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>
                                     </a>
                                 </h4>
                             </div>
