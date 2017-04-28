@@ -8,7 +8,7 @@
             <field name="inherit_id" ref="product.product_template_only_form_view"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='default_code']" position="after">
-                    <field name="inner_code" attrs="{'invisible':[('sale_ok','!=',True)]}"/>
+                    <field name="inner_code" attrs="{'invisible':[('sale_ok','!=',True)]}" string="国内简称"/>
                     <field name="inner_spec" attrs="{'invisible':[('sale_ok','!=',True)]}"/>
                 </xpath>
             </field>
