@@ -5,8 +5,6 @@ odoo.define('linkloving_core.employee_kanban_view_handler', function (require) {
 
     KanbanRecord.include({
         on_card_clicked: function () {
-            event.preventDefault();
-            event.stopPropagation();
             if (this.model === 'product.template') {
                 // needed to diffentiate : check in/out kanban view of employees <-> standard employee kanban view
                 var action = {
