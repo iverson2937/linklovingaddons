@@ -16,6 +16,25 @@ PRODUCT_TYPE = {
 }
 PURCHASE_TYPE = {
     'draft': u'草稿',
+    'to approve': u'待审核',
+    'purchase': u'采购订单'
+}
+MO_STATE = {
+    'draft': u'草稿',
+    'confirmed': u'已排产',
+    'waiting_material': u'等待备料',
+    'prepare_material_ing': u'备料中',
+    'finish_prepare_material': u'备料完成',
+    'already_picking': u'已领料',
+    'planned': u'安排中',
+    'progress': u'生产中',
+    'waiting_quality_inspection': u'等待品检',
+    'quality_inspection_ing': u'品检中',
+    'waiting_rework': u'等待返工',
+    'rework_ing': u'返工中',
+    'waiting_inventory_material': u'等待清点退料',
+    'waiting_warehouse_inspection': u'等待检验退料',
+    'waiting_post_inventory': u'等待入库'
 }
 
 
@@ -41,7 +60,7 @@ class ProductTemplate(models.Model):
                     'id': line.order_id.id,
                     'qty': line.product_qty,
                     'date_planned': line.date_planned,
-                    'state': line.order_id.state
+                    'state': PURCHASE_TYPE[line.order_id.state]
                 })
 
         mo_ids = self.env['mrp.production'].search(
@@ -54,7 +73,7 @@ class ProductTemplate(models.Model):
                     'id': mo.id,
                     'name': mo.name,
                     'qty': mo.product_qty,
-                    'state': mo.state,
+                    'state': MO_STATE[mo.state],
                     'date': mo.date_planned_start,
                     'origin': mo.origin if mo.origin else '',
                 })
@@ -92,7 +111,6 @@ class ProductTemplate(models.Model):
                     'draft': self.get_draft_po_qty(line.product_id.product_variant_ids[0]),
                     'stock': line.product_id.qty_available,
                     'require': line.product_id.outgoing_qty
-
 
                 })
                 bom_lines.append(res)
