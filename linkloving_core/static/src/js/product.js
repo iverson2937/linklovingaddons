@@ -13,6 +13,29 @@ odoo.define('linkloving_core.product_detail', function (require) {
         template: "HomePage",
         events: {
             'click .click_tag_a': 'show_bom_line',
+            'click .show_po_number':'to_po_page',
+        },
+        to_po_page:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var act_id = target.getAttribute("data-id");
+            act_id = parseInt(act_id);
+            var action = {
+                name:"rest",
+                type: 'ir.actions.act_window',
+                res_model:'purchase.order',
+                view_type: 'form',
+               view_mode: 'tree,form',
+                views: [[false, 'form']],
+
+                // tag: 'hr_attendance_kiosk_confirm',
+                res_id: act_id,
+                target:"new"
+                // employee_name: this.record.name.raw_value,
+                // employee_state: this.record.attendance_state.raw_value,
+            };
+            console.log(action);
+            this.do_action(action);
         },
 
         init: function (parent, action) {

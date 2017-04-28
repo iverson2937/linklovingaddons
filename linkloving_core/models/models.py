@@ -15,9 +15,7 @@ PRODUCT_TYPE = {
     'finished': u'成品',
 }
 PURCHASE_TYPE = {
-    '': '',
-    '': '',
-    '': ''
+    'draft': u'草稿',
 }
 
 
@@ -69,8 +67,8 @@ class ProductTemplate(models.Model):
             for line in lines:
 
                 line_service = ''
-                if line.route_ids:
-                    for route in line.route_ids:
+                if line.product_id.route_ids:
+                    for route in line.product_id.route_ids:
                         line_service += dict[route.name]
                 res = {}
                 level = False
