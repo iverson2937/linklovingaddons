@@ -67,6 +67,11 @@ class ProductTemplate(models.Model):
             process = bom.process_id.name
 
             for line in lines:
+
+                line_service = ''
+                if line.route_ids:
+                    for route in line.route_ids:
+                        line_service += dict[route.name]
                 res = {}
                 level = False
                 purchase_line_ids = self.env['purchase.order.line'].search(
@@ -81,7 +86,16 @@ class ProductTemplate(models.Model):
                     'product_id': line.product_id.product_tmpl_id.id,
                     'name': line.product_id.product_tmpl_id.name,
                     'level': level,
-                    'product_qty': line.product_qty
+                    'product_qty': line.product_qty,
+                    'process': process,
+                    'type': PRODUCT_TYPE.get(line.product_id.product_ll_type),
+                    'service': line_service,
+                    'on_produce': line.product_id.incoming_qty,
+                    'draft': self.get_draft_po_qty(line.product_id.product_variant_ids[0]),
+                    'stock': line.product_id.qty_available,
+                    'require': line.product_id.outgoing_qty
+
+
                 })
                 bom_lines.append(res)
 
