@@ -1175,6 +1175,7 @@ class LinklovingAppApi(http.Controller):
             'process_id' : {
                 'process_id' : production.process_id.id,
                 'name' : production.process_id.name,
+                'is_rework': production.process_id.is_rework,
             },
             'prepare_material_area_id' : {
                 'area_id' : production.prepare_material_area_id.id,
