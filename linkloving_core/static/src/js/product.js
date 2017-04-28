@@ -14,6 +14,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
         events: {
             'click .click_tag_a': 'show_bom_line',
             'click .show_po_number':'to_po_page',
+            'click .show_mo_number': 'to_mo_page',
         },
         to_po_page:function (e) {
             var e = e || window.event;
@@ -27,14 +28,30 @@ odoo.define('linkloving_core.product_detail', function (require) {
                 view_type: 'form',
                view_mode: 'tree,form',
                 views: [[false, 'form']],
-
-                // tag: 'hr_attendance_kiosk_confirm',
                 res_id: act_id,
                 target:"new"
                 // employee_name: this.record.name.raw_value,
                 // employee_state: this.record.attendance_state.raw_value,
             };
-            console.log(action);
+            this.do_action(action);
+        },
+        to_mo_page:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var act_id = target.getAttribute("data-id");
+            act_id = parseInt(act_id);
+            var action = {
+                name:"制造单",
+                type: 'ir.actions.act_window',
+                res_model:'mrp.production',
+                view_type: 'form',
+               view_mode: 'tree,form',
+                views: [[false, 'form']],
+                res_id: act_id,
+                target:"new"
+                // employee_name: this.record.name.raw_value,
+                // employee_state: this.record.attendance_state.raw_value,
+            };
             this.do_action(action);
         },
 

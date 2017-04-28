@@ -36,7 +36,6 @@
 }
 #accordion .panel{
     border:none!important;
-    border-left: 1px dotted black;
     box-shadow: none !important;
     -webkit-box-shadow: none !important;
 }
