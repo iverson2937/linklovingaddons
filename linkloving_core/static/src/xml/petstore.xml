@@ -119,6 +119,8 @@
                             <span><t t-esc="item.name"/> </span>
                             <span style="margin-left:15px"><t t-esc="item.date"/> </span>
                             <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+                            <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
+                            <span style="margin-left:15px"><t t-esc="item.origin"/> </span>
                         </a>
                     </h4>
                 </div>
@@ -133,7 +135,7 @@
                 <div class="panel-heading">
                     <h4 class="panel-title">
                         <a data-toggle="collapse" data-parent="#name">
-                            <span t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
+                            <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
                             <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
                             <span style="margin-left:15px"><t t-esc="item.state"/> </span>
                             <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
