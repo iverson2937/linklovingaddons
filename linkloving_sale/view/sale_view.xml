@@ -15,7 +15,7 @@
                     <attribute name="string">对账状态</attribute>
                 </field>
                 <field name="invoice_status" position="before">
-                    <field name="shipping_status" string="出货状态"/>
+                    <field name="shipping_status" string="出货状态" invisible="1"/>
                     <field name="shipping_rate" widget="progressbar"/>
                 </field>
             </field>
@@ -78,8 +78,8 @@
 
                 <xpath expr="//tree/field[@name='product_id']" position="replace">
                     <field name="product_id" options="{'no_create': True}"/>
-                    <field name="inner_code"/>
-                    <field name="inner_spec"/>
+                    <field name="inner_code" string="国内简称"/>
+                    <field name="inner_spec" string="国内型号"/>
                 </xpath>
                 <xpath expr="//tree/field[@name='tax_id']" position="attributes">
                     <attribute name='invisible'>1</attribute>
