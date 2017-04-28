@@ -25,6 +25,8 @@ odoo.define('linkloving_core.product_detail', function (require) {
                 res_model:'purchase.order',
                 view_type: 'form',
                view_mode: 'tree,form',
+                views: [[false, 'form']],
+
                 // tag: 'hr_attendance_kiosk_confirm',
                 res_id: act_id,
                 target:"new"

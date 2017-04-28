@@ -15,9 +15,7 @@ PRODUCT_TYPE = {
     'finished': u'成品',
 }
 PURCHASE_TYPE = {
-    '': '',
-    '': '',
-    '': ''
+    'draft': u'草稿',
 }
 
 
