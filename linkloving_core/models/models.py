@@ -86,9 +86,9 @@ class ProductTemplate(models.Model):
 
             for line in lines:
                 line_process = False
-                line_process_id = line.product_id.process_id
-                if line_process_id:
-                    line_process = line_process_id.name
+                bom_ids = line.product_id.bom_ids
+                if bom_ids:
+                    line_process = bom_ids[0].process_id.name
                 line_service = []
                 if line.product_id.route_ids:
                     for route in line.product_id.route_ids:
