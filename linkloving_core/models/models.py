@@ -47,18 +47,13 @@ class ProductTemplate(models.Model):
         bom_ids = self.bom_ids
         bom_lines = []
         process = False
-        service = []
+        service = ''
         draft_qty = 0.0
-        if self.route_ids:
-            for route in self.route_ids:
-                service.append(route.id)
-        # FIXME:
-        if 6 in service:
+        if self.order_ll_type == 'ordering':
             draft_qty = self.get_draft_po_qty(self.product_variant_ids[0])
             on_produce = self.incoming_qty
-        elif 5 in service:
+        elif self.order_ll_type == 'stock':
             draft_qty = self.get_draft_mo(self.id)
-            print draft_qty, 'draft.......'
             on_produce = self.get_onproduct_mo(self.id)
 
         po_lines = self.env['purchase.order.line'].search(
@@ -98,16 +93,13 @@ class ProductTemplate(models.Model):
                 line_process = False
                 has_purchase = has_mo = False
                 # FIXME:
-                line_service = []
                 line_draft_qty = line_on_produce = 0.0
-                if line.product_id.route_ids:
-                    for route in line.product_id.route_ids:
-                        line_service.append(route.id)
-                if 6 in line_service:
+
+                if line.product_id.order_ll_type == 'ordering':
                     line_draft_qty = self.get_draft_po_qty(line.product_id.product_variant_ids[0])
                     line_on_produce = line.product_id.incoming_qty
                     has_purchase = True
-                elif 5 in line_service:
+                elif line.product_id.order_ll_type == 'stock':
                     line_draft_qty = self.get_draft_mo(line.product_id.product_tmpl_id.id)
 
                     line_on_produce = self.get_onproduct_mo(line.product_id.product_tmpl_id.id)
@@ -132,7 +124,7 @@ class ProductTemplate(models.Model):
                     'product_qty': line.product_qty,
                     'process': line_process,
                     'type': PRODUCT_TYPE.get(line.product_id.product_ll_type),
-                    'service': line_service,
+                    'service': line.product_id.order_ll_type,
                     'on_produce': line_on_produce,
                     'draft': line_draft_qty,
                     'stock': line.product_id.qty_available,
@@ -146,7 +138,7 @@ class ProductTemplate(models.Model):
             'product_id': self.id,
             'process': process,
             'type': PRODUCT_TYPE.get(self.product_ll_type),
-            'service': service,
+            'service': line.product_id.order_ll_type,
             'mo_ids': ids,
             'po_lines': line_ids,
             'on_produce': on_produce,
