@@ -1085,10 +1085,11 @@ class LinklovingAppApi(http.Controller):
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error' : _("MO not found")})
         if is_spilt_done:
-            mrp_production.button_mark_done()
-        else:
             mrp_production.post_inventory()
             mrp_production.state = "process"
+        else:
+            mrp_production.button_mark_done()
+
 
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
