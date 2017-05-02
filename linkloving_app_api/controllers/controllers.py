@@ -13,7 +13,6 @@ import datetime
 import jpush
 import pytz
 from pip import download
-from serial import tools
 
 import odoo
 import odoo.modules.registry
@@ -1583,7 +1582,7 @@ class LinklovingAppApi(http.Controller):
         type = request.jsonrequest.get("type")
         if order_name:
             pickings = request.env["stock.picking"].sudo().search([('origin', 'like', order_name),
-                                                                   ('picking_type_code', '=', 'outgoing')])
+                                                                   ('picking_type_code', '=', type)])
             json_list = []
             for picking in pickings:
                 json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
