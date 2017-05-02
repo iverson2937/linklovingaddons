@@ -85,7 +85,10 @@ class ProductTemplate(models.Model):
             process = bom.process_id.name
 
             for line in lines:
-
+                line_process = False
+                line_process_id = line.product_id.process_id
+                if line_process_id:
+                    line_process = line_process_id.name
                 line_service = []
                 if line.product_id.route_ids:
                     for route in line.product_id.route_ids:
@@ -105,7 +108,7 @@ class ProductTemplate(models.Model):
                     'name': line.product_id.product_tmpl_id.name,
                     'level': level,
                     'product_qty': line.product_qty,
-                    'process': process,
+                    'process': line_process,
                     'type': PRODUCT_TYPE.get(line.product_id.product_ll_type),
                     'service': line_service,
                     'on_produce': line.product_id.incoming_qty,
