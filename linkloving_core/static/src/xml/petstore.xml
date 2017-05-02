@@ -110,12 +110,12 @@
                     <div class="panel panel-warning">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <input type="checkbox" name="chk_all" t-att-id="'chk'+result.product_id" class="chk_all"/>
+                                <!--<input type="checkbox" name="chk_all" t-att-id="'chk'+result.product_id" class="chk_all"/>-->
                                 <a data-toggle="collapse" data-parent="#name" t-att-href="'#po'+result.product_id">
                                     PO单[<t t-esc="po_length"/>]
                                     <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                                 </a>
-                                <button class="btn btn-primary send-po-btn">按钮</button>
+                                <!--<button class="btn btn-primary send-po-btn">按钮</button>-->
                             </h4>
                         </div>
                         <t t-if="po_length!=0">
@@ -261,12 +261,12 @@
                     <div class="panel panel-warning">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <input type="checkbox" name="chk_all" t-att-id="'chk'+result.product_id" class="chk_all"/>
+                                <!--<input type="checkbox" name="chk_all" t-att-id="'chk'+result.product_id" class="chk_all"/>-->
                                 <a data-toggle="collapse" data-parent="#name" t-att-href="'#po'+result.product_id">
                                     PO单[<t t-esc="po_length"/>]
                                     <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                                 </a>
-                                <button class="btn btn-primary send-po-btn">按钮</button>
+                                <!--<button class="btn btn-primary send-po-btn">按钮</button>-->
                             </h4>
                         </div>
                         <t t-if="po_length!=0">
