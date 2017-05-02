@@ -1086,7 +1086,7 @@ class LinklovingAppApi(http.Controller):
                                               res_data={'error' : _("MO not found")})
         if is_spilt_done:
             mrp_production.post_inventory()
-            mrp_production.state = "process"
+            mrp_production.state = "progress"
         else:
             mrp_production.button_mark_done()
 
