@@ -136,7 +136,6 @@ class ProductTemplate(models.Model):
 
                 })
                 bom_lines.append(res)
-        print draft, 'ddddddddddd'
         return {
             'name': self.name,
             'bom_lines': bom_lines,
