@@ -117,6 +117,8 @@ class ProductTemplate(models.Model):
                 if bom_ids:
                     line_process = bom_ids[0].process_id.name
 
+                res = {}
+                level = False
                 # purchase_line_ids = self.env['purchase.order.line'].search(
                 #     [('product_id', '=', line.product_id.id), ('state', 'not in', ['cancel', 'done'])])
                 # for purchase_line in purchase_line_ids:
