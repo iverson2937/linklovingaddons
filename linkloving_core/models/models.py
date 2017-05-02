@@ -98,16 +98,16 @@ class ProductTemplate(models.Model):
                 line_process = False
                 # FIXME:
                 line_service = []
-                draft_qty = 0.0
+                line_draft_qty = line_on_produce = 0.0
                 if line.product_id.route_ids:
                     for route in line.product_id.route_ids:
                         line_service.append(route.id)
                 if 6 in line_service:
-                    draft_qty = self.get_draft_po_qty(line.product_id.product_variant_ids[0])
-                    on_produce = line.product_id.incoming_qty
+                    line_draft_qty = self.get_draft_po_qty(line.product_id.product_variant_ids[0])
+                    line_on_produce = line.product_id.incoming_qty
                 elif 5 in line_service:
-                    draft_qty = self.get_draft_mo(line.product_id.product_tmpl_id.id)
-                    on_produce = self.get_onproduct_mo(line.product_id.product_tmpl_id.id)
+                    line_draft_qty = self.get_draft_mo(line.product_id.product_tmpl_id.id)
+                    line_on_produce = self.get_onproduct_mo(line.product_id.product_tmpl_id.id)
                 bom_ids = line.product_id.bom_ids
                 if bom_ids:
                     line_process = bom_ids[0].process_id.name
@@ -129,8 +129,8 @@ class ProductTemplate(models.Model):
                     'process': line_process,
                     'type': PRODUCT_TYPE.get(line.product_id.product_ll_type),
                     'service': line_service,
-                    'on_produce': on_produce,
-                    'draft': draft_qty,
+                    'on_produce': line_on_produce,
+                    'draft': line_draft_qty,
                     'stock': line.product_id.qty_available,
                     'require': line.product_id.outgoing_qty
 
