@@ -96,6 +96,7 @@ class ProductTemplate(models.Model):
 
             for line in lines:
                 line_process = False
+                has_purchase = has_mo = False
                 # FIXME:
                 line_service = []
                 line_draft_qty = line_on_produce = 0.0
@@ -107,7 +108,10 @@ class ProductTemplate(models.Model):
                     line_on_produce = line.product_id.incoming_qty
                 elif 5 in line_service:
                     line_draft_qty = self.get_draft_mo(line.product_id.product_tmpl_id.id)
+
                     line_on_produce = self.get_onproduct_mo(line.product_id.product_tmpl_id.id)
+                    if line_draft_qty or line_on_produce:
+                        has_mo = True
                 bom_ids = line.product_id.bom_ids
                 if bom_ids:
                     line_process = bom_ids[0].process_id.name
@@ -115,11 +119,10 @@ class ProductTemplate(models.Model):
                 level = False
                 purchase_line_ids = self.env['purchase.order.line'].search(
                     [('product_id', '=', line.product_id.id), ('state', 'not in', ['cancel', 'done'])])
-                has_purchase = False
                 for purchase_line in purchase_line_ids:
                     if purchase_line.product_qty > purchase_line.qty_received:
                         has_purchase = True
-                if line.product_id.bom_ids or has_purchase:
+                if line.product_id.bom_ids or has_purchase or has_mo:
                     level = True
                 res.update({
                     'product_id': line.product_id.product_tmpl_id.id,
