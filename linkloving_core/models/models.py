@@ -106,8 +106,8 @@ class ProductTemplate(models.Model):
                     draft_qty = self.get_draft_po_qty(line.product_id.product_variant_ids[0])
                     on_produce = line.product_id.incoming_qty
                 elif 5 in line_service:
-                    draft_qty = self.get_draft_mo(line.product_id.id)
-                    on_produce = self.get_onproduct_mo(line.product_id.id)
+                    draft_qty = self.get_draft_mo(line.product_id.product_tmpl_id.id)
+                    on_produce = self.get_onproduct_mo(line.product_id.product_tmpl_id.id)
                 bom_ids = line.product_id.bom_ids
                 if bom_ids:
                     line_process = bom_ids[0].process_id.name
