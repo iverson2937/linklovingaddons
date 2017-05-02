@@ -64,7 +64,8 @@ class LinklovingEb(http.Controller):
     def get_today_eb_order(self, **kw):
         partner_id = request.jsonrequest.get("partner_id")
         eb_order = request.env["eb.order"].sudo().search(
-                [("my_create_date", "=", datetime.datetime.utcnow().strftime('%Y-%m-%d')),
+                [("my_create_date", "=", datetime.datetime.today().strftime('%Y-%m-%d'))
+                    ,
                  ("state", "=", "draft"),
                  ("partner_id", "=", partner_id)], limit=1)
         if not eb_order:
