@@ -20,15 +20,16 @@
                        <t t-esc="result.name"/>
                        <span class="show_bom_line_one" style="margin-left:15px">
                              [
-                           <t t-if="result.process">
-                                  <t t-esc="result.process"/>
-                            </t>/
                             <t t-if="result.type">
                                   <t t-esc="result.type"/>
                             </t>/
-                            <t t-if="result.service">
-                                <t t-esc="result.service"/>
-                            </t>]
+                            <t t-if="result.transform_service">
+                                <t t-esc="result.transform_service"/>
+                            </t>/
+                           <t t-if="result.process">
+                                  <t t-esc="result.process"/>
+                            </t>
+                           ]
                         </span>
                        <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                     </a>
@@ -36,37 +37,39 @@
             </div>
             <div id="name" class="panel-collapse collapse in">
                 <div class="panel-body">
-                    <div class="panel panel-info">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="#name" t-att-href="'#mo'+result.product_id">
-                                    制造单[<t t-esc="mo_length"/>]
-                                    <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
-                                </a>
-                            </h4>
-                        </div>
-                        <t t-if="mo_length!=0">
-                            <div t-att-id="'mo'+result.product_id" class="panel-collapse collapse">
-                                <div class="panel-body">
-                                    <t t-foreach="result.mo_ids" t-as="item">
-                                        <div class="panel panel-success">
-                                            <div class="panel-heading">
-                                                <h4 class="panel-title">
-                                                    <a data-toggle="collapse" data-parent="#name">
-                                                        <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.date"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.origin"/> </span>
-                                                    </a>
-                                                </h4>
-                                            </div>
-                                        </div>
-                                    </t>
-                                </div>
+                    <t t-if="result.process">
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#name" t-att-href="'#mo'+result.product_id">
+                                        制造单[<t t-esc="mo_length"/>]
+                                        <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
+                                    </a>
+                                </h4>
                             </div>
-                        </t>
-                    </div>
+                            <t t-if="mo_length!=0">
+                                <div t-att-id="'mo'+result.product_id" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        <t t-foreach="result.mo_ids" t-as="item">
+                                            <div class="panel panel-success">
+                                                <div class="panel-heading">
+                                                    <h4 class="panel-title">
+                                                        <a data-toggle="collapse" data-parent="#name">
+                                                            <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
+                                                            <span style="margin-left:15px"><t t-esc="item.date"/> </span>
+                                                            <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+                                                            <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
+                                                            <!--<span style="margin-left:15px"><t t-esc="item.origin"/> </span>-->
+                                                        </a>
+                                                    </h4>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
 
                     <t t-foreach="bom_lines" t-as="item">
                         <div class="panel panel-default">
@@ -77,17 +80,18 @@
                                             <span class="fa fa-caret-right open-sign"></span>
                                         <!--</t>-->
                                         <t t-esc="item.name"/>
-                                         <span class="show_bom_line_one" style="margin-left:15px">
+                                        <span class="show_bom_line_one" style="margin-left:15px">
                                              [
-                                             <t t-if="result.process">
-                                                  <t t-esc="result.process"/>
-                                            </t>/
-                                            <t t-if="result.type">
+                                            <t t-if="item.type">
                                                   <t t-esc="item.type"/>
                                             </t>/
-                                            <t t-if="result.service">
-                                                <t t-esc="item.service"/>
-                                            </t>]
+                                            <t t-if="item.transform_service">
+                                                <t t-esc="item.transform_service"/>
+                                            </t>/
+                                            <t t-if="item.process">
+                                                  <t t-esc="item.process"/>
+                                            </t>
+                                             ]
                                         </span>
                                        <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
                                     </a>
@@ -106,10 +110,12 @@
                     <div class="panel panel-warning">
                         <div class="panel-heading">
                             <h4 class="panel-title">
+                                <input type="checkbox" name="chk_all" t-att-id="'chk'+result.product_id" class="chk_all"/>
                                 <a data-toggle="collapse" data-parent="#name" t-att-href="'#po'+result.product_id">
                                     PO单[<t t-esc="po_length"/>]
                                     <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                                 </a>
+                                <button class="btn btn-primary send-po-btn">按钮</button>
                             </h4>
                         </div>
                         <t t-if="po_length!=0">
@@ -119,6 +125,7 @@
                                         <div class="panel panel-success">
                                             <div class="panel-heading">
                                                 <h4 class="panel-title">
+                                                    <input type="checkbox" t-att-name="'chk'+result.product_id" t-att-po-id="item.id" />
                                                     <a data-toggle="collapse" data-parent="#name">
                                                         <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
@@ -150,7 +157,7 @@
                             <span style="margin-left:15px"><t t-esc="item.date"/> </span>
                             <span style="margin-left:15px"><t t-esc="item.state"/> </span>
                             <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
-                            <span style="margin-left:15px"><t t-esc="item.origin"/> </span>
+                            <!--<span style="margin-left:15px"><t t-esc="item.origin"/> </span>-->
                         </a>
                     </h4>
                 </div>
@@ -180,37 +187,39 @@
         <div class="panel panel-default">
             <div id="name" class="panel-collapse collapse in">
                 <div class="panel-body">
-                    <div class="panel panel-info">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="#name" t-att-href="'#mo'+result.product_id">
-                                    制造单[<t t-esc="mo_length"/>]
-                                    <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
-                                </a>
-                            </h4>
-                        </div>
-                        <t t-if="mo_length!=0">
-                            <div t-att-id="'mo'+result.product_id" class="panel-collapse collapse">
-                                <div class="panel-body">
-                                    <t t-foreach="result.mo_ids" t-as="item">
-                                        <div class="panel panel-success">
-                                            <div class="panel-heading">
-                                                <h4 class="panel-title">
-                                                    <a data-toggle="collapse" data-parent="#name">
-                                                        <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.date"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.origin"/> </span>
-                                                    </a>
-                                                </h4>
-                                            </div>
-                                        </div>
-                                    </t>
-                                </div>
+                    <t t-if="result.process">
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#name" t-att-href="'#mo'+result.product_id">
+                                        制造单[<t t-esc="mo_length"/>]
+                                        <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
+                                    </a>
+                                </h4>
                             </div>
-                        </t>
-                    </div>
+                            <t t-if="mo_length!=0">
+                                <div t-att-id="'mo'+result.product_id" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        <t t-foreach="result.mo_ids" t-as="item">
+                                            <div class="panel panel-success">
+                                                <div class="panel-heading">
+                                                    <h4 class="panel-title">
+                                                        <a data-toggle="collapse" data-parent="#name">
+                                                            <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
+                                                            <span style="margin-left:15px"><t t-esc="item.date"/> </span>
+                                                            <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+                                                            <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
+                                                            <!--<span style="margin-left:15px"><t t-esc="item.origin"/> </span>-->
+                                                        </a>
+                                                    </h4>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
 
 
                     <t t-foreach="bom_lines" t-as="item">
@@ -224,16 +233,17 @@
                                         <t t-esc="item.name"/>
                                          <span class="show_bom_line_one" style="margin-left:15px">
                                              [
-                                             <t t-if="result.process">
-                                                  <t t-esc="result.process"/>
-                                            </t>/
-                                            <t t-if="result.type">
+                                            <t t-if="item.type">
                                                   <t t-esc="item.type"/>
                                             </t>/
-                                            <t t-if="result.service">
-                                                <t t-esc="item.service"/>
-                                            </t>]
-                                        </span>
+                                            <t t-if="item.transform_service">
+                                                <t t-esc="item.transform_service"/>
+                                            </t>/
+                                            <t t-if="item.process">
+                                                  <t t-esc="item.process"/>
+                                            </t>
+                                             ]
+                                         </span>
                                        <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
                                     </a>
                                 </h4>
@@ -251,10 +261,12 @@
                     <div class="panel panel-warning">
                         <div class="panel-heading">
                             <h4 class="panel-title">
+                                <input type="checkbox" name="chk_all" t-att-id="'chk'+result.product_id" class="chk_all"/>
                                 <a data-toggle="collapse" data-parent="#name" t-att-href="'#po'+result.product_id">
                                     PO单[<t t-esc="po_length"/>]
                                     <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                                 </a>
+                                <button class="btn btn-primary send-po-btn">按钮</button>
                             </h4>
                         </div>
                         <t t-if="po_length!=0">
@@ -264,6 +276,7 @@
                                         <div class="panel panel-success">
                                             <div class="panel-heading">
                                                 <h4 class="panel-title">
+                                                    <input type="checkbox" t-att-name="'chk'+result.product_id" />
                                                     <a data-toggle="collapse" data-parent="#name">
                                                         <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>

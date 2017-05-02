@@ -49,3 +49,8 @@
 #accordion .panel-success{
     margin-left: 15px!important;
 }
+#accordion .btn{
+    padding: 6px 8px;
+    font-size: 12px;
+    line-height: 0.9;
+}
