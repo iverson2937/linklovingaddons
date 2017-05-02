@@ -47,10 +47,10 @@ class ProductTemplate(models.Model):
         bom_ids = self.bom_ids
         bom_lines = []
         process = False
-        service = ''
+        service = []
         if self.route_ids:
             for route in self.route_ids:
-                service += dict[route.name]
+                service.append(route.id)
         po_lines = self.env['purchase.order.line'].search(
             [('product_id', '=', self.product_variant_ids[0].id), ('state', 'not in', ['cancel', 'done'])])
         line_ids = []
@@ -86,10 +86,10 @@ class ProductTemplate(models.Model):
 
             for line in lines:
 
-                line_service = ''
+                line_service = []
                 if line.product_id.route_ids:
                     for route in line.product_id.route_ids:
-                        line_service += dict[route.name]
+                        line_service.append(route.id)
                 res = {}
                 level = False
                 purchase_line_ids = self.env['purchase.order.line'].search(
