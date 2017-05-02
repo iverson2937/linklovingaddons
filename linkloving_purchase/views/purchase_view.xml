@@ -66,6 +66,10 @@
                 <xpath expr="//field[@name='order_line']/form/sheet/notebook/page/field[@name='name']" position="after">
                     <field name="output_rate"/>
                 </xpath>
+                <xpath expr="//button[@name='action_cancel']" position="replace">
+                    <button name="action_cancel" states="draft,to approve,sent,purchase" type="object" string="取消订单"
+                            confirm="确定取消吗？"/>
+                </xpath>
 
                 <xpath expr="//field[@name='partner_id']" position="replace">
                     <field name="partner_id"
