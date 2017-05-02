@@ -411,7 +411,7 @@ class MrpProductionExtend(models.Model):
                 moves_to_do = move.stock_moves.filtered(lambda x: x.state not in ('done', 'cancel'))
                 if moves_to_do:
                     moves_to_do[0].quantity_done += move.over_picking_qty
-                    moves_to_do[0].action_done()
+                    # moves_to_do[0].action_done()
                 else:
                     new_move = move.stock_moves[0].copy(
                         default={'quantity_done': move.over_picking_qty, 'product_uom_qty': move.over_picking_qty,
@@ -422,7 +422,7 @@ class MrpProductionExtend(models.Model):
                     move.production_id.move_raw_ids = move.production_id.move_raw_ids + new_move
                     move.over_picking_qty = 0
                     new_move.write({'state': 'assigned', })
-                    new_move.action_done()
+                    # new_move.action_done()
             if self._context.get('picking_mode') == 'first_picking':  # 如果备料数量不等于0
                 if not move.stock_moves:
                     continue
@@ -442,13 +442,13 @@ class MrpProductionExtend(models.Model):
                     move.production_id.move_raw_ids = move.production_id.move_raw_ids + split_move
                     split_move.write({'state': 'assigned', })
                     move.stock_moves[0].quantity_done = move.stock_moves[0].product_uom_qty
-                    split_move.action_done()
-                    move.stock_moves[0].action_done()
+                    # split_move.action_done()
+                    # move.stock_moves[0].action_done()
                 else:
                     move.stock_moves[0].quantity_done_store = move.quantity_ready
                     move.stock_moves[0].quantity_done = move.quantity_ready
-                    move.stock_moves[0].action_done()
-
+                    # move.stock_moves[0].action_done()
+        self.post_inventory()
         if self._context.get('picking_mode') == 'first_picking':
             self.write({'state': 'finish_prepare_material'})
             # elif self._context.get('picking_mode') == 'second_picking':
@@ -679,14 +679,15 @@ class MrpProductionProduceExtend(models.TransientModel):
         quantity = self.product_qty
         if float_compare(quantity, 0, precision_rounding=self.product_uom_id.rounding) <= 0:
             raise UserError(_('You should at least produce some quantity'))
-        for move in moves.filtered(lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel')):
-            if move.unit_factor:
-                qty = quantity * move.unit_factor
-                if qty > move.product_uom_qty:
-                    move.quantity_done_store += move.product_uom_qty
-                else:
-                    move.quantity_done_store += qty
-                move.action_done()
+            # for move in moves.filtered(lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel')):
+            #     if move.unit_factor:
+            #         qty = quantity * move.unit_factor
+            #         if qty > move.product_uom_qty:
+            #             move.quantity_done_store += move.product_uom_qty
+            #         else:
+            #             move.quantity_done_store += qty
+            # move.action_done()
+            # self.production_id.post_inventory()
                 # if move.product_id.virtual_available < 0:
                 #     move.quantity_done_store = move.quantity_done_store / (1 + move.bom_line_id.scrap_rate / 100)
         moves = self.production_id.move_finished_ids.filtered(
