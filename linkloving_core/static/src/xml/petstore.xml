@@ -107,39 +107,41 @@
                         </div>
                     </t>
 
-                    <div class="panel panel-warning">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <!--<input type="checkbox" name="chk_all" t-att-id="'chk'+result.product_id" class="chk_all"/>-->
-                                <a data-toggle="collapse" data-parent="#name" t-att-href="'#po'+result.product_id">
-                                    PO单[<t t-esc="po_length"/>]
-                                    <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
-                                </a>
-                                <!--<button class="btn btn-primary send-po-btn">按钮</button>-->
-                            </h4>
-                        </div>
-                        <t t-if="po_length!=0">
-                            <div t-att-id="'po'+result.product_id" class="panel-collapse collapse">
-                                <div class="panel-body">
-                                    <t t-foreach="result.po_lines" t-as="item">
-                                        <div class="panel panel-success">
-                                            <div class="panel-heading">
-                                                <h4 class="panel-title">
-                                                    <input type="checkbox" t-att-name="'chk'+result.product_id" t-att-po-id="item.id" />
-                                                    <a data-toggle="collapse" data-parent="#name">
-                                                        <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
-                                                    </a>
-                                                </h4>
-                                            </div>
-                                        </div>
-                                    </t>
-                                </div>
+                    <t t-if="result.if_po">
+                        <div class="panel panel-warning">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <!--<input type="checkbox" name="chk_all" t-att-id="'chk'+result.product_id" class="chk_all"/>-->
+                                    <a data-toggle="collapse" data-parent="#name" t-att-href="'#po'+result.product_id">
+                                        PO[<t t-esc="po_length"/>]
+                                        <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
+                                    </a>
+                                    <!--<button class="btn btn-primary send-po-btn">按钮</button>-->
+                                </h4>
                             </div>
-                        </t>
-                    </div>
+                            <t t-if="po_length!=0">
+                                <div t-att-id="'po'+result.product_id" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        <t t-foreach="result.po_lines" t-as="item">
+                                            <div class="panel panel-success">
+                                                <div class="panel-heading">
+                                                    <h4 class="panel-title">
+                                                       <!--<input type="checkbox" t-att-name="'chk'+result.product_id" t-att-po-id="item.id" />-->
+                                                        <a data-toggle="collapse" data-parent="#name">
+                                                            <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
+                                                            <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
+                                                            <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+                                                            <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
+                                                        </a>
+                                                    </h4>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
 
                 </div>
             </div>
@@ -258,39 +260,42 @@
                         </div>
                     </t>
 
-                    <div class="panel panel-warning">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <!--<input type="checkbox" name="chk_all" t-att-id="'chk'+result.product_id" class="chk_all"/>-->
-                                <a data-toggle="collapse" data-parent="#name" t-att-href="'#po'+result.product_id">
-                                    PO单[<t t-esc="po_length"/>]
-                                    <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
-                                </a>
-                                <!--<button class="btn btn-primary send-po-btn">按钮</button>-->
-                            </h4>
-                        </div>
-                        <t t-if="po_length!=0">
-                            <div t-att-id="'po'+result.product_id" class="panel-collapse collapse">
-                                <div class="panel-body">
-                                    <t t-foreach="result.po_lines" t-as="item">
-                                        <div class="panel panel-success">
-                                            <div class="panel-heading">
-                                                <h4 class="panel-title">
-                                                    <input type="checkbox" t-att-name="'chk'+result.product_id" />
-                                                    <a data-toggle="collapse" data-parent="#name">
-                                                        <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
-                                                    </a>
-                                                </h4>
-                                            </div>
-                                        </div>
-                                    </t>
-                                </div>
+                    <t t-if="result.if_po">
+                        <div class="panel panel-warning">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <!--<input type="checkbox" name="chk_all" t-att-id="'chk'+result.product_id" class="chk_all"/>-->
+                                    <a data-toggle="collapse" data-parent="#name" t-att-href="'#po'+result.product_id">
+                                        PO[<t t-esc="po_length"/>]
+                                        <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
+                                    </a>
+                                    <!--<button class="btn btn-primary send-po-btn">按钮</button>-->
+                                </h4>
                             </div>
-                        </t>
-                    </div>
+                            <t t-if="po_length!=0">
+                                <div t-att-id="'po'+result.product_id" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        <t t-foreach="result.po_lines" t-as="item">
+                                            <div class="panel panel-success">
+                                                <div class="panel-heading">
+                                                    <h4 class="panel-title">
+                                                        <!--<input type="checkbox" t-att-name="'chk'+result.product_id" />-->
+                                                        <a data-toggle="collapse" data-parent="#name">
+                                                            <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
+                                                            <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
+                                                            <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+                                                            <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
+                                                        </a>
+                                                    </h4>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+
                 </div>
             </div>
         </div>
