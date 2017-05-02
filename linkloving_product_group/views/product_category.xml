@@ -1,0 +1,22 @@
+<odoo>
+    <data>
+        <record id="view_product_category_tree" model="ir.ui.view">
+            <field name="name">account.account.tree</field>
+            <field name="model">product.category</field>
+            <field name="field_parent">child_id</field>
+            <field name="arch" type="xml">
+                <tree string="类别" toolbar="1">
+                    <field name="name"/>
+
+                </tree>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>
+
+
+
+
+
