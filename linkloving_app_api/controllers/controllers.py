@@ -2,7 +2,6 @@
 import base64
 import json
 from urllib2 import URLError
-import pickle
 
 import time
 
@@ -19,18 +18,13 @@ import odoo.modules.registry
 from odoo.addons.web.controllers.main import ensure_db
 
 from odoo import fields
-from odoo.api import call_kw, Environment
-from odoo.modules import get_resource_path
 from odoo.osv import expression
 from odoo.tools import float_compare, SUPERUSER_ID, werkzeug, os, safe_eval
-from odoo.tools import topological_sort
 from odoo.tools.translate import _
-from odoo.tools.misc import str2bool, xlwt
 from odoo import http
 from odoo.http import content_disposition, dispatch_rpc, request, \
                       serialize_exception as _serialize_exception
 from odoo.exceptions import AccessError, UserError
-from odoo.models import check_method_name
 
 
 app_key = "6e6ce8723531335ce45edd34"
@@ -1085,11 +1079,17 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/produce_done', type='json', auth='none', csrf=False)
     def produce_done(self, **kw):
         order_id = request.jsonrequest.get('order_id')  # get paramter
+        is_spilt_done = request.jsonrequest.get('is_spilt_done')  # 分批产出
         mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
         if not mrp_production:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error' : _("MO not found")})
-        mrp_production.button_mark_done()
+        if is_spilt_done:
+            mrp_production.post_inventory()
+            mrp_production.state = "process"
+        else:
+            mrp_production.button_mark_done()
+
 
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
