@@ -48,9 +48,19 @@ class ProductTemplate(models.Model):
         bom_lines = []
         process = False
         service = []
+        draft_qty = 0.0
         if self.route_ids:
             for route in self.route_ids:
                 service.append(route.id)
+        # FIXME:
+        if 6 in service:
+            draft_qty = self.get_draft_po_qty(self.product_variant_ids[0])
+            on_produce = self.incoming_qty
+        elif 5 in service:
+            draft_qty = self.get_draft_mo(self.id)
+            print draft_qty, 'draft.......'
+            on_produce = self.get_onproduct_mo(self.id)
+
         po_lines = self.env['purchase.order.line'].search(
             [('product_id', '=', self.product_variant_ids[0].id), ('state', 'not in', ['cancel', 'done'])])
         line_ids = []
@@ -76,7 +86,7 @@ class ProductTemplate(models.Model):
                     'qty': mo.product_qty,
                     'state': MO_STATE[mo.state],
                     'date': mo.date_planned_start,
-                    'origin': mo.origin if mo.origin else '',
+                    # 'origin': mo.origin if mo.origin else '',
                 })
 
         if bom_ids:
@@ -86,13 +96,21 @@ class ProductTemplate(models.Model):
 
             for line in lines:
                 line_process = False
-                bom_ids = line.product_id.bom_ids
-                if bom_ids:
-                    line_process = bom_ids[0].process_id.name
+                # FIXME:
                 line_service = []
+                draft_qty = 0.0
                 if line.product_id.route_ids:
                     for route in line.product_id.route_ids:
                         line_service.append(route.id)
+                if 6 in line_service:
+                    draft_qty = self.get_draft_po_qty(line.product_id.product_variant_ids[0])
+                    on_produce = line.product_id.incoming_qty
+                elif 5 in line_service:
+                    draft_qty = self.get_draft_mo(line.product_id.id)
+                    on_produce = self.get_onproduct_mo(line.product_id.id)
+                bom_ids = line.product_id.bom_ids
+                if bom_ids:
+                    line_process = bom_ids[0].process_id.name
                 res = {}
                 level = False
                 purchase_line_ids = self.env['purchase.order.line'].search(
@@ -111,14 +129,14 @@ class ProductTemplate(models.Model):
                     'process': line_process,
                     'type': PRODUCT_TYPE.get(line.product_id.product_ll_type),
                     'service': line_service,
-                    'on_produce': line.product_id.incoming_qty,
-                    'draft': self.get_draft_po_qty(line.product_id.product_variant_ids[0]),
+                    'on_produce': on_produce,
+                    'draft': draft_qty,
                     'stock': line.product_id.qty_available,
                     'require': line.product_id.outgoing_qty
 
                 })
                 bom_lines.append(res)
-
+        print draft, 'ddddddddddd'
         return {
             'name': self.name,
             'bom_lines': bom_lines,
@@ -128,8 +146,8 @@ class ProductTemplate(models.Model):
             'service': service,
             'mo_ids': ids,
             'po_lines': line_ids,
-            'on_produce': self.incoming_qty,
-            'draft': self.get_draft_po_qty(self.product_variant_ids[0]),
+            'on_produce': on_produce,
+            'draft': draft_qty,
             'stock': self.qty_available,
             'require': self.outgoing_qty
         }
@@ -145,13 +163,21 @@ class ProductTemplate(models.Model):
                     total_draft_order_qty += po_line.product_qty
         return total_draft_order_qty
 
+    def get_draft_mo(self, product_id):
+        mo_ids = self.env['mrp.production'].search([('product_tmpl_id', '=', product_id), ('state', '=', 'draft')])
+        return sum(mo.product_qty for mo in mo_ids)
+
+    def get_onproduct_mo(self, product_id):
+        mo_ids = self.env['mrp.production'].search(
+            [('product_tmpl_id', '=', product_id), ('state', 'not in', ['draft', 'cancel', 'done'])])
+        return sum(mo.product_qty for mo in mo_ids)
+
     @api.multi
     def show_detail(self):
         return {
             'type': 'ir.actions.client',
             'tag': 'product_detail',
             'product_id': self.id
-
         }
 
     class ProductTemplate(models.Model):
