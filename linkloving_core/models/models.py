@@ -93,10 +93,10 @@ class ProductTemplate(models.Model):
             bom = bom_ids[0]
             lines = bom.bom_line_ids
             process = bom.process_id.name
+            res = {}
 
             for line in lines:
-                line_process = False
-                has_purchase = has_mo = False
+                has_purchase = has_mo = level = line_process = False
                 # FIXME:
                 line_service = []
                 line_draft_qty = line_on_produce = 0.0
@@ -106,6 +106,7 @@ class ProductTemplate(models.Model):
                 if 6 in line_service:
                     line_draft_qty = self.get_draft_po_qty(line.product_id.product_variant_ids[0])
                     line_on_produce = line.product_id.incoming_qty
+                    has_purchase = True
                 elif 5 in line_service:
                     line_draft_qty = self.get_draft_mo(line.product_id.product_tmpl_id.id)
 
@@ -115,13 +116,12 @@ class ProductTemplate(models.Model):
                 bom_ids = line.product_id.bom_ids
                 if bom_ids:
                     line_process = bom_ids[0].process_id.name
-                res = {}
-                level = False
-                purchase_line_ids = self.env['purchase.order.line'].search(
-                    [('product_id', '=', line.product_id.id), ('state', 'not in', ['cancel', 'done'])])
-                for purchase_line in purchase_line_ids:
-                    if purchase_line.product_qty > purchase_line.qty_received:
-                        has_purchase = True
+
+                # purchase_line_ids = self.env['purchase.order.line'].search(
+                #     [('product_id', '=', line.product_id.id), ('state', 'not in', ['cancel', 'done'])])
+                # for purchase_line in purchase_line_ids:
+                #     if purchase_line.product_qty > purchase_line.qty_received:
+                #         has_purchase = True
                 if line.product_id.bom_ids or has_purchase or has_mo:
                     level = True
                 res.update({
