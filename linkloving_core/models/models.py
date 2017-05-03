@@ -48,7 +48,7 @@ class ProductTemplate(models.Model):
         bom_lines = []
         process = False
         service = ''
-        draft_qty = 0.0
+        draft_qty = on_produce = 0.0
         if self.order_ll_type == 'ordering':
             draft_qty = self.get_draft_po_qty(self.product_variant_ids[0])
             on_produce = self.incoming_qty
