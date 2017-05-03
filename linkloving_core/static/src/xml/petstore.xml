@@ -24,7 +24,8 @@
                                   <t t-esc="result.type"/>
                             </t>/
                             <t t-if="result.service">
-                                 <t t-esc="service[result.service]"/>
+                                 <!--<t t-esc="service[result.service]"/>-->
+                                <t t-esc="result.service"/>
                             </t>/
                            <t t-if="result.process">
                                 <t t-esc="result.process"/>
@@ -86,15 +87,15 @@
                                                 <t t-esc="item.type"/>
                                             </t>/
                                             <t t-if="item.service">
-                                                 <t t-esc="service[item.service]"/>
+                                                 <t t-esc="item.service"/>
+                                                <!--<t t-esc="service[item.service]"/>-->
                                             </t>/
                                             <t t-if="item.process">
                                                   <t t-esc="item.process"/>
                                             </t>
                                              ]
                                             [
-                                            1:
-                                            <t t-esc="item.product_qty"/>
+                                            1:<t t-esc="item.product_qty"/>
                                             ]
                                         </span>
                                        <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
@@ -248,11 +249,10 @@
                                             <t t-if="item.process">
                                                   <t t-esc="item.process"/>
                                             </t>
-                                             [
-                                            1:
-                                            <t t-esc="item.product_qty"/>
-                                            ]
                                              ]
+                                             [
+                                            1:<t t-esc="item.product_qty"/>
+                                            ]
                                          </span>
                                        <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
                                     </a>

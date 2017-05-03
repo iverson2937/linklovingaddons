@@ -139,12 +139,22 @@ odoo.define('linkloving_core.product_detail', function (require) {
                                     'ordering':'订单制',
                                     'stock':'备货制'
                                 }
+                                if(result.service=='ordering'){
+                                    result.service='订单制'
+                                }else if(result.service=='stock'){
+                                    result.service='备货制'
+                                }
                                 if(result.type == '半成品'){
-                                    result.service='stock';
+                                    result.service='备货制';
                                 }
                                 for(var i=0;i<result.bom_lines.length;i++){
                                     if(result.bom_lines[i].type=='半成品'){
-                                        result.bom_lines[i].service='stock';
+                                        result.bom_lines[i].service='备货制';
+                                    }
+                                    if(result.bom_lines[i].service=='ordering'){
+                                        result.service='订单制'
+                                    }else if(result.service=='stock'){
+                                        result.bom_lines[i].service='备货制'
                                     }
                                 }
 
@@ -179,12 +189,22 @@ odoo.define('linkloving_core.product_detail', function (require) {
                         'ordering':'订单制',
                         'stock':'备货制'
                     }
+                    if(result.service=='ordering'){
+                        result.service='订单制'
+                    }else if(result.service=='stock'){
+                        result.service='备货制'
+                    }
                     if(result.type == '半成品'){
-                        result.service='stock';
+                        result.service='备货制';
                     }
                     for(var i=0;i<result.bom_lines.length;i++){
                         if(result.bom_lines[i].type=='半成品'){
-                            result.bom_lines[i].service='stock';
+                            result.bom_lines[i].service='备货制';
+                        }
+                        if(result.bom_lines[i].service=='ordering'){
+                            result.service='订单制'
+                        }else if(result.service=='stock'){
+                            result.bom_lines[i].service='备货制'
                         }
                     }
                     self.$el.append(QWeb.render('show_bom_line_tr', {bom_lines: result.bom_lines,result:result,po_length:po_length,bom_length:bom_length,mo_length: mo_length,service:service}));
