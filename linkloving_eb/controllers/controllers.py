@@ -12,6 +12,7 @@ from pip import download
 
 import odoo
 from odoo import http
+from odoo.addons.base.ir.ir_qweb import fields
 from odoo.http import request
 
 STATUS_CODE_OK = 1
@@ -32,22 +33,45 @@ class JsonResponse(object):
 class LinklovingEb(http.Controller):
     @http.route('/linkloving_app_api/eb_order/get_eb_order_list', auth='none', type="json", crsf=False)
     def get_eb_order_list(self, **kw):
+        partner_id = request.jsonrequest.get("partner_id")
         limit = request.jsonrequest.get("limit")
         offset = request.jsonrequest.get("offset")
 
-        orders = request.env["eb.order"].sudo().search([],limit=limit, offset=offset)
+        orders = request.env["eb.order"].sudo().search([("partner_id", "=", partner_id)], limit=limit, offset=offset)
         orders_json = []
         for order in orders:
             orders_json.append(LinklovingEb.convert_eb_order_to_json(order))
         return JsonResponse.send_response(res_code=STATUS_CODE_OK,
                                           res_data=orders_json)
 
+    @http.route('/linkloving_app_api/eb_order/get_eb_shop_list', auth='none', type="json", crsf=False)
+    def get_eb_shop_list(self, **kw):
+        ds_team = request.env["crm.team"].sudo().search([("name", "=", "电商零售")], limit=1)
+        partner_list = request.env["res.partner"].sudo().search([("team_id", "=", ds_team.id)])
+        json_list = []
+        for partner in partner_list:
+            json_list.append(self.convert_partner_to_json(partner))
+        return JsonResponse.send_response(res_code=STATUS_CODE_OK,
+                                          res_data=json_list)
+
+    def convert_partner_to_json(self, partner):
+        return {
+            "partner_id": partner.id,
+            "name": partner.name or None,
+        }
+
     @http.route('/linkloving_app_api/eb_order/get_today_eb_order', auth='none', type="json", crsf=False)
     def get_today_eb_order(self, **kw):
+        partner_id = request.jsonrequest.get("partner_id")
         eb_order = request.env["eb.order"].sudo().search(
-                [("my_create_date", "=", datetime.date.today().strftime('%Y-%m-%d')), ("state", "=", "draft")], limit=1)
+                [("my_create_date", "=", datetime.datetime.today().strftime('%Y-%m-%d'))
+                    ,
+                 ("state", "=", "draft"),
+                 ("partner_id", "=", partner_id)], limit=1)
         if not eb_order:
-            eb_order = request.env["eb.order"].sudo().create({})
+            eb_order = request.env["eb.order"].sudo().create({
+                "partner_id": partner_id,
+            })
         return JsonResponse.send_response(res_code=STATUS_CODE_OK,
                                           res_data=LinklovingEb.convert_eb_order_to_json(eb_order))
 
@@ -113,8 +137,14 @@ class LinklovingEb(http.Controller):
             "order_name" : order.name,
             "state" : order.state,
             "is_finish_transfer" : order.is_finish_transfer,
-            "create_date" : order.create_date,
-            "eb_order_line_ids" : [{"line_id" : order_line.id,"product_id" : {"product_id" : order_line.product_id.id, "product_name" : order_line.product_id.display_name},"qty": order_line.qty}  for order_line in order.eb_order_line_ids]
+            "create_date": order.my_create_date,
+            "eb_order_line_ids": [{"line_id": order_line.id, "product_id": {"product_id": order_line.product_id.id,
+                                                                            "product_name": order_line.product_id.display_name},
+                                   "qty": order_line.qty} for order_line in order.eb_order_line_ids],
+            "partner_id": {
+                "partner_id": order.partner_id.id,
+                "name": order.partner_id.name,
+            }
         }
         return data
 #创建退货单
@@ -150,8 +180,9 @@ class LinklovingEb(http.Controller):
     def prepare_eb_refund_order_values(self, dic):
 
         vals = {
-            "tracking_num" : dic.get("tracking_num") or "",
-            "refund_img" : dic.get("refund_img"),
+            "tracking_num": dic.get("tracking_num") or "",
+            "refund_img": dic.get("refund_img"),
+            "partner_id": dic.get("partner_id").get("partner_id") or None,
             "eb_refund_order_line_ids" : [(0, 0, {"qty" : line.get("qty"), "product_id" : line.get("product_id").get("product_product_id")}) for line in dic.get("eb_refund_order_line_ids")]
         }
         return vals
@@ -162,6 +193,11 @@ class LinklovingEb(http.Controller):
         data = {
             "order_id" : order.id,
             "tracking_num" : order.tracking_num,
+            "partner_id":
+                {
+                    "partner_id": order.partner_id.id,
+                    "name": order.partner_id.name,
+                },
             "state" : order.state,
             "create_date" : order.create_date,
             "refund_img" : LinklovingEb.get_img_url(order.id, "eb.refund.order", "refund_img"),
@@ -173,8 +209,10 @@ class LinklovingEb(http.Controller):
     def get_eb_refund_order_list(self, **kw):
         limit = request.jsonrequest.get("limit")
         offset = request.jsonrequest.get("offset")
+        partner_id = request.jsonrequest.get("partner_id")
 
-        orders = request.env["eb.refund.order"].sudo().search([],limit=limit, offset=offset)
+        orders = request.env["eb.refund.order"].sudo().search([("partner_id", "=", partner_id)], limit=limit,
+                                                              offset=offset)
         orders_json = []
         for order in orders:
             orders_json.append(LinklovingEb.convert_eb_refund_order_to_json(order))
