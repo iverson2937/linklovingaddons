@@ -18,6 +18,57 @@ odoo.define('linkloving_core.product_detail', function (require) {
             'click .chk_all_mo': 'check_all',
             'click .send-po-btn':'get_po_id',
             'click .send-mo-btn':'get_mo_id',
+            'click .refresh_tree':'refresh_trees'
+        },
+        refresh_trees:function () {
+            var self = this;
+            self.$el.html(" ");
+            if(this.product_id){
+                return new Model("product.template")
+                .call("get_detail", [this.product_id])
+                .then(function (result) {
+                    console.log(result);
+                    var transform_service="";
+                    var po_length = result.po_lines.length;
+                    var bom_length = result.bom_lines.length;
+                    var mo_length = result.mo_ids.length;
+                    //时间截取
+                    if(result.mo_ids.length>0){
+                        for(var i=0;i<result.mo_ids.length;i++){
+                            result.mo_ids[i].date = result.mo_ids[i].date.substr(0,10);
+                        }
+                    }
+                    if(result.po_lines.length>0){
+                        for(var i=0;i<result.po_lines.length;i++){
+                            result.po_lines[i].date_planned = result.po_lines[i].date_planned.substr(0,10);
+                        }
+                    }
+                    var service={
+                        'ordering':'订单制',
+                        'stock':'备货制'
+                    }
+                    if(result.service=='ordering'){
+                        result.service='订单制'
+                    }else if(result.service=='stock'){
+                        result.service='备货制'
+                    }
+                    if(result.type == '半成品'){
+                        result.service='备货制';
+                    }
+                    for(var i=0;i<result.bom_lines.length;i++){
+                        if(result.bom_lines[i].type=='半成品'){
+                            result.bom_lines[i].service='备货制';
+                        }
+                        if(result.bom_lines[i].service=='ordering'){
+                            result.service='订单制'
+                        }else if(result.service=='stock'){
+                            result.bom_lines[i].service='备货制'
+                        }
+                    }
+                    self.$el.append(QWeb.render('show_bom_line_tr', {bom_lines: result.bom_lines,result:result,po_length:po_length,bom_length:bom_length,mo_length: mo_length,service:service}));
+
+                });
+            }
         },
         check_all:function (e) {
             var e = e || window.event;
