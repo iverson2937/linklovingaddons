@@ -38,15 +38,15 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     @api.model
-    def action_combine(self, key, value):
-        print key, value
+    def action_combine(self, args, **kwargs):
+        print args, kwargs
         context = dict(self._context or {})
         active_ids = context.get('active_ids', []) or []
         qty = 0
         product_id = []
         ids = []
         origin = ''
-        for record in self.env['mrp.production'].browse(active_ids):
+        for record in self.env['mrp.production'].browse(args):
             if record.state not in ['draft', 'confirmed', 'waiting_material']:
                 raise UserError(_("Only draft MO can combine."))
 
@@ -85,10 +85,10 @@ class ProductTemplate(models.Model):
         process = False
         service = ''
         draft_qty = on_produce = 0.0
-        if self.purchase_ok:
+        if self.product_ll_type == 'raw material':
             draft_qty = self.get_draft_po_qty(self.product_variant_ids[0])
             on_produce = self.incoming_qty
-        elif self.order_ll_type == 'stock':
+        else:
             draft_qty = self.get_draft_mo(self.id)
             on_produce = self.get_onproduct_mo(self.id)
 
@@ -134,7 +134,7 @@ class ProductTemplate(models.Model):
                 if line.product_id.purchase_ok:
                     line_draft_qty = self.get_draft_po_qty(line.product_id.product_variant_ids[0])
                     line_on_produce = line.product_id.incoming_qty
-                elif line.product_id.order_ll_type == 'stock':
+                else:
                     line_draft_qty = self.get_draft_mo(line.product_id.product_tmpl_id.id)
 
                     line_on_produce = self.get_onproduct_mo(line.product_id.product_tmpl_id.id)

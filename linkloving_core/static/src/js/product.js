@@ -55,8 +55,12 @@ odoo.define('linkloving_core.product_detail', function (require) {
                 if($(this).prop("checked")){
                     mo_merge_inputs_ids.push($(this).attr("mo-id"))
                 }
+            });
+
+            console.log(mo_merge_inputs_ids);
+            new Model("product.template").call("action_combine", [mo_merge_inputs_ids]).then(function (result) {
+                console.log(result);
             })
-            console.log(mo_merge_inputs_ids)
         },
 
         to_po_page:function (e) {
