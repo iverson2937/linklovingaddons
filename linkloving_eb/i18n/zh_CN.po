@@ -34,7 +34,7 @@ msgstr "点击这里创建一个新的调拨"
 #: selection:eb.order,state:0
 #, python-format
 msgid "Confirm"
-msgstr "Confirm"
+msgstr "已生成出货单"
 
 #. module: linkloving_eb
 #: model:ir.model.fields,field_description:linkloving_eb.field_eb_order_create_uid
