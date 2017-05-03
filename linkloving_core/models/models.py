@@ -39,6 +39,7 @@ class ProductTemplate(models.Model):
 
     @api.model
     def action_combine(self, args, **kwargs):
+        raise UserError('合并功能还没完善')
         print args, kwargs
         context = dict(self._context or {})
         active_ids = context.get('active_ids', []) or []
