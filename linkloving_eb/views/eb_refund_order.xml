@@ -1,68 +1,76 @@
 <openerp>
-  <data>
 
-      <record id="eb_refund_order_tree" model="ir.ui.view">
-          <field name="name">EB Refund Orders</field>
-          <field name="model">eb.refund.order</field>
-          <field name="arch" type="xml">
-                  <tree>
-                      <field name="tracking_num" require="1"/>
-                      <field name="partner_id" string="店名"/>
-                      <field name="state"/>
-                      <field name="create_date"/>
-                  </tree>
-          </field>
-      </record>
+    <data>
 
-      <record id="eb_refund_order_form" model="ir.ui.view">
-          <field name="name">EB Refund Orders</field>
-          <field name="model">eb.refund.order</field>
-          <field name="arch" type="xml">
-                  <form>
-                      <header><field name="state" widget="statusbar" />
-                        <button string="入库，并提交给销售确认" type="object" name="action_confirm" states="draft" groups="stock.group_stock_manager,stock.group_stock_user"/>
-                          <button string="已录入至后台" type="object" name="action_ok" states="waiting_sale_confirm" groups="sales_team.group_sale_salesman_all_leads, sales_team.group_sale_salesman, sales_team.group_sale_manager"/>
-                      </header>
-                      <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <button name="action_view_delivery"
-                            string="Delivery"
-                            type="object"
-                            class="oe_stat_button"
-                            icon="fa-truck">
-                        </button>
-                    </div>
-                          <group>
+        <record id="eb_refund_order_tree" model="ir.ui.view">
+            <field name="name">EB Refund Orders</field>
+            <field name="model">eb.refund.order</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="tracking_num" require="1"/>
+                    <field name="partner_id" string="店名"/>
+                    <field name="state"/>
+                    <field name="create_date"/>
+                </tree>
+            </field>
+        </record>
 
-                              <group>
+
+        <record id="eb_refund_order_form" model="ir.ui.view">
+            <field name="name">EB Refund Orders</field>
+            <field name="model">eb.refund.order</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <field name="state" widget="statusbar"/>
+                        <button string="入库，并提交给销售确认" type="object"
+                                name="action_confirm" states="draft"
+                                groups="stock.group_stock_manager,stock.group_stock_user"/>
+                        <button string="已录入至后台" type="object" name="action_ok"
+                                states="waiting_sale_confirm"
+                                groups="sales_team.group_sale_salesman_all_leads, sales_team.group_sale_salesman, sales_team.group_sale_manager"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_delivery"
+                                    string="Delivery"
+                                    type="object"
+                                    class="oe_stat_button"
+                                    icon="fa-truck">
+                            </button>
+                        </div>
+                        <group>
+
+                            <group>
                                 <field name="tracking_num" require="1"/>
-                                  <field name="partner_id" string="店名"/>
-                              </group>
-                              <group>
-                                  <field name="refund_img" widget="image"/>
+                                <field name="partner_id" string="店名"/>
+                            </group>
+                            <group>
+                                <field name="refund_img" widget="image"/>
                                 <field name="create_date"/>
-                              </group>
-                          </group>
+                            </group>
+                        </group>
 
-                          <notebook>
-                              <page>
-                                  <field name="eb_refund_order_line_ids">
-                                      <tree editable="bottom">
-                                          <field name="product_id"/>
-                                          <field name="qty"/>
-                                      </tree>
-                                  </field>
-                              </page>
-                          </notebook>
-                                            </sheet>
+                        <notebook>
+                            <page>
+                                <field name="eb_refund_order_line_ids">
+                                    <tree editable="bottom">
+                                        <field name="product_id"/>
+                                        <field name="qty"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
 
-                      </form>
+                </form>
 
-          </field>
-      </record>
+            </field>
+        </record>
 
 
-      <record id="action_eb_picking_tree_outgoing_stock" model="ir.actions.act_window">
+        <record id="action_eb_picking_tree_outgoing_stock"
+                model="ir.actions.act_window">
             <field name="name">EB Refund Orders</field>
             <field name="res_model">eb.refund.order</field>
             <field name="type">ir.actions.act_window</field>
@@ -70,21 +78,25 @@
             <field name="view_mode">tree,form</field>
             <field name="domain">[('state','!=', 'confirmed')]</field>
             <!--<field name="context">{-->
-                    <!--'contact_display': 'partner_address',-->
+            <!--'contact_display': 'partner_address',-->
             <!--}-->
             <!--</field>-->
             <!--<field name="search_view_id" ref="stock.view_picking_internal_search"/>-->
-                <field name="help" type="html">
+            <field name="help" type="html">
                 <!--<field name="search_view_id" ref="sale.sale_order_view_search_inherit_sale"/>-->
-              <p class="oe_view_nocontent_create">
-                Click here to create a new transfer.
-              </p><p>
-                You can either do it immediately or mark it as Todo for future processing. Use your scanner to validate the transferred quantity quicker.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click here to create a new transfer.
+                </p>
+                <p>
+                    You can either do it immediately or mark it as Todo for
+                    future processing. Use your scanner to validate the
+                    transferred quantity quicker.
+                </p>
             </field>
         </record>
 
-            <record id="action_eb_picking_tree_outgoing_sale" model="ir.actions.act_window">
+        <record id="action_eb_picking_tree_outgoing_sale"
+                model="ir.actions.act_window">
             <field name="name">EB Refund Orders</field>
             <field name="res_model">eb.refund.order</field>
             <field name="type">ir.actions.act_window</field>
@@ -92,81 +104,83 @@
             <field name="view_mode">tree,form</field>
             <field name="domain">[('state','!=', 'draft')]</field>
             <!--<field name="context">{-->
-                    <!--'contact_display': 'partner_address',-->
+            <!--'contact_display': 'partner_address',-->
             <!--}-->
             <!--</field>-->
             <!--<field name="search_view_id" ref="stock.view_picking_internal_search"/>-->
-                <field name="help" type="html">
+            <field name="help" type="html">
                 <!--<field name="search_view_id" ref="sale.sale_order_view_search_inherit_sale"/>-->
-              <p class="oe_view_nocontent_create">
-                Click here to create a new transfer.
-              </p><p>
-                You can either do it immediately or mark it as Todo for future processing. Use your scanner to validate the transferred quantity quicker.
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click here to create a new transfer.
+                </p>
+                <p>
+                    You can either do it immediately or mark it as Todo for
+                    future processing. Use your scanner to validate the
+                    transferred quantity quicker.
+                </p>
             </field>
         </record>
 
-         <menuitem id="eb_refund_order"
-                   name="EB Refund Orders"
-                   parent="stock.menu_stock_warehouse_mgmt"
-                   sequence="3"
-                   action="action_eb_picking_tree_outgoing_stock"
-                   groups="stock.group_stock_manager,stock.group_stock_user"/>
+        <menuitem id="eb_refund_order"
+                  name="EB Refund Orders"
+                  parent="stock.menu_stock_warehouse_mgmt"
+                  sequence="3"
+                  action="action_eb_picking_tree_outgoing_stock"
+                  groups="stock.group_stock_manager,stock.group_stock_user"/>
 
         <menuitem action="action_eb_picking_tree_outgoing_sale"
-            id="menu_eb_refund_soperation"
-            name="EB Refund Orders"
-            parent="sales_team.menu_sales"
-            sequence="6"/>
+                  id="menu_eb_refund_soperation"
+                  name="电商退货记录"
+                  parent="linkloving_sale.menu_sales_shipping_record"
+                  sequence="4"/>
         <!--&lt;!&ndash; Lead Menu &ndash;&gt;-->
 
 
-
-      <!--<record id="account_multi_create_sale_order_view" model="ir.ui.view">-->
-            <!--<field name="name">multi.create.order.form</field>-->
-            <!--<field name="model">multi.create.order</field>-->
-            <!--<field name="arch" type="xml">-->
-                <!--<form string="生成销售订单">-->
-                    <!--<p class="oe_grey">-->
-                        <!--是否将这些单据合成一张销售单-->
-                    <!--</p>-->
-                    <!--<footer>-->
-                        <!--<button string="确定" name="action_ok" type="object" default_focus="1"-->
-                                <!--class="btn-primary"/>-->
-                        <!--<button string="Cancel" class="btn-default" special="cancel"/>-->
-                    <!--</footer>-->
-                <!--</form>-->
-            <!--</field>-->
+        <!--<record id="account_multi_create_sale_order_view" model="ir.ui.view">-->
+        <!--<field name="name">multi.create.order.form</field>-->
+        <!--<field name="model">multi.create.order</field>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<form string="生成销售订单">-->
+        <!--<p class="oe_grey">-->
+        <!--是否将这些单据合成一张销售单-->
+        <!--</p>-->
+        <!--<footer>-->
+        <!--<button string="确定" name="action_ok" type="object" default_focus="1"-->
+        <!--class="btn-primary"/>-->
+        <!--<button string="Cancel" class="btn-default" special="cancel"/>-->
+        <!--</footer>-->
+        <!--</form>-->
+        <!--</field>-->
         <!--</record>-->
 
 
         <!--<act_window id="account_multi_create_sale_order"-->
-                    <!--multi="True"-->
-                    <!--key2="client_action_multi" name="批量生成销售订单"-->
-                    <!--res_model="multi.create.order" src_model="eb.order"-->
-                    <!--view_mode="form" target="new" view_type="form"/>-->
+        <!--multi="True"-->
+        <!--key2="client_action_multi" name="批量生成销售订单"-->
+        <!--res_model="multi.create.order" src_model="eb.order"-->
+        <!--view_mode="form" target="new" view_type="form"/>-->
 
 
-      <!--&lt;!&ndash;<record id="action_product_sale_order" model="ir.actions.act_window">&ndash;&gt;-->
-            <!--&lt;!&ndash;<field name="name">Sale Order</field>&ndash;&gt;-->
-            <!--&lt;!&ndash;<field name="res_model">sale.order</field>&ndash;&gt;-->
-            <!--&lt;!&ndash;&lt;!&ndash;<field name="context">{'search_default_product_id': [active_id], 'default_product_id': active_id}</field>&ndash;&gt;&ndash;&gt;-->
-            <!--&lt;!&ndash;&lt;!&ndash;<field name="domain">[('state', 'in', ['sale', 'done'])]</field>&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;<record id="action_product_sale_order" model="ir.actions.act_window">&ndash;&gt;-->
+        <!--&lt;!&ndash;<field name="name">Sale Order</field>&ndash;&gt;-->
+        <!--&lt;!&ndash;<field name="res_model">sale.order</field>&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;<field name="context">{'search_default_product_id': [active_id], 'default_product_id': active_id}</field>&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;<field name="domain">[('state', 'in', ['sale', 'done'])]</field>&ndash;&gt;&ndash;&gt;-->
         <!--&lt;!&ndash;</record>&ndash;&gt;-->
 
-      <!--<record id="action_product_sale_order" model="ir.actions.act_window">-->
-            <!--<field name="name">Sale Order</field>-->
-            <!--<field name="res_model">sale.order</field>-->
-            <!--<field name="type">ir.actions.act_window</field>-->
-            <!--<field name="view_type">form</field>-->
-            <!--<field name="view_mode">tree,form</field>-->
-            <!--<field name="domain"></field>-->
-            <!--<field name="help" type="html">-->
-              <!--<p class="oe_view_nocontent_create">-->
-                <!--Click here to create a new transfer.-->
-              <!--</p>-->
-            <!--</field>-->
+        <!--<record id="action_product_sale_order" model="ir.actions.act_window">-->
+        <!--<field name="name">Sale Order</field>-->
+        <!--<field name="res_model">sale.order</field>-->
+        <!--<field name="type">ir.actions.act_window</field>-->
+        <!--<field name="view_type">form</field>-->
+        <!--<field name="view_mode">tree,form</field>-->
+        <!--<field name="domain"></field>-->
+        <!--<field name="help" type="html">-->
+        <!--<p class="oe_view_nocontent_create">-->
+        <!--Click here to create a new transfer.-->
+        <!--</p>-->
+        <!--</field>-->
         <!--</record>-->
 
-  </data>
+    </data>
 </openerp>

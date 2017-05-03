@@ -18,6 +18,73 @@ odoo.define('linkloving_core.product_detail', function (require) {
             'click .chk_all_mo': 'check_all',
             'click .send-po-btn':'get_po_id',
             'click .send-mo-btn':'get_mo_id',
+            'click .refresh_tree':'refresh_trees',
+            'click .click_mo_a':'show_mo_lists',
+            'click .click_po_a':'show_mo_lists'
+        },
+        show_mo_lists:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            if(target.classList.contains('open-sign')){
+                target = target.parentNode;
+            }
+            if(target.childNodes[1].classList.contains("fa-caret-right")){
+                target.childNodes[1].classList.remove("fa-caret-right");
+                target.childNodes[1].classList.add("fa-caret-down");
+            }else if(target.childNodes[1].classList.contains("fa-caret-down")){
+                target.childNodes[1].classList.remove("fa-caret-down");
+                target.childNodes[1].classList.add("fa-caret-right");
+            }
+        },
+        refresh_trees:function () {
+            var self = this;
+            self.$el.html(" ");
+            if(this.product_id){
+                return new Model("product.template")
+                .call("get_detail", [this.product_id])
+                .then(function (result) {
+                    // console.log(result);
+                    var transform_service="";
+                    var po_length = result.po_lines.length;
+                    var bom_length = result.bom_lines.length;
+                    var mo_length = result.mo_ids.length;
+                    //时间截取
+                    if(result.mo_ids.length>0){
+                        for(var i=0;i<result.mo_ids.length;i++){
+                            result.mo_ids[i].date = result.mo_ids[i].date.substr(0,10);
+                        }
+                    }
+                    if(result.po_lines.length>0){
+                        for(var i=0;i<result.po_lines.length;i++){
+                            result.po_lines[i].date_planned = result.po_lines[i].date_planned.substr(0,10);
+                        }
+                    }
+                    var service={
+                        'ordering':'订单制',
+                        'stock':'备货制'
+                    }
+                    if(result.service=='ordering'){
+                        result.service='订单制'
+                    }else if(result.service=='stock'){
+                        result.service='备货制'
+                    }
+                    if(result.type == '半成品'){
+                        result.service='备货制';
+                    }
+                    for(var i=0;i<result.bom_lines.length;i++){
+                        if(result.bom_lines[i].type=='半成品'){
+                            result.bom_lines[i].service='备货制';
+                        }
+                        if(result.bom_lines[i].service=='ordering'){
+                            result.service='订单制'
+                        }else if(result.service=='stock'){
+                            result.bom_lines[i].service='备货制'
+                        }
+                    }
+                    self.$el.append(QWeb.render('show_bom_line_tr', {bom_lines: result.bom_lines,result:result,po_length:po_length,bom_length:bom_length,mo_length: mo_length,service:service}));
+
+                });
+            }
         },
         check_all:function (e) {
             var e = e || window.event;
@@ -51,7 +118,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
             var check_name =  target.getAttribute("check-name");
             var mo_merge_inputs_ids = [];
             var mo_merge_inputs = $("input[name="+check_name+"]");
-            console.log(mo_merge_inputs)
+            // console.log(mo_merge_inputs)
             mo_merge_inputs.each(function () {
                 if($(this).prop("checked")){
                     mo_merge_inputs_ids.push(parseInt($(this).attr("mo-id")))
@@ -62,7 +129,6 @@ odoo.define('linkloving_core.product_detail', function (require) {
                     console.log(result);
                     result.date_planned_start = result.date_planned_start.substr(0,10);
                     if(mo_merge_inputs_ids.length>0){
-                       console.log(mo_merge_inputs[0].parentNode.parentNode.parentNode.parentNode)
                        var new_mo = mo_merge_inputs[0].parentNode.parentNode.parentNode.parentNode;
                        new_mo.innerHTML="";
                        new_mo.innerHTML="<div class='panel panel-success'><div class='panel-heading'><h4 class='panel-title'>" +
@@ -75,6 +141,8 @@ odoo.define('linkloving_core.product_detail', function (require) {
                            "</h4></div></div>";
                     }
                 })
+            }else {
+                alert("您要合并的MO个数必须大于一个")
             }
 
         },
@@ -89,7 +157,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
                 type: 'ir.actions.act_window',
                 res_model:'purchase.order',
                 view_type: 'form',
-               view_mode: 'tree,form',
+                view_mode: 'tree,form',
                 views: [[false, 'form']],
                 res_id: act_id,
                 target:"new"
@@ -108,7 +176,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
                 type: 'ir.actions.act_window',
                 res_model:'mrp.production',
                 view_type: 'form',
-               view_mode: 'tree,form',
+                view_mode: 'tree,form',
                 views: [[false, 'form']],
                 res_id: act_id,
                 target:"new"
@@ -125,19 +193,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             //若点击的是
-            if(target.classList.contains('show_bom_line_one')||target.classList.contains('show_bom_line_two')){
-                target = target.parentNode;
-            }
-            //小三角的变化
-            if(target.childNodes.length > 1){
-                if(target.childNodes[1].classList.contains("fa-caret-right")){
-                    target.childNodes[1].classList.remove("fa-caret-right");
-                    target.childNodes[1].classList.add("fa-caret-down");
-                }else if(target.childNodes[1].classList.contains("fa-caret-down")){
-                    target.childNodes[1].classList.remove("fa-caret-down");
-                    target.childNodes[1].classList.add("fa-caret-right");
-                }
-            }
+
             if(target.classList.contains('open-sign')){
                 if(target.classList.contains("fa-caret-right")){
                     target.classList.remove("fa-caret-right");

@@ -234,8 +234,7 @@
                 </p>
             </field>
         </record>
-        <menuitem id="payment_register_apply" action="action_payment_register" parent="purchase.menu_purchase_control"
-                  sequence="0"/>
+
 
         <!--收款登记add by allen 暂时性隐藏-->
         <menuitem id="payment_received_register" action="action_payment_received_register"

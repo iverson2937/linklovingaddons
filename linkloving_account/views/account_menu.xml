@@ -4,11 +4,10 @@
 
         <!--重写会计页面的客户按钮-->
 
-        <menuitem id="account.menu_account_customer" name="Customers"
+        <menuitem id="account.menu_account_customer" name="客户信息"
                   parent="account.menu_finance_receivables"
                   action="linkloving_sale.sale_action_partner_form"/>
 
     </data>
 </openerp>
-
 

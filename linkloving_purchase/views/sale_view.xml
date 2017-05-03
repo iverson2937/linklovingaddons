@@ -1,8 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-           <menuitem id="menu_sale_order_list" name="Sales Orders" parent="purchase.menu_purchase_root"
-                  action="sale.action_orders" sequence="10"/>
+        <menuitem id="menu_sale_order_list" name="订单管理"
+                  parent="purchase.menu_purchase_root"
+                  action="sale.action_orders" sequence="2"/>
+
+        <menuitem id="purchase.menu_purchase_control" name="入库"
+                  parent="purchase.menu_purchase_root" sequence="4"/>
+
+
+        <menuitem id="menu_purchase_account_invoice" name="对账"
+                  parent="purchase.menu_purchase_root" sequence="5"/>
+
+        <menuitem id="payment_register_apply"
+                  action="linkloving_account.action_payment_register"
+                  parent="menu_purchase_account_invoice"
+                  sequence="0" name="付款申请"/>
+
+        <menuitem id="purchase.menu_procurement_management_pending_invoice"
+                  action="purchase.action_invoice_pending"
+                  parent="menu_purchase_account_invoice"
+                  sequence="13"/>
+
+
+        <!--purchase-->
+        <menuitem action="purchase.purchase_rfq" id="purchase.menu_purchase_rfq"
+                  parent="menu_sale_order_list"
+                  sequence="0"/>
+
+
+        <menuitem action="purchase.purchase_form_action"
+                  id="purchase.menu_purchase_form_action"
+                  parent="menu_sale_order_list"
+                  sequence="1"/>
+
     </data>
 </openerp>
 

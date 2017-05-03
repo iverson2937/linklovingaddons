@@ -16,6 +16,49 @@
             </field>
         </record>
 
+        <menuitem id="menu_sales_shipping_record" sequence="97"
+                  parent="sales_team.menu_base_partner" name="出货记录"/>
+
+
+        <menuitem sequence="5" id="menu_sales_orders"
+                  parent="sales_team.menu_base_partner" name="订单"/>
+
+        <menuitem id="sale.menu_sale_quotations"
+                  action="sale.action_quotations"
+                  parent="menu_sales_orders"
+                  sequence="1"/>
+
+        <menuitem action="sale.action_orders"
+                  id="sale.menu_sale_order" parent="menu_sales_orders"
+                  sequence="12" groups="sales_team.group_sale_salesman,sales_team.group_sale_manager"/>
+
+
+        <!--移动部分到配置-->
+        <menuitem id="crm.crm_opportunity_report_menu" name="Pipeline"
+                  parent="sales_team.menu_sale_config"
+                  groups="base.group_no_one"
+                  action="crm.crm_opportunity_report_action" sequence="5"/>
+        <menuitem name="Sales" action="sale.action_order_report_all"
+                  id="sale.menu_report_product_all"
+                  groups="base.group_no_one"
+                  parent="sales_team.menu_sale_config" sequence="10"/>
+        <menuitem id="crm.crm_activity_report_menu" name="Activities"
+                  groups="base.group_no_one"
+                  parent="sales_team.menu_sale_config"
+                  action="crm.crm_activity_report_action" sequence="7"/>
+
+        <!--delivery-->
+        <menuitem id="delivery.sale_menu_delivery" name="Delivery"
+                  parent="sales_team.menu_sale_config"
+                  groups="base.group_no_one" sequence="12"/>
+        <!--crm-->
+        <menuitem id="crm.menu_crm_config_lead" name="Leads &amp; Opportunities"
+                  parent="sales_team.menu_sale_config" sequence="11"
+                  groups="base.group_no_one"/>
+        <menuitem id="sales_team.menu_config_address_book"
+                  parent="sales_team.menu_sale_config"
+                  name="Contacts" sequence="4" groups="base.group_no_one"/>
+
 
     </data>
 </openerp>

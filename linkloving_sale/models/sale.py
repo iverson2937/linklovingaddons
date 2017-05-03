@@ -18,10 +18,11 @@ class SaleOrder(models.Model):
     @api.depends('product_count', 'order_line.qty_delivered')
     def _compute_shipping_rate(self):
         for r in self:
-            qtys = sum(line.qty_delivered for line in r.order_line)
-            r.shipping_rate = (qtys / r.product_count) * 100.0
+            if r.product_count:
+                qtys = sum(line.qty_delivered for line in r.order_line)
+                r.shipping_rate = (qtys / r.product_count) * 100.0
 
-    shipping_rate = fields.Float(string=u"出货率", compute='_compute_shipping_rate')
+    shipping_rate = fields.Float(string=u"出货率", compute='_compute_shipping_rate', store=True)
     pi_number = fields.Char(string='PI Number')
     is_emergency = fields.Boolean(string=u'Is Emergency')
     remark = fields.Text(string=u'备注')
