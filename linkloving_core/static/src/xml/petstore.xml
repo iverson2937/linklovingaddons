@@ -23,12 +23,17 @@
                             <t t-if="result.type">
                                   <t t-esc="result.type"/>
                             </t>/
-                            <t t-if="result.transform_service">
-                                <t t-esc="result.transform_service"/>
+                            <t t-if="result.service">
+                                 <t t-if="result.service==ordering">
+                                    订单制
+                                </t>
+                                <t t-if="result.service==stock">
+                                    备货制
+                                </t>
                             </t>/
                            <t t-if="result.process">
-                                  <t t-esc="result.process"/>
-                            </t>
+                                <t t-esc="result.process"/>
+                           </t>
                            ]
                         </span>
                        <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
@@ -42,7 +47,7 @@
                             <div class="panel-heading">
                                 <h4 class="panel-title">
                                     <a data-toggle="collapse" data-parent="#name" t-att-href="'#mo'+result.product_id">
-                                        制造单[<t t-esc="mo_length"/>]
+                                        MO[<t t-esc="mo_length"/>]
                                         <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                                     </a>
                                 </h4>
@@ -76,17 +81,22 @@
                             <div class="panel-heading">
                                 <h4 class="panel-title">
                                     <a data-toggle="collapse" data-parent="#name" t-att-data-level="item.level" t-att-href="'#'+item.product_id" class="click_tag_a" t-att-data-product-id="item.product_id">
-                                        <!--<t t-if="item.level">-->
+                                        <t t-if="item.level">
                                             <span class="fa fa-caret-right open-sign"></span>
-                                        <!--</t>-->
+                                        </t>
                                         <t t-esc="item.name"/>
                                         <span class="show_bom_line_one" style="margin-left:15px">
                                              [
                                             <t t-if="item.type">
-                                                  <t t-esc="item.type"/>
+                                                <t t-esc="item.type"/>
                                             </t>/
-                                            <t t-if="item.transform_service">
-                                                <t t-esc="item.transform_service"/>
+                                            <t t-if="item.service">
+                                                <t t-if="item.service==ordering">
+                                                    订单制
+                                                </t>
+                                                <t t-if="item.service==stock">
+                                                    备货制
+                                                </t>
                                             </t>/
                                             <t t-if="item.process">
                                                   <t t-esc="item.process"/>
@@ -107,7 +117,7 @@
                         </div>
                     </t>
 
-                    <t t-if="result.if_po">
+                    <t t-if="result.purchase_ok">
                         <div class="panel panel-warning">
                             <div class="panel-heading">
                                 <h4 class="panel-title">
@@ -194,7 +204,7 @@
                             <div class="panel-heading">
                                 <h4 class="panel-title">
                                     <a data-toggle="collapse" data-parent="#name" t-att-href="'#mo'+result.product_id">
-                                        制造单[<t t-esc="mo_length"/>]
+                                        MO[<t t-esc="mo_length"/>]
                                         <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                                     </a>
                                 </h4>
@@ -229,17 +239,22 @@
                             <div class="panel-heading">
                                 <h4 class="panel-title">
                                     <a data-toggle="collapse" data-parent="#name" t-att-data-level="item.level" t-att-href="'#'+item.product_id" class="click_tag_a" t-att-data-product-id="item.product_id">
-                                        <!--<t t-if="item.level">-->
+                                        <t t-if="item.level">
                                             <span class="fa fa-caret-right open-sign"></span>
-                                        <!--</t>-->
+                                        </t>
                                         <t t-esc="item.name"/>
                                          <span class="show_bom_line_one" style="margin-left:15px">
                                              [
                                             <t t-if="item.type">
                                                   <t t-esc="item.type"/>
                                             </t>/
-                                            <t t-if="item.transform_service">
-                                                <t t-esc="item.transform_service"/>
+                                            <t t-if="item.service">
+                                                <t t-if="item.service==ordering">
+                                                    订单制
+                                                </t>
+                                                <t t-if="item.service==stock">
+                                                    备货制
+                                                </t>
                                             </t>/
                                             <t t-if="item.process">
                                                   <t t-esc="item.process"/>
@@ -260,7 +275,7 @@
                         </div>
                     </t>
 
-                    <t t-if="result.if_po">
+                    <t t-if="result.purchase_ok">
                         <div class="panel panel-warning">
                             <div class="panel-heading">
                                 <h4 class="panel-title">

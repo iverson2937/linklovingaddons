@@ -131,37 +131,9 @@ odoo.define('linkloving_core.product_detail', function (require) {
                                     }
                                 }
 
-                                if(result.service){
-                                    result.if_po = false;
-                                     for(var i=0;i<result.service.length;i++){
-                                        if(result.service[i]==1){
-                                            result.transform_service = transform_service + "订单制"
-                                        }else if(result.service[i]==5){
-                                            result.transform_service = transform_service + "制造"
-                                        }else if(result.service[i]==6){
-                                            result.transform_service = transform_service + "采购"
-                                            result.if_po = true;
-                                        }
-                                    }
-                                }
-                                for(var i=0;i<result.bom_lines.length;i++){
-                                    result.bom_lines[i].transform_service = "";
-                                    result.bom_lines[i].if_po = false;
-                                    if(result.bom_lines[i].service){
-                                        for(var j=0;j<result.bom_lines[i].service.length;j++){
-                                            if(result.bom_lines[i].service[j]==1){
-                                                result.bom_lines[i].transform_service = result.bom_lines[i].transform_service + "订单制"
-                                            }else if(result.bom_lines[i].service[j]==5){
-                                                result.bom_lines[i].transform_service = result.bom_lines[i].transform_service + "制造"
-                                            }else if(result.bom_lines[i].service[j]==6){
-                                                result.bom_lines[i].transform_service = result.bom_lines[i].transform_service + "采购"
-                                                result.bom_lines[i].if_po = true;
-                                            }
-                                        }
-                                    }
-                                }
-                                self.$("#"+product_id+">.panel-body").append(QWeb.render('show_bom_line_tr_add', {bom_lines: result.bom_lines,result:result,po_length:po_length,bom_length:bom_length,mo_length: mo_length,transform_service:transform_service}));
 
+
+                                self.$("#"+product_id+">.panel-body").append(QWeb.render('show_bom_line_tr_add', {bom_lines: result.bom_lines,result:result,po_length:po_length,bom_length:bom_length,mo_length: mo_length}));
                             });
                  }
             // }
@@ -188,37 +160,9 @@ odoo.define('linkloving_core.product_detail', function (require) {
                             result.po_lines[i].date_planned = result.po_lines[i].date_planned.substr(0,10);
                         }
                     }
-                    if(result.service){
-                        result.if_po = false;
-                         for(var i=0;i<result.service.length;i++){
-                            if(result.service[i]==1){
-                                result.transform_service = transform_service + "订单制"
-                            }else if(result.service[i]==5){
-                                result.transform_service = transform_service + "制造"
-                            }else if(result.service[i]==6){
-                                result.transform_service = transform_service + "采购"
-                                result.if_po = true;
-                            }
-                        }
-                    }
-                    for(var i=0;i<result.bom_lines.length;i++){
-                        result.bom_lines[i].transform_service = "";
-                        result.bom_lines[i].if_po = false;
-                        if(result.bom_lines[i].service){
-                            for(var j=0;j<result.bom_lines[i].service.length;j++){
-                                if(result.bom_lines[i].service[j]==1){
-                                    result.bom_lines[i].transform_service = result.bom_lines[i].transform_service + "订单制"
-                                }else if(result.bom_lines[i].service[j]==5){
-                                    result.bom_lines[i].transform_service = result.bom_lines[i].transform_service + "制造"
-                                }else if(result.bom_lines[i].service[j]==6){
-                                    result.bom_lines[i].transform_service = result.bom_lines[i].transform_service + "采购"
-                                    result.bom_lines[i].if_po = true;
-                                }
-                            }
-                        }
-                    }
 
-                    self.$el.append(QWeb.render('show_bom_line_tr', {bom_lines: result.bom_lines,result:result,po_length:po_length,bom_length:bom_length,mo_length: mo_length,transform_service:transform_service}));
+
+                    self.$el.append(QWeb.render('show_bom_line_tr', {bom_lines: result.bom_lines,result:result,po_length:po_length,bom_length:bom_length,mo_length: mo_length}));
 
                 });
             }
