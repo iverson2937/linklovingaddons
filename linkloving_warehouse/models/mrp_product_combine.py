@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, api, _
 from odoo.exceptions import UserError
+from odoo.tools import float_is_zero
 
 
 class MrpProductionCombine(models.TransientModel):
@@ -26,7 +27,10 @@ class MrpProductionCombine(models.TransientModel):
             product_id.append(record.product_id)
             ids.append(record.id)
             qty += record.product_qty
-            origin = origin + '; ' + record.origin if record.origin else ''
+            if origin:
+                origin = origin + ', ' + record.origin
+            else:
+                origin = record.origin
             record.action_cancel()
         if len(set(product_id)) > 1:
             raise UserError(_('MO product must be same'))

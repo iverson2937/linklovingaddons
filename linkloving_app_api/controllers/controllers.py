@@ -792,7 +792,10 @@ class LinklovingAppApi(http.Controller):
                 fixed_location_ids = location.putaway_strategy_id.fixed_location_ids
 
                 if mrp_production.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:  # 半成品入库
-                    mrp_production.button_mark_done()
+                    if mrp_production.is_split_done:
+                        mrp_production.write({'state': 'progress'})
+                    else:
+                        mrp_production.button_mark_done()
                     JPushExtend.send_notification_push(audience=jpush.audience(
                             jpush.tag(LinklovingAppApi.get_jpush_tags("qc"))
                     ), notification=mrp_production.product_id.name,
@@ -2068,10 +2071,11 @@ class LinklovingAppApi(http.Controller):
             menu_ids = []
             for xml_name in xml_names:
                 list = xml_name.split(".")
-                menu_id = request.env['ir.model.data'].sudo().search_read(
-                        [('name', '=', list[1]),
-                         ('module', '=', list[0]),
-                         ('model', '=', 'ir.ui.menu')], fields=['res_id'])
+                if len(list) >= 2:
+                    menu_id = request.env['ir.model.data'].sudo().search_read(
+                            [('name', '=', list[1]),
+                             ('module', '=', list[0]),
+                             ('model', '=', 'ir.ui.menu')], fields=['res_id'])
                 if menu_id:
                     menu_ids.append(menu_id[0]["res_id"])
 
