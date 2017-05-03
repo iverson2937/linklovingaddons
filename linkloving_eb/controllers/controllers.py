@@ -153,6 +153,7 @@ class LinklovingEb(http.Controller):
         eb_refund_order_dic = request.jsonrequest.get("eb_refund_order")
 
         eb_order = request.env["eb.refund.order"].sudo().create(self.prepare_eb_refund_order_values(eb_refund_order_dic))
+        eb_order.action_confirm()
         return JsonResponse.send_response(res_code=STATUS_CODE_OK,
                                           res_data=LinklovingEb.convert_eb_refund_order_to_json(eb_order))
 

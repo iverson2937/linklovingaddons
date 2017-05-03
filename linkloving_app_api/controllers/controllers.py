@@ -772,7 +772,11 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/produce_finish', type='json', auth='none', csrf=False)
     def produce_finish(self, **kw):
         order_id = request.jsonrequest.get('order_id')  # get paramter
+        is_split_done = request.jsonrequest.get("is_split_done")
         mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
+        # 记录是否分批发货
+        mrp_production.is_split_done = is_split_done
+
         if not mrp_production:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error' : _("The MO not found")})
@@ -1079,12 +1083,11 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/produce_done', type='json', auth='none', csrf=False)
     def produce_done(self, **kw):
         order_id = request.jsonrequest.get('order_id')  # get paramter
-        is_spilt_done = request.jsonrequest.get('is_spilt_done')  # 分批产出
         mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
         if not mrp_production:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error' : _("MO not found")})
-        if is_spilt_done:
+        if mrp_production.is_split_done:
             mrp_production.post_inventory()
             mrp_production.state = "progress"
         else:

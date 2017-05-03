@@ -148,6 +148,7 @@ class MultiCreateOrder(models.TransientModel):
             order.back_to_wh()#先将原来的回到仓库
             order.sale_order_id = sale_order.id
             order.state = "transfered"
+        sale_order.action_confirm()
 
         return self.action_view_sale_order(sale_order.id)
 

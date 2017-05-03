@@ -240,6 +240,8 @@ class MrpProductionExtend(models.Model):
     #         move = get_parent_move(production.move_finished_ids[0])
     #         production.origin_sale_order_id = move.procurement_id and move.procurement_id.sale_line_id and move.procurement_id.sale_line_id.order_id.id or False
     #####生产完成 提交信息
+    # 是否分批产出
+    is_split_done = fields.Boolean(u"是否分批产出")
     produce_img = fields.Binary(u"图片信息")
     produce_area_id = fields.Many2one('stock.location.area')
 
