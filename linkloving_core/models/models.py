@@ -127,6 +127,7 @@ class ProductTemplate(models.Model):
                     'service': line.product_id.order_ll_type,
                     'on_produce': line_on_produce,
                     'draft': line_draft_qty,
+                    'purchase_ok': line.product_id.purchase_ok,
                     'stock': line.product_id.qty_available,
                     'require': line.product_id.outgoing_qty
 
@@ -138,11 +139,12 @@ class ProductTemplate(models.Model):
             'product_id': self.id,
             'process': process,
             'type': PRODUCT_TYPE.get(self.product_ll_type),
-            'service': line.product_id.order_ll_type,
+            'service': self.order_ll_type,
             'mo_ids': ids,
             'po_lines': line_ids,
             'on_produce': on_produce,
             'draft': draft_qty,
+            'purchase_ok': self.purchase_ok,
             'stock': self.qty_available,
             'require': self.outgoing_qty
         }
