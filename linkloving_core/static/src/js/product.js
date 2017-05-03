@@ -51,15 +51,32 @@ odoo.define('linkloving_core.product_detail', function (require) {
             var check_name =  target.getAttribute("check-name");
             var mo_merge_inputs_ids = [];
             var mo_merge_inputs = $("input[name="+check_name+"]");
+            console.log(mo_merge_inputs)
             mo_merge_inputs.each(function () {
                 if($(this).prop("checked")){
                     mo_merge_inputs_ids.push(parseInt($(this).attr("mo-id")))
                 }
             });
-            console.log(mo_merge_inputs_ids);
-            new Model("product.template").call("action_combine", [mo_merge_inputs_ids]).then(function (result) {
-                console.log(result);
-            })
+            if(mo_merge_inputs_ids.length>1){
+                new Model("product.template").call("action_combine", [mo_merge_inputs_ids]).then(function (result) {
+                    console.log(result);
+                    result.date_planned_start = result.date_planned_start.substr(0,10);
+                    if(mo_merge_inputs_ids.length>0){
+                       console.log(mo_merge_inputs[0].parentNode.parentNode.parentNode.parentNode)
+                       var new_mo = mo_merge_inputs[0].parentNode.parentNode.parentNode.parentNode;
+                       new_mo.innerHTML="";
+                       new_mo.innerHTML="<div class='panel panel-success'><div class='panel-heading'><h4 class='panel-title'>" +
+                           "<input name='chk_mo"+result.product_id+"' type='checkbox' mo-id="+result.id+"> <a data-parent='#name' data-toggle='collapse' class='collapsed' aria-expanded='false'>" +
+                           "<span class='show_mo_number' style='cursor: pointer;'>"+result.name+"</span>" +
+                               "<span style='margin-left:15px'>"+result.date_planned_start+"</span>"+
+                               "<span style='margin-left:15px'>"+ result.state+"</span>"+
+                               "<span style='margin-left:15px'>"+ result.qty+"</span>"+
+                           "</a>" +
+                           "</h4></div></div>";
+                    }
+                })
+            }
+
         },
 
         to_po_page:function (e) {
