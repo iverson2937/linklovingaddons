@@ -40,7 +40,6 @@ class ProductTemplate(models.Model):
     @api.model
     def action_combine(self, args, **kwargs):
         raise UserError('合并功能还没完善')
-        print args, kwargs
         context = dict(self._context or {})
         active_ids = context.get('active_ids', []) or []
         qty = 0
@@ -48,7 +47,6 @@ class ProductTemplate(models.Model):
         ids = []
         origin = ''
         for record in self.env['mrp.production'].browse(args):
-            print record
             if record.state not in ['draft', 'confirmed', 'waiting_material']:
                 raise UserError(_("Only draft MO can combine."))
 
@@ -78,6 +76,8 @@ class ProductTemplate(models.Model):
             'name': mo_id.name,
             'qty': mo_id.product_qty,
             'state': mo_id.state,
+            'id': mo_id.id,
+            'date_planed_start': mo_id.date_planed_start
         }
 
     @api.multi
