@@ -47,6 +47,7 @@ class ProductTemplate(models.Model):
         ids = []
         origin = ''
         for record in self.env['mrp.production'].browse(args):
+            print record
             if record.state not in ['draft', 'confirmed', 'waiting_material']:
                 raise UserError(_("Only draft MO can combine."))
 
