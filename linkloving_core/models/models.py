@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
 
-from odoo import models, fields, api
-
-dict = {
-    'Buy': u'采购',
-    'Make To Order': u'按订单生成',
-    'Manufacture': u'制造'
-}
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 PRODUCT_TYPE = {
     'raw material': u'原料',
@@ -42,6 +37,47 @@ MO_STATE = {
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    @api.model
+    def action_combine(self, key, value):
+        print key, value
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+        qty = 0
+        product_id = []
+        ids = []
+        origin = ''
+        for record in self.env['mrp.production'].browse(active_ids):
+            if record.state not in ['draft', 'confirmed', 'waiting_material']:
+                raise UserError(_("Only draft MO can combine."))
+
+            product_id.append(record.product_id)
+            ids.append(record.id)
+            qty += record.product_qty
+            origin = origin + '; ' + record.origin if record.origin else ''
+            record.action_cancel()
+        if len(set(product_id)) > 1:
+            raise UserError(_('MO product must be same'))
+        bom_id = product_id[0].bom_ids
+        mo_id = self.env['mrp.production'].create({
+            'product_qty': qty,
+            'product_id': product_id[0].id,
+            'bom_id': bom_id.id,
+            'product_uom_id': product_id[0].uom_id.id,
+            'state': 'draft',
+            'origin': origin,
+            'process_id': bom_id.process_id.id,
+            'unit_price': bom_id.process_id.unit_price,
+            'hour_price': bom_id.hour_price,
+            'in_charge_id': bom_id.process_id.partner_id.id
+        })
+        mo_id.source_mo_ids = ids
+
+        return {
+            'name': mo_id.name,
+            'qty': mo_id.product_qty,
+            'state': mo_id.state,
+        }
+
     @api.multi
     def get_detail(self):
         bom_ids = self.bom_ids
@@ -49,7 +85,7 @@ class ProductTemplate(models.Model):
         process = False
         service = ''
         draft_qty = on_produce = 0.0
-        if self.order_ll_type == 'ordering':
+        if self.purchase_ok:
             draft_qty = self.get_draft_po_qty(self.product_variant_ids[0])
             on_produce = self.incoming_qty
         elif self.order_ll_type == 'stock':
@@ -95,7 +131,7 @@ class ProductTemplate(models.Model):
                 # FIXME:
                 line_draft_qty = line_on_produce = 0.0
 
-                if line.product_id.order_ll_type == 'ordering':
+                if line.product_id.purchase_ok:
                     line_draft_qty = self.get_draft_po_qty(line.product_id.product_variant_ids[0])
                     line_on_produce = line.product_id.incoming_qty
                 elif line.product_id.order_ll_type == 'stock':
