@@ -9,7 +9,7 @@
 
 
     <t t-name="show_bom_line_tr">
-        <button class="refresh_tree btn btn-primary" style="margin-bottom:30px;margin-right:100px;float:right;">刷新树形结构</button>
+        <button class="refresh_tree btn btn-primary" style="margin-bottom:30px;margin-right:100px;float:right;"><span class="fa fa-refresh open-sign"></span>   刷新</button>
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
