@@ -244,7 +244,8 @@
                                                   <t t-esc="item.type"/>
                                             </t>/
                                             <t t-if="item.service">
-                                                 <t t-esc="service[item.service]"/>
+                                                <t t-esc="item.service"/>
+                                                 <!--<t t-esc="service[item.service]"/>-->
                                             </t>/
                                             <t t-if="item.process">
                                                   <t t-esc="item.process"/>

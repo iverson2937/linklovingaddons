@@ -31,14 +31,17 @@ odoo.define('linkloving_core.product_detail', function (require) {
             var target = e.target || e.srcElement;
             var check_name =  target.getAttribute("check-name");
             console.log(check_name);
-            var merge_inputd_ids = [];
+            var merge_inputs_ids = [];
             var merge_inputs = $("input[name="+check_name+"]");
             merge_inputs.each(function () {
                 if($(this).prop("checked")){
-                    merge_inputd_ids.push($(this).attr("po-id"))
+                    merge_inputs_ids.push($(this).attr("po-id"))
                 }
             })
-            console.log(merge_inputd_ids)
+            console.log(merge_inputs_ids)
+             new Model("product.template").call("action_combine",[merge_inputs_ids]).then(function (result) {
+                 console.log(result);
+             })
         },
         
 
