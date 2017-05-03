@@ -15,7 +15,9 @@ odoo.define('linkloving_core.product_detail', function (require) {
             'click .show_po_number':'to_po_page',
             'click .show_mo_number': 'to_mo_page',
             'click .chk_all': 'check_all',
-            'click .send-po-btn':'get_po_id'
+            'click .chk_all_mo': 'check_all',
+            'click .send-po-btn':'get_po_id',
+            'click .send-mo-btn':'get_mo_id',
         },
         check_all:function (e) {
             var e = e || window.event;
@@ -30,7 +32,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var check_name =  target.getAttribute("check-name");
-            console.log(check_name);
+            // console.log(check_name);
             var merge_inputs_ids = [];
             var merge_inputs = $("input[name="+check_name+"]");
             merge_inputs.each(function () {
@@ -43,7 +45,19 @@ odoo.define('linkloving_core.product_detail', function (require) {
                  console.log(result);
              })
         },
-        
+        get_mo_id:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var check_name =  target.getAttribute("check-name");
+            var mo_merge_inputs_ids = [];
+            var mo_merge_inputs = $("input[name="+check_name+"]");
+            mo_merge_inputs.each(function () {
+                if($(this).prop("checked")){
+                    mo_merge_inputs_ids.push($(this).attr("mo-id"))
+                }
+            })
+            console.log(mo_merge_inputs_ids)
+        },
 
         to_po_page:function (e) {
             var e = e || window.event;
