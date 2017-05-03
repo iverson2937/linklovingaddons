@@ -26,14 +26,19 @@ odoo.define('linkloving_core.product_detail', function (require) {
                 $(this).prop("checked",target.checked)
             })
         },
-        get_po_id:function () {
-            var abc=$("input[name=chk51826]");
-            abc.each(function () {
-                console.log($(this).prop("checked"));
+        get_po_id:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var check_name =  target.getAttribute("check-name");
+            console.log(check_name);
+            var merge_inputd_ids = [];
+            var merge_inputs = $("input[name="+check_name+"]");
+            merge_inputs.each(function () {
                 if($(this).prop("checked")){
-                    console.log('xxx')
+                    merge_inputd_ids.push($(this).attr("po-id"))
                 }
             })
+            console.log(merge_inputd_ids)
         },
         
 
