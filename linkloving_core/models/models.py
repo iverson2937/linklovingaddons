@@ -75,7 +75,7 @@ class ProductTemplate(models.Model):
         return {
             'name': mo_id.name,
             'qty': mo_id.product_qty,
-            'state': mo_id.state,
+            'state': MO_STATE[mo_id.state],
             'id': mo_id.id,
             'date_planed_start': mo_id.date_planed_start
         }
