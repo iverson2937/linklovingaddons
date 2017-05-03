@@ -24,12 +24,7 @@
                                   <t t-esc="result.type"/>
                             </t>/
                             <t t-if="result.service">
-                                 <t t-if="result.service==ordering">
-                                    订单制
-                                </t>
-                                <t t-if="result.service==stock">
-                                    备货制
-                                </t>
+                                 <t t-esc="service[result.service]"/>
                             </t>/
                            <t t-if="result.process">
                                 <t t-esc="result.process"/>
@@ -91,12 +86,7 @@
                                                 <t t-esc="item.type"/>
                                             </t>/
                                             <t t-if="item.service">
-                                                <t t-if="item.service==ordering">
-                                                    订单制
-                                                </t>
-                                                <t t-if="item.service==stock">
-                                                    备货制
-                                                </t>
+                                                 <t t-esc="service[item.service]"/>
                                             </t>/
                                             <t t-if="item.process">
                                                   <t t-esc="item.process"/>
@@ -249,12 +239,7 @@
                                                   <t t-esc="item.type"/>
                                             </t>/
                                             <t t-if="item.service">
-                                                <t t-if="item.service==ordering">
-                                                    订单制
-                                                </t>
-                                                <t t-if="item.service==stock">
-                                                    备货制
-                                                </t>
+                                                 <t t-esc="service[item.service]"/>
                                             </t>/
                                             <t t-if="item.process">
                                                   <t t-esc="item.process"/>

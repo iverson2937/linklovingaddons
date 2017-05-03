@@ -130,10 +130,13 @@ odoo.define('linkloving_core.product_detail', function (require) {
                                         result.mo_ids[i].date = result.mo_ids[i].date.substr(0,10);
                                     }
                                 }
+                                var service={
+                                    'ordering':'订单制',
+                                    'stock':'备货制'
+                                }
 
 
-
-                                self.$("#"+product_id+">.panel-body").append(QWeb.render('show_bom_line_tr_add', {bom_lines: result.bom_lines,result:result,po_length:po_length,bom_length:bom_length,mo_length: mo_length}));
+                                self.$("#"+product_id+">.panel-body").append(QWeb.render('show_bom_line_tr_add', {bom_lines: result.bom_lines,result:result,po_length:po_length,bom_length:bom_length,mo_length: mo_length,service:service}));
                             });
                  }
             // }
@@ -160,9 +163,13 @@ odoo.define('linkloving_core.product_detail', function (require) {
                             result.po_lines[i].date_planned = result.po_lines[i].date_planned.substr(0,10);
                         }
                     }
+                    var service={
+                        'ordering':'订单制',
+                        'stock':'备货制'
+                    }
 
 
-                    self.$el.append(QWeb.render('show_bom_line_tr', {bom_lines: result.bom_lines,result:result,po_length:po_length,bom_length:bom_length,mo_length: mo_length}));
+                    self.$el.append(QWeb.render('show_bom_line_tr', {bom_lines: result.bom_lines,result:result,po_length:po_length,bom_length:bom_length,mo_length: mo_length,service:service}));
 
                 });
             }
