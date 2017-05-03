@@ -134,7 +134,14 @@ odoo.define('linkloving_core.product_detail', function (require) {
                                     'ordering':'订单制',
                                     'stock':'备货制'
                                 }
-
+                                if(result.type == '半成品'){
+                                    result.service='stock';
+                                }
+                                for(var i=0;i<result.bom_lines.length;i++){
+                                    if(result.bom_lines[i].type=='半成品'){
+                                        result.bom_lines[i].service='stock';
+                                    }
+                                }
 
                                 self.$("#"+product_id+">.panel-body").append(QWeb.render('show_bom_line_tr_add', {bom_lines: result.bom_lines,result:result,po_length:po_length,bom_length:bom_length,mo_length: mo_length,service:service}));
                             });
@@ -167,8 +174,14 @@ odoo.define('linkloving_core.product_detail', function (require) {
                         'ordering':'订单制',
                         'stock':'备货制'
                     }
-
-
+                    if(result.type == '半成品'){
+                        result.service='stock';
+                    }
+                    for(var i=0;i<result.bom_lines.length;i++){
+                        if(result.bom_lines[i].type=='半成品'){
+                            result.bom_lines[i].service='stock';
+                        }
+                    }
                     self.$el.append(QWeb.render('show_bom_line_tr', {bom_lines: result.bom_lines,result:result,po_length:po_length,bom_length:bom_length,mo_length: mo_length,service:service}));
 
                 });
