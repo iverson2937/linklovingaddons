@@ -37,7 +37,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
             var merge_inputs = $("input[name="+check_name+"]");
             merge_inputs.each(function () {
                 if($(this).prop("checked")){
-                    merge_inputs_ids.push($(this).attr("po-id"))
+                    merge_inputs_ids.push(parseInt($(this).attr("po-id")))
                 }
             })
             console.log(merge_inputs_ids)
@@ -53,10 +53,9 @@ odoo.define('linkloving_core.product_detail', function (require) {
             var mo_merge_inputs = $("input[name="+check_name+"]");
             mo_merge_inputs.each(function () {
                 if($(this).prop("checked")){
-                    mo_merge_inputs_ids.push($(this).attr("mo-id"))
+                    mo_merge_inputs_ids.push(parseInt($(this).attr("mo-id")))
                 }
             });
-
             console.log(mo_merge_inputs_ids);
             new Model("product.template").call("action_combine", [mo_merge_inputs_ids]).then(function (result) {
                 console.log(result);

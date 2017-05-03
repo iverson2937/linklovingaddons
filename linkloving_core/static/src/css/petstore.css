@@ -28,8 +28,16 @@
     display: table-cell !important;
 }
 
+
+.o_web_client{
+    overflow: scroll!important;
+    width:100%!important;
+    min-width: 1400px;!important;
+}
 #accordion{
     margin-top: 50px;
+    width: 100%;
+    min-width: 1200px;
 }
 #accordion h4,#accordion a,#accordion span{
     font-size: 14px!important;
