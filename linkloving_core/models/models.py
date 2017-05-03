@@ -98,7 +98,6 @@ class ProductTemplate(models.Model):
                 if line.product_id.order_ll_type == 'ordering':
                     line_draft_qty = self.get_draft_po_qty(line.product_id.product_variant_ids[0])
                     line_on_produce = line.product_id.incoming_qty
-                    has_purchase = True
                 elif line.product_id.order_ll_type == 'stock':
                     line_draft_qty = self.get_draft_mo(line.product_id.product_tmpl_id.id)
 
@@ -115,7 +114,7 @@ class ProductTemplate(models.Model):
                 # for purchase_line in purchase_line_ids:
                 #     if purchase_line.product_qty > purchase_line.qty_received:
                 #         has_purchase = True
-                if line.product_id.bom_ids or has_purchase or has_mo:
+                if line.product_id.bom_ids or line.product_id.purchase_ok or has_mo:
                     level = True
                 res.update({
                     'product_id': line.product_id.product_tmpl_id.id,
