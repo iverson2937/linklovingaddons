@@ -130,10 +130,10 @@
         <!--</record>-->
 
         <menuitem action="action_eb_picking_tree_outgoing"
-            id="menu_eb_operation"
-            name="电商出货记录"
-            parent="sales_team.menu_sales_chu"
-            sequence="3"/>
+                  id="menu_eb_operation"
+                  name="电商出货记录"
+                  parent="linkloving_sale.menu_sales_shipping_record"
+                  sequence="3"/>
         <!--&lt;!&ndash; Lead Menu &ndash;&gt;-->
 
 

@@ -9,17 +9,17 @@
                   parent="purchase.menu_purchase_root" sequence="4"/>
 
 
-        <menuitem id="menu_purchase_check" name="对账"
+        <menuitem id="menu_purchase_account_invoice" name="对账"
                   parent="purchase.menu_purchase_root" sequence="5"/>
 
         <menuitem id="payment_register_apply"
                   action="linkloving_account.action_payment_register"
-                  parent="menu_purchase_check"
+                  parent="menu_purchase_account_invoice"
                   sequence="0" name="付款申请"/>
 
         <menuitem id="purchase.menu_procurement_management_pending_invoice"
                   action="purchase.action_invoice_pending"
-                  parent="menu_purchase_check"
+                  parent="menu_purchase_account_invoice"
                   sequence="13"/>
 
 
@@ -33,13 +33,6 @@
                   id="purchase.menu_purchase_form_action"
                   parent="menu_sale_order_list"
                   sequence="1"/>
-
-        <menuitem
-                action="linkloving_mrp_extend.make_by_mrp_purchase_form_action"
-                id="linkloving_mrp_extend.menu_purchase_make_by_mrp"
-                parent="menu_sale_order_list" name="MRP生成订单"
-                sequence="16"/>
-
 
     </data>
 </openerp>

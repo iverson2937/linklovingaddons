@@ -22,7 +22,7 @@
 
         <menuitem action="action_return_stock_picking_confirm"
                   id="menu_stock_picking_return_confirm"
-                  parent="sales_team.menu_sales_chu"
+                  parent="linkloving_sale.menu_sales_shipping_record"
                   sequence="2" name="退货入库确认"/>
 
         <record id="action_stock_picking_confirm_outgoing_return"

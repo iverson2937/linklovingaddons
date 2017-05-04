@@ -170,8 +170,8 @@
 
 
         <menuitem action="action_rma_sales"
-                  id="menu_rma_sales" parent="sale.menu_sale_invoicing"
-                  sequence="3" name="销售退货"/>
+                  id="menu_rma_sales" parent="linkloving_sale.menu_sales_orders"
+                  sequence="100" name="销售退货"/>
 
         <record id="view_return_material_form" model="ir.ui.view">
             <field name="name">return.goods.sales.form</field>
@@ -380,7 +380,7 @@
 
         <menuitem id="menu_customer_invoice_refund"
                   action="action_customer_invoice_refund"
-                  parent="sales_team.menu_sales_check" sequence="2"/>
+                  parent="linkloving_purchase.menu_purchase_account_invoice" sequence="2"/>
 
         <record id="action_vendor_refund_bill" model="ir.actions.act_window">
             <field name="name">退货对账单</field>
@@ -413,7 +413,7 @@
         <menuitem
                 id="menu_vendor_refund_bill"
                 action="action_vendor_refund_bill"
-                parent="linkloving_purchase.menu_purchase_check"
+                parent="linkloving_purchase.menu_purchase_account_invoice"
                 sequence="14"/>
 
     </data>

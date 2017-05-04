@@ -47,12 +47,13 @@
                   id="menu_sale_order_invoice" parent="sale.menu_sale_invoicing"
                   sequence="2"/>
 
-        <menuitem id="sale.menu_sales_other" sequence="101"
-                  parent="sales_team.menu_base_partner" name="其他"/>
+
 
         <!--Receipt*-->
         <menuitem action="action_payment_received_register_sale"
-                  id="menu_sale_order_invoice" parent="sale.menu_sales_other"
+                  id="menu_sale_order_invoice"
+                  parent="sales_team.menu_sale_config"
+                  groups="base.group_no_one"
                   sequence="1"/>
 
 

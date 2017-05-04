@@ -131,7 +131,7 @@
         <menuitem action="action_eb_picking_tree_outgoing_sale"
                   id="menu_eb_refund_soperation"
                   name="电商退货记录"
-                  parent="sales_team.menu_sales_chu"
+                  parent="linkloving_sale.menu_sales_shipping_record"
                   sequence="4"/>
         <!--&lt;!&ndash; Lead Menu &ndash;&gt;-->
 
