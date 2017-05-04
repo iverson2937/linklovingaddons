@@ -16,7 +16,9 @@
                     <a data-toggle="collapse" data-parent="#accordion" class="click_tag_a" data-level="true"
                        href="#name">
                        <span class="fa fa-caret-down open-sign"></span>
-                       <t t-esc="result.name"/>
+                       <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
+                    </a>
+                    <t t-esc="result.name"/>
                        <span class="show_bom_line_one" style="margin-left:15px">
                              [
                             <t t-if="result.type">
@@ -31,8 +33,6 @@
                            </t>
                            ]
                         </span>
-                       <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
-                    </a>
                 </h4>
             </div>
             <div id="name" class="panel-collapse collapse in">
@@ -46,9 +46,9 @@
                                         <t t-if="mo_length>0">
                                             <span class="fa fa-caret-right open-sign"></span>
                                         </t>
-                                        MO[<t t-esc="mo_length"/>]
-                                        <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                                     </a>
+                                    MO[<t t-esc="mo_length"/>]
+                                    <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                                     <button class="btn btn-primary send-mo-btn" t-att-check-name="'chk_mo'+result.product_id">合并</button>
                                 </h4>
                             </div>
@@ -85,7 +85,9 @@
                                         <t t-if="item.level">
                                             <span class="fa fa-caret-right open-sign"></span>
                                         </t>
-                                        <t t-esc="item.name"/>
+                                       <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
+                                    </a>
+                                    <t t-esc="item.name"/>
                                         <span class="show_bom_line_one" style="margin-left:15px">
                                             [
                                             1:<t t-esc="item.product_qty"/>
@@ -103,8 +105,6 @@
                                             </t>
                                              ]
                                         </span>
-                                       <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
-                                    </a>
                                 </h4>
                             </div>
                             <!--<t t-if="item.level">-->
@@ -126,9 +126,9 @@
                                         <t t-if="po_length>0">
                                             <span class="fa fa-caret-right open-sign"></span>
                                         </t>
-                                        PO[<t t-esc="po_length"/>]
-                                        <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                                     </a>
+                                     PO[<t t-esc="po_length"/>]
+                                        <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                                     <!--<button class="btn btn-primary send-po-btn">合并</button>-->
                                 </h4>
                             </div>
@@ -211,9 +211,9 @@
                                         <t t-if="mo_length>0">
                                             <span class="fa fa-caret-right open-sign"></span>
                                         </t>
-                                        MO[<t t-esc="mo_length"/>]
-                                        <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                                     </a>
+                                    MO[<t t-esc="mo_length"/>]
+                                        <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                                     <button class="btn btn-primary send-mo-btn" t-att-check-name="'chk_mo'+result.product_id">合并</button>
                                 </h4>
                             </div>
@@ -251,7 +251,10 @@
                                         <t t-if="item.level">
                                             <span class="fa fa-caret-right open-sign"></span>
                                         </t>
-                                        <t t-esc="item.name"/>
+
+                                       <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
+                                    </a>
+                                    <t t-esc="item.name"/>
                                          <span class="show_bom_line_one" style="margin-left:15px">
                                              [
                                             1:<t t-esc="item.product_qty"/>
@@ -269,8 +272,6 @@
                                             </t>
                                              ]
                                          </span>
-                                       <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
-                                    </a>
                                 </h4>
                             </div>
                             <!--<t t-if="item.level">-->
@@ -292,9 +293,9 @@
                                         <t t-if="po_length>0">
                                             <span class="fa fa-caret-right open-sign"></span>
                                         </t>
-                                        PO[<t t-esc="po_length"/>]
-                                        <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                                     </a>
+                                    PO[<t t-esc="po_length"/>]
+                                        <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                                     <!--<button class="btn btn-primary send-po-btn" t-att-check-name="'chk'+result.product_id">合并</button>-->
                                 </h4>
                             </div>
