@@ -413,6 +413,7 @@
         <menuitem
                 id="menu_vendor_refund_bill"
                 action="action_vendor_refund_bill"
+                name="退货对账单"
                 parent="linkloving_purchase.menu_purchase_account_invoice"
                 sequence="14"/>
 
