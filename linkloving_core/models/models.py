@@ -39,7 +39,6 @@ class ProductTemplate(models.Model):
 
     @api.model
     def action_combine(self, args, **kwargs):
-        print args, kwargs
         context = dict(self._context or {})
         active_ids = context.get('active_ids', []) or []
         qty = 0
@@ -75,7 +74,10 @@ class ProductTemplate(models.Model):
         return {
             'name': mo_id.name,
             'qty': mo_id.product_qty,
-            'state': mo_id.state,
+            'id': mo_id.id,
+            'product_id':mo_id.product_tmpl_id.id,
+            'date_planned_start': mo_id.date_planned_start,
+            'state': MO_STATE[mo_id.state],
         }
 
     @api.multi

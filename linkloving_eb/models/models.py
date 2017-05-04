@@ -38,6 +38,7 @@ class linkloving_eb_temporary_order(models.Model):
     stock_picking_ids = fields.One2many("stock.picking","eb_order_id")
     sale_order_id = fields.Many2one("sale.order")
     is_finish_transfer = fields.Selection([('yes', '已完成'),("no", "未完成")],"是否已经出货", compute="_compute_is_finsish_transfer")
+    partner_id = fields.Many2one("res.partner")
 
     @api.multi
     def action_confirm(self):
@@ -147,6 +148,7 @@ class MultiCreateOrder(models.TransientModel):
             order.back_to_wh()#先将原来的回到仓库
             order.sale_order_id = sale_order.id
             order.state = "transfered"
+        sale_order.action_confirm()
 
         return self.action_view_sale_order(sale_order.id)
 
@@ -176,6 +178,7 @@ class Linkloving_eb_refunds_order(models.Model):
     _name = "eb.refund.order"
 
     tracking_num = fields.Char("快递单号")
+    partner_id = fields.Many2one("res.partner")
 
     eb_refund_order_line_ids = fields.One2many('eb.refund.order.line', 'eb_refund_order_id')
 

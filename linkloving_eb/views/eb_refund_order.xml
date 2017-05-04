@@ -1,4 +1,5 @@
 <openerp>
+
     <data>
 
         <record id="eb_refund_order_tree" model="ir.ui.view">
@@ -7,11 +8,13 @@
             <field name="arch" type="xml">
                 <tree>
                     <field name="tracking_num" require="1"/>
+                    <field name="partner_id" string="店名"/>
                     <field name="state"/>
                     <field name="create_date"/>
                 </tree>
             </field>
         </record>
+
 
         <record id="eb_refund_order_form" model="ir.ui.view">
             <field name="name">EB Refund Orders</field>
@@ -40,6 +43,7 @@
 
                             <group>
                                 <field name="tracking_num" require="1"/>
+                                <field name="partner_id" string="店名"/>
                             </group>
                             <group>
                                 <field name="refund_img" widget="image"/>
