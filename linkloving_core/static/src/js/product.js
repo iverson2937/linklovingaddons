@@ -19,7 +19,8 @@ odoo.define('linkloving_core.product_detail', function (require) {
             'click .send-po-btn':'get_po_id',
             'click .send-mo-btn':'get_mo_id',
             'click .refresh_tree':'refresh_trees',
-            'click .click_mo_a':'show_mo_lists'
+            'click .click_mo_a':'show_mo_lists',
+            'click .click_po_a':'show_mo_lists'
         },
         show_mo_lists:function (e) {
             var e = e || window.event;
