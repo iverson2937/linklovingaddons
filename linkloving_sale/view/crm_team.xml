@@ -20,7 +20,7 @@
                   parent="sales_team.menu_base_partner" name="出货记录"/>
 
 
-        <menuitem sequence="4" id="menu_sales_orders"
+        <menuitem sequence="5" id="menu_sales_orders"
                   parent="sales_team.menu_base_partner" name="订单"/>
 
         <menuitem id="sale.menu_sale_quotations"
