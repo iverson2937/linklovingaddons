@@ -42,7 +42,10 @@
                             <div class="panel-heading">
                                 <h4 class="panel-title">
                                     <input type="checkbox" name="chk_all_mo" t-att-id="'chk_mo'+result.product_id" class="chk_all_mo"/>
-                                    <a data-toggle="collapse" data-parent="#name" t-att-href="'#mo'+result.product_id">
+                                    <a data-toggle="collapse" data-parent="#name" t-att-href="'#mo'+result.product_id" class="click_mo_a">
+                                        <t t-if="mo_length>0">
+                                            <span class="fa fa-caret-right open-sign"></span>
+                                        </t>
                                         MO[<t t-esc="mo_length"/>]
                                         <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                                     </a>
@@ -201,7 +204,10 @@
                             <div class="panel-heading">
                                 <h4 class="panel-title">
                                     <input type="checkbox" name="chk_all_mo" t-att-id="'chk_mo'+result.product_id" class="chk_all_mo"/>
-                                    <a data-toggle="collapse" data-parent="#name" t-att-href="'#mo'+result.product_id">
+                                    <a data-toggle="collapse" data-parent="#name" t-att-href="'#mo'+result.product_id" class="click_mo_a">
+                                        <t t-if="mo_length>0">
+                                            <span class="fa fa-caret-right open-sign"></span>
+                                        </t>
                                         MO[<t t-esc="mo_length"/>]
                                         <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                                     </a>
