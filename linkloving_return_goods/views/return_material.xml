@@ -380,7 +380,8 @@
 
         <menuitem id="menu_customer_invoice_refund"
                   action="action_customer_invoice_refund"
-                  parent="linkloving_purchase.menu_purchase_account_invoice" sequence="2"/>
+                  name="退货对账单"
+                  parent="sale.menu_sale_invoicing" sequence="2"/>
 
         <record id="action_vendor_refund_bill" model="ir.actions.act_window">
             <field name="name">退货对账单</field>
