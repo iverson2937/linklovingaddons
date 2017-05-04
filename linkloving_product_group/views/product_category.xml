@@ -12,7 +12,19 @@
             </field>
         </record>
 
+        <record id="mrp_bom_line_action_from_bom" model="ir.actions.act_window">
+            <field name="name">Bill of Materials Structure</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.category</field>
+            <field name="domain">[]</field>
+            <field name="view_type">tree</field>
+            <field name="view_id" ref="view_product_category_tree"/>
+            <field name="view_type">tree</field>
+        </record>
 
+
+        <menuitem id="menu_productccccc_config" name="Resource" sequence="30"/>
+        <menuitem id="test" action="mrp_bom_line_action_from_bom" parent="menu_productccccc_config"/>
     </data>
 </odoo>
 
