@@ -7,7 +7,8 @@
                 <form string="退货单" class="o_sale_order">
                     <header>
                         <button name="return_confirm" string="确定"
-                                type="object" class="btn-primary" states="draft"/>
+                                type="object" class="btn-primary"
+                                states="draft"/>
                         <button name="create_invoice" string="创建对账单"
                                 type="object" class="btn-primary"
                                 attrs="{'invisible':[('invoice_status','!=','to invoice')]}"/>
@@ -15,16 +16,20 @@
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
-                            <button type="object" name="action_view_delivery" class="oe_stat_button" icon="fa-truck"
-                                    attrs="{'invisible': [('delivery_count', '=', 0)]}" groups="base.group_user">
-                                <field name="delivery_count" widget="statinfo" string="收货"/>
+                            <button type="object" name="action_view_delivery"
+                                    class="oe_stat_button" icon="fa-truck"
+                                    attrs="{'invisible': [('delivery_count', '=', 0)]}"
+                                    groups="base.group_user">
+                                <field name="delivery_count" widget="statinfo"
+                                       string="收货"/>
                             </button>
                             <button name="action_view_invoice"
                                     type="object"
                                     class="oe_stat_button"
                                     icon="fa-pencil-square-o"
                                     attrs="{'invisible': [('invoice_count', '=', 0)]}">
-                                <field name="invoice_count" widget="statinfo" string="对账单"/>
+                                <field name="invoice_count" widget="statinfo"
+                                       string="对账单"/>
                             </button>
 
                         </div>
@@ -35,17 +40,23 @@
                         </div>
                         <group>
                             <group>
-                                <field name="partner_id" domain="[('customer','=',True)]"
-                                       options='{"no_create": True}' string="客户"/>
-                                <field name="partner_invoice_id" required='False'/>
-                                <field name="partner_shipping_id" required="False"/>
-                                <field name="so_id" string="参考订单号" options="{'no_create':True}"
+                                <field name="partner_id"
+                                       domain="[('customer','=',True)]"
+                                       options='{"no_create": True}'
+                                       string="客户"/>
+                                <field name="partner_invoice_id"
+                                       required='False'/>
+                                <field name="partner_shipping_id"
+                                       required="False"/>
+                                <field name="so_id" string="参考订单号"
+                                       options="{'no_create':True}"
                                        domain="[('partner_id','=',partner_id)]"/>
                                 <field name="tracking_number" required="0"/>
                             </group>
                             <group>
                                 <field name="date" string="退货日期"/>
-                                <field name="tax_id" string="税率" domain="[('type_tax_use','=','purchase')]"
+                                <field name="tax_id" string="税率"
+                                       domain="[('type_tax_use','=','purchase')]"
                                        required="1"/>
                             </group>
                             <field name="remark"/>
@@ -57,9 +68,13 @@
                                     <form string="Sales Order Lines">
                                         <group>
                                             <group>
-                                                <field name="product_id" string="产品" domain="[('sale_ok', '=', True)]"/>
-                                                <field name="product_uom_qty" string="退货数量"/>
-                                                <field name="qty_delivered" string="收到数量"/>
+                                                <field name="product_id"
+                                                       string="产品"
+                                                       domain="[('sale_ok', '=', True)]"/>
+                                                <field name="product_uom_qty"
+                                                       string="退货数量"/>
+                                                <field name="qty_delivered"
+                                                       string="收到数量"/>
                                                 <field name="product_uom"/>
                                                 <field name="price_unit"/>
                                                 <field name="price_subtotal"/>
@@ -68,32 +83,43 @@
                                             </group>
                                         </group>
                                     </form>
-                                    <tree string="Sales Order Lines" editable="bottom">
-                                        <field name="product_id" string="产品" domain="[('sale_ok', '=', True)]"/>
-                                        <field name="product_uom_qty" string="退货数量"/>
-                                        <field name="qty_delivered" string="收到数量"/>
+                                    <tree string="Sales Order Lines"
+                                          editable="bottom">
+                                        <field name="product_id" string="产品"
+                                               domain="[('sale_ok', '=', True)]"/>
+                                        <field name="product_uom_qty"
+                                               string="退货数量"/>
+                                        <field name="qty_delivered"
+                                               string="收到数量"/>
                                         <field name="product_uom" string="单位"/>
                                         <field name="price_unit" string="单价"/>
                                         <field name="price_subtotal"/>
                                         <field name="qty_to_invoice"/>
                                         <field name="invoice_status"/>
                                         <field name="price_tax" invisible="1"/>
-                                        <field name="tax_id" domain="[('type_tax_use','=','purchase')]" invisible="1"/>
+                                        <field name="tax_id"
+                                               domain="[('type_tax_use','=','purchase')]"
+                                               invisible="1"/>
                                     </tree>
                                 </field>
-                                <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total">
-                                    <field name="amount_untaxed" widget='monetary'
+                                <group class="oe_subtotal_footer oe_right"
+                                       colspan="2" name="sale_total">
+                                    <field name="amount_untaxed"
+                                           widget='monetary'
                                            options="{'currency_field': 'currency_id'}"/>
                                     <field name="amount_tax" widget='monetary'
                                            options="{'currency_field': 'currency_id'}"/>
                                     <div class="oe_subtotal_footer_separator oe_inline o_td_label">
                                         <label for="amount_total"/>
                                         <button name="button_dummy"
-                                                states="draft,sent" string="更新" type="object"
+                                                states="draft,sent" string="更新"
+                                                type="object"
                                                 class="oe_edit_only oe_link"/>
                                     </div>
-                                    <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator"
-                                           widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                                    <field name="amount_total" nolabel="1"
+                                           class="oe_subtotal_footer_separator"
+                                           widget='monetary'
+                                           options="{'currency_field': 'currency_id'}"/>
                                 </group>
                             </page>
                         </notebook>
@@ -144,8 +170,8 @@
 
 
         <menuitem action="action_rma_sales"
-                  id="menu_rma_sales" parent="sales_team.menu_sales"
-                  sequence="100"/>
+                  id="menu_rma_sales" parent="sale.menu_sale_invoicing"
+                  sequence="3" name="销售退货"/>
 
         <record id="view_return_material_form" model="ir.ui.view">
             <field name="name">return.goods.sales.form</field>
@@ -165,16 +191,20 @@
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
-                            <button type="object" name="action_view_delivery" class="oe_stat_button" icon="fa-truck"
-                                    attrs="{'invisible': [('delivery_count', '=', 0)]}" groups="base.group_user">
-                                <field name="delivery_count" widget="statinfo" string="交货"/>
+                            <button type="object" name="action_view_delivery"
+                                    class="oe_stat_button" icon="fa-truck"
+                                    attrs="{'invisible': [('delivery_count', '=', 0)]}"
+                                    groups="base.group_user">
+                                <field name="delivery_count" widget="statinfo"
+                                       string="交货"/>
                             </button>
                             <button name="action_view_invoice"
                                     type="object"
                                     class="oe_stat_button"
                                     icon="fa-pencil-square-o"
                                     attrs="{'invisible': [('invoice_count', '=', 0)]}">
-                                <field name="invoice_count" widget="statinfo" string="对账单"/>
+                                <field name="invoice_count" widget="statinfo"
+                                       string="对账单"/>
                             </button>
 
                         </div>
@@ -186,17 +216,23 @@
                         </div>
                         <group>
                             <group>
-                                <field name="partner_id" domain="[('supplier','=',True)]"
-                                       options='{"no_create": True}' string="供应商"/>
-                                <field name="partner_invoice_id" required='False'/>
-                                <field name="partner_shipping_id" required="False"/>
-                                <field name="purchase_id" string="参考订单号" options="{'no_create':True}"
+                                <field name="partner_id"
+                                       domain="[('supplier','=',True)]"
+                                       options='{"no_create": True}'
+                                       string="供应商"/>
+                                <field name="partner_invoice_id"
+                                       required='False'/>
+                                <field name="partner_shipping_id"
+                                       required="False"/>
+                                <field name="purchase_id" string="参考订单号"
+                                       options="{'no_create':True}"
                                        domain="[('partner_id','=',partner_id)]"/>
                                 <field name="tracking_number" required="0"/>
                             </group>
                             <group>
                                 <field name="date" string="退货日期"/>
-                                <field name="tax_id" string="税率" domain="[('type_tax_use','=','sale')]"
+                                <field name="tax_id" string="税率"
+                                       domain="[('type_tax_use','=','sale')]"
                                        required="1"/>
                             </group>
                             <field name="remark"/>
@@ -208,10 +244,13 @@
                                     <form string="Sales Order Lines">
                                         <group>
                                             <group>
-                                                <field name="product_id" string="产品"
+                                                <field name="product_id"
+                                                       string="产品"
                                                        domain="[('purchase_ok', '=', True)]"/>
-                                                <field name="product_uom_qty" string="退货数量"/>
-                                                <field name="qty_delivered" string="收到数量"/>
+                                                <field name="product_uom_qty"
+                                                       string="退货数量"/>
+                                                <field name="qty_delivered"
+                                                       string="收到数量"/>
                                                 <field name="product_uom"/>
                                                 <field name="price_unit"/>
                                                 <field name="price_subtotal"/>
@@ -221,31 +260,41 @@
                                         </group>
                                     </form>
                                     <tree string="退货明细" editable="bottom">
-                                        <field name="product_id" string="产品" domain="[('purchase_ok', '=', True)]"/>
-                                        <field name="product_uom_qty" string="退货数量"/>
-                                        <field name="qty_delivered" string="收到数量"/>
+                                        <field name="product_id" string="产品"
+                                               domain="[('purchase_ok', '=', True)]"/>
+                                        <field name="product_uom_qty"
+                                               string="退货数量"/>
+                                        <field name="qty_delivered"
+                                               string="收到数量"/>
                                         <field name="product_uom" string="单位"/>
                                         <field name="price_unit" string="单价"/>
                                         <field name="price_subtotal"/>
                                         <field name="qty_to_invoice"/>
                                         <field name="invoice_status"/>
                                         <field name="price_tax" invisible="1"/>
-                                        <field name="tax_id" domain="[('type_tax_use','=','sale')]" invisible="1"/>
+                                        <field name="tax_id"
+                                               domain="[('type_tax_use','=','sale')]"
+                                               invisible="1"/>
                                     </tree>
                                 </field>
-                                <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total">
-                                    <field name="amount_untaxed" widget='monetary'
+                                <group class="oe_subtotal_footer oe_right"
+                                       colspan="2" name="sale_total">
+                                    <field name="amount_untaxed"
+                                           widget='monetary'
                                            options="{'currency_field': 'currency_id'}"/>
                                     <field name="amount_tax" widget='monetary'
                                            options="{'currency_field': 'currency_id'}"/>
                                     <div class="oe_subtotal_footer_separator oe_inline o_td_label">
                                         <label for="amount_total"/>
                                         <button name="button_dummy"
-                                                states="draft,sent" string="更新" type="object"
+                                                states="draft,sent" string="更新"
+                                                type="object"
                                                 class="oe_edit_only oe_link"/>
                                     </div>
-                                    <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator"
-                                           widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                                    <field name="amount_total" nolabel="1"
+                                           class="oe_subtotal_footer_separator"
+                                           widget='monetary'
+                                           options="{'currency_field': 'currency_id'}"/>
                                 </group>
                             </page>
                         </notebook>
@@ -291,56 +340,71 @@
             </field>
         </record>
 
-        <menuitem action="action_rma_purchase"
-                  id="menu_rma_purchase" parent="purchase.menu_procurement_management"
+        <menuitem action="action_rma_purchase" name="采购退货"
+                  id="menu_rma_purchase"
+                  parent="linkloving_purchase.menu_sale_order_list"
                   sequence="100"/>
 
 
-        <record id="action_customer_invoice_refund" model="ir.actions.act_window">
+        <record id="action_customer_invoice_refund"
+                model="ir.actions.act_window">
             <field name="name">退货对账单</field>
             <field name="res_model">account.invoice</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph
+            </field>
             <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('linkloving_invoice_workflow.invoice_customer_tree')}),
                 (0, 0, {'view_mode': 'form', 'view_id': ref('account.invoice_form')})]"/>
             <field name="domain">[('type','=','out_refund')]</field>
-            <field name="context">{'default_type':'out_refund', 'type':'out_refund'}</field>
-            <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+            <field name="context">{'default_type':'out_refund',
+                'type':'out_refund'}
+            </field>
+            <field name="search_view_id"
+                   ref="account.view_account_invoice_filter"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
                     Click to create a vendor bill.
                 </p>
                 <p>
-                    Use this menu to control the invoices to be received from your
+                    Use this menu to control the invoices to be received from
+                    your
                     vendors. When registering a new bill, set the purchase order
-                    and Odoo will fill the bill automatically according to ordered
+                    and Odoo will fill the bill automatically according to
+                    ordered
                     or received quantities.
                 </p>
             </field>
         </record>
 
 
-        <menuitem id="menu_customer_invoice_refund" action="action_customer_invoice_refund"
-                  parent="sale.menu_sale_invoicing" sequence="2"/>
+        <menuitem id="menu_customer_invoice_refund"
+                  action="action_customer_invoice_refund"
+                  parent="sales_team.menu_sales_check" sequence="2"/>
 
         <record id="action_vendor_refund_bill" model="ir.actions.act_window">
             <field name="name">退货对账单</field>
             <field name="res_model">account.invoice</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph
+            </field>
             <field eval="False" name="view_id"/>
             <field name="domain">[('type','=','in_refund')]</field>
-            <field name="context">{'default_type':'in_invoice', 'type':'in_invoice', 'journal_type': 'purchase'}</field>
-            <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+            <field name="context">{'default_type':'in_invoice',
+                'type':'in_invoice', 'journal_type': 'purchase'}
+            </field>
+            <field name="search_view_id"
+                   ref="account.view_account_invoice_filter"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
                     Click to create a vendor bill.
                 </p>
                 <p>
-                    Use this menu to control the invoices to be received from your
+                    Use this menu to control the invoices to be received from
+                    your
                     vendors. When registering a new bill, set the purchase order
-                    and Odoo will fill the bill automatically according to ordered
+                    and Odoo will fill the bill automatically according to
+                    ordered
                     or received quantities.
                 </p>
             </field>
@@ -349,7 +413,7 @@
         <menuitem
                 id="menu_vendor_refund_bill"
                 action="action_vendor_refund_bill"
-                parent="purchase.menu_purchase_control"
+                parent="linkloving_purchase.menu_purchase_check"
                 sequence="14"/>
 
     </data>

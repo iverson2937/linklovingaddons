@@ -16,6 +16,58 @@
             </field>
         </record>
 
+        <menuitem id="sales_team.menu_sales_chu" sequence="97"
+                  parent="sales_team.menu_base_partner" name="出货记录"/>
+        <menuitem id="sales_team.menu_sales_check" sequence="98"
+                  parent="sales_team.menu_base_partner" name="对账"/>
+
+        <menuitem sequence="5" id="sale.menu_sale_invoicing"
+                  parent="sales_team.menu_base_partner" name="订单"/>
+
+
+        <menuitem action="sale.action_orders_upselling"
+                  id="sale.menu_sale_order_upselling"
+                  parent="sales_team.menu_sales_check"
+                  sequence="3" name="超售订单"/>
+
+        <menuitem action="sale.action_orders_to_invoice"
+                  id="sale.menu_sale_order_invoice"
+                  parent="sales_team.menu_sales_check"
+                  sequence="4" name="待开发票销售"/>
+
+        <menuitem id="sale.menu_sale_quotations"
+                  action="sale.action_quotations"
+                  parent="sale.menu_sale_invoicing"
+                  sequence="1"/>
+
+
+        <menuitem action="sale.action_orders"
+                  id="sale.menu_sale_order" parent="sale.menu_sale_invoicing"
+                  sequence="2"
+                  groups="sales_team.group_sale_salesman,sales_team.group_sale_manager"/>
+        <menuitem id="crm.crm_opportunity_report_menu" name="Pipeline"
+                  parent="sale.menu_sales_other"
+                  action="crm.crm_opportunity_report_action" sequence="5"/>
+        <menuitem name="Sales" action="sale.action_order_report_all"
+                  id="sale.menu_report_product_all"
+                  parent="sale.menu_sales_other" sequence="10"/>
+        <menuitem id="crm.crm_activity_report_menu" name="Activities"
+                  groups="sales_team.group_sale_manager"
+                  parent="sale.menu_sales_other"
+                  action="crm.crm_activity_report_action" sequence="7"/>
+
+        <!--delivery-->
+        <menuitem id="delivery.sale_menu_delivery" name="Delivery"
+                  parent="sale.menu_sales_other"
+                  groups="sales_team.group_sale_manager" sequence="12"/>
+        <!--crm-->
+        <menuitem id="crm.menu_crm_config_lead" name="Leads &amp; Opportunities"
+                  parent="sale.menu_sales_other" sequence="11"
+                  groups="sales_team.group_sale_manager"/>
+        <menuitem id="sales_team.menu_config_address_book"
+                  parent="sale.menu_sales_other"
+                  name="Contacts" sequence="4" groups="base.group_system"/>
+
 
     </data>
 </openerp>

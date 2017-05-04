@@ -129,9 +129,9 @@
 
         <menuitem action="action_eb_picking_tree_outgoing"
             id="menu_eb_operation"
-            name="EB Transfer"
-            parent="sales_team.menu_sales"
-            sequence="6"/>
+            name="电商出货记录"
+            parent="sales_team.menu_sales_chu"
+            sequence="3"/>
         <!--&lt;!&ndash; Lead Menu &ndash;&gt;-->
 
 
