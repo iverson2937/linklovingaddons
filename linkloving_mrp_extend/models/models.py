@@ -17,6 +17,15 @@ class MrpBomExtend(models.Model):
     _inherit = 'mrp.bom'
 
     product_specs = fields.Text(string=u'Product Specification', related='product_tmpl_id.product_specs')
+    state = fields.fields.Selection([
+        ('draft', u'草稿'),
+        ('release', u'正式')
+    ], u'状态', track_visibility='onchange', default='draft')
+
+    @api.multi
+    def set_to_release(self):
+        self.state = 'release'
+
     product_id = fields.Many2one(
         'product.product', 'Product Variant',
         domain="['&', ('product_tmpl_id', '=', product_tmpl_id), ('type', 'in', ['product', 'consu'])]",
