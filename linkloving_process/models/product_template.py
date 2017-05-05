@@ -12,8 +12,8 @@ class ProductTemplate(models.Model):
     process_id = fields.Many2one('mrp.process', compute="get_process_id", store=True)
 
     @api.depends('bom_ids.process_id')
+    @api.multi
     def get_process_id(self):
         for product in self:
             if product.bom_ids:
                 product.process_id = product.bom_ids[0].process_id.id
-                print product.process_id.name
