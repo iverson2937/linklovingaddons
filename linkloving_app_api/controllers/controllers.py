@@ -1606,8 +1606,9 @@ class LinklovingAppApi(http.Controller):
             json_list = []
             for picking in pickings:
                 json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
-
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+        else:
+            return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": u"请输入单名"})
     #产品出入库部分
     @http.route('/linkloving_app_api/get_group_by_list', type='json', auth='none', csrf=False)
     def get_group_by_list(self, **kw):
@@ -1948,7 +1949,7 @@ class LinklovingAppApi(http.Controller):
             'picking_id' : stock_picking_obj.id,
             'complete_rate': stock_picking_obj.complete_rate,
             'has_attachment': LinklovingAppApi.is_has_attachment(stock_picking_obj.id, 'stock.picking'),
-            'sale_note': stock_picking_obj.sale_id.remark ,
+            'sale_note': stock_picking_obj.sale_id.remark,
             'delivery_rule': stock_picking_obj.delivery_rule or None,
             'picking_type_code' : stock_picking_obj.picking_type_code,
             'name': stock_picking_obj.name,
