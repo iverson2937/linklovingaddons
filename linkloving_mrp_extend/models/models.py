@@ -314,7 +314,8 @@ class MrpProductionExtend(models.Model):
     def button_return_material(self, need_create_one):
         view = self.env.ref('linkloving_mrp_extend.stock_return_material_form_view2')
         if not need_create_one:
-            return_obj = self.env['mrp.return.material'].search([('production_id', '=', self.id)])[0]
+            return_obj = self.env['mrp.return.material'].search([('production_id', '=', self.id),
+                                                                 ('state', '=', 'draft')])[0]
             res = {'type': 'ir.actions.act_window',
                    'res_model': 'mrp.return.material',
                    'view_mode': 'form',

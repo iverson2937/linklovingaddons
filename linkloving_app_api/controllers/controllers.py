@@ -792,7 +792,10 @@ class LinklovingAppApi(http.Controller):
                 fixed_location_ids = location.putaway_strategy_id.fixed_location_ids
 
                 if mrp_production.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:  # 半成品入库
-                    mrp_production.button_mark_done()
+                    if mrp_production.is_split_done:
+                        mrp_production.write({'state': 'progress'})
+                    else:
+                        mrp_production.button_mark_done()
                     JPushExtend.send_notification_push(audience=jpush.audience(
                             jpush.tag(LinklovingAppApi.get_jpush_tags("qc"))
                     ), notification=mrp_production.product_id.name,
@@ -945,7 +948,8 @@ class LinklovingAppApi(http.Controller):
                 return_lines.append(obj.id)
 
             return_material_model = request.env['mrp.return.material']
-            returun_material_obj = return_material_model.sudo().search([('production_id', '=', order_id)])
+            returun_material_obj = return_material_model.sudo().search([('production_id', '=', order_id),
+                                                                        ('state', '=', 'draft')])
             if not returun_material_obj:  # 如果没生成过就生成一遍， 防止出现多条记录
                 returun_material_obj = return_material_model.sudo().create({
                     'production_id': mrp_production.id,
@@ -958,7 +962,8 @@ class LinklovingAppApi(http.Controller):
             mrp_production.write({'state': 'waiting_warehouse_inspection'})
         else:
             return_material_model = request.env['mrp.return.material']
-            returun_material_obj = return_material_model.sudo().search([('production_id', '=', order_id)])
+            returun_material_obj = return_material_model.sudo().search([('production_id', '=', order_id),
+                                                                        ('state', '=', 'draft')])
             if not returun_material_obj:
                 return JsonResponse.send_response(STATUS_CODE_ERROR,
                                                   res_data={'error': _("Order of return material not found")})
@@ -1005,7 +1010,8 @@ class LinklovingAppApi(http.Controller):
                 return_lines.append(obj.id)
 
             return_material_model = request.env['mrp.return.material']
-            returun_material_obj = return_material_model.sudo().search([('production_id','=',order_id)])
+            returun_material_obj = return_material_model.sudo().search([('production_id', '=', order_id),
+                                                                        ('state', '=', 'draft')])
             if not returun_material_obj:#如果没生成过就生成一遍， 防止出现多条记录
                 returun_material_obj = return_material_model.sudo().create({
                     'production_id' : mrp_production.id,
@@ -1018,7 +1024,8 @@ class LinklovingAppApi(http.Controller):
             mrp_production.write({'state': 'waiting_warehouse_inspection'})
         else:
             return_material_model = request.env['mrp.return.material']
-            returun_material_obj = return_material_model.sudo().search([('production_id', '=', order_id)])
+            returun_material_obj = return_material_model.sudo().search([('production_id', '=', order_id),
+                                                                        ('state', '=', 'draft')])
             if not returun_material_obj:
                 return JsonResponse.send_response(STATUS_CODE_ERROR,
                                                   res_data={'error' : _("Order of return material not found")})
@@ -1032,7 +1039,15 @@ class LinklovingAppApi(http.Controller):
                     continue
                 move = request.env['stock.move'].sudo().create(returun_material_obj._prepare_move_values(r))
                 move.action_done()
-            mrp_production.write({'state': 'waiting_post_inventory'})
+
+            location = request.env["stock.location"].sudo().search([("name", "=", "半成品流转库")], limit=1)
+            if location and location.putaway_strategy_id and location.putaway_strategy_id.fixed_location_ids:
+                fixed_location_ids = location.putaway_strategy_id.fixed_location_ids
+
+                if mrp_production.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:  # 半成品入库
+                    mrp_production.write({'state': 'done'})
+                else:
+                    mrp_production.write({'state': 'waiting_post_inventory'})
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
@@ -1042,8 +1057,10 @@ class LinklovingAppApi(http.Controller):
     def get_return_detail(self, **kw):
         order_id = request.jsonrequest.get('order_id')  # get paramter
         return_material_model = request.env['mrp.return.material']
-        return_lines = return_material_model.sudo().search_read([('production_id', '=', order_id)], limit=1)
-        return_material_obj = return_material_model.sudo().search([('production_id', '=', order_id)])
+        return_lines = return_material_model.sudo().search_read([('production_id', '=', order_id),
+                                                                 ('state', '=', 'draft')], limit=1)
+        return_material_obj = return_material_model.sudo().search([('production_id', '=', order_id),
+                                                                   ('state', '=', 'draft')])
 
         return_lines[0]['product_ids'] = []
         data = []
@@ -2068,10 +2085,11 @@ class LinklovingAppApi(http.Controller):
             menu_ids = []
             for xml_name in xml_names:
                 list = xml_name.split(".")
-                menu_id = request.env['ir.model.data'].sudo().search_read(
-                        [('name', '=', list[1]),
-                         ('module', '=', list[0]),
-                         ('model', '=', 'ir.ui.menu')], fields=['res_id'])
+                if len(list) >= 2:
+                    menu_id = request.env['ir.model.data'].sudo().search_read(
+                            [('name', '=', list[1]),
+                             ('module', '=', list[0]),
+                             ('model', '=', 'ir.ui.menu')], fields=['res_id'])
                 if menu_id:
                     menu_ids.append(menu_id[0]["res_id"])
 
