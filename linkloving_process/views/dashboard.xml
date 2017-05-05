@@ -67,7 +67,7 @@
                                 </div>
                                 <div class="container o_kanban_card_content o_visible">
                                     <div class="row">
-                                        <div class="col-xs-4 o_kanban_primary_left">
+                                        <div class="col-xs-6 o_kanban_primary_left">
                                             <button class="btn btn-primary"
                                                     name="get_action_mrp_production_tree_to_combine"
                                                     type="object">
@@ -78,18 +78,18 @@
 
                                             </button>
                                         </div>
-                                        <div class="col-xs-4 o_kanban_primary_left">
-                                            <button class="btn btn-primary"
-                                                    name="get_stock_detail"
-                                                    type="object">
-                                                <span>
-                                                    <t t-esc="record.total_qty.value"/>
-                                                    库存
-                                                </span>
+                                        <!--<div class="col-xs-4 o_kanban_primary_left">-->
+                                        <!--<button class="btn btn-primary"-->
+                                        <!--name="get_stock_detail"-->
+                                        <!--type="object">-->
+                                        <!--<span>-->
+                                        <!--<t t-esc="record.total_qty.value"/>-->
+                                        <!--库存-->
+                                        <!--</span>-->
 
-                                            </button>
-                                        </div>
-                                        <div class="col-xs-4 o_kanban_primary_right" style="min-height:150px">
+                                        <!--</button>-->
+                                        <!--</div>-->
+                                        <div class="col-xs-6 o_kanban_primary_right" style="min-height:150px">
                                             <div class="row">
                                                 <div class="col-xs-9">
                                                     <a name="get_action_mrp_production_tree_delay" type="object">
