@@ -17,7 +17,13 @@ class MrpBomExtend(models.Model):
     _inherit = 'mrp.bom'
 
     product_specs = fields.Text(string=u'Product Specification', related='product_tmpl_id.product_specs')
-    state = fields.fields.Selection([
+
+
+    product_id = fields.Many2one(
+        'product.product', 'Product Variant',
+        domain="['&', ('product_tmpl_id', '=', product_tmpl_id), ('type', 'in', ['product', 'consu'])]",
+        help="If a product variant is defined the BOM is available only for this product.", copy=False)
+    state = fields.Selection([
         ('draft', u'草稿'),
         ('release', u'正式')
     ], u'状态', track_visibility='onchange', default='draft')
@@ -25,11 +31,6 @@ class MrpBomExtend(models.Model):
     @api.multi
     def set_to_release(self):
         self.state = 'release'
-
-    product_id = fields.Many2one(
-        'product.product', 'Product Variant',
-        domain="['&', ('product_tmpl_id', '=', product_tmpl_id), ('type', 'in', ['product', 'consu'])]",
-        help="If a product variant is defined the BOM is available only for this product.", copy=False)
 
     def explode(self, product, quantity, picking_type=False):
         """
