@@ -24,7 +24,7 @@
                 <xpath expr="//field[@name='barcode']" position="before">
                     <label for="street" string="Stock Location"/>
                     <div class="o_address_format">
-                        <field name="area_id" class="o_address_city"/>
+                        <field name="area_id" class="o_address_city" options="{'no_create':True}"/>
                         <field name="location_x" class="o_address_state" placeholder=""/>
                         <field name="location_y" class="o_address_state" placeholder=""/>
                     </div>
@@ -33,6 +33,9 @@
                 <xpath expr="//field[@name='barcode']" position="after">
                     <field name="product_specs"/>
                     <field name="description"/>
+                </xpath>
+                <xpath expr="//field[@name='categ_id']" position="attributes">
+                    <attribute name="options">{'no_create':True}</attribute>
                 </xpath>
 
             </field>
@@ -47,7 +50,7 @@
                 <xpath expr="//field[@name='barcode']" position="before">
                     <label for="street" string="Stock Location"/>
                     <div class="o_address_format">
-                        <field name="area_id" class="o_address_city"/>
+                        <field name="area_id" class="o_address_city" options="{'no_create':True}"/>
                         <field name="location_x" class="o_address_state"/>
                         <field name="location_y" class="o_address_state"/>
                     </div>
@@ -59,6 +62,10 @@
                 <xpath expr="//field[@name='default_code']" position="attributes">
                     <attribute name="string">料号</attribute>
                 </xpath>
+                <xpath expr="//field[@name='categ_id']" position="attributes">
+                    <attribute name="options">{'no_create':True}</attribute>
+                </xpath>
+
             </field>
         </record>
     </data>
