@@ -42,9 +42,10 @@
                             <strong>Printing date:</strong><br/>
                             <span t-esc="time.strftime('%Y-%m-%d')"/>
                         </div>
-                        <div class="col-xs-3" t-if="'sale_ref' in o">
-                            <strong>Partner Ref:</strong><br/>
-                            <span t-esc="'sale_ref' in o and o.sale_ref"/>
+                        <div class="col-xs-3" t-if="'process_id' in o">
+                            <strong>工序:</strong>
+                            <br/>
+                            <span t-esc="o.process_id.name"/>
                         </div>
                         <div class="col-xs-3" t-if="'sale_name' in o">
                             <strong>SO Number:</strong><br/>
