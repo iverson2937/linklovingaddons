@@ -42,6 +42,7 @@
                     <field name="count_mo_tomorrow"/>
                     <field name="count_mo_after_tomorrow"/>
                     <field name="count_mo_others"/>
+                    <field name="total_qty"/>
                     <templates>
                         <t t-name="kanban-box">
                             <div name="stock_picking">
@@ -66,13 +67,24 @@
                                 </div>
                                 <div class="container o_kanban_card_content o_visible">
                                     <div class="row">
-                                        <div class="col-xs-6 o_kanban_primary_left">
+                                        <div class="col-xs-3 o_kanban_primary_left">
                                             <button class="btn btn-primary"
                                                     name="get_action_mrp_production_tree_to_combine"
                                                     type="object">
                                                 <span>
                                                     <t t-esc="record.count_mo_waiting.value"/>
                                                     Schedule
+                                                </span>
+
+                                            </button>
+                                        </div>
+                                        <div class="col-xs-3 o_kanban_primary_left">
+                                            <button class="btn btn-primary"
+                                                    name="get_stock_detail"
+                                                    type="object">
+                                                <span>
+                                                    <t t-esc="record.total_qty.value"/>
+                                                    库存
                                                 </span>
 
                                             </button>

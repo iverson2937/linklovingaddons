@@ -29,6 +29,19 @@ class MrpProcess(models.Model):
     total_qty = fields.Integer(compute="_get_total_qty")
 
     @api.multi
+    def get_stock_detail(self):
+
+        return {
+            'name': u'库存',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'product.template',
+            'target': 'current',
+            'domain': [('process_id', '=', self.id)]
+        }
+
+    @api.multi
     def _get_total_qty(self):
         for process in self:
             products = self.env['product.template'].search([('process_id', '=', process.id)])
