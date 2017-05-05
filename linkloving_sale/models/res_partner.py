@@ -27,6 +27,27 @@ class Partner(models.Model):
     ], string=u'Customer Level', default=1)
     internal_code = fields.Char(string='No')
     x_qq = fields.Char(string=u'Instant Messaging')
+    detailed_address = fields.Char(string=u'adc', compute='_street_name')
+
+    skype_is = fields.Char(string=u'网络电话')
+    whatapp_is = fields.Char(string=u'社交号码')
+    wechat_is = fields.Char(string=u'微信号')
+
+    @api.depends('street', 'country_id', 'zip', 'state_id', 'city', 'street', 'street2')
+    def _street_name(self):
+        for record in self:
+            record.detailed_address = ''
+            asd = (str(record.country_id.name) if type(record.country_id.name) == bool else (
+                record.country_id.name).encode("utf-8")) + (
+                      str(record.zip) if type(record.zip) == bool else (record.zip).encode("utf-8")) + (
+                      str(record.state_id.name) if type(record.state_id.name) == bool else (
+                          record.state_id.name).encode(
+                          "utf-8")) + (
+                      str(record.city) if type(record.city) == bool else (record.city).encode("utf-8")) + (
+                      str(record.street) if type(record.street) == bool else (record.street).encode("utf-8")) + (
+                      str(record.street2) if type(record.street2) == bool else (record.street2).encode("utf-8"))
+
+            record.detailed_address = asd.replace("False", "")
 
     _sql_constraints = [
         ('internal_code_uniq', 'unique (internal_code)', 'The No must be unique!')
@@ -51,7 +72,8 @@ class Partner(models.Model):
                 if not name and partner.type in ['invoice', 'delivery', 'other']:
                     name = dict(self.fields_get(['type'])['type']['selection'])[partner.type]
                 if not partner.is_company:
-                    name = "%s, %s,%s" % (partner.commercial_company_name or partner.parent_id.name, name,partner.street or  '')
+                    name = "%s, %s,%s" % (
+                        partner.commercial_company_name or partner.parent_id.name, name, partner.street or '')
             if self._context.get('show_address_only'):
                 name = partner._display_address(without_company=True)
             if self._context.get('show_address'):

@@ -306,7 +306,7 @@
             </field>
         </record>
 
-        <menuitem id="customer_invoice" action="customer_invoice_pending"
-                  parent="linkloving_sale.menu_sales_account_invoice" sequence="1" name="销售对账单"/>
+        <!--<menuitem id="customer_invoice" action="customer_invoice_pending"-->
+                  <!--parent="linkloving_sale.menu_sales_account_invoice" sequence="1" name="销售对账单"/>-->
     </data>
 </openerp>

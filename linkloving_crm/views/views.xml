@@ -6,9 +6,31 @@
             <field name="model">crm.lead</field>
             <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
             <field name="arch" type="xml">
-
-                <xpath expr="//field[@name='name']" position="replace">
+                <!--右-->
+                <xpath expr="//field[@name='tag_ids']" position="after">
+                    <field name="source"/>
                 </xpath>
+                <xpath expr="//field[@name='source']" position="after">
+                    <field name="Communication_identifier"/>
+                </xpath>
+                <xpath expr="//field[@name='Communication_identifier']" position="after">
+                    <field name="communicate_in_time"/>
+                </xpath>
+
+                <!--左-->
+                <xpath expr="//field[@name='team_id']" position="after">
+                    <field name="continent"/>
+                </xpath>
+                <xpath expr="//field[@name='continent']" position="after">
+                    <field name="express_sample_record"/>
+                </xpath>
+                <xpath expr="//field[@name='express_sample_record']" position="after">
+                    <field name="Follow_up_the_history"/>
+                </xpath>
+                <xpath expr="//field[@name='Follow_up_the_history']" position="after">
+                    <field name="Interested_in_product"/>
+                </xpath>
+
 
             </field>
         </record>
