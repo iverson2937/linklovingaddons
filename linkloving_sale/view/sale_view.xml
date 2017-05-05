@@ -58,7 +58,7 @@
 
 
                 <xpath expr="//field[@name='validity_date']" position="replace">
-                    <field name="validity_date" string="交货日期" required="0"/>
+                    <field name="validity_date" string="交货日期" attrs="{'required':[('state','in',['draft','sent'])]}"/>
                 </xpath>
                 <xpath expr="//field[@name='partner_invoice_id']" position="attributes">
                     <attribute name="options">{'no_create': True}</attribute>
