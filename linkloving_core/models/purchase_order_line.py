@@ -14,3 +14,19 @@ class SaleOrderLine(models.Model):
             'tag': 'product_detail',
             'product_id': self.product_id.product_tmpl_id.id
         }
+
+    @api.multi
+    def get_mo_list(self):
+
+        for line in self:
+            origin = line.order_id.origin
+            sources = []
+            if origin:
+                mos = origin.split(',')
+
+                for mo in mos:
+                    mo_ids = mo.split(':')
+                    for mo_id in mo_ids:
+                        sources.append(mo_id.strip())
+
+            print sources

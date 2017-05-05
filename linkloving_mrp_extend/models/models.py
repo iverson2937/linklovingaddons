@@ -72,6 +72,18 @@ class MrpBomLineExtend(models.Model):
     active1 = fields.Boolean(related='product_id.active')
 
     @api.multi
+    def show_product_form(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': u'产品',
+            'view_mode': 'form',
+            'view_type': 'form',
+            'res_model': 'product.template',
+            'target': 'current',
+            'res_id': self.product_id.product_tmpl_id.id
+        }
+
+    @api.multi
     def action_see_bom_structure_reverse(self):
         bom_tree_view = self.env.ref('linkloving_mrp_extend.linkloving_mrp_bom_tree_view')
         bom_form_view = self.env.ref('linkloving_mrp_extend.linkloving_mrp_bom_form_view')
@@ -302,7 +314,8 @@ class MrpProductionExtend(models.Model):
     def button_return_material(self, need_create_one):
         view = self.env.ref('linkloving_mrp_extend.stock_return_material_form_view2')
         if not need_create_one:
-            return_obj = self.env['mrp.return.material'].search([('production_id', '=', self.id)])[0]
+            return_obj = self.env['mrp.return.material'].search([('production_id', '=', self.id),
+                                                                 ('state', '=', 'draft')])[0]
             res = {'type': 'ir.actions.act_window',
                    'res_model': 'mrp.return.material',
                    'view_mode': 'form',
@@ -690,8 +703,8 @@ class MrpProductionProduceExtend(models.TransientModel):
             #             move.quantity_done_store += qty
             # move.action_done()
             # self.production_id.post_inventory()
-                # if move.product_id.virtual_available < 0:
-                #     move.quantity_done_store = move.quantity_done_store / (1 + move.bom_line_id.scrap_rate / 100)
+            # if move.product_id.virtual_available < 0:
+            #     move.quantity_done_store = move.quantity_done_store / (1 + move.bom_line_id.scrap_rate / 100)
         moves = self.production_id.move_finished_ids.filtered(
             lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel'))
         for move in moves:
