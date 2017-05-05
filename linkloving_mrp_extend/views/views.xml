@@ -37,6 +37,21 @@
             </field>
         </record>
 
+
+        <record id="view_mrp_bom_filter_ol" model="ir.ui.view">
+            <field name="name">mrp.bom.filter.inherit</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.view_mrp_bom_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='normal']" position="after">
+                    <filter name='draft' string="草稿BOM" domain="[('state', '=', 'draft')]"/>
+                    <filter name='release' string="正式BOM" domain="[('state', '=', 'release')]"/>
+                </xpath>
+
+
+            </field>
+        </record>
+
         <record id="linkloving_mrp_bom_form_view" model="ir.ui.view">
             <field name="name">mrp.bom.form.inherit</field>
             <field name="model">mrp.bom</field>
