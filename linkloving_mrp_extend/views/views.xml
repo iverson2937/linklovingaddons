@@ -143,8 +143,8 @@
                     <button name="button_fill_material" attrs="{'invisible': ['|',('state', '!=', 'progress')]}"
                             type="object" string="Extra Picking Material"
                             groups="linkloving_mrp_extend.group_charge_produce"/>
-                    <button name="button_return_material" attrs="{'invisible': ['|',('state', '!=', 'done')]}"
-                            type="object" string="Return Material"/>
+                    <!--<button name="button_return_material" attrs="{'invisible': ['|',('state', '!=', 'done')]}"-->
+                    <!--type="object" string="Return Material"/>-->
                 </xpath>
 
                 <xpath expr="//header/button[@name='button_scrap']" position="replace">

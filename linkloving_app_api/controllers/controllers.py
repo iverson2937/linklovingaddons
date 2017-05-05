@@ -333,8 +333,8 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/get_recent_production_order', type='json', auth='none', csrf=False)
     def get_recent_production_order(self, **kw):
         today_time = fields.datetime.now()
-        # limit = request.jsonrequest.get('limit')
-        # offset = request.jsonrequest.get('offset')
+        limit = request.jsonrequest.get('limit')
+        offset = request.jsonrequest.get('offset')
         date_to_show = request.jsonrequest.get("date")
         process_id = request.jsonrequest.get("process_id")
         one_days_after = datetime.timedelta(days=1)
@@ -359,7 +359,7 @@ class LinklovingAppApi(http.Controller):
                 ('state', 'in', ['waiting_material', 'prepare_material_ing']),
                 ('process_id', '=', process_id)]
 
-        orders_today = request.env['mrp.production'].sudo().search(domain)
+        orders_today = request.env['mrp.production'].sudo().search(domain, limit=limit, offset=offset)
 
         data = []
         for production in orders_today:
