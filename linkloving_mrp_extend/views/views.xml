@@ -53,6 +53,14 @@
                     <button name="action_see_bom_structure_reverse" type="object" string="Bom逆展"/>
                 </xpath>
 
+                <xpath expr="//sheet" position="before">
+                    <header>
+                        <button name="set_to_release" type="object" states="draft" string="确认"
+                                class="oe_highlight"/>
+                        <field name="state" widget="statusbar" readonly="1"/>
+                    </header>
+                </xpath>
+
 
             </field>
         </record>
