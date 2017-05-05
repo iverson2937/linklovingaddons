@@ -18,6 +18,7 @@
                        <span class="fa fa-caret-down open-sign"></span>
                        <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                     </a>
+                    [<t t-esc="result.part_no"/> ]
                     <t t-esc="result.name"/>
                        <span class="show_bom_line_one" style="margin-left:15px">
                              [
@@ -87,6 +88,7 @@
                                         </t>
                                        <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
                                     </a>
+                                    [<t t-esc="item.part_no"/> ]
                                     <t t-esc="item.name"/>
                                         <span class="show_bom_line_one" style="margin-left:15px">
                                             [
@@ -254,6 +256,7 @@
 
                                        <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
                                     </a>
+                                    [<t t-esc="item.part_no"/> ]
                                     <t t-esc="item.name"/>
                                          <span class="show_bom_line_one" style="margin-left:15px">
                                              [
