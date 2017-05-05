@@ -206,11 +206,16 @@
                     </page>
                 </xpath>
 
+                <xpath expr="//field[@name='move_finished_ids']/tree/field[@name='product_id']" position="attributes">
+                    <attribute name="options">{'no_create':True}</attribute>
+                </xpath>
+
+
                 <xpath expr="//field[@name='move_raw_ids']" position="replace">
                     <field name="sim_stock_move_lines">
                         <tree editable="bottom" delete="0" decoration-warning="quantity_done&gt;product_uom_qty"
                               decoration-success="quantity_done>=product_uom_qty" create="0">
-                            <field name="product_id" string="产品"/>
+                            <field name="product_id" string="产品" options="{'no_create':True}"/>
                             <field name="qty_available" string="库存"/>
                             <field name="virtual_available" string="Forecast Quantity"/>
                             <field name="suggest_qty" string="Suggest Quantity"/>
@@ -320,7 +325,7 @@
                         <tree editable="bottom" delete="0" decoration-warning="quantity_ready&gt;product_uom_qty"
                               decoration-success="quantity_ready>=product_uom_qty" create="0">
                             <field name="production_state" readonly="1" invisible="1" autofocus="autofocus"/>
-                            <field name="product_id" readonly="1"/>
+                            <field name="product_id" readonly="1" options="{'no_create': True}"/>
                             <field name="qty_available" string="库存"/>
                             <field name="virtual_available" string="预测数量"/>
                             <field name="suggest_qty" readonly="1" string="建议数量"/>
