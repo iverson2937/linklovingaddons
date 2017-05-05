@@ -214,7 +214,8 @@
                 <xpath expr="//field[@name='move_raw_ids']" position="replace">
                     <field name="sim_stock_move_lines">
                         <tree editable="bottom" delete="0" decoration-warning="quantity_done&gt;product_uom_qty"
-                              decoration-success="quantity_done>=product_uom_qty" create="0">
+                              decoration-success="quantity_done>=product_uom_qty"
+                              decoration-danger="qty_available&lt;0" create="0">
                             <field name="product_id" string="产品" options="{'no_create':True}"/>
                             <field name="qty_available" string="库存"/>
                             <field name="virtual_available" string="Forecast Quantity"/>
