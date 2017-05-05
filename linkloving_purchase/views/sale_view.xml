@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <menuitem id="menu_sale_order_list" name="订单管理"
+        <menuitem id="menu_purchase_order" name="订单管理"
                   parent="purchase.menu_purchase_root"
+                  action="sale.action_orders" sequence="2"/>
+        <menuitem id="menu_sale_order_list" name="销售订单"
+                  parent="purchase.purchase_report"
                   action="sale.action_orders" sequence="2"/>
 
         <menuitem id="purchase.menu_purchase_control" name="入库"
@@ -25,13 +28,13 @@
 
         <!--purchase-->
         <menuitem action="purchase.purchase_rfq" id="purchase.menu_purchase_rfq"
-                  parent="menu_sale_order_list"
+                  parent="menu_purchase_order"
                   sequence="0"/>
 
 
         <menuitem action="purchase.purchase_form_action"
                   id="purchase.menu_purchase_form_action"
-                  parent="menu_sale_order_list"
+                  parent="menu_purchase_order"
                   sequence="1"/>
 
     </data>

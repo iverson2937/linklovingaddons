@@ -15,4 +15,5 @@ class ProductTemplate(models.Model):
     def get_process_id(self):
         for product in self:
             if product.bom_ids:
-                product.process_id = self.bom_ids[0].process_id.id
+                product.process_id = product.bom_ids[0].process_id.id
+                print product.process_id.name

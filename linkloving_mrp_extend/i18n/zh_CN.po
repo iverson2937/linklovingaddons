@@ -538,7 +538,7 @@ msgstr "Order Type"
 #: model:ir.actions.act_window,name:linkloving_mrp_extend.make_by_mrp_purchase_form_action
 #: model:ir.ui.menu,name:linkloving_mrp_extend.menu_purchase_make_by_mrp
 msgid "Orders Make By MRP"
-msgstr "Orders Make By MRP"
+msgstr "MRP生成订单"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_production_origin_sale_order_id

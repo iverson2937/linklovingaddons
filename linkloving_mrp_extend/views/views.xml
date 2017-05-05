@@ -1091,7 +1091,7 @@
 
         <menuitem
                 action="make_by_mrp_purchase_form_action" id="menu_purchase_make_by_mrp"
-                parent="linkloving_purchase.menu_sale_order_list" name="MRP生成订单" sequence="16"/>
+                parent="linkloving_purchase.menu_purchase_order" name="Orders Make By MRP" sequence="16"/>
 
 
         <record id="mrp_production_tree_view_ll" model="ir.ui.view">
