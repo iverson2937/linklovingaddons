@@ -20,7 +20,8 @@ odoo.define('linkloving_core.product_detail', function (require) {
             'click .send-mo-btn':'get_mo_id',
             'click .refresh_tree':'refresh_trees',
             'click .click_mo_a':'show_mo_lists',
-            'click .click_po_a':'show_mo_lists'
+            'click .click_po_a':'show_mo_lists',
+            'click .product_name':'to_product_name'
         },
         show_mo_lists:function (e) {
             var e = e || window.event;
@@ -129,16 +130,24 @@ odoo.define('linkloving_core.product_detail', function (require) {
                     console.log(result);
                     result.date_planned_start = result.date_planned_start.substr(0,10);
                     if(mo_merge_inputs_ids.length>0){
+                       mo_merge_inputs.each(function () {
+                           if($(this).prop("checked")){
+                               $(this).parent().parent().parent().remove();
+                           }
+                       })
                        var new_mo = mo_merge_inputs[0].parentNode.parentNode.parentNode.parentNode;
-                       new_mo.innerHTML="";
-                       new_mo.innerHTML="<div class='panel panel-success'><div class='panel-heading'><h4 class='panel-title'>" +
-                           "<input name='chk_mo"+result.product_id+"' type='checkbox' mo-id="+result.id+"> <a data-parent='#name' data-toggle='collapse' class='collapsed' aria-expanded='false'>" +
-                           "<span class='show_mo_number' style='cursor: pointer;'>"+result.name+"</span>" +
-                               "<span style='margin-left:15px'>"+result.date_planned_start+"</span>"+
-                               "<span style='margin-left:15px'>"+ result.state+"</span>"+
-                               "<span style='margin-left:15px'>"+ result.qty+"</span>"+
-                           "</a>" +
-                           "</h4></div></div>";
+                        console.log(new_mo)
+                        console.log(self.$el)
+                       // new_mo.innerHTML="";
+                       // var new_div ="<div class='panel panel-success'><div class='panel-heading'><h4 class='panel-title'>" +
+                       //     "<input name='chk_mo"+result.product_id+"' type='checkbox' mo-id="+result.id+"> <a data-parent='#name' data-toggle='collapse' class='collapsed' aria-expanded='false'>" +
+                       //     "<span class='show_mo_number' style='cursor: pointer;'>"+result.name+"</span>" +
+                       //         "<span style='margin-left:15px'>"+result.date_planned_start+"</span>"+
+                       //         "<span style='margin-left:15px'>"+ result.state+"</span>"+
+                       //         "<span style='margin-left:15px'>"+ result.qty+"</span>"+
+                       //     "</a>" +
+                       //     "</h4></div></div>";
+                       //  self.new_mo.appendChild(new_div)
                     }
                 })
             }else {
@@ -175,6 +184,23 @@ odoo.define('linkloving_core.product_detail', function (require) {
                 name:"制造单",
                 type: 'ir.actions.act_window',
                 res_model:'mrp.production',
+                view_type: 'form',
+                view_mode: 'tree,form',
+                views: [[false, 'form']],
+                res_id: act_id,
+                target:"new"
+            };
+            this.do_action(action);
+        },
+        to_product_name:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var act_id = target.getAttribute("data-id");
+            act_id = parseInt(act_id);
+            var action = {
+                name:"产品",
+                type: 'ir.actions.act_window',
+                res_model:'product.template',
                 view_type: 'form',
                 view_mode: 'tree,form',
                 views: [[false, 'form']],

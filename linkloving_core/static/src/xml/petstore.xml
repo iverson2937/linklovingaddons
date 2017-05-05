@@ -19,9 +19,9 @@
                        <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                     </a>
                     [<t t-esc="result.part_no"/> ]
-                    <t t-esc="result.name"/>
-                       <span class="show_bom_line_one" style="margin-left:15px">
-                             [
+                    <span class="product_name" t-att-data-id="result.product_id" style="cursor:pointer"><t t-esc="result.name"/></span>
+                    <span class="show_bom_line_one" style="margin-left:15px">
+                         [
                             <t t-if="result.type">
                                   <t t-esc="result.type"/>
                             </t>/
@@ -29,11 +29,11 @@
                                  <!--<t t-esc="service[result.service]"/>-->
                                 <t t-esc="result.service"/>
                             </t>/
-                           <t t-if="result.process">
+                            <t t-if="result.process">
                                 <t t-esc="result.process"/>
-                           </t>
-                           ]
-                        </span>
+                            </t>
+                          ]
+                    </span>
                 </h4>
             </div>
             <div id="name" class="panel-collapse collapse in">
@@ -89,8 +89,8 @@
                                        <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
                                     </a>
                                     [<t t-esc="item.part_no"/> ]
-                                    <t t-esc="item.name"/>
-                                        <span class="show_bom_line_one" style="margin-left:15px">
+                                    <span class="product_name" t-att-data-id="item.product_id" style="cursor:pointer"><t t-esc="item.name"/></span>
+                                    <span class="show_bom_line_one" style="margin-left:15px">
                                             [
                                             1:<t t-esc="item.product_qty"/>
                                             ]
@@ -106,7 +106,7 @@
                                                   <t t-esc="item.process"/>
                                             </t>
                                              ]
-                                        </span>
+                                    </span>
                                 </h4>
                             </div>
                             <!--<t t-if="item.level">-->
@@ -257,24 +257,25 @@
                                        <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
                                     </a>
                                     [<t t-esc="item.part_no"/> ]
-                                    <t t-esc="item.name"/>
-                                         <span class="show_bom_line_one" style="margin-left:15px">
-                                             [
-                                            1:<t t-esc="item.product_qty"/>
-                                            ]
-                                             [
-                                            <t t-if="item.type">
-                                                  <t t-esc="item.type"/>
-                                            </t>/
-                                            <t t-if="item.service">
-                                                <t t-esc="item.service"/>
-                                                 <!--<t t-esc="service[item.service]"/>-->
-                                            </t>/
-                                            <t t-if="item.process">
-                                                  <t t-esc="item.process"/>
-                                            </t>
-                                             ]
-                                         </span>
+
+                                    <span class="product_name" t-att-data-id="item.product_id" style="cursor:pointer"><t t-esc="item.name"/></span>
+                                    <span class="show_bom_line_one" style="margin-left:15px">
+                                         [
+                                        1:<t t-esc="item.product_qty"/>
+                                        ]
+                                         [
+                                        <t t-if="item.type">
+                                              <t t-esc="item.type"/>
+                                        </t>/
+                                        <t t-if="item.service">
+                                            <t t-esc="item.service"/>
+                                             <!--<t t-esc="service[item.service]"/>-->
+                                        </t>/
+                                        <t t-if="item.process">
+                                              <t t-esc="item.process"/>
+                                        </t>
+                                         ]
+                                    </span>
                                 </h4>
                             </div>
                             <!--<t t-if="item.level">-->
