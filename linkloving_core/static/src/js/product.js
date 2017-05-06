@@ -25,19 +25,35 @@ odoo.define('linkloving_core.product_detail', function (require) {
             'click .click_po_detail_a':'show_po_detail_line'
         },
         show_po_detail_line:function (e) {
-            var e = e || window.event;
+           var e = e || window.event;
             var target = e.target || e.srcElement;
-            if(target.classList.contains('open-sign')||target.classList.contains('show_bom_line_two')){
+            //若点击的是
+            if(target.classList.contains('show_bom_line_one')||target.classList.contains('show_bom_line_two')){
                 target = target.parentNode;
             }
-            if(target.childNodes[1].classList.contains("fa-caret-right")){
-                target.childNodes[1].classList.remove("fa-caret-right");
-                target.childNodes[1].classList.add("fa-caret-down");
-            }else if(target.childNodes[1].classList.contains("fa-caret-down")){
-                target.childNodes[1].classList.remove("fa-caret-down");
-                target.childNodes[1].classList.add("fa-caret-right");
+            //小三角的变化
+            if(target.childNodes.length > 1){
+                if(target.childNodes[1].classList.contains("fa-caret-right")){
+                    target.childNodes[1].classList.remove("fa-caret-right");
+                    target.childNodes[1].classList.add("fa-caret-down");
+                }else if(target.childNodes[1].classList.contains("fa-caret-down")){
+                    target.childNodes[1].classList.remove("fa-caret-down");
+                    target.childNodes[1].classList.add("fa-caret-right");
+                }
+            }
+            if(target.classList.contains('open-sign')){
+                if(target.classList.contains("fa-caret-right")){
+                    target.classList.remove("fa-caret-right");
+                    target.classList.add("fa-caret-down");
+                }else if(target.classList.contains("fa-caret-down")){
+                    target.classList.remove("fa-caret-down");
+                    target.classList.add("fa-caret-right");
+                }
+                target = target.parentNode;
             }
             var po_id = target.attributes['data-po-id'].nodeValue;
+            po_id = parseInt(po_id);
+            console.log(po_id);
             new Model("purchase.order.line")
                 .call("get_mo_list", [po_id])
                 .then(function (result) {
