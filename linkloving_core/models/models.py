@@ -118,6 +118,7 @@ class ProductTemplate(models.Model):
                 ids.append({
                     'id': mo.id,
                     'name': mo.name,
+                    'product_id': mo.product_tmpl_id.product_variant_ids[0].id,
                     'qty': mo.product_qty,
                     'state': MO_STATE[mo.state],
                     'date': mo.date_planned_start,
