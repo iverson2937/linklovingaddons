@@ -5,6 +5,14 @@ from odoo import models, fields, api
 from models import MO_STATE
 import uuid
 
+SALE_ORDER_STATE = {
+    'sale': u'销售订单',
+    'sent': u'已发送报价单',
+    'cancel': u'取消',
+    'draft': u'草稿',
+    'done': u'完成',
+}
+
 
 # MO_STATE = {
 #     'draft': u'草稿',
@@ -121,7 +129,7 @@ class PurchaseOrderLine(models.Model):
                                 'id': so_id.id,
                                 'model': 'sale.order',
                                 'origin': False,
-                                'state': so_id.state,
+                                'state': SALE_ORDER_STATE[so_id.state],
                                 'product_qty': order_line_id.product_qty,
                                 'date': so_id.validity_date,
                             })
