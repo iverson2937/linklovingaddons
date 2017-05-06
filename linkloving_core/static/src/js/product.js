@@ -24,7 +24,26 @@ odoo.define('linkloving_core.product_detail', function (require) {
             'click .product_name':'to_product_name',
             'click .click_po_detail_a':'show_po_detail_line',
             'click .click_po_detail_a_add':'show_po_detail_line_add',
-            'click .click_mo_detail_a':'show_mo_detail_line'
+            'click .click_mo_detail_a':'show_mo_detail_line',
+            'click .po_mo_target':'to_po_or_mo_page'
+        },
+        to_po_or_mo_page:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var model_name = target.attributes['data-model'].nodeValue;
+            var to_page_id = target.attributes['data-id'].nodeValue;
+            to_page_id = parseInt(to_page_id)
+            var action = {
+                name:"详细",
+                type: 'ir.actions.act_window',
+                res_model:model_name,
+                view_type: 'form',
+                view_mode: 'tree,form',
+                views: [[false, 'form']],
+                res_id: to_page_id,
+                target:"new"
+            };
+            this.do_action(action);
         },
         show_mo_detail_line:function (e) {
              var e = e || window.event;
@@ -57,11 +76,14 @@ odoo.define('linkloving_core.product_detail', function (require) {
             var return_origin = target.attributes['data-origin'].nodeValue;
             var more_mo = target.attributes['data-more-mo'].nodeValue;
             mo_id = parseInt(mo_id);
-            console.log(mo_id);
+            // console.log(more_mo);
             new Model("purchase.order.line")
                 .call("get_source_list", [return_origin,mo_id])
                 .then(function (result) {
                     console.log(result)
+                    for(var i=0;i<result.length;i++){
+                        result[i].date = result[i].date.substr(0,10);
+                    }
                     self.$("#mo_detail"+more_mo+">.panel-body").html(" ")
                     self.$("#mo_detail"+more_mo+">.panel-body").append(QWeb.render('show_mo_detail_add', {result:result}));
                 })
@@ -99,7 +121,10 @@ odoo.define('linkloving_core.product_detail', function (require) {
             new Model("purchase.order.line")
                 .call("get_mo_list", [po_id])
                 .then(function (result) {
-                    // console.log(result)
+                    console.log(result)
+                    for(var i=0;i<result.length;i++){
+                        result[i].date = result[i].date.substr(0,10);
+                    }
                     self.$("#po_detail"+po_id+">.panel-body").html(" ")
                     self.$("#po_detail"+po_id+">.panel-body").append(QWeb.render('show_po_detail_add', {result:result}));
                 })
@@ -135,11 +160,13 @@ odoo.define('linkloving_core.product_detail', function (require) {
             var return_origin = target.attributes['data-origin'].nodeValue;
             var mo_id = target.attributes['mo-id'].nodeValue;
             product_id = parseInt(product_id);
-            console.log(product_id);
             new Model("purchase.order.line")
                 .call("get_source_list", [return_origin,product_id])
                 .then(function (result) {
                     console.log(result)
+                    for(var i=0;i<result.length;i++){
+                        result[i].date = result[i].date.substr(0,10);
+                    }
                     self.$("#mo_source"+mo_id+">.panel-body").html(" ")
                     self.$("#mo_source"+mo_id+">.panel-body").append(QWeb.render('show_po_detail_add', {result:result}));
                 })

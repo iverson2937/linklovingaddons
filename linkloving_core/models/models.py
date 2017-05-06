@@ -30,7 +30,9 @@ MO_STATE = {
     'rework_ing': u'返工中',
     'waiting_inventory_material': u'等待清点退料',
     'waiting_warehouse_inspection': u'等待检验退料',
-    'waiting_post_inventory': u'等待入库'
+    'waiting_post_inventory': u'等待入库',
+    'done':u'完成',
+    'cancel':u'取消'
 }
 
 
@@ -85,7 +87,7 @@ class ProductTemplate(models.Model):
         bom_ids = self.bom_ids
         bom_lines = []
         process = False
-        state = False
+        state_bom = False
         service = ''
         draft_qty = on_produce = 0.0
         if self.product_ll_type == 'raw material':
@@ -121,7 +123,7 @@ class ProductTemplate(models.Model):
                     'name': mo.name,
                     'product_id': mo.product_tmpl_id.product_variant_ids[0].id,
                     'qty': mo.product_qty,
-                    'uuid': uuid.uuid1(),
+                    'uuid': str(uuid.uuid1()),
                     'origin': mo.origin,
                     'state': MO_STATE[mo.state],
                     'date': mo.date_planned_start,
@@ -130,7 +132,7 @@ class ProductTemplate(models.Model):
 
         if bom_ids:
             bom = bom_ids[0]
-            state = bom.state
+            state_bom = bom.state
             lines = bom.bom_line_ids
             process = bom.process_id.name
 
@@ -151,8 +153,10 @@ class ProductTemplate(models.Model):
                     if line_draft_qty or line_on_produce:
                         has_mo = True
                 bom_ids = line.product_id.bom_ids
+                state_bom_line=False
                 if bom_ids:
                     line_process = bom_ids[0].process_id.name
+                    state_bom_line=bom_ids[0].state
 
                 res = {}
                 level = False
@@ -174,6 +178,7 @@ class ProductTemplate(models.Model):
                     'service': line.product_id.order_ll_type,
                     'on_produce': line_on_produce,
                     'draft': line_draft_qty,
+                    'state_bom':state_bom_line,
                     'purchase_ok': line.product_id.purchase_ok,
                     'stock': line.product_id.qty_available,
                     'require': line.product_id.outgoing_qty
@@ -195,7 +200,7 @@ class ProductTemplate(models.Model):
             'purchase_ok': self.purchase_ok,
             'stock': self.qty_available,
             'require': self.outgoing_qty,
-            'state': state
+            'state_bom': state_bom
         }
 
     def get_draft_po_qty(self, product_id):

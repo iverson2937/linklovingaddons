@@ -106,7 +106,7 @@ class PurchaseOrderLine(models.Model):
                                 'product_id': mo_id.product_tmpl_id.product_variant_ids[0].id,
                                 'date': mo_id.date_planned_start,
                                 'state': MO_STATE[mo_id.state],
-                                'uuid': uuid.uuid1(),
+                                'uuid': str(uuid.uuid1()),
                                 'id': mo_id.id,
                                 'model': "mrp.production",
                                 'origin': mo_id.origin
