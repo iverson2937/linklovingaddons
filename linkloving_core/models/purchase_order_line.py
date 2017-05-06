@@ -35,12 +35,14 @@ class PurchaseOrderLine(models.Model):
                     for move_line in mo_id.sim_stock_move_lines:
                         print line.product_id.id
                         print move_line.product_id.id
-                        if line.product_id.id== move_line.product_id.id:
+                        if line.product_id.id == move_line.product_id.id:
                             res.append({
                                 'name': mo_id.name,
                                 'product_qty': move_line.product_uom_qty,
                                 'date': mo_id.date_planned_start,
-                                'state': mo_id.state
+                                'state': mo_id.state,
+                                'is_so': True,
+                                'origin': mo_id.orgin
                             })
                             print res
                 else:
@@ -50,6 +52,8 @@ class PurchaseOrderLine(models.Model):
                             res.append({
                                 'partner_name': so_id.partner_id.name,
                                 'name': so_id.name,
+                                'is_so': True,
+                                'origin': so_id.orgin,
                                 'product_qty': order_line_id.product_qty,
                                 'date': so_id.validity_date,
                             })
