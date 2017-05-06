@@ -142,7 +142,7 @@
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title">
                                                        <!--<input type="checkbox" t-att-name="'chk'+result.product_id" t-att-po-id="item.id" />-->
-                                                        <a data-toggle="collapse" data-parent="#name" t-att-href="'#po_detail'+item.id" class="click_po_detail_a" t-att-data-po-id="item.id">
+                                                        <a data-toggle="collapse" data-parent="#name" t-att-href="'#po_detail'+item.id" class="click_po_detail_a" t-att-data-po-id="item.line_id">
                                                             <t t-if="item.origin!=false">
                                                                 <span class="fa fa-caret-right open-sign po_details"></span>
                                                             </t>
@@ -285,7 +285,7 @@
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title">
                                                         <!--<input type="checkbox" t-att-name="'chk'+result.product_id" t-att-po-id="item.id"/>-->
-                                                        <a data-toggle="collapse" data-parent="#name" t-att-href="'#po_detail'+item.id" class="click_po_detail_a" t-att-data-po-id="item.id">
+                                                        <a data-toggle="collapse" data-parent="#name" t-att-href="'#po_detail'+item.id" class="click_po_detail_a" t-att-data-po-id="item.line_id">
                                                             <t t-if="item.origin!=false">
                                                                 <span class="fa fa-caret-right open-sign po_details"></span>
                                                             </t>
@@ -312,6 +312,24 @@
                 </div>
             </div>
         </div>
+    </t>
+
+    <t t-name="show_po_detail_add">
+        <t t-foreach="result" t-as="item">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#name">
+
+                        </a>
+                        <span><t t-esc="item.name"/></span>
+                        <span><t t-esc="item.product_qty"/></span>
+                        <span><t t-esc="item.date"/></span>
+                        <span><t t-esc="item.state"/></span>
+                    </h4>
+                </div>
+            </div>
+        </t>
     </t>
 
 </templates>

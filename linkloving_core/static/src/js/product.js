@@ -58,6 +58,8 @@ odoo.define('linkloving_core.product_detail', function (require) {
                 .call("get_mo_list", [po_id])
                 .then(function (result) {
                     console.log(result)
+                    self.$("#po_detail"+po_id+">.panel-body").html(" ")
+                    self.$("#po_detail"+po_id+">.panel-body").append(QWeb.render('show_po_detail_add', {result:result}));
                 })
         },
         show_mo_lists:function (e) {
