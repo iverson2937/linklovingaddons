@@ -85,6 +85,7 @@ class ProductTemplate(models.Model):
         bom_ids = self.bom_ids
         bom_lines = []
         process = False
+        state = False
         service = ''
         draft_qty = on_produce = 0.0
         if self.product_ll_type == 'raw material':
@@ -128,8 +129,10 @@ class ProductTemplate(models.Model):
 
         if bom_ids:
             bom = bom_ids[0]
+            state = bom.state
             lines = bom.bom_line_ids
             process = bom.process_id.name
+
             res = {}
 
             for line in lines:
@@ -190,7 +193,8 @@ class ProductTemplate(models.Model):
             'draft': draft_qty,
             'purchase_ok': self.purchase_ok,
             'stock': self.qty_available,
-            'require': self.outgoing_qty
+            'require': self.outgoing_qty,
+            'state': state
         }
 
     def get_draft_po_qty(self, product_id):
