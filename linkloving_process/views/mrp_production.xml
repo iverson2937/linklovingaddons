@@ -85,6 +85,9 @@
                 <xpath expr="//field[@name='product_id']" position="after">
                     <field name="process_id" string="Process" filter_domain="[('process_id.name','ilike',self)]"/>
                 </xpath>
+                <xpath expr="//group/filter[2]" position="replace">
+                    <filter string="工序" domain="[]" context="{'group_by':'process_id'}"/>
+                </xpath>
 
             </field>
         </record>
