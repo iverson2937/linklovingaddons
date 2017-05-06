@@ -2,6 +2,27 @@
 import json
 
 from odoo import models, fields, api
+from models import MO_STATE
+import uuid
+
+
+# MO_STATE = {
+#     'draft': u'草稿',
+#     'confirmed': u'已排产',
+#     'waiting_material': u'等待备料',
+#     'prepare_material_ing': u'备料中',
+#     'finish_prepare_material': u'备料完成',
+#     'already_picking': u'已领料',
+#     'planned': u'安排中',
+#     'progress': u'生产中',
+#     'waiting_quality_inspection': u'等待品检',
+#     'quality_inspection_ing': u'品检中',
+#     'waiting_rework': u'等待返工',
+#     'rework_ing': u'返工中',
+#     'waiting_inventory_material': u'等待清点退料',
+#     'waiting_warehouse_inspection': u'等待检验退料',
+#     'waiting_post_inventory': u'等待入库'
+# }
 
 
 class PurchaseOrderLine(models.Model):
@@ -41,7 +62,7 @@ class PurchaseOrderLine(models.Model):
                                 'product_qty': move_line.product_uom_qty,
                                 'product_id': mo_id.product_tmpl_id.product_variant_ids[0].id,
                                 'date': mo_id.date_planned_start,
-                                'state': mo_id.state,
+                                'state': MO_STATE[mo_id.state],
                                 'id': mo_id.id,
                                 'model': "mrp.production",
                                 'origin': mo_id.origin
@@ -84,7 +105,8 @@ class PurchaseOrderLine(models.Model):
                                 'product_qty': move_line.product_uom_qty,
                                 'product_id': mo_id.product_tmpl_id.product_variant_ids[0].id,
                                 'date': mo_id.date_planned_start,
-                                'state': mo_id.state,
+                                'state': MO_STATE[mo_id.state],
+                                'uuid': uuid.uuid1(),
                                 'id': mo_id.id,
                                 'model': "mrp.production",
                                 'origin': mo_id.origin
@@ -99,6 +121,7 @@ class PurchaseOrderLine(models.Model):
                                 'id': so_id.id,
                                 'model': 'sale.order',
                                 'origin': False,
+                                'state': so_id.state,
                                 'product_qty': order_line_id.product_qty,
                                 'date': so_id.validity_date,
                             })

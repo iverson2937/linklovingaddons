@@ -3,7 +3,7 @@ import json
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-
+import uuid
 PRODUCT_TYPE = {
     'raw material': u'原料',
     'semi-finished': u'半成品',
@@ -61,6 +61,7 @@ class ProductTemplate(models.Model):
             'product_qty': qty,
             'product_id': product_id[0].id,
             'bom_id': bom_id.id,
+            'uuid': uuid.uuid1(),
             'product_uom_id': product_id[0].uom_id.id,
             'state': 'draft',
             'origin': origin,
