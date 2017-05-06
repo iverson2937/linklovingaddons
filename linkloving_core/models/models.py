@@ -120,6 +120,7 @@ class ProductTemplate(models.Model):
                     'name': mo.name,
                     'product_id': mo.product_tmpl_id.product_variant_ids[0].id,
                     'qty': mo.product_qty,
+                    'origin': mo.origin,
                     'state': MO_STATE[mo.state],
                     'date': mo.date_planned_start,
                     # 'origin': mo.origin if mo.origin else '',
