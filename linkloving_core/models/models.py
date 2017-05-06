@@ -101,7 +101,7 @@ class ProductTemplate(models.Model):
             if line.product_qty > line.qty_received:
                 line_ids.append({
                     'name': line.order_id.name,
-                    'id': line.order_id.id,
+                    'id': line.id,
                     'origin': line.order_id.origin,
                     'qty': line.product_qty,
                     'date_planned': line.date_planned,
