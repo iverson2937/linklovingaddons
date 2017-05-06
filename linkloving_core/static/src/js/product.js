@@ -16,12 +16,33 @@ odoo.define('linkloving_core.product_detail', function (require) {
             'click .show_mo_number': 'to_mo_page',
             'click .chk_all': 'check_all',
             'click .chk_all_mo': 'check_all',
-            'click .send-po-btn':'get_po_id',
+            // 'click .send-po-btn':'get_po_id',
             'click .send-mo-btn':'get_mo_id',
             'click .refresh_tree':'refresh_trees',
             'click .click_mo_a':'show_mo_lists',
             'click .click_po_a':'show_mo_lists',
-            'click .product_name':'to_product_name'
+            'click .product_name':'to_product_name',
+            'click .click_po_detail_a':'show_po_detail_line'
+        },
+        show_po_detail_line:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            if(target.classList.contains('open-sign')||target.classList.contains('show_bom_line_two')){
+                target = target.parentNode;
+            }
+            if(target.childNodes[1].classList.contains("fa-caret-right")){
+                target.childNodes[1].classList.remove("fa-caret-right");
+                target.childNodes[1].classList.add("fa-caret-down");
+            }else if(target.childNodes[1].classList.contains("fa-caret-down")){
+                target.childNodes[1].classList.remove("fa-caret-down");
+                target.childNodes[1].classList.add("fa-caret-right");
+            }
+            var po_id = target.attributes['data-po-id'].nodeValue;
+            new Model("purchase.order.line")
+                .call("get_mo_list", [po_id])
+                .then(function (result) {
+                    console.log(result)
+                })
         },
         show_mo_lists:function (e) {
             var e = e || window.event;
@@ -96,23 +117,23 @@ odoo.define('linkloving_core.product_detail', function (require) {
                 $(this).prop("checked",target.checked)
             })
         },
-        get_po_id:function (e) {
-            var e = e || window.event;
-            var target = e.target || e.srcElement;
-            var check_name =  target.getAttribute("check-name");
-            // console.log(check_name);
-            var merge_inputs_ids = [];
-            var merge_inputs = $("input[name="+check_name+"]");
-            merge_inputs.each(function () {
-                if($(this).prop("checked")){
-                    merge_inputs_ids.push(parseInt($(this).attr("po-id")))
-                }
-            })
-            console.log(merge_inputs_ids)
-             new Model("product.template").call("action_combine",[merge_inputs_ids]).then(function (result) {
-                 console.log(result);
-             })
-        },
+        // get_po_id:function (e) {
+        //     var e = e || window.event;
+        //     var target = e.target || e.srcElement;
+        //     var check_name =  target.getAttribute("check-name");
+        //     // console.log(check_name);
+        //     var merge_inputs_ids = [];
+        //     var merge_inputs = $("input[name="+check_name+"]");
+        //     merge_inputs.each(function () {
+        //         if($(this).prop("checked")){
+        //             merge_inputs_ids.push(parseInt($(this).attr("po-id")))
+        //         }
+        //     })
+        //     console.log(merge_inputs_ids)
+        //      new Model("product.template").call("action_combine",[merge_inputs_ids]).then(function (result) {
+        //          console.log(result);
+        //      })
+        // },
         get_mo_id:function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;

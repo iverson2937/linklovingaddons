@@ -129,8 +129,8 @@
                                             <span class="fa fa-caret-right open-sign"></span>
                                         </t>
                                     </a>
-                                     PO[<t t-esc="po_length"/>]
-                                        <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
+                                    PO[<t t-esc="po_length"/>]
+                                    <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                                     <!--<button class="btn btn-primary send-po-btn">合并</button>-->
                                 </h4>
                             </div>
@@ -142,14 +142,23 @@
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title">
                                                        <!--<input type="checkbox" t-att-name="'chk'+result.product_id" t-att-po-id="item.id" />-->
-                                                        <a data-toggle="collapse" data-parent="#name">
-                                                            <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
-                                                            <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
-                                                            <span style="margin-left:15px"><t t-esc="item.state"/> </span>
-                                                            <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
+                                                        <a data-toggle="collapse" data-parent="#name" t-att-href="'#po_detail'+item.id" class="click_po_detail_a" t-att-data-po-id="item.id">
+                                                            <t t-if="item.origin!=false">
+                                                                <span class="fa fa-caret-right open-sign po_details"></span>
+                                                            </t>
                                                         </a>
+                                                        <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
                                                     </h4>
                                                 </div>
+                                                <div class="panel-collapse collapse" t-att-id="'po_detail'+item.id">
+                                                    <div class="panel-body">
+
+                                                    </div>
+                                                </div>
+
                                             </div>
                                         </t>
                                     </div>
@@ -163,42 +172,7 @@
         </div>
     </t>
 
-    <!--MO的QWeb-->
-    <t t-name="show_bom_line_mo">
-        <t t-foreach="mo" t-as="item">
-            <div class="panel panel-success">
-                <div class="panel-heading">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#name">
-                            <span><t t-esc="item.name"/> </span>
-                            <span style="margin-left:15px"><t t-esc="item.date"/> </span>
-                            <span style="margin-left:15px"><t t-esc="item.state"/> </span>
-                            <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
-                            <!--<span style="margin-left:15px"><t t-esc="item.origin"/> </span>-->
-                        </a>
-                    </h4>
-                </div>
-            </div>
-        </t>
-    </t>
 
-    <!--PO的QWeb-->
-    <t t-name="show_bom_line_po">
-        <t t-foreach="po" t-as="item">
-            <div class="panel panel-danger">
-                <div class="panel-heading">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#name">
-                            <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
-                            <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
-                            <span style="margin-left:15px"><t t-esc="item.state"/> </span>
-                            <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
-                        </a>
-                    </h4>
-                </div>
-            </div>
-        </t>
-    </t>
 
     <t t-name="show_bom_line_tr_add">
         <div class="panel panel-default">
@@ -311,13 +285,21 @@
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title">
                                                         <!--<input type="checkbox" t-att-name="'chk'+result.product_id" t-att-po-id="item.id"/>-->
-                                                        <a data-toggle="collapse" data-parent="#name">
-                                                            <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
-                                                            <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
-                                                            <span style="margin-left:15px"><t t-esc="item.state"/> </span>
-                                                            <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
+                                                        <a data-toggle="collapse" data-parent="#name" t-att-href="'#po_detail'+item.id" class="click_po_detail_a" t-att-data-po-id="item.id">
+                                                            <t t-if="item.origin!=false">
+                                                                <span class="fa fa-caret-right open-sign po_details"></span>
+                                                            </t>
                                                         </a>
+                                                        <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
                                                     </h4>
+                                                </div>
+                                                <div class="panel-collapse collapse" t-att-id="'po_detail'+item.id">
+                                                    <div class="panel-body">
+
+                                                    </div>
                                                 </div>
                                             </div>
                                         </t>
