@@ -42,7 +42,7 @@ class PurchaseOrderLine(models.Model):
                                 'date': mo_id.date_planned_start,
                                 'state': mo_id.state,
                                 'is_so': True,
-                                'origin': mo_id.orgin
+                                'origin': mo_id.origin
                             })
                             print res
                 else:
@@ -53,7 +53,7 @@ class PurchaseOrderLine(models.Model):
                                 'partner_name': so_id.partner_id.name,
                                 'name': so_id.name,
                                 'is_so': True,
-                                'origin': so_id.orgin,
+                                'origin': so_id.origin,
                                 'product_qty': order_line_id.product_qty,
                                 'date': so_id.validity_date,
                             })
