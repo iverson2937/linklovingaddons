@@ -39,7 +39,7 @@ class PurchaseOrderLine(models.Model):
                             res.append({
                                 'name': mo_id.name,
                                 'product_qty': move_line.product_uom_qty,
-                                'product_id': mo_id.product_tmpl_id,
+                                'product_id': mo_id.product_tmpl_id.product_variant_ids[0].id,
                                 'date': mo_id.date_planned_start,
                                 'state': mo_id.state,
                                 'id': mo_id.id,
@@ -76,16 +76,31 @@ class PurchaseOrderLine(models.Model):
                 if s.startswith('MO'):
                     mo_id = self.env['mrp.production'].search([('name', '=', s)])
                     for move_line in mo_id.sim_stock_move_lines:
+                        print move_line.product_id.id
+                        print product_id
                         if product_id == move_line.product_id.id:
                             res.append({
                                 'name': mo_id.name,
                                 'product_qty': move_line.product_uom_qty,
-                                'product_id': mo_id.product_tmpl_id,
+                                'product_id': mo_id.product_tmpl_id.product_variant_ids[0].id,
                                 'date': mo_id.date_planned_start,
                                 'state': mo_id.state,
                                 'id': mo_id.id,
                                 'model': "mrp.production",
                                 'origin': mo_id.origin
+                            })
+                elif s.startswith('MO'):
+                    so_id = self.env['sale.order'].search([('name', '=', s)])
+                    for order_line_id in so_id.order_line:
+                        if product_id == order_line_id.product_id:
+                            res.append({
+                                'partner_name': so_id.partner_id.name,
+                                'name': so_id.name,
+                                'id': so_id.id,
+                                'model': 'sale.order',
+                                'origin': False,
+                                'product_qty': order_line_id.product_qty,
+                                'date': so_id.validity_date,
                             })
 
             return res
