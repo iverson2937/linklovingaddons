@@ -14,27 +14,20 @@ SALE_ORDER_STATE = {
 }
 
 
-# MO_STATE = {
-#     'draft': u'草稿',
-#     'confirmed': u'已排产',
-#     'waiting_material': u'等待备料',
-#     'prepare_material_ing': u'备料中',
-#     'finish_prepare_material': u'备料完成',
-#     'already_picking': u'已领料',
-#     'planned': u'安排中',
-#     'progress': u'生产中',
-#     'waiting_quality_inspection': u'等待品检',
-#     'quality_inspection_ing': u'品检中',
-#     'waiting_rework': u'等待返工',
-#     'rework_ing': u'返工中',
-#     'waiting_inventory_material': u'等待清点退料',
-#     'waiting_warehouse_inspection': u'等待检验退料',
-#     'waiting_post_inventory': u'等待入库'
-# }
-
-
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
+
+    @api.multi
+    def show_product_form(self):
+        return {
+            'name': u'产品明细',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'product.template',
+            'target': 'current',
+            'res_id': self.product_id.product_tmpl_id.id
+        }
 
     @api.multi
     def show_product_detail(self):
