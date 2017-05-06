@@ -41,7 +41,8 @@ class PurchaseOrderLine(models.Model):
                                 'product_qty': move_line.product_uom_qty,
                                 'date': mo_id.date_planned_start,
                                 'state': mo_id.state,
-                                'is_so': True,
+                                'id': mo_id.id,
+                                'model': "mrp.production",
                                 'origin': mo_id.origin
                             })
                             print res
@@ -52,8 +53,9 @@ class PurchaseOrderLine(models.Model):
                             res.append({
                                 'partner_name': so_id.partner_id.name,
                                 'name': so_id.name,
-                                'is_so': True,
+                                'id': so_id.id,
                                 'origin': so_id.origin,
+                                'model': 'sale.order',
                                 'product_qty': order_line_id.product_qty,
                                 'date': so_id.validity_date,
                             })
