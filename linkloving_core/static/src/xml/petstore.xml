@@ -61,14 +61,22 @@
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title">
                                                         <input type="checkbox" t-att-name="'chk_mo'+result.product_id" t-att-mo-id="item.id" />
-                                                        <a data-toggle="collapse" data-parent="#name">
-                                                            <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
-                                                            <span style="margin-left:15px"><t t-esc="item.date"/> </span>
-                                                            <span style="margin-left:15px"><t t-esc="item.state"/> </span>
-                                                            <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
-                                                            <!--<span style="margin-left:15px"><t t-esc="item.origin"/> </span>-->
+                                                        <a data-toggle="collapse" t-att-data-more-mo="item.id" data-parent="#name" t-att-data-origin="item.origin" t-att-href="'#mo_detail'+item.id" class="click_mo_detail_a" t-att-data-mo-id="item.product_id">
+                                                            <t t-if="item.origin!=false">
+                                                                <span class="fa fa-caret-right open-sign po_details"></span>
+                                                            </t>
                                                         </a>
+                                                        <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.date"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
+                                                        <!--<span style="margin-left:15px"><t t-esc="item.origin"/> </span>-->
                                                     </h4>
+                                                </div>
+                                                <div class="panel-collapse collapse" t-att-id="'mo_detail'+item.id">
+                                                    <div class="panel-body">
+
+                                                    </div>
                                                 </div>
                                             </div>
                                         </t>
@@ -201,14 +209,22 @@
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title">
                                                         <input type="checkbox" t-att-name="'chk_mo'+result.product_id" t-att-mo-id="item.id"/>
-                                                        <a data-toggle="collapse" data-parent="#name">
-                                                            <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
-                                                            <span style="margin-left:15px"><t t-esc="item.date"/> </span>
-                                                            <span style="margin-left:15px"><t t-esc="item.state"/> </span>
-                                                            <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
-                                                            <!--<span style="margin-left:15px"><t t-esc="item.origin"/> </span>-->
+                                                        <a data-toggle="collapse" data-parent="#name" t-att-data-more-mo="item.id" t-att-href="'#mo_detail'+item.id" t-att-data-origin="item.origin" class="click_mo_detail_a" t-att-data-mo-id="item.product_id">
+                                                            <t t-if="item.origin!=false">
+                                                                <span class="fa fa-caret-right open-sign po_details"></span>
+                                                            </t>
                                                         </a>
+                                                        <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.date"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
+                                                        <!--<span style="margin-left:15px"><t t-esc="item.origin"/> </span>-->
                                                     </h4>
+                                                </div>
+                                                <div class="panel-collapse collapse" t-att-id="'mo_detail'+item.id">
+                                                    <div class="panel-body">
+
+                                                    </div>
                                                 </div>
                                             </div>
                                         </t>
@@ -328,9 +344,42 @@
                         <span><t t-esc="item.product_qty"/></span>
                         <span><t t-esc="item.date"/></span>
                         <span><t t-esc="item.state"/></span>
+                        <div class="panel-collapse collapse" t-att-id="'mo_detail'+item.id">
+                            <div class="panel-body">
+
+                            </div>
+                        </div>
                     </h4>
                 </div>
                 <div class="panel-collapse collapse" t-att-id="'mo_source'+item.id">
+                    <div class="panel-body">
+
+                    </div>
+                </div>
+            </div>
+        </t>
+    </t>
+
+    <t t-name="show_mo_detail_add">
+        <t t-foreach="result" t-as="item">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" t-att-data-mo-id="item.product_id" t-att-data-more-mo="item.id" t-att-mo-id="item.id" class="click_mo_detail_a" data-parent="#name" t-att-href="'#mo_detail'+item.id"  t-att-data-origin="item.origin">
+                            <t t-if="item.origin!=false">
+                                <span class="fa fa-caret-right open-sign po_details"></span>
+                            </t>
+                        </a>
+                        <span><t t-esc="item.name"/></span>
+                        <span><t t-esc="item.product_qty"/></span>
+                        <span><t t-esc="item.date"/></span>
+                        <t t-if="item.partner_name">
+                            <span><t t-esc="item.partner_name"/></span>
+                        </t>
+
+                    </h4>
+                </div>
+                <div class="panel-collapse collapse" t-att-id="'mo_detail'+item.id">
                     <div class="panel-body">
 
                     </div>

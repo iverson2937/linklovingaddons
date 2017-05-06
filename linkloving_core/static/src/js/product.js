@@ -23,7 +23,48 @@ odoo.define('linkloving_core.product_detail', function (require) {
             'click .click_po_a':'show_mo_lists',
             'click .product_name':'to_product_name',
             'click .click_po_detail_a':'show_po_detail_line',
-            'click .click_po_detail_a_add':'show_po_detail_line_add'
+            'click .click_po_detail_a_add':'show_po_detail_line_add',
+            'click .click_mo_detail_a':'show_mo_detail_line'
+        },
+        show_mo_detail_line:function (e) {
+             var e = e || window.event;
+            var target = e.target || e.srcElement;
+            //若点击的是
+            if(target.classList.contains('show_bom_line_one')||target.classList.contains('show_bom_line_two')){
+                target = target.parentNode;
+            }
+            //小三角的变化
+            if(target.childNodes.length > 1){
+                if(target.childNodes[1].classList.contains("fa-caret-right")){
+                    target.childNodes[1].classList.remove("fa-caret-right");
+                    target.childNodes[1].classList.add("fa-caret-down");
+                }else if(target.childNodes[1].classList.contains("fa-caret-down")){
+                    target.childNodes[1].classList.remove("fa-caret-down");
+                    target.childNodes[1].classList.add("fa-caret-right");
+                }
+            }
+            if(target.classList.contains('open-sign')){
+                if(target.classList.contains("fa-caret-right")){
+                    target.classList.remove("fa-caret-right");
+                    target.classList.add("fa-caret-down");
+                }else if(target.classList.contains("fa-caret-down")){
+                    target.classList.remove("fa-caret-down");
+                    target.classList.add("fa-caret-right");
+                }
+                target = target.parentNode;
+            }
+            var mo_id = target.attributes['data-mo-id'].nodeValue;
+            var return_origin = target.attributes['data-origin'].nodeValue;
+            var more_mo = target.attributes['data-more-mo'].nodeValue;
+            mo_id = parseInt(mo_id);
+            console.log(mo_id);
+            new Model("purchase.order.line")
+                .call("get_source_list", [return_origin,mo_id])
+                .then(function (result) {
+                    console.log(result)
+                    self.$("#mo_detail"+more_mo+">.panel-body").html(" ")
+                    self.$("#mo_detail"+more_mo+">.panel-body").append(QWeb.render('show_mo_detail_add', {result:result}));
+                })
         },
         show_po_detail_line:function (e) {
            var e = e || window.event;
@@ -58,7 +99,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
             new Model("purchase.order.line")
                 .call("get_mo_list", [po_id])
                 .then(function (result) {
-                    console.log(result)
+                    // console.log(result)
                     self.$("#po_detail"+po_id+">.panel-body").html(" ")
                     self.$("#po_detail"+po_id+">.panel-body").append(QWeb.render('show_po_detail_add', {result:result}));
                 })

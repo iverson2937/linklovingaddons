@@ -89,10 +89,10 @@ class PurchaseOrderLine(models.Model):
                                 'model': "mrp.production",
                                 'origin': mo_id.origin
                             })
-                elif s.startswith('MO'):
+                elif s.startswith('SO'):
                     so_id = self.env['sale.order'].search([('name', '=', s)])
                     for order_line_id in so_id.order_line:
-                        if product_id == order_line_id.product_id:
+                        if product_id == order_line_id.product_id.id:
                             res.append({
                                 'partner_name': so_id.partner_id.name,
                                 'name': so_id.name,
