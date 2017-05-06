@@ -28,5 +28,3 @@ class SaleOrderLine(models.Model):
                     mo_ids = mo.split(':')
                     for mo_id in mo_ids:
                         sources.append(mo_id.strip())
-
-            print sources

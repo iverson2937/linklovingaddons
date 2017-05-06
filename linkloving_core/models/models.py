@@ -102,6 +102,7 @@ class ProductTemplate(models.Model):
                 line_ids.append({
                     'name': line.order_id.name,
                     'id': line.order_id.id,
+                    'origin': line.order_id.origin,
                     'qty': line.product_qty,
                     'date_planned': line.date_planned,
                     'state': PURCHASE_TYPE[line.order_id.state]
