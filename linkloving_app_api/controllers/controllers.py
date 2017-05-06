@@ -253,19 +253,24 @@ class LinklovingAppApi(http.Controller):
                                                                       groupby=["date_planned_start"])
 
         list = []
+
+        def get_count_iter(orders):
+            count = 0
+            for order in orders:
+                count += order.get("date_planned_start_count")
+            return count
         if order_delay:
             list.append({"state": "delay",
-                         "count": order_delay[0].get("date_planned_start_count")})
+                         "count": get_count_iter(order_delay)})
         if order_today:
             list.append({"state": "today",
-                         "count": order_today[0].get("date_planned_start_count")})
+                         "count": get_count_iter(order_today)})
         if order_tomorrow:
             list.append({"state": "tomorrow",
-                         "count": order_tomorrow[0].get("date_planned_start_count")})
+                         "count": get_count_iter(order_tomorrow)})
         if order_after:
             list.append({"state": "after",
-                         "count": order_after[0].get("date_planned_start_count")})
-
+                         "count": get_count_iter(order_after)})
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=list)
 
     @http.route('/linkloving_app_api/get_order_count_by_process', type='json', auth='none', csrf=False)
@@ -313,18 +318,24 @@ class LinklovingAppApi(http.Controller):
                                                                           groupby=["date_planned_start"])
 
             list = []
+
+            def get_count_iter(orders):
+                count = 0
+                for order in orders:
+                    count += order.get("date_planned_start_count")
+                return count
             if order_delay:
                 list.append({"state": "delay",
-                             "count": order_delay[0].get("date_planned_start_count")})
+                             "count": get_count_iter(order_delay)})
             if order_today:
                 list.append({"state": "today",
-                             "count": order_today[0].get("date_planned_start_count")})
+                             "count": get_count_iter(order_today)})
             if order_tomorrow:
                 list.append({"state": "tomorrow",
-                             "count": order_tomorrow[0].get("date_planned_start_count")})
+                             "count": get_count_iter(order_tomorrow)})
             if order_after:
                 list.append({"state": "after",
-                             "count": order_after[0].get("date_planned_start_count")})
+                             "count": get_count_iter(order_after)})
             process_count_dict[process_id] = list
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=process_count_dict)
 
@@ -332,12 +343,14 @@ class LinklovingAppApi(http.Controller):
 
     @http.route('/linkloving_app_api/get_recent_production_order', type='json', auth='none', csrf=False)
     def get_recent_production_order(self, **kw):
-        today_time = fields.datetime.now()
+
         limit = request.jsonrequest.get('limit')
         offset = request.jsonrequest.get('offset')
         date_to_show = request.jsonrequest.get("date")
         process_id = request.jsonrequest.get("process_id")
         one_days_after = datetime.timedelta(days=1)
+        today_time = fields.datetime.strptime(fields.datetime.strftime(fields.datetime.now(), '%Y-%m-%d'),
+                                              '%Y-%m-%d')
         if date_to_show != "delay":
             today_time = fields.datetime.strptime(date_to_show, '%Y-%m-%d')
         one_millisec_before = datetime.timedelta(milliseconds=1)  #
@@ -349,7 +362,7 @@ class LinklovingAppApi(http.Controller):
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "未找到工序id"})
 
         if date_to_show == "delay":
-            domain = [('date_planned_start', '<=', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
+            domain = [('date_planned_start', '<', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
                       ('state', 'in', ['waiting_material', 'prepare_material_ing']),
                       ('process_id', '=', process_id)]
         else:
