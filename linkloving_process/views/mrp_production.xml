@@ -83,6 +83,7 @@
             <field name="inherit_id" ref="mrp.view_mrp_production_filter"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='product_id']" position="after">
+                    <field name="origin" string="原订单号" filter_domain="[('origin','ilike',self)]"/>
                     <field name="process_id" string="Process" filter_domain="[('process_id.name','ilike',self)]"/>
                 </xpath>
                 <xpath expr="//group/filter[2]" position="replace">
