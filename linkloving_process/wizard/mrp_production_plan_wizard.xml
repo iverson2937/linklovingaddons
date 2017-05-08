@@ -21,7 +21,7 @@
                     <footer>
                         <button name='action_mo_plan' type='object' string='确认' class='oe_highlight'/>
                         or
-                        <button string='Cancel' class='oe_link' special='取消'/>
+                        <button string='取消' class='oe_link' special='cancel'/>
                     </footer>
                 </form>
             </field>
