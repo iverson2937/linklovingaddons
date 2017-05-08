@@ -22,8 +22,6 @@ class MrpProductionWizard(models.TransientModel):
         start_date = datetime.datetime.strptime(self.start_date, "%Y-%m-%d").strftime('%Y-%m-%d %H:%M:%S')
         end_date = (datetime.datetime.strptime(self.end_date, "%Y-%m-%d") + datetime.timedelta(days=1)).strftime(
             '%Y-%m-%d %H:%M:%S')
-        print start_date
-        print end_date
         domain = [('date_planned_start', '>', start_date),
                   ('date_planned_start', '<', end_date), ('process_id', '=', self.process_id.id),
                   ('state', 'not in', ['cancel', 'draft', 'done'])]

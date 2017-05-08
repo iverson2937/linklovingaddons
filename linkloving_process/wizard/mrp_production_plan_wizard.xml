@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+        <record id='mrp_production_plan_wizard' model='ir.ui.view'>
+            <field name='name'>mrp.production.plan.wizard</field>
+            <field name='model'>mrp.production.plan.wizard</field>
+            <field name='type'>form</field>
+            <field name='arch' type='xml'>
+                <form name='安排订单'>
+                    <group>
+                        <group>
+                            <field name='date_planned_start' required='1'/>
+                        </group>
+                        <group>
+                            <field name="partner_id" string="工序负责人"/>
+                        </group>
+                    </group>
+
+                    <footer>
+                        <button name='action_mo_plan' type='object' string='确认' class='oe_highlight'/>
+                        or
+                        <button string='Cancel' class='oe_link' special='取消'/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window id="action_mrp_production_plan"
+                    multi="True"
+                    key2="client_action_multi" name="批量安排生产"
+                    res_model="mrp.production.plan.wizard" src_model="mrp.production"
+                    view_mode="form" target="new" view_type="form"/>
+
+    </data>
+</openerp>
