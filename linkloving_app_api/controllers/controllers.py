@@ -216,7 +216,8 @@ class LinklovingAppApi(http.Controller):
         one_days_after = datetime.timedelta(days=1)
         today_time = fields.datetime.strptime(fields.datetime.strftime(date_to_show, '%Y-%m-%d'),
                                               '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
-        timez = fields.datetime.now() - fields.datetime.utcnow()
+        user = request.env["res.users"].sudo().browse(request.context.get("uid"))
+        timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
         after_day = today_time + one_days_after
         order_delay = request.env["mrp.production"].sudo().read_group(
                 [('date_planned_start', '<', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
@@ -280,7 +281,8 @@ class LinklovingAppApi(http.Controller):
         one_days_after = datetime.timedelta(days=1)
         today_time = fields.datetime.strptime(fields.datetime.strftime(date_to_show, '%Y-%m-%d'),
                                               '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
-        timez = fields.datetime.now() - fields.datetime.utcnow()
+        user = request.env["res.users"].sudo().browse(request.context.get("uid"))
+        timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
         after_day = today_time + one_days_after
         after_2_day = after_day + one_days_after
         after_3_day = after_2_day + one_days_after
@@ -356,8 +358,8 @@ class LinklovingAppApi(http.Controller):
         one_millisec_before = datetime.timedelta(milliseconds=1)  #
         today_time = today_time - one_millisec_before  # 今天的最后一秒
         after_day = today_time + one_days_after
-
-        timez = fields.datetime.now() - fields.datetime.utcnow()
+        user = request.env["res.users"].sudo().browse(request.context.get("uid"))
+        timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
         if not process_id:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "未找到工序id"})
 
@@ -1715,6 +1717,7 @@ class LinklovingAppApi(http.Controller):
         complete_rate = request.jsonrequest.get("complete_rate")
         partner_id = request.jsonrequest.get('partner_id')
         domain = [("picking_type_code", "=", "outgoing")]
+        # expression.AND([domain, [("picking_type_code", "=", "outgoing")]])
         # request.env["stock.picking"].sudo().search([("state", "in", ("partially_available", "assigned", "confirmed")),
         #                                             ("picking_type_code", "=", "outgoing")])._compute_complete_rate()
         if state:
@@ -1724,7 +1727,7 @@ class LinklovingAppApi(http.Controller):
                 domain = expression.AND([domain, [("complete_rate", "=", int(complete_rate)),
                                                   ("state", "in", ["partially_available", "assigned", "confirmed"])]])
             if complete_rate == 99:
-                domain = expression.AND([domain, [("complete_rate", "<", 100), ("complete_rate", ">", 0),
+                domain = expression.AND([domain, ['&', '&', ("complete_rate", "<", 100), ("complete_rate", ">", 0),
                                                   ("state", "in", ["partially_available", "assigned", "confirmed"])]])
                 domain = expression.OR([domain, [("complete_rate", "<", 0)]])
 

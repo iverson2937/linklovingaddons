@@ -874,7 +874,10 @@ class SimStockMove(models.Model):
     def _default_suggest_qty(self):
         for sim_move in self:
             if sim_move.stock_moves:
-                sim_move.suggest_qty = sim_move.stock_moves[0].suggest_qty
+                for move in sim_move.stock_moves:
+                    if move.state != "cancel":
+                        sim_move.suggest_qty = move.suggest_qty
+                        break
 
     def _compute_quantity_available(self):
         for sim_move in self:
