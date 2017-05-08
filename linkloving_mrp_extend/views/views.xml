@@ -92,6 +92,15 @@
                     <attribute name="options">{'no_create':True}</attribute>
                 </xpath>
 
+                <div name="button_box" position="inside">
+                    <button class="oe_stat_button" name="action_view_qc_report"
+                            type="object" icon="fa-list-alt"
+                            attrs="{'invisible': [('qc_feedback_count', '=', 0)]}">
+                        <field name="qc_feedback_count" string="品检单" widget="statinfo"/>
+                    </button>
+
+                </div>
+
                 <xpath expr="//button[@name='button_plan']" position="after">
                     <button name="button_action_confirm_draft" class="oe_highlight"
                             attrs="{'invisible': [('state', 'not in', 'draft')]}" type="object"
