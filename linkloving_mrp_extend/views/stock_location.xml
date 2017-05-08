@@ -1,0 +1,18 @@
+<openerp>
+    <data>
+        <!-- Inherit Form View to Modify it -->
+        <record id="ll_view_location_form" model="ir.ui.view">
+            <field name="name">stock.location.form.inherit</field>
+            <field name="model">stock.location</field>
+            <field name="inherit_id" ref="stock.view_location_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='return_location']" position="after">
+                    <field name="is_circulate_location"/>
+                    <field name="is_semi_finished_location"/>
+                </xpath>
+
+            </field>
+        </record>
+    </data>
+</openerp>

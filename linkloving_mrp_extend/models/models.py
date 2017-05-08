@@ -932,7 +932,7 @@ class SimStockMove(models.Model):
     area_id = fields.Many2one(related='product_id.area_id')
     product_type = fields.Selection(string="物料类型", selection=[('semi-finished', '半成品'), ('material', '原材料'), ],
                                     required=False, compute="_compute_product_type")
-
+    is_prepare_finished = fields.Boolean(u"是否备货完成")
 
 class ReturnMaterialLine(models.Model):
     _name = 'return.material.line'
@@ -1235,3 +1235,10 @@ class purchase_order_extend(models.Model):
             if not order.state in ["cancel", "make_by_mrp"]:
                 raise UserError(_('In order to delete a purchase order, you must cancel it first.'))
         super(models.Model, self).unlink()  ###注意 fixme
+
+
+class StockLocationExtend(models.Model):
+    _inherit = "stock.location"
+
+    is_circulate_location = fields.Boolean(u"是否是流转库")
+    is_semi_finished_location = fields.Boolean(u"是否是半成品库")
