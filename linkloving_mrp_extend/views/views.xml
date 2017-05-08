@@ -488,7 +488,7 @@
             </field>
         </record>
         <menuitem id="menu_mrp_confirmed"
-                  name="Confirmed Orders"
+                  name="已确认"
                   parent="mrp.menu_mrp_manufacturing"
                   action="mrp_confirmed"
                   sequence="21"
@@ -520,7 +520,7 @@
             </field>
         </record>
         <menuitem id="menu_mrp_waiting_material"
-                  name="Waiting Material Orders"
+                  name="待备料"
                   parent="mrp.menu_mrp_manufacturing"
                   action="mrp_waiting_material"
                   sequence="22"
@@ -552,7 +552,7 @@
             </field>
         </record>
         <menuitem id="menu_mrp_prepare_material_ing"
-                  name="Prepare Material ing Orders"
+                  name="备料中"
                   parent="mrp.menu_mrp_manufacturing"
                   action="mrp_prepare_material_ing"
                   sequence="23"
@@ -584,7 +584,7 @@
             </field>
         </record>
         <menuitem id="menu_mrp_finish_prepare_material"
-                  name="Finish Prepare Material Orders"
+                  name="待领料"
                   parent="mrp.menu_mrp_manufacturing"
                   action="mrp_finish_prepare_material"
                   sequence="24"
@@ -617,7 +617,7 @@
             </field>
         </record>
         <menuitem id="menu_mrp_already_picking"
-                  name="Already Picking Orders"
+                  name="待生产"
                   parent="mrp.menu_mrp_manufacturing"
                   action="mrp_already_picking"
                   sequence="25"
@@ -649,7 +649,7 @@
             </field>
         </record>
         <menuitem id="menu_mrp_progress"
-                  name="Progress Orders"
+                  name="生产中"
                   parent="mrp.menu_mrp_manufacturing"
                   action="mrp_progress"
                   sequence="26"
@@ -681,7 +681,7 @@
             </field>
         </record>
         <menuitem id="menu_mrp_waiting_quality_inspection"
-                  name="Waiting Inspection Orders"
+                  name="待品检"
                   parent="mrp.menu_mrp_manufacturing"
                   action="mrp_waiting_quality_inspection"
                   sequence="27"
@@ -714,7 +714,7 @@
             </field>
         </record>
         <menuitem id="menu_mrp_quality_inspection_ing"
-                  name="Inspection ing Orders"
+                  name="品检中"
                   parent="mrp.menu_mrp_manufacturing"
                   action="mrp_quality_inspection_ing"
                   sequence="28"
@@ -746,7 +746,7 @@
             </field>
         </record>
         <menuitem id="menu_mrp_waiting_inventory_material"
-                  name="Waiting Inventory Orders"
+                  name="待退料"
                   parent="mrp.menu_mrp_manufacturing"
                   action="mrp_waiting_inventory_material"
                   sequence="29"
@@ -778,7 +778,7 @@
             </field>
         </record>
         <menuitem id="menu_mrp_waiting_warehouse_inspection"
-                  name="Waiting Warehouse Insepcetion Orders"
+                  name="退料待入库"
                   parent="mrp.menu_mrp_manufacturing"
                   action="mrp_waiting_warehouse_inspection"
                   sequence="30"
@@ -810,7 +810,7 @@
             </field>
         </record>
         <menuitem id="menu_mrp_waiting_post_inventory"
-                  name="Waiting Post Orders"
+                  name="产成品待入库"
                   parent="mrp.menu_mrp_manufacturing"
                   action="mrp_waiting_post_inventory"
                   sequence="31"
@@ -843,10 +843,10 @@
         </record>
 
         <menuitem id="menu_mrp_waiting_rework"
-                  name="Waiting Rework Orders"
+                  name="待返工"
                   parent="mrp.menu_mrp_manufacturing"
                   action="mrp_waiting_rework"
-                  sequence="31"
+                  sequence="32"
                   groups="group_charge_produce"/>
 
 
@@ -877,10 +877,10 @@
         </record>
 
         <menuitem id="menu_mrp_rework_ing"
-                  name="Reworking Orders"
+                  name="返工中"
                   parent="mrp.menu_mrp_manufacturing"
                   action="mrp_rework_ing"
-                  sequence="31"
+                  sequence="33"
                   groups="group_charge_produce"/>
 
 
@@ -909,10 +909,10 @@
             </field>
         </record>
         <menuitem id="menu_mrp_done"
-                  name="Done Orders"
+                  name="已完成"
                   parent="mrp.menu_mrp_manufacturing"
                   action="mrp_done"
-                  sequence="32"/>
+                  sequence="34"/>
 
         <record id="mrp_cancelled" model="ir.actions.act_window">
             <field name="name">Cancelled Orders</field>
@@ -939,10 +939,36 @@
             </field>
         </record>
         <menuitem id="menu_mrp_cancelled"
-                  name="Cancelled Orders"
+                  name="已取消"
                   parent="mrp.menu_mrp_manufacturing"
                   action="mrp_cancelled"
-                  sequence="32"/>
+                  sequence="35"/>
+
+
+        <menuitem action="mrp.mrp_production_action"
+                  id="mrp.menu_mrp_production_action"
+                  parent="mrp.menu_mrp_manufacturing"
+                  sequence="1" name="制造订单汇总"/>
+
+
+        <menuitem id="mrp.menu_mrp_unbuild"
+                  name="拆解单"
+                  parent="mrp.menu_mrp_manufacturing"
+                  action="mrp.mrp_unbuild"
+                  sequence="40"/>
+
+
+        <menuitem id="mrp.menu_mrp_scrap"
+                  name="报废"
+                  parent="mrp.menu_mrp_manufacturing"
+                  action="stock.action_stock_scrap"
+                  sequence="41"/>
+
+
+        <menuitem id="mrp.mrp_message_menu"
+                  parent="mrp.menu_mrp_manufacturing"
+                  action="mrp.mrp_message_action_main"
+                  sequence="42"/>
 
 
         <record id="action_picking_tree_outgoing" model="ir.actions.act_window">

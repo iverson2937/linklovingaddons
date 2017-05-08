@@ -56,7 +56,7 @@ msgstr "已领料"
 #: model:ir.actions.act_window,name:linkloving_mrp_extend.mrp_already_picking
 #: model:ir.ui.menu,name:linkloving_mrp_extend.menu_mrp_already_picking
 msgid "Already Picking Orders"
-msgstr "已领料"
+msgstr "待生产"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_worker_line_amount_of_money
@@ -73,8 +73,8 @@ msgstr "Area"
 #. module: linkloving_mrp_extend
 #: code:addons/linkloving_mrp_extend/models/models.py:96
 #, python-format
-msgid "Available"
-msgstr "已备齐"
+msgid "Can send the material"
+msgstr "可发料"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model,name:linkloving_mrp_extend.model_mrp_bom
@@ -300,7 +300,7 @@ msgstr "补领料"
 #: model:ir.actions.act_window,name:linkloving_mrp_extend.mrp_finish_prepare_material
 #: model:ir.ui.menu,name:linkloving_mrp_extend.menu_mrp_finish_prepare_material
 msgid "Finish Prepare Material Orders"
-msgstr "已完成备料"
+msgstr "待领料"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_stock_move_virtual_available
@@ -984,7 +984,7 @@ msgstr "等待检验退料"
 #: model:ir.actions.act_window,name:linkloving_mrp_extend.mrp_waiting_quality_inspection
 #: model:ir.ui.menu,name:linkloving_mrp_extend.menu_mrp_waiting_quality_inspection
 msgid "Waiting Inspection Orders"
-msgstr "等待品检"
+msgstr "待品检"
 
 #. module: linkloving_mrp_extend
 #: code:addons/linkloving_mrp_extend/models/models.py:188
@@ -996,26 +996,26 @@ msgstr "等待清点退料"
 #: model:ir.actions.act_window,name:linkloving_mrp_extend.mrp_waiting_inventory_material
 #: model:ir.ui.menu,name:linkloving_mrp_extend.menu_mrp_waiting_inventory_material
 msgid "Waiting Inventory Orders"
-msgstr "等待清点退料"
+msgstr "待退料"
 
 #. module: linkloving_mrp_extend
 #: model:ir.actions.act_window,name:linkloving_mrp_extend.mrp_waiting_material
 #: model:ir.ui.menu,name:linkloving_mrp_extend.menu_mrp_waiting_material
 msgid "Waiting Material Orders"
-msgstr "等待备料"
+msgstr "待备料"
 
 #. module: linkloving_mrp_extend
 #: model:ir.actions.act_window,name:linkloving_mrp_extend.mrp_waiting_post_inventory
 #: model:ir.ui.menu,name:linkloving_mrp_extend.menu_mrp_waiting_post_inventory
 msgid "Waiting Post Orders"
-msgstr "等待入库"
+msgstr "产成品待入库"
 
 #. module: linkloving_mrp_extend
 #: code:addons/linkloving_mrp_extend/models/models.py:178
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.view_mrp_production_filter
 #, python-format
 msgid "Waiting Prepare Material"
-msgstr "等待备料"
+msgstr "待备料"
 
 #. module: linkloving_mrp_extend
 #: code:addons/linkloving_mrp_extend/models/models.py:184
@@ -1034,7 +1034,7 @@ msgstr "等待返工"
 #: model:ir.actions.act_window,name:linkloving_mrp_extend.mrp_waiting_rework
 #: model:ir.ui.menu,name:linkloving_mrp_extend.menu_mrp_waiting_rework
 msgid "Waiting Rework Orders"
-msgstr "等待返工"
+msgstr "待返工"
 
 #. module: linkloving_mrp_extend
 #: code:addons/linkloving_mrp_extend/models/models.py:190
@@ -1051,7 +1051,7 @@ msgstr "等待入库"
 #: model:ir.actions.act_window,name:linkloving_mrp_extend.mrp_waiting_warehouse_inspection
 #: model:ir.ui.menu,name:linkloving_mrp_extend.menu_mrp_waiting_warehouse_inspection
 msgid "Waiting Warehouse Insepcetion Orders"
-msgstr "等待仓库检验退料"
+msgstr "退料待入库"
 
 #. module: linkloving_mrp_extend
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.linkloving_mrp_production_form_view
