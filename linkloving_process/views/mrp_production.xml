@@ -83,7 +83,11 @@
             <field name="inherit_id" ref="mrp.view_mrp_production_filter"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='product_id']" position="after">
+                    <field name="origin" string="原订单号" filter_domain="[('origin','ilike',self)]"/>
                     <field name="process_id" string="Process" filter_domain="[('process_id.name','ilike',self)]"/>
+                </xpath>
+                <xpath expr="//group/filter[2]" position="replace">
+                    <filter string="工序" domain="[]" context="{'group_by':'process_id'}"/>
                 </xpath>
 
             </field>
@@ -95,7 +99,7 @@
             <field name="type">ir.actions.act_window</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[('state','=','draft')]</field>
+            <field name="domain">[]</field>
             <field name="context">{
                 'search_default_process_id': active_id,
                 }

@@ -17,10 +17,20 @@ class MrpBomExtend(models.Model):
     _inherit = 'mrp.bom'
 
     product_specs = fields.Text(string=u'Product Specification', related='product_tmpl_id.product_specs')
+
+
     product_id = fields.Many2one(
         'product.product', 'Product Variant',
         domain="['&', ('product_tmpl_id', '=', product_tmpl_id), ('type', 'in', ['product', 'consu'])]",
         help="If a product variant is defined the BOM is available only for this product.", copy=False)
+    state = fields.Selection([
+        ('draft', u'草稿'),
+        ('release', u'正式')
+    ], u'状态', track_visibility='onchange', default='draft')
+
+    @api.multi
+    def set_to_release(self):
+        self.state = 'release'
 
     def explode(self, product, quantity, picking_type=False):
         """
@@ -864,7 +874,10 @@ class SimStockMove(models.Model):
     def _default_suggest_qty(self):
         for sim_move in self:
             if sim_move.stock_moves:
-                sim_move.suggest_qty = sim_move.stock_moves[0].suggest_qty
+                for move in sim_move.stock_moves:
+                    if move.state != "cancel":
+                        sim_move.suggest_qty = move.suggest_qty
+                        break
 
     def _compute_quantity_available(self):
         for sim_move in self:

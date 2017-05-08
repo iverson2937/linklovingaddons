@@ -26,9 +26,28 @@ class MrpProcess(models.Model):
     count_mo_others = fields.Integer(compute='_compute_process_count')
     is_outside = fields.Boolean(string=u'是否为委外')
     sequence = fields.Integer()
+    total_qty = fields.Integer(compute="_get_total_qty")
+
+    @api.multi
+    def get_stock_detail(self):
+
+        return {
+            'name': u'库存',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'product.template',
+            'target': 'current',
+            'domain': [('process_id', '=', self.id)]
+        }
+
+    @api.multi
+    def _get_total_qty(self):
+        for process in self:
+            products = self.env['product.template'].search([('process_id', '=', process.id)])
+            process.total_qty = sum(product.qty_available for product in products)
 
     def _today(self):
-        print (datetime.date.today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')
         return (datetime.date.today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')
 
     def _tomorrow(self):

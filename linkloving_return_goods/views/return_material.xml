@@ -342,7 +342,7 @@
 
         <menuitem action="action_rma_purchase" name="采购退货"
                   id="menu_rma_purchase"
-                  parent="linkloving_purchase.menu_sale_order_list"
+                  parent="linkloving_purchase.menu_purchase_order"
                   sequence="100"/>
 
 

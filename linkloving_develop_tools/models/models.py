@@ -79,3 +79,6 @@ class CreateOrderPointWizard(models.TransientModel):
                                                      ("picking_type_code", "=", "outgoing")])
         pickings.do_unreserve()
 
+    def action_create_menu(self):
+        menus = self.env["product.category"].search([])
+        menus.menu_create()

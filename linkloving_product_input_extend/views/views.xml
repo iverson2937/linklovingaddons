@@ -45,5 +45,34 @@
                 </form>
             </field>
         </record>
+
+
+        <record id="action_multi_set_type_1" model="ir.ui.view">
+            <field name="name">multi.set.type.form</field>
+            <field name="model">multi.set.type</field>
+            <field name="arch" type="xml">
+                <form string="批量设置物料类型">
+                    <field name="product_ll_type" required="1"/>
+                    <field name="order_ll_type"
+                           attrs="{'invisible': [('product_ll_type', '!=', 'finished')],'required':[('product_ll_type', '=', 'finished')]}"/>
+
+
+                    <footer>
+                        <button string="确定" name="action_ok" type="object" default_focus="1"
+                                context="{'is_checked':1}"
+                                class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+        <act_window id="action_multi_set_type"
+                    multi="True"
+                    key2="client_action_multi" name="批量设置物料类型"
+                    res_model="multi.set.type" src_model="product.template"
+                    view_mode="form" target="new" view_type="form"/>
+
     </data>
 </openerp>

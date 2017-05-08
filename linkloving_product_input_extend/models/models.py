@@ -112,3 +112,44 @@ class StockOrdering(models.TransientModel):
 
     max_qty = fields.Float("最大存货数量")
     min_qty = fields.Float("最小存货数量")
+
+
+class MultiSetType(models.TransientModel):
+    _name = "multi.set.type"
+
+    product_ll_type = fields.Selection(string="物料类型", selection=[('raw material', '原料'),
+                                                                 ('semi-finished', '半成品'),
+                                                                 ('finished', '成品')])
+
+    order_ll_type = fields.Selection(string="订单类型",
+                                     selection=[('ordering', '订单制'),
+                                                ('stock', '备货制')], help="订单制:路线自动选中按订单生成项,备货制:需要填写最大最小存货数量")
+
+    @api.multi
+    def action_ok(self):
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+        products = self.env['product.template'].search([('id', 'in', active_ids)])
+
+        for product in products:
+            product.product_ll_type = self.product_ll_type
+            if self.product_ll_type == "raw material":  # 原料
+                product.sale_ok = False
+                product.purchase_ok = True
+                product.route_ids = [(6, 0, (
+                    self.env.ref('stock.route_warehouse0_mto').id, self.env.ref('purchase.route_warehouse0_buy').id))]
+            elif self.product_ll_type == "semi-finished":  # 半成品
+                product.sale_ok = False
+                product.purchase_ok = False
+                product.route_ids = [(6, 0, (
+                    self.env.ref('stock.route_warehouse0_mto').id,
+                    self.env.ref('mrp.route_warehouse0_manufacture').id))]
+            elif self.product_ll_type == "finished":  # 成品
+                product.order_ll_type = self.order_ll_type
+                product.sale_ok = True
+                product.purchase_ok = False
+                if self.order_ll_type == "ordering":  # 订单制
+                    product.route_ids = [(6, 0, [self.env.ref('mrp.route_warehouse0_manufacture').id,
+                                                 self.env.ref('stock.route_warehouse0_mto').id])]
+                elif self.order_ll_type == "stock":  # 备货制
+                    product.route_ids = [(6, 0, [self.env.ref('mrp.route_warehouse0_manufacture').id])]

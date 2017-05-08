@@ -13,7 +13,7 @@
         </record>
 
         <record id="mrp_bom_line_action_from_bom" model="ir.actions.act_window">
-            <field name="name">Bill of Materials Structure</field>
+            <field name="name">产品分类</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">product.category</field>
             <field name="domain">[]</field>
@@ -23,8 +23,9 @@
         </record>
 
 
-        <menuitem id="menu_productccccc_config" name="Resource" sequence="30"/>
-        <menuitem id="test" action="mrp_bom_line_action_from_bom" parent="menu_productccccc_config"/>
+        <menuitem id="menu_product_config" name="产品分类" sequence="30" groups="base.group_no_one"/>
+        <menuitem id="test" action="mrp_bom_line_action_from_bom" parent="menu_product_config"
+                  groups="base.group_no_one"/>
     </data>
 </odoo>
 

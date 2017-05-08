@@ -37,6 +37,21 @@
             </field>
         </record>
 
+
+        <record id="view_mrp_bom_filter_ol" model="ir.ui.view">
+            <field name="name">mrp.bom.filter.inherit</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.view_mrp_bom_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='normal']" position="after">
+                    <filter name='draft' string="草稿BOM" domain="[('state', '=', 'draft')]"/>
+                    <filter name='release' string="正式BOM" domain="[('state', '=', 'release')]"/>
+                </xpath>
+
+
+            </field>
+        </record>
+
         <record id="linkloving_mrp_bom_form_view" model="ir.ui.view">
             <field name="name">mrp.bom.form.inherit</field>
             <field name="model">mrp.bom</field>
@@ -51,6 +66,14 @@
                     <field name="scrap_rate"/>
                     <field name="active1" invisible="1"/>
                     <button name="action_see_bom_structure_reverse" type="object" string="Bom逆展"/>
+                </xpath>
+
+                <xpath expr="//sheet" position="before">
+                    <header>
+                        <button name="set_to_release" type="object" states="draft" string="确认"
+                                class="oe_highlight"/>
+                        <field name="state" widget="statusbar" readonly="1"/>
+                    </header>
                 </xpath>
 
 
@@ -120,8 +143,8 @@
                     <button name="button_fill_material" attrs="{'invisible': ['|',('state', '!=', 'progress')]}"
                             type="object" string="Extra Picking Material"
                             groups="linkloving_mrp_extend.group_charge_produce"/>
-                    <button name="button_return_material" attrs="{'invisible': ['|',('state', '!=', 'done')]}"
-                            type="object" string="Return Material"/>
+                    <!--<button name="button_return_material" attrs="{'invisible': ['|',('state', '!=', 'done')]}"-->
+                    <!--type="object" string="Return Material"/>-->
                 </xpath>
 
                 <xpath expr="//header/button[@name='button_scrap']" position="replace">
@@ -206,11 +229,17 @@
                     </page>
                 </xpath>
 
+                <xpath expr="//field[@name='move_finished_ids']/tree/field[@name='product_id']" position="attributes">
+                    <attribute name="options">{'no_create':True}</attribute>
+                </xpath>
+
+
                 <xpath expr="//field[@name='move_raw_ids']" position="replace">
                     <field name="sim_stock_move_lines">
                         <tree editable="bottom" delete="0" decoration-warning="quantity_done&gt;product_uom_qty"
-                              decoration-success="quantity_done>=product_uom_qty" create="0">
-                            <field name="product_id" string="产品"/>
+                              decoration-success="quantity_done>=product_uom_qty"
+                              decoration-danger="qty_available&lt;product_uom_qty" create="0">
+                            <field name="product_id" string="产品" options="{'no_create':True}"/>
                             <field name="qty_available" string="库存"/>
                             <field name="virtual_available" string="Forecast Quantity"/>
                             <field name="suggest_qty" string="Suggest Quantity"/>
@@ -320,7 +349,7 @@
                         <tree editable="bottom" delete="0" decoration-warning="quantity_ready&gt;product_uom_qty"
                               decoration-success="quantity_ready>=product_uom_qty" create="0">
                             <field name="production_state" readonly="1" invisible="1" autofocus="autofocus"/>
-                            <field name="product_id" readonly="1"/>
+                            <field name="product_id" readonly="1" options="{'no_create': True}"/>
                             <field name="qty_available" string="库存"/>
                             <field name="virtual_available" string="预测数量"/>
                             <field name="suggest_qty" readonly="1" string="建议数量"/>
@@ -1088,7 +1117,7 @@
 
         <menuitem
                 action="make_by_mrp_purchase_form_action" id="menu_purchase_make_by_mrp"
-                parent="linkloving_purchase.menu_sale_order_list" name="MRP生成订单" sequence="16"/>
+                parent="linkloving_purchase.menu_purchase_order" name="Orders Make By MRP" sequence="16"/>
 
 
         <record id="mrp_production_tree_view_ll" model="ir.ui.view">
