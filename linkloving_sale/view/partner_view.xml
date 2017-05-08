@@ -74,17 +74,17 @@
 
                 <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='comment']"
                        position="after">
-                    <field name="whatapp_is"/>
+                    <field name="whatapp"/>
                 </xpath>
 
-                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='whatapp_is']"
+                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='whatapp']"
                        position="after">
-                    <field name="wechat_is"/>
+                    <field name="wechat"/>
                 </xpath>
 
-                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='wechat_is']"
+                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='wechat']"
                        position="after">
-                    <field name="skype_is"/>
+                    <field name="skype"/>
                 </xpath>
 
                 <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='function']"

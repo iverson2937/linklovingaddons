@@ -11,9 +11,9 @@
                     <field name="source"/>
                 </xpath>
                 <xpath expr="//field[@name='source']" position="after">
-                    <field name="Communication_identifier"/>
+                    <field name="communication_identifier"/>
                 </xpath>
-                <xpath expr="//field[@name='Communication_identifier']" position="after">
+                <xpath expr="//field[@name='communication_identifier']" position="after">
                     <field name="communicate_in_time"/>
                 </xpath>
 
@@ -25,10 +25,10 @@
                     <field name="express_sample_record"/>
                 </xpath>
                 <xpath expr="//field[@name='express_sample_record']" position="after">
-                    <field name="Follow_up_the_history"/>
+                    <field name="follow_up_the_history"/>
                 </xpath>
-                <xpath expr="//field[@name='Follow_up_the_history']" position="after">
-                    <field name="Interested_in_product"/>
+                <xpath expr="//field[@name='follow_up_the_history']" position="after">
+                    <field name="interested_in_product"/>
                 </xpath>
 
 

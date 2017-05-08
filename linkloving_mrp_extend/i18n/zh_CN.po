@@ -73,8 +73,8 @@ msgstr "Area"
 #. module: linkloving_mrp_extend
 #: code:addons/linkloving_mrp_extend/models/models.py:96
 #, python-format
-msgid "Available"
-msgstr "已备齐"
+msgid "Can send the material"
+msgstr "可发料"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model,name:linkloving_mrp_extend.model_mrp_bom

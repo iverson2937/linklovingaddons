@@ -29,9 +29,9 @@ class Partner(models.Model):
     x_qq = fields.Char(string=u'Instant Messaging')
     detailed_address = fields.Char(string=u'adc', compute='_street_name')
 
-    skype_is = fields.Char(string=u'网络电话')
-    whatapp_is = fields.Char(string=u'社交号码')
-    wechat_is = fields.Char(string=u'微信号')
+    skype = fields.Char(string=u'网络电话')
+    whatapp = fields.Char(string=u'社交号码')
+    wechat = fields.Char(string=u'微信号')
 
     @api.depends('street', 'country_id', 'zip', 'state_id', 'city', 'street', 'street2')
     def _street_name(self):
