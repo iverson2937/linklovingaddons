@@ -1078,6 +1078,15 @@ class MrpQcFeedBack(models.Model):
 
     product_id = fields.Many2one('production_id.product_id')
 
+    qc_imgs = fields.One2many(comodel_name="qc.feedback.img", inverse_name="feedback_id", string="品检图片",
+                              required=False, )
+
+
+class MrpQcFeedBackImg(models.Model):
+    _name = "qc.feedback.img"
+
+    qc_img = fields.Binary(u"品检图片")
+    feedback_id = fields.Many2one("mrp.qc.feedback")
 
 class MultiHandleWorker(models.TransientModel):
     _name = 'multi.handle.worker'
