@@ -12,13 +12,15 @@ class MrpProduction(models.Model):
     @api.onchange('process_id')
     def onchange_process_id(self):
         if self.process_id.is_rework:
-            pass
+            self.is_rework = True
+        else:
+            self.is_rework = False
 
     def _generate_raw_moves(self, exploded_lines):
         self.ensure_one()
         moves = self.env['stock.move']
         source_location = self.picking_type_id.default_location_src_id
-        if self.process_id.is_rework:
+        if self.is_rework:
             if not self.rework_material_line_ids:
                 raise UserError(u'请添加重工物料')
             for line_id in self.rework_material_line_ids:
