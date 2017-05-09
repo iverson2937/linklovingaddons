@@ -957,6 +957,7 @@ class SimStockMove(models.Model):
                                     required=False, compute="_compute_product_type")
     is_prepare_finished = fields.Boolean(u"是否备货完成")
 
+
 class ReturnMaterialLine(models.Model):
     _name = 'return.material.line'
 
@@ -1266,3 +1267,4 @@ class StockLocationExtend(models.Model):
 
     is_circulate_location = fields.Boolean(u"是否是流转库")
     is_semi_finished_location = fields.Boolean(u"是否是半成品库")
+    user_ids = fields.Many2many('res.users')
