@@ -180,16 +180,13 @@ class MrpProductionExtend(models.Model):
     @api.multi
     def action_view_qc_report(self):
         ids = []
-        for feedback in self.qc_feedback_ids:
-            for img in feedback.qc_imgs:
-                ids.append(img.id)
 
         return {
             'name': u'品检报告',
             'type': 'ir.actions.act_window',
-            'res_model': 'qc.feedback.img',
+            'res_model': 'mrp.qc.feedback',
             'view_mode': 'tree,form',
-            'domain': [('id', 'in', ids)],
+            'domain': [('id', 'in', self.qc_feedback_ids)],
             'target': 'current',
         }
 
