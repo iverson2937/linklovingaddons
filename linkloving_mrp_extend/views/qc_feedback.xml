@@ -23,7 +23,34 @@
 
         <record id="mrp_qc_feedback_form" model="ir.ui.view">
             <field name="name">品检单</field>
-            <field name="model">mrp.qc_feedback</field>
+            <field name="model">mrp.qc.feedback</field>
+            <field name="arch" type="xml">
+                <form>
+
+
+                    <sheet>
+                        <group>
+                            <group>
+                                <filed name="production_id" readonly="1"/>
+                                <filed name="product_id" readonly="1"/>
+
+                                <filed name="qc_test_qty" readonly="1"/>
+
+                                <filed name="qc_rate" readonly="1"/>
+
+                            </group>
+                            <group>
+                                <filed name="qty_produced" readonly="1"/>
+                                <filed name="qc_fail_qty" readonly="1"/>
+                                <filed name="qc_fail_rate" readonly="1"/>
+                            </group>
+                            <filed name="qc_note"/>
+                        </group>
+
+                    </sheet>
+
+                </form>
+            </field>
         </record>
 
 
