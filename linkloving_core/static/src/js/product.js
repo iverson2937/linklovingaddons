@@ -284,19 +284,15 @@ odoo.define('linkloving_core.product_detail', function (require) {
                                $(this).parent().parent().parent().remove();
                            }
                        })
-                       var new_mo = mo_merge_inputs[0].parentNode.parentNode.parentNode.parentNode;
-                        console.log(new_mo)
-                        console.log(self.$el)
-                       // new_mo.innerHTML="";
-                       // var new_div ="<div class='panel panel-success'><div class='panel-heading'><h4 class='panel-title'>" +
-                       //     "<input name='chk_mo"+result.product_id+"' type='checkbox' mo-id="+result.id+"> <a data-parent='#name' data-toggle='collapse' class='collapsed' aria-expanded='false'>" +
-                       //     "<span class='show_mo_number' style='cursor: pointer;'>"+result.name+"</span>" +
-                       //         "<span style='margin-left:15px'>"+result.date_planned_start+"</span>"+
-                       //         "<span style='margin-left:15px'>"+ result.state+"</span>"+
-                       //         "<span style='margin-left:15px'>"+ result.qty+"</span>"+
-                       //     "</a>" +
-                       //     "</h4></div></div>";
-                       //  self.new_mo.appendChild(new_div)
+                       var new_div ="<div class='panel panel-success'><div class='panel-heading'><h4 class='panel-title'>" +
+                           "<input name='chk_mo"+result.product_id+"' type='checkbox' mo-id="+result.id+"> <a data-parent='#name' data-toggle='collapse' class='collapsed' aria-expanded='false'>" +
+                           "<span class='show_mo_number' style='cursor: pointer;'>"+result.name+"</span>" +
+                               "<span style='margin-left:15px'>"+result.date_planned_start+"</span>"+
+                               "<span style='margin-left:15px'>"+ result.state+"</span>"+
+                               "<span style='margin-left:15px'>"+ result.qty+"</span>"+
+                           "</a>" +
+                           "</h4></div></div>";
+                        self.$("input[name="+check_name+"]").eq(0).parent().parent().parent().parent().append(new_div)
                     }
                 })
             }else {
