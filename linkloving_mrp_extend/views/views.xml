@@ -16,7 +16,7 @@
             <field name="model">qc.feedback.img</field>
             <field name="arch" type="xml">
                 <tree>
-                    <field name="qc_img" widget="image"/>
+                    <field name="qc_img" widget="tree-image-preview"/>
                 </tree>
             </field>
         </record>
