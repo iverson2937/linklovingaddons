@@ -11,25 +11,6 @@
         </record>
 
 
-        <record id="qc_feedback_img_tree" model="ir.ui.view">
-            <field name="name">品检单</field>
-            <field name="model">qc.feedback.img</field>
-            <field name="arch" type="xml">
-                <tree>
-                    <field name="qc_img" widget="tree-image-preview"/>
-                </tree>
-            </field>
-        </record>
-        <record id="qc_feedback_img_form" model="ir.ui.view">
-            <field name="name">品检单</field>
-            <field name="model">qc.feedback.img</field>
-            <field name="arch" type="xml">
-                <form>
-                    <field name="qc_img" widget="binary"/>
-                </form>
-            </field>
-        </record>
-
         <record id="view_confirm_production_wizard" model="ir.ui.view">
             <field name="name">Confirm Production</field>
             <field name="model">confirm.production</field>
