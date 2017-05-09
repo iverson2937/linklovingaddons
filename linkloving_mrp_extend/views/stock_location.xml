@@ -10,6 +10,7 @@
                 <xpath expr="//field[@name='return_location']" position="after">
                     <field name="is_circulate_location"/>
                     <field name="is_semi_finished_location"/>
+                    <field name="user_ids" widget="many2many_tags" string="负责人"/>
                 </xpath>
 
             </field>

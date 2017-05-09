@@ -18,7 +18,6 @@ class MrpBomExtend(models.Model):
 
     product_specs = fields.Text(string=u'Product Specification', related='product_tmpl_id.product_specs')
 
-
     product_id = fields.Many2one(
         'product.product', 'Product Variant',
         domain="['&', ('product_tmpl_id', '=', product_tmpl_id), ('type', 'in', ['product', 'consu'])]",
@@ -178,6 +177,30 @@ class StockMoveExtend(models.Model):
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 
+    @api.multi
+    def action_view_qc_report(self):
+        ids = []
+        for feedback in self.qc_feedback_ids:
+            for img in feedback.qc_imgs:
+                ids.append(img.id)
+
+        return {
+            'name': u'品检报告',
+            'type': 'ir.actions.act_window',
+            'res_model': 'qc.feedback.img',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', ids)],
+            'target': 'current',
+        }
+
+    qc_feedback_ids = fields.One2many('mrp.qc.feedback', 'production_id')
+
+    @api.multi
+    def _get_qc_feedback_count(self):
+        for feedback in self:
+            feedback.qc_feedback_count = len(feedback.qc_feedback_ids)
+
+    qc_feedback_count = fields.Integer(compute='_get_qc_feedback_count')
     availability = fields.Selection([
         ('assigned', _('Available')),
         ('partially_available', _('Partially Available')),
@@ -934,6 +957,7 @@ class SimStockMove(models.Model):
                                     required=False, compute="_compute_product_type")
     is_prepare_finished = fields.Boolean(u"是否备货完成")
 
+
 class ReturnMaterialLine(models.Model):
     _name = 'return.material.line'
 
@@ -1087,6 +1111,7 @@ class MrpQcFeedBackImg(models.Model):
 
     qc_img = fields.Binary(u"品检图片")
     feedback_id = fields.Many2one("mrp.qc.feedback")
+
 
 class MultiHandleWorker(models.TransientModel):
     _name = 'multi.handle.worker'
@@ -1242,3 +1267,4 @@ class StockLocationExtend(models.Model):
 
     is_circulate_location = fields.Boolean(u"是否是流转库")
     is_semi_finished_location = fields.Boolean(u"是否是半成品库")
+    user_ids = fields.Many2many('res.users')
