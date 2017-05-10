@@ -132,10 +132,15 @@
                                             </div>
 
                                         </div>
-                                        <div class="col-xs-12 o_kanban_primary_bottom text-center">
+                                        <div class="col-xs-6">
                                             <button name="mo_schedule_query" class="o_inline_link oe_high_light"
                                                     type="object">Manufacturing order Query
                                             </button>
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <a name="%(create_mrp_production)d" type="action">
+                                                创建
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
