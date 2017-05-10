@@ -106,6 +106,9 @@
                     <button name="button_action_confirm_draft" class="oe_highlight"
                             attrs="{'invisible': [('state', 'not in', 'draft')]}" type="object"
                             groups="linkloving_mrp_extend.group_charge_produce" string="Confirm the Schedule"/>
+                    <button name="button_action_cancel_confirm" class="oe_link"
+                            attrs="{'invisible': [('state', 'not in', 'confirmed')]}" type="object"
+                            groups="linkloving_mrp_extend.group_charge_produce" string="取消加入排程"/>
                     <button name="button_waiting_material" class="oe_highlight"
                             attrs="{'invisible': [('state', 'not in', 'confirmed')]}" type="object"
                             groups="linkloving_mrp_extend.group_charge_produce"

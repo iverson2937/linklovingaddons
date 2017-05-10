@@ -317,7 +317,7 @@ class MrpProductionExtend(models.Model):
         ('waiting_warehouse_inspection', _('Waiting Check Return Material')),
         ('waiting_post_inventory', _('Waiting Stock Transfers')),
         ('done', 'Done'),
-        ('cancel', 'Cancelled')], string='State',
+        ('cancel', 'Cancelled')], string='status',
         copy=False, default='confirmed', track_visibility='onchange')
 
     # 计算所有工人总共花的工时
@@ -380,6 +380,11 @@ class MrpProductionExtend(models.Model):
     def button_action_confirm_draft(self):
         for production in self:
             production.write({'state': 'confirmed'})
+
+    @api.multi
+    def button_action_cancel_confirm(self):
+        for production in self:
+            production.write({'state': 'draft'})
 
     # 开始备料
     def button_start_prepare_material(self):
