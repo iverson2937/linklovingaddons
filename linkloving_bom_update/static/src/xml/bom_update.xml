@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+    <t t-name="bom_wraper">
+        <div class="panel-group" id="accordion">
+
+        </div>
+    </t>
+
+    <t t-name="bom_tree">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" t-att-href="'#'+result.uuid" class="click_bom_tag_a">
+                        <span class="fa fa-caret-right open-sign"></span>
+                    </a>
+                    <span><t t-esc="result.name"/></span>
+                </h4>
+            </div>
+            <div t-att-id="result.uuid" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <t t-foreach="result.bom_ids" t-as="item">
+                        <div class="panel panel-default">
+                            <h4 class="panel-title">
+                               <!--<a data-toggle="collapse" t-att-href="'#'+item"-->
+                               <t t-foreach="item" t-as="line">
+                                   <t t-esc="line.name"/>
+                               </t>
+                            </h4>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
