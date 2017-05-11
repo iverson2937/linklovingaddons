@@ -74,6 +74,10 @@
                 <xpath expr="//tree/field[@name='date_planned']" position="replace">
                     <field name="date_planned" string="交期" widget="date"/>
                 </xpath>
+                <xpath expr="//tree/field[@name='product_uom']" position="attributes">
+                    <attribute name="options">{'no_create':True}</attribute>
+                </xpath>
+
 
                 <xpath expr="//field[@name='partner_id']" position="replace">
                     <field name="partner_id"
@@ -227,7 +231,6 @@
                     key2="client_action_multi" name="Combine Draft Purchase Order"
                     res_model="manual.combine.po" src_model="purchase.order"
                     view_mode="form" target="new" view_type="form"/>
-
 
 
     </data>
