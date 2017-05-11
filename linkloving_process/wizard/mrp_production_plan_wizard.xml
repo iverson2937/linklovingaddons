@@ -15,6 +15,7 @@
                         </group>
                         <group>
                             <field name="partner_id" string="工序负责人"/>
+                            <field name="is_set_start" string="确认生产,准备领料"/>
                         </group>
                     </group>
 
