@@ -186,7 +186,7 @@ class MrpProductionExtend(models.Model):
             'type': 'ir.actions.act_window',
             'res_model': 'mrp.qc.feedback',
             'view_mode': 'tree,form',
-            'domain': [('id', 'in', self.qc_feedback_ids)],
+            'domain': [('id', 'in', self.qc_feedback_ids.ids)],
             'target': 'current',
         }
 
