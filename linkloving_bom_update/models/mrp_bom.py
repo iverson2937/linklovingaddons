@@ -36,12 +36,11 @@ class MrpBom(models.Model):
         def _get_rec(object, level, qty=1.0, uom=False):
             for l in object:
                 res = {}
-                res['pname'] = l.product_id.name_get()[0][1]
-                res['pcode'] = l.product_id.default_code
+                res['name'] = l.product_id.name_get()[0][1]
+                res['product_id'] = l.product_id.id
+                res['code'] = l.product_id.default_code
                 res['uuid'] = str(uuid.uuid1())
-                res['uname'] = l.product_uom_id.name
                 res['level'] = level
-                res['code'] = l.bom_id.code
                 result.append(res)
                 if l.child_line_ids:
                     if level < 6:
