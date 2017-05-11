@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import uuid
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
@@ -22,7 +23,12 @@ class MrpBom(models.Model):
             print line
             print line
             res.append(self.get_bom_line(line))
-        return res
+        return {
+            'uuid': str(uuid.uuid1()),
+            'product_id': self.product_tmpl_id.id,
+            'name': self.product_tmpl_id.name_get()[0][1],
+            'bom_ids': res
+        }
 
     def get_bom_line(self, object, level=0):
         result = []
@@ -32,7 +38,7 @@ class MrpBom(models.Model):
                 res = {}
                 res['pname'] = l.product_id.name_get()[0][1]
                 res['pcode'] = l.product_id.default_code
-
+                res['uuid'] = str(uuid.uuid1())
                 res['uname'] = l.product_uom_id.name
                 res['level'] = level
                 res['code'] = l.bom_id.code
@@ -40,7 +46,7 @@ class MrpBom(models.Model):
                 if l.child_line_ids:
                     if level < 6:
                         level += 1
-                    _get_rec(l.child_line_ids, level, qty=res['pqty'], uom=res['puom'])
+                    _get_rec(l.child_line_ids, level)
                     if level > 0 and level < 6:
                         level -= 1
             print result
