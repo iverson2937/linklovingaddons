@@ -32,7 +32,6 @@ class MrpBom(models.Model):
         return result
 
     def get_bom_line(self, line, level=0):
-        result = []
         bom_line_ids = []
         if line.child_line_ids:
             if level < 6:
@@ -46,16 +45,15 @@ class MrpBom(models.Model):
             'name': line.product_id.name_get()[0][1],
             'product_id': line.product_id.default_code,
             'code': line.product_id.default_code,
+            'uuid': str(uuid.uuid1()),
             'level': level,
             'bom_ids': bom_line_ids
         }
-        result.append(res)
 
-        return result
+        return res
 
 
 def _get_rec(object, level, qty=1.0, uom=False):
-    result = []
     for l in object:
         bom_line_ids = []
         if l.child_line_ids:
@@ -70,10 +68,9 @@ def _get_rec(object, level, qty=1.0, uom=False):
             'name': l.product_id.name_get()[0][1],
             'product_id': l.product_id.default_code,
             'code': l.product_id.default_code,
+            'uuid': str(uuid.uuid1()),
             'level': level,
             'bom_ids': bom_line_ids
         }
 
-        result.append(res)
-
-    return result
+    return res
