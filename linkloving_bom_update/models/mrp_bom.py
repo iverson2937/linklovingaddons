@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import uuid
 
 from odoo import models, fields, api, _
@@ -23,32 +24,40 @@ class MrpBom(models.Model):
             print line
             print line
             res.append(self.get_bom_line(line))
-        return {
+        abc = {
             'uuid': str(uuid.uuid1()),
             'product_id': self.product_tmpl_id.id,
             'name': self.product_tmpl_id.name_get()[0][1],
             'bom_ids': res
         }
 
+        return json.dumps(abc)
+
     def get_bom_line(self, object, level=0):
         result = []
 
         def _get_rec(object, level, qty=1.0, uom=False):
+
             for l in object:
-                res = {}
-                res['name'] = l.product_id.name_get()[0][1]
-                res['product_id'] = l.product_id.id
-                res['code'] = l.product_id.default_code
-                res['uuid'] = str(uuid.uuid1())
-                res['level'] = level
-                result.append(res)
+                bom_line_ids = []
                 if l.child_line_ids:
                     if level < 6:
                         level += 1
-                    _get_rec(l.child_line_ids, level)
+                    for line in l.child_line_ids:
+                        bom_line_ids.append(_get_rec(line, level))
                     if level > 0 and level < 6:
                         level -= 1
-            print result
+
+                res = {
+                    'name': l.product_id.name_get()[0][1],
+                    'product_id': l.product_id.default_code,
+                    'code': l.product_id.default_code,
+                    'level': level,
+                    'bom_ids': bom_line_ids
+                }
+
+                result.append(res)
+
             return result
 
         children = _get_rec(object, level)
