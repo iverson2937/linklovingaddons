@@ -21,45 +21,59 @@ class MrpBom(models.Model):
     def get_bom(self):
         res = []
         for line in self.bom_line_ids:
-            print line
-            print line
             res.append(self.get_bom_line(line))
-        abc = {
+        result = {
             'uuid': str(uuid.uuid1()),
             'product_id': self.product_tmpl_id.id,
             'name': self.product_tmpl_id.name_get()[0][1],
             'bom_ids': res
         }
 
-        return json.dumps(abc)
+        return result
 
-    def get_bom_line(self, object, level=0):
+    def get_bom_line(self, line, level=0):
         result = []
+        bom_line_ids = []
+        if line.child_line_ids:
+            if level < 6:
+                level += 1
+            for l in line.child_line_ids:
+                bom_line_ids.append(_get_rec(l, level))
+            if level > 0 and level < 6:
+                level -= 1
 
-        def _get_rec(object, level, qty=1.0, uom=False):
+        res = {
+            'name': line.product_id.name_get()[0][1],
+            'product_id': line.product_id.default_code,
+            'code': line.product_id.default_code,
+            'level': level,
+            'bom_ids': bom_line_ids
+        }
+        result.append(res)
 
-            for l in object:
-                bom_line_ids = []
-                if l.child_line_ids:
-                    if level < 6:
-                        level += 1
-                    for line in l.child_line_ids:
-                        bom_line_ids.append(_get_rec(line, level))
-                    if level > 0 and level < 6:
-                        level -= 1
+        return result
 
-                res = {
-                    'name': l.product_id.name_get()[0][1],
-                    'product_id': l.product_id.default_code,
-                    'code': l.product_id.default_code,
-                    'level': level,
-                    'bom_ids': bom_line_ids
-                }
 
-                result.append(res)
+def _get_rec(object, level, qty=1.0, uom=False):
+    result = []
+    for l in object:
+        bom_line_ids = []
+        if l.child_line_ids:
+            if level < 6:
+                level += 1
+            for line in l.child_line_ids:
+                bom_line_ids.append(_get_rec(line, level))
+            if level > 0 and level < 6:
+                level -= 1
 
-            return result
+        res = {
+            'name': l.product_id.name_get()[0][1],
+            'product_id': l.product_id.default_code,
+            'code': l.product_id.default_code,
+            'level': level,
+            'bom_ids': bom_line_ids
+        }
 
-        children = _get_rec(object, level)
+        result.append(res)
 
-        return children
+    return result
