@@ -12,6 +12,22 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
     var _t = core._t;
 
     var BomUpdate = Widget.extend({
+        init: function (parent, action) {
+            this._super.apply(this, arguments);
+            this.bom_id = action.bom_id;
+            var self = this;
+        },
+        start: function () {
+            var self = this;
+            if (this.bom_id) {
+                return new Model("mrp.bom")
+                    .call("get_bom", [this.bom_id])
+                    .then(function (result) {
+                        console.log(result);
+                    })
+            }
+        }
+
 
     })
 
