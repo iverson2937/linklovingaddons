@@ -1,2 +1,8 @@
 jpush ==3.2.4.1
 <xpath expr="//tree" position="attributes"> <attribute name="create">false</attribute> </xpath>
+
+           <!--<div class="col-xs-6">-->
+                                            <!--<a name="%(create_mrp_production)d" type="action">-->
+                                                <!--创建-->
+                                            <!--</a>-->
+                                        <!--</div>-->
