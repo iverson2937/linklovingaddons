@@ -217,6 +217,11 @@ class LinklovingAppApi(http.Controller):
         today_time = fields.datetime.strptime(fields.datetime.strftime(date_to_show, '%Y-%m-%d'),
                                               '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
         user = request.env["res.users"].sudo().browse(request.context.get("uid"))
+        locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
+        if not locations:
+            location_domain = []
+        else:
+            location_domain = locations.ids
         timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
         after_day = today_time + one_days_after
         order_delay = request.env["mrp.production"].sudo().read_group(
@@ -224,26 +229,30 @@ class LinklovingAppApi(http.Controller):
 
                  ('state', 'in', ['waiting_material', 'prepare_material_ing']),
 
-                 ('process_id', '=', process_id)]
+                 ('process_id', '=', process_id),
+                 ('location_ids', 'in', location_domain)]
                 , fields=["date_planned_start"],
                 groupby=["date_planned_start"])
 
         domain = [('date_planned_start', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
                   ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                   ('state', 'in', ['waiting_material', 'prepare_material_ing']),
-                  ('process_id', '=', process_id)]
+                  ('process_id', '=', process_id),
+                  ('location_ids', 'in', location_domain)]
         today_time = today_time + one_days_after
         after_day = after_day + one_days_after
         domain_tommorrow = [('date_planned_start', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
                             ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                             ('state', 'in', ['waiting_material', 'prepare_material_ing']),
-                            ('process_id', '=', process_id)]
+                            ('process_id', '=', process_id),
+                            ('location_ids', 'in', location_domain)]
         today_time = today_time + one_days_after
         after_day = after_day + one_days_after
         domain_after_day = [('date_planned_start', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
                             ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                             ('state', 'in', ['waiting_material', 'prepare_material_ing']),
-                            ('process_id', '=', process_id)]
+                            ('process_id', '=', process_id),
+                            ('location_ids', 'in', location_domain)]
 
         order_today = request.env["mrp.production"].sudo().read_group(domain, fields=["date_planned_start"],
                                                                       groupby=["date_planned_start"])
@@ -282,6 +291,12 @@ class LinklovingAppApi(http.Controller):
         today_time = fields.datetime.strptime(fields.datetime.strftime(date_to_show, '%Y-%m-%d'),
                                               '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
         user = request.env["res.users"].sudo().browse(request.context.get("uid"))
+        user_id = request.context.get("uid")
+        locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
+        if not locations:
+            location_domain = []
+        else:
+            location_domain = locations.ids
         timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
         after_day = today_time + one_days_after
         after_2_day = after_day + one_days_after
@@ -293,22 +308,25 @@ class LinklovingAppApi(http.Controller):
 
                      ('state', 'in', ['waiting_material', 'prepare_material_ing']),
 
-                     ('process_id', '=', process_id)]
+                     ('process_id', '=', process_id),
+                     ('location_ids', 'in', location_domain)]
                     , fields=["date_planned_start"],
                     groupby=["date_planned_start"])
-
             domain = [('date_planned_start', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
                       ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                       ('state', 'in', ['waiting_material', 'prepare_material_ing']),
-                      ('process_id', '=', process_id)]
+                      ('process_id', '=', process_id),
+                      ('location_ids', 'in', location_domain)]
             domain_tommorrow = [('date_planned_start', '>', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                                 ('date_planned_start', '<', (after_2_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                                 ('state', 'in', ['waiting_material', 'prepare_material_ing']),
-                                ('process_id', '=', process_id)]
+                                ('process_id', '=', process_id),
+                                ('location_ids', 'in', location_domain)]
             domain_after_day = [('date_planned_start', '>', (after_2_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                                 ('date_planned_start', '<', (after_3_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                                 ('state', 'in', ['waiting_material', 'prepare_material_ing']),
-                                ('process_id', '=', process_id)]
+                                ('process_id', '=', process_id),
+                                ('location_ids', 'in', location_domain)]
 
             order_today = request.env["mrp.production"].sudo().read_group(domain, fields=["date_planned_start"],
                                                                           groupby=["date_planned_start"])
@@ -341,8 +359,6 @@ class LinklovingAppApi(http.Controller):
             process_count_dict[process_id] = list
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=process_count_dict)
 
-
-
     @http.route('/linkloving_app_api/get_recent_production_order', type='json', auth='none', csrf=False)
     def get_recent_production_order(self, **kw):
 
@@ -353,6 +369,12 @@ class LinklovingAppApi(http.Controller):
         one_days_after = datetime.timedelta(days=1)
         today_time = fields.datetime.strptime(fields.datetime.strftime(fields.datetime.now(), '%Y-%m-%d'),
                                               '%Y-%m-%d')
+        locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
+        if not locations:
+            location_domain = []
+        else:
+            location_domain = locations.ids
+
         if date_to_show != "delay":
             today_time = fields.datetime.strptime(date_to_show, '%Y-%m-%d')
         one_millisec_before = datetime.timedelta(milliseconds=1)  #
@@ -366,13 +388,15 @@ class LinklovingAppApi(http.Controller):
         if date_to_show == "delay":
             domain = [('date_planned_start', '<', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
                       ('state', 'in', ['waiting_material', 'prepare_material_ing']),
-                      ('process_id', '=', process_id)]
+                      ('process_id', '=', process_id),
+                      ('location_ids', 'in', location_domain)]
         else:
             domain = [
             ('date_planned_start', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
             ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                 ('state', 'in', ['waiting_material', 'prepare_material_ing']),
-                ('process_id', '=', process_id)]
+                ('process_id', '=', process_id),
+                ('location_ids', 'in', location_domain)]
 
         orders_today = request.env['mrp.production'].sudo().search(domain, limit=limit, offset=offset)
 
@@ -632,10 +656,16 @@ class LinklovingAppApi(http.Controller):
         mrp_production = mrp_production_model.sudo().search([('id', '=', order_id)])[0]
 
         stock_moves = request.jsonrequest.get('stock_moves') #get paramter
-        stock_move_lines = []
+        stock_move_lines = request.env["sim.stock.move"].sudo()
         for move in stock_moves:
             sim_stock_move = LinklovingAppApi.get_model_by_id(move['stock_move_lines_id'], request, 'sim.stock.move')
+            stock_move_lines += sim_stock_move
             if not sim_stock_move.stock_moves:
+                continue
+
+            if move['quantity_ready'] > 0:
+                sim_stock_move.is_prepare_finished = True
+            else:
                 continue
             rounding = sim_stock_move.stock_moves[0].product_uom.rounding
             if float_compare(move['quantity_ready'], sim_stock_move.stock_moves[0].product_uom_qty, precision_rounding=rounding) > 0:
@@ -664,11 +694,13 @@ class LinklovingAppApi(http.Controller):
         # except UserError, e:
         #     return JsonResponse.send_response(STATUS_CODE_ERROR,
         #                                       res_data={"error":e.name})
-        mrp_production.write({'state': 'finish_prepare_material'})
+        if all(sim_move.is_prepare_finished for sim_move in stock_move_lines):
+            mrp_production.write({'state': 'finish_prepare_material'})
 
-        JPushExtend.send_notification_push(audience=jpush.audience(
-            jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
-        ),notification=mrp_production.product_id.name,body=_("Qty:%d,Finish picking！") % (mrp_production.product_qty))
+            JPushExtend.send_notification_push(audience=jpush.audience(
+                    jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
+            ), notification=mrp_production.product_id.name,
+                    body=_("Qty:%d,Finish picking！") % (mrp_production.product_qty))
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
@@ -802,7 +834,7 @@ class LinklovingAppApi(http.Controller):
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error': _("Ordering MO need to produce all the products")})
         else:
-            location = request.env["stock.location"].sudo().search([("name", "=", "半成品流转库")], limit=1)
+            location = request.env["stock.location"].sudo().search([("is_circulate_location", "=", True)], limit=1)
             if location and location.putaway_strategy_id and location.putaway_strategy_id.fixed_location_ids:
                 fixed_location_ids = location.putaway_strategy_id.fixed_location_ids
 
@@ -901,9 +933,14 @@ class LinklovingAppApi(http.Controller):
             'qc_test_qty' : qc_test_qty,
             'qc_fail_qty' : qc_fail_qty,
             'qc_note' : qc_note,
-            'qc_img' : qc_img,
             'production_id': order_id,
         })
+        for img in qc_img:
+            qc_img_id = request.env["qc.feedback.img"].sudo().create({
+                'feedback_id': feedback.id,
+                'qc_img': img,
+            })
+            feedback.qc_imgs = [(4, qc_img_id.id)]
         mrp_production.qc_feedback_id = feedback.id
 
         if not mrp_production:
@@ -924,11 +961,12 @@ class LinklovingAppApi(http.Controller):
     @classmethod
     def get_qc_img_url(cls, worker_id, ):
         # DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
-        url = '%slinkloving_app_api/get_worker_image?worker_id=%s&model=%s&field=%s' % (
-            request.httprequest.host_url, str(worker_id), 'mrp.qc.feedback', 'qc_img')
-        if not url:
-            return ''
-        return url
+        imgs = []
+        for img_id in worker_id:
+            url = '%slinkloving_app_api/get_worker_image?worker_id=%s&model=%s&field=%s' % (
+                request.httprequest.host_url, str(img_id), 'qc.feedback.img', 'qc_img')
+            imgs.append(url)
+        return imgs
 
     @http.route('/linkloving_app_api/start_rework', type='json', auth='none', csrf=False)
     def start_rework(self, **kw):
@@ -1055,7 +1093,7 @@ class LinklovingAppApi(http.Controller):
                 move = request.env['stock.move'].sudo().create(returun_material_obj._prepare_move_values(r))
                 move.action_done()
 
-            location = request.env["stock.location"].sudo().search([("name", "=", "半成品流转库")], limit=1)
+            location = request.env["stock.location"].sudo().search([("is_circulate_location", "=", True)], limit=1)
             if location and location.putaway_strategy_id and location.putaway_strategy_id.fixed_location_ids:
                 fixed_location_ids = location.putaway_strategy_id.fixed_location_ids
 
@@ -1097,19 +1135,21 @@ class LinklovingAppApi(http.Controller):
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error':_("MO not found")})
         # if not production_order.qc_feedback_id:
-
-        data = {
-            'production_id' : order_id,
-            'qty_produced' :production_order.qc_feedback_id.qty_produced,
-            'qc_test_qty' : production_order.qc_feedback_id.qc_test_qty,
-            'qc_rate':production_order.qc_feedback_id.qc_rate,
-            'qc_fail_qty':production_order.qc_feedback_id.qc_fail_qty,
-            'qc_fail_rate':production_order.qc_feedback_id.qc_fail_rate,
-            'qc_note':production_order.qc_feedback_id.qc_note or '',
-            'qc_img':LinklovingAppApi.get_qc_img_url(production_order.qc_feedback_id.id),
-        }
+        json_list = []
+        for qc_feedback in production_order.qc_feedback_ids:
+            data = {
+                'production_id': order_id,
+                'qty_produced': qc_feedback.qty_produced,
+                'qc_test_qty': qc_feedback.qc_test_qty,
+                'qc_rate': qc_feedback.qc_rate,
+                'qc_fail_qty': qc_feedback.qc_fail_qty,
+                'qc_fail_rate': qc_feedback.qc_fail_rate,
+                'qc_note': qc_feedback.qc_note or '',
+                'qc_img': LinklovingAppApi.get_qc_img_url(qc_feedback.qc_imgs.ids),
+            }
+            json_list.append(data)
         return JsonResponse.send_response(STATUS_CODE_OK,
-                                          res_data=data)
+                                          res_data=json_list)
 
     #生产完成入库
     @http.route('/linkloving_app_api/produce_done', type='json', auth='none', csrf=False)

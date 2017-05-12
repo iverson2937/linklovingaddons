@@ -11,6 +11,25 @@
         </record>
 
 
+        <record id="qc_feedback_img_tree" model="ir.ui.view">
+            <field name="name">品检单</field>
+            <field name="model">qc.feedback.img</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="qc_img" widget="tree-image-preview"/>
+                </tree>
+            </field>
+        </record>
+        <record id="qc_feedback_img_form" model="ir.ui.view">
+            <field name="name">品检单</field>
+            <field name="model">qc.feedback.img</field>
+            <field name="arch" type="xml">
+                <form>
+                    <field name="qc_img" widget="image"/>
+                </form>
+            </field>
+        </record>
+
         <record id="view_confirm_production_wizard" model="ir.ui.view">
             <field name="name">Confirm Production</field>
             <field name="model">confirm.production</field>
@@ -1140,6 +1159,9 @@
             <field name="inherit_id" ref="mrp.mrp_production_tree_view"/>
             <field name="arch" type="xml">
 
+                <xpath expr="//field[@name='product_qty']" position="after">
+                    <field name="qty_unpost" string="产出数量"/>
+                </xpath>
                 <xpath expr="//field[@name='product_uom_id']" position="replace">
                 </xpath>
 

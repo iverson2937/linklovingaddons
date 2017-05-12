@@ -191,6 +191,15 @@ class MrpProductionExtend(models.Model):
         }
 
     qc_feedback_ids = fields.One2many('mrp.qc.feedback', 'production_id')
+    qty_unpost = fields.Float(string=u"已生产的数量", compute="_compute_qty_unpost")
+    is_on_rework = fields.Boolean(string=u"是否在返工中", )
+
+    @api.multi
+    def _compute_qty_unpost(self):
+        for production in self:
+            feedbacks = production.qc_feedback_ids.filtered(lambda x: x.state not in ["check_to_rework"])
+            production.qty_unpost = sum(feedbacks.mapped("qty_produced"))
+
 
     @api.multi
     def _get_qc_feedback_count(self):
@@ -256,6 +265,21 @@ class MrpProductionExtend(models.Model):
             'production_id': self.id
         }
 
+    #####仓库负责人的集合
+    location_ids = fields.Many2many(comodel_name="stock.location", compute="_compute_location_ids", store=True)
+
+    @api.depends("move_raw_ids.product_id.categ_id.fixed_location_ids.putaway_id.location_ids")
+    @api.multi
+    def _compute_location_ids(self):
+        for mo in self:
+            ids = []
+            for move in mo.move_raw_ids:
+                for fix_location_id in move.product_id.categ_id.fixed_location_ids:
+                    for location_id in fix_location_id.putaway_id.location_ids:
+                        ids.append(location_id.id)
+
+            mo.location_ids = [(6, 0, set(ids))]
+
     # 备料信息
     prepare_material_img = fields.Binary(string='Stock Image')
     prepare_material_area_id = fields.Many2one('stock.location.area', string='Area')
@@ -309,8 +333,9 @@ class MrpProductionExtend(models.Model):
         ('already_picking', _('Already Picking Material')),
         ('planned', 'Planned'),
         ('progress', '生产中'),
-        ('waiting_quality_inspection', _('Waiting Quality Inspection')),
-        ('quality_inspection_ing', _('Under Quality Inspection')),
+        ('waiting_inspection_finish', u'等待品检完成'),
+        # ('waiting_quality_inspection', _('Waiting Quality Inspection')),
+        # ('quality_inspection_ing', _('Under Quality Inspection')),
         ('waiting_rework', _('Waiting Rework')),
         ('rework_ing', _('Under Rework')),
         ('waiting_inventory_material', _('Waiting Inventory Material')),
@@ -340,6 +365,14 @@ class MrpProductionExtend(models.Model):
     # @api.multi
     # def add_worker(self):
 
+    @api.multi
+    def _compute_state(self):
+        for production in self:
+            # 如果有其中一个状态为品检失败
+            if any(feedback.state == 'qc_fail' for feedback in production.qc_feedback_ids):
+                pass
+            elif all(feedback.state in ['qc_success', ] for feedback in production.qc_feedback_ids):
+                pass
 
     def button_return_material(self, need_create_one):
         view = self.env.ref('linkloving_mrp_extend.stock_return_material_form_view2')
@@ -412,24 +445,37 @@ class MrpProductionExtend(models.Model):
         # 生产完成 等待品检
 
     def button_produce_finish(self):
-        if self.qty_produced == 0:
+        if self.qty_unpost == 0:
             raise UserError(_('These is not output,can not finish the order!'))
-        if not self.check_to_done and self.production_order_type == 'ordering':
+        if self.qty_unpost <= self.product_qty and self.production_order_type == 'ordering':
             raise UserError(_('You have to complete the order before close it!'))
         else:
+            if self.is_on_rework:  # 生产完成, 但是还在返工中 说明此次返工还没产出
+                raise UserError(u"该单据还在返工中,请先产出数量")
             # 生产完成 结算工时
             self.worker_line_ids.change_worker_state('outline')
+            self.state = self.compute_order_state()
+            # if all(feedback.state in ['qc_success', 'alredy_post_inventory'] for feedback in self.qc_feedback_ids):
+            #     self.state = "waiting_inventory_material"#等待清点退料
+            #有其中一个单据还没品捡 或者还没品捡完成, 等待品捡完成
 
-            self.write({'state': 'waiting_quality_inspection'})
+    def compute_order_state(self):
+        if any(feedback.state in ['draft', 'qc_ing'] for feedback in self.qc_feedback_ids):
+            state = "waiting_inspection_finish"  # 等待品捡完成,
+        elif any(feedback.state == 'qc_fail' for feedback in self.qc_feedback_ids):
+            state = "waiting_rework"
+        else:
+            state = "waiting_inventory_material"
+        return state
 
-    # 开始品检
-    def button_start_quality_inspection(self):
-        self.write({'state': 'quality_inspection_ing'})
-
-    # 品检通过
-    def button_quality_inspection_success(self):
-        self.write({'state': 'waiting_inventory_material'})
-        # self.write({'state': 'waiting_post_inventory'}
+    # # 开始品检
+    # def button_start_quality_inspection(self):
+    #     self.write({'state': 'quality_inspection_ing'})
+    #
+    # # 品检通过
+    # def button_quality_inspection_success(self):
+    #     self.write({'state': 'waiting_inventory_material'})
+    #     # self.write({'state': 'waiting_post_inventory'}
 
     # 清点物料
     def button_inventory_material(self):
@@ -438,14 +484,6 @@ class MrpProductionExtend(models.Model):
     # 仓库清点物料
     def button_check_inventory_material(self):
         return self.button_return_material(need_create_one=False)
-
-    # 品检失败,变为等待返工中
-    def button_quality_inspection_failed(self):
-        self.write({'state': 'waiting_rework'})
-        # 开始返工   ,返工中
-
-    def button_start_rework(self):
-        self.write({'state': 'rework_ing'})
 
     def picking_material(self):
         if self._context.get('picking_mode') == 'first_picking':
@@ -722,10 +760,27 @@ class ConfirmProduction(models.TransientModel):
 class MrpProductionProduceExtend(models.TransientModel):
     _inherit = 'mrp.product.produce'
 
+    @api.model
+    def default_get(self, fields):
+        res = super(MrpProductionProduceExtend, self).default_get(fields)
+        production = self.env['mrp.production'].browse(self._context['active_id'])
+        quantity = production.product_qty - production.qty_unpost
+        quantity = quantity if (quantity > 0) else 0
+        res["product_qty"] = quantity
+        return res
     @api.multi
     def do_produce(self):
+        quantity = self.product_qty
+        if float_compare(quantity, 0, precision_rounding=self.product_uom_id.rounding) > 0:
+            self.production_id.is_on_rework = False
+            self.feedback_create(self.product_qty)  # 产出  生成品检单
+        return {'type': 'ir.actions.act_window_close'}
+        # moves = self.production_id.move_finished_ids.filtered(lambda x: x.id != )
+        #
+        # qty_split = move.product_uom._compute_quantity(move.product_uom_qty - move.quantity_done, move.product_id.uom_id)
+        # new_move = move.split(qty_split)
         # Nothing to do for lots since values are created using default data (stock.move.lots)
-        moves = self.production_id.move_raw_ids
+        # moves = self.production_id.move_raw_ids
         quantity = self.product_qty
         if float_compare(quantity, 0, precision_rounding=self.product_uom_id.rounding) <= 0:
             raise UserError(_('You should at least produce some quantity'))
@@ -752,6 +807,47 @@ class MrpProductionProduceExtend(models.TransientModel):
             self.production_id.state = 'progress'
         return {'type': 'ir.actions.act_window_close'}
 
+    def do_produce_and_post_inventory(self):
+        quantity = self.product_qty
+        if float_compare(quantity, 0, precision_rounding=self.product_uom_id.rounding) <= 0:
+            raise UserError(_('You should at least produce some quantity'))
+            # for move in moves.filtered(lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel')):
+            #     if move.unit_factor:
+            #         qty = quantity * move.unit_factor
+            #         if qty > move.product_uom_qty:
+            #             move.quantity_done_store += move.product_uom_qty
+            #         else:
+            #             move.quantity_done_store += qty
+            # move.action_done()
+            # self.production_id.post_inventory()
+            # if move.product_id.virtual_available < 0:
+            #     move.quantity_done_store = move.quantity_done_store / (1 + move.bom_line_id.scrap_rate / 100)
+        moves = self.production_id.move_finished_ids.filtered(
+                lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel'))
+        for move in moves:
+            if move.product_id.id == self.production_id.product_id.id:
+                move.quantity_done_store += quantity
+            elif move.unit_factor:
+                move.quantity_done_store += quantity * move.unit_factor
+        self.check_finished_move_lots()
+        if self.production_id.state == 'confirmed':
+            self.production_id.state = 'progress'
+
+        self.production_id.post_inventory()
+
+    # 创建品捡单, 如果有其他处于等待品捡的单据就合并起来
+    def feedback_create(self, qty_produced):
+        draft_sum_qty = qty_produced
+        feedback_draft = self.env["mrp.qc.feedback"]
+        if self.production_id.qc_feedback_ids:
+            feedback_draft = self.production_id.qc_feedback_ids.filtered(lambda x: x.state == 'draft')
+            draft_sum_qty += sum(feedback_draft.mapped("qty_produced"))
+        feedback = self.env['mrp.qc.feedback'].create({
+            'qty_produced': draft_sum_qty,
+            'production_id': self.production_id.id,
+        })
+        feedback_draft.unlink()
+        return feedback
 
 class ReturnOfMaterial(models.Model):
     _name = 'mrp.return.material'
@@ -811,7 +907,7 @@ class ReturnOfMaterial(models.Model):
                 move = self.env['stock.move'].create(self._prepare_move_values(r))
                 r.return_qty = 0
                 move.action_done()
-            self.production_id.write({'state': 'waiting_post_inventory'})
+            self.production_id.write({'state': 'done'})
         else:
             self.production_id.write({'state': 'waiting_warehouse_inspection'})
         return True
@@ -929,12 +1025,17 @@ class SimStockMove(models.Model):
 
     @api.multi
     def _compute_product_type(self):
-        location = self.env["stock.location"].search([("name", "=", "半成品流转库")], limit=1)
-        if location and location.putaway_strategy_id and location.putaway_strategy_id.fixed_location_ids:
-            fixed_location_ids = location.putaway_strategy_id.fixed_location_ids
+        circulate_location = self.env["stock.location"].search([("is_circulate_location", "=", True)], limit=1)
+        semi_finished_location = self.env["stock.location"].search([("is_semi_finished_location", "=", True)], limit=1)
+        if circulate_location and circulate_location.putaway_strategy_id and circulate_location.putaway_strategy_id.fixed_location_ids:
+            fixed_location_ids = circulate_location.putaway_strategy_id.fixed_location_ids
+        if semi_finished_location and semi_finished_location.putaway_strategy_id and semi_finished_location.putaway_strategy_id.fixed_location_ids:
+            semi_finished_fixed_location_ids = semi_finished_location.putaway_strategy_id.fixed_location_ids
         for sim in self:
             if sim.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:
-                sim.product_type = "semi-finished"
+                sim.product_type = "semi-finished"  # 半成品流转
+            elif sim.product_id.categ_id.id in semi_finished_fixed_location_ids.mapped("category_id").ids:
+                sim.product_type = "real_semi_finished"#半成品
             else:
                 sim.product_type = "material"
 
@@ -955,7 +1056,9 @@ class SimStockMove(models.Model):
     over_picking_qty = fields.Float()
     quantity_ready = fields.Float()
     area_id = fields.Many2one(related='product_id.area_id')
-    product_type = fields.Selection(string="物料类型", selection=[('semi-finished', '半成品'), ('material', '原材料'), ],
+    product_type = fields.Selection(string="物料类型", selection=[('semi-finished', '流转品'),
+                                                              ('material', '原材料'),
+                                                              ('real_semi_finished', '半成品')],
                                     required=False, compute="_compute_product_type")
     is_prepare_finished = fields.Boolean(u"是否备货完成")
 
@@ -1091,10 +1194,13 @@ class MrpQcFeedBack(models.Model):
     @api.multi
     def _compute_qc_fail_rate(self):
         for qc in self:
-            qc.qc_fail_rate = qc.qc_fail_qty / qc.qc_test_qty * 100
+            if qc.qc_test_qty != 0:
+                qc.qc_fail_rate = qc.qc_fail_qty / qc.qc_test_qty * 100
+            else:
+                qc.qc_fail_rate = 0
 
     production_id = fields.Many2one('mrp.production')
-    qty_produced = fields.Float(related='production_id.qty_produced')
+    qty_produced = fields.Float()
     qc_test_qty = fields.Float(string='Sampling Quantity')
     qc_rate = fields.Float(compute='_compute_qc_rate')
     qc_fail_qty = fields.Float('NG Quantity')
@@ -1107,6 +1213,54 @@ class MrpQcFeedBack(models.Model):
     qc_imgs = fields.One2many(comodel_name="qc.feedback.img", inverse_name="feedback_id", string="品检图片",
                               required=False, )
 
+    state = fields.Selection(string=u"状态", selection=[('draft', u'等待品检'),
+                                                      ('qc_ing', u'品检中'),
+                                                      ('qc_success', u'等待入库'),
+                                                      ('qc_fail', u'品检失败'),
+                                                      ('check_to_rework', u'已确认返工'),
+                                                      ('alredy_post_inventory', u'已入库')], required=False,
+                             default='draft')
+
+    # 等待品捡 -> 品捡中
+    def action_start_qc(self):
+        self.state = "qc_ing"
+
+    # 品捡中 -> 品捡完成
+    def action_qc_success(self):
+        if self.qc_test_qty <= 0:
+            raise UserError(u"品检数量不能为0")
+        self.state = "qc_success"
+
+        if self.production_id.state in ['waiting_rework', 'waiting_inspection_finish']:
+            self.production_id.state = self.production_id.compute_order_state()
+
+    # 品捡中 -> 品捡失败
+    def action_qc_fail(self):
+        if self.qc_test_qty <= 0:
+            raise UserError(u"品检数量不能为0")
+        self.state = "qc_fail"
+        if self.production_id.state in ['waiting_rework', 'waiting_inspection_finish']:
+            self.production_id.state = self.production_id.compute_order_state()
+
+    # 品捡成功 -> 已入库
+    def action_post_inventory(self):
+        self.state = "alredy_post_inventory"
+        mrp_product_produce = self.env['mrp.product.produce']
+        produce = mrp_product_produce.create({
+            'product_qty': self.qty_produced,
+            'production_id': self.production_id.id,
+            'product_uom_id': self.production_id.product_uom_id.id,
+            'product_id': self.production_id.product_id.id,
+        })
+
+        produce.do_produce_and_post_inventory()
+
+    # 品捡失败 -> 返工
+    def action_check_to_rework(self):
+        if self.production_id.state == "waiting_rework":
+            self.state = "check_to_rework"
+            self.production_id.state = "progress"
+            self.production_id.is_on_rework = True
 
 class MrpQcFeedBackImg(models.Model):
     _name = "qc.feedback.img"
@@ -1270,3 +1424,20 @@ class StockLocationExtend(models.Model):
     is_circulate_location = fields.Boolean(u"是否是流转库")
     is_semi_finished_location = fields.Boolean(u"是否是半成品库")
     user_ids = fields.Many2many('res.users')
+
+    def get_semi_finished_location_by_user(self, user_id):
+        locations = self.env["stock.location"].search([('user_ids', 'in', [user_id]),
+                                                       ('is_semi_finished_location', '=', True)])
+        return locations
+
+
+class ProductCategoryExtend(models.Model):
+    _inherit = 'product.category'
+
+    fixed_location_ids = fields.One2many("stock.fixed.putaway.strat", "fixed_location_id")
+
+
+class ProductPutawayExtend(models.Model):
+    _inherit = 'product.putaway'
+
+    location_ids = fields.One2many(comodel_name="stock.location", inverse_name="putaway_strategy_id", string="", required=False, )

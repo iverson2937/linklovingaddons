@@ -25,29 +25,36 @@
             <field name="name">品检单</field>
             <field name="model">mrp.qc.feedback</field>
             <field name="arch" type="xml">
-                <form>
-
-
+                <form string="品检单">
+                    <header>
+                        <button name="action_start_qc" string="开始品检" class="oe_highlight" states="draft" type="object"/>
+                        <button name="action_qc_success" string="品检通过" class="oe_highlight" states="qc_ing"
+                                type="object"/>
+                        <button name="action_qc_fail" string="品检失败" class="oe_highlight" states="qc_ing" type="object"/>
+                        <button name="action_post_inventory" string="入库" class="oe_highlight" states="qc_success"
+                                type="object"/>
+                        <button name="action_check_to_rework" string="开始返工" class="oe_highlight" states="qc_fail"
+                                type="object"/>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,qc_ing,qc_success,alredy_post_inventory"/>
+                    </header>
                     <sheet>
                         <group>
                             <group>
-                                <filed name="production_id" readonly="1" string="制造单号"/>
-                                <filed name="product_id" readonly="1" string="产品"/>
-
-                                <filed name="qty_produced" readonly="1" string="生产数量"/>
-
-
+                                <field name="production_id" readonly="1" string="制造单号"/>
+                                <field name="product_id" readonly="1" string="产品"/>
                             </group>
                             <group>
-                                <filed name="qc_test_qty" readonly="1" string="测试数量"/>
-                                <filed name="qc_fail_qty" readonly="1" string="不良数量"/>
-                                <filed name="qc_fail_rate" readonly="1" string="不良率"/>
+                                <field name="qty_produced" readonly="1" string="生产数量"/>
+                                <field name="qc_test_qty" string="测试数量"/>
+                                <field name="qc_fail_qty" string="不良数量"/>
+                                <field name="qc_fail_rate" readonly="1" string="不良率"/>
                             </group>
-                            <filed name="qc_note"/>
+                            <field name="qc_note"/>
                         </group>
                         <notebook>
                             <page string="图片">
-                                <field name="qc_imgs" readonly="1">
+                                <field name="qc_imgs">
                                     <tree>
                                         <field name="qc_img" widget="tree_image_preview"/>
                                     </tree>
