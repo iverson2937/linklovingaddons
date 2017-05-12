@@ -67,7 +67,24 @@
                 </form>
             </field>
         </record>
+        <record id="mrp_qc_feedback_tree" model="ir.ui.view">
+            <field name="name">mrp.qc.feedback.tree</field>
+            <field name="model">mrp.qc.feedback</field>
+            <field name="arch" type="xml">
+                <tree string="品检单">
 
+                    <field name="production_id" readonly="1" string="制造单号"/>
+                    <field name="product_id" readonly="1" string="产品"/>
+                    <field name="qty_produced" readonly="1" string="生产数量"/>
+                    <field name="qc_test_qty" string="测试数量"/>
+                    <field name="qc_fail_qty" string="不良数量"/>
+                    <field name="qc_fail_rate" readonly="1" string="不良率"/>
+                    <field name="qc_note"/>
+
+
+                </tree>
+            </field>
+        </record>
 
     </data>
 </openerp>
