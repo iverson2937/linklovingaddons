@@ -232,6 +232,9 @@
                     res_model="manual.combine.po" src_model="purchase.order"
                     view_mode="form" target="new" view_type="form"/>
 
+        <menuitem id="purchase.menu_procurement_management" name="Purchase"
+                  parent="purchase.menu_purchase_root" sequence="4"/>
+
 
     </data>
 </openerp>
