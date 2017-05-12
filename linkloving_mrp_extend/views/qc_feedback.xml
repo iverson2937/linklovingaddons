@@ -71,8 +71,7 @@
             <field name="name">mrp.qc.feedback.tree</field>
             <field name="model">mrp.qc.feedback</field>
             <field name="arch" type="xml">
-                <tree string="品检单">
-
+                <tree string="品检单" create="false">
                     <field name="production_id" readonly="1" string="制造单号"/>
                     <field name="product_id" readonly="1" string="产品"/>
                     <field name="qty_produced" readonly="1" string="生产数量"/>
@@ -80,11 +79,170 @@
                     <field name="qc_fail_qty" string="不良数量"/>
                     <field name="qc_fail_rate" readonly="1" string="不良率"/>
                     <field name="qc_note"/>
-
-
                 </tree>
             </field>
         </record>
+        <record id="view_mrp_qc_feedback_search" model="ir.ui.view">
+            <field name="name">mrp.qc.feedback.tree</field>
+            <field name="model">mrp.qc.feedback</field>
+            <field name="arch" type="xml">
+                <search string="品检单" create="false">
+                    <field name="production_id" readonly="1" string="制造单号"/>
+
+                </search>
+            </field>
+        </record>
+
+        <menuitem
+                id="mrp_production_qc_inspection"
+                parent="mrp.menu_mrp_manufacturing"
+                sequence="2" name="品检单"/>
+
+
+        <record id="action_wait_qc_inspection" model="ir.actions.act_window">
+            <field name="name">等待品检</field>
+            <field name="res_model">mrp.qc.feedback</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state','=', 'draft')]</field>
+            <field name="context">{'state': 'draft'}</field>
+
+            <field name="search_view_id" ref="view_mrp_qc_feedback_search"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    没有等待品检的品检单.
+                </p>
+                <p>
+
+                </p>
+            </field>
+        </record>
+
+        <menuitem
+                id="mrp_production_wait_qc_inspection"
+                parent="mrp_production_qc_inspection"
+                action="action_wait_qc_inspection"
+                sequence="2" name="等待品检"/>
+        <record id="action_qc_inspecting" model="ir.actions.act_window">
+            <field name="name">品检中</field>
+            <field name="res_model">mrp.qc.feedback</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state','=', 'qc_ing')]</field>
+            <field name="context">{'state': 'qc_ing'}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    没有等待品检的品检单.
+                </p>
+                <p>
+
+                </p>
+            </field>
+        </record>
+
+        <menuitem
+                id="mrp_production_qc_inspecting"
+                parent="mrp_production_qc_inspection"
+                action="action_qc_inspecting"
+                sequence="2" name="品检中"/>
+
+        <record id="action_qc_success" model="ir.actions.act_window">
+            <field name="name">等待入库</field>
+            <field name="res_model">mrp.qc.feedback</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state','=', 'qc_success')]</field>
+            <field name="context">{'state': 'qc_success'}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    没有等待入库.
+                </p>
+                <p>
+
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem
+                id="mrp_production_action_qc_success"
+                parent="mrp_production_qc_inspection"
+                action="action_qc_success"
+                sequence="2" name="等待入库"/>
+        <record id="action_already_post_inventory" model="ir.actions.act_window">
+            <field name="name">已入库</field>
+            <field name="res_model">mrp.qc.feedback</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state','=', 'alredy_post_inventory')]</field>
+            <field name="context">{'state': 'alredy_post_inventory'}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    没有已入库.
+                </p>
+                <p>
+
+                </p>
+            </field>
+        </record>
+        <menuitem
+                id="mrp_production_alredy_post_inventory"
+                parent="mrp_production_qc_inspection"
+                action="action_already_post_inventory"
+                sequence="2" name="已入库"/>
+
+        <record id="action_qc_inspection_fail" model="ir.actions.act_window">
+            <field name="name">品检失败</field>
+            <field name="res_model">mrp.qc.feedback</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state','=', 'qc_fail')]</field>
+            <field name="context">{'state': 'qc_fail'}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    没有品检失败的.
+                </p>
+                <p>
+
+                </p>
+            </field>
+        </record>
+        <menuitem
+                id="mrp_production_qc_inspection_fail"
+                parent="mrp_production_qc_inspection"
+                action="action_qc_inspection_fail"
+                sequence="2" name="品检失败"/>
+
+        <record id="action_qc_inspection_check_to_rework" model="ir.actions.act_window">
+            <field name="name">确认返工</field>
+            <field name="res_model">mrp.qc.feedback</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state','=', 'check_to_rework')]</field>
+            <field name="context">{'state': 'check_to_rework'}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    没有确认返工的.
+                </p>
+                <p>
+
+                </p>
+            </field>
+        </record>
+
+        <menuitem
+                id="mrp_production_qc_inspection_check_to_rework"
+                parent="mrp_production_qc_inspection"
+                action="action_qc_inspection_check_to_rework"
+                sequence="2" name="确认返工"/>
+
+        check_to_rework
 
     </data>
 </openerp>

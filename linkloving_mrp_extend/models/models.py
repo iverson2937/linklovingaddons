@@ -200,7 +200,6 @@ class MrpProductionExtend(models.Model):
             feedbacks = production.qc_feedback_ids.filtered(lambda x: x.state not in ["check_to_rework"])
             production.qty_unpost = sum(feedbacks.mapped("qty_produced"))
 
-
     @api.multi
     def _get_qc_feedback_count(self):
         for feedback in self:
@@ -457,7 +456,7 @@ class MrpProductionExtend(models.Model):
             self.state = self.compute_order_state()
             # if all(feedback.state in ['qc_success', 'alredy_post_inventory'] for feedback in self.qc_feedback_ids):
             #     self.state = "waiting_inventory_material"#等待清点退料
-            #有其中一个单据还没品捡 或者还没品捡完成, 等待品捡完成
+            # 有其中一个单据还没品捡 或者还没品捡完成, 等待品捡完成
 
     def compute_order_state(self):
         if any(feedback.state in ['draft', 'qc_ing'] for feedback in self.qc_feedback_ids):
@@ -768,6 +767,7 @@ class MrpProductionProduceExtend(models.TransientModel):
         quantity = quantity if (quantity > 0) else 0
         res["product_qty"] = quantity
         return res
+
     @api.multi
     def do_produce(self):
         quantity = self.product_qty
@@ -823,7 +823,7 @@ class MrpProductionProduceExtend(models.TransientModel):
             # if move.product_id.virtual_available < 0:
             #     move.quantity_done_store = move.quantity_done_store / (1 + move.bom_line_id.scrap_rate / 100)
         moves = self.production_id.move_finished_ids.filtered(
-                lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel'))
+            lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel'))
         for move in moves:
             if move.product_id.id == self.production_id.product_id.id:
                 move.quantity_done_store += quantity
@@ -848,6 +848,7 @@ class MrpProductionProduceExtend(models.TransientModel):
         })
         feedback_draft.unlink()
         return feedback
+
 
 class ReturnOfMaterial(models.Model):
     _name = 'mrp.return.material'
@@ -1035,7 +1036,7 @@ class SimStockMove(models.Model):
             if sim.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:
                 sim.product_type = "semi-finished"  # 半成品流转
             elif sim.product_id.categ_id.id in semi_finished_fixed_location_ids.mapped("category_id").ids:
-                sim.product_type = "real_semi_finished"#半成品
+                sim.product_type = "real_semi_finished"  # 半成品
             else:
                 sim.product_type = "material"
 
@@ -1182,6 +1183,7 @@ class LLWorkerTimeLine(models.Model):
 
 class MrpQcFeedBack(models.Model):
     _name = 'mrp.qc.feedback'
+    _inherit = ['mail.thread', 'ir.needaction_mixin']
 
     @api.multi
     def _compute_qc_rate(self):
@@ -1261,6 +1263,17 @@ class MrpQcFeedBack(models.Model):
             self.state = "check_to_rework"
             self.production_id.state = "progress"
             self.production_id.is_on_rework = True
+
+    @api.model
+    def _needaction_domain_get(self):
+        """ Returns the domain to filter records that require an action
+            :return: domain or False is no action
+
+        """
+        state = self._context.get('state')
+
+        return [('state', '=', state)]
+
 
 class MrpQcFeedBackImg(models.Model):
     _name = "qc.feedback.img"
@@ -1440,4 +1453,5 @@ class ProductCategoryExtend(models.Model):
 class ProductPutawayExtend(models.Model):
     _inherit = 'product.putaway'
 
-    location_ids = fields.One2many(comodel_name="stock.location", inverse_name="putaway_strategy_id", string="", required=False, )
+    location_ids = fields.One2many(comodel_name="stock.location", inverse_name="putaway_strategy_id", string="",
+                                   required=False, )
