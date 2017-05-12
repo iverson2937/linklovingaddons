@@ -5,6 +5,8 @@ from odoo import models, fields, api
 from models import MO_STATE
 import uuid
 
+from odoo.exceptions import UserError
+
 SALE_ORDER_STATE = {
     'sale': u'销售订单',
     'sent': u'已发送报价单',
@@ -55,8 +57,10 @@ class PurchaseOrderLine(models.Model):
                 if s.startswith('MO'):
                     mo_id = self.env['mrp.production'].sudo().search([('name', '=', s)])
                     for move_line in mo_id.sim_stock_move_lines:
-                        print line.product_id.id
-                        print move_line.product_id.id
+                        if not mo_id.product_tmpl_id.product_variant_ids:
+                            raise UserError(u'此料号已经被归档')
+
+
                         if line.product_id.id == move_line.product_id.id:
                             res.append({
                                 'name': mo_id.name,

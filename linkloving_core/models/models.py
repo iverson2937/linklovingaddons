@@ -84,6 +84,8 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def get_detail(self):
+        if not self.product_variant_ids:
+            raise UserError(u'已归档无法查看')
         bom_ids = self.bom_ids
         bom_lines = []
         process = False
