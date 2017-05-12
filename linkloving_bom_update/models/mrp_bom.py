@@ -47,7 +47,6 @@ class MrpBom(models.Model):
             'code': line.product_id.default_code,
             'uuid': str(uuid.uuid1()),
             'level': level,
-            'uuid': str(uuid.uuid1()),
             'bom_ids': bom_line_ids
         }
 
@@ -71,7 +70,6 @@ def _get_rec(object, level, qty=1.0, uom=False):
             'code': l.product_id.default_code,
             'uuid': str(uuid.uuid1()),
             'level': level,
-            'uuid': str(uuid.uuid1()),
             'bom_ids': bom_line_ids
         }
 
