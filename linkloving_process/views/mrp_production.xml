@@ -116,26 +116,18 @@
         </record>
 
 
-        <record id="action_create_mrp_production" model="ir.actions.act_window">
-            <field name="name">To Do</field>
+        <!-- Process Dashboard Views -->
+        <record id="action_create_mrp_production_form" model="ir.actions.act_window">
+            <field name="name">新建制造单</field>
             <field name="res_model">mrp.production</field>
             <field name="type">ir.actions.act_window</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-            <field name="domain">[('state','in',['draft','confirmed','waiting_material'])]</field>
+            <field name="view_mode">form</field>
             <field name="context">{
-                'search_default_process_id': active_id,
-                'group_by':'product_id',
+                'search_default_process_id': [active_id],
+                'default_process_id': active_id,
+                'default_user_id': uid,
                 }
-            </field>
-            <field name="help" type="html">
-                <p class="oe_view_nocontent_create">
-                    Click here to create a new transfer.
-                </p>
-                <p>
-                    You can either do it immediately or mark it as Todo for future processing. Use your scanner to
-                    validate the transferred quantity quicker.
-                </p>
             </field>
         </record>
 
