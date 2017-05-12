@@ -60,6 +60,7 @@
                                        required="1"/>
                             </group>
                             <field name="remark"/>
+                            <field name="invoice_status" invisible="1"/>
 
                         </group>
                         <notebook>
