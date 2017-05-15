@@ -12,6 +12,10 @@
 
                                 <div class="row mt32 mb32">
                                     <div class="col-xs-2">
+                                        <strong>报销单号:</strong>
+                                        <p t-field="o.expense_no"/>
+                                    </div>
+                                    <div class="col-xs-2">
                                         <strong>Employee:</strong>
                                         <p t-field="o.employee_id.name"/>
                                     </div>
@@ -19,7 +23,7 @@
                                         <strong>Date:</strong>
                                         <p t-field="o.accounting_date"/>
                                     </div>
-                                    <div class="col-xs-3">
+                                    <div class="col-xs-2">
                                         <strong>Description:</strong>
                                         <p t-field="o.name"/>
                                     </div>
@@ -27,10 +31,10 @@
                                         <strong>Validated By:</strong>
                                         <p t-field="o.responsible_id"/>
                                     </div>
-                                    <div class="col-xs-3">
-                                        <strong>Payment By:</strong>
-                                        <p t-field="o.payment_mode"/>
-                                    </div>
+                                    <!--<div class="col-xs-2">-->
+                                    <!--<strong>Payment By:</strong>-->
+                                    <!--<p t-field="o.payment_mode"/>-->
+                                    <!--</div>-->
                                 </div>
 
                                 <table class="table table-condensed">
