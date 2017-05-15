@@ -12,62 +12,65 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
     var _t = core._t;
 
     var BomUpdate = Widget.extend({
-        template:'bom_wraper',
-        events:{
+        template: 'bom_wraper',
+        events: {
             'click .click_bom_tag_a': 'show_bom_lists',
             'click .add_product': 'add_product_function',
-            'blur .add_product_input':'add_product_input_blur',
-            'focus .add_product_input':'add_product_input_focus',
-            'click .add_product_lis':'chose_li_to_input',
+            'blur .add_product_input': 'add_product_input_blur',
+            'focus .add_product_input': 'add_product_input_focus',
+            'click .add_product_lis': 'chose_li_to_input',
             'click .bom_modify_submit': 'bom_modify_submit',
-            'input .add_product_input':'when_input_is_on'
+            'input .add_product_input': 'when_input_is_on'
         },
-        when_input_is_on:function (e) {
-            var e = e||window.event;
-            var target = e.target||e.srcElement;
+        when_input_is_on: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
             var change_lis = target.nextElementSibling.childNodes;
             console.log(target.value)
             return new Model("product.template")
-               .call("search", [target.value])
-               .then(function (result) {
-                   console.log(result)
-               })
+                .query(['display_name'])
+                .filter([['name', 'ilike', target.value]])
+                .limit(8)
+                .all()
+                .then(function (result) {
+                    console.log(result)
+                })
         },
-        bom_modify_submit:function () {
+        bom_modify_submit: function () {
             $(".add_product_input_wraper").each(function () {
                 console.log($(this).children("input:first-child").val())
                 var add_product_value = $(this).children("input:first-child").val();
-                if(add_product_value!=""){
-                    $(this).parent().html("<a></a><span>"+add_product_value+"</span>");
-                }else {
+                if (add_product_value != "") {
+                    $(this).parent().html("<a></a><span>" + add_product_value + "</span>");
+                } else {
                     $(this).parent().parent().parent().remove()
                 }
 
-            })  
+            })
         },
-        chose_li_to_input:function (e) {
-            var e = e||window.event;
-            var target = e.target||e.srcElement;
+        chose_li_to_input: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
             target.parentNode.previousElementSibling.value = target.innerHTML
             console.log(target.innerHTML);
         },
-        add_product_input_focus:function (e) {
-            var e = e||window.event;
-            var target = e.target||e.srcElement;
-            target.nextElementSibling.style.display="block"
+        add_product_input_focus: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            target.nextElementSibling.style.display = "block"
         },
-        add_product_input_blur:function () {
+        add_product_input_blur: function () {
             setTimeout(function () {
                 $(".add_product_ul").hide()
-            },150)
+            }, 150)
         },
-        add_product_function:function (e) {
+        add_product_function: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var level_add = target.parentNode.parentNode.nextElementSibling;
             var wraper = level_add.getElementsByTagName("div");
             var wheather_input = wraper[0].getElementsByTagName("div");
-            if(wheather_input[0].classList.contains("input-panel")){
+            if (wheather_input[0].classList.contains("input-panel")) {
                 return
             }
             var divs = document.createElement("div");
@@ -83,23 +86,23 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             })
         },
 
-        show_bom_lists:function (e) {
+        show_bom_lists: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
-            if(target.childNodes.length > 1){
-                if(target.childNodes[1].classList.contains("fa-caret-right")){
+            if (target.childNodes.length > 1) {
+                if (target.childNodes[1].classList.contains("fa-caret-right")) {
                     target.childNodes[1].classList.remove("fa-caret-right");
                     target.childNodes[1].classList.add("fa-caret-down");
-                }else if(target.childNodes[1].classList.contains("fa-caret-down")){
+                } else if (target.childNodes[1].classList.contains("fa-caret-down")) {
                     target.childNodes[1].classList.remove("fa-caret-down");
                     target.childNodes[1].classList.add("fa-caret-right");
                 }
             }
-            if(target.classList.contains('open-sign')){
-                if(target.classList.contains("fa-caret-right")){
+            if (target.classList.contains('open-sign')) {
+                if (target.classList.contains("fa-caret-right")) {
                     target.classList.remove("fa-caret-right");
                     target.classList.add("fa-caret-down");
-                }else if(target.classList.contains("fa-caret-down")){
+                } else if (target.classList.contains("fa-caret-down")) {
                     target.classList.remove("fa-caret-down");
                     target.classList.add("fa-caret-right");
                 }
@@ -120,7 +123,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                     .then(function (result) {
                         console.log(result);
 
-                        self.$el.append(QWeb.render('bom_tree',{result:result}))
+                        self.$el.append(QWeb.render('bom_tree', {result: result}))
                     })
             }
         }
