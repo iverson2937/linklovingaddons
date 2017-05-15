@@ -785,37 +785,37 @@
                   sequence="29"
                   groups="group_charge_produce"/>
 
-        <!--<record id="mrp_waiting_warehouse_inspection" model="ir.actions.act_window">-->
-        <!--<field name="name">Waiting Warehouse Insepcetion Orders</field>-->
-        <!--<field name="type">ir.actions.act_window</field>-->
-        <!--<field name="res_model">mrp.production</field>-->
-        <!--<field name="view_type">form</field>-->
-        <!--<field name="view_mode">tree,kanban,form,calendar,pivot,graph,gantt</field>-->
-        <!--<field name="view_id" eval="False"/>-->
-        <!--<field name="search_view_id" ref="view_mrp_production_filter"/>-->
-        <!--<field name="domain">[('state','=', 'waiting_warehouse_inspection')]</field>-->
-        <!--<field name="context">{'state':'waiting_warehouse_inspection'}</field>-->
-        <!--<field name="help" type="html">-->
-        <!--<p class="oe_view_nocontent_create">-->
-        <!--Click to create a manufacturing order.-->
-        <!--</p>-->
-        <!--<p>-->
-        <!--A manufacturing order, based on a bill of materials, will-->
-        <!--consume raw materials and produce finished products.-->
-        <!--</p>-->
-        <!--<p>-->
-        <!--Manufacturing orders are usually proposed automatically based-->
-        <!--on customer requirements or automated rules like the minimum-->
-        <!--stock rule.-->
-        <!--</p>-->
-        <!--</field>-->
-        <!--</record>-->
-        <!--<menuitem id="menu_mrp_waiting_warehouse_inspection"-->
-        <!--name="退料待入库"-->
-        <!--parent="mrp.menu_mrp_manufacturing"-->
-        <!--action="mrp_waiting_warehouse_inspection"-->
-        <!--sequence="30"-->
-        <!--groups="group_charge_warehouse"/>-->
+        <record id="mrp_waiting_warehouse_inspection" model="ir.actions.act_window">
+            <field name="name">Waiting Warehouse Insepcetion Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">mrp.production</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph,gantt</field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="view_mrp_production_filter"/>
+            <field name="domain">[('state','=', 'waiting_warehouse_inspection')]</field>
+            <field name="context">{'state':'waiting_warehouse_inspection'}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+                <p>
+                    A manufacturing order, based on a bill of materials, will
+                    consume raw materials and produce finished products.
+                </p>
+                <p>
+                    Manufacturing orders are usually proposed automatically based
+                    on customer requirements or automated rules like the minimum
+                    stock rule.
+                </p>
+            </field>
+        </record>
+        <menuitem id="menu_mrp_waiting_warehouse_inspection"
+                  name="退料待入库"
+                  parent="mrp.menu_mrp_production_action"
+                  action="mrp_waiting_warehouse_inspection"
+                  sequence="30"
+                  groups="group_charge_warehouse"/>
 
         <!--<record id="mrp_waiting_post_inventory" model="ir.actions.act_window">-->
         <!--<field name="name">Waiting Post Orders</field>-->
