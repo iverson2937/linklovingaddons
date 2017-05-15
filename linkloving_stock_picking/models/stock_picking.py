@@ -197,7 +197,7 @@ class SaleOrderExtend(models.Model):
     @api.depends('company_id')
     def _compute_prices(self):
 
-        domain_quant_loc, domain_move_in_loc, domain_move_out_loc = self._get_domain_locations()
+        domain_quant_loc, domain_move_in_loc, domain_move_out_loc = self.env['product.product']._get_domain_locations()
         domain_move_in_todo = [('state', 'in', ['done'])] + [
             ('product_id', 'in', [self.product_id.id])] + domain_move_in_loc
         domain_move_out_todo = [('state', 'in', ['done'])] + [
@@ -214,75 +214,5 @@ class SaleOrderExtend(models.Model):
             sgin = -1
         self.data_type = self.product_uom_qty * sgin
 
-    def _get_domain_locations(self):
-        '''
-        Parses the context and returns a list of location_ids based on it.
-        It will return all stock locations when no parameters are given
-        Possible parameters are shop, warehouse, location, force_company, compute_child
-        '''
-        # TDE FIXME: clean that brol, context seems overused
-        Warehouse = self.env['stock.warehouse']
 
-        location_ids = []
-        if self.env.context.get('location', False):
-            if isinstance(self.env.context['location'], (int, long)):
-                location_ids = [self.env.context['location']]
-            elif isinstance(self.env.context['location'], basestring):
-                domain = [('complete_name', 'ilike', self.env.context['location'])]
-                if self.env.context.get('force_company', False):
-                    domain += [('company_id', '=', self.env.context['force_company'])]
-                location_ids = self.env['stock.location'].search(domain).ids
-            else:
-                location_ids = self.env.context['location']
-        else:
-            if self.env.context.get('warehouse', False):
-                if isinstance(self.env.context['warehouse'], (int, long)):
-                    wids = [self.env.context['warehouse']]
-                elif isinstance(self.env.context['warehouse'], basestring):
-                    domain = [('name', 'ilike', self.env.context['warehouse'])]
-                    if self.env.context.get('force_company', False):
-                        domain += [('company_id', '=', self.env.context['force_company'])]
-                    wids = Warehouse.search(domain).ids
-                else:
-                    wids = self.env.context['warehouse']
-            else:
-                wids = Warehouse.search([]).ids
 
-            for w in Warehouse.browse(wids):
-                location_ids.append(w.view_location_id.id)
-        return self._get_domain_locations_new(location_ids, company_id=self.env.context.get('force_company', False),
-                                              compute_child=self.env.context.get('compute_child', True))
-
-    def _get_domain_locations_new(self, location_ids, company_id=False, compute_child=True):
-        operator = compute_child and 'child_of' or 'in'
-        domain = company_id and ['&', ('company_id', '=', company_id)] or []
-        locations = self.env['stock.location'].browse(location_ids)
-        # TDE FIXME: should move the support of child_of + auto_join directly in expression
-        # The code has been modified because having one location with parent_left being
-        # 0 make the whole domain unusable
-        hierarchical_locations = locations.filtered(
-            lambda location: location.parent_left != 0 and operator == "child_of")
-        other_locations = locations.filtered(
-            lambda location: location not in hierarchical_locations)  # TDE: set - set ?
-        loc_domain = []
-        dest_loc_domain = []
-        for location in hierarchical_locations:
-            loc_domain = loc_domain and ['|'] + loc_domain or loc_domain
-            loc_domain += ['&',
-                           ('location_id.parent_left', '>=', location.parent_left),
-                           ('location_id.parent_left', '<', location.parent_right)]
-            dest_loc_domain = dest_loc_domain and ['|'] + dest_loc_domain or dest_loc_domain
-            dest_loc_domain += ['&',
-                                ('location_dest_id.parent_left', '>=', location.parent_left),
-                                ('location_dest_id.parent_left', '<', location.parent_right)]
-        if other_locations:
-            loc_domain = loc_domain and ['|'] + loc_domain or loc_domain
-            loc_domain = loc_domain + [('location_id', operator, [location.id for location in other_locations])]
-            dest_loc_domain = dest_loc_domain and ['|'] + dest_loc_domain or dest_loc_domain
-            dest_loc_domain = dest_loc_domain + [
-                ('location_dest_id', operator, [location.id for location in other_locations])]
-        return (
-            domain + loc_domain,
-            domain + dest_loc_domain + ['!'] + loc_domain if loc_domain else domain + dest_loc_domain,
-            domain + loc_domain + ['!'] + dest_loc_domain if dest_loc_domain else domain + loc_domain
-        )
