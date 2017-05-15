@@ -16,7 +16,7 @@
 
                 <xpath expr="//button[@name='do_new_transfer']" position="replace">
 
-                       <button name="to_stock" string="出库" type="object" class="oe_highlight"
+                    <button name="to_stock" string="出库" type="object" class="oe_highlight"
                             attrs="{'invisible': [('state','not in',['waiting_out'])]}"
                             groups="stock.group_stock_user"/>
                     <button name="to_stock" string="入库" type="object" class="oe_highlight"
@@ -40,16 +40,21 @@
                             groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
                 </xpath>
                 <xpath expr="//button[@name='do_new_transfer']" position="after">
-                    <button name="action_check_pass" states="qc_check" string="Quality Check Pass" groups="stock.group_stock_user"
+                    <button name="action_check_pass" states="qc_check" string="Quality Check Pass"
+                            groups="stock.group_stock_user"
                             type="object" class="oe_highlight"/>
-                    <button name="action_check_fail" states="qc_check" string="Quality Check Fail" groups="stock.group_stock_user"
+                    <button name="action_check_fail" states="qc_check" string="Quality Check Fail"
+                            groups="stock.group_stock_user"
                             type="object"/>
 
                 </xpath>
 
-                  <xpath expr="//field[@name='location_id']" position="after">
-                   <field name="tracking_number" string="Tracking Number"/>
+                <xpath expr="//field[@name='location_id']" position="after">
+                    <field name="tracking_number" string="Tracking Number"/>
+                </xpath>
 
+                <xpath expr="//field[@name='origin']" position="after">
+                    <field name="storage_type" string="入库类型"/>
                 </xpath>
 
                 <!--<xpath expr="//notebook/page[1]" position="after">-->
@@ -72,6 +77,22 @@
         </record>
 
 
+        <record id="view_move_trees" model="ir.ui.view">
+            <field name="name">stock.move.tree</field>
+            <field name="model">stock.move</field>
+            <field name="inherit_id" ref="stock.view_move_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='product_id']" position="after">
+                    <field name="data_type" string="数量"/>
+                </xpath>
+
+                <xpath expr="//field[@name='product_uom_qty']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+            </field>
+        </record>
+
+
         <record model="ir.ui.view" id="view_stock_picking_tree">
             <field name="name">stock.picking.wave.inherit.tree</field>
             <field name="model">stock.picking</field>
@@ -79,6 +100,10 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='state']" position="after">
                     <field name="create_uid"/>
+                </xpath>
+
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="storage_type" string="入库类型"/>
                 </xpath>
             </field>
         </record>
@@ -110,6 +135,17 @@
                 <xpath expr="//field[@name='partner_id']" position="after">
                     <field name="origin"/>
                 </xpath>
+
+                <xpath expr="//filter[@name='done']" position="after">
+                    <separator/>
+                    <filter string="采购入库" name="procurement_warehousing"
+                            domain="[('storage_type', '=', 'procurement_warehousing')]"/>
+                    <filter string="退料入库" name="return_of_materials_to_storeroom"
+                            domain="[('storage_type', '=', 'return_of_materials_to_storeroom')]"/>
+                    <filter string="退货入库" name="return_storage"
+                            domain="[('storage_type', '=', 'return_storage')]"/>
+                </xpath>
+
             </field>
         </record>
 
@@ -138,8 +174,6 @@
                 </p>
             </field>
         </record>
-
-
 
 
         <menuitem id="stock_picking_confirm" action="action_stock_picking_confirm"
