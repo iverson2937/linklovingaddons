@@ -8,19 +8,23 @@
     </t>
 
     <t t-name="bom_tree">
+        <button class="btn btn-primary bom_modify_submit">提交修改</button>
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
                     <a data-toggle="collapse" data-parent="#accordion" t-att-href="'#'+result.uuid" class="click_bom_tag_a">
                         <t t-if="result.bom_ids.length>0">
-                            <span class="fa fa-caret-right open-sign"></span>
+                            <span class="fa fa-caret-down open-sign"></span>
                         </t>
                     </a>
                     <span><t t-esc="result.name"/></span>
+                    <t t-if="result.bom_ids.length>0">
+                        <span style="margin-left:30px;cursor:pointer" class="fa fa-plus add_product"></span>
+                    </t>
                 </h4>
             </div>
 
-            <div t-att-id="result.uuid" class="panel-collapse collapse">
+            <div t-att-id="result.uuid" class="panel-collapse collapse in">
                 <div class="panel-body">
                     <t t-foreach="result.bom_ids" t-as="item">
                         <div class="panel panel-default">
@@ -31,7 +35,10 @@
                                             <span class="fa fa-caret-right open-sign"></span>
                                         </t>
                                     </a>
-                                    <t t-esc="item.name"/>
+                                    <span><t t-esc="item.name"/></span>
+                                    <t t-if="item.bom_ids.length>0">
+                                        <span style="margin-left:30px;cursor:pointer" class="fa fa-plus add_product"></span>
+                                    </t>
                                 </h4>
                             </div>
                             <div t-att-id="item.uuid" class="panel-collapse collapse">
@@ -61,12 +68,14 @@
                             <span class="fa fa-caret-right open-sign"></span>
                         </t>
                     </a>
-                    <t t-esc="arg.name"/>
+                    <span><t t-esc="arg.name"/></span>
+                    <t t-if="arg.bom_ids.length>0">
+                        <span style="margin-left:30px;cursor:pointer" class="fa fa-plus add_product"></span>
+                    </t>
                 </h4>
             </div>
             <div t-att-id="arg.uuid" class="panel-collapse collapse">
                 <div class="panel-body">
-
                     <t t-if="arg.bom_ids.length>0">
                         <t t-foreach="arg.bom_ids" t-as="items">
                             <t t-call="more">
