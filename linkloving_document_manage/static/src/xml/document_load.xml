@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+    <t t-name="document_load_page">
+        <div>
+            <div>此功能暂时仅支持IE浏览器</div>
+            <input type="file" id="importFile" /><br />
+    	    <button class="load_file_submit">上传</button>
+        </div>
+    </t>
+</templates>
