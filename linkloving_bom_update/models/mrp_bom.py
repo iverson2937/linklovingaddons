@@ -24,6 +24,7 @@ class MrpBom(models.Model):
             res.append(self.get_bom_line(line))
         result = {
             'uuid': str(uuid.uuid1()),
+            'bom_id': self.id,
             'product_id': self.product_tmpl_id.id,
             'name': self.product_tmpl_id.name_get()[0][1],
             'bom_ids': res
@@ -44,6 +45,7 @@ class MrpBom(models.Model):
         res = {
             'name': line.product_id.name_get()[0][1],
             'product_id': line.product_id.default_code,
+            'id': line.id,
             'code': line.product_id.default_code,
             'uuid': str(uuid.uuid1()),
             'level': level,
@@ -69,6 +71,7 @@ def _get_rec(object, level, qty=1.0, uom=False):
             'product_id': l.product_id.default_code,
             'code': l.product_id.default_code,
             'uuid': str(uuid.uuid1()),
+            'id': l.id,
             'level': level,
             'bom_ids': bom_line_ids
         }
