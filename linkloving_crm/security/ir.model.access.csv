@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_linkloving_crm_linkloving_crm,linkloving_crm.linkloving_crm,model_linkloving_crm_linkloving_crm,,1,0,0,0
+access_linkloving_crm_crm_continent,linkloving_crm.crm_continent,model_crm_continent,,1,1,1,1
