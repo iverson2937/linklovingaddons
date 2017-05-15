@@ -35,10 +35,10 @@
                          ]
                         <t t-if="result.state_bom">
                             <t t-if="result.state_bom=='draft'">
-                                <span class="fa fa-stop" style="padding-left:10px;color:red;"></span>
+                                <span class="fa fa-circle" style="padding-left:10px;color:red;"></span>
                             </t>
                             <t t-if="result.state_bom=='release'">
-                                <span class="fa fa-stop" style="padding-left:10px;color:green;"></span>
+                                <span class="fa fa-circle" style="padding-left:10px;color:green;"></span>
                             </t>
                         </t>
                     </span>
@@ -124,10 +124,10 @@
                                              ]
                                             <t t-if="item.state_bom">
                                                 <t t-if="item.state_bom=='draft'">
-                                                    <span class="fa fa-stop" style="padding-left:10px;color:red;"></span>
+                                                    <span class="fa fa-circle" style="padding-left:10px;color:red;"></span>
                                                 </t>
                                                 <t t-if="item.state_bom=='release'">
-                                                    <span class="fa fa-stop" style="padding-left:10px;color:green;"></span>
+                                                    <span class="fa fa-circle" style="padding-left:10px;color:green;"></span>
                                                 </t>
                                             </t>
                                     </span>
@@ -283,10 +283,10 @@
                                          ]
                                          <t t-if="item.state_bom">
                                             <t t-if="item.state_bom=='draft'">
-                                                <span class="fa fa-stop" style="padding-left:10px;color:red;"></span>
+                                                <span class="fa fa-circle" style="padding-left:10px;color:red;"></span>
                                             </t>
                                             <t t-if="item.state_bom=='release'">
-                                                <span class="fa fa-stop" style="padding-left:10px;color:green;"></span>
+                                                <span class="fa fa-circle" style="padding-left:10px;color:green;"></span>
                                             </t>
                                          </t>
                                     </span>

@@ -1,0 +1,66 @@
+<openerp>
+    <data>
+
+
+        <record id="qc_feedback_img_tree" model="ir.ui.view">
+            <field name="name">品检单</field>
+            <field name="model">qc.feedback.img</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="qc_img" widget="tree-image-preview"/>
+                </tree>
+            </field>
+        </record>
+        <record id="qc_feedback_img_form" model="ir.ui.view">
+            <field name="name">品检单</field>
+            <field name="model">qc.feedback.img</field>
+            <field name="arch" type="xml">
+                <form>
+                    <field name="qc_img" widget="binary"/>
+                </form>
+            </field>
+        </record>
+
+        <record id="mrp_qc_feedback_form" model="ir.ui.view">
+            <field name="name">品检单</field>
+            <field name="model">mrp.qc.feedback</field>
+            <field name="arch" type="xml">
+                <form>
+
+
+                    <sheet>
+                        <group>
+                            <group>
+                                <filed name="production_id" readonly="1" string="制造单号"/>
+                                <filed name="product_id" readonly="1" string="产品"/>
+
+                                <filed name="qty_produced" readonly="1" string="生产数量"/>
+
+
+                            </group>
+                            <group>
+                                <filed name="qc_test_qty" readonly="1" string="测试数量"/>
+                                <filed name="qc_fail_qty" readonly="1" string="不良数量"/>
+                                <filed name="qc_fail_rate" readonly="1" string="不良率"/>
+                            </group>
+                            <filed name="qc_note"/>
+                        </group>
+                        <notebook>
+                            <page string="图片">
+                                <field name="qc_imgs" readonly="1">
+                                    <tree>
+                                        <field name="qc_img" widget="tree_image_preview"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+
+                    </sheet>
+
+                </form>
+            </field>
+        </record>
+
+
+    </data>
+</openerp>

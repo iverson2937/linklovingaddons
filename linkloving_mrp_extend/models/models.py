@@ -18,7 +18,6 @@ class MrpBomExtend(models.Model):
 
     product_specs = fields.Text(string=u'Product Specification', related='product_tmpl_id.product_specs')
 
-
     product_id = fields.Many2one(
         'product.product', 'Product Variant',
         domain="['&', ('product_tmpl_id', '=', product_tmpl_id), ('type', 'in', ['product', 'consu'])]",
@@ -178,6 +177,27 @@ class StockMoveExtend(models.Model):
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 
+    @api.multi
+    def action_view_qc_report(self):
+        ids = []
+
+        return {
+            'name': u'品检报告',
+            'type': 'ir.actions.act_window',
+            'res_model': 'mrp.qc.feedback',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', self.qc_feedback_ids.ids)],
+            'target': 'current',
+        }
+
+    qc_feedback_ids = fields.One2many('mrp.qc.feedback', 'production_id')
+
+    @api.multi
+    def _get_qc_feedback_count(self):
+        for feedback in self:
+            feedback.qc_feedback_count = len(feedback.qc_feedback_ids)
+
+    qc_feedback_count = fields.Integer(compute='_get_qc_feedback_count')
     availability = fields.Selection([
         ('assigned', _('Can send the material')),
         ('partially_available', _('Partially Available')),
@@ -297,7 +317,7 @@ class MrpProductionExtend(models.Model):
         ('waiting_warehouse_inspection', _('Waiting Check Return Material')),
         ('waiting_post_inventory', _('Waiting Stock Transfers')),
         ('done', 'Done'),
-        ('cancel', 'Cancelled')], string='State',
+        ('cancel', 'Cancelled')], string='status',
         copy=False, default='confirmed', track_visibility='onchange')
 
     # 计算所有工人总共花的工时
@@ -360,6 +380,11 @@ class MrpProductionExtend(models.Model):
     def button_action_confirm_draft(self):
         for production in self:
             production.write({'state': 'confirmed'})
+
+    @api.multi
+    def button_action_cancel_confirm(self):
+        for production in self:
+            production.write({'state': 'draft'})
 
     # 开始备料
     def button_start_prepare_material(self):
@@ -932,6 +957,7 @@ class SimStockMove(models.Model):
     area_id = fields.Many2one(related='product_id.area_id')
     product_type = fields.Selection(string="物料类型", selection=[('semi-finished', '半成品'), ('material', '原材料'), ],
                                     required=False, compute="_compute_product_type")
+    is_prepare_finished = fields.Boolean(u"是否备货完成")
 
 
 class ReturnMaterialLine(models.Model):
@@ -1077,6 +1103,16 @@ class MrpQcFeedBack(models.Model):
     qc_img = fields.Binary(string='Quality Inspection Image')
 
     product_id = fields.Many2one('production_id.product_id')
+
+    qc_imgs = fields.One2many(comodel_name="qc.feedback.img", inverse_name="feedback_id", string="品检图片",
+                              required=False, )
+
+
+class MrpQcFeedBackImg(models.Model):
+    _name = "qc.feedback.img"
+
+    qc_img = fields.Binary(u"品检图片")
+    feedback_id = fields.Many2one("mrp.qc.feedback")
 
 
 class MultiHandleWorker(models.TransientModel):
@@ -1226,3 +1262,11 @@ class purchase_order_extend(models.Model):
             if not order.state in ["cancel", "make_by_mrp"]:
                 raise UserError(_('In order to delete a purchase order, you must cancel it first.'))
         super(models.Model, self).unlink()  ###注意 fixme
+
+
+class StockLocationExtend(models.Model):
+    _inherit = "stock.location"
+
+    is_circulate_location = fields.Boolean(u"是否是流转库")
+    is_semi_finished_location = fields.Boolean(u"是否是半成品库")
+    user_ids = fields.Many2many('res.users')

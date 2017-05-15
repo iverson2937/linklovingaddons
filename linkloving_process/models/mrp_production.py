@@ -15,6 +15,10 @@ class MrpProduction(models.Model):
     unit_price = fields.Float()
 
     @api.multi
+    def mo_create(self):
+        pass
+
+    @api.multi
     def _prepare_invoice(self):
         inv_obj = self.env['account.invoice']
 
@@ -118,7 +122,6 @@ class MrpProduction(models.Model):
     @api.multi
     def action_view_mrp_invoice(self):
         print self.env['account.invoice'].search([('origin', '=', self.name)]).ids
-
 
         return {
             'name': _('对账单'),

@@ -27,12 +27,14 @@
         'security/mrp_groups.xml',
         'security/ir.model.access.csv',
         'views/views.xml',
+        'views/stock_location.xml',
         'views/templates.xml',
         'report/mrp_bom_structure_report_templates.xml',
         'report/mrp_production_templates.xml',
         'report/stock_picking_operations.xml',
         'wizard/tracking_number_wizard.xml',
         'report/stock_picking_report.xml',
+        'views/qc_feedback.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

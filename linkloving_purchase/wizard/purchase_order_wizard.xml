@@ -34,7 +34,7 @@
         </record>
 
 
-        <menuitem id="menu_purchase_order_list_export" name="Reports" parent="purchase.menu_purchase_root"
+        <menuitem id="menu_purchase_order_list_export" name="Reports" parent="purchase_others"
                   action="action_purchase_order_wizard"/>
 
 

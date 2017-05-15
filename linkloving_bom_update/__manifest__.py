@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "linkloving_process",
+    'name': "linkloving_bom_update",
 
     'summary': """
         Short (1 phrase/line) summary of the module's purpose, used as
@@ -20,22 +20,17 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'mrp', 'linkloving_account', 'hr', 'linkloving_warehouse', 'stock'],
+    'depends': ['base', 'mrp'],
 
     # always loaded
     'data': [
-        'security/ir.model.access.csv',
-        'views/mrp_process.xml',
-        'views/mrp_bom.xml',
-        'views/mrp_production.xml',
-        'views/hr_employee.xml',
-        'views/dashboard.xml',
-        'wizard/mrp_production_query_wizard.xml',
-        'wizard/mrp_production_plan_wizard.xml'
+        # 'security/ir.model.access.csv',
+        'views/views.xml',
+        'views/templates.xml',
     ],
     # only loaded in demonstration mode
-
     'demo': [
         'demo/demo.xml',
     ],
+    'qweb': ['static/src/xml/*.xml'],
 }

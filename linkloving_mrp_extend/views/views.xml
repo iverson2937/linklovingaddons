@@ -10,6 +10,7 @@
             <field name="target">new</field>
         </record>
 
+
         <record id="view_confirm_production_wizard" model="ir.ui.view">
             <field name="name">Confirm Production</field>
             <field name="model">confirm.production</field>
@@ -33,6 +34,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//tree/field[@name='product_tmpl_id']" position="after">
                     <field name="product_specs"/>
+                    <field name="state"/>
                 </xpath>
             </field>
         </record>
@@ -92,10 +94,22 @@
                     <attribute name="options">{'no_create':True}</attribute>
                 </xpath>
 
+                <div name="button_box" position="inside">
+                    <button class="oe_stat_button" name="action_view_qc_report"
+                            type="object" icon="fa-list-alt"
+                            attrs="{'invisible': [('qc_feedback_count', '=', 0)]}">
+                        <field name="qc_feedback_count" string="品检单" widget="statinfo"/>
+                    </button>
+
+                </div>
+
                 <xpath expr="//button[@name='button_plan']" position="after">
                     <button name="button_action_confirm_draft" class="oe_highlight"
                             attrs="{'invisible': [('state', 'not in', 'draft')]}" type="object"
                             groups="linkloving_mrp_extend.group_charge_produce" string="Confirm the Schedule"/>
+                    <button name="button_action_cancel_confirm" class="oe_link"
+                            attrs="{'invisible': [('state', 'not in', 'confirmed')]}" type="object"
+                            groups="linkloving_mrp_extend.group_charge_produce" string="取消加入排程"/>
                     <button name="button_waiting_material" class="oe_highlight"
                             attrs="{'invisible': [('state', 'not in', 'confirmed')]}" type="object"
                             groups="linkloving_mrp_extend.group_charge_produce"

@@ -4,7 +4,7 @@ from odoo import models, fields, api, _
 
 import datetime
 import time
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, float_compare, float_is_zero
 
 
 class MrpProcess(models.Model):
@@ -30,6 +30,11 @@ class MrpProcess(models.Model):
 
     @api.multi
     def get_stock_detail(self):
+        ids = []
+        products = self.env['product.template'].search([('process_id', '=', self.id)])
+        for product in products:
+            if not float_is_zero(product.qty_available, 2):
+                ids.append(product.id)
 
         return {
             'name': u'库存',
@@ -38,8 +43,8 @@ class MrpProcess(models.Model):
             'view_mode': 'tree,form',
             'res_model': 'product.template',
             'target': 'current',
-            'domain': [('process_id', '=', self.id)]
-        }
+            'domain': [('id', 'in', ids)]}
+
 
     @api.multi
     def _get_total_qty(self):
