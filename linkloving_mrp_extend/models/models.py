@@ -179,7 +179,7 @@ class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 
     availability = fields.Selection([
-        ('assigned', _('Available')),
+        ('assigned', _('Can send the material')),
         ('partially_available', _('Partially Available')),
         ('waiting', _('Waiting')),
         ('none', 'None')], string=_('Material Status'),

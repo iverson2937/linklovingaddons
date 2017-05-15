@@ -50,7 +50,8 @@
                     <field name="mobile" required="0"/>
                 </xpath>
                 <xpath expr="//field[@name='category_id']" position="before">
-                    <field name="team_id" attrs="{'invisible': [('supplier','=', True)],'required':[('customer','=', True)]}"/>
+                    <field name="team_id"
+                           attrs="{'invisible': [('supplier','=', True)],'required':[('customer','=', True)]}"/>
                 </xpath>
                 <xpath expr="//field[@name='category_id']" position="after">
                     <field name="source_id" string="Source" attrs="{'invisible': [('customer','!=', True)]}"/>
@@ -64,6 +65,34 @@
                 <xpath expr="//field[@name='lang']" position="after">
                     <field name="level" attrs="{'invisible': [('customer','!=', True)]}"/>
                 </xpath>
+
+                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/div/div/field[@name='country_id']"
+                       position="after">
+                    <field name="detailed_address"/>
+                </xpath>
+
+
+                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='comment']"
+                       position="after">
+                    <field name="whatapp"/>
+                </xpath>
+
+                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='whatapp']"
+                       position="after">
+                    <field name="wechat"/>
+                </xpath>
+
+                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='wechat']"
+                       position="after">
+                    <field name="skype"/>
+                </xpath>
+
+                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='function']"
+                       position="attributes">
+                    <attribute name="string">职位</attribute>
+                </xpath>
+
+
             </field>
         </record>
 
