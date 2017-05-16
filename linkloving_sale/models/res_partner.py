@@ -27,7 +27,7 @@ class Partner(models.Model):
     ], string=u'Customer Level', default=1)
     internal_code = fields.Char(string='No')
     x_qq = fields.Char(string=u'Instant Messaging')
-    detailed_address = fields.Char(string=u'adc', compute='_street_name')
+    detailed_address = fields.Char(string=u'地址', compute='_street_name')
 
     skype = fields.Char(string=u'网络电话')
     whatapp = fields.Char(string=u'社交号码')
