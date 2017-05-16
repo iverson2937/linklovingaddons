@@ -44,15 +44,19 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 })
         },
         bom_modify_submit: function () {
-            var back_datas={};
+            var back_datas=[];
             $(".add_product_input_wraper").each(function () {
                 var arr=[];
+                var json_data={};
                 var add_product_value = $(this).children("input:first-child").val();
                 var add_product_id = $(this).children("input:first-child").prop("id");
                 if (add_product_value != "") {
                     getParents($(this));
                     console.log(arr);
-                    back_datas[add_product_id] = arr.join(",");
+                    json_data["product_id"] = add_product_id;
+                    json_data["parents"] = arr.join(",");
+                    back_datas.push(json_data);
+                    // json_data[add_product_id] = arr.join(",");
                     $(this).parent().parent().parent().removeClass("input-panel");
                     $(this).parent().html("<a></a><span>" + add_product_value + "</span>");
                 } else {
