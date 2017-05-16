@@ -45,6 +45,8 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
         },
         bom_modify_submit: function () {
             var back_datas=[];
+            var top_bom_id = $("#accordion").attr("data-bom-id");
+            // console.log(top_bom_id)
             $(".add_product_input_wraper").each(function () {
                 var arr=[];
                 var json_data={};
@@ -86,7 +88,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 res_model:'bom.update.wizard',
                 view_type: 'form',
                 view_mode: 'tree,form',
-                context:back_datas,
+                context:{'back_datas':back_datas,"bom_id":top_bom_id},
                 views: [[false, 'form']],
                 // res_id: act_id,
                 target:"new"
@@ -170,6 +172,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                         console.log(result);
 
                         self.$el.append(QWeb.render('bom_tree', {result: result}))
+                        console.log(self.$el.attr("data-bom-id",result.bom_id))
                     })
             }
         }
