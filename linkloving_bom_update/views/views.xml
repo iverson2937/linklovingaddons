@@ -1,0 +1,12 @@
+<odoo>
+  <data>
+     <template id="bom_update_static" name="linkloving_bom_update_assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+
+                <script type="text/javascript" src="/linkloving_bom_update/static/src/js/bom_update.js"/>
+                <link rel="stylesheet" href="/linkloving_bom_update/static/src/css/bom_update.css"/>
+            </xpath>
+     </template>
+
+  </data>
+</odoo>

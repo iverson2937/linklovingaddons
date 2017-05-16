@@ -3,7 +3,7 @@ import json
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-
+import uuid
 PRODUCT_TYPE = {
     'raw material': u'原料',
     'semi-finished': u'半成品',
@@ -30,7 +30,9 @@ MO_STATE = {
     'rework_ing': u'返工中',
     'waiting_inventory_material': u'等待清点退料',
     'waiting_warehouse_inspection': u'等待检验退料',
-    'waiting_post_inventory': u'等待入库'
+    'waiting_post_inventory': u'等待入库',
+    'done':u'完成',
+    'cancel':u'取消'
 }
 
 
@@ -82,9 +84,12 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def get_detail(self):
+        if not self.product_variant_ids:
+            raise UserError(u'已归档无法查看')
         bom_ids = self.bom_ids
         bom_lines = []
         process = False
+        state_bom = False
         service = ''
         draft_qty = on_produce = 0.0
         if self.product_ll_type == 'raw material':
@@ -102,6 +107,8 @@ class ProductTemplate(models.Model):
                 line_ids.append({
                     'name': line.order_id.name,
                     'id': line.order_id.id,
+                    'line_id': line.id,
+                    'origin': line.order_id.origin,
                     'qty': line.product_qty,
                     'date_planned': line.date_planned,
                     'state': PURCHASE_TYPE[line.order_id.state]
@@ -116,7 +123,10 @@ class ProductTemplate(models.Model):
                 ids.append({
                     'id': mo.id,
                     'name': mo.name,
+                    'product_id': mo.product_tmpl_id.product_variant_ids[0].id,
                     'qty': mo.product_qty,
+                    'uuid': str(uuid.uuid1()),
+                    'origin': mo.origin,
                     'state': MO_STATE[mo.state],
                     'date': mo.date_planned_start,
                     # 'origin': mo.origin if mo.origin else '',
@@ -124,8 +134,10 @@ class ProductTemplate(models.Model):
 
         if bom_ids:
             bom = bom_ids[0]
+            state_bom = bom.state
             lines = bom.bom_line_ids
             process = bom.process_id.name
+
             res = {}
 
             for line in lines:
@@ -143,8 +155,10 @@ class ProductTemplate(models.Model):
                     if line_draft_qty or line_on_produce:
                         has_mo = True
                 bom_ids = line.product_id.bom_ids
+                state_bom_line=False
                 if bom_ids:
                     line_process = bom_ids[0].process_id.name
+                    state_bom_line=bom_ids[0].state
 
                 res = {}
                 level = False
@@ -166,6 +180,7 @@ class ProductTemplate(models.Model):
                     'service': line.product_id.order_ll_type,
                     'on_produce': line_on_produce,
                     'draft': line_draft_qty,
+                    'state_bom':state_bom_line,
                     'purchase_ok': line.product_id.purchase_ok,
                     'stock': line.product_id.qty_available,
                     'require': line.product_id.outgoing_qty
@@ -186,7 +201,8 @@ class ProductTemplate(models.Model):
             'draft': draft_qty,
             'purchase_ok': self.purchase_ok,
             'stock': self.qty_available,
-            'require': self.outgoing_qty
+            'require': self.outgoing_qty,
+            'state_bom': state_bom
         }
 
     def get_draft_po_qty(self, product_id):
