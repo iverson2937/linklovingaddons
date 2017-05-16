@@ -71,11 +71,11 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 }
             });
             console.log(back_datas);
-            return new Model("bom.line")
-                    .call("bom.line.update", [back_datas])
-                    .then(function (result) {
-                        console.log(result);
-                    })
+            // return new Model("bom.line")
+            //         .call("bom.line.update", [back_datas])
+            //         .then(function (result) {
+            //             console.log(result);
+            //         })
         },
         chose_li_to_input: function (e) {
             var e = e || window.event;
@@ -100,7 +100,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             var wraper = level_add.getElementsByTagName("div");
             var wheather_input = wraper[0].getElementsByTagName("div");
             if (wheather_input[0].classList.contains("input-panel")) {
-                return
+                // return
             }
             var divs = document.createElement("div");
             divs.classList.add("panel");
