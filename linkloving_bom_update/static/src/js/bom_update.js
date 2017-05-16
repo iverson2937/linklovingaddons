@@ -52,8 +52,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 if (add_product_value != "") {
                     getParents($(this));
                     console.log(arr);
-                    arr.join(",");
-                    back_datas[add_product_id] = arr;
+                    back_datas[add_product_id] = arr.join(",");
                     $(this).parent().parent().parent().removeClass("input-panel");
                     $(this).parent().html("<a></a><span>" + add_product_value + "</span>");
                 } else {
@@ -70,7 +69,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                         getParents($obj);
                     }
                 }
-            })
+            });
             console.log(back_datas);
             return new Model("bom.line")
                     .call("bom.line.update", [back_datas])
