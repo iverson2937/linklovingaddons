@@ -4,10 +4,10 @@
     height: 100%;
 }
 .add_product_input{
-    width: 220px!important;
+    width: 300px!important;
 }
 .add_product_input_wraper>ul{
-    width: 220px;
+    width: 300px;
     position: absolute;
     top: 20px;
     left:0;
@@ -19,8 +19,8 @@
     z-index: 10000;
 }
 .add_product_input_wraper>ul>li{
-    height: 30px;
-    padding: 5px;
+    height: 40px;
+    padding: 3px;
     cursor: pointer;
 }
 .add_product_input_wraper>ul>li:hover{

@@ -24,7 +24,7 @@
                 </h4>
             </div>
 
-            <div t-att-id="result.uuid" class="panel-collapse collapse in">
+            <div t-att-id="result.uuid" t-att-data-return-id="result.bom_id" class="panel-collapse collapse in">
                 <div class="panel-body">
                     <t t-foreach="result.bom_ids" t-as="item">
                         <div class="panel panel-default">
@@ -41,7 +41,7 @@
                                     </t>
                                 </h4>
                             </div>
-                            <div t-att-id="item.uuid" class="panel-collapse collapse">
+                            <div t-att-id="item.uuid" t-att-data-return-id="item.id" class="panel-collapse collapse">
                                 <div class="panel-body">
                                     <t t-if="item.bom_ids.length>0">
                                         <t t-foreach="item.bom_ids" t-as="items">
@@ -74,7 +74,7 @@
                     </t>
                 </h4>
             </div>
-            <div t-att-id="arg.uuid" class="panel-collapse collapse">
+            <div t-att-id="arg.uuid" t-att-data-return-id="arg.id" class="panel-collapse collapse">
                 <div class="panel-body">
                     <t t-if="arg.bom_ids.length>0">
                         <t t-foreach="arg.bom_ids" t-as="items">
