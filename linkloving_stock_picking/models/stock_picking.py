@@ -8,6 +8,12 @@ class StockPicking(models.Model):
     _inherit = ['stock.picking', 'ir.needaction_mixin']
     tracking_number = fields.Char(string=u'Tracking Number')
 
+    storage_type = fields.Selection([
+        ('procurement_warehousing', '采购入库'),
+        ('return_of_materials_to_storeroom', '退料入库'),
+        ('return_storage', '退货入库'),
+    ])
+
     def _get_po_number(self):
         if self.origin:
             po = self.env['purchase.order'].search([('name', '=', self.origin)])
@@ -172,10 +178,41 @@ class StockPicking(models.Model):
                 picking_contain += pick
         return picking_contain
 
+
 class SaleOrderExtend(models.Model):
     _inherit = "sale.order"
 
-    delivery_rule = fields.Selection(string="交货规则", selection=[('delivery_once', '一次性发齐货'),
-                                                               ('create_backorder', '允许部分发货,并产生欠单'),
-                                                               ('cancel_backorder', '允许部分发货,不产生欠单')],
+    delivery_rule = fields.Selection(string=u"交货规则", selection=[('delivery_once', u'一次性发齐货'),
+                                                               ('create_backorder', u'允许部分发货,并产生欠单'),
+                                                               ('cancel_backorder', u'允许部分发货,不产生欠单')],
                                      required=False, default="delivery_once")
+
+
+class StockMove(models.Model):
+    _inherit = "stock.move"
+
+    data_type = fields.Float(string=u'数量', required=True, default=0.0, compute='_compute_qty')
+
+    @api.one
+    @api.depends('company_id')
+    def _compute_qty(self):
+
+        domain_quant_loc, domain_move_in_loc, domain_move_out_loc = self.env['product.product']._get_domain_locations()
+        domain_move_in_todo = [('state', 'in', ['done'])] + [
+            ('product_id', 'in', [self.product_id.id])] + domain_move_in_loc
+        domain_move_out_todo = [('state', 'in', ['done'])] + [
+            ('product_id', 'in', [self.product_id.id])] + domain_move_out_loc
+        Move = self.env['stock.move']
+        # 共接收数量
+        moves_in_res = dict((item['product_id'][0], item['product_qty']) for item in
+                            Move.read_group(domain_move_in_todo, ['product_id', 'product_qty'], ['product_id']))
+        # 共支出数量
+        moves_out_res = dict((item['product_id'][0], item['product_qty']) for item in
+                             Move.read_group(domain_move_out_todo, ['product_id', 'product_qty'], ['product_id']))
+        sgin = 1
+        if self in self.product_id.env['stock.move'].search(domain_move_out_todo):
+            sgin = -1
+        self.data_type = self.product_uom_qty * sgin
+
+
+

@@ -85,7 +85,7 @@
                            domain="[('supplier','=',True),('is_company','=',True)]" options="{'no_create': True}"/>
                 </xpath>
                 <xpath expr="//field[@name='date_order']" position="after">
-                    <field name="handle_date"/>
+                    <field name="handle_date" required="1" string="交期"/>
                     <field name="remark" string="Remark"/>
                 </xpath>
 

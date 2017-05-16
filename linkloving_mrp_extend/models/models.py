@@ -199,7 +199,7 @@ class MrpProductionExtend(models.Model):
 
     qc_feedback_count = fields.Integer(compute='_get_qc_feedback_count')
     availability = fields.Selection([
-        ('assigned', _('Available')),
+        ('assigned', _('Can send the material')),
         ('partially_available', _('Partially Available')),
         ('waiting', _('Waiting')),
         ('none', 'None')], string=_('Material Status'),

@@ -308,5 +308,6 @@
 
         <menuitem id="customer_invoice" action="customer_invoice_pending"
                   parent="sale.menu_sale_invoicing" sequence="1" name="销售对账单"/>
+
     </data>
 </openerp>

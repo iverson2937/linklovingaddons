@@ -7,8 +7,44 @@
             <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
             <field name="arch" type="xml">
 
-                <xpath expr="//field[@name='name']" position="replace">
+                <xpath expr="//field[@name='country_id']" position="after">
+                    <field name="continent" placeholder="大州"/>
                 </xpath>
+                <!--右-->
+                <xpath expr="//field[@name='tag_ids']" position="after">
+                    <field name="qq"/>
+                </xpath>
+
+                <xpath expr="//field[@name='qq']" position="after">
+                    <field name="wechat"/>
+                </xpath>
+
+                <xpath expr="//field[@name='wechat']" position="after">
+                    <field name="whatsapp"/>
+                </xpath>
+
+                <xpath expr="//field[@name='whatsapp']" position="after">
+                    <field name="skype"/>
+                </xpath>
+                <xpath expr="//field[@name='skype']" position="after">
+                    <field name="communication_identifier"/>
+                </xpath>
+
+
+                <!--左-->
+
+                <xpath expr="//field[@name='team_id']" position="after">
+                    <field name="source"/>
+                </xpath>
+                <xpath expr="//field[@name='source']" position="after">
+                    <field name="express_sample_record"/>
+                </xpath>
+
+
+                <xpath expr="//field[@name='express_sample_record']" position="after">
+                    <field name="interested_in_product"/>
+                </xpath>
+
 
             </field>
         </record>

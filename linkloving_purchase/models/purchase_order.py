@@ -18,7 +18,7 @@ class PurchaseOrder(models.Model):
     product_count = fields.Float(compute='get_product_count')
     tax_id = fields.Many2one('account.tax', string='Tax')
     remark = fields.Text(string='Remark')
-    handle_date = fields.Datetime()
+    handle_date = fields.Datetime(string='交期')
     product_id = fields.Many2one(related='order_line.product_id')
     product_qty = fields.Float(related='order_line.product_qty')
 
