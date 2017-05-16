@@ -34,7 +34,7 @@ odoo.define('linkloving_core.form_widget_extend', function (require) {
             } else {
                 this.datewidget.set_value(this.get('value'));
             }
-            console.log("opopopop")
+            // console.log("opopopop")
         }
     });
 

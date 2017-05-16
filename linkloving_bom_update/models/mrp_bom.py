@@ -77,3 +77,8 @@ def _get_rec(object, level, qty=1.0, uom=False):
         }
 
     return res
+
+
+
+class bom_update_Wizard(models.TransientModel):
+    _name = "bom.update.wizard"

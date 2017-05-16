@@ -87,4 +87,23 @@
             </div>
          </div>
     </t>
+
+
+
+    <record id='action_bom_modify_wizard' model='ir.actions.act_window'>
+        <field name='name'>Bom Modify</field>
+        <field name='res_model'>bom.update.wizard</field>
+        <field name='view_type'>form</field>
+        <field name='view_mode'>form</field>
+        <field name="view_id" ref="bom_update_wizard_form"/>
+
+        <field name='target'>new</field>
+    </record>
+
+
+
+
+
+
+
 </templates>
