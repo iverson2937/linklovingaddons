@@ -72,25 +72,25 @@
                 </xpath>
 
 
-                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='comment']"
-                       position="after">
-                    <field name="whatapp"/>
-                </xpath>
+                <!--<xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='comment']"-->
+                <!--position="after">-->
+                <!--<field name="whatapp"/>-->
+                <!--</xpath>-->
 
-                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='whatapp']"
-                       position="after">
-                    <field name="wechat"/>
-                </xpath>
+                <!--<xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='whatapp']"-->
+                <!--position="after">-->
+                <!--<field name="wechat"/>-->
+                <!--</xpath>-->
 
-                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='wechat']"
-                       position="after">
-                    <field name="skype"/>
-                </xpath>
+                <!--<xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='wechat']"-->
+                <!--position="after">-->
+                <!--<field name="skype"/>-->
+                <!--</xpath>-->
 
-                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='function']"
-                       position="attributes">
-                    <attribute name="string">职位</attribute>
-                </xpath>
+                <!--<xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='function']"-->
+                <!--position="attributes">-->
+                <!--<attribute name="string">职位</attribute>-->
+                <!--</xpath>-->
 
 
             </field>
