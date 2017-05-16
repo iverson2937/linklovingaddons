@@ -31,14 +31,6 @@ class CrmLead(models.Model):
             # 'source': self.source,
             # 'interested_in_product': self.interested_in_product,
 
-            # 'communication_identifier': self.communication_identifier,
-            # 'qq': self.qq,
-            # 'skype': self.skype,
-            # 'whatsapp': self.whatsapp,
-            # 'wechat': self.wechat,
-            # 'continent': self.continent.id,
-            # 'express_sample_record': self.express_sample_record,
-
             'name': name,
             'user_id': self.user_id.id,
             'comment': self.description,
