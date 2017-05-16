@@ -62,3 +62,14 @@
     font-size: 12px;
     line-height: 0.9;
 }
+#accordion .open-sign{
+    font-size: 20px!important;
+}
+
+
+
+.o_content header{
+    position: fixed;
+    z-index: 100;
+    width: calc(100% - 236px);
+}
