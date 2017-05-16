@@ -182,20 +182,20 @@ class StockPicking(models.Model):
 class SaleOrderExtend(models.Model):
     _inherit = "sale.order"
 
-    delivery_rule = fields.Selection(string="交货规则", selection=[('delivery_once', '一次性发齐货'),
-                                                               ('create_backorder', '允许部分发货,并产生欠单'),
-                                                               ('cancel_backorder', '允许部分发货,不产生欠单')],
+    delivery_rule = fields.Selection(string=u"交货规则", selection=[('delivery_once', u'一次性发齐货'),
+                                                               ('create_backorder', u'允许部分发货,并产生欠单'),
+                                                               ('cancel_backorder', u'允许部分发货,不产生欠单')],
                                      required=False, default="delivery_once")
 
 
-class SaleOrderExtend(models.Model):
+class StockMove(models.Model):
     _inherit = "stock.move"
 
-    data_type = fields.Float(string='数量', required=True, default=1.0, compute='_compute_prices')
+    data_type = fields.Float(string=u'数量', required=True, default=0.0, compute='_compute_qty')
 
     @api.one
     @api.depends('company_id')
-    def _compute_prices(self):
+    def _compute_qty(self):
 
         domain_quant_loc, domain_move_in_loc, domain_move_out_loc = self.env['product.product']._get_domain_locations()
         domain_move_in_todo = [('state', 'in', ['done'])] + [
