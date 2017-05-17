@@ -70,13 +70,13 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                     limit: 8,
                 })
                 .then(function (result) {
-                    console.log(result)
+                    console.log(result);
                     for (var i = 0; i < result.length; i++) {
                         if (i >= result.length) {
                             break;
                         }
-                        change_lis[i].innerText = result[i].display_name;
-                        change_lis[i].setAttribute("id", result[i].id);
+                        change_lis[i].innerText = result[i][1];
+                        change_lis[i].setAttribute("id", result[i][0]);
                     }
                 })
         },
