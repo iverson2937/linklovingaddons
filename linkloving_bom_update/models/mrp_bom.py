@@ -27,6 +27,7 @@ class MrpBom(models.Model):
             'bom_id': self.id,
             'product_id': self.product_tmpl_id.id,
             'name': self.product_tmpl_id.name_get()[0][1],
+            'process_id': self.process_id.name,
             'bom_ids': res
         }
 
@@ -41,6 +42,10 @@ class MrpBom(models.Model):
                 bom_line_ids.append(_get_rec(l, level))
             if level > 0 and level < 6:
                 level -= 1
+        bom_id = line.product_id.product_tmpl_id.bom_ids
+        process_id = False
+        if bom_id:
+            process_id = bom_id[0].process_id.name
 
         res = {
             'name': line.product_id.name_get()[0][1],
@@ -48,6 +53,8 @@ class MrpBom(models.Model):
             'id': line.id,
             'code': line.product_id.default_code,
             'uuid': str(uuid.uuid1()),
+            'qty': line.product_qty,
+            'process_id': process_id,
             'level': level,
             'bom_ids': bom_line_ids
         }
@@ -65,13 +72,18 @@ def _get_rec(object, level, qty=1.0, uom=False):
                 bom_line_ids.append(_get_rec(line, level))
             if level > 0 and level < 6:
                 level -= 1
-
+        bom_id = l.product_id.product_tmpl_id.bom_ids
+        process_id = False
+        if bom_id:
+            process_id = bom_id[0].process_id.name
         res = {
             'name': l.product_id.name_get()[0][1],
             'product_id': l.product_id.default_code,
             'code': l.product_id.default_code,
             'uuid': str(uuid.uuid1()),
             'id': l.id,
+            'qty': l.product_qty,
+            'process_id': process_id,
             'level': level,
             'bom_ids': bom_line_ids
         }

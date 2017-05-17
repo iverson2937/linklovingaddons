@@ -29,7 +29,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             console.log(change_lis)
             return new Model("product.product")
                 .query(['display_name'])
-                .filter([['name', 'ilike', target.value]])
+                .filter([['name', 'ilike', target.value], ['default_code', 'ilike', target.value]])
                 .limit(8)
                 .all()
                 .then(function (result) {
