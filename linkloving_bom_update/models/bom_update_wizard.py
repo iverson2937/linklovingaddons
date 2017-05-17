@@ -27,6 +27,8 @@ class BomUpdateWizard(models.TransientModel):
             for val in vals:
                 product_id = val.get('product_id')
                 parents = val.get('parents')
+                last_bom_line_id = val.get('last_product_id')
+
                 to_update_bom_line_ids = parents.split(',')
                 for line in to_update_bom_line_ids:
                     line = int(line)
@@ -81,6 +83,11 @@ class BomUpdateWizard(models.TransientModel):
                             'product_id': int(product_id),
                             'bom_id': new_bom_id.id,
                         })
+                        # 此为修改bom，需要删除一个bom_line
+                        if last_bom_line_id:
+                            old_product_id = line_obj.browse(int(last_bom_line_id)).product_id
+                            update_bom_line_delete(new_bom_id, old_product_id)
+
                         product_id = False
 
                     temp_product_id = new_product_tmpl_id.id
@@ -95,6 +102,12 @@ def update_bom_line_copy(new_bom_id, new_product_id, old_product_id):
         for line in new_bom_id.bom_line_ids:
             if line.product_id.id == old_product_id.id:
                 line.product_id = new_product_id
+
+
+def update_bom_line_delete(new_bom_id, old_product_id):
+    for line in new_bom_id.bom_line_ids:
+        if line.product_id.id == old_product_id.id:
+            line.unlink()
 
 
 def get_next_default_code(default_code):
