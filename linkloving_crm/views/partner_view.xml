@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="crm_view_partner_form_linkloving" model="ir.ui.view">
+            <field name="name">crm form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/div/div/field[@name='country_id']"
+                       position="after">
+                    <field name="detailed_address"/>
+                </xpath>
+                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='comment']"
+                       position="after">
+                    <field name="whatsapp"/>
+                </xpath>
+                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='whatsapp']"
+                       position="after">
+                    <field name="wechat"/>
+                </xpath>
+                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='wechat']"
+                       position="after">
+                    <field name="skype"/>
+                </xpath>
+
+                <!--zuo-->
+                <xpath expr="//field[@name='country_id']" position="after">
+                    <field name="continent" placeholder="大州"/>
+                </xpath>
+
+                <xpath expr="//field[@name='category_id']" position="after">
+                    <field name="express_sample_record"/>
+                </xpath>
+
+
+                <!--you-->
+                <xpath expr="//field[@name='lang']" position="after">
+                    <field name="qq"/>
+                </xpath>
+
+                <xpath expr="//field[@name='qq']" position="after">
+                    <field name="skype"/>
+                </xpath>
+
+                <xpath expr="//field[@name='skype']" position="after">
+                    <field name="whatsapp"/>
+                </xpath>
+
+                <xpath expr="//field[@name='whatsapp']" position="after">
+                    <field name="wechat"/>
+                </xpath>
+
+                <xpath expr="//field[@name='wechat']" position="after">
+                    <field name="communication_identifier"/>
+                </xpath>
+
+
+            </field>
+        </record>
+    </data>
+</openerp>

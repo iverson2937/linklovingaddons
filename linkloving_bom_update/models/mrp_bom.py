@@ -157,8 +157,5 @@ def get_next_default_code(default_code):
     return int(version) + 1
 
 
-if __name__ == '__main__':
-    get_next_default_code('123.444')
-    abc = [1, 3, 4]
-    efc = abc[:-1]
-    efc[1:]
+class BomUpdateWizard(models.TransientModel):
+    _name = "bom.update.wizard"
