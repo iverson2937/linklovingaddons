@@ -7,6 +7,10 @@
     width: 300px!important;
     display: inline-block!important;
 }
+#accordion .product_propor{
+    width: 20px!important;
+    display: inline-block!important;
+}
 .add_product_input_wraper>ul{
     width: 300px;
     position: absolute;
