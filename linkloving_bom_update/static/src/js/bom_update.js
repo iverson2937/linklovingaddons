@@ -28,10 +28,10 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             var change_lis = target.nextElementSibling.childNodes;
             console.log(change_lis)
             return new Model("product.product")
-                .query(['display_name'])
-                .filter([['name', 'ilike', target.value], ['default_code', 'ilike', target.value]])
-                .limit(8)
-                .all()
+                .call('name_search', [], {
+                    name: target.value,
+                    limit: 8,
+                })
                 .then(function (result) {
                     console.log(result)
                     for (var i = 0; i < result.length; i++) {
