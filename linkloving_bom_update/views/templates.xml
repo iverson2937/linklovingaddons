@@ -20,16 +20,20 @@
             <field name='model'>bom.update.wizard</field>
             <field name='type'>form</field>
             <field name='arch' type='xml'>
-                 <form string="Confirm Draft Invoices">
-                        <p class="oe_grey">
-                            新建还是修改BOM
-                        </p>
-                        <footer>
-                            <button string="新建BOM" name="action_cancel" type="object" default_focus="1"
-                                    class="btn-primary new_bom" context="{'update':False}"/>
-                            <button string="修改BOM" class="btn-default modify_current_bom" name="action_cancel" type="object" context="{'update':True}"/>
-                        </footer>
-                 </form>
+                <form string="Confirm Draft Invoices">
+                    <group>
+                        <field name="postfix" required="1"/>
+                    </group>
+
+
+                    <footer>
+                        <button string="新建BOM" name="bom_line_update" type="object" default_focus="1"
+                                class="btn-primary new_bom" context="{'update':False}"/>
+                        <button string="修改BOM" class="btn-default modify_current_bom" name="bom_line_update"
+                                type="object"
+                                context="{'update':True}"/>
+                    </footer>
+                </form>
             </field>
         </record>
 

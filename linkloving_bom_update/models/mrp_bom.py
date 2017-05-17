@@ -27,6 +27,7 @@ class MrpBom(models.Model):
             'bom_id': self.id,
             'product_id': self.product_tmpl_id.id,
             'name': self.product_tmpl_id.name_get()[0][1],
+            'process_id': self.process_id.name,
             'bom_ids': res
         }
 
@@ -41,6 +42,10 @@ class MrpBom(models.Model):
                 bom_line_ids.append(_get_rec(l, level))
             if level > 0 and level < 6:
                 level -= 1
+        bom_id = line.product_id.product_tmpl_id.bom_ids
+        process_id = False
+        if bom_id:
+            process_id = bom_id[0].process_id.name
 
         res = {
             'name': line.product_id.name_get()[0][1],
@@ -48,6 +53,8 @@ class MrpBom(models.Model):
             'id': line.id,
             'code': line.product_id.default_code,
             'uuid': str(uuid.uuid1()),
+            'qty': line.product_qty,
+            'process_id': process_id,
             'level': level,
             'bom_ids': bom_line_ids
         }
@@ -65,13 +72,18 @@ def _get_rec(object, level, qty=1.0, uom=False):
                 bom_line_ids.append(_get_rec(line, level))
             if level > 0 and level < 6:
                 level -= 1
-
+        bom_id = l.product_id.product_tmpl_id.bom_ids
+        process_id = False
+        if bom_id:
+            process_id = bom_id[0].process_id.name
         res = {
             'name': l.product_id.name_get()[0][1],
             'product_id': l.product_id.default_code,
             'code': l.product_id.default_code,
             'uuid': str(uuid.uuid1()),
             'id': l.id,
+            'qty': l.product_qty,
+            'process_id': process_id,
             'level': level,
             'bom_ids': bom_line_ids
         }
@@ -79,6 +91,39 @@ def _get_rec(object, level, qty=1.0, uom=False):
     return res
 
 
+class MrpBomLine(models.Model):
+    _inherit = 'mrp.bom.line'
 
-class bom_update_Wizard(models.TransientModel):
-    _name = "bom.update.wizard"
+
+
+    # def update_bom_line(self, line_id, postfix, product_id, products):
+    #     bom = line_id.bom_id
+    #     product_tmpl_id = bom.product_tmpl_id
+    #     default_code = get_next_default_code(product_tmpl_id.default_code)
+    #     new_name = product_tmpl_id.name + postfix
+    #     if products.get(line_id):
+    #         new_bom_id = products.get(line_id).get('new_bom_id')
+    #         new_product_tmpl_id = products.get(line_id).get('new_product_tmpl_id')
+    #     else:
+    #         new_product_tmpl_id = product_tmpl_id.copy(name=new_name)
+    #         new_bom_id = bom.copy(product_tmpl_id=new_product_tmpl_id, default_code=default_code)
+    #         products.update({
+    #             line_id: {
+    #                 'new_bom_id': new_bom_id,
+    #                 'new_product_id': new_product_tmpl_id,
+    #             }
+    #         })
+    #         self.create({
+    #             'product_id': product_id,
+    #             'bom_id': new_bom_id.id
+    #         })
+    #     return new_product_tmpl_id
+
+
+def get_next_default_code(default_code):
+    if not default_code:
+        raise UserError(u'产品没有对应料号')
+
+    version = default_code.split('.')[-1]
+
+    return int(version) + 1

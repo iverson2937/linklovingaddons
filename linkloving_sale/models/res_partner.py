@@ -25,7 +25,7 @@ class Partner(models.Model):
         (2, u'2nd'),
         (3, u'3rd')
     ], string=u'Customer Level', default=1)
-    internal_code = fields.Char(string='No')
+    internal_code = fields.Char(string=u'编号')
     x_qq = fields.Char(string=u'Instant Messaging')
 
     _sql_constraints = [

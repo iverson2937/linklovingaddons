@@ -63,30 +63,29 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var change_lis = target.nextElementSibling.childNodes;
-            console.log(change_lis);
-            return new Model("product.template")
-                .query(['display_name'])
-                .filter([['name', 'ilike', target.value]])
-                .limit(8)
-                .all()
+            console.log(change_lis)
+            return new Model("product.product")
+                .call('name_search', [], {
+                    name: target.value,
+                    limit: 8,
+                })
                 .then(function (result) {
                     console.log(result)
-                    for(var i=0;i<result.length;i++){
-                        if(i>=result.length){
+                    for (var i = 0; i < result.length; i++) {
+                        if (i >= result.length) {
                             break;
                         }
                         change_lis[i].innerText = result[i].display_name;
-                        change_lis[i].setAttribute("id",result[i].id);
+                        change_lis[i].setAttribute("id", result[i].id);
                     }
                 })
         },
         bom_modify_submit: function () {
-            var back_datas=[];
+            var back_datas = [];
             var top_bom_id = $("#accordion").attr("data-bom-id");
-            // console.log(top_bom_id)
             $(".add_product_input_wraper").each(function () {
-                var arr=[];
-                var json_data={};
+                var arr = [];
+                var json_data = {};
                 var add_product_value = $(this).children("input:first-child").val();
                 var add_product_id = $(this).children("input:first-child").prop("id");
 
@@ -112,8 +111,8 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 }
                 //递归 找父级
                 function getParents($obj) {
-                    if($obj.parents(".panel-collapse")){
-                        if($obj.parents(".panel-collapse").length==0){
+                    if ($obj.parents(".panel-collapse")) {
+                        if ($obj.parents(".panel-collapse").length == 0) {
                             return
                         }
                         arr.push($obj.parents(".panel-collapse").attr("data-return-id"));
@@ -123,21 +122,22 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 }
             });
             console.log(back_datas);
+
             // return new Model("bom.line")
             //         .call("bom.line.update", [back_datas])
             //         .then(function (result) {
             //             console.log(result);
             //         })
             var action = {
-                name:"BOM",
+                name: "BOM",
                 type: 'ir.actions.act_window',
-                res_model:'bom.update.wizard',
+                res_model: 'bom.update.wizard',
                 view_type: 'form',
                 view_mode: 'tree,form',
-                context:{'back_datas':back_datas,"bom_id":top_bom_id},
+                context: {'back_datas': back_datas, "bom_id": top_bom_id},
                 views: [[false, 'form']],
                 // res_id: act_id,
-                target:"new"
+                target: "new"
             };
             this.do_action(action);
 
@@ -146,7 +146,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             target.parentNode.previousElementSibling.value = target.innerHTML;
-            target.parentNode.previousElementSibling.setAttribute("id",target.getAttribute("id"));
+            target.parentNode.previousElementSibling.setAttribute("id", target.getAttribute("id"));
         },
         add_product_input_focus: function (e) {
             var e = e || window.event;
@@ -217,9 +217,8 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                     .call("get_bom", [this.bom_id])
                     .then(function (result) {
                         console.log(result);
-
                         self.$el.append(QWeb.render('bom_tree', {result: result}))
-                        // console.log(self.$el.attr("data-bom-id",result.bom_id))
+                        console.log(self.$el.attr("data-bom-id", result.bom_id))
                     })
             }
         }
