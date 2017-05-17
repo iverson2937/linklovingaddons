@@ -49,7 +49,7 @@ class MrpBom(models.Model):
 
         res = {
             'name': line.product_id.name_get()[0][1],
-            'product_id': line.product_id.default_code,
+            'product_id': line.product_id.id,
             'id': line.id,
             'code': line.product_id.default_code,
             'uuid': str(uuid.uuid1()),
@@ -78,7 +78,7 @@ def _get_rec(object, level, qty=1.0, uom=False):
             process_id = bom_id[0].process_id.name
         res = {
             'name': l.product_id.name_get()[0][1],
-            'product_id': l.product_id.default_code,
+            'product_id': l.product_id.id,
             'code': l.product_id.default_code,
             'uuid': str(uuid.uuid1()),
             'id': l.id,

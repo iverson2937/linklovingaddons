@@ -36,7 +36,7 @@ class BomUpdateWizard(models.TransientModel):
                         line_id = self.env['mrp.bom.line'].browse(int(line))
                         if not products.get(line_id.product_id):
                             old_product_tmpl_id = line_id.product_id
-                            default_code = get_next_default_code(old_product_tmpl_id.default_code)
+                            default_code = self.get_next_default_code(old_product_tmpl_id.default_code)
                             new_product_tmpl_id = line_id.product_id.product_tmpl_id.copy(
                                 {'name': old_product_tmpl_id.name + postfix,
                                  'default_code': default_code})
@@ -52,13 +52,11 @@ class BomUpdateWizard(models.TransientModel):
                             new_product_tmpl_id = product_tmpl_obj.browse(
                                 products.get(line_id.product_id).get('new_product_tmpl_id'))
                             new_bom_id = bom_obj.browse(products.get(line_id.product_id).get('new_bom_id'))
-
-
                     else:
                         bom_id = bom_obj.browse(line)
                         old_product_tmpl_id = bom_id.product_tmpl_id
                         if not products.get('bom'):
-                            default_code = get_next_default_code(old_product_tmpl_id.default_code)
+                            default_code = self.get_next_default_code(old_product_tmpl_id.default_code)
                             new_product_tmpl_id = old_product_tmpl_id.copy({'name': old_product_tmpl_id.name + postfix,
                                                                             'default_code': default_code})
                             new_bom_id = bom_id.copy()
@@ -91,10 +89,25 @@ class BomUpdateWizard(models.TransientModel):
                         product_id = False
 
                     temp_product_id = new_product_tmpl_id.id
+        else:
+            pass
 
-    @api.multi
-    def get_product_id_version(self):
-        pass
+    def get_next_default_code(self, default_code):
+        if not default_code:
+            raise UserError(u'产品没有对应料号')
+
+        # 取前10位
+        prefix = default_code[0:10]
+        products = self.env['product.template'].search([('default_code', 'ilike', prefix)])
+        versions = []
+        for product in products:
+            versions.append(int(product.default_code.split('.')[-1]))
+
+        # FIXME:GET CORRECT VERSION
+        version = ('000' + str(int(max(versions)) + 1))[-3:]
+        new_code = prefix + version
+        print new_code
+        return new_code
 
 
 def update_bom_line_copy(new_bom_id, new_product_id, old_product_id):
@@ -108,19 +121,6 @@ def update_bom_line_delete(new_bom_id, old_product_id):
     for line in new_bom_id.bom_line_ids:
         if line.product_id.id == old_product_id.id:
             line.unlink()
-
-
-def get_next_default_code(default_code):
-    if not default_code:
-        raise UserError(u'产品没有对应料号')
-
-    raw_version = default_code.split('.')[-1]
-    # 取前10位
-    prefix = default_code[0:11]
-    # FIXME:GET CORRECT VERSION
-    version = ('000' + str(int(raw_version) + 1))[-3:]
-    new_code = prefix + str(int(version) + 1)
-    return new_code
 
 
 if __name__ == '__main__':
