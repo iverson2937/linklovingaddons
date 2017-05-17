@@ -90,7 +90,30 @@ class BomUpdateWizard(models.TransientModel):
 
                     temp_product_id = new_product_tmpl_id.id
         else:
-            pass
+            # 修改bOM
+            for val in vals:
+                product_id = val.get('product_id')
+                parents = val.get('parents')
+                last_bom_line_id = val.get('last_product_id')
+
+                to_update_bom_line_ids = parents.split(',')
+                for line in to_update_bom_line_ids:
+                    line = int(line)
+                    if line != main_bom_id:
+                        line_id = self.env['mrp.bom.line'].browse(int(line))
+                        bom_id = line_id.product_id.product_tmpl_id.bom_id
+                    else:
+                        bom_id = bom_obj.browse(line)
+                    if product_id:
+                        line_obj.create({
+                            'product_id': int(product_id),
+                            'bom_id': bom_id.id,
+                        })
+                        # 此为修改bom，需要删除一个bom_line
+                        if last_bom_line_id:
+                            line_obj.product_id = product_id
+
+                        product_id = False
 
     def get_next_default_code(self, default_code):
         if not default_code:
@@ -102,11 +125,8 @@ class BomUpdateWizard(models.TransientModel):
         versions = []
         for product in products:
             versions.append(int(product.default_code.split('.')[-1]))
-
-        # FIXME:GET CORRECT VERSION
         version = ('000' + str(int(max(versions)) + 1))[-3:]
         new_code = prefix + version
-        print new_code
         return new_code
 
 
