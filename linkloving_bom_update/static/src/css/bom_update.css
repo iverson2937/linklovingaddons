@@ -35,3 +35,6 @@
 #accordion .delete_product{
     cursor: pointer;
 }
+#accordion .product_copy{
+    cursor: pointer;
+}

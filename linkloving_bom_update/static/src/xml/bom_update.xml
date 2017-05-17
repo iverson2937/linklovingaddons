@@ -36,7 +36,7 @@
                                             <span class="fa fa-caret-right open-sign"></span>
                                         </t>
                                     </a>
-                                    <span t-att-data-product-id="item.id" class="product_name"><t t-esc="item.name"/></span>
+                                    <span t-att-data-id="item.product_id" t-att-data-product-id="item.id" class="product_name"><t t-esc="item.name"/></span>
                                     <span style="margin-left:15px"><t t-esc="item.qty"/></span>
                                     <t t-if="item.process_id != false">
                                         <span style="margin-left:15px"><t t-esc="item.process_id"/></span>
@@ -44,6 +44,7 @@
                                     <t t-if="item.bom_ids.length>0">
                                         <span style="margin-left:30px;cursor:pointer" class="fa fa-plus add_product"></span>
                                     </t>
+                                    <span class='fa fa-copy product_copy' style='margin-left: 15px'></span>
                                 </h4>
                             </div>
                             <div t-att-id="item.uuid" t-att-data-return-id="item.id" class="panel-collapse collapse">
@@ -73,7 +74,7 @@
                             <span class="fa fa-caret-right open-sign"></span>
                         </t>
                     </a>
-                    <span t-att-data-product-id="arg.id" class="product_name"><t t-esc="arg.name"/></span>
+                    <span t-att-data-id="arg.product_id" t-att-data-product-id="arg.id" class="product_name"><t t-esc="arg.name"/></span>
                     <span style="margin-left:15px"><t t-esc="arg.qty"/></span>
                     <t t-if="arg.process_id != false">
                         <span style="margin-left:15px"><t t-esc="arg.process_id"/></span>
@@ -81,6 +82,7 @@
                     <t t-if="arg.bom_ids.length>0">
                         <span style="margin-left:30px;cursor:pointer" class="fa fa-plus add_product"></span>
                     </t>
+                    <span class='fa fa-copy product_copy' style='margin-left: 15px'></span>
                 </h4>
             </div>
             <div t-att-id="arg.uuid" t-att-data-return-id="arg.id" class="panel-collapse collapse">

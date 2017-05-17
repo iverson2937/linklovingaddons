@@ -22,7 +22,8 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             'click .bom_modify_submit': 'bom_modify_submit',
             'input .add_product_input': 'when_input_is_on',
             'dblclick .product_name': 'modify_product_fn',
-            'click .delete_product': 'delete_product_fn'
+            'click .delete_product': 'delete_product_fn',
+            // 'click .product_copy':
         },
         delete_product_fn:function (e) {
             var e = e||window.event;
@@ -36,6 +37,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             var target = e.target || e.srcElement;
             var last_product_name = target.innerText;
             var last_product_id = target.getAttribute("data-product-id");
+            var last_id = target.getAttribute("data-id");
             var wraper = target.parentNode.parentNode.parentNode;
             var inset_before = target.parentNode.parentNode.nextElementSibling;
 
@@ -43,7 +45,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             target.parentNode.parentNode.parentNode.removeChild(target.parentNode.parentNode);
             var divs = document.createElement("div");
             divs.classList.add("panel-heading");
-            divs.innerHTML = '<h4 class="panel-title"><div class="add_product_input_wraper"><input id='+last_product_id+' data-product-id='+last_product_id+' class="add_product_input" type="text"/>' +
+            divs.innerHTML = '<h4 class="panel-title"><div class="add_product_input_wraper"><input id='+last_id+' data-product-id='+last_product_id+' class="add_product_input" type="text"/>' +
                 '<ul class="add_product_ul"><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul>' +
                 '<input class="product_propor" style="margin-left: 15px" type="text"/>'+
                 '<span class="fa fa-trash-o delete_product" style="margin-left: 15px"></span>'+
