@@ -3,8 +3,9 @@
     width:100%;
     height: 100%;
 }
-.add_product_input{
+#accordion .add_product_input{
     width: 300px!important;
+    display: inline-block!important;
 }
 .add_product_input_wraper>ul{
     width: 300px;
@@ -25,4 +26,8 @@
 }
 .add_product_input_wraper>ul>li:hover{
     background: #7c7bad;
+}
+
+#accordion .delete_product{
+    cursor: pointer;
 }

@@ -20,13 +20,50 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             'focus .add_product_input': 'add_product_input_focus',
             'click .add_product_lis': 'chose_li_to_input',
             'click .bom_modify_submit': 'bom_modify_submit',
-            'input .add_product_input': 'when_input_is_on'
+            'input .add_product_input': 'when_input_is_on',
+            'dblclick .product_name': 'modify_product_fn',
+            'click .delete_product': 'delete_product_fn'
+        },
+        delete_product_fn:function (e) {
+            var e = e||window.event;
+            var target = e.target || e.srcElement;
+            var $target = $(target);
+            $target.parents(".panel-default")[0].remove();
+            console.log('delete');
+        },
+        modify_product_fn:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var last_product_name = target.innerText;
+            var last_product_id = target.getAttribute("data-product-id");
+            var wraper = target.parentNode.parentNode.parentNode;
+            var inset_before = target.parentNode.parentNode.nextElementSibling;
+
+            target.parentNode.parentNode.parentNode.classList.add("input-panel");
+            target.parentNode.parentNode.parentNode.removeChild(target.parentNode.parentNode);
+            var divs = document.createElement("div");
+            divs.classList.add("panel-heading");
+            divs.innerHTML = '<h4 class="panel-title"><div class="add_product_input_wraper"><input data-product-id='+last_product_id+' class="add_product_input" type="text"/>' +
+                '<ul class="add_product_ul"><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul>' +
+                    '<span class="fa fa-trash-o delete_product" style="margin-left: 15px"></span>'+
+                '</div></h4>';
+
+            wraper.insertBefore(divs,inset_before);
+            // console.log(target)
+            $(".add_product_input_wraper>input").each(function () {
+                $(this).attr("value",last_product_name);
+                // $(this).attr("data-product-id",last_product_id);
+            })
+            $(".add_product_ul>li").each(function () {
+                $(this).addClass("add_product_lis")
+            })
+
         },
         when_input_is_on: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var change_lis = target.nextElementSibling.childNodes;
-            console.log(change_lis)
+            console.log(change_lis);
             return new Model("product.template")
                 .query(['display_name'])
                 .filter([['name', 'ilike', target.value]])
@@ -52,15 +89,24 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 var json_data={};
                 var add_product_value = $(this).children("input:first-child").val();
                 var add_product_id = $(this).children("input:first-child").prop("id");
+
+                if($(this).children("input:first-child").attr("data-product-id")!= undefined){
+                    var last_product_id = $(this).children("input:first-child").attr("data-product-id");
+                }
+
                 if (add_product_value != "") {
                     getParents($(this));
                     console.log(arr);
                     json_data["product_id"] = add_product_id;
                     json_data["parents"] = arr.join(",");
+                    if(typeof(last_product_id)!= "undefined"){
+                        json_data["last_product_id"] = last_product_id;
+                    }
+
                     back_datas.push(json_data);
 
                     $(this).parent().parent().parent().removeClass("input-panel");
-                    $(this).parent().html("<a></a><span>" + add_product_value + "</span>");
+                    $(this).parent().html("<a></a><span class='product_name' data-product-id="+add_product_id+">" + add_product_value + "</span>");
                 } else {
                     $(this).parent().parent().parent().remove()
                 }
@@ -127,6 +173,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             divs.classList.add("input-panel");
             divs.innerHTML = "<div class='panel-heading'><h4 class='panel-title'><div class='add_product_input_wraper'><input class='add_product_input' type='text'/>" +
                 "<ul class='add_product_ul'><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul>" +
+                    "<span class='fa fa-trash-o delete_product' style='margin-left: 15px'></span>"+
                 "</div></h4></div>";
             wraper[0].prepend(divs);
             $(".add_product_ul>li").each(function () {
@@ -172,7 +219,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                         console.log(result);
 
                         self.$el.append(QWeb.render('bom_tree', {result: result}))
-                        console.log(self.$el.attr("data-bom-id",result.bom_id))
+                        // console.log(self.$el.attr("data-bom-id",result.bom_id))
                     })
             }
         }
