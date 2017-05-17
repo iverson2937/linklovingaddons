@@ -80,15 +80,17 @@ class CrmLead(models.Model):
         if not contact_name:
             contact_name = self.env['res.partner']._parse_partner_name(self.email_from)[0] if self.email_from else False
 
+        is_contact = False
         if self.partner_name:
             partner_company = self._lead_create_contact(self.partner_name, True, False, True)
         elif self.partner_id:
             partner_company = self.partner_id
         else:
             partner_company = None
+            is_contact = True
 
         if contact_name:
-            return self._lead_create_contact(contact_name, False, partner_company.id if partner_company else False,
+            return self._lead_create_contact(contact_name, is_contact, partner_company.id if partner_company else False,
                                              True)
 
         if partner_company:
