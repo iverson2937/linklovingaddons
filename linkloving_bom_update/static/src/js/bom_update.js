@@ -44,7 +44,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 })
         },
         bom_modify_submit: function () {
-            var back_datas=[];
+            var back_datas = [];
             var top_bom_id = $("#accordion").attr("data-bom-id");
             $(".add_product_input_wraper").each(function () {
                 var arr = [];
@@ -83,15 +83,15 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             //             console.log(result);
             //         })
             var action = {
-                name:"BOM",
+                name: "BOM",
                 type: 'ir.actions.act_window',
-                res_model:'bom.update.wizard',
+                res_model: 'bom.update.wizard',
                 view_type: 'form',
                 view_mode: 'tree,form',
-                context:{'back_datas':back_datas,"bom_id":top_bom_id},
+                context: {'back_datas': back_datas, "bom_id": top_bom_id},
                 views: [[false, 'form']],
                 // res_id: act_id,
-                target:"new"
+                target: "new"
             };
             this.do_action(action);
 
@@ -172,7 +172,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                         console.log(result);
 
                         self.$el.append(QWeb.render('bom_tree', {result: result}))
-                        console.log(self.$el.attr("data-bom-id",result.bom_id))
+                        console.log(self.$el.attr("data-bom-id", result.bom_id))
                     })
             }
         }
