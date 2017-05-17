@@ -22,7 +22,7 @@
             <field name='arch' type='xml'>
                 <form string="Confirm Draft Invoices">
                     <group>
-                        <field name="postfix" required="1"/>
+                        <field name="postfix" required="0"/>
                     </group>
 
 

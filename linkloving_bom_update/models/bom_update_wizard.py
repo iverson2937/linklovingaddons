@@ -101,17 +101,19 @@ class BomUpdateWizard(models.TransientModel):
                     line = int(line)
                     if line != main_bom_id:
                         line_id = self.env['mrp.bom.line'].browse(int(line))
-                        bom_id = line_id.product_id.product_tmpl_id.bom_id
+                        bom_id = line_id.product_id.product_tmpl_id.bom_ids[0]
                     else:
                         bom_id = bom_obj.browse(line)
                     if product_id:
-                        line_obj.create({
-                            'product_id': int(product_id),
-                            'bom_id': bom_id.id,
-                        })
-                        # 此为修改bom，需要删除一个bom_line
                         if last_bom_line_id:
-                            line_obj.product_id = product_id
+                            line_obj.browse(int(last_bom_line_id)).product_id = product_id
+                        else:
+                            line_obj.create({
+                                'product_id': int(product_id),
+                                'bom_id': bom_id.id,
+                            })
+                        # 此为修改bom，需要删除一个bom_line
+
 
                         product_id = False
 
