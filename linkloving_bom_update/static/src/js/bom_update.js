@@ -27,7 +27,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             var target = e.target || e.srcElement;
             var change_lis = target.nextElementSibling.childNodes;
             console.log(change_lis)
-            return new Model("product.template")
+            return new Model("product.product")
                 .query(['display_name'])
                 .filter([['name', 'ilike', target.value]])
                 .limit(8)
