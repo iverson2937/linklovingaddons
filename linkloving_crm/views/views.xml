@@ -78,7 +78,7 @@
             <field name="model">crm.remark.record</field>
             <field name="arch" type="xml">
                 <tree string="备注记录">
-                    <field name="partner_id"/>
+                    <field name="partner_id" options="{'no_create':True}"/>
                     <field name="subject"/>
                     <field name="real_time"/>
                     <field name="detail"/>
