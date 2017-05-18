@@ -35,6 +35,10 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             var arr=[];
 
             var del_bom_id =  $target.prevAll(".add_product_input").attr("data-product-id");
+            if(del_bom_id == undefined){
+                $target.parents(".panel-default")[0].remove();
+                return;
+            }
             console.log(del_bom_id);
             getParents($target);
             console.log(arr);
