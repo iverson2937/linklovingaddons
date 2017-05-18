@@ -26,11 +26,11 @@ class BomUpdateWizard(models.TransientModel):
         if not update:
             for val in vals:
                 temp_product_id = False
-                product_id = int(val.get('product_id')) if val.get('product_id') else None
+                product_id = val.get('product_id')
                 parents = val.get('parents')
                 modify_type = val.get('modify_type')
-                last_bom_line_id = int(val.get('last_product_id')) if val.get('last_bom_line_id') else None
-                del_bom_line_id = int(val.get('del_bom_id')) if val.get('del_bom_id') else None
+                last_bom_line_id = val.get('last_product_id')
+                del_bom_line_id = val.get('del_bom_id')
                 qty = val.get('qty')
                 to_update_bom_line_ids = parents.split(',')
                 name_product_name = val.get('copy_name')
@@ -169,7 +169,7 @@ class BomUpdateWizard(models.TransientModel):
             return {
                 'type': 'ir.actions.client',
                 'tag': 'bom_update',
-                'bom_id': bom_id.id
+                'bom_id': main_bom_id
             }
 
     def get_next_default_code(self, default_code):
