@@ -26,7 +26,28 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             'click .product_copy': 'copy_product_fn'
         },
         copy_product_fn:function () {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var last_product_name = $(target).prev().prev().text();
+            var last_product_id = $(target).prev().prev().attr("data-product-id");
+            var last_id = $(target).prev().prev().attr("data-id");
+            var wraper = target.parentNode.parentNode.parentNode;
+            var inset_before = target.parentNode.parentNode.nextElementSibling;
 
+            target.parentNode.parentNode.parentNode.classList.add("input-panel");
+            target.parentNode.parentNode.parentNode.removeChild(target.parentNode.parentNode);
+            var divs = document.createElement("div");
+            divs.classList.add("panel-heading");
+            divs.innerHTML = '<h4 class="panel-title"><div class="add_product_input_wraper"><input id='+last_id+' data-product-id='+last_product_id+' class="copy_product_input" type="text"/>' +
+                '<input class="product_propor" style="margin-left: 15px" type="text"/>'+
+                '<span class="fa fa-trash-o delete_product" style="margin-left: 15px"></span>'+
+                '</div></h4>';
+
+            wraper.insertBefore(divs,inset_before);
+            // console.log(target)
+            $("input[data-product-id="+last_product_id+"]").attr("value",last_product_name);
+            $("input[data-product-id="+last_product_id+"]").attr("data-modify-type","copy");
+            $("input[data-product-id="+last_product_id+"]").next().val($(target).prev().html());
         },
         delete_product_fn:function (e) {
             var e = e||window.event;
@@ -81,6 +102,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             // console.log(target)
             $("input[data-product-id="+last_product_id+"]").attr("value",last_product_name);
             $("input[data-product-id="+last_product_id+"]").attr("data-modify-type","edit");
+            $("input[data-product-id="+last_product_id+"]").next().next().val($(target).next().html());
 
             $(".add_product_ul>li").each(function () {
                 $(this).addClass("add_product_lis");
@@ -91,7 +113,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var change_lis = target.nextElementSibling.childNodes;
-            console.log(change_lis)
+            // console.log(change_lis);
             return new Model("product.product")
                 .call('name_search', [], {
                     name: target.value,
@@ -127,6 +149,9 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 var add_product_id = $(this).children("input:first-child").prop("id");
                 var add_product_qty = $(this).children("input[class='product_propor']").val();
                 var modify_type = $(this).children("input:first-child").attr("data-modify-type");
+                if(modify_type == 'copy'){
+                    json_data["copy_name"] = $(this).children("input:first-child").val();
+                }
 
                 if($(this).children("input:first-child").attr("data-product-id")!= undefined){
                     var last_product_id = $(this).children("input:first-child").attr("data-product-id");
@@ -154,7 +179,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 function getParents($obj) {
                     if ($obj.parents(".panel-collapse")) {
                         if ($obj.parents(".panel-collapse").length == 0) {
-                            return
+                            return;
                         }
                         arr.push($obj.parents(".panel-collapse").attr("data-return-id"));
                         $obj = $obj.parents(".panel-collapse");
@@ -163,25 +188,15 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 }
             });
             var data_delete_products = $("#accordion").attr("data-delete-products");
-            console.log(data_delete_products)
             if(data_delete_products!=""){
                 data_delete_products = data_delete_products.replace(/^{/,"[{");
                 data_delete_products = data_delete_products.replace(/,$/,"]");
 
-                // console.log(data_delete_products);
-                // console.log(JSON.parse(data_delete_products));
-
                 back_datas = back_datas.concat(JSON.parse(data_delete_products));
                 $("#accordion").attr("data-delete-products","");
-                console.log(back_datas);
             }
+            console.log(back_datas);
 
-
-            // return new Model("bom.line")
-            //         .call("bom.line.update", [back_datas])
-            //         .then(function (result) {
-            //             console.log(result);
-            //         })
             var action = {
                 name: "BOM",
                 type: 'ir.actions.act_window',
