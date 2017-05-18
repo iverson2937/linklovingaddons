@@ -14,7 +14,7 @@ class BomUpdateWizard(models.TransientModel):
     def bom_line_update(self):
         context = self._context
         main_bom_id = int(context.get('bom_id'))
-        postfix = self.postfix
+        postfix = self.postfix if self.postfix else ''
         update = context.get('update')
         vals = context.get('back_datas')
         line_obj = self.env['mrp.bom.line']
@@ -104,6 +104,11 @@ class BomUpdateWizard(models.TransientModel):
                     elif modify_type == 'del':
                         old_product_id = line_obj.browse(int(del_bom_line_id)).product_id
                         update_bom_line_delete(new_bom_id, old_product_id)
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'bom_update',
+                'bom_id': new_bom_id.id
+            }
         else:
             # 修改bOM
             for val in vals:
@@ -111,43 +116,59 @@ class BomUpdateWizard(models.TransientModel):
                 parents = val.get('parents')
                 last_bom_line_id = val.get('last_product_id')
                 qty = val.get('qty')
+                modify_type = val.get('modify_type')
+                del_bom_line_id = val.get('del_bom_id')
 
                 to_update_bom_line_ids = parents.split(',')
-                for line in to_update_bom_line_ids:
-                    line = int(line)
-                    if line != main_bom_id:
-                        line_id = self.env['mrp.bom.line'].browse(int(line))
-                        bom_id = line_id.product_id.product_tmpl_id.bom_ids[0]
-                    else:
-                        bom_id = bom_obj.browse(line)
+                line = int(to_update_bom_line_ids[0])
+                if line != main_bom_id:
+                    line_id = self.env['mrp.bom.line'].browse(int(line))
+                    bom_id = line_id.product_id.product_tmpl_id.bom_ids[0]
+                else:
+                    bom_id = bom_obj.browse(line)
+
+                if modify_type == 'add':
                     if product_id:
-                        if last_bom_line_id:
-                            bom_line_id = line_obj.browse(int(last_bom_line_id))
-                            bom_line_id.product_id = product_id
-                            bom_line_id.qty = qty
-
-                        else:
-                            line_obj.create({
-                                'product_id': int(product_id),
-                                'qty': qty,
-                                'bom_id': bom_id.id,
-                            })
-                        # 此为修改bom，需要删除一个bom_line
-
-
+                        line_obj.create({
+                            'product_id': int(product_id),
+                            'qty': qty,
+                            'bom_id': bom_id.id,
+                        })
                         product_id = False
+                        # 此为修改bom，需要删除一个bom_line
+                elif modify_type == 'edit':
+                    if product_id:
+                        line_obj.create({
+                            'product_id': int(product_id),
+                            'qty': qty,
+                            'bom_id': bom_id.id,
+                        })
+                        product_id = False
+                        old_product_id = line_obj.browse(int(last_bom_line_id)).product_id
+                        update_bom_line_delete(bom_id, old_product_id)
+                # 直接删除line无需添加
+                elif modify_type == 'del':
+                    old_product_id = line_obj.browse(int(del_bom_line_id)).product_id
+                    update_bom_line_delete(bom_id, old_product_id)
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'bom_update',
+                'bom_id': bom_id.id
+            }
+
+
 
     def get_next_default_code(self, default_code):
         if not default_code:
             raise UserError(u'产品没有对应料号')
 
         # 取前10位
-        prefix = default_code[0:10]
+        prefix = default_code[0:11]
         products = self.env['product.template'].search([('default_code', 'ilike', prefix)])
         versions = []
         for product in products:
             versions.append(int(product.default_code.split('.')[-1]))
-        version = ('000' + str(int(max(versions)) + 1))[-3:]
+        version = ('000' + str(int(max(versions)) + 1))[-2:]
         new_code = prefix + version
         return new_code
 
