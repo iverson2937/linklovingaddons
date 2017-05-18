@@ -23,14 +23,36 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             'input .add_product_input': 'when_input_is_on',
             'dblclick .product_name': 'modify_product_fn',
             'click .delete_product': 'delete_product_fn',
-            // 'click .product_copy':
+            'click .product_copy': 'copy_product_fn'
+        },
+        copy_product_fn:function () {
+
         },
         delete_product_fn:function (e) {
             var e = e||window.event;
             var target = e.target || e.srcElement;
             var $target = $(target);
+            var arr=[];
+
+            var del_bom_id =  $target.prevAll(".add_product_input").attr("data-product-id");
+            console.log(del_bom_id);
+            getParents($target);
+            console.log(arr);
+            var dele_val = $("#accordion").attr("data-delete-products");
+            $("#accordion").attr("data-delete-products",dele_val+'{"modify_type":"del","del_bom_id":'+del_bom_id+',"parents":"'+arr+'"},');
             $target.parents(".panel-default")[0].remove();
-            console.log('delete');
+
+            //递归 找父级
+            function getParents($obj) {
+                if ($obj.parents(".panel-collapse")) {
+                    if ($obj.parents(".panel-collapse").length == 0) {
+                        return
+                    }
+                    arr.push($obj.parents(".panel-collapse").attr("data-return-id"));
+                    $obj = $obj.parents(".panel-collapse");
+                    getParents($obj);
+                }
+            }
         },
         modify_product_fn:function (e) {
             var e = e || window.event;
@@ -54,6 +76,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             wraper.insertBefore(divs,inset_before);
             // console.log(target)
             $("input[data-product-id="+last_product_id+"]").attr("value",last_product_name);
+            $("input[data-product-id="+last_product_id+"]").attr("data-modify-type","edit");
 
             $(".add_product_ul>li").each(function () {
                 $(this).addClass("add_product_lis");
@@ -89,6 +112,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                     }
                 })
         },
+        //提交时的动作
         bom_modify_submit: function () {
             var back_datas = [];
             var top_bom_id = $("#accordion").attr("data-bom-id");
@@ -98,6 +122,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 var add_product_value = $(this).children("input:first-child").val();
                 var add_product_id = $(this).children("input:first-child").prop("id");
                 var add_product_qty = $(this).children("input[class='product_propor']").val();
+                var modify_type = $(this).children("input:first-child").attr("data-modify-type");
 
                 if($(this).children("input:first-child").attr("data-product-id")!= undefined){
                     var last_product_id = $(this).children("input:first-child").attr("data-product-id");
@@ -109,6 +134,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                     json_data["product_id"] = add_product_id;
                     json_data["parents"] = arr.join(",");
                     json_data["qty"] = add_product_qty;
+                    json_data["modify_type"] = modify_type;
                     if(typeof(last_product_id)!= "undefined"){
                         json_data["last_product_id"] = last_product_id;
                     }
@@ -132,6 +158,14 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                     }
                 }
             });
+            var data_delete_products = $("#accordion").attr("data-delete-products");
+            data_delete_products = data_delete_products.replace(/^{/,"[{");
+            data_delete_products = data_delete_products.replace(/,$/,"]");
+
+            // console.log(data_delete_products);
+            // console.log(JSON.parse(data_delete_products));
+
+            back_datas = back_datas.concat(JSON.parse(data_delete_products));
             console.log(back_datas);
 
             // return new Model("bom.line")
@@ -182,7 +216,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             divs.classList.add("panel");
             divs.classList.add("panel-default");
             divs.classList.add("input-panel");
-            divs.innerHTML = "<div class='panel-heading'><h4 class='panel-title'><div class='add_product_input_wraper'><input class='add_product_input' type='text'/>" +
+            divs.innerHTML = "<div class='panel-heading'><h4 class='panel-title'><div class='add_product_input_wraper'><input data-modify-type='add' class='add_product_input' type='text'/>" +
                 "<ul class='add_product_ul'><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul>" +
                 "<input class='product_propor' style='margin-left: 15px' type='text'/> "+
                 "<span class='fa fa-trash-o delete_product' style='margin-left: 15px'></span>"+
@@ -231,6 +265,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                         console.log(result);
                         self.$el.append(QWeb.render('bom_tree', {result: result}))
                         console.log(self.$el.attr("data-bom-id", result.bom_id))
+                        self.$el.attr("data-delete-products","")
                     })
             }
         }
