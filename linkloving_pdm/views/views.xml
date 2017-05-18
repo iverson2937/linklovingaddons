@@ -1,0 +1,52 @@
+<openerp>
+    <data>
+        <record id="product_template_form_inherit" model="ir.ui.view">
+            <field name="name">product.template.form.inherit</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='notes']" position="after">
+                    <page string="SIP">
+                        <field name="sip_files" mode="kanban"
+                               context="{'product_id':active_id,'model':'product.template'}">
+                            <kanban>
+                                <field name="file_binary"/>
+                                <field name="file_name"/>
+
+                                <templates>
+                                    <t t-name="kanban-box">
+                                        <div class="oe_kanban_details">
+                                            <field name="file_name" string="文件名"/>
+                                            <field name="state" string="状态"/>
+
+                                        </div>
+                                    </t>
+                                </templates>
+
+                            </kanban>
+                        </field>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+
+        <record model="ir.actions.act_window" id="action_final_review_partner">
+            <field name="name">文件终审人设置</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">final.review.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a Barcode Nomenclature .
+              </p><p>
+                文件终审人设置
+              </p>
+            </field>
+        </record>
+
+        <menuitem id="final_review_partner_menu" parent="stock.menu_stock_config_settings" action="action_final_review_partner"
+        sequence="50" groups="base.group_no_one"/>
+    </data>
+</openerp>
