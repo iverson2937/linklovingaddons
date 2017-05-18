@@ -163,14 +163,19 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 }
             });
             var data_delete_products = $("#accordion").attr("data-delete-products");
-            data_delete_products = data_delete_products.replace(/^{/,"[{");
-            data_delete_products = data_delete_products.replace(/,$/,"]");
+            console.log(data_delete_products)
+            if(data_delete_products!=""){
+                data_delete_products = data_delete_products.replace(/^{/,"[{");
+                data_delete_products = data_delete_products.replace(/,$/,"]");
 
-            // console.log(data_delete_products);
-            // console.log(JSON.parse(data_delete_products));
+                // console.log(data_delete_products);
+                // console.log(JSON.parse(data_delete_products));
 
-            back_datas = back_datas.concat(JSON.parse(data_delete_products));
-            console.log(back_datas);
+                back_datas = back_datas.concat(JSON.parse(data_delete_products));
+                $("#accordion").attr("data-delete-products","");
+                console.log(back_datas);
+            }
+
 
             // return new Model("bom.line")
             //         .call("bom.line.update", [back_datas])
