@@ -99,9 +99,11 @@ class BomUpdateWizard(models.TransientModel):
                                 'product_qty': qty,
                                 'bom_id': new_bom_id.id,
                             })
-                            product_id = False
+                            #
+                        if product_id != line_obj.browse(int(last_bom_line_id)).product_id.id:
                             old_product_id = line_obj.browse(int(last_bom_line_id)).product_id
                             update_bom_line_delete(new_bom_id, old_product_id)
+                        product_id = False
                     elif modify_type == 'copy':
                         if name_product_name:
                             new_default_code = self.get_next_default_code(
