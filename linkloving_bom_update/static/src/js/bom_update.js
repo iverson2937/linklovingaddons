@@ -196,7 +196,10 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 $("#accordion").attr("data-delete-products","");
             }
             console.log(back_datas);
-
+            if(back_datas.length==0){
+                alert("你没有做任何操作")
+                return;
+            }
             var action = {
                 name: "BOM",
                 type: 'ir.actions.act_window',
@@ -242,7 +245,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             divs.classList.add("input-panel");
             divs.innerHTML = "<div class='panel-heading'><h4 class='panel-title'><div class='add_product_input_wraper'><input data-modify-type='add' class='add_product_input' type='text'/>" +
                 "<ul class='add_product_ul'><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul>" +
-                "<input class='product_propor' style='margin-left: 15px' type='text'/> "+
+                "<input class='product_propor' style='margin-left: 15px' type='text' value='1'/> "+
                 "<span class='fa fa-trash-o delete_product' style='margin-left: 15px'></span>"+
                 "</div></h4></div>";
             wraper[0].prepend(divs);
