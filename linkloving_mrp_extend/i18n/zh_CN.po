@@ -632,7 +632,7 @@ msgstr "生产"
 #. module: linkloving_mrp_extend
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.linkloving_mrp_production_form_view
 msgid "Production Complete,Send to Inspection"
-msgstr "生产完成，送往品检"
+msgstr "完成生产"
 
 #. module: linkloving_mrp_extend
 #: model:ir.model.fields,field_description:linkloving_mrp_extend.field_mrp_qc_feedback_production_id
