@@ -96,6 +96,10 @@ class HrExpenseSheet(models.Model):
 
         self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
 
+    @api.multi
+    def return_to_approve(self):
+        self.state = 'approve'
+
     @api.model
     def create(self, vals):
         if vals.get('expense_no', 'New') == 'New':

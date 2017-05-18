@@ -173,6 +173,10 @@
                                 class="oe_highlight"/>
                         <button name="action_receive_payment" states="approve" string="Receivable Payment" type="object"
                                 groups="account.group_account_user" class="oe_highlight o_expense_sheet_post"/>
+                        <!--<button name="return_to_approve" type="action"-->
+                        <!--string="返回" class="oe_highlight o_expense_sheet_pay"-->
+                        <!--attrs="{'invisible': [('state', '!=', 'post')]}"-->
+                        <!--groups="account.group_account_user"/>-->
                         <button name="%(hr_expense.hr_expense_register_payment_wizard_action)d" type="action"
                                 string="Register Payment" class="oe_highlight o_expense_sheet_pay"
                                 attrs="{'invisible': [('state', '!=', 'post')]}"
