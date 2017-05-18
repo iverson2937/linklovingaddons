@@ -70,7 +70,8 @@ class MrpProcess(models.Model):
 
         domains = {
             'count_mo_draft': [('state', '=', 'draft')],
-            'count_mo_delay': [('date_planned_start', '<', datetime.date.today().strftime('%Y-%m-%d %H:%M:%S'))],
+            'count_mo_delay': [('date_planned_start', '<', datetime.date.today().strftime('%Y-%m-%d %H:%M:%S')),
+                               ('state', '!=', 'draft')],
             'count_mo_waiting': [('state', 'in', ['draft', 'confirmed', 'waiting_material'])],
             'count_mo_today': [('date_planned_start', '>', datetime.date.today().strftime('%Y-%m-%d %H:%M:%S')),
                                ('date_planned_start', '<', self._today())],
