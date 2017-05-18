@@ -48,5 +48,70 @@
 
             </field>
         </record>
+
+
+        <record model="ir.ui.view" id="view_remark_record_form">
+            <field name="name">res.remark.record.form</field>
+            <field name="model">crm.remark.record</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="subject"/>
+                                <field name="minuciosidad"/>
+                            </group>
+                            <group>
+                                <field name="partner_id"/>
+                                <field name="reality_time"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_remark_record_tree" model="ir.ui.view">
+            <field name="name">res.remark.record.tree</field>
+            <field name="model">crm.remark.record</field>
+            <field name="arch" type="xml">
+                <tree string="备注记录">
+                    <field name="subject"/>
+                    <field name="minuciosidad"/>
+                    <field name="partner_id"/>
+                    <field name="reality_time"/>
+                    <field name="create_date" string="创建时间"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <!-- open activities related to given partner -->
+        <record id="crm_remark_action_tree" model="ir.actions.act_window">
+            <field name="name">Remark</field>
+            <field name="res_model">crm.remark.record</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'default_partner_id':active_id}</field>
+        </record>
+
+
+        <record id="res_partner_view_buttons" model="ir.ui.view">
+            <field name="name">res.partner.view.buttons</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="priority" eval="20"/>
+            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+            <field name="arch" type="xml">
+                <div name="button_box" position="inside">
+                    <button class="oe_stat_button" type="action" name="%(linkloving_crm.crm_remark_action_tree)d"
+                            icon="fa-book">
+                        <field string="备注" name="remark_count" widget="statinfo"/>
+                    </button>
+                </div>
+            </field>
+        </record>
+
+
     </data>
 </openerp>

@@ -88,6 +88,12 @@
                     <filter string="Waiting Payment" name="register" domain="[('state', '=', 'confirm')]"/>
                     <filter string="Done" name="register" domain="[('state', '=', 'done')]"/>
                     <separator/>
+                    <group expand='0' string='Group by...'>
+                        <filter string='合作伙伴' domain="[]" context="{'group_by': 'partner_id'}"/>
+                        <filter string='状态' domain="[]" context="{'group_by': 'state'}"/>
+                        <filter string='创建时间' domain="[]" context="{'group_by': 'create_date'}"/>
+                    </group>
+
 
                 </search>
             </field>
@@ -166,7 +172,7 @@
                     <field name="create_uid"/>
                     <field name="create_date"/>
                     <field name="remark"/>
-                    <field name="state"/>
+                    <field name="state" string="状态"/>
                 </tree>
             </field>
         </record>
