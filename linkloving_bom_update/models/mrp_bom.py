@@ -81,7 +81,7 @@ def _get_rec(object, level, qty=1.0, uom=False):
         res = {
             'name': l.product_id.name,
             'product_id': l.product_id.id,
-            'product_tmpl_id': line.product_id.product_tmpl_id.id,
+            'product_tmpl_id': l.product_id.product_tmpl_id.id,
             'code': l.product_id.default_code,
             'uuid': str(uuid.uuid1()),
             'id': l.id,
