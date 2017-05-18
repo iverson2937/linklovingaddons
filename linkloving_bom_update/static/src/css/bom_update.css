@@ -42,3 +42,11 @@
 #accordion .product_copy{
     cursor: pointer;
 }
+#accordion .bom_back{
+    float: right;
+    margin-right: 80px;
+    margin-top: -15px;
+}
+#accordion .bom_modify_submit{
+    margin-top: -15px;
+}

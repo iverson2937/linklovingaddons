@@ -23,7 +23,21 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             'input .add_product_input': 'when_input_is_on',
             'dblclick .product_name': 'modify_product_fn',
             'click .delete_product': 'delete_product_fn',
-            'click .product_copy': 'copy_product_fn'
+            'click .product_copy': 'copy_product_fn',
+            'click .bom_back': 'bom_back_fn'
+        },
+        bom_back_fn:function () {
+            var action = {
+                name:"产品",
+                type: 'ir.actions.act_window',
+                res_model:'mrp.bom',
+                view_type: 'form',
+                view_mode: 'tree,form',
+                views: [[false, 'form']],
+                res_id: parseInt($("#accordion").attr("data-bom-id")),
+                target:"self"
+            };
+            this.do_action(action);
         },
         copy_product_fn:function () {
             var e = e || window.event;
@@ -160,12 +174,12 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 if (add_product_value != "") {
                     getParents($(this));
                     console.log(arr);
-                    json_data["product_id"] = add_product_id;
+                    json_data["product_id"] = parseInt(add_product_id);
                     json_data["parents"] = arr.join(",");
                     json_data["qty"] = add_product_qty;
                     json_data["modify_type"] = modify_type;
                     if(typeof(last_product_id)!= "undefined"){
-                        json_data["last_product_id"] = last_product_id;
+                        json_data["last_product_id"] = parseInt(last_product_id);
                     }
 
                     back_datas.push(json_data);
