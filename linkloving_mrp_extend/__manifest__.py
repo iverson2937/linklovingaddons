@@ -35,6 +35,7 @@
         'wizard/tracking_number_wizard.xml',
         'report/stock_picking_report.xml',
         'views/qc_feedback.xml',
+        'security/mrp_qc_feedback_seq.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

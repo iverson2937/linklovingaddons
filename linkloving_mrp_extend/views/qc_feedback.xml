@@ -43,6 +43,7 @@
                             <group>
                                 <field name="production_id" readonly="1" string="制造单号"/>
                                 <field name="product_id" readonly="1" string="产品"/>
+                                <field name="feedback_backorder_id" readonly="1"/>
                             </group>
                             <group>
                                 <field name="qty_produced" readonly="1" string="生产数量"/>
@@ -241,8 +242,6 @@
                 parent="mrp_production_qc_inspection"
                 action="action_qc_inspection_check_to_rework"
                 sequence="2" name="确认返工"/>
-
-        check_to_rework
 
     </data>
 </openerp>

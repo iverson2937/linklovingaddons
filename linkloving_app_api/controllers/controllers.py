@@ -152,6 +152,43 @@ class LinklovingAppApi(http.Controller):
             return ''
         return url
 
+    @http.route('/linkloving_app_api/get_rework_ing_production', type='json', auth='none', csrf=False)
+    def get_rework_ing_production(self):
+        partner_id = request.jsonrequest.get('partner_id')
+        mrp_production = request.env['mrp.production'].sudo()
+        domain = []
+        if partner_id:
+            domain.append('|')
+            domain.append(('in_charge_id', '=', partner_id))
+            domain.append(('create_uid', '=', partner_id))
+        domain.append(('state', '=', 'progress'))
+        domain.append(('feedback_on_rework', '!=', None))
+
+        production_rework = mrp_production.search(domain,
+                                                  offset=request.jsonrequest['offset'],
+                                                  limit=request.jsonrequest['limit'],
+                                                  order='date_planned_start desc'
+                                                  )
+
+        data = []
+        for production in production_rework:
+            dict = {
+                'order_id': production.id,
+                'display_name': production.display_name,
+                'product_name': production.product_id.display_name,
+                'date_planned_start': production.date_planned_start,
+                'state': production.state,
+                'product_qty': production.product_qty,
+                'in_charge_name': production.in_charge_id.name,
+                'origin': production.origin,
+                'process_id': {
+                    'process_id': production.process_id.id,
+                    'name': production.process_id.name,
+                }
+            }
+            data.append(dict)
+        # user_data = LinklovingAppApi.odoo10.execute('res.users', 'read', [LinklovingAppApi.odoo10.env.user.id])
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
     #获取生产单列表
     @http.route('/linkloving_app_api/get_mrp_production', type='json', auth='none', csrf=False)
     def get_mrp_production(self, **kw):
@@ -166,6 +203,8 @@ class LinklovingAppApi(http.Controller):
 
         if request.jsonrequest.get('state'):
             domain.append(('state','=',request.jsonrequest['state']))
+            if request.jsonrequest.get('state') == 'progress':
+                domain.append(('feedback_on_rework', '=', None))
 
         if condition and condition[condition.keys()[0]]:
             domain = (condition.keys()[0], 'like', condition[condition.keys()[0]])
@@ -291,7 +330,6 @@ class LinklovingAppApi(http.Controller):
         today_time = fields.datetime.strptime(fields.datetime.strftime(date_to_show, '%Y-%m-%d'),
                                               '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
         user = request.env["res.users"].sudo().browse(request.context.get("uid"))
-        user_id = request.context.get("uid")
         locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
         if not locations:
             location_domain = []
@@ -688,7 +726,7 @@ class LinklovingAppApi(http.Controller):
                 sim_stock_move.stock_moves[0].quantity_done_store = move['quantity_ready']
                 sim_stock_move.stock_moves[0].quantity_done = move['quantity_ready']
                 sim_stock_move.stock_moves[0].action_done()
-
+            sim_stock_move.quantity_ready = 0  # 清0
         # try:
         #     mrp_production.post_inventory()
         # except UserError, e:
@@ -738,7 +776,7 @@ class LinklovingAppApi(http.Controller):
                 sim_stock_move.stock_moves[0].quantity_done_store = move['quantity_ready']
                 sim_stock_move.stock_moves[0].quantity_done = move['quantity_ready']
                 sim_stock_move.stock_moves[0].action_done()
-
+            sim_stock_move.quantity_ready = 0  #清0
         # try:
         #     mrp_production.post_inventory()
         # except UserError, e:
@@ -801,7 +839,7 @@ class LinklovingAppApi(http.Controller):
         produce_qty = request.jsonrequest.get('produce_qty')
 
         try:
-            mrp_product_produce = request.env['mrp.product.produce']
+            mrp_product_produce = request.env['mrp.product.produce'].with_context({'active_id': order_id})
             produce = mrp_product_produce.sudo().create({
                 'product_qty' : produce_qty,
                 'production_id' : order_id,
@@ -809,7 +847,7 @@ class LinklovingAppApi(http.Controller):
                 'product_id' : mrp_production.product_id.id,
             })
             produce.do_produce()
-        except:
+        except UserError, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error':_('do produce error')})
         return JsonResponse.send_response(STATUS_CODE_OK,
@@ -819,49 +857,29 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/produce_finish', type='json', auth='none', csrf=False)
     def produce_finish(self, **kw):
         order_id = request.jsonrequest.get('order_id')  # get paramter
-        is_split_done = request.jsonrequest.get("is_split_done")
         mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
-        # 记录是否分批发货
-        mrp_production.is_split_done = is_split_done
 
         if not mrp_production:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error' : _("The MO not found")})
-        if mrp_production.qty_produced == 0:
+        if mrp_production.qty_unpost == 0:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error':_("Product qty can not be 0 ")})
-        if not mrp_production.check_to_done and mrp_production.production_order_type == 'ordering':
+        if mrp_production.qty_unpost <= mrp_production.product_qty and mrp_production.production_order_type == 'ordering':
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error': _("Ordering MO need to produce all the products")})
         else:
-            location = request.env["stock.location"].sudo().search([("is_circulate_location", "=", True)], limit=1)
-            if location and location.putaway_strategy_id and location.putaway_strategy_id.fixed_location_ids:
-                fixed_location_ids = location.putaway_strategy_id.fixed_location_ids
+            if mrp_production.feedback_on_rework:  # 生产完成, 但是还在返工中 说明此次返工还没产出
+                return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                                  res_data={"error": u"该单据还在返工中,请先产出数量"})
+            # 生产完成 结算工时
+            mrp_production.state = mrp_production.compute_order_state()
 
-                if mrp_production.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:  # 半成品入库
-                    if mrp_production.is_split_done:
-                        mrp_production.write({'state': 'progress'})
-                    else:
-                        mrp_production.button_mark_done()
-                    JPushExtend.send_notification_push(audience=jpush.audience(
-                            jpush.tag(LinklovingAppApi.get_jpush_tags("qc"))
-                    ), notification=mrp_production.product_id.name,
-                            body=_("数量:%d,半成品已生产完成") % (mrp_production.qty_produced))
-                else:
-                    mrp_production.write({'state': 'waiting_quality_inspection'})
-                    JPushExtend.send_notification_push(audience=jpush.audience(
-                            jpush.tag(LinklovingAppApi.get_jpush_tags("qc"))
-                    ), notification=mrp_production.product_id.name,
-                            body=_("Qty:%d,Produce finish,To QC") % (mrp_production.qty_produced))
-
-            else:
-                mrp_production.write({'state': 'waiting_quality_inspection'})
-                JPushExtend.send_notification_push(audience=jpush.audience(
+            JPushExtend.send_notification_push(audience=jpush.audience(
                         jpush.tag(LinklovingAppApi.get_jpush_tags("qc"))
-        ),notification=mrp_production.product_id.name,body=_("Qty:%d,Produce finish,To QC")% (mrp_production.qty_produced))
-            # else:
-            #     return JsonResponse.send_response(STATUS_CODE_ERROR,
-            #                                       res_data={"error": "该产品未设置物料类型,请设置"})
+            ),
+                    notification=mrp_production.product_id.name,
+                    body=u"数量:%d, %s" % (mrp_production.qty_produced, mrp_production.state))
 
             mrp_production.worker_line_ids.change_worker_state('outline')
 
@@ -903,37 +921,36 @@ class LinklovingAppApi(http.Controller):
     #开始品检
     @http.route('/linkloving_app_api/start_quality_inspection', type='json', auth='none', csrf=False)
     def start_quality_inspection(self, **kw):
-        order_id = request.jsonrequest.get('order_id')  # get paramter
-        mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
-        if not mrp_production:
+        feedback_id = request.jsonrequest.get('feedback_id')  # get paramter
+        feedback = LinklovingAppApi.get_model_by_id(feedback_id, request, 'mrp.qc.feedback')
+        if not feedback_id:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error' : _("MO not found")})
-        mrp_production.write({'state': 'quality_inspection_ing'})
+                                              res_data={'error': u"未找到对应的品检单"})
+        feedback.action_start_qc()
 
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
-        ),notification=mrp_production.product_id.name,body=_("Qty:%d,QC start") % (mrp_production.qty_produced))
+        ), notification=feedback.production_id.product_id.name, body=_("Qty:%d,QC start") % (feedback.qty_produced))
         return JsonResponse.send_response(STATUS_CODE_OK,
-                                          res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
+                                          res_data=self.convert_qc_feedback_to_json(feedback))
 
 
     #品检结果
     @http.route('/linkloving_app_api/inspection_result', type='json', auth='none', csrf=False)
     def inspection_result(self, **kw):
 
-        order_id = request.jsonrequest.get('order_id')  # get paramter
+        feedback_id = request.jsonrequest.get('feedback_id')  # get paramter
         result = request.jsonrequest.get('result')
 
         qc_test_qty = request.jsonrequest.get('qc_test_qty')#抽样数量
         qc_fail_qty = request.jsonrequest.get('qc_fail_qty')#不良品数量
         qc_note = request.jsonrequest.get('qc_note')#批注
         qc_img = request.jsonrequest.get('qc_img')#图片
-        mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
-        feedback = request.env['mrp.qc.feedback'].sudo().create({
+        feedback = LinklovingAppApi.get_model_by_id(feedback_id, request, 'mrp.qc.feedback')
+        feedback.write({
             'qc_test_qty' : qc_test_qty,
             'qc_fail_qty' : qc_fail_qty,
             'qc_note' : qc_note,
-            'production_id': order_id,
         })
         for img in qc_img:
             qc_img_id = request.env["qc.feedback.img"].sudo().create({
@@ -941,23 +958,26 @@ class LinklovingAppApi(http.Controller):
                 'qc_img': img,
             })
             feedback.qc_imgs = [(4, qc_img_id.id)]
-        mrp_production.qc_feedback_id = feedback.id
 
-        if not mrp_production:
+        if not feedback:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error' : _("MO not found")})
-
-        if result == True:
-            mrp_production.write({'state': 'waiting_inventory_material'})
-        else:
-            mrp_production.write({'state': 'waiting_rework'})
+        try:
+            if result == True:
+                feedback.action_qc_success()
+            else:
+                feedback.action_qc_fail()
+        except UserError, e:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={"error": e.name})
 
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
-        ),notification=mrp_production.product_id.name,body=_("Qty:%d,QC finish") % (mrp_production.qty_produced))
+        ), notification=feedback.production_id.product_id.name, body=_("Qty:%d,QC finish") % (feedback.qty_produced))
 
         return JsonResponse.send_response(STATUS_CODE_OK,
-                                          res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
+                                          res_data=self.convert_qc_feedback_to_json(feedback))
+
     @classmethod
     def get_qc_img_url(cls, worker_id, ):
         # DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
@@ -970,11 +990,15 @@ class LinklovingAppApi(http.Controller):
 
     @http.route('/linkloving_app_api/start_rework', type='json', auth='none', csrf=False)
     def start_rework(self, **kw):
-        order_id = request.jsonrequest.get('order_id')  # get paramter
-        mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
-        mrp_production.button_start_rework()
+        feedback_id = request.jsonrequest.get('feedback_id')  # get paramter
+        feedback = LinklovingAppApi.get_model_by_id(feedback_id, request, 'mrp.qc.feedback')
+        try:
+            feedback.action_check_to_rework()
+        except UserError, e:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={"error": e.name})
         return JsonResponse.send_response(STATUS_CODE_OK,
-                                          res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
+                                          res_data=self.convert_qc_feedback_to_json(feedback))
 
     @http.route('/linkloving_app_api/semi_finished_return_material', type='json', auth='none', csrf=False)
     def semi_finished_return_material(self, **kw):
@@ -1049,7 +1073,7 @@ class LinklovingAppApi(http.Controller):
                                               res_data={'error' : _("MO not found")})
         return_lines = []
         if all(stock_move.get("return_qty") == 0 for stock_move in stock_move_ids):
-            mrp_production.write({'state': 'waiting_post_inventory'})
+            mrp_production.write({'state': 'done'})
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
         if not is_check:
@@ -1093,14 +1117,15 @@ class LinklovingAppApi(http.Controller):
                 move = request.env['stock.move'].sudo().create(returun_material_obj._prepare_move_values(r))
                 move.action_done()
 
-            location = request.env["stock.location"].sudo().search([("is_circulate_location", "=", True)], limit=1)
-            if location and location.putaway_strategy_id and location.putaway_strategy_id.fixed_location_ids:
-                fixed_location_ids = location.putaway_strategy_id.fixed_location_ids
-
-                if mrp_production.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:  # 半成品入库
-                    mrp_production.write({'state': 'done'})
-                else:
-                    mrp_production.write({'state': 'waiting_post_inventory'})
+            mrp_production.write({'state': 'done'})
+            #
+            # location = request.env["stock.location"].sudo().search([("is_circulate_location", "=", True)], limit=1)
+            # if location and location.putaway_strategy_id and location.putaway_strategy_id.fixed_location_ids:
+            #     fixed_location_ids = location.putaway_strategy_id.fixed_location_ids
+            #
+            #     if mrp_production.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:  # 半成品入库
+            #     else:
+            #         mrp_production.write({'state': 'waiting_post_inventory'})
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
@@ -1115,6 +1140,9 @@ class LinklovingAppApi(http.Controller):
         return_material_obj = return_material_model.sudo().search([('production_id', '=', order_id),
                                                                    ('state', '=', 'draft')])
 
+        if not return_lines:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={"error": u"退料单异常,请在网页端操作"})
         return_lines[0]['product_ids'] = []
         data = []
         for return_line in return_material_obj.return_ids:
@@ -1127,18 +1155,43 @@ class LinklovingAppApi(http.Controller):
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=data)
 
+    @http.route('/linkloving_app_api/get_feedback_detail', type='json', auth='none', csrf=False)
+    def get_feedback_detail(self, **kw):
+        feedback_id = request.jsonrequest.get('feedback_id')
+        feedback = request.env["mrp.qc.feedback"].sudo().browse(feedback_id)
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=self.convert_qc_feedback_to_json(feedback))
+
     @http.route('/linkloving_app_api/get_qc_feedback', type='json', auth='none', csrf=False)
     def get_qc_feedback(self, **kw):
+        limit = request.jsonrequest.get("limit")
+        offset = request.jsonrequest.get("offset")
         order_id = request.jsonrequest.get('order_id')
-        production_order = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
-        if not production_order:
-            return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error':_("MO not found")})
+        state = request.jsonrequest.get('state')
+        if order_id:
+            feedbacks = request.env["mrp.production"].sudo().browse(order_id).qc_feedback_ids
+        if state:
+            feedbacks = request.env["mrp.qc.feedback"].sudo().search([("state", '=', state)],
+                                                                     limit=limit,
+                                                                     offset=offset,
+                                                                     order='production_id desc')
         # if not production_order.qc_feedback_id:
         json_list = []
-        for qc_feedback in production_order.qc_feedback_ids:
-            data = {
-                'production_id': order_id,
+        for qc_feedback in feedbacks:
+            json_list.append(self.convert_qc_feedback_to_json(qc_feedback))
+
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=json_list)
+
+    def convert_qc_feedback_to_json(self, qc_feedback):
+        data = {
+            'feedback_id': qc_feedback.id,
+            'name': qc_feedback.name,
+            'production_id': {
+                "order_id": qc_feedback.production_id.id,
+                "display_name": qc_feedback.production_id.display_name
+            },
+            'state': qc_feedback.state,
                 'qty_produced': qc_feedback.qty_produced,
                 'qc_test_qty': qc_feedback.qc_test_qty,
                 'qc_rate': qc_feedback.qc_rate,
@@ -1146,32 +1199,30 @@ class LinklovingAppApi(http.Controller):
                 'qc_fail_rate': qc_feedback.qc_fail_rate,
                 'qc_note': qc_feedback.qc_note or '',
                 'qc_img': LinklovingAppApi.get_qc_img_url(qc_feedback.qc_imgs.ids),
-            }
-            json_list.append(data)
-        return JsonResponse.send_response(STATUS_CODE_OK,
-                                          res_data=json_list)
-
+        }
+        return data
     #生产完成入库
     @http.route('/linkloving_app_api/produce_done', type='json', auth='none', csrf=False)
     def produce_done(self, **kw):
-        order_id = request.jsonrequest.get('order_id')  # get paramter
-        mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
-        if not mrp_production:
+        feedback_id = request.jsonrequest.get('feedback_id')  # get paramter
+        feedback = LinklovingAppApi.get_model_by_id(feedback_id, request, 'mrp.qc.feedback')
+        if not feedback:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error' : _("MO not found")})
-        if mrp_production.is_split_done:
-            mrp_production.post_inventory()
-            mrp_production.state = "progress"
-        else:
-            mrp_production.button_mark_done()
-
+                                              res_data={'error': u"未找到对应的品检单"})
+        try:
+            feedback.action_post_inventory()
+        except UserError, e:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={"error": e.name})
 
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
-        ),notification=mrp_production.product_id.name,body=_("Qty:%d,Post Inventory Finish") % (mrp_production.qty_produced))
+        ),
+                notification=feedback.production_id.product_id.name,
+                body=_("Qty:%d,Post Inventory Finish") % (feedback.qty_produced))
 
         return JsonResponse.send_response(STATUS_CODE_OK,
-                                          res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
+                                          res_data=self.convert_qc_feedback_to_json(feedback))
 
     #根据id 和model  返回对应的实例
     @classmethod
@@ -1245,7 +1296,7 @@ class LinklovingAppApi(http.Controller):
             'origin' : production.origin,
             'cur_location': None,
             'stock_move_lines' : stock_move,
-            'qty_produced' : production.qty_produced,
+            'qty_produced': production.qty_unpost,
             'process_id' : {
                 'process_id' : production.process_id.id,
                 'name' : production.process_id.name,
@@ -1257,6 +1308,10 @@ class LinklovingAppApi(http.Controller):
             },
             'prepare_material_img': LinklovingAppApi.get_prepare_material_img_url(production.id),
             'is_pending' :  production.is_pending,
+            'feedback_on_rework': {
+                'feedback_id': production.feedback_on_rework.id,
+                'name': production.feedback_on_rework.name or None,
+            }
         }
         return data
     @classmethod

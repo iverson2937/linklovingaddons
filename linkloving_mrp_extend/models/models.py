@@ -192,13 +192,14 @@ class MrpProductionExtend(models.Model):
 
     qc_feedback_ids = fields.One2many('mrp.qc.feedback', 'production_id')
     qty_unpost = fields.Float(string=u"已生产的数量", compute="_compute_qty_unpost")
-    is_on_rework = fields.Boolean(string=u"是否在返工中", )
+    feedback_on_rework = fields.Many2one("mrp.qc.feedback", u"返工单", track_visibility='onchange')
 
     @api.multi
     def _compute_qty_unpost(self):
         for production in self:
             feedbacks = production.qc_feedback_ids.filtered(lambda x: x.state not in ["check_to_rework"])
             production.qty_unpost = sum(feedbacks.mapped("qty_produced"))
+
 
     @api.multi
     def _get_qc_feedback_count(self):
@@ -232,6 +233,7 @@ class MrpProductionExtend(models.Model):
     def create(self, vals):
         res = super(MrpProductionExtend, self).create(vals)
         self._compute_sim_stock_move_lines(res)
+        res._compute_location_ids()
         return res
 
     @api.multi
@@ -272,11 +274,12 @@ class MrpProductionExtend(models.Model):
     def _compute_location_ids(self):
         for mo in self:
             ids = []
+
             for move in mo.move_raw_ids:
                 for fix_location_id in move.product_id.categ_id.fixed_location_ids:
                     for location_id in fix_location_id.putaway_id.location_ids:
                         ids.append(location_id.id)
-
+            print ids, 'sssssssssssssssss'
             mo.location_ids = [(6, 0, set(ids))]
 
     # 备料信息
@@ -377,14 +380,19 @@ class MrpProductionExtend(models.Model):
         view = self.env.ref('linkloving_mrp_extend.stock_return_material_form_view2')
         if not need_create_one:
             return_obj = self.env['mrp.return.material'].search([('production_id', '=', self.id),
-                                                                 ('state', '=', 'draft')])[0]
-            res = {'type': 'ir.actions.act_window',
-                   'res_model': 'mrp.return.material',
-                   'view_mode': 'form',
-                   'view_id': view.id,
-                   'res_id': return_obj.id,
-                   'target': 'new'
-                   }
+                                                                 ('state', '=', 'draft')])
+            if return_obj:
+
+                res = {'type': 'ir.actions.act_window',
+                       'res_model': 'mrp.return.material',
+                       'view_mode': 'form',
+                       'view_id': view.id,
+                       'res_id': return_obj.id,
+                       'target': 'new'
+                       }
+            else:
+                self.state = "done"
+                res = {}
         else:
             res = {'type': 'ir.actions.act_window',
                    'res_model': 'mrp.return.material',
@@ -449,7 +457,7 @@ class MrpProductionExtend(models.Model):
         if self.qty_unpost <= self.product_qty and self.production_order_type == 'ordering':
             raise UserError(_('You have to complete the order before close it!'))
         else:
-            if self.is_on_rework:  # 生产完成, 但是还在返工中 说明此次返工还没产出
+            if self.feedback_on_rework:  # 生产完成, 但是还在返工中 说明此次返工还没产出
                 raise UserError(u"该单据还在返工中,请先产出数量")
             # 生产完成 结算工时
             self.worker_line_ids.change_worker_state('outline')
@@ -650,9 +658,20 @@ class MrpProductionExtend(models.Model):
 
         """
         state = self._context.get('state')
-        if state and state in ['finish_prepare_material', 'already_picking', 'progress', 'waiting_rework', 'rework_ing',
+        feedback_on_rework = self._context.get("feedback_on_rework")
+        if state and state in ['finish_prepare_material', 'already_picking', 'waiting_rework',
                                'waiting_inventory_material']:
+
             return [('state', '=', state), ('in_charge_id', '=', self.env.user.partner_id.id)]
+        elif state == "progress":
+            if not feedback_on_rework:
+                return [('state', '=', 'progress'),
+                        ('in_charge_id', '=', self.env.user.partner_id.id),
+                        ('feedback_on_rework', '=', None)]
+            else:
+                return [('state', '=', "progress"),
+                        ('in_charge_id', '=', self.env.user.partner_id.id),
+                        ('feedback_on_rework', '!=', None)]
         else:
             return [('state', '=', state)]
 
@@ -762,49 +781,27 @@ class MrpProductionProduceExtend(models.TransientModel):
     @api.model
     def default_get(self, fields):
         res = super(MrpProductionProduceExtend, self).default_get(fields)
-        production = self.env['mrp.production'].browse(self._context['active_id'])
+        if res.get('production_id'):
+            production = self.env['mrp.production'].browse(res.get('production_id'))
+        else:
+            production = self.env['mrp.production'].browse(self._context.get('active_id'))
         quantity = production.product_qty - production.qty_unpost
         quantity = quantity if (quantity > 0) else 0
         res["product_qty"] = quantity
         return res
-
     @api.multi
     def do_produce(self):
         quantity = self.product_qty
         if float_compare(quantity, 0, precision_rounding=self.product_uom_id.rounding) > 0:
-            self.production_id.is_on_rework = False
-            self.feedback_create(self.product_qty)  # 产出  生成品检单
-        return {'type': 'ir.actions.act_window_close'}
-        # moves = self.production_id.move_finished_ids.filtered(lambda x: x.id != )
-        #
-        # qty_split = move.product_uom._compute_quantity(move.product_uom_qty - move.quantity_done, move.product_id.uom_id)
-        # new_move = move.split(qty_split)
-        # Nothing to do for lots since values are created using default data (stock.move.lots)
-        # moves = self.production_id.move_raw_ids
-        quantity = self.product_qty
-        if float_compare(quantity, 0, precision_rounding=self.product_uom_id.rounding) <= 0:
-            raise UserError(_('You should at least produce some quantity'))
-            # for move in moves.filtered(lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel')):
-            #     if move.unit_factor:
-            #         qty = quantity * move.unit_factor
-            #         if qty > move.product_uom_qty:
-            #             move.quantity_done_store += move.product_uom_qty
-            #         else:
-            #             move.quantity_done_store += qty
-            # move.action_done()
-            # self.production_id.post_inventory()
-            # if move.product_id.virtual_available < 0:
-            #     move.quantity_done_store = move.quantity_done_store / (1 + move.bom_line_id.scrap_rate / 100)
-        moves = self.production_id.move_finished_ids.filtered(
-            lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel'))
-        for move in moves:
-            if move.product_id.id == self.production_id.product_id.id:
-                move.quantity_done_store += quantity
-            elif move.unit_factor:
-                move.quantity_done_store += quantity * move.unit_factor
-        self.check_finished_move_lots()
-        if self.production_id.state == 'confirmed':
-            self.production_id.state = 'progress'
+            feedback = self.feedback_create(self.product_qty)  # 产出  生成品检单
+            self.production_id.feedback_on_rework = False
+            location = self.env["stock.location"].sudo().search([("is_circulate_location", "=", True)], limit=1)
+            if location and location.putaway_strategy_id and location.putaway_strategy_id.fixed_location_ids:
+                fixed_location_ids = location.putaway_strategy_id.fixed_location_ids
+
+                if self.production_id.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:  # 半成品入库
+                    feedback.action_post_inventory()
+
         return {'type': 'ir.actions.act_window_close'}
 
     def do_produce_and_post_inventory(self):
@@ -823,7 +820,7 @@ class MrpProductionProduceExtend(models.TransientModel):
             # if move.product_id.virtual_available < 0:
             #     move.quantity_done_store = move.quantity_done_store / (1 + move.bom_line_id.scrap_rate / 100)
         moves = self.production_id.move_finished_ids.filtered(
-            lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel'))
+                lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel'))
         for move in moves:
             if move.product_id.id == self.production_id.product_id.id:
                 move.quantity_done_store += quantity
@@ -843,12 +840,12 @@ class MrpProductionProduceExtend(models.TransientModel):
             feedback_draft = self.production_id.qc_feedback_ids.filtered(lambda x: x.state == 'draft')
             draft_sum_qty += sum(feedback_draft.mapped("qty_produced"))
         feedback = self.env['mrp.qc.feedback'].create({
+            'feedback_backorder_id': self.production_id.feedback_on_rework.id,
             'qty_produced': draft_sum_qty,
             'production_id': self.production_id.id,
         })
         feedback_draft.unlink()
         return feedback
-
 
 class ReturnOfMaterial(models.Model):
     _name = 'mrp.return.material'
@@ -1028,6 +1025,8 @@ class SimStockMove(models.Model):
     def _compute_product_type(self):
         circulate_location = self.env["stock.location"].search([("is_circulate_location", "=", True)], limit=1)
         semi_finished_location = self.env["stock.location"].search([("is_semi_finished_location", "=", True)], limit=1)
+        fixed_location_ids = self.env["stock.fixed.putaway.strat"]
+        semi_finished_fixed_location_ids = self.env["stock.fixed.putaway.strat"]
         if circulate_location and circulate_location.putaway_strategy_id and circulate_location.putaway_strategy_id.fixed_location_ids:
             fixed_location_ids = circulate_location.putaway_strategy_id.fixed_location_ids
         if semi_finished_location and semi_finished_location.putaway_strategy_id and semi_finished_location.putaway_strategy_id.fixed_location_ids:
@@ -1039,6 +1038,7 @@ class SimStockMove(models.Model):
                 sim.product_type = "real_semi_finished"  # 半成品
             else:
                 sim.product_type = "material"
+
 
     product_id = fields.Many2one('product.product', )
     production_id = fields.Many2one('mrp.production')
@@ -1201,6 +1201,7 @@ class MrpQcFeedBack(models.Model):
             else:
                 qc.qc_fail_rate = 0
 
+    name = fields.Char('Name', index=True, required=True)
     production_id = fields.Many2one('mrp.production')
     qty_produced = fields.Float()
     qc_test_qty = fields.Float(string='Sampling Quantity')
@@ -1215,6 +1216,7 @@ class MrpQcFeedBack(models.Model):
     qc_imgs = fields.One2many(comodel_name="qc.feedback.img", inverse_name="feedback_id", string="品检图片",
                               required=False, )
 
+    feedback_backorder_id = fields.Many2one("mrp.qc.feedback", u"返工于")
     state = fields.Selection(string=u"状态", selection=[('draft', u'等待品检'),
                                                       ('qc_ing', u'品检中'),
                                                       ('qc_success', u'等待入库'),
@@ -1223,6 +1225,10 @@ class MrpQcFeedBack(models.Model):
                                                       ('alredy_post_inventory', u'已入库')], required=False,
                              default='draft')
 
+    @api.model
+    def create(self, vals):
+        vals['name'] = self.env['ir.sequence'].next_by_code('mrp.qc.feedback') or 'New'
+        return super(MrpQcFeedBack, self).create(vals)
     # 等待品捡 -> 品捡中
     def action_start_qc(self):
         self.state = "qc_ing"
@@ -1247,7 +1253,7 @@ class MrpQcFeedBack(models.Model):
     # 品捡成功 -> 已入库
     def action_post_inventory(self):
         self.state = "alredy_post_inventory"
-        mrp_product_produce = self.env['mrp.product.produce']
+        mrp_product_produce = self.env['mrp.product.produce'].with_context({'active_id': self.production_id.id})
         produce = mrp_product_produce.create({
             'product_qty': self.qty_produced,
             'production_id': self.production_id.id,
@@ -1262,7 +1268,9 @@ class MrpQcFeedBack(models.Model):
         if self.production_id.state == "waiting_rework":
             self.state = "check_to_rework"
             self.production_id.state = "progress"
-            self.production_id.is_on_rework = True
+            self.production_id.feedback_on_rework = self
+        else:
+            raise UserError(u"请先完成生产单,才能进行返工")
 
     @api.model
     def _needaction_domain_get(self):
@@ -1273,7 +1281,6 @@ class MrpQcFeedBack(models.Model):
         state = self._context.get('state')
 
         return [('state', '=', state)]
-
 
 class MrpQcFeedBackImg(models.Model):
     _name = "qc.feedback.img"
@@ -1440,14 +1447,14 @@ class StockLocationExtend(models.Model):
 
     def get_semi_finished_location_by_user(self, user_id):
         locations = self.env["stock.location"].search([('user_ids', 'in', [user_id]),
-                                                       ('is_semi_finished_location', '=', True)])
+                                                       ])
         return locations
 
 
 class ProductCategoryExtend(models.Model):
     _inherit = 'product.category'
 
-    fixed_location_ids = fields.One2many("stock.fixed.putaway.strat", "fixed_location_id")
+    fixed_location_ids = fields.One2many("stock.fixed.putaway.strat", "category_id")
 
 
 class ProductPutawayExtend(models.Model):
