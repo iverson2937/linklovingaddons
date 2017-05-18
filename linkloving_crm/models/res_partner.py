@@ -56,5 +56,5 @@ class CrmRemarkRecord(models.Model):
 
     subject = fields.Char(u'主题')
     partner_id = fields.Many2one('res.partner', u'客户')
-    minuciosidad = fields.Text(string=u'详细')
-    reality_time = fields.Date(string=u'真实时间')
+    detail = fields.Text(string=u'详细')
+    real_time = fields.Date(string=u'日期')

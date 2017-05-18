@@ -59,12 +59,13 @@
                         <group>
                             <group>
                                 <field name="subject"/>
-                                <field name="minuciosidad"/>
+
                             </group>
                             <group>
                                 <field name="partner_id"/>
-                                <field name="reality_time"/>
+                                <field name="real_time"/>
                             </group>
+                            <field name="detail"/>
                         </group>
                     </sheet>
                 </form>
@@ -77,11 +78,10 @@
             <field name="model">crm.remark.record</field>
             <field name="arch" type="xml">
                 <tree string="备注记录">
-                    <field name="subject"/>
-                    <field name="minuciosidad"/>
                     <field name="partner_id"/>
-                    <field name="reality_time"/>
-                    <field name="create_date" string="创建时间"/>
+                    <field name="subject"/>
+                    <field name="real_time"/>
+                    <field name="detail"/>
                 </tree>
             </field>
         </record>
@@ -96,8 +96,8 @@
         </record>
 
 
-        <record id="res_partner_view_buttons" model="ir.ui.view">
-            <field name="name">res.partner.view.buttons</field>
+        <record id="res_partner_view_record" model="ir.ui.view">
+            <field name="name">res.partner.view.record</field>
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="priority" eval="20"/>
@@ -106,7 +106,7 @@
                 <div name="button_box" position="inside">
                     <button class="oe_stat_button" type="action" name="%(linkloving_crm.crm_remark_action_tree)d"
                             icon="fa-book">
-                        <field string="备注" name="remark_count" widget="statinfo"/>
+                        <field string="记录" name="remark_count" widget="statinfo"/>
                     </button>
                 </div>
             </field>
