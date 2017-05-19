@@ -21,10 +21,30 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             'click .add_product_lis': 'chose_li_to_input',
             'click .bom_modify_submit': 'bom_modify_submit',
             'input .add_product_input': 'when_input_is_on',
-            'dblclick .product_name': 'modify_product_fn',
+            'click .product_edit': 'modify_product_fn',
             'click .delete_product': 'delete_product_fn',
             'click .product_copy': 'copy_product_fn',
-            'click .bom_back': 'bom_back_fn'
+            'click .bom_back': 'bom_back_fn',
+            'click .product_name': 'to_bom_line_page'
+        },
+        to_bom_line_page:function (e) {
+            var e = e||window.event;
+            var target = e.target||e.srcElement;
+            console.log($(target).attr("data-templ-id"));
+            if($(target).attr("data-templ-id")==undefined){
+               target = $(target).parent();
+            }
+            var action = {
+                name:"产品",
+                type: 'ir.actions.act_window',
+                res_model:'product.template',
+                view_type: 'form',
+                view_mode: 'tree,form',
+                views: [[false, 'form']],
+                res_id: parseInt($(target).attr("data-templ-id")),
+                target:"new"
+            };
+            this.do_action(action);
         },
         bom_back_fn:function () {
             var action = {
@@ -42,7 +62,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
         copy_product_fn:function () {
             var e = e || window.event;
             var target = e.target || e.srcElement;
-            var last_product_name = $(target).prev().prev().text();
+            var last_product_name = $(target).prev().prev().children().text();
             var last_product_id = $(target).prev().prev().attr("data-product-id");
             var last_id = $(target).prev().prev().attr("data-id");
             var wraper = target.parentNode.parentNode.parentNode;
@@ -54,7 +74,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             divs.classList.add("panel-heading");
             divs.innerHTML = '<h4 class="panel-title"><div class="add_product_input_wraper"><input id='+last_id+' data-product-id='+last_product_id+' class="copy_product_input" type="text"/>' +
                 '<input class="product_propor" style="margin-left: 15px" type="text"/>'+
-                '<span class="fa fa-trash-o delete_product" style="margin-left: 15px"></span>'+
+                // '<span class="fa fa-trash-o delete_product" style="margin-left: 15px"></span>'+
                 '</div></h4>';
 
             wraper.insertBefore(divs,inset_before);
@@ -96,6 +116,8 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
         modify_product_fn:function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
+            target = target.parentNode.firstChild.nextElementSibling.nextElementSibling;
+            console.log(target);
             var last_product_name = target.innerText;
             var last_product_id = target.getAttribute("data-product-id");
             var last_id = target.getAttribute("data-id");
@@ -304,9 +326,9 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                     .call("get_bom", [this.bom_id])
                     .then(function (result) {
                         console.log(result);
-                        self.$el.append(QWeb.render('bom_tree', {result: result}))
-                        console.log(self.$el.attr("data-bom-id", result.bom_id))
-                        self.$el.attr("data-delete-products","")
+                        self.$el.append(QWeb.render('bom_tree', {result: result}));
+                        self.$el.attr("data-bom-id", result.bom_id);
+                        self.$el.attr("data-delete-products","");
                     })
             }
         }

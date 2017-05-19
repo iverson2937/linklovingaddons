@@ -73,3 +73,6 @@
     z-index: 100;
     width: calc(100% - 236px);
 }
+.o_content .o_form_sheet{
+    margin:100px auto!important;
+}
