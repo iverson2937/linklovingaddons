@@ -81,9 +81,9 @@ class BomUpdateWizard(models.TransientModel):
                     if temp_new_product_id:
                         tmp_id = product_tmpl_obj.browse(temp_new_product_id)
                         update_bom_line_copy(new_bom_id, tmp_id.product_variant_ids[0].id, temp_old_product_id)
-                    temp_new_product_id = new_product_tmpl_id.id
-                    temp_old_product_id = old_line_id.product_id.id
-
+                    if new_product_tmpl_id and old_line_id:
+                        temp_new_product_id = new_product_tmpl_id.id
+                        temp_old_product_id = old_line_id.product_id.id
 
                     if modify_type == 'add':
                         if product_id:
@@ -166,6 +166,15 @@ class BomUpdateWizard(models.TransientModel):
                             'product_id': int(product_id),
                             'product_qty': qty,
                         })
+                elif modify_type == 'copy':
+                    name_product_name = val.get('copy_name')
+                    if name_product_name:
+                        new_default_code = self.get_next_default_code(
+                            product_id_obj.browse(product_id).default_code)
+                        new_product_id = product_id_obj.browse(product_id).product_tmpl_id.copy(
+                            {'name': name_product_name, 'default_code': new_default_code})
+                        last_bom_line_id = line_obj.browse(int(last_bom_line_id))
+                        last_bom_line_id.product_id = new_product_id.product_variant_ids[0].id
 
                 # 直接删除line无需添加
                 elif modify_type == 'del':
