@@ -154,6 +154,7 @@ class AccountPayment(models.Model):
     _inherit = 'account.payment'
     team_id = fields.Many2one('crm.team', related='partner_id.team_id')
     customer = fields.Boolean(related='partner_id.customer')
+    origin = fields.Char(string=u'源单据')
 
     @api.onchange('partner_type')
     def _onchange_partner_type(self):
