@@ -12,7 +12,7 @@
     display: inline-block!important;
 }
 #accordion .product_propor{
-    width: 20px!important;
+    width: 30px!important;
     display: inline-block!important;
 }
 .add_product_input_wraper>ul{
@@ -49,4 +49,7 @@
 }
 #accordion .bom_modify_submit{
     margin-top: -15px;
+}
+#accordion .product_name{
+    cursor: pointer;
 }
