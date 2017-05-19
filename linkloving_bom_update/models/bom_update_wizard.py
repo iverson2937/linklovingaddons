@@ -25,7 +25,7 @@ class BomUpdateWizard(models.TransientModel):
 
         if not update:
             for val in vals:
-                temp_product_id = False
+                temp_new_product_id = temp_old_product_id = False
                 product_id = val.get('product_id')
                 parents = val.get('parents')
                 modify_type = val.get('modify_type')
@@ -77,10 +77,13 @@ class BomUpdateWizard(models.TransientModel):
                                 products.get('bom').get('new_product_tmpl_id'))
                             new_bom_id = bom_obj.browse(products.get('bom').get('new_bom_id'))
 
-                    if temp_product_id:
-                        tmp_id = product_tmpl_obj.browse(temp_product_id)
-                        update_bom_line_copy(new_bom_id, tmp_id.product_variant_ids[0].id, old_line_id.product_id)
-                    temp_product_id = new_product_tmpl_id.id
+                    # 循环把copy的new bom 中的bom line 的 product_id 为就产品的bom line 替换掉
+                    if temp_new_product_id:
+                        tmp_id = product_tmpl_obj.browse(temp_new_product_id)
+                        update_bom_line_copy(new_bom_id, tmp_id.product_variant_ids[0].id, temp_old_product_id)
+                    temp_new_product_id = new_product_tmpl_id.id
+                    temp_old_product_id = old_line_id.product_id.id
+
 
                     if modify_type == 'add':
                         if product_id:
@@ -184,7 +187,7 @@ class BomUpdateWizard(models.TransientModel):
         versions = []
         for product in products:
             versions.append(int(product.default_code.split('.')[-1]))
-        version = ('000' + str(int(max(versions)) + 1))[-2:]
+        version = ('000' + str(int(max(versions)) + 1))[-3:]
         new_code = prefix + version
         return new_code
 
@@ -192,7 +195,7 @@ class BomUpdateWizard(models.TransientModel):
 def update_bom_line_copy(new_bom_id, new_product_id, old_product_id):
     if new_product_id:
         for line in new_bom_id.bom_line_ids:
-            if line.product_id.id == old_product_id.id:
+            if line.product_id.id == old_product_id:
                 line.product_id = new_product_id
                 return True
 
