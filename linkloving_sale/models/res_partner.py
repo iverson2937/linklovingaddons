@@ -5,6 +5,15 @@
 ##############################################################################
 from odoo import fields, api, models
 
+AVAILABLE_PRIORITIES = [
+    ('0', 'badly'),
+    ('1', 'Low'),
+    ('2', 'Normal'),
+    ('3', 'High'),
+    ('4', 'Very High'),
+    ('5', 'top level'),
+]
+
 
 class Partner(models.Model):
     """"""
@@ -20,17 +29,28 @@ class Partner(models.Model):
 
     team_id = fields.Many2one('crm.team')
     source_id = fields.Many2one('res.partner.source')
+
     level = fields.Selection([
         (1, u'lst'),
         (2, u'2nd'),
         (3, u'3rd')
     ], string=u'Customer Level', default=1)
+
+    priority = fields.Selection(AVAILABLE_PRIORITIES, string=u'客户星级', index=True, default=AVAILABLE_PRIORITIES[0][0])
+
     internal_code = fields.Char(string=u'编号')
     x_qq = fields.Char(string=u'Instant Messaging')
 
     _sql_constraints = [
         ('internal_code_uniq', 'unique (internal_code)', 'The No must be unique!')
     ]
+
+    # @api.onchange('priority')
+    # def _priority_default(self):
+    #     for partner_data in self:
+    #         data = self.env['crm.lead'].search([('partner_id', '=', partner_data.id)])
+    #         if data:
+    #             data.write({'priority': partner_data.priority})
 
     @api.model
     def create(self, vals):
