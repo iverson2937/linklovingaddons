@@ -28,7 +28,7 @@ class MrpBom(models.Model):
             'product_id': self.product_tmpl_id.id,
             'product_tmpl_id': self.product_tmpl_id.id,
             'name': self.product_tmpl_id.name,
-            'code': self.product_tmpl_id.product_code,
+            'code': self.product_tmpl_id.default_code,
             'process_id': self.process_id.name,
             'bom_ids': res
         }
@@ -53,6 +53,7 @@ class MrpBom(models.Model):
             'name': line.product_id.name,
             'product_id': line.product_id.id,
             'product_tmpl_id': line.product_id.product_tmpl_id.id,
+            'is_highlight': line.is_highlight,
             'id': line.id,
             'code': line.product_id.default_code,
             'uuid': str(uuid.uuid1()),
@@ -85,6 +86,7 @@ def _get_rec(object, level, qty=1.0, uom=False):
             'product_tmpl_id': l.product_id.product_tmpl_id.id,
             'code': l.product_id.default_code,
             'uuid': str(uuid.uuid1()),
+            'is_highlight': l.is_highlight,
             'id': l.id,
             'qty': l.product_qty,
             'process_id': process_id,
@@ -97,6 +99,7 @@ def _get_rec(object, level, qty=1.0, uom=False):
 
 class MrpBomLine(models.Model):
     _inherit = 'mrp.bom.line'
+    is_highlight = fields.Boolean()
 
 
 

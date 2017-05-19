@@ -194,7 +194,6 @@ def update_bom_line_copy(new_bom_id, new_product_id, old_product_id):
         for line in new_bom_id.bom_line_ids:
             if line.product_id.id == old_product_id.id:
                 line.product_id = new_product_id
-                print 'dddddddddddddddddddddddd'
                 return True
 
 
