@@ -286,6 +286,12 @@
                 <xpath expr="//field[@name='payment_date']" position="replace">
                     <field name="payment_date"/>
                 </xpath>
+                <xpath expr="//field[@name='payment_date']" position="replace">
+                    <field name="payment_date"/>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="attributes">
+                    <attribute name="attrs">{'required': [('state', 'in', ['confirm'])]}</attribute>
+                </xpath>
 
                 <xpath expr="//field[@name='partner_id']" position="after">
                     <field name="customer" invisible="1"/>
@@ -294,6 +300,26 @@
                 </xpath>
             </field>
         </record>
+        <record id="account.action_account_payments" model="ir.actions.act_window">
+            <field name="name">Payments</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,graph</field>
+            <field name="context">{'default_payment_type': 'inbound','to_sales':True}</field>
+            <field name="domain">[('partner_type', '=', 'customer')]</field>
+            <field name="view_id" ref="account.view_account_payment_tree"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to register a payment
+                </p>
+                <p>
+                    Payments are used to register liquidity movements (send, collect or transfer money).
+                    You can then process those payments by your own means or by using installed facilities.
+                </p>
+            </field>
+        </record>
+
+
     </data>
 </openerp>
 

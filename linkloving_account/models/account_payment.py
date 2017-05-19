@@ -154,7 +154,9 @@ class AccountPayment(models.Model):
     _inherit = 'account.payment'
     team_id = fields.Many2one('crm.team', related='partner_id.team_id')
     customer = fields.Boolean(related='partner_id.customer')
-    origin = fields.Char(string=u'源单据')
+    state = fields.Selection(selection_add=[('confirm', u'销售确认')])
+
+    # origin = fields.Char(string=u'源单据')
 
     @api.onchange('partner_type')
     def _onchange_partner_type(self):
@@ -234,5 +236,7 @@ class AccountPayment(models.Model):
             # add by allen
             for balance in rec.invoice_ids.balance_ids:
                 balance.state = 1
-
-            rec.write({'state': 'posted', 'move_name': move.name})
+            state = 'post'
+            if self._context.get('to_sales'):
+                state = 'confirm'
+            rec.write({'state': state, 'move_name': move.name})
