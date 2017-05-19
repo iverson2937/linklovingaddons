@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//field[@name='country_id']" position="after">
-                    <field name="continent" placeholder="大州"/>
+                    <field name="continent" placeholder="大洲"/>
                 </xpath>
                 <!--右-->
                 <xpath expr="//field[@name='tag_ids']" position="after">
@@ -34,15 +34,21 @@
                 <!--左-->
 
                 <xpath expr="//field[@name='team_id']" position="after">
-                    <field name="source"/>
+                    <field name="crm_source_id" options="{'no_create': True}"/>
                 </xpath>
-                <xpath expr="//field[@name='source']" position="after">
+                <xpath expr="//field[@name='crm_source_id']" position="after">
                     <field name="express_sample_record"/>
                 </xpath>
 
 
-                <xpath expr="//field[@name='express_sample_record']" position="after">
-                    <field name="interested_in_product"/>
+                <!--<xpath expr="//field[@name='express_sample_record']" position="after">-->
+                <!---->
+                <!--</xpath>-->
+
+                <xpath expr="//page[@name='extra']" position="after">
+                    <page string="商品">
+                        <field name="interested_in_product"/>
+                    </page>
                 </xpath>
 
 
@@ -110,6 +116,67 @@
                 </div>
             </field>
         </record>
+
+        <!--crm.lead.source-->
+        <record model="ir.ui.view" id="view_crm_lead_source_form">
+            <field name="name">crm.lead.source.form</field>
+            <field name="model">crm.lead.source</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <field name="detail"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_crm_lead_source_tree" model="ir.ui.view">
+            <field name="name">crm.lead.source.tree</field>
+            <field name="model">crm.lead.source</field>
+            <field name="arch" type="xml">
+                <tree string="备注记录">
+                    <field name="name"/>
+                    <field name="detail"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_crm_lead_source" model="ir.actions.act_window">
+            <field name="name">线索来源</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">crm.lead.source</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+
+            <!--<field name="domain">-->
+            <!--[('payment_type','=',2),('state','!=','draft')]-->
+            <!--</field>-->
+            <!--<field name="context">{'posted':True}</field>-->
+            <!--<field name="view_ids" eval="[(5,0,0),-->
+            <!--(0,0,{'view_mode':'tree', 'view_id': ref('account_payment_register_tree_sale')}),-->
+            <!--(0,0,{'view_mode':'form', 'view_id': ref('account_receive_register_form')})]"/>-->
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click add source record.
+                </p>
+                <p>
+                    No source Found!
+                </p>
+            </field>
+        </record>
+
+
+        <!--Receipt*-->
+        <menuitem action="action_crm_lead_source"
+                  id="menu_crm_lead_source"
+                  parent="sales_team.menu_sale_config"
+                  sequence="2" name="线索来源"/>
 
 
     </data>

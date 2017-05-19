@@ -63,8 +63,22 @@
                 <xpath expr="//field[@name='category_id']" position="after">
                     <field name="x_qq"/>
                 </xpath>
+
                 <xpath expr="//field[@name='lang']" position="after">
                     <field name="level" attrs="{'invisible': [('customer','!=', True)]}"/>
+                </xpath>
+
+                <xpath expr="//field[@name='level']" position="after">
+                    <field name="priority" widget="priority"/>
+                </xpath>
+
+
+                <xpath expr="//page[@name='accounting_disabled']" position="after">
+                    <page string="Order Lines">
+                        <group>
+                            <field name="interested_in_product"/>
+                        </group>
+                    </page>
                 </xpath>
 
 

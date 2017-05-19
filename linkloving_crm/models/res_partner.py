@@ -58,3 +58,10 @@ class CrmRemarkRecord(models.Model):
     partner_id = fields.Many2one('res.partner', u'客户')
     detail = fields.Text(string=u'详细')
     real_time = fields.Date(string=u'日期', default=fields.Date.context_today)
+
+
+class CrmLeadSource(models.Model):
+    _name = 'crm.lead.source'
+
+    name = fields.Char(u'来源')
+    detail = fields.Text(string=u'详细')
