@@ -304,6 +304,11 @@
                             attrs="{'invisible': ['|',('availability', 'in', ('assigned', 'none')),('state','not in',('progress'))]}"
                             type="object" groups="linkloving_mrp_extend.group_charge_produce"/>
                 </xpath>
+
+                <xpath expr="//button[@name='%(mrp.action_mrp_production_moves)d']" position="replace">
+                    <button name="%(mrp.action_mrp_production_moves)d" type="action" string="Inventory Moves"
+                            class="oe_stat_button" icon="fa-arrows-v"/>
+                </xpath>
             </field>
         </record>
         <record id="product_product_action" model="ir.actions.act_window">
