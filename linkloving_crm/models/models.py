@@ -2,14 +2,24 @@
 from odoo import models, fields, api
 from odoo import tools
 
+AVAILABLE_PRIORITIES = [
+    ('0', 'badly'),
+    ('1', 'Low'),
+    ('2', 'Normal'),
+    ('3', 'High'),
+    ('4', 'Very High'),
+    ('5', 'top level'),
+]
+
 
 class CrmLead(models.Model):
     _inherit = "crm.lead"
-    source = fields.Char(string=u'来源')
+    crm_source_id = fields.Many2one('crm.lead.source', string=u'来源')
 
     continent = fields.Many2one('crm.continent', string=u'所属大洲')
     express_sample_record = fields.Char(string=u'快递账号')
-    interested_in_product = fields.Char(string=u'感兴趣产品')
+
+    interested_in_product = fields.Many2many('product.template', string=u'感兴趣产品')
 
     communication_identifier = fields.Char(string=u'其他沟通方式')
     qq = fields.Char(string=u'QQ')
@@ -50,7 +60,8 @@ class CrmLead(models.Model):
             'country_id': self.country_id.id,
             'state_id': self.state_id.id,
             'is_company': is_company,
-            'type': 'contact'
+            'type': 'contact',
+            'priority': self.priority
         }
 
         values_company = {
@@ -63,7 +74,7 @@ class CrmLead(models.Model):
             'whatsapp': self.whatsapp,
             'wechat': self.wechat,
             'continent': self.continent.id,
-            'express_sample_record': self.express_sample_record
+            'express_sample_record': self.express_sample_record,
         }
 
         if is_company:
@@ -96,6 +107,9 @@ class CrmLead(models.Model):
         if partner_company:
             return partner_company
         return self._lead_create_contact(self.name, True, False, True)
+
+    priority = fields.Selection(AVAILABLE_PRIORITIES, string='Rating', index=True,
+                                default=AVAILABLE_PRIORITIES[0][0])
 
 
 class CrmContinent(models.Model):

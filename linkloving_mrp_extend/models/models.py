@@ -657,6 +657,11 @@ class MrpProductionExtend(models.Model):
             :return: domain or False is no action
 
         """
+        today_time = fields.datetime.strptime(fields.datetime.strftime(fields.datetime.now(), '%Y-%m-%d'),
+                                              '%Y-%m-%d')
+        one_days_after = datetime.timedelta(days=3)
+        after_day = today_time + one_days_after
+
         state = self._context.get('state')
         feedback_on_rework = self._context.get("feedback_on_rework")
         if state and state in ['finish_prepare_material', 'already_picking', 'waiting_rework',
@@ -667,13 +672,20 @@ class MrpProductionExtend(models.Model):
             if not feedback_on_rework:
                 return [('state', '=', 'progress'),
                         ('in_charge_id', '=', self.env.user.partner_id.id),
-                        ('feedback_on_rework', '=', None)]
+                        ('feedback_on_rework', '=', None),
+                        ('date_planned_start', '<', after_day.strftime('%Y-%m-%d %H:%M:%S'))]
             else:
                 return [('state', '=', "progress"),
                         ('in_charge_id', '=', self.env.user.partner_id.id),
-                        ('feedback_on_rework', '!=', None)]
+                        ('feedback_on_rework', '!=', None),
+                        ('date_planned_start', '<', after_day.strftime('%Y-%m-%d %H:%M:%S'))]
         else:
-            return [('state', '=', state)]
+            locations = self.env["stock.location"].sudo().get_semi_finished_location_by_user(self._context.get("uid"))
+            location_cir = self.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
+            location_domain = locations.ids + location_cir
+            return [('state', '=', state),
+                    ('location_ids', 'in', location_domain),
+                    ('date_planned_start', '<', after_day.strftime('%Y-%m-%d %H:%M:%S'))]
 
 
 class ChangeProductionQty(models.TransientModel):
@@ -808,7 +820,7 @@ class MrpProductionProduceExtend(models.TransientModel):
         quantity = self.product_qty
         if float_compare(quantity, 0, precision_rounding=self.product_uom_id.rounding) <= 0:
             return
-            # raise UserError(_('You should at least produce some quantity'))
+            # raise UserError(u"请填写生产数量!")
             # for move in moves.filtered(lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel')):
             #     if move.unit_factor:
             #         qty = quantity * move.unit_factor

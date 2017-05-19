@@ -38,15 +38,34 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to add a Barcode Nomenclature .
-              </p><p>
-                文件终审人设置
-              </p>
+                <p class="oe_view_nocontent_create">
+                    Click to add a Barcode Nomenclature .
+                </p>
+                <p>
+                    文件终审人设置
+                </p>
             </field>
         </record>
 
-        <menuitem id="final_review_partner_menu" parent="stock.menu_stock_config_settings" action="action_final_review_partner"
-        sequence="50" groups="base.group_no_one"/>
+        <menuitem id="final_review_partner_menu" parent="stock.menu_stock_config_settings"
+                  action="action_final_review_partner"
+                  sequence="50" groups="base.group_no_one"/>
+
+
+        <record id="review_process_wizard_form" model="ir.ui.view">
+            <field name="name">选择下一个审核人</field>
+            <field name="model">review.process.wizard</field>
+            <field name="arch" type="xml">
+                <form string="选择下一个审核人">
+                    <sheet>
+                        <group>
+                            <field name="partner_id"/>
+                            <p>若没有选择下一个的审核人,将直接送往终审人</p>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
     </data>
 </openerp>
