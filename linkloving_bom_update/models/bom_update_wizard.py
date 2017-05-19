@@ -34,6 +34,7 @@ class BomUpdateWizard(models.TransientModel):
                 qty = val.get('qty')
                 to_update_bom_line_ids = parents.split(',')
                 name_product_name = val.get('copy_name')
+                old_line_id = False
 
                 for line in to_update_bom_line_ids:
                     line = int(line)
