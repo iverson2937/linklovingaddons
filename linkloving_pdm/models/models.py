@@ -45,6 +45,18 @@ class ReviewProcess(models.Model):
                 res.append((process.id, u'已审核完毕'))
         return res
 
+    # 开启一次审核流程
+    def create_review_process(self, res_model, res_id):
+            review_id = self.env["review.process"].create({
+                'res_model': self._name,
+                'res_id': self.id,
+            })
+            self.env["review.process.line"].create({
+                'partner_id': self.env.user.partner_id.id,
+                'review_id': review_id.id,
+            })
+            return review_id.id
+
 
 class ReviewProcessLine(models.Model):
     _name = 'review.process.line'
@@ -61,6 +73,29 @@ class ReviewProcessLine(models.Model):
 
     is_last_review= fields.Boolean(default=False)
 
+    def submit_to_next_reviewer(self, to_last_review=False, partner_id=None):
+        is_last_review = False
+        if to_last_review \
+                or partner_id.id == self.env["final.review.partner"].get_final_review_partner_id().id:
+            is_last_review = True
+
+        #新建一个 审核条目 指向下一个审核人员
+        self.env["review.process.line"].create({
+            'partner_id': self.env["final.review.partner"].get_final_review_partner_id().id,
+            'review_id': self.review_id.id,
+            'last_review_line_id': self.id,
+            'is_last_review':is_last_review,
+        })
+        #设置现有的这个审核条目状态等
+        self.review_process_line.write({
+            'review_time': fields.datetime.now(),
+            'state': 'review_ing',#如果不是终审 还有一个
+        })
+
+    #拒绝审核
+    def action_deny(self):
+        pass
+
 class ProductAttachmentInfo(models.Model):
     _name = 'product.attachment.info'
 
@@ -73,18 +108,6 @@ class ProductAttachmentInfo(models.Model):
                 return product_tmpl.product_variant_ids[0].id
             else:
                 return res_id
-
-    def _create_review_process(self):
-        if not self.review_id:
-            review_id = self.env["review.process"].create({
-                'res_model': self._name,
-                'res_id': self.id,
-            })
-            self.env["review.process.line"].create({
-                'partner_id': self.env.user.partner_id.id,
-                'review_id': review_id.id,
-            })
-            return review_id.id
 
 
     file_name = fields.Char(u"文件名")
@@ -135,7 +158,8 @@ class ProductAttachmentInfo(models.Model):
     @api.multi
     def action_send_to_review(self):
         self._check_file_or_remote_path()
-        self._create_review_process()
+        if not self.review_id:
+            self.env["review.process"].create_review_process('product.attachment.info', self.id)
         self.write({
             'state': 'review_ing',
         })
@@ -187,22 +211,8 @@ class ReviewProcessWizard(models.TransientModel):
     def action_pass(self):
         to_last_review = self._context.get("to_last_review")#是否送往终审
 
-        is_last_review = False
-        if to_last_review or self.partner_id.id == self.env["final.review.partner"].get_final_review_partner_id().id:
-            is_last_review = True
-
-        #新建一个 审核条目 指向下一个审核人员
-        self.env["review.process.line"].create({
-            'partner_id': self.env["final.review.partner"].get_final_review_partner_id().id,
-            'review_id': self.review_process_line.review_id.id,
-            'last_review_line_id': self.review_process_line.id,
-            'is_last_review':is_last_review,
-        })
-        #设置现有的这个审核条目状态等
-        self.review_process_line.write({
-            'review_time': fields.datetime.now(),
-            'state': 'review_ing',#如果不是终审 还有一个
-        })
+        self.review_process_line.submit_to_next_reviewer(to_last_review=to_last_review,
+                                                         partner_id=self.partner_id)
 
 
 

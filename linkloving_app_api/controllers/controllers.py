@@ -257,10 +257,8 @@ class LinklovingAppApi(http.Controller):
                                               '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
         user = request.env["res.users"].sudo().browse(request.context.get("uid"))
         locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
-        if not locations:
-            location_domain = []
-        else:
-            location_domain = locations.ids
+        location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
+        location_domain = locations.ids + location_cir
         timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
         after_day = today_time + one_days_after
         order_delay = request.env["mrp.production"].sudo().read_group(
@@ -331,10 +329,9 @@ class LinklovingAppApi(http.Controller):
                                               '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
         user = request.env["res.users"].sudo().browse(request.context.get("uid"))
         locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
-        if not locations:
-            location_domain = []
-        else:
-            location_domain = locations.ids
+        location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
+        location_domain = locations.ids + location_cir
+
         timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
         after_day = today_time + one_days_after
         after_2_day = after_day + one_days_after
@@ -419,6 +416,8 @@ class LinklovingAppApi(http.Controller):
         today_time = today_time - one_millisec_before  # 今天的最后一秒
         after_day = today_time + one_days_after
         user = request.env["res.users"].sudo().browse(request.context.get("uid"))
+        location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
+        location_domain = locations.ids + location_cir
         timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
         if not process_id:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "未找到工序id"})
