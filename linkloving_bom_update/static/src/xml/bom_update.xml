@@ -18,7 +18,7 @@
                             <span class="fa fa-caret-down open-sign"></span>
                         </t>
                     </a>
-                    <span><t t-esc="result.name"/></span>
+                    <span t-att-data-templ-id="result.product_tmpl_id" class="product_name">[<t t-esc="result.code"/>]<span><t t-esc="result.name"/></span></span>
                     <span style="margin-left:15px"><t t-esc="result.process_id"/></span>
                     <t t-if="result.bom_ids.length>0">
                         <span style="margin-left:30px;cursor:pointer" class="fa fa-plus add_product"></span>
@@ -37,7 +37,7 @@
                                             <span class="fa fa-caret-right open-sign"></span>
                                         </t>
                                     </a>
-                                    <span t-att-data-id="item.product_id" t-att-data-product-id="item.id" class="product_name"><t t-esc="item.name"/></span>
+                                    <span t-att-data-templ-id="item.product_tmpl_id" t-att-data-id="item.product_id" t-att-data-product-id="item.id" class="product_name">[<t t-esc="item.code"/>]<span><t t-esc="item.name"/></span></span>
                                     <span style="margin-left:15px"><t t-esc="item.qty"/></span>
                                     <t t-if="item.process_id != false">
                                         <span style="margin-left:15px"><t t-esc="item.process_id"/></span>
@@ -46,6 +46,7 @@
                                         <span style="margin-left:30px;cursor:pointer" class="fa fa-plus add_product"></span>
                                     </t>
                                     <span class='fa fa-copy product_copy' style='margin-left: 15px'></span>
+                                    <button style="margin-left:15px" class="btn btn-primary product_edit">编辑</button>
                                 </h4>
                             </div>
                             <div t-att-id="item.uuid" t-att-data-return-id="item.id" class="panel-collapse collapse">
@@ -75,7 +76,7 @@
                             <span class="fa fa-caret-right open-sign"></span>
                         </t>
                     </a>
-                    <span t-att-data-id="arg.product_id" t-att-data-product-id="arg.id" class="product_name"><t t-esc="arg.name"/></span>
+                    <span t-att-data-templ-id="arg.product_tmpl_id" t-att-data-id="arg.product_id" t-att-data-product-id="arg.id" class="product_name">[<t t-esc="arg.code"/>]<span><t t-esc="arg.name"/></span></span>
                     <span style="margin-left:15px"><t t-esc="arg.qty"/></span>
                     <t t-if="arg.process_id != false">
                         <span style="margin-left:15px"><t t-esc="arg.process_id"/></span>
@@ -84,6 +85,7 @@
                         <span style="margin-left:30px;cursor:pointer" class="fa fa-plus add_product"></span>
                     </t>
                     <span class='fa fa-copy product_copy' style='margin-left: 15px'></span>
+                    <button style="margin-left:15px" class="btn btn-primary product_edit">编辑</button>
                 </h4>
             </div>
             <div t-att-id="arg.uuid" t-att-data-return-id="arg.id" class="panel-collapse collapse">
