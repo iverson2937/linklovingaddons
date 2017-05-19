@@ -30,25 +30,22 @@
                 <div class="panel-body">
                     <t t-foreach="result.bom_ids" t-as="item">
                         <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h4 class="panel-title">
-                                    <a data-toggle="collapse" t-att-href="'#'+item.uuid" class="click_bom_tag_a">
-                                        <t t-if="item.bom_ids.length>0">
-                                            <span class="fa fa-caret-right open-sign"></span>
-                                        </t>
-                                    </a>
-                                    <span t-att-data-templ-id="item.product_tmpl_id" t-att-data-id="item.product_id" t-att-data-product-id="item.id" class="product_name">[<t t-esc="item.code"/>]<span><t t-esc="item.name"/></span></span>
-                                    <span style="margin-left:15px"><t t-esc="item.qty"/></span>
-                                    <t t-if="item.process_id != false">
-                                        <span style="margin-left:15px"><t t-esc="item.process_id"/></span>
+                            <!--判断给不同的颜色-->
+                            <t t-if="item.is_highlight==true">
+                                <div class="panel-heading change_color">
+                                    <t t-call="pro_detail">
+                                        <t t-set="item" t-value="item"/>
                                     </t>
-                                    <t t-if="item.bom_ids.length>0">
-                                        <span style="margin-left:30px;cursor:pointer" class="fa fa-plus add_product"></span>
+                                </div>
+                            </t>
+                            <t t-elif="item.is_highlight==false">
+                                <div class="panel-heading">
+                                    <t t-call="pro_detail">
+                                        <t t-set="item" t-value="item"/>
                                     </t>
-                                    <span class='fa fa-copy product_copy' style='margin-left: 15px'></span>
-                                    <button style="margin-left:15px" class="btn btn-primary product_edit">编辑</button>
-                                </h4>
-                            </div>
+                                </div>
+                            </t>
+
                             <div t-att-id="item.uuid" t-att-data-return-id="item.id" class="panel-collapse collapse">
                                 <div class="panel-body">
                                     <t t-if="item.bom_ids.length>0">
@@ -69,25 +66,21 @@
 
     <t t-name="more">
          <div class="panel panel-default">
-            <div class="panel-heading">
-                <h4 class="panel-title">
-                    <a data-toggle="collapse" t-att-href="'#'+arg.uuid" class="click_bom_tag_a">
-                        <t t-if="arg.bom_ids.length>0">
-                            <span class="fa fa-caret-right open-sign"></span>
-                        </t>
-                    </a>
-                    <span t-att-data-templ-id="arg.product_tmpl_id" t-att-data-id="arg.product_id" t-att-data-product-id="arg.id" class="product_name">[<t t-esc="arg.code"/>]<span><t t-esc="arg.name"/></span></span>
-                    <span style="margin-left:15px"><t t-esc="arg.qty"/></span>
-                    <t t-if="arg.process_id != false">
-                        <span style="margin-left:15px"><t t-esc="arg.process_id"/></span>
+            <t t-if="arg.is_highlight==true">
+                <div class="panel-heading change_color">
+                    <t t-call="pro_detail">
+                        <t t-set="item" t-value="arg"/>
                     </t>
-                    <t t-if="arg.bom_ids.length>0">
-                        <span style="margin-left:30px;cursor:pointer" class="fa fa-plus add_product"></span>
+                </div>
+            </t>
+            <t t-elif="arg.is_highlight==false">
+                <div class="panel-heading">
+                    <t t-call="pro_detail">
+                        <t t-set="item" t-value="arg"/>
                     </t>
-                    <span class='fa fa-copy product_copy' style='margin-left: 15px'></span>
-                    <button style="margin-left:15px" class="btn btn-primary product_edit">编辑</button>
-                </h4>
-            </div>
+                </div>
+            </t>
+
             <div t-att-id="arg.uuid" t-att-data-return-id="arg.id" class="panel-collapse collapse">
                 <div class="panel-body">
                     <t t-if="arg.bom_ids.length>0">
@@ -102,21 +95,25 @@
          </div>
     </t>
 
-
-
-    <record id='action_bom_modify_wizard' model='ir.actions.act_window'>
-        <field name='name'>Bom Modify</field>
-        <field name='res_model'>bom.update.wizard</field>
-        <field name='view_type'>form</field>
-        <field name='view_mode'>form</field>
-        <field name="view_id" ref="bom_update_wizard_form"/>
-
-        <field name='target'>new</field>
-    </record>
-
-
-
-
+    <t t-name="pro_detail">
+        <h4 class="panel-title">
+            <a data-toggle="collapse" t-att-href="'#'+item.uuid" class="click_bom_tag_a">
+                <t t-if="item.bom_ids.length>0">
+                    <span class="fa fa-caret-right open-sign"></span>
+                </t>
+            </a>
+            <span t-att-data-templ-id="item.product_tmpl_id" t-att-data-id="item.product_id" t-att-data-product-id="item.id" class="product_name">[<t t-esc="item.code"/>]<span><t t-esc="item.name"/></span></span>
+            <span style="margin-left:15px"><t t-esc="item.qty"/></span>
+            <t t-if="item.process_id != false">
+                <span style="margin-left:15px"><t t-esc="item.process_id"/></span>
+            </t>
+            <t t-if="item.bom_ids.length>0">
+                <span style="margin-left:30px;cursor:pointer" class="fa fa-plus add_product"></span>
+            </t>
+            <span class='fa fa-copy product_copy' style='margin-left: 15px'></span>
+            <button style="margin-left:15px" class="btn btn-primary product_edit">编辑</button>
+        </h4>
+    </t>
 
 
 

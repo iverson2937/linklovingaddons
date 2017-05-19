@@ -233,7 +233,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             }
             console.log(back_datas);
             if(back_datas.length==0){
-                alert("你没有做任何操作")
+                alert("你没有做任何操作");
                 return;
             }
             var action = {
