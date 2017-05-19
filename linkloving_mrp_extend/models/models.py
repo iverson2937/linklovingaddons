@@ -807,7 +807,8 @@ class MrpProductionProduceExtend(models.TransientModel):
     def do_produce_and_post_inventory(self):
         quantity = self.product_qty
         if float_compare(quantity, 0, precision_rounding=self.product_uom_id.rounding) <= 0:
-            raise UserError(_('You should at least produce some quantity'))
+            return
+            # raise UserError(_('You should at least produce some quantity'))
             # for move in moves.filtered(lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel')):
             #     if move.unit_factor:
             #         qty = quantity * move.unit_factor
@@ -827,8 +828,6 @@ class MrpProductionProduceExtend(models.TransientModel):
             elif move.unit_factor:
                 move.quantity_done_store += quantity * move.unit_factor
         self.check_finished_move_lots()
-        if self.production_id.state == 'confirmed':
-            self.production_id.state = 'progress'
 
         self.production_id.post_inventory()
 
