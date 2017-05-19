@@ -843,6 +843,7 @@ class MrpProductionProduceExtend(models.TransientModel):
             'feedback_backorder_id': self.production_id.feedback_on_rework.id,
             'qty_produced': draft_sum_qty,
             'production_id': self.production_id.id,
+            'product_id': self.production_id.product_id.id,
         })
         feedback_draft.unlink()
         return feedback
@@ -1211,7 +1212,7 @@ class MrpQcFeedBack(models.Model):
     qc_note = fields.Text(string='Note')
     qc_img = fields.Binary(string='Quality Inspection Image')
 
-    product_id = fields.Many2one('production_id.product_id')
+    product_id = fields.Many2one('product.product', related='production_id.product_id')
 
     qc_imgs = fields.One2many(comodel_name="qc.feedback.img", inverse_name="feedback_id", string="品检图片",
                               required=False, )
