@@ -405,10 +405,6 @@ class LinklovingAppApi(http.Controller):
         today_time = fields.datetime.strptime(fields.datetime.strftime(fields.datetime.now(), '%Y-%m-%d'),
                                               '%Y-%m-%d')
         locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
-        if not locations:
-            location_domain = []
-        else:
-            location_domain = locations.ids
 
         if date_to_show != "delay":
             today_time = fields.datetime.strptime(date_to_show, '%Y-%m-%d')
