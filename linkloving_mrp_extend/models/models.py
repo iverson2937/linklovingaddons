@@ -807,8 +807,7 @@ class MrpProductionProduceExtend(models.TransientModel):
     def do_produce_and_post_inventory(self):
         quantity = self.product_qty
         if float_compare(quantity, 0, precision_rounding=self.product_uom_id.rounding) <= 0:
-            return
-            # raise UserError(_('You should at least produce some quantity'))
+            raise UserError(u"请填写生产数量!")
             # for move in moves.filtered(lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel')):
             #     if move.unit_factor:
             #         qty = quantity * move.unit_factor

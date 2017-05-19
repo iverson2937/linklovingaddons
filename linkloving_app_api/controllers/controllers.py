@@ -1187,7 +1187,6 @@ class LinklovingAppApi(http.Controller):
         data = {
             'feedback_id': qc_feedback.id,
             'name': qc_feedback.name,
-
             'production_id': {
                 "order_id": qc_feedback.production_id.id,
                 "display_name": qc_feedback.production_id.display_name,
