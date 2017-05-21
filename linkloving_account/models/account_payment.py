@@ -154,9 +154,15 @@ class AccountPayment(models.Model):
     _inherit = 'account.payment'
     team_id = fields.Many2one('crm.team', related='partner_id.team_id')
     customer = fields.Boolean(related='partner_id.customer')
-    state = fields.Selection(selection_add=[('confirm', u'销售确认')])
+    state = fields.Selection(selection_add=[('confirm', u'销售确认'), ('done', u'完成')])
+    remark = fields.Text(string='备注')
 
     # origin = fields.Char(string=u'源单据')
+
+    def set_to_done(self):
+        self.state = 'done'
+
+
 
     @api.onchange('partner_type')
     def _onchange_partner_type(self):

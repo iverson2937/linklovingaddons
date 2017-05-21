@@ -48,13 +48,41 @@
                   sequence="2"/>
 
 
-
         <!--Receipt*-->
         <menuitem action="action_payment_received_register_sale"
                   id="menu_sale_order_invoice"
                   parent="sales_team.menu_sale_config"
                   groups="base.group_no_one"
                   sequence="1"/>
+
+        <record id="action_account_payment_sales_confirm"
+                model="ir.actions.act_window">
+            <field name="name">收款客户确认</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">
+                [('state','=','confirm')]
+            </field>
+            <field name="context">{'confirm':True}</field>
+            <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'tree', 'view_id': ref('view_account_payment_tree_linkloving')}),
+            (0,0,{'view_mode':'form', 'view_id': ref('account.view_account_payment_form')})]"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click add receipt record.
+                </p>
+                <p>
+                    No record Found!
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_account_payment_sales_confirm"
+                  action="action_account_payment_sales_confirm"
+                  name="收款客户确认"
+                  parent="sale.menu_sale_invoicing" sequence="６"/>
 
 
         <menuitem id="menu_product_normal_action_puchased"
