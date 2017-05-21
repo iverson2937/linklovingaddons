@@ -53,6 +53,17 @@
                 <xpath expr="//field[@name='wechat']" position="after">
                     <field name="communication_identifier"/>
                 </xpath>
+                <xpath expr="//field[@name='level']" position="after">
+                    <field name="priority" widget="priority"/>
+                </xpath>
+
+                <xpath expr="//page[@name='accounting_disabled']" position="after">
+                    <page string="产品">
+                        <group>
+                            <field name="interested_in_product"/>
+                        </group>
+                    </page>
+                </xpath>
 
 
             </field>
