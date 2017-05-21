@@ -69,13 +69,6 @@
                 </xpath>
 
 
-                <!--<xpath expr="//page[@name='accounting_disabled']" position="after">-->
-                <!--<page string="Order Lines">-->
-                <!--<group>-->
-                <!--<field name="interested_in_product"/>-->
-                <!--</group>-->
-                <!--</page>-->
-                <!--</xpath>-->
 
 
                 <!--<xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='function']"-->
