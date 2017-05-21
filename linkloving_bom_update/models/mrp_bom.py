@@ -101,6 +101,12 @@ class MrpBomLine(models.Model):
     _inherit = 'mrp.bom.line'
     is_highlight = fields.Boolean()
 
+    @api.multi
+    def toggle_highlight(self):
+        """ Inverse the value of the field ``active`` on the records in ``self``. """
+        for record in self:
+            record.is_highlight = not record.is_highlight
+
 
 
     # def update_bom_line(self, line_id, postfix, product_id, products):

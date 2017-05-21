@@ -11,7 +11,13 @@
                     </button>
 
                 </div>
-
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="decoration-bf">is_highlight==True</attribute>
+                </xpath>
+                <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_uom_id']" position="after">
+                    <button name="toggle_highlight" type="object" icon="fa-flag"/>
+                    <field name="is_highlight" invisible="1"/>
+                </xpath>
             </field>
         </record>
 
