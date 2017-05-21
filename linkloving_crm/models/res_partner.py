@@ -5,11 +5,21 @@
 ##############################################################################
 from odoo import fields, api, models
 
+AVAILABLE_PRIORITIES = [
+    ('0', 'badly'),
+    ('1', 'Low'),
+    ('2', 'Normal'),
+    ('3', 'High'),
+    ('4', 'Very High'),
+    ('5', 'top level'),
+]
+
 
 class CrmPartner(models.Model):
     """"""
 
     _inherit = 'res.partner'
+    priority = fields.Selection(AVAILABLE_PRIORITIES, string=u'客户星级', index=True, default=AVAILABLE_PRIORITIES[0][0])
 
     detailed_address = fields.Char(string=u'地址', compute='_street_name')
 
