@@ -41,7 +41,7 @@
 
 
         <record id="view_partner_form_linkloving" model="ir.ui.view">
-            <field name="name">product.product.form</field>
+            <field name="name">res.partner.form</field>
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
@@ -68,18 +68,14 @@
                     <field name="level" attrs="{'invisible': [('customer','!=', True)]}"/>
                 </xpath>
 
-                <xpath expr="//field[@name='level']" position="after">
-                    <field name="priority" widget="priority"/>
-                </xpath>
 
-
-                <xpath expr="//page[@name='accounting_disabled']" position="after">
-                    <page string="Order Lines">
-                        <group>
-                            <field name="interested_in_product"/>
-                        </group>
-                    </page>
-                </xpath>
+                <!--<xpath expr="//page[@name='accounting_disabled']" position="after">-->
+                <!--<page string="Order Lines">-->
+                <!--<group>-->
+                <!--<field name="interested_in_product"/>-->
+                <!--</group>-->
+                <!--</page>-->
+                <!--</xpath>-->
 
 
                 <!--<xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='function']"-->
