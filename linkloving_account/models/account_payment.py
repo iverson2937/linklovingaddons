@@ -151,7 +151,8 @@ class AccountPaymentRegister(models.Model):
 
 
 class AccountPayment(models.Model):
-    _inherit = 'account.payment'
+    _name = 'account.payment'
+    _inherit = ['account.payment', 'ir.needaction_mixin']
     team_id = fields.Many2one('crm.team', related='partner_id.team_id')
     customer = fields.Boolean(related='partner_id.customer')
     state = fields.Selection(selection_add=[('confirm', u'销售确认'), ('done', u'完成')])
@@ -161,8 +162,6 @@ class AccountPayment(models.Model):
 
     def set_to_done(self):
         self.state = 'done'
-
-
 
     @api.onchange('partner_type')
     def _onchange_partner_type(self):
@@ -246,3 +245,11 @@ class AccountPayment(models.Model):
             if self._context.get('to_sales'):
                 state = 'confirm'
             rec.write({'state': state, 'move_name': move.name})
+
+    @api.model
+    def _needaction_domain_get(self):
+        """ Returns the domain to filter records that require an action
+            :return: domain or False is no action
+        """
+        state = self._context.get('state')
+        return [('state', '=', state)]
