@@ -242,7 +242,7 @@ class AccountPayment(models.Model):
             # add by allen
             for balance in rec.invoice_ids.balance_ids:
                 balance.state = 1
-            state = 'post'
+            state = 'posted'
             if self._context.get('to_sales'):
                 state = 'confirm'
             rec.write({'state': state, 'move_name': move.name})
