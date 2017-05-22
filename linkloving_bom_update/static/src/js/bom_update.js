@@ -59,7 +59,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             };
             this.do_action(action);
         },
-        copy_product_fn:function () {
+        copy_product_fn:function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var last_product_name = $(target).prev().prev().children().text();
