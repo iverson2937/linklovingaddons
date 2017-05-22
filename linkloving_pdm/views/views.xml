@@ -7,29 +7,90 @@
             <field name="arch" type="xml">
                 <xpath expr="//page[@name='notes']" position="after">
                     <page string="SIP">
-                        <field name="sip_files" mode="kanban"
-                               context="{'product_id':active_id,'model':'product.template'}">
+                        <field name="sip_files" mode="kanban" class="oe_kanban_global_click"
+                               context="{'default_product_tmpl_id':active_id,'default_type':'sip'}">
                             <kanban>
-                                <field name="file_binary"/>
+                                <field name="type"/>
                                 <field name="file_name"/>
-
+                                <field name="who_review_now"/>
                                 <templates>
                                     <t t-name="kanban-box">
-                                        <div class="oe_kanban_details">
-                                            <field name="file_name" string="文件名"/>
-                                            <field name="state" string="状态"/>
+                                        <div t-att-class="oe_kanban_global_click">
+                                            <div class="oe_kanban_details">
+                                                <field name="file_name" string="文件名"/>
+                                                <field name="state"/>
+                                                <field name="who_review_now"/>
 
+                                            </div>
+
+                                            <div class="o_kanban_button">
+                                                <button name="%(action_review_process_wizard)d"
+                                                        type="action"
+                                                        class="oe_highlight"
+                                                        context="{'default_product_attachment_info_id':active_id}"
+                                                >审核操作
+                                                </button>
+                                            </div>
                                         </div>
                                     </t>
                                 </templates>
-
                             </kanban>
+                            <form string="文件">
+                                <sheet>
+                                    <group>
+
+                                        <group>
+                                            <field name="file_name"/>
+                                            <field name="remote_path"/>
+                                            <field name="file_binary"/>
+                                            <field name="state"/>
+                                            <field name="version"/>
+                                            <field name="product_tmpl_id"/>
+                                            <field name="review_id"/>
+                                            <field name="type" invisible="1"/>
+                                        </group>
+                                    </group>
+
+                                </sheet>
+                            </form>
                         </field>
                     </page>
                 </xpath>
             </field>
         </record>
 
+        <record id="product_attachment_info" model="ir.ui.view">
+            <field name="name">product.attachment.info.form</field>
+            <field name="model">product.attachment.info</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="file_name"/>
+                                <field name="remote_path"/>
+                                <field name="file_binary"/>
+                                <field name="state"/>
+                                <field name="version"/>
+                                <field name="product_tmpl_id"/>
+                                <field name="review_id"/>
+                                <field name="type" invisible="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="final_review_partner_tree" model="ir.ui.view">
+            <field name="name">final.review.partner</field>
+            <field name="model">final.review.partner</field>
+            <field name="arch" type="xml">
+                <tree string="终审人">
+                    <field name="final_review_partner_id"/>
+                </tree>
+            </field>
+        </record>
 
         <record model="ir.actions.act_window" id="action_final_review_partner">
             <field name="name">文件终审人设置</field>
@@ -47,10 +108,10 @@
             </field>
         </record>
 
-        <menuitem id="final_review_partner_menu" parent="stock.menu_stock_config_settings"
+        <menuitem id="final_review_partner_menu"
+                  parent="stock.menu_stock_config_settings"
                   action="action_final_review_partner"
                   sequence="50" groups="base.group_no_one"/>
-
 
         <record id="review_process_wizard_form" model="ir.ui.view">
             <field name="name">选择下一个审核人</field>
@@ -59,12 +120,25 @@
                 <form string="选择下一个审核人">
                     <sheet>
                         <group>
-                            <field name="partner_id"/>
-                            <p>若没有选择下一个的审核人,将直接送往终审人</p>
+                            <field name="partner_id" require="1"/>
                         </group>
                     </sheet>
+                    <footer>
+                        <button name='action_pass' type='object' string='送审' class='oe_highlight'/>
+                        <button string='送往终审' type='object' name='action_pass' class='oe_link'
+                                context="{'to_last_review':True}"/>
+                        <button string='取消' class='oe_link' special='cancel'/>
+                    </footer>
                 </form>
             </field>
+        </record>
+
+        <record id="action_review_process_wizard" model="ir.actions.act_window">
+            <field name="name">选择下一个审核人</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">review.process.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
         </record>
 
     </data>

@@ -29,12 +29,20 @@ class ReviewProcess(models.Model):
             else:
                 process.who_review_now = None
 
+    @api.multi
+    def _compute_process_line_review_now(self):
+        for process in self:
+            waiting_review_line = process.review_line_ids.filtered(lambda x: x.state == 'waiting_review')
+            if waiting_review_line:
+                process.who_review_now = waiting_review_line[0]
+            else:
+                process.who_review_now = None
     res_model = fields.Char('Related Model', required=True, index=True, help='Model of the followed resource')
     res_id = fields.Integer('Related ID', index=True, help='Id of the followed resource')
     review_line_ids = fields.One2many("review.process.line", "review_id", string=u"审核过程")
 
     who_review_now = fields.Many2one("res.partner",string=u'待...审核', compute="_compute_who_review_now")
-
+    process_line_review_now = fields.Many2one("review.process.line", compute="_compute_process_line_review_now")
     @api.multi
     def name_get(self):
         res = []
@@ -48,8 +56,8 @@ class ReviewProcess(models.Model):
     # 开启一次审核流程
     def create_review_process(self, res_model, res_id):
             review_id = self.env["review.process"].create({
-                'res_model': self._name,
-                'res_id': self.id,
+                'res_model': res_model,
+                'res_id': res_id,
             })
             self.env["review.process.line"].create({
                 'partner_id': self.env.user.partner_id.id,
@@ -74,6 +82,10 @@ class ReviewProcessLine(models.Model):
     is_last_review= fields.Boolean(default=False)
 
     def submit_to_next_reviewer(self, to_last_review=False, partner_id=None):
+        if not partner_id:
+            raise UserError(u"请选择审核人!")
+        if not self.env["final.review.partner"].get_final_review_partner_id():
+            raise UserError(u'请联系管理员,设置终审人!')
         is_last_review = False
         if to_last_review \
                 or partner_id.id == self.env["final.review.partner"].get_final_review_partner_id().id:
@@ -87,7 +99,7 @@ class ReviewProcessLine(models.Model):
             'is_last_review':is_last_review,
         })
         #设置现有的这个审核条目状态等
-        self.review_process_line.write({
+        self.write({
             'review_time': fields.datetime.now(),
             'state': 'review_ing',#如果不是终审 还有一个
         })
@@ -99,17 +111,24 @@ class ReviewProcessLine(models.Model):
 class ProductAttachmentInfo(models.Model):
     _name = 'product.attachment.info'
 
-    def _default_product_id(self):
+    # def _default_product_id(self):
+    #     model = self._context.get("model")
+    #     res_id = self._context.get("product_id")
+    #     if model == 'product.template':
+    #         product_tmpl = self.env[model].browse(res_id)
+    #         if product_tmpl.product_variant_ids:
+    #             return product_tmpl.product_variant_ids[0].id
+    #         else:
+    #             return res_id
+
+    def _default_version(self):
         model = self._context.get("model")
         res_id = self._context.get("product_id")
-        if model == 'product.template':
-            product_tmpl = self.env[model].browse(res_id)
-            if product_tmpl.product_variant_ids:
-                return product_tmpl.product_variant_ids[0].id
-            else:
-                return res_id
+        self.env["product.attachment.info"].search([('product_tmpl_id', '=', res_id),
+                                                    ])
+        return None
 
-
+    name = fields.Char("名称", default="v")
     file_name = fields.Char(u"文件名")
     remote_path = fields.Char(string=u"远程路径", required=False, )
     file_binary = fields.Binary()
@@ -119,20 +138,38 @@ class ProductAttachmentInfo(models.Model):
                                                       ('released', u'已发布'),
                                                       ('deny', u'被拒'),
                                                       ('cancel', u'已取消')],
-                             default='draft', required=False)
-    version = fields.Char(string=u"版本号", required=False, )
+                             default='draft', required=False, readonly=True)
+    version = fields.Char(string=u"版本号", default=_default_version)
 
-    product_id = fields.Many2one(
-            'product.product', 'Product', default=_default_product_id)
+    # product_id = fields.Many2one(
+    #         'product.product', 'Product',default='_default_product_id',
+    #         readonly=True)
 
     product_tmpl_id = fields.Many2one('product.template',
                                       string=u"产品",
-                                      related='product_id.product_tmpl_id')  # 该产品
+                                      # related='product_id.product_tmpl_id',
+                                      readonly=True)  # 该产品
 
     review_id = fields.Many2one("review.process",
                                 string=u'待...审核',
                                 track_visibility='always',
                                 readonly=True,)
+
+    type = fields.Selection(string="类型", selection=[('sip', 'SIP'),
+                                                    ('sop', 'SOP'),
+                                                    ('ipqc', 'IPQC')], required=True, )
+
+    @api.model
+    def create(self, vals):
+        if (vals.get("file_binary") or vals.get("remote_path")):
+            vals['state'] = 'waiting_release'
+        return super(ProductAttachmentInfo, self).create(vals)
+
+    @api.multi
+    def write(self, vals):
+        if (vals.get("file_binary") or vals.get("remote_path")):
+            vals['state'] = 'waiting_release'
+        return super(ProductAttachmentInfo, self).write(vals)
 
 
     # @api.multi
@@ -159,7 +196,7 @@ class ProductAttachmentInfo(models.Model):
     def action_send_to_review(self):
         self._check_file_or_remote_path()
         if not self.review_id:
-            self.env["review.process"].create_review_process('product.attachment.info', self.id)
+            self.review_id = self.env["review.process"].create_review_process('product.attachment.info', self.id)
         self.write({
             'state': 'review_ing',
         })
@@ -188,8 +225,10 @@ class ProductTemplateExtend(models.Model):
 
     sip_files = fields.One2many(comodel_name="product.attachment.info",
                                 inverse_name="product_tmpl_id",
+                                domain=[("type", "=", "sip")],
                                 string="SIP",
-                                required=False, )
+                                required=False,
+                                )
 
     sop_files = fields.One2many(comodel_name="product.attachment.info",
                                 inverse_name="product_tmpl_id",
@@ -206,11 +245,13 @@ class ReviewProcessWizard(models.TransientModel):
     _name = 'review.process.wizard'
 
     partner_id = fields.Many2one("res.partner",string=u'提交给...审核', domain=[('employee','=',True)])
+    product_attachment_info_id = fields.Many2one("product.attachment.info")
     review_process_line = fields.Many2one("review.process.line")
     # 审核通过
     def action_pass(self):
         to_last_review = self._context.get("to_last_review")#是否送往终审
-
+        if not self.product_attachment_info_id.review_id:  # 如果没审核过
+            self.product_attachment_info_id.action_send_to_review()
         self.review_process_line.submit_to_next_reviewer(to_last_review=to_last_review,
                                                          partner_id=self.partner_id)
 
@@ -221,8 +262,6 @@ class FinalReviewPartner(models.Model):
 
     final_review_partner_id = fields.Many2one(comodel_name="res.partner", string="终审人", required=False,
                                               domain=[('employee','=',True)])
-
-
 
     def get_final_review_partner_id(self):
         final = self.env["final.review.partner"].search([],limit=1)

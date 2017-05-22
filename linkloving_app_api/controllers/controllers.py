@@ -223,6 +223,7 @@ class LinklovingAppApi(http.Controller):
                 'date_planned_start': production.date_planned_start,
                 'state': production.state,
                 'product_qty': production.product_qty,
+                'qty_produced': production.qty_unpost,
                 'in_charge_name':production.in_charge_id.name,
                 'origin': production.origin,
                 'process_id' : {
