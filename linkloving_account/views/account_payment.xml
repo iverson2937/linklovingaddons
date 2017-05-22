@@ -58,7 +58,7 @@
                 <xpath expr="//button[@name='post']" position="after">
                     <button name="set_to_done" class="oe_highlight" states="confirm" string="确认客户" type="object"/>
                 </xpath>
-                <xpath expr="//form/sheet/group[0]" position="after">
+                <xpath expr="//form/sheet/group" position="after">
                     <field name="remark"/>
                 </xpath>
                 <xpath expr="//field[@name='partner_id']" position="attributes">
