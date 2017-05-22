@@ -128,7 +128,6 @@ class ProductAttachmentInfo(models.Model):
                                                     ])
         return None
 
-    name = fields.Char("名称", default="v")
     file_name = fields.Char(u"文件名")
     remote_path = fields.Char(string=u"远程路径", required=False, )
     file_binary = fields.Binary()

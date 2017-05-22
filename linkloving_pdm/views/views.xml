@@ -12,14 +12,14 @@
                             <kanban>
                                 <field name="type"/>
                                 <field name="file_name"/>
-                                <field name="who_review_now"/>
+                                <field name="review_id"/>
                                 <templates>
                                     <t t-name="kanban-box">
                                         <div t-att-class="oe_kanban_global_click">
                                             <div class="oe_kanban_details">
                                                 <field name="file_name" string="文件名"/>
                                                 <field name="state"/>
-                                                <field name="who_review_now"/>
+                                                <field name="review_id"/>
 
                                             </div>
 
