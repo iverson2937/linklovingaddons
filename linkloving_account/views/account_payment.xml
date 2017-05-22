@@ -43,6 +43,7 @@
                 <xpath expr="//field[@name='partner_id']" position="attributes">
                     <attribute name="options">{'no_create':True}</attribute>
                     <attribute name="required">0</attribute>
+                    <attribute name="domain">[('is_company','=',True)]</attribute>
                 </xpath>
                 <xpath expr="//field[@name='payment_type']" position="attributes">
                     <attribute name="readonly">0</attribute>
@@ -70,6 +71,8 @@
                     <field name="team_id" readonly="1" string="Sale Team" attrs="{'invisible':[('customer','!=',True)]}"
                            options="{'no_create':True}"/>
                 </xpath>
+
+
             </field>
         </record>
         <record id="account.action_account_payments" model="ir.actions.act_window">

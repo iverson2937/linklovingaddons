@@ -152,9 +152,10 @@ class AccountPaymentRegister(models.Model):
 
 class AccountPayment(models.Model):
     _name = 'account.payment'
-    _inherit = ['account.payment', 'ir.needaction_mixin']
+    _inherit = ['account.payment', 'ir.needaction_mixin', 'mail.thread']
     team_id = fields.Many2one('crm.team', related='partner_id.team_id')
     customer = fields.Boolean(related='partner_id.customer')
+    partner_id = fields.Many2one('res.partner', track_visibility='onchange')
     state = fields.Selection(selection_add=[('confirm', u'销售确认'), ('done', u'完成')])
     remark = fields.Text(string='备注')
 
