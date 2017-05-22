@@ -8,11 +8,11 @@
             <field name="model">account.payment</field>
             <field name="arch" type="xml">
                 <tree create="false">
-                    <field name="payment_date"/>
+                    <field name="payment_date" string="收款日期"/>
                     <field name="name"/>
                     <field name="journal_id"/>
                     <field name="payment_method_id"/>
-                    <field name="partner_id" string="Customer"/>
+                    <field name="partner_id" string="客戶"/>
                     <field name="amount" sum="Amount"/>
                     <field name="state"/>
                     <field name="company_id" groups="base.group_multi_company"/>
@@ -45,7 +45,7 @@
                     <attribute name="required">0</attribute>
                 </xpath>
                 <xpath expr="//field[@name='payment_type']" position="attributes">
-                    <attribute name="readonly">1</attribute>
+                    <attribute name="readonly">0</attribute>
                 </xpath>
                 <xpath expr="//field[@name='payment_date']" position="replace">
                     <field name="payment_date"/>
