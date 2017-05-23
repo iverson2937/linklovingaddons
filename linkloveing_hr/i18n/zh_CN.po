@@ -124,7 +124,7 @@ msgstr "已审核暂支"
 #. module: linkloveing_hr
 #: model:ir.ui.menu,name:linkloveing_hr.menu_account_payment_approved
 msgid "Approved Loan"
-msgstr "已审核暂支"
+msgstr "已支付"
 
 #. module: linkloveing_hr
 #: model:ir.model,name:linkloveing_hr.model_account_asset_asset
