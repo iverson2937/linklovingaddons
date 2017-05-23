@@ -9,6 +9,7 @@ from odoo.exceptions import UserError
 class BomUpdateWizard(models.TransientModel):
     _name = "bom.update.wizard"
     postfix = fields.Char(string=u'后缀')
+    partner_id = fields.Many2one('res.partner', domain=[('customer', '=', True)])
 
     @api.multi
     def bom_line_update(self):
