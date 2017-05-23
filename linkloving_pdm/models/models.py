@@ -34,9 +34,9 @@ class ReviewProcess(models.Model):
         for process in self:
             waiting_review_line = process.review_line_ids.filtered(lambda x: x.state == 'waiting_review')
             if waiting_review_line:
-                process.who_review_now = waiting_review_line[0]
+                process.process_line_review_now = waiting_review_line[0]
             else:
-                process.who_review_now = None
+                process.process_line_review_now = None
     res_model = fields.Char('Related Model', required=True, index=True, help='Model of the followed resource')
     res_id = fields.Integer('Related ID', index=True, help='Id of the followed resource')
     review_line_ids = fields.One2many("review.process.line", "review_id", string=u"审核过程")
@@ -93,7 +93,7 @@ class ReviewProcessLine(models.Model):
 
         #新建一个 审核条目 指向下一个审核人员
         self.env["review.process.line"].create({
-            'partner_id': self.env["final.review.partner"].get_final_review_partner_id().id,
+            'partner_id': partner_id.id,
             'review_id': self.review_id.id,
             'last_review_line_id': self.id,
             'is_last_review':is_last_review,
@@ -101,9 +101,8 @@ class ReviewProcessLine(models.Model):
         #设置现有的这个审核条目状态等
         self.write({
             'review_time': fields.datetime.now(),
-            'state': 'review_ing',#如果不是终审 还有一个
+            'state': 'review_success'
         })
-
     #拒绝审核
     def action_deny(self):
         pass
@@ -246,14 +245,15 @@ class ReviewProcessWizard(models.TransientModel):
     partner_id = fields.Many2one("res.partner",string=u'提交给...审核', domain=[('employee','=',True)])
     product_attachment_info_id = fields.Many2one("product.attachment.info")
     review_process_line = fields.Many2one("review.process.line")
+
     # 审核通过
     def action_pass(self):
         to_last_review = self._context.get("to_last_review")#是否送往终审
         if not self.product_attachment_info_id.review_id:  # 如果没审核过
             self.product_attachment_info_id.action_send_to_review()
-        self.review_process_line.submit_to_next_reviewer(to_last_review=to_last_review,
-                                                         partner_id=self.partner_id)
-
+        self.product_attachment_info_id.review_id.process_line_review_now.submit_to_next_reviewer(
+            to_last_review=to_last_review,
+            partner_id=self.partner_id)
 
 
 class FinalReviewPartner(models.Model):

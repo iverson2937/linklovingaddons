@@ -347,6 +347,26 @@ class MrpProductionExtend(models.Model):
         ('cancel', 'Cancelled')], string='status',
         copy=False, default='confirmed', track_visibility='onchange')
 
+    sale_remark = fields.Text(compute='_compute_sale_remark', string=u"销售单备注")
+    remark = fields.Text(string=u"MO单备注")
+
+    @api.multi
+    def _compute_sale_remark(self):
+        for production in self:
+            origin = production.origin
+            order_name_list = []
+            if origin:
+                split_by_dot = origin.split(",")  # cccc
+                for split in split_by_dot:
+                    split_by_maohao = split.split(":")
+                    order_name_list += split_by_maohao
+            sale_orders = self.env["sale.order"].search([("name", "in", order_name_list)])
+            sale_remark = ''
+            for sale_order in sale_orders:
+                if sale_order.remark:
+                    sale_remark += (sale_order.name + ":" + sale_order.remark + "\n")
+            production.sale_remark = sale_remark
+
     # 计算所有工人总共花的工时
     @api.one
     def _compute_total_spent_time(self):
@@ -405,7 +425,10 @@ class MrpProductionExtend(models.Model):
 
     # 确认生产 等待备料
     def button_waiting_material(self):
-        self.write({'state': 'waiting_material'})
+        if self.location_ids.filtered(lambda x: x.is_circulate_location == False):
+            self.write({'state': 'waiting_material'})
+        else:
+            self.write({'state': 'finish_prepare_material'})
         qty_wizard = self.env['change.production.qty'].create({
             'mo_id': self.id,
             'product_qty': self.product_qty,

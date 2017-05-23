@@ -465,7 +465,6 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/get_order_detail', type='json', auth='none', csrf=False)
     def get_order_detail(self, **kw):
         order_id = request.jsonrequest.get('order_id')
-        mrp_production = request.env['mrp.production'].sudo()
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
     #确认订单
@@ -1311,7 +1310,9 @@ class LinklovingAppApi(http.Controller):
             'feedback_on_rework': {
                 'feedback_id': production.feedback_on_rework.id,
                 'name': production.feedback_on_rework.name or None,
-            }
+            },
+            'sale_remark': production.sale_remark or '',
+            'remark': production.remark or '',
         }
         return data
     @classmethod
