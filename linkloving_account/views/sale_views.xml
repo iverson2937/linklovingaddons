@@ -82,7 +82,7 @@
         <menuitem id="menu_account_payment_sales_confirm"
                   action="action_account_payment_sales_confirm"
                   name="收款客户确认"
-                  parent="sale.menu_sale_invoicing" sequence="６"/>
+                  parent="sale.menu_sale_invoicing" sequence="6"/>
 
 
         <menuitem id="menu_product_normal_action_puchased"

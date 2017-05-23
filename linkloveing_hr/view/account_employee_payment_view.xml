@@ -17,7 +17,8 @@
                         <button name="submit" class="oe_highlight" states="draft" string="Post" type="object"/>
 
 
-                        <button name="manager1_approve" class="oe_highlight" states="confirm" string="Approve" type="object"
+                        <button name="manager1_approve" class="oe_highlight" states="confirm" string="Approve"
+                                type="object"
                                 groups="hr_expense.group_hr_expense_user"/>
                         <button name="manager2_approve" class="oe_highlight" states="manager1_approve" string="Approve"
                                 groups="hr_expense.group_hr_expense_manager"
@@ -268,9 +269,14 @@
                   parent="menu_account_payment"
                   groups="account.group_account_user"
                   action="action_account_payment_all"/>
+
         <menuitem id="menu_account_payment_wait_pay" name="Loan to Payment" sequence="0"
                   parent="menu_account_payment"
                   groups="account.group_account_user"
+                  action="action_account_payment_wait_pay"/>
+
+        <menuitem id="menu_account_payment_wait_pay_loan" name="待付款暂支" sequence="6"
+                  parent="hr_expense.menu_hr_expense_accountant"
                   action="action_account_payment_wait_pay"/>
 
 

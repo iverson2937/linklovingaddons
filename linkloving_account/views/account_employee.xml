@@ -7,15 +7,15 @@
             <field name="name">account.payment.tree</field>
             <field name="model">account.payment</field>
             <field name="arch" type="xml">
-             <tree create="false">
-                 <field name="payment_date"/>
-                 <field name="name"/>
-                  <field name="partner_id" string="Employee"/>
-                  <field name="payment_type"/>
-                  <field name="journal_id"/>
-                  <field name="amount"/>
-                  <field name="state"/>
-             </tree>
+                <tree create="false">
+                    <field name="payment_date"/>
+                    <field name="name"/>
+                    <field name="partner_id" string="Employee"/>
+                    <field name="payment_type"/>
+                    <field name="journal_id"/>
+                    <field name="amount"/>
+                    <field name="state"/>
+                </tree>
             </field>
         </record>
 
@@ -30,8 +30,15 @@
         <menuitem id="menu_employee_entry" name="Employee" parent="account.menu_finance" sequence="3"
                   groups="account.group_account_invoice"/>
 
+
+        <menuitem action="account.action_account_payments" id="account.menu_action_account_payments_receivable"
+                  parent="account.menu_finance_receivables" sequence="0" groups="account.group_account_user"/>
+
         <menuitem id="menu_employee_payment" name='Employee Payment Register' parent="menu_employee_entry"
                   groups="account.group_account_invoice" action="action_employee_payment_register"/>
+
+        <menuitem id="menu_hr_expense_accountant" name="费用" sequence="3" parent="account.menu_finance"
+        />
 
 
     </data>
