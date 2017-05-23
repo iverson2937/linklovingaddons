@@ -37,8 +37,8 @@
         <menuitem id="menu_employee_payment" name='Employee Payment Register' parent="menu_employee_entry"
                   groups="account.group_account_invoice" action="action_employee_payment_register"/>
 
-        <menuitem id="menu_hr_expense_accountant" name="费用" sequence="3" parent="account.menu_finance"
-        />
+        <menuitem id="hr_expense.menu_hr_expense_accountant" name="费用" sequence="3" parent="account.menu_finance"
+                  groups="account.group_account_invoice"/>
 
 
     </data>
