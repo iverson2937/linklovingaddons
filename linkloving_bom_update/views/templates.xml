@@ -28,8 +28,14 @@
             <field name='arch' type='xml'>
                 <form string="Confirm Draft Invoices">
                     <group>
-                        <field name="partner_id" string="客户"/>
-                        <field name="postfix" required="0"/>
+                        <group>
+                            <field name="partner_id" string="客户"/>
+
+                        </group>
+                        <group>
+                            <field name="postfix" required="0"/>
+                        </group>
+
                     </group>
 
 
