@@ -212,6 +212,8 @@
                 <!--添加订单类型-->
                 <xpath expr="//field[@name='origin']" position="after">
                     <field name="production_order_type" widget="radio"/>
+                    <field name="sale_remark"/>
+                    <field name="remark"/>
                 </xpath>
                 <xpath expr="//group" position="after">
                     <field name="output_rate"/>

@@ -7,7 +7,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//page[@name='notes']" position="after">
                     <page string="SIP">
-                        <field name="sip_files" mode="kanban" class="oe_kanban_global_click"
+                        <field name="sip_files" mode="kanban"
                                context="{'default_product_tmpl_id':active_id,'default_type':'sip'}">
                             <kanban>
                                 <field name="type"/>
@@ -15,7 +15,7 @@
                                 <field name="review_id"/>
                                 <templates>
                                     <t t-name="kanban-box">
-                                        <div t-att-class="oe_kanban_global_click">
+                                        <div class="oe_kanban_global_click">
                                             <div class="oe_kanban_details">
                                                 <field name="file_name" string="文件名"/>
                                                 <field name="state"/>
