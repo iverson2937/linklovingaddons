@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import re
 import uuid
 
 from odoo import models, fields, api, _
@@ -230,3 +231,7 @@ if __name__ == '__main__':
     ac = '010'
     ccc = ('000' + str(int(ac) + 1))[-3:]
     print ccc
+
+    a = u"p(123adf)zzz"
+    b = re.findall(ur"[^(<]+(?=[>）])", a)
+    print b
