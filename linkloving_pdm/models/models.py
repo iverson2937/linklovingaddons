@@ -81,7 +81,9 @@ class ReviewProcessLine(models.Model):
 
     is_last_review= fields.Boolean(default=False)
 
-    def submit_to_next_reviewer(self, to_last_review=False, partner_id=None):
+    remark = fields.Text(u"备注")
+
+    def submit_to_next_reviewer(self, to_last_review=False, partner_id=None, remark=None):
         if not partner_id:
             raise UserError(u"请选择审核人!")
         if not self.env["final.review.partner"].get_final_review_partner_id():
@@ -101,8 +103,14 @@ class ReviewProcessLine(models.Model):
         #设置现有的这个审核条目状态等
         self.write({
             'review_time': fields.datetime.now(),
-            'state': 'review_success'
+            'state': 'review_success',
+            'remark': remark
         })
+
+    # 审核通过
+    def action_pass(self):
+        pass
+
     #拒绝审核
     def action_deny(self):
         pass
@@ -127,6 +135,12 @@ class ProductAttachmentInfo(models.Model):
                                                     ])
         return None
 
+    @api.multi
+    def _compute_has_right_to_review(self):
+        for info in self:
+            if info.review_id.who_review_now.user_id == self.env.user.id:
+                info.has_right_to_review = True
+
     file_name = fields.Char(u"文件名")
     remote_path = fields.Char(string=u"远程路径", required=False, )
     file_binary = fields.Binary()
@@ -139,6 +153,7 @@ class ProductAttachmentInfo(models.Model):
                              default='draft', required=False, readonly=True)
     version = fields.Char(string=u"版本号", default=_default_version)
 
+    has_right_to_review = fields.Boolean(compute='_compute_has_right_to_review')
     # product_id = fields.Many2one(
     #         'product.product', 'Product',default='_default_product_id',
     #         readonly=True)
@@ -245,15 +260,16 @@ class ReviewProcessWizard(models.TransientModel):
     partner_id = fields.Many2one("res.partner",string=u'提交给...审核', domain=[('employee','=',True)])
     product_attachment_info_id = fields.Many2one("product.attachment.info")
     review_process_line = fields.Many2one("review.process.line")
-
+    remark = fields.Text(u"备注", required=True)
     # 审核通过
-    def action_pass(self):
+    def action_to_next(self):
         to_last_review = self._context.get("to_last_review")#是否送往终审
         if not self.product_attachment_info_id.review_id:  # 如果没审核过
             self.product_attachment_info_id.action_send_to_review()
         self.product_attachment_info_id.review_id.process_line_review_now.submit_to_next_reviewer(
             to_last_review=to_last_review,
-            partner_id=self.partner_id)
+                partner_id=self.partner_id,
+                remark=self.remark)
 
 
 class FinalReviewPartner(models.Model):
