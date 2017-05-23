@@ -2253,3 +2253,12 @@ class LinklovingAppApi(http.Controller):
                     res[xml_name]['needaction_enabled'] = model._needaction
                     res[xml_name]['needaction_counter'] = model._needaction_count(dom)
         return res
+
+    @http.route('/linkloving_app_api/get_bom_detail', type='json', auth="none", csrf=False)
+    def get_bom_detail(self, **kw):
+        order_id = request.jsonrequest.get("order_id")
+
+        order = request.env["mrp.production"].sudo().browse(order_id)
+
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=order.bom_id.get_bom())

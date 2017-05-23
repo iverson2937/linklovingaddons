@@ -13,12 +13,15 @@
                                 <field name="type"/>
                                 <field name="file_name"/>
                                 <field name="review_id"/>
+                                <field name="has_right_to_review" invisible="1"/>
+
                                 <templates>
                                     <t t-name="kanban-box">
                                         <div class="oe_kanban_global_click">
                                             <div class="oe_kanban_details">
                                                 <field name="file_name" string="文件名"/>
                                                 <field name="state"/>
+                                                <field name="has_right_to_review" invisible="1"/>
                                                 <field name="review_id"/>
 
                                             </div>
@@ -28,6 +31,7 @@
                                                         type="action"
                                                         class="oe_highlight"
                                                         context="{'default_product_attachment_info_id':active_id}"
+                                                        attrs="{'invisible': [('has_right_to_review', '=', False)]}"
                                                 >审核操作
                                                 </button>
                                             </div>
@@ -75,6 +79,7 @@
                                 <field name="product_tmpl_id"/>
                                 <field name="review_id"/>
                                 <field name="type" invisible="1"/>
+
                             </group>
                         </group>
                     </sheet>
@@ -121,10 +126,11 @@
                     <sheet>
                         <group>
                             <field name="partner_id" require="1"/>
+                            <field name="remark"/>
                         </group>
                     </sheet>
                     <footer>
-                        <button name='action_pass' type='object' string='送审' class='oe_highlight'/>
+                        <button name='action_to_next' type='object' string='送审' class='oe_highlight'/>
                         <button string='送往终审' type='object' name='action_pass' class='oe_link'
                                 context="{'to_last_review':True}"/>
                         <button string='取消' class='oe_link' special='cancel'/>

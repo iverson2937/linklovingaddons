@@ -710,6 +710,22 @@ class MrpProductionExtend(models.Model):
                     ('location_ids', 'in', location_domain),
                     ('date_planned_start', '<', after_day.strftime('%Y-%m-%d %H:%M:%S'))]
 
+    @api.multi
+    def action_cancel(self):
+        res = super(MrpProductionExtend, self).action_cancel()
+        for p in self:
+            return_m = self.env["mrp.return.material"].create({
+                'production_id': p.id
+            })
+            move_raw = p.move_raw_ids.filtered(lambda x: x.state == 'done')
+            for line in return_m.return_ids:
+                for move in move_raw:
+                    if line.product_id.id == move.product_id.id:
+                        line.return_qty += move.quantity_done
+            return_m.no_confirm_return()
+            # return_m.do_retrurn()
+        return res
+
 
 class ChangeProductionQty(models.TransientModel):
     _inherit = 'change.production.qty'
@@ -944,6 +960,16 @@ class ReturnOfMaterial(models.Model):
         else:
             self.production_id.write({'state': 'waiting_warehouse_inspection'})
         return True
+
+    # 不需要确认的退料
+    @api.multi
+    def no_confirm_return(self):
+        for r in self.return_ids:
+            if r.return_qty == 0:
+                continue
+            move = self.env['stock.move'].create(self._prepare_move_values(r))
+            r.return_qty = 0
+            move.action_done()
 
     @api.model
     def create(self, vals):
