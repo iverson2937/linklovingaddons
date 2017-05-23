@@ -1,0 +1,527 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* linkloving_project
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-05-22 07:45+0000\n"
+"PO-Revision-Date: 2017-05-22 07:45+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Accept Emails From"
+msgstr "接收邮件来自"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Administration"
+msgstr "管理"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Append this project to another one using analytic accounts hierarchy"
+msgstr "使用分析账户层级结构将此项目追加到另一个分析帐户"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_delegate_user_id
+msgid "Assign To"
+msgstr "指派到"
+
+#. module: linkloving_project
+#: code:addons/linkloving_project/wizard/project_task_delegate.py:113
+#: code:addons/linkloving_project/wizard/project_task_delegate.py:114
+#: code:addons/linkloving_project/wizard/project_task_delegate.py:121
+#: code:addons/linkloving_project/wizard/project_task_delegate.py:122
+#, python-format
+msgid "CHECK: "
+msgstr "检查: "
+
+#. module: linkloving_project
+#: code:addons/linkloving_project/wizard/project_task_delegate.py:125
+#, python-format
+msgid "CHECK: %s"
+msgstr "检查:  %s"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.view_project_task_delegate
+msgid "Cancel"
+msgstr "取消"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Cancel Project"
+msgstr "取消项目"
+
+#. module: linkloving_project
+#: selection:project.project,state:0
+msgid "Cancelled"
+msgstr "已取消"
+
+#. module: linkloving_project
+#: model:ir.model,name:linkloving_project.model_project_category
+msgid "Category of project's task, issue, ..."
+msgstr "项目任务以及问题的类别"
+
+#. module: linkloving_project
+#: model:ir.actions.act_window,help:linkloving_project.project_category_action
+msgid "Click to add a new tag."
+msgstr "点击来创建一个新标签"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Close Project"
+msgstr "关闭项目"
+
+#. module: linkloving_project
+#: selection:project.project,state:0
+msgid "Closed"
+msgstr "已关闭"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_work_company_id
+msgid "Company"
+msgstr "公司"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_category_create_uid
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_delegate_create_uid
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_work_create_uid
+msgid "Created by"
+msgstr "创建人"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_category_create_date
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_delegate_create_date
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_work_create_date
+msgid "Created on"
+msgstr "创建时间"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Customer"
+msgstr "客户"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_work_date
+msgid "Date"
+msgstr "日期"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.view_project_task_delegate
+msgid "Delegated Task"
+msgstr "已委派任务"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_child_ids
+msgid "Delegated Tasks"
+msgstr "已委派任务"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_delegate_name
+msgid "Delegated Title"
+msgstr "委派标题"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_delegated_user_id
+msgid "Delegated To"
+msgstr "委派給"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_category_display_name
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_delegate_display_name
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_work_display_name
+msgid "Display Name"
+msgstr "显示名称"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Documents"
+msgstr "文档"
+
+#. module: linkloving_project
+#: selection:project.task.delegate,state:0
+msgid "Done"
+msgstr "完成"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_work_user_id
+msgid "Done by"
+msgstr "完成者"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_project_effective_hours
+msgid "Effective hours"
+msgstr "实际时数"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Email Alias"
+msgstr "Email别名"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "End Date"
+msgstr "结束日期"
+
+#. module: linkloving_project
+#: model:ir.model.fields,help:linkloving_project.field_project_task_delegate_planned_hours_me
+msgid "Estimated time for you to validate the work done by the user to whom you delegate this task"
+msgstr "你复核分派任务的工作成果需要的工时数"
+
+#. module: linkloving_project
+#: model:ir.model.fields,help:linkloving_project.field_project_task_delegate_planned_hours
+msgid "Estimated time to close this task by the delegated user"
+msgstr "被分派任务的人估算的工时"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Follow this project to automatically track the events associated to tasks and issues of this project."
+msgstr "关注此项目的同时，跟踪此项目的任务和问题关联的事件。"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_effective_hours
+msgid "Hours Spent"
+msgstr "时间花费"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_delegate_planned_hours_me
+msgid "Hours to Validate"
+msgstr "确认小时数"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_category_id
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_delegate_id
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_work_id
+msgid "ID"
+msgstr "ID"
+
+#. module: linkloving_project
+#: selection:project.project,state:0
+msgid "In Progress"
+msgstr "进行中"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Incoming Emails create"
+msgstr "收到的邮件创建"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_category___last_update
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_delegate___last_update
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_work___last_update
+msgid "Last Modified on"
+msgstr "最后修改日"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_category_write_uid
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_delegate_write_uid
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_work_write_uid
+msgid "Last Updated by"
+msgstr "最后更新人"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_category_write_date
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_delegate_write_date
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_work_write_date
+msgid "Last Updated on"
+msgstr "最后更新时间"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Miscellaneous"
+msgstr "杂项"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_category_name
+msgid "Name"
+msgstr "名字"
+
+#. module: linkloving_project
+#: selection:project.project,state:0
+msgid "New"
+msgstr "新建"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "New Project Based on Template"
+msgstr "基于该模板新建项目"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_delegate_new_task_description
+#: model:ir.ui.view,arch_db:linkloving_project.view_project_task_delegate
+msgid "New Task Description"
+msgstr "新任务说明"
+
+#. module: linkloving_project
+#: model:ir.model.fields,help:linkloving_project.field_project_task_delegate_state
+msgid "New state of your own task. Pending will be reopened automatically when the delegated task is closed"
+msgstr "你的任务进入了新的阶段。等待状态将在分派的任务结束后重启任务"
+
+#. module: linkloving_project
+#: model:ir.model.fields,help:linkloving_project.field_project_task_delegate_name
+msgid "New title of the task delegated to the user"
+msgstr "分派给这个用户的任务标题"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Other Info"
+msgstr "其他信息"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Parent"
+msgstr "上一级"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_parent_ids
+msgid "Parent Tasks"
+msgstr "上一级任务"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_project_parent_id
+msgid "Parent id"
+msgstr "父级ID"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+#: selection:project.project,state:0
+#: selection:project.task.delegate,state:0
+msgid "Pending"
+msgstr "暂停"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_delegate_planned_hours
+msgid "Planned Hours"
+msgstr "已计划的小时数"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_project_planned_hours
+msgid "Planned hours"
+msgstr "已计划的小时数"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_project_progress_rate
+msgid "Progress rate"
+msgstr "Progress rate"
+
+#. module: linkloving_project
+#: model:ir.model,name:linkloving_project.model_project_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_delegate_project_id
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Project"
+msgstr "项目"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Project Manager"
+msgstr "项目管理员"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Project Name"
+msgstr "项目名称"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Project Stages"
+msgstr "项目阶段"
+
+#. module: linkloving_project
+#: model:ir.actions.act_window,name:linkloving_project.action_project_task_delegate
+#: model:ir.ui.view,arch_db:linkloving_project.view_project_task_delegate
+msgid "Project Task Delegate"
+msgstr "任务分派"
+
+#. module: linkloving_project
+#: model:ir.model,name:linkloving_project.model_project_task_work
+msgid "Project Task Work"
+msgstr "任务工作"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.view_project_project_gantt
+msgid "Projects"
+msgstr "项目"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Re-open project"
+msgstr "重启项目"
+
+#. module: linkloving_project
+#: model:ir.model.fields,help:linkloving_project.field_project_task_delegate_new_task_description
+msgid "Reinclude the description of the task in the task of the user"
+msgstr "包含当前任务的描述"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Reset as Project"
+msgstr "重设为项目"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_reviewer_id
+msgid "Reviewer"
+msgstr "审阅者"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Set as Template"
+msgstr "搜索项目"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Start Date"
+msgstr "开始日期"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_project_state
+msgid "Status"
+msgstr "状态"
+
+#. module: linkloving_project
+#: model:ir.actions.act_window,name:linkloving_project.project_category_action
+#: model:ir.ui.menu,name:linkloving_project.menu_project_category_act
+msgid "Tags"
+msgstr "标签"
+
+#. module: linkloving_project
+#: model:ir.model,name:linkloving_project.model_project_task
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_work_task_id
+msgid "Task"
+msgstr "任务"
+
+#. module: linkloving_project
+#: model:ir.model,name:linkloving_project.model_project_task_delegate
+msgid "Task Delegate"
+msgstr "任务分派"
+
+#. module: linkloving_project
+#: model:res.groups,name:linkloving_project.group_delegate_task
+msgid "Task Delegation"
+msgstr "任务委派"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.view_task_work_form
+#: model:ir.ui.view,arch_db:linkloving_project.view_task_work_tree
+msgid "Task Work"
+msgstr "任务工作"
+
+#. module: linkloving_project
+#: model:res.groups,name:linkloving_project.group_tasks_work_on_tasks
+msgid "Task's Work on Tasks"
+msgstr "任务的工作任务"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+#: model:ir.ui.view,arch_db:linkloving_project.view_task_gantt
+msgid "Tasks"
+msgstr "任务"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Team"
+msgstr "团队"
+
+#. module: linkloving_project
+#: selection:project.project,state:0
+msgid "Template"
+msgstr "模版"
+
+#. module: linkloving_project
+#: model:ir.actions.act_window,name:linkloving_project.open_view_template_project
+msgid "Templates of Projects"
+msgstr "项目模版"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_work_hours
+msgid "Time Spent"
+msgstr "花费的时间"
+
+#. module: linkloving_project
+#: model:ir.model.fields,help:linkloving_project.field_project_task_delegate_prefix
+msgid "Title for your validation task"
+msgstr "验证任务的前缀"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "To invoice or setup invoicing and renewal options, go to the related contract:"
+msgstr "开票或设定发票更新选项，到相关的合同："
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_total_hours
+msgid "Total"
+msgstr "总计"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_project_total_hours
+msgid "Total hours"
+msgstr "总小时数"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.edit_project
+msgid "Use Tasks"
+msgstr "使用任务"
+
+#. module: linkloving_project
+#: model:ir.model.fields,help:linkloving_project.field_project_task_delegate_project_id
+#: model:ir.model.fields,help:linkloving_project.field_project_task_delegate_user_id
+msgid "User you want to delegate this task to"
+msgstr "你要分派这个任务给哪个用户"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_delegate_state
+msgid "Validation State"
+msgstr "验证状态"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.view_project_task_delegate
+msgid "Validation Task"
+msgstr "验证任务"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.view_project_task_delegate
+msgid "Validation Task Title"
+msgstr "验证任务标题"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_work_ids
+msgid "Work done"
+msgstr "工作完成"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_work_name
+msgid "Work summary"
+msgstr "工作摘要"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_progress
+msgid "Working Time Progress (%)"
+msgstr "工作时间进度（％）"
+
+#. module: linkloving_project
+#: model:ir.model.fields,field_description:linkloving_project.field_project_task_delegate_prefix
+msgid "Your Task Title"
+msgstr "你的任务主题"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.view_project_task_delegate
+msgid "_Delegate"
+msgstr "_D分派"
+
+#. module: linkloving_project
+#: model:ir.ui.view,arch_db:linkloving_project.view_project_task_delegate
+msgid "or"
+msgstr "或"
+
+#. module: linkloving_project
+#: model:ir.model,name:linkloving_project.model_project_abc
+msgid "project.abc"
+msgstr "project.abc"
+
