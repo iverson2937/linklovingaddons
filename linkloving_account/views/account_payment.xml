@@ -63,6 +63,7 @@
                     <field name="remark"/>
                 </xpath>
                 <xpath expr="//field[@name='partner_id']" position="attributes">
+                    <attribute name="domain">[('customer','=',context.get('customer')]</attribute>
                     <attribute name="attrs">{'required': [('state', 'in', ['confirm'])]}</attribute>
                 </xpath>
 

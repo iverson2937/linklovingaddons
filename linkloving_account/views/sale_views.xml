@@ -65,7 +65,7 @@
             <field name="domain">
                 [('state','=','confirm')]
             </field>
-            <field name="context">{'state':'confirm'}</field>
+            <field name="context">{'state':'confirm','customer':True}</field>
             <field name="view_ids" eval="[(5,0,0),
             (0,0,{'view_mode':'tree', 'view_id': ref('view_account_payment_tree_linkloving')}),
             (0,0,{'view_mode':'form', 'view_id': ref('account.view_account_payment_form')})]"/>
