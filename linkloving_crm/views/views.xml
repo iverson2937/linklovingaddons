@@ -176,7 +176,7 @@
         <!--Receipt*-->
         <menuitem action="action_crm_lead_source"
                   id="menu_crm_lead_source"
-                  parent="sales_team.menu_sale_config"
+                  parent="sales_team.menu_sales"
                   sequence="2" name="线索来源"/>
 
 
