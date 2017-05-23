@@ -243,7 +243,7 @@ class AccountPayment(models.Model):
             for balance in rec.invoice_ids.balance_ids:
                 balance.state = 1
             state = 'posted'
-            if self._context.get('to_sales'):
+            if self._context.get('to_sales') and self.payment_type == 'inbound':
                 state = 'confirm'
             rec.write({'state': state, 'move_name': move.name})
 
