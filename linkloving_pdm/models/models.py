@@ -2,7 +2,6 @@
 
 from odoo import models, fields, api
 
-
 # class linkloving_pdm(models.Model):
 #     _name = 'linkloving_pdm.linkloving_pdm'
 
@@ -25,7 +24,7 @@ class ReviewProcess(models.Model):
         for process in self:
             waiting_review_line = process.review_line_ids.filtered(lambda x: x.state == 'waiting_review')
             if waiting_review_line:
-                process.who_review_now =  waiting_review_line[0].partner_id
+                process.who_review_now = waiting_review_line[0].partner_id
             else:
                 process.who_review_now = None
 
@@ -37,12 +36,14 @@ class ReviewProcess(models.Model):
                 process.process_line_review_now = waiting_review_line[0]
             else:
                 process.process_line_review_now = None
+
     res_model = fields.Char('Related Model', required=True, index=True, help='Model of the followed resource')
     res_id = fields.Integer('Related ID', index=True, help='Id of the followed resource')
     review_line_ids = fields.One2many("review.process.line", "review_id", string=u"审核过程")
 
-    who_review_now = fields.Many2one("res.partner",string=u'待...审核', compute="_compute_who_review_now")
+    who_review_now = fields.Many2one("res.partner", string=u'待...审核', compute="_compute_who_review_now")
     process_line_review_now = fields.Many2one("review.process.line", compute="_compute_process_line_review_now")
+
     @api.multi
     def name_get(self):
         res = []
@@ -55,21 +56,22 @@ class ReviewProcess(models.Model):
 
     # 开启一次审核流程
     def create_review_process(self, res_model, res_id):
-            review_id = self.env["review.process"].create({
-                'res_model': res_model,
-                'res_id': res_id,
-            })
-            self.env["review.process.line"].create({
-                'partner_id': self.env.user.partner_id.id,
-                'review_id': review_id.id,
-            })
-            return review_id.id
+        review_id = self.env["review.process"].create({
+            'res_model': res_model,
+            'res_id': res_id,
+        })
+        self.env["review.process.line"].create({
+            'partner_id': self.env.user.partner_id.id,
+            'review_id': review_id.id,
+            'review_order_seq': 1,
+        })
+        return review_id.id
 
 
 class ReviewProcessLine(models.Model):
     _name = 'review.process.line'
 
-    partner_id = fields.Many2one("res.partner", domain=[('employee','=',True)])
+    partner_id = fields.Many2one("res.partner", domain=[('employee', '=', True)])
     review_time = fields.Datetime(string=u"操作时间", required=False, )
     state = fields.Selection(string=u"状态", selection=[('waiting_review', u'等待审核'),
                                                       ('review_success', u'审核通过'),
@@ -79,8 +81,9 @@ class ReviewProcessLine(models.Model):
     last_review_line_id = fields.Many2one("review.process.line", string=u"上一次审核")
     review_id = fields.Many2one('review.process')
 
-    is_last_review= fields.Boolean(default=False)
+    is_last_review = fields.Boolean(default=False)
 
+    review_order_seq = fields.Integer(string=u'审核顺序', help=u"从1开始")  # 从1开始
     remark = fields.Text(u"备注")
 
     def submit_to_next_reviewer(self, to_last_review=False, partner_id=None, remark=None):
@@ -93,14 +96,15 @@ class ReviewProcessLine(models.Model):
                 or partner_id.id == self.env["final.review.partner"].get_final_review_partner_id().id:
             is_last_review = True
 
-        #新建一个 审核条目 指向下一个审核人员
+        # 新建一个 审核条目 指向下一个审核人员
         self.env["review.process.line"].create({
             'partner_id': partner_id.id,
             'review_id': self.review_id.id,
             'last_review_line_id': self.id,
-            'is_last_review':is_last_review,
+            'review_order_seq': self.review_order_seq + 1,
+            'is_last_review': is_last_review,
         })
-        #设置现有的这个审核条目状态等
+        # 设置现有的这个审核条目状态等
         self.write({
             'review_time': fields.datetime.now(),
             'state': 'review_success',
@@ -108,12 +112,32 @@ class ReviewProcessLine(models.Model):
         })
 
     # 审核通过
-    def action_pass(self):
-        pass
+    def action_pass(self, remark):
+        if self.env["final.review.partner"].get_final_review_partner_id().id == self.env.user.partner_id.id:
+            self.write({
+                'review_time': fields.datetime.now(),
+                'state': 'review_success',
+                'remark': remark
+            })
 
-    #拒绝审核
-    def action_deny(self):
-        pass
+        else:
+            raise UserError(u"终审人才能进行审核")
+
+    # 拒绝审核
+    def action_deny(self, remark):
+        self.write({
+            'review_time': fields.datetime.now(),
+            'state': 'review_fail',
+            'remark': remark
+        })
+        # 新建一个 审核条目 指向最初的人
+        self.env["review.process.line"].create({
+            'partner_id': self.create_uid.partner_id.id,
+            'review_id': self.review_id.id,
+            'last_review_line_id': self.id,
+            'review_order_seq': self.review_order_seq + 1,
+        })
+
 
 class ProductAttachmentInfo(models.Model):
     _name = 'product.attachment.info'
@@ -166,7 +190,7 @@ class ProductAttachmentInfo(models.Model):
     review_id = fields.Many2one("review.process",
                                 string=u'待...审核',
                                 track_visibility='always',
-                                readonly=True,)
+                                readonly=True, )
 
     type = fields.Selection(string="类型", selection=[('sip', 'SIP'),
                                                     ('sop', 'SOP'),
@@ -184,7 +208,6 @@ class ProductAttachmentInfo(models.Model):
             vals['state'] = 'waiting_release'
         return super(ProductAttachmentInfo, self).write(vals)
 
-
     # @api.multi
     # def _compute_version(self):
     #     for info in self:
@@ -195,6 +218,7 @@ class ProductAttachmentInfo(models.Model):
         for info in self:
             if not (info.file_binary or info.remote_path):
                 raise UserError(u"该单据还未上传文件不能进行下一步操作")
+
     # 等待文件 -> 等待发布
     @api.multi
     def action_waiting_release(self):
@@ -202,7 +226,6 @@ class ProductAttachmentInfo(models.Model):
         self.write({
             'state': 'waiting_release'
         })
-
 
     # 等待发布 -> 审核中
     @api.multi
@@ -214,27 +237,57 @@ class ProductAttachmentInfo(models.Model):
             'state': 'review_ing',
         })
 
-
     # 等待发布 -> 已发布
     @api.multi
     def action_released(self):
-        pass
-
+        self._check_file_or_remote_path()
+        self.write({
+            'state': 'released'
+        })
 
     # 等待发布 -> 被拒
     @api.multi
     def action_deny(self):
-        pass
-
+        self.write({
+            'state': 'deny'
+        })
 
     # 等待发布 -> 取消
     @api.multi
     def action_cancel(self):
-        pass
+        self.write({
+            'state': 'cancel'
+        })
 
 
 class ProductTemplateExtend(models.Model):
     _inherit = "product.template"
+
+    @api.multi
+    def document_load(self):
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'document_manage',
+            'product_id': self.id
+        }
+
+    #####
+    def get_attachemnt_info_list(self):
+        files = self.env["product.attachment.info"].search_read([("type", "=", "sip"), ("product_tmpl_id", '=', self.id)])
+        # file_json_list = []
+        # for file in files:
+        #     file_json = {
+        #         ''
+        #     }
+        return {
+            'sip': files,
+            'sop': {},
+            'ipqc': {},
+            'design': {},
+            'other': {},
+        }
+
+    #####
 
     sip_files = fields.One2many(comodel_name="product.attachment.info",
                                 inverse_name="product_tmpl_id",
@@ -245,41 +298,70 @@ class ProductTemplateExtend(models.Model):
 
     sop_files = fields.One2many(comodel_name="product.attachment.info",
                                 inverse_name="product_tmpl_id",
+                                domain=[("type", "=", "sop")],
                                 string="SOP",
                                 required=False, )
 
     ipqc_files = fields.One2many(comodel_name="product.attachment.info",
                                  inverse_name="product_tmpl_id",
+                                 domain=[("type", "=", "ipqc")],
                                  string="IPQC",
                                  required=False, )
 
+    other_files = fields.One2many(comodel_name="product.attachment.info",
+                                  inverse_name="product_tmpl_id",
+                                  domain=[("type", "=", "other")],
+                                  string="Other",
+                                  required=False, )
+    design_files = fields.One2many(comodel_name="product.attachment.info",
+                                   inverse_name="product_tmpl_id",
+                                   domain=[("type", "=", "design")],
+                                   string="Design",
+                                   required=False, )
 
 class ReviewProcessWizard(models.TransientModel):
     _name = 'review.process.wizard'
 
-    partner_id = fields.Many2one("res.partner",string=u'提交给...审核', domain=[('employee','=',True)])
+    partner_id = fields.Many2one("res.partner", string=u'提交给...审核', domain=[('employee', '=', True)])
     product_attachment_info_id = fields.Many2one("product.attachment.info")
-    review_process_line = fields.Many2one("review.process.line")
+    review_process_line = fields.Many2one("review.process.line",
+                                          related="product_attachment_info_id.review_id.process_line_review_now")
     remark = fields.Text(u"备注", required=True)
-    # 审核通过
+
+    # 送审
     def action_to_next(self):
-        to_last_review = self._context.get("to_last_review")#是否送往终审
+        to_last_review = self._context.get("to_last_review")  # 是否送往终审
         if not self.product_attachment_info_id.review_id:  # 如果没审核过
             self.product_attachment_info_id.action_send_to_review()
+
+        self.product_attachment_info_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
         self.product_attachment_info_id.review_id.process_line_review_now.submit_to_next_reviewer(
-            to_last_review=to_last_review,
+                to_last_review=to_last_review,
                 partner_id=self.partner_id,
                 remark=self.remark)
+
+    # 终审 审核通过
+    def action_pass(self):
+        # 审核通过
+        self.review_process_line.action_pass(self.remark)
+        # 改变文件状态
+        self.product_attachment_info_id.action_released()
+
+    # 审核不通过
+    def action_deny(self):
+        self.review_process_line.action_deny(self.remark)
+        # 改变文件状态
+        self.product_attachment_info_id.action_deny()
 
 
 class FinalReviewPartner(models.Model):
     _name = 'final.review.partner'
 
     final_review_partner_id = fields.Many2one(comodel_name="res.partner", string="终审人", required=False,
-                                              domain=[('employee','=',True)])
+                                              domain=[('employee', '=', True)])
 
     def get_final_review_partner_id(self):
-        final = self.env["final.review.partner"].search([],limit=1)
+        final = self.env["final.review.partner"].search([], limit=1)
         if final:
             return final[0].final_review_partner_id
         else:
