@@ -46,7 +46,7 @@ class BomUpdateWizard(models.TransientModel):
                             old_product_tmpl_id = old_line_id.product_id
                             default_code = self.get_next_default_code(old_product_tmpl_id.default_code)
                             new_product_tmpl_id = old_line_id.product_id.product_tmpl_id.copy(
-                                {'name': old_product_tmpl_id.name + postfix,
+                                {'name': self.get_new_product_name(self.gold_product_tmpl_id.name, postfix),
                                  'default_code': default_code})
                             new_bom_id = old_line_id.product_id.product_tmpl_id.bom_ids[0].copy()
                             new_bom_id.product_tmpl_id = new_product_tmpl_id.id
@@ -65,8 +65,9 @@ class BomUpdateWizard(models.TransientModel):
                         old_product_tmpl_id = bom_id.product_tmpl_id
                         if not products.get('bom'):
                             default_code = self.get_next_default_code(old_product_tmpl_id.default_code)
-                            new_product_tmpl_id = old_product_tmpl_id.copy({'name': old_product_tmpl_id.name + postfix,
-                                                                            'default_code': default_code})
+                            new_product_tmpl_id = old_product_tmpl_id.copy(
+                                {'name': self.get_new_product_name(self.gold_product_tmpl_id.name, postfix),
+                                 'default_code': default_code})
                             new_bom_id = bom_id.copy()
                             new_bom_id.product_tmpl_id = new_product_tmpl_id.id
                             products.update({
@@ -203,6 +204,17 @@ class BomUpdateWizard(models.TransientModel):
         new_code = prefix + version
         return new_code
 
+    @staticmethod
+    def get_new_product_name(old_name, postfix):
+        old = re.findall(ur"[^(<]+(?=[>）])", old_name)
+        if old and len(old) == 1:
+            new_name = old_name.replace(old, postfix)
+        elif len(old) > 1:
+            UserError(u'产品名称不规范，找不到想要的版本')
+        else:
+            new_name = old_name + '<' + postfix + '>'
+        return new_name
+
 
 def update_bom_line_copy(new_bom_id, new_product_id, old_product_id):
     if new_product_id:
@@ -232,6 +244,6 @@ if __name__ == '__main__':
     ccc = ('000' + str(int(ac) + 1))[-3:]
     print ccc
 
-    a = u"p(123adf)zzz"
+    a = u"p<123adf>zzz"
     b = re.findall(ur"[^(<]+(?=[>）])", a)
     print b
