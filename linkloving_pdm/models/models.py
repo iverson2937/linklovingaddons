@@ -273,9 +273,12 @@ class ProductTemplateExtend(models.Model):
 
     #####
     def get_file_type_list(self):
+        files = self.env["product.attachment.info"].search_read(
+                [("type", "=", 'sip'), ("product_tmpl_id", '=', self.id)])
         return [
             {'name': 'SIP',
-             'type': 'sip'},
+             'type': 'sip',
+             'files': files},
             {'name': 'SOP',
              'type': 'sop'},
             {'name': 'IPQC',
