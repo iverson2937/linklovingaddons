@@ -25,15 +25,14 @@
                                                 <field name="review_id"/>
 
                                             </div>
-
                                             <div class="o_kanban_button">
                                                 <button name="%(action_review_process_wizard)d"
                                                         type="action"
                                                         class="oe_highlight"
                                                         context="{'default_product_attachment_info_id':active_id}"
-                                                        attrs="{'invisible': [('has_right_to_review', '=', False)]}"
                                                 >审核操作
                                                 </button>
+                                                <!--attrs="{'invisible': [('has_right_to_review', '=', False)]}"-->
                                             </div>
                                         </div>
                                     </t>
@@ -131,8 +130,11 @@
                     </sheet>
                     <footer>
                         <button name='action_to_next' type='object' string='送审' class='oe_highlight'/>
-                        <button string='送往终审' type='object' name='action_pass' class='oe_link'
+                        <button string='送往终审' type='object' name='action_to_next' class='oe_link'
                                 context="{'to_last_review':True}"/>
+                        <button name='action_pass' type='object' string='审核通过' class='oe_highlight'/>
+                        <button name='action_deny' type='object' string='审核不通过' class='oe_highlight'/>
+
                         <button string='取消' class='oe_link' special='cancel'/>
                     </footer>
                 </form>

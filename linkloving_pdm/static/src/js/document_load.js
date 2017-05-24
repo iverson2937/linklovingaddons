@@ -32,8 +32,8 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
         },
         start: function () {
             var self = this;
-            return new Model("")
-                .call("", [this.bom_id])
+            return new Model("product.template")
+                .call("get_attachemnt_info_list", [this.product_id])
                 .then(function (result) {
                     console.log(result);
                     self.$el.append(QWeb.render('document_load_detail', {result: result}));
