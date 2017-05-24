@@ -16,6 +16,16 @@ from odoo import models, fields, api
 #         self.value2 = float(self.value) / 100
 from odoo.exceptions import UserError
 
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
+
+    @api.multi
+    def document_load(self):
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'document_manage',
+            'product_id': self.id
+        }
 
 class ReviewProcess(models.Model):
     _name = 'review.process'

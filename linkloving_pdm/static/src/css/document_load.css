@@ -1,0 +1,33 @@
+.document_page_container{
+    margin: 50px auto;
+    width: 80%;
+    min-width: 780px;
+}
+.document_page_container .active>a{
+    background-color: #337ab7!important;
+    color: white!important;
+}
+.document_page_container>ul>li>a{
+    border: 1px solid #dddede!important;
+}
+.document_page_container #myTabContent{
+    padding-top: 30px;
+}
+.document_page_container .tab_message_display{
+    overflow: hidden;
+}
+.document_page_container .tab_message_display>div{
+    float: left;
+    margin-right: 30px;
+}
+.document_page_container .tab_pane_display{
+    border: 1px solid #dddede;
+    padding: 5px;
+    position: relative;
+    overflow: hidden;
+}
+.document_page_container .tab_pane_display .document_btns{
+    position: absolute;
+    top: 7px;
+    right: 7px;
+}

@@ -147,5 +147,13 @@
             <field name="target">new</field>
         </record>
 
+         <template id="document_manage_static" name="linkloving_document_manage" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+
+                <script type="text/javascript" src="/linkloving_pdm/static/src/js/document_load.js"/>
+                <link rel="stylesheet" href="/linkloving_pdm/static/src/css/document_load.css"/>
+            </xpath>
+        </template>
+
     </data>
 </openerp>
