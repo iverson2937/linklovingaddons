@@ -1916,6 +1916,15 @@ class LinklovingAppApi(http.Controller):
             json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
 
+    # 查看bom详情
+    # @http.route('/linkloving_app_api/get_bom_detail', type='json', auth="none", csrf=False)
+    # def get_bom_detail(self, **kw):
+    #     order_id = request.jsonrequest.get("order_id")
+    #
+    #     order = request.env["mrp.production"].sudo().browse(order_id)
+    #
+    #     return JsonResponse.send_response(STATUS_CODE_OK,
+    #                                       res_data=order.bom_id.get_bom())
 
     @http.route('/linkloving_app_api/change_stock_picking_state', type='json', auth='none', csrf=False)
     def change_stock_picking_state(self, **kw):
@@ -2254,11 +2263,3 @@ class LinklovingAppApi(http.Controller):
                     res[xml_name]['needaction_counter'] = model._needaction_count(dom)
         return res
 
-    @http.route('/linkloving_app_api/get_bom_detail', type='json', auth="none", csrf=False)
-    def get_bom_detail(self, **kw):
-        order_id = request.jsonrequest.get("order_id")
-
-        order = request.env["mrp.production"].sudo().browse(order_id)
-
-        return JsonResponse.send_response(STATUS_CODE_OK,
-                                          res_data=order.bom_id.get_bom())
