@@ -10,13 +10,14 @@ from odoo.exceptions import UserError
 class BomUpdateWizard(models.TransientModel):
     _name = "bom.update.wizard"
     postfix = fields.Char(string=u'后缀')
-    partner_id = fields.Many2one('res.partner', domain=[('customer', '=', True)])
+    partner_id = fields.Many2one('res.partner', domain=[('customer', '=', True), ('is_company', '=', True)])
 
     @api.multi
     def bom_line_update(self):
         context = self._context
         main_bom_id = int(context.get('bom_id'))
         postfix = self.postfix if self.postfix else ''
+        partner_id = self.partner_id
         update = context.get('update')
         vals = context.get('back_datas')
         line_obj = self.env['mrp.bom.line']
@@ -195,13 +196,27 @@ class BomUpdateWizard(models.TransientModel):
             raise UserError(u'产品没有对应料号')
 
         # 取前10位
-        prefix = default_code[0:11]
+        if self.partner_id:
+            if not self.partner_id.customer_code:
+                raise UserError(u'该客户未定义客户号码')
+        codes = default_code.splite('.')
+        spec = codes[0:2]
+        prefix = '.'.join(spec.append(self.partner_id.customer_code))
+
+
+
         products = self.env['product.template'].search([('default_code', 'ilike', prefix)])
+        if not products:
+            return prefix + ".A"
         versions = []
+
         for product in products:
-            versions.append(int(product.default_code.split('.')[-1]))
-        version = ('000' + str(int(max(versions)) + 1))[-3:]
-        new_code = prefix + version
+            if len(product.default_code.split('.')) > 3:
+                versions.append(int(product.default_code.split('.')[-1]))
+        if not versions:
+            return prefix + ".B"
+        new_version = chr(ord(max(versions)) + 1)
+        new_code = '.'.join(spec.extend([self.partner_id.customer_code, new_version]))
         return new_code
 
     @staticmethod
@@ -247,3 +262,12 @@ if __name__ == '__main__':
     a = u"p<123adf>zzz"
     b = re.findall(ur"[^(<]+(?=[>）])", a)
     print b
+
+    a = '1.2.3.4'
+
+    b = a.split('.')
+    c = b[0:2]
+    c.append(3)
+
+    D = ['A', 'B']
+    print chr(ord('a') + 1)
