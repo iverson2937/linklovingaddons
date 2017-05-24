@@ -58,18 +58,15 @@
                 <xpath expr="//form/sheet/group" position="after">
                     <field name="remark"/>
                 </xpath>
-                <xpath expr="//field[@name='partner_id']" position="attributes">
-                    <attribute name="options">{'no_create':True}</attribute>
-                    <attribute name="domain">[('customer','=',context.get('customer')),('is_company','=',True)]
-                    </attribute>
-                    <attribute name="attrs">{'required': [('state', 'in', ['confirm'])]}</attribute>
-                </xpath>
-
-                <xpath expr="//field[@name='partner_id']" position="after">
+                <xpath expr="//field[@name='partner_id']" position="replace">
+                    <field name="partner_id" options="{'no_create':True}" nolabel="1"
+                           domain="[('customer','=',context.get('customer')),('is_company','=',True)]"
+                           attrs="{'required': [('state', 'in', ['confirm'])]}"/>
                     <field name="customer" invisible="1"/>
                     <field name="team_id" readonly="1" string="Sale Team" attrs="{'invisible':[('customer','!=',True)]}"
                            options="{'no_create':True}"/>
                 </xpath>
+
 
                 <xpath expr="//sheet" position="after">
                     <div class="oe_chatter">
