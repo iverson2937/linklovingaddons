@@ -286,19 +286,15 @@ class ProductTemplateExtend(models.Model):
              'type': 'design'},
         ]
 
-    def get_attachemnt_info_list(self):
-        files = self.env["product.attachment.info"].search_read([("type", "=", "sip"), ("product_tmpl_id", '=', self.id)])
-        # file_json_list = []
-        # for file in files:
-        #     file_json = {
-        #         ''
-        #     }
+    def get_attachemnt_info_list(self, **kwargs):
+        type = kwargs.get('type')
+        if not type:
+            type = 'sip'
+        files = self.env["product.attachment.info"].search_read(
+                [("type", "=", type), ("product_tmpl_id", '=', self.id)])
         return {
-            'sip': files,
-            'sop': {},
-            'ipqc': {},
-            'design': {},
-            'other': {},
+            'type': type,
+            'files': files,
         }
 
     #####
