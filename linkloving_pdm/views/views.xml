@@ -13,7 +13,7 @@
                                 <field name="type"/>
                                 <field name="file_name"/>
                                 <field name="review_id"/>
-                                <field name="has_right_to_review" invisible="1"/>
+                                <!--<field name="has_right_to_review" invisible="1"/>-->
 
                                 <templates>
                                     <t t-name="kanban-box">
@@ -21,7 +21,7 @@
                                             <div class="oe_kanban_details">
                                                 <field name="file_name" string="文件名"/>
                                                 <field name="state"/>
-                                                <field name="has_right_to_review" invisible="1"/>
+                                                <!--<field name="has_right_to_review" invisible="1"/>-->
                                                 <field name="review_id"/>
 
                                             </div>

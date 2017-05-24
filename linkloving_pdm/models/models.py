@@ -273,7 +273,7 @@ class ProductTemplateExtend(models.Model):
 
     #####
     def get_attachemnt_info_list(self):
-        files = self.env["product.attachment.info"].seach_read([("type", "=", "sip"), ("id", '=', self.id)])
+        files = self.env["product.attachment.info"].search_read([("type", "=", "sip"), ("product_tmpl_id", '=', self.id)])
         # file_json_list = []
         # for file in files:
         #     file_json = {
