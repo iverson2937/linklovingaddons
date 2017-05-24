@@ -60,7 +60,7 @@
                 </xpath>
                 <xpath expr="//field[@name='partner_id']" position="replace">
                     <field name="partner_id" options="{'no_create':True}" nolabel="1"
-                           domain="[('customer','=',context.get('customer')),('is_company','=',True)]"
+                           domain="[('customer','=',context.get('is_customer')),('is_company','=',True)]"
                            attrs="{'required': [('state', 'in', ['confirm'])]}"/>
                     <field name="customer" invisible="1"/>
                     <field name="team_id" readonly="1" string="Sale Team" attrs="{'invisible':[('customer','!=',True)]}"
