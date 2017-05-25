@@ -54,7 +54,7 @@
                     <field name="communication_identifier"/>
                 </xpath>
                 <xpath expr="//field[@name='lang']" position="after">
-                    <field name="priority" widget="priority"/>
+                    <field name="priority" widget="priority" attrs="{'invisible':[('customer','=', False)]}"/>
                 </xpath>
 
                 <xpath expr="//page[@name='accounting_disabled']" position="after">
