@@ -13,17 +13,37 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
 
     var DocumentManage = Widget.extend({
         template: 'document_load_page',
-
-        event:{
-          'click .load_file_submit':'load_file'
+        events:{
+            'show.bs.tab .tab_toggle_a':'document_change_tabs',
+            'click .document_manage_btn':'document_form_pop'
         },
-        load_file:function () {
-            console.log('1')
-		    var filename = document.getElementById("importFile").value;
-		    // 这时的filename不是 importFile 框中的值
-		    alert(filename);
-            console.log('hjhjhj')
-            console.log('2')
+        document_form_pop:function (e) {
+            var e = e||window.event;
+            var target = e.target||e.srcElement;
+            var file_id = $(target).attr("data-id");
+            var action = {
+                name:"详细",
+                type: 'ir.actions.act_window',
+                res_model:'review.process.wizard',
+                view_type: 'form',
+                view_mode: 'tree,form',
+                views: [[false, 'form']],
+                context: {'default_product_attachment_info_id':file_id} ,
+                target:"new"
+            };
+            this.do_action(action);
+        },
+        document_change_tabs:function (e) {
+            var e = e||window.event;
+            var target = e.target||e.srcElement;
+            var file_type = $(target).attr("data");
+            return new Model("product.template")
+                .call("get_attachemnt_info_list", [this.product_id], {type:file_type})
+                .then(function (result) {
+                    console.log(result);
+                    self.$("#"+file_type).html("");
+                    self.$("#"+file_type).append(QWeb.render('active_document_tab', {result: result}));
+                })
         },
         init: function (parent, action) {
             this._super.apply(this, arguments);
