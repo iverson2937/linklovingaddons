@@ -67,6 +67,17 @@ class ReviewProcess(models.Model):
         })
         return review_id.id
 
+    # 获得审核全流程
+    def get_review_line_list(self):
+        self.ensure_one()
+        sorted_line = sorted(self.review_line_ids, key=lambda x: x.review_order_seq)
+        line_list = []
+        for line in sorted_line:
+            line_list.append({
+                'name': line.partner_id.name,
+                'state': line.state,
+            })
+        return line_list
 
 class ReviewProcessLine(models.Model):
     _name = 'review.process.line'
@@ -162,7 +173,7 @@ class ProductAttachmentInfo(models.Model):
     @api.multi
     def _compute_has_right_to_review(self):
         for info in self:
-            if info.review_id.who_review_now.user_id == self.env.user.id:
+            if self.env.user.id in info.review_id.who_review_now.user_ids.ids:
                 info.has_right_to_review = True
 
     file_name = fields.Char(u"文件名")
@@ -273,12 +284,11 @@ class ProductTemplateExtend(models.Model):
 
     #####
     def get_file_type_list(self):
-        files = self.env["product.attachment.info"].search_read(
-                [("type", "=", 'sip'), ("product_tmpl_id", '=', self.id)])
+
         return [
             {'name': 'SIP',
              'type': 'sip',
-             'files': files},
+             'files': self.convert_attendment_info_list(type='sip')},
             {'name': 'SOP',
              'type': 'sop'},
             {'name': 'IPQC',
@@ -293,13 +303,29 @@ class ProductTemplateExtend(models.Model):
         type = kwargs.get('type')
         if not type:
             type = 'sip'
-        files = self.env["product.attachment.info"].search_read(
-                [("type", "=", type), ("product_tmpl_id", '=', self.id)])
         return {
             'type': type,
-            'files': files,
+            'files': self.convert_attendment_info_list(type),
         }
 
+    def convert_attendment_info_list(self, type):
+        files = self.env["product.attachment.info"].search(
+                [("type", "=", type), ("product_tmpl_id", '=', self.id)])
+        json_list = []
+        for a_file in files:
+            json_list.append(self.convert_attachment_info(a_file))
+        return json_list
+
+    def convert_attachment_info(self, info):
+        return {
+            'file_name': info.file_name or '',
+            'review_id': info.review_id.who_review_now.name or '',
+            'remote_path': info.remote_path or '',
+            'version': info.version or '',
+            'state': info.state,
+            'has_right_to_review': info.has_right_to_review,
+            'review_line': info.review_id.get_review_line_list()
+        }
     #####
 
     sip_files = fields.One2many(comodel_name="product.attachment.info",
@@ -353,6 +379,7 @@ class ReviewProcessWizard(models.TransientModel):
                 partner_id=self.partner_id,
                 remark=self.remark)
 
+        return True
     # 终审 审核通过
     def action_pass(self):
         # 审核通过
@@ -360,12 +387,14 @@ class ReviewProcessWizard(models.TransientModel):
         # 改变文件状态
         self.product_attachment_info_id.action_released()
 
+        return True
     # 审核不通过
     def action_deny(self):
         self.review_process_line.action_deny(self.remark)
         # 改变文件状态
-        self.product_attachment_info_id.action_deny()
+        self.produc_attachment_info_id.action_deny()
 
+        return True
 
 class FinalReviewPartner(models.Model):
     _name = 'final.review.partner'
@@ -379,3 +408,35 @@ class FinalReviewPartner(models.Model):
             return final[0].final_review_partner_id
         else:
             return False
+
+    @api.model
+    def create(self, vals):
+        res = super(FinalReviewPartner, self).create(vals)
+        users = res.final_review_partner_id.user_ids
+        for user in users:
+            user.groups_id = [(4, self.env.ref("linkloving_pdm.group_final_review_partner").id)]
+        return res
+        # group_final_review_partner
+
+    @api.multi
+    def unlink(self):
+        user_ids = self.final_review_partner_id.user_ids
+        for user in user_ids:
+            user.groups_id = [(2, self.env.ref("linkloving_pdm.group_final_review_partner").id)]
+
+        return super(FinalReviewPartner, self).unlink()
+
+    @api.multi
+    def write(self, vals):
+        group = self.env.ref("linkloving_pdm.group_final_review_partner").id
+        user_ids = self.final_review_partner_id.user_ids
+        for user in user_ids:
+            user.groups_id = [(2, group)]
+
+        res = super(FinalReviewPartner, self).write(vals)
+
+        users = self.final_review_partner_id.user_ids
+        for user in users:
+            user.groups_id = [(4, group)]
+
+        return res

@@ -12,7 +12,7 @@
                             <kanban>
                                 <field name="type"/>
                                 <field name="file_name"/>
-                                <field name="review_id"/>
+                                <field name="review_id" options="{'always_reload': True}"/>
                                 <!--<field name="has_right_to_review" invisible="1"/>-->
 
                                 <templates>
@@ -22,7 +22,7 @@
                                                 <field name="file_name" string="文件名"/>
                                                 <field name="state"/>
                                                 <!--<field name="has_right_to_review" invisible="1"/>-->
-                                                <field name="review_id"/>
+                                                <field name="review_id" options="{'always_reload': True}"/>
 
                                             </div>
                                             <div class="o_kanban_button">
@@ -129,13 +129,15 @@
                         </group>
                     </sheet>
                     <footer>
-                        <button name='action_to_next' type='object' string='送审' class='oe_highlight'/>
-                        <button string='送往终审' type='object' name='action_to_next' class='oe_link'
+                        <button name='action_to_next' type='object' string='送审' class='oe_highlight review_reload'/>
+                        <button string='送往终审' type='object' name='action_to_next' class='oe_link review_reload'
                                 context="{'to_last_review':True}"/>
-                        <button name='action_pass' type='object' string='审核通过' class='oe_highlight'/>
-                        <button name='action_deny' type='object' string='审核不通过' class='oe_highlight'/>
+                        <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
+                                groups="linkloving_pdm.group_final_review_partner"/>
+                        <button name='action_deny' type='object' string='审核不通过' class='oe_highlight review_reload'
+                                groups="linkloving_pdm.group_final_review_partner"/>
 
-                        <button string='取消' class='oe_link' special='cancel'/>
+                        <button string='取消' class='oe_link review_reload' special='cancel'/>
                     </footer>
                 </form>
             </field>

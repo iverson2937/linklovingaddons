@@ -13,7 +13,7 @@
     border: 1px solid #dddede!important;
 }
 .document_page_container #myTabContent{
-    padding-top: 30px;
+    padding-top: 18px;
 }
 .document_page_container .tab_message_display{
     overflow: hidden;
@@ -24,17 +24,53 @@
 }
 .document_page_container .tab_pane_display{
     border: 1px solid #dddede;
-    padding: 5px;
+    padding: 10px;
     position: relative;
     overflow: hidden;
     margin-bottom: 15px;
 }
+.document_page_container .tab_pane_display .document_review_list{
+    position: absolute;
+    top: 0px;
+    right: 90px;
+    padding: 10px;
+    /*background: pink;*/
+    width: 60%;
+    height:100%;
+}
+.document_page_container .tab_pane_display .document_review_list>span{
+    width: 45px;
+    color: green;
+    float: left;
+    font-size: 36px;
+    margin-left: 8px;
+    /*margin-top: -2px;*/
+    display: block;
+    height: 32px;
+    margin-bottom: 3px;
+}
+.document_page_container .tab_pane_display .document_review_list>.document_yellow{
+    color: darkorange!important;
+}
+.document_page_container .tab_pane_display .document_review_list>div{
+    padding-left: 3px;
+    padding-right: 3px;
+    line-height: 30px;
+    text-align: center;
+    border:1px solid black;
+    float: left;
+    margin-bottom: 3px;
+}
+
 .document_page_container .tab_pane_display .tab_message_display>div{
-    margin-bottom: 5px;
-    margin-top: 5px;
+    margin-bottom: 8px;
+    margin-top: 8px;
 }
 .document_page_container .tab_pane_display .document_btns{
     position: absolute;
     top: 7px;
     right: 7px;
+}
+.document_page_container .create_document{
+    margin-top: 18px;
 }
