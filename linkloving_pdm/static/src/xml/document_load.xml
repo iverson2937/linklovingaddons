@@ -47,6 +47,10 @@
                                             <span class="fa fa-long-arrow-right document_yellow"></span>
                                             <div>等待</div>
                                         </t>
+                                         <t t-if="review_list.state=='review_fail'">
+                                            <span class="fa fa-long-arrow-right document_red"></span>
+                                            <div>审核不通过</div>
+                                        </t>
                                     </t>
 
                                 </div>
@@ -85,6 +89,11 @@
                         <t t-if="review_list.state=='waiting_review'">
                             <span class="fa fa-long-arrow-right document_yellow"></span>
                             <div>等待</div>
+                        </t>
+                        <t t-if="review_list.state=='review_fail'">
+                            <span class="fa fa-long-arrow-right document_red"></span>
+                            <div>审核不通过</div>
+                            <span class="fa fa-long-arrow-right"></span>
                         </t>
                     </t>
 

@@ -40,7 +40,8 @@
     /*min-width: 1200px;*/
 }
 #accordion h4,#accordion a,#accordion span{
-    font-size: 14px!important;
+    font-size: 12px!important;
+    font-weight:500!important;
 }
 #accordion .panel{
     border:none!important;
@@ -50,6 +51,7 @@
 #accordion .panel-body{
     padding-top: 3px;
     padding-bottom: 1px;
+    padding-left: 25px;
 }
 #accordion>.panel>.panel-collapse>.panel-body{
     padding-bottom: 50px;
@@ -64,6 +66,7 @@
 }
 #accordion .open-sign{
     font-size: 20px!important;
+    margin-left: -10px;
 }
 
 

@@ -56,3 +56,14 @@
 #accordion .change_color{
     background-color: rgba(255,140,105,0.5)!important;
 }
+#accordion span,#accordion a{
+    font-size: 12px!important;
+    font-weight:600!important;
+}
+#accordion .panel-default > .panel-heading{
+    background-color: white;
+    padding: 4px 15px;
+}
+#accordion .panel-body{
+    border-top: none;
+}
