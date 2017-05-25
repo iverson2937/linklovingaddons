@@ -110,7 +110,7 @@
             <t t-if="item.bom_ids.length>0">
                 <span style="margin-left:30px;cursor:pointer" class="fa fa-plus add_product"></span>
             </t>
-            <span class='fa fa-copy product_copy' style='margin-left: 15px'></span>
+            <!--<span class='fa fa-copy product_copy' style='margin-left: 15px'></span>-->
             <button style="margin-left:15px" class="btn btn-primary product_edit">编辑</button>
         </h4>
     </t>

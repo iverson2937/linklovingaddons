@@ -182,6 +182,8 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 var arr = [];
                 var json_data = {};
                 var add_product_value = $(this).children("input:first-child").val();
+                var add_data_id_value = $(this).children("input:first-child").attr("data-id-value");
+
                 var add_product_id = $(this).children("input:first-child").prop("id");
                 var add_product_qty = $(this).children("input[class='product_propor']").val();
                 var modify_type = $(this).children("input:first-child").attr("data-modify-type");
@@ -194,6 +196,13 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 }
 
                 if (add_product_value != "") {
+                    if(add_data_id_value != add_product_value){
+                        json_data["if_input_changed"] = true;
+                        json_data["input_changed_value"] = add_product_value;
+                    }else {
+                        json_data["if_input_changed"] = false;
+                    }
+
                     getParents($(this));
                     console.log(arr);
                     json_data["product_id"] = parseInt(add_product_id);
@@ -255,6 +264,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             var target = e.target || e.srcElement;
             target.parentNode.previousElementSibling.value = target.innerHTML;
             target.parentNode.previousElementSibling.setAttribute("id", target.getAttribute("id"));
+            target.parentNode.previousElementSibling.setAttribute("data-id-value", target.innerHTML);
         },
         add_product_input_focus: function (e) {
             var e = e || window.event;
@@ -266,6 +276,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 $(".add_product_ul").hide()
             }, 150)
         },
+        //加号的
         add_product_function: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
