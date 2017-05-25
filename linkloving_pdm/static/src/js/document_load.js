@@ -15,7 +15,20 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
         template: 'document_load_page',
         events:{
             'show.bs.tab .tab_toggle_a':'document_change_tabs',
-            'click .document_manage_btn':'document_form_pop'
+            'click .document_manage_btn':'document_form_pop',
+            'click .create_document_btn':'create_document_fn'
+        },
+        create_document_fn:function () {
+              var action = {
+                name:"详细",
+                type: 'ir.actions.act_window',
+                res_model:'product.attachment.info',
+                view_type: 'form',
+                view_mode: 'tree,form',
+                views: [[false, 'form']],
+                target:"new"
+            };
+            this.do_action(action);
         },
         document_form_pop:function (e) {
             var e = e||window.event;

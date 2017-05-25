@@ -70,7 +70,7 @@ class ReviewProcess(models.Model):
     # 获得审核全流程
     def get_review_line_list(self):
         self.ensure_one()
-        sorted_line = sorted(self.review_line_ids, lambda x: x.review_order_seq)
+        sorted_line = sorted(self.review_line_ids, key=lambda x: x.review_order_seq)
         line_list = []
         for line in sorted_line:
             line_list.append({
@@ -319,7 +319,7 @@ class ProductTemplateExtend(models.Model):
     def convert_attachment_info(self, info):
         return {
             'file_name': info.file_name or '',
-            'review_id': info.review_id.partner_id.name or '',
+            'review_id': info.review_id.who_review_now.name or '',
             'remote_path': info.remote_path or '',
             'version': info.version or '',
             'state': info.state,

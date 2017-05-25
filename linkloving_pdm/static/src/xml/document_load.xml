@@ -20,7 +20,7 @@
             </t>
         </ul>
         <div class="create_document">
-            <button class="btn btn-primary">创建</button>
+            <button class="btn btn-primary create_document_btn">创建</button>
         </div>
 
         <div id="myTabContent" class="tab-content">
@@ -36,6 +36,19 @@
                                     <div>远程地址：<span><t t-esc="item_files.remote_path"/></span></div>
                                     <div>版本：<span><t t-esc="item_files.version"/></span></div>
                                     <div>状态：<span><t t-esc="item_files.state"/></span></div>
+                                </div>
+                                <div class="document_review_list">
+                                    <t t-foreach="item_files.review_line" t-as="review_list">
+                                        <div><t t-esc="review_list.name"/></div>
+                                        <t t-if="review_list.state=='review_success'">
+                                            <span class="fa fa-long-arrow-right"></span>
+                                        </t>
+                                        <t t-if="review_list.state=='waiting_review'">
+                                            <span class="fa fa-long-arrow-right document_yellow"></span>
+                                            <div>等待</div>
+                                        </t>
+                                    </t>
+
                                 </div>
                                 <div class="document_btns">
                                     <t t-if="item_files.has_right_to_review == true">
@@ -63,6 +76,19 @@
                     <div>版本：<span><t t-esc="item_files.version"/></span></div>
                     <div>状态：<span><t t-esc="item_files.state"/></span></div>
                 </div>
+                 <div class="document_review_list">
+                    <t t-foreach="item_files.review_line" t-as="review_list">
+                        <div><t t-esc="review_list.name"/></div>
+                        <t t-if="review_list.state=='review_success'">
+                            <span class="fa fa-long-arrow-right"></span>
+                        </t>
+                        <t t-if="review_list.state=='waiting_review'">
+                            <span class="fa fa-long-arrow-right document_yellow"></span>
+                            <div>等待</div>
+                        </t>
+                    </t>
+
+                 </div>
                 <div class="document_btns">
                     <!--<t t-if="item_files.has_right_to_review == true">-->
                         <button class="btn btn-primary document_manage_btn" t-att-data-id="item_files.id">审核操作</button>
