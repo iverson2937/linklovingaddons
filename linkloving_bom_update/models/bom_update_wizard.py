@@ -36,6 +36,7 @@ class BomUpdateWizard(models.TransientModel):
                 product_id = val.get('product_id')
                 parents = val.get('parents')
                 modify_type = val.get('modify_type')
+                input_changed_value = val.get('input_changed_value')
                 last_bom_line_id = val.get('last_product_id')
                 del_bom_line_id = val.get('del_bom_id')
                 qty = val.get('qty')
@@ -95,6 +96,12 @@ class BomUpdateWizard(models.TransientModel):
                         temp_old_product_id = old_line_id.product_id.id
 
                     if modify_type == 'add':
+                        if input_changed_value:
+                            product_tmpl_id = product_id_obj.browse(product_id).product_tmpl_id
+                            new_name = self.get_new_product_name(input_changed_value, postfix)
+                            default_code = self.get_next_default_code(product_tmpl_id.default_code)
+                            new_pl_id = product_tmpl_id.copy({'name': new_name, 'default_code': default_code})
+                            product_id = new_pl_id.product_variant_ids[0].id
                         if product_id:
                             line_obj.create({
                                 'product_id': product_id,
@@ -118,10 +125,11 @@ class BomUpdateWizard(models.TransientModel):
                         product_id = False
                     elif modify_type == 'copy':
                         if name_product_name:
+                            new_name = self.get_new_product_name(name_product_name, postfix)
                             new_default_code = self.get_next_default_code(
                                 product_id_obj.browse(product_id).default_code)
                             new_product_id = product_id_obj.browse(product_id).product_tmpl_id.copy(
-                                {'name': name_product_name, 'default_code': new_default_code})
+                                {'name': new_name, 'default_code': new_default_code})
                             line_obj.create({
                                 'product_id': new_product_id.product_variant_ids[0].id,
                                 'qty': qty,
@@ -146,6 +154,7 @@ class BomUpdateWizard(models.TransientModel):
             for val in vals:
                 product_id = val.get('product_id')
                 parents = val.get('parents')
+                input_changed_value = vals.get('input_changed_value')
                 last_bom_line_id = val.get('last_product_id')
                 qty = val.get('qty')
                 modify_type = val.get('modify_type')
@@ -160,6 +169,12 @@ class BomUpdateWizard(models.TransientModel):
                     bom_id = bom_obj.browse(line)
 
                 if modify_type == 'add':
+                    if input_changed_value:
+                        product_tmpl_id = product_id_obj.browse(product_id).product_tmpl_id
+                        new_name = self.get_new_product_name(input_changed_value, postfix)
+                        default_code = self.get_next_default_code(product_tmpl_id.default_code)
+                        new_pl_id = product_tmpl_id.copy({'name': new_name, 'default_code': default_code})
+                        product_id = new_pl_id.product_variant_ids[0].id
                     if product_id:
                         line_obj.create({
                             'product_id': int(product_id),
