@@ -118,7 +118,8 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             var target = e.target || e.srcElement;
             target = target.parentNode.firstChild.nextElementSibling.nextElementSibling;
             console.log(target);
-            var last_product_name = target.innerText;
+            var last_product_name = $(target).children('span').text();
+            console.log(last_product_name)
             var last_product_id = target.getAttribute("data-product-id");
             var last_id = target.getAttribute("data-id");
             var wraper = target.parentNode.parentNode.parentNode;
