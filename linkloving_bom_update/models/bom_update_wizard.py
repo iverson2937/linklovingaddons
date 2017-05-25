@@ -109,6 +109,7 @@ class BomUpdateWizard(models.TransientModel):
                                 'bom_id': new_bom_id.id,
                             })
                             product_id = False
+                            input_changed_value = False
                             # 此为修改bom，需要删除一个bom_line
                     elif modify_type == 'edit':
                         old_product_id = line_obj.browse(last_bom_line_id).product_id
@@ -160,7 +161,7 @@ class BomUpdateWizard(models.TransientModel):
             for val in vals:
                 product_id = val.get('product_id')
                 parents = val.get('parents')
-                input_changed_value = vals.get('input_changed_value')
+                input_changed_value = val.get('input_changed_value')
                 last_bom_line_id = val.get('last_product_id')
                 qty = val.get('qty')
                 modify_type = val.get('modify_type')
