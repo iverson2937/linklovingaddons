@@ -19,6 +19,9 @@
                 <t t-set="i" t-value="2"/>
             </t>
         </ul>
+        <div class="create_document">
+            <button class="btn btn-primary">创建</button>
+        </div>
 
         <div id="myTabContent" class="tab-content">
             <t t-set="j" t-value="1"/>
