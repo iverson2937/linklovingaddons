@@ -219,7 +219,7 @@ class BomUpdateWizard(models.TransientModel):
         if not versions:
             return prefix + ".B"
         new_version = chr(ord(max(versions)) + 1)
-        spec.extend([self.partner_id.customer_code, new_version])
+        spec.extend([customer_code, new_version])
         new_code = '.'.join(spec)
         return new_code
 
