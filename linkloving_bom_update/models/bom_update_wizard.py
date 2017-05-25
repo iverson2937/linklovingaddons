@@ -129,7 +129,7 @@ class BomUpdateWizard(models.TransientModel):
                             update_bom_line_delete(new_bom_id, old_product_id)
                         elif product_id and old_product_id.id == product_id:
                             update_bom_line_update(new_bom_id, old_product_id, qty)
-                        # 第二次循环只需要拷贝bom,product,不需要修改创建修改bom line
+                            # 第二次循环只需要拷贝bom,product,不需要修改创建修改bom line
                     elif modify_type == 'copy':
                         if name_product_name:
                             new_name = self.get_new_product_name(name_product_name, postfix)
@@ -241,7 +241,7 @@ class BomUpdateWizard(models.TransientModel):
         if not versions:
             return prefix + ".B"
         new_version = chr(ord(max(versions)) + 1)
-        spec.extend([customer_code, new_version])
+        spec.append(new_version)
         new_code = '.'.join(spec)
         return new_code
 
