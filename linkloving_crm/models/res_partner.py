@@ -69,9 +69,24 @@ class CrmRemarkRecord(models.Model):
     detail = fields.Text(string=u'详细')
     real_time = fields.Date(string=u'日期', default=fields.Date.context_today)
 
+    i_adc = fields.Many2many('product.template', string=u'拜访记录')
+
 
 class CrmLeadSource(models.Model):
     _name = 'crm.lead.source'
 
     name = fields.Char(u'来源')
     detail = fields.Text(string=u'详细')
+
+
+class CrmRemarkRecord(models.Model):
+    _inherit = 'mail.message'
+
+    @api.multi
+    def send_mail_action_is_my(self):
+        # TDE/ ???
+        return self.send_mail()
+
+    @api.multi
+    def send_mail(self):
+        return {'type': 'ir.actions.act_window_close'}

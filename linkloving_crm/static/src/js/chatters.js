@@ -289,7 +289,46 @@ odoo.define('mail.Chatters', function (require) {
         events: {
             "click .o_chatter_button_new_message": "on_open_composer_new_message",
             "click .o_chatter_button_log_note": "on_open_composer_log_note",
+
+
+            "click .o_chatter_button_update_message": "on_open_full_composer_is_my",
+
+            "click .o_chatter_button_update_messages": function (event) {
+                var message = $(event.currentTarget).data('message-id');
+
+                var action_two = {
+                    type: 'ir.actions.act_window',
+                    res_model: 'mail.message',
+                    // view_id: 'view_message_form_is_my',
+                    view_mode: 'form',
+                    views: [[1669 || false, 'form']],
+                    res_id: message,
+                    target: 'new'
+                }
+
+
+                var self = this;
+                self.do_action(action_two, {
+                    on_close: function () {
+                        self.trigger('need_refresh');
+                        var parent = self.getParent();
+                        chat_manager.get_messages({model: parent.model, res_id: parent.res_id});
+                    },
+                }).then(self.trigger.bind(self, 'close_composer'));
+
+                // this.do_action(action_two, {
+                //     on_close: function () {
+                //         // reload view
+                //         alert()
+                //         self.getParent().destroy()
+                //         self.getParent().reload();
+                //     },
+                // });
+
+
+            },
         },
+
 
         init: function () {
             this._super.apply(this, arguments);
@@ -546,7 +585,6 @@ odoo.define('mail.Chatters', function (require) {
             chat_manager.remove_chatter_messages(this.model);
             this._super.apply(this, arguments);
         },
-
     });
 
     core.form_widget_registry.add('mail_threads', Chatter);

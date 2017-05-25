@@ -5,7 +5,9 @@
         <t t-if="messages.length">
             <t t-if="options.display_load_more &amp;&amp; options.display_order == ORDER.ASC"
                t-call="mail.ChatThread.LoadMore"/>
+
             <t t-call="mail.ChatThread.Content"/>
+
             <t t-if="options.display_load_more &amp;&amp; options.display_order == ORDER.DESC"
                t-call="mail.ChatThread.LoadMore"/>
         </t>
@@ -55,11 +57,14 @@
                         t-att-data-oe-id="message.author_redirect ? message.author_id[0] : ''"
                         t-attf-class="o_thread_message_avatar #{message.author_redirect ? 'o_mail_redirect' : ''}"/>
                 </t>
+
                 <t t-if="message.mailto || !message.author_id[0]">
                     <img t-if="message.avatar_src &amp;&amp; message.display_author"
                         t-att-src="message.avatar_src"
                         class="o_thread_message_avatar"/>
                 </t>
+
+
                 <span t-if="!message.display_author" t-att-title="message.date" class="o_thread_message_side_date">
                     <t t-esc="message.date.format('hh:mm')"/>
                 </span>
@@ -94,6 +99,8 @@
                     <t t-if="message.origin_id &amp;&amp; (message.origin_id !== options.channel_id)">
                         (from <a t-att-data-oe-id="message.origin_id" href="#">#<t t-esc="message.origin_name"/></a>)
                     </t>
+
+
                     <span t-if="options.display_email_icon &amp;&amp; message.customer_email_data &amp;&amp; message.customer_email_data.length" class="o_thread_tooltip_container">
                         <i t-att-class="'o_thread_tooltip o_thread_message_email o_thread_message_email_' + message.customer_email_status + ' fa fa-envelope-o'"/>
                         <span class="o_thread_tooltip_content">
@@ -109,10 +116,16 @@
                             </t>
                         </span>
                     </span>
+
                     <span>
+
+
                         <i t-if="options.display_stars &amp;&amp; !message.is_system_notification"
                             t-att-class="'fa fa-lg o_thread_message_star ' + (message.is_starred ? 'fa-star' : 'fa-star-o')"
                             t-att-data-message-id="message.id" title="Mark as Todo"/>
+
+
+
                        <i t-if="message.record_name &amp;&amp; message.model != 'mail.channel' &amp;&amp; options.display_reply_icon"
                            class="fa fa-reply o_thread_message_reply"
                            t-att-data-message-id="message.id" title="Reply"/>
@@ -120,7 +133,22 @@
                            class="fa fa-check o_thread_message_needaction"
                            t-att-data-message-id="message.id" title="Mark as Read"/>
                     </span>
+                    <span>
+
+
+                    <!--<button  class="btn btn-sm btn-primary o_chatter_button_update_message">编辑</button>-->
+                        <i t-if="options.display_stars &amp;&amp; !message.is_system_notification"
+                            t-att-class="'btn btn-sm btn-primary o_chatter_button_update_message ' "
+                            t-att-data-message-id="message" title="Mark as Todo">编辑</i>
+
+                        <i t-if="options.display_stars &amp;&amp; !message.is_system_notification"
+                            t-att-class="'btn btn-sm btn-primary o_chatter_button_update_messages ' "
+                            t-att-data-message-id="message.id" title="Mark as Todo">编辑2</i>
+
+                    </span>
                 </p>
+
+
                 <t t-if="message.tracking_value_ids &amp;&amp; message.tracking_value_ids.length &gt; 0">
                     <t t-if="message.subtype_description">
                         <p t-esc="message.subtype_description"/>
@@ -134,6 +162,7 @@
                 <t t-foreach="message.attachment_ids" t-as="attachment">
                     <t t-call="mail.Attachment"/>
                 </t>
+
             </div>
         </div>
         <t t-if="options.messages_separator_position == message.id">
