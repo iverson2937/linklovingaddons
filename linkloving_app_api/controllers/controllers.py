@@ -724,7 +724,7 @@ class LinklovingAppApi(http.Controller):
             sim_stock_move.quantity_ready = 0  # 清0
         # try:
         #     mrp_production.post_inventory()
-        # except UserError, e:
+        # except UserError, e:.filtered(lambda x: x.product_type != 'semi-finished')
         #     return JsonResponse.send_response(STATUS_CODE_ERROR,
         #                                       res_data={"error":e.name})
         if all(sim_move.is_prepare_finished for sim_move in
