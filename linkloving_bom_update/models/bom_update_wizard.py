@@ -15,6 +15,7 @@ class BomUpdateWizard(models.TransientModel):
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         self.postfix = self.partner_id.customer_alias
+
     @api.multi
     def bom_line_update(self):
         context = self._context
@@ -206,8 +207,6 @@ class BomUpdateWizard(models.TransientModel):
         spec.append(self.partner_id.customer_code)
         prefix = '.'.join(spec)
 
-
-
         products = self.env['product.template'].search([('default_code', 'ilike', prefix)])
         if not products:
             return prefix + ".A"
@@ -215,18 +214,19 @@ class BomUpdateWizard(models.TransientModel):
 
         for product in products:
             if len(product.default_code.split('.')) > 3:
-                versions.append(int(product.default_code.split('.')[-1]))
+                versions.append(product.default_code.split('.')[-1])
         if not versions:
             return prefix + ".B"
         new_version = chr(ord(max(versions)) + 1)
-        new_code = '.'.join(spec.extend([self.partner_id.customer_code, new_version]))
+        spec.extend([self.partner_id.customer_code, new_version])
+        new_code = '.'.join(spec)
         return new_code
 
     @staticmethod
     def get_new_product_name(old_name, postfix):
         old = re.findall(ur"[^(<]+(?=[>）])", old_name)
         if old and len(old) == 1:
-            new_name = old_name.replace(old, postfix)
+            new_name = old_name.replace(old[0], postfix)
         elif len(old) > 1:
             UserError(u'产品名称不规范，找不到想要的版本')
         else:
