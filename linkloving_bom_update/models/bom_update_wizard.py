@@ -12,6 +12,9 @@ class BomUpdateWizard(models.TransientModel):
     postfix = fields.Char(string=u'后缀')
     partner_id = fields.Many2one('res.partner', domain=[('customer', '=', True), ('is_company', '=', True)])
 
+    @api.onchange('partner_id')
+    def _onchange_partner_id(self):
+        self.postfix = self.partner_id.customer_alias
     @api.multi
     def bom_line_update(self):
         context = self._context
@@ -67,7 +70,7 @@ class BomUpdateWizard(models.TransientModel):
                         if not products.get('bom'):
                             default_code = self.get_next_default_code(old_product_tmpl_id.default_code)
                             new_product_tmpl_id = old_product_tmpl_id.copy(
-                                {'name': self.get_new_product_name(self.gold_product_tmpl_id.name, postfix),
+                                {'name': self.get_new_product_name(old_product_tmpl_id.name, postfix),
                                  'default_code': default_code})
                             new_bom_id = bom_id.copy()
                             new_bom_id.product_tmpl_id = new_product_tmpl_id.id
@@ -195,13 +198,13 @@ class BomUpdateWizard(models.TransientModel):
         if not default_code:
             raise UserError(u'产品没有对应料号')
 
-        # 取前10位
         if self.partner_id:
             if not self.partner_id.customer_code:
                 raise UserError(u'该客户未定义客户号码')
-        codes = default_code.splite('.')
+        codes = default_code.split('.')
         spec = codes[0:2]
-        prefix = '.'.join(spec.append(self.partner_id.customer_code))
+        spec.append(self.partner_id.customer_code)
+        prefix = '.'.join(spec)
 
 
 
