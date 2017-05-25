@@ -198,15 +198,16 @@ class BomUpdateWizard(models.TransientModel):
     def get_next_default_code(self, default_code):
         if not default_code:
             raise UserError(u'产品没有对应料号')
-
+        codes = default_code.split('.')
+        customer_code = codes[2]
         if self.partner_id:
             if not self.partner_id.customer_code:
                 raise UserError(u'该客户未定义客户号码')
-        codes = default_code.split('.')
-        spec = codes[0:2]
-        spec.append(self.partner_id.customer_code)
-        prefix = '.'.join(spec)
+            customer_code = self.partner_id.customer_code
 
+        spec = codes[0:2]
+        spec.append(customer_code)
+        prefix = '.'.join(spec)
         products = self.env['product.template'].search([('default_code', 'ilike', prefix)])
         if not products:
             return prefix + ".A"
