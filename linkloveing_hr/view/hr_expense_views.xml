@@ -3,16 +3,14 @@
     <data>
 
 
-
-
-         <record id="hr_expense_form_view_inherit" model="ir.ui.view">
+        <record id="hr_expense_form_view_inherit" model="ir.ui.view">
             <field name="model">hr.expense</field>
             <field name="inherit_id" ref="hr_expense.hr_expense_form_view"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='payment_mode']" position="attributes">
                     <attribute name="readonly">1</attribute>
                 </xpath>
-                   <xpath expr="//field[@name='employee_id']" position="after">
+                <xpath expr="//field[@name='employee_id']" position="after">
                     <field name="department_id"/>
                 </xpath>
                 <xpath expr="//field[@name='product_id']" position="attributes">
@@ -71,6 +69,7 @@
             <field name="res_model">hr.expense.sheet</field>
             <field name="view_mode">tree,kanban,form,pivot,graph</field>
             <field name="search_view_id" ref="hr_expense.view_hr_expense_sheet_filter"/>
+            <field name="domain">[('income','!=',True)]</field>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
                     Click here to create a new expense report.
@@ -82,24 +81,22 @@
         </record>
 
         <record id="view_hr_expense_sheet_filter" model="ir.ui.view">
-        <field name="name">res.partner.geo.inherit.search</field>
-        <field name="model">hr.expense.sheet</field>
-        <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_filter"/>
-        <field name="arch" type="xml">
-            <filter name="approved" position="replace">
-                <filter domain="[('state', '=', 'post')]" string="To Pay" name="approved" help="Expenses to Invoice"/>
-            </filter>
-            <field name="name" position="after">
-                <field name="total_amount"/>
+            <field name="name">res.partner.geo.inherit.search</field>
+            <field name="model">hr.expense.sheet</field>
+            <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_filter"/>
+            <field name="arch" type="xml">
+                <filter name="approved" position="replace">
+                    <filter domain="[('state', '=', 'post')]" string="To Pay" name="approved"
+                            help="Expenses to Invoice"/>
+                </filter>
+                <field name="name" position="after">
+                    <field name="total_amount"/>
+                </field>
+                <field name="name" position="after">
+                    <field name="expense_no" string="Expense No" filter_domain="[('expense_no','ilike',self)]"/>
+                </field>
             </field>
-            <field name="name" position="after">
-                <field name="expense_no" string="Expense No" filter_domain="[('expense_no','ilike',self)]"/>
-            </field>
-        </field>
-    </record>
-
-
-
+        </record>
 
 
         <menuitem id="hr_expense.menu_hr_expense_sheet_all_to_approve" name="Expense Reports To Approve" sequence="1"
@@ -113,8 +110,6 @@
                   parent="hr_expense.menu_hr_expense_to_approve"
                   groups="base.group_erp_manager"
                   action="action_hr_expense_sheet_all"/>
-
-
 
 
     </data>

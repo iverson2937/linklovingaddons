@@ -39,7 +39,8 @@
         'wizard/hr_expense_receive_wizard.xml',
         'report/report_template.xml',
         'report/report.xml',
-        'report/hr_expense_sheet_report.xml'
+        'report/hr_expense_sheet_report.xml',
+        'data/income_seq.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

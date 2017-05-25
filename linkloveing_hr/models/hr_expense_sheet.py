@@ -13,7 +13,7 @@ class HrExpenseSheet(models.Model):
     payment_id = fields.Many2one('account.employee.payment')
     income = fields.Boolean()
     partner_id = fields.Many2one('res.partner')
-    payment_line_ids=fields.One2many('account.employee.payment.line','sheet_id')
+    payment_line_ids = fields.One2many('account.employee.payment.line', 'sheet_id')
 
     @api.multi
     def action_sheet_move_create(self):
@@ -47,8 +47,8 @@ class HrExpenseSheet(models.Model):
     to_approve_id = fields.Many2one('res.users', readonly=True, track_visibility='onchange')
 
     state = fields.Selection([('submit', 'Submitted'),
-                              ('manager1_approve', '1st Approved'),
-                              ('manager2_approve', '2nd Approved'),
+                              ('manager1_approve', u'一级审核'),
+                              ('manager2_approve', u'二级审核'),
                               ('manager3_approve', 'General Manager Approved'),
                               ('approve', 'Approved'),
                               ('post', 'Posted'),
@@ -103,7 +103,10 @@ class HrExpenseSheet(models.Model):
     @api.model
     def create(self, vals):
         if vals.get('expense_no', 'New') == 'New':
-            vals['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense.sheet') or '/'
+            if self._context.get('default_income'):
+                vals['expense_no'] = self.env['ir.sequence'].next_by_code('account.income') or '/'
+            else:
+                vals['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense.sheet') or '/'
         exp = super(HrExpenseSheet, self).create(vals)
         if exp.employee_id == exp.employee_id.department_id.manager_id:
             department = exp.to_approve_id.employee_ids.department_id
@@ -117,6 +120,7 @@ class HrExpenseSheet(models.Model):
 
     @api.multi
     def write(self, vals):
+
         if vals.get('state') == 'cancel':
             self.to_approve_id = False
 
@@ -134,8 +138,6 @@ class HrExpenseSheet(models.Model):
             self.to_approve_id = self.employee_id.department_id.manager_id.user_id.id
 
         return self.write({'state': 'submit'})
-
-
 
     @api.multi
     def process(self):
@@ -180,7 +182,7 @@ class HrExpenseSheet(models.Model):
     @api.multi
     def register_payment_action(self):
 
-        amount=self.total_amount- sum(line.amount for line in self.payment_line_ids)
+        amount = self.total_amount - sum(line.amount for line in self.payment_line_ids)
 
         context = {'default_payment_type': 'outbound', 'default_amount': amount}
 
@@ -218,14 +220,14 @@ class HrExpenseSheet(models.Model):
             'target': 'new',
         }
 
-        @api.model
-        def _needaction_domain_get(self):
-            """ Returns the domain to filter records that require an action
-                :return: domain or False is no action
-            """
-            if self._context.get('to_approve_id'):
-                return [('to_approve_id', '=', self.env.user.id)]
-            if self._context.get('search_default_to_post'):
-                return [('state', '=', 'approve')]
-            if self._context.get('search_default_approved'):
-                return [('state', '=', 'post')]
+    @api.model
+    def _needaction_domain_get(self):
+        """ Returns the domain to filter records that require an action
+            :return: domain or False is no action
+        """
+        if self._context.get('to_approve_id'):
+            return [('to_approve_id', '=', self.env.user.id)]
+        if self._context.get('search_default_to_post'):
+            return [('state', '=', 'approve')]
+        if self._context.get('search_default_approved'):
+            return [('state', '=', 'post')]
