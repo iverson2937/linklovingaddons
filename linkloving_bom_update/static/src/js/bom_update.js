@@ -25,7 +25,17 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             'click .delete_product': 'delete_product_fn',
             'click .product_copy': 'copy_product_fn',
             'click .bom_back': 'bom_back_fn',
-            'click .product_name': 'to_bom_line_page'
+            'click .product_name': 'to_bom_line_page',
+            'click .bom_update_cancel':'cancel_bom_modify'
+        },
+        cancel_bom_modify:function (e) {
+            var e = e||window.event;
+            var target = e.target||e.srcElement;
+            $(target).parent().parent().parent().parent().removeClass("input-panel");
+            $(target).parent().parent().html($(target).parents('#accordion').attr("data-delete-html"));
+
+            // $(this).parent().parent().parent().removeClass("input-panel");
+            // $(this).parent().html("<a></a><span class='product_name' data-product-id="+add_product_id+">" + add_product_value + "</span><span style='margin-left: 15px'>"+add_product_qty+"</span>");
         },
         to_bom_line_page:function (e) {
             var e = e||window.event;
@@ -117,9 +127,12 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             target = target.parentNode.firstChild.nextElementSibling.nextElementSibling;
-            console.log(target);
+            // $(target).parent().html();
+            $(target).parents("#accordion").attr("data-delete-html", $(target).parent().html());
+
+
             var last_product_name = $(target).children('span').text();
-            console.log(last_product_name)
+            console.log(last_product_name);
             var last_product_id = target.getAttribute("data-product-id");
             var last_id = target.getAttribute("data-id");
             var wraper = target.parentNode.parentNode.parentNode;
@@ -133,6 +146,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 '<ul class="add_product_ul"><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul>' +
                 '<input class="product_propor" style="margin-left: 15px" type="text"/>'+
                 '<span class="fa fa-trash-o delete_product" style="margin-left: 15px"></span>'+
+                "<button class='btn btn-default bom_update_cancel' style='margin-left: 15px'>取消</button>"+
                 '</div></h4>';
 
             wraper.insertBefore(divs,inset_before);
@@ -295,6 +309,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 "<ul class='add_product_ul'><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul>" +
                 "<input class='product_propor' style='margin-left: 15px' type='text' value='1'/> "+
                 "<span class='fa fa-trash-o delete_product' style='margin-left: 15px'></span>"+
+                "<button class='btn btn-default bom_update_cancel' style='margin-left: 15px'>取消</button>"+
                 "</div></h4></div>";
             wraper[0].prepend(divs);
             $(".add_product_ul>li").each(function () {

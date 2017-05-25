@@ -52,6 +52,9 @@
 .document_page_container .tab_pane_display .document_review_list>.document_yellow{
     color: darkorange!important;
 }
+.document_page_container .tab_pane_display .document_review_list>.document_red{
+    color: red!important;
+}
 .document_page_container .tab_pane_display .document_review_list>div{
     padding-left: 3px;
     padding-right: 3px;
