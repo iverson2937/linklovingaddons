@@ -77,7 +77,7 @@
                                 <field name="version"/>
                                 <field name="product_tmpl_id"/>
                                 <field name="review_id"/>
-                                <field name="type" invisible="1"/>
+                                <field name="type"/>
 
                             </group>
                         </group>
