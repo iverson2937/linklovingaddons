@@ -29,7 +29,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 view_mode: 'tree,form',
                 views: [[false, 'form']],
                 context: {'default_product_attachment_info_id':file_id} ,
-                target:"new"
+                target: "new",
             };
             this.do_action(action);
             self.$(document).ajaxComplete(function ( event, xhr, settings) {
@@ -85,7 +85,6 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                     self.$el.append(QWeb.render('document_load_detail', {result: result}));
                 })
         }
-
 
     })
 

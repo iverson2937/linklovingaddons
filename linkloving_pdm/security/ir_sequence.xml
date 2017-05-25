@@ -1,5 +1,8 @@
 <openerp>
     <data>
-
+        <record id="group_final_review_partner" model="res.groups">
+            <field name="name">终审人</field>
+            <!--<field name="category_id" ref="base.module_category_hidden"/>-->
+        </record>
     </data>
 </openerp>
