@@ -112,17 +112,23 @@ class BomUpdateWizard(models.TransientModel):
                             # 此为修改bom，需要删除一个bom_line
                     elif modify_type == 'edit':
                         old_product_id = line_obj.browse(last_bom_line_id).product_id
-                        if product_id and old_product_id.id != product_id:
+                        if input_changed_value:
+                            product_tmpl_id = product_id_obj.browse(product_id).product_tmpl_id
+                            new_name = self.get_new_product_name(input_changed_value, postfix)
+                            default_code = self.get_next_default_code(product_tmpl_id.default_code)
+                            new_pl_id = product_tmpl_id.copy({'name': new_name, 'default_code': default_code})
+                            product_id = new_pl_id.product_variant_ids[0].id
+                        if product_id:
                             line_obj.create({
                                 'product_id': product_id,
                                 'product_qty': qty,
                                 'bom_id': new_bom_id.id,
                             })
+                            product_id = False
                             update_bom_line_delete(new_bom_id, old_product_id)
                         elif product_id and old_product_id.id == product_id:
                             update_bom_line_update(new_bom_id, old_product_id, qty)
                         # 第二次循环只需要拷贝bom,product,不需要修改创建修改bom line
-                        product_id = False
                     elif modify_type == 'copy':
                         if name_product_name:
                             new_name = self.get_new_product_name(name_product_name, postfix)
