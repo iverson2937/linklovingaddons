@@ -392,7 +392,7 @@ class ReviewProcessWizard(models.TransientModel):
     def action_deny(self):
         self.review_process_line.action_deny(self.remark)
         # 改变文件状态
-        self.produc_attachment_info_id.action_deny()
+        self.product_attachment_info_id.action_deny()
 
         return True
 
