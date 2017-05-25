@@ -191,6 +191,7 @@ class project_work(models.Model):
     _name = "project.task.work"
     _description = "Project Task Work"
 
+
     _order = "date desc"
 
     name = fields.Char('Work summary')
