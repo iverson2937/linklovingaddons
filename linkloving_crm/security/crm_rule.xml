@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data noupdate="0">
+<odoo>
 
-        <record id="crm_lead_rule" model="ir.rule">
-            <field name="name">HR Expense Sheet Rule</field>
-            <field name="model_id" ref="hr_expense.model_hr_expense_sheet"/>
-            <field name="domain_force">['|', '|', '|','|',('to_approve_id.id','=', user.id),('manager1_id.id','=',
-                user.id),('manager2_id.id','=', user.id),('manager3_id.id','=', user.id),('responsible_id.id','=',
-                user.id)]
-            </field>
-            <field name="groups" eval="[(4, ref('hr_expense.group_hr_expense_user'))]"/>
+
+    <record model="ir.rule" id="sale_team_comp_rule">
+        <field name="name">Sales Team multi-company</field>
+        <field name="model_id" ref="model_crm_team"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+    </record>
+
+    <record model="ir.ui.menu" id="sales_team.menu_sale_config">
+        <field name="name">Configuration</field>
+        <field eval="[(6,0,[ref('base.group_system')])]" name="groups_id"/>
+    </record>
+
+    <record model="ir.ui.menu" id="menu_config_address_book">
+        <field name="name">Contacts</field>
+        <field eval="[(6,0,[ref('base.group_system'), ref('base.group_partner_manager')])]" name="groups_id"/>
+    </record>
+
+    <data noupdate="1">
+        <record id="base.default_user" model="res.users">
+            <field name="groups_id" eval="[(4,ref('sales_team.group_sale_manager'))]"/>
         </record>
     </data>
-</openerp>
+</odoo>
