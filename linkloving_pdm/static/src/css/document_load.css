@@ -2,6 +2,8 @@
     margin: 50px auto;
     width: 80%;
     min-width: 780px;
+    background: white;
+    padding: 10px;
 }
 .document_page_container .active>a{
     background-color: #337ab7!important;
@@ -17,7 +19,7 @@
     overflow: hidden;
 }
 .document_page_container .tab_message_display>div{
-    float: left;
+    /*float: left;*/
     margin-right: 30px;
 }
 .document_page_container .tab_pane_display{
@@ -25,6 +27,11 @@
     padding: 5px;
     position: relative;
     overflow: hidden;
+    margin-bottom: 15px;
+}
+.document_page_container .tab_pane_display .tab_message_display>div{
+    margin-bottom: 5px;
+    margin-top: 5px;
 }
 .document_page_container .tab_pane_display .document_btns{
     position: absolute;

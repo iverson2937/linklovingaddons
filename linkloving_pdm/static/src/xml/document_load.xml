@@ -9,65 +9,59 @@
 
     <t t-name="document_load_detail">
         <ul id="document_tab" class="nav nav-tabs">
-                <li class="active">
-                    <a href="#document_one" data-toggle="tab">
-                         文件系统一
+            <t t-set="i" t-value="1"/>
+            <t t-foreach="result" t-as="item">
+                <li t-att-class="i ==1 ? 'active': ''">
+                    <a t-att-href="'#'+item.type" data-toggle="tab" class="tab_toggle_a" t-att-data="item.type">
+                         <t t-esc="item.name"/>
                     </a>
                 </li>
-                <li>
-                    <a href="#document_two" data-toggle="tab">
-                        文件系统二
-                    </a>
-                </li>
-                <li>
-                    <a href="#document_three" data-toggle="tab">
-                        文件系统三
-                    </a>
-                </li>
-                <li>
-                    <a href="#document_four" data-toggle="tab">
-                        文件系统四
-                    </a>
-                </li>
-                <li>
-                    <a href="#document_five" data-toggle="tab">
-                        文件系统五
-                    </a>
-                </li>
-            </ul>
+                <t t-set="i" t-value="2"/>
+            </t>
+        </ul>
 
-            <div id="myTabContent" class="tab-content">
-                <div class="tab-pane fade in active" id="document_one">
-                    <div class="tab_pane_display">
-                        <div class="tab_message_display">
-                            <div>文件名：<span>1</span></div>
-                            <div>审核人：</div> <br/>
-                            <div>远程地址：<span>3</span></div>
-                            <div>版本：<span>2</span></div>
-                            <div>状态：<span>4</span></div>
-                        </div>
-                        <div class="document_btns">
-                            <button class="btn btn-primary">按钮1</button>
-                            <button class="btn btn-primary">按钮2</button>
-                            <button class="btn btn-primary">按钮3</button>
-                            <button class="btn btn-primary">按钮4</button>
-                            <button class="btn btn-primary">按钮5</button>
-                        </div>
-                    </div>
+        <div id="myTabContent" class="tab-content">
+            <t t-set="j" t-value="1"/>
+            <t t-foreach="result" t-as="item">
+                <div t-att-class="j==1?'tab-pane fade in active':'tab-pane fade'" t-att-id="item.type">
+                    <t t-if="item.files">
+                        <t t-foreach="item.files" t-as="item_files">
+                            <div class="tab_pane_display">
+                                <div class="tab_message_display">
+                                    <div>文件名：<span><t t-esc="item_files.file_name"/></span></div>
+                                    <div>审核人：<span><t t-esc="item_files.review_id"/></span></div>
+                                    <div>远程地址：<span><t t-esc="item_files.remote_path"/></span></div>
+                                    <div>版本：<span><t t-esc="item_files.version"/></span></div>
+                                    <div>状态：<span><t t-esc="item_files.state"/></span></div>
+                                </div>
+                                <div class="document_btns">
+                                    <button class="btn btn-primary document_manage_btn" t-att-data-id="item_files.id">按钮1</button>
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+
                 </div>
-                <div class="tab-pane fade" id="document_two">
-                    <p>iOS 是一个由苹果公司开发和发布的手机操作系统。最初是于 2007 年首次发布 iPhone、iPod Touch 和 Apple
-                        TV。iOS 派生自 OS X，它们共享 Darwin 基础。OS X 操作系统是用在苹果电脑上，iOS 是苹果的移动版本。</p>
+                <t t-set="j" t-value="2"/>
+            </t>
+
+        </div>
+    </t>
+
+    <t t-name="active_document_tab">
+        <t t-foreach="result.files" t-as="item_files">
+            <div class="tab_pane_display">
+                <div class="tab_message_display">
+                    <div>文件名：<span><t t-esc="item_files.file_name"/></span></div>
+                    <div>审核人：<span><t t-esc="item_files.review_id"/></span></div>
+                    <div>远程地址：<span><t t-esc="item_files.remote_path"/></span></div>
+                    <div>版本：<span><t t-esc="item_files.version"/></span></div>
+                    <div>状态：<span><t t-esc="item_files.state"/></span></div>
                 </div>
-                <div class="tab-pane fade" id="document_three">
-                    <p>jMeter 是一款开源的测试软件。它是 100% 纯 Java 应用程序，用于负载和性能测试。</p>
-                </div>
-                <div class="tab-pane fade" id="document_four">
-                    <p>jMeter 是一款开源的测试软件。它是 100% 纯 Java 应用程序，用于负载和性能测试。</p>
-                </div>
-                <div class="tab-pane fade" id="document_five">
-                    <p>jMeter 是一款开源的测试软件。它是 100% 纯 Java 应用程序，用于负载和性能测试。</p>
+                <div class="document_btns">
+                    <button class="btn btn-primary document_manage_btn" t-att-data-id="item_files.id">按钮1</button>
                 </div>
             </div>
+        </t>
     </t>
 </templates>

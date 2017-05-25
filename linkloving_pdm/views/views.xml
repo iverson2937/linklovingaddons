@@ -38,24 +38,24 @@
                                     </t>
                                 </templates>
                             </kanban>
-                            <form string="文件">
-                                <sheet>
-                                    <group>
+                            <!--<form string="文件">-->
+                                <!--<sheet>-->
+                                    <!--<group>-->
 
-                                        <group>
-                                            <field name="file_name"/>
-                                            <field name="remote_path"/>
-                                            <field name="file_binary"/>
-                                            <field name="state"/>
-                                            <field name="version"/>
-                                            <field name="product_tmpl_id"/>
-                                            <field name="review_id"/>
-                                            <field name="type" invisible="1"/>
-                                        </group>
-                                    </group>
+                                        <!--<group>-->
+                                            <!--<field name="file_name"/>-->
+                                            <!--<field name="remote_path"/>-->
+                                            <!--<field name="file_binary"/>-->
+                                            <!--<field name="state"/>-->
+                                            <!--<field name="version"/>-->
+                                            <!--<field name="product_tmpl_id"/>-->
+                                            <!--<field name="review_id"/>-->
+                                            <!--<field name="type"/>-->
+                                        <!--</group>-->
+                                    <!--</group>-->
 
-                                </sheet>
-                            </form>
+                                <!--</sheet>-->
+                            <!--</form>-->
                         </field>
                     </page>
                 </xpath>
