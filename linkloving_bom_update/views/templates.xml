@@ -29,7 +29,8 @@
                 <form string="Confirm Draft Invoices">
                     <group>
                         <group>
-                            <field name="partner_id" string="客户"/>
+                            <field name="partner_id" string="客户" domain="[('customer_code','!=',False)]"
+                                   options="{'no_create':True}"/>
 
                         </group>
                         <group>

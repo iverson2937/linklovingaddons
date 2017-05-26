@@ -12,6 +12,10 @@ class BomUpdateWizard(models.TransientModel):
     postfix = fields.Char(string=u'后缀')
     partner_id = fields.Many2one('res.partner', domain=[('customer', '=', True), ('is_company', '=', True)])
 
+    @api.onchange('partner_id')
+    def _onchange_partner_id(self):
+        self.postfix = self.partner_id.customer_alias
+
     @api.multi
     def bom_line_update(self):
         context = self._context
@@ -32,6 +36,7 @@ class BomUpdateWizard(models.TransientModel):
                 product_id = val.get('product_id')
                 parents = val.get('parents')
                 modify_type = val.get('modify_type')
+                input_changed_value = val.get('input_changed_value')
                 last_bom_line_id = val.get('last_product_id')
                 del_bom_line_id = val.get('del_bom_id')
                 qty = val.get('qty')
@@ -47,7 +52,7 @@ class BomUpdateWizard(models.TransientModel):
                             old_product_tmpl_id = old_line_id.product_id
                             default_code = self.get_next_default_code(old_product_tmpl_id.default_code)
                             new_product_tmpl_id = old_line_id.product_id.product_tmpl_id.copy(
-                                {'name': self.get_new_product_name(self.gold_product_tmpl_id.name, postfix),
+                                {'name': self.get_new_product_name(old_product_tmpl_id.name, postfix),
                                  'default_code': default_code})
                             new_bom_id = old_line_id.product_id.product_tmpl_id.bom_ids[0].copy()
                             new_bom_id.product_tmpl_id = new_product_tmpl_id.id
@@ -67,7 +72,7 @@ class BomUpdateWizard(models.TransientModel):
                         if not products.get('bom'):
                             default_code = self.get_next_default_code(old_product_tmpl_id.default_code)
                             new_product_tmpl_id = old_product_tmpl_id.copy(
-                                {'name': self.get_new_product_name(self.gold_product_tmpl_id.name, postfix),
+                                {'name': self.get_new_product_name(old_product_tmpl_id.name, postfix),
                                  'default_code': default_code})
                             new_bom_id = bom_id.copy()
                             new_bom_id.product_tmpl_id = new_product_tmpl_id.id
@@ -91,6 +96,12 @@ class BomUpdateWizard(models.TransientModel):
                         temp_old_product_id = old_line_id.product_id.id
 
                     if modify_type == 'add':
+                        if input_changed_value:
+                            product_tmpl_id = product_id_obj.browse(product_id).product_tmpl_id
+                            new_name = self.get_new_product_name(input_changed_value, postfix)
+                            default_code = self.get_next_default_code(product_tmpl_id.default_code)
+                            new_pl_id = product_tmpl_id.copy({'name': new_name, 'default_code': default_code})
+                            product_id = new_pl_id.product_variant_ids[0].id
                         if product_id:
                             line_obj.create({
                                 'product_id': product_id,
@@ -98,26 +109,35 @@ class BomUpdateWizard(models.TransientModel):
                                 'bom_id': new_bom_id.id,
                             })
                             product_id = False
+                            input_changed_value = False
                             # 此为修改bom，需要删除一个bom_line
                     elif modify_type == 'edit':
                         old_product_id = line_obj.browse(last_bom_line_id).product_id
-                        if product_id and old_product_id.id != product_id:
+                        if input_changed_value:
+                            product_tmpl_id = product_id_obj.browse(product_id).product_tmpl_id
+                            new_name = self.get_new_product_name(input_changed_value, postfix)
+                            default_code = self.get_next_default_code(product_tmpl_id.default_code)
+                            new_pl_id = product_tmpl_id.copy({'name': new_name, 'default_code': default_code})
+                            product_id = new_pl_id.product_variant_ids[0].id
+                        if product_id:
                             line_obj.create({
                                 'product_id': product_id,
                                 'product_qty': qty,
                                 'bom_id': new_bom_id.id,
                             })
+                            product_id = False
+                            input_changed_value = False
                             update_bom_line_delete(new_bom_id, old_product_id)
                         elif product_id and old_product_id.id == product_id:
                             update_bom_line_update(new_bom_id, old_product_id, qty)
-                        # 第二次循环只需要拷贝bom,product,不需要修改创建修改bom line
-                        product_id = False
+                            # 第二次循环只需要拷贝bom,product,不需要修改创建修改bom line
                     elif modify_type == 'copy':
                         if name_product_name:
+                            new_name = self.get_new_product_name(name_product_name, postfix)
                             new_default_code = self.get_next_default_code(
                                 product_id_obj.browse(product_id).default_code)
                             new_product_id = product_id_obj.browse(product_id).product_tmpl_id.copy(
-                                {'name': name_product_name, 'default_code': new_default_code})
+                                {'name': new_name, 'default_code': new_default_code})
                             line_obj.create({
                                 'product_id': new_product_id.product_variant_ids[0].id,
                                 'qty': qty,
@@ -142,6 +162,7 @@ class BomUpdateWizard(models.TransientModel):
             for val in vals:
                 product_id = val.get('product_id')
                 parents = val.get('parents')
+                input_changed_value = val.get('input_changed_value')
                 last_bom_line_id = val.get('last_product_id')
                 qty = val.get('qty')
                 modify_type = val.get('modify_type')
@@ -156,6 +177,12 @@ class BomUpdateWizard(models.TransientModel):
                     bom_id = bom_obj.browse(line)
 
                 if modify_type == 'add':
+                    if input_changed_value:
+                        product_tmpl_id = product_id_obj.browse(product_id).product_tmpl_id
+                        new_name = self.get_new_product_name(input_changed_value, postfix)
+                        default_code = self.get_next_default_code(product_tmpl_id.default_code)
+                        new_pl_id = product_tmpl_id.copy({'name': new_name, 'default_code': default_code})
+                        product_id = new_pl_id.product_variant_ids[0].id
                     if product_id:
                         line_obj.create({
                             'product_id': int(product_id),
@@ -165,6 +192,13 @@ class BomUpdateWizard(models.TransientModel):
                         product_id = False
                         # 此为修改bom，需要删除一个bom_line
                 elif modify_type == 'edit':
+                    if input_changed_value:
+                        product_tmpl_id = product_id_obj.browse(product_id).product_tmpl_id
+                        new_name = self.get_new_product_name(input_changed_value, postfix)
+                        default_code = self.get_next_default_code(product_tmpl_id.default_code)
+                        new_pl_id = product_tmpl_id.copy({'name': new_name, 'default_code': default_code})
+                        product_id = new_pl_id.product_variant_ids[0].id
+
                     last_bom_line_id = line_obj.browse(int(last_bom_line_id))
                     if product_id:
                         last_bom_line_id.write({
@@ -194,17 +228,16 @@ class BomUpdateWizard(models.TransientModel):
     def get_next_default_code(self, default_code):
         if not default_code:
             raise UserError(u'产品没有对应料号')
-
-        # 取前10位
+        codes = default_code.split('.')
+        customer_code = codes[2]
         if self.partner_id:
             if not self.partner_id.customer_code:
                 raise UserError(u'该客户未定义客户号码')
-        codes = default_code.splite('.')
+            customer_code = self.partner_id.customer_code
+
         spec = codes[0:2]
-        prefix = '.'.join(spec.append(self.partner_id.customer_code))
-
-
-
+        spec.append(customer_code)
+        prefix = '.'.join(spec)
         products = self.env['product.template'].search([('default_code', 'ilike', prefix)])
         if not products:
             return prefix + ".A"
@@ -212,22 +245,26 @@ class BomUpdateWizard(models.TransientModel):
 
         for product in products:
             if len(product.default_code.split('.')) > 3:
-                versions.append(int(product.default_code.split('.')[-1]))
+                versions.append(product.default_code.split('.')[-1])
         if not versions:
             return prefix + ".B"
         new_version = chr(ord(max(versions)) + 1)
-        new_code = '.'.join(spec.extend([self.partner_id.customer_code, new_version]))
+        spec.append(new_version)
+        new_code = '.'.join(spec)
         return new_code
 
     @staticmethod
     def get_new_product_name(old_name, postfix):
         old = re.findall(ur"[^(<]+(?=[>）])", old_name)
         if old and len(old) == 1:
-            new_name = old_name.replace(old, postfix)
+            new_name = old_name.replace(old[0], postfix)
         elif len(old) > 1:
             UserError(u'产品名称不规范，找不到想要的版本')
         else:
-            new_name = old_name + '<' + postfix + '>'
+            if postfix:
+                new_name = old_name + '<' + postfix + '>'
+            else:
+                new_name = old_name
         return new_name
 
 

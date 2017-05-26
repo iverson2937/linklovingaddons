@@ -37,58 +37,56 @@ class linkloving_project(models.Model):
         pricelist_id = partner_id.property_product_pricelist
         self.pricelist_id = pricelist_id
 
-    def _get_project_and_children(self,ids):
-        """ retrieve all children projects of project ids;
-            return a dictionary mapping each project to its parent project (or None)
-        """
-
-        res = dict.fromkeys(ids, None)
-        # while self._ids:
-        #     self._cr.execute("""
-        #         SELECT project.id, parent.id
-        #         FROM project_project project, project_project parent, account_analytic_account account
-        #         WHERE project.analytic_account_id = account.id
-        #         AND parent.id IN %s
-        #         """, (tuple(ids),))
-        #     dic = dict(self._cr.fetchall())
-        #     res.update(dic)
-        #     ids = dic.keys()
-        return res
-
-    def _progress_rate(self):
-        child_parent = self._get_project_and_children(self._ids)
-        print 'ddddddddddddddddddddddd'
-        # compute planned_hours, total_hours, effective_hours specific to each project
-        self._cr.execute("""
-            SELECT project_id, COALESCE(SUM(planned_hours), 0.0),
-                COALESCE(SUM(total_hours), 0.0), COALESCE(SUM(effective_hours), 0.0)
-            FROM project_task
-            LEFT JOIN project_task_type ON project_task.stage_id = project_task_type.id
-            WHERE project_task.project_id IN %s AND project_task_type.fold = False
-            GROUP BY project_id
-            """, (tuple(child_parent.keys()),))
-        # aggregate results into res
-        print 'ddddddddddddddd'
-        res = dict([(id, {'planned_hours': 0.0, 'total_hours': 0.0, 'effective_hours': 0.0}) for id in self._ids])
-        for id, planned, total, effective in self._cr.fetchall():
-            # add the values specific to id to all parent projects of id in the result
-            while id:
-                if id in self:
-                    res[id]['planned_hours'] += planned
-                    res[id]['total_hours'] += total
-                    res[id]['effective_hours'] += effective
-                id = child_parent[id]
-        # compute progress rates
-        for id in self:
-            if res[id]['total_hours']:
-                res[id]['progress_rate'] = round(100.0 * res[id]['effective_hours'] / res[id]['total_hours'], 2)
-            else:
-                res[id]['progress_rate'] = 0.0
-        return res
-
-    # # TODO 计算项目耗时, 未实现
+    # def _get_project_and_children(self,ids):
+    #     """ retrieve all children projects of project ids;
+    #         return a dictionary mapping each project to its parent project (or None)
+    #     """
+    #
+    #     res = dict.fromkeys(ids, None)
+    #     # while self._ids:
+    #     #     self._cr.execute("""
+    #     #         SELECT project.id, parent.id
+    #     #         FROM project_project project, project_project parent, account_analytic_account account
+    #     #         WHERE project.analytic_account_id = account.id
+    #     #         AND parent.id IN %s
+    #     #         """, (tuple(ids),))
+    #     #     dic = dict(self._cr.fetchall())
+    #     #     res.update(dic)
+    #     #     ids = dic.keys()
+    #     return res
+    #
     # def _progress_rate(self):
-    #     return 5.5
+    #     child_parent = self._get_project_and_children(self._ids)
+    #     # compute planned_hours, total_hours, effective_hours specific to each project
+    #     self._cr.execute("""
+    #         SELECT project_id, COALESCE(SUM(planned_hours), 0.0),
+    #             COALESCE(SUM(total_hours), 0.0), COALESCE(SUM(effective_hours), 0.0)
+    #         FROM project_task
+    #         LEFT JOIN project_task_type ON project_task.stage_id = project_task_type.id
+    #         WHERE project_task.project_id IN %s AND project_task_type.fold = False
+    #         GROUP BY project_id
+    #         """, (tuple(child_parent.keys()),))
+    #     # aggregate results into res
+    #     res = dict([(id, {'planned_hours': 0.0, 'total_hours': 0.0, 'effective_hours': 0.0}) for id in self._ids])
+    #     for id, planned, total, effective in self._cr.fetchall():
+    #         # add the values specific to id to all parent projects of id in the result
+    #         while id:
+    #             if id in self:
+    #                 res[id]['planned_hours'] += planned
+    #                 res[id]['total_hours'] += total
+    #                 res[id]['effective_hours'] += effective
+    #             id = child_parent[id]
+    #     # compute progress rates
+    #     for id in self:
+    #         if res[id]['total_hours']:
+    #             res[id]['progress_rate'] = round(100.0 * res[id]['effective_hours'] / res[id]['total_hours'], 2)
+    #         else:
+    #             res[id]['progress_rate'] = 0.0
+    #     return res
+
+    # TODO 计算项目耗时, 未实现
+    def _progress_rate(self):
+        return 5.5
 
     planned_hours = fields.Float(compute=_progress_rate)
 
@@ -190,6 +188,7 @@ class project_category(models.Model):
 class project_work(models.Model):
     _name = "project.task.work"
     _description = "Project Task Work"
+
 
     _order = "date desc"
 

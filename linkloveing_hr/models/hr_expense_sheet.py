@@ -14,7 +14,6 @@ class HrExpenseSheet(models.Model):
     income = fields.Boolean()
     partner_id = fields.Many2one('res.partner')
     payment_line_ids = fields.One2many('account.employee.payment.line', 'sheet_id')
-
     remark_comments_ids = fields.One2many('hr.remark.comment', 'expense_sheet_id', string='审核记录')
 
     @api.multi
@@ -109,7 +108,10 @@ class HrExpenseSheet(models.Model):
     @api.model
     def create(self, vals):
         if vals.get('expense_no', 'New') == 'New':
-            vals['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense.sheet') or '/'
+            if self._context.get('default_income'):
+                vals['expense_no'] = self.env['ir.sequence'].next_by_code('account.income') or '/'
+            else:
+                vals['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense.sheet') or '/'
 
         remark_comment = create_remark_comment(self, '送审', 'create')
 
@@ -129,6 +131,7 @@ class HrExpenseSheet(models.Model):
 
     @api.multi
     def write(self, vals):
+
         if vals.get('state') == 'cancel':
             self.to_approve_id = False
 
@@ -299,3 +302,15 @@ class HrExpenseRefuseWizard(models.TransientModel):
         remark_comment.write(
             {'expense_sheet_id': expense_sheet.id, 'target_uid': name})
         return {'type': 'ir.actions.act_window_close'}
+
+    @api.model
+    def _needaction_domain_get(self):
+        """ Returns the domain to filter records that require an action
+            :return: domain or False is no action
+        """
+        if self._context.get('to_approve_id'):
+            return [('to_approve_id', '=', self.env.user.id)]
+        if self._context.get('search_default_to_post'):
+            return [('state', '=', 'approve')]
+        if self._context.get('search_default_approved'):
+            return [('state', '=', 'post')]

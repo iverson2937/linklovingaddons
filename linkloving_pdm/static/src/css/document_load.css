@@ -1,7 +1,9 @@
 .document_page_container{
     margin: 50px auto;
-    width: 80%;
-    min-width: 780px;
+    width: 85%;
+    min-width: 850px;
+    background: white;
+    padding: 10px;
 }
 .document_page_container .active>a{
     background-color: #337ab7!important;
@@ -11,23 +13,212 @@
     border: 1px solid #dddede!important;
 }
 .document_page_container #myTabContent{
-    padding-top: 30px;
+    padding-top: 18px;
 }
 .document_page_container .tab_message_display{
     overflow: hidden;
+    width: 35%;
 }
 .document_page_container .tab_message_display>div{
-    float: left;
+    /*float: left;*/
     margin-right: 30px;
 }
 .document_page_container .tab_pane_display{
     border: 1px solid #dddede;
-    padding: 5px;
+    padding: 10px;
     position: relative;
     overflow: hidden;
+    margin-bottom: 15px;
+}
+.document_page_container .tab_pane_display .document_review_list{
+    position: absolute;
+    top: 0px;
+    right: 90px;
+    padding: 10px;
+    padding-left: 60px;
+    /*background: pink;*/
+    width: 60%;
+    height:100%;
+}
+.document_page_container .tab_pane_display .document_review_list>span{
+    width: 45px;
+    color: green;
+    float: left;
+    font-size: 36px;
+    margin-left: 8px;
+    /*margin-top: -2px;*/
+    display: block;
+    height: 32px;
+    margin-bottom: 3px;
+}
+.document_page_container .tab_pane_display .document_review_list>.document_yellow{
+    color: darkorange!important;
+}
+.document_page_container .tab_pane_display .document_review_list>.document_red{
+    color: red!important;
+}
+.document_page_container .tab_pane_display .document_review_list>div{
+    padding-left: 3px;
+    padding-right: 3px;
+    line-height: 30px;
+    text-align: center;
+    border:1px solid black;
+    float: left;
+    margin-bottom: 3px;
+}
+
+.document_page_container .tab_pane_display .tab_message_display>div{
+    margin-bottom: 8px;
+    margin-top: 8px;
 }
 .document_page_container .tab_pane_display .document_btns{
     position: absolute;
     top: 7px;
     right: 7px;
+}
+.document_page_container .create_document{
+    margin-top: 18px;
+}
+
+
+
+.load_container{
+    position: fixed;
+    z-index: 100000;
+    top:0;left:0;
+    width: 100%;
+    height:100%;
+    background: rgba(0,0,0,.4);
+    display: none;
+}
+.load_wraper{
+    width:700px;
+    height: 380px;
+    background: white;
+    margin:100px auto;
+    position: relative;
+    box-shadow: 8px 8px 12px;
+}
+.load_top_close{
+    border-bottom: 1px solid #d2d2d2;
+    font-size: 22px;
+    width:100%;
+    overflow: hidden;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.load_top_close span{
+    float: right;
+    margin-right: 15px;
+    cursor: pointer;
+}
+.input_messages{
+    overflow: hidden;
+    margin-top: 40px;
+}
+.input_messages>div{
+    float: left;
+    border-right: 1px solid #dce4ec;
+    padding-left: 45px;
+}
+.input_messages>div>p{
+    display: block;
+    margin: 17px;
+}
+.input_messages>form{
+    padding-top:10px;
+}
+.input_messages>form>input{
+    float: left;
+    display: block;
+    outline:none;
+    border:none;
+    width: 280px;
+    margin:5px 30px;
+    border:1px solid #d5d5d5;
+}
+.input_messages>form input[type="file"]{
+    border: none;
+    margin-bottom: 8px;
+
+    position: absolute;
+    /*font-size: 100px;*/
+    right: 0;
+    top: 0;
+    opacity: 0;
+}
+.input_messages>form>input[type="file"]:hover{
+     background: #AADFFD;
+    border-color: #78C3F3;
+    color: #004974;
+    text-decoration: none;
+}
+.input_messages a{
+    float: left;
+    position: relative;
+    background: #D0EEFF;
+    /*border: 1px solid #99D3F5;*/
+    border-radius: 4px;
+    padding: 4px 50px;
+    overflow: hidden;
+    color: #1E88C7;
+    text-decoration: none;
+    text-indent: 0;
+    line-height: 20px;
+    display: block;
+    width: 156px;
+    margin:5px 30px;
+}
+.load_wraper .submit_file{
+    margin-top: 45px;
+    padding-top: 30px;
+    overflow: hidden;
+    border-top: 1px solid #d2d2d2;
+}
+.load_wraper .submit_file button{
+    float: left;
+    margin-left: 120px;
+}
+.submit_file_yes{
+    position: absolute;
+    bottom: 37px;
+    left: 0;
+    width: 57px!important;
+}
+.document_modify_wraper{
+    position: relative;
+    background: #7c7bad;
+    /*border: 1px solid #99D3F5;*/
+    border-radius: 4px;
+    overflow: hidden;
+    color: white;
+    text-decoration: none;
+    text-indent: 0;
+    text-align: center;
+    height: 30px;
+    line-height: 30px;
+    display: block;
+    width: 79px;
+    margin-top: 10px;
+}
+.document_modify_wraper:hover{
+    color: white;
+}
+.document_modify{
+    border: none;
+    margin-bottom: 8px;
+    position: absolute;
+    /*font-size: 100px;*/
+    right: 0;
+    top: 0;
+    opacity: 0;
+}
+.document_modify:hover{
+    background: #7c7bad;
+    border-color: #78C3F3;
+    color: white;
+    text-decoration: none;
+}
+.document_modify_name{
+    color: red;
 }

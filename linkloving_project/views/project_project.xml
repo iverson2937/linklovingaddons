@@ -8,35 +8,6 @@
                 </gantt>
             </field>
         </record>
-
-        <record id="project.open_create_project" model="ir.actions.act_window">
-            <field name="name">Create a Project</field>
-            <field name="res_model">project.project</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">form</field>
-            <field name="view_id" ref="edit_project"/>
-            <field name="target">current</field>
-        </record>
-
-        <record id="project.open_view_project_all" model="ir.actions.act_window">
-            <field name="name">Projects</field>
-            <field name="res_model">project.project</field>
-            <field name="view_type">form</field>
-            <field name="domain">[]</field>
-            <field name="view_mode">kanban,form</field>
-            <field name="search_view_id" ref="project.view_project_project_filter"/>
-            <field name="target">main</field>
-            <field name="help" type="html">
-                <p class="oe_view_nocontent_create">
-                    Click to create a new project.
-                    <br/>
-                    <i>Or <a type="action" name="%(project.activate_sample_project)d">activate a sample project</a> to
-                        play with.
-                    </i>
-                </p>
-            </field>
-        </record>
-
         <record id="edit_project" model="ir.ui.view">
             <field name="name">project.project.form</field>
             <field name="model">project.project</field>
@@ -159,7 +130,7 @@
                                     <field name="active"
                                            attrs="{'invisible':[('state','in',['open', 'pending', 'template'])]}"/>
                                     <!--groups="base.group_multi_currency" required="1"-->
-                                    <field name="currency_id"  required="0"/>
+                                    <field name="currency_id" required="0"/>
                                     <field name="parent_id" string="Parent"
                                            help="Append this project to another one using analytic accounts hierarchy"
                                            domain="[('id','!=',analytic_account_id)]"
@@ -179,6 +150,34 @@
                         <field name="message_ids" widget="mail_thread"/>
                     </div>
                 </form>
+            </field>
+        </record>
+
+        <record id="project.open_create_project" model="ir.actions.act_window">
+            <field name="name">Create a Project</field>
+            <field name="res_model">project.project</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="edit_project"/>
+            <field name="target">current</field>
+        </record>
+
+        <record id="project.open_view_project_all" model="ir.actions.act_window">
+            <field name="name">Projects</field>
+            <field name="res_model">project.project</field>
+            <field name="view_type">form</field>
+            <field name="domain">[]</field>
+            <field name="view_mode">kanban,form</field>
+            <field name="search_view_id" ref="project.view_project_project_filter"/>
+            <field name="target">main</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a new project.
+                    <br/>
+                    <i>Or <a type="action" name="%(project.activate_sample_project)d">activate a sample project</a> to
+                        play with.
+                    </i>
+                </p>
             </field>
         </record>
 
