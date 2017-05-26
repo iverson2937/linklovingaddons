@@ -234,17 +234,17 @@ class HrExpenseSheet(models.Model):
             'target': 'new',
         }
 
-        @api.model
-        def _needaction_domain_get(self):
-            """ Returns the domain to filter records that require an action
-                :return: domain or False is no action
-            """
-            if self._context.get('to_approve_id'):
-                return [('to_approve_id', '=', self.env.user.id)]
-            if self._context.get('search_default_to_post'):
-                return [('state', '=', 'approve')]
-            if self._context.get('search_default_approved'):
-                return [('state', '=', 'post')]
+    @api.model
+    def _needaction_domain_get(self):
+        """ Returns the domain to filter records that require an action
+            :return: domain or False is no action
+        """
+        if self._context.get('to_approve_id'):
+            return [('to_approve_id', '=', self.env.user.id)]
+        if self._context.get('search_default_to_post'):
+            return [('state', '=', 'approve')]
+        if self._context.get('search_default_approved'):
+            return [('state', '=', 'post')]
 
 
 def create_remark_comment(data, body, type):
@@ -303,14 +303,3 @@ class HrExpenseRefuseWizard(models.TransientModel):
             {'expense_sheet_id': expense_sheet.id, 'target_uid': name})
         return {'type': 'ir.actions.act_window_close'}
 
-    @api.model
-    def _needaction_domain_get(self):
-        """ Returns the domain to filter records that require an action
-            :return: domain or False is no action
-        """
-        if self._context.get('to_approve_id'):
-            return [('to_approve_id', '=', self.env.user.id)]
-        if self._context.get('search_default_to_post'):
-            return [('state', '=', 'approve')]
-        if self._context.get('search_default_approved'):
-            return [('state', '=', 'post')]
