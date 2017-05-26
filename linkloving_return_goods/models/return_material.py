@@ -30,6 +30,10 @@ class ReturnMaterial(models.Model):
     invoice_count = fields.Integer(compute='_get_invoiced')
 
     @api.multi
+    def button_dummy(self):
+        return True
+
+    @api.multi
     def unlink(self):
         if self.state != 'draft':
             UserError(u'只可删除草稿状态的退货单')
