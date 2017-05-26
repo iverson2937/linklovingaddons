@@ -14,6 +14,7 @@ class HrExpenseSheet(models.Model):
     income = fields.Boolean()
     partner_id = fields.Many2one('res.partner')
     payment_line_ids = fields.One2many('account.employee.payment.line', 'sheet_id')
+    remark_comments_ids = fields.One2many('hr.remark.comment', 'expense_sheet_id', string='审核记录')
 
     @api.multi
     def action_sheet_move_create(self):
@@ -47,8 +48,8 @@ class HrExpenseSheet(models.Model):
     to_approve_id = fields.Many2one('res.users', readonly=True, track_visibility='onchange')
 
     state = fields.Selection([('submit', 'Submitted'),
-                              ('manager1_approve', u'一级审核'),
-                              ('manager2_approve', u'二级审核'),
+                              ('manager1_approve', u'1级审核'),
+                              ('manager2_approve', u'2级审核'),
                               ('manager3_approve', 'General Manager Approved'),
                               ('approve', 'Approved'),
                               ('post', 'Posted'),
@@ -71,15 +72,16 @@ class HrExpenseSheet(models.Model):
         if department.allow_amount and self.total_amount < department.allow_amount:
             self.to_approve_id = False
             self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
-
         else:
-
             self.to_approve_id = department.parent_id.manager_id.user_id.id
-
             self.write({'state': 'manager1_approve', 'approve_ids': [(4, self.env.user.id)]})
+
+        remark_comment = create_remark_comment(self, '1级审核', 'manager1_approve')
+        remark_comment.write({'target_uid': department.parent_id.manager_id.user_id.name})
 
     @api.multi
     def manager2_approve(self):
+
         department = self.to_approve_id.employee_ids.department_id
         if department.allow_amount and self.total_amount < department.allow_amount:
             self.to_approve_id = False
@@ -89,6 +91,9 @@ class HrExpenseSheet(models.Model):
             self.to_approve_id = department.parent_id.manager_id.user_id.id
 
             self.write({'state': 'manager2_approve', 'approve_ids': [(4, self.env.user.id)]})
+
+        remark_comment = create_remark_comment(self, '2级审核', 'manager2_approve')
+        remark_comment.write({'target_uid': ''})
 
     @api.multi
     def manager3_approve(self):
@@ -107,6 +112,11 @@ class HrExpenseSheet(models.Model):
                 vals['expense_no'] = self.env['ir.sequence'].next_by_code('account.income') or '/'
             else:
                 vals['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense.sheet') or '/'
+
+        remark_comment = create_remark_comment(self, '送审', 'create')
+
+        vals['remark_comments_ids'] = remark_comment
+
         exp = super(HrExpenseSheet, self).create(vals)
         if exp.employee_id == exp.employee_id.department_id.manager_id:
             department = exp.to_approve_id.employee_ids.department_id
@@ -116,6 +126,7 @@ class HrExpenseSheet(models.Model):
                 exp.to_approve_id = exp.employee_id.department_id.parent_id.manager_id.user_id.id
         else:
             exp.to_approve_id = exp.employee_id.department_id.manager_id.user_id.id
+        remark_comment.write({'expense_sheet_id': exp.id, 'target_uid': exp.employee_id.department_id.manager_id.name})
         return exp
 
     @api.multi
@@ -136,6 +147,9 @@ class HrExpenseSheet(models.Model):
                 self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
         else:
             self.to_approve_id = self.employee_id.department_id.manager_id.user_id.id
+
+        remark_comment = create_remark_comment(self, '重新提交', 'create')
+        remark_comment.write({'expense_sheet_id': self.id})
 
         return self.write({'state': 'submit'})
 
@@ -219,6 +233,75 @@ class HrExpenseSheet(models.Model):
             'type': 'ir.actions.act_window',
             'target': 'new',
         }
+
+        @api.model
+        def _needaction_domain_get(self):
+            """ Returns the domain to filter records that require an action
+                :return: domain or False is no action
+            """
+            if self._context.get('to_approve_id'):
+                return [('to_approve_id', '=', self.env.user.id)]
+            if self._context.get('search_default_to_post'):
+                return [('state', '=', 'approve')]
+            if self._context.get('search_default_approved'):
+                return [('state', '=', 'post')]
+
+
+def create_remark_comment(data, body, type):
+    name = ''
+    if data._name != 'hr.expense.refuse.wizard':
+        name = data.employee_id.department_id.manager_id.name
+    values = {
+        'create_uid': data.create_uid,
+        'body': body,
+        'message_type': type,
+        'expense_sheet_id': data.id,
+        'target_uid': name
+    }
+
+    return data.env['hr.remark.comment'].create(values)[0]
+
+
+class HrRemarkComment(models.Model):
+    _name = 'hr.remark.comment'
+
+    body = fields.Char(string=u'内容')
+
+    create_uid = fields.Many2one('res.users', string=u'创建用户', readonly=True)
+
+    target_uid = fields.Char(string=u'目标用户', readonly=True)
+
+    message_type = fields.Selection([
+        ('create', u'送审'),
+        ('manager1_approve', u'1级审核'),
+        ('manager2_approve', u'2级审核'),
+        ('done', u'审核通过'),
+        ('refuse', u'拒绝'),
+        ('update', u'修改'),
+    ], default='create')
+
+    expense_sheet_id = fields.Integer(u'审核对象', readonly=True)
+
+
+class HrExpenseRefuseWizard(models.TransientModel):
+    _inherit = "hr.expense.refuse.wizard"
+
+    @api.multi
+    def expense_refuse_reason(self):
+        self.ensure_one()
+
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', [])
+        expense_sheet = self.env['hr.expense.sheet'].browse(active_ids)
+        expense_sheet.refuse_expenses(self.description)
+
+        remark_comment = create_remark_comment(self, '拒绝', 'refuse')
+        name = expense_sheet.create_uid.employee_ids.department_id.manager_id.name
+        if remark_comment.write_uid == expense_sheet.create_uid:
+            name = expense_sheet.create_uid.employee_ids.name
+        remark_comment.write(
+            {'expense_sheet_id': expense_sheet.id, 'target_uid': name})
+        return {'type': 'ir.actions.act_window_close'}
 
     @api.model
     def _needaction_domain_get(self):
