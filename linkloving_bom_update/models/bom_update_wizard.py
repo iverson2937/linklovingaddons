@@ -126,6 +126,7 @@ class BomUpdateWizard(models.TransientModel):
                                 'bom_id': new_bom_id.id,
                             })
                             product_id = False
+                            input_changed_value = False
                             update_bom_line_delete(new_bom_id, old_product_id)
                         elif product_id and old_product_id.id == product_id:
                             update_bom_line_update(new_bom_id, old_product_id, qty)
