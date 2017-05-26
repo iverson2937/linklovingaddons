@@ -31,7 +31,7 @@
                         <t t-foreach="item.files" t-as="item_files">
                             <div class="tab_pane_display">
                                 <div class="tab_message_display">
-                                    <div>文件名：<span><t t-esc="item_files.file_name"/></span></div>
+                                    <div>文件：<span><t t-esc="item_files.file_name"/></span></div>
                                     <div>审核人：<span><t t-esc="item_files.review_id"/></span></div>
                                     <div>远程地址：<span><t t-esc="item_files.remote_path"/></span></div>
                                     <div>版本：<span><t t-esc="item_files.version"/></span></div>
@@ -58,6 +58,7 @@
                                     <t t-if="item_files.has_right_to_review == true">
                                         <button class="btn btn-primary document_manage_btn" t-att-data-id="item_files.id">审核操作</button>
                                     </t>
+                                    <button class="btn btn-primary document_modify">文件修改</button>
                                 </div>
                             </div>
                         </t>
@@ -94,6 +95,7 @@
                     </form>
                 </div>
                  <div class="submit_file">
+                    <!--<button class="btn btn-info submit_file_yes">上传</button>-->
                     <button class="btn btn-default submit_file_no">取消</button>
                 </div>
             </div>
@@ -104,7 +106,7 @@
         <t t-foreach="result.files" t-as="item_files">
             <div class="tab_pane_display">
                 <div class="tab_message_display">
-                    <div>文件名：<span><t t-esc="item_files.file_name"/></span></div>
+                    <div>文件：<span><t t-esc="item_files.file_name"/></span></div>
                     <div>审核人：<span><t t-esc="item_files.review_id"/></span></div>
                     <div>远程地址：<span><t t-esc="item_files.remote_path"/></span></div>
                     <div>版本：<span><t t-esc="item_files.version"/></span></div>
@@ -132,6 +134,9 @@
                     <!--<t t-if="item_files.has_right_to_review == true">-->
                         <button class="btn btn-primary document_manage_btn" t-att-data-id="item_files.id">审核操作</button>
                     <!--</t>-->
+                    <a href="javascript:;" class="document_modify_wraper">文件修改
+                        <input type="file" class="document_modify"/>
+                    </a>
                 </div>
             </div>
         </t>

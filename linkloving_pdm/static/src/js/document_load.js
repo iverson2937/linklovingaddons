@@ -18,9 +18,28 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             'click .document_manage_btn':'document_form_pop',
             'click .create_document_btn':'create_document_fn',
             'click .load_container_close':'close_document_container',
-            'click .submit_file_no':'close_document_container',
             'change .my_load_file':'get_file_name',
-            'click .submit_file_yes': 'load_file'
+            'click .submit_file_yes': 'load_file',
+            'change .document_modify':'document_modify_fn'
+        },
+        document_modify_fn:function (e) {
+            var e = e||window.event;
+            var target = e.target||e.srcElement;
+            console.log($(target).parents(".tab_pane_display").children(".tab_message_display"))
+            $(target).parents(".tab_pane_display").children(".tab_message_display").prepend("<div class='document_modify_name'>新修改的文件：<span>"+target.files[0].name+"</span></div>")
+            $(".document_modify span").val(target.files[0].name);
+
+            console.log(target.files[0])
+            var new_file = target.files[0]
+            $.ajax({
+                type:"post",
+                url:"",
+                async:true,
+                data:{
+                    'new_file':new_file,
+                },
+            })
+
         },
         load_file:function () {
 
@@ -44,9 +63,9 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             //     target:"new"
             // };
             // this.do_action(action);
-            $(".load_container").show();
+             $(".load_container").show();
             $(".file_active_id").val($(this)[0].product_id);
-            $(".file_active_type").val($("li.active a").attr("data"));
+            $(".file_active_type").val($("li.active a").attr("data"))
         },
         document_form_pop:function (e) {
             var e = e||window.event;
