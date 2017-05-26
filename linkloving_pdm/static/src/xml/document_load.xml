@@ -66,7 +66,37 @@
                 </div>
                 <t t-set="j" t-value="2"/>
             </t>
+        </div>
 
+        <!--上传文件界面-->
+        <div class="load_container">
+            <div class="load_wraper">
+                <div class="load_top_close">
+                    <span class="fa fa-close load_container_close"></span>
+                </div>
+                <div class="input_messages">
+                    <div>
+                        <p>文件名：</p>
+                        <p>远程路径：</p>
+                        <p>上传文件：</p>
+                        <p>版本号：</p>
+                    </div>
+                    <form enctype="multipart/form-data" action="" method="post">
+                        <input type="hidden" class="file_active_id" name="active_id"/>
+                        <input type="hidden" class="file_active_type" name="active_type"/>
+                        <input type="text" class="my_load_file_name" name="my_load_file_name"/>
+                        <input type="text" class="my_load_file_remote_path" name="my_load_file_remote_path"/>
+                        <a href="javascript:;">选择文件
+                            <input type="file" class="my_load_file" name="my_load_file"/>
+                        </a>
+                        <input type="text" class="my_load_file_version" name="my_load_file_version"/>
+                        <input type="submit" class="btn btn-info submit_file_yes"/>
+                    </form>
+                </div>
+                 <div class="submit_file">
+                    <button class="btn btn-default submit_file_no">取消</button>
+                </div>
+            </div>
         </div>
     </t>
 

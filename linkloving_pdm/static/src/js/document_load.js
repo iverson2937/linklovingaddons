@@ -16,19 +16,37 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
         events:{
             'show.bs.tab .tab_toggle_a':'document_change_tabs',
             'click .document_manage_btn':'document_form_pop',
-            'click .create_document_btn':'create_document_fn'
+            'click .create_document_btn':'create_document_fn',
+            'click .load_container_close':'close_document_container',
+            'click .submit_file_no':'close_document_container',
+            'change .my_load_file':'get_file_name',
+            'click .submit_file_yes': 'load_file'
+        },
+        load_file:function () {
+
+        },
+        get_file_name:function (e) {
+            var e = e||window.event;
+            var target = e.target||e.srcElement;
+            $(".my_load_file_name").val(target.files[0].name)
+        },
+        close_document_container:function () {
+            $(".load_container").hide()
         },
         create_document_fn:function () {
-              var action = {
-                name:"详细",
-                type: 'ir.actions.act_window',
-                res_model:'product.attachment.info',
-                view_type: 'form',
-                view_mode: 'tree,form',
-                views: [[false, 'form']],
-                target:"new"
-            };
-            this.do_action(action);
+            //   var action = {
+            //     name:"详细",
+            //     type: 'ir.actions.act_window',
+            //     res_model:'product.attachment.info',
+            //     view_type: 'form',
+            //     view_mode: 'tree,form',
+            //     views: [[false, 'form']],
+            //     target:"new"
+            // };
+            // this.do_action(action);
+            $(".load_container").show();
+            $(".file_active_id").val($(this)[0].product_id);
+            $(".file_active_type").val($("li.active a").attr("data"));
         },
         document_form_pop:function (e) {
             var e = e||window.event;

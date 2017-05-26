@@ -79,3 +79,9 @@
 .o_content .o_form_sheet{
     margin:100px auto!important;
 }
+.o_list_view thead{
+    position: relative;
+}
+.o_list_view thead>tr{
+    position: relative;
+}
