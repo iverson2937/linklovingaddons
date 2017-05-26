@@ -354,7 +354,7 @@ class ReturnMaterialLine(models.Model):
         """
         for line in self:
             line.update({
-                'price_tax': line.price_unit * line.tax_id.amount / 100,
+                'price_tax': line.product_uom_qty * line.price_unit * line.tax_id.amount / 100,
                 'price_total': line.price_unit * line.product_uom_qty,
                 'price_subtotal': line.price_unit * (1 - line.tax_id.amount / 100) * line.product_uom_qty,
 
