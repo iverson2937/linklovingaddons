@@ -28,6 +28,7 @@
         'views/views.xml',
         'views/templates.xml',
         'views/partner_view.xml',
+        'security/crm_rule.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
