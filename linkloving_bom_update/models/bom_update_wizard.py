@@ -192,6 +192,13 @@ class BomUpdateWizard(models.TransientModel):
                         product_id = False
                         # 此为修改bom，需要删除一个bom_line
                 elif modify_type == 'edit':
+                    if input_changed_value:
+                        product_tmpl_id = product_id_obj.browse(product_id).product_tmpl_id
+                        new_name = self.get_new_product_name(input_changed_value, postfix)
+                        default_code = self.get_next_default_code(product_tmpl_id.default_code)
+                        new_pl_id = product_tmpl_id.copy({'name': new_name, 'default_code': default_code})
+                        product_id = new_pl_id.product_variant_ids[0].id
+
                     last_bom_line_id = line_obj.browse(int(last_bom_line_id))
                     if product_id:
                         last_bom_line_id.write({
@@ -254,7 +261,10 @@ class BomUpdateWizard(models.TransientModel):
         elif len(old) > 1:
             UserError(u'产品名称不规范，找不到想要的版本')
         else:
-            new_name = old_name + '<' + postfix + '>'
+            if postfix:
+                new_name = old_name + '<' + postfix + '>'
+            else:
+                new_name = old_name
         return new_name
 
 
