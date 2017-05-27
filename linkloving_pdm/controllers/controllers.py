@@ -35,5 +35,15 @@ class LinklovingPdm(http.Controller):
         return out % (func, json.dumps(args), json.dumps({}))
 
     @http.route('/linkloving_pdm/update_attachment_info', type='http', auth='user')
-    def update_attachment_info(self, **kw):
-        return True
+    def update_attachment_info(self, attachment_id, new_file):
+        attachment = request.env['product.attachment.info'].browse(attachment_id)
+        out = """<script language="javascript" type="text/javascript">
+                    var win = window.top.window;
+                    win.jQuery(win).trigger(%s, %s);
+                </script>"""
+
+        attach = attachment.write({
+            'file_name': new_file.filename,
+        })
+
+        return json.dumps({"error": "123"})

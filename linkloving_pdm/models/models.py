@@ -165,8 +165,7 @@ class ProductAttachmentInfo(models.Model):
     def _default_version(self):
         model = self._context.get("model")
         res_id = self._context.get("product_id")
-        self.env["product.attachment.info"].search([('product_tmpl_id', '=', res_id),
-                                                    ])
+        self.env["product.attachment.info"].search([('product_tmpl_id', '=', res_id), ])
         return None
 
     @api.multi
@@ -220,6 +219,16 @@ class ProductAttachmentInfo(models.Model):
             vals['state'] = 'waiting_release'
         return super(ProductAttachmentInfo, self).write(vals)
 
+    @api.one
+    def update_attachment(self, **kwargs):
+
+        if self.state not in ['waiting_release', 'draft']:
+            raise UserError(u'文件正在处于审核中,请先取消审核,再进行操作')
+        self.write({
+            "file_binary": kwargs.get("file_binary"),
+            'file_name': kwargs.get("file_name"),
+        })
+        return True
     # @api.multi
     # def _compute_version(self):
     #     for info in self:
