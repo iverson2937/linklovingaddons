@@ -62,10 +62,11 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
 
         },
         load_file: function () {
-            $(".my_load_file_name").val("");
-            $(".my_load_file_remote_path").val("");
-            $(".my_load_file_version").val("");
+            // $(".my_load_file_name").val("");
+            // $(".my_load_file_remote_path").val("");
+            // $(".my_load_file_version").val("");
             $(".load_container").hide();
+             $.blockUI({ message: '<img src="linkloving_pdm/static/src/css/spin.png"/><h3>请稍后</h3>' });
         },
         get_file_name: function (e) {
             var e = e || window.event;
@@ -88,7 +89,8 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             // this.do_action(action);
             $(".load_container").show();
             $(".file_active_id").val($(this)[0].product_id);
-            $(".file_active_type").val($("li.active a").attr("data"));
+            $(".file_active_type").val($("li.active>a").attr("data"));
+            $(".o_loading").show();
 
             var callback = _.uniqueId('func_');
             $(".file_func").val(callback);
@@ -99,6 +101,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 return new Model("product.template")
                     .call("get_attachemnt_info_list", [product_id], {type: file_type})
                     .then(function (result) {
+                        $.unblockUI();
                         console.log(result);
                         self.$("#" + file_type).html("");
                         self.$("#" + file_type).append(QWeb.render('active_document_tab', {result: result}));
