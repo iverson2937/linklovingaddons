@@ -105,6 +105,7 @@ class BomUpdateWizard(models.TransientModel):
                         if product_id:
                             line_obj.create({
                                 'product_id': product_id,
+                                'is_highlight': True,
                                 'product_qty': qty,
                                 'bom_id': new_bom_id.id,
                             })
@@ -122,6 +123,7 @@ class BomUpdateWizard(models.TransientModel):
                         if product_id:
                             line_obj.create({
                                 'product_id': product_id,
+                                'is_highlight': True,
                                 'product_qty': qty,
                                 'bom_id': new_bom_id.id,
                             })
@@ -141,6 +143,7 @@ class BomUpdateWizard(models.TransientModel):
                             line_obj.create({
                                 'product_id': new_product_id.product_variant_ids[0].id,
                                 'qty': qty,
+                                'is_highlight': True,
                                 'bom_id': new_bom_id.id,
                             })
                             name_product_name = False
@@ -188,6 +191,7 @@ class BomUpdateWizard(models.TransientModel):
                         line_obj.create({
                             'product_id': int(product_id),
                             'product_qty': qty,
+                            'is_highlight': True,
                             'bom_id': bom_id.id,
                         })
                         product_id = False
@@ -205,6 +209,7 @@ class BomUpdateWizard(models.TransientModel):
                         last_bom_line_id.write({
                             'product_id': int(product_id),
                             'product_qty': qty,
+                            'is_highlight': True,
                         })
                 elif modify_type == 'copy':
                     name_product_name = val.get('copy_name')
@@ -234,6 +239,7 @@ class BomUpdateWizard(models.TransientModel):
             'tag': 'bom_update',
             'bom_id': main_bom_id
         }
+
     def get_next_default_code(self, default_code):
         if not default_code:
             raise UserError(u'产品没有对应料号')
@@ -282,6 +288,7 @@ def update_bom_line_copy(new_bom_id, new_product_id, old_product_id):
         for line in new_bom_id.bom_line_ids:
             if line.product_id.id == old_product_id:
                 line.product_id = new_product_id
+                line.is_highlight = True
                 return True
 
 
