@@ -155,6 +155,7 @@ class BomUpdateWizard(models.TransientModel):
             return {
                 'type': 'ir.actions.client',
                 'tag': 'bom_update',
+                'target': 'fullscreen',
                 'bom_id': new_bom_id.id
             }
         else:
@@ -225,6 +226,14 @@ class BomUpdateWizard(models.TransientModel):
                 'bom_id': main_bom_id
             }
 
+    @api.multi
+    def create_cancel(self):
+        main_bom_id = int(self._context.get('bom_id'))
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'bom_update',
+            'bom_id': main_bom_id
+        }
     def get_next_default_code(self, default_code):
         if not default_code:
             raise UserError(u'产品没有对应料号')
