@@ -25,10 +25,11 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
         document_modify_fn:function (e) {
             var e = e||window.event;
             var target = e.target||e.srcElement;
-            console.log($(target).parents(".tab_pane_display").children(".tab_message_display"))
-            $(target).parents(".tab_pane_display").children(".tab_message_display").prepend("<div class='document_modify_name'>新修改的文件：<span>"+target.files[0].name+"</span></div>")
+            console.log($(target).parents(".tab_pane_display").children(".tab_message_display"));
+            $(target).parents(".tab_pane_display").children(".tab_message_display").prepend("<div class='document_modify_name'>新修改的文件：<span>" + target.files[0].name + "</span></div>");
             $(".document_modify span").val(target.files[0].name);
-
+            var new_file_id = $(".tab_pane_display").attr("data-id");
+            console.log(new_file_id)
             console.log(target.files[0])
             var new_file = target.files[0]
             $.ajax({
@@ -37,12 +38,16 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 async:true,
                 data:{
                     'new_file':new_file,
+                    'new_file_id': new_file_id
                 },
             })
 
         },
         load_file:function () {
-
+            $(".my_load_file_name").val("");
+            $(".my_load_file_remote_path").val("");
+            $(".my_load_file_version").val("");
+            $(".load_container").hide();
         },
         get_file_name:function (e) {
             var e = e||window.event;
@@ -63,9 +68,24 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             //     target:"new"
             // };
             // this.do_action(action);
-             $(".load_container").show();
+            $(".load_container").show();
             $(".file_active_id").val($(this)[0].product_id);
-            $(".file_active_type").val($("li.active a").attr("data"))
+            $(".file_active_type").val($("li.active a").attr("data"));
+
+            var callback = _.uniqueId('func_');
+            $(".file_func").val(callback);
+            window[callback] = function () {
+                // window.location.reload()
+                var file_type = self.$("#document_tab").attr("data-now-tab");
+                var product_id = parseInt(self.$("#document_tab").attr("data-product-id"));
+                return new Model("product.template")
+                    .call("get_attachemnt_info_list", [product_id], {type: file_type})
+                    .then(function (result) {
+                        console.log(result);
+                        self.$("#" + file_type).html("");
+                        self.$("#" + file_type).append(QWeb.render('active_document_tab', {result: result}));
+                    })
+            }
         },
         document_form_pop:function (e) {
             var e = e||window.event;

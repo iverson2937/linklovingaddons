@@ -213,6 +213,9 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 if (add_product_value != "") {
                     if(add_data_id_value != add_product_value){
                         json_data["if_input_changed"] = true;
+                        // add_product_value = add_product_value.replace(/^\[[0-9A-Za-z.]]$/)
+
+
                         json_data["input_changed_value"] = add_product_value;
                     }else {
                         json_data["if_input_changed"] = false;

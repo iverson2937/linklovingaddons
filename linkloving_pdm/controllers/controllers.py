@@ -1,20 +1,39 @@
 # -*- coding: utf-8 -*-
-from odoo import http
+import base64
+import json
 
-# class LinklovingPdm(http.Controller):
-#     @http.route('/linkloving_pdm/linkloving_pdm/', auth='public')
-#     def index(self, **kw):
-#         return "Hello, world"
+from odoo import http, _
+from odoo.http import serialize_exception, request, _logger
 
-#     @http.route('/linkloving_pdm/linkloving_pdm/objects/', auth='public')
-#     def list(self, **kw):
-#         return http.request.render('linkloving_pdm.listing', {
-#             'root': '/linkloving_pdm/linkloving_pdm',
-#             'objects': http.request.env['linkloving_pdm.linkloving_pdm'].search([]),
-#         })
 
-#     @http.route('/linkloving_pdm/linkloving_pdm/objects/<model("linkloving_pdm.linkloving_pdm"):obj>/', auth='public')
-#     def object(self, obj, **kw):
-#         return http.request.render('linkloving_pdm.object', {
-#             'object': obj
-#         })
+class LinklovingPdm(http.Controller):
+    @http.route('/linkloving_pdm/upload_attachment_info', type='http', auth='user')
+    def index(self, func, active_id, active_type, my_load_file_name, my_load_file, my_load_file_remote_path,
+              my_load_file_version, **kwargs):
+        Model = request.env['product.attachment.info']
+        out = """<script type='text/javascript'>
+            window.parent['%s'](%s, %s);
+        </script>"""
+        try:
+            attach = Model.create({
+                'file_name': my_load_file_name,
+                'file_binary': base64.encodestring(my_load_file.read()),
+                'remote_path': my_load_file_remote_path,
+                'state': 'waiting_release',
+                'product_tmpl_id': int(active_id),
+                'type': active_type,
+                'version': my_load_file_version,
+            })
+            args = {
+                'filename': my_load_file.filename,
+                'mimetype': my_load_file.content_type,
+                'id': attach.id
+            }
+        except Exception:
+            error = {'error': _("Something horrible happened")}
+            _logger.exception("Fail to upload attachment %s" % my_load_file.filename)
+        return out % (func, json.dumps(args), json.dumps({}))
+
+    @http.route('/linkloving_pdm/update_attachment_info', type='http', auth='user')
+    def update_attachment_info(self, **kw):
+        return True

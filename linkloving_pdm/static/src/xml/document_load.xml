@@ -29,7 +29,7 @@
                 <div t-att-class="j==1?'tab-pane fade in active':'tab-pane fade'" t-att-id="item.type">
                     <t t-if="item.files">
                         <t t-foreach="item.files" t-as="item_files">
-                            <div class="tab_pane_display">
+                            <div class="tab_pane_display" t-att-data-id="item_files.id">
                                 <div class="tab_message_display">
                                     <div>文件：<span><t t-esc="item_files.file_name"/></span></div>
                                     <div>审核人：<span><t t-esc="item_files.review_id"/></span></div>
@@ -82,7 +82,9 @@
                         <p>上传文件：</p>
                         <p>版本号：</p>
                     </div>
-                    <form enctype="multipart/form-data" action="" method="post">
+                    <form enctype="multipart/form-data" action="/linkloving_pdm/upload_attachment_info" method="post" target="id_iframe">
+                        <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
+                        <input type="hidden" class="file_func" name="func"/>
                         <input type="hidden" class="file_active_id" name="active_id"/>
                         <input type="hidden" class="file_active_type" name="active_type"/>
                         <input type="text" class="my_load_file_name" name="my_load_file_name"/>
@@ -93,6 +95,7 @@
                         <input type="text" class="my_load_file_version" name="my_load_file_version"/>
                         <input type="submit" class="btn btn-info submit_file_yes"/>
                     </form>
+                    <iframe id="id_iframe" name="id_iframe" style="display:none;"></iframe>
                 </div>
                  <div class="submit_file">
                     <!--<button class="btn btn-info submit_file_yes">上传</button>-->
