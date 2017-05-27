@@ -82,7 +82,8 @@
                         <p>上传文件：</p>
                         <p>版本号：</p>
                     </div>
-                    <form enctype="multipart/form-data" action="" method="post">
+                    <form enctype="multipart/form-data" action="/linkloving_pdm/upload_attachment_info" method="post">
+                        <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
                         <input type="hidden" class="file_active_id" name="active_id"/>
                         <input type="hidden" class="file_active_type" name="active_type"/>
                         <input type="text" class="my_load_file_name" name="my_load_file_name"/>

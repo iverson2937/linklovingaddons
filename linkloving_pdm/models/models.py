@@ -204,7 +204,9 @@ class ProductAttachmentInfo(models.Model):
 
     type = fields.Selection(string="类型", selection=[('sip', 'SIP'),
                                                     ('sop', 'SOP'),
-                                                    ('ipqc', 'IPQC')], required=True, )
+                                                    ('ipqc', 'IPQC'),
+                                                    ('other', 'Other'),
+                                                    ('design', 'Design')], required=True, )
 
     @api.model
     def create(self, vals):

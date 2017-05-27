@@ -66,6 +66,8 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
              $(".load_container").show();
             $(".file_active_id").val($(this)[0].product_id);
             $(".file_active_type").val($("li.active a").attr("data"))
+            console.log($("li.active>a").attr("data"))
+            console.log($(".file_active_type").val())
         },
         document_form_pop:function (e) {
             var e = e||window.event;
