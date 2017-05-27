@@ -42,7 +42,7 @@
 
                     <footer>
                         <button string="确认" name="bom_line_update" type="object" default_focus="1"
-                                class="btn-primary new_bom" context="{'update':False}"/>
+                                class="btn-primary new_bom" context="{}"/>
                         <button string="取消" class="btn-default modify_current_bom" name="create_cancel"
                                 type="object"/>
                     </footer>

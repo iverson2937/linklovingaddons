@@ -28,6 +28,7 @@
         'views/views.xml',
         'views/templates.xml',
         'views/res_partner.xml',
+        'views/product_product.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

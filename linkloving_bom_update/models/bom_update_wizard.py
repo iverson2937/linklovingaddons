@@ -155,7 +155,7 @@ class BomUpdateWizard(models.TransientModel):
             return {
                 'type': 'ir.actions.client',
                 'tag': 'bom_update',
-                'target': 'fullscreen',
+                'target': 'current',
                 'bom_id': new_bom_id.id
             }
         else:
