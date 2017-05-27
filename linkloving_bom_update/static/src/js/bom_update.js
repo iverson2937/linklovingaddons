@@ -20,6 +20,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             'focus .add_product_input': 'add_product_input_focus',
             'click .add_product_lis': 'chose_li_to_input',
             'click .bom_modify_submit': 'bom_modify_submit',
+            'click .bom_modify_direct': 'bom_modify_submit',
             'input .add_product_input': 'when_input_is_on',
             'click .product_edit': 'modify_product_fn',
             'click .delete_product': 'delete_product_fn',
@@ -192,7 +193,14 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 })
         },
         //提交时的动作
-        bom_modify_submit: function () {
+        bom_modify_submit: function (e) {
+            var e = e||window.event;
+            var target = e.target||e.srcElement;
+            if($(target).hasClass("bom_modify_direct")){
+                var btn_update = true;
+            }else {
+                var btn_update = false;
+            }
             var back_datas = [];
             var top_bom_id = $("#accordion").attr("data-bom-id");
             //无输入框时的提交
@@ -200,11 +208,13 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 $(".made_by_per_edit").each(function (){
                     var arr = [];
                     var json_data = {};
-                    json_data["product_id"] = $(this).attr("data-product-id");
+                    json_data["product_id"] = $(this).attr("data-id");
+                    json_data["last_product_id"] = $(this).attr("data-product-id");
                     getParents($(this));
                     json_data["parents"] = arr.join(",");
                     json_data["qty"] = $(this).next().text();
                     json_data["input_changed_value"] = $(this).text();
+                    json_data["modify_type"] =  $(this).attr("data-modify-type");
                     back_datas.push(json_data);
                     function getParents($obj) {
                         if ($obj.parents(".panel-collapse")) {
@@ -260,7 +270,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                     back_datas.push(json_data);
 
                     $(this).parent().parent().parent().removeClass("input-panel");
-                    $(this).parent().html("<a></a><span class='product_name made_by_per_edit' data-product-id="+add_product_id+"><span>" + add_product_value + "</span></span><span style='margin-left: 15px'>"+add_product_qty+"</span><span class='fa fa-edit product_edit' style='margin-left:15px;cursor:pointer'></span>");
+                    $(this).parent().html("<a></a><span class='product_name made_by_per_edit' data-modify-type="+modify_type+" data-id="+add_product_id+" data-product-id="+add_product_id+"><span>" + add_product_value + "</span></span><span style='margin-left: 15px'>"+add_product_qty+"</span><span class='fa fa-edit product_edit' style='margin-left:15px;cursor:pointer'></span>");
                 } else {
                     $(this).parent().parent().parent().remove()
                 }
@@ -290,13 +300,14 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                 alert("你没有做任何操作");
                 return;
             }
+            console.log(btn_update)
             var action = {
                 name: "BOM",
                 type: 'ir.actions.act_window',
                 res_model: 'bom.update.wizard',
                 view_type: 'form',
                 view_mode: 'tree,form',
-                context: {'back_datas': back_datas, "bom_id": top_bom_id},
+                context: {'back_datas': back_datas, "bom_id": top_bom_id,"update": btn_update},
                 views: [[false, 'form']],
                 // res_id: act_id,
                 target: "new"
