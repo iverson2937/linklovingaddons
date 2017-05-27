@@ -88,13 +88,16 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             // };
             // this.do_action(action);
             $(".load_container").show();
-            $(".file_active_id").val($(this)[0].product_id);
+            // $(".file_active_id").val($(this)[0].product_id);
             $(".file_active_type").val($("li.active>a").attr("data"));
-            $(".o_loading").show();
 
             var callback = _.uniqueId('func_');
             $(".file_func").val(callback);
-            window[callback] = function () {
+            window[callback] = function (result) {
+                if(result.error){
+                    alert(result.error)
+                }
+                console.log(result)
                 // window.location.reload()
                 var file_type = self.$("#document_tab").attr("data-now-tab");
                 var product_id = parseInt(self.$("#document_tab").attr("data-product-id"));

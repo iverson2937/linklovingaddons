@@ -17,6 +17,8 @@ class LinklovingPdm(http.Controller):
         </script>"""
         if active_type or my_load_file or active_id:
             error = u"缺少必要的参数"
+            args = {"error": error}
+            return out % (func, json.dumps(args), json.dumps({}))
         try:
             attach = Model.create({
                 'file_name': my_load_file_name,
