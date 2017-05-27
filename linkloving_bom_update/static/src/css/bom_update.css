@@ -47,8 +47,9 @@
     margin-right: 80px;
     margin-top: -15px;
 }
-#accordion .bom_modify_submit{
+#accordion .bom_modify_submit,#accordion .bom_modify_direct{
     margin-top: -30px;
+    margin-left: 15px;
 }
 #accordion .product_name{
     cursor: pointer;

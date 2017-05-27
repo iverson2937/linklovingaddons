@@ -126,8 +126,10 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
         modify_product_fn:function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
-            target = target.parentNode.firstChild.nextElementSibling.nextElementSibling;
+            // target = target.parentNode.firstChild.nextElementSibling.nextElementSibling;
             // $(target).parent().html();
+            target = $(target).parent().children(".product_name");
+            target = target[0]
             $(target).parents("#accordion").attr("data-delete-html", $(target).parent().html());
 
 
@@ -193,6 +195,31 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
         bom_modify_submit: function () {
             var back_datas = [];
             var top_bom_id = $("#accordion").attr("data-bom-id");
+            //无输入框时的提交
+            if($(".made_by_per_edit")){
+                $(".made_by_per_edit").each(function (){
+                    var arr = [];
+                    var json_data = {};
+                    json_data["product_id"] = $(this).attr("data-product-id");
+                    getParents($(this));
+                    json_data["parents"] = arr.join(",");
+                    json_data["qty"] = $(this).next().text();
+                    json_data["input_changed_value"] = $(this).text();
+                    back_datas.push(json_data);
+                    function getParents($obj) {
+                        if ($obj.parents(".panel-collapse")) {
+                            if ($obj.parents(".panel-collapse").length == 0) {
+                                return;
+                            }
+                            arr.push($obj.parents(".panel-collapse").attr("data-return-id"));
+                            $obj = $obj.parents(".panel-collapse");
+                            getParents($obj);
+                        }
+                    }
+                })
+                console.log(back_datas);
+            }
+            //有输入框时的提交
             $(".add_product_input_wraper").each(function () {
                 var arr = [];
                 var json_data = {};
@@ -233,7 +260,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                     back_datas.push(json_data);
 
                     $(this).parent().parent().parent().removeClass("input-panel");
-                    $(this).parent().html("<a></a><span class='product_name' data-product-id="+add_product_id+">" + add_product_value + "</span><span style='margin-left: 15px'>"+add_product_qty+"</span>");
+                    $(this).parent().html("<a></a><span class='product_name made_by_per_edit' data-product-id="+add_product_id+"><span>" + add_product_value + "</span></span><span style='margin-left: 15px'>"+add_product_qty+"</span><span class='fa fa-edit product_edit' style='margin-left:15px;cursor:pointer'></span>");
                 } else {
                     $(this).parent().parent().parent().remove()
                 }
@@ -249,6 +276,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                     }
                 }
             });
+
             var data_delete_products = $("#accordion").attr("data-delete-products");
             if(data_delete_products!=""){
                 data_delete_products = data_delete_products.replace(/^{/,"[{");

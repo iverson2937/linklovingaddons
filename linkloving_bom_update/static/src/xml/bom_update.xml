@@ -8,7 +8,8 @@
     </t>
 
     <t t-name="bom_tree">
-        <button class="btn btn-primary bom_modify_submit">提交修改</button>
+        <button class="btn btn-primary bom_modify_submit">新建</button>
+        <button class="btn btn-primary bom_modify_direct">直接修改</button>
         <button class="btn btn-primary bom_back">返回</button>
         <div class="panel panel-default">
             <div class="panel-heading">
