@@ -14,6 +14,7 @@
                 <link rel="shortcut icon" href="/linkloving_web/static/src/img/favicon.ico" type="image/x-icon"/>
             </xpath>
         </template>
+
         <template id="layout_footer_copyright" inherit_id="website.layout_footer_copyright" name="Footer Copyright">
             <xpath expr="//div[@class='pull-left text-muted']" position="replace">
                 <div class="text-center text-muted" itemscope="itemscope" itemtype="http://schema.org/Organization">
@@ -21,7 +22,8 @@
                     <a href="http://www.miitbeian.gov.cn/">苏ICP备14005617号-2</a>
                 </div>
             </xpath>
-
+            <xpath expr="//footer/div[@id='footer']/div[@class='row']/div[3]/h4" position="replace">
+            </xpath>
             <xpath expr="//div[@class='pull-right']" position="replace">
 
             </xpath>
