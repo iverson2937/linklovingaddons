@@ -222,3 +222,7 @@
 .document_modify_name{
     color: red;
 }
+.fa-spin {
+  -webkit-animation: fa-spin 2s infinite linear;
+  animation: fa-spin 2s infinite linear;
+}

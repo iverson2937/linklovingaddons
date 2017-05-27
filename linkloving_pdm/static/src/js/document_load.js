@@ -66,7 +66,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             // $(".my_load_file_remote_path").val("");
             // $(".my_load_file_version").val("");
             $(".load_container").hide();
-             $.blockUI({ message: '<img src="linkloving_pdm/static/src/css/spin.png"/><h3>请稍后</h3>' });
+            $.blockUI({ message: '<img src="linkloving_pdm/static/src/css/spin.png" style="animation: fa-spin 1s infinite steps(12);"/><h3>请稍后</h3>' });
         },
         get_file_name: function (e) {
             var e = e || window.event;
