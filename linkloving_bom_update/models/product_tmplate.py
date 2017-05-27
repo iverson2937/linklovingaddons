@@ -11,6 +11,8 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def bom_update(self):
+        if not self.bom_ids:
+            raise UserError(u'改产品没有BOM')
         return {
             'type': 'ir.actions.client',
             'tag': 'bom_update',
@@ -23,6 +25,8 @@ class ProductProduct(models.Model):
 
     @api.multi
     def bom_update(self):
+        if not self.self.product_tmpl_id.bom_ids:
+            raise UserError(u'改产品没有BOM')
         return {
             'type': 'ir.actions.client',
             'tag': 'bom_update',
