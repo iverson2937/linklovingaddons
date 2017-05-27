@@ -63,7 +63,7 @@
                                        attrs="{'readonly':[('state','in',['close', 'cancelled'])]}"
                                        context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'project.group_project_manager']}"/>
                                 <newline/>
-                                <field name="partner_id" on_change="onchange_partner_id(partner_id)" string="Customer"/>
+                                <field name="partner_id" string="Customer"/>
                             </group>
                             <p attrs="{'invisible': [('analytic_account_id','=',False)]}">
                                 To invoice or setup invoicing and renewal options, go to the related contract:
@@ -381,8 +381,9 @@
                     <field name="planned_hours" invisible="context.get('set_visible',False)"
                            groups="project.group_time_work_estimation_tasks"/>
                     <field name="effective_hours" widget="float_time" sum="Spent Hours" invisible="1"/>
+                    <!--on_change="onchange_remaining(remaining_hours,planned_hours)"-->
                     <field name="remaining_hours" widget="float_time" sum="Remaining Hours"
-                           on_change="onchange_remaining(remaining_hours,planned_hours)"
+
                            invisible="context.get('set_visible',False)"
                            groups="project.group_time_work_estimation_tasks"/>
                     <field name="date_deadline" invisible="context.get('deadline_visible',True)"/>
