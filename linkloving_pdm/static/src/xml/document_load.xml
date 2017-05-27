@@ -107,7 +107,7 @@
 
     <t t-name="active_document_tab">
         <t t-foreach="result.files" t-as="item_files">
-            <div class="tab_pane_display">
+            <div class="tab_pane_display" t-att-data-id="item_files.id">
                 <div class="tab_message_display">
                     <div>文件：<span><t t-esc="item_files.file_name"/></span></div>
                     <div>审核人：<span><t t-esc="item_files.review_id"/></span></div>
