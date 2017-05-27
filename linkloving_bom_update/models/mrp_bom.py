@@ -87,7 +87,7 @@ def _get_rec(object, level, qty=1.0, uom=False):
             'product_tmpl_id': l.product_id.product_tmpl_id.id,
             'code': l.product_id.default_code,
             'uuid': str(uuid.uuid1()),
-            'product_specs': line.product_id.product_specs,
+            'product_specs': l.product_id.product_specs,
             'is_highlight': l.is_highlight,
             'id': l.id,
             'qty': l.product_qty,
