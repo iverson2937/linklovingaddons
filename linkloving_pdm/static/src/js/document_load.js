@@ -42,7 +42,10 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
 
         },
         load_file:function () {
-            // $(".load_container").hide();
+            $(".my_load_file_name").val("");
+            $(".my_load_file_remote_path").val("");
+            $(".my_load_file_version").val("");
+            $(".load_container").hide();
         },
         get_file_name:function (e) {
             var e = e||window.event;
@@ -70,7 +73,16 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             var callback = _.uniqueId('func_');
             $(".file_func").val(callback);
             window[callback] = function () {
-                window.location.reload()
+                // window.location.reload()
+                var file_type = self.$("#document_tab").attr("data-now-tab");
+                var product_id = parseInt(self.$("#document_tab").attr("data-product-id"));
+                return new Model("product.template")
+                .call("get_attachemnt_info_list", [product_id], {type:file_type})
+                .then(function (result) {
+                    console.log(result);
+                    self.$("#"+file_type).html("");
+                    self.$("#"+file_type).append(QWeb.render('active_document_tab', {result: result}));
+                })
             }
         },
         document_form_pop:function (e) {
