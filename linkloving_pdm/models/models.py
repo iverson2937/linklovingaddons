@@ -281,6 +281,15 @@ class ProductAttachmentInfo(models.Model):
         })
 
 
+ATTACHMENT_STATE = {
+    'draft': u'等待文件',
+    'waiting_release': u'等待提交审核',
+    'review_ing': u'审核中',
+    'released': u'已发布',
+    'deny': u'被拒',
+    'cancel': u"已取消",
+}
+
 class ProductTemplateExtend(models.Model):
     _inherit = "product.template"
 
@@ -333,10 +342,11 @@ class ProductTemplateExtend(models.Model):
             'review_id': info.review_id.who_review_now.name or '',
             'remote_path': info.remote_path or '',
             'version': info.version or '',
-            'state': info.state,
+            'state': ATTACHMENT_STATE[info.state],
             'has_right_to_review': info.has_right_to_review,
             'review_line': info.review_id.get_review_line_list()
         }
+
     #####
 
     sip_files = fields.One2many(comodel_name="product.attachment.info",
