@@ -28,7 +28,8 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             console.log($(target).parents(".tab_pane_display").children(".tab_message_display"));
             $(target).parents(".tab_pane_display").children(".tab_message_display").prepend("<div class='document_modify_name'>新修改的文件：<span>"+target.files[0].name+"</span></div>");
             $(".document_modify span").val(target.files[0].name);
-
+            var new_file_id = $(".tab_pane_display").attr("data-id");
+            console.log(new_file_id)
             console.log(target.files[0])
             var new_file = target.files[0]
             $.ajax({
@@ -37,6 +38,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 async:true,
                 data:{
                     'new_file':new_file,
+                    'new_file_id':new_file_id
                 },
             })
 
@@ -66,7 +68,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             //     target:"new"
             // };
             // this.do_action(action);
-             $(".load_container").show();
+            $(".load_container").show();
             $(".file_active_id").val($(this)[0].product_id);
             $(".file_active_type").val($("li.active a").attr("data"));
 
