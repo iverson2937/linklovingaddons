@@ -3,6 +3,7 @@ import base64
 import json
 
 from odoo import http, _
+from odoo.exceptions import UserError
 from odoo.http import serialize_exception, request, _logger
 
 
@@ -14,6 +15,10 @@ class LinklovingPdm(http.Controller):
         out = """<script type='text/javascript'>
             window.parent['%s'](%s, %s);
         </script>"""
+        if active_type or my_load_file or active_id:
+            error = u"缺少必要的参数"
+            args = {"error": error}
+            return out % (func, json.dumps(args), json.dumps({}))
         try:
             attach = Model.create({
                 'file_name': my_load_file_name,
@@ -32,7 +37,7 @@ class LinklovingPdm(http.Controller):
         except Exception:
             error = {'error': _("Something horrible happened")}
             _logger.exception("Fail to upload attachment %s" % my_load_file.filename)
-        return out % (func, json.dumps(args), json.dumps({}))
+        return out % (func, json.dumps(args), json.dumps({"error": error}))
 
     @http.route('/linkloving_pdm/update_attachment_info', type='http', auth='user')
     def update_attachment_info(self, attachment_id, new_file):
