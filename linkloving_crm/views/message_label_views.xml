@@ -54,7 +54,8 @@
         <!--Receipt*-->
         <menuitem action="action_crm_message_label"
                   id="menu_crm_message_label"
-                  parent="sales_team.menu_sale_config"
+                  parent="sales_team.menu_sales"
+                  groups="sales_team.group_sale_manager"
                   sequence="2" name="记录类型"/>
 
 
