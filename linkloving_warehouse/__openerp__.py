@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'product', 'mrp', 'purchase'],
+    'depends': ['base', 'product', 'mrp', 'purchase', 'stock'],
 
     # always loaded
     'data': [
@@ -31,6 +31,7 @@
         'views/mrp_production_combine.xml',
         # 'views/stock_picking_view.xml',
         'views/product_view.xml',
+        'views/product_config.xml',
         'templates.xml',
     ],
     # only loaded in demonstration mode
