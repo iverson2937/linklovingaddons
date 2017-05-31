@@ -73,6 +73,11 @@
                             </group>
                             <field name="detail"/>
                         </group>
+                        <notebook>
+                            <page string="产品">
+                                <field name="i_adc"/>
+                            </page>
+                        </notebook>
                     </sheet>
                 </form>
             </field>
@@ -173,12 +178,57 @@
         </record>
 
 
+
+
+
         <!--Receipt*-->
         <menuitem action="action_crm_lead_source"
                   id="menu_crm_lead_source"
                   parent="sales_team.menu_sales"
                   groups="sales_team.group_sale_manager"
                   sequence="2" name="线索来源"/>
+
+
+        <record model="ir.ui.view" id="mail.view_message_form">
+            <field name="name">mail.message.form</field>
+            <field name="model">mail.message</field>
+            <field name="priority">20</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="subject"/>
+                                <field name="date" invisible="1"/>
+                                <field name="email_from" invisible="1"/>
+                                <field name="author_id" invisible="1"/>
+                                <field name="record_name" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="label_ids" string="记录类型" widget="many2many_tags"
+                                       options="{'no_create': True}"/>
+                                <field name="parent_id" invisible="1"/>
+                                <field name="model" invisible="1"/>
+                                <field name="res_id" invisible="1"/>
+                                <field name="message_type" invisible="1"/>
+                                <field name="subtype_id" invisible="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Body">
+                                <field name="body" options="{'style-inline': true}"/>
+                            </page>
+
+                        </notebook>
+                    </sheet>
+
+                    <footer>
+                        <button string="修改" name="send_mail_action_is_my" type="object" class="btn-primary"/>
+                        <button string="取消" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
 
 
     </data>

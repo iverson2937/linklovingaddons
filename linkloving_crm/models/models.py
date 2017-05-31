@@ -9,11 +9,13 @@ AVAILABLE_PRIORITIES = [
     ('3', 'High'),
     ('4', 'Very High'),
     ('5', 'top level'),
+
 ]
 
 
 class CrmLead(models.Model):
     _inherit = "crm.lead"
+
     crm_source_id = fields.Many2one('crm.lead.source', string=u'来源')
 
     continent = fields.Many2one('crm.continent', string=u'所属大洲')
