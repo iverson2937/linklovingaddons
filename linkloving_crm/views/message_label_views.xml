@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+
+
+        <!--crm.lead.source-->
+        <record model="ir.ui.view" id="view_crm_message_label_form">
+            <field name="name">crm.message_label.form</field>
+            <field name="model">message.label</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <field name="description"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_crm_message_label_tree" model="ir.ui.view">
+            <field name="name">crm.lead.message.label</field>
+            <field name="model">message.label</field>
+            <field name="arch" type="xml">
+                <tree string="备注记录">
+                    <field name="name"/>
+                    <field name="description"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_crm_message_label" model="ir.actions.act_window">
+            <field name="name">记录类型</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">message.label</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click add record type.
+                </p>
+                <p>
+                    No source Found!
+                </p>
+            </field>
+        </record>
+
+        <!--Receipt*-->
+        <menuitem action="action_crm_message_label"
+                  id="menu_crm_message_label"
+                  parent="sales_team.menu_sale_config"
+                  sequence="2" name="记录类型"/>
+
+
+
+    </data>
+</openerp>

@@ -299,9 +299,9 @@ odoo.define('mail.Chatters', function (require) {
                 var action_two = {
                     type: 'ir.actions.act_window',
                     res_model: 'mail.message',
-                    // view_id: 'view_message_form_is_my',
+                    view_id: 'view_message_form_is_is',
                     view_mode: 'form',
-                    views: [[1669 || false, 'form']],
+                    views: [[false, 'form']],
                     res_id: message,
                     target: 'new'
                 }

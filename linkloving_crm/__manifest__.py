@@ -28,6 +28,7 @@
         'views/views.xml',
         'views/templates.xml',
         'views/partner_view.xml',
+        'views/message_label_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

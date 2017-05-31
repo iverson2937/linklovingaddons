@@ -177,6 +177,9 @@
         </record>
 
 
+
+
+
         <!--Receipt*-->
         <menuitem action="action_crm_lead_source"
                   id="menu_crm_lead_source"
@@ -184,8 +187,8 @@
                   sequence="2" name="线索来源"/>
 
 
-        <record model="ir.ui.view" id="view_message_form_is_my">
-            <field name="name">mail.message.form.is.my</field>
+        <record model="ir.ui.view" id="mail.view_message_form">
+            <field name="name">mail.message.form</field>
             <field name="model">mail.message</field>
             <field name="priority">20</field>
             <field name="arch" type="xml">
@@ -193,18 +196,20 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name="subject" />
-                                <field name="date" />
-                                <field name="email_from" />
-                                <field name="author_id" />
-                                <field name="record_name" />
+                                <field name="subject"/>
+                                <field name="date" invisible="1"/>
+                                <field name="email_from" invisible="1"/>
+                                <field name="author_id" invisible="1"/>
+                                <field name="record_name" invisible="1"/>
                             </group>
                             <group>
-                                <field name="parent_id"/>
-                                <field name="model"/>
-                                <field name="res_id"/>
-                                <field name="message_type"/>
-                                <field name="subtype_id"/>
+                                <field name="label_ids" string="记录类型" widget="many2many_tags"
+                                       options="{'no_create': True}"/>
+                                <field name="parent_id" invisible="1"/>
+                                <field name="model" invisible="1"/>
+                                <field name="res_id" invisible="1"/>
+                                <field name="message_type" invisible="1"/>
+                                <field name="subtype_id" invisible="1"/>
                             </group>
                         </group>
                         <notebook>
@@ -217,11 +222,7 @@
 
                     <footer>
                         <button string="修改" name="send_mail_action_is_my" type="object" class="btn-primary"/>
-                        <!--<button string="修改" type="object" class="btn-primary o_composer_button_send"/>-->
                         <button string="取消" class="btn-default" special="cancel"/>
-
-                        <!--<button icon="fa-lg fa-save" type="object" name="save_as_template" string="Save as new template"-->
-                                <!--class="pull-right btn-default" help="Save as a new template"/>-->
                     </footer>
                 </form>
             </field>
