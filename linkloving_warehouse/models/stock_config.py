@@ -20,11 +20,11 @@ class StockConfigSettings(models.TransientModel):
         def rename(self):
             products = self.env['product.template'].search([])
             for product in products:
-                if re.findall(r"{-RT-ENG}", product.name):
+                if re.findall(r"{-RT-CN}", product.name):
                     continue
-                old = re.findall(r"-RT-ENG", product.name)
+                old = re.findall(r"-RT-CN", product.name)
                 new_name = ''
                 if old:
-                    new_name = product.name.replace(old[0], "{RT-ENG}")
+                    new_name = product.name.replace(old[0], "{RT-CN}")
                 if new_name:
                     product.name = new_name
