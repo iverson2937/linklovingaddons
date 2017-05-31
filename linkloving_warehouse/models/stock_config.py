@@ -27,5 +27,4 @@ class StockConfigSettings(models.TransientModel):
                 if old:
                     new_name = product.name.replace(old[0], "{RT-ENG}")
                 if new_name:
-                    print new_name
                     product.name = new_name
