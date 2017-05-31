@@ -17,7 +17,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             'show.bs.tab .tab_toggle_a': 'document_change_tabs',
             'click .document_manage_btn': 'document_form_pop',
             'click .create_document_btn': 'create_document_fn',
-            'click .load_container_close': 'close_document_container',
+            'click .load_caontiner_close': 'close_document_container',
             'change .my_load_file': 'get_file_name',
             'click .submit_file_yes': 'load_file',
             'change .document_modify': 'document_modify_fn'
@@ -88,7 +88,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             // };
             // this.do_action(action);
             $(".load_container").show();
-            // $(".file_active_id").val($(this)[0].product_id);
+            $(".file_active_id").val($(this)[0].product_id);
             $(".file_active_type").val($("li.active>a").attr("data"));
 
             var callback = _.uniqueId('func_');
