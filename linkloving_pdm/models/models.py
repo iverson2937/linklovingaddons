@@ -161,6 +161,9 @@ class ProductAttachmentInfo(models.Model):
     #             return product_tmpl.product_variant_ids[0].id
     #         else:
     #             return res_id
+    def _get_version(self):
+        pass
+
 
     def _default_version(self):
         model = self._context.get("model")
@@ -186,6 +189,7 @@ class ProductAttachmentInfo(models.Model):
                              default='draft', required=False, readonly=True)
     version = fields.Char(string=u"版本号", default=_default_version)
 
+    seq_version = fields.Many2one('ir.sequence')
     has_right_to_review = fields.Boolean(compute='_compute_has_right_to_review')
     # product_id = fields.Many2one(
     #         'product.product', 'Product',default='_default_product_id',

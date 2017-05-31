@@ -39,16 +39,28 @@ class LinklovingPdm(http.Controller):
             _logger.exception("Fail to upload attachment %s" % my_load_file.filename)
         return out % (func, json.dumps(args), json.dumps({"error": error}))
 
-    @http.route('/linkloving_pdm/update_attachment_info', type='http', auth='user')
-    def update_attachment_info(self, attachment_id, new_file):
-        attachment = request.env['product.attachment.info'].browse(attachment_id)
-        out = """<script language="javascript" type="text/javascript">
-                    var win = window.top.window;
-                    win.jQuery(win).trigger(%s, %s);
-                </script>"""
+    # @http.route('/linkloving_pdm/update_attachment_info', type='http', auth='user')
+    # def update_attachment_info(self, attachment_id, new_file):
+    #     attachment = request.env['product.attachment.info'].browse(attachment_id)
+    #     out = """<script language="javascript" type="text/javascript">
+    #                 var win = window.top.window;
+    #                 win.jQuery(win).trigger(%s, %s);
+    #             </script>"""
+    #
+    #     attach = attachment.write({
+    #         'file_name': new_file.filename,
+    #     })
+    #
+    #     return json.dumps({"error": "123"})
+    #
 
-        attach = attachment.write({
-            'file_name': new_file.filename,
+    @http.route('/update_attachment_info', type='json', auth='none')
+    def update_attachment_info(self):
+        attachment_id = request.jsonrequest.get("attachment_id")  # 附件id
+        path = request.jsonrequest.get("path")  # 远程地址
+
+        return json.dumps({
+            "msg": u"得到的参数",
+            "attachment_id": attachment_id,
+            "path": path,
         })
-
-        return json.dumps({"error": "123"})
