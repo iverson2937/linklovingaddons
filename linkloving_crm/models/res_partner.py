@@ -26,7 +26,7 @@ class CrmPartner(models.Model):
     source = fields.Char(string=u'来源')
     continent = fields.Many2one('crm.continent', string=u'所属大洲')
     express_sample_record = fields.Char(string=u'快递账号')
-    interested_in_product = fields.Char(string=u'感兴趣产品')
+    interested_in_product = fields.Many2many('product.template', string=u'感兴趣产品')
     communication_identifier = fields.Char(string=u'其他沟通方式')
     qq = fields.Char(string=u'QQ')
 
@@ -69,9 +69,24 @@ class CrmRemarkRecord(models.Model):
     detail = fields.Text(string=u'详细')
     real_time = fields.Date(string=u'日期', default=fields.Date.context_today)
 
+    i_adc = fields.Many2many('product.template', string=u'拜访记录')
+
 
 class CrmLeadSource(models.Model):
     _name = 'crm.lead.source'
 
     name = fields.Char(u'来源')
     detail = fields.Text(string=u'详细')
+
+
+class CrmRemarkRecord(models.Model):
+    _inherit = 'mail.message'
+
+    @api.multi
+    def send_mail_action_is_my(self):
+        # TDE/ ???
+        return self.send_mail()
+
+    @api.multi
+    def send_mail(self):
+        return {'type': 'ir.actions.act_window_close'}

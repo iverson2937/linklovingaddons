@@ -29,12 +29,11 @@
         'views/templates.xml',
         'views/partner_view.xml',
         'security/crm_rule.xml',
+        'views/message_label_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
     ],
-    'qweb': [
-        'static/src/xml/thread.xml',
-    ],
+    'qweb': ['static/src/xml/*.xml'],
 }
