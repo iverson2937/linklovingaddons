@@ -1,5 +1,12 @@
 <openerp>
     <data>
+        <record id="action_review_process_wizard" model="ir.actions.act_window">
+            <field name="name">选择下一个审核人</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">review.process.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
         <record id="product_template_form_inherit" model="ir.ui.view">
             <field name="name">product.template.form.inherit</field>
             <field name="model">product.template</field>
@@ -39,22 +46,22 @@
                                 </templates>
                             </kanban>
                             <!--<form string="文件">-->
-                                <!--<sheet>-->
-                                    <!--<group>-->
+                            <!--<sheet>-->
+                            <!--<group>-->
 
-                                        <!--<group>-->
-                                            <!--<field name="file_name"/>-->
-                                            <!--<field name="remote_path"/>-->
-                                            <!--<field name="file_binary"/>-->
-                                            <!--<field name="state"/>-->
-                                            <!--<field name="version"/>-->
-                                            <!--<field name="product_tmpl_id"/>-->
-                                            <!--<field name="review_id"/>-->
-                                            <!--<field name="type"/>-->
-                                        <!--</group>-->
-                                    <!--</group>-->
+                            <!--<group>-->
+                            <!--<field name="file_name"/>-->
+                            <!--<field name="remote_path"/>-->
+                            <!--<field name="file_binary"/>-->
+                            <!--<field name="state"/>-->
+                            <!--<field name="version"/>-->
+                            <!--<field name="product_tmpl_id"/>-->
+                            <!--<field name="review_id"/>-->
+                            <!--<field name="type"/>-->
+                            <!--</group>-->
+                            <!--</group>-->
 
-                                <!--</sheet>-->
+                            <!--</sheet>-->
                             <!--</form>-->
                         </field>
                     </page>
@@ -143,15 +150,8 @@
             </field>
         </record>
 
-        <record id="action_review_process_wizard" model="ir.actions.act_window">
-            <field name="name">选择下一个审核人</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">review.process.wizard</field>
-            <field name="view_mode">form</field>
-            <field name="target">new</field>
-        </record>
 
-         <template id="document_manage_static" name="linkloving_document_manage" inherit_id="web.assets_backend">
+        <template id="document_manage_static" name="linkloving_document_manage" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
 
                 <script type="text/javascript" src="/linkloving_pdm/static/src/js/document_load.js"/>
