@@ -1,0 +1,23 @@
+<odoo>
+    <data>
+
+
+        <record id="res_group_view_inherit" model="ir.ui.view">
+            <field name="name">res.groups.form</field>
+            <field name="model">res.groups</field>
+            <field name="inherit_id" ref="base.view_groups_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//sheet" position="before">
+                    <header>
+                        <button name="update_hr_job_form" type="object" string="确认"
+                                class="oe_highlight"/>
+                    </header>
+                </xpath>
+
+
+            </field>
+        </record>
+
+
+    </data>
+</odoo>
