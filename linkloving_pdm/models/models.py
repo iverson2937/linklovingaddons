@@ -162,6 +162,7 @@ class ProductAttachmentInfo(models.Model):
     #         else:
     #             return res_id
     def _get_version(self):
+
         pass
 
 
@@ -187,9 +188,8 @@ class ProductAttachmentInfo(models.Model):
                                                       ('deny', u'被拒'),
                                                       ('cancel', u'已取消')],
                              default='draft', required=False, readonly=True)
-    version = fields.Char(string=u"版本号", default=_default_version)
-
-    seq_version = fields.Many2one('ir.sequence')
+    # version = fields.Char(string=u"版本号", default=_default_version)
+    version = fields.Many2one('ir.sequence', string=u"版本号")
     has_right_to_review = fields.Boolean(compute='_compute_has_right_to_review')
     # product_id = fields.Many2one(
     #         'product.product', 'Product',default='_default_product_id',
@@ -215,7 +215,10 @@ class ProductAttachmentInfo(models.Model):
     def create(self, vals):
         if (vals.get("file_binary") or vals.get("remote_path")):
             vals['state'] = 'waiting_release'
-        return super(ProductAttachmentInfo, self).create(vals)
+        res = super(ProductAttachmentInfo, self).create(vals)
+
+        return res
+
 
     @api.multi
     def write(self, vals):
