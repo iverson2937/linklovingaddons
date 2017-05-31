@@ -47,8 +47,8 @@
 
                 <xpath expr="//page[@name='extra']" position="after">
                     <page string="产品">
-                        <field name="interested_in_product" domain="[('sale_ok','=',True)]"
-                               context="{'search_default_filter_categ_id':1}"/>
+                        <field name="interested_in_product" domain="[('sale_ok','=',True),('name','ilike', 'RT-ENG')]"
+                        />
                     </page>
                 </xpath>
 
