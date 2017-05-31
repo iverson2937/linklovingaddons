@@ -1,4 +1,4 @@
-odoo.define('mail.ChatThread', function (require) {
+odoo.define('mail.ChatThread1', function (require) {
 "use strict";
 
 var core = require('web.core');
