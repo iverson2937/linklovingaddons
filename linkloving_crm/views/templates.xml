@@ -5,6 +5,8 @@
             <xpath expr="." position="inside">
 
                 <script type="text/javascript" src="/linkloving_crm/static/src/js/chatters.js"/>
+                <script type="text/javascript" src="/linkloving_crm/static/src/js/thread.js"/>
+
 
             </xpath>
         </template>
