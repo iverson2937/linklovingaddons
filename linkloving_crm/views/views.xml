@@ -47,8 +47,8 @@
 
                 <xpath expr="//page[@name='extra']" position="after">
                     <page string="产品">
-                        <field name="interested_in_product" domain="[('sale_ok','=',True),('name','ilike', 'RT-ENG')]"
-                        />
+                        <field name="interested_in_product" domain="[('sale_ok','=',True)]"
+                            context="{'search_default_rteng':1}"/>
                     </page>
                 </xpath>
 
@@ -178,9 +178,6 @@
         </record>
 
 
-
-
-
         <!--Receipt*-->
         <menuitem action="action_crm_lead_source"
                   id="menu_crm_lead_source"
@@ -227,6 +224,19 @@
                         <button string="取消" class="btn-default" special="cancel"/>
                     </footer>
                 </form>
+            </field>
+        </record>
+
+
+        <record id="product_template_search_view_website_crm" model="ir.ui.view">
+            <field name="name">product.template.search.published</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_search_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='consumable']" position="after">
+                    <separator/>
+                    <filter string="RT-ENG" name="rteng" domain="[('name','ilike', 'RT-ENG')]"/>
+                </xpath>
             </field>
         </record>
 
