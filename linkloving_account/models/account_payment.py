@@ -22,6 +22,10 @@ class AccountPaymentRegisterBalance(models.Model):
 
 
 class AccountPaymentRegister(models.Model):
+    """
+    付款申请表
+    """
+
     _name = 'account.payment.register'
     _order = 'create_date desc'
     _inherit = ['mail.thread', 'ir.needaction_mixin']
@@ -190,7 +194,6 @@ class AccountPayment(models.Model):
             rec['partner_type'] = MAP_INVOICE_TYPE_PARTNER_TYPE[invoice['type']]
             rec['partner_id'] = invoice['partner_id'][0]
             rec['amount'] = amount
-            print rec['amount']
         return rec
 
     @api.multi
