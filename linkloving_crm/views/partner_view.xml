@@ -58,8 +58,10 @@
                 </xpath>
 
                 <xpath expr="//page[@name='accounting_disabled']" position="after">
+
                     <page string="产品">
-                        <field name="interested_in_product"/>
+                        <field name="interested_in_product" domain="[('sale_ok','=',True)]"
+                               context="{'search_default_rteng':1,'search_default_filter_categ_id':1}"/>
                     </page>
                 </xpath>
 
