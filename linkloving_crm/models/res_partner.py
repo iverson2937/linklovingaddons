@@ -4,6 +4,7 @@
 # directory
 ##############################################################################
 from odoo import fields, api, models
+from odoo.exceptions import UserError
 
 AVAILABLE_PRIORITIES = [
     ('0', 'badly'),
@@ -15,7 +16,7 @@ AVAILABLE_PRIORITIES = [
 ]
 
 
-class CrmPartner(models.Model):
+class ResPartner(models.Model):
     """"""
 
     _inherit = 'res.partner'
@@ -33,6 +34,23 @@ class CrmPartner(models.Model):
     skype = fields.Char(string=u'Skype')
     whatsapp = fields.Char(string=u'WhatsApp')
     wechat = fields.Char(string=u'微信')
+
+    @api.model
+    def create(self, vals):
+        exist = self.env['res.partner'].search([('name', '=', vals['name'].strip())])
+        if exist:
+            raise UserError(u'该名称已经存在')
+        return super(ResPartner, self).create(vals)
+
+    @api.multi
+    def write(self, vals):
+        exist = False
+        if 'name' in vals:
+            exist = self.env['res.partner'].search([('name', '=', vals['name'].strip())])
+
+        if exist:
+            raise UserError(u'该名称已经存在')
+        return super(ResPartner, self).write(vals)
 
     @api.depends('street', 'country_id', 'zip', 'state_id', 'city', 'street', 'street2')
     def _street_name(self):
