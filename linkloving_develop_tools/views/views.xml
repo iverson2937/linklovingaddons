@@ -9,22 +9,30 @@
                         为国内产品创建重订货规则？
                     </p>
                     <footer>
-                        <button string="99 98阶生成存货规则" name="action_create_in_aboard_rule" type="object"
-                                default_focus="1"
-                                class="btn-primary"/>
-                        <button string="合并make_by_mrp生成的采购单" name="action_combine_purchase_order" type="object"
-                                default_focus="1"
-                                class="btn-primary"/>
-                        <button string="取消保留stock picking单据" name="action_unreserved_stock_picking" type="object"
-                                default_focus="1"
-                                class="btn-primary"/>
-                        <button string="批量处理stockmove单" name="action_handle_stock_move" type="object"
-                                default_focus="1"
-                                class="btn-primary"/>
-                        <button string="生成产品分类菜单" name="action_create_menu" type="object"
-                                default_focus="1"
-                                class="btn-primary"/>
+                        <!--<button string="99 98阶生成存货规则" name="action_create_in_aboard_rule" type="object"-->
+                        <!--default_focus="1"-->
+                        <!--class="btn-primary"/>-->
+                        <!--<button string="合并make_by_mrp生成的采购单" name="action_combine_purchase_order" type="object"-->
+                        <!--default_focus="1"-->
+                        <!--class="btn-primary"/>-->
+                        <!--<button string="取消保留stock picking单据" name="action_unreserved_stock_picking" type="object"-->
+                        <!--default_focus="1"-->
+                        <!--class="btn-primary"/>-->
+                        <!--<button string="批量处理stockmove单" name="action_handle_stock_move" type="object"-->
+                        <!--default_focus="1"-->
+                        <!--class="btn-primary"/>-->
+                        <!--<button string="生成产品分类菜单" name="action_create_menu" type="object"-->
+                        <!--default_focus="1"-->
+                        <!--class="btn-primary"/>-->
                         <button string="Cancel" class="btn-default" special="cancel"/>
+
+                        <button string="一键取消MO" name="action_cancel_mo" type="object"
+                                default_focus="1"
+                                class="btn-primary"/>
+
+                        <button string="一键取消未发货SO" name="action_cancel_so" type="object"
+                                default_focus="1"
+                                class="btn-primary"/>
                     </footer>
                 </form>
             </field>

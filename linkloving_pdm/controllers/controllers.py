@@ -15,7 +15,7 @@ class LinklovingPdm(http.Controller):
         out = """<script type='text/javascript'>
             window.parent['%s'](%s, %s);
         </script>"""
-        if active_type or my_load_file or active_id:
+        if not active_type or not my_load_file or not active_id:
             error = u"缺少必要的参数"
             args = {"error": error}
             return out % (func, json.dumps(args), json.dumps({}))
@@ -27,7 +27,8 @@ class LinklovingPdm(http.Controller):
                 'state': 'waiting_release',
                 'product_tmpl_id': int(active_id),
                 'type': active_type,
-                'version': my_load_file_version,
+                'version': Model.with_context({"product_id": int(active_id),
+                                               "type": active_type})._default_version(),
             })
             args = {
                 'filename': my_load_file.filename,
@@ -37,7 +38,7 @@ class LinklovingPdm(http.Controller):
         except Exception:
             error = {'error': _("Something horrible happened")}
             _logger.exception("Fail to upload attachment %s" % my_load_file.filename)
-        return out % (func, json.dumps(args), json.dumps({"error": error}))
+        return out % (func, json.dumps(args), json.dumps({}))
 
     # @http.route('/linkloving_pdm/update_attachment_info', type='http', auth='user')
     # def update_attachment_info(self, attachment_id, new_file):
