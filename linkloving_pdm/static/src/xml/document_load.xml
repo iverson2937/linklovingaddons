@@ -8,6 +8,9 @@
     </t>
 
     <t t-name="document_load_detail">
+         <script>
+            $(function () { $("[data-toggle='tooltip']").tooltip(); });
+        </script>
         <ul id="document_tab" class="nav nav-tabs">
             <t t-set="i" t-value="1"/>
             <t t-foreach="result" t-as="item">
@@ -41,15 +44,15 @@
                                     <t t-foreach="item_files.review_line" t-as="review_list">
                                         <div><t t-esc="review_list.name"/></div>
                                         <t t-if="review_list.state=='review_success'">
-                                            <span class="fa fa-long-arrow-right"></span>
+                                            <span class="fa fa-long-arrow-right" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark"></span>
                                         </t>
                                         <t t-if="review_list.state=='waiting_review'">
                                             <span class="fa fa-long-arrow-right document_yellow"></span>
                                             <div>等待</div>
                                         </t>
-                                         <t t-if="review_list.state=='review_fail'">
-                                            <span class="fa fa-long-arrow-right document_red"></span>
-                                            <div>审核不通过</div>
+                                         <t t-if="review_list.state=='review_fail'||review_list.state=='review_canceled'">
+                                            <span class="fa fa-long-arrow-right document_red" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark"></span>
+                                            <!--<div>审核不通过</div>-->
                                         </t>
                                     </t>
 
@@ -106,6 +109,9 @@
     </t>
 
     <t t-name="active_document_tab">
+        <script>
+            $(function () { $("[data-toggle='tooltip']").tooltip(); });
+        </script>
         <t t-foreach="result.files" t-as="item_files">
             <div class="tab_pane_display" t-att-data-id="item_files.id">
                 <div class="tab_message_display">
@@ -119,17 +125,18 @@
                     <t t-foreach="item_files.review_line" t-as="review_list">
                         <div><t t-esc="review_list.name"/></div>
                         <t t-if="review_list.state=='review_success'">
-                            <span class="fa fa-long-arrow-right"></span>
+                            <span class="fa fa-long-arrow-right" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark"></span>
                         </t>
                         <t t-if="review_list.state=='waiting_review'">
                             <span class="fa fa-long-arrow-right document_yellow"></span>
                             <div>等待</div>
                         </t>
-                        <t t-if="review_list.state=='review_fail'">
-                            <span class="fa fa-long-arrow-right document_red"></span>
-                            <div>审核不通过</div>
-                            <span class="fa fa-long-arrow-right"></span>
+                        <t t-if="review_list.state=='review_fail'||review_list.state=='review_canceled'">
+                            <span class="fa fa-long-arrow-right document_red" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark"></span>
+                            <!--<div>审核不通过</div>-->
+                            <!--<span class="fa fa-long-arrow-right"></span>-->
                         </t>
+
                     </t>
 
                  </div>
