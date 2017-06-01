@@ -6,6 +6,11 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='category_id']" position="after">
+                    <field name="crm_source_id" string="来源" attrs="{'invisible': [('customer','!=', True)]}"
+                           options="{'no_create':True}"/>
+                </xpath>
                 <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/div/div/field[@name='country_id']"
                        position="after">
                     <field name="detailed_address"/>

@@ -59,6 +59,7 @@ class CrmLead(models.Model):
             'street2': self.street2,
             'zip': self.zip,
             'city': self.city,
+            'crm_source_id': self.crm_source_id.id,
             'country_id': self.country_id.id,
             'state_id': self.state_id.id,
             'is_company': is_company,

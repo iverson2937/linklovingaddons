@@ -35,6 +35,8 @@ class ResPartner(models.Model):
     whatsapp = fields.Char(string=u'WhatsApp')
     wechat = fields.Char(string=u'微信')
 
+    crm_source_id = fields.Many2one('crm.lead.source', string=u'来源')
+
     @api.model
     def create(self, vals):
         exist = self.env['res.partner'].search([('name', '=', vals['name'].strip())])
