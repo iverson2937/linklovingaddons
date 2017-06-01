@@ -23,6 +23,15 @@ class AccountEmployeePayment(models.Model):
     sheet_ids = fields.One2many('hr.expense.sheet', 'payment_id')
     return_ids = fields.One2many('account.employee.payment.return', 'payment_id')
 
+    # FIXME:USE BETTER WAY TO HIDE THE BUTTON
+    def _get_is_show(self):
+        is_show = False
+        if self.env.user.id == self.to_approve_id.id:
+            is_show = True
+        self.is_show = is_show
+
+    is_show = fields.Boolean(compute=_get_is_show)
+
     @api.one
     @api.depends('return_ids')
     def _get_return_balance(self):
