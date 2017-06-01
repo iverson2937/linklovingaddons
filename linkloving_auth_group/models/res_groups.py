@@ -55,7 +55,7 @@ class GroupsView(models.Model):
 
         # We have to try-catch this, because at first init the view does not
         # exist but we are already creating some basic groups.
-        view = self.env.ref('hr.view_hr_job_form', raise_if_not_found=False)
+        view = self.env.ref('linkloving_auth_group.hr_job_groups_view', raise_if_not_found=False)
         if view and view.exists() and view._name == 'ir.ui.view':
             group_no_one = view.env.ref('base.group_no_one')
             xml1, xml2 = [], []

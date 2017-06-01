@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
+from itertools import chain, repeat
 from collections import defaultdict, MutableMapping, OrderedDict
 
 #
@@ -10,88 +11,84 @@ from odoo.addons.base.res.res_users import parse_m2m
 from odoo.tools import partition
 
 
+def name_boolean_group(id):
+    return 'in_group_' + str(id)
+
+
+def name_selection_groups(ids):
+    return 'sel_groups_' + '_'.join(map(str, ids))
+
+
+def is_boolean_group(name):
+    return name.startswith('in_group_')
+
+
+def is_selection_groups(name):
+    return name.startswith('sel_groups_')
+
+
+def is_reified_group(name):
+    return is_boolean_group(name) or is_selection_groups(name)
+
+
+def get_boolean_group(name):
+    return int(name[9:])
+
+
+def get_selection_groups(name):
+    return map(int, name[11:].split('_'))
+
+
 class HrJob(models.Model):
     _inherit = 'hr.job'
 
     groups_id = fields.Many2many('res.groups')
 
-    def get_application_groups(self, domain):
-        """ Return the non-share groups that satisfy ``domain``. """
-        return self.search(domain + [('share', '=', False)])
-
     @api.model
-    def get_groups_by_application(self):
-        """ Return all groups classified by application (module category), as a list::
+    def create(self, values):
+        values = self._remove_reified_groups(values)
+        user = super(HrJob, self).create(values)
+        group_multi_company = self.env.ref('base.group_multi_company', False)
+        if group_multi_company and 'company_ids' in values:
+            if len(user.company_ids) <= 1 and user.id in group_multi_company.users.ids:
+                group_multi_company.write({'users': [(3, user.id)]})
+            elif len(user.company_ids) > 1 and user.id not in group_multi_company.users.ids:
+                group_multi_company.write({'users': [(4, user.id)]})
+        return user
 
-                [(app, kind, groups), ...],
-
-            where ``app`` and ``groups`` are recordsets, and ``kind`` is either
-            ``'boolean'`` or ``'selection'``. Applications are given in sequence
-            order.  If ``kind`` is ``'selection'``, ``groups`` are given in
-            reverse implication order.
-        """
-
-        def linearize(app, gs):
-            # determine sequence order: a group appears after its implied groups
-            order = {g: len(g.trans_implied_ids & gs) for g in gs}
-            # check whether order is total, i.e., sequence orders are distinct
-            print order
-            print len(set(order.itervalues()))
-            print gs
-            print len(set(order.itervalues()))
-            if len(set(order.itervalues())) == len(gs):
-                return (app, 'selection', gs.sorted(key=order.get))
-            else:
-                return (app, 'boolean', gs)
-
-        # classify all groups by application
-        by_app, others = defaultdict(self.browse), self.browse()
-        for g in self.get_application_groups([]):
-            print '------------------------------------------------------'
-            print g.name
-            print g.category_id
-            if g.category_id:
-                by_app[g.category_id] += g
-            else:
-                others += g
-        # build the result
-        res = []
-        for app, gs in sorted(by_app.iteritems(), key=lambda (a, _): a.sequence or 0):
-            res.append(linearize(app, gs))
-        if others:
-            res.append((self.env['ir.module.category'], 'boolean', others))
+    @api.multi
+    def write(self, values):
+        values = self._remove_reified_groups(values)
+        res = super(HrJob, self).write(values)
+        group_multi_company = self.env.ref('base.group_multi_company', False)
+        if group_multi_company and 'company_ids' in values:
+            for user in self:
+                if len(user.company_ids) <= 1 and user.id in group_multi_company.users.ids:
+                    group_multi_company.write({'users': [(3, user.id)]})
+                elif len(user.company_ids) > 1 and user.id not in group_multi_company.users.ids:
+                    group_multi_company.write({'users': [(4, user.id)]})
         return res
 
-    @api.model
-    def fields_get(self, allfields=None, attributes=None):
-        res = super(HrJob, self).fields_get(allfields, attributes=attributes)
-        print res
-        # add reified groups fields
-        print self.env['res.groups'].sudo().get_groups_by_application()
-        print '______________________________________'
-        for app, kind, gs in self.env['res.groups'].sudo().get_groups_by_application():
-            if kind == 'selection':
-                # selection group field
-                tips = ['%s: %s' % (g.name, g.comment) for g in gs if g.comment]
-                res[name_selection_groups(gs.ids)] = {
-                    'type': 'selection',
-                    'string': app.name or _('Other'),
-                    'selection': [(False, '')] + [(g.id, g.name) for g in gs],
-                    'help': '\n'.join(tips),
-                    'exportable': False,
-                    'selectable': False,
-                }
+    def _remove_reified_groups(self, values):
+        """ return `values` without reified group fields """
+        add, rem = [], []
+        values1 = {}
+
+        for key, val in values.iteritems():
+            if is_boolean_group(key):
+                (add if val else rem).append(get_boolean_group(key))
+            elif is_selection_groups(key):
+                rem += get_selection_groups(key)
+                if val:
+                    add.append(val)
             else:
-                # boolean group fields
-                for g in gs:
-                    res[name_boolean_group(g.id)] = {
-                        'type': 'boolean',
-                        'string': g.name,
-                        'help': g.comment,
-                        'exportable': False,
-                        'selectable': False,
-                    }
-        return res
+                values1[key] = val
+
+        if 'groups_id' not in values and (add or rem):
+            # remove group ids in `rem` and add group ids in `add`
+            values1['groups_id'] = zip(repeat(3), rem) + zip(repeat(4), add)
+
+        return values1
 
     @api.model
     def default_get(self, fields):
@@ -99,7 +96,6 @@ class HrJob(models.Model):
         fields1 = (fields + ['groups_id']) if group_fields else fields
         values = super(HrJob, self).default_get(fields1)
         self._add_reified_groups(group_fields, values)
-        print values, 'ddddddddddddddd'
         return values
 
     @api.multi
@@ -136,3 +132,31 @@ class HrJob(models.Model):
             elif is_selection_groups(f):
                 selected = [gid for gid in get_selection_groups(f) if gid in gids]
                 values[f] = selected and selected[-1] or False
+
+    @api.model
+    def fields_get(self, allfields=None, attributes=None):
+        res = super(HrJob, self).fields_get(allfields, attributes=attributes)
+        # add reified groups fields
+        for app, kind, gs in self.env['res.groups'].sudo().get_groups_by_application():
+            if kind == 'selection':
+                # selection group field
+                tips = ['%s: %s' % (g.name, g.comment) for g in gs if g.comment]
+                res[name_selection_groups(gs.ids)] = {
+                    'type': 'selection',
+                    'string': app.name or _('Other'),
+                    'selection': [(False, '')] + [(g.id, g.name) for g in gs],
+                    'help': '\n'.join(tips),
+                    'exportable': False,
+                    'selectable': False,
+                }
+            else:
+                # boolean group fields
+                for g in gs:
+                    res[name_boolean_group(g.id)] = {
+                        'type': 'boolean',
+                        'string': g.name,
+                        'help': g.comment,
+                        'exportable': False,
+                        'selectable': False,
+                    }
+        return res
