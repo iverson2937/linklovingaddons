@@ -26,6 +26,7 @@
     'data': [
         # 'security/ir.model.access.csv',
         'views/hr_job.xml',
+        # 'views/hr_employee.xml',
         'views/res_groups.xml',
         # 'views/templates.xml',
     ],
