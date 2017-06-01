@@ -74,9 +74,11 @@ class ReviewProcess(models.Model):
         for line in sorted_line:
             line_list.append({
                 'name': line.partner_id.name,
+                'remark': line.remark or '',
                 'state': line.state,
             })
         return line_list
+
 
 class ReviewProcessLine(models.Model):
     _name = 'review.process.line'
@@ -85,7 +87,8 @@ class ReviewProcessLine(models.Model):
     review_time = fields.Datetime(string=u"操作时间", required=False, )
     state = fields.Selection(string=u"状态", selection=[('waiting_review', u'等待审核'),
                                                       ('review_success', u'审核通过'),
-                                                      ('review_fail', u'审核不通过')], required=False,
+                                                      ('review_fail', u'审核不通过'),
+                                                      ('review_canceled', u'取消审核')], required=False,
                              default='waiting_review')
 
     last_review_line_id = fields.Many2one("review.process.line", string=u"上一次审核")
@@ -148,6 +151,19 @@ class ReviewProcessLine(models.Model):
             'review_order_seq': self.review_order_seq + 1,
         })
 
+    def action_cancel(self, remark):
+        self.write({
+            'review_time': fields.datetime.now(),
+            'state': 'review_canceled',
+            'remark': remark
+        })
+        # 新建一个 审核条目 指向最初的人
+        self.env["review.process.line"].create({
+            'partner_id': self.create_uid.partner_id.id,
+            'review_id': self.review_id.id,
+            'last_review_line_id': self.id,
+            'review_order_seq': self.review_order_seq + 1,
+        })
 
 class ProductAttachmentInfo(models.Model):
     _name = 'product.attachment.info'
@@ -165,18 +181,30 @@ class ProductAttachmentInfo(models.Model):
 
         pass
 
-
     def _default_version(self):
         model = self._context.get("model")
         res_id = self._context.get("product_id")
-        self.env["product.attachment.info"].search([('product_tmpl_id', '=', res_id), ])
-        return None
+        type = self._context.get("type")
+        if not res_id or not type:
+            raise UserError(u"找不到对应的文件类型或产品")
+        attachs = self.env["product.attachment.info"].search([('product_tmpl_id', '=', res_id),
+                                                              ('type', '=', type)])
+        return max(attachs.mapped("version")) + 1 if attachs.mapped("version") else 1
+
+    @api.multi
+    def _compute_is_able_to_use(self):
+        for info in self:
+            attachs = self.env["product.attachment.info"].search([('product_tmpl_id', '=', info.product_tmpl_id.id),
+                                                                  ('type', '=', info.type)])
+            if info.version == max(attachs.mapped("version")) and info.state == 'released':
+                info.is_able_to_use = True
 
     @api.multi
     def _compute_has_right_to_review(self):
         for info in self:
             if self.env.user.id in info.review_id.who_review_now.user_ids.ids:
                 info.has_right_to_review = True
+
 
     file_name = fields.Char(u"文件名")
     remote_path = fields.Char(string=u"远程路径", required=False, )
@@ -188,8 +216,9 @@ class ProductAttachmentInfo(models.Model):
                                                       ('deny', u'被拒'),
                                                       ('cancel', u'已取消')],
                              default='draft', required=False, readonly=True)
-    # version = fields.Char(string=u"版本号", default=_default_version)
-    version = fields.Many2one('ir.sequence', string=u"版本号")
+    version = fields.Integer(string=u"版本号", default=_default_version)
+
+    is_able_to_use = fields.Boolean(string=u"是否可以使用", compute="_compute_is_able_to_use")
     has_right_to_review = fields.Boolean(compute='_compute_has_right_to_review')
     # product_id = fields.Many2one(
     #         'product.product', 'Product',default='_default_product_id',
@@ -219,7 +248,6 @@ class ProductAttachmentInfo(models.Model):
 
         return res
 
-
     @api.multi
     def write(self, vals):
         if (vals.get("file_binary") or vals.get("remote_path")):
@@ -236,6 +264,7 @@ class ProductAttachmentInfo(models.Model):
             'file_name': kwargs.get("file_name"),
         })
         return True
+
     # @api.multi
     # def _compute_version(self):
     #     for info in self:
@@ -297,6 +326,7 @@ ATTACHMENT_STATE = {
     'cancel': u"已取消",
 }
 
+
 class ProductTemplateExtend(models.Model):
     _inherit = "product.template"
 
@@ -336,7 +366,7 @@ class ProductTemplateExtend(models.Model):
 
     def convert_attendment_info_list(self, type):
         files = self.env["product.attachment.info"].search(
-                [("type", "=", type), ("product_tmpl_id", '=', self.id)])
+                [("type", "=", type), ("product_tmpl_id", '=', self.id)], order='version desc')
         json_list = []
         for a_file in files:
             json_list.append(self.convert_attachment_info(a_file))
@@ -351,7 +381,8 @@ class ProductTemplateExtend(models.Model):
             'version': info.version or '',
             'state': ATTACHMENT_STATE[info.state],
             'has_right_to_review': info.has_right_to_review,
-            'review_line': info.review_id.get_review_line_list()
+            'review_line': info.review_id.get_review_line_list(),
+            'is_able_to_use': info.is_able_to_use,
         }
 
     #####
@@ -386,6 +417,7 @@ class ProductTemplateExtend(models.Model):
                                    string="Design",
                                    required=False, )
 
+
 class ReviewProcessWizard(models.TransientModel):
     _name = 'review.process.wizard'
 
@@ -408,6 +440,7 @@ class ReviewProcessWizard(models.TransientModel):
                 remark=self.remark)
 
         return True
+
     # 终审 审核通过
     def action_pass(self):
         # 审核通过
@@ -416,6 +449,7 @@ class ReviewProcessWizard(models.TransientModel):
         self.product_attachment_info_id.action_released()
 
         return True
+
     # 审核不通过
     def action_deny(self):
         self.review_process_line.action_deny(self.remark)
@@ -423,6 +457,11 @@ class ReviewProcessWizard(models.TransientModel):
         self.product_attachment_info_id.action_deny()
 
         return True
+
+    def action_cancel_review(self):
+        self.review_process_line.action_cancel(self.remark)
+        self.product_attachment_info_id.action_cancel()
+
 
 class FinalReviewPartner(models.Model):
     _name = 'final.review.partner'
