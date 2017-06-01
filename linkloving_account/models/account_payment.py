@@ -166,6 +166,8 @@ class AccountPayment(models.Model):
     # origin = fields.Char(string=u'源单据')
 
     def set_to_done(self):
+        if not self.partner_id:
+            raise UserError(u'请填写客户')
         self.state = 'done'
 
     @api.onchange('partner_type')
