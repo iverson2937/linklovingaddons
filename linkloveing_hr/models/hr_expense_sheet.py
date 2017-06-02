@@ -47,7 +47,8 @@ class HrExpenseSheet(models.Model):
 
     to_approve_id = fields.Many2one('res.users', readonly=True, track_visibility='onchange')
 
-    state = fields.Selection([('submit', 'Submitted'),
+    state = fields.Selection([('draft', u'草稿'),
+                              ('submit', 'Submitted'),
                               ('manager1_approve', u'1级审核'),
                               ('manager2_approve', u'2级审核'),
                               ('manager3_approve', 'General Manager Approved'),
@@ -56,7 +57,7 @@ class HrExpenseSheet(models.Model):
                               ('done', 'Paid'),
                               ('cancel', 'Refused')
                               ], string='Status', index=True, readonly=True, track_visibility='onchange', copy=False,
-                             default='submit', required=True,
+                             default='draft', required=True,
                              help='Expense Report State')
 
     @api.multi
