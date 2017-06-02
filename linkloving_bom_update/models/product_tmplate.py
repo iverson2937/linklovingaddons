@@ -11,7 +11,7 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def write(self, vals):
-        if 'RT-ENG' in vals['name'] and not self.env.user.has_group('mrp.group_mrp_manager'):
+        if 'name' in vals and 'RT-ENG' in vals['name'] and not self.env.user.has_group('mrp.group_mrp_manager'):
             raise UserError(u'只有库存管理员才可以修改基础物料')
         return super(ProductTemplate, self).write(vals)
 
@@ -53,7 +53,7 @@ class ProductProduct(models.Model):
 
     @api.multi
     def write(self, vals):
-        if 'RT-ENG' in self.bom_id.product_tmpl_id.name and not self.env.user.has_group('mrp.group_mrp_manager'):
+        if 'RT-ENG' in self.name and not self.env.user.has_group('mrp.group_mrp_manager'):
             raise UserError(u'只有库存管理员才可以修改基础物料')
         return super(ProductProduct, self).write(vals)
 
