@@ -1282,6 +1282,7 @@ class LinklovingAppApi(http.Controller):
                 'product_id' : production.product_id.id,
                 'product_name' : production.product_id.display_name,
                 'product_ll_type': production.product_id.product_ll_type or '',
+                'product_specs': production.product_id.product_specs,
                 'area_id' : {
                     'area_id' : production.product_id.area_id.id,
                     'area_name': production.product_id.area_id.name,
@@ -1314,6 +1315,7 @@ class LinklovingAppApi(http.Controller):
             },
             'sale_remark': production.sale_remark or '',
             'remark': production.remark or '',
+            'is_bom_update': production.is_bom_update,
         }
         return data
     @classmethod

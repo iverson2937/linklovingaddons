@@ -1,12 +1,23 @@
 <odoo>
-  <data>
-     <template id="bom_update_static" name="linkloving_bom_update_assets" inherit_id="web.assets_backend">
+    <data>
+        <template id="bom_update_static" name="linkloving_bom_update_assets" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
 
                 <script type="text/javascript" src="/linkloving_bom_update/static/src/js/bom_update.js"/>
                 <link rel="stylesheet" href="/linkloving_bom_update/static/src/css/bom_update.css"/>
             </xpath>
-     </template>
+        </template>
 
-  </data>
+        <record id="linkloving_mrp_production_form_view" model="ir.ui.view">
+            <field name="name">mrp.production.tree.inherit</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="is_bom_update" invisible="1"/>
+                    <label style="color:red;" string="BOM已发生变化" attrs="{'invisible': [('is_bom_update', '=', False)]}"/>
+                </field>
+            </field>
+        </record>
+    </data>
 </odoo>
