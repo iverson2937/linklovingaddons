@@ -112,14 +112,15 @@ class HrExpenseSheet(models.Model):
                 vals['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense.sheet') or '/'
 
         exp = super(HrExpenseSheet, self).create(vals)
-        if exp.employee_id == exp.employee_id.department_id.manager_id:
-            department = exp.to_approve_id.employee_ids.department_id
+        #
+        if exp.employee_id == exp.department_id.manager_id:
+            department = exp.department_id
             if department.allow_amount and self.total_amount > department.allow_amount:
                 exp.write({'state': 'approve'})
             else:
-                exp.to_approve_id = exp.employee_id.department_id.parent_id.manager_id.user_id.id
+                exp.to_approve_id = exp.department_id.parent_id.manager_id.user_id.id
         else:
-            exp.to_approve_id = exp.employee_id.department_id.manager_id.user_id.id
+            exp.to_approve_id = exp.department_id.manager_id.user_id.id
 
         create_remark_comment(exp, u'送审')
 
