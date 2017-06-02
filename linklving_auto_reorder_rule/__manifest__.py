@@ -21,7 +21,7 @@
 
     # any module necessary for this one to work correctly
     'depends': ['base',
-                'stock'],
+                'stock', 'linkloving_develop_tools'],
 
     # always loaded
     'data': [
