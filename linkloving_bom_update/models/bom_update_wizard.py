@@ -34,6 +34,8 @@ class BomUpdateWizard(models.TransientModel):
             for val in vals:
                 temp_new_product_id = temp_old_product_id = False
                 product_id = val.get('product_id')
+                if product_id:
+                    product_id = int(product_id)
                 parents = val.get('parents')
                 modify_type = val.get('modify_type')
                 input_changed_value = val.get('input_changed_value')
@@ -165,6 +167,8 @@ class BomUpdateWizard(models.TransientModel):
             # 修改bOM
             for val in vals:
                 product_id = val.get('product_id')
+                if product_id:
+                    product_id = int(product_id)
                 parents = val.get('parents')
                 input_changed_value = val.get('input_changed_value')
                 last_bom_line_id = val.get('last_product_id')
@@ -182,7 +186,7 @@ class BomUpdateWizard(models.TransientModel):
 
                 if modify_type == 'add':
                     if input_changed_value:
-                        product_tmpl_id = product_id_obj.browse(product_id).product_tmpl_id
+                        product_tmpl_id = product_id_obj.browse(int(product_id)).product_tmpl_id
                         new_name = self.get_new_product_name(input_changed_value, postfix)
                         default_code = self.get_next_default_code(product_tmpl_id.default_code)
                         new_pl_id = product_tmpl_id.copy({'name': new_name, 'default_code': default_code})
@@ -199,7 +203,6 @@ class BomUpdateWizard(models.TransientModel):
                 elif modify_type == 'edit':
                     product_tmpl_id = product_id_obj.browse(product_id).product_tmpl_id
                     if input_changed_value and product_tmpl_id.name != input_changed_value:
-
                         new_name = self.get_new_product_name(input_changed_value, postfix)
                         default_code = self.get_next_default_code(product_tmpl_id.default_code)
                         new_pl_id = product_tmpl_id.copy({'name': new_name, 'default_code': default_code})

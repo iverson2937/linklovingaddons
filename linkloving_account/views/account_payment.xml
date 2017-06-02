@@ -56,7 +56,7 @@
                     <button name="set_to_done" class="oe_highlight" states="confirm" string="确认客户" type="object"/>
                 </xpath>
                 <xpath expr="//form/sheet/group" position="after">
-                    <field name="remark"/>
+                    <field name="remark" placeholder="备注"/>
                 </xpath>
                 <xpath expr="//field[@name='partner_id']" position="replace">
                     <field name="partner_id" options="{'no_create':True}" nolabel="1"
@@ -78,6 +78,8 @@
 
             </field>
         </record>
+
+
         <record id="account.action_account_payments" model="ir.actions.act_window">
             <field name="name">Payments</field>
             <field name="res_model">account.payment</field>
@@ -94,6 +96,21 @@
                     Payments are used to register liquidity movements (send, collect or transfer money).
                     You can then process those payments by your own means or by using installed facilities.
                 </p>
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="view_account_payment_search_inherit">
+            <field name="name">stock.picking.search.inherit</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="replace">
+                    <field name="amount" filter_domain="['|', ('name','ilike',self), ('communication','ilike',self)]"
+                           string="编号"/>
+                    <field name="amount" filter_domain="[('amount','=',self)]" string="金额"/>
+                </xpath>
+
             </field>
         </record>
 
