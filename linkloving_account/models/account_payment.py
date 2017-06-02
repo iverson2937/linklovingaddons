@@ -168,6 +168,8 @@ class AccountPayment(models.Model):
     def set_to_done(self):
         if not self.partner_id:
             raise UserError(u'请填写客户')
+        for move in self.move_line_ids:
+            move.partner_id = self.partner_id
         self.state = 'done'
 
     @api.onchange('partner_type')
