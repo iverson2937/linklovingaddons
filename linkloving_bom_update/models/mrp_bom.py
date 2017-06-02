@@ -109,7 +109,13 @@ class MrpBomLine(models.Model):
         for record in self:
             record.is_highlight = not record.is_highlight
 
+    @api.multi
+    def create(self, vals):
+        return super(MrpBomLine, self).create(vals)
 
+    @api.multi
+    def write(self, vals):
+        return super(MrpBomLine, self).write(vals)
 
     # def update_bom_line(self, line_id, postfix, product_id, products):
     #     bom = line_id.bom_id
