@@ -97,15 +97,17 @@ class HrExpenseSheet(models.Model):
     @api.multi
     def hr_expense_sheet_post(self):
         for exp in self:
+            state = 'submit'
             if exp.employee_id == exp.department_id.manager_id:
                 department = exp.department_id
                 if department.allow_amount and self.total_amount > department.allow_amount:
+                    state = 'approve'
                     exp.write({'state': 'approve'})
                 else:
                     exp.to_approve_id = exp.department_id.parent_id.manager_id.user_id.id
             else:
                 exp.to_approve_id = exp.department_id.manager_id.user_id.id
-
+            exp.write({'state': state})
             create_remark_comment(exp, u'送审')
 
 
