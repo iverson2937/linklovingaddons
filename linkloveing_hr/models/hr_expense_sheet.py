@@ -6,7 +6,7 @@ from odoo.exceptions import UserError
 
 class HrExpenseSheet(models.Model):
     _inherit = 'hr.expense.sheet'
-    expense_no = fields.Char()
+    expense_no = fields.Char(default=lambda self: _('New'))
     approve_ids = fields.Many2many('res.users')
     is_deduct_payment = fields.Boolean(default=False)
     pre_payment_reminding = fields.Float(related='employee_id.pre_payment_reminding')
@@ -111,6 +111,7 @@ class HrExpenseSheet(models.Model):
                 vals['expense_no'] = self.env['ir.sequence'].next_by_code('account.income') or '/'
             else:
                 vals['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense.sheet') or '/'
+            vals['name'] = vals['expense_no']
 
         exp = super(HrExpenseSheet, self).create(vals)
         #
@@ -260,6 +261,7 @@ class HrRemarkComment(models.Model):
     body = fields.Char(string=u'内容')
     target_uid = fields.Many2one('res.users')
     message_type = fields.Selection([
+        ('draft', u'草稿'),
         ('submit', u'送审'),
         ('manager1_approve', u'1级审核'),
         ('manager2_approve', u'2级审核'),

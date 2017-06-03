@@ -8,9 +8,28 @@ class HrExpense(models.Model):
 
     department_id = fields.Many2one('hr.department', string=u'部门')
 
+    @api.depends('sheet_id', 'sheet_id.account_move_id', 'sheet_id.state')
+    def _compute_state(self):
+        for expense in self:
+            if expense.sheet_id:
+                expense.state = "draft"
+            elif expense.sheet_id.state == "cancel":
+                expense.state = "refused"
+            elif not expense.sheet_id.account_move_id:
+                expense.state = "draft"
+            else:
+                expense.state = "done"
+
     @api.onchange('employee_id')
     def onchange_employee_id(self):
         self.department_id = self.employee_id.department_id.id
 
-
-
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        if self.product_id:
+            self.unit_amount = self.product_id.price_compute('standard_price')[self.product_id.id]
+            self.product_uom_id = self.product_id.uom_id
+            self.tax_ids = self.product_id.supplier_taxes_id
+            account = self.product_id.product_tmpl_id._get_product_accounts()['expense']
+            if account:
+                self.account_id = account

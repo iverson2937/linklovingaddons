@@ -1,72 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <record id="linkloving_view_expenses_form" model="ir.ui.view">
+        <record id="hr_expense.view_hr_expense_sheet_form" model="ir.ui.view">
             <field name="model">hr.expense.sheet</field>
-            <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_form"/>
             <field name="arch" type="xml">
-                <field name="department_id"/>
-                <xpath expr="//field[@name='department_id']" position="after">
-                    <field name="department_id"/>
-                </xpath>
-                <xpath expr="//field[@name='journal_id']" position="replace">
-                    <field name="journal_id"/>
-                </xpath>
-                <xpath expr="//field[@name='employee_id']" position="before">
-                    <field name="expense_no" readonly="1"/>
-                </xpath>
-                <xpath expr="//tree/field[@name='name']" position="after">
-                    <field name="account_id"/>
-                </xpath>
-                <xpath expr="//field[@name='employee_id']" position="after">
-                    <field name="pre_payment_reminding" attrs="{'invisible': [('pre_payment_reminding', '=', False)]}"
-                           readonly="1"/>
-                    <field name="to_approve_id" string="Waiting Approve By"/>
-                    <field name="is_show" invisible="1"/>
-                </xpath>
-                <xpath expr="//button[@name='%(hr_expense.hr_expense_register_payment_wizard_action)d']"
-                       position="replace">
-                    <button name="register_payment_action" type="object" string="Register Payment"
-                            class="oe_highlight o_expense_sheet_pay" attrs="{'invisible': [('state', '!=', 'post')]}"
-                            context="{'default_amount': total_amount, 'partner_id': address_id}"
-                            groups="account.group_account_user"/>
+                <form string="Expense Reports" class="o_expense_sheet">
+                    <header>
+                        <button name="action_sheet_move_create" states="approve" string="Post Journal Entries"
+                                type="object" groups="account.group_account_user"
+                                class="oe_highlight o_expense_sheet_post"/>
+                        <button name="%(hr_expense.hr_expense_register_payment_wizard_action)d" type="action"
+                                string="Register Payment" class="oe_highlight o_expense_sheet_pay"
+                                attrs="{'invisible': [('state', '!=', 'post')]}"
+                                context="{'default_amount': total_amount, 'partner_id': address_id}"
+                                groups="account.group_account_user"/>
+                        <button name="reset_expense_sheets" states="cancel" string="Resubmit" type="object"/>
+                        <button name="%(hr_expense.hr_expense_refuse_wizard_action)d" states="submit" string="Refuse"
+                                type="action" groups="hr_expense.group_hr_expense_user"/>
+                        <button name="manager1_approve" string="Approve" type="object"
+                                groups="hr_expense.group_hr_expense_user" class="oe_highlight o_expense_sheet_approve"
+                                attrs="{'invisible':['|',('is_show','=',False),('state','!=','submit')]}"
+                        />
+                        <button name="manager2_approve" states="manager1_approve" string="Approve" type="object"
+                                groups="hr_expense.group_hr_expense_manager"
+                                class="oe_highlight o_expense_sheet_approve"/>
+                        <button name="manager3_approve" states="manager2_approve" string="Approve" type="object"
+                                groups="linkloveing_hr.group_hr_expense_president"
+                                class="oe_highlight"/>
+                        <button name="%(hr_expense.hr_expense_refuse_wizard_action)d" states="approve" string="Refuse"
+                                type="action" groups="account.group_account_user"/>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,submit,manager1_approve,manager2_approve,approve,post,done"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box">
+                            <button name="action_get_attachment_view"
+                                    class="oe_stat_button"
+                                    icon="fa-book"
+                                    type="object">
+                                <field name="attachment_number" widget="statinfo" string="Documents"/>
+                            </button>
+                            <button name="action_open_journal_entries"
+                                    class="oe_stat_button"
+                                    icon="fa-book"
+                                    string="Accounting Entries"
+                                    attrs="{'invisible': [('account_move_id', '=', False)]}"
+                                    type="object">
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="expense_no" placeholder="e.g. Trip to NY" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="employee_id" invisible="1"/>
+                                <field name="to_approve_id"/>
+                                <field name="is_show" invisible="1"/>
+                                <field name="payment_mode" invisible="1"/>
+                                <field name="responsible_id" invisible="1"/>
+                                <field name="total_amount" invisible="1"/>
+                                <field name="currency_id" invisible="1"/>
+                                <field name="address_id" invisible="1"/>
+                                <field name="department_id"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="pre_payment_reminding"
+                                       attrs="{'invisible': [('pre_payment_reminding', '=', False)]}"
+                                       readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="journal_id" domain="[('type', '=', 'purchase')]"
+                                       groups="account.group_account_user"
+                                       options="{'no_open': True, 'no_create': True}"
+                                       invisible="1"/>
+                                <field name="bank_journal_id" groups="account.group_account_user"
+                                       options="{'no_open': True, 'no_create': True}"
+                                       invisible="1"
+                                       domain="[('type', 'in', ['cash', 'bank'])]"/>
+                                <field name="accounting_date" groups="account.group_account_user"
+                                       attrs="{'invisible': [('state', 'not in', ['approve', 'post', 'done'])]}"/>
+                                <field name="account_move_id" invisible="1"/>
+                            </group>
+                        </group>
+                        <field name="expense_line_ids"
+                               context="{'default_employee_id':employee_id,'default_department_id':department_id}">
+                            <tree>
+                                <field name="name"/>
+                                <field name="state" invisible="1"/>
+                                <field name="analytic_account_id" groups="analytic.group_analytic_accounting"/>
+                                <field name="message_unread" invisible="1"/>
+                                <field name="attachment_number" invisible="1"/>
+                                <field name="attachment_number" string=" "/>
+                                <button name="action_get_attachment_view" string="View Attachments" type="object"
+                                        icon="fa-paperclip"/>
+                                <field name="tax_ids" widget="many2many_tags"/>
+                                <field name="total_amount" sum="Total Amount" widget="monetary"/>
+                            </tree>
+                        </field>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
 
-                </xpath>
-                <xpath expr="//field[@name='expense_line_ids']" position="attributes">
-                    <attribute name="domain">[('state', '=', 'draft'),('create_uid','=',uid)]</attribute>
-                </xpath>
 
-                <xpath expr="//button[@name='approve_expense_sheets']" position="replace">
-                    <button name="manager1_approve" string="Approve" type="object"
-                            groups="hr_expense.group_hr_expense_user" class="oe_highlight o_expense_sheet_approve"
-                            attrs="{'invisible':['|',('is_show','=',False),('state','!=','submit')]}"
-                    />
-                    <button name="manager2_approve" states="manager1_approve" string="Approve" type="object"
-                            groups="hr_expense.group_hr_expense_manager" class="oe_highlight o_expense_sheet_approve"/>
-                    <button name="manager3_approve" states="manager2_approve" string="Approve" type="object"
-                            groups="linkloveing_hr.group_hr_expense_president"
-                            class="oe_highlight"/>
-                </xpath>
-                <xpath expr="//field[@name='state']" position="replace">
-                    <field name="state" widget="statusbar"
-                           statusbar_visible="draft,submit,manager1_approve,manager2_approve,approve,post,done"/>
-                </xpath>
-                <xpath expr="//button[@name='%(hr_expense.hr_expense_refuse_wizard_action)d']" position="replace">
-                    <button name="%(hr_expense.hr_expense_refuse_wizard_action)d"
-                            states="submit,manager1_approve,manager2_approve,manager3_approve" string="Refuse"
-                            type="action" groups="hr_expense.group_hr_expense_user"/>
-                </xpath>
+                <!--<xpath expr="//button[@name='%(hr_expense.hr_expense_refuse_wizard_action)d']" position="replace">-->
+                <!--<button name="%(hr_expense.hr_expense_refuse_wizard_action)d"-->
+                <!--states="submit,manager1_approve,manager2_approve,manager3_approve" string="Refuse"-->
+                <!--type="action" groups="hr_expense.group_hr_expense_user"/>-->
+                <!--</xpath>-->
 
-                <xpath expr="//button[@name='action_sheet_move_create']" position="replace">
-                    <button name="to_do_journal_entry" states="approve" string="Confirm" type="object"
-                            context="{'employee_id':employee_id}"
-                            groups="account.group_account_user" class="oe_highlight o_expense_sheet_post"/>
-                </xpath>
-
-
-                <xpath expr="//field[@name='expense_line_ids']//tree//field[@name='name']" position="after">
-                    <field name="department_id"/>
-                </xpath>
+                <!--<xpath expr="//button[@name='action_sheet_move_create']" position="replace">-->
+                <!--<button name="to_do_journal_entry" states="approve" string="Confirm" type="object"-->
+                <!--context="{'employee_id':employee_id}"-->
+                <!--groups="account.group_account_user" class="oe_highlight o_expense_sheet_post"/>-->
+                <!--</xpath>-->
+                <!---->
 
 
             </field>
@@ -302,7 +354,7 @@
 
         <menuitem id="hr_expense.menu_hr_expense_my_expenses_to_submit" name="待提交的报销单" sequence="1"
                   parent="hr_expense.menu_hr_expense_my_expenses"
-                  action="hr_expense.hr_expense_actions_my_unsubmitted"/>
+                  action="hr_expense_sheet_actions_my_draft"/>
 
 
     </data>
