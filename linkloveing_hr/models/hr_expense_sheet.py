@@ -251,7 +251,7 @@ def create_remark_comment(data, body):
         'expense_sheet_id': data.id,
         'target_uid': data.to_approve_id.id
     }
-    return data.env['hr.remark.comment'].create(values)
+    # return data.env['hr.remark.comment'].create(values)
 
 
 class HrRemarkComment(models.Model):
