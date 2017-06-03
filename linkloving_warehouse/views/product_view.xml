@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+
+        <record id="product_category_all" model="product.category">
+            <field name="name">All</field>
+        </record>
         <!-- INHERITED TREE -->
         <record id="view_product_template_tree" model="ir.ui.view">
             <field name="name">product.template.tree.inherit</field>
