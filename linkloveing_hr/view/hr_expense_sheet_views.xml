@@ -6,6 +6,11 @@
             <field name="arch" type="xml">
                 <form string="Expense Reports" class="o_expense_sheet">
                     <header>
+
+
+                        <button name="hr_expense_sheet_post" states="draft" string="提交审核"
+                                type="object" groups="account.group_account_user"
+                                class="oe_highlight o_expense_sheet_post"/>
                         <button name="action_sheet_move_create" states="approve" string="Post Journal Entries"
                                 type="object" groups="account.group_account_user"
                                 class="oe_highlight o_expense_sheet_post"/>
@@ -87,17 +92,74 @@
                         <field name="expense_line_ids"
                                context="{'default_employee_id':employee_id,'default_department_id':department_id}">
                             <tree>
-                                <field name="name"/>
+                                <field name="product_id"/>
                                 <field name="state" invisible="1"/>
-                                <field name="analytic_account_id" groups="analytic.group_analytic_accounting"/>
+                                <field name="total_amount" sum="Total Amount" widget="monetary" string="金额"/>
+                                <field name="analytic_account_id" groups="analytic.group_analytic_accounting"
+                                       invisible="1"/>
                                 <field name="message_unread" invisible="1"/>
                                 <field name="attachment_number" invisible="1"/>
                                 <field name="attachment_number" string=" "/>
                                 <button name="action_get_attachment_view" string="View Attachments" type="object"
                                         icon="fa-paperclip"/>
                                 <field name="tax_ids" widget="many2many_tags"/>
-                                <field name="total_amount" sum="Total Amount" widget="monetary"/>
+                                <field name="name"/>
                             </tree>
+                            <form>
+                                <sheet>
+                                    <div class="oe_button_box">
+                                        <button name="action_get_attachment_view"
+                                                class="oe_stat_button"
+                                                icon="fa-book"
+                                                type="object">
+                                            <field name="attachment_number" widget="statinfo" string="Documents"/>
+                                        </button>
+                                    </div>
+                                    <div class="oe_title">
+                                        <label for="name"/>
+                                        <h1>
+                                            <field name="name" placeholder="e.g. Lunch with Customer"/>
+                                        </h1>
+                                    </div>
+                                    <group>
+                                        <group>
+                                            <field name="product_id" context="{'default_can_be_expensed': 1}"
+                                                   attrs="{}"/>
+                                            <field name="unit_amount" required="1" widget="monetary"
+                                                   options="{'currency_field': 'currency_id'}" string="金额"/>
+                                            <field name="quantity" class="oe_inline" invisible="1"/>
+                                            <field name="product_uom_id" widget="selection" class="oe_inline"
+                                                   groups="product.group_uom" invisible="1"/>
+                                            <field name="tax_ids" domain="[('type_tax_use', '=', 'purchase')]"
+                                                   widget="many2many_tags" options="{'no_create':True}"/>
+                                        </group>
+                                        <group>
+                                            <field name="reference"/>
+                                            <field name="date"/>
+                                            <field name="state"/>
+                                            <field name="account_id"/>
+                                            <field name="employee_id"/>
+                                            <field name="department_id"/>
+                                            <field name="sheet_id" invisible="1"/>
+                                            <field name="currency_id" groups="base.group_multi_currency"/>
+                                            <field name="analytic_account_id"
+                                                   groups="analytic.group_analytic_accounting" string="项目"/>
+                                            <field name="company_id" groups="base.group_multi_company"/>
+                                        </group>
+                                        <group>
+                                            <field name="total_amount" widget='monetary'
+                                                   options="{'currency_field': 'currency_id'}" invisible="1"/>
+                                            <div>
+                                                <field name="payment_mode" widget="radio" invisible="1"/>
+                                            </div>
+                                        </group>
+
+                                    </group>
+                                    <div>
+                                        <field name="description" placeholder="Notes..."/>
+                                    </div>
+                                </sheet>
+                            </form>
                         </field>
                     </sheet>
                     <div class="oe_chatter">
