@@ -37,22 +37,24 @@ class ResPartner(models.Model):
 
     crm_source_id = fields.Many2one('crm.lead.source', string=u'来源')
 
-    @api.model
-    def create(self, vals):
-        exist = self.env['res.partner'].search([('name', '=', vals['name'].strip())])
-        if exist:
-            raise UserError(u'该名称已经存在')
-        return super(ResPartner, self).create(vals)
+    # @api.model
+    # def create(self, vals):
+    #     exist = self.env['res.partner'].search(
+    #             [('name', '=', vals['name'].strip()), ('customer', '=', True), ('is_company', '=', True)])
+    #     if exist:
+    #         raise UserError(u'该名称已经存在')
+    #     return super(ResPartner, self).create(vals)
 
-    @api.multi
-    def write(self, vals):
-        exist = False
-        if 'name' in vals:
-            exist = self.env['res.partner'].search([('name', '=', vals['name'].strip())])
-
-        if exist:
-            raise UserError(u'该名称已经存在')
-        return super(ResPartner, self).write(vals)
+    # @api.multi
+    # def write(self, vals):
+    #     exist = False
+    #     if 'name' in vals:
+    #         exist = self.env['res.partner'].search(
+    #             [('name', '=', vals['name'].strip()), ('customer', '=', True), ('is_company', '=', True)])
+    #
+    #     if exist:
+    #         raise UserError(u'该名称已经存在')
+    #     return super(ResPartner, self).write(vals)
 
     @api.depends('street', 'country_id', 'zip', 'state_id', 'city', 'street', 'street2')
     def _street_name(self):

@@ -104,35 +104,61 @@ class MrpBomLine(models.Model):
     is_highlight = fields.Boolean()
 
     @api.multi
+    def write(self, vals):
+        if 'RT-ENG' in self.bom_id.product_tmpl_id.name and not self.env.user.has_group('mrp.group_mrp_manager'):
+            raise UserError(u'只有库存管理员才可以修改基础bom')
+        return super(MrpBomLine, self).write(vals)
+
+    @api.multi
+    def unlink(self):
+        if 'RT-ENG' in self.bom_id.product_tmpl_id.name and not self.env.user.has_group('mrp.group_mrp_manager'):
+            raise UserError(u'只有库存管理员才可以修改基础bom')
+        return super(MrpBomLine, self).unlink()
+
+    @api.model
+    def create(self, vals):
+        if 'bom_id' in vals:
+            product_name = self.env['mrp.bom'].browse(vals['bom_id']).product_tmpl_id.name
+            if 'RT-ENG' in product_name and not self.env.user.has_group('mrp.group_mrp_manager'):
+                raise UserError(u'只有库存管理员才可以修改基础bom')
+        return super(MrpBomLine, self).create(vals)
+
+    @api.multi
     def toggle_highlight(self):
         """ Inverse the value of the field ``active`` on the records in ``self``. """
         for record in self:
             record.is_highlight = not record.is_highlight
 
+    @api.multi
+    def create(self, vals):
+        return super(MrpBomLine, self).create(vals)
 
+    @api.multi
+    def write(self, vals):
+        return super(MrpBomLine, self).write(vals)
 
-    # def update_bom_line(self, line_id, postfix, product_id, products):
-    #     bom = line_id.bom_id
-    #     product_tmpl_id = bom.product_tmpl_id
-    #     default_code = get_next_default_code(product_tmpl_id.default_code)
-    #     new_name = product_tmpl_id.name + postfix
-    #     if products.get(line_id):
-    #         new_bom_id = products.get(line_id).get('new_bom_id')
-    #         new_product_tmpl_id = products.get(line_id).get('new_product_tmpl_id')
-    #     else:
-    #         new_product_tmpl_id = product_tmpl_id.copy(name=new_name)
-    #         new_bom_id = bom.copy(product_tmpl_id=new_product_tmpl_id, default_code=default_code)
-    #         products.update({
-    #             line_id: {
-    #                 'new_bom_id': new_bom_id,
-    #                 'new_product_id': new_product_tmpl_id,
-    #             }
-    #         })
-    #         self.create({
-    #             'product_id': product_id,
-    #             'bom_id': new_bom_id.id
-    #         })
-    #     return new_product_tmpl_id
+            # def update_bom_line(self, line_id, postfix, product_id, products):
+            #     bom = line_id.bom_id
+            #     product_tmpl_id = bom.product_tmpl_id
+            #     default_code = get_next_default_code(product_tmpl_id.default_code)
+            #     new_name = product_tmpl_id.name + postfix
+            #     if products.get(line_id):
+            #         new_bom_id = products.get(line_id).get('new_bom_id')
+            #         new_product_tmpl_id = products.get(line_id).get('new_product_tmpl_id')
+            #     else:
+            #         new_product_tmpl_id = product_tmpl_id.copy(name=new_name)
+            #         new_bom_id = bom.copy(product_tmpl_id=new_product_tmpl_id, default_code=default_code)
+            #         products.update({
+            #             line_id: {
+            #                 'new_bom_id': new_bom_id,
+            #                 'new_product_id': new_product_tmpl_id,
+            #             }
+            #         })
+            #         self.create({
+            #             'product_id': product_id,
+            #             'bom_id': new_bom_id.id
+            #         })
+            #     return new_product_tmpl_id
 
 
 def get_next_default_code(default_code):

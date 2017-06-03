@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+
         <!-- INHERITED TREE -->
         <record id="view_product_template_tree" model="ir.ui.view">
             <field name="name">product.template.tree.inherit</field>

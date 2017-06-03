@@ -292,6 +292,18 @@
                   parent="hr_expense.menu_hr_expense_accountant"
                   action="action_hr_expense_sheet_to_receive"/>
 
+        <record id="hr_expense_sheet_actions_my_draft" model="ir.actions.act_window">
+            <field name="name">hr.expense.sheet.draft.my</field>
+            <field name="res_model">hr.expense.sheet</field>
+            <field name="domain">[('employee_id.user_id', '=', uid),('state','=','draft')]</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="hr_expense.menu_hr_expense_my_expenses_to_submit" name="待提交的报销单" sequence="1"
+                  parent="hr_expense.menu_hr_expense_my_expenses"
+                  action="hr_expense.hr_expense_actions_my_unsubmitted"/>
+
 
     </data>
 </openerp>

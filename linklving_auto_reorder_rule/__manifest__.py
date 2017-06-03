@@ -21,13 +21,13 @@
 
     # any module necessary for this one to work correctly
     'depends': ['base',
-                'stock'],
+                'stock', 'linkloving_develop_tools'],
 
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
-        'views/views.xml',
-        'views/templates.xml',
+        # 'views/views.xml',
+        # 'views/templates.xml',
         'wizard/product_category_create_reorder_rule.xml',
         'wizard/product_create_reorder_rule.xml',
     ],

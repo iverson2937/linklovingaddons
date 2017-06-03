@@ -95,3 +95,4 @@ class ProductTemplate(models.Model):
                 [('product_tmpl_id', '=', record.id), ('active', '=', active)])
             for product in products:
                 product.active = not product.active
+
