@@ -57,7 +57,7 @@ class HrExpenseSheet(models.Model):
                               ('done', 'Paid'),
                               ('cancel', 'Refused')
                               ], string='Status', index=True, readonly=True, track_visibility='onchange', copy=False,
-                             default='draft', required=True,
+                             default='submit', required=True,
                              help='Expense Report State')
 
     @api.multi
