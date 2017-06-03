@@ -95,3 +95,9 @@ class ProductTemplate(models.Model):
                 [('product_tmpl_id', '=', record.id), ('active', '=', active)])
             for product in products:
                 product.active = not product.active
+
+    def _get_default_category_id(self):
+        if self._context.get('categ_id') or self._context.get('default_categ_id'):
+            return self._context.get('categ_id') or self._context.get('default_categ_id')
+        category = self.env['product.category'].search([], limit=1)
+        return category and category.id or False
