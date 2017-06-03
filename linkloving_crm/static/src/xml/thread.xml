@@ -141,16 +141,34 @@
                     <t t-raw="message.body"/>
 
 
-                    <t t-raw="message.label_ids"/>
+
+                    <!--<t t-foreach="message.label_ids.raw_value" t-as="rec">-->
+                            <!--<t t-esc="rec" />;-->
+                    <!--</t>-->
+
+
+
+                    <!--<t t-esc="message.label_id"/>;;-->
+
+                      <!--<t t-if="message.label_ids &gt; 0">-->
+                            <!--<li>Estimate </li>-->
+                      <!--</t>-->
+
+                    <!--<t t-if="message.label_ids &lt; 0">-->
+                            <!--<li>Estimate </li>-->
+                      <!--</t>-->
+
+
+
 
 
                 </t>
 
-                <t t-if="message.label_ids">
-                          <t t-foreach="message.label_ids" t-as="label">
-                            <span class='o_attachment_name'><t t-esc='label.name'/></span>
-                          </t>
-                </t>
+                <!--<t t-if="message.label_ids">-->
+                <!--<t t-foreach="message.label_ids" t-as="label">-->
+                <!--<span class='o_attachment_name'><t t-esc='label.name'/></span>-->
+                <!--</t>-->
+                <!--</t>-->
 
 
                 <t t-foreach="message.attachment_ids" t-as="attachment">

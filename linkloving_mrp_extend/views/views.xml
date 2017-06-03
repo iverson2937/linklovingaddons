@@ -185,7 +185,7 @@
                 </xpath>
 
                 <xpath expr="//header/button[@name='action_cancel']" position="replace">
-                    <button name="action_cancel" type="object" string="Cancel"
+                    <button name="action_cancel" type="object" string="取消订单"
                             attrs="{'invisible': [('state', 'not in', ('confirmed','waiting_material', 'prepare_material_ing'))]}"
                             groups="linkloving_mrp_extend.group_charge_produce"/>
                 </xpath>

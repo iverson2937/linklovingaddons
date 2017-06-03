@@ -1,6 +1,5 @@
 odoo.define('mail.ChatThread1', function (require) {
 "use strict";
-
 var core = require('web.core');
 var Widget = require('web.Widget');
 

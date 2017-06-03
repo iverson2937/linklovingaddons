@@ -215,12 +215,14 @@
                             <page string="Body">
                                 <field name="body" options="{'style-inline': true}"/>
                             </page>
-
                         </notebook>
+                        <group>
+                            <field name="postil" string="批注" placeholder="批注..."/>
+                        </group>
                     </sheet>
 
                     <footer>
-                        <button string="修改" name="send_mail_action_is_my" type="object" class="btn-primary"/>
+                        <button string="修改" name="send_message_action" type="object" class="btn-primary"/>
                         <button string="取消" class="btn-default" special="cancel"/>
                     </footer>
                 </form>

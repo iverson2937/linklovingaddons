@@ -97,16 +97,3 @@ class CrmLeadSource(models.Model):
 
     name = fields.Char(u'来源')
     detail = fields.Text(string=u'详细')
-
-
-class CrmRemarkRecord(models.Model):
-    _inherit = 'mail.message'
-
-    @api.multi
-    def send_mail_action_is_my(self):
-        # TDE/ ???
-        return self.send_mail()
-
-    @api.multi
-    def send_mail(self):
-        return {'type': 'ir.actions.act_window_close'}
