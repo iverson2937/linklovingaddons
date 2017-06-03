@@ -36,17 +36,17 @@
                     <attribute name="domain">[('state', '=', 'draft'),('create_uid','=',uid)]</attribute>
                 </xpath>
 
-                <!--<xpath expr="//button[@name='approve_expense_sheets']" position="replace">-->
-                <!--<button name="manager1_approve" string="Approve" type="object"-->
-                <!--groups="hr_expense.group_hr_expense_user" class="oe_highlight o_expense_sheet_approve"-->
-                <!--attrs="{'invisible':['|',('is_show','=',False),('state','!=','submit')]}"-->
-                <!--/>-->
-                <!--<button name="manager2_approve" states="manager1_approve" string="Approve" type="object"-->
-                <!--groups="hr_expense.group_hr_expense_manager" class="oe_highlight o_expense_sheet_approve"/>-->
-                <!--<button name="manager3_approve" states="manager2_approve" string="Approve" type="object"-->
-                <!--groups="linkloveing_hr.group_hr_expense_president"-->
-                <!--class="oe_highlight"/>-->
-                <!--</xpath>-->
+                <xpath expr="//button[@name='approve_expense_sheets']" position="replace">
+                    <button name="manager1_approve" string="Approve" type="object"
+                            groups="hr_expense.group_hr_expense_user" class="oe_highlight o_expense_sheet_approve"
+                            attrs="{'invisible':['|',('is_show','=',False),('state','!=','submit')]}"
+                    />
+                    <button name="manager2_approve" states="manager1_approve" string="Approve" type="object"
+                            groups="hr_expense.group_hr_expense_manager" class="oe_highlight o_expense_sheet_approve"/>
+                    <button name="manager3_approve" states="manager2_approve" string="Approve" type="object"
+                            groups="linkloveing_hr.group_hr_expense_president"
+                            class="oe_highlight"/>
+                </xpath>
                 <xpath expr="//field[@name='state']" position="replace">
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,submit,manager1_approve,manager2_approve,approve,post,done"/>
@@ -291,17 +291,6 @@
         <menuitem id="menu_hr_expense_sheet_to_receive" name="Accounting Use Only" sequence="5"
                   parent="hr_expense.menu_hr_expense_accountant"
                   action="action_hr_expense_sheet_to_receive"/>
-
-        <record id="hr_expense_sheet_actions_my_draft" model="ir.actions.act_window">
-            <field name="name">hr.expense.sheet.draft.my</field>
-            <field name="res_model">hr.expense.sheet</field>
-            <field name="domain">[('employee_id.user_id', '=', uid),('state','=','draft')]</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-        </record>
-
-        <menuitem id="hr_expense.menu_hr_expense_my_expenses_to_submit" name="待提交的报销单" sequence="1"
-                  parent="hr_expense.menu_hr_expense_my_expenses" action="hr_expense_sheet_actions_my_draft"/>
 
 
     </data>
