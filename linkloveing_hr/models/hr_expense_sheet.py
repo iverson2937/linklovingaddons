@@ -95,6 +95,22 @@ class HrExpenseSheet(models.Model):
         create_remark_comment(self, u'2级审核')
 
     @api.multi
+    def hr_expense_sheet_post(self):
+        for exp in self:
+            if exp.employee_id == exp.department_id.manager_id:
+                department = exp.department_id
+                if department.allow_amount and self.total_amount > department.allow_amount:
+                    exp.write({'state': 'approve'})
+                else:
+                    exp.to_approve_id = exp.department_id.parent_id.manager_id.user_id.id
+            else:
+                exp.to_approve_id = exp.department_id.manager_id.user_id.id
+
+            create_remark_comment(exp, u'送审')
+
+
+
+    @api.multi
     def manager3_approve(self):
         self.to_approve_id = False
 
@@ -115,16 +131,6 @@ class HrExpenseSheet(models.Model):
 
         exp = super(HrExpenseSheet, self).create(vals)
         #
-        if exp.employee_id == exp.department_id.manager_id:
-            department = exp.department_id
-            if department.allow_amount and self.total_amount > department.allow_amount:
-                exp.write({'state': 'approve'})
-            else:
-                exp.to_approve_id = exp.department_id.parent_id.manager_id.user_id.id
-        else:
-            exp.to_approve_id = exp.department_id.manager_id.user_id.id
-
-        create_remark_comment(exp, u'送审')
 
         return exp
 

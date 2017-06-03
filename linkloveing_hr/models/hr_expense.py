@@ -20,9 +20,6 @@ class HrExpense(models.Model):
             else:
                 expense.state = "done"
 
-    @api.onchange('employee_id')
-    def onchange_employee_id(self):
-        self.department_id = self.employee_id.department_id.id
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
