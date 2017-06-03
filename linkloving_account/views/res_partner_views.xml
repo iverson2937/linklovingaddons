@@ -57,7 +57,6 @@
           -->
 
 
-
         <record id="account.view_partner_property_form" model="ir.ui.view">
             <field name="name">res.partner.property.form.inherit</field>
             <field name="model">res.partner</field>
@@ -74,7 +73,7 @@
                                 <field name="property_payment_term_id" widget="selection"/>
                                 <field name="credit"/>
                                 <field name="trust"/>
-                        </group>
+                            </group>
                             <group string="Purchase" name="acc_purchase">
                                 <field name="property_supplier_payment_term_id" widget="selection"/>
                                 <field name="debit"/>
@@ -100,6 +99,22 @@
                         </div>
                     </page>
                 </page>
+            </field>
+        </record>
+
+
+        <record id="view_partner_customer_form" model="ir.ui.view">
+            <field name="name">res.partner.customer.form</field>
+            <field name="model">res.partner</field>
+            <field name="priority">2</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='user_id']" position="before">
+                    <field name="related_partner_id" options="{'no_create': True}"/>
+                </xpath>
+
+
             </field>
         </record>
     </data>
