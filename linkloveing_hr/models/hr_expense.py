@@ -7,6 +7,7 @@ class HrExpense(models.Model):
     _inherit = 'hr.expense'
 
     department_id = fields.Many2one('hr.department', string=u'部门')
+    doc = fields.Binary(attachment=True, string=u'附件')
 
     @api.depends('sheet_id', 'sheet_id.account_move_id', 'sheet_id.state')
     def _compute_state(self):

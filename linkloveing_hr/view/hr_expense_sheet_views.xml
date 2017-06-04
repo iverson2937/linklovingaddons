@@ -9,7 +9,7 @@
 
 
                         <button name="hr_expense_sheet_post" states="draft" string="提交审核"
-                                type="object" groups="account.group_account_user"
+                                type="object" groups="base.group_user"
                                 class="oe_highlight o_expense_sheet_post"/>
                         <button name="action_sheet_move_create" states="approve" string="Post Journal Entries"
                                 type="object" groups="account.group_account_user"
@@ -20,8 +20,6 @@
                                 context="{'default_amount': total_amount, 'partner_id': address_id}"
                                 groups="account.group_account_user"/>
                         <button name="reset_expense_sheets" states="cancel" string="Resubmit" type="object"/>
-                        <button name="%(hr_expense.hr_expense_refuse_wizard_action)d" states="submit" string="Refuse"
-                                type="action" groups="hr_expense.group_hr_expense_user"/>
                         <button name="manager1_approve" string="Approve" type="object"
                                 groups="hr_expense.group_hr_expense_user" class="oe_highlight o_expense_sheet_approve"
                                 attrs="{'invisible':['|',('is_show','=',False),('state','!=','submit')]}"
@@ -32,7 +30,8 @@
                         <button name="manager3_approve" states="manager2_approve" string="Approve" type="object"
                                 groups="linkloveing_hr.group_hr_expense_president"
                                 class="oe_highlight"/>
-                        <button name="%(hr_expense.hr_expense_refuse_wizard_action)d" states="approve" string="Refuse"
+                        <button name="%(hr_expense.hr_expense_refuse_wizard_action)d"
+                                states="submit,manager1_approve,manager2_approve,manager3_approve" string="Refuse"
                                 type="action" groups="account.group_account_user"/>
                         <field name="state" widget="statusbar"
                                statusbar_visible="draft,submit,manager1_approve,manager2_approve,approve,post,done"/>
@@ -61,21 +60,21 @@
                         </div>
                         <group>
                             <group>
-                                <field name="employee_id" invisible="1"/>
-                                <field name="to_approve_id"/>
-                                <field name="is_show" invisible="1"/>
-                                <field name="payment_mode" invisible="1"/>
-                                <field name="responsible_id" invisible="1"/>
-                                <field name="total_amount" invisible="1"/>
-                                <field name="currency_id" invisible="1"/>
-                                <field name="address_id" invisible="1"/>
-                                <field name="department_id"/>
+
+                                <field name="department_id" required="1" options="{'no_create':True}"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
                                 <field name="pre_payment_reminding"
                                        attrs="{'invisible': [('pre_payment_reminding', '=', False)]}"
                                        readonly="1"/>
+                                <field name="employee_id" invisible="1"/>
+                                <field name="is_show" invisible="1"/>
+                                <field name="responsible_id" invisible="1"/>
+                                <field name="total_amount" invisible="1"/>
+                                <field name="currency_id" invisible="1"/>
+                                <field name="address_id" invisible="1"/>
                             </group>
                             <group>
+                                <field name="to_approve_id"/>
                                 <field name="journal_id" domain="[('type', '=', 'purchase')]"
                                        groups="account.group_account_user"
                                        options="{'no_open': True, 'no_create': True}"
@@ -89,7 +88,7 @@
                                 <field name="account_move_id" invisible="1"/>
                             </group>
                         </group>
-                        <field name="expense_line_ids"
+                        <field name="expense_line_ids" attrs="{'readonly':[('state','!=','draft')]}"
                                context="{'default_employee_id':employee_id,'default_department_id':department_id}">
                             <tree>
                                 <field name="product_id"/>
@@ -124,7 +123,7 @@
                                     <group>
                                         <group>
                                             <field name="product_id" context="{'default_can_be_expensed': 1}"
-                                                   attrs="{}"/>
+                                                   options="{'no_create':True}"/>
                                             <field name="unit_amount" required="1" widget="monetary"
                                                    options="{'currency_field': 'currency_id'}" string="金额"/>
                                             <field name="quantity" class="oe_inline" invisible="1"/>
@@ -135,6 +134,7 @@
                                         </group>
                                         <group>
                                             <field name="reference"/>
+                                            <field name="doc" widget="binary"/>
                                             <field name="date"/>
                                             <field name="state"/>
                                             <field name="account_id"/>
@@ -410,6 +410,20 @@
             <field name="name">hr.expense.sheet.draft.my</field>
             <field name="res_model">hr.expense.sheet</field>
             <field name="domain">[('employee_id.user_id', '=', uid),('state','=','draft')]</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('hr_expense.view_hr_expense_sheet_tree')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('hr_expense.view_hr_expense_sheet_form')})]"/>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record id="hr_expense_sheet_actions_my_cancel" model="ir.actions.act_window">
+            <field name="name">hr.expense.sheet.draft.my</field>
+            <field name="res_model">hr.expense.sheet</field>
+            <field name="domain">[('employee_id.user_id', '=', uid),('state','=','cancel')]</field>
+            <field name="context">{'state':'cancel'}</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('hr_expense.view_hr_expense_sheet_tree')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('hr_expense.view_hr_expense_sheet_form')})]"/>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
@@ -417,6 +431,8 @@
         <menuitem id="hr_expense.menu_hr_expense_my_expenses_to_submit" name="待提交的报销单" sequence="1"
                   parent="hr_expense.menu_hr_expense_my_expenses"
                   action="hr_expense_sheet_actions_my_draft"/>
+        <menuitem id="menu_hr_expense_my_expenses_refused" name="退回的报销单" sequence="2"
+                  parent="hr_expense.menu_hr_expense_my_expenses" action="hr_expense_sheet_actions_my_cancel"/>
 
 
     </data>
