@@ -7,17 +7,16 @@
                 <div class="oe_structure"/>
                 <div class="row">
                     <div class="col-xs-6">
-                        <strong t-if="doc.partner_shipping_id == doc.partner_invoice_id">Invoicing and shipping
-                            address:
+                        <strong t-if="doc.partner_shipping_id == doc.partner_invoice_id">出货和发票地址:
                         </strong>
-                        <strong t-if="doc.partner_shipping_id != doc.partner_invoice_id">Invoicing address:</strong>
+                        <strong t-if="doc.partner_shipping_id != doc.partner_invoice_id">发票地址:</strong>
                         <div t-field="doc.partner_invoice_id"
                              t-options='{"widget": "contact", "fields": [ "name", "phone","mobile", "fax"], "no_marker": True, "phone_icons": True}'/>
                         <p t-if="doc.partner_id.vat">VAT:
                             <span t-field="doc.partner_id.vat"/>
                         </p>
                         <div t-if="doc.partner_shipping_id != doc.partner_invoice_id" class="mt8">
-                            <strong>Shipping address:</strong>
+                            <strong>送货地址:</strong>
                             <div t-field="doc.partner_shipping_id"
                                  t-options='{"widget": "contact", "fields": ["name", "phone","mobile", "fax"], "no_marker": True, "phone_icons": True}'/>
                             <p t-if="doc.partner_id.vat">VAT:
@@ -32,8 +31,8 @@
                 </div>
 
                 <h2>
-                    <span t-if="doc.state not in ['draft','sent']">Order #</span>
-                    <span t-if="doc.state in ['draft','sent']">Quotation #</span>
+                    <span t-if="doc.state not in ['draft','sent']">订单 #</span>
+                    <span t-if="doc.state in ['draft','sent']">报价单 #</span>
                     <span t-field="doc.name"/>
                     <span t-if="doc.validity_date"># 交货日期</span>
                     <span t-field="doc.validity_date"/>
@@ -45,12 +44,12 @@
                         <p t-field="doc.client_order_ref"/>
                     </div>
                     <div t-if="doc.date_order" class="col-xs-3">
-                        <strong t-if="doc.state not in ['draft','sent']">Date Ordered:</strong>
+                        <strong t-if="doc.state not in ['draft','sent']">交货日期:</strong>
                         <strong t-if="doc.state in ['draft','sent']">Quotation Date:</strong>
-                        <p t-field="doc.date_order"/>
+                        <p t-field="doc.validity_date"/>
                     </div>
                     <div t-if="doc.user_id.name" class="col-xs-3">
-                        <strong>Salesperson:</strong>
+                        <strong>销售员:</strong>
                         <p t-field="doc.user_id"/>
                     </div>
                     <div name="remark" t-if="doc.remark" class="col-xs-3">
@@ -76,21 +75,22 @@
                             <tr>
                                 <th>No</th>
                                 <t t-if="not page[0]['is_domestic']">
-                                    <th>Description</th>
+                                    <th>产品</th>
                                 </t>
                                 <t t-if="page[0]['is_domestic']">
-                                    <th>Product Name</th>
+                                    <th>国内简称</th>
                                 </t>
                                 <t t-if="page[0]['is_domestic']">
-                                    <th>Product Specification</th>
+                                    <th>国内型号</th>
                                 </t>
-                                <th class="text-right">Quantity</th>
-                                <th class="text-right">Unit Price</th>
+                                <th class="text-left">规格</th>
+                                <th class="text-left">数量</th>
+                                <th class="text-left">单位</th>
                                 <th t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
                                     Disc.(%)
                                 </th>
                                 <th class="text-right">Taxes</th>
-                                <th class="text-right" groups="sale.group_show_price_subtotal">Price</th>
+                                <th class="text-right" groups="sale.group_show_price_subtotal">单价</th>
                                 <th class="text-right price_tax_included" groups="sale.group_show_price_total">Total
                                     Price
                                 </th>
@@ -123,6 +123,9 @@
                                         </td>
                                         <td  t-if="l.inner_spec">
                                             <span t-field="l.inner_spec"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="l.product_id.product_specs"/>
                                         </td>
                                         <td class="text-right">
                                             <span t-field="l.product_uom_qty"/>
@@ -176,7 +179,7 @@
 
                     </div>
                     <div class="col-xs-">
-                       <strong> Total Amount：</strong>
+                        <strong>总数量：</strong>
                         <strong>
                              <span t-field="doc.product_count"/>
                         </strong>
@@ -185,7 +188,7 @@
                         <table class="table table-condensed">
                             <tr class="border-black">
                                 <td>
-                                    <strong>Total Without Taxes</strong>
+                                    <strong>未含税金额</strong>
                                 </td>
                                 <td class="text-right">
                                     <span t-field="doc.amount_untaxed"
@@ -195,7 +198,7 @@
                             <t t-foreach="doc._get_tax_amount_by_group()" t-as="amount_by_group">
                                 <tr>
                                     <td>
-                                        <span t-esc="amount_by_group[0] or 'Taxes'"/>
+                                        <span t-esc="amount_by_group[0] or '税金'"/>
                                     </td>
                                     <td class="text-right">
                                         <span t-esc="amount_by_group[1]"/>
@@ -204,7 +207,7 @@
                             </t>
                             <tr class="border-black">
                                 <td>
-                                    <strong>Total</strong>
+                                    <strong>总计</strong>
                                 </td>
                                 <td class="text-right">
                                     <span t-field="doc.amount_total"
