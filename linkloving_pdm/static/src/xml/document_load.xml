@@ -11,7 +11,7 @@
          <script>
             $(function () { $("[data-toggle='tooltip']").tooltip(); });
         </script>
-        <ul id="document_tab" class="nav nav-tabs">
+        <ul id="document_tab" class="nav nav-tabs" data-now-tab="sip">
             <t t-set="i" t-value="1"/>
             <t t-foreach="result" t-as="item">
                 <li t-att-class="i ==1 ? 'active': ''">
@@ -38,7 +38,12 @@
                                     <div>审核人：<span><t t-esc="item_files.review_id"/></span></div>
                                     <div>远程地址：<span><t t-esc="item_files.remote_path"/></span></div>
                                     <div>版本：<span><t t-esc="item_files.version"/></span></div>
-                                    <div>状态：<span><t t-esc="item_files.state"/></span></div>
+                                    <div>状态：
+                                        <span><t t-esc="item_files.state"/></span>
+                                        <t t-if="item_files.is_show_cancel">
+                                            <button class="btn btn-primary review_cancel">取消审核</button>
+                                        </t>
+                                    </div>
                                 </div>
                                 <div class="document_review_list">
                                     <t t-foreach="item_files.review_line" t-as="review_list">
@@ -61,7 +66,10 @@
                                     <t t-if="item_files.has_right_to_review == true">
                                         <button class="btn btn-primary document_manage_btn" t-att-data-id="item_files.id">审核操作</button>
                                     </t>
-                                    <button class="btn btn-primary document_modify">文件修改</button>
+                                    <a href="javascript:;" class="document_modify_wraper">文件修改
+                                        <input type="file" class="document_modify"/>
+                                    </a>
+                                    <button class="btn btn-primary document_download">下载</button>
                                 </div>
                             </div>
                         </t>
@@ -81,9 +89,9 @@
                 <div class="input_messages">
                     <div>
                         <p>文件名：</p>
-                        <p>远程路径：</p>
+                        <!--<p>远程路径：</p>-->
                         <p>上传文件：</p>
-                        <p>版本号：</p>
+                        <!--<p>版本号：</p>-->
                     </div>
                     <form enctype="multipart/form-data" action="/linkloving_pdm/upload_attachment_info" method="post" target="id_iframe">
                         <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
@@ -91,11 +99,13 @@
                         <input type="hidden" class="file_active_id" name="active_id"/>
                         <input type="hidden" class="file_active_type" name="active_type"/>
                         <input type="text" class="my_load_file_name" name="my_load_file_name"/>
-                        <input type="text" class="my_load_file_remote_path" name="my_load_file_remote_path"/>
+                        <input type="hidden" class="" name="my_load_file_remote_path" value=""/>
+                        <input type="hidden" class="" name="my_load_file_version" value=""/>
+                        <!--<input type="text" class="my_load_file_remote_path" name="my_load_file_remote_path"/>-->
                         <a href="javascript:;">选择文件
                             <input type="file" class="my_load_file" name="my_load_file"/>
                         </a>
-                        <input type="text" class="my_load_file_version" name="my_load_file_version"/>
+                        <!--<input type="text" class="my_load_file_version" name="my_load_file_version"/>-->
                         <input type="submit" class="btn btn-info submit_file_yes"/>
                     </form>
                     <iframe id="id_iframe" name="id_iframe" style="display:none;"></iframe>
@@ -141,12 +151,13 @@
 
                  </div>
                 <div class="document_btns">
-                    <!--<t t-if="item_files.has_right_to_review == true">-->
+                    <t t-if="item_files.has_right_to_review == true">
                         <button class="btn btn-primary document_manage_btn" t-att-data-id="item_files.id">审核操作</button>
-                    <!--</t>-->
+                    </t>
                     <a href="javascript:;" class="document_modify_wraper">文件修改
                         <input type="file" class="document_modify"/>
                     </a>
+                    <button class="btn btn-primary document_download">下载</button>
                 </div>
             </div>
         </t>

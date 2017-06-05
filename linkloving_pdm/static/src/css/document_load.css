@@ -181,7 +181,8 @@
 }
 .submit_file_yes{
     position: absolute;
-    bottom: 37px;
+    /*bottom: 37px;*/
+    bottom: 107px;
     left: 0;
     width: 57px!important;
 }
@@ -225,4 +226,7 @@
 .fa-spin {
   -webkit-animation: fa-spin 2s infinite linear;
   animation: fa-spin 2s infinite linear;
+}
+.document_download{
+    margin-top: 10px;
 }

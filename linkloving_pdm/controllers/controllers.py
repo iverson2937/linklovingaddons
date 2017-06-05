@@ -2,6 +2,8 @@
 import base64
 import json
 
+import werkzeug
+
 from odoo import http, _
 from odoo.exceptions import UserError
 from odoo.http import serialize_exception, request, _logger
@@ -66,3 +68,28 @@ class LinklovingPdm(http.Controller):
             "file": file,
             "result": result,
         })
+
+    @http.route('/download_file', type='http', auth='public')
+    def content_common(self, xmlid=None, model='product.attachment.info', id=None, field='file_binary', filename=None,
+                       filename_field='datas_fname', unique=None, mimetype=None, download=None, data=None, token=None):
+        if not filename:
+            info = request.env[model].browse(int(id))
+            filename = info.file_name
+        status, headers, content = request.registry['ir.http'].binary_content(xmlid=xmlid, model=model, id=id,
+                                                                              field=field, unique=unique,
+                                                                              filename=filename,
+                                                                              filename_field=filename_field,
+                                                                              download=download, mimetype=mimetype)
+        if status == 304:
+            response = werkzeug.wrappers.Response(status=status, headers=headers)
+        elif status == 301:
+            return werkzeug.utils.redirect(content, code=301)
+        elif status != 200:
+            response = request.not_found()
+        else:
+            content_base64 = base64.b64decode(content)
+            headers.append(('Content-Length', len(content_base64)))
+            response = request.make_response(content_base64, headers)
+        if token:
+            response.set_cookie('fileToken', token)
+        return response

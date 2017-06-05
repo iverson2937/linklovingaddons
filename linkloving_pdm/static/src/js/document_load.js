@@ -20,7 +20,36 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             'click .load_container_close': 'close_document_container',
             'change .my_load_file': 'get_file_name',
             'click .submit_file_yes': 'load_file',
-            'change .document_modify': 'document_modify_fn'
+            'change .document_modify': 'document_modify_fn',
+            'click .document_download': 'document_download_fn',
+            'click .review_cancel':'cancel_review'
+        },
+        cancel_review:function (e) {
+             var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var file_id = $(target).attr("data-id");
+            var action = {
+                name: "填写取消审核原因",
+                type: 'ir.actions.act_window',
+                res_model: 'review.process.cancel.wizard',
+                view_type: 'form',
+                view_mode: 'tree,form',
+                views: [[false, 'form']],
+                context: {'default_product_attachment_info_id': file_id},
+                target: "new",
+            };
+            this.do_action(action);
+        },
+        document_download_fn: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
+            console.log(new_file_id)
+            // return '/web/content/?download=true&model=product.attachment.info&id=' + new_file_id + '&field=file_binary';
+            window.location.href = '/download_file/?download=true&id=' + new_file_id;
+
+
+
         },
         document_modify_fn: function (e) {
             var e = e || window.event;
@@ -87,9 +116,10 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             //     target:"new"
             // };
             // this.do_action(action);
+            $("#document_tab").attr("data-product-id", this.product_id);
             $(".load_container").show();
             $(".file_active_id").val($(this)[0].product_id);
-            $(".file_active_type").val($("li.active>a").attr("data"));
+            $(".file_active_type").val($("li.active>a.tab_toggle_a").attr("data"));
             var callback = _.uniqueId('func_');
             $(".file_func").val(callback);
             window[callback] = function (result) {

@@ -205,7 +205,13 @@ class ProductAttachmentInfo(models.Model):
             if self.env.user.id in info.review_id.who_review_now.user_ids.ids:
                 info.has_right_to_review = True
 
+    @api.multi
+    def _compute_is_show_cancel(self):
+        for info in self:
+            if self.env.user.id == info.create_uid.id and info.state == 'review_ing':
+                info.is_show_cancel = True
 
+    is_show_cancel = fields.Boolean(compute='_compute_is_show_cancel')
     file_name = fields.Char(u"文件名")
     remote_path = fields.Char(string=u"远程路径", required=False, )
     file_binary = fields.Binary()
@@ -383,6 +389,7 @@ class ProductTemplateExtend(models.Model):
             'has_right_to_review': info.has_right_to_review,
             'review_line': info.review_id.get_review_line_list(),
             'is_able_to_use': info.is_able_to_use,
+            'is_show_cancel': info.is_show_cancel,
         }
 
     #####
@@ -417,6 +424,16 @@ class ProductTemplateExtend(models.Model):
                                    string="Design",
                                    required=False, )
 
+
+class ReviewProcessWizard(models.TransientModel):
+    _name = 'review.process.cancel.wizard'
+
+    product_attachment_info_id = fields.Many2one("product.attachment.info")
+    remark = fields.Text(u"备注", required=True)
+
+    def action_cancel_review(self):
+        self.review_process_line.action_cancel(self.remark)
+        self.product_attachment_info_id.action_cancel()
 
 class ReviewProcessWizard(models.TransientModel):
     _name = 'review.process.wizard'
