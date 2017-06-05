@@ -207,9 +207,9 @@ class ProductAttachmentInfo(models.Model):
 
     @api.multi
     def _compute_is_show_cancel(self):
-        for wizard in self:
-            if self.env.user.id == wizard.product_attachment_info_id.create_uid.id and wizard.product_attachment_info_id.state == 'review_ing':
-                wizard.is_show_cancel = True
+        for info in self:
+            if self.env.user.id == info.create_uid.id and info.state == 'review_ing':
+                info.is_show_cancel = True
 
     is_show_cancel = fields.Boolean(compute='_compute_is_show_cancel')
     file_name = fields.Char(u"文件名")
@@ -424,6 +424,16 @@ class ProductTemplateExtend(models.Model):
                                    string="Design",
                                    required=False, )
 
+
+class ReviewProcessWizard(models.TransientModel):
+    _name = 'review.process.cancel.wizard'
+
+    product_attachment_info_id = fields.Many2one("product.attachment.info")
+    remark = fields.Text(u"备注", required=True)
+
+    def action_cancel_review(self):
+        self.review_process_line.action_cancel(self.remark)
+        self.product_attachment_info_id.action_cancel()
 
 class ReviewProcessWizard(models.TransientModel):
     _name = 'review.process.wizard'

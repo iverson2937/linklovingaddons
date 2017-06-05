@@ -22,6 +22,23 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             'click .submit_file_yes': 'load_file',
             'change .document_modify': 'document_modify_fn',
             'click .document_download': 'document_download_fn',
+            'click .review_cancel':'cancel_review'
+        },
+        cancel_review:function (e) {
+             var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var file_id = $(target).attr("data-id");
+            var action = {
+                name: "填写取消审核原因",
+                type: 'ir.actions.act_window',
+                res_model: 'review.process.cancel.wizard',
+                view_type: 'form',
+                view_mode: 'tree,form',
+                views: [[false, 'form']],
+                context: {'default_product_attachment_info_id': file_id},
+                target: "new",
+            };
+            this.do_action(action);
         },
         document_download_fn: function (e) {
             var e = e || window.event;

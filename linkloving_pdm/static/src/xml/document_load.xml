@@ -38,7 +38,12 @@
                                     <div>审核人：<span><t t-esc="item_files.review_id"/></span></div>
                                     <div>远程地址：<span><t t-esc="item_files.remote_path"/></span></div>
                                     <div>版本：<span><t t-esc="item_files.version"/></span></div>
-                                    <div>状态：<span><t t-esc="item_files.state"/></span></div>
+                                    <div>状态：
+                                        <span><t t-esc="item_files.state"/></span>
+                                        <t t-if="item_files.is_show_cancel">
+                                            <button class="btn btn-primary review_cancel">取消审核</button>
+                                        </t>
+                                    </div>
                                 </div>
                                 <div class="document_review_list">
                                     <t t-foreach="item_files.review_line" t-as="review_list">

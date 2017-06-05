@@ -150,6 +150,24 @@
             </field>
         </record>
 
+        <record id="review_process_cancel_wizard_form" model="ir.ui.view">
+            <field name="name">填写取消审核原因</field>
+            <field name="model">review.process.cancel.wizard</field>
+            <field name="arch" type="xml">
+                <form string="填写取消审核原因">
+                    <sheet>
+                        <group>
+                            <field name="remark"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name='action_cancel' type='object' string='确定取消审核' class='oe_highlight review_reload'/>
+                        <button string='放弃' class='oe_link review_reload' special='cancel'/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
 
         <template id="document_manage_static" name="linkloving_document_manage" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
