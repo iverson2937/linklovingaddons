@@ -6,6 +6,15 @@ from odoo.exceptions import UserError
 
 class HrExpenseSheet(models.Model):
     _inherit = 'hr.expense.sheet'
+
+    @api.depends('expense_line_ids')
+    def _get_full_name(self):
+        name = ''
+        for line in self.expense_line_ids:
+            name += line.name + ' ;'
+        self.name = name
+
+    name = fields.Char(compute='_get_full_name', store=True, required=False)
     expense_no = fields.Char(default=lambda self: _('New'))
     approve_ids = fields.Many2many('res.users')
     is_deduct_payment = fields.Boolean(default=False)
@@ -110,8 +119,6 @@ class HrExpenseSheet(models.Model):
             exp.write({'state': state})
             create_remark_comment(exp, u'送审')
 
-
-
     @api.multi
     def manager3_approve(self):
         self.to_approve_id = False
@@ -129,7 +136,6 @@ class HrExpenseSheet(models.Model):
                 vals['expense_no'] = self.env['ir.sequence'].next_by_code('account.income') or '/'
             else:
                 vals['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense.sheet') or '/'
-            vals['name'] = vals['expense_no']
 
         exp = super(HrExpenseSheet, self).create(vals)
         #
