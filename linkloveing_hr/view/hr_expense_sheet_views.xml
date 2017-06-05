@@ -143,7 +143,8 @@
                                             <field name="sheet_id" invisible="1"/>
                                             <field name="currency_id" groups="base.group_multi_currency"/>
                                             <field name="analytic_account_id"
-                                                   groups="analytic.group_analytic_accounting" string="项目"/>
+                                                   groups="analytic.group_analytic_accounting" string="项目"
+                                                   options="{'no_create: True'}"/>
                                             <field name="company_id" groups="base.group_multi_company"/>
                                         </group>
                                         <group>
