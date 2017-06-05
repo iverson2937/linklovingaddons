@@ -43,6 +43,7 @@ class HrJob(models.Model):
     _inherit = 'hr.job'
 
     groups_id = fields.Many2many('res.groups')
+    employee_ids = fields.Many2many('hr.employee', 'hr_job_hr_employee_rel', 'employee_id', 'job_id')
 
     @api.model
     def create(self, values):
@@ -59,8 +60,9 @@ class HrJob(models.Model):
     @api.multi
     def write(self, values):
         values = self._remove_reified_groups(values)
+        update_groups = False
         if 'groups_id' in values:
-            pass
+            update_groups = True
         res = super(HrJob, self).write(values)
         group_multi_company = self.env.ref('base.group_multi_company', False)
         if group_multi_company and 'company_ids' in values:
@@ -69,6 +71,9 @@ class HrJob(models.Model):
                     group_multi_company.write({'users': [(3, user.id)]})
                 elif len(user.company_ids) > 1 and user.id not in group_multi_company.users.ids:
                     group_multi_company.write({'users': [(4, user.id)]})
+        if update_groups:
+            for employee in self.employee_ids:
+                employee.user_id.groups_id = self.groups_id
         return res
 
     def _remove_reified_groups(self, values):

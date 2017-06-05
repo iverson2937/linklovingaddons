@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from lxml import etree
 from lxml.builder import E
 
@@ -5,22 +7,18 @@ from odoo import models, fields, api, _
 
 
 def name_boolean_group(id):
-    print id
     return 'in_group_' + str(id)
 
 
 def name_selection_groups(ids):
-    print ids
     return 'sel_groups_' + '_'.join(map(str, ids))
 
 
 def is_boolean_group(name):
-    print name
     return name.startswith('in_group_')
 
 
 def is_selection_groups(name):
-    print name
     return name.startswith('sel_groups_')
 
 
@@ -38,6 +36,32 @@ def get_selection_groups(name):
 
 class GroupsView(models.Model):
     _inherit = 'res.groups'
+
+    # 工作头衔页面定义权限
+    @api.model
+    def create(self, values):
+        user = super(GroupsView, self).create(values)
+        self._update_hr_job_groups_view()
+
+        # ir_values.get_actions() depends on action records
+        self.env['ir.values'].clear_caches()
+        return user
+
+    @api.multi
+    def write(self, values):
+        res = super(GroupsView, self).write(values)
+        self._update_hr_job_groups_view()
+        # ir_values.get_actions() depends on action records
+        self.env['ir.values'].clear_caches()
+        return res
+
+    @api.multi
+    def unlink(self):
+        res = super(GroupsView, self).unlink()
+        self._update_hr_job_groups_view()
+        # ir_values.get_actions() depends on action records
+        self.env['ir.values'].clear_caches()
+        return res
 
     @api.multi
     def update_hr_job_form(self):
