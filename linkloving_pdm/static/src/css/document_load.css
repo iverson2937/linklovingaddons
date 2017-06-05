@@ -181,7 +181,8 @@
 }
 .submit_file_yes{
     position: absolute;
-    bottom: 37px;
+    /*bottom: 37px;*/
+    bottom: 78px;
     left: 0;
     width: 57px!important;
 }

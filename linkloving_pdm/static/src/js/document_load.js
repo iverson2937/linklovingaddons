@@ -89,7 +89,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             // this.do_action(action);
             $(".load_container").show();
             $(".file_active_id").val($(this)[0].product_id);
-            $(".file_active_type").val($("li.active>a").attr("data"));
+            $(".file_active_type").val($("li.active>a.tab_toggle_a").attr("data"));
             var callback = _.uniqueId('func_');
             $(".file_func").val(callback);
             window[callback] = function (result) {
