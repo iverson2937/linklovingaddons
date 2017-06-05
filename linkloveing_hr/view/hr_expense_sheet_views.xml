@@ -136,10 +136,10 @@
                                             <field name="reference"/>
                                             <field name="doc" widget="binary"/>
                                             <field name="date"/>
-                                            <field name="state"/>
+                                            <field name="state" invisible="1"/>
                                             <field name="account_id"/>
-                                            <field name="employee_id"/>
-                                            <field name="department_id"/>
+                                            <field name="employee_id" readonly="1"/>
+                                            <field name="department_id" readonly="1"/>
                                             <field name="sheet_id" invisible="1"/>
                                             <field name="currency_id" groups="base.group_multi_currency"/>
                                             <field name="analytic_account_id"
@@ -155,9 +155,12 @@
                                         </group>
 
                                     </group>
-                                    <div>
-                                        <field name="description" placeholder="Notes..."/>
-                                    </div>
+                                    <notebook>
+                                        <page string="关联订单">
+                                            <field name="sale_ids" options="{'no_create':True}"/>
+                                        </page>
+                                    </notebook>
+
                                 </sheet>
                             </form>
                         </field>

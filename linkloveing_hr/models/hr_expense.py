@@ -8,6 +8,7 @@ class HrExpense(models.Model):
 
     department_id = fields.Many2one('hr.department', string=u'部门')
     doc = fields.Binary(attachment=True, string=u'附件')
+    sale_ids = fields.Many2many('sale.order')
 
     @api.depends('sheet_id', 'sheet_id.account_move_id', 'sheet_id.state')
     def _compute_state(self):
