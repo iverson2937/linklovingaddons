@@ -138,10 +138,10 @@
                                             <field name="date"/>
                                             <field name="state" invisible="1"/>
                                             <field name="account_id"/>
-                                            <field name="employee_id" readonly="1"/>
-                                            <field name="department_id" readonly="1"/>
+                                            <field name="employee_id" readonly="1" required="1"/>
+                                            <field name="department_id" readonly="1" required="1"/>
                                             <field name="sheet_id" invisible="1"/>
-                                            <field name="currency_id" groups="base.group_multi_currency"/>
+                                            <field name="currency_id" groups="base.group_multi_currency" invisible="1"/>
                                             <field name="analytic_account_id"
                                                    groups="analytic.group_analytic_accounting" string="项目"
                                                    options="{'no_create':True}"/>
