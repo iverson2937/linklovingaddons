@@ -431,7 +431,7 @@
         <menuitem id="hr_expense.menu_hr_expense_my_expenses_to_submit" name="待提交的报销单" sequence="1"
                   parent="hr_expense.menu_hr_expense_my_expenses"
                   action="hr_expense_sheet_actions_my_draft"/>
-        <menuitem id="menu_hr_expense_my_expenses_refused" name="退回的报销单" sequence="2"
+        <menuitem id="hr_expense.menu_hr_expense_my_expenses_refused" name="退回的报销单" sequence="2"
                   parent="hr_expense.menu_hr_expense_my_expenses" action="hr_expense_sheet_actions_my_cancel"/>
 
 
