@@ -226,3 +226,6 @@
   -webkit-animation: fa-spin 2s infinite linear;
   animation: fa-spin 2s infinite linear;
 }
+.document_download{
+    margin-top: 10px;
+}

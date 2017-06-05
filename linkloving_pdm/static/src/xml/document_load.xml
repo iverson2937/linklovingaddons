@@ -61,7 +61,10 @@
                                     <t t-if="item_files.has_right_to_review == true">
                                         <button class="btn btn-primary document_manage_btn" t-att-data-id="item_files.id">审核操作</button>
                                     </t>
-                                    <button class="btn btn-primary document_modify">文件修改</button>
+                                    <a href="javascript:;" class="document_modify_wraper">文件修改
+                                        <input type="file" class="document_modify"/>
+                                    </a>
+                                    <button class="btn btn-primary document_download">下载</button>
                                 </div>
                             </div>
                         </t>
@@ -141,12 +144,13 @@
 
                  </div>
                 <div class="document_btns">
-                    <!--<t t-if="item_files.has_right_to_review == true">-->
+                    <t t-if="item_files.has_right_to_review == true">
                         <button class="btn btn-primary document_manage_btn" t-att-data-id="item_files.id">审核操作</button>
-                    <!--</t>-->
+                    </t>
                     <a href="javascript:;" class="document_modify_wraper">文件修改
                         <input type="file" class="document_modify"/>
                     </a>
+                    <button class="btn btn-primary document_download">下载</button>
                 </div>
             </div>
         </t>
