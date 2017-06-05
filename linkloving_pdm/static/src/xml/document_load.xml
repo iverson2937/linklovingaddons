@@ -38,7 +38,7 @@
                                     <div>审核人：<span><t t-esc="item_files.review_id"/></span></div>
                                     <div>远程地址：<span><t t-esc="item_files.remote_path"/></span></div>
                                     <div>版本：<span><t t-esc="item_files.version"/></span></div>
-                                    <div>状态：<span><t t-esc="item_files.state"/></span></div>
+                                    <div>状态：<span><t t-esc="item_files.state[1]"/></span></div>
                                     <div>创建人：<span><t t-esc="item_files.create_uid_name"/></span></div>
                                     <div>
                                         <t t-if="item_files.is_show_cancel">
@@ -60,6 +60,9 @@
                                             <span class="fa fa-long-arrow-right document_red" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark"></span>
                                              <!--<div>审核不通过</div>-->
                                         </t>
+                                    </t>
+                                    <t t-if="item_files.state[0] == 'released'">
+                                         <div><t t-esc="item_files.state[1]" /></div>
                                     </t>
 
                                 </div>
@@ -107,7 +110,7 @@
                             <input type="file" class="my_load_file" name="my_load_file"/>
                         </a>
                         <!--<input type="text" class="my_load_file_version" name="my_load_file_version"/>-->
-                        <input type="submit" class="btn btn-info submit_file_yes"/>
+                        <input type="submit" value="提交" class="btn btn-info submit_file_yes"/>
                     </form>
                     <iframe id="id_iframe" name="id_iframe" style="display:none;"></iframe>
                 </div>
@@ -130,7 +133,7 @@
                     <div>审核人：<span><t t-esc="item_files.review_id"/></span></div>
                     <div>远程地址：<span><t t-esc="item_files.remote_path"/></span></div>
                     <div>版本：<span><t t-esc="item_files.version"/></span></div>
-                    <div>状态：<span><t t-esc="item_files.state"/></span></div>
+                    <div>状态：<span><t t-esc="item_files.state[1]"/></span></div>
                     <div>创建人：<span><t t-esc="item_files.create_uid_name"/></span></div>
                 </div>
                  <div class="document_review_list">
@@ -148,7 +151,9 @@
                             <!--<div>审核不通过</div>-->
                             <!--<span class="fa fa-long-arrow-right"></span>-->
                         </t>
-
+                    </t>
+                     <t t-if="item_files.state[0] == 'released'">
+                        <div><t t-esc="item_files.state[1]" /></div>
                     </t>
 
                  </div>

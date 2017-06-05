@@ -157,6 +157,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             this.do_action(action);
             self.$(document).ajaxComplete(function (event, xhr, settings) {
                 // "{"jsonrpc":"2.0","method":"call","params":{"model":"review.process.wizard","method":"search_read","args":[[["id","in",[10]]],["remark","partner_id","display_name","__last_update"]],"kwargs":{"context":{"lang":"zh_CN","tz":"Asia/Shanghai","uid":1,"default_product_attachment_info_id":"4","params":{},"bin_size":true,"active_test":false}}},"id":980816587}"
+                console.log('sssssssss')
                 var data = JSON.parse(settings.data)
                 if (data.params.model == 'review.process.wizard') {
                     if (data.params.method == 'action_to_next' ||
@@ -164,7 +165,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                         data.params.method == 'action_deny'
                     ) {
                         var file_type = self.$("#document_tab").attr("data-now-tab");
-                        var product_id = parseInt(self.$("#document_tab").attr("data-product-id"));
+                        var product_id = parseInt($("body").attr("data-product-id"));
                         return new Model("product.template")
                             .call("get_attachemnt_info_list", [product_id], {type: file_type})
                             .then(function (result) {
@@ -201,6 +202,8 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
         },
         start: function () {
             var self = this;
+            console.log($("body"))
+            $("body").attr("data-product-id", this.product_id);
             return new Model("product.template")
                 .call("get_file_type_list", [this.product_id])
                 .then(function (result) {
