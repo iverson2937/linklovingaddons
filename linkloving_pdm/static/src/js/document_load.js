@@ -20,7 +20,15 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             'click .load_container_close': 'close_document_container',
             'change .my_load_file': 'get_file_name',
             'click .submit_file_yes': 'load_file',
-            'change .document_modify': 'document_modify_fn'
+            'change .document_modify': 'document_modify_fn',
+            'click .document_download': 'document_download_fn',
+        },
+        document_download_fn: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
+            console.log(new_file_id)
+            return '/web/content/?download=true&model=product.attachment.info&id=' + new_file_id + '&field=file_binary';
         },
         document_modify_fn: function (e) {
             var e = e || window.event;

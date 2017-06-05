@@ -7,67 +7,67 @@
             <field name="view_mode">form</field>
             <field name="target">new</field>
         </record>
-        <record id="product_template_form_inherit" model="ir.ui.view">
-            <field name="name">product.template.form.inherit</field>
-            <field name="model">product.template</field>
-            <field name="inherit_id" ref="product.product_template_only_form_view"/>
-            <field name="arch" type="xml">
-                <xpath expr="//page[@name='notes']" position="after">
-                    <page string="SIP">
-                        <field name="sip_files" mode="kanban"
-                               context="{'default_product_tmpl_id':active_id,'default_type':'sip'}">
-                            <kanban>
-                                <field name="type"/>
-                                <field name="file_name"/>
-                                <field name="review_id" options="{'always_reload': True}"/>
-                                <!--<field name="has_right_to_review" invisible="1"/>-->
+        <!--<record id="product_template_form_inherit" model="ir.ui.view">-->
+        <!--<field name="name">product.template.form.inherit</field>-->
+        <!--<field name="model">product.template</field>-->
+        <!--<field name="inherit_id" ref="product.product_template_only_form_view"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<xpath expr="//page[@name='notes']" position="after">-->
+        <!--<page string="SIP">-->
+        <!--<field name="sip_files" mode="kanban"-->
+        <!--context="{'default_product_tmpl_id':active_id,'default_type':'sip'}">-->
+        <!--<kanban>-->
+        <!--<field name="type"/>-->
+        <!--<field name="file_name"/>-->
+        <!--<field name="review_id" options="{'always_reload': True}"/>-->
+        <!--&lt;!&ndash;<field name="has_right_to_review" invisible="1"/>&ndash;&gt;-->
 
-                                <templates>
-                                    <t t-name="kanban-box">
-                                        <div class="oe_kanban_global_click">
-                                            <div class="oe_kanban_details">
-                                                <field name="file_name" string="文件名"/>
-                                                <field name="state"/>
-                                                <!--<field name="has_right_to_review" invisible="1"/>-->
-                                                <field name="review_id" options="{'always_reload': True}"/>
+        <!--<templates>-->
+        <!--<t t-name="kanban-box">-->
+        <!--<div class="oe_kanban_global_click">-->
+        <!--<div class="oe_kanban_details">-->
+        <!--<field name="file_name" string="文件名"/>-->
+        <!--<field name="state"/>-->
+        <!--&lt;!&ndash;<field name="has_right_to_review" invisible="1"/>&ndash;&gt;-->
+        <!--<field name="review_id" options="{'always_reload': True}"/>-->
 
-                                            </div>
-                                            <div class="o_kanban_button">
-                                                <button name="%(action_review_process_wizard)d"
-                                                        type="action"
-                                                        class="oe_highlight"
-                                                        context="{'default_product_attachment_info_id':active_id}"
-                                                >审核操作
-                                                </button>
-                                                <!--attrs="{'invisible': [('has_right_to_review', '=', False)]}"-->
-                                            </div>
-                                        </div>
-                                    </t>
-                                </templates>
-                            </kanban>
-                            <!--<form string="文件">-->
-                            <!--<sheet>-->
-                            <!--<group>-->
+        <!--</div>-->
+        <!--<div class="o_kanban_button">-->
+        <!--<button name="%(action_review_process_wizard)d"-->
+        <!--type="action"-->
+        <!--class="oe_highlight"-->
+        <!--context="{'default_product_attachment_info_id':active_id}"-->
+        <!--&gt;审核操作-->
+        <!--</button>-->
+        <!--&lt;!&ndash;attrs="{'invisible': [('has_right_to_review', '=', False)]}"&ndash;&gt;-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</t>-->
+        <!--</templates>-->
+        <!--</kanban>-->
+        <!--&lt;!&ndash;<form string="文件">&ndash;&gt;-->
+        <!--&lt;!&ndash;<sheet>&ndash;&gt;-->
+        <!--&lt;!&ndash;<group>&ndash;&gt;-->
 
-                            <!--<group>-->
-                            <!--<field name="file_name"/>-->
-                            <!--<field name="remote_path"/>-->
-                            <!--<field name="file_binary"/>-->
-                            <!--<field name="state"/>-->
-                            <!--<field name="version"/>-->
-                            <!--<field name="product_tmpl_id"/>-->
-                            <!--<field name="review_id"/>-->
-                            <!--<field name="type"/>-->
-                            <!--</group>-->
-                            <!--</group>-->
+        <!--&lt;!&ndash;<group>&ndash;&gt;-->
+        <!--&lt;!&ndash;<field name="file_name"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;<field name="remote_path"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;<field name="file_binary"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;<field name="state"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;<field name="version"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;<field name="product_tmpl_id"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;<field name="review_id"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;<field name="type"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;</group>&ndash;&gt;-->
+        <!--&lt;!&ndash;</group>&ndash;&gt;-->
 
-                            <!--</sheet>-->
-                            <!--</form>-->
-                        </field>
-                    </page>
-                </xpath>
-            </field>
-        </record>
+        <!--&lt;!&ndash;</sheet>&ndash;&gt;-->
+        <!--&lt;!&ndash;</form>&ndash;&gt;-->
+        <!--</field>-->
+        <!--</page>-->
+        <!--</xpath>-->
+        <!--</field>-->
+        <!--</record>-->
 
         <record id="product_attachment_info" model="ir.ui.view">
             <field name="name">product.attachment.info.form</field>
