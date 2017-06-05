@@ -28,7 +28,11 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             var target = e.target || e.srcElement;
             var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
             console.log(new_file_id)
-            return '/web/content/?download=true&model=product.attachment.info&id=' + new_file_id + '&field=file_binary';
+            // return '/web/content/?download=true&model=product.attachment.info&id=' + new_file_id + '&field=file_binary';
+            window.location.href = '/web/content/?download=true&model=product.attachment.info&id=' + new_file_id + '&field=file_binary';
+
+
+
         },
         document_modify_fn: function (e) {
             var e = e || window.event;
@@ -95,6 +99,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             //     target:"new"
             // };
             // this.do_action(action);
+            $("#document_tab").attr("data-product-id", this.product_id);
             $(".load_container").show();
             $(".file_active_id").val($(this)[0].product_id);
             $(".file_active_type").val($("li.active>a.tab_toggle_a").attr("data"));

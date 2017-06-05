@@ -11,7 +11,7 @@
          <script>
             $(function () { $("[data-toggle='tooltip']").tooltip(); });
         </script>
-        <ul id="document_tab" class="nav nav-tabs">
+        <ul id="document_tab" class="nav nav-tabs" data-now-tab="sip">
             <t t-set="i" t-value="1"/>
             <t t-foreach="result" t-as="item">
                 <li t-att-class="i ==1 ? 'active': ''">
@@ -95,7 +95,7 @@
                         <input type="hidden" class="file_active_type" name="active_type"/>
                         <input type="text" class="my_load_file_name" name="my_load_file_name"/>
                         <input type="hidden" class="" name="my_load_file_remote_path" value=""/>
-                        <input type="text" class="" name="my_load_file_version" value=""/>
+                        <input type="hidden" class="" name="my_load_file_version" value=""/>
                         <!--<input type="text" class="my_load_file_remote_path" name="my_load_file_remote_path"/>-->
                         <a href="javascript:;">选择文件
                             <input type="file" class="my_load_file" name="my_load_file"/>
