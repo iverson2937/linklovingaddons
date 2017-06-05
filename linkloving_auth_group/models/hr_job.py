@@ -59,6 +59,8 @@ class HrJob(models.Model):
     @api.multi
     def write(self, values):
         values = self._remove_reified_groups(values)
+        if 'groups_id' in values:
+            pass
         res = super(HrJob, self).write(values)
         group_multi_company = self.env.ref('base.group_multi_company', False)
         if group_multi_company and 'company_ids' in values:

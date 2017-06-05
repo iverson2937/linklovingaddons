@@ -41,7 +41,18 @@ class HrEmployee(models.Model):
                 self.env['res.users'].browse(self.user_id.id).write({
                     'groups_id': [(6, 0, groups)]
                 })
+        return res
 
+    @api.multi
+    def create(self, vals):
+        res = super(HrEmployee, self).create(vals)
+        groups = []
+        for job in self.hr_job_ids:
+            for group in job.groups_id:
+                groups.append(group.id)
+                self.env['res.users'].browse(self.user_id.id).write({
+                    'groups_id': [(6, 0, groups)]
+                })
         return res
 
 # class ResUser(models.Model):
