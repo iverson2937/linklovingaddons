@@ -38,8 +38,8 @@
                                     <div>审核人：<span><t t-esc="item_files.review_id"/></span></div>
                                     <div>远程地址：<span><t t-esc="item_files.remote_path"/></span></div>
                                     <div>版本：<span><t t-esc="item_files.version"/></span></div>
-                                    <div>状态：
-                                        <span><t t-esc="item_files.state"/></span>
+                                    <div>状态：<span><t t-esc="item_files.state"/></span>
+                                        <div>创建人：<span><t t-esc="item_files.create_uid_name"/></span></div>
                                         <t t-if="item_files.is_show_cancel">
                                             <button class="btn btn-primary review_cancel">取消审核</button>
                                         </t>
@@ -57,7 +57,7 @@
                                         </t>
                                          <t t-if="review_list.state=='review_fail'||review_list.state=='review_canceled'">
                                             <span class="fa fa-long-arrow-right document_red" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark"></span>
-                                            <!--<div>审核不通过</div>-->
+                                             <!--<div>审核不通过</div>-->
                                         </t>
                                     </t>
 
@@ -130,6 +130,7 @@
                     <div>远程地址：<span><t t-esc="item_files.remote_path"/></span></div>
                     <div>版本：<span><t t-esc="item_files.version"/></span></div>
                     <div>状态：<span><t t-esc="item_files.state"/></span></div>
+                    <div>创建人：<span><t t-esc="item_files.create_uid_name"/></span></div>
                 </div>
                  <div class="document_review_list">
                     <t t-foreach="item_files.review_line" t-as="review_list">
@@ -151,7 +152,7 @@
 
                  </div>
                 <div class="document_btns">
-                    <t t-if="item_files.has_right_to_review == true">
+                    <t t-if="item_files.has_right_to_review == true || item_files.is_first_review == true">
                         <button class="btn btn-primary document_manage_btn" t-att-data-id="item_files.id">审核操作</button>
                     </t>
                     <a href="javascript:;" class="document_modify_wraper">文件修改
