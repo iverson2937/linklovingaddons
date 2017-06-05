@@ -143,9 +143,6 @@
                                 groups="linkloving_pdm.group_final_review_partner"/>
                         <button name='action_deny' type='object' string='审核不通过' class='oe_highlight review_reload'
                                 groups="linkloving_pdm.group_final_review_partner"/>
-                        <button name='action_cancel_review' type='object' string='取消审核'
-                                class='oe_highlight review_reload'
-                                groups="linkloving_pdm.group_final_review_partner"/>
 
                         <button string='取消' class='oe_link review_reload' special='cancel'/>
                     </footer>

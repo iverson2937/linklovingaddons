@@ -29,7 +29,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
             console.log(new_file_id)
             // return '/web/content/?download=true&model=product.attachment.info&id=' + new_file_id + '&field=file_binary';
-            window.location.href = '/web/content/?download=true&model=product.attachment.info&id=' + new_file_id + '&field=file_binary';
+            window.location.href = '/download_file/?download=true&id=' + new_file_id;
 
 
 
