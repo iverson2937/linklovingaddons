@@ -392,7 +392,7 @@ class ProductTemplateExtend(models.Model):
             'review_id': info.review_id.who_review_now.name or '',
             'remote_path': info.remote_path or '',
             'version': info.version or '',
-            'state': ATTACHMENT_STATE[info.state],
+            'state': [info.state, ATTACHMENT_STATE[info.state]],
             'has_right_to_review': info.has_right_to_review,
             'review_line': info.review_id.get_review_line_list(),
             'is_able_to_use': info.is_able_to_use,
