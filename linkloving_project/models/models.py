@@ -103,15 +103,6 @@ class linkloving_project(models.Model):
     # TODO 未实现
     total_hours = fields.Float(compute=_progress_rate)
 
-    @api.depends('use_tasks', 'use_issues')
-    def on_change_use_tasks_or_issues(self):
-        values = {}
-        if self.use_tasks and not self.use_issues:
-            values['alias_model'] = 'project.task'
-        elif not self.use_tasks and self.use_issues:
-            values['alias_model'] = 'project.issue'
-        return {'value': values}
-
 
 class linkloving_project_task(models.Model):
     _inherit = 'project.task'

@@ -113,7 +113,6 @@
                                     </kanban>
                                 </field>
                             </page>
-                            <field name="use_issues"/>
                             <page string="Other Info">
                                 <group string="Administration">
                                     <field name="privacy_visibility" widget="radio"/>
