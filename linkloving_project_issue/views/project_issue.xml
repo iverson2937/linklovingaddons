@@ -335,32 +335,12 @@
                         <field string="Issues" name="issue_count" widget="statinfo"/>
                     </button>
                 </xpath>
-                <xpath expr='//page[@name="project_stages"]' position="attributes">
-                    <attribute name="attrs">{'invisible': [('use_tasks', '=', False),('use_issues','=',False)]}
-                    </attribute>
-                </xpath>
-                <xpath expr='//field[@name="use_tasks"]' position="attributes">
-                    <attribute name="attrs">{'on_change': 'on_change_use_tasks_or_issues(use_tasks, use_issues)'}
-                    </attribute>
-                </xpath>
-                <!--<field name="sequence" position="before">-->
-                <!--<field name="project_escalation_id"/>-->
-                <!--</field>-->
-            </field>
-        </record>
 
-        <record id="project.view_project_kanban_inherited" model="ir.ui.view">
-            <field name="name">project.project.kanban.inherited</field>
-            <field name="model">project.project</field>
-            <field name="inherit_id" ref="project.view_project_kanban"/>
-            <field name="arch" type="xml">
-                <field name="use_tasks" position="after">
-                    <field name="use_issues"/>
-                    <field name="issue_ids" invisible="1"/>
-                </field>
 
             </field>
         </record>
+
+
 
         <record id="project.analytic_account_inherited_issue_form" model="ir.ui.view">
             <field name="name">account.analytic.account.issue.form.inherit</field>
