@@ -78,7 +78,7 @@
                         </group>
                         <group>
                             <field name="id"/>
-                            <field name="version_id" groups="base.group_user"/>
+                            <!--<field name="version_id" groups="base.group_user"/>-->
                             <field name="priority" groups="base.group_user" widget="priority"/>
                             <label for="task_id" groups="base.group_user"/>
                             <div groups="base.group_user">
