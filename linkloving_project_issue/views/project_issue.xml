@@ -219,7 +219,7 @@
                                     <div>
                                         <b><field name="name"/></b> <br/>
                                         <field name="partner_id"/> <br/>
-                                        <field name="version_id"/>
+                                        <!--<field name="version_id"/>-->
                                     </div>
                                     <div class="oe_kanban_bottom_right">
                                         <img t-att-src="kanban_image('res.users', 'image_small', record.user_id.raw_value)" t-att-title="record.user_id.value" width="24" height="24" class="oe_kanban_avatar pull-right"/>
@@ -264,7 +264,7 @@
                     <field name="name" string="Feature description"/>
                     <field name="partner_id"/>
                     <field name="priority" string="Priority"/>
-                    <field name="version_id"/>
+                    <!--<field name="version_id"/>-->
                     <field name="user_id"/>
                     <field name="stage_id" widget="selection" readonly="1"/>
                 </tree>
