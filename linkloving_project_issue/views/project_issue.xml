@@ -66,19 +66,19 @@
                         <!--<label for="categ_ids" class="oe_edit_only"/>-->
                         <!--<field name="categ_ids" widget="many2many_tags"/>-->
                         <group>
-                            <group>
-                                <field name="user_id"
-                                       context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'project.group_project_user']}"/>
-                                <field name="partner_id" on_change="onchange_partner_id(partner_id)"/>
-                                <field name="email_from"/>
-                                <label for="project_id"/>
-                                <div>
-                                    <field name="project_id" on_change="on_change_project(project_id)" class="oe_inline"
-                                           context="{'default_use_issues':1}"/>
-                                    <button name="case_escalate" string="⇒ Escalate" type="object" class="oe_link"
-                                            groups="base.group_user"/>
-                                </div>
-                            </group>
+                        <group>
+                            <field name="user_id"
+                                   context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'project.group_project_user']}"/>
+                            <field name="partner_id" on_change="onchange_partner_id(partner_id)"/>
+                            <field name="email_from"/>
+                            <label for="project_id"/>
+                            <div>
+                                <field name="project_id" on_change="on_change_project(project_id)" class="oe_inline"
+                                       context="{'default_use_issues':1}"/>
+                                <button name="case_escalate" string="⇒ Escalate" type="object" class="oe_link"
+                                        groups="base.group_user"/>
+                            </div>
+                        </group>
                             <group>
                                 <field name="id"/>
                                 <!--<field name="version_id" groups="base.group_user"/>-->
@@ -105,7 +105,7 @@
                                         <field name="working_hours_close" widget="float_time"/>
                                         <field name="inactivity_days"/>
                                         <field name="days_since_creation"/>
-                                    </group>
+                                </group>
                                     <group string="Status" groups="base.group_no_one">
                                         <field name="active"/>
                                     </group>
@@ -318,34 +318,16 @@
         </record>
 
         <!-- Project -->
-        <!--<record id="project.view_project_form_inherited" model="ir.ui.view">-->
-        <!--<field name="name">project.project.form.inherited</field>-->
-        <!--<field name="model">project.project</field>-->
-        <!--<field name="inherit_id" ref="edit_project"/>-->
-        <!--<field name="arch" type="xml">-->
+        <record id="project.view_project_form_inherited" model="ir.ui.view">
+            <field name="name">project.project.form.inherited</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="linkloving_project.edit_project"/>
+            <field name="arch" type="xml">
+                <field name="id"/>
 
-        <!--<xpath expr='//div[@name="options_active"]' position='inside'>-->
-        <!--<field name="use_issues" class="oe_inline"-->
-        <!--on_change="on_change_use_tasks_or_issues(use_tasks, use_issues)"/>-->
-        <!--<label for="use_issues"/>-->
-        <!--</xpath>-->
-        <!--<xpath expr='//div[@name="buttons"]' position='inside'>-->
-        <!--<button class="oe_inline oe_stat_button" type="action" attrs="{'invisible':[('use_issues','=', 0)]}"-->
-        <!--name="%(act_project_project_2_project_issue_all)d" icon="fa-bug">-->
-        <!--&lt;!&ndash;<field string="Issues" name="issue_count" widget="statinfo"/>&ndash;&gt;-->
-        <!--</button>-->
-        <!--</xpath>-->
-        <!--<xpath expr='//page[@name="project_stages"]' position="attributes">-->
-        <!--<attribute name="attrs">{'invisible': [('use_tasks', '=', False),('use_issues','=',False)]}</attribute>-->
-        <!--</xpath>-->
-        <!--<xpath expr='//field[@name="use_tasks"]' position="attributes">-->
-        <!--<attribute name="attrs">{'on_change': 'on_change_use_tasks_or_issues(use_tasks, use_issues)'}</attribute>-->
-        <!--</xpath>-->
-        <!--&lt;!&ndash;<field name="sequence" position="before">&ndash;&gt;-->
-        <!--&lt;!&ndash;<field name="project_escalation_id"/>&ndash;&gt;-->
-        <!--&lt;!&ndash;</field>&ndash;&gt;-->
-        <!--</field>-->
-        <!--</record>-->
+
+            </field>
+        </record>
 
         <record id="project.view_project_kanban_inherited" model="ir.ui.view">
             <field name="name">project.project.kanban.inherited</field>
