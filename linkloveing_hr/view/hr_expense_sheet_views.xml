@@ -373,7 +373,8 @@
                                context="{'default_employee_id':employee_id,'default_department_id':department_id,'default_state':'draft'}">
                             <tree editable="top">
                                 <field name="date"/>
-                                <field name="product_id"/>
+                                <field name="product_id" options="{'no_create': True}"
+                                       domain="[('can_be_expensed','=',True)]"/>
                                 <field name="name"/>
                                 <field name="state" invisible="1"/>
                                 <field name="analytic_account_id" groups="analytic.group_analytic_accounting"
