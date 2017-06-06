@@ -128,7 +128,6 @@
                     <field name="project_id"/>
                     <field name="priority" string="Priority" groups="base.group_user"/>
                     <field name="create_date"/>
-                    <!--<field name="version_id" widget="selection"/>-->
                     <field name="user_id"/>
                     <!--<field name="progress" widget="progressbar" attrs="{'invisible':[('task_id','=',False)]}"/>-->
                     <field name="stage_id" widget="selection" readonly="1"/>
