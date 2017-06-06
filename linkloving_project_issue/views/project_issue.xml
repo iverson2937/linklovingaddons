@@ -147,7 +147,6 @@
                     <field name="partner_id" operator="child_of"/>
                     <field name="user_id"/>
                     <field name="project_id"/>
-                    <field name="categ_ids"/>
                     <field name="stage_id" domain="[]"/>
                     <filter string="My Issues" domain="[('user_id','=',uid)]"/>
                     <filter string="Unassigned" name="unassigned" domain="[('user_id', '=', False)]"/>
