@@ -79,12 +79,13 @@ class HrExpenseSheet(models.Model):
             UserError(u'请设置该员工部门')
         if not department.manager_id:
             UserError(u'该员工所在部门未设置经理(审核人)')
-        if department.allow_amount and self.total_amount < department.allow_amount:
+        # 如果没有上级部门，或者报销金额小于该部门的允许最大金额
+        if not department.parent_id or (department.allow_amount and self.total_amount < department.allow_amount):
             self.to_approve_id = False
             self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
         else:
-            # if not department.parent_id.manager_id:
-            #     raise UserError(u'上级部门没有设置经理,请联系管理员')
+            if not department.parent_id.manager_id:
+                raise UserError(u'上级部门没有设置经理,请联系管理员')
             self.to_approve_id = department.parent_id.manager_id.user_id.id
             self.write({'state': 'manager1_approve', 'approve_ids': [(4, self.env.user.id)]})
 
@@ -94,13 +95,13 @@ class HrExpenseSheet(models.Model):
     def manager2_approve(self):
 
         department = self.to_approve_id.employee_ids.department_id
-        if department.allow_amount and self.total_amount < department.allow_amount:
+        if not department.parent_id or (department.allow_amount and self.total_amount < department.allow_amount):
             self.to_approve_id = False
             self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
 
         else:
-            # if not department.parent_id.manager_id:
-            #     raise UserError(u'上级部门没有设置经理,请联系管理员')
+            if not department.parent_id.manager_id:
+                raise UserError(u'上级部门没有设置经理,请联系管理员')
             self.to_approve_id = department.parent_id.manager_id.user_id.id
 
             self.write({'state': 'manager2_approve', 'approve_ids': [(4, self.env.user.id)]})
@@ -111,17 +112,23 @@ class HrExpenseSheet(models.Model):
     def hr_expense_sheet_post(self):
         for exp in self:
             state = 'submit'
-            if exp.employee_id == exp.department_id.manager_id:
-                department = exp.department_id
-                if department.allow_amount and self.total_amount > department.allow_amount:
+            department = exp.department_id
+            if exp.employee_id == department.manager_id:
+
+                if not department.parent_id or (
+                            department.allow_amount and self.total_amount > department.allow_amount):
                     state = 'approve'
                     exp.write({'state': 'approve'})
                 else:
-                    exp.to_approve_id = exp.department_id.parent_id.manager_id.user_id.id
+                    if not department.parent_id.manager_id:
+                        raise UserError(u'上级部门未设置审核人')
+                    exp.to_approve_id = department.parent_id.manager_id.user_id.id
             else:
                 # if not department.parent_id.manager_id:
                 #     raise UserError(u'上级部门没有设置经理,请联系管理员')
-                exp.to_approve_id = exp.department_id.manager_id.user_id.id
+                if not department.manager_id:
+                    raise UserError(u'请设置部门审核人')
+                exp.to_approve_id = department.manager_id.user_id.id
             exp.write({'state': state})
             create_remark_comment(exp, u'送审')
 
