@@ -1514,7 +1514,12 @@ class purchase_order_extend(models.Model):
     @api.multi
     def change_state_to_rfq(self):
         for po in self:
-            po.state = "draft"
+            po.sudo().write({
+                'state': 'draft',
+            })
+            self._cr.execute("update purchase_order SET create_uid = %d where id = %d" % (self.env.user.id, po.id))
+
+        print('test')
 
     def unlink_cancel_po(self):
         po_canceled = self.env["purchase.order"].search([("state", "=", "cancel")])

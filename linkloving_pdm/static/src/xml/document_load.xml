@@ -77,7 +77,9 @@
                                         <input type="file" class="document_modify"/>
                                         </a>
                                     </t>
-                                    <button class="btn btn-primary document_download">下载</button>
+                                    <t t-if="item_files.is_able_to_use == true">
+                                        <button class="btn btn-primary document_download">下载</button>
+                                    </t>
                                 </div>
                             </div>
                         </t>
@@ -175,7 +177,9 @@
                         </a>
                     </t>
 
-                    <button class="btn btn-primary document_download">下载</button>
+                    <t t-if="item_files.is_able_to_use == true">
+                        <button class="btn btn-primary document_download">下载</button>
+                    </t>
                 </div>
             </div>
         </t>
