@@ -83,6 +83,8 @@ class HrExpenseSheet(models.Model):
             self.to_approve_id = False
             self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
         else:
+            if not department.parent_id.manager_id:
+                raise UserError(u'上级部门没有设置经理,请联系管理员')
             self.to_approve_id = department.parent_id.manager_id.user_id.id
             self.write({'state': 'manager1_approve', 'approve_ids': [(4, self.env.user.id)]})
 
@@ -97,6 +99,8 @@ class HrExpenseSheet(models.Model):
             self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
 
         else:
+            if not department.parent_id.manager_id:
+                raise UserError(u'上级部门没有设置经理,请联系管理员')
             self.to_approve_id = department.parent_id.manager_id.user_id.id
 
             self.write({'state': 'manager2_approve', 'approve_ids': [(4, self.env.user.id)]})
@@ -115,6 +119,8 @@ class HrExpenseSheet(models.Model):
                 else:
                     exp.to_approve_id = exp.department_id.parent_id.manager_id.user_id.id
             else:
+                if not department.parent_id.manager_id:
+                    raise UserError(u'上级部门没有设置经理,请联系管理员')
                 exp.to_approve_id = exp.department_id.manager_id.user_id.id
             exp.write({'state': state})
             create_remark_comment(exp, u'送审')
