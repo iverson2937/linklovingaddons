@@ -285,6 +285,9 @@
             <field name="arch" type="xml">
                 <form string="Expense Reports" class="o_expense_sheet">
                     <header>
+                        <button name="hr_expense_sheet_post" states="draft" string="提交审核"
+                                type="object" groups="base.group_user"
+                                class="oe_highlight o_expense_sheet_post"/>
                         <button name="manager1_approve" string="Post" type="object"
                                 groups="hr_expense.group_hr_expense_user" class="oe_highlight o_expense_sheet_approve"
                                 attrs="{'invisible':[('state','!=','submit')]}"
