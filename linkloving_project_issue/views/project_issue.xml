@@ -292,7 +292,7 @@
         <record id="project.view_project_form_inherited" model="ir.ui.view">
             <field name="name">project.project.form.inherited</field>
             <field name="model">project.project</field>
-            <field name="inherit_id" ref="project.edit_project"/>
+            <field name="inherit_id" ref="linkloving_project.edit_project"/>
             <field name="arch" type="xml">
                 <xpath expr='//field[@name="use_tasks"]' position='attributes'>
                     <attribute name="on_change">on_change_use_tasks_or_issues(use_tasks, use_issues)</attribute>
