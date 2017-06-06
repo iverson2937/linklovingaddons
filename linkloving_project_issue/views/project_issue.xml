@@ -83,7 +83,7 @@
                             <label for="task_id" groups="base.group_user"/>
                             <div groups="base.group_user">
                                 <field name="task_id" on_change="onchange_task_id(task_id)" class="oe_inline" context="{'default_project_id':project_id}"/>
-                                <field name="progress" widget="progressbar" attrs="{'invisible':[('task_id','=',False)]}" class="oe_inline"/>
+                                <!--<field name="progress" widget="progressbar" attrs="{'invisible':[('task_id','=',False)]}" class="oe_inline"/>-->
                             </div>
                         </group>
                     </group>
