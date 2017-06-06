@@ -13,6 +13,7 @@ class linkloving_project(models.Model):
                               ('pending', 'Pending'),
                               ('close', 'Closed')],
                              'Status', copy=False, default='draft')
+    issue_count = fields.Float()
 
     #
     # # TODO 计算项目耗时, 未实现
