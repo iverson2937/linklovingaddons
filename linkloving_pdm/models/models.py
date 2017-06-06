@@ -177,9 +177,8 @@ class ProductAttachmentInfo(models.Model):
     #             return product_tmpl.product_variant_ids[0].id
     #         else:
     #             return res_id
-    def _get_version(self):
-
-        pass
+    def get_download_filename(self):
+        return self.type + '_' + self.version + '_' + self.file_name
 
     def _default_version(self):
         model = self._context.get("model")

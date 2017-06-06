@@ -74,7 +74,7 @@ class LinklovingPdm(http.Controller):
                        filename_field='datas_fname', unique=None, mimetype=None, download=None, data=None, token=None):
         if not filename:
             info = request.env[model].browse(int(id))
-            filename = info.file_name
+            filename = info.get_download_filename()
         status, headers, content = request.registry['ir.http'].binary_content(xmlid=xmlid, model=model, id=id,
                                                                               field=field, unique=unique,
                                                                               filename=filename,
