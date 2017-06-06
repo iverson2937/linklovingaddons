@@ -202,7 +202,7 @@ class ProductAttachmentInfo(models.Model):
     @api.multi
     def _compute_has_right_to_review(self):
         for info in self:
-            if self.env.user.id in info.review_id.who_review_now.user_ids.ids:
+            if self.env.user.id in info.review_id.who_review_now.user_ids.ids and info.state == 'review_ing':
                 info.has_right_to_review = True
 
     @api.multi
@@ -211,6 +211,13 @@ class ProductAttachmentInfo(models.Model):
             if self.env.user.id == info.create_uid.id and info.state == 'review_ing':
                 info.is_show_cancel = True
 
+    @api.multi
+    def _compute_is_first_review(self):
+        for info in self:
+            if self.env.user.id == info.create_uid.id and info.state in ['draft', 'waiting_release', 'deny', 'cancel']:
+                info.is_first_review = True
+
+    is_first_review = fields.Boolean(compute='_compute_is_first_review')
     is_show_cancel = fields.Boolean(compute='_compute_is_show_cancel')
     file_name = fields.Char(u"文件名")
     remote_path = fields.Char(string=u"远程路径", required=False, )
@@ -385,11 +392,13 @@ class ProductTemplateExtend(models.Model):
             'review_id': info.review_id.who_review_now.name or '',
             'remote_path': info.remote_path or '',
             'version': info.version or '',
-            'state': ATTACHMENT_STATE[info.state],
+            'state': [info.state, ATTACHMENT_STATE[info.state]],
             'has_right_to_review': info.has_right_to_review,
             'review_line': info.review_id.get_review_line_list(),
             'is_able_to_use': info.is_able_to_use,
             'is_show_cancel': info.is_show_cancel,
+            'is_first_review': info.is_first_review,
+            'create_uid_name': info.create_uid.name,
         }
 
     #####
