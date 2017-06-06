@@ -27,7 +27,8 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
         cancel_review:function (e) {
              var e = e || window.event;
             var target = e.target || e.srcElement;
-            var file_id = $(target).attr("data-id");
+            var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
+            console.log(new_file_id);
             var action = {
                 name: "填写取消审核原因",
                 type: 'ir.actions.act_window',
@@ -35,7 +36,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 view_type: 'form',
                 view_mode: 'tree,form',
                 views: [[false, 'form']],
-                context: {'default_product_attachment_info_id': file_id},
+                context: {'default_product_attachment_info_id': parseInt(new_file_id)},
                 target: "new",
             };
             this.do_action(action);

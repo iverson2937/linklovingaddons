@@ -178,7 +178,7 @@ class ProductAttachmentInfo(models.Model):
     #         else:
     #             return res_id
     def get_download_filename(self):
-        return self.type + '_' + self.version + '_' + self.file_name
+        return self.type + '_' + str(self.version) + '_' + self.file_name
 
     def _default_version(self):
         model = self._context.get("model")
@@ -437,6 +437,9 @@ class ReviewProcessWizard(models.TransientModel):
     _name = 'review.process.cancel.wizard'
 
     product_attachment_info_id = fields.Many2one("product.attachment.info")
+    review_process_line = fields.Many2one("review.process.line",
+                                          related="product_attachment_info_id.review_id.process_line_review_now")
+
     remark = fields.Text(u"备注", required=True)
 
     def action_cancel_review(self):
