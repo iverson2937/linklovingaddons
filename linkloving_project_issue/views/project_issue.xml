@@ -61,8 +61,8 @@
                     <h1>
                         <field name="name" class="oe_inline"/>
                     </h1>
-                    <label for="categ_ids" class="oe_edit_only"/>
-                    <field name="categ_ids" widget="many2many_tags"/>
+                    <!--<label for="categ_ids" class="oe_edit_only"/>-->
+                    <!--<field name="categ_ids" widget="many2many_tags"/>-->
                     <group>
                         <group>
                             <field name="user_id"
