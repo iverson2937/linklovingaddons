@@ -4,7 +4,7 @@ from odoo import models, fields, api, _
 
 
 class linkloving_project(models.Model):
-    _inherit = 'project.project'
+    _name = 'project.project'
 
     state = fields.Selection([('template', 'Template'),
                               ('draft', 'New'),
