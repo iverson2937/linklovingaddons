@@ -109,6 +109,8 @@
                     <field name="amount" filter_domain="['|', ('name','ilike',self), ('communication','ilike',self)]"
                            string="编号"/>
                     <field name="amount" filter_domain="[('amount','=',self)]" string="金额"/>
+                    <filter string="销售确认完成" domain="[('state','=','done')]" name="state_done"/>
+                    <filter string="待销售确认" domain="[('state','=','confirm')]" name="state_confirm"/>
                 </xpath>
 
             </field>
