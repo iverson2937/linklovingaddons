@@ -63,7 +63,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="domain">
-                [('state','=','confirm')]
+                [('state','=','confirm'),('state','=','done')]
             </field>
             <field name="context">{'state':'confirm','is_customer':True}</field>
             <field name="view_ids" eval="[(5,0,0),
