@@ -111,6 +111,8 @@ class HrExpenseSheet(models.Model):
     @api.multi
     def hr_expense_sheet_post(self):
         for exp in self:
+            if not exp.expense_line_ids:
+                raise UserError(u'请填写报销明细')
             state = 'submit'
             department = exp.department_id
             if exp.employee_id == department.manager_id:
