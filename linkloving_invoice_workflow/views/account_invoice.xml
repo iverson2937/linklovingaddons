@@ -180,7 +180,7 @@
             <field name="inherit_id" ref="account.invoice_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='partner_shipping_id']" position="after">
-                    <field name="deduct_amount" attrs="{'readonly': [('state', 'in', ['open','paid'])]}" string="Deduction" />
+                    <field name="deduct_amount" attrs="{'readonly': [('state', 'in', ['open','paid'])]}" string="扣减" />
                     <field name="remark"/>
                 </xpath>
             </field>

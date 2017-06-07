@@ -9,9 +9,9 @@ class StockPicking(models.Model):
     tracking_number = fields.Char(string=u'Tracking Number')
 
     storage_type = fields.Selection([
-        ('procurement_warehousing', '采购入库'),
-        ('return_of_materials_to_storeroom', '退料入库'),
-        ('return_storage', '退货入库'),
+        ('procurement_warehousing', u'采购入库'),
+        ('return_of_materials_to_storeroom', u'退料入库'),
+        ('return_storage', u'退货入库'),
     ])
 
     def _get_po_number(self):
@@ -35,9 +35,9 @@ class StockPicking(models.Model):
                     picking.delivery_rule = sale_id.delivery_rule
                     break
 
-    delivery_rule = fields.Selection(compute="_compute_delivery_rule", selection=[('delivery_once', '一次性发齐货'),
-                                                                                  ('create_backorder', '允许部分发货,并产生欠单'),
-                                                                                  ('cancel_backorder', '允许部分发货,不产生欠单')],
+    delivery_rule = fields.Selection(compute="_compute_delivery_rule", selection=[('delivery_once', u'一次性发齐货'),
+                                                                                  ('create_backorder', u'允许部分发货,并产生欠单'),
+                                                                                  ('cancel_backorder', u'允许部分发货,不产生欠单')],
                                      )
 
     # actual_state = fields.Selection(string="", selection=[('', ''), ('', ''), ], required=False, )

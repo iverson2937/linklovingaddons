@@ -11,6 +11,16 @@
                     <field name="crm_source_id" string="来源" attrs="{'invisible': [('customer','!=', True)]}"
                            options="{'no_create':True}"/>
                 </xpath>
+
+                <xpath expr="//field[@name='crm_source_id']" position="after">
+                    <field name="customer_status" options="{'no_create':True}"/>
+                </xpath>
+
+                <xpath expr="//field[@name='customer_status']" position="after">
+                    <field name="is_order"/>
+                </xpath>
+
+
                 <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/div/div/field[@name='country_id']"
                        position="after">
                     <field name="detailed_address"/>
@@ -37,7 +47,6 @@
                     <field name="express_sample_record"/>
                 </xpath>
 
-
                 <!--you-->
                 <xpath expr="//field[@name='lang']" position="after">
                     <field name="qq"/>
@@ -63,7 +72,6 @@
                 </xpath>
 
                 <xpath expr="//page[@name='accounting_disabled']" position="after">
-
                     <page string="产品">
                         <field name="interested_in_product" domain="[('sale_ok','=',True)]"
                                context="{'search_default_rteng':1,'search_default_filter_categ_id':1}"/>
@@ -80,5 +88,19 @@
 
             </field>
         </record>
+
+
+        <record id="crm_view_res_partner_filter_assign" model="ir.ui.view">
+            <field name="name">crm.res.partner.geo.inherit.search</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='group_by']/filter[@name='salesperson']" position="after">
+                    <filter string="销售团队" name="team_id" context="{'group_by' : 'team_id'}" domain="[]"/>
+                </xpath>
+            </field>
+        </record>
+
+
     </data>
 </openerp>

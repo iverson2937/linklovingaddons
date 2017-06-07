@@ -75,7 +75,7 @@
                         </group>
                         <notebook>
                             <page string="产品">
-                                <field name="i_adc"/>
+                                <field name="product_visit_record"/>
                             </page>
                         </notebook>
                     </sheet>
@@ -159,14 +159,6 @@
             <field name="res_model">crm.lead.source</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-
-            <!--<field name="domain">-->
-            <!--[('payment_type','=',2),('state','!=','draft')]-->
-            <!--</field>-->
-            <!--<field name="context">{'posted':True}</field>-->
-            <!--<field name="view_ids" eval="[(5,0,0),-->
-            <!--(0,0,{'view_mode':'tree', 'view_id': ref('account_payment_register_tree_sale')}),-->
-            <!--(0,0,{'view_mode':'form', 'view_id': ref('account_receive_register_form')})]"/>-->
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
                     Click add source record.
@@ -186,6 +178,61 @@
                   sequence="2" name="线索来源"/>
 
 
+        <!--message.order.status-->
+        <record model="ir.ui.view" id="view_message_order_status_form">
+            <field name="name">message.order.status.form</field>
+            <field name="model">message.order.status</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <field name="description"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_message_order_status_tree" model="ir.ui.view">
+            <field name="name">message.order.status.tree</field>
+            <field name="model">message.order.status</field>
+            <field name="arch" type="xml">
+                <tree string="客户状态">
+                    <field name="name"/>
+                    <field name="description"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_message_order_status" model="ir.actions.act_window">
+            <field name="name">客户状态</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">message.order.status</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click add customer status.
+                </p>
+                <p>
+                    No source Found!
+                </p>
+            </field>
+        </record>
+
+
+        <!--Receipt*-->
+        <menuitem action="action_message_order_status"
+                  id="menu_message_order_status"
+                  parent="sales_team.menu_sales"
+                  groups="sales_team.group_sale_manager"
+                  sequence="3" name="客户状态"/>
+
+
         <record model="ir.ui.view" id="mail.view_message_form">
             <field name="name">mail.message.form</field>
             <field name="model">mail.message</field>
@@ -202,7 +249,7 @@
                                 <field name="record_name" invisible="1"/>
                             </group>
                             <group>
-                                <field name="label_ids" string="记录类型" widget="many2many_tags"
+                                <field name="messages_label_ids" string="记录类型" widget="many2many_checkboxes"
                                        options="{'no_create': True}"/>
                                 <field name="parent_id" invisible="1"/>
                                 <field name="model" invisible="1"/>

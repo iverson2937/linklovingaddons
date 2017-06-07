@@ -6,7 +6,6 @@
 from odoo import fields, api, models
 
 
-
 class Partner(models.Model):
     """"""
 
@@ -84,5 +83,5 @@ class ResPartnerSource(models.Model):
 
     _name = 'res.partner.source'
 
-    name = fields.Char()
+    name = fields.Char(required=True)
     description = fields.Text()
