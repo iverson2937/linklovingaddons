@@ -161,7 +161,8 @@
                         </group>
                     </sheet>
                     <footer>
-                        <button name='action_cancel' type='object' string='确定取消审核' class='oe_highlight review_reload'/>
+                        <button name='action_cancel_review' type='object' string='确定取消审核'
+                                class='oe_highlight review_reload'/>
                         <button string='放弃' class='oe_link review_reload' special='cancel'/>
                     </footer>
                 </form>
