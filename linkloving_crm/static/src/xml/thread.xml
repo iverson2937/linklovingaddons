@@ -2,15 +2,15 @@
 <templates xml:space="preserve">
 
 
-    <t t-name="mail.ChatThread">
+    <t t-name="mail.ChatThreads">
         <t t-if="messages.length">
             <t t-if="options.display_load_more &amp;&amp; options.display_order == ORDER.ASC"
-               t-call="mail.ChatThread.LoadMore"/>
+               t-call="mail.ChatThreads.LoadMore"/>
 
-            <t t-call="mail.ChatThread.Content"/>
+            <t t-call="mail.ChatThreads.Content"/>
 
             <t t-if="options.display_load_more &amp;&amp; options.display_order == ORDER.DESC"
-               t-call="mail.ChatThread.LoadMore"/>
+               t-call="mail.ChatThreads.LoadMore"/>
         </t>
         <t t-if="options.display_empty_channel">
             <t t-call="mail.EmptyChannel" />
@@ -33,7 +33,7 @@
         </t>
     </div>
 
-    <t t-name="mail.ChatThread.Content">
+    <t t-name="mail.ChatThreads.Content">
         <t t-if="options.messages_separator_position == 'top'" t-call="mail.MessagesSeparator"/>
         <t t-set="current_day" t-value="0"/>
         <t t-foreach="messages" t-as="message">
@@ -44,11 +44,11 @@
                 <t t-set="current_day" t-value="message.day"/>
             </div>
 
-            <t t-call="mail.ChatThread.Message"/>
+            <t t-call="mail.ChatThreads.Message"/>
         </t>
     </t>
 
-    <t t-name="mail.ChatThread.Message">
+    <t t-name="mail.ChatThreads.Message">
         <div t-att-class="'o_thread_message' + (message.expanded ? ' o_message_expanded '  : ' ') + (message.is_selected ? 'o_thread_selected_message' : '')" t-att-data-message-id="message.id">
             <div t-if="options.display_avatar" class="o_thread_message_sidebar">
                 <t t-if="!message.mailto &amp;&amp; message.author_id[0]">
@@ -134,29 +134,24 @@
                     <t t-if="message.subtype_description">
                         <p t-esc="message.subtype_description"/>
                     </t>
-                    <t t-call="mail.ChatThread.MessageTracking"/>
+                    <t t-call="mail.ChatThreads.MessageTracking"/>
                 </t>
                 <p t-if="options.display_subject &amp;&amp; message.display_subject" class="o_mail_subject">Subject: <t t-esc="message.subject"/></p>
                 <t t-if="!(message.tracking_value_ids &amp;&amp; message.tracking_value_ids.length &gt; 0)">
                     <t t-raw="message.body"/>
 
+                    <!--<t t-raw="message.messages_label_body"/>;-->
+                    <!--<t t-raw="message.id"/>;-->
+                    <!--<t t-raw="message.messages_label_ids"/>;-->
 
 
-                    <!--<t t-foreach="message.label_ids.raw_value" t-as="rec">-->
-                            <!--<t t-esc="rec" />;-->
+                    <!--<t t-if="message.label_ids &gt; 0">-->
+                    <!--<li>Estimate </li>-->
                     <!--</t>-->
 
-
-
-                    <!--<t t-esc="message.label_id"/>;;-->
-
-                      <!--<t t-if="message.label_ids &gt; 0">-->
-                            <!--<li>Estimate </li>-->
-                      <!--</t>-->
-
                     <!--<t t-if="message.label_ids &lt; 0">-->
-                            <!--<li>Estimate </li>-->
-                      <!--</t>-->
+                    <!--<li>Estimate </li>-->
+                    <!--</t>-->
 
 
 
@@ -164,12 +159,13 @@
 
                 </t>
 
-                <!--<t t-if="message.label_ids">-->
-                <!--<t t-foreach="message.label_ids" t-as="label">-->
-                <!--<span class='o_attachment_name'><t t-esc='label.name'/></span>-->
-                <!--</t>-->
-                <!--</t>-->
+                <!--<t t-if="message.messages_label_ids">-->
+                <!--<t t-foreach="message.messages_label_ids" t-as="labels">-->
+                <!--<span class='o_labels_name'><t t-esc='labels'/></span>-->
 
+                <!--<span class='o_labels_name'><t t-esc='labels.name'/></span>-->
+                <!--</t>-->
+                <!--</t>-->
 
                 <t t-foreach="message.attachment_ids" t-as="attachment">
                     <t t-call="mail.Attachment"/>
@@ -189,7 +185,7 @@
         </div>
     </t>
 
-    <t t-name="mail.ChatThread.MessageTracking">
+    <t t-name="mail.ChatThreads.MessageTracking">
         <ul class="o_mail_thread_message_tracking">
             <t t-foreach='message.tracking_value_ids' t-as='value'>
                 <li>
@@ -234,7 +230,7 @@
         </div>
     </t>
 
-     <t t-name="mail.ChatThread.LoadMore">
+     <t t-name="mail.ChatThreads.LoadMore">
         <div t-if="!all_messages_loaded" class="o_thread_show_more">
             <button class="btn btn-sm btn-link">-------- Show older messages --------</button>
         </div>

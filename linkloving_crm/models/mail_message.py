@@ -5,10 +5,22 @@ from odoo import tools
 
 class CrmMailMessage(models.Model):
     _inherit = 'mail.message'
-    label_ids = fields.Many2many('message.label', string='记录类型')
+
+    messages_label_ids = fields.Many2many('message.label', 'message_label_mail_message_rel', string='记录类型')
+    messages_label_body = fields.Char()
 
     postil = fields.Text(string='批注')
 
     @api.multi
     def send_message_action(self):
+        data = ' '
+        for ss in self.messages_label_ids:
+            data += (' ' + ss.name)
+        self.write({'messages_label_body': data})
         return {'type': 'ir.actions.act_window_close'}
+
+
+class CrmMessageLabelStatus(models.Model):
+    _name = 'message.order.status'
+    name = fields.Char(string=u'订单状态')
+    description = fields.Text(string=u'描述')

@@ -9,11 +9,13 @@ from odoo.exceptions import UserError
 from odoo.osv import expression
 from odoo.tools import float_compare, float_round, DEFAULT_SERVER_DATETIME_FORMAT
 
+
 class linkloving_product_extend(models.Model):
     _inherit = "product.product"
 
     qty_require = fields.Float(u"需求数量")
     is_trigger_by_so = fields.Boolean(default=False)
+
 
 class linkloving_product_product_extend(models.Model):
     _inherit = "product.template"
@@ -21,17 +23,20 @@ class linkloving_product_product_extend(models.Model):
     qty_require = fields.Float(related="product_variant_id.qty_require")
     is_trigger_by_so = fields.Boolean(default=False, related="product_variant_id.is_trigger_by_so")
 
+
 class linkloving_production_extend1(models.Model):
     _inherit = "mrp.production"
 
     origin_sale_id = fields.Many2one("sale.order", string=u"源销售单据名称")
     origin_mo_id = fields.Many2one("mrp.production", string=u"源生产单据名称")
 
+
 class linkloving_purchase_order_extend(models.Model):
     _inherit = "purchase.order"
 
     origin_sale_id = fields.Many2one("sale.order", string=u"源销售单据名称")
     origin_mo_id = fields.Many2one("mrp.production", string=u"源生产单据名称")
+
 
 class linkloving_procurement_order_extend(models.Model):
     _inherit = "procurement.order"
@@ -42,7 +47,7 @@ class linkloving_procurement_order_extend(models.Model):
         on the default behavior """
         if self.get_warehouse():
             domain = expression.AND(
-                    [['|', ('warehouse_id', '=', self.get_warehouse().id), ('warehouse_id', '=', False)], domain])
+                [['|', ('warehouse_id', '=', self.get_warehouse().id), ('warehouse_id', '=', False)], domain])
         Pull = self.env['procurement.rule']
         res = self.env['procurement.rule']
         if product_id.route_ids:
@@ -101,7 +106,7 @@ class linkloving_procurement_order_extend(models.Model):
                                                                            limit=1)
                 qty = xuqiul + OrderPoint.product_min_qty - product_id.qty_available
                 mos = self.env["mrp.production"].search(
-                        [("product_id", "=", product_id.id), ("state", "not in", ("cancel", "done"))])
+                    [("product_id", "=", product_id.id), ("state", "not in", ("cancel", "done"))])
                 qty_in_procure = 0
                 for mo in mos:
                     qty_in_procure += mo.product_qty
@@ -141,8 +146,8 @@ class linkloving_procurement_order_extend(models.Model):
         procurement_list = []
 
         orderpoints_noprefetch = OrderPoint.with_context(prefetch_fields=False).search(
-                company_id and [('company_id', '=', company_id)] or [],
-                order=self._procurement_from_orderpoint_get_order())
+            company_id and [('company_id', '=', company_id)] or [],
+            order=self._procurement_from_orderpoint_get_order())
         while orderpoints_noprefetch:
             orderpoints = OrderPoint.browse(orderpoints_noprefetch[:1000].ids)
             orderpoints_noprefetch = orderpoints_noprefetch[1000:]
@@ -190,8 +195,8 @@ class linkloving_procurement_order_extend(models.Model):
                                     qty_rounded -= total_draft_order_qty
                                 if qty_rounded > 0:
                                     new_procurement = ProcurementAutorundefer.create(
-                                            orderpoint._prepare_procurement_values(qty_rounded,
-                                                                                   **group['procurement_values']))
+                                        orderpoint._prepare_procurement_values(qty_rounded,
+                                                                               **group['procurement_values']))
                                     procurement_list.append(new_procurement)
                                     new_procurement.message_post_with_view('mail.message_origin_link',
                                                                            values={'self': new_procurement,
@@ -233,7 +238,6 @@ class linkloving_procurement_order_extend(models.Model):
             cr.close()
         return {}
 
-
     @api.multi
     def make_mo(self):
         """ Create production orders from procurements """
@@ -248,7 +252,7 @@ class linkloving_procurement_order_extend(models.Model):
                 vals = procurement._prepare_mo_vals(bom)
                 if vals["product_qty"] == 0:
                     print("dont need create mo")
-                    return {procurement.id : 1}
+                    return {procurement.id: 1}
                 production = ProductionSudo.create(vals)
                 res[procurement.id] = production.id
                 procurement.message_post(body=_("Manufacturing Order <em>%s</em> created.") % (production.name))
@@ -256,6 +260,7 @@ class linkloving_procurement_order_extend(models.Model):
                 res[procurement.id] = False
                 procurement.message_post(body=_("No BoM exists for this product!"))
         return res
+
 
 # # class linkloving_mrp_reconsitution(models.Model):
 # #     _name = 'linkloving_mrp_reconsitution.linkloving_mrp_reconsitution'
@@ -542,6 +547,7 @@ class linkloving_sale_extend(models.Model):
 
     def action_confirm(self):
         self.ensure_one()
+        self.env['res.partner'].search([('id', '=', self.partner_id.id)]).write({'is_order': 'have'})
         for line in self.order_line:
             if self.env.ref(
                     "mrp.route_warehouse0_manufacture") in line.product_id.route_ids and not line.product_id.bom_ids:
@@ -553,28 +559,33 @@ class linkloving_sale_extend(models.Model):
         # 剪掉需求
         # self.order_line.rollback_qty_require()
         return super(linkloving_sale_extend, self).action_cancel()
+
+
 class linkloving_sale_order_line_extend(models.Model):
     _inherit = "sale.order.line"
-
 
     def _search_suitable_rule(self, product_id, domain):
         """ First find a rule among the ones defined on the procurement order
         group; then try on the routes defined for the product; finally fallback
         on the default behavior """
         if self.get_warehouse():
-            domain = expression.AND([['|', ('warehouse_id', '=', self.get_warehouse().id), ('warehouse_id', '=', False)], domain])
+            domain = expression.AND(
+                [['|', ('warehouse_id', '=', self.get_warehouse().id), ('warehouse_id', '=', False)], domain])
         Pull = self.env['procurement.rule']
         res = self.env['procurement.rule']
         if product_id.route_ids:
-            res = Pull.search(expression.AND([[('route_id', 'in', product_id.route_ids.ids)], domain]), order='route_sequence, sequence', limit=1)
+            res = Pull.search(expression.AND([[('route_id', 'in', product_id.route_ids.ids)], domain]),
+                              order='route_sequence, sequence', limit=1)
         if not res:
             product_routes = product_id.route_ids | product_id.categ_id.total_route_ids
             if product_routes:
-                res = Pull.search(expression.AND([[('route_id', 'in', product_routes.ids)], domain]), order='route_sequence, sequence', limit=1)
+                res = Pull.search(expression.AND([[('route_id', 'in', product_routes.ids)], domain]),
+                                  order='route_sequence, sequence', limit=1)
         if not res:
             warehouse_routes = self.get_warehouse().route_ids
             if warehouse_routes:
-                res = Pull.search(expression.AND([[('route_id', 'in', warehouse_routes.ids)], domain]), order='route_sequence, sequence', limit=1)
+                res = Pull.search(expression.AND([[('route_id', 'in', warehouse_routes.ids)], domain]),
+                                  order='route_sequence, sequence', limit=1)
         if not res:
             res = Pull.search(expression.AND([[('route_id', '=', False)], domain]), order='sequence', limit=1)
         return res
@@ -593,7 +604,7 @@ class linkloving_sale_order_line_extend(models.Model):
 
     def get_suitable_rule(self, product_id):
         all_parent_location_ids = self._find_parent_locations()
-        rule = self._search_suitable_rule(product_id ,[('location_id', 'in', all_parent_location_ids.ids)])
+        rule = self._search_suitable_rule(product_id, [('location_id', 'in', all_parent_location_ids.ids)])
         return rule
 
     @api.multi
@@ -604,7 +615,7 @@ class linkloving_sale_order_line_extend(models.Model):
     def update_po_ordes_mrp_made(self):
         if self.order_id:
             pos = self.env["purchase.order"].search([("origin", "ilike", self.order_id.name)])
-            for po in pos:#SO2017040301269:MO/2017040322133, SO2017040301271:MO/2017040322137,
+            for po in pos:  # SO2017040301269:MO/2017040322133, SO2017040301271:MO/2017040322137,
                 for line in po.order_line:
                     yl_list = self.get_boms()  # 原材料
                     for yl in yl_list:
@@ -623,7 +634,7 @@ class linkloving_sale_order_line_extend(models.Model):
     def get_boms(self):
         self.ensure_one()
         bom = self.env['mrp.bom'].with_context(
-                company_id=self.env.user.company_id.id, force_company=self.env.user.company_id.id
+            company_id=self.env.user.company_id.id, force_company=self.env.user.company_id.id
         )._bom_find(product=self.product_id)
         boms, lines = bom.explode(self.product_id, self.product_qty, picking_type=bom.picking_type_id)
         yl_list = []
@@ -641,7 +652,7 @@ class linkloving_sale_order_line_extend(models.Model):
         recursion_bom(lines, self, yl_list)  # 递归bom
         return yl_list
 
-    def get_actual_require_qty(self,product_id, require_qty_this_time):
+    def get_actual_require_qty(self, product_id, require_qty_this_time):
         actual_need_qty = 0
 
         rule = self.get_suitable_rule(product_id)
@@ -663,7 +674,7 @@ class linkloving_sale_order_line_extend(models.Model):
                                                                            limit=1)
                 qty = xuqiul + OrderPoint.product_min_qty - product_id.qty_available
                 mos = self.env["mrp.production"].search(
-                        [("product_id", "=", product_id.id), ("state", "not in", ("cancel", "done"))])
+                    [("product_id", "=", product_id.id), ("state", "not in", ("cancel", "done"))])
                 qty_in_procure = 0
                 for mo in mos:
                     qty_in_procure += mo.product_qty
@@ -673,7 +684,7 @@ class linkloving_sale_order_line_extend(models.Model):
 
         elif rule.action == "buy":
             xuqiul = product_id.qty_require + require_qty_this_time
-            pos = self.env["purchase.order"].search([("state", "=", ("make_by_mrp","draft"))])
+            pos = self.env["purchase.order"].search([("state", "=", ("make_by_mrp", "draft"))])
             chose_po_lines = self.env["purchase.order.line"]
             total_draft_order_qty = 0
             for po in pos:
@@ -687,23 +698,23 @@ class linkloving_sale_order_line_extend(models.Model):
 
         return actual_need_qty
 
-#
-#     @api.multi
-#     def _create_requirement_order(self):
-#         ret = []
-#         for order_line in self:
-#             requiment = self.env["mrp.requirement"].create({
-#                     "required_qty" : order_line.product_uom_qty,
-#                     "product_id" : order_line.product_id.id,
-#                     "orign_order" : order_line.order_id.name,
-#                     "state" : "draft",
-#                     "location_id" : order_line.order_id.warehouse_id.lot_stock_id.id,
-#                     'route_ids': order_line.route_id and [(4, order_line.route_id.id)] or [],
-#                     'warehouse_id': order_line.order_id.warehouse_id and order_line.order_id.warehouse_id.id or False,
-#                     'partner_dest_id': order_line.order_id.partner_shipping_id.id,
-#                     'product_uom': order_line.product_uom.id,
-#                     'company_id': order_line.order_id.company_id.id,
-#                 })
-#             ret.append(requiment)
-#
-#         return ret
+        #
+        #     @api.multi
+        #     def _create_requirement_order(self):
+        #         ret = []
+        #         for order_line in self:
+        #             requiment = self.env["mrp.requirement"].create({
+        #                     "required_qty" : order_line.product_uom_qty,
+        #                     "product_id" : order_line.product_id.id,
+        #                     "orign_order" : order_line.order_id.name,
+        #                     "state" : "draft",
+        #                     "location_id" : order_line.order_id.warehouse_id.lot_stock_id.id,
+        #                     'route_ids': order_line.route_id and [(4, order_line.route_id.id)] or [],
+        #                     'warehouse_id': order_line.order_id.warehouse_id and order_line.order_id.warehouse_id.id or False,
+        #                     'partner_dest_id': order_line.order_id.partner_shipping_id.id,
+        #                     'product_uom': order_line.product_uom.id,
+        #                     'company_id': order_line.order_id.company_id.id,
+        #                 })
+        #             ret.append(requiment)
+        #
+        #         return ret

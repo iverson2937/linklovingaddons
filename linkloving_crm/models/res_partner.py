@@ -27,7 +27,8 @@ class ResPartner(models.Model):
     source = fields.Char(string=u'来源')
     continent = fields.Many2one('crm.continent', string=u'所属大洲')
     express_sample_record = fields.Char(string=u'快递账号')
-    interested_in_product = fields.Many2many('product.template', string=u'感兴趣产品')
+    interested_in_product = fields.Many2many('product.template', 'res_interested_in_product_template_ref',
+                                             string=u'感兴趣产品')
     communication_identifier = fields.Char(string=u'其他沟通方式')
     qq = fields.Char(string=u'QQ')
 
@@ -36,6 +37,15 @@ class ResPartner(models.Model):
     wechat = fields.Char(string=u'微信')
 
     crm_source_id = fields.Many2one('crm.lead.source', string=u'来源')
+
+    customer_status = fields.Many2one('message.order.status', string=u'客户状态')
+    is_order = fields.Selection([('have', '产生过订单'), ('none', '无订单')], string=u'订单记录', default='none')
+
+    user_id = fields.Many2one('res.users', string='Salesperson', default=lambda self: self.env.user,
+                              help='The internal user that is in charge of communicating with this contact if any.')
+    team_id = fields.Many2one('crm.team', string='Sales Team', oldname='section_id',
+                              default=lambda self: self.env['crm.team'].sudo()._get_default_team_id(
+                                  user_id=self.env.uid))
 
     # @api.model
     # def create(self, vals):
@@ -84,14 +94,16 @@ class ResPartner(models.Model):
 
 
 class CrmRemarkRecord(models.Model):
+    """
+    在客户界面显示一个右侧 按钮 =客户评论
+    """
     _name = 'crm.remark.record'
 
     subject = fields.Char(u'主题')
     partner_id = fields.Many2one('res.partner', u'客户')
     detail = fields.Text(string=u'详细')
     real_time = fields.Date(string=u'日期', default=fields.Date.context_today)
-
-    i_adc = fields.Many2many('product.template', string=u'拜访记录')
+    product_visit_record = fields.Many2many('product.template', string=u'拜访记录')
 
 
 class CrmLeadSource(models.Model):

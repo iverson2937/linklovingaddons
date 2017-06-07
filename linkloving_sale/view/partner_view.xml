@@ -58,7 +58,7 @@
                 </xpath>
 
                 <xpath expr="//field[@name='category_id']" position="after">
-                    <field name="internal_code" required="False"/>
+                    <field name="internal_code" required="False" invisible="1"/>
                 </xpath>
                 <xpath expr="//field[@name='category_id']" position="after">
                     <field name="x_qq"/>

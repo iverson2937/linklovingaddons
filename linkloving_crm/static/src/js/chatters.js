@@ -2,7 +2,7 @@ odoo.define('mail.Chatters', function (require) {
     "use strict";
     var chat_manager = require('mail.chat_manager');
     var composer = require('mail.composer');
-    var ChatThread = require('mail.ChatThread');
+    var ChatThread = require('mail.ChatThreads');
     var utils = require('mail.utils');
 
     var config = require('web.config');
@@ -290,7 +290,7 @@ odoo.define('mail.Chatters', function (require) {
             "click .o_chatter_button_log_note": "on_open_composer_log_note",
 
 
-            "click .o_chatter_button_update_message": "on_open_full_composer_is_my",
+            // "click .o_chatter_button_update_message": "on_open_full_composer_is_my",
 
             "click .o_chatter_button_update_messages": function (event) {
                 var message = $(event.currentTarget).data('message-id');
@@ -314,17 +314,6 @@ odoo.define('mail.Chatters', function (require) {
                         chat_manager.get_messages({model: parent.model, res_id: parent.res_id});
                     },
                 }).then(self.trigger.bind(self, 'close_composer'));
-
-                // this.do_action(action_two, {
-                //     on_close: function () {
-                //         // reload view
-                //         alert()
-                //         self.getParent().destroy()
-                //         self.getParent().reload();
-                //     },
-                // });
-
-
             },
         },
 
@@ -587,7 +576,6 @@ odoo.define('mail.Chatters', function (require) {
     });
 
     core.form_widget_registry.add('mail_threads', Chatter);
-
     return Chatter;
 
 });

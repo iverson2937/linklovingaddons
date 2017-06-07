@@ -3,9 +3,7 @@
     <data>
 
 
-
-
-        <!--crm.lead.source-->
+        <!--message.label-->
         <record model="ir.ui.view" id="view_crm_message_label_form">
             <field name="name">crm.message_label.form</field>
             <field name="model">message.label</field>
@@ -57,7 +55,6 @@
                   parent="sales_team.menu_sales"
                   groups="sales_team.group_sale_manager"
                   sequence="2" name="记录类型"/>
-
 
 
     </data>

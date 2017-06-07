@@ -21,7 +21,8 @@ class CrmLead(models.Model):
     continent = fields.Many2one('crm.continent', string=u'所属大洲')
     express_sample_record = fields.Char(string=u'快递账号')
 
-    interested_in_product = fields.Many2many('product.template', string=u'感兴趣产品')
+    interested_in_product = fields.Many2many('product.template', 'crm_interested_in_product_template_ref',
+                                             string=u'感兴趣产品')
 
     communication_identifier = fields.Char(string=u'其他沟通方式')
     qq = fields.Char(string=u'QQ')
@@ -67,10 +68,13 @@ class CrmLead(models.Model):
             'priority': self.priority
         }
 
+        alarm_record = set()
+
+        [alarm_record.add(adc.id) for adc in self.interested_in_product]
+
+        print list(alarm_record)
         values_company = {
 
-            # 'source': self.source,
-            # 'interested_in_product': self.interested_in_product,
             'communication_identifier': self.communication_identifier,
             'qq': self.qq,
             'skype': self.skype,
@@ -78,6 +82,7 @@ class CrmLead(models.Model):
             'wechat': self.wechat,
             'continent': self.continent.id,
             'express_sample_record': self.express_sample_record,
+            'interested_in_product': [(6, 0, list(alarm_record))]
         }
 
         if is_company:
