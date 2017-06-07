@@ -56,8 +56,8 @@ class BomUpdateWizard(models.TransientModel):
                             new_product_tmpl_id = old_line_id.product_id.product_tmpl_id.copy(
                                 {'name': self.get_new_product_name(old_product_tmpl_id.name, postfix),
                                  'default_code': default_code})
-                            new_bom_id = old_line_id.product_id.product_tmpl_id.bom_ids[0].copy()
-                            new_bom_id.product_tmpl_id = new_product_tmpl_id.id
+                            new_bom_id = old_line_id.product_id.product_tmpl_id.bom_ids[0].copy(
+                                {"product_tmpl_id": new_product_tmpl_id.id})
                             products.update({
                                 old_line_id.product_id: {
                                     'new_product_tmpl_id': new_product_tmpl_id.id,
@@ -76,8 +76,7 @@ class BomUpdateWizard(models.TransientModel):
                             new_product_tmpl_id = old_product_tmpl_id.copy(
                                 {'name': self.get_new_product_name(old_product_tmpl_id.name, postfix),
                                  'default_code': default_code})
-                            new_bom_id = bom_id.copy()
-                            new_bom_id.product_tmpl_id = new_product_tmpl_id.id
+                            new_bom_id = bom_id.copy({'product_tmpl_id': new_product_tmpl_id.id})
                             products.update({
                                 'bom': {
                                     'new_product_tmpl_id': new_product_tmpl_id.id,
