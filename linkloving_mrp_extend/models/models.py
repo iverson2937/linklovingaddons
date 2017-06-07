@@ -191,6 +191,12 @@ class MrpProductionExtend(models.Model):
             'target': 'current',
         }
 
+    def action_see_scrap_moves(self):
+        self.ensure_one()
+        action = self.env.ref('linkloving_mrp_extend.action_mrp_production_scrap_moves').read()[0]
+        action['domain'] = [('production_id', '=', self.id), ('is_scrap', '=', True)]
+        return action
+
     qc_feedback_ids = fields.One2many('mrp.qc.feedback', 'production_id')
     qty_unpost = fields.Float(string=u"已生产的数量", compute="_compute_qty_unpost")
     feedback_on_rework = fields.Many2one("mrp.qc.feedback", u"返工单", track_visibility='onchange')

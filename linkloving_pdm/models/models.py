@@ -449,7 +449,8 @@ class ReviewProcessWizard(models.TransientModel):
 class ReviewProcessWizard(models.TransientModel):
     _name = 'review.process.wizard'
 
-    partner_id = fields.Many2one("res.partner", string=u'提交给...审核', domain=[('employee', '=', True)])
+    cur_partner_id = fields.Many2one('res.partner', default=lambda self: self.env.user.partner_id)
+    partner_id = fields.Many2one("res.partner", string=u'提交给...审核', domain=[('employee', '=', True), ])
     product_attachment_info_id = fields.Many2one("product.attachment.info")
     review_process_line = fields.Many2one("review.process.line",
                                           related="product_attachment_info_id.review_id.process_line_review_now")

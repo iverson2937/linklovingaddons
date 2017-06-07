@@ -57,11 +57,11 @@ class LinklovingPdm(http.Controller):
     #     return json.dumps({"error": "123"})
     #
 
-    @http.route('/update_attachment_info', type='json', auth='none')
-    def update_attachment_info(self):
-        attachment_id = request.jsonrequest.get("attachment_id")  # 附件id
-        file = request.jsonrequest.get("file")  # 远程地址
-        result = request.jsonrequest.get("result")
+    @http.route('/update_attachment_info', type='http', auth='none')
+    def update_attachment_info(self, attachment_id=None, file=None, result=None):
+        # attachment_id = request..get("attachment_id")  # 附件id
+        # file = request.jsonrequest.get("file")  # 远程地址
+        # result = request.jsonrequest.get("result")
         return json.dumps({
             "msg": u"得到的参数",
             "attachment_id": attachment_id,

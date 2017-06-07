@@ -1050,6 +1050,7 @@ class LinklovingAppApi(http.Controller):
                     continue
                 move = request.env['stock.move'].sudo().create(returun_material_obj._prepare_move_values(r))
                 move.action_done()
+            returun_material_obj.return_ids.create_scraps()
             mrp_production.write({'state': 'done'})
 
         return JsonResponse.send_response(STATUS_CODE_OK,
@@ -1112,7 +1113,7 @@ class LinklovingAppApi(http.Controller):
                     continue
                 move = request.env['stock.move'].sudo().create(returun_material_obj._prepare_move_values(r))
                 move.action_done()
-
+            returun_material_obj.return_ids.create_scraps()
             mrp_production.write({'state': 'done'})
             #
             # location = request.env["stock.location"].sudo().search([("is_circulate_location", "=", True)], limit=1)

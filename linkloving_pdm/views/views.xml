@@ -131,7 +131,9 @@
                 <form string="选择下一个审核人">
                     <sheet>
                         <group>
-                            <field name="partner_id" require="1"/>
+                            <field name="cur_partner_id"/>
+                            <field name="partner_id" require="1"
+                                   domain="[('id','!=',cur_partner_id),('employee', '=', True)]"/>
                             <field name="remark"/>
                         </group>
                     </sheet>
