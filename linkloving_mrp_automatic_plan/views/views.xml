@@ -1,5 +1,18 @@
 <openerp>
     <data>
+        <record model="ir.actions.client" id="to_date_page_list_action">
+              <field name="name">linkloving_mrp_automatic_plan window</field>
+              <field name="tag">mrp_automatic_plan.homepage</field>
+        </record>
+
+        <menuitem id="employ_date"
+                  name="日期"
+                  parent="hr.menu_human_resources_configuration"
+                  action="to_date_page_list_action"/>
+
+
+
+
         <!-- explicit list view definition -->
         <!--
         <record model="ir.ui.view" id="linkloving_mrp_automatic_plan.list">
@@ -21,7 +34,7 @@
           <field name="name">linkloving_mrp_automatic_plan window</field>
           <field name="res_model">linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan</field>
           <field name="view_mode">tree,form</field>
-        </record>
+        </record
         -->
 
         <!-- server action to the one above -->
