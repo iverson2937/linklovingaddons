@@ -39,13 +39,19 @@ class ResPartner(models.Model):
     crm_source_id = fields.Many2one('crm.lead.source', string=u'来源')
 
     customer_status = fields.Many2one('message.order.status', string=u'客户状态')
-    is_order = fields.Selection([('have', '产生过订单'), ('none', '无订单')], string=u'订单记录', default='none')
+    is_order = fields.Boolean(string=u'订单记录', readonly=True, compute='_compute_is_order')
 
     user_id = fields.Many2one('res.users', string='Salesperson', default=lambda self: self.env.user,
                               help='The internal user that is in charge of communicating with this contact if any.')
     team_id = fields.Many2one('crm.team', string='Sales Team', oldname='section_id',
                               default=lambda self: self.env['crm.team'].sudo()._get_default_team_id(
                                   user_id=self.env.uid))
+
+    @api.multi
+    def _compute_is_order(self):
+        for line in self:
+            if line.sale_order_count > 0:
+                line.is_order = True
 
     # @api.model
     # def create(self, vals):
