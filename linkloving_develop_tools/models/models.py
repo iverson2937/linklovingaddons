@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+import logging
 
 from odoo import models, fields, api
 
+_logger = logging.getLogger(__name__)
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
@@ -119,7 +121,9 @@ class CreateOrderPointWizard(models.TransientModel):
 
         sos = self.env["sale.order"].search([('state', '=', 'sale'),
                                              ('shipping_rate', '<=', '0')])
+
         for so in sos:
+            _logger.warning("start doing so")
             so.action_cancel()
 
                 # sos = self.env["sale.order"].search([('state', '=', 'cancel')])
