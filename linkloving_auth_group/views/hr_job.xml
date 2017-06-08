@@ -6,7 +6,7 @@
             <field name="model">hr.job</field>
             <field name="inherit_id" ref="hr.view_hr_job_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='description']" position="replace">
+                <xpath expr="//field[@name='description']" position="after">
                     <field name="description"/>
                 </xpath>
 

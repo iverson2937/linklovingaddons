@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['base', 'mrp'],
 
     # always loaded
     'data': [
@@ -32,4 +32,5 @@
     'demo': [
         'demo/demo.xml',
     ],
+    'qweb': ['static/src/xml/*.xml'],
 }
