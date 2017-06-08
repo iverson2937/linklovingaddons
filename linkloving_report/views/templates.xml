@@ -8,6 +8,7 @@
         <menuitem id="menu_expense_sheet_report" name="报销费用报告" parent="account.menu_finance_reports"
                   action="action_hr_expense_sheet_wizard" groups="account.group_account_user"/>
         <!--<menuitem id="menu_pre_payment_outgoing_report" name="暂支支出报告" parent="account.menu_finance_reports"-->
+        <!--action="action_pre_payment_report"-->
         <!--groups="account.group_account_user"/>-->
         <!--<menuitem id="menu_pre_payment_deduct_report" name="暂支冲抵" parent="account.menu_finance_reports"-->
         <!--groups="account.group_account_user"/>-->
@@ -15,8 +16,9 @@
         <!--groups="account.group_account_user"/>-->
         <!--<menuitem id="menu_sale_income_report" name="销售收入报告" parent="account.menu_finance_reports"-->
         <!--groups="account.group_account_user"/>-->
-        <!--<menuitem id="menu_other_income_report" name="其他收入报告" parent="account.menu_finance_reports"-->
-        <!--groups="account.group_account_user"/>-->
+        <menuitem id="menu_other_income_report" name="其他收入报告" parent="account.menu_finance_reports"
+                  action="action_hr_expense_sheet_income_wizard"
+                  groups="account.group_account_user"/>
         <!--<menuitem id="menu_payment_return_report" name="暂支还款" parent="account.menu_finance_reports"-->
         <!--groups="account.group_account_user"/>-->
 
