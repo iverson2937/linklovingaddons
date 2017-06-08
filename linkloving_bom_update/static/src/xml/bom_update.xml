@@ -5,6 +5,9 @@
         <div class="panel-group" id="accordion">
 
         </div>
+        <div class="bom_review">
+
+        </div>
     </t>
 
     <t t-name="bom_tree">
