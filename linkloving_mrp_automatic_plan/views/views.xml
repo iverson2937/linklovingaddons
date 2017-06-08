@@ -1,8 +1,17 @@
 <openerp>
     <data>
+         <template id="mrp_automatic_plan" name="linkloving_mrp_automatic_plan" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/linkloving_mrp_automatic_plan/static/src/js/date.js"/>
+                <script type="text/javascript" src="/linkloving_mrp_automatic_plan/static/src/js/almanac.js"/>
+                <link rel="stylesheet" href="/linkloving_mrp_automatic_plan/static/src/css/almanac.css"/>
+                <link rel="stylesheet" href="/linkloving_mrp_automatic_plan/static/src/css/date.css"/>
+            </xpath>
+        </template>
+
         <record model="ir.actions.client" id="to_date_page_list_action">
               <field name="name">linkloving_mrp_automatic_plan window</field>
-              <field name="tag">mrp_automatic_plan.homepage</field>
+              <field name="tag">date_manage</field>
         </record>
 
         <menuitem id="employ_date"

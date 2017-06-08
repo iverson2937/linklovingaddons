@@ -1,0 +1,17 @@
+.date_container{
+    margin-top: 80px;
+}
+.holiday,.work{
+    position: absolute;
+    top:0;
+    left: 0;
+    color: white;
+    font-size: 12px;
+    font-weight: 100;
+}
+.work{
+    background: #FF4500;
+}
+.holiday{
+    background: green;
+}

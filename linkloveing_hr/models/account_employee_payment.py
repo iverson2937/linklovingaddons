@@ -9,6 +9,11 @@ class AccountEmployeePayment(models.Model):
     _inherit = ['mail.thread', 'ir.needaction_mixin']
     _order = 'create_date desc'
     name = fields.Char()
+
+    def _get_account_date(self):
+        self.accounting_date = self.apply_date
+
+    accounting_date = fields.Date(compute='_get_account_date', string=u'会计日期', store=True)
     employee_id = fields.Many2one('hr.employee',
                                   default=lambda self: self.env['hr.employee'].search([('user_id', '=', self.env.uid)],
                                                                                       limit=1))
