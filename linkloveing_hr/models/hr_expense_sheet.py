@@ -66,7 +66,7 @@ class HrExpenseSheet(models.Model):
                               ('done', 'Paid'),
                               ('cancel', 'Refused')
                               ], string='Status', index=True, readonly=True, track_visibility='onchange', copy=False,
-                             default='submit', required=True,
+                             default='draft', required=True,
                              help='Expense Report State')
 
     @api.multi
@@ -301,7 +301,7 @@ class HrRemarkComment(models.Model):
         ('approve', u'批准'),
         ('post', 'Posted'),
         ('cancel', u'拒绝')
-    ], default='submit')
+    ], default='draft')
     expense_sheet_id = fields.Many2one('hr.expense.sheet', string=u'审核对象')
 
 
