@@ -110,15 +110,24 @@ class CreateOrderPointWizard(models.TransientModel):
         print(111111)
 
     def action_cancel_mo(self):
-        productions = self.env["mrp.production"].search([('state', 'not in', ['done', 'cancel'])])
+        productions = self.env["mrp.production"].search([('state', 'in', ['draft', 'confirmed'])])
         productions.action_cancel()
 
     def action_cancel_so(self):
-        sos = self.env["sale.order"].search([('state', 'not in', ['done', 'cancel']),
-                                             ('shipping_status', '=', 'no')])
-        sos.action_cancel()
+        # sos_unlink = self.env["sale.order"].search([('state', '=', 'cancel')])
+        # sos_unlink.unlink()
+
+        sos = self.env["sale.order"].search([('state', '=', 'sale'),
+                                             ('shipping_rate', '<=', '0')])
+        for so in sos:
+            so.action_cancel()
+
+                # sos = self.env["sale.order"].search([('state', '=', 'cancel')])
+            so.action_draft()
+            so.action_confirm()
 
     def action_confirm_canceled_so(self):
-        sos = self.env["sale.order"].search([('state', '=', 'cancel')])
-        sos.action_draft()
-        sos.action_confirm()
+        pass
+        # sos = self.env["sale.order"].search([('state', '=', 'cancel')])
+        # sos.action_draft()
+        # sos.action_confirm()
