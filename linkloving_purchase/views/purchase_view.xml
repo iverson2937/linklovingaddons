@@ -19,7 +19,7 @@
             <field name="name">purchase.order.tree.inherit</field>
             <field name="model">purchase.order</field>
             <field name="arch" type="xml">
-                <tree fonts="bold:message_unread==True" default_order="name desc"
+                <tree fonts="bold:message_unread==True" default_order="create_date desc"
                       colors="grey:state=='cancel';blue:state in ('wait','confirmed');red:state in ('except_invoice','except_picking')"
                       string="采购单">
                     <field name="message_unread" invisible="1"/>
@@ -44,7 +44,7 @@
             <field name="name">purchase.order.tree.inherit</field>
             <field name="model">purchase.order</field>
             <field name="arch" type="xml">
-                <tree fonts="bold:message_unread==True" default_order="name desc"
+                <tree fonts="bold:message_unread==True" default_order="create_date desc"
                       colors="grey:state=='cancel';blue:state in ('wait','confirmed');red:state in ('except_invoice','except_picking')"
                       string="采购单">
                     <field name="message_unread" invisible="1"/>
