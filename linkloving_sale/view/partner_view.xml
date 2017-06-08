@@ -61,7 +61,7 @@
                     <field name="internal_code" required="False" invisible="1"/>
                 </xpath>
                 <xpath expr="//field[@name='category_id']" position="after">
-                    <field name="x_qq"/>
+                    <field name="x_qq" invisible="1"/>
                 </xpath>
 
                 <xpath expr="//field[@name='lang']" position="after">

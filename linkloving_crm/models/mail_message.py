@@ -17,7 +17,12 @@ class CrmMailMessage(models.Model):
         for ss in self.messages_label_ids:
             data += (' ' + ss.name)
         self.write({'messages_label_body': data})
-        return {'type': 'ir.actions.act_window_close'}
+        return {'type': 'ir.actions.act_window',
+                'res_model': 'res.partner',
+                'view_mode': 'form,tree',
+                'view_type': 'form',
+                'res_id': self.res_id,
+                'target': 'self'}
 
 
 class CrmMessageLabelStatus(models.Model):

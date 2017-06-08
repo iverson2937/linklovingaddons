@@ -13,11 +13,12 @@
                 </xpath>
 
                 <xpath expr="//field[@name='crm_source_id']" position="after">
-                    <field name="customer_status" options="{'no_create':True}"/>
+                    <field name="customer_status" options="{'no_create':True}"
+                           attrs="{'invisible':[('customer','=', False)]}"/>
                 </xpath>
 
                 <xpath expr="//field[@name='customer_status']" position="after">
-                    <field name="is_order"/>
+                    <field name="is_order" attrs="{'invisible':[('customer','=', False)]}"/>
                 </xpath>
 
 
@@ -49,23 +50,23 @@
 
                 <!--you-->
                 <xpath expr="//field[@name='lang']" position="after">
-                    <field name="qq"/>
+                    <field name="qq" invisible="1"/>
                 </xpath>
 
                 <xpath expr="//field[@name='qq']" position="after">
-                    <field name="skype"/>
+                    <field name="skype" invisible="1"/>
                 </xpath>
 
                 <xpath expr="//field[@name='skype']" position="after">
-                    <field name="whatsapp"/>
+                    <field name="whatsapp" invisible="1"/>
                 </xpath>
 
                 <xpath expr="//field[@name='whatsapp']" position="after">
-                    <field name="wechat"/>
+                    <field name="wechat" invisible="1"/>
                 </xpath>
 
                 <xpath expr="//field[@name='wechat']" position="after">
-                    <field name="communication_identifier"/>
+                    <field name="communication_identifier" invisible="1"/>
                 </xpath>
                 <xpath expr="//field[@name='lang']" position="after">
                     <field name="priority" widget="priority" attrs="{'invisible':[('customer','=', False)]}"/>
