@@ -292,6 +292,28 @@ odoo.define('mail.Chatters', function (require) {
 
             // "click .o_chatter_button_update_message": "on_open_full_composer_is_my",
 
+
+            // "click .o_composer_button_sendss": function () {
+            //     // if (this.is_empty() || !this.do_check_attachment_upload()) {
+            //     //     return;
+            //     // }
+            //
+            //     alert('wojinlaile')
+            //
+            //     var self = this;
+            //     composer.preprocess_message().then(function (message) {
+            //         self.trigger('post_message', message);
+            //
+            //         // Empty input, selected partners and attachments
+            //         self.$input.val('');
+            //         self.mention_manager.reset_selections();
+            //         self.set('attachment_ids', []);
+            //
+            //         self.$input.focus();
+            //     });
+            // },
+
+
             "click .o_chatter_button_update_messages": function (event) {
                 var message = $(event.currentTarget).data('message-id');
 

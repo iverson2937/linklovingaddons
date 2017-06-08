@@ -140,9 +140,14 @@
                 <t t-if="!(message.tracking_value_ids &amp;&amp; message.tracking_value_ids.length &gt; 0)">
                     <t t-raw="message.body"/>
 
+
+
                     <!--<t t-raw="message.messages_label_body"/>;-->
                     <!--<t t-raw="message.id"/>;-->
-                    <!--<t t-raw="message.messages_label_ids"/>;-->
+                    <!--<t t-raw="message.channel_ids"/>;-->
+                    <!--<t t-raw="message.needaction_partner_ids"/>;-->
+                    <!--<t t-raw="message.partner_ids"/>;-->
+
 
 
                     <!--<t t-if="message.label_ids &gt; 0">-->

@@ -145,7 +145,8 @@
             <field name="arch" type="xml">
                 <field name="display_name" position="before">
                     <field name="customer_code"/>
-                    <field name="team_id"/>
+                    <field name="team_id" invisible="1"/>
+                    <field name="user_id"/>
                 </field>
                 <!--<field name="email" position="after">-->
                 <!--<field name="state_id"/>-->
