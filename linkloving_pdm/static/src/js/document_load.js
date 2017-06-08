@@ -42,7 +42,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             this.do_action(action);
             self.$(document).ajaxComplete(function (event, xhr, settings) {
                 // "{"jsonrpc":"2.0","method":"call","params":{"model":"review.process.wizard","method":"search_read","args":[[["id","in",[10]]],["remark","partner_id","display_name","__last_update"]],"kwargs":{"context":{"lang":"zh_CN","tz":"Asia/Shanghai","uid":1,"default_product_attachment_info_id":"4","params":{},"bin_size":true,"active_test":false}}},"id":980816587}"
-                console.log(settings)
+                // console.log(settings)
                 var data = JSON.parse(settings.data)
                 if (data.params.model == 'review.process.cancel.wizard') {
                     if (data.params.method == 'action_cancel_review') {
@@ -176,7 +176,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             this.do_action(action);
             self.$(document).ajaxComplete(function (event, xhr, settings) {
                 // "{"jsonrpc":"2.0","method":"call","params":{"model":"review.process.wizard","method":"search_read","args":[[["id","in",[10]]],["remark","partner_id","display_name","__last_update"]],"kwargs":{"context":{"lang":"zh_CN","tz":"Asia/Shanghai","uid":1,"default_product_attachment_info_id":"4","params":{},"bin_size":true,"active_test":false}}},"id":980816587}"
-                console.log('sssssssss')
+                // console.log(settings)
                 var data = JSON.parse(settings.data)
                 if (data.params.model == 'review.process.wizard') {
                     if (data.params.method == 'action_to_next' ||
