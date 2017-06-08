@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from odoo import models, api
 
 
@@ -22,7 +24,6 @@ class MailThread(models.AbstractModel):
             for key, value in fields.iteritems():
                 if not 'sel_groups_' in key and not 'in_group_' in key:
                     res.update({key: value})
-            print res, 'ddddddddddd'
             return res
 
         return {}
