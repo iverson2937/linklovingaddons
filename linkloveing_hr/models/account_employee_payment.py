@@ -10,8 +10,9 @@ class AccountEmployeePayment(models.Model):
     _order = 'create_date desc'
     name = fields.Char()
 
-    def _get_account_date(self):
-        self.accounting_date = self.apply_date
+    # def _get_account_date(self):
+    #     for p in self:
+    #         p.accounting_date = p.apply_date
 
     accounting_date = fields.Date(compute='_get_account_date', string=u'会计日期', store=True)
     employee_id = fields.Many2one('hr.employee',
