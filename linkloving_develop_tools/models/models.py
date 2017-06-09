@@ -134,7 +134,7 @@ class CreateOrderPointWizard(models.TransientModel):
                 # so_cancel_redo += so
 
     def cancel_temp_no(self):
-        so_cancel_redo = self.env["sale.order"].search([("temp_no", "=", True)], limit=10)
+        so_cancel_redo = self.env["sale.order"].search([("temp_no", "=", True)], limit=20)
         i = 0
         for so in so_cancel_redo:
             i = i + 1
