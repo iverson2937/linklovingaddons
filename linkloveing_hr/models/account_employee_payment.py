@@ -10,15 +10,20 @@ class AccountEmployeePayment(models.Model):
     _order = 'create_date desc'
     name = fields.Char()
 
-    # def _get_account_date(self):
-    #     for p in self:
-    #         p.accounting_date = p.apply_date
+    def _get_account_date(self):
+        for p in self:
+            p.accounting_date = p.apply_date
 
-    # accounting_date = fields.Date(compute='_get_account_date', string=u'会计日期', store=True)
+    accounting_date = fields.Date(compute='_get_account_date', string=u'会计日期', store=True)
     employee_id = fields.Many2one('hr.employee',
                                   default=lambda self: self.env['hr.employee'].search([('user_id', '=', self.env.uid)],
                                                                                       limit=1))
-    department_id = fields.Many2one('hr.department')
+
+    def _get_account_date(self):
+        for p in self:
+            p.department_id = p.employee_id.department_id.id
+
+    department_id = fields.Many2one('hr.department', compute='_get_department_id', store=True)
     to_approve_id = fields.Many2one('res.users', track_visibility='onchange')
     approve_ids = fields.Many2many('res.users')
     apply_date = fields.Date(default=fields.Date.context_today)

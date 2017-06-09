@@ -12,6 +12,57 @@ class HrExpenseSheetWizard(models.TransientModel):
     end_date = fields.Date(u'结束时间', default=datetime.datetime.now())
     income = fields.Boolean()
 
+    def _get_data_by_pre_payment_deduct(self, date1, date2):
+        returnDict = {}
+        employee_payment = self.env['account.employee.payment']
+
+        payment_ids = employee_payment.search([
+            ('state', '=', 'paid'),
+            ('accounting_date', '>=', date1), ('accounting_date', '<=', date2)], order='name desc')
+
+        sheet_sequence = 1
+        for payment in payment_ids:
+            returnDict[payment.id] = {'data': {}, 'line': {}}
+            returnDict[payment.id]['data'] = {
+                'sequence': sheet_sequence,
+                'accounting_date': payment.accounting_date,
+                'name': payment.name,
+                'employee': payment.employee_id.name,
+                'department': payment.department_id.name,
+                'amount': payment.amount,
+                'pre_payment_reminding': payment.pre_payment_reminding
+            }
+            for line in payment.payment_line_ids:
+                returnDict[payment.id]['line'].update({line.id: {
+                    'expense_no': line.expense_no,
+                    'name': line.name,
+                    'amount_total': line.sheet_id.total_amount,
+                    'amount': line.amount,
+                }})
+        return returnDict
+
+    def _get_data_by_pre_payment_income(self, date1, date2):
+        returnDict = {}
+        employee_payment = self.env['account.employee.payment']
+
+        payment_ids = employee_payment.search([
+            ('state', '=', 'paid'),
+            ('accounting_date', '>=', date1), ('accounting_date', '<=', date2)], order='name desc')
+
+        sheet_sequence = 1
+        for payment in payment_ids:
+            returnDict[payment.id] = {'data': {}, 'line': {}}
+            returnDict[payment.id]['data'] = {
+                'sequence': sheet_sequence,
+                'accounting_date': payment.accounting_date,
+                'name': payment.name,
+                'remark': payment.remark,
+                'department': payment.department_id.name,
+                'amount': payment.amount,
+                'employee': payment.employee_id.name
+            }
+        return returnDict
+
     def _get_data_by_hr_expense_sheet(self, date1, date2, income):
         returnDict = {}
         hr_expense_sheet = self.env['hr.expense.sheet']
@@ -44,12 +95,16 @@ class HrExpenseSheetWizard(models.TransientModel):
     def print_report(self):
 
         for report in self:
+            report_name = ''
+            datas = {}
             if self._context.get('prepayment_outgoing'):
                 datas = self._get_data_by_pre_payment_income(report.start_date, report.end_date)
-                report_name = 'linkloving_report.prepayment_income_report'
+                report_name = 'linkloving_report.pre_payment_report'
+            elif self._context.get('prepayment_deduct'):
+                datas = self._get_data_by_pre_payment_deduct(report.start_date, report.end_date)
+                report_name = 'linkloving_report.pre_payment_deduct_report'
             elif self._context.get('income'):
-                datas = self._get_data_by_hr_expense_sheet(report.start_date, report.end_date, report.income)
+                datas = self._get_data_by_hr_expense_sheet(report.start_date, report.end_date, False)
                 report_name = 'linkloving_report.linkloving_hr_expense_sheet_report'
-
 
             return self.env['report'].get_action(self, report_name, datas)
