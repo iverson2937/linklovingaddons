@@ -130,8 +130,11 @@ class CreateOrderPointWizard(models.TransientModel):
         for so in sos:
             mos = self.env["mrp.production"].search([('origin', 'like', so.name)])
             if all(mo.state in ["draft", "confirmed", "cancel"] for mo in mos):
-                so_cancel_redo += so
+                so.temp_no = True
+                # so_cancel_redo += so
 
+    def cancel_temp_no(self):
+        so_cancel_redo = self.env["sale.order"].search([("temp_no", "=", True)], limit=10)
         for so in so_cancel_redo:
             i = i + 1
             _logger.warning("start doing so, %d/%d" % (i, len(so_cancel_redo)))
@@ -141,11 +144,17 @@ class CreateOrderPointWizard(models.TransientModel):
                 # sos = self.env["sale.order"].search([('state', '=', 'cancel')])
                 so.action_draft()
                 so.action_confirm()
+                so.temp_no = False
             except:
                 continue
-
     def action_confirm_canceled_so(self):
         pass
         # sos = self.env["sale.order"].search([('state', '=', 'cancel')])
         # sos.action_draft()
         # sos.action_confirm()
+
+
+class SaleOrderExtend(models.Model):
+    _inherit = "sale.order"
+
+    temp_no = fields.Boolean()
