@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+import logging
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
+_logger = logging.getLogger(__name__)
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
@@ -119,12 +122,18 @@ class CreateOrderPointWizard(models.TransientModel):
 
         sos = self.env["sale.order"].search([('state', '=', 'sale'),
                                              ('shipping_rate', '<=', '0')])
+        i = 0
         for so in sos:
-            so.action_cancel()
+            i = i + 1
+            _logger.warning("start doing so, %d/%d" % (i, len(sos)))
+            try:
+                so.action_cancel()
 
                 # sos = self.env["sale.order"].search([('state', '=', 'cancel')])
-            so.action_draft()
-            so.action_confirm()
+                so.action_draft()
+                so.action_confirm()
+            except UserError, e:
+                continue
 
     def action_confirm_canceled_so(self):
         pass
