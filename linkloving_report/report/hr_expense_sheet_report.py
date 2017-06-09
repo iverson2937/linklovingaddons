@@ -185,7 +185,7 @@ class PrePaymentDeductReport(http.Controller):
             )
 
             header_list = [
-                u'支出日期', u'部门', u'报销单号', u'明细', u'抵扣金额', u'人员', u'暂支单号',u'暂支金额', u'暂支余额'
+                u'支出日期', u'部门', u'报销单号', u'明细', u'抵扣金额', u'人员', u'暂支单号', u'暂支金额', u'暂支余额'
             ]
 
             [data_sheet.write(0, row, line, style) for row, line in enumerate(header_list)]
@@ -202,7 +202,8 @@ class PrePaymentDeductReport(http.Controller):
                 data_sheet.write(current_row, 6, vals.get('name') and vals.get('name') or '', style)
                 data_sheet.write(current_row, 7, vals.get('amount') and vals.get('amount') or '', style)
                 data_sheet.write(current_row, 8,
-                                 vals.get('pre_payment_reminding') and vals.get('pre_payment_reminding') or '0.00', style)
+                                 vals.get('pre_payment_reminding') and vals.get('pre_payment_reminding') or '0.00',
+                                 style)
                 if not record.get('line'):
                     data_sheet.write(current_row, 2, '', style)
                     data_sheet.write(current_row, 3, '', style)
