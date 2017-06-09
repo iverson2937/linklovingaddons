@@ -123,7 +123,17 @@ class CreateOrderPointWizard(models.TransientModel):
         sos = self.env["sale.order"].search([('state', '=', 'sale'),
                                              ('shipping_rate', '<=', '0')])
         i = 0
+        # self.order_line.mapped('procurement_ids')
+        # filtered(lambda order: order.state != 'done')
+        # procurement.rule_id.action == 'manufacture'
+        so_cancel_redo = self.env["sale.order"]
         for so in sos:
+            mos = self.env["mrp.production"].search([('origin', 'like', so.name)])
+            if all(mo.state in ["draft", "confirmed", "cancel"] for mo in mos):
+                so_cancel_redo += so
+
+        _logger.warning("start doing so, %d/%d" % (i, len(sos)))
+        for so in so_cancel_redo:
             i = i + 1
             _logger.warning("start doing so, %d/%d" % (i, len(sos)))
             try:
