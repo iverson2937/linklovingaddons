@@ -67,7 +67,7 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
         payment = self.env['account.payment'].create({
             'partner_type': 'employee',
             'payment_type': payment_type,
-            'partner_id': self.partner_id.id,
+            # 'partner_id': self.partner_id.id,
             'journal_id': self.journal_id.id,
             'company_id': self.company_id.id,
             'payment_method_id': self.payment_method_id.id,
