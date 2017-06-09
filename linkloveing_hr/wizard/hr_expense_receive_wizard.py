@@ -19,7 +19,7 @@ class HrExpenseReceiveWizard(models.TransientModel):
     sheet_id = fields.Many2one('hr.expense.sheet', required=1, default=_default_sheet_id)
     account_id = fields.Many2one('account.account')
 
-    partner_id = fields.Many2one('res.partner', string='Partner', required=True)
+    partner_id = fields.Many2one('res.partner', string='Partner', required=False)
     journal_id = fields.Many2one('account.journal', string='Payment Method', required=True,
                                  domain=[('type', 'in', ('bank', 'cash'))])
     company_id = fields.Many2one('res.company', related='journal_id.company_id', string='Company', readonly=True,
@@ -71,7 +71,7 @@ class HrExpenseReceiveWizard(models.TransientModel):
             'partner_type': 'other',
             'payment_type': 'inbound',
             'receive_account_id': self.account_id.id,
-            'partner_id': self.partner_id.id,
+            # 'partner_id': self.partner_id.id,
             'journal_id': self.journal_id.id,
             'company_id': self.company_id.id,
             'payment_method_id': self.payment_method_id.id,
