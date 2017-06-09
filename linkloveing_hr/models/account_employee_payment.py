@@ -14,7 +14,7 @@ class AccountEmployeePayment(models.Model):
     #     for p in self:
     #         p.accounting_date = p.apply_date
 
-    accounting_date = fields.Date(compute='_get_account_date', string=u'会计日期', store=True)
+    # accounting_date = fields.Date(compute='_get_account_date', string=u'会计日期', store=True)
     employee_id = fields.Many2one('hr.employee',
                                   default=lambda self: self.env['hr.employee'].search([('user_id', '=', self.env.uid)],
                                                                                       limit=1))
