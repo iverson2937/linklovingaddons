@@ -20,7 +20,7 @@ class HrExpenseSheet(models.Model):
     is_deduct_payment = fields.Boolean(default=False)
     pre_payment_reminding = fields.Float(related='employee_id.pre_payment_reminding')
     payment_id = fields.Many2one('account.employee.payment')
-    income = fields.Boolean()
+    income = fields.Boolean(default=False)
     partner_id = fields.Many2one('res.partner')
     payment_line_ids = fields.One2many('account.employee.payment.line', 'sheet_id')
     remark_comments_ids = fields.One2many('hr.remark.comment', 'expense_sheet_id', string=u'审核记录')
