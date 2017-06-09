@@ -142,7 +142,7 @@ class CreateOrderPointWizard(models.TransientModel):
                 # sos = self.env["sale.order"].search([('state', '=', 'cancel')])
                 so.action_draft()
                 so.action_confirm()
-            except UserError, e:
+            except:
                 continue
 
     def action_confirm_canceled_so(self):
