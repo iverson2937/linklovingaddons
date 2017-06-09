@@ -132,10 +132,9 @@ class CreateOrderPointWizard(models.TransientModel):
             if all(mo.state in ["draft", "confirmed", "cancel"] for mo in mos):
                 so_cancel_redo += so
 
-        _logger.warning("start doing so, %d/%d" % (i, len(sos)))
         for so in so_cancel_redo:
             i = i + 1
-            _logger.warning("start doing so, %d/%d" % (i, len(sos)))
+            _logger.warning("start doing so, %d/%d" % (i, len(so_cancel_redo)))
             try:
                 so.action_cancel()
 
