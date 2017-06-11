@@ -31,6 +31,30 @@
             <field name='report_rml'>/report/linkloving_report.pre_payment_deduct_report</field>
             <field name="report_name">linkloving_report.pre_payment_deduct_report</field>
         </record>
+               <record id='action_purchase_payment_report' model='ir.actions.report.xml'>
+            <field name="name">采购支出报告</field>
+            <field name='report_type'>controller</field>
+            <field name='model'>account.payment.register</field>
+            <field name='report_rml'>/report/linkloving_report.purchase_payment_report</field>
+            <field name="report_name">linkloving_report.purchase_payment_report</field>
+        </record>
+
+                    <record id='action_income_payment_report' model='ir.actions.report.xml'>
+            <field name="name">销售收入报告</field>
+            <field name='report_type'>controller</field>
+            <field name='model'>account.payment</field>
+            <field name='report_rml'>/report/linkloving_report.account_payment_income_report</field>
+            <field name="report_name">linkloving_report.account_payment_income_report</field>
+        </record>
+
+                <record id='action_income_payment_report' model='ir.actions.report.xml'>
+            <field name="name">暂支还款</field>
+            <field name='report_type'>controller</field>
+            <field name='model'>account.employee.payment.return</field>
+            <field name='report_rml'>/report/linkloving_report.return_account_payment_report</field>
+            <field name="report_name">linkloving_report.return_account_payment_report</field>
+        </record>
+
 
 
     </data>
