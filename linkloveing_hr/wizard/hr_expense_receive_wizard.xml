@@ -14,7 +14,7 @@
                             <group>
                                 <field name="partner_id" required="0"
                                        context="{'default_is_company': True, 'default_supplier': True}" string="Source"
-                                       invisible="1"/>
+                                       invisible="0"/>
                                 <field name="journal_id" widget="selection"/>
                                 <field name="account_id" string="Income Account" />
                                 <field name="hide_payment_method" invisible="1"/>
