@@ -57,20 +57,6 @@ class MrpBom(models.Model):
 
         return result
 
-
-def set_bom_line_product_bom_released(line):
-    line.product_tmpl_id.bom_id.state = 'release'
-    if line.child_line_ids:
-        for l in line.child_line_ids:
-            set_bom_line_product_bom_released(l)
-
-
-def reject_bom_line_product_bom(line):
-    line.product_tmpl_id.bom_id.state = 'reject'
-    if line.child_line_ids:
-        for l in line.child_line_ids:
-            reject_bom_line_product_bom(l)
-
     def get_bom_line(self, line, level=0):
         bom_line_ids = []
         if line.child_line_ids:
@@ -173,3 +159,17 @@ def get_next_default_code(default_code):
     version = default_code.split('.')[-1]
 
     return int(version) + 1
+
+
+def set_bom_line_product_bom_released(line):
+    line.product_tmpl_id.bom_id.state = 'release'
+    if line.child_line_ids:
+        for l in line.child_line_ids:
+            set_bom_line_product_bom_released(l)
+
+
+def reject_bom_line_product_bom(line):
+    line.product_tmpl_id.bom_id.state = 'reject'
+    if line.child_line_ids:
+        for l in line.child_line_ids:
+            reject_bom_line_product_bom(l)
