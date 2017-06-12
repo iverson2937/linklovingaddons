@@ -39,7 +39,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             var action = {
                 name: "详细",
                 type: 'ir.actions.act_window',
-                res_model: 'review.process.wizard',
+                res_model: 'review.bom.wizard',
                 view_type: 'form',
                 view_mode: 'tree,form',
                 views: [[false, 'form']],
