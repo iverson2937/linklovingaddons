@@ -136,6 +136,17 @@ class ReviewProcessLine(models.Model):
         else:
             raise UserError(u"终审人才能进行审核")
 
+    def action_approve(self, remark):
+            if self.review_id.who_review_now.id == self.env.user.partner_id.id:
+                self.write({
+                    'review_time': fields.datetime.now(),
+                    'state': 'review_success',
+                    'remark': remark
+                })
+
+            else:
+                raise UserError(u"您不是审核人")
+
     # 拒绝审核
     def action_deny(self, remark):
         self.write({

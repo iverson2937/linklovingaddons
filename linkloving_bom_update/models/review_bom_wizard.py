@@ -30,7 +30,7 @@ class ReviewProcessWizard(models.TransientModel):
     # 终审 审核通过
     def action_pass(self):
         # 审核通过
-        self.review_process_line.action_pass(self.remark)
+        self.review_process_line.action_approve(self.remark)
         # 改变文件状态
         self.bom_id.action_released()
 
@@ -40,6 +40,6 @@ class ReviewProcessWizard(models.TransientModel):
     def action_deny(self):
         self.review_process_line.action_deny(self.remark)
         # 改变文件状态
-        self.product_attachment_info_id.action_deny()
+        self.bom_id.action_deny()
 
         return True

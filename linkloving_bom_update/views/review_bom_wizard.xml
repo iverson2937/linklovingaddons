@@ -9,16 +9,16 @@
                         <group>
                             <field name="cur_partner_id" invisible="1"/>
                             <field name="partner_id" require="1"
-                                   domain="[('id','!=',cur_partner_id),('employee', '=', True)]" string="审核人"/>
+                                   domain="[('id','!=',cur_partner_id),('employee', '=', True)]" string="审核人" options="{'no_create':True}"/>
                             <field name="remark" string="备注"/>
                         </group>
                     </sheet>
                     <footer>
                         <button name='send_to_review' type='object' string='送审' class='oe_highlight review_reload'/>
                         <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
-                                groups="linkloving_pdm.group_final_review_partner"/>
+                                groups=""/>
                         <button name='action_deny' type='object' string='审核不通过' class='oe_highlight review_reload'
-                                groups="linkloving_pdm.group_final_review_partner"/>
+                                groups=""/>
 
                         <button string='取消' class='oe_link review_reload' special='cancel'/>
                     </footer>

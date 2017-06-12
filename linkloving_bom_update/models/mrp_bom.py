@@ -12,7 +12,7 @@ class MrpBom(models.Model):
     review_id = fields.Many2one("review.process",
                                 string=u'待...审核',
                                 track_visibility='always',
-                                readonly=True, )
+                                readonly=True, copy=False)
 
     @api.multi
     def action_send_to_review(self):
@@ -162,14 +162,14 @@ def get_next_default_code(default_code):
 
 
 def set_bom_line_product_bom_released(line):
-    line.product_tmpl_id.bom_id.state = 'release'
+    line.bom_id.state = 'release'
     if line.child_line_ids:
         for l in line.child_line_ids:
             set_bom_line_product_bom_released(l)
 
 
 def reject_bom_line_product_bom(line):
-    line.product_tmpl_id.bom_id.state = 'reject'
+    line.bom_id.state = 'reject'
     if line.child_line_ids:
         for l in line.child_line_ids:
             reject_bom_line_product_bom(l)
