@@ -19,6 +19,15 @@ class MrpBom(models.Model):
         if not self.review_id:
             self.review_id = self.env["review.process"].create_review_process('mrp.bom', self.id)
 
+    @api.multi
+    def action_deny(self):
+        for line in self.bom_line_ids:
+            reject_bom_line_product_bom(line)
+
+    @api.multi
+    def action_released(self):
+        for l in self.bom_line_ids:
+            set_bom_line_product_bom_released(l)
 
     @api.multi
     def bom_detail(self):
@@ -47,6 +56,20 @@ class MrpBom(models.Model):
         }
 
         return result
+
+
+def set_bom_line_product_bom_released(line):
+    line.product_tmpl_id.bom_id.state = 'release'
+    if line.child_line_ids:
+        for l in line.child_line_ids:
+            set_bom_line_product_bom_released(l)
+
+
+def reject_bom_line_product_bom(line):
+    line.product_tmpl_id.bom_id.state = 'reject'
+    if line.child_line_ids:
+        for l in line.child_line_ids:
+            reject_bom_line_product_bom(l)
 
     def get_bom_line(self, line, level=0):
         bom_line_ids = []
@@ -141,8 +164,6 @@ class MrpBomLine(models.Model):
         """ Inverse the value of the field ``active`` on the records in ``self``. """
         for record in self:
             record.is_highlight = not record.is_highlight
-
-
 
 
 def get_next_default_code(default_code):

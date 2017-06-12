@@ -24,6 +24,7 @@ class MrpBomExtend(models.Model):
         help="If a product variant is defined the BOM is available only for this product.", copy=False)
     state = fields.Selection([
         ('new', u'新建'),
+        ('reject', u'已拒绝'),
         ('draft', u'草稿'),
         ('review_ing', u'审核中'),
         ('release', u'正式')
