@@ -96,5 +96,7 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
         # account_move_lines_to_reconcile.reconcile()
 
         self.register_id.state='done'
+        for invoice in self.register_id.invoice_ids:
+            invoice.auto_set_to_done()
 
         return {'type': 'ir.actions.act_window_close'}

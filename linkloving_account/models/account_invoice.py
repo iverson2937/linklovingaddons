@@ -2,15 +2,31 @@
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+from odoo.tools import float_is_zero
 
 
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
     invoice = fields.Char(string='Invoice No')
     balance_ids = fields.One2many('account.payment.register.balance', 'invoice_id')
+    payment_ids = fields.Many2many('account.payment.register', 'account_invoice_account_payment_register_rel',
+                                   'account_payment_register_id', 'account_invoice_id')
     remain_apply_balance = fields.Monetary(string='To Apply', currency_field='currency_id',
                                            store=True, readonly=True, compute='_compute_amount',
                                            help="Total amount in the currency of the invoice, negative for credit notes.")
+
+    @api.one
+    def auto_set_to_done(self):
+        if self.state == 'open':
+            domain = [('account_id', '=', self.account_id.id), ('partner_id', '=', self.env['res.partner']._find_accounting_partner(self.partner_id).id), ('reconciled', '=', False), ('amount_residual', '!=', 0.0)]
+            if self.type in ('out_invoice', 'in_refund'):
+                domain.extend([('credit', '>', 0), ('debit', '=', 0)])
+            else:
+                domain.extend([('credit', '=', 0), ('debit', '>', 0)])
+            lines = self.env['account.move.line'].search(domain)
+            for line in lines:
+                if self.has_outstanding:
+                    self.assign_outstanding_credit(line.id)
 
     @api.one
     @api.depends('invoice_line_ids.price_subtotal', 'tax_line_ids.amount', 'currency_id', 'company_id', 'date_invoice',
@@ -37,4 +53,3 @@ class AccountInvoice(models.Model):
             for balance_id in self.balance_ids:
                 amount += balance_id.amount
             self.remain_apply_balance = self.remain_apply_balance - amount
-
