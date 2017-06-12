@@ -41,7 +41,7 @@
                         <group>
                             <group>
                                 <field name="partner_id"
-                                       domain="[('customer','=',True)]"
+                                       domain="[('customer','=',True),('is_company','=',True)]"
                                        options='{"no_create": True}'
                                        string="客户"/>
                                 <field name="partner_invoice_id"
