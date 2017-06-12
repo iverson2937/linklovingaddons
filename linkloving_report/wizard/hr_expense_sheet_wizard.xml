@@ -16,9 +16,9 @@
                     </group>
 
                     <footer>
-                        <button name='print_report' type='object' string='Export Excel Reports' class='oe_highlight'/>
+                        <button name='print_report' type='object' string='导出' class='oe_highlight'/>
                         or
-                        <button string='Cancel' class='oe_link' special='cancel'/>
+                        <button string='取消' class='oe_link' special='cancel'/>
                     </footer>
                 </form>
             </field>
