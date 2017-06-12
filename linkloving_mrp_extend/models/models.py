@@ -23,9 +23,11 @@ class MrpBomExtend(models.Model):
         domain="['&', ('product_tmpl_id', '=', product_tmpl_id), ('type', 'in', ['product', 'consu'])]",
         help="If a product variant is defined the BOM is available only for this product.", copy=False)
     state = fields.Selection([
+        ('new', u'新建'),
         ('draft', u'草稿'),
+        ('review_ing', u'审核中'),
         ('release', u'正式')
-    ], u'状态', track_visibility='onchange', default='draft')
+    ], u'状态', track_visibility='onchange', default='new')
 
     @api.multi
     def set_to_release(self):
@@ -206,7 +208,6 @@ class MrpProductionExtend(models.Model):
         for production in self:
             feedbacks = production.qc_feedback_ids.filtered(lambda x: x.state not in ["check_to_rework"])
             production.qty_unpost = sum(feedbacks.mapped("qty_produced"))
-
 
     @api.multi
     def _get_qc_feedback_count(self):
@@ -847,6 +848,7 @@ class MrpProductionProduceExtend(models.TransientModel):
         quantity = quantity if (quantity > 0) else 0
         res["product_qty"] = quantity
         return res
+
     @api.multi
     def do_produce(self):
         quantity = self.product_qty
@@ -879,7 +881,7 @@ class MrpProductionProduceExtend(models.TransientModel):
             # if move.product_id.virtual_available < 0:
             #     move.quantity_done_store = move.quantity_done_store / (1 + move.bom_line_id.scrap_rate / 100)
         moves = self.production_id.move_finished_ids.filtered(
-                lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel'))
+            lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel'))
         for move in moves:
             if move.product_id.id == self.production_id.product_id.id:
                 move.quantity_done_store += quantity
@@ -904,6 +906,7 @@ class MrpProductionProduceExtend(models.TransientModel):
         })
         feedback_draft.unlink()
         return feedback
+
 
 class ReturnOfMaterial(models.Model):
     _name = 'mrp.return.material'
@@ -1113,7 +1116,6 @@ class SimStockMove(models.Model):
             else:
                 sim.product_type = "material"
 
-
     product_id = fields.Many2one('product.product', )
     production_id = fields.Many2one('mrp.production')
     stock_moves = fields.One2many('stock.move', compute=_compute_stock_moves)
@@ -1175,7 +1177,6 @@ class ReturnMaterialLine(models.Model):
                 'scrap_qty': scrap_qty
             })
         scrap_env.do_scrap()
-
 
 
 class HrEmployeeExtend(models.Model):
@@ -1335,6 +1336,7 @@ class MrpQcFeedBack(models.Model):
     def create(self, vals):
         vals['name'] = self.env['ir.sequence'].next_by_code('mrp.qc.feedback') or 'New'
         return super(MrpQcFeedBack, self).create(vals)
+
     # 等待品捡 -> 品捡中
     def action_start_qc(self):
         self.state = "qc_ing"
@@ -1387,6 +1389,7 @@ class MrpQcFeedBack(models.Model):
         state = self._context.get('state')
 
         return [('state', '=', state)]
+
 
 class MrpQcFeedBackImg(models.Model):
     _name = "qc.feedback.img"
@@ -1587,16 +1590,16 @@ class ProductionScrap(models.Model):
     production_id = fields.Many2one('mrp.production', string=u'生产单')
     product_id = fields.Many2one('product.product', string=u'产品')
     product_uom_id = fields.Many2one(
-            'product.uom', 'Unit of Measure',
-            required=True, states={'done': [('readonly', True)]})
+        'product.uom', 'Unit of Measure',
+        required=True, states={'done': [('readonly', True)]})
     scrap_qty = fields.Float(u'报废数量')
     # scrap_line_ids = fields.One2many('production.scrap.line', 'scrap_id')
     location_id = fields.Many2one(
-            'stock.location', 'Location', domain="[('usage', '=', 'production')]",
-            required=True, states={'done': [('readonly', True)]}, default=_get_default_location_id)
+        'stock.location', 'Location', domain="[('usage', '=', 'production')]",
+        required=True, states={'done': [('readonly', True)]}, default=_get_default_location_id)
     scrap_location_id = fields.Many2one(
-            'stock.location', 'Scrap Location', default=_get_default_scrap_location_id,
-            domain="[('scrap_location', '=', True)]", states={'done': [('readonly', True)]})
+        'stock.location', 'Scrap Location', default=_get_default_scrap_location_id,
+        domain="[('scrap_location', '=', True)]", states={'done': [('readonly', True)]})
 
     def _prepare_move_values(self, ):
         self.ensure_one()
