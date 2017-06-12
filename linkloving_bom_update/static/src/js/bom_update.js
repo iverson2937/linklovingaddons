@@ -27,8 +27,28 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             'click .product_copy': 'copy_product_fn',
             'click .bom_back': 'bom_back_fn',
             'click .product_name': 'to_bom_line_page',
-            'click .bom_update_cancel':'cancel_bom_modify'
+            'click .bom_update_cancel':'cancel_bom_modify',
+            'click .bom_review_operate_btn':'bom_review_func'
         },
+        //bom审核
+        bom_review_func:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var bom_id = $("#accordion").attr("data-bom-id");
+            console.log(bom_id)
+            var action = {
+                name: "详细",
+                type: 'ir.actions.act_window',
+                res_model: 'review.process.wizard',
+                view_type: 'form',
+                view_mode: 'tree,form',
+                views: [[false, 'form']],
+                context: {'default_bom_id': bom_id},
+                target: "new",
+            };
+            this.do_action(action);
+        },
+
         cancel_bom_modify:function (e) {
             var e = e||window.event;
             var target = e.target||e.srcElement;
