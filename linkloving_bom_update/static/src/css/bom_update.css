@@ -79,3 +79,35 @@
 .bom_review_operate_btn{
 
 }
+
+
+.bom_review_list{
+    overflow: hidden;
+    margin-top: 30px;
+}
+.bom_review .bom_review_list>span{
+    width: 45px;
+    color: green;
+    float: left;
+    font-size: 36px;
+    margin-left: 8px;
+    /*margin-top: -2px;*/
+    display: block;
+    height: 32px;
+    margin-bottom: 3px;
+}
+.bom_review .bom_review_list>.document_yellow{
+    color: darkorange!important;
+}
+.bom_review .bom_review_list>.document_red{
+    color: red!important;
+}
+.bom_review  .bom_review_list>div{
+    padding-left: 3px;
+    padding-right: 3px;
+    line-height: 30px;
+    text-align: center;
+    border:1px solid black;
+    float: left;
+    margin-bottom: 3px;
+}

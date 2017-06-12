@@ -221,11 +221,12 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
         },
         start: function () {
             var self = this;
-            console.log($("body"))
+            // console.log($("body"))
             $("body").attr("data-product-id", this.product_id);
             return new Model("product.template")
                 .call("get_file_type_list", [this.product_id])
                 .then(function (result) {
+                    console.log(result)
                     self.$el.append(QWeb.render('document_load_detail', {result: result}));
                 })
         }
