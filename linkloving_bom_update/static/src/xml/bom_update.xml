@@ -120,5 +120,29 @@
         </h4>
     </t>
 
+    <t t-name="bom_review">
+        <button class="btn btn-primary bom_review_operate_btn">审核操作</button>
+        <div class="bom_review_list">
+            <t t-foreach="result.review_line" t-as="review_list">
+                <div><t t-esc="review_list.name"/></div>
+                <t t-if="review_list.state=='review_success'">
+                    <span class="fa fa-long-arrow-right" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark"></span>
+                </t>
+                <t t-if="review_list.state=='waiting_review'">
+                    <span class="fa fa-long-arrow-right document_yellow"></span>
+                    <div>等待</div>
+                </t>
+                 <t t-if="review_list.state=='review_fail'||review_list.state=='review_canceled'">
+                    <span class="fa fa-long-arrow-right document_red" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark"></span>
+                     <!--<div>审核不通过</div>-->
+                </t>
+            </t>
+            <t t-if="result.state == 'release'">
+                 <div>已发布</div>
+            </t>
+
+        </div>
+    </t>
+
 
 </templates>

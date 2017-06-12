@@ -14,8 +14,11 @@
                 <!-- 假日方案 -->
                 <div class="zh-almanac" id="id_almanac" data-id="2">
                   <div class="hint-bar clearfix">
-                    <span class="title-bar" id="GZ">
-                    </span>
+                    <!--<span class="title-bar" id="GZ">-->
+                    <!--</span>-->
+                      <span class="date_edit_x">编辑</span>
+                      <span class="date_edit_x_cancel">取消</span>
+
                     <div class="control-bar">
                       <div class="control-module year-control">
                         <a class="prev" id="nianjian" action="prev" href="javascript:;"></a>

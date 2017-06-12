@@ -26,8 +26,32 @@ class linkloving_mrp_automatic_plan(models.Model):
             "holiday": html.decode("gbk")
         }
 
+    def calc_status_light(self):
+        pass
+
 class MrpBomExtend(models.Model):
     _inherit = 'mrp.bom'
 
     prepare_time = fields.Integer(u"准备时间 (秒)")
     capacity_value = fields.Integer(u"产能 (pcs/s)")
+
+
+    # class PuchaseOrderEx(models.Model):
+    #     _inherit = "purchase.order"
+    #
+    #     status_light = fields.Selection(string="状态灯", selection=[('0', '红'),
+    #                                                              ('1', '黄'),
+    #                                                              ('2','绿') ], required=False, )
+    #
+    # class SaleOrderEx(models.Model):
+    #     _inherit = "sale.order"
+    #
+    #     status_light = fields.Selection(string="状态灯", selection=[('0', '红'),
+    #                                                              ('1', '黄'),
+    #                                                              ('2','绿') ], required=False, )
+    # class MrpProductionEx(models.Model):
+    #     _inherit = "mrp.production"
+    #
+    #     status_light = fields.Selection(string="状态灯", selection=[('0', '红'),
+    #                                                              ('1', '黄'),
+    #                                                              ('2','绿') ], required=False, )

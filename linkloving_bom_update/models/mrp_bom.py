@@ -9,6 +9,17 @@ from odoo.exceptions import UserError
 class MrpBom(models.Model):
     _inherit = 'mrp.bom'
 
+    review_id = fields.Many2one("review.process",
+                                string=u'待...审核',
+                                track_visibility='always',
+                                readonly=True, )
+
+    @api.multi
+    def action_send_to_review(self):
+        if not self.review_id:
+            self.review_id = self.env["review.process"].create_review_process('mrp.bom', self.id)
+
+
     @api.multi
     def bom_detail(self):
 
@@ -30,7 +41,9 @@ class MrpBom(models.Model):
             'name': self.product_tmpl_id.name,
             'code': self.product_tmpl_id.default_code,
             'process_id': self.process_id.name,
-            'bom_ids': res
+            'bom_ids': res,
+            'state': self.state,
+            'review_line': self.review_id.get_review_line_list(),
         }
 
         return result

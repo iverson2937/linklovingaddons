@@ -27,8 +27,47 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             'click .product_copy': 'copy_product_fn',
             'click .bom_back': 'bom_back_fn',
             'click .product_name': 'to_bom_line_page',
-            'click .bom_update_cancel':'cancel_bom_modify'
+            'click .bom_update_cancel':'cancel_bom_modify',
+            'click .bom_review_operate_btn':'bom_review_func'
         },
+        //bom审核
+        bom_review_func:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var bom_id = $("#accordion").attr("data-bom-id");
+            console.log(bom_id)
+            var action = {
+                name: "详细",
+                type: 'ir.actions.act_window',
+                res_model: 'review.bom.wizard',
+                view_type: 'form',
+                view_mode: 'tree,form',
+                views: [[false, 'form']],
+                context: {'default_bom_id': bom_id},
+                target: "new",
+            };
+            this.do_action(action);
+            self.$(document).ajaxComplete(function (event, xhr, settings) {
+                // "{"jsonrpc":"2.0","method":"call","params":{"model":"review.process.wizard","method":"search_read","args":[[["id","in",[10]]],["remark","partner_id","display_name","__last_update"]],"kwargs":{"context":{"lang":"zh_CN","tz":"Asia/Shanghai","uid":1,"default_product_attachment_info_id":"4","params":{},"bin_size":true,"active_test":false}}},"id":980816587}"
+                console.log(settings)
+                var data = JSON.parse(settings.data)
+                if (data.params.model == 'review.bom.wizard') {
+                    if (data.params.method == 'send_to_review' ||
+                        data.params.method == 'action_pass' ||
+                        data.params.method == 'action_deny'
+                    ) {
+                        return new Model("mrp.bom")
+                            .call("get_bom", [parseInt(bom_id)])
+                            .then(function (result) {
+                                console.log(result);
+                                self.$(".bom_review").html("");
+                                self.$(".bom_review").append(QWeb.render('bom_review', {result: result}));
+                            })
+                    }
+                }
+            })
+        },
+
         cancel_bom_modify:function (e) {
             var e = e||window.event;
             var target = e.target||e.srcElement;
@@ -58,22 +97,23 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             this.do_action(action);
         },
         bom_back_fn:function () {
-            var action = {
-                name:"产品",
-                type: 'ir.actions.act_window',
-                res_model:'mrp.bom',
-                view_type: 'form',
-                view_mode: 'tree,form',
-                views: [[false, 'form']],
-                res_id: parseInt($("#accordion").attr("data-bom-id")),
-                target:"self"
-            };
-            this.do_action(action);
+            // var action = {
+            //     name:"产品",
+            //     type: 'ir.actions.act_window',
+            //     res_model:'mrp.bom',
+            //     view_type: 'form',
+            //     view_mode: 'tree,form',
+            //     views: [[false, 'form']],
+            //     res_id: parseInt($("#accordion").attr("data-bom-id")),
+            //     target:"self"
+            // };
+            // this.do_action(action);
+            window.history.go(-1);
         },
         copy_product_fn:function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
-            var last_product_name = $(target).prev().prev().children().text();
+            var last_product_name = $(target).prev().prev(  ).children().text();
             var last_product_id = $(target).prev().prev().attr("data-product-id");
             var last_id = $(target).prev().prev().attr("data-id");
             var wraper = target.parentNode.parentNode.parentNode;
@@ -395,10 +435,12 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                     .then(function (result) {
                         console.log(result);
                         self.$el.eq(0).append(QWeb.render('bom_tree', {result: result}));
-                        console.log(self.$el[2]);
-                        console.log(self.$el.eq(2));
-                        self.$el.attr("data-bom-id", result.bom_id);
-                        self.$el.attr("data-delete-products","");
+                        self.$el.eq(2).append(QWeb.render('bom_review', {result: result}));
+                        console.log('spspsps')
+                        // console.log(self.$el.eq(2));
+                        // console.log(self.$el.eq(2));
+                        self.$el.eq(0).attr("data-bom-id", result.bom_id);
+                        self.$el.eq(0).attr("data-delete-products","");
                     })
             }
         }
