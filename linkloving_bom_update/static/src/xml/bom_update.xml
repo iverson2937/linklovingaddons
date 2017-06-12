@@ -6,7 +6,7 @@
 
         </div>
         <div class="bom_review">
-            <button class="btn btn-primary bom_review_operate_btn">审核操作</button>
+
         </div>
     </t>
 
@@ -121,6 +121,7 @@
     </t>
 
     <t t-name="bom_review">
+        <button class="btn btn-primary bom_review_operate_btn">审核操作</button>
         <div class="bom_review_list">
             <t t-foreach="result.review_line" t-as="review_list">
                 <div><t t-esc="review_list.name"/></div>
