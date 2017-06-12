@@ -572,9 +572,9 @@
                         this.showAlmanacDetail(eDay);   // 显示右侧黄历
                     }
 
-                    if (cld[sD].lDay == 1)  //显示农历月
-                        lObj.html('<b>' + (cld[sD].isLeap ? '闰' : '') + cld[sD].lMonth + '月' + (this.monthDays(cld[sD].lYear, cld[sD].lMonth) == 29 ? '小' : '大') + '</b>');
-                    else  //显示农历日
+                    // if (cld[sD].lDay == 1)  //显示农历月
+                    //     lObj.html('<b>' + (cld[sD].isLeap ? '闰' : '') + cld[sD].lMonth + '月' + (this.monthDays(cld[sD].lYear, cld[sD].lMonth) == 29 ? '小' : '大') + '</b>');
+                    // else  //显示农历日
                         lObj.text(this.cDay(cld[sD].lDay));
 
                     s = cld[sD].lunarFestival;
@@ -592,10 +592,10 @@
                             // if (s.length > 0)  s = s.fontcolor('limegreen');
                         }
                     }
-                    if (cld[sD].solarTerms == '清明') s = '清明节'.fontcolor('red');
-                    if (cld[sD].solarTerms == '芒种') s = '芒种'.fontcolor('red');
-                    if (cld[sD].solarTerms == '夏至') s = '夏至'.fontcolor('red');
-                    if (cld[sD].solarTerms == '冬至') s = '冬至'.fontcolor('red');
+                    // if (cld[sD].solarTerms == '清明') s = '清明节'.fontcolor('');
+                    // if (cld[sD].solarTerms == '芒种') s = '芒种'.fontcolor('');
+                    // if (cld[sD].solarTerms == '夏至') s = '夏至'.fontcolor('');
+                    // if (cld[sD].solarTerms == '冬至') s = '冬至'.fontcolor('');
 
                     if (s.length > 0)  lObj.html(s);
                 }
@@ -674,7 +674,7 @@
             for (var i = 0; i < 6; i++) {   // 6行
               for (var j = 0; j < 7; j++) {
                 gNum = i * 7 + j;
-                var className = ""
+                var className = "date_day";
                 if($('li[data-id="' + (j-1>=0? j-1 : 6) + '"]', wktitle).hasClass('weekend')){
                     className = "weekend";
                 }
@@ -696,7 +696,11 @@
                     })).append($('<span/>').attr({
                         'id': 'LD' + gNum,
                         'class': 'lunar'
-                    }));
+                    })).append($('<span/>').attr({
+                            'class': 'edit_holiday date_edit_condition'
+                    }).text("假")).append($('<span/>').attr({
+                            'class':'edit_work date_edit_condition'
+                    }).text('班'));
                 }
                 // 重新绑定事件
                 li.hover(function() {          // 鼠标滑过事件
@@ -727,7 +731,7 @@
                 if (gd.hasClass('weekend')){
                     gd.removeAttr('data-solor class').addClass('weekend');
                 }else{
-                    gd.removeAttr('data-solor class');
+                    gd.removeAttr('data-solor');
                 }
             }
         },

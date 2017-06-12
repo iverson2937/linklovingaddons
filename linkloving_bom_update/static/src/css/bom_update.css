@@ -74,4 +74,8 @@
     margin-top: 100px;
     border:1px solid #d7d7d7;
     padding: 20px 20px;
+    position: relative;
+}
+.bom_review_operate_btn{
+
 }

@@ -6,7 +6,7 @@
 
         </div>
         <div class="bom_review">
-
+            <button class="btn btn-primary bom_review_operate_btn">审核操作</button>
         </div>
     </t>
 

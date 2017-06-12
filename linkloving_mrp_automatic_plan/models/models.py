@@ -4,6 +4,7 @@ from odoo import models, fields, api
 import json
 import urllib
 
+
 class linkloving_mrp_automatic_plan(models.Model):
     _name = 'linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan'
 
@@ -25,6 +26,7 @@ class linkloving_mrp_automatic_plan(models.Model):
         return {
             "holiday": html.decode("gbk")
         }
+
 
 class MrpBomExtend(models.Model):
     _inherit = 'mrp.bom'

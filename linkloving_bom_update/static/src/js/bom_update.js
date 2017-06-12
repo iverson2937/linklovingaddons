@@ -397,8 +397,8 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                         self.$el.eq(0).append(QWeb.render('bom_tree', {result: result}));
                         console.log(self.$el[2]);
                         console.log(self.$el.eq(2));
-                        self.$el.attr("data-bom-id", result.bom_id);
-                        self.$el.attr("data-delete-products","");
+                        self.$el.eq(0).attr("data-bom-id", result.bom_id);
+                        self.$el.eq(0).attr("data-delete-products","");
                     })
             }
         }
