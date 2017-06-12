@@ -358,6 +358,8 @@ class MrpProductionExtend(models.Model):
     sale_remark = fields.Text(compute='_compute_sale_remark', string=u"销售单备注")
     remark = fields.Text(string=u"MO单备注")
 
+    picking_material_date = fields.Datetime()
+
     @api.multi
     def _compute_sale_remark(self):
         for production in self:
@@ -587,7 +589,8 @@ class MrpProductionExtend(models.Model):
 
     # 领料登记
     def button_already_picking(self):
-        self.write({'state': 'already_picking'})
+        self.write({'state': 'already_picking',
+                    'picking_material_date': fields.datetime.now()})
 
     # return self._show_picking_view(picking_mode='first_picking')
 
