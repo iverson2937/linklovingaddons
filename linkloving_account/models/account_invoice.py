@@ -10,7 +10,7 @@ class AccountInvoice(models.Model):
     invoice = fields.Char(string='Invoice No')
     balance_ids = fields.One2many('account.payment.register.balance', 'invoice_id')
     payment_ids = fields.Many2many('account.payment.register', 'account_invoice_account_payment_register_rel',
-                                   'account_payment_register_id', 'account_invoice_id')
+                                   'account_invoice_id', 'account_payment_register_id')
     remain_apply_balance = fields.Monetary(string='To Apply', currency_field='currency_id',
                                            store=True, readonly=True, compute='_compute_amount',
                                            help="Total amount in the currency of the invoice, negative for credit notes.")
@@ -18,7 +18,9 @@ class AccountInvoice(models.Model):
     @api.one
     def auto_set_to_done(self):
         if self.state == 'open':
-            domain = [('account_id', '=', self.account_id.id), ('partner_id', '=', self.env['res.partner']._find_accounting_partner(self.partner_id).id), ('reconciled', '=', False), ('amount_residual', '!=', 0.0)]
+            domain = [('account_id', '=', self.account_id.id),
+                      ('partner_id', '=', self.env['res.partner']._find_accounting_partner(self.partner_id).id),
+                      ('reconciled', '=', False), ('amount_residual', '!=', 0.0)]
             if self.type in ('out_invoice', 'in_refund'):
                 domain.extend([('credit', '>', 0), ('debit', '=', 0)])
             else:

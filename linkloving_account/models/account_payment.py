@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo.exceptions import UserError, ValidationError
+from odoo import models, fields, api, _
 
 MAP_INVOICE_TYPE_PARTNER_TYPE = {
     'out_invoice': 'customer',
@@ -7,7 +8,6 @@ MAP_INVOICE_TYPE_PARTNER_TYPE = {
     'in_invoice': 'supplier',
     'in_refund': 'supplier',
 }
-from odoo import models, fields, api, _
 
 
 class AccountPaymentRegisterBalance(models.Model):
