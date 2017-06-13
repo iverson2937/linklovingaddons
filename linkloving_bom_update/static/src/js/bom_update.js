@@ -424,7 +424,13 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
 
         init: function (parent, action) {
             this._super.apply(this, arguments);
+            console.log(action)
             this.bom_id = action.bom_id;
+            if (action.bom_id) {
+                this.bom_id = action.bom_id;
+            } else {
+                this.bom_id = action.params.active_id;
+            }
             var self = this;
         },
         start: function () {
