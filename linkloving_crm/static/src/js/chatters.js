@@ -1,6 +1,6 @@
 odoo.define('mail.Chatters', function (require) {
     "use strict";
-    var chat_manager = require('mail.chat_manager');
+    var chat_manager = require('mail.chat_managers');
     var composer = require('mail.composer');
     var ChatThread = require('mail.ChatThreads');
     var utils = require('mail.utils');
@@ -14,6 +14,7 @@ odoo.define('mail.Chatters', function (require) {
 
     var _t = core._t;
     var QWeb = core.qweb;
+
 
 // -----------------------------------------------------------------------------
 // Chat Composer for the Chatter
@@ -68,7 +69,6 @@ odoo.define('mail.Chatters', function (require) {
                 if (self.options.is_log) {
                     message.subtype = 'mail.mt_note';
                 }
-
                 // Partner_ids
                 if (!self.options.is_log) {
                     var checked_suggested_partners = self.get_checked_suggested_partners();

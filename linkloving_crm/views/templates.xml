@@ -6,6 +6,7 @@
 
                 <script type="text/javascript" src="/linkloving_crm/static/src/js/chatters.js"/>
                 <script type="text/javascript" src="/linkloving_crm/static/src/js/threads.js"/>
+                <script type="text/javascript" src="/linkloving_crm/static/src/js/chat_managers.js"/>
 
 
             </xpath>

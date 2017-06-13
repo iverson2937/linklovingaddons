@@ -15,6 +15,7 @@
                                 <field name="name"/>
                             </group>
                             <field name="description"/>
+                            <field name="message_type_img_id"/>
                         </group>
                     </sheet>
                 </form>
@@ -29,6 +30,7 @@
                 <tree string="备注记录">
                     <field name="name"/>
                     <field name="description"/>
+                    <field name="message_type_img_id"/>
                 </tree>
             </field>
         </record>

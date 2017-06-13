@@ -50,7 +50,28 @@
 
     <t t-name="mail.ChatThreads.Message">
         <div t-att-class="'o_thread_message' + (message.expanded ? ' o_message_expanded '  : ' ') + (message.is_selected ? 'o_thread_selected_message' : '')" t-att-data-message-id="message.id">
+
+
             <div t-if="options.display_avatar" class="o_thread_message_sidebar">
+                    <t t-if="message.messages_label_ids">
+                         <t t-foreach="message.messages_label_ids" t-as="label_msg">
+                             <!--<img class="pull-left" src="/web/image/13947" style="width: 60%;"/>-->
+                             <t t-if="label_msg.message_type_img_id &gt; 0">
+                                <img t-att-src="'/web/image/'+label_msg.message_type_img_id+'/27x27'"/>
+                             </t>
+                             <t t-if="label_msg.message_type_img_id &lt;=0">
+                                  <span class="fa fa-comment" style="font-size: 27px;color: mintcream;"/>
+                             </t>
+                             <!--<span class="fa fa-comment" title="微信" style="font-size: 35px;color: red;"/>-->
+                         </t>
+                    </t>
+                    <t t-if="message.messages_label_ids &lt;= 0">
+                                  <span class="fa fa-comment" style="font-size: 27px;color: mintcream;"/>
+                    </t>
+            </div>
+
+            <div t-if="options.display_avatar" class="o_thread_message_sidebar">
+
                 <t t-if="!message.mailto &amp;&amp; message.author_id[0]">
                     <img t-if="message.avatar_src &amp;&amp; message.display_author"
                         t-att-src="message.avatar_src"
@@ -139,38 +160,12 @@
                 <p t-if="options.display_subject &amp;&amp; message.display_subject" class="o_mail_subject">Subject: <t t-esc="message.subject"/></p>
                 <t t-if="!(message.tracking_value_ids &amp;&amp; message.tracking_value_ids.length &gt; 0)">
                     <t t-raw="message.body"/>
-
-
-
-                    <!--<t t-raw="message.messages_label_body"/>;-->
-                    <!--<t t-raw="message.id"/>;-->
-                    <!--<t t-raw="message.channel_ids"/>;-->
-                    <!--<t t-raw="message.needaction_partner_ids"/>;-->
-                    <!--<t t-raw="message.partner_ids"/>;-->
-
-
-
-                    <!--<t t-if="message.label_ids &gt; 0">-->
-                    <!--<li>Estimate </li>-->
+                    <!--<t t-if="message.messages_label_ids">-->
+                    <!--<t t-foreach="message.messages_label_ids" t-as="label_msg">-->
+                    <!--&#45;&#45;<t t-esc="label_msg.name"/>&#45;&#45;-->
                     <!--</t>-->
-
-                    <!--<t t-if="message.label_ids &lt; 0">-->
-                    <!--<li>Estimate </li>-->
                     <!--</t>-->
-
-
-
-
-
                 </t>
-
-                <!--<t t-if="message.messages_label_ids">-->
-                <!--<t t-foreach="message.messages_label_ids" t-as="labels">-->
-                <!--<span class='o_labels_name'><t t-esc='labels'/></span>-->
-
-                <!--<span class='o_labels_name'><t t-esc='labels.name'/></span>-->
-                <!--</t>-->
-                <!--</t>-->
 
                 <t t-foreach="message.attachment_ids" t-as="attachment">
                     <t t-call="mail.Attachment"/>
