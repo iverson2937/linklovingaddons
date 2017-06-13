@@ -8,6 +8,16 @@
             </xpath>
         </template>
 
-
+        <record id="linkloving_mrp_production_form_view" model="ir.ui.view">
+            <field name="name">mrp.production.tree.inherit</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="is_bom_update" invisible="1"/>
+                    <label style="color:red;" string="BOM已发生变化" attrs="{'invisible': [('is_bom_update', '=', False)]}"/>
+                </field>
+            </field>
+        </record>
     </data>
 </odoo>
