@@ -10,15 +10,7 @@
                             icon="fa-tasks" string="BOM修改">
                     </button>
                 </div>
-                <!--<xpath expr="//tree" position="attributes">-->
-                <!--<attribute name="decoration-warning">is_highlight==True</attribute>-->
-                <!--</xpath>-->
-                <!--<xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_uom_id']" position="after">-->
-                <!--<field name="is_highlight" invisible="1"/>-->
-                <!--<button name="toggle_highlight" type="object" icon="fa-flag"-->
-                <!--attrs="{'invisible':[('is_highlight','!=',True)]}"/>-->
 
-                <!--</xpath>-->
             </field>
         </record>
 
