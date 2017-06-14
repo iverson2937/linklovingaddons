@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 
 from odoo.exceptions import UserError
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, float_is_zero, float_compare
 from odoo import models, fields, api, _, SUPERUSER_ID
 
 _logger = logging.getLogger(__name__)
@@ -31,11 +31,30 @@ class PurchaseOrder(models.Model):
 
     shipping_rate = fields.Float(string=u"收货率", compute='_compute_shipping_rate', store=True)
 
+    @api.one
+    @api.depends('order_line.shipping_status')
+    def _get_shipping_status(self):
+        for order in self:
+            if order.state == 'purchase' and all(line.shipping_status == 'done' for line in self.order_line if
+                                                 line.product_id.type in ['product', 'consu']):
+                order.shipping_status = 'done'
+            elif order.state == 'purchase' and all(line.shipping_status == 'no' for line in self.order_line):
+                order.shipping_status = 'no'
+            else:
+                order.shipping_status = 'part_shipping'
+            print order.shipping_status
+
     invoice_status = fields.Selection([
         ('no', u'待出货'),
         ('to invoice', u'待对账'),
         ('invoiced', u'已对账完成'),
     ], string=u'对账单状态', compute='_get_invoiced', store=True, readonly=True, copy=False, default='no')
+
+    shipping_status = fields.Selection([
+        ('no', u'未入库'),
+        ('part_shipping', u'部分入库'),
+        ('done', u'入库完成'),
+    ], compute='_get_shipping_status', default='no')
 
     @api.depends('order_line.move_ids')
     def _compute_picking(self):
@@ -81,6 +100,45 @@ class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
     product_specs = fields.Text(string=u'Specification', related='product_id.product_specs')
+    shipping_status = fields.Selection([
+        ('no', u'待出货'),
+        ('part_shipping', u'部分出货'),
+        ('done', u'出货完成'),
+    ], default='no', compute='_compute_shipping_status', store=True, readonly=True)
+
+    @api.depends('state', 'product_qty', 'qty_received', 'qty_to_invoice', 'qty_invoiced')
+    def _compute_shipping_status(self):
+        """
+        Compute the invoice status of a SO line. Possible statuses:
+        - no: if the SO is not in status 'sale' or 'done', we consider that there is nothing to
+          invoice. This is also hte default value if the conditions of no other status is met.
+        - to invoice: we refer to the quantity to invoice of the line. Refer to method
+          `_get_to_invoice_qty()` for more information on how this quantity is calculated.
+        - upselling: this is possible only for a product invoiced on ordered quantities for which
+          we delivered more than expected. The could arise if, for example, a project took more
+          time than expected but we decided not to invoice the extra cost to the client. This
+          occurs onyl in state 'sale', so that when a SO is set to done, the upselling opportunity
+          is removed from the list.
+        - invoiced: the quantity invoiced is larger or equal to the quantity ordered.
+        """
+        precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+        for line in self:
+
+            if float_is_zero(line.qty_received, precision_digits=precision) and line.product_id.type in (
+                    'consu', 'product'):
+                line.shipping_status = 'no'
+            elif float_compare(line.qty_received, line.product_qty,
+                               precision_digits=precision) < 0 and line.product_id.type in ('consu', 'product'):
+                line.shipping_status = 'part_shipping'
+
+            elif float_compare(line.qty_received, line.product_qty,
+                               precision_digits=precision) == 0 and line.product_id.type in (
+                    'consu', 'product'):
+                print 'dddddddddddddddddddddd'
+                line.shipping_status = 'done'
+
+            else:
+                line.shipping_status = 'no'
 
     def get_draft_po_qty(self, product_id):
         pos = self.env["purchase.order"].search([("state", "in", ("make_by_mrp", "draft", "to approve"))])
@@ -100,7 +158,7 @@ class PurchaseOrderLine(models.Model):
             on_way_qty = draft_qty + line.product_id.incoming_qty
             if line.product_id.outgoing_qty:
                 rate = ((
-                        draft_qty + line.product_id.incoming_qty + line.product_id.qty_available) / line.product_id.outgoing_qty)
+                            draft_qty + line.product_id.incoming_qty + line.product_id.qty_available) / line.product_id.outgoing_qty)
                 rate = round(rate, 2)
 
                 line.output_rate = (u"(草稿量: %s+在途量: " + "%s " + u"+库存:" + "%s ) /"u" 需求量：" + "%s = %s") % (
@@ -190,7 +248,6 @@ class manual_combine_po(models.TransientModel):
 
             for po_line in po_group[1:]:
                 po_line.unlink()
-
 
     def combine_origin(self, po, po_to_combine):
         if not po.origin:
