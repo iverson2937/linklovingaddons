@@ -22,6 +22,15 @@ class PurchaseOrder(models.Model):
     product_id = fields.Many2one(related='order_line.product_id')
     product_qty = fields.Float(related='order_line.product_qty')
 
+    @api.depends('product_count', 'order_line.qty_received')
+    def _compute_shipping_rate(self):
+        for r in self:
+            if r.product_count:
+                qtys = sum(line.qty_received for line in r.order_line)
+                r.shipping_rate = (qtys / r.product_count) * 100.0
+
+    shipping_rate = fields.Float(string=u"出货率", compute='_compute_shipping_rate', store=True)
+
     invoice_status = fields.Selection([
         ('no', u'待出货'),
         ('to invoice', u'待对账'),
