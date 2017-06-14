@@ -29,7 +29,7 @@
                     <field name="amount_total" string="汇总金额"/>
                     <field name="product_id" string="产品"/>
                     <field name="shipping_rate" widget="progressbar"/>
-                    <field name="shipping_status"/>
+                    <field name="shipping_status" invisible="1"/>
                     <field name="state"/>
                     <field name="create_uid"/>
 
