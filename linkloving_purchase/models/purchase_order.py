@@ -29,7 +29,7 @@ class PurchaseOrder(models.Model):
                 qtys = sum(line.qty_received for line in r.order_line)
                 r.shipping_rate = (qtys / r.product_count) * 100.0
 
-    shipping_rate = fields.Float(string=u"出货率", compute='_compute_shipping_rate', store=True)
+    shipping_rate = fields.Float(string=u"收货率", compute='_compute_shipping_rate', store=True)
 
     invoice_status = fields.Selection([
         ('no', u'待出货'),
