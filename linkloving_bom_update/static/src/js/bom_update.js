@@ -49,7 +49,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
             this.do_action(action);
             self.$(document).ajaxComplete(function (event, xhr, settings) {
                 // "{"jsonrpc":"2.0","method":"call","params":{"model":"review.process.wizard","method":"search_read","args":[[["id","in",[10]]],["remark","partner_id","display_name","__last_update"]],"kwargs":{"context":{"lang":"zh_CN","tz":"Asia/Shanghai","uid":1,"default_product_attachment_info_id":"4","params":{},"bin_size":true,"active_test":false}}},"id":980816587}"
-                console.log(settings)
+                // console.log(settings)
                 var data = JSON.parse(settings.data)
                 if (data.params.model == 'review.bom.wizard') {
                     if (data.params.method == 'send_to_review' ||
@@ -60,8 +60,8 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                             .call("get_bom", [parseInt(bom_id)])
                             .then(function (result) {
                                 console.log(result);
-                                self.$(".bom_review").html("");
-                                self.$(".bom_review").append(QWeb.render('bom_review', {result: result}));
+                                self.$("#accordion").html("");
+                                self.$("#accordion").append(QWeb.render('bom_tree', {result: result}));
                             })
                     }
                 }
@@ -441,10 +441,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
                     .then(function (result) {
                         console.log(result);
                         self.$el.eq(0).append(QWeb.render('bom_tree', {result: result}));
-                        self.$el.eq(2).append(QWeb.render('bom_review', {result: result}));
-                        console.log('spspsps')
-                        // console.log(self.$el.eq(2));
-                        // console.log(self.$el.eq(2));
+
                         self.$el.eq(0).attr("data-bom-id", result.bom_id);
                         self.$el.eq(0).attr("data-delete-products","");
                     })
