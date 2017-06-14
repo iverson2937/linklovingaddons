@@ -130,6 +130,7 @@ odoo.define('linkloving_mrp_automatic_plan.date_manage', function (require) {
             // this.product_id = action.product_id;
             var self = this;
             self.edit_status = false;
+            // self.ceshi = "canghaiyeumimgzhuyoulei";
         },
         start: function () {
             var self = this;
