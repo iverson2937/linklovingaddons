@@ -31,8 +31,8 @@
             <field name="res_model">product.template</field>
             <field name="view_mode">tree,form,kanban</field>
             <field name="view_type">form</field>
-            <field name="domain">[('sale_ok','=',1)]</field>
-            <field name="context">{}</field>
+            <field name="domain">[]</field>
+            <field name="context">{"search_default_filter_to_sell":1}</field>
         </record>
 
         <menuitem action="product_template_action"
