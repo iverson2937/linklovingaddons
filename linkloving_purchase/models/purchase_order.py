@@ -72,7 +72,8 @@ class PurchaseOrder(models.Model):
         for order in self:
             count = 0.0
             for line in order.order_line:
-                count += line.product_qty
+                if line.product_id.type != 'service':
+                    count += line.product_qty
             order.product_count = count
 
 
