@@ -199,7 +199,7 @@
                 <xpath expr="//filter[@name='message_needaction']" position="after">
                     <separator/>
                     <filter string="未出货" domain="[('shipping_rate','=',0)]" name="shipping_rate"/>
-                    <filter string="正在出货"
+                    <filter string="部分出货"
                             domain="['&amp;', ('shipping_rate','&gt;', 0), ('shipping_rate', '&lt;', 100)]"
                             name="shipping_rate"/>
                     <filter string="出货完成" domain="[('shipping_rate','&gt;=',100)]" name="shipping_rate"/>
