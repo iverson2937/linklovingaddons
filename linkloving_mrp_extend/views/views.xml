@@ -106,7 +106,9 @@
                     <field name="active1" invisible="1"/>
                     <button name="action_see_bom_structure_reverse" type="object" string="Bom逆展"/>
                 </xpath>
-
+                <xpath expr="//field[@name='mo_type']" position="after">
+                    <field name="bom_remark"/>
+                </xpath>
                 <xpath expr="//sheet" position="before">
                     <header>
                         <button name="set_to_release" type="object" states="draft" string="确认"
@@ -228,6 +230,10 @@
                     <field name="production_order_type" widget="radio"/>
                     <field name="sale_remark"/>
                     <field name="remark"/>
+                </xpath>
+
+                <xpath expr="//field[@name='bom_id']" position="after">
+                    <field name="factory_remark"/>
                 </xpath>
                 <xpath expr="//group" position="after">
                     <field name="output_rate"/>
