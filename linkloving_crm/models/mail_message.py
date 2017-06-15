@@ -92,12 +92,12 @@ class CrmMailMessage(models.Model):
             'mimetype': attachment['mimetype'],
         }) for attachment in attachments_data)
 
-        messages_label_data = message_label.sudo().read(['id', 'name', 'description', 'message_type_img_id'])
+        # messages_label_data = message_label.sudo().read(['id', 'name', 'description', 'message_type_img_id'])
+        messages_label_data = message_label.sudo().read(['id', 'name', 'description'])
         messages_label_tree = dict((message_label['id'], {
             'id': message_label['id'],
             'name': message_label['name'],
             'description': message_label['description'],
-            'message_type_img_id': message_label['message_type_img_id'],
         }) for message_label in messages_label_data)
 
         # 3. Tracking values

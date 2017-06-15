@@ -55,11 +55,14 @@
             <div t-if="options.display_avatar" class="o_thread_message_sidebar">
                     <t t-if="message.messages_label_ids">
                          <t t-foreach="message.messages_label_ids" t-as="label_msg">
-                             <!--<img class="pull-left" src="/web/image/13947" style="width: 60%;"/>-->
-                             <t t-if="label_msg.message_type_img_id &gt; 0">
-                                <img t-att-src="'/web/image/'+label_msg.message_type_img_id+'/27x27'"/>
-                             </t>
-                             <t t-if="label_msg.message_type_img_id &lt;=0">
+
+                             <!--<img class="pull-left" src="label_msg.doc_img" style="width: 60%;"/>-->
+
+                             <!--<img t-att-src="'/web/image/'+label_msg.message_type_img_id+'/27x27'"/>-->
+                                 <img class="img img-circle media-object"
+                                                    t-att-src="'/web/image?model=message.label&amp;field=message_type_img&amp;id='+label_msg.id"
+                                                    style="width: 30px"/>
+                             <t t-if="label_msg.message_type_img &lt;=0">
                                   <span class="fa fa-comment" style="font-size: 27px;color: mintcream;"/>
                              </t>
                              <!--<span class="fa fa-comment" title="微信" style="font-size: 35px;color: red;"/>-->
