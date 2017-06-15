@@ -29,7 +29,7 @@ class MrpProduction(models.Model):
                     'date': self.date_planned_start,
                     'product_id': line_id.product_id.id,
                     'product_uom_qty': line_id.product_qty * self.product_qty,
-                    'product_uom': line_id.product_uom_id.id,
+                    'product_uom': line_id.product_id.uom_id.id,
                     'location_id': source_location.id,
                     'location_dest_id': line_id.product_id.property_stock_production.id,
                     'raw_material_production_id': self.id,

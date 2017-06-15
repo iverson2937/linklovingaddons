@@ -8,7 +8,8 @@
     </t>
 
     <t t-name="bom_tree">
-        <button class="btn btn-primary bom_modify_submit">提交修改</button>
+        <button class="btn btn-primary bom_modify_submit">另存为</button>
+        <button class="btn btn-primary bom_modify_direct">替换</button>
         <button class="btn btn-primary bom_back">返回</button>
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -62,6 +63,32 @@
                 </div>
             </div>
         </div>
+
+        <div class="bom_review">
+             <t t-if="result.state != 'release'">
+                <button class="btn btn-primary bom_review_operate_btn">审核操作</button>
+            </t>
+            <div class="bom_review_list">
+                <t t-foreach="result.review_line" t-as="review_list">
+                    <div><t t-esc="review_list.name"/></div>
+                    <t t-if="review_list.state=='review_success'">
+                        <span class="fa fa-long-arrow-right" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark"></span>
+                    </t>
+                    <t t-if="review_list.state=='waiting_review'">
+                        <span class="fa fa-long-arrow-right document_yellow"></span>
+                        <div>等待</div>
+                    </t>
+                     <t t-if="review_list.state=='review_fail'||review_list.state=='review_canceled'">
+                        <span class="fa fa-long-arrow-right document_red" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark"></span>
+                         <!--<div>审核不通过</div>-->
+                    </t>
+                </t>
+                <t t-if="result.state == 'release'">
+                     <div>已发布</div>
+                </t>
+
+            </div>
+        </div>
     </t>
 
     <t t-name="more">
@@ -110,11 +137,11 @@
             <t t-if="item.bom_ids.length>0">
                 <span style="margin-left:30px;cursor:pointer" class="fa fa-plus add_product"></span>
             </t>
-            <span class='fa fa-copy product_copy' style='margin-left: 15px'></span>
-            <button style="margin-left:15px" class="btn btn-primary product_edit">编辑</button>
+            <!--<span class='fa fa-copy product_copy' style='margin-left: 15px'></span>-->
+            <!--<button style="margin-left:15px" class="btn btn-primary product_edit">编辑</button>-->
+            <span class="fa fa-edit product_edit" style="margin-left:15px;cursor:pointer"></span>
         </h4>
     </t>
-
 
 
 </templates>

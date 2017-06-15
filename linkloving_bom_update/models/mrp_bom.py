@@ -9,6 +9,26 @@ from odoo.exceptions import UserError
 class MrpBom(models.Model):
     _inherit = 'mrp.bom'
 
+    review_id = fields.Many2one("review.process",
+                                string=u'待...审核',
+                                track_visibility='always',
+                                readonly=True, copy=False)
+
+    @api.multi
+    def action_send_to_review(self):
+        if not self.review_id:
+            self.review_id = self.env["review.process"].create_review_process('mrp.bom', self.id)
+
+    @api.multi
+    def action_deny(self):
+        for line in self.bom_line_ids:
+            reject_bom_line_product_bom(line)
+
+    @api.multi
+    def action_released(self):
+        for l in self.bom_line_ids:
+            set_bom_line_product_bom_released(l)
+
     @api.multi
     def bom_detail(self):
 
@@ -30,7 +50,9 @@ class MrpBom(models.Model):
             'name': self.product_tmpl_id.name,
             'code': self.product_tmpl_id.default_code,
             'process_id': self.process_id.name,
-            'bom_ids': res
+            'bom_ids': res,
+            'state': self.state,
+            'review_line': self.review_id.get_review_line_list(),
         }
 
         return result
@@ -55,6 +77,7 @@ class MrpBom(models.Model):
             'product_tmpl_id': line.product_id.product_tmpl_id.id,
             'is_highlight': line.is_highlight,
             'id': line.id,
+            'product_specs': line.product_id.product_specs,
             'code': line.product_id.default_code,
             'uuid': str(uuid.uuid1()),
             'qty': line.product_qty,
@@ -86,6 +109,7 @@ def _get_rec(object, level, qty=1.0, uom=False):
             'product_tmpl_id': l.product_id.product_tmpl_id.id,
             'code': l.product_id.default_code,
             'uuid': str(uuid.uuid1()),
+            'product_specs': l.product_id.product_specs,
             'is_highlight': l.is_highlight,
             'id': l.id,
             'qty': l.product_qty,
@@ -102,35 +126,30 @@ class MrpBomLine(models.Model):
     is_highlight = fields.Boolean()
 
     @api.multi
+    def write(self, vals):
+        if 'RT-ENG' in self.bom_id.product_tmpl_id.name and not self.env.user.has_group('mrp.group_mrp_manager'):
+            raise UserError(u'只有库存管理员才可以修改基础bom')
+        return super(MrpBomLine, self).write(vals)
+
+    @api.multi
+    def unlink(self):
+        if 'RT-ENG' in self.bom_id.product_tmpl_id.name and not self.env.user.has_group('mrp.group_mrp_manager'):
+            raise UserError(u'只有库存管理员才可以修改基础bom')
+        return super(MrpBomLine, self).unlink()
+
+    @api.model
+    def create(self, vals):
+        if 'bom_id' in vals:
+            product_name = self.env['mrp.bom'].browse(vals['bom_id']).product_tmpl_id.name
+            if 'RT-ENG' in product_name and not self.env.user.has_group('mrp.group_mrp_manager'):
+                raise UserError(u'只有库存管理员才可以修改基础bom')
+        return super(MrpBomLine, self).create(vals)
+
+    @api.multi
     def toggle_highlight(self):
         """ Inverse the value of the field ``active`` on the records in ``self``. """
         for record in self:
             record.is_highlight = not record.is_highlight
-
-
-
-    # def update_bom_line(self, line_id, postfix, product_id, products):
-    #     bom = line_id.bom_id
-    #     product_tmpl_id = bom.product_tmpl_id
-    #     default_code = get_next_default_code(product_tmpl_id.default_code)
-    #     new_name = product_tmpl_id.name + postfix
-    #     if products.get(line_id):
-    #         new_bom_id = products.get(line_id).get('new_bom_id')
-    #         new_product_tmpl_id = products.get(line_id).get('new_product_tmpl_id')
-    #     else:
-    #         new_product_tmpl_id = product_tmpl_id.copy(name=new_name)
-    #         new_bom_id = bom.copy(product_tmpl_id=new_product_tmpl_id, default_code=default_code)
-    #         products.update({
-    #             line_id: {
-    #                 'new_bom_id': new_bom_id,
-    #                 'new_product_id': new_product_tmpl_id,
-    #             }
-    #         })
-    #         self.create({
-    #             'product_id': product_id,
-    #             'bom_id': new_bom_id.id
-    #         })
-    #     return new_product_tmpl_id
 
 
 def get_next_default_code(default_code):
@@ -140,3 +159,17 @@ def get_next_default_code(default_code):
     version = default_code.split('.')[-1]
 
     return int(version) + 1
+
+
+def set_bom_line_product_bom_released(line):
+    line.bom_id.state = 'release'
+    if line.child_line_ids:
+        for l in line.child_line_ids:
+            set_bom_line_product_bom_released(l)
+
+
+def reject_bom_line_product_bom(line):
+    line.bom_id.state = 'reject'
+    if line.child_line_ids:
+        for l in line.child_line_ids:
+            reject_bom_line_product_bom(l)

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+
         <!-- INHERITED TREE -->
         <record id="view_product_template_tree" model="ir.ui.view">
             <field name="name">product.template.tree.inherit</field>
@@ -13,6 +14,11 @@
                 <xpath expr="//field[@name='default_code']" position="attributes">
                     <attribute name="string">料号</attribute>
                 </xpath>
+
+                <xpath expr="//field[@name='type']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
             </field>
         </record>
         <!-- INHERITED FORM -->

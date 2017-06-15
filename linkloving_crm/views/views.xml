@@ -34,7 +34,7 @@
                 <!--左-->
 
                 <xpath expr="//field[@name='team_id']" position="after">
-                    <field name="crm_source_id" options="{'no_create': True}"/>
+                    <field name="crm_source_id" options="{'no_create': True}" required="True"/>
                 </xpath>
                 <xpath expr="//field[@name='crm_source_id']" position="after">
                     <field name="express_sample_record"/>
@@ -48,7 +48,7 @@
                 <xpath expr="//page[@name='extra']" position="after">
                     <page string="产品">
                         <field name="interested_in_product" domain="[('sale_ok','=',True)]"
-                               context="{'search_default_filter_categ_id':1}"/>
+                               context="{'search_default_rteng':1,'search_default_filter_categ_id':1}"/>
                     </page>
                 </xpath>
 
@@ -73,6 +73,11 @@
                             </group>
                             <field name="detail"/>
                         </group>
+                        <notebook>
+                            <page string="产品">
+                                <field name="product_visit_record"/>
+                            </page>
+                        </notebook>
                     </sheet>
                 </form>
             </field>
@@ -102,21 +107,21 @@
         </record>
 
 
-        <record id="res_partner_view_record" model="ir.ui.view">
-            <field name="name">res.partner.view.record</field>
-            <field name="model">res.partner</field>
-            <field name="inherit_id" ref="base.view_partner_form"/>
-            <field name="priority" eval="20"/>
-            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
-            <field name="arch" type="xml">
-                <div name="button_box" position="inside">
-                    <button class="oe_stat_button" type="action" name="%(linkloving_crm.crm_remark_action_tree)d"
-                            icon="fa-book">
-                        <field string="记录" name="remark_count" widget="statinfo"/>
-                    </button>
-                </div>
-            </field>
-        </record>
+        <!--<record id="res_partner_view_record" model="ir.ui.view">-->
+        <!--<field name="name">res.partner.view.record</field>-->
+        <!--<field name="model">res.partner</field>-->
+        <!--<field name="inherit_id" ref="base.view_partner_form"/>-->
+        <!--<field name="priority" eval="20"/>-->
+        <!--<field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<div name="button_box" position="inside">-->
+        <!--<button class="oe_stat_button" type="action" name="%(linkloving_crm.crm_remark_action_tree)d"-->
+        <!--icon="fa-book">-->
+        <!--<field string="记录" name="remark_count" widget="statinfo"/>-->
+        <!--</button>-->
+        <!--</div>-->
+        <!--</field>-->
+        <!--</record>-->
 
         <!--crm.lead.source-->
         <record model="ir.ui.view" id="view_crm_lead_source_form">
@@ -154,14 +159,6 @@
             <field name="res_model">crm.lead.source</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-
-            <!--<field name="domain">-->
-            <!--[('payment_type','=',2),('state','!=','draft')]-->
-            <!--</field>-->
-            <!--<field name="context">{'posted':True}</field>-->
-            <!--<field name="view_ids" eval="[(5,0,0),-->
-            <!--(0,0,{'view_mode':'tree', 'view_id': ref('account_payment_register_tree_sale')}),-->
-            <!--(0,0,{'view_mode':'form', 'view_id': ref('account_receive_register_form')})]"/>-->
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
                     Click add source record.
@@ -179,6 +176,119 @@
                   parent="sales_team.menu_sales"
                   groups="sales_team.group_sale_manager"
                   sequence="2" name="线索来源"/>
+
+
+        <!--message.order.status-->
+        <record model="ir.ui.view" id="view_message_order_status_form">
+            <field name="name">message.order.status.form</field>
+            <field name="model">message.order.status</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <field name="description"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_message_order_status_tree" model="ir.ui.view">
+            <field name="name">message.order.status.tree</field>
+            <field name="model">message.order.status</field>
+            <field name="arch" type="xml">
+                <tree string="客户状态">
+                    <field name="name"/>
+                    <field name="description"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_message_order_status" model="ir.actions.act_window">
+            <field name="name">客户状态</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">message.order.status</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click add customer status.
+                </p>
+                <p>
+                    No source Found!
+                </p>
+            </field>
+        </record>
+
+
+        <!--Receipt*-->
+        <menuitem action="action_message_order_status"
+                  id="menu_message_order_status"
+                  parent="sales_team.menu_sales"
+                  groups="sales_team.group_sale_manager"
+                  sequence="3" name="客户状态"/>
+
+
+        <record model="ir.ui.view" id="mail.view_message_form">
+            <field name="name">mail.message.form</field>
+            <field name="model">mail.message</field>
+            <field name="priority">20</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="subject"/>
+                                <field name="date" invisible="1"/>
+                                <field name="email_from" invisible="1"/>
+                                <field name="author_id" invisible="1"/>
+                                <field name="record_name" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="messages_label_ids" string="记录类型" widget="many2many_checkboxes"
+                                       options="{'no_create': True}"/>
+                                <field name="parent_id" invisible="1"/>
+                                <field name="model" invisible="1"/>
+                                <field name="res_id" invisible="1"/>
+                                <field name="message_type" invisible="1"/>
+                                <field name="subtype_id" invisible="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Body">
+                                <field name="body" options="{'style-inline': true}"/>
+                            </page>
+                        </notebook>
+                        <group>
+                            <field name="postil" string="批注" placeholder="批注..."/>
+                        </group>
+                    </sheet>
+
+                    <footer>
+                        <button string="修改" name="send_message_action" type="object" class="btn-primary"/>
+                        <!--<button string="修改" type="button" class="btn btn-sm btn-primary o_composer_button_sendss"/>-->
+                        <button string="取消" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="product_template_search_view_website_crm" model="ir.ui.view">
+            <field name="name">product.template.search.published</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_search_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='consumable']" position="after">
+                    <separator/>
+                    <filter string="RT-ENG" name="rteng" domain="[('name','ilike', 'RT-ENG')]"/>
+                </xpath>
+            </field>
+        </record>
 
 
     </data>

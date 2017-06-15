@@ -1,0 +1,81 @@
+<openerp>
+    <data>
+         <template id="mrp_automatic_plan" name="linkloving_mrp_automatic_plan" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/linkloving_mrp_automatic_plan/static/src/js/date.js"/>
+                <script type="text/javascript" src="/linkloving_mrp_automatic_plan/static/src/js/almanac.js"/>
+                <link rel="stylesheet" href="/linkloving_mrp_automatic_plan/static/src/css/almanac.css"/>
+                <link rel="stylesheet" href="/linkloving_mrp_automatic_plan/static/src/css/date.css"/>
+            </xpath>
+        </template>
+
+        <record model="ir.actions.client" id="to_date_page_list_action">
+              <field name="name">linkloving_mrp_automatic_plan window</field>
+              <field name="tag">date_manage</field>
+        </record>
+
+        <menuitem id="employ_date"
+                  name="日期"
+                  parent="hr.menu_human_resources_configuration"
+                  action="to_date_page_list_action"/>
+
+
+
+
+        <!-- explicit list view definition -->
+        <!--
+        <record model="ir.ui.view" id="linkloving_mrp_automatic_plan.list">
+          <field name="name">linkloving_mrp_automatic_plan list</field>
+          <field name="model">linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan</field>
+          <field name="arch" type="xml">
+            <tree>
+              <field name="name"/>
+              <field name="value"/>
+              <field name="value2"/>
+            </tree>
+          </field>
+        </record>
+        -->
+
+        <!-- actions opening views on models -->
+        <!--
+        <record model="ir.actions.act_window" id="linkloving_mrp_automatic_plan.action_window">
+          <field name="name">linkloving_mrp_automatic_plan window</field>
+          <field name="res_model">linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan</field>
+          <field name="view_mode">tree,form</field>
+        </record
+        -->
+
+        <!-- server action to the one above -->
+        <!--
+        <record model="ir.actions.server" id="linkloving_mrp_automatic_plan.action_server">
+          <field name="name">linkloving_mrp_automatic_plan server</field>
+          <field name="model_id" ref="model_linkloving_mrp_automatic_plan_linkloving_mrp_automatic_plan"/>
+          <field name="code">
+            action = {
+              "type": "ir.actions.act_window",
+              "view_mode": "tree,form",
+              "res_model": self._name,
+            }
+          </field>
+        </record>
+        -->
+
+        <!-- Top menu item -->
+        <!--
+        <menuitem name="linkloving_mrp_automatic_plan" id="linkloving_mrp_automatic_plan.menu_root"/>
+        -->
+        <!-- menu categories -->
+        <!--
+        <menuitem name="Menu 1" id="linkloving_mrp_automatic_plan.menu_1" parent="linkloving_mrp_automatic_plan.menu_root"/>
+        <menuitem name="Menu 2" id="linkloving_mrp_automatic_plan.menu_2" parent="linkloving_mrp_automatic_plan.menu_root"/>
+        -->
+        <!-- actions -->
+        <!--
+        <menuitem name="List" id="linkloving_mrp_automatic_plan.menu_1_list" parent="linkloving_mrp_automatic_plan.menu_1"
+                  action="linkloving_mrp_automatic_plan.action_window"/>
+        <menuitem name="Server to list" id="linkloving_mrp_automatic_plan" parent="linkloving_mrp_automatic_plan.menu_2"
+                  action="linkloving_mrp_automatic_plan.action_server"/>
+        -->
+    </data>
+</openerp>

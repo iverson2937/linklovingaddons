@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo.exceptions import UserError, ValidationError
+from odoo import models, fields, api, _
 
 MAP_INVOICE_TYPE_PARTNER_TYPE = {
     'out_invoice': 'customer',
@@ -7,7 +8,6 @@ MAP_INVOICE_TYPE_PARTNER_TYPE = {
     'in_invoice': 'supplier',
     'in_refund': 'supplier',
 }
-from odoo import models, fields, api, _
 
 
 class AccountPaymentRegisterBalance(models.Model):
@@ -22,6 +22,10 @@ class AccountPaymentRegisterBalance(models.Model):
 
 
 class AccountPaymentRegister(models.Model):
+    """
+    付款申请表
+    """
+
     _name = 'account.payment.register'
     _order = 'create_date desc'
     _inherit = ['mail.thread', 'ir.needaction_mixin']
@@ -162,6 +166,10 @@ class AccountPayment(models.Model):
     # origin = fields.Char(string=u'源单据')
 
     def set_to_done(self):
+        if not self.partner_id:
+            raise UserError(u'请填写客户')
+        for move in self.move_line_ids:
+            move.partner_id = self.partner_id
         self.state = 'done'
 
     @api.onchange('partner_type')
@@ -190,7 +198,6 @@ class AccountPayment(models.Model):
             rec['partner_type'] = MAP_INVOICE_TYPE_PARTNER_TYPE[invoice['type']]
             rec['partner_id'] = invoice['partner_id'][0]
             rec['amount'] = amount
-            print rec['amount']
         return rec
 
     @api.multi

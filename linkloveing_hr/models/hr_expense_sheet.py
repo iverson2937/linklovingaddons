@@ -6,14 +6,24 @@ from odoo.exceptions import UserError
 
 class HrExpenseSheet(models.Model):
     _inherit = 'hr.expense.sheet'
-    expense_no = fields.Char()
+
+    @api.depends('expense_line_ids')
+    def _get_full_name(self):
+        name = ''
+        for line in self.expense_line_ids:
+            name += line.name + ' ;'
+        self.name = name
+
+    name = fields.Char(compute='_get_full_name', store=True, required=False)
+    expense_no = fields.Char(default=lambda self: _('New'))
     approve_ids = fields.Many2many('res.users')
     is_deduct_payment = fields.Boolean(default=False)
     pre_payment_reminding = fields.Float(related='employee_id.pre_payment_reminding')
     payment_id = fields.Many2one('account.employee.payment')
-    income = fields.Boolean()
+    income = fields.Boolean(default=False)
     partner_id = fields.Many2one('res.partner')
     payment_line_ids = fields.One2many('account.employee.payment.line', 'sheet_id')
+    remark_comments_ids = fields.One2many('hr.remark.comment', 'expense_sheet_id', string=u'审核记录')
 
     @api.multi
     def action_sheet_move_create(self):
@@ -46,16 +56,17 @@ class HrExpenseSheet(models.Model):
 
     to_approve_id = fields.Many2one('res.users', readonly=True, track_visibility='onchange')
 
-    state = fields.Selection([('submit', 'Submitted'),
-                              ('manager1_approve', u'一级审核'),
-                              ('manager2_approve', u'二级审核'),
+    state = fields.Selection([('draft', u'草稿'),
+                              ('submit', 'Submitted'),
+                              ('manager1_approve', u'1级审核'),
+                              ('manager2_approve', u'2级审核'),
                               ('manager3_approve', 'General Manager Approved'),
                               ('approve', 'Approved'),
                               ('post', 'Posted'),
                               ('done', 'Paid'),
                               ('cancel', 'Refused')
                               ], string='Status', index=True, readonly=True, track_visibility='onchange', copy=False,
-                             default='submit', required=True,
+                             default='draft', required=True,
                              help='Expense Report State')
 
     @api.multi
@@ -68,27 +79,60 @@ class HrExpenseSheet(models.Model):
             UserError(u'请设置该员工部门')
         if not department.manager_id:
             UserError(u'该员工所在部门未设置经理(审核人)')
-        if department.allow_amount and self.total_amount < department.allow_amount:
+        # 如果没有上级部门，或者报销金额小于该部门的允许最大金额
+        if not department.parent_id or (department.allow_amount and self.total_amount < department.allow_amount):
             self.to_approve_id = False
             self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
-
         else:
-
+            if not department.parent_id.manager_id:
+                raise UserError(u'上级部门没有设置经理,请联系管理员')
             self.to_approve_id = department.parent_id.manager_id.user_id.id
-
             self.write({'state': 'manager1_approve', 'approve_ids': [(4, self.env.user.id)]})
+
+        create_remark_comment(self, u'1级审核')
 
     @api.multi
     def manager2_approve(self):
+
         department = self.to_approve_id.employee_ids.department_id
-        if department.allow_amount and self.total_amount < department.allow_amount:
+        if not department.parent_id or (department.allow_amount and self.total_amount < department.allow_amount):
             self.to_approve_id = False
             self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
 
         else:
+            if not department.parent_id.manager_id:
+                raise UserError(u'上级部门没有设置经理,请联系管理员')
             self.to_approve_id = department.parent_id.manager_id.user_id.id
 
             self.write({'state': 'manager2_approve', 'approve_ids': [(4, self.env.user.id)]})
+
+        create_remark_comment(self, u'2级审核')
+
+    @api.multi
+    def hr_expense_sheet_post(self):
+        for exp in self:
+            if not exp.expense_line_ids:
+                raise UserError(u'请填写报销明细')
+            state = 'submit'
+            department = exp.department_id
+            if exp.employee_id == department.manager_id:
+
+                if not department.parent_id or (
+                            department.allow_amount and self.total_amount > department.allow_amount):
+                    state = 'approve'
+                    exp.write({'state': 'approve'})
+                else:
+                    if not department.parent_id.manager_id:
+                        raise UserError(u'上级部门未设置审核人')
+                    exp.to_approve_id = department.parent_id.manager_id.user_id.id
+            else:
+                # if not department.parent_id.manager_id:
+                #     raise UserError(u'上级部门没有设置经理,请联系管理员')
+                if not department.manager_id:
+                    raise UserError(u'请设置部门审核人')
+                exp.to_approve_id = department.manager_id.user_id.id
+            exp.write({'state': state})
+            create_remark_comment(exp, u'送审')
 
     @api.multi
     def manager3_approve(self):
@@ -107,15 +151,10 @@ class HrExpenseSheet(models.Model):
                 vals['expense_no'] = self.env['ir.sequence'].next_by_code('account.income') or '/'
             else:
                 vals['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense.sheet') or '/'
+
         exp = super(HrExpenseSheet, self).create(vals)
-        if exp.employee_id == exp.employee_id.department_id.manager_id:
-            department = exp.to_approve_id.employee_ids.department_id
-            if department.allow_amount and self.total_amount > department.allow_amount:
-                exp.write({'state': 'approve'})
-            else:
-                exp.to_approve_id = exp.employee_id.department_id.parent_id.manager_id.user_id.id
-        else:
-            exp.to_approve_id = exp.employee_id.department_id.manager_id.user_id.id
+        #
+
         return exp
 
     @api.multi
@@ -136,6 +175,8 @@ class HrExpenseSheet(models.Model):
                 self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
         else:
             self.to_approve_id = self.employee_id.department_id.manager_id.user_id.id
+
+        create_remark_comment(self, u'重新提交')
 
         return self.write({'state': 'submit'})
 
@@ -231,3 +272,55 @@ class HrExpenseSheet(models.Model):
             return [('state', '=', 'approve')]
         if self._context.get('search_default_approved'):
             return [('state', '=', 'post')]
+
+
+def create_remark_comment(data, body):
+    values = {
+        'body': body,
+        'message_type': data.state,
+        'expense_sheet_id': data.id,
+        'target_uid': data.to_approve_id.id
+    }
+    # return data.env['hr.remark.comment'].create(values)
+
+
+class HrRemarkComment(models.Model):
+    _name = 'hr.remark.comment'
+
+    body = fields.Char(string=u'内容')
+    target_uid = fields.Many2one('res.users')
+    message_type = fields.Selection([
+        ('draft', u'草稿'),
+        ('submit', u'送审'),
+        ('manager1_approve', u'1级审核'),
+        ('manager2_approve', u'2级审核'),
+        ('done', u'审核通过'),
+        ('refuse', u'拒绝'),
+        ('update', u'修改'),
+        ('manager3_approve', u'3级审核'),
+        ('approve', u'批准'),
+        ('post', 'Posted'),
+        ('cancel', u'拒绝')
+    ], default='draft')
+    expense_sheet_id = fields.Many2one('hr.expense.sheet', string=u'审核对象')
+
+
+class HrExpenseRefuseWizard(models.TransientModel):
+    _inherit = "hr.expense.refuse.wizard"
+
+    @api.multi
+    def expense_refuse_reason(self):
+        self.ensure_one()
+
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', [])
+        expense_sheet = self.env['hr.expense.sheet'].browse(active_ids)
+        expense_sheet.refuse_expenses(self.description)
+        create_remark_comment(expense_sheet, u'拒绝')
+        return {'type': 'ir.actions.act_window_close'}
+
+
+class HrResUsers(models.Model):
+    _inherit = "res.users"
+
+    remark_ids = fields.One2many('hr.remark.comment', 'target_uid')

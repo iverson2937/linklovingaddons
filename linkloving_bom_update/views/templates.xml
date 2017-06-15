@@ -9,13 +9,13 @@
                     <button class="oe_stat_button" name="bom_detail" type="object"
                             icon="fa-tasks" string="BOM修改">
                     </button>
-
                 </div>
                 <xpath expr="//tree" position="attributes">
-                    <attribute name="decoration-bf">is_highlight==True</attribute>
+                    <attribute name="decoration-warning">is_highlight==True</attribute>
                 </xpath>
                 <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_uom_id']" position="after">
-                    <button name="toggle_highlight" type="object" icon="fa-flag"/>
+                    <button name="toggle_highlight" type="object" icon="fa-flag"
+                            attrs="{'invisible':[('is_highlight','!=',True)]}"/>
                     <field name="is_highlight" invisible="1"/>
                 </xpath>
             </field>
@@ -41,11 +41,10 @@
 
 
                     <footer>
-                        <button string="新建BOM" name="bom_line_update" type="object" default_focus="1"
-                                class="btn-primary new_bom" context="{'update':False}"/>
-                        <button string="修改BOM" class="btn-default modify_current_bom" name="bom_line_update"
-                                type="object"
-                                context="{'update':True}"/>
+                        <button string="确认" name="bom_line_update" type="object" default_focus="1"
+                                class="btn-primary new_bom" context="{}"/>
+                        <button string="取消" class="btn-default modify_current_bom" name="create_cancel"
+                                type="object"/>
                     </footer>
                 </form>
             </field>

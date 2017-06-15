@@ -13,6 +13,12 @@
 
                 </xpath>
 
+                <xpath expr="//button[@name='action_cancel']" position="attributes">
+                    <attribute name="string">取消订单</attribute>
+
+                </xpath>
+
+
 
                 <xpath expr="//button[@name='do_new_transfer']" position="replace">
 

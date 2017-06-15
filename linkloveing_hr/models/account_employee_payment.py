@@ -9,10 +9,21 @@ class AccountEmployeePayment(models.Model):
     _inherit = ['mail.thread', 'ir.needaction_mixin']
     _order = 'create_date desc'
     name = fields.Char()
+
+    def _get_account_date(self):
+        for p in self:
+            p.accounting_date = p.apply_date
+
+    accounting_date = fields.Date(compute='_get_account_date', string=u'会计日期', store=True)
     employee_id = fields.Many2one('hr.employee',
                                   default=lambda self: self.env['hr.employee'].search([('user_id', '=', self.env.uid)],
                                                                                       limit=1))
-    department_id = fields.Many2one('hr.department')
+
+    def _get_account_date(self):
+        for p in self:
+            p.department_id = p.employee_id.department_id.id
+
+    department_id = fields.Many2one('hr.department', compute='_get_department_id', store=True)
     to_approve_id = fields.Many2one('res.users', track_visibility='onchange')
     approve_ids = fields.Many2many('res.users')
     apply_date = fields.Date(default=fields.Date.context_today)
@@ -22,6 +33,15 @@ class AccountEmployeePayment(models.Model):
     bank_account_id = fields.Many2one('res.partner.bank', related='employee_id.bank_account_id')
     sheet_ids = fields.One2many('hr.expense.sheet', 'payment_id')
     return_ids = fields.One2many('account.employee.payment.return', 'payment_id')
+
+    # FIXME:USE BETTER WAY TO HIDE THE BUTTON
+    def _get_is_show(self):
+        is_show = False
+        if self.env.user.id == self.to_approve_id.id:
+            is_show = True
+        self.is_show = is_show
+
+    is_show = fields.Boolean(compute=_get_is_show)
 
     @api.one
     @api.depends('return_ids')
@@ -93,11 +113,15 @@ class AccountEmployeePayment(models.Model):
 
         if self.employee_id == self.employee_id.department_id.manager_id:
             department = self.to_approve_id.employee_ids.department_id
-            if department.allow_amount and self.amount > department.allow_amount:
+            if not department.parent_id or (department.allow_amount and self.amount > department.allow_amount):
                 self.write({'state': 'approve'})
             else:
+                if not self.employee_id.department_id.parent_id.manager_id:
+                    raise UserError(u'上级部门未设置审核人')
                 self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
         else:
+            if not self.employee_id.department_id:
+                raise UserError(u'请设置部门审核人')
             self.to_approve_id = self.employee_id.department_id.manager_id.user_id.id
 
     @api.multi
@@ -106,11 +130,17 @@ class AccountEmployeePayment(models.Model):
         #     self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
         # else:
         department = self.to_approve_id.employee_ids.department_id
-        if department.allow_amount and self.amount < department.allow_amount:
+        if not department:
+            UserError(u'请设置该员工部门')
+        if not department.manager_id:
+            UserError(u'该员工所在部门未设置经理(审核人)')
+        if not department.parent_id or (department.allow_amount and self.amount < department.allow_amount):
             self.to_approve_id = False
             self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
 
         else:
+            if not department.parent_id.manager_id:
+                raise UserError(u'上级部门没有设置经理,请联系管理员')
             self.to_approve_id = department.parent_id.manager_id.user_id.id
 
             self.write({'state': 'manager1_approve', 'approve_ids': [(4, self.env.user.id)]})
@@ -123,11 +153,17 @@ class AccountEmployeePayment(models.Model):
     @api.multi
     def manager2_approve(self):
         department = self.to_approve_id.employee_ids.department_id
-        if self.amount < department.allow_amount:
+        if not department:
+            UserError(u'请设置该员工部门')
+        if not department.manager_id:
+            UserError(u'该员工所在部门未设置经理(审核人)')
+        if not department.parent_id or (department.allow_amount and self.amount < department.allow_amount):
             self.to_approve_id = False
             self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
 
         else:
+            if not department.parent_id.manager_id:
+                raise UserError(u'上级部门没有设置经理,请联系管理员')
             self.to_approve_id = department.parent_id.manager_id.user_id.id
 
             self.write({'state': 'manager2_approve', 'approve_ids': [(4, self.env.user.id)]})

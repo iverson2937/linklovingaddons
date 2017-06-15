@@ -1,5 +1,16 @@
 <openerp>
     <data>
+        <record model="ir.actions.act_window" id="action_mrp_production_scrap_moves">
+            <field name="name">Stock Moves</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">stock.move</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">['|', ('is_scrap', '=', True), ('raw_material_production_id', '=', active_id),
+                ('production_id', '=',
+                active_id)]
+            </field>
+        </record>
         <!--  confirm production model  -->
         <record id="action_confirm_production" model="ir.actions.act_window">
             <field name="name">Confirm Production</field>
@@ -82,6 +93,9 @@
                     <attribute name="decoration-danger">active1==False</attribute>
                 </xpath>
                 <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_id']" position="attributes">
+                    <attribute name="options">{'no_create':True}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='product_tmpl_id']" position="attributes">
                     <attribute name="options">{'no_create':True}</attribute>
                 </xpath>
 
@@ -185,7 +199,7 @@
                 </xpath>
 
                 <xpath expr="//header/button[@name='action_cancel']" position="replace">
-                    <button name="action_cancel" type="object" string="Cancel"
+                    <button name="action_cancel" type="object" string="取消订单"
                             attrs="{'invisible': [('state', 'not in', ('confirmed','waiting_material', 'prepare_material_ing'))]}"
                             groups="linkloving_mrp_extend.group_charge_produce"/>
                 </xpath>
@@ -310,6 +324,8 @@
                 <xpath expr="//button[@name='%(mrp.action_mrp_production_moves)d']" position="replace">
                     <button name="%(mrp.action_mrp_production_moves)d" type="action" string="Inventory Moves"
                             class="oe_stat_button" icon="fa-arrows-v"/>
+                    <button name="action_see_scrap_moves" type="object" string="报废的物料"
+                            class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('state', '!=', 'done')]}"/>
                 </xpath>
             </field>
         </record>
@@ -1221,5 +1237,6 @@
                 </xpath>
             </field>
         </record>
+
     </data>
 </openerp>

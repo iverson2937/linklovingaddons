@@ -47,12 +47,67 @@
     margin-right: 80px;
     margin-top: -15px;
 }
-#accordion .bom_modify_submit{
+#accordion .bom_modify_submit,#accordion .bom_modify_direct{
     margin-top: -30px;
+    margin-left: 15px;
 }
 #accordion .product_name{
     cursor: pointer;
 }
 #accordion .change_color{
     background-color: rgba(255,140,105,0.5)!important;
+}
+#accordion span,#accordion a{
+    font-size: 12px!important;
+    font-weight:600!important;
+}
+#accordion .panel-default > .panel-heading{
+    background-color: white;
+    padding: 4px 15px;
+}
+#accordion .panel-body{
+    border-top: none;
+}
+
+
+.bom_review{
+    margin-top: 100px;
+    border:1px solid #d7d7d7;
+    padding: 20px 20px;
+    position: relative;
+}
+.bom_review_operate_btn{
+
+}
+
+
+#accordion .bom_review_list{
+    overflow: hidden;
+    margin-top: 30px;
+}
+#accordion .bom_review .bom_review_list>span{
+    width: 45px;
+    color: green;
+    float: left;
+    font-size: 36px!important;
+    margin-left: 8px;
+    /*margin-top: -2px;*/
+    display: block;
+    height: 32px;
+    margin-bottom: 3px;
+}
+#accordion .bom_review .bom_review_list>.document_yellow{
+    color: darkorange!important;
+}
+#accordion .bom_review .bom_review_list>.document_red{
+    color: red!important;
+}
+#accordion .bom_review  .bom_review_list>div{
+    padding-left: 3px;
+    padding-right: 3px;
+    line-height: 30px;
+    text-align: center;
+    border:1px solid black;
+    float: left;
+    margin-bottom: 3px;
 }

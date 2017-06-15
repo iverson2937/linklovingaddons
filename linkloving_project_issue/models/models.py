@@ -2,8 +2,6 @@
 
 from odoo import models, fields, api
 
-# class linkloving_project_issue(models.Model):
-#     _name = 'linkloving_project_issue.linkloving_project_issue'
 
 #     name = fields.Char()
 #     value = fields.Integer()
@@ -18,6 +16,9 @@ class linkloving_project_issue_version(models.Model):
     _name = "linkloving.project.issue.version"
     _order = "name desc"
 
-    name = fields.Char('Version Number', required=True);
-    active = fields.Boolean('Active', required=False, default=1);
+    name = fields.Char('Version Number', required=True)
+    active = fields.Boolean('Active', required=False, default=1)
 
+class ProjectIssue(models.Model):
+    _inherit = 'project.issue'
+    version_id = fields.Many2one('project.issue.version')

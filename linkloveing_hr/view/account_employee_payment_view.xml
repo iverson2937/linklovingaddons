@@ -17,13 +17,16 @@
                         <button name="submit" class="oe_highlight" states="draft" string="Post" type="object"/>
 
 
-                        <button name="manager1_approve" class="oe_highlight" states="confirm" string="Approve"
+                        <button name="manager1_approve" class="oe_highlight" string="Approve"
+                                attrs="{'invisible':['|',('is_show','=',False),('state','!=','confirm')]}"
                                 type="object"
                                 groups="hr_expense.group_hr_expense_user"/>
-                        <button name="manager2_approve" class="oe_highlight" states="manager1_approve" string="Approve"
+                        <button name="manager2_approve" class="oe_highlight" string="Approve"
+                                attrs="{'invisible':['|',('is_show','=',False),('state','!=','manager1_approve')]}"
                                 groups="hr_expense.group_hr_expense_manager"
                                 type="object"/>
-                        <button name="manager3_approve" class="oe_highlight" states="manager2_approve" string="Approve"
+                        <button name="manager3_approve" class="oe_highlight" string="Approve"
+                                attrs="{'invisible':['|',('is_show','=',False),('state','!=','manager2_approve')]}"
                                 groups="hr_expense.group_hr_expense_manager"
                                 type="object"/>
                         <button name="reject" class="oe_link"
@@ -55,6 +58,7 @@
                             <group>
                                 <!--<field name="is_show" invisible="1"/>-->
                                 <field name="employee_id" string="Employee"/>
+                                <field name="is_show" invisible="1"/>
                                 <field name="can_return" invisible="1"/>
                                 <field name="bank_account_id" string="Bank Account"
                                        context="{'default_partner_id':address_home_id}"/>

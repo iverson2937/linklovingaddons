@@ -4,6 +4,7 @@
 # directory
 ##############################################################################
 from odoo import fields, api, models
+from odoo.exceptions import UserError
 
 AVAILABLE_PRIORITIES = [
     ('0', 'badly'),
@@ -15,24 +16,62 @@ AVAILABLE_PRIORITIES = [
 ]
 
 
-class CrmPartner(models.Model):
+class ResPartner(models.Model):
     """"""
 
     _inherit = 'res.partner'
-    priority = fields.Selection(AVAILABLE_PRIORITIES, string=u'客户星级', index=True, default=AVAILABLE_PRIORITIES[0][0])
+
+    priority = fields.Selection(AVAILABLE_PRIORITIES, string=u'客户星级', index=True)
 
     detailed_address = fields.Char(string=u'地址', compute='_street_name')
 
     source = fields.Char(string=u'来源')
     continent = fields.Many2one('crm.continent', string=u'所属大洲')
     express_sample_record = fields.Char(string=u'快递账号')
-    interested_in_product = fields.Char(string=u'感兴趣产品')
+    interested_in_product = fields.Many2many('product.template', 'res_interested_in_product_template_ref',
+                                             string=u'感兴趣产品')
     communication_identifier = fields.Char(string=u'其他沟通方式')
     qq = fields.Char(string=u'QQ')
 
     skype = fields.Char(string=u'Skype')
     whatsapp = fields.Char(string=u'WhatsApp')
     wechat = fields.Char(string=u'微信')
+
+    crm_source_id = fields.Many2one('crm.lead.source', string=u'来源', required=True)
+
+    customer_status = fields.Many2one('message.order.status', string=u'客户状态')
+    is_order = fields.Boolean(string=u'订单记录', readonly=True, compute='_compute_is_order')
+
+    user_id = fields.Many2one('res.users', string='Salesperson', default=lambda self: self.env.user,
+                              help='The internal user that is in charge of communicating with this contact if any.')
+    team_id = fields.Many2one('crm.team', string='Sales Team', oldname='section_id',
+                              default=lambda self: self.env['crm.team'].sudo()._get_default_team_id(
+                                  user_id=self.env.uid))
+
+    @api.multi
+    def _compute_is_order(self):
+        for line in self:
+            if line.sale_order_count > 0:
+                line.is_order = True
+
+    # @api.model
+    # def create(self, vals):
+    #     exist = self.env['res.partner'].search(
+    #             [('name', '=', vals['name'].strip()), ('customer', '=', True), ('is_company', '=', True)])
+    #     if exist:
+    #         raise UserError(u'该名称已经存在')
+    #     return super(ResPartner, self).create(vals)
+
+    # @api.multi
+    # def write(self, vals):
+    #     exist = False
+    #     if 'name' in vals:
+    #         exist = self.env['res.partner'].search(
+    #             [('name', '=', vals['name'].strip()), ('customer', '=', True), ('is_company', '=', True)])
+    #
+    #     if exist:
+    #         raise UserError(u'该名称已经存在')
+    #     return super(ResPartner, self).write(vals)
 
     @api.depends('street', 'country_id', 'zip', 'state_id', 'city', 'street', 'street2')
     def _street_name(self):
@@ -62,12 +101,16 @@ class CrmPartner(models.Model):
 
 
 class CrmRemarkRecord(models.Model):
+    """
+    在客户界面显示一个右侧 按钮 =客户评论
+    """
     _name = 'crm.remark.record'
 
     subject = fields.Char(u'主题')
     partner_id = fields.Many2one('res.partner', u'客户')
     detail = fields.Text(string=u'详细')
     real_time = fields.Date(string=u'日期', default=fields.Date.context_today)
+    product_visit_record = fields.Many2many('product.template', string=u'拜访记录')
 
 
 class CrmLeadSource(models.Model):

@@ -6,6 +6,26 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='category_id']" position="after">
+                    <field name="crm_source_id" string="来源" attrs="{'invisible': [('customer','!=', True)]}"
+                           options="{'no_create':True}" required="True"/>
+                </xpath>
+
+                <xpath expr="//field[@name='category_id']" position="attributes">
+                    <attribute name="required">True</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='crm_source_id']" position="after">
+                    <field name="customer_status" options="{'no_create':True}"
+                           attrs="{'invisible':[('customer','=', False)]}"/>
+                </xpath>
+
+                <xpath expr="//field[@name='customer_status']" position="after">
+                    <field name="is_order" attrs="{'invisible':[('customer','=', False)]}"/>
+                </xpath>
+
+
                 <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/div/div/field[@name='country_id']"
                        position="after">
                     <field name="detailed_address"/>
@@ -32,41 +52,73 @@
                     <field name="express_sample_record"/>
                 </xpath>
 
-
                 <!--you-->
                 <xpath expr="//field[@name='lang']" position="after">
-                    <field name="qq"/>
+                    <field name="qq" invisible="1"/>
                 </xpath>
 
                 <xpath expr="//field[@name='qq']" position="after">
-                    <field name="skype"/>
+                    <field name="skype" invisible="1"/>
                 </xpath>
 
                 <xpath expr="//field[@name='skype']" position="after">
-                    <field name="whatsapp"/>
+                    <field name="whatsapp" invisible="1"/>
                 </xpath>
 
                 <xpath expr="//field[@name='whatsapp']" position="after">
-                    <field name="wechat"/>
+                    <field name="wechat" invisible="1"/>
                 </xpath>
 
                 <xpath expr="//field[@name='wechat']" position="after">
-                    <field name="communication_identifier"/>
+                    <field name="communication_identifier" invisible="1"/>
                 </xpath>
                 <xpath expr="//field[@name='lang']" position="after">
-                    <field name="priority" widget="priority" attrs="{'invisible':[('customer','=', False)]}"/>
+                    <field name="priority" widget="priority" attrs="{'invisible':[('customer','=', False)]}"
+                           required="True"/>
                 </xpath>
 
                 <xpath expr="//page[@name='accounting_disabled']" position="after">
                     <page string="产品">
-                        <group>
-                            <field name="interested_in_product"/>
-                        </group>
+                        <field name="interested_in_product" domain="[('sale_ok','=',True)]"
+                               context="{'search_default_rteng':1,'search_default_filter_categ_id':1}"/>
                     </page>
                 </xpath>
 
-
             </field>
         </record>
+
+
+        <record id="mail.view_emails_partner_info_form" model="ir.ui.view">
+            <field name="name">res.partner.emails.info.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='user_id']" position="after">
+                    <field name='notify_email' widget="radio" groups="base.group_no_one"/>
+                    <field name="opt_out" string="Mailing Opt-Out" groups="base.group_no_one"/>
+                    <field name="message_bounce" groups="base.group_no_one"/>
+                </xpath>
+                <xpath expr="//sheet" position="after">
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_threads" options='{"thread_level": 1}'/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+
+        <record id="crm_view_res_partner_filter_assign" model="ir.ui.view">
+            <field name="name">crm.res.partner.geo.inherit.search</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='group_by']/filter[@name='salesperson']" position="after">
+                    <filter string="销售团队" name="team_id" context="{'group_by' : 'team_id'}" domain="[]"/>
+                </xpath>
+            </field>
+        </record>
+
+
     </data>
 </openerp>

@@ -21,6 +21,7 @@ MO_STATE = {
     'waiting_material': u'等待备料',
     'prepare_material_ing': u'备料中',
     'finish_prepare_material': u'备料完成',
+    'waiting_inspection_finish': u'等待品检完成',
     'already_picking': u'已领料',
     'planned': u'安排中',
     'progress': u'生产中',

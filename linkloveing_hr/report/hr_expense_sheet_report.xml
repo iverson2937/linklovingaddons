@@ -1,36 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-
         <template id="hr_expense.report_expense_sheet">
             <t t-call="report.html_container">
                 <t t-foreach="docs" t-as="o">
                     <t t-if="o.state in ['approve','post','done']">
                         <t t-call="report.external_layout">
                             <div class="page">
-                                <h2>Expenses Report</h2>
-
-                                <div class="row mt32 mb32">
-                                    <div class="col-xs-2">
-                                        <strong>报销单号:</strong>
-                                        <p t-field="o.expense_no"/>
+                                <div class="row">
+                                    <div class="col-xs-4">
+                                        <h2>Expenses Report</h2>
                                     </div>
+                                    <div class="col-xs-offset-4 ">
+                                        <!--<strong>报销单号:</strong>-->
+                                        <h2>
+                                            <span t-field="o.expense_no"></span>
+                                        </h2>
+                                    </div>
+
+                                </div>
+                                <div class="row mt32 mb32">
+                                    <!--<div class="col-xs-2">-->
+                                    <!--<strong>报销单号:</strong>-->
+                                    <!--<p t-field="o.expense_no"/>-->
+                                    <!--</div>-->
                                     <div class="col-xs-2">
                                         <strong>Employee:</strong>
                                         <p t-field="o.employee_id.name"/>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <strong>部门:</strong>
+                                        <p t-field="o.department_id"/>
                                     </div>
                                     <div class="col-xs-2">
                                         <strong>Date:</strong>
                                         <p t-field="o.accounting_date"/>
                                     </div>
-                                    <div class="col-xs-2">
+                                    <div class="col-xs-5">
                                         <strong>Description:</strong>
                                         <p t-field="o.name"/>
                                     </div>
-                                    <div class="col-xs-2">
-                                        <strong>Validated By:</strong>
-                                        <p t-field="o.responsible_id"/>
-                                    </div>
+                                    <!--<div class="col-xs-2">-->
+                                    <!--<strong>Validated By:</strong>-->
+                                    <!--<p t-field="o.responsible_id"/>-->
+                                    <!--</div>-->
                                     <!--<div class="col-xs-2">-->
                                     <!--<strong>Payment By:</strong>-->
                                     <!--<p t-field="o.payment_mode"/>-->
@@ -104,22 +117,68 @@
                                 </div>
 
                                 <!--<p>Certified honest and conform,<br/>(Date and signature).-->
-                                    <!--<br/>-->
-                                    <!--<br/>-->
+                                <!--<br/>-->
+                                <!--<br/>-->
                                 <!--</p>-->
-                                        <div class="col-xs-3">
-                                    <strong>总经理:</strong>
+                                <div class="row">
+                                    <div class="col-xs-offset-9">
+                                        <strong>制单人:</strong>
+                                        <span t-field="o.create_uid.name"></span>
+                                    </div>
                                 </div>
-                                <div class="col-xs-3">
-                                    <strong>财务:</strong>
+                                <br/>
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <strong>总经理:</strong>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <strong>财务:</strong>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <strong>部门主管:</strong>
+                                    </div>
+                                    <div class="col-xs-offset-9">
+                                        <strong>收款人:</strong>
+                                        <!--<span t-field="o.create_uid.name"></span>-->
+                                    </div>
                                 </div>
-                                <div class="col-xs-3">
-                                    <strong>部门主管:</strong>
+                                <!--<div class="row">-->
+                                <!--<div class="col-xs-6">-->
+                                <!--<strong>经理Email:</strong>-->
+                                <!--<span t-field="o.employee_id.parent_id.work_email"></span>-->
+                                <!--</div>-->
+                                <!--<div class="col-xs-6">-->
+                                <!--<strong>总经理Email:</strong>-->
+                                <!--<span t-field="o.employee_id.parent_id.parent_id.work_email"></span>-->
+                                <!--</div>-->
+                                <!--</div>-->
+                                <br/>
+                                <br/>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <strong>以下是送审记录</strong>
+                                    </div>
                                 </div>
-                                <div class="col-xs-3">
-                                    <strong>制单人:</strong>
-                                    <span t-field="o.create_uid.name"></span>
-                                </div>
+                                <table class="table table-condensed">
+                                    <div class="row">
+                                        <t t-set="i" t-value="1"/>
+                                        <tr t-foreach="o.remark_comments_ids" t-as="lines">
+                                            <td>
+                                                <span t-esc="i"/>
+                                            </td>
+                                            <t t-set="i" t-value="i+1"/>
+                                            <td>
+                                                <span t-field="lines.body"/>:
+                                                <span t-field="lines.create_uid"/>-->
+
+                                                <span t-field="lines.target_uid"/>;
+                                                <span t-field="lines.create_date"/>
+                                            </td>
+                                        </tr>
+                                    </div>
+                                </table>
+
+
                             </div>
                         </t>
                     </t>

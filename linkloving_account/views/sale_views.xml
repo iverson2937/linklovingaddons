@@ -63,9 +63,9 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="domain">
-                [('state','=','confirm')]
+                ['|',('state','=','confirm'),('state','=','done')]
             </field>
-            <field name="context">{'state':'confirm','is_customer':True}</field>
+            <field name="context">{'state':'confirm','is_customer':True,'search_default_state_confirm':1}</field>
             <field name="view_ids" eval="[(5,0,0),
             (0,0,{'view_mode':'tree', 'view_id': ref('view_account_payment_tree_linkloving')}),
             (0,0,{'view_mode':'form', 'view_id': ref('account.view_account_payment_form')})]"/>

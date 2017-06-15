@@ -1,2 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_linkloving_project_linkloving_project,linkloving_project.linkloving_project,model_linkloving_project_linkloving_project,,1,0,0,0
+access_linkloving_project_task_work,linkloving_project.linkloving_project_task_work,model_project_task_work,,1,1,1,1

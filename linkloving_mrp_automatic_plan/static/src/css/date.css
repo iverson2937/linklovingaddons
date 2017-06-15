@@ -1,0 +1,52 @@
+.date_container{
+    margin-top: 80px;
+}
+.holiday,.work{
+    position: absolute;
+    top:0;
+    left: 0;
+    color: white;
+    font-size: 12px;
+    font-weight: 100;
+}
+.work{
+    background: #FF4500;
+}
+.holiday{
+    background: green;
+}
+.date_edit_x,.date_save_x{
+    cursor : pointer;
+    margin-left: 25px;
+    display: inline-block;
+    margin-top: 8px;
+    padding: 2px!important;
+    border: 1px solid #d7d7d7;
+    line-height: initial;
+}
+.date_edit_condition{
+    position: absolute;
+    bottom: 0;
+    font-size: 12px;
+    display: none;
+    background: #EEEE00;
+    padding: 5px;
+    text-align: center;
+}
+.edit_holiday{
+    left:0;
+}
+.edit_work{
+    right:0;
+}
+.date_edit_x_cancel{
+    cursor : pointer;
+    margin-left: 25px;
+    display: inline-block;
+    margin-top: 8px;
+    padding: 2px!important;
+    border: 1px solid #d7d7d7;
+    line-height: initial;
+    margin-left: 15px;
+    display: none;
+}

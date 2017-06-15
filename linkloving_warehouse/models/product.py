@@ -43,6 +43,26 @@ class ProductProduct(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    # @api.multi
+    # def write(self, vals):
+    #     if 'uom_id' in vals:
+    #         new_uom = self.env['product.uom'].browse(vals['uom_id'])
+    #         updated = self.filtered(lambda template: template.uom_id != new_uom)
+    #         done_moves = self.env['stock.move'].search(
+    #             [('product_id', 'in', updated.mapped('product_variant_ids').ids)])
+    #         for move in done_moves:
+    #             if move.state != 'done':
+    #                 move.product_uom = vals['uom_id']
+    #     return super(ProductTemplate, self).write(vals)
+
+    def _get_default_uom_id(self):
+        return self.env["product.uom"].search([], limit=1, order='id').id
+
+    uom_id = fields.Many2one(
+        'product.uom', 'Unit of Measure',
+        default=_get_default_uom_id, required=True,
+        help="Default Unit of Measure used for all stock operation.", track_visibility='onchange')
+
     product_specs = fields.Text(string=u'Product Specification')
     default_code = fields.Char(related='product_variant_ids.default_code')
     area_id = fields.Many2one(related='product_variant_ids.area_id', string='Area')
@@ -75,3 +95,4 @@ class ProductTemplate(models.Model):
                 [('product_tmpl_id', '=', record.id), ('active', '=', active)])
             for product in products:
                 product.active = not product.active
+

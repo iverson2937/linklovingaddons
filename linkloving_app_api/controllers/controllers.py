@@ -249,6 +249,7 @@ class LinklovingAppApi(http.Controller):
         return {"process_id": process.id,
                 "name": process.name}
 
+    # 单个工序
     @http.route('/linkloving_app_api/get_date_uncomplete_orders', type='json', auth='none', csrf=False)
     def get_date_uncomplete_orders(self, **kw):
         process_id = request.jsonrequest.get("process_id")
@@ -321,6 +322,7 @@ class LinklovingAppApi(http.Controller):
                          "count": get_count_iter(order_after)})
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=list)
 
+    # 多个工序 的订单数量
     @http.route('/linkloving_app_api/get_order_count_by_process', type='json', auth='none', csrf=False)
     def get_order_count_by_process(self, **kw):
         process_ids = request.jsonrequest.get("process_ids")
@@ -436,7 +438,11 @@ class LinklovingAppApi(http.Controller):
 
         data = []
         for production in orders_today:
-            dict = {
+            data.append(self.get_simple_production_json(production))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    def get_simple_production_json(self, production):
+        return {
                 'order_id': production.id,
                 'display_name': production.display_name,
                 'product_name': production.product_id.display_name,
@@ -450,16 +456,139 @@ class LinklovingAppApi(http.Controller):
                     'name': production.process_id.name,
                 }
             }
-            data.append(dict)
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-
-
-    def getYesterday(self):  #
+    def getYesterday(self):
         today = datetime.date.today()
         oneday = datetime.timedelta(seconds=1)
         yesterday = today + oneday
         return str(yesterday)
+
+    # 等待生产的数量
+    @http.route('/linkloving_app_api/get_already_picking_orders_count', type='json', auth='none', csrf=False)
+    def get_already_picking_orders_count(self, **kw):
+        partner_id = request.jsonrequest.get("partner_id")
+        date_to_show = fields.datetime.now()
+        one_days_after = datetime.timedelta(days=1)
+        today_time = fields.datetime.strptime(fields.datetime.strftime(date_to_show, '%Y-%m-%d'),
+                                              '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
+        user = request.env["res.users"].sudo().browse(request.context.get("uid"))
+        # locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
+        # location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
+        # location_domain = locations.ids + location_cir
+        timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
+        after_day = today_time + one_days_after
+
+        domain_uid = ['|', ('in_charge_id', '=', partner_id), ('create_uid', '=', partner_id)]
+        domain_delay = [('picking_material_date', '<', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
+
+                        ('state', 'in', ['already_picking']),
+                        # ('process_id', '=', process_id),
+                        # ('location_ids', 'in', location_domain)
+                        ]
+        domain_delay = expression.AND([domain_delay, domain_uid])
+        order_delay = request.env["mrp.production"].sudo().read_group(
+                domain_delay
+                , fields=["picking_material_date"],
+                groupby=["picking_material_date"])
+
+        domain = [('picking_material_date', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                  ('picking_material_date', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                  ('state', 'in', ['already_picking']),
+                  # ('process_id', '=', process_id),
+                  # ('location_ids', 'in', location_domain)
+                  ]
+        domain = expression.AND([domain, domain_uid])
+        today_time = today_time + one_days_after
+        after_day = after_day + one_days_after
+        domain_tommorrow = [('picking_material_date', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                            ('picking_material_date', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                            ('state', 'in', ['already_picking']),
+                            # ('process_id', '=', process_id),
+                            # ('location_ids', 'in', location_domain)
+                            ]
+        domain_tommorrow = expression.AND([domain_tommorrow, domain_uid])
+
+        today_time = today_time + one_days_after
+        after_day = after_day + one_days_after
+        domain_after_day = [('picking_material_date', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                            ('picking_material_date', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                            ('state', 'in', ['already_picking']),
+                            # ('process_id', '=', process_id),
+                            # ('location_ids', 'in', location_domain)
+                            ]
+        domain_after_day = expression.AND([domain_after_day, domain_uid])
+
+        order_today = request.env["mrp.production"].sudo().read_group(domain, fields=["picking_material_date"],
+                                                                      groupby=["picking_material_date"])
+        order_tomorrow = request.env["mrp.production"].sudo().read_group(domain_tommorrow,
+                                                                         fields=["picking_material_date"],
+                                                                         groupby=["picking_material_date"])
+        order_after = request.env["mrp.production"].sudo().read_group(domain_after_day,
+                                                                      fields=["picking_material_date"],
+                                                                      groupby=["picking_material_date"])
+
+        list = []
+
+        def get_count_iter(orders):
+            count = 0
+            for order in orders:
+                count += order.get("picking_material_date_count")
+            return count
+
+        if order_delay:
+            list.append({"state": "delay",
+                         "count": get_count_iter(order_delay)})
+        if order_today:
+            list.append({"state": "today",
+                         "count": get_count_iter(order_today)})
+        if order_tomorrow:
+            list.append({"state": "tomorrow",
+                         "count": get_count_iter(order_tomorrow)})
+        if order_after:
+            list.append({"state": "after",
+                         "count": get_count_iter(order_after)})
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=list)
+
+    @http.route('/linkloving_app_api/get_recent_alredy_picking_order', type='json', auth='none', csrf=False)
+    def get_recent_alredy_picking_order(self, **kw):
+        limit = request.jsonrequest.get('limit')
+        offset = request.jsonrequest.get('offset')
+        date_to_show = request.jsonrequest.get("date")
+        partner_id = request.jsonrequest.get('partner_id')
+        one_days_after = datetime.timedelta(days=1)
+        today_time = fields.datetime.strptime(fields.datetime.strftime(fields.datetime.now(), '%Y-%m-%d'),
+                                              '%Y-%m-%d')
+
+        domain_uid = ['|', ('in_charge_id', '=', partner_id), ('create_uid', '=', partner_id)]
+
+        if date_to_show != "delay":
+            today_time = fields.datetime.strptime(date_to_show, '%Y-%m-%d')
+
+        one_millisec_before = datetime.timedelta(milliseconds=1)  #
+        today_time = today_time - one_millisec_before  # 今天的最后一秒
+        after_day = today_time + one_days_after
+        user = request.env["res.users"].sudo().browse(request.context.get("uid"))
+
+        timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
+
+        if date_to_show == "delay":
+            domain = [('picking_material_date', '<', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                      ('state', 'in', ['already_picking']),
+                      ]
+        else:
+            domain = [
+                ('picking_material_date', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                ('picking_material_date', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                ('state', 'in', ['already_picking']),
+            ]
+        domain = expression.AND([domain, domain_uid])
+        orders_today = request.env['mrp.production'].sudo().search(domain, limit=limit, offset=offset)
+
+        data = []
+        for production in orders_today:
+            data.append(self.get_simple_production_json(production))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
 
     #获取生产单详细内容
     @http.route('/linkloving_app_api/get_order_detail', type='json', auth='none', csrf=False)
@@ -724,10 +853,11 @@ class LinklovingAppApi(http.Controller):
             sim_stock_move.quantity_ready = 0  # 清0
         # try:
         #     mrp_production.post_inventory()
-        # except UserError, e:
+        # except UserError, e:.filtered(lambda x: x.product_type != 'semi-finished')
         #     return JsonResponse.send_response(STATUS_CODE_ERROR,
         #                                       res_data={"error":e.name})
-        if all(sim_move.is_prepare_finished for sim_move in stock_move_lines):
+        if all(sim_move.is_prepare_finished for sim_move in
+               stock_move_lines.filtered(lambda x: x.product_type != 'semi-finished')):
             mrp_production.write({'state': 'finish_prepare_material'})
 
             JPushExtend.send_notification_push(audience=jpush.audience(
@@ -778,7 +908,8 @@ class LinklovingAppApi(http.Controller):
         #     return JsonResponse.send_response(STATUS_CODE_ERROR,
         #                                       res_data={"error":e.name})
 
-        mrp_production.write({'state': 'already_picking'})
+        mrp_production.write({'state': 'already_picking',
+                              'picking_material_date': fields.datetime.now()})
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
@@ -1049,6 +1180,7 @@ class LinklovingAppApi(http.Controller):
                     continue
                 move = request.env['stock.move'].sudo().create(returun_material_obj._prepare_move_values(r))
                 move.action_done()
+            returun_material_obj.return_ids.create_scraps()
             mrp_production.write({'state': 'done'})
 
         return JsonResponse.send_response(STATUS_CODE_OK,
@@ -1111,7 +1243,7 @@ class LinklovingAppApi(http.Controller):
                     continue
                 move = request.env['stock.move'].sudo().create(returun_material_obj._prepare_move_values(r))
                 move.action_done()
-
+            returun_material_obj.return_ids.create_scraps()
             mrp_production.write({'state': 'done'})
             #
             # location = request.env["stock.location"].sudo().search([("is_circulate_location", "=", True)], limit=1)
@@ -1281,6 +1413,7 @@ class LinklovingAppApi(http.Controller):
                 'product_id' : production.product_id.id,
                 'product_name' : production.product_id.display_name,
                 'product_ll_type': production.product_id.product_ll_type or '',
+                'product_specs': production.product_id.product_specs,
                 'area_id' : {
                     'area_id' : production.product_id.area_id.id,
                     'area_name': production.product_id.area_id.name,
@@ -1313,6 +1446,7 @@ class LinklovingAppApi(http.Controller):
             },
             'sale_remark': production.sale_remark or '',
             'remark': production.remark or '',
+            'is_bom_update': production.is_bom_update,
         }
         return data
     @classmethod
@@ -2263,3 +2397,14 @@ class LinklovingAppApi(http.Controller):
                     res[xml_name]['needaction_counter'] = model._needaction_count(dom)
         return res
 
+
+        # if __name__ == '__main__':
+        #         domain = ['|', ('in_charge_id', '=', 1),('create_uid', '=', 1)]
+        #
+        #         domain_delay = [('date_planned_start', '<', fields.datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+        #
+        #                  ('state', 'in', ['already_picking']),
+        #                  # ('process_id', '=', process_id),
+        #                  # ('location_ids', 'in', location_domain)
+        #                  ]
+        #         domain_delay = expression.AND([domain_delay,domain])

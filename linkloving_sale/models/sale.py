@@ -157,9 +157,6 @@ class SaleOrderLine(models.Model):
         """
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
         for line in self:
-            print float_compare(line.qty_delivered, line.product_uom_qty, precision_digits=precision)
-            print float_compare(line.qty_delivered, line.product_uom_qty, precision_digits=precision) >= 0
-            print float_compare(line.qty_delivered, line.product_uom_qty, precision_digits=precision) == 0
 
             if float_is_zero(line.qty_delivered, precision_digits=precision) and line.product_id.type in (
                     'consu', 'product'):

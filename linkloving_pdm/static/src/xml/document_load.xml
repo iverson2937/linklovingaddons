@@ -8,7 +8,10 @@
     </t>
 
     <t t-name="document_load_detail">
-        <ul id="document_tab" class="nav nav-tabs">
+         <script>
+            $(function () { $("[data-toggle='tooltip']").tooltip(); });
+        </script>
+        <ul id="document_tab" class="nav nav-tabs" data-now-tab="sip">
             <t t-set="i" t-value="1"/>
             <t t-foreach="result" t-as="item">
                 <li t-att-class="i ==1 ? 'active': ''">
@@ -19,6 +22,9 @@
                 <t t-set="i" t-value="2"/>
             </t>
         </ul>
+        <div class="create_document">
+            <button class="btn btn-primary create_document_btn">创建</button>
+        </div>
 
         <div id="myTabContent" class="tab-content">
             <t t-set="j" t-value="1"/>
@@ -26,17 +32,53 @@
                 <div t-att-class="j==1?'tab-pane fade in active':'tab-pane fade'" t-att-id="item.type">
                     <t t-if="item.files">
                         <t t-foreach="item.files" t-as="item_files">
-                            <div class="tab_pane_display">
+                            <div class="tab_pane_display" t-att-data-id="item_files.id">
                                 <div class="tab_message_display">
-                                    <div>文件名：<span><t t-esc="item_files.file_name"/></span></div>
+                                    <div>文件：<span><t t-esc="item_files.file_name"/></span></div>
                                     <div>审核人：<span><t t-esc="item_files.review_id"/></span></div>
                                     <div>远程地址：<span><t t-esc="item_files.remote_path"/></span></div>
                                     <div>版本：<span><t t-esc="item_files.version"/></span></div>
-                                    <div>状态：<span><t t-esc="item_files.state"/></span></div>
+                                    <div>状态：<span><t t-esc="item_files.state[1]"/></span>
+                                        <t t-if="item_files.is_show_cancel">
+                                            <button class="btn btn-primary review_cancel">取消审核</button>
+                                        </t>
+                                    </div>
+                                    <div>创建人：<span><t t-esc="item_files.create_uid_name"/></span></div>
+                                    <!--<div>-->
+                                    <!---->
+                                    <!--</div>-->
+                                </div>
+                                <div class="document_review_list">
+                                    <t t-foreach="item_files.review_line" t-as="review_list">
+                                        <div><t t-esc="review_list.name"/></div>
+                                        <t t-if="review_list.state=='review_success'">
+                                            <span class="fa fa-long-arrow-right" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark"></span>
+                                        </t>
+                                        <t t-if="review_list.state=='waiting_review'">
+                                            <span class="fa fa-long-arrow-right document_yellow"></span>
+                                            <div>等待</div>
+                                        </t>
+                                         <t t-if="review_list.state=='review_fail'||review_list.state=='review_canceled'">
+                                            <span class="fa fa-long-arrow-right document_red" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark"></span>
+                                             <!--<div>审核不通过</div>-->
+                                        </t>
+                                    </t>
+                                    <t t-if="item_files.state[0] == 'released'">
+                                         <div><t t-esc="item_files.state[1]" /></div>
+                                    </t>
+
                                 </div>
                                 <div class="document_btns">
-                                    <t t-if="item_files.has_right_to_review == true">
+                                    <t t-if="item_files.has_right_to_review == true || item_files.is_first_review == true">
                                         <button class="btn btn-primary document_manage_btn" t-att-data-id="item_files.id">审核操作</button>
+                                    </t>
+                                    <t t-if="item_files.state[0] == 'draft' || item_files.state[0] == 'waiting_release'||item_files.state[0] == 'deny'||item_files.state[0]=='cancel' ">
+                                        <a href="javascript:;" class="document_modify_wraper">文件修改
+                                        <input type="file" class="document_modify"/>
+                                        </a>
+                                    </t>
+                                    <t t-if="item_files.is_able_to_use == true">
+                                        <button class="btn btn-primary document_download">下载</button>
                                     </t>
                                 </div>
                             </div>
@@ -46,24 +88,98 @@
                 </div>
                 <t t-set="j" t-value="2"/>
             </t>
+        </div>
 
+        <!--上传文件界面-->
+        <div class="load_container">
+            <div class="load_wraper">
+                <div class="load_top_close">
+                    <span class="fa fa-close load_container_close"></span>
+                </div>
+                <div class="input_messages">
+                    <div>
+                        <p>文件名：</p>
+                        <!--<p>远程路径：</p>-->
+                        <p>上传文件：</p>
+                        <!--<p>版本号：</p>-->
+                    </div>
+                    <form enctype="multipart/form-data" action="/linkloving_pdm/upload_attachment_info" method="post" target="id_iframe">
+                        <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
+                        <input type="hidden" class="file_func" name="func"/>
+                        <input type="hidden" class="file_active_id" name="active_id"/>
+                        <input type="hidden" class="file_active_type" name="active_type"/>
+                        <input type="text" class="my_load_file_name" name="my_load_file_name"/>
+                        <input type="hidden" class="" name="my_load_file_remote_path" value=""/>
+                        <input type="hidden" class="" name="my_load_file_version" value=""/>
+                        <!--<input type="text" class="my_load_file_remote_path" name="my_load_file_remote_path"/>-->
+                        <a href="javascript:;">选择文件
+                            <input type="file" class="my_load_file" name="my_load_file"/>
+                        </a>
+                        <!--<input type="text" class="my_load_file_version" name="my_load_file_version"/>-->
+                        <input type="submit" value="提交" class="btn btn-info submit_file_yes"/>
+                    </form>
+                    <iframe id="id_iframe" name="id_iframe" style="display:none;"></iframe>
+                </div>
+                 <div class="submit_file">
+                    <!--<button class="btn btn-info submit_file_yes">上传</button>-->
+                    <button class="btn btn-default submit_file_no">取消</button>
+                </div>
+            </div>
         </div>
     </t>
 
     <t t-name="active_document_tab">
+        <script>
+            $(function () { $("[data-toggle='tooltip']").tooltip(); });
+        </script>
         <t t-foreach="result.files" t-as="item_files">
-            <div class="tab_pane_display">
+            <div class="tab_pane_display" t-att-data-id="item_files.id">
                 <div class="tab_message_display">
-                    <div>文件名：<span><t t-esc="item_files.file_name"/></span></div>
+                    <div>文件：<span><t t-esc="item_files.file_name"/></span></div>
                     <div>审核人：<span><t t-esc="item_files.review_id"/></span></div>
                     <div>远程地址：<span><t t-esc="item_files.remote_path"/></span></div>
                     <div>版本：<span><t t-esc="item_files.version"/></span></div>
-                    <div>状态：<span><t t-esc="item_files.state"/></span></div>
+                    <div>状态：<span><t t-esc="item_files.state[1]"/></span>
+                                        <t t-if="item_files.is_show_cancel">
+                                            <button class="btn btn-primary review_cancel" >取消审核</button>
+                                        </t>
+                                    </div>
+                    <div>创建人：<span><t t-esc="item_files.create_uid_name"/></span></div>
                 </div>
+                 <div class="document_review_list">
+                    <t t-foreach="item_files.review_line" t-as="review_list">
+                        <div><t t-esc="review_list.name"/></div>
+                        <t t-if="review_list.state=='review_success'">
+                            <span class="fa fa-long-arrow-right" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark"></span>
+                        </t>
+                        <t t-if="review_list.state=='waiting_review'">
+                            <span class="fa fa-long-arrow-right document_yellow"></span>
+                            <div>等待</div>
+                        </t>
+                        <t t-if="review_list.state=='review_fail'||review_list.state=='review_canceled'">
+                            <span class="fa fa-long-arrow-right document_red" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark"></span>
+                            <!--<div>审核不通过</div>-->
+                            <!--<span class="fa fa-long-arrow-right"></span>-->
+                        </t>
+                    </t>
+                     <t t-if="item_files.state[0] == 'released'">
+                        <div><t t-esc="item_files.state[1]" /></div>
+                    </t>
+
+                 </div>
                 <div class="document_btns">
-                    <!--<t t-if="item_files.has_right_to_review == true">-->
+                    <t t-if="item_files.has_right_to_review == true || item_files.is_first_review == true">
                         <button class="btn btn-primary document_manage_btn" t-att-data-id="item_files.id">审核操作</button>
-                    <!--</t>-->
+                    </t>
+                    <t t-if="item_files.state[0] == 'draft' || item_files.state[0] == 'waiting_release'||item_files.state[0] == 'deny'||item_files.state[0]=='cancel' ">
+                        <a href="javascript:;" class="document_modify_wraper">文件修改
+                        <input type="file" class="document_modify"/>
+                        </a>
+                    </t>
+
+                    <t t-if="item_files.is_able_to_use == true">
+                        <button class="btn btn-primary document_download">下载</button>
+                    </t>
                 </div>
             </div>
         </t>

@@ -92,7 +92,7 @@
                                        attrs="{'readonly':[('state','in',['close', 'cancelled'])]}"
                                        context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'project.group_project_manager']}"/>
                                 <newline/>
-                                <field name="partner_id" on_change="onchange_partner_id(partner_id)" string="Customer"/>
+                                <field name="partner_id" string="Customer"/>
                             </group>
                             <p attrs="{'invisible': [('analytic_account_id','=',False)]}">
                                 To invoice or setup invoicing and renewal options, go to the related contract:
@@ -159,7 +159,7 @@
                                     <field name="active"
                                            attrs="{'invisible':[('state','in',['open', 'pending', 'template'])]}"/>
                                     <!--groups="base.group_multi_currency" required="1"-->
-                                    <field name="currency_id"  required="0"/>
+                                    <field name="currency_id" required="0"/>
                                     <field name="parent_id" string="Parent"
                                            help="Append this project to another one using analytic accounts hierarchy"
                                            domain="[('id','!=',analytic_account_id)]"
@@ -179,6 +179,34 @@
                         <field name="message_ids" widget="mail_thread"/>
                     </div>
                 </form>
+            </field>
+        </record>
+
+        <record id="project.open_create_project" model="ir.actions.act_window">
+            <field name="name">Create a Project</field>
+            <field name="res_model">project.project</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="edit_project"/>
+            <field name="target">current</field>
+        </record>
+
+        <record id="project.open_view_project_all" model="ir.actions.act_window">
+            <field name="name">Projects</field>
+            <field name="res_model">project.project</field>
+            <field name="view_type">form</field>
+            <field name="domain">[]</field>
+            <field name="view_mode">kanban,form</field>
+            <field name="search_view_id" ref="project.view_project_project_filter"/>
+            <field name="target">main</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a new project.
+                    <br/>
+                    <i>Or <a type="action" name="%(project.activate_sample_project)d">activate a sample project</a> to
+                        play with.
+                    </i>
+                </p>
             </field>
         </record>
 
@@ -382,8 +410,9 @@
                     <field name="planned_hours" invisible="context.get('set_visible',False)"
                            groups="project.group_time_work_estimation_tasks"/>
                     <field name="effective_hours" widget="float_time" sum="Spent Hours" invisible="1"/>
+                    <!--on_change="onchange_remaining(remaining_hours,planned_hours)"-->
                     <field name="remaining_hours" widget="float_time" sum="Remaining Hours"
-                           on_change="onchange_remaining(remaining_hours,planned_hours)"
+
                            invisible="context.get('set_visible',False)"
                            groups="project.group_time_work_estimation_tasks"/>
                     <field name="date_deadline" invisible="context.get('deadline_visible',True)"/>

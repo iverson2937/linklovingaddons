@@ -56,6 +56,10 @@
                             confirm="确定取消订单吗？"/>
                 </xpath>
 
+                <xpath expr="//button[@name='action_done']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
 
                 <xpath expr="//field[@name='validity_date']" position="replace">
                     <field name="validity_date" string="交货日期" attrs="{'required':[('state','in',['draft','sent'])]}"/>
@@ -78,8 +82,8 @@
 
                 <xpath expr="//tree/field[@name='product_id']" position="replace">
                     <field name="product_id" options="{'no_create': True}"/>
-                    <field name="inner_code" string="国内简称"/>
-                    <field name="inner_spec" string="国内型号"/>
+                    <field name="inner_code" string="国内简称" readonly="1"/>
+                    <field name="inner_spec" string="国内型号" readonly="1"/>
                 </xpath>
                 <xpath expr="//tree/field[@name='tax_id']" position="attributes">
                     <attribute name='invisible'>1</attribute>
@@ -140,12 +144,20 @@
             <field name="inherit_id" ref="base.view_partner_tree"/>
             <field name="arch" type="xml">
                 <field name="display_name" position="before">
-                    <field name="internal_code"/>
-                    <field name="team_id"/>
+                    <field name="customer_code"/>
+                    <field name="team_id" invisible="1"/>
+                    <field name="user_id"/>
                 </field>
-                <field name="email" position="after">
-                    <field name="state_id"/>
-                </field>
+                <!--<field name="email" position="after">-->
+                <!--<field name="state_id"/>-->
+                <!--</field>-->
+
+
+                <xpath expr="//field[@name='display_name']" position="after">
+                    <field name="is_order"/>
+                    <field name="priority" widget="priority"/>
+                    <field name="level"/>
+                </xpath>
 
             </field>
         </record>
@@ -183,6 +195,18 @@
                 <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
                     <field name="pi_number" filter_domain="[('pi_number','ilike',self)]"/>
                 </xpath>
+
+                <xpath expr="//filter[@name='message_needaction']" position="after">
+                    <separator/>
+                    <filter string="未出货" domain="[('shipping_rate','=',0)]" name="shipping_rate"/>
+                    <filter string="部分出货"
+                            domain="['&amp;', ('shipping_rate','&gt;', 0), ('shipping_rate', '&lt;', 100)]"
+                            name="shipping_rate"/>
+                    <filter string="出货完成" domain="[('shipping_rate','&gt;=',100)]" name="shipping_rate"/>
+                    <separator/>
+                </xpath>
+
+
             </field>
         </record>
 
