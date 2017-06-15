@@ -81,28 +81,28 @@
 }
 
 
-.bom_review_list{
+#accordion .bom_review_list{
     overflow: hidden;
     margin-top: 30px;
 }
-.bom_review .bom_review_list>span{
+#accordion .bom_review .bom_review_list>span{
     width: 45px;
     color: green;
     float: left;
-    font-size: 36px;
+    font-size: 36px!important;
     margin-left: 8px;
     /*margin-top: -2px;*/
     display: block;
     height: 32px;
     margin-bottom: 3px;
 }
-.bom_review .bom_review_list>.document_yellow{
+#accordion .bom_review .bom_review_list>.document_yellow{
     color: darkorange!important;
 }
-.bom_review .bom_review_list>.document_red{
+#accordion .bom_review .bom_review_list>.document_red{
     color: red!important;
 }
-.bom_review  .bom_review_list>div{
+#accordion .bom_review  .bom_review_list>div{
     padding-left: 3px;
     padding-right: 3px;
     line-height: 30px;

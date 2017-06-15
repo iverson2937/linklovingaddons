@@ -28,6 +28,8 @@
                     <field name="product_count" string="汇总数量"/>
                     <field name="amount_total" string="汇总金额"/>
                     <field name="product_id" string="产品"/>
+                    <field name="shipping_rate" widget="progressbar"/>
+                    <field name="shipping_status" invisible="1"/>
                     <field name="state"/>
                     <field name="create_uid"/>
 
@@ -153,6 +155,14 @@
                     <field name="remark" filter_domain="[('remark','ilike',self)]" string="Remark"/>
                     <filter string="My Purchase Order" domain="[('create_uid','=',uid)]"
                             name="my_purchase_orders_filter"/>
+                    <separator/>
+                    <filter string="未入库" domain="[('shipping_rate','=',0)]" name="no"/>
+                    <filter string="部分入库"
+                            domain="['&amp;', ('shipping_rate','&gt;', 0), ('shipping_rate', '&lt;', 100)]"
+                            name="part_shipping"/>
+                    <filter string="入库完成" domain="[('shipping_rate','&gt;=',100)]" name="done"/>
+                    <separator/>
+
                 </xpath>
             </field>
         </record>
