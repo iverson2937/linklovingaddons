@@ -9,7 +9,11 @@
 
                 <xpath expr="//field[@name='category_id']" position="after">
                     <field name="crm_source_id" string="来源" attrs="{'invisible': [('customer','!=', True)]}"
-                           options="{'no_create':True}"/>
+                           options="{'no_create':True}" required="True"/>
+                </xpath>
+
+                <xpath expr="//field[@name='category_id']" position="attributes">
+                    <attribute name="required">True</attribute>
                 </xpath>
 
                 <xpath expr="//field[@name='crm_source_id']" position="after">
@@ -69,7 +73,8 @@
                     <field name="communication_identifier" invisible="1"/>
                 </xpath>
                 <xpath expr="//field[@name='lang']" position="after">
-                    <field name="priority" widget="priority" attrs="{'invisible':[('customer','=', False)]}"/>
+                    <field name="priority" widget="priority" attrs="{'invisible':[('customer','=', False)]}"
+                           required="True"/>
                 </xpath>
 
                 <xpath expr="//page[@name='accounting_disabled']" position="after">

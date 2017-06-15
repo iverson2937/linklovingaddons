@@ -19,7 +19,7 @@ class Partner(models.Model):
                               help="Check this box if this contact is a customer.")
 
     team_id = fields.Many2one('crm.team')
-    source_id = fields.Many2one('res.partner.source')
+    source_id = fields.Many2one('res.partner.source', required=True)
 
     level = fields.Selection([
         (1, u'lst'),
