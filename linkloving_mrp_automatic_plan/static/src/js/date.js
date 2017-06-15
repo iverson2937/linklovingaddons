@@ -93,6 +93,28 @@ odoo.define('linkloving_mrp_automatic_plan.date_manage', function (require) {
             $(".date_save_x").addClass("date_edit_x");
             $(".date_save_x").removeClass("date_save_x");
             $(".date_edit_x_cancel").hide()
+
+            return new Model("linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan")
+                .call("calc_status_light", [""])
+                .then(function (result){
+                    console.log(result)
+                    var holiday_jsons = JSON.parse(result.holiday)
+                    var holidays = holiday_jsons.data[0].holiday;
+                    self.holidays = holidays;
+
+                    self.$el.append(QWeb.render('Date_Detail'))
+
+                    setTimeout(function () {
+                        $(holidays).each(function () {
+                            // console.log($(this.list))
+                            $(this.list).each(function () {
+                                // console.log(this.date)
+                                $("#id_container .left ol li[data-complete="+this.date+"]").css("background","red")
+                            })
+                        })
+                    },200)
+
+                });
         },
         //点击编辑的事件
         edit_status_x:function () {
