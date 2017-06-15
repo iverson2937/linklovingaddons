@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'project'],
+    'depends': ['base', 'project', 'project_issue'],
 
     # always loaded
     'data': [
@@ -30,6 +30,8 @@
         'security/project_security.xml',
         'wizard/project_task_delegate_view.xml',
         'views/project_project.xml',
+        'views/project_issue.xml',
+        'views/project_issue_sheet_view.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

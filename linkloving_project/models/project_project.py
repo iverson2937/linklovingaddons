@@ -6,6 +6,27 @@ from odoo import models, fields, api, _
 class linkloving_project(models.Model):
     _inherit = 'project.project'
 
+    project_escalation_id = fields.Many2one('project.project', 'Project Escalation',
+                                            help='If any issue is escalated from the current Project, it will be listed under the project selected here.',
+                                            states={'close': [('readonly', True)],
+                                                    'cancelled': [('readonly', True)]})
+    members = fields.Many2many('res.users', 'project_user_rel', 'project_id', 'uid', 'Project Members',
+                                help="Project's members are users who can have an access to the tasks related to this project.",
+                                states={'close': [('readonly', True)], 'cancelled': [('readonly', True)]})
+
+    currency_id = fields.Many2one('res.currency', string='Currency')
+
+    def _check_escalation(self):
+        for project in self:
+            if project.project_escalation_id:
+                if project.project_escalation_id.id == project.id:
+                    return False
+            return True
+
+    _constraints = [
+        (_check_escalation, 'Error! You cannot assign escalation to the same project!', ['project_escalation_id'])
+    ]
+
     state = fields.Selection([('template', 'Template'),
                               ('draft', 'New'),
                               ('open', 'In Progress'),
@@ -199,6 +220,7 @@ class project_work(models.Model):
     user_id = fields.Many2one('res.users', 'Done by', required=True, select="1", default=lambda self: self.env.user)
     company_id = fields.Many2one('res.company', related='task_id.company_id', store=True, readonly=True)
 
+    @api.model
     def create(self, vals):
         if 'hours' in vals and (not vals['hours']):
             vals['hours'] = 0.00
@@ -208,6 +230,7 @@ class project_work(models.Model):
             self.env['project.task'].invalidate_cache(['remaining_hours'], [vals['task_id']])
         return super(project_work, self).create(vals)
 
+    @api.multi
     def write(self, vals):
         if 'hours' in vals and (not vals['hours']):
             vals['hours'] = 0.00
@@ -219,6 +242,7 @@ class project_work(models.Model):
                 task_obj.invalidate_cache(['remaining_hours'], [work.task_id.id])
         return super(project_work, self).write(vals)
 
+    @api.multi
     def unlink(self):
         task_obj = self.pool.get('project.task')
         for work in self:
