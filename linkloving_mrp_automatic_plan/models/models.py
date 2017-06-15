@@ -88,16 +88,16 @@ class linkloving_mrp_automatic_plan(models.Model):
         po_s = [self.env["purchase.order"]]
 
         def rescuise(mos, lv_mo, lv):
-            lv += 1
             new_mos = self.env["mrp.production"]
-            new_pos = self.env["purchase.order"]
+            mo_relate_mo.append([])
             for mo in lv_mo:
-                new_mos += mos.filtered(lambda x: mo.name in x.origin)
-                new_pos += pos.filtered(lambda x: mo.name in x.origin)
-            mo_relate_mo[lv] = {'mo': new_mos,
-                                'po': new_pos}
-            if new_mos:
-                rescuise(mos, new_mos, lv)
+                new_mos = mos.filtered(lambda x: mo.name in x.origin)
+                mo_relate_mo[lv].append({"origin_mo": mo, 'mos': new_mos})
+                if new_mos:
+                    rescuise(mos, new_mos, lv)
+            lv += 1
+            # if new_mos:
+            # rescuise(mos, new_mos, lv)
 
         all_data = []
         for so in sos:
@@ -105,20 +105,31 @@ class linkloving_mrp_automatic_plan(models.Model):
             mos = self.env["mrp.production"].search([("origin", 'like', so.name)])
             lv1_mo = mos.filtered(lambda x: "WH" in x.origin)
             all_mo_mo = []
+
+            origin_mos = []
+            for mo in mos:
+                origin_pos = pos.filtered(lambda x: mo.name in x.origin)
+                origin_mos.append({
+                    'mo': mo,
+                    'po': origin_pos,
+                })
+
             for mo in lv1_mo:
-                lv = 1
-                mo_relate_mo = {'id': mo,
-                                'po': pos.filtered(lambda x: mo.name in x.origin)}
+                lv = 0
+                mo_relate_mo = []
                 rescuise(mos, mo, lv)
                 all_mo_mo.append(mo_relate_mo)
 
             all_data.append({
                 'so': so,
-                'orders': all_mo_mo
+                'orders': all_mo_mo,
+                'origin_mos': origin_mos
             })
 
         print(all_data)
         self.cal_mo_light_status(all_data)
+        for order in all_data.get("orders"):
+            pass
         # so.action_cancel()
         # procurements = so.order_line.mapped('procurement_ids')
         # get_propagate_order(procurements)
@@ -140,6 +151,18 @@ class linkloving_mrp_automatic_plan(models.Model):
                 mo.status_light = "1"
             elif today_start < date_planned_start and today_end < date_planned_end:  # 开始在今天 结束不在
                 mo.status_light = "2"
+
+    def cal_po_light_status(self, pos):
+        today_start, today_end = self.get_today_start_end()
+        for po in pos:
+            if po.handle_date < today_start:
+                po.status_light = "2"
+            elif po.handle_date > today_end:
+                po.status_light = "0"
+            elif po.handle_date < today_end and po.handle_date > today_start:
+                po.status_light = "1"
+
+
 
     def get_today_start_end(self):
         timez = fields.datetime.now(pytz.timezone(self.env.user.tz)).tzinfo._utcoffset
