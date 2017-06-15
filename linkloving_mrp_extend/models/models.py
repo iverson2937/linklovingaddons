@@ -30,6 +30,8 @@ class MrpBomExtend(models.Model):
         ('release', u'正式')
     ], u'状态', track_visibility='onchange', default='new')
 
+    bom_remark = fields.Text(string=u"备注", track_visibility='onchange')
+
     @api.multi
     def set_to_release(self):
         self.state = 'release'
@@ -357,9 +359,18 @@ class MrpProductionExtend(models.Model):
         copy=False, default='confirmed', track_visibility='onchange')
 
     sale_remark = fields.Text(compute='_compute_sale_remark', string=u"销售单备注")
+
+    # bom_remark = fields.Text(compute="_compute_bom_remark", string=u'Bom备注')
     remark = fields.Text(string=u"MO单备注")
 
     picking_material_date = fields.Datetime()
+
+    factory_remark = fields.Text(string=u"工厂备注", track_visibility='onchange')
+
+    # @api.multi
+    # def _compute_bom_remark(self):
+    #     for production in self:
+
 
     @api.multi
     def _compute_sale_remark(self):
@@ -923,7 +934,7 @@ class ReturnOfMaterial(models.Model):
 
     @api.model
     def _default_return_line(self):
-        if self._context.get('active_id'):
+        if self._context.get('active_id') and self._context.get('active_mode') == "mrp.production":
             mrp_production_order = self.env['mrp.production'].browse(self._context['active_id'])
             if mrp_production_order.product_id.bom_ids:
                 product_ids = mrp_production_order.product_id.bom_ids[0].bom_line_ids.mapped(

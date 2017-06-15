@@ -127,22 +127,28 @@ class MrpBomLine(models.Model):
 
     @api.multi
     def write(self, vals):
-        if 'RT-ENG' in self.bom_id.product_tmpl_id.name and not self.env.user.has_group('mrp.group_mrp_manager'):
-            raise UserError(u'只有库存管理员才可以修改基础bom')
+
+        if (
+                'RT-ENG' in self.bom_id.product_tmpl_id.name or self.bom_id.product_tmpl_id.product_ll_type == 'semi-finished') \
+                and not self.env.user.has_group('mrp.group_mrp_manager'):
+            raise UserError(u'你没有权限修改请联系管理员')
         return super(MrpBomLine, self).write(vals)
 
     @api.multi
     def unlink(self):
-        if 'RT-ENG' in self.bom_id.product_tmpl_id.name and not self.env.user.has_group('mrp.group_mrp_manager'):
-            raise UserError(u'只有库存管理员才可以修改基础bom')
+        if (
+                'RT-ENG' in self.bom_id.product_tmpl_id.name or self.bom_id.product_tmpl_id.product_ll_type == 'semi-finished') \
+                and not self.env.user.has_group('mrp.group_mrp_manager'):
+            raise UserError(u'你没有权限修改请联系管理员')
         return super(MrpBomLine, self).unlink()
 
     @api.model
     def create(self, vals):
         if 'bom_id' in vals:
-            product_name = self.env['mrp.bom'].browse(vals['bom_id']).product_tmpl_id.name
-            if 'RT-ENG' in product_name and not self.env.user.has_group('mrp.group_mrp_manager'):
-                raise UserError(u'只有库存管理员才可以修改基础bom')
+            product_id = self.env['mrp.bom'].browse(vals['bom_id']).product_tmpl_id
+            if ('RT-ENG' in product_id.name or product_id.product_ll_type == 'semi-finished') \
+                    and not self.env.user.has_group('mrp.group_mrp_manager'):
+                raise UserError(u'你没有权限修改请联系管理员')
         return super(MrpBomLine, self).create(vals)
 
     @api.multi

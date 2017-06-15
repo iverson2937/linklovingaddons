@@ -6,7 +6,7 @@
             <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='action_cancel']" position="replace">
-                    <button name="action_cancel" states="draft,sent,sale" type="object" string="取消订单"
+                    <button name="action_cancel" states="draft,confirmed,waiting_material" type="object" string="取消订单"
                             confirm="确定制造订单吗？"/>
                 </xpath>
                 <div name="button_box" position="inside">

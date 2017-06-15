@@ -120,6 +120,9 @@ class BomUpdateWizard(models.TransientModel):
                             new_name = self.get_new_product_name(input_changed_value, postfix)
                             default_code = self.get_next_default_code(product_tmpl_id.default_code)
                             new_pl_id = product_tmpl_id.copy({'name': new_name, 'default_code': default_code})
+                            # 如果修改一个半成品替换的话，需拷贝bom
+                            if product_tmpl_id.bom_ids:
+                                product_tmpl_id.bom_ids[0].copy({'product_tmpl_id': new_pl_id.id})
                             product_id = new_pl_id.product_variant_ids[0].id
                         if product_id:
                             line_obj.create({
@@ -202,9 +205,12 @@ class BomUpdateWizard(models.TransientModel):
                 elif modify_type == 'edit':
                     product_tmpl_id = product_id_obj.browse(product_id).product_tmpl_id
                     if input_changed_value and product_tmpl_id.name != input_changed_value:
+
                         new_name = self.get_new_product_name(input_changed_value, postfix)
                         default_code = self.get_next_default_code(product_tmpl_id.default_code)
                         new_pl_id = product_tmpl_id.copy({'name': new_name, 'default_code': default_code})
+                        if product_tmpl_id.bom_ids:
+                            product_tmpl_id.bom_ids[0].copy({'product_tmpl_id': new_pl_id.id})
                         product_id = new_pl_id.product_variant_ids[0].id
 
                     last_bom_line_id = line_obj.browse(int(last_bom_line_id))
