@@ -37,7 +37,7 @@ class ResPartner(models.Model):
     whatsapp = fields.Char(string=u'WhatsApp')
     wechat = fields.Char(string=u'微信')
 
-    crm_source_id = fields.Many2one('crm.lead.source', string=u'来源', required=True)
+    crm_source_id = fields.Many2one('crm.lead.source', string=u'来源')
 
     customer_status = fields.Many2one('message.order.status', string=u'客户状态')
     is_order = fields.Boolean(string=u'订单记录', readonly=True, compute='_compute_is_order')
