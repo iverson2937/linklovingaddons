@@ -8,7 +8,7 @@ class CrmMailMessage(models.Model):
 
     messages_label_ids = fields.Many2many('message.label', 'message_label_mail_message_type_rel', string='记录类型')
 
-    messages_label_body = fields.Char()
+    # messages_label_body = fields.Char()
 
     postil = fields.Text(string='批注')
 
