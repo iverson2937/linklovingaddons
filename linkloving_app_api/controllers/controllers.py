@@ -1502,15 +1502,15 @@ class LinklovingAppApi(http.Controller):
         product_s = sudo_model.search(domain)
         if product_s:
             data = {
-                'theoretical_qty' : product_s.qty_available,
-                'product_qty' : 0,
-                'product' : {
-                    'product_id' : product_s.id,
-                    'product_name' : product_s.display_name,
-                    'image_medium' : LinklovingAppApi.get_product_image_url(product_s, model='product.product'),
-                    'product_spec' : product_s.product_specs,
-                    'area' : {
-                        'area_id' : product_s.area_id.id,
+                'theoretical_qty': product_s.qty_available,
+                'product_qty': 0,
+                'product': {
+                    'product_id': product_s.id,
+                    'product_name': product_s.display_name,
+                    'image_medium': LinklovingAppApi.get_product_image_url(product_s, model='product.product'),
+                    'product_spec': product_s.product_specs,
+                    'area': {
+                        'area_id': product_s.area_id.id,
                         'area_name': product_s.area_id.name,
                     }
                 }
