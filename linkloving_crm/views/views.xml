@@ -34,7 +34,7 @@
                 <!--左-->
 
                 <xpath expr="//field[@name='team_id']" position="after">
-                    <field name="crm_source_id" options="{'no_create': True}"/>
+                    <field name="crm_source_id" options="{'no_create': True}" required="True"/>
                 </xpath>
                 <xpath expr="//field[@name='crm_source_id']" position="after">
                     <field name="express_sample_record"/>

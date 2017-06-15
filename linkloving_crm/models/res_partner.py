@@ -21,7 +21,7 @@ class ResPartner(models.Model):
 
     _inherit = 'res.partner'
 
-    priority = fields.Selection(AVAILABLE_PRIORITIES, string=u'客户星级', index=True, default=AVAILABLE_PRIORITIES[0][0])
+    priority = fields.Selection(AVAILABLE_PRIORITIES, string=u'客户星级', index=True)
 
     detailed_address = fields.Char(string=u'地址', compute='_street_name')
 
@@ -37,7 +37,7 @@ class ResPartner(models.Model):
     whatsapp = fields.Char(string=u'WhatsApp')
     wechat = fields.Char(string=u'微信')
 
-    crm_source_id = fields.Many2one('crm.lead.source', string=u'来源')
+    crm_source_id = fields.Many2one('crm.lead.source', string=u'来源', required=True)
 
     customer_status = fields.Many2one('message.order.status', string=u'客户状态')
     is_order = fields.Boolean(string=u'订单记录', readonly=True, compute='_compute_is_order')

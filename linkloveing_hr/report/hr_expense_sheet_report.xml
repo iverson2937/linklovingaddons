@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-
         <template id="hr_expense.report_expense_sheet">
             <t t-call="report.html_container">
                 <t t-foreach="docs" t-as="o">
@@ -9,10 +8,10 @@
                         <t t-call="report.external_layout">
                             <div class="page">
                                 <div class="row">
-                                    <div class="col-xs-2">
+                                    <div class="col-xs-4">
                                         <h2>Expenses Report</h2>
                                     </div>
-                                    <div class="col-xs-offset-2 ">
+                                    <div class="col-xs-offset-4 ">
                                         <!--<strong>报销单号:</strong>-->
                                         <h2>
                                             <span t-field="o.expense_no"></span>
@@ -29,17 +28,21 @@
                                         <strong>Employee:</strong>
                                         <p t-field="o.employee_id.name"/>
                                     </div>
+                                    <div class="col-xs-3">
+                                        <strong>部门:</strong>
+                                        <p t-field="o.department_id"/>
+                                    </div>
                                     <div class="col-xs-2">
                                         <strong>Date:</strong>
                                         <p t-field="o.accounting_date"/>
                                     </div>
-                                    <div class="col-xs-2">
+                                    <div class="col-xs-5">
                                         <strong>Description:</strong>
                                         <p t-field="o.name"/>
                                     </div>
                                     <!--<div class="col-xs-2">-->
-                                        <!--<strong>Validated By:</strong>-->
-                                        <!--<p t-field="o.responsible_id"/>-->
+                                    <!--<strong>Validated By:</strong>-->
+                                    <!--<p t-field="o.responsible_id"/>-->
                                     <!--</div>-->
                                     <!--<div class="col-xs-2">-->
                                     <!--<strong>Payment By:</strong>-->
