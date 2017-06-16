@@ -1166,7 +1166,7 @@
             <field name="view_mode">tree,kanban,form,pivot,graph,calendar</field>
             <field name="domain">[('state','=',('make_by_mrp'))]</field>
             <field name="view_ids" eval="[(5,0,0),
-            (0,0,{'view_mode':'tree', 'view_id': ref('linkloving_purchase.purchase_order_tree_ll')}),
+            (0,0,{'view_mode':'tree', 'view_id': ref('purchase.purchase_order_tree')}),
             (0,0,{'view_mode':'form', 'view_id': ref('purchase.purchase_order_form')})]"/>
 
             <field name="search_view_id" ref="purchase.view_purchase_order_filter"/>
