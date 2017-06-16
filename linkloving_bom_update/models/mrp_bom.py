@@ -142,14 +142,14 @@ class MrpBomLine(models.Model):
             raise UserError(u'你没有权限修改请联系管理员')
         return super(MrpBomLine, self).unlink()
 
-    @api.model
-    def create(self, vals):
-        if 'bom_id' in vals:
-            product_id = self.env['mrp.bom'].browse(vals['bom_id']).product_tmpl_id
-            if ('RT-ENG' in product_id.name or product_id.product_ll_type == 'semi-finished') \
-                    and not self.env.user.has_group('mrp.group_mrp_manager'):
-                raise UserError(u'你没有权限修改请联系管理员')
-        return super(MrpBomLine, self).create(vals)
+    # @api.model
+    # def create(self, vals):
+    #     if 'bom_id' in vals:
+    #         product_id = self.env['mrp.bom'].browse(vals['bom_id']).product_tmpl_id
+    #         if ('RT-ENG' in product_id.name or product_id.product_ll_type == 'semi-finished') \
+    #                 and not self.env.user.has_group('mrp.group_mrp_manager'):
+    #             raise UserError(u'你没有权限修改请联系管理员')
+    #     return super(MrpBomLine, self).create(vals)
 
     @api.multi
     def toggle_highlight(self):
