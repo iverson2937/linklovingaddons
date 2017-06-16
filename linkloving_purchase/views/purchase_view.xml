@@ -153,6 +153,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//filter[@name='approved']" position="after">
                     <field name="remark" filter_domain="[('remark','ilike',self)]" string="Remark"/>
+                    <field name="origin" filter_domain="[('origin','ilike',self)]" string="源单据"/>
                     <filter string="My Purchase Order" domain="[('create_uid','=',uid)]"
                             name="my_purchase_orders_filter"/>
                     <separator/>
