@@ -7,9 +7,7 @@
             <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
             <field name="inherit_id" ref="project_issue.project_issue_form_view" />
             <field name="arch" type="xml">
-                <field name="project_id" position="attributes">
-                    <attribute name="on_change">on_change_project(project_id)</attribute>
-                </field>
+
                 <field name="active" position="after">
                     <newline/>
                     <group colspan="4"> 
@@ -19,15 +17,15 @@
                     </group>
                 </field>
                 <xpath expr="//notebook/page[1]" position="before">
-                    <page string="Worklogs">
+                    <page string="工作摘要">
                         <field name="timesheet_ids" colspan="4" nolabel="1" context="{'default_user_id' : uid, 'default_account_id' : analytic_account_id}"
                                 groups="base.group_user">
                             <tree editable="bottom" string="Timesheets">
                                 <field name="name"/>
-                                <field name="unit_amount" widget="float_time"/>
+                                <field name="unit_amount" widget="float_time" string="花费时间"/>
                                 <field name="account_id" invisible="0" domain="[('partner_id', '=', parent.partner_id)]" groups="analytic.group_analytic_accounting"/>
-                                <field name="date"/>
-                                <field name="user_id"/>
+                                <field name="date" string="日期"/>
+                                <field name="user_id" string="操作人"/>
                                 <field invisible="1" name="journal_id"/>
                                 <field invisible="1" name="product_id"/>
                                 <field invisible="1" name="product_uom_id"/>
