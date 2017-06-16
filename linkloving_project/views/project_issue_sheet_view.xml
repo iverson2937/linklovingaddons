@@ -5,25 +5,26 @@
             <field name="name">Project Issue Tracker Form</field>
             <field name="model">project.issue</field>
             <field name="groups_id" eval="[(4, ref('base.group_user'))]"/>
-            <field name="inherit_id" ref="project_issue.project_issue_form_view" />
+            <field name="inherit_id" ref="project_issue.project_issue_form_view"/>
             <field name="arch" type="xml">
-
-                <field name="active" position="after">
-                    <newline/>
-                    <group colspan="4"> 
-                        <field name="analytic_account_id"
-                               domain="[('parent_id','!=',False),('partner_id', '=', partner_id),('type', '!=', 'view')]"
-                               on_change=''/>
-                    </group>
-                </field>
+                <!--待解决-->
+                <xpath expr="//field[@name='task_id']" position="after">
+                    <field name="planed_level" widget="priority"/>
+                    <field name="actual_level" widget="priority"/>
+                    <field name="analytic_account_id"
+                           invisible="1"
+                           domain=""/>
+                </xpath>
                 <xpath expr="//notebook/page[1]" position="before">
                     <page string="工作摘要">
-                        <field name="timesheet_ids" colspan="4" nolabel="1" context="{'default_user_id' : uid, 'default_account_id' : analytic_account_id}"
-                                groups="base.group_user">
+                        <field name="timesheet_ids" colspan="4" nolabel="1"
+                               context="{'default_user_id' : uid, 'default_account_id' : analytic_account_id}"
+                               groups="base.group_user">
                             <tree editable="bottom" string="Timesheets">
                                 <field name="name"/>
                                 <field name="unit_amount" widget="float_time" string="花费时间"/>
-                                <field name="account_id" invisible="0" domain="[('partner_id', '=', parent.partner_id)]" groups="analytic.group_analytic_accounting"/>
+                                <field name="account_id" invisible="0" domain="[('partner_id', '=', parent.partner_id)]"
+                                       groups="analytic.group_analytic_accounting"/>
                                 <field name="date" string="日期"/>
                                 <field name="user_id" string="操作人"/>
                                 <field invisible="1" name="journal_id"/>
@@ -31,6 +32,7 @@
                                 <field invisible="1" name="product_uom_id"/>
                                 <field invisible="1" name="amount"/>
                                 <field invisible="1" name="general_account_id"/>
+                                <!--待解决-->
                                 <!--<field invisible="1" name="to_invoice"/>-->
                             </tree>
                         </field>
