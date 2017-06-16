@@ -71,16 +71,16 @@ class hr_analytic_timesheet(models.Model):
     _inherits = {'account.analytic.line': 'line_id'}
     _order = "id desc"
 
-    line_id = fields.Many2one('account.analytic.line', 'Analytic Line', ondelete='cascade', required=True)
-    partner_id = fields.Many2one('res.partner', related='account_id.partner_id', string='Partner', store=True)
+    # line_id = fields.Many2one('account.analytic.line', 'Analytic Line', ondelete='cascade', required=True)
+    # partner_id = fields.Many2one('res.partner', related='account_id.partner_id', string='Partner', store=True)
     issue_id = fields.Many2one('project.issue', 'Issue')
 
-    product_uom_id = fields.Many2one('product.uom', 'Unit of Measure', default="_getEmployeeUnit")
-    product_id = fields.Many2one('product.product', 'Product', default="_getEmployeeProduct")
+    product_uom_id = fields.Many2one('product.uom', 'Unit of Measure')
+    product_id = fields.Many2one('product.product', 'Product')
     general_account_id = fields.Many2one('account.account', 'General Account', required=True, ondelete='restrict',
-                                         default="_getGeneralAccount")
+                                         default=1)
     journal_id = fields.Many2one('account.analytic.journal', 'Analytic Journal', required=True, ondelete='restrict',
-                                 select=True, default="_getAnalyticJournal")
+                                 select=True, default=1)
     date = fields.Date()
     user_id = fields.Many2one('res.users')
 
@@ -124,50 +124,57 @@ class hr_analytic_timesheet(models.Model):
             return self.emp.product_id.uom_id.id
         return False
 
-    def _getGeneralAccount(self):
-        emp_obj = self.env['hr.employee']
-        emp_id = emp_obj.search([('user_id', '=', self._context.get('user_id') or self.env.user.id)])
-        if bool(self.emp.product_id):
-            a = self.emp.product_id.property_account_expense.id
-            if not a:
-                a = self.emp.product_id.categ_id.property_account_expense_categ.id
-            if a:
-                return a
-        return False
+    # def _getGeneralAccount(self):
+    #     emp_obj = self.env['hr.employee']
+    #     emp_id = emp_obj.search([('user_id', '=', self._context.get('user_id') or self.env.user.id)])
+    #     if bool(self.emp_id.product_id):
+    #         a = emp_id.product_id.property_account_expense.id
+    #         if not a:
+    #             a = emp_id.product_id.categ_id.property_account_expense_categ.id
+    #         if a:
+    #             return a
+    #     print 'dddddddddddddddddddddddddddddddddddddddddddd'
+    #     return False
 
-    def _getAnalyticJournal(self):
-        emp_obj = self.env['hr.employee']
-        if self._context.get('employee_id'):
-            emp_id = [self._context.get('employee_id')]
-        else:
-            emp_id = emp_obj.search([('user_id', '=', self._context.get('user_id') or self.env.user.id)], limit=1)
-        if not emp_id:
-            model, action_id = self.env['ir.model.data'].get_object_reference('hr', 'open_view_employee_list_my')
-            msg = _("Employee is not created for this user. Please create one from configuration panel.")
-            raise UserWarning('Go to the configuration panel')
-        emp = emp_obj.browse(emp_id[0])
-        if emp.journal_id:
-            return emp.journal_id.id
-        else:
-            raise UserWarning(
-                'No analytic journal defined for \'%s\'.\nYou should assign an analytic journal on the employee form.')
+    # def _getAnalyticJournal(self):
+    #     emp_obj = self.env['hr.employee']
+    #     if self._context.get('employee_id'):
+    #         emp_id = [self._context.get('employee_id')]
+    #     else:
+    #         emp_id = emp_obj.search([('user_id', '=', self._context.get('user_id') or self.env.user.id)], limit=1)
+    #     if not emp_id:
+    #         model, action_id = self.env['ir.model.data'].get_object_reference('hr', 'open_view_employee_list_my')
+    #         msg = _("Employee is not created for this user. Please create one from configuration panel.")
+    #         raise UserWarning('Go to the configuration panel')
+    #     emp = emp_obj.browse(emp_id[0])
+    #     if emp.journal_id:
+    #         return emp.journal_id.id
+    #     else:
+    #         raise UserWarning(
+    #             'No analytic journal defined for \'%s\'.\nYou should assign an analytic journal on the employee form.')
 
     @api.onchange("account_id")
     def on_change_account_id(self):
+        print self.account_id
+        print 'ddddddddddddddddddd333dddddd'
         return {'value': {}}
 
-    @api.onchange("date")
-    def on_change_date(self):
-        if self._ids:
-            new_date = self.read(self._ids[0], ['date'])['date']
-            if self._date != new_date:
-                warning = {'title': _('User Alert!'), 'message': _(
-                    'Changing the date will let this entry appear in the timesheet of the new date.')}
-                return {'value': {}, 'warning': warning}
-        return {'value': {}}
+    # @api.onchange("date")
+    # def on_change_date(self):
+    #     print 'ddddddddddddddddddddd'
+    #     if self._ids:
+    #         new_date = self.read(self._ids[0], ['date'])['date']
+    #         if self._date != new_date:
+    #             warning = {'title': _('User Alert!'), 'message': _(
+    #                 'Changing the date will let this entry appear in the timesheet of the new date.')}
+    #             return {'value': {}, 'warning': warning}
+    #     return {'value': {}}
+
+
 
     @api.model
     def create(self, vals):
+        print vals
         emp_obj = self.env['hr.employee']
         emp_id = emp_obj.search([('user_id', '=', self._context.get('user_id') or self.env.user.id)])
         ename = ''
@@ -182,23 +189,19 @@ class hr_analytic_timesheet(models.Model):
         return super(hr_analytic_timesheet, self).create(vals)
 
     # @api.onchange("user_id")
-    def on_change_user_id(self):
-        if not self.user_id:
-            return {}
-        context = {'user_id': self.user_id}
-        return {'value': {
-            'product_id': self._getEmployeeProduct(),
-            'product_uom_id': self._getEmployeeUnit(),
-            'general_account_id': self._getGeneralAccount(),
-            'journal_id': self._getAnalyticJournal(),
-        }}
+        # def on_change_user_id(self):
+        #     if not self.user_id:
+        #         return {}
+        #     context = {'user_id': self.user_id}
+        #     return {'value': {
+        #         'product_id': self._getEmployeeProduct(),
+        #         'product_uom_id': self._getEmployeeUnit(),
+        #         'general_account_id': self._getGeneralAccount(),
+        #         'journal_id': self._getAnalyticJournal(),
+        #     }}
 
 
-class hr_analytic_issue(models.Model):
-    _inherit = 'hr.analytic.timesheet'
-    _description = 'hr analytic timesheet'
 
-    issue_id = fields.Many2one('project.issue', 'Issue')
 
 
 class hr_timesheet_invoice_factor(models.Model):

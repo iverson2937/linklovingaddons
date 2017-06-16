@@ -14,8 +14,8 @@
                     <newline/>
                     <group colspan="4"> 
                         <field name="analytic_account_id"
-                            domain="[('parent_id','!=',False),('partner_id', '=', partner_id),('type', '!=', 'view')]"
-                            on_change='on_change_account_id(analytic_account_id)'/>
+                               domain="[('parent_id','!=',False),('partner_id', '=', partner_id),('type', '!=', 'view')]"
+                               on_change=''/>
                     </group>
                 </field>
                 <xpath expr="//notebook/page[1]" position="before">
