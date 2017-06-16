@@ -15,13 +15,13 @@
 
         <!--</field>-->
         <!--</record>-->
-        <record id="purchase.purchase_order_tree" model="ir.ui.view">
+        <record id="purchase_order_tree_inherit" model="ir.ui.view">
             <field name="name">purchase.order.tree.inherit</field>
             <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_tree"/>
             <field name="arch" type="xml">
-                <tree fonts="bold:message_unread==True" default_order="create_date desc"
-                      colors="grey:state=='cancel';blue:state in ('wait','confirmed');red:state in ('except_invoice','except_picking')"
-                      string="采购单">
+
+                <xpath expr="//tree" position="replace">
                     <field name="message_unread" invisible="1"/>
                     <field name="name" string="单号"/>
                     <field name="partner_id"/>
@@ -32,12 +32,7 @@
                     <field name="shipping_status" invisible="1"/>
                     <field name="state"/>
                     <field name="create_uid"/>
-
-
-                    <!--<field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>-->
-                    <!--<field name="invoice_status" invisible="not context.get('show_purchase', False)"/>-->
-                    <!--<field name="remark"/>-->
-                </tree>
+                </xpath>
 
             </field>
         </record>
