@@ -1001,9 +1001,9 @@ class LinklovingAppApi(http.Controller):
                 'product_id' : mrp_production.product_id.id,
             })
             produce.do_produce()
-        except UserError, e:
+        except Exception, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error':_('do produce error')})
+                                              res_data={'error': e.name})
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
