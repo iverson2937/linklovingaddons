@@ -122,18 +122,20 @@
                 <xpath expr="//notebook/page[3]" position="after">
                     <page string="投入">
                         <group colspan="4">
-                            <field name="input_product_ids" editable="bottom">
-                                <tree>
-                                    <field name="product_id" options="{'no_create':True}"/>
+                            <field name="input_product_ids" context="{'default_type':'input'}">
+                                <tree editable="bottom">
+                                    <field name="product_id" options="{'no_create':True}" string="产品"/>
+                                    <field name="type"/>
                                 </tree>
                             </field>
                         </group>
                     </page>
                     <page string="产出">
                         <group colspan="4">
-                            <field name="output_product_ids" editable="bottom">
-                                <tree>
-                                    <field name="product_id" options="{'no_create':True}"/>
+                            <field name="output_product_ids" context="{'default_type':'input'}">
+                                <tree editable="bottom" conext="{'default_type':'output'}">
+                                    <field name="product_id" options="{'no_create':True}" string="产品"/>
+                                    <field name="type"/>
                                 </tree>
                             </field>
                         </group>
