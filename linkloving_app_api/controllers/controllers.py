@@ -838,10 +838,10 @@ class LinklovingAppApi(http.Controller):
     def finish_prepare_material(self, **kw):
         order_id = request.jsonrequest.get('order_id') #get paramter
         mrp_production_model = request.env['mrp.production']
-        mrp_production = mrp_production_model.sudo(user=request.context.get("uid")).search([('id', '=', order_id)])[0]
+        mrp_production = mrp_production_model.sudo().search([('id', '=', order_id)])[0]
 
         stock_moves = request.jsonrequest.get('stock_moves') #get paramter
-        stock_move_lines = request.env["sim.stock.move"].sudo(user=request.context.get("uid"))
+        stock_move_lines = request.env["sim.stock.move"].sudo()
         try:
             for move in stock_moves:
                 sim_stock_move = LinklovingAppApi.get_model_by_id(move['stock_move_lines_id'], request,
