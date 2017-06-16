@@ -79,9 +79,33 @@
 .o_content .o_form_sheet{
     margin:100px auto!important;
 }
-.o_list_view thead{
+/*.o_list_view thead{*/
+    /*position: relative;*/
+/*}*/
+/*.o_list_view thead>tr{*/
+    /*position: relative;*/
+/*}*/
+
+
+.table-responsive table{
     position: relative;
 }
-.o_list_view thead>tr{
-    position: relative;
+.table-responsive thead{
+    position: fixed;
+    width: calc(100% - 237px);
+}
+.table-responsive .not_full_thead{
+    position: fixed;
+    width: calc(100% - 220px)!important;
+}
+.table-responsive thead tr{
+    width: 100%;
+    display: block;
+}
+.table-responsive thead tr th{
+    /*padding: 8px;*/
+    padding-right: 0;
+}
+.table-responsive tbody{
+    /*margin-top: 50px;*/
 }
