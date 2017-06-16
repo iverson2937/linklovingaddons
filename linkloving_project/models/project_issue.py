@@ -16,6 +16,7 @@ class project_issue(models.Model):
     _inherit = 'project.issue'
 
     version_id = fields.Many2one('project.issue.version', 'Version')
+    date_deadline = fields.Date(string=u'截止日期')
     planed_level = fields.Selection(AVAILABLE_PRIORITIES, string=u'计划星级')
     actual_level = fields.Selection(AVAILABLE_PRIORITIES, string=u'质量星级')
 
