@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_linkloving_project_task_work,linkloving_project.linkloving_project_task_work,model_project_task_work,,1,1,1,1
+access_linkloving_.linkloving_hr_analytic_timesheet,linkloving_project.linkloving_hr_analytic_timesheet,model_hr_analytic_timesheet,,1,1,1,1
+access_linkloving_.linkloving_hr_timesheet_invoice_factor,linkloving_project.linkloving_hr_timesheet_invoice_factor,model_hr_timesheet_invoice_factor,,1,1,1,1
