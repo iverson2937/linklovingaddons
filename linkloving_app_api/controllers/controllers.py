@@ -842,52 +842,57 @@ class LinklovingAppApi(http.Controller):
 
         stock_moves = request.jsonrequest.get('stock_moves') #get paramter
         stock_move_lines = request.env["sim.stock.move"].sudo(user=request.context.get("uid"))
-        for move in stock_moves:
-            sim_stock_move = LinklovingAppApi.get_model_by_id(move['stock_move_lines_id'], request, 'sim.stock.move')
-            stock_move_lines += sim_stock_move
-            if not sim_stock_move.stock_moves:
-                continue
+        try:
+            for move in stock_moves:
+                sim_stock_move = LinklovingAppApi.get_model_by_id(move['stock_move_lines_id'], request,
+                                                                  'sim.stock.move')
+                stock_move_lines += sim_stock_move
+                if not sim_stock_move.stock_moves:
+                    continue
 
-            if move['quantity_ready'] > 0:
-                sim_stock_move.is_prepare_finished = True
-            else:
-                continue
-            rounding = sim_stock_move.stock_moves[0].product_uom.rounding
-            if float_compare(move['quantity_ready'], sim_stock_move.stock_moves[0].product_uom_qty, precision_rounding=rounding) > 0:
-                qty_split = sim_stock_move.stock_moves[0].product_uom._compute_quantity(
-                    move['quantity_ready'] - sim_stock_move.stock_moves[0].product_uom_qty,
-                    sim_stock_move.stock_moves[0].product_id.uom_id)
+                if move['quantity_ready'] > 0:
+                    sim_stock_move.is_prepare_finished = True
+                else:
+                    continue
+                rounding = sim_stock_move.stock_moves[0].product_uom.rounding
+                if float_compare(move['quantity_ready'], sim_stock_move.stock_moves[0].product_uom_qty,
+                                 precision_rounding=rounding) > 0:
+                    qty_split = sim_stock_move.stock_moves[0].product_uom._compute_quantity(
+                            move['quantity_ready'] - sim_stock_move.stock_moves[0].product_uom_qty,
+                            sim_stock_move.stock_moves[0].product_id.uom_id)
 
-                split_move = sim_stock_move.stock_moves[0].copy(
-                    default={'quantity_done': qty_split, 'product_uom_qty': qty_split,
-                             'production_id': sim_stock_move.production_id.id,
-                             'raw_material_production_id': sim_stock_move.raw_material_production_id.id,
-                             'procurement_id': sim_stock_move.procurement_id.id or False,
-                             'is_over_picking': True})
-                sim_stock_move.production_id.move_raw_ids = sim_stock_move.production_id.move_raw_ids + split_move
-                split_move.write({'state': 'assigned', })
-                sim_stock_move.stock_moves[0].quantity_done = sim_stock_move.stock_moves[0].product_uom_qty
-                split_move.action_done()
-                sim_stock_move.stock_moves[0].action_done()
-            else:
-                sim_stock_move.stock_moves[0].quantity_done_store = move['quantity_ready']
-                sim_stock_move.stock_moves[0].quantity_done = move['quantity_ready']
-                sim_stock_move.stock_moves[0].action_done()
-            sim_stock_move.quantity_ready = 0  # 清0
-        # try:
-        #     mrp_production.post_inventory()
-        # except UserError, e:.filtered(lambda x: x.product_type != 'semi-finished')
-        #     return JsonResponse.send_response(STATUS_CODE_ERROR,
-        #                                       res_data={"error":e.name})
-        if all(sim_move.is_prepare_finished for sim_move in
-               stock_move_lines.filtered(lambda x: x.product_type != 'semi-finished')):
-            mrp_production.write({'state': 'finish_prepare_material'})
+                    split_move = sim_stock_move.stock_moves[0].copy(
+                            default={'quantity_done': qty_split, 'product_uom_qty': qty_split,
+                                     'production_id': sim_stock_move.production_id.id,
+                                     'raw_material_production_id': sim_stock_move.raw_material_production_id.id,
+                                     'procurement_id': sim_stock_move.procurement_id.id or False,
+                                     'is_over_picking': True})
+                    sim_stock_move.production_id.move_raw_ids = sim_stock_move.production_id.move_raw_ids + split_move
+                    split_move.write({'state': 'assigned',})
+                    sim_stock_move.stock_moves[0].quantity_done = sim_stock_move.stock_moves[0].product_uom_qty
+                    split_move.action_done()
+                    sim_stock_move.stock_moves[0].action_done()
+                else:
+                    sim_stock_move.stock_moves[0].quantity_done_store = move['quantity_ready']
+                    sim_stock_move.stock_moves[0].quantity_done = move['quantity_ready']
+                    sim_stock_move.stock_moves[0].action_done()
+                sim_stock_move.quantity_ready = 0  # 清0
+            # try:
+            #     mrp_production.post_inventory()
+            # except UserError, e:.filtered(lambda x: x.product_type != 'semi-finished')
+            #     return JsonResponse.send_response(STATUS_CODE_ERROR,
+            #                                       res_data={"error":e.name})
+            if all(sim_move.is_prepare_finished for sim_move in
+                   stock_move_lines.filtered(lambda x: x.product_type != 'semi-finished')):
+                mrp_production.write({'state': 'finish_prepare_material'})
 
-            JPushExtend.send_notification_push(audience=jpush.audience(
-                    jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
-            ), notification=mrp_production.product_id.name,
-                    body=_("Qty:%d,Finish picking！") % (mrp_production.product_qty))
-
+                JPushExtend.send_notification_push(audience=jpush.audience(
+                        jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
+                ), notification=mrp_production.product_id.name,
+                        body=_("Qty:%d,Finish picking！") % (mrp_production.product_qty))
+        except Exception, e:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={"error": e.name})
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
