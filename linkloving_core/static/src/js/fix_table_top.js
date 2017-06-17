@@ -36,7 +36,7 @@ odoo.define('linkloving_core.TreeView', function (require) {
                     $("tbody tr:first td").height($("thead tr th").height());
 
                    if($(".table-responsive>table").height()<$(".o_view_manager_content").height()){
-                       $(".table-responsive thead").addClass("not_full_thead")
+                       $(".table-responsive thead").addClass("not_full_thead");
                    }
                 }
             })
