@@ -2,11 +2,9 @@
 import math
 
 import datetime
-
 from odoo import models, fields, api, _
+from odoo.tools import float_compare,float_round
 from odoo.exceptions import UserError
-from odoo.tools import float_compare
-from odoo.tools import float_round
 
 
 class NewMrpProduction(models.Model):
