@@ -1,0 +1,97 @@
+<odoo>
+    <data>
+
+
+        <record id="output_material_form" model="ir.ui.view">
+            <field name="name">产出</field>
+            <field name="model">mrp.production</field>
+            <field name="priority" eval="100"/>
+            <field name="arch" type="xml">
+                <form string="产出">
+                    <field name="output_product_ids" options="{'reload_on_button': True}">
+                        <tree editable="bottom" delete="0" create="0">
+                            <field name="product_id" readonly="1" options="{'no_create': True}"/>
+                            <field name="total_produce_qty"/>
+                            <field name="produce_qty"/>
+                        </tree>
+                    </field>
+                    <!--<field name="move_raw_ids" options="{'reload_on_button': True}">-->
+                    <!--<tree editable="bottom" delete="0" default_order="is_done desc,sequence" decoration-muted="is_done" decoration-warning="quantity_done&gt;product_uom_qty" decoration-success="quantity_done==product_uom_qty" decoration-danger="quantity_available &lt; product_uom_qty" create="0">-->
+                    <!--<field name="product_id" required="1"/>-->
+                    <!--<field name="product_uom" groups="product.group_uom"/>-->
+                    <!--<field name="has_tracking" invisible="1"/>-->
+                    <!--<field name="is_done" invisible="1"/>-->
+                    <!--<field name="sequence" invisible="1"/>-->
+                    <!--<field name="location_id" domain="[('id', 'child_of', parent.location_id)]" invisible="1"/>-->
+                    <!--<field name="location_dest_id" domain="[('id', 'child_of', parent.location_dest_id)]" invisible="1"/>-->
+                    <!--<field name="state" invisible="1"/>-->
+                    <!--<field name="suggest_qty" readonly="1"/>-->
+                    <!--<field name="quantity_available" attrs="{'invisible': [('is_done', '=', True)]}"/>-->
+                    <!--<field name="product_uom_qty" readonly="1" attrs="{'required': [('product_id', '!=', False)]}" string="To Consume"/>-->
+                    <!--<field name="quantity_done" attrs="{'readonly': [ '|', ('is_done', '=', True),('has_tracking', 'in', ['lot','serial'])]}" string="Consumed"/>-->
+                    <!--<field name="over_picking_qty" invisible="context.get('overpicking_invisible')"/>-->
+                    <!--<button name="split_move_lot" string="Register lots" type="object" icon="fa-list" attrs="{'invisible': [('has_tracking', 'not in', ['lot','serial'])]}"/>-->
+                    <!--</tree>-->
+                    <!--</field>-->
+                    <footer>
+                        <button name="confirm_output" string="Confirm"
+                                colspan="1" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="mrp_production_form_view_inherit" model="ir.ui.view">
+            <field name="name">mrp.production.tree.inherit</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+            <field name="arch" type="xml">
+
+
+                <xpath expr="//field[@name='bom_id']" position="attributes">
+                    <attribute name="readonly">0</attribute>
+                </xpath>
+
+                <xpath expr="//button[@name='button_plan']" position="after">
+                    <button name="button_multi_output" class="oe_highlight"
+                            attrs="{'invisible': [('state', '!=', 'progress')]}" type="object"
+                            string="产出" groups="linkloving_mrp_extend.group_charge_inspection"/>
+
+                </xpath>
+
+
+                <xpath expr="//field[@name='bom_id']" position="after">
+                    <field name="is_multi_output"/>
+                </xpath>
+
+
+                <xpath expr="//notebook/page[3]" position="after">
+                    <page string="投入">
+                        <group colspan="4">
+                            <field name="input_product_ids" context="{'default_type':'input'}">
+                                <tree editable="bottom">
+                                    <field name="product_id" options="{'no_create':True}" string="产品"/>
+                                    <field name="type" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                    <page string="产出">
+                        <group colspan="4">
+                            <field name="output_product_ids" context="{'default_type':'output'}">
+                                <tree editable="bottom" conext="{'default_type':'output'}">
+                                    <field name="product_id" options="{'no_create':True}" string="产品"/>
+                                    <field name="type" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                </xpath>
+
+
+            </field>
+        </record>
+    </data>
+</odoo>
