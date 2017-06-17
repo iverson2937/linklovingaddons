@@ -23,21 +23,33 @@ odoo.define('linkloving_core.TreeView', function (require) {
                 // console.log(settings)
                 // var data = JSON.parse(settings.data)
                 if(settings.url == '/web/dataset/search_read'){
-                    $("tbody tr:first td").each(function (index) {
-                        // $("thead tr:first th").eq(index).width($(this).width());
-                        $("thead tr:first th").eq(index).css("width",index==0 ? $(this).width()/$("thead tr:first").width()*100+'%':$(this).width()+10);
-                        console.log($(this).width())
-                    })
-                    if($("tbody tr:first").hasClass("add_empty_tr")){
+                    // if($(".o_view_manager_content>.o_form_view")){
+                    //     console.log('ssss')
+                    // }else {
+                        $(".table-responsive table").addClass("fix_table");
+                        $(".table-responsive thead").addClass("fix_table_thead");
+                        $(".table-responsive thead tr").addClass("fix_table_thead_tr");
+                        $(".table-responsive thead tr th").addClass("fix_table_thead_tr_th");
 
-                    }else {
-                        $("tbody").prepend("<tr class='add_empty_tr'><td> </td></tr>");
-                    }
-                    $("tbody tr:first td").height($("thead tr th").height());
 
-                   if($(".table-responsive>table").height()<$(".o_view_manager_content").height()){
-                       $(".table-responsive thead").addClass("not_full_thead");
-                   }
+                        $("tbody tr:first td").each(function (index) {
+                            // $("thead tr:first th").eq(index).width($(this).width());
+                            $("thead tr:first th").eq(index).css("width", index == 0 ? $(this).width() / $("thead tr:first").width() * 100 + '%' : $(this).width() + 10);
+                            console.log($(this).width())
+                        })
+                        if ($("tbody tr:first").hasClass("add_empty_tr")) {
+
+                        } else {
+                            $("tbody").prepend("<tr class='add_empty_tr'><td> </td></tr>");
+                        }
+                        $("tbody tr:first td").height($("thead tr th").height());
+
+                        if ($(".table-responsive>table").height() < $(".o_view_manager_content").height()) {
+                            $(".table-responsive thead").addClass("not_full_thead");
+                        }else {
+                             $(".table-responsive thead").removeClass("not_full_thead");
+                        }
+                    // }
                 }
             })
             $(window).resize(function () {
@@ -53,9 +65,11 @@ odoo.define('linkloving_core.TreeView', function (require) {
                     // }
                     $("tbody tr:first td").height($("thead tr th").height());
 
-                   if($(".table-responsive>table").height()<$(".o_view_manager_content").height()){
-                       $(".table-responsive thead").addClass("not_full_thead")
-                   }
+                   // if($(".table-responsive>table").height() < $(".o_view_manager_content").height()){
+                   //     $(".table-responsive thead").addClass("not_full_thead")
+                   // }else {
+                   //     $(".table-responsive thead").removeClass("not_full_thead");
+                   // }
             })
 
         }

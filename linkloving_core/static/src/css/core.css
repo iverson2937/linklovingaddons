@@ -87,10 +87,10 @@
 /*}*/
 
 
-.table-responsive table{
+.fix_table{
     position: relative;
 }
-.table-responsive thead{
+.fix_table_thead{
     position: fixed;
     width: calc(100% - 237px);
 }
@@ -98,14 +98,10 @@
     position: fixed;
     width: calc(100% - 220px)!important;
 }
-.table-responsive thead tr{
+.fix_table_thead_tr{
     width: 100%;
     display: block;
 }
-.table-responsive thead tr th{
-    /*padding: 8px;*/
+.fix_table_thead_tr_th{
     padding-right: 0;
-}
-.table-responsive tbody{
-    /*margin-top: 50px;*/
 }
