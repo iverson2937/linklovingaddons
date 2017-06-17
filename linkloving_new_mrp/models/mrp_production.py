@@ -3,7 +3,7 @@ import math
 
 import datetime
 from odoo import models, fields, api, _
-from odoo.tools import float_compare,float_round
+from odoo.tools import float_compare, float_round
 from odoo.exceptions import UserError
 
 
