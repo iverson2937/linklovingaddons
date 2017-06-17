@@ -685,6 +685,8 @@ odoo.define('mail.chat_managers', function (require) {
             // enrichment at display time but the current design makes this quite hard to do.
             var body = utils.parse_and_transform(_.str.trim(data.content), utils.add_link);
 
+
+            alert(data)
             var msg = {
                 partner_ids: data.partner_ids,
                 body: body,

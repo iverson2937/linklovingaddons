@@ -1,7 +1,7 @@
 odoo.define('mail.Chatters', function (require) {
     "use strict";
     var chat_manager = require('mail.chat_managers');
-    var composer = require('mail.composer');
+    var composer = require('mail.composers');
     var ChatThread = require('mail.ChatThreads');
     var utils = require('mail.utils');
 
@@ -24,7 +24,7 @@ odoo.define('mail.Chatters', function (require) {
 // informations), and the button to open the full composer wizard.
 // -----------------------------------------------------------------------------
     var ChatterComposer = composer.BasicComposer.extend({
-        template: 'mail.chatters.ChatComposer',
+        template: 'mail.chatters.ChatComposers',
 
         init: function (parent, dataset, options) {
             this._super(parent, options);
