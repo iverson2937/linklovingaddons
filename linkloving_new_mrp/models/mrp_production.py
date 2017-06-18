@@ -10,15 +10,40 @@ from odoo.exceptions import UserError
 class NewMrpProduction(models.Model):
     _inherit = 'mrp.production'
     is_multi_output = fields.Boolean(default=True)
+
+    product_id = fields.Many2one(
+        'product.product', 'Product',
+        domain=[('type', 'in', ['product', 'consu'])],
+        readonly=True, required=False,
+        states={'confirmed': [('readonly', False)]})
     output_product_ids = fields.One2many('mrp.production.material', 'mo_id', domain=[('type', '=', 'output')])
     input_product_ids = fields.One2many('mrp.production.material', 'mo_id', domain=[('type', '=', 'input')])
 
+    def button_waiting_material(self):
+        if self.is_multi_output:
+            self._generate_moves()
+            self._compute_sim_stock_move_lines(self)
+        self.write({'state': 'waiting_material'})
+
     @api.multi
     def confirm_output(self):
+
         for line in self.output_product_ids:
             for finish_id in self.move_finished_ids:
                 if line.product_id.id == finish_id.product_id.id:
-                    finish_id.product_uom_qty = line.produce_qty
+                    finish_id.quantity_done += line.produce_qty
+
+        if sum(move.quantity_done for move in self.move_raw_ids) < sum(
+                move.quantity_done for move in self.move_finished_ids):
+            raise UserError('产出大于投入')
+
+    def button_produce_finish(self):
+        if self.is_multi_output:
+            self.post_inventory()
+            self.state = 'done'
+            return
+        else:
+            super(NewMrpProduction, self).button_produce_finish()
 
         @api.multi
         def do_produce(self):
@@ -47,6 +72,19 @@ class NewMrpProduction(models.Model):
                     'date_start': datetime.now(),
                 })
             return {'type': 'ir.actions.act_window_close'}
+
+    @api.multi
+    def add_input_out_products(self):
+        view = self.env.ref('linkloving_new_mrp.add_input_output_material_form')
+        return {'type': 'ir.actions.act_window',
+                'res_model': 'mrp.production',
+                'view_mode': 'form',
+                'view_id': view.id,
+                'res_id': self.id,
+                # 'context': {'picking_mode': picking_mode,
+                #             'overpicking_invisible': overpicking_invisible,
+                #             'quantity_ready_invisible': quantity_ready_invisible},
+                'target': 'new'}
 
     @api.multi
     def button_multi_output(self):
@@ -141,7 +179,7 @@ class NewMrpProduction(models.Model):
                     'product_id': line.product_id.id,
                     'product_uom': line.product_id.uom_id.id,
                     'product_uom_qty': self.product_qty,
-                    'location_id': self.product_id.property_stock_production.id,
+                    'location_id': line.product_id.property_stock_production.id,
                     'location_dest_id': self.location_dest_id.id,
                     'move_dest_id': self.procurement_ids and self.procurement_ids[0].move_dest_id.id or False,
                     'procurement_id': self.procurement_ids and self.procurement_ids[0].id or False,
@@ -170,6 +208,11 @@ class NewMrpProduction(models.Model):
             })
             move.action_confirm()
             return move
+
+    product_uom_id = fields.Many2one(
+        'product.uom', 'Product Unit of Measure',
+        oldname='product_uom', readonly=True, required=False,
+        states={'confirmed': [('readonly', False)]})
 
     def _generate_raw_moves(self, exploded_lines):
         self.ensure_one()
@@ -206,14 +249,50 @@ class NewMrpProduction(models.Model):
                 moves += self._generate_raw_move(bom_line, line_data)
         return moves
 
+    state = fields.Selection([
+        ('draft', _('Draft')),
+        ('confirmed', u'已排产'),
+        ('waiting_material', _('Waiting Prepare Material')),
+        ('prepare_material_ing', _('Material Preparing')),
+        ('finish_prepare_material', _('Material Ready')),
+        ('already_picking', _('Already Picking Material')),
+        ('planned', 'Planned'),
+        ('progress', '生产中'),
+        ('waiting_inspection_finish', u'等待品检完成'),
+        ('waiting_quality_inspection', _('Waiting Quality Inspection')),
+        ('quality_inspection_ing', _('Under Quality Inspection')),
+        ('waiting_rework', _('Waiting Rework')),
+        ('rework_ing', _('Under Rework')),
+        ('waiting_inventory_material', _('Waiting Inventory Material')),
+        ('waiting_warehouse_inspection', _('Waiting Check Return Material')),
+        ('waiting_post_inventory', _('Waiting Stock Transfers')),
+        ('done', 'Done'),
+        ('cancel', 'Cancelled')], string='status',
+        copy=False, default='draft', track_visibility='onchange')
+
+    @api.multi
+    def _generate_moves(self):
+        for production in self:
+            if production.state == 'draft' and production.is_multi_output:
+                return
+            production._generate_finished_moves()
+            factor = 1
+            boms, lines = production.bom_id.explode(production.product_id, factor,
+                                                    picking_type=production.bom_id.picking_type_id)
+            production._generate_raw_moves(lines)
+            # Check for all draft moves whether they are mto or not
+            production._adjust_procure_method()
+            production.move_raw_ids.action_confirm()
+        return True
+
 
 class MrpProductionMaterial(models.Model):
     _name = 'mrp.production.material'
     product_id = fields.Many2one('product.product', string=u'产品', required=True)
-    total_produce_qty = fields.Float(string=u'累计产出数量')
+    # total_produce_qty = fields.Float(string=u'累计产出数量')
     produce_qty = fields.Float(string=u'产出数量')
 
-    mo_id = fields.Many2one('mrp.production')
+    mo_id = fields.Many2one('mrp.production', on_delete='cascade')
     type = fields.Selection([
         ('input', '输入'),
         ('output', '输出')

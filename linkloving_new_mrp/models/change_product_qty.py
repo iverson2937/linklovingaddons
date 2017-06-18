@@ -25,11 +25,7 @@ class ChangeProductionQty(models.TransientModel):
                                                                  production.bom_id.product_uom_id) / production.bom_id.product_qty
             boms, lines = production.bom_id.explode(production.product_id, factor,
                                                     picking_type=production.bom_id.picking_type_id)
-            if production.is_multi_output:
-                for line in production.input_product_ids:
-                    production.update_input_material(line, production.product_qty)
-
-            else:
+            if not production.is_multi_output:
                 for line, line_data in lines:
                     production._update_raw_move(line, line_data)
             operation_bom_qty = {}
@@ -83,3 +79,8 @@ class ChangeProductionQty(models.TransientModel):
                 production_move = production.move_finished_ids.filtered(
                     lambda x: x.state not in ('done', 'cancel') and production.product_id.id == x.product_id.id)
                 production_move.write({'product_uom_qty': qty})
+
+
+
+
+
