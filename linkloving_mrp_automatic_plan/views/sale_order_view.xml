@@ -10,5 +10,18 @@
             </field>
         </record>
 
+        <!-- Inherit Form View to Modify it -->
+        <record id="ll_view_order_form" model="ir.ui.view">
+            <field name="name">sale.order.form.inherit</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='order_line']/tree/field[@name='customer_lead']" position="after">
+                    <field name="status_light"/>
+                </xpath>
+
+            </field>
+        </record>
     </data>
 </openerp>

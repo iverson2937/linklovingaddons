@@ -30,36 +30,36 @@ class linkloving_mrp_automatic_plan(models.Model):
 
     def calc_status_light(self):
 
-        def get_propagate_po(propagated_procurements):
-            pos = self.env["purchase.order"]
-            for procurement in propagated_procurements:
-                if procurement.rule_id.action == 'buy':
-                    if procurement.purchase_line_id:
-                        pos += procurement.purchase_line_id.order_id
-                    else:
-                        propagated_procurements -= procurement
-            if pos:
-                return pos
-            else:
-                return propagated_procurements
+        # def get_propagate_po(propagated_procurements):
+        #     pos = self.env["purchase.order"]
+        #     for procurement in propagated_procurements:
+        #         if procurement.rule_id.action == 'buy':
+        #             if procurement.purchase_line_id:
+        #                 pos += procurement.purchase_line_id.order_id
+        #             else:
+        #                 propagated_procurements -= procurement
+        #     if pos:
+        #         return pos
+        #     else:
+        #         return propagated_procurements
 
-        def get_propagate_sm(propagated_procurements):
-            cancel_moves = propagated_procurements.filtered(lambda order: order.rule_id.action == 'move').mapped(
-                'move_ids')
-            new_ps = propagated_procurements.search(
-                    [('move_dest_id', 'in', cancel_moves.filtered(lambda move: move.propagate).ids)])
-            if new_ps:
-                return get_propagate_po(new_ps)
-            else:
-                return get_propagate_po(propagated_procurements)
-
-        def get_propagate_mo(propagated_procurements):
-            production_orders = propagated_procurements.filtered(
-                lambda procurement: procurement.rule_id.action == 'manufacture' and procurement.production_id).mapped(
-                'production_id')
-            if production_orders:
-                return production_orders
-            return get_propagate_sm(propagated_procurements)
+        # def get_propagate_sm(propagated_procurements):
+        #     cancel_moves = propagated_procurements.filtered(lambda order: order.rule_id.action == 'move').mapped(
+        #         'move_ids')
+        #     new_ps = propagated_procurements.search(
+        #             [('move_dest_id', 'in', cancel_moves.filtered(lambda move: move.propagate).ids)])
+        #     if new_ps:
+        #         return get_propagate_po(new_ps)
+        #     else:
+        #         return get_propagate_po(propagated_procurements)
+        #
+        # def get_propagate_mo(propagated_procurements):
+        #     production_orders = propagated_procurements.filtered(
+        #         lambda procurement: procurement.rule_id.action == 'manufacture' and procurement.production_id).mapped(
+        #         'production_id')
+        #     if production_orders:
+        #         return production_orders
+        #     return get_propagate_sm(propagated_procurements)
 
         def get_propagate_order(procurements):
             propagated_procurements = procurements.filtered(lambda order: order.state != 'done')
@@ -128,8 +128,17 @@ class linkloving_mrp_automatic_plan(models.Model):
                 for mo in line:
                     self.cal_mo_light_status(mo, origin_mos)
 
-            # 计算SO单 状态灯
-            so.status_light = max(lv1_mo.mapped("status_light"))
+            # 计算SO单订单条目 状态灯
+            for line in so.order_line:
+                moves = line.procurement_ids[0].move_ids.ids
+                pros = self.env["procurement.order"].search([("move_dest_id", 'in', moves)])
+                production_ids = pros.mapped("production_id")
+                if production_ids:
+                    line.status_light = max(production_ids.mapped("status_light"))
+
+            # so status light
+            so.status_light = max(so.order_line.mapped("status_light"))
+
             # for mo in lv1_mo:
             #     lv = 0
             #     mo_relate_mo = []
@@ -227,6 +236,14 @@ class SaleOrderEx(models.Model):
     status_light = fields.Selection(string="状态灯", selection=[(2, '红'),
                                                              (1, '黄'),
                                                              (0, '绿')], required=False, )
+
+
+class SaleOrderLineEx(models.Model):
+    _inherit = "sale.order.line"
+    status_light = fields.Selection(string="状态灯", selection=[(2, '红'),
+                                                             (1, '黄'),
+                                                             (0, '绿')], required=False, )
+
 
 
 class MrpProductionEx(models.Model):
