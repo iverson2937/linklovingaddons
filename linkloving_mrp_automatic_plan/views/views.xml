@@ -19,9 +19,6 @@
                   parent="hr.menu_human_resources_configuration"
                   action="to_date_page_list_action"/>
 
-
-
-
         <!-- explicit list view definition -->
         <!--
         <record model="ir.ui.view" id="linkloving_mrp_automatic_plan.list">

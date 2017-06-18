@@ -1,0 +1,11 @@
+<openerp>
+    <data>
+        <!--<record id="linkloving_mrp_bom_tree_view" model="ir.ui.view">-->
+        <!--<field name="name">mrp.bom.tree.inherit</field>-->
+        <!--<field name="model">mrp.bom</field>-->
+        <!--<field name="inherit_id" ref="mrp.mrp_bom_tree_view"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--</field>-->
+        <!--</record>-->
+    </data>
+</openerp>

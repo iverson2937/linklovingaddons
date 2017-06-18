@@ -31,18 +31,14 @@ class PurchaseOrder(models.Model):
 
     shipping_rate = fields.Float(string=u"收货率", compute='_compute_shipping_rate', store=True)
 
-    @api.one
-    @api.depends('order_line.shipping_status')
-    def _get_shipping_status(self):
+    @api.multi
+    def _compute_shipping_status(self):
         for order in self:
-            if order.state == 'purchase' and all(line.shipping_status == 'done' for line in self.order_line if
-                                                 line.product_id.type in ['product', 'consu']):
+
+            if order.state == 'purchase' and all(picking.state in ["cancel", "done"] for picking in order.picking_ids):
                 order.shipping_status = 'done'
-            elif order.state == 'purchase' and all(line.shipping_status == 'no' for line in self.order_line):
-                order.shipping_status = 'no'
             else:
-                order.shipping_status = 'part_shipping'
-            print order.shipping_status
+                order.shipping_status = 'no'
 
     invoice_status = fields.Selection([
         ('no', u'待出货'),
@@ -54,7 +50,7 @@ class PurchaseOrder(models.Model):
         ('no', u'未入库'),
         ('part_shipping', u'部分入库'),
         ('done', u'入库完成'),
-    ], compute='_get_shipping_status', default='no')
+    ], compute='_compute_shipping_status', default='no')
 
     @api.depends('order_line.move_ids')
     def _compute_picking(self):
