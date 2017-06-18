@@ -84,39 +84,21 @@ class linkloving_mrp_automatic_plan(models.Model):
 
         # sos = self.env["sale.order"].search([("state", '=', 'sale')])
         sos = self.env["sale.order"].browse(3510)
-        mo_s = [self.env["mrp.production"]]
-        po_s = [self.env["purchase.order"]]
 
-        # def rescuise(lv_mos):
-        #     # new_mos = self.env["mrp.production"]
-        #
-        #     for mo in lv_mos:
-        #         rescuise1(mo)
-        #         # new_mos += mos.filtered(lambda x: mo.name in x.origin)
-        #     # mo_relate_mo[lv].append({"origin_mo": mo, 'mos': new_mos})
-        #     # if new_mos:
-        #     #     rescuise(mos, new_mos, lv)
-        #     # if new_mos:
-        #     # rescuise(mos, new_mos, lv)
-        #
-        # def rescuise1(mo):
-        #     childs = mos.filtered(lambda x: mo.name in x.origin)
-        #     if childs:
-        #         rescuise(childs)
-
-        all_data = []
         for so in sos:
             pos = self.env["purchase.order"].search([("origin", 'like', so.name)])
             mos = self.env["mrp.production"].search([("origin", 'like', so.name)])
             lv1_mo = mos.filtered(lambda x: "WH" in x.origin)
             all_mo_mo = []
 
+            # 获取最底下的节点
             last_nodes = self.env["mrp.production"]  # 最底下的节点
             for mo in mos:
                 relate_mos = mos.filtered(lambda x: mo.name in x.origin)
                 if not relate_mos:
                     last_nodes += mo
 
+            # 根据最底下的节点 获取到每条线
             lines = []
             for mo in last_nodes:
                 node = mo
@@ -132,27 +114,28 @@ class linkloving_mrp_automatic_plan(models.Model):
                         lines.append(one_line)
                         break
 
+            # 获取到每张mo对应的 po
             origin_mos = {}
             for mo in mos:
                 origin_pos = pos.filtered(lambda x: mo.name in x.origin)
                 origin_mos[mo.id] = origin_pos
 
+            # 计算po单 状态灯
+            self.cal_po_light_status(pos)
+
+            # 开始计算灯状态
             for line in lines:
-                line.reverse()
                 for mo in line:
                     self.cal_mo_light_status(mo, origin_mos)
 
+            # 计算SO单 状态灯
+            so.status_light = max(lv1_mo.mapped("status_light"))
             # for mo in lv1_mo:
             #     lv = 0
             #     mo_relate_mo = []
             #     rescuise(mos, mo, lv)
             #     all_mo_mo.append(mo_relate_mo)
 
-            all_data.append({
-                'so': so,
-                'orders': all_mo_mo,
-                'origin_mos': origin_mos
-            })
         # so.action_cancel()
         # procurements = so.order_line.mapped('procurement_ids')
         # get_propagate_order(procurements)
@@ -164,7 +147,18 @@ class linkloving_mrp_automatic_plan(models.Model):
             date_planned_end = fields.datetime.strptime(mo.date_planned_finished, '%Y-%m-%d %H:%M:%S')
 
             orgin_pos = origin_mos.get(mo.id)
-            mo.status_light = max(orgin_pos.mapped("status_light"))
+            if orgin_pos:
+                mo.status_light = max(orgin_pos.mapped("status_light"))
+
+            # 如果状态为未排产 则直接红灯
+            if mo.state in ["draft"]:
+                mo.status_light = 2
+                continue
+
+            # mo状态为 等待退料,接受退料,结束(成品已入库)
+            if mo.state in ["done", "waiting_inventory_material", "waiting_warehouse_inspection"]:
+                mo.status_light = 0
+                continue
 
             if date_planned_start > date_planned_end:
                 break
@@ -180,18 +174,30 @@ class linkloving_mrp_automatic_plan(models.Model):
                 mo.status_light = max(1, mo.status_light)
             elif today_start < date_planned_start and today_end < date_planned_end:  # 开始在今天 结束不在
                 mo.status_light = 2
+            else:
+                mo.status_light = 2
 
     def cal_po_light_status(self, pos):
         today_start, today_end = self.get_today_start_end()
+
         for po in pos:
-            if po.handle_date < today_start:
+            if po.handle_date:
+                handle_date = fields.datetime.strptime(po.handle_date, '%Y-%m-%d %H:%M:%S')
+            else:  # 如果没有日期 则直接红灯
                 po.status_light = 2
-            elif po.handle_date > today_end:
+                continue
+            if po.shipping_status == "done":  # 如果已经收货完成 则绿灯
                 po.status_light = 0
-            elif po.handle_date < today_end and po.handle_date > today_start:
+                continue
+
+            if not handle_date or handle_date < today_start:
+                po.status_light = 2
+            elif handle_date > today_end and po.state == 'purchase':
+                po.status_light = 0
+            elif (handle_date < today_end) and (handle_date > today_start):
                 po.status_light = 1
-
-
+            else:
+                po.status_light = 2
 
     def get_today_start_end(self):
         timez = fields.datetime.now(pytz.timezone(self.env.user.tz)).tzinfo._utcoffset
