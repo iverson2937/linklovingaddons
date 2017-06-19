@@ -42,7 +42,7 @@ class NewMrpProduction(models.Model):
     def button_produce_finish(self):
         if self.is_multi_output:
             self.post_inventory()
-            self.state = 'done'
+            self.state = 'waiting_inventory_material'
             return
         else:
             super(NewMrpProduction, self).button_produce_finish()
