@@ -112,7 +112,8 @@ class ProductTemplate(models.Model):
                     'origin': line.order_id.origin,
                     'qty': line.product_qty,
                     'date_planned': line.date_planned,
-                    'state': PURCHASE_TYPE[line.order_id.state]
+                    'state': PURCHASE_TYPE[line.order_id.state],
+                    'status_light': line.order_id.status_light or 3,
                 })
 
         mo_ids = self.env['mrp.production'].search(
@@ -130,6 +131,7 @@ class ProductTemplate(models.Model):
                     'origin': mo.origin,
                     'state': MO_STATE[mo.state],
                     'date': mo.date_planned_start,
+                    'status_light': mo.status_light,
                     # 'origin': mo.origin if mo.origin else '',
                 })
 
@@ -156,10 +158,10 @@ class ProductTemplate(models.Model):
                     if line_draft_qty or line_on_produce:
                         has_mo = True
                 bom_ids = line.product_id.bom_ids
-                state_bom_line=False
+                state_bom_line = False
                 if bom_ids:
                     line_process = bom_ids[0].process_id.name
-                    state_bom_line=bom_ids[0].state
+                    state_bom_line = bom_ids[0].state
 
                 res = {}
                 level = False
@@ -184,8 +186,7 @@ class ProductTemplate(models.Model):
                     'state_bom':state_bom_line,
                     'purchase_ok': line.product_id.purchase_ok,
                     'stock': line.product_id.qty_available,
-                    'require': line.product_id.outgoing_qty
-
+                    'require': line.product_id.outgoing_qty,
                 })
                 bom_lines.append(res)
         return {

@@ -78,7 +78,16 @@
                                                         <span style="margin-left:15px"><t t-esc="item.date"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.state"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
-                                                        <!--<span style="margin-left:15px"><t t-esc="item.origin"/> </span>-->
+                                                        <t t-if="item.status_light == 2">
+                                                        <span style="margin-left:15px;color:red;" class="fa fa-circle"></span>
+                                                        </t>
+                                                        <t t-if="item.status_light == 1">
+                                                        <span style="margin-left:15px;color:yellow;" class="fa fa-circle"></span>
+                                                        </t>
+                                                        <t t-if="item.status_light == 0">
+                                                        <span style="margin-left:15px;color:green;" class="fa fa-circle"></span>
+                                                        </t>
+
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'mo_detail'+item.uuid">
@@ -175,6 +184,16 @@
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.state"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
+
+                                                        <t t-if="item.status_light == 2">
+                                                        <span style="margin-left:15px;color:red;" class="fa fa-circle"></span>
+                                                        </t>
+                                                        <t t-if="item.status_light == 1">
+                                                        <span style="margin-left:15px;color:yellow;" class="fa fa-circle"></span>
+                                                        </t>
+                                                        <t t-if="item.status_light == 0">
+                                                        <span style="margin-left:15px;color:green;" class="fa fa-circle"></span>
+                                                        </t>
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'po_detail'+item.line_id">
