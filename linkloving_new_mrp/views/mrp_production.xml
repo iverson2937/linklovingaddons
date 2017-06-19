@@ -101,9 +101,9 @@
                     </field>
 
                     <footer>
-                        <button name="picking_material" string="Confirm"
+                        <button name="picking_material" string="确定"
                                 colspan="1" type="object" class="btn-primary"/>
-                        <button string="Cancel" class="btn-default" special="cancel"/>
+                        <button string="取消" class="btn-default" special="cancel"/>
                     </footer>
                 </form>
             </field>

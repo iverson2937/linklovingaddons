@@ -21,7 +21,7 @@ class NewMrpProduction(models.Model):
 
     def button_waiting_material(self):
         if self.is_multi_output:
-            if not self.output_product_ids or self.input_product_ids:
+            if not self.output_product_ids or not self.input_product_ids:
                 raise UserError(u'请添加投入产出')
             self._generate_moves()
             self._compute_sim_stock_move_lines(self)
