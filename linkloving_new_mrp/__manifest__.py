@@ -28,6 +28,7 @@
         'views/views.xml',
         'views/mrp_production.xml',
         'views/mrp_product_rule.xml',
+        'views/mrp_process.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

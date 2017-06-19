@@ -120,11 +120,14 @@
 
                 </xpath>
                 <xpath expr="//field[@name='product_id']" position="attributes">
-                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)]}</attribute>
+                    <attribute name="attrs">
+                        {'invisible':[('is_multi_output','=',True)],'readonly':[('state','not
+                        in',['draft','confirmed'])]}
+                    </attribute>
 
                 </xpath>
                 <xpath expr="//field[@name='product_qty']" position="attributes">
-                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)]}</attribute>
+                    <attribute name="attrs">{'readonly':[('state','not in',['draft','confirmed'])]}</attribute>
 
                 </xpath>
                 <xpath expr="//field[@name='unit_price']" position="attributes">
@@ -142,7 +145,7 @@
 
                 <xpath expr="//field[@name='product_id']" position="after">
                     <field name="rule_id" options="{'no_create':True}"
-                           attrs="{'required':[('is_multi_output','=',True)]}"/>
+                           attrs="{'required':[('is_multi_output','=',True)],'invisible':[('is_multi_output','!=',True)]}"/>
                 </xpath>
 
 
@@ -166,26 +169,55 @@
                 <xpath expr="//field[@name='bom_id']" position="after">
                     <field name="is_multi_output"/>
                 </xpath>
+                <xpath expr="//field[@name='sim_stock_move_lines']" position="replace">
+                    <field name="sim_stock_move_lines">
+                        <tree editable="bottom" delete="0" decoration-warning="quantity_done&gt;product_uom_qty"
+                              decoration-success="quantity_done>=product_uom_qty"
+                              decoration-danger="qty_available&lt;product_uom_qty" create="0">
+                            <field name="product_id" string="产品" options="{'no_create':True}"/>
+                            <field name="qty_available" string="库存"/>
+                            <field name="virtual_available" string="Forecast Quantity"
+                                   attrs=""/>
+                            <field name="suggest_qty" string="Suggest Quantity"
+                                   attrs=""/>
+                            <field name="quantity_available" string="系统可用"
+                                   attrs=""/>
+                            <field name="product_uom_qty" string="Demand Quantity"
+                                   attrs=""/>
+                            <field name="quantity_done" string="备料数量"/>
+                            <field name="return_qty" readonly="1" string="Return Quantity"/>
+                        </tree>
+                    </field>
+                </xpath>
 
 
-                <!--<xpath expr="//notebook/page[3]" position="after">-->
-                <!--<page string="投入">-->
-                <!--<field name="input_product_ids" context="{'default_type':'input'}" create="0">-->
-                <!--<tree editable="bottom" create="0" delete="0">-->
-                <!--<field name="product_id" options="{'no_create':True}" string="产品"/>-->
-                <!--<field name="type" invisible="1"/>-->
-                <!--</tree>-->
-                <!--</field>-->
-                <!--</page>-->
-                <!--<page string="产出">-->
-                <!--<field name="output_product_ids" context="{'default_type':'output'}" create="0">-->
-                <!--<tree editable="bottom" create="0" delete="0">-->
-                <!--<field name="product_id" options="{'no_create':True}" string="产品"/>-->
-                <!--<field name="type" invisible="1"/>-->
-                <!--</tree>-->
-                <!--</field>-->
-                <!--</page>-->
-                <!--</xpath>-->
+                <xpath expr="//notebook/page[1]" position="replace">
+                    <!--<page string="投入">-->
+                    <!--<field name="input_product_ids" readonly="1">-->
+                    <!--<tree editable="bottom" create="0" delete="0">-->
+                    <!--<field name="product_id" options="{'no_create':True}" string="产品"/>-->
+                    <!--<field name="type" invisible="1"/>-->
+                    <!--</tree>-->
+                    <!--</field>-->
+                    <!--</page>-->
+                    <!--<page string="产出">-->
+                    <!--<field name="output_product_ids" readonly="1" context="{'default_type':'output'}" create="0">-->
+                    <!--<tree editable="bottom" create="0" delete="0">-->
+                    <!--<field name="product_id" options="{'no_create':True}" string="产品"/>-->
+                    <!--<field name="type" invisible="1"/>-->
+                    <!--</tree>-->
+                    <!--</field>-->
+                    <!--</page>-->
+                    <page string="产成品">
+                        <field name="stock_move_lines_finished" readonly="1" context="{'default_type':'output'}"
+                               create="0">
+                            <tree editable="bottom" create="0" delete="0">
+                                <field name="product_id" options="{'no_create':True}" string="产品"/>
+                                <field name="quantity_done_finished" string="产出数量"/>
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
             </field>
         </record>
     </data>

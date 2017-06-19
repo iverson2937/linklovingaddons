@@ -9,8 +9,10 @@ from odoo.exceptions import UserError
 
 class NewMrpProduction(models.Model):
     _inherit = 'mrp.production'
-    is_multi_output = fields.Boolean(default=True)
+    is_multi_output = fields.Boolean(related='process_id.is_multi_output')
     rule_id = fields.Many2one('mrp.product.rule')
+    stock_move_lines_finished = fields.One2many('stock.move.finished', 'production_id')
+    is_force_output = fields.Boolean(string=u'是否要求产出完整')
 
     product_id = fields.Many2one(
         'product.product', 'Product',
@@ -20,12 +22,43 @@ class NewMrpProduction(models.Model):
     output_product_ids = fields.One2many('mrp.product.rule.line', related='rule_id.output_product_ids')
     input_product_ids = fields.One2many('mrp.product.rule.line', related='rule_id.input_product_ids')
 
+    @api.multi
+    def _compute_done_stock_move_lines(self, new_pr):
+        list = []
+        for move in new_pr.move_finished_ids:
+            list.append(move.product_id.id)
+        a = set(list)  # 不重复的set集合
+        res_list = []
+        stock_move_lines_finished = self.env["stock.move.finished"].search([("production_id", "=", new_pr.id)])
+        if not stock_move_lines_finished:
+            for r in a:
+                dict = self._prepare_stock_move_done_values(r)
+                res = self.env['stock.move.finished'].create(dict)
+                res_list.append(res.id)
+                new_pr.stock_move_lines_finished = res_list
+        else:
+            new_pr.stock_move_lines_finished = stock_move_lines_finished
+            # else:
+            #     for r in a:
+            #         if r.product_id not in self.sim_stock_move_lines.mapped('product_id'):
+            #             dict = self._prepare_sim_stock_move_values(r)
+            #             res = self.env['sim.stock.move'].create(dict)
+            #             self.sim_stock_move_lines |= res
+            # return
+
+    def _prepare_stock_move_done_values(self, value):
+        return {
+            'product_id': value,
+            'production_id': self.id
+        }
+
     def button_waiting_material(self):
         if self.is_multi_output:
             if not self.output_product_ids or not self.input_product_ids:
                 raise UserError(u'请添加投入产出')
             self._generate_moves()
             self._compute_sim_stock_move_lines(self)
+            self._compute_done_stock_move_lines(self)
         self.write({'state': 'waiting_material'})
 
     @api.multi
