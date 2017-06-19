@@ -9,7 +9,7 @@
             <field name="arch" type="xml">
                 <form string="产出">
                     <field name="output_product_ids" options="{'reload_on_button': True}">
-                        <tree editable="bottom" delete="0" create="0">
+                        <tree editable="bottom">
                             <field name="product_id" readonly="1" options="{'no_create': True}"/>
                             <!--<field name="total_produce_qty"/>-->
                             <field name="produce_qty"/>
@@ -17,65 +17,65 @@
                     </field>
 
                     <footer>
-                        <button name="confirm_output" string="Confirm"
+                        <button name="confirm_output" string="确认"
                                 colspan="1" type="object" class="btn-primary"/>
-                        <button string="Cancel" class="btn-default" special="cancel"/>
+                        <button string="取消" class="btn-default" special="cancel"/>
                     </footer>
                 </form>
             </field>
         </record>
 
-        <record id="add_input_output_material_form" model="ir.ui.view">
-            <field name="name">添加材料</field>
-            <field name="model">mrp.production</field>
-            <field name="priority" eval="100"/>
-            <field name="arch" type="xml">
-                <form string="Picking material detail">
-                    <sheet>
-                        <notebook>
-                            <page string="投入">
-                                <field name="input_product_ids" options="{'reload_on_button': True}"
-                                       context="{'default_type':'input'}">
-                                    <tree editable="bottom" delete="1"
-                                          create="1">
+        <!--<record id="add_input_output_material_form" model="ir.ui.view">-->
+        <!--<field name="name">添加材料</field>-->
+        <!--<field name="model">mrp.production</field>-->
+        <!--<field name="priority" eval="100"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<form string="Picking material detail">-->
+        <!--<sheet>-->
+        <!--<notebook>-->
+        <!--<page string="投入">-->
+        <!--<field name="input_product_ids" options="{'reload_on_button': True}"-->
+        <!--context="{'default_type':'input'}">-->
+        <!--<tree editable="bottom" delete="1"-->
+        <!--create="1">-->
 
-                                        <field name="product_id" readonly="0" options="{'no_create': True}"/>
-                                        <field name="type" invisible="0"/>
+        <!--<field name="product_id" readonly="0" options="{'no_create': True}"/>-->
+        <!--<field name="type" invisible="0"/>-->
 
-                                        <!--<field name="return_qty"  invisible="[('production_state', 'not in', ('waiting_inventory_material','waiting_warehouse_inspection'))]" string="退料数量"/>-->
-                                    </tree>
-                                </field>
+        <!--&lt;!&ndash;<field name="return_qty"  invisible="[('production_state', 'not in', ('waiting_inventory_material','waiting_warehouse_inspection'))]" string="退料数量"/>&ndash;&gt;-->
+        <!--</tree>-->
+        <!--</field>-->
 
-                            </page>
+        <!--</page>-->
 
-                        </notebook>
-                        <notebook>
-                            <page string="产出">
-                                <field name="output_product_ids" options="{'reload_on_button': True}"
-                                       context="{'default_type':'output'}" string="产出">
-                                    <tree editable="bottom" delete="1" create="1">
+        <!--</notebook>-->
+        <!--<notebook>-->
+        <!--<page string="产出">-->
+        <!--<field name="output_product_ids" options="{'reload_on_button': True}"-->
+        <!--context="{'default_type':'output'}" string="产出">-->
+        <!--<tree editable="bottom" delete="1" create="1">-->
 
-                                        <field name="product_id" options="{'no_create': True}"/>
-                                        <field name="type" invisible="1"/>
+        <!--<field name="product_id" options="{'no_create': True}"/>-->
+        <!--<field name="type" invisible="1"/>-->
 
-                                        <!--<field name="return_qty"  invisible="[('production_state', 'not in', ('waiting_inventory_material','waiting_warehouse_inspection'))]" string="退料数量"/>-->
-                                    </tree>
-                                </field>
-                            </page>
-                        </notebook>
+        <!--&lt;!&ndash;<field name="return_qty"  invisible="[('production_state', 'not in', ('waiting_inventory_material','waiting_warehouse_inspection'))]" string="退料数量"/>&ndash;&gt;-->
+        <!--</tree>-->
+        <!--</field>-->
+        <!--</page>-->
+        <!--</notebook>-->
 
-                    </sheet>
+        <!--</sheet>-->
 
 
-                    <footer>
-                        <button name="picking_material" string="Confirm"
-                                colspan="1" type="object" class="btn-primary"/>
-                        <button string="Cancel" class="btn-default" special="cancel"/>
-                    </footer>
-                </form>
-            </field>
+        <!--<footer>-->
+        <!--<button name="picking_material" string="Confirm"-->
+        <!--colspan="1" type="object" class="btn-primary"/>-->
+        <!--<button string="Cancel" class="btn-default" special="cancel"/>-->
+        <!--</footer>-->
+        <!--</form>-->
+        <!--</field>-->
 
-        </record>
+        <!--</record>-->
         <record id="picking_material_form" model="ir.ui.view">
             <field name="name">Picking Material Detail</field>
             <field name="model">mrp.production</field>
@@ -101,9 +101,9 @@
                     </field>
 
                     <footer>
-                        <button name="picking_material" string="Confirm"
+                        <button name="picking_material" string="确定"
                                 colspan="1" type="object" class="btn-primary"/>
-                        <button string="Cancel" class="btn-default" special="cancel"/>
+                        <button string="取消" class="btn-default" special="cancel"/>
                     </footer>
                 </form>
             </field>
@@ -116,13 +116,39 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='product_uom_id']" position="replace">
                     <field name="product_uom_id" options="{'no_open':True,'no_create':True}" groups="product.group_uom"
-                           attrs="{'readonly': [('has_moves', '=', True)],'required':[('is_multi_output','!=',True)]}"/>
+                           attrs="{'readonly': [('has_moves', '=', True)],'required':[('is_multi_output','!=',True)],'invisible':[('is_multi_output','=',True)]}"/>
 
+                </xpath>
+                <xpath expr="//field[@name='product_id']" position="attributes">
+                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)]}</attribute>
+
+                </xpath>
+                <xpath expr="//field[@name='product_qty']" position="attributes">
+                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)]}</attribute>
+
+                </xpath>
+                <xpath expr="//field[@name='unit_price']" position="attributes">
+                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)]}</attribute>
+
+                </xpath>
+                <xpath expr="//field[@name='mo_type']" position="attributes">
+                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)]}</attribute>
+
+                </xpath>
+                <xpath expr="//field[@name='hour_price']" position="attributes">
+                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)]}</attribute>
+
+                </xpath>
+
+                <xpath expr="//field[@name='product_id']" position="after">
+                    <field name="rule_id" options="{'no_create':True}"
+                           attrs="{'required':[('is_multi_output','=',True)]}"/>
                 </xpath>
 
 
                 <xpath expr="//field[@name='bom_id']" position="attributes">
                     <attribute name="required">0</attribute>
+                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)]}</attribute>
                 </xpath>
 
                 <xpath expr="//button[@name='open_produce_product']" position="replace">
@@ -142,28 +168,24 @@
                 </xpath>
 
 
-                <xpath expr="//notebook/page[3]" position="after">
-                    <page string="投入">
-                        <group colspan="4">
-                            <field name="input_product_ids" context="{'default_type':'input'}">
-                                <tree editable="bottom">
-                                    <field name="product_id" options="{'no_create':True}" string="产品"/>
-                                    <field name="type"/>
-                                </tree>
-                            </field>
-                        </group>
-                    </page>
-                    <page string="产出">
-                        <group colspan="4">
-                            <field name="output_product_ids" context="{'default_type':'output'}">
-                                <tree editable="bottom">
-                                    <field name="product_id" options="{'no_create':True}" string="产品"/>
-                                    <field name="type"/>
-                                </tree>
-                            </field>
-                        </group>
-                    </page>
-                </xpath>
+                <!--<xpath expr="//notebook/page[3]" position="after">-->
+                <!--<page string="投入">-->
+                <!--<field name="input_product_ids" context="{'default_type':'input'}" create="0">-->
+                <!--<tree editable="bottom" create="0" delete="0">-->
+                <!--<field name="product_id" options="{'no_create':True}" string="产品"/>-->
+                <!--<field name="type" invisible="1"/>-->
+                <!--</tree>-->
+                <!--</field>-->
+                <!--</page>-->
+                <!--<page string="产出">-->
+                <!--<field name="output_product_ids" context="{'default_type':'output'}" create="0">-->
+                <!--<tree editable="bottom" create="0" delete="0">-->
+                <!--<field name="product_id" options="{'no_create':True}" string="产品"/>-->
+                <!--<field name="type" invisible="1"/>-->
+                <!--</tree>-->
+                <!--</field>-->
+                <!--</page>-->
+                <!--</xpath>-->
             </field>
         </record>
     </data>

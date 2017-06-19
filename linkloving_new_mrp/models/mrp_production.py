@@ -10,17 +10,20 @@ from odoo.exceptions import UserError
 class NewMrpProduction(models.Model):
     _inherit = 'mrp.production'
     is_multi_output = fields.Boolean(default=True)
+    rule_id = fields.Many2one('mrp.product.rule')
 
     product_id = fields.Many2one(
         'product.product', 'Product',
         domain=[('type', 'in', ['product', 'consu'])],
         readonly=True, required=False,
         states={'confirmed': [('readonly', False)]})
-    output_product_ids = fields.One2many('mrp.production.material', 'mo_id', domain=[('type', '=', 'output')])
-    input_product_ids = fields.One2many('mrp.production.material', 'mo_id', domain=[('type', '=', 'input')])
+    output_product_ids = fields.One2many('mrp.product.rule.line', related='rule_id.output_product_ids')
+    input_product_ids = fields.One2many('mrp.product.rule.line', related='rule_id.input_product_ids')
 
     def button_waiting_material(self):
         if self.is_multi_output:
+            if not self.output_product_ids or not self.input_product_ids:
+                raise UserError(u'请添加投入产出')
             self._generate_moves()
             self._compute_sim_stock_move_lines(self)
         self.write({'state': 'waiting_material'})
@@ -40,7 +43,7 @@ class NewMrpProduction(models.Model):
     def button_produce_finish(self):
         if self.is_multi_output:
             self.post_inventory()
-            self.state = 'done'
+            self.state = 'waiting_inventory_material'
             return
         else:
             super(NewMrpProduction, self).button_produce_finish()
