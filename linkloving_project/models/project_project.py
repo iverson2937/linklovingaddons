@@ -2,16 +2,6 @@
 
 from odoo import models, fields, api, _
 
-AVAILABLE_PRIORITIES = [
-    ('0', 'badly'),
-    ('1', 'Low'),
-    ('2', 'Normal'),
-    ('3', 'High'),
-    ('4', 'Very High'),
-    ('5', 'top level'),
-]
-
-
 class linkloving_project(models.Model):
     _inherit = 'project.project'
 
@@ -133,81 +123,6 @@ class linkloving_project(models.Model):
     total_hours = fields.Float(compute=_progress_rate)
 
 
-class linkloving_project_task(models.Model):
-    _inherit = 'project.task'
-
-    _order = "priority desc, sequence, date_start, name, id"
-
-    # TODO 计算项目耗时, 未实现
-    def _progress_rate(self):
-        return 5.5
-
-    # TODO 未实现
-    def _hours_get(self):
-        return 5.0
-
-    reviewer_id = fields.Many2one('res.users', string='Reviewer', select=True, track_visibility='onchange',
-                                  default=lambda self: self.env.user)
-    planed_level = fields.Selection(AVAILABLE_PRIORITIES, string=u'计划星级')
-    actual_level = fields.Selection(AVAILABLE_PRIORITIES, string=u'质量星级')
-
-    parent_ids = fields.Many2many('project.task', 'project_task_parent_rel', 'task_id', 'parent_id', 'Parent Tasks')
-
-    child_ids = fields.Many2many('project.task', 'project_task_parent_rel', 'parent_id', 'task_id', 'Delegated Tasks')
-
-    work_ids = fields.One2many('project.task.work', 'task_id', 'Work done')
-
-    # TODO 未实现
-    effective_hours = fields.Float(compute=_hours_get, string='Hours Spent')
-
-    # TODO 未实现
-    progress = fields.Float(compute=_hours_get, string='Working Time Progress (%)')
-
-    # TODO 未实现
-    total_hours = fields.Float(compute=_hours_get, string='Total')
-
-    delegated_user_id = fields.Many2one('res.users', string='Delegated To', related='child_ids.user_id')
-
-    @api.multi
-    def do_delegate(self, task_ids, delegate_data=None):
-        """
-        Delegate Task to another users.
-        """
-        if delegate_data is None:
-            delegate_data = {}
-        assert delegate_data['user_id'], _("Delegated User should be specified")
-        delegated_tasks = {}
-        for task_id in task_ids:
-            task = self.env['project.task'].browse(task_id)
-            delegated_task_id = task.copy({
-                'name': delegate_data['name'],
-                'project_id': delegate_data['project_id'] and delegate_data['project_id'][0] or False,
-                'stage_id': delegate_data.get('stage_id') and delegate_data.get('stage_id')[0] or False,
-                'user_id': delegate_data['user_id'] and delegate_data['user_id'][0] or False,
-                'planned_hours': delegate_data['planned_hours'] or 0.0,
-                'parent_ids': [(6, 0, [task.id])],
-                'description': delegate_data['new_task_description'] or '',
-                'child_ids': [],
-                'work_ids': []
-            })
-            self._delegate_task_attachments(task.id, delegated_task_id)
-            newname = delegate_data['prefix'] or ''
-            task.write({
-                'remaining_hours': delegate_data['planned_hours_me'],
-                'planned_hours': delegate_data['planned_hours_me'] + (task.effective_hours or 0.0),
-                'name': newname,
-            })
-            delegated_tasks[task.id] = delegated_task_id
-        return delegated_tasks
-
-    def _delegate_task_attachments(self, task_id, delegated_task_id):
-        attachment = self.env['ir.attachment']
-        attachment_ids = attachment.search([('res_model', '=', self._name), ('res_id', '=', task_id)])
-        new_attachment_ids = []
-        for attachment_id in attachment_ids:
-            new_attachment_ids.append(attachment.copy(attachment_id, default={'res_id': delegated_task_id}))
-        return new_attachment_ids
-
 
 class project_category(models.Model):
     """ Category of project's task (or issue) """
@@ -227,6 +142,7 @@ class project_work(models.Model):
     date = fields.Datetime('Date', select="1", default=lambda *a: fields.Datetime.now())
     task_id = fields.Many2one('project.task', 'Task', ondelete='cascade', required=True, select="1")
     hours = fields.Float('Time Spent')
+    progress = fields.Integer(string=u'完成进度')
     user_id = fields.Many2one('res.users', 'Done by', required=True, select="1", default=lambda self: self.env.user)
     company_id = fields.Many2one('res.company', related='task_id.company_id', store=True, readonly=True)
 
