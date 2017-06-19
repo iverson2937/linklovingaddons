@@ -59,9 +59,9 @@ class PurchaseOrder(models.Model):
                 r.unlink()
                 if proc_obj:
                     proc_obj.run()
-        if not self.order_line:
-            self.state = 'cancel'
-            self.unlink()
+                    # if not self.order_line:
+                    #     self.state = 'cancel'
+                    #     self.unlink()
 
 class linkloving_procurement_order(models.Model):
     _inherit = 'procurement.order'
