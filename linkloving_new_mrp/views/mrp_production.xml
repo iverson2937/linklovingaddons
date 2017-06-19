@@ -101,9 +101,9 @@
                     </field>
 
                     <footer>
-                        <button name="picking_material" string="Confirm"
+                        <button name="picking_material" string="确定"
                                 colspan="1" type="object" class="btn-primary"/>
-                        <button string="Cancel" class="btn-default" special="cancel"/>
+                        <button string="取消" class="btn-default" special="cancel"/>
                     </footer>
                 </form>
             </field>
@@ -145,24 +145,20 @@
 
                 <xpath expr="//notebook/page[3]" position="after">
                     <page string="投入">
-                        <group colspan="4">
-                            <field name="input_product_ids" context="{'default_type':'input'}">
+                        <field name="input_product_ids" context="{'default_type':'input'}" create="0">
                                 <tree editable="bottom">
                                     <field name="product_id" options="{'no_create':True}" string="产品"/>
                                     <field name="type" invisible="1"/>
                                 </tree>
                             </field>
-                        </group>
                     </page>
                     <page string="产出">
-                        <group colspan="4">
-                            <field name="output_product_ids" context="{'default_type':'output'}">
+                        <field name="output_product_ids" context="{'default_type':'output'}" create="0">
                                 <tree editable="bottom">
                                     <field name="product_id" options="{'no_create':True}" string="产品"/>
                                     <field name="type" invisible="1"/>
                                 </tree>
                             </field>
-                        </group>
                     </page>
                 </xpath>
             </field>
