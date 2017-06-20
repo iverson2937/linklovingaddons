@@ -48,7 +48,7 @@ odoo.define('mail.ChatWindow', function (require) {
 
 console.log(1212121)
             this.$header1 = this.$('.o_chat_header_adc');
-            alert(this.$header1)
+            // alert(this.$header1)
 
 
             this.thread = new ChatThread(this, {

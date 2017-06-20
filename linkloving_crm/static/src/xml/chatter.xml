@@ -18,7 +18,7 @@
             <t t-if="!widget.options.is_log">
                 <!-- Text for followers -->
                 <span class="o_chatter_composer_info">
-                    To: Followers of222222222222222
+                    To: Followers of
                     <t t-if="widget.options.record_name">
                         &quot;<t t-esc="widget.options.record_name"/>&quot;
                     </t>
@@ -30,12 +30,11 @@
 
                 <div class="o_composer_suggested_partners">
 
-                    rrrrrrr
+                    <!--rrrrrrr-->
 
 
                     <t t-foreach="widget.options" t-as="asdc">
-                        <t t-esc="asdc"/>
-                        <input type="checkbox" class="o_chat_header_adc" name="adc" tt-att-value="asdc"/>
+                        <input type="hidden" class="o_chat_header_adc" name="adc" tt-att-value="asdc"/>
                     </t>
 
 
@@ -50,7 +49,7 @@
                             </t>
                         </div>
                     </t>
-                    qqqqqqqq
+                    <!--qqqqqqqq-->
                 </div>
 
             </t>

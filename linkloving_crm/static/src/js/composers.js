@@ -432,8 +432,8 @@ odoo.define('mail.composers', function (require) {
 
             this.$in_msg = this.$('.o_chat_header_adc');
 
-            alert(this.$in_msg)
-            alert("控件打开")
+            // alert(this.$in_msg)
+            // alert("控件打开")
 
             this.$input.focus(function () {
                 self.trigger('input_focused');
@@ -487,7 +487,7 @@ odoo.define('mail.composers', function (require) {
             // prevent html space collapsing
             value = value.replace(/ /g, '&nbsp;').replace(/([^>])&nbsp;([^<])/g, '$1 $2');
 
-            alert(value)
+            // alert(value)
 
             var commands = this.options.commands_enabled ? this.mention_manager.get_listener_selection('/') : [];
             return $.when({
