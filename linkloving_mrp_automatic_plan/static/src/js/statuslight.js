@@ -11,7 +11,7 @@ odoo.define('web.StatusLight', function (require) {
 
     var StatusLight = Column.extend({
         _format: function (row_data, options) {
-            console.log(row_data);
+            // console.log(row_data);
             return _.template(
                 '<span class="fa fa-circle" style="color:<%-value%>"></span>')({
                     value: _.str.sprintf("%.0f", row_data[this.status_light] || 0) == 1 ? 'green' : _.str.sprintf("%.0f", row_data[this.id].value || 0) == 2 ? 'yellow' : 'red'

@@ -16,7 +16,7 @@ odoo.define('linkloving_core.TreeView', function (require) {
         init: function () {
             var self = this;
             this._super.apply(this, arguments);
-            // console.log('yes')
+            console.log('yes')
         },
         start:function () {
             self.$(document).ajaxComplete(function (event, xhr, settings) {
