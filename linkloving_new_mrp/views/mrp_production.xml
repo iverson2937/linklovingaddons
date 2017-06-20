@@ -135,8 +135,8 @@
 
                 <xpath expr="//field[@name='product_qty']" position="attributes">
                     <attribute name="attrs">
-                        {'readonly':[('state','not
-                        in',['draft','confirmed'])],'invisible':[('is_multi_output','=',True)]}
+                        {'readonly':[('state','not in',['draft','confirmed'])],
+                        'invisible':[('is_multi_output','=',True)]}
                     </attribute>
 
 
