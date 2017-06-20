@@ -8,7 +8,7 @@
 
                 <xpath expr="//field[@name='create_uid']" position="after">
                     <!-- Add new fields here -->
-                    <field name="status_light"/>
+                    <field name="status_light" widget="statuslight"/>
                 </xpath>
 
             </field>

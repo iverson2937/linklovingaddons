@@ -421,6 +421,8 @@ odoo.define('mail.composers', function (require) {
 
             this.PartnerModel = new Model('res.partner');
             this.ChannelModel = new Model('mail.channel');
+
+
         },
 
         start: function () {
@@ -430,10 +432,23 @@ odoo.define('mail.composers', function (require) {
             this.$attachments_list = this.$('.o_composer_attachments_list');
             this.$input = this.$('.o_composer_input textarea');
 
-            this.$in_msg = this.$('.o_chat_header_adc');
+            this.$in_msg = this.$('.o_composer_text_field_field');
 
-            alert(this.$in_msg)
-            alert("控件打开")
+            this.$in_adc_msg = this.$('.o_chat_header_adc');
+
+            this.$ace_msg_vle = this.$('.js_msg_comments input[type="checkbox"]');
+
+
+            $('.js_msg_comments input[type="checkbox"]').click(function () {
+                if (!$(this).prop("checked")) {
+
+                    // alert($(this.prop("name")));
+                    // $(this).closest('.js_msg_comments').find('input[type="text"]').val("");
+                }
+            });
+
+
+            // alert("控件打开")
 
             this.$input.focus(function () {
                 self.trigger('input_focused');
@@ -487,7 +502,26 @@ odoo.define('mail.composers', function (require) {
             // prevent html space collapsing
             value = value.replace(/ /g, '&nbsp;').replace(/([^>])&nbsp;([^<])/g, '$1 $2');
 
-            alert(value)
+            var value1 = _.escape(this.$in_msg.val()).replace(/\n|\r/g, '<br/>');
+            // prevent html space collapsing
+            value1 = value1.replace(/ /g, '&nbsp;').replace(/([^>])&nbsp;([^<])/g, '$1 $2');
+
+
+            var value2 = _.escape(this.$in_adc_msg.val());
+
+
+            for (var aces in this.$ace_msg_vle) {
+                // if (!aces.prop("checked")) {
+                // alert(this.$ace_msg_vle[aces].prop("name"));
+                // }
+            }
+
+            // console.log("我来看看你是什么")
+            // alert("提交后 处理消息")
+            // alert(value1)
+            // alert(value)
+            // alert(value2)
+            // alert(this.$in_adc_msg.val())
 
             var commands = this.options.commands_enabled ? this.mention_manager.get_listener_selection('/') : [];
             return $.when({
@@ -505,7 +539,10 @@ odoo.define('mail.composers', function (require) {
 
             console.log("发送消息")
 
+
             var self = this;
+
+
             this.preprocess_message().then(function (message) {
                 self.trigger('post_message', message);
 

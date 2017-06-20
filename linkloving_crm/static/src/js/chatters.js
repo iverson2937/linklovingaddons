@@ -27,6 +27,11 @@ odoo.define('mail.Chatters', function (require) {
         template: 'mail.chatters.ChatComposers',
 
         init: function (parent, dataset, options) {
+
+            // alert("什么时候")
+
+
+            console.log("gggggggggg")
             this._super(parent, options);
             this.thread_dataset = dataset;
             this.suggested_partners = [];
@@ -356,6 +361,7 @@ odoo.define('mail.Chatters', function (require) {
             var self = this;
 
             // Hide the chatter in 'create' mode
+            console.log("wwwwwwwwwwwwww")
             this.view.on("change:actual_mode", this, this.check_visibility);
             this.check_visibility();
             var $container = this.$el.parent();

@@ -23,8 +23,7 @@ class linkloving_mrp_automatic_plan(models.Model):
 
     @api.multi
     def get_holiday(self):
-        page = urllib.urlopen(
-            "https://sp0.baidu.com/8aQDcjqpAAV3otqbppnN2DJv/api.php?query=2017%E5%B9%B48%E6%9C%88&co=&resource_id=6018&t=1496889566304&ie=utf8&oe=gbk&format=json&tn=baidu&_=1496889558209")
+        page = urllib.urlopen("https://sp0.baidu.com/8aQDcjqpAAV3otqbppnN2DJv/api.php?query=2017%E5%B9%B48%E6%9C%88&co=&resource_id=6018&t=1496889566304&ie=utf8&oe=gbk&format=json&tn=baidu&_=1496889558209")
         html = page.read()
         # print html.decode("gbk")
         return {
