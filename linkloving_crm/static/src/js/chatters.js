@@ -28,7 +28,7 @@ odoo.define('mail.Chatters', function (require) {
 
         init: function (parent, dataset, options) {
 
-            alert("什么时候")
+            // alert("什么时候")
 
 
             console.log("gggggggggg")

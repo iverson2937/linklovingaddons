@@ -442,13 +442,13 @@ odoo.define('mail.composers', function (require) {
             $('.js_msg_comments input[type="checkbox"]').click(function () {
                 if (!$(this).prop("checked")) {
 
-                    alert($(this.prop("name")));
+                    // alert($(this.prop("name")));
                     // $(this).closest('.js_msg_comments').find('input[type="text"]').val("");
                 }
             });
 
 
-            alert("控件打开")
+            // alert("控件打开")
 
             this.$input.focus(function () {
                 self.trigger('input_focused');
@@ -512,16 +512,16 @@ odoo.define('mail.composers', function (require) {
 
             for (var aces in this.$ace_msg_vle) {
                 // if (!aces.prop("checked")) {
-                alert(this.$ace_msg_vle[aces].prop("name"));
+                // alert(this.$ace_msg_vle[aces].prop("name"));
                 // }
             }
 
-            console.log("我来看看你是什么")
-            alert("提交后 处理消息")
-            alert(value1)
-            alert(value)
-            alert(value2)
-            alert(this.$in_adc_msg.val())
+            // console.log("我来看看你是什么")
+            // alert("提交后 处理消息")
+            // alert(value1)
+            // alert(value)
+            // alert(value2)
+            // alert(this.$in_adc_msg.val())
 
             var commands = this.options.commands_enabled ? this.mention_manager.get_listener_selection('/') : [];
             return $.when({

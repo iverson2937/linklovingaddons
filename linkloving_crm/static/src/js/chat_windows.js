@@ -47,13 +47,13 @@ odoo.define('mail.ChatWindow', function (require) {
             this.$header = this.$('.o_chat_header');
 
 
-            alert("获取的到 自己加的值")
+            // alert("获取的到 自己加的值")
 
             console.log(1212121)
 
 
             this.$header1 = this.$('.o_chat_header_adc');
-            alert(this.$header1)
+            // alert(this.$header1)
 
 
             this.thread = new ChatThread(this, {
