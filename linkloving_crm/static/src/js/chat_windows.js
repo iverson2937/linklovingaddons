@@ -46,7 +46,12 @@ odoo.define('mail.ChatWindow', function (require) {
             this.$input = this.$('.o_composer_text_field');
             this.$header = this.$('.o_chat_header');
 
-console.log(1212121)
+
+            alert("获取的到 自己加的值")
+
+            console.log(1212121)
+
+
             this.$header1 = this.$('.o_chat_header_adc');
             alert(this.$header1)
 

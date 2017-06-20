@@ -2,6 +2,15 @@
 
 from odoo import models, fields, api, _
 
+AVAILABLE_PRIORITIES = [
+    ('0', 'badly'),
+    ('1', 'Low'),
+    ('2', 'Normal'),
+    ('3', 'High'),
+    ('4', 'Very High'),
+    ('5', 'top level'),
+]
+
 
 class linkloving_project(models.Model):
     _inherit = 'project.project'
@@ -11,8 +20,8 @@ class linkloving_project(models.Model):
                                             states={'close': [('readonly', True)],
                                                     'cancelled': [('readonly', True)]})
     members = fields.Many2many('res.users', 'project_user_rel', 'project_id', 'uid', 'Project Members',
-                                help="Project's members are users who can have an access to the tasks related to this project.",
-                                states={'close': [('readonly', True)], 'cancelled': [('readonly', True)]})
+                               help="Project's members are users who can have an access to the tasks related to this project.",
+                               states={'close': [('readonly', True)], 'cancelled': [('readonly', True)]})
 
     currency_id = fields.Many2one('res.currency', string='Currency')
 
@@ -139,6 +148,8 @@ class linkloving_project_task(models.Model):
 
     reviewer_id = fields.Many2one('res.users', string='Reviewer', select=True, track_visibility='onchange',
                                   default=lambda self: self.env.user)
+    planed_level = fields.Selection(AVAILABLE_PRIORITIES, string=u'计划星级')
+    actual_level = fields.Selection(AVAILABLE_PRIORITIES, string=u'质量星级')
 
     parent_ids = fields.Many2many('project.task', 'project_task_parent_rel', 'task_id', 'parent_id', 'Parent Tasks')
 
@@ -209,7 +220,6 @@ class project_category(models.Model):
 class project_work(models.Model):
     _name = "project.task.work"
     _description = "Project Task Work"
-
 
     _order = "date desc"
 

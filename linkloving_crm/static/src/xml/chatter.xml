@@ -30,13 +30,22 @@
 
                 <div class="o_composer_suggested_partners">
 
+
+                    <textarea class="o_composer_text_field_field" tabindex="2"
+                              placeholder="Write something33333333333333333333..."/>
+
                     rrrrrrr
 
+                    <t t-esc="widget.options.send_text"/>****
 
-                    <t t-foreach="widget.options" t-as="asdc">
-                        <t t-esc="asdc"/>
-                        <input type="checkbox" class="o_chat_header_adc" name="adc" tt-att-value="asdc"/>
-                    </t>
+                    <div class="js_msg_comments">
+                        <t t-foreach="widget.options" t-as="asdc">
+                            <!--<t t-esc="asdc"/>-->
+                            <input type="checkbox" class="o_chat_header_adc" t-att-name="asdc" tt-att-value="asdc">
+                                <t t-esc="asdc"/>
+                            </input>
+                        </t>
+                    </div>
 
 
                     <t t-foreach='widget.suggested_partners' t-as='recipient'>

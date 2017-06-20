@@ -1,0 +1,197 @@
+<odoo>
+    <data>
+
+        <record id="mrp_production_form_view_inherit" model="ir.ui.view">
+            <field name="name">mrp.production.tree.inherit</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='bom_id']" position="replace">
+                </xpath>
+                <!--<xpath expr="//field[@name='bom_id']" position="attributes">-->
+                <!--<attribute name="options">{'no_create':True}</attribute>-->
+                <!--</xpath>-->
+
+                <!--<div name="button_box" position="inside">-->
+                <!--<button class="oe_stat_button" name="action_view_qc_report"-->
+                <!--type="object" icon="fa-list-alt"-->
+                <!--attrs="{'invisible': [('qc_feedback_count', '=', 0)]}">-->
+                <!--<field name="qc_feedback_count" string="品检单" widget="statinfo"/>-->
+                <!--</button>-->
+
+                <!--</div>-->
+
+                <!--<xpath expr="//button[@name='button_plan']" position="after">-->
+                <!--<button name="button_action_confirm_draft" class="oe_highlight"-->
+                <!--attrs="{'invisible': [('state', 'not in', 'draft')]}" type="object"-->
+                <!--groups="linkloving_mrp_extend.group_charge_produce" string="Confirm the Schedule"/>-->
+                <!--<button name="button_action_cancel_confirm" class="oe_link"-->
+                <!--attrs="{'invisible': [('state', 'not in', 'confirmed')]}" type="object"-->
+                <!--groups="linkloving_mrp_extend.group_charge_produce" string="取消加入排程"/>-->
+                <!--<button name="button_waiting_material" class="oe_highlight"-->
+                <!--attrs="{'invisible': [('state', 'not in', 'confirmed')]}" type="object"-->
+                <!--groups="linkloving_mrp_extend.group_charge_produce"-->
+                <!--string="Confirm Order,Prepare Material"/>-->
+                <!--<button name="button_start_prepare_material" class="oe_highlight"-->
+                <!--attrs="{'invisible': [('state', 'not in', 'waiting_material')]}" type="object"-->
+                <!--string="Start Prepare Material" groups="linkloving_mrp_extend.group_charge_warehouse"/>-->
+                <!--<button name="button_finish_prepare_material" class="oe_highlight"-->
+                <!--attrs="{'invisible': [('state', 'not in', 'prepare_material_ing')]}" type="object"-->
+                <!--string="Material Ready" groups="linkloving_mrp_extend.group_charge_warehouse"/>-->
+                <!--&lt;!&ndash;<button name="button_already_picking" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'finish_prepare_material')]}" type="object" string="已领料" />&ndash;&gt;-->
+                <!--<button name="button_already_picking" class="oe_highlight"-->
+                <!--attrs="{'invisible': [('state', '!=', 'finish_prepare_material')]}" type="object"-->
+                <!--string="Receive Material Register" groups="linkloving_mrp_extend.group_charge_produce"/>-->
+                <!--<button name="button_start_produce" class="oe_highlight"-->
+                <!--attrs="{'invisible': ['|',('state', '!=', 'already_picking')]}"-->
+                <!--type="object" string="开始生产"-->
+                <!--groups="linkloving_mrp_extend.group_charge_produce"/>-->
+                <!--<button name="button_produce_finish" class="oe_highlight"-->
+                <!--attrs="{'invisible': [ '|', ('availability', 'not in', ['partially_available', 'assigned']),('state', '!=', 'progress')]}"-->
+                <!--type="object" string="Production Complete,Send to Inspection"-->
+                <!--groups="linkloving_mrp_extend.group_charge_produce"/>-->
+                <!--<button name="button_start_quality_inspection" class="oe_highlight"-->
+                <!--attrs="{'invisible': [('state', '!=', 'waiting_quality_inspection')]}" type="object"-->
+                <!--string="Start Inspection" groups="linkloving_mrp_extend.group_charge_inspection"/>-->
+
+                <!--<button name="button_quality_inspection_success"-->
+                <!--attrs="{'invisible': [('state', '!=', 'quality_inspection_ing')]}" type="object"-->
+                <!--string="Quality Inspection Pass" groups="linkloving_mrp_extend.group_charge_inspection"/>-->
+                <!--<button name="button_quality_inspection_failed"-->
+                <!--attrs="{'invisible': [('state', '!=', 'quality_inspection_ing')]}" type="object"-->
+                <!--string="Quality Inspection Fail" groups="linkloving_mrp_extend.group_charge_inspection"/>-->
+
+                <!--<button name="button_inventory_material"-->
+                <!--attrs="{'invisible': [('state', 'not in', ('waiting_inventory_material'))]}" type="object"-->
+                <!--string="Count Material" groups="linkloving_mrp_extend.group_charge_produce"/>-->
+                <!--<button name="button_check_inventory_material" context="{'is_checking':True}"-->
+                <!--attrs="{'invisible': [('state', 'not in', ('waiting_warehouse_inspection'))]}" type="object"-->
+                <!--string="Warehouse Confirm Material" groups="linkloving_mrp_extend.group_charge_warehouse"/>-->
+
+                <!--<button name="button_fill_material" attrs="{'invisible': ['|',('state', '!=', 'progress')]}"-->
+                <!--type="object" string="Extra Picking Material"-->
+                <!--groups="linkloving_mrp_extend.group_charge_produce"/>-->
+                <!--&lt;!&ndash;<button name="button_return_material" attrs="{'invisible': ['|',('state', '!=', 'done')]}"&ndash;&gt;-->
+                <!--&lt;!&ndash;type="object" string="Return Material"/>&ndash;&gt;-->
+                <!--</xpath>-->
+
+                <!--<xpath expr="//header/button[@name='button_scrap']" position="replace">-->
+                <!--<button name="button_scrap" type="object" string="Scrap" attrs="{'invisible': True}"/>-->
+                <!--</xpath>-->
+
+                <!--<xpath expr="//header/button[@name='action_cancel']" position="replace">-->
+                <!--<button name="action_cancel" type="object" string="取消订单"-->
+                <!--attrs="{'invisible': [('state', 'not in', ('confirmed','waiting_material', 'prepare_material_ing'))]}"-->
+                <!--groups="linkloving_mrp_extend.group_charge_produce"/>-->
+                <!--</xpath>-->
+
+                <!--<xpath expr="//header/button[@name='button_unreserve']" position="replace">-->
+                <!--</xpath>-->
+
+                <!--<xpath expr="//header/button[@name='open_produce_product'][2]" position="replace">-->
+                <!--</xpath>-->
+
+                <!--<xpath expr="//header/button[@name='open_produce_product'][1]" position="replace">-->
+                <!--<button name="open_produce_product"-->
+                <!--attrs="{'invisible': ['|', '|', '|', ('check_to_done', '=', True), ('availability', 'not in', ['partially_available', 'assigned']), ('state', 'not in', ('progress')), ('routing_id', '!=', False)]}"-->
+                <!--string="产出" type="object" class="oe_highlight"-->
+                <!--groups="linkloving_mrp_extend.group_charge_produce"/>-->
+                <!--</xpath>-->
+
+                <!--<xpath expr="//sheet/group/group/div/button[@type='action']" position="replace">-->
+                <!--<button type="action"-->
+                <!--name="%(mrp.action_change_production_qty)d"-->
+                <!--string="Update" states="confirmed,planned" class="oe_link"/>-->
+                <!--</xpath>-->
+
+                <!--&lt;!&ndash;添加订单类型&ndash;&gt;-->
+                <!--<xpath expr="//field[@name='origin']" position="after">-->
+                <!--<field name="production_order_type" widget="radio"/>-->
+                <!--<field name="sale_remark"/>-->
+                <!--<field name="remark"/>-->
+                <!--</xpath>-->
+
+                <!--<xpath expr="//field[@name='bom_id']" position="after">-->
+                <!--<field name="factory_remark"/>-->
+                <!--</xpath>-->
+                <!--<xpath expr="//group" position="after">-->
+                <!--<field name="output_rate"/>-->
+                <!--</xpath>-->
+
+                <xpath expr="//notebook/page[3]" position="after">
+                    <page string="投入">
+                        <group colspan="4">
+                            <field name="input_product_ids" context="{'default_type':'input'}">
+                                <tree editable="bottom">
+                                    <field name="product_id" options="{'no_create':True}" string="产品"/>
+                                    <field name="type"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                    <page string="产出">
+                        <group colspan="4">
+                            <field name="output_product_ids" context="{'default_type':'input'}">
+                                <tree editable="bottom" conext="{'default_type':'output'}">
+                                    <field name="product_id" options="{'no_create':True}" string="产品"/>
+                                    <field name="type"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                </xpath>
+
+                <!--<xpath expr="//field[@name='move_finished_ids']/tree/field[@name='product_id']" position="attributes">-->
+                <!--<attribute name="options">{'no_create':True}</attribute>-->
+                <!--</xpath>-->
+
+
+                <!--<xpath expr="//field[@name='move_raw_ids']" position="replace">-->
+                <!--<field name="sim_stock_move_lines">-->
+                <!--<tree editable="bottom" delete="0" decoration-warning="quantity_done&gt;product_uom_qty"-->
+                <!--decoration-success="quantity_done>=product_uom_qty"-->
+                <!--decoration-danger="qty_available&lt;product_uom_qty" create="0">-->
+                <!--<field name="product_id" string="产品" options="{'no_create':True}"/>-->
+                <!--<field name="qty_available" string="库存"/>-->
+                <!--<field name="virtual_available" string="Forecast Quantity"/>-->
+                <!--<field name="suggest_qty" string="Suggest Quantity"/>-->
+                <!--<field name="quantity_available" string="系统可用"/>-->
+                <!--<field name="product_uom_qty" string="Demand Quantity"/>-->
+                <!--<field name="quantity_done" string="备料数量"/>-->
+                <!--<field name="return_qty" readonly="1" string="Return Quantity"/>-->
+                <!--</tree>-->
+                <!--</field>-->
+                <!--</xpath>-->
+                <!--<xpath expr="//field[@name='state']" position="replace">-->
+                <!--<field name="state" widget="statusbar"-->
+                <!--statusbar_visible="confirmed,waiting_material,prepare_material_ing,finish_prepare_material,already_picking,progress,waiting_quality_inspection,quality_inspection_ing,waiting_post_inventory,done"/>-->
+                <!--</xpath>-->
+
+                <!--<xpath expr="//button[@name='post_inventory']" position="replace">-->
+                <!--&lt;!&ndash;<button name="post_inventory" string="Post Inventory" type="object" class="oe_highlight" attrs="{'invisible': ['|', ('post_visible', '=', False),('state', 'not in', 'waiting_post_inventory')]}"/>&ndash;&gt;-->
+                <!--</xpath>-->
+
+                <!--<xpath expr="//button[@name='button_mark_done']" position="replace">-->
+                <!--<button name="button_mark_done"-->
+                <!--string="标记为完成"-->
+                <!--attrs="{'invisible': [ ('state', 'not in', 'waiting_post_inventory')]}" type="object"-->
+                <!--class="oe_highlight" groups="linkloving_mrp_extend.group_charge_produce"/>-->
+                <!--</xpath>-->
+
+                <!--<xpath expr="//button[@name='action_assign']" position="replace">-->
+                <!--<button name="action_assign" string="检查可用性"-->
+                <!--attrs="{'invisible': ['|',('availability', 'in', ('assigned', 'none')),('state','not in',('progress'))]}"-->
+                <!--type="object" groups="linkloving_mrp_extend.group_charge_produce"/>-->
+                <!--</xpath>-->
+
+                <!--<xpath expr="//button[@name='%(mrp.action_mrp_production_moves)d']" position="replace">-->
+                <!--<button name="%(mrp.action_mrp_production_moves)d" type="action" string="Inventory Moves"-->
+                <!--class="oe_stat_button" icon="fa-arrows-v"/>-->
+                <!--<button name="action_see_scrap_moves" type="object" string="报废的物料"-->
+                <!--class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('state', '!=', 'done')]}"/>-->
+                <!--</xpath>-->
+            </field>
+        </record>
+    </data>
+</odoo>
