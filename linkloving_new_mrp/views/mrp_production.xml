@@ -179,14 +179,14 @@
                 <xpath expr="//field[@name='bom_id']" position="after">
                     <field name="is_multi_output" invisible="1"/>
                     <field name="is_force_output"
-                           attrs="{'readonly':[('state','not in',['draft','confirmed'])],'invisible':[('is_multi_output','=',True)]}"/>
+                           attrs="{'readonly':[('state','not in',['draft','confirmed'])],'invisible':[('is_multi_output','!=',True)]}"/>
                 </xpath>
 
 
                 <xpath expr="//notebook/page[3]" position="replace">
                 </xpath>
                 <xpath expr="//notebook/page[2]" position="replace">
-                    <page string="投入">
+                    <page string="投入" attrs="{'invisible':[('state','not in',['draft','confirmed'])]}">
                         <field name="input_product_ids" readonly="1">
                             <tree editable="bottom" create="0" delete="0">
                                 <field name="product_id" options="{'no_create':True}" string="产品"/>
@@ -194,7 +194,7 @@
                             </tree>
                         </field>
                     </page>
-                    <page string="产出">
+                    <page string="产出" attrs="{'invisible':[('state','not in',['draft','confirmed'])]}">
                         <field name="output_product_ids" readonly="1" create="0">
                             <tree editable="bottom" create="0" delete="0">
                                 <field name="product_id" options="{'no_create':True}" string="产品"/>
@@ -204,9 +204,10 @@
                     </page>
 
 
-                    <page string="投入">
+                    <page string="投入1"
+                          attrs="{'invisible':[('state','in',['draft','confirmed']),('is_multi_output','=',True)]}">
                         <field name="sim_stock_move_lines"
-                               attrs="{'invisible':[('state','not in',['draft','confirmed'])]}">
+                               attrs="{'invisible':[('state','in',['draft','confirmed'])]}">
                             <tree editable="bottom" delete="0" decoration-warning="quantity_done&gt;product_uom_qty"
                                   decoration-success="quantity_done>=product_uom_qty"
                                   decoration-danger="qty_available&lt;product_uom_qty" create="0">
@@ -222,7 +223,7 @@
                         </field>
 
                     </page>
-                    <page string="产成品">
+                    <page string="产出1" attrs="{'invisible':[('state','in',['draft','confirmed'])]}">
                         <field name="stock_move_lines_finished" readonly="1" context="{'default_type':'output'}"
                                create="0">
                             <tree editable="bottom" create="0" delete="0">

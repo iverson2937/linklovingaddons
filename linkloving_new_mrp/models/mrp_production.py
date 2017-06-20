@@ -266,33 +266,28 @@ class NewMrpProduction(models.Model):
         if self.is_multi_output:
             if not self.input_product_ids:
                 raise UserError('请添加投入物料')
-            for line_id in self.input_product_ids:
-                data = {
-                    'name': self.name,
-                    'date': self.date_planned_start,
-                    'product_id': line_id.product_id.id,
-                    'product_uom_qty': self.product_qty,
-                    'product_uom': line_id.product_id.uom_id.id,
-                    'location_id': source_location.id,
-                    'location_dest_id': line_id.product_id.property_stock_production.id,
-                    'raw_material_production_id': self.id,
-                    'company_id': self.company_id.id,
-                    'price_unit': line_id.product_id.standard_price,
-                    'procure_method': 'make_to_stock',
-                    'origin': self.name,
-                    'warehouse_id': source_location.get_warehouse().id,
-                    'group_id': self.procurement_group_id.id,
-                    'propagate': self.propagate,
-                    'suggest_qty': self.product_qty,
-                }
-                moves.create(data)
+        for line_id in self.input_product_ids:
+            data = {
+                'name': self.name,
+                'date': self.date_planned_start,
+                'product_id': line_id.product_id.id,
+                'product_uom_qty': self.product_qty,
+                'product_uom': line_id.product_id.uom_id.id,
+                'location_id': source_location.id,
+                'location_dest_id': line_id.product_id.property_stock_production.id,
+                'raw_material_production_id': self.id,
+                'company_id': self.company_id.id,
+                'price_unit': line_id.product_id.standard_price,
+                'procure_method': 'make_to_stock',
+                'origin': self.name,
+                'warehouse_id': source_location.get_warehouse().id,
+                'group_id': self.procurement_group_id.id,
+                'propagate': self.propagate,
+                'suggest_qty': self.product_qty,
+            }
+            moves.create(data)
+        return super(NewMrpProduction, self)._generate_raw_moves(exploded_lines)
 
-
-
-        else:
-            for bom_line, line_data in exploded_lines:
-                moves += self._generate_raw_move(bom_line, line_data)
-        return moves
 
     state = fields.Selection([
         ('draft', _('Draft')),
@@ -315,20 +310,23 @@ class NewMrpProduction(models.Model):
         ('cancel', 'Cancelled')], string='status',
         copy=False, default='draft', track_visibility='onchange')
 
-    @api.multi
-    def _generate_moves(self):
-        for production in self:
-            if production.state == 'draft' and production.is_multi_output:
-                return
-            production._generate_finished_moves()
-            factor = 1
-            boms, lines = production.bom_id.explode(production.product_id, factor,
-                                                    picking_type=production.bom_id.picking_type_id)
-            production._generate_raw_moves(lines)
-            # Check for all draft moves whether they are mto or not
-            production._adjust_procure_method()
-            production.move_raw_ids.action_confirm()
-        return True
+    # @api.multi
+    # # def _generate_moves(self):
+    # #     for production in self:
+    # #         if not production.bom_id:
+    # #             raise UserError('BOM')
+    # #         if production.state == 'draft' and production.is_multi_output:
+    # #             return
+    # #         production._generate_finished_moves()
+    # #         factor = production.product_uom_id._compute_quantity(production.product_qty,
+    # #                                                              production.bom_id.product_uom_id) / production.bom_id.product_qty
+    # #         boms, lines = production.bom_id.explode(production.product_id, factor,
+    # #                                                 picking_type=production.bom_id.picking_type_id)
+    # #         production._generate_raw_moves(lines)
+    # #         # Check for all draft moves whether they are mto or not
+    # #         production._adjust_procure_method()
+    # #         production.move_raw_ids.action_confirm()
+    # #     return True
 
 # class MrpProductionMaterial(models.Model):
 #     _name = 'mrp.production.material'

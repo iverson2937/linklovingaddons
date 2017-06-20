@@ -13,6 +13,11 @@ class MrpProductRule(models.Model):
                                          required=1)
     input_product_ids = fields.One2many('mrp.product.rule.line', 'rule_id', domain=[('type', '=', 'input')], required=1)
 
+    @api.multi
+    def write(self, vals):
+        print vals, 'dddd'
+        return super(MrpProductRule, self).write(vals)
+
     @api.model
     def create(self, vals):
         if not vals.get('name'):
@@ -31,3 +36,8 @@ class MrpProductRuleLine(models.Model):
         ('input', '投入'),
         ('output', '产出'),
     ])
+
+    @api.multi
+    def write(self, vals):
+        print vals, 'dddd'
+        return super(MrpProductRuleLine, self).write(vals)
