@@ -167,28 +167,28 @@
 
 
                 <xpath expr="//field[@name='bom_id']" position="after">
-                    <field name="is_multi_output"/>
+                    <field name="is_multi_output" invisible="1"/>
                 </xpath>
-                <xpath expr="//field[@name='sim_stock_move_lines']" position="replace">
-                    <field name="sim_stock_move_lines">
-                        <tree editable="bottom" delete="0" decoration-warning="quantity_done&gt;product_uom_qty"
-                              decoration-success="quantity_done>=product_uom_qty"
-                              decoration-danger="qty_available&lt;product_uom_qty" create="0">
-                            <field name="product_id" string="产品" options="{'no_create':True}"/>
-                            <field name="qty_available" string="库存"/>
-                            <field name="virtual_available" string="Forecast Quantity"
-                                   attrs=""/>
-                            <field name="suggest_qty" string="Suggest Quantity"
-                                   attrs=""/>
-                            <field name="quantity_available" string="系统可用"
-                                   attrs=""/>
-                            <field name="product_uom_qty" string="Demand Quantity"
-                                   attrs=""/>
-                            <field name="quantity_done" string="备料数量"/>
-                            <field name="return_qty" readonly="1" string="Return Quantity"/>
-                        </tree>
-                    </field>
-                </xpath>
+                <!--<xpath expr="//field[@name='sim_stock_move_lines']" position="replace">-->
+                <!--<field name="sim_stock_move_lines">-->
+                <!--<tree editable="bottom" delete="0" decoration-warning="quantity_done&gt;product_uom_qty"-->
+                <!--decoration-success="quantity_done>=product_uom_qty"-->
+                <!--decoration-danger="qty_available&lt;product_uom_qty" create="0">-->
+                <!--<field name="product_id" string="产品" options="{'no_create':True}"/>-->
+                <!--<field name="qty_available" string="库存"/>-->
+                <!--<field name="virtual_available" string="Forecast Quantity"-->
+                <!--attrs=""/>-->
+                <!--<field name="suggest_qty" string="Suggest Quantity"-->
+                <!--attrs=""/>-->
+                <!--<field name="quantity_available" string="系统可用"-->
+                <!--attrs=""/>-->
+                <!--<field name="product_uom_qty" string="Demand Quantity"-->
+                <!--attrs=""/>-->
+                <!--<field name="quantity_done" string="备料数量"/>-->
+                <!--<field name="return_qty" readonly="1" string="Return Quantity"/>-->
+                <!--</tree>-->
+                <!--</field>-->
+                <!--</xpath>-->
 
 
                 <xpath expr="//notebook/page[1]" position="replace">
