@@ -8,6 +8,7 @@
             <field name="priority" eval="100"/>
             <field name="arch" type="xml">
                 <form string="产出">
+                    <field name="input_product_ids"  invisible="1"/>
                     <field name="output_product_ids" options="{'reload_on_button': True}">
                         <tree editable="bottom">
                             <field name="product_id" readonly="1" options="{'no_create': True}"/>
@@ -161,18 +162,22 @@
 
                 <xpath expr="//field[@name='bom_id']" position="attributes">
                     <attribute name="required">0</attribute>
-                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)]}</attribute>
+                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)],'readonly':[('state','not in',['draft','confirmed'])]}
+                    </attribute>
                 </xpath>
 
-                <xpath expr="//button[@name='open_produce_product']" position="replace">
+                <xpath expr="//button[@name='open_produce_product']" position="attributes">
+                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)]}</attribute>
 
                     <!--<button name="add_input_out_products" class="oe_highlight"-->
                     <!--attrs="{'invisible': [('state', '!=', 'draft')]}" type="object"-->
                     <!--string="添加投入产出" groups="linkloving_mrp_extend.group_charge_inspection"/>-->
+                </xpath>
+                <xpath expr="//button[@name='open_produce_product']" position="after">
+
                     <button name="button_multi_output" class="oe_highlight"
                             attrs="{'invisible': [('state', '!=', 'progress')]}" type="object"
                             string="产出" groups="linkloving_mrp_extend.group_charge_inspection"/>
-
                 </xpath>
 
 
@@ -182,38 +187,38 @@
                            attrs="{'readonly':[('state','not in',['draft','confirmed'])],'invisible':[('is_multi_output','!=',True)]}"/>
                 </xpath>
 
-
-                <xpath expr="//notebook/page[3]" position="replace">
+                <xpath expr="//notebook/page[3]" position="attributes">
+                    <attribute name="attrs">{'invisible':[('state','in',['waiting_inventory_material','done'])]}
+                    </attribute>
                 </xpath>
+
                 <xpath expr="//notebook/page[2]" position="replace">
-                    <page string="投入" attrs="{'invisible':[('state','not in',['draft','confirmed'])]}">
-                        <field name="input_product_ids" readonly="1">
-                            <tree editable="bottom" create="0" delete="0">
-                                <field name="product_id" options="{'no_create':True}" string="产品"/>
-                                <field name="type" invisible="1"/>
-                            </tree>
-                        </field>
-                    </page>
-                    <page string="产出" attrs="{'invisible':[('state','not in',['draft','confirmed'])]}">
-                        <field name="output_product_ids" readonly="1" create="0">
-                            <tree editable="bottom" create="0" delete="0">
-                                <field name="product_id" options="{'no_create':True}" string="产品"/>
-                                <field name="type" invisible="1"/>
-                            </tree>
-                        </field>
-                    </page>
+                    <!--<page string="投入" attrs="{'invisible':[('state','not in',['draft','confirmed'])]}">-->
+                    <!--<field name="input_product_ids" readonly="1">-->
+                    <!--<tree editable="bottom" create="0" delete="0">-->
+                    <!--<field name="product_id" options="{'no_create':True}" string="产品"/>-->
+                    <!--<field name="type" invisible="1"/>-->
+                    <!--</tree>-->
+                    <!--</field>-->
+                    <!--</page>-->
+                    <!--<page string="产出" attrs="{'invisible':[('state','not in',['draft','confirmed'])]}">-->
+                    <!--<field name="output_product_ids" readonly="1" create="0">-->
+                    <!--<tree editable="bottom" create="0" delete="0">-->
+                    <!--<field name="product_id" options="{'no_create':True}" string="产品"/>-->
+                    <!--<field name="type" invisible="1"/>-->
+                    <!--</tree>-->
+                    <!--</field>-->
+                    <!--</page>-->
 
 
-                    <page string="投入1"
-                          attrs="{'invisible':[('state','in',['draft','confirmed']),('is_multi_output','=',True)]}">
-                        <field name="sim_stock_move_lines"
-                               attrs="{'invisible':[('state','in',['draft','confirmed'])]}">
+                    <page string="投入">
+                        <field name="sim_stock_move_lines">
                             <tree editable="bottom" delete="0" decoration-warning="quantity_done&gt;product_uom_qty"
                                   decoration-success="quantity_done>=product_uom_qty"
                                   decoration-danger="qty_available&lt;product_uom_qty" create="0">
                                 <field name="product_id" string="产品" options="{'no_create':True}"/>
                                 <field name="qty_available" string="库存"/>
-                                <field name="virtual_available" string="预测数量" invisible="1"/>
+                                <field name="virtual_available" string="预测数量"/>
                                 <field name="suggest_qty" string="建议数量" invisible="1"/>
                                 <field name="quantity_available" string="系统可用" invisible="1"/>
                                 <field name="product_uom_qty" string="需求数量" invisible="1"/>
@@ -223,7 +228,8 @@
                         </field>
 
                     </page>
-                    <page string="产出1" attrs="{'invisible':[('state','in',['draft','confirmed'])]}">
+
+                    <page string="产成品" attrs="{'invisible':[('state','not in',['waiting_inventory_material','done'])]}">
                         <field name="stock_move_lines_finished" readonly="1" context="{'default_type':'output'}"
                                create="0">
                             <tree editable="bottom" create="0" delete="0">
