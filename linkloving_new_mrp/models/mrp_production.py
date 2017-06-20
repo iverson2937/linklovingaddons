@@ -12,7 +12,7 @@ class NewMrpProduction(models.Model):
     is_multi_output = fields.Boolean(related='process_id.is_multi_output')
     rule_id = fields.Many2one('mrp.product.rule')
     stock_move_lines_finished = fields.One2many('stock.move.finished', 'production_id')
-    is_force_output = fields.Boolean(string=u'是否要求产出完整')
+    is_force_output = fields.Boolean(string=u'是否要求产出完整', default=True)
 
     product_id = fields.Many2one(
         'product.product', 'Product',
@@ -54,6 +54,7 @@ class NewMrpProduction(models.Model):
 
     def button_waiting_material(self):
         if self.is_multi_output:
+
             if not self.output_product_ids or not self.input_product_ids:
                 raise UserError(u'请添加投入产出')
             self._generate_moves()
@@ -75,8 +76,16 @@ class NewMrpProduction(models.Model):
 
     def button_produce_finish(self):
         if self.is_multi_output:
+            if self.is_force_output and sum(move.quantity_done for move in self.move_raw_ids) > sum(
+                    move.quantity_done for move in self.move_finished_ids):
+                raise UserError('尚未完全产出,不允许完成')
             self.post_inventory()
-            self.state = 'waiting_inventory_material'
+            if sum(move.quantity_done for move in self.move_raw_ids) == sum(
+                    move.quantity_done for move in self.move_finished_ids):
+                state = 'done'
+            else:
+                state = 'waiting_inventory_material'
+            self.state = state
             return
         else:
             super(NewMrpProduction, self).button_produce_finish()

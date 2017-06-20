@@ -32,7 +32,7 @@ class StockMoveFinished(models.Model):
             sim_move.quantity_done = 0
             for move in sim_move.production_id.move_finished_ids:
                 if move.product_id == sim_move.product_id and not move.is_return_material and move.state == "done":
-                    print sim_move.quantity_done
                     sim_move.quantity_done_finished += move.quantity_done
 
     quantity_done_finished = fields.Float(default=0, compute=_compute_quantity_done_finished)
+    quantity_done = fields.Float(default=0, compute=_compute_quantity_done_finished)
