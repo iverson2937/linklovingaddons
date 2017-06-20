@@ -31,9 +31,8 @@
                 <div class="o_composer_suggested_partners">
 
 
-
                     <!--<textarea class="o_composer_text_field_field" tabindex="2"-->
-                              <!--placeholder="Write something33333333333333333333..."/>-->
+                    <!--placeholder="Write something33333333333333333333..."/>-->
 
                     <!--rrrrrrr-->
 
@@ -41,8 +40,7 @@
 
                     <div class="js_msg_comments">
                         <t t-foreach="widget.options" t-as="asdc">
-                            <!--<t t-esc="asdc"/>-->
-                            <input type="hidden" class="o_chat_header_adc" t-att-name="asdc" tt-att-value="asdc">
+                            <input type="hidden" class="o_chat_header_adc" t-att-name="asdc">
                                 <!--<t t-esc="asdc"/>-->
                             </input>
                         </t>

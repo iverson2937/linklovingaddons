@@ -89,9 +89,15 @@ class linkloving_mrp_automatic_plan(models.Model):
         else:
             # sos = self.env["sale.order"].browse(order_id)
             sos = self.env["sale.order"].search([("state", '=', 'sale')])
+        i = 0
         for so in sos:
+            print('%d/%d' % (i, len(sos)))
+            i += 1
             pos = self.env["purchase.order"].search([("origin", 'like', so.name)])
             mos = self.env["mrp.production"].search([("origin", 'like', so.name)])
+
+            if not pos and not mos:
+                continue
             lv1_mo = mos.filtered(lambda x: "WH" in x.origin)
             all_mo_mo = []
 
@@ -106,19 +112,27 @@ class linkloving_mrp_automatic_plan(models.Model):
             lines = []
             for mo in last_nodes:
                 node = mo
-                one_line = []
-                lines.append(node)
+                one_line = [node]
                 while True:
                     if not node.origin:
                         break
                     origins = node.origin.split(",")
-                    if len(origins) == 1 and ':' in origins[0]:
-                        origin = origins[0].split(":")[1]
-                    else:
-                        continue
-                    one_mo = mos.filtered(lambda x: x.name == origin)
-                    one_line.append(one_mo)
-                    node = one_mo
+                    need_break_after_while = False
+                    for ori in origins:
+                        if ':' in ori:
+                            origin = ori.split(":")[1]
+
+                            one_mo = mos.filtered(lambda x: x.name == origin)
+                            one_line.append(one_mo)
+                            node = one_mo
+                            if node in lv1_mo:
+                                break
+                        else:
+                            need_break_after_while = True
+                            break
+                    if need_break_after_while:
+                        break
+
                     if node in lv1_mo:
                         lines.append(one_line)
                         break
@@ -135,7 +149,7 @@ class linkloving_mrp_automatic_plan(models.Model):
             # 开始计算灯状态
             for line in lines:
                 for mo in line:
-                    self.cal_mo_light_status(mo, origin_mos)
+                    self.cal_mo_light_status(mo, origin_mos, line)
 
             # 计算SO单订单条目 状态灯
             for line in so.order_line:
@@ -147,7 +161,8 @@ class linkloving_mrp_automatic_plan(models.Model):
                         line.status_light = max(production_ids.mapped("status_light"))
 
             # so status light
-            so.status_light = max(so.order_line.mapped("status_light"))
+            if so.order_line.mapped("status_light"):
+                so.status_light = max(so.order_line.mapped("status_light"))
 
             # for mo in lv1_mo:
             #     lv = 0
@@ -159,7 +174,7 @@ class linkloving_mrp_automatic_plan(models.Model):
         # procurements = so.order_line.mapped('procurement_ids')
         # get_propagate_order(procurements)
 
-    def cal_mo_light_status(self, mos, origin_mos):
+    def cal_mo_light_status(self, mos, origin_mos, line):
         today_start, today_end = self.get_today_start_end()
         for mo in mos:
             # mo.status_light = False
@@ -179,6 +194,14 @@ class linkloving_mrp_automatic_plan(models.Model):
             if mo.state in ["done", "waiting_inventory_material", "waiting_warehouse_inspection"]:
                 mo.status_light = max(1, mo.status_light)
                 continue
+            index = 0
+            for s in line:
+                if mo == s:
+                    break
+                index += 1
+            if index > 0:
+                child_mo = line[index - 1]
+                mo.status_light = max(mo.status_light, child_mo.status_light)
 
             if date_planned_start > date_planned_end:
                 mo.status_light = 3
@@ -200,26 +223,31 @@ class linkloving_mrp_automatic_plan(models.Model):
 
     def cal_po_light_status(self, pos):
         today_start, today_end = self.get_today_start_end()
-
+        four_days = datetime.timedelta(days=4)
+        two_days = datetime.timedelta(days=2)
         for po in pos:
             try:
-                if po.handle_date:
-                    handle_date = fields.datetime.strptime(po.handle_date, '%Y-%m-%d %H:%M:%S')
-                else:  # 如果没有日期 则直接红灯
-                    po.status_light = 3
-                    continue
-                if po.shipping_status == "done":  # 如果已经收货完成 则绿灯
-                    po.status_light = 1
-                    continue
+                if po.state == 'purchase':
+                    if po.handle_date:
+                        handle_date = fields.datetime.strptime(po.handle_date, '%Y-%m-%d %H:%M:%S')
+                    else:  # 如果没有日期 则直接红灯
+                        po.status_light = 3
+                        continue
 
-                if handle_date < today_start:
-                    po.status_light = 3
-                elif handle_date > today_end and po.state == 'purchase':
-                    po.status_light = 1
-                elif (handle_date < today_end) and (handle_date > today_start):
-                    po.status_light = 2
+                    if po.shipping_status == "done":  # 如果已经收货完成 则绿灯
+                        po.status_light = 1
+                        continue
+
+                    if handle_date - today_start < two_days:
+                        po.status_light = 3
+                    elif handle_date - today_end > four_days:
+                        po.status_light = 1
+                    elif (handle_date - today_end <= four_days) and (handle_date - today_start >= two_days):
+                        po.status_light = 2
+                    else:
+                        po.status_light = 3
                 else:
-                    po.status_light = 3
+                    continue
             except:
                 continue
 
@@ -258,13 +286,12 @@ class SaleOrderEx(models.Model):
             self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].calc_status_light(self)
         return super(SaleOrderEx, self).read(fields, load)
 
+
 class SaleOrderLineEx(models.Model):
     _inherit = "sale.order.line"
     status_light = fields.Selection(string="状态灯", selection=[(3, '红'),
                                                              (2, '黄'),
                                                              (1, '绿')], required=False, )
-
-
 
 class MrpProductionEx(models.Model):
     _inherit = "mrp.production"
