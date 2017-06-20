@@ -162,7 +162,8 @@ class ProductTemplateExtend(models.Model):
 
 class StockMoveExtend(models.Model):
     _inherit = 'stock.move'
-
+    _order = 'create_date desc'
+    reason = fields.Char(u'备注')
     qty_available = fields.Float(string='On Hand', related='product_id.qty_available')
     virtual_available = fields.Float(string='Forecast Quantity', related='product_id.virtual_available')
     suggest_qty = fields.Integer(string='Suggest Quantity', help=u'建议数量 = 实际数量 + 预计报废数量', )

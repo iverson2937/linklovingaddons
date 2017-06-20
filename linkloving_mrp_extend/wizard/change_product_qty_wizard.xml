@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+        <record id="stock_change_product_qty_form_inherit" model="ir.ui.view">
+            <field name="name">stock.change.product.qty</field>
+            <field name="model">stock.change.product.qty</field>
+            <field name="inherit_id" ref="stock.view_change_product_quantity"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='new_quantity']" position="after">
+                    <field name="reason"/>
+
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</openerp>

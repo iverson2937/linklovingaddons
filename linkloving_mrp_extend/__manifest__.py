@@ -29,10 +29,12 @@
         'views/views.xml',
         'views/stock_location.xml',
         'views/templates.xml',
+        'views/stock_move.xml',
         'report/mrp_bom_structure_report_templates.xml',
         'report/mrp_production_templates.xml',
         'report/stock_picking_operations.xml',
         'wizard/tracking_number_wizard.xml',
+        'wizard/change_product_qty_wizard.xml',
         'report/stock_picking_report.xml',
         'views/qc_feedback.xml',
         'security/mrp_qc_feedback_seq.xml'
