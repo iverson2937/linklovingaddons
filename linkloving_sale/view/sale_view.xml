@@ -154,7 +154,7 @@
 
 
                 <xpath expr="//field[@name='display_name']" position="after">
-                    <field name="is_order"/>
+                    <!--<field name="is_order"/>-->
                     <field name="priority" widget="priority"/>
                     <field name="level"/>
                 </xpath>
