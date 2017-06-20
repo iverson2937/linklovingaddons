@@ -432,6 +432,7 @@ class LinklovingAppApi(http.Controller):
 
         if date_to_show != "delay":
             today_time = fields.datetime.strptime(date_to_show, '%Y-%m-%d')
+
         one_millisec_before = datetime.timedelta(milliseconds=1)  #
         today_time = today_time - one_millisec_before  # 今天的最后一秒
         after_day = today_time + one_days_after
