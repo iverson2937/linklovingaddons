@@ -321,15 +321,14 @@ class NewMrpProduction(models.Model):
             production.move_raw_ids.action_confirm()
         return True
 
-
-class MrpProductionMaterial(models.Model):
-    _name = 'mrp.production.material'
-    product_id = fields.Many2one('product.product', string=u'产品', required=True)
-    # total_produce_qty = fields.Float(string=u'累计产出数量')
-    produce_qty = fields.Float(string=u'产出数量')
-
-    mo_id = fields.Many2one('mrp.production', on_delete='cascade')
-    type = fields.Selection([
-        ('input', '输入'),
-        ('output', '输出')
-    ])
+# class MrpProductionMaterial(models.Model):
+#     _name = 'mrp.production.material'
+#     product_id = fields.Many2one('product.product', string=u'产品', required=True)
+#     # total_produce_qty = fields.Float(string=u'累计产出数量')
+#     produce_qty = fields.Float(string=u'产出数量')
+#
+#     mo_id = fields.Many2one('mrp.production', on_delete='cascade')
+#     type = fields.Selection([
+#         ('input', '输入'),
+#         ('output', '输出')
+#     ])
