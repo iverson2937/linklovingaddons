@@ -6,6 +6,9 @@ from odoo import models, fields, api
 import json
 import urllib
 
+from odoo.exceptions import MissingError
+
+
 class linkloving_mrp_automatic_plan(models.Model):
     _name = 'linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan'
 
@@ -27,7 +30,7 @@ class linkloving_mrp_automatic_plan(models.Model):
             "holiday": html.decode("gbk")
         }
 
-    def calc_status_light(self):
+    def calc_status_light(self, order_id=None):
 
         # def get_propagate_po(propagated_procurements):
         #     pos = self.env["purchase.order"]
@@ -60,30 +63,32 @@ class linkloving_mrp_automatic_plan(models.Model):
         #         return production_orders
         #     return get_propagate_sm(propagated_procurements)
 
-        def get_propagate_order(procurements):
-            propagated_procurements = procurements.filtered(lambda order: order.state != 'done')
-            obj_get = get_propagate_mo(propagated_procurements)
-            if not obj_get:
-                return
-            if type(obj_get) == type(self.env["procurement.order"]):
-                get_propagate_order(obj_get)
-            elif type(obj_get) == type(self.env["purchase.order"]):
-                po_s[0] += obj_get
-            elif type(obj_get) == type(self.env["mrp.production"]):
-                mo_s[0] += obj_get
-                for production in obj_get:
-                    finish_moves = production.move_finished_ids.filtered(lambda x: x.state not in ('done', 'cancel'))
-                    raw_moves = production.move_raw_ids.filtered(lambda x: x.state not in ('done', 'cancel'))
+        # def get_propagate_order(procurements):
+        #     propagated_procurements = procurements.filtered(lambda order: order.state != 'done')
+        #     obj_get = get_propagate_mo(propagated_procurements)
+        #     if not obj_get:
+        #         return
+        #     if type(obj_get) == type(self.env["procurement.order"]):
+        #         get_propagate_order(obj_get)
+        #     elif type(obj_get) == type(self.env["purchase.order"]):
+        #         po_s[0] += obj_get
+        #     elif type(obj_get) == type(self.env["mrp.production"]):
+        #         mo_s[0] += obj_get
+        #         for production in obj_get:
+        #             finish_moves = production.move_finished_ids.filtered(lambda x: x.state not in ('done', 'cancel'))
+        #             raw_moves = production.move_raw_ids.filtered(lambda x: x.state not in ('done', 'cancel'))
+        #
+        #             procurements = self.env["procurement.order"].search([('move_dest_id', 'in', raw_moves.ids)])
+        #             get_propagate_order(procurements)
+        #
+        #     else:
+        #         pass
 
-                    procurements = self.env["procurement.order"].search([('move_dest_id', 'in', raw_moves.ids)])
-                    get_propagate_order(procurements)
-
-            else:
-                pass
-
-        # sos = self.env["sale.order"].search([("state", '=', 'sale')])
-        sos = self.env["sale.order"].browse(3510)
-
+        if order_id:
+            sos = self.env["sale.order"].browse(order_id.id)
+        else:
+            # sos = self.env["sale.order"].browse(order_id)
+            sos = self.env["sale.order"].search([("state", '=', 'sale')])
         for so in sos:
             pos = self.env["purchase.order"].search([("origin", 'like', so.name)])
             mos = self.env["mrp.production"].search([("origin", 'like', so.name)])
@@ -102,10 +107,15 @@ class linkloving_mrp_automatic_plan(models.Model):
             for mo in last_nodes:
                 node = mo
                 one_line = []
+                lines.append(node)
                 while True:
+                    if not node.origin:
+                        break
                     origins = node.origin.split(",")
-                    if len(origins) == 1:
+                    if len(origins) == 1 and ':' in origins[0]:
                         origin = origins[0].split(":")[1]
+                    else:
+                        continue
                     one_mo = mos.filtered(lambda x: x.name == origin)
                     one_line.append(one_mo)
                     node = one_mo
@@ -129,11 +139,12 @@ class linkloving_mrp_automatic_plan(models.Model):
 
             # 计算SO单订单条目 状态灯
             for line in so.order_line:
-                moves = line.procurement_ids[0].move_ids.ids
-                pros = self.env["procurement.order"].search([("move_dest_id", 'in', moves)])
-                production_ids = pros.mapped("production_id")
-                if production_ids:
-                    line.status_light = max(production_ids.mapped("status_light"))
+                if line.procurement_ids and line.procurement_ids[0].move_ids:
+                    moves = line.procurement_ids[0].move_ids.ids
+                    pros = self.env["procurement.order"].search([("move_dest_id", 'in', moves)])
+                    production_ids = pros.mapped("production_id")
+                    if production_ids:
+                        line.status_light = max(production_ids.mapped("status_light"))
 
             # so status light
             so.status_light = max(so.order_line.mapped("status_light"))
@@ -151,6 +162,7 @@ class linkloving_mrp_automatic_plan(models.Model):
     def cal_mo_light_status(self, mos, origin_mos):
         today_start, today_end = self.get_today_start_end()
         for mo in mos:
+            # mo.status_light = False
             date_planned_start = fields.datetime.strptime(mo.date_planned_start, '%Y-%m-%d %H:%M:%S')
             date_planned_end = fields.datetime.strptime(mo.date_planned_finished, '%Y-%m-%d %H:%M:%S')
 
@@ -160,52 +172,56 @@ class linkloving_mrp_automatic_plan(models.Model):
 
             # 如果状态为未排产 则直接红灯
             if mo.state in ["draft"]:
-                mo.status_light = 2
+                mo.status_light = 3
                 continue
 
             # mo状态为 等待退料,接受退料,结束(成品已入库)
             if mo.state in ["done", "waiting_inventory_material", "waiting_warehouse_inspection"]:
-                mo.status_light = 0
+                mo.status_light = max(1, mo.status_light)
                 continue
 
             if date_planned_start > date_planned_end:
+                mo.status_light = 3
                 break
             if date_planned_start < today_start and date_planned_end < today_start:  # 开始时间-结束时间 在今天之前
-                mo.status_light = 2
+                mo.status_light = 3
             elif today_end < date_planned_start and today_end < date_planned_end:  # 开始结束都在今天之后
-                mo.status_light = max(0, mo.status_light)
+                mo.status_light = max(1, mo.status_light)
             elif today_start > date_planned_start and today_end < date_planned_end:  # 开始在今天之前, 结束在今天之后
-                mo.status_light = 2
+                mo.status_light = 3
             elif today_start > date_planned_start and today_end > date_planned_end:  # 开始时间再今天之前,结束时间再今天之内
-                mo.status_light = max(1, mo.status_light)
+                mo.status_light = max(2, mo.status_light)
             elif today_start < date_planned_start and today_end > date_planned_end:  # 开始结束都在今天之内
-                mo.status_light = max(1, mo.status_light)
+                mo.status_light = max(2, mo.status_light)
             elif today_start < date_planned_start and today_end < date_planned_end:  # 开始在今天 结束不在
-                mo.status_light = 2
+                mo.status_light = 3
             else:
-                mo.status_light = 2
+                mo.status_light = 3
 
     def cal_po_light_status(self, pos):
         today_start, today_end = self.get_today_start_end()
 
         for po in pos:
-            if po.handle_date:
-                handle_date = fields.datetime.strptime(po.handle_date, '%Y-%m-%d %H:%M:%S')
-            else:  # 如果没有日期 则直接红灯
-                po.status_light = 2
-                continue
-            if po.shipping_status == "done":  # 如果已经收货完成 则绿灯
-                po.status_light = 0
-                continue
+            try:
+                if po.handle_date:
+                    handle_date = fields.datetime.strptime(po.handle_date, '%Y-%m-%d %H:%M:%S')
+                else:  # 如果没有日期 则直接红灯
+                    po.status_light = 3
+                    continue
+                if po.shipping_status == "done":  # 如果已经收货完成 则绿灯
+                    po.status_light = 1
+                    continue
 
-            if not handle_date or handle_date < today_start:
-                po.status_light = 2
-            elif handle_date > today_end and po.state == 'purchase':
-                po.status_light = 0
-            elif (handle_date < today_end) and (handle_date > today_start):
-                po.status_light = 1
-            else:
-                po.status_light = 2
+                if handle_date < today_start:
+                    po.status_light = 3
+                elif handle_date > today_end and po.state == 'purchase':
+                    po.status_light = 1
+                elif (handle_date < today_end) and (handle_date > today_start):
+                    po.status_light = 2
+                else:
+                    po.status_light = 3
+            except:
+                continue
 
     def get_today_start_end(self):
         timez = fields.datetime.now(pytz.timezone(self.env.user.tz)).tzinfo._utcoffset
@@ -225,28 +241,33 @@ class MrpBomExtend(models.Model):
 
 class PuchaseOrderEx(models.Model):
     _inherit = "purchase.order"
-    status_light = fields.Selection(string="状态灯", selection=[(2, '红'),
-                                                             (1, '黄'),
-                                                             (0, '绿')], required=False, )
+    status_light = fields.Selection(string="状态灯", selection=[(3, '红'),
+                                                             (2, '黄'),
+                                                             (1, '绿')], required=False, )
 
 
 class SaleOrderEx(models.Model):
     _inherit = "sale.order"
-    status_light = fields.Selection(string="状态灯", selection=[(2, '红'),
-                                                             (1, '黄'),
-                                                             (0, '绿')], required=False, )
+    status_light = fields.Selection(string="状态灯", selection=[(3, '红'),
+                                                             (2, '黄'),
+                                                             (1, '绿')], required=False, )
 
+    @api.multi
+    def read(self, fields=None, load='_classic_read'):
+        if len(self) == 1 and load == '_classic_read':
+            self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].calc_status_light(self)
+        return super(SaleOrderEx, self).read(fields, load)
 
 class SaleOrderLineEx(models.Model):
     _inherit = "sale.order.line"
-    status_light = fields.Selection(string="状态灯", selection=[(2, '红'),
-                                                             (1, '黄'),
-                                                             (0, '绿')], required=False, )
+    status_light = fields.Selection(string="状态灯", selection=[(3, '红'),
+                                                             (2, '黄'),
+                                                             (1, '绿')], required=False, )
 
 
 
 class MrpProductionEx(models.Model):
     _inherit = "mrp.production"
-    status_light = fields.Selection(string="状态灯", selection=[(2, '红'),
-                                                             (1, '黄'),
-                                                             (0, '绿')], required=False, )
+    status_light = fields.Selection(string="状态灯", selection=[(3, '红'),
+                                                             (2, '黄'),
+                                                             (1, '绿')], required=False, )

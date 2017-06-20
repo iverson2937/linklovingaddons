@@ -1,0 +1,27 @@
+    .oe_kanban_status {
+        display: inline-block;
+        height: 12px;
+        width: 12px;
+        border-radius: 6px;
+
+        background-color: @odoo-brand-secondary;
+
+        &.oe_kanban_status_black {
+            background-color: #000000;
+        }
+        &.oe_kanban_status_orange {
+            background-color: #ff46fa;
+        }
+        &.oe_kanban_status_yellow {
+            background-color: @brand-warning;
+        }
+        &.oe_kanban_status_green {
+            background-color: @brand-success;
+        }
+        &.oe_kanban_status_red {
+            background-color: @brand-danger;
+        }
+        &.oe_kanban_status_blue {
+            background-color: @brand-info;
+        }
+    }

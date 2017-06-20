@@ -32,6 +32,8 @@
         'views/project_project.xml',
         'views/project_issue.xml',
         'views/project_issue_sheet_view.xml',
+        'views/project_templates.xml',
+        'views/project_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

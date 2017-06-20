@@ -20,13 +20,15 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'mrp', 'linkloving_mrp_extend'],
+    'depends': ['base', 'mrp', 'linkloving_mrp_extend', 'linkloving_process'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
         'views/views.xml',
         'views/mrp_production.xml',
+        'views/mrp_product_rule.xml',
+        'views/mrp_process.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

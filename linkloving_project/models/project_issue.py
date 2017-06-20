@@ -16,9 +16,17 @@ class project_issue(models.Model):
     _inherit = 'project.issue'
 
     version_id = fields.Many2one('project.issue.version', 'Version')
+
+    legend_audit = fields.Char(related="stage_id.legend_audit", string='Kanban Audit Explanation', readonly=True)
+
+    legend_close = fields.Char(related="stage_id.legend_close", string='Kanban Audit Explanation', readonly=True)
+
+    legend_pending = fields.Char(related="stage_id.legend_pending", string='Kanban Audit Explanation', readonly=True)
+
     date_deadline = fields.Date(string=u'截止日期')
     planed_level = fields.Selection(AVAILABLE_PRIORITIES, string=u'计划星级')
     actual_level = fields.Selection(AVAILABLE_PRIORITIES, string=u'质量星级')
+
 
     @api.onchange("project_id")
     def on_change_project(self):

@@ -70,7 +70,7 @@ class ProductTemplate(models.Model):
             'process_id': bom_id.process_id.id,
             'unit_price': bom_id.process_id.unit_price,
             'hour_price': bom_id.hour_price,
-            'in_charge_id': bom_id.process_id.partner_id.id
+            'in_charge_id': bom_id.process_id.partner_id.id,
         })
         mo_id.source_mo_ids = ids
 
@@ -81,6 +81,7 @@ class ProductTemplate(models.Model):
             'product_id':mo_id.product_tmpl_id.id,
             'date_planned_start': mo_id.date_planned_start,
             'state': MO_STATE[mo_id.state],
+            'status_light': mo_id.status_light,
         }
 
     @api.multi
@@ -113,7 +114,7 @@ class ProductTemplate(models.Model):
                     'qty': line.product_qty,
                     'date_planned': line.date_planned,
                     'state': PURCHASE_TYPE[line.order_id.state],
-                    'status_light': line.order_id.status_light or 3,
+                    'status_light': line.order_id.status_light,
                 })
 
         mo_ids = self.env['mrp.production'].search(

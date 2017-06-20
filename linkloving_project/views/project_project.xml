@@ -1,5 +1,16 @@
 <odoo>
     <data>
+        <record id="view_task_search_form_inherit" model="ir.ui.view">
+            <field name="name">project.task.search.form</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_search_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='stage_id']" position="after">
+                    <filter string="Waiting Audit Tasks" name="waiting_audit_tasks" domain="[('kanban_state','=','audit'),('reviewer_id','=',uid)]"/>
+                </xpath>
+            </field>
+        </record>
+
         <record id="view_project_project_gantt" model="ir.ui.view">
             <field name="name">project.project.gantt</field>
             <field name="model">project.project</field>
@@ -34,6 +45,20 @@
                     <i>Or <a type="action" name="%(project.activate_sample_project)d">activate a sample project</a> to
                         play with.
                     </i>
+                </p>
+            </field>
+        </record>
+        <record id="act_project_project_2_project_task_waiting_audit" model="ir.actions.act_window">
+            <field name="name">Waiting Audit Tasks</field>
+            <field name="res_model">project.task</field>
+            <field name="view_mode">kanban,tree,form,calendar,pivot,graph</field>
+            <field name="context">{
+                'search_default_waiting_audit_tasks': 1,
+            }</field>
+            <field name="search_view_id" ref="project.view_task_search_form"/>
+            <field name="help" type="html">
+                <p>
+                    Odoo's project management allows you to manage the pipeline of your tasks efficiently. You can track progress, discuss on tasks, attach documents, etc.
                 </p>
             </field>
         </record>
@@ -286,12 +311,10 @@
                                        options='{"no_open": True}'
                                        context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'project.group_project_user']}"/>
                                 <!--on_change="onchange_planned(planned_hours, effective_hours)"-->
-                                <field name="planned_hours" widget="float_time"
-                                       groups="project.group_time_work_estimation_tasks"
-                                />
+                                <field name="planned_hours" widget="float_time" groups="project.group_time_work_estimation_tasks" />
                                 <field name="planed_level" widget="priority"/>
                                 <field name="actual_level" widget="priority"/>
-
+s
                             </group>
                             <group>
                                 <field name="date_deadline"/>
@@ -308,6 +331,7 @@
                                     <tree string="Task Work" editable="top">
                                         <field name="name"/>
                                         <field name="hours" widget="float_time" sum="Spent Hours"/>
+                                        <field name="progress" />
                                         <field name="date"/>
                                         <field name="user_id"
                                                context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'project.group_project_user']}"/>
@@ -406,6 +430,19 @@
             </field>
         </record>
 
+        <record id="view_task_kanban_inherit" model="ir.ui.view">
+            <field name="name">project.task.kanban</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='legend_normal']" position="after">
+                    <field name="legend_audit"/>
+                    <field name="legend_close"/>
+                    <field name="legend_pending"/>
+                </xpath>
+            </field>
+        </record>
+
         <record id="view_task_gantt" model="ir.ui.view">
             <field name="name">project.task.gantt</field>
             <field name="model">project.task</field>
@@ -430,6 +467,13 @@
 
         <menuitem action="project_category_action" id="menu_project_category_act" parent="base.menu_definitions"
                   groups="base.group_no_one"/>
+
+        <menuitem id="menu_action_view_waiting_audit_task"
+            name="Waiting Audit Tasks"
+            action="act_project_project_2_project_task_waiting_audit"
+            parent="project.menu_project_management"
+            sequence="11"/>
+
 
     </data>
 

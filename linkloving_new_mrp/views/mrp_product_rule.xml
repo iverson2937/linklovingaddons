@@ -1,0 +1,193 @@
+<odoo>
+    <data>
+
+
+        <record id="mrp_product_rule_form" model="ir.ui.view">
+            <field name="name">产出</field>
+            <field name="model">mrp.product.rule</field>
+            <field name="priority" eval="100"/>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <h3>投入</h3>
+                        <field name="input_product_ids" options="{'reload_on_button': True}"
+                               context="{'default_type':'input'}">
+                            <tree editable="bottom">
+                                <field name="product_id" readonly="0" options="{'no_create': True}" string="产品"/>
+                                <!--<field name="total_produce_qty"/>-->
+                                <field name="produce_qty" invisible="1"/>
+                                <field name="type"/>
+                            </tree>
+                        </field>
+                        <h3>产出</h3>
+                        <field name="output_product_ids" options="{'reload_on_button': True}"
+                               context="{'default_type':'output'}">
+                            <tree editable="bottom">
+                                <field name="product_id" readonly="0" options="{'no_create': True}" string="产品"/>
+                                <!--<field name="total_produce_qty"/>-->
+                                <field name="produce_qty" invisible="1"/>
+                                <field name="type"/>
+                            </tree>
+                        </field>
+
+
+                    </sheet>
+
+
+                </form>
+            </field>
+        </record>
+
+
+        <record id="action_product_input_output_relation" model="ir.actions.act_window">
+            <field name="name">物料关系</field>
+            <field name="res_model">mrp.product.rule</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <menuitem action="action_product_input_output_relation" id="menu_product_input_output_relation"
+                  parent="mrp.menu_mrp_bom"
+                  string="物料关系维护"
+                  sequence="11"/>
+
+        <!--<record id="add_input_output_material_form" model="ir.ui.view">-->
+        <!--<field name="name">添加材料</field>-->
+        <!--<field name="model">mrp.production</field>-->
+        <!--<field name="priority" eval="100"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<form string="Picking material detail">-->
+        <!--<sheet>-->
+        <!--<notebook>-->
+        <!--<page string="投入">-->
+        <!--<field name="input_product_ids" options="{'reload_on_button': True}"-->
+        <!--context="{'default_type':'input'}">-->
+        <!--<tree editable="bottom" delete="1"-->
+        <!--create="1">-->
+
+        <!--<field name="product_id" readonly="0" options="{'no_create': True}"/>-->
+        <!--<field name="type" invisible="0"/>-->
+
+        <!--&lt;!&ndash;<field name="return_qty"  invisible="[('production_state', 'not in', ('waiting_inventory_material','waiting_warehouse_inspection'))]" string="退料数量"/>&ndash;&gt;-->
+        <!--</tree>-->
+        <!--</field>-->
+
+        <!--</page>-->
+
+        <!--</notebook>-->
+        <!--<notebook>-->
+        <!--<page string="产出">-->
+        <!--<field name="output_product_ids" options="{'reload_on_button': True}"-->
+        <!--context="{'default_type':'output'}" string="产出">-->
+        <!--<tree editable="bottom" delete="1" create="1">-->
+
+        <!--<field name="product_id" options="{'no_create': True}"/>-->
+        <!--<field name="type" invisible="1"/>-->
+
+        <!--&lt;!&ndash;<field name="return_qty"  invisible="[('production_state', 'not in', ('waiting_inventory_material','waiting_warehouse_inspection'))]" string="退料数量"/>&ndash;&gt;-->
+        <!--</tree>-->
+        <!--</field>-->
+        <!--</page>-->
+        <!--</notebook>-->
+
+        <!--</sheet>-->
+
+
+        <!--<footer>-->
+        <!--<button name="picking_material" string="Confirm"-->
+        <!--colspan="1" type="object" class="btn-primary"/>-->
+        <!--<button string="Cancel" class="btn-default" special="cancel"/>-->
+        <!--</footer>-->
+        <!--</form>-->
+        <!--</field>-->
+
+        <!--</record>-->
+        <!--<record id="picking_material_form" model="ir.ui.view">-->
+        <!--<field name="name">Picking Material Detail</field>-->
+        <!--<field name="model">mrp.production</field>-->
+        <!--<field name="priority" eval="100"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<form string="Picking material detail">-->
+        <!--<field name="sim_stock_move_lines" options="{'reload_on_button': True}">-->
+        <!--<tree editable="bottom" delete="0" decoration-warning="quantity_ready&gt;product_uom_qty"-->
+        <!--decoration-success="quantity_ready>=product_uom_qty" create="0">-->
+        <!--<field name="production_state" readonly="1" invisible="1" autofocus="autofocus"/>-->
+        <!--<field name="product_id" readonly="1" options="{'no_create': True}"/>-->
+        <!--<field name="qty_available" string="库存"/>-->
+        <!--<field name="virtual_available" string="预测数量" invisible="1"/>-->
+        <!--<field name="suggest_qty" readonly="1" string="建议数量" invisible="1"/>-->
+        <!--<field name="quantity_available" string="系统可用" invisible="1"/>-->
+        <!--<field name="product_uom_qty" string="实际需求物料数量" invisible="1"/>-->
+        <!--<field name="quantity_ready" readonly="context.get('quantity_ready_invisible')"-->
+        <!--string="备料数量"/>-->
+        <!--<field name="over_picking_qty" invisible="context.get('overpicking_invisible')"-->
+        <!--string="超领数量"/>-->
+        <!--&lt;!&ndash;<field name="return_qty"  invisible="[('production_state', 'not in', ('waiting_inventory_material','waiting_warehouse_inspection'))]" string="退料数量"/>&ndash;&gt;-->
+        <!--</tree>-->
+        <!--</field>-->
+
+        <!--<footer>-->
+        <!--<button name="picking_material" string="确定"-->
+        <!--colspan="1" type="object" class="btn-primary"/>-->
+        <!--<button string="取消" class="btn-default" special="cancel"/>-->
+        <!--</footer>-->
+        <!--</form>-->
+        <!--</field>-->
+        <!--</record>-->
+
+        <!--<record id="mrp_production_form_view_inherit" model="ir.ui.view">-->
+        <!--<field name="name">mrp.production.tree.inherit</field>-->
+        <!--<field name="model">mrp.production</field>-->
+        <!--<field name="inherit_id" ref="mrp.mrp_production_form_view"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<xpath expr="//field[@name='product_uom_id']" position="replace">-->
+        <!--<field name="product_uom_id" options="{'no_open':True,'no_create':True}" groups="product.group_uom"-->
+        <!--attrs="{'readonly': [('has_moves', '=', True)],'required':[('is_multi_output','!=',True)]}"/>-->
+
+        <!--</xpath>-->
+
+
+        <!--<xpath expr="//field[@name='bom_id']" position="attributes">-->
+        <!--<attribute name="required">0</attribute>-->
+        <!--<attribute name="attrs">{'invisible':[('is_multi_output','=',True)]}</attribute>-->
+        <!--</xpath>-->
+
+        <!--<xpath expr="//button[@name='open_produce_product']" position="replace">-->
+
+        <!--<button name="add_input_out_products" class="oe_highlight"-->
+        <!--attrs="{'invisible': [('state', '!=', 'draft')]}" type="object"-->
+        <!--string="添加投入产出" groups="linkloving_mrp_extend.group_charge_inspection"/>-->
+        <!--<button name="button_multi_output" class="oe_highlight"-->
+        <!--attrs="{'invisible': [('state', '!=', 'progress')]}" type="object"-->
+        <!--string="产出" groups="linkloving_mrp_extend.group_charge_inspection"/>-->
+
+        <!--</xpath>-->
+
+
+        <!--<xpath expr="//field[@name='bom_id']" position="after">-->
+        <!--<field name="is_multi_output"/>-->
+        <!--</xpath>-->
+
+
+        <!--<xpath expr="//notebook/page[3]" position="after">-->
+        <!--<page string="投入">-->
+        <!--<field name="input_product_ids" context="{'default_type':'input'}" create="0">-->
+        <!--<tree editable="bottom">-->
+        <!--<field name="product_id" options="{'no_create':True}" string="产品"/>-->
+        <!--<field name="type" invisible="1"/>-->
+        <!--</tree>-->
+        <!--</field>-->
+        <!--</page>-->
+        <!--<page string="产出">-->
+        <!--<field name="output_product_ids" context="{'default_type':'output'}" create="0">-->
+        <!--<tree editable="bottom">-->
+        <!--<field name="product_id" options="{'no_create':True}" string="产品"/>-->
+        <!--<field name="type" invisible="1"/>-->
+        <!--</tree>-->
+        <!--</field>-->
+        <!--</page>-->
+        <!--</xpath>-->
+        <!--</field>-->
+        <!--</record>-->
+    </data>
+</odoo>

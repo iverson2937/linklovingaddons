@@ -934,7 +934,8 @@ class ReturnOfMaterial(models.Model):
 
     @api.model
     def _default_return_line(self):
-        if self._context.get('active_id') and self._context.get('active_mode') == "mrp.production":
+        product_ids = []
+        if self._context.get('active_id') and self._context.get('active_model') == "mrp.production":
             mrp_production_order = self.env['mrp.production'].browse(self._context['active_id'])
             if mrp_production_order.product_id.bom_ids:
                 product_ids = mrp_production_order.product_id.bom_ids[0].bom_line_ids.mapped(

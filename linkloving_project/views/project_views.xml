@@ -1,0 +1,17 @@
+<odoo>
+    <record id="task_type_edit_inherit" model="ir.ui.view">
+        <field name="name">project.task.type.form</field>
+        <field name="model">project.task.type</field>
+        <field name="inherit_id" ref="project.task_type_edit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='legend_blocked']" position="after">
+                <label for="legend_audit" string=" " class="oe_kanban_status oe_kanban_status_orange oe_project_kanban_legend"/>
+                <field name="legend_audit" nolabel="1"/>
+                <label for="legend_close" string=" " class="oe_kanban_status oe_kanban_status_black oe_project_kanban_legend"/>
+                <field name="legend_close" nolabel="1"/>
+                <label for="legend_pending" string=" " class="oe_kanban_status oe_kanban_status_yellow oe_project_kanban_legend"/>
+                <field name="legend_pending" nolabel="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

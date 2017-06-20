@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <template id="assets_backend" name="project assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <link rel="stylesheet" href="/linkloving_project/static/src/less/kanban_view.less"/>
+                <script type="text/javascript" src="/linkloving_project/static/src/js/linkloving_task_kanban.js"></script>
+            </xpath>
+        </template>
+</odoo>

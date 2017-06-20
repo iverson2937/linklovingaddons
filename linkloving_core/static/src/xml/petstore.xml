@@ -78,13 +78,13 @@
                                                         <span style="margin-left:15px"><t t-esc="item.date"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.state"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
-                                                        <t t-if="item.status_light == 2">
+                                                        <t t-if="item.status_light == 3">
                                                         <span style="margin-left:15px;color:red;" class="fa fa-circle"></span>
                                                         </t>
-                                                        <t t-if="item.status_light == 1">
+                                                        <t t-if="item.status_light == 2">
                                                         <span style="margin-left:15px;color:yellow;" class="fa fa-circle"></span>
                                                         </t>
-                                                        <t t-if="item.status_light == 0">
+                                                        <t t-if="item.status_light == 1">
                                                         <span style="margin-left:15px;color:green;" class="fa fa-circle"></span>
                                                         </t>
 
@@ -185,13 +185,13 @@
                                                         <span style="margin-left:15px"><t t-esc="item.state"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
 
-                                                        <t t-if="item.status_light == 2">
+                                                        <t t-if="item.status_light == 3">
                                                         <span style="margin-left:15px;color:red;" class="fa fa-circle"></span>
                                                         </t>
-                                                        <t t-if="item.status_light == 1">
+                                                        <t t-if="item.status_light == 2">
                                                         <span style="margin-left:15px;color:yellow;" class="fa fa-circle"></span>
                                                         </t>
-                                                        <t t-if="item.status_light == 0">
+                                                        <t t-if="item.status_light == 1">
                                                         <span style="margin-left:15px;color:green;" class="fa fa-circle"></span>
                                                         </t>
                                                     </h4>
@@ -254,13 +254,13 @@
                                                         <span style="margin-left:15px"><t t-esc="item.state"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
                                                         <!--<span style="margin-left:15px"><t t-esc="item.origin"/> </span>-->
-                                                        <t t-if="item.status_light == 2">
+                                                        <t t-if="item.status_light == 3">
                                                         <span style="margin-left:15px;color:red;" class="fa fa-circle"></span>
                                                         </t>
-                                                        <t t-if="item.status_light == 1">
+                                                        <t t-if="item.status_light == 2">
                                                         <span style="margin-left:15px;color:yellow;" class="fa fa-circle"></span>
                                                         </t>
-                                                        <t t-if="item.status_light == 0">
+                                                        <t t-if="item.status_light == 1">
                                                         <span style="margin-left:15px;color:green;" class="fa fa-circle"></span>
                                                         </t>
                                                     </h4>
@@ -362,13 +362,13 @@
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.state"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
-                                                        <t t-if="item.status_light == 2">
+                                                        <t t-if="item.status_light == 3">
                                                         <span style="margin-left:15px;color:red;" class="fa fa-circle"></span>
                                                         </t>
-                                                        <t t-if="item.status_light == 1">
+                                                        <t t-if="item.status_light == 2">
                                                         <span style="margin-left:15px;color:yellow;" class="fa fa-circle"></span>
                                                         </t>
-                                                        <t t-if="item.status_light == 0">
+                                                        <t t-if="item.status_light == 1">
                                                         <span style="margin-left:15px;color:green;" class="fa fa-circle"></span>
                                                         </t>
                                                     </h4>
@@ -408,13 +408,13 @@
                         <t t-if="item.partner_name">
                             <span><t t-esc="item.partner_name"/></span>
                         </t>
-                        <t t-if="item.status_light == 2">
+                        <t t-if="item.status_light == 3">
                         <span style="margin-left:15px;color:red;" class="fa fa-circle"></span>
                         </t>
-                        <t t-if="item.status_light == 1">
+                        <t t-if="item.status_light == 2">
                         <span style="margin-left:15px;color:yellow;" class="fa fa-circle"></span>
                         </t>
-                        <t t-if="item.status_light == 0">
+                        <t t-if="item.status_light == 1">
                         <span style="margin-left:15px;color:green;" class="fa fa-circle"></span>
                         </t>
                     </h4>
@@ -445,13 +445,13 @@
                             <span style="margin-left:15px"><t t-esc="item.partner_name"/></span>
                         </t>
                         <span style="margin-left:15px"><t t-esc="item.state"/></span>
-                        <t t-if="item.status_light == 2">
+                        <t t-if="item.status_light == 3">
                         <span style="margin-left:15px;color:red;" class="fa fa-circle"></span>
                         </t>
-                        <t t-if="item.status_light == 1">
+                        <t t-if="item.status_light == 2">
                         <span style="margin-left:15px;color:yellow;" class="fa fa-circle"></span>
                         </t>
-                        <t t-if="item.status_light == 0">
+                        <t t-if="item.status_light == 1">
                         <span style="margin-left:15px;color:green;" class="fa fa-circle"></span>
                         </t>
                     </h4>
