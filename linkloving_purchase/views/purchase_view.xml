@@ -22,7 +22,9 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//tree" position="replace">
-                    <tree>
+                    <tree fonts="bold:message_unread==True" default_order="create_date desc"
+                          colors="grey:state=='cancel';blue:state in ('wait','confirmed');red:state in ('except_invoice','except_picking')"
+                          string="采购单">
                         <field name="message_unread" invisible="1"/>
                         <field name="name" string="单号"/>
                         <field name="partner_id"/>
