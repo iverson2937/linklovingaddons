@@ -347,453 +347,489 @@ odoo.define('mail.composers', function (require) {
 
     });
 
+    var msg_checkbox = new Array();
     var BasicComposer = Widget.extend({
-        template: "mail.ChatComposers",
+            template: "mail.ChatComposers",
 
-        events: {
-            "keydown .o_composer_input textarea": "on_keydown",
-            "keyup .o_composer_input": "on_keyup",
-            "change input.o_form_input_file": "on_attachment_change",
-            "click .o_composer_button_send": "send_message",
-            "click .o_composer_button_add_attachment": "on_click_add_attachment",
-            "click .o_attachment_delete": "on_attachment_delete",
-        },
+            events: {
+                "keydown .o_composer_input textarea": "on_keydown",
+                "keyup .o_composer_input": "on_keyup",
+                "change input.o_form_input_file": "on_attachment_change",
+                "click .o_composer_button_send": "send_message",
+                "click .o_composer_button_add_attachment": "on_click_add_attachment",
+                "click .o_attachment_delete": "on_attachment_delete",
 
-        init: function (parent, options) {
-            this._super.apply(this, arguments);
-            this.options = _.defaults(options || {}, {
-                commands_enabled: true,
-                context: {},
-                input_baseline: 18,
-                input_max_height: 150,
-                input_min_height: 28,
-                mention_fetch_limit: 8,
-                mention_partners_restricted: false, // set to true to only suggest prefetched partners
-                send_text: _t('Send'),
-                default_body: '',
-                default_mention_selections: {},
-            });
-            this.context = this.options.context;
+                'click input': 'on_click_inputs',
 
-            // Attachments
-            this.AttachmentDataSet = new data.DataSetSearch(this, 'ir.attachment', this.context);
-            this.fileupload_id = _.uniqueId('o_chat_fileupload');
-            this.set('attachment_ids', []);
+            },
 
-            // Mention
-            this.mention_manager = new MentionManager(this);
-            this.mention_manager.register({
-                delimiter: MENTION_PARTNER_DELIMITER,
-                fetch_callback: this.mention_fetch_partners.bind(this),
-                generate_links: true,
-                model: 'res.partner',
-                redirect_classname: 'o_mail_redirect',
-                selection: this.options.default_mention_selections[MENTION_PARTNER_DELIMITER],
-                suggestion_template: 'mail.MentionPartnerSuggestions',
-            });
-            this.mention_manager.register({
-                delimiter: MENTION_CHANNEL_DELIMITER,
-                fetch_callback: this.mention_fetch_channels.bind(this),
-                generate_links: true,
-                model: 'mail.channel',
-                redirect_classname: 'o_channel_redirect',
-                selection: this.options.default_mention_selections[MENTION_CHANNEL_DELIMITER],
-                suggestion_template: 'mail.MentionChannelSuggestions',
-            });
-            this.mention_manager.register({
-                delimiter: MENTION_CANNED_RESPONSE_DELIMITER,
-                fetch_callback: this.mention_get_canned_responses.bind(this),
-                selection: this.options.default_mention_selections[MENTION_CANNED_RESPONSE_DELIMITER],
-                suggestion_template: 'mail.MentionCannedResponseSuggestions',
-            });
-            if (this.options.commands_enabled) {
+            init: function (parent, options) {
+                this._super.apply(this, arguments);
+                this.options = _.defaults(options || {}, {
+                    commands_enabled: true,
+                    context: {},
+                    input_baseline: 18,
+                    input_max_height: 150,
+                    input_min_height: 28,
+                    mention_fetch_limit: 8,
+                    mention_partners_restricted: false, // set to true to only suggest prefetched partners
+                    send_text: _t('Send'),
+                    default_body: '',
+                    default_mention_selections: {},
+                });
+                this.context = this.options.context;
+
+                // Attachments
+                this.AttachmentDataSet = new data.DataSetSearch(this, 'ir.attachment', this.context);
+                this.fileupload_id = _.uniqueId('o_chat_fileupload');
+                this.set('attachment_ids', []);
+
+                // Mention
+                this.mention_manager = new MentionManager(this);
                 this.mention_manager.register({
-                    beginning_only: true,
-                    delimiter: MENTION_COMMAND_DELIMITER,
-                    fetch_callback: this.mention_get_commands.bind(this),
-                    selection: this.options.default_mention_selections[MENTION_COMMAND_DELIMITER],
-                    suggestion_template: 'mail.MentionCommandSuggestions',
+                    delimiter: MENTION_PARTNER_DELIMITER,
+                    fetch_callback: this.mention_fetch_partners.bind(this),
+                    generate_links: true,
+                    model: 'res.partner',
+                    redirect_classname: 'o_mail_redirect',
+                    selection: this.options.default_mention_selections[MENTION_PARTNER_DELIMITER],
+                    suggestion_template: 'mail.MentionPartnerSuggestions',
                 });
-            }
-
-            // Emojis
-            this.emoji_container_classname = 'o_composer_emoji';
-
-            this.PartnerModel = new Model('res.partner');
-            this.ChannelModel = new Model('mail.channel');
-
-
-        },
-
-        start: function () {
-            var self = this;
-
-            this.$attachment_button = this.$(".o_composer_button_add_attachment");
-            this.$attachments_list = this.$('.o_composer_attachments_list');
-            this.$input = this.$('.o_composer_input textarea');
-
-            this.$in_msg = this.$('.o_composer_text_field_field');
-
-            this.$in_adc_msg = this.$('.o_chat_header_adc');
-
-            this.$ace_msg_vle = this.$('.js_msg_comments input[type="checkbox"]');
-
-
-            $('.js_msg_comments input[type="checkbox"]').click(function () {
-                if (!$(this).prop("checked")) {
-
-                    // alert($(this.prop("name")));
-                    // $(this).closest('.js_msg_comments').find('input[type="text"]').val("");
-                }
-            });
-
-
-            // alert("控件打开")
-
-            this.$input.focus(function () {
-                self.trigger('input_focused');
-            });
-            this.$input.val(this.options.default_body);
-            dom_utils.autoresize(this.$input, {parent: this, min_height: this.options.input_min_height});
-
-            // Attachments
-            $(window).on(this.fileupload_id, this.on_attachment_loaded);
-            this.on("change:attachment_ids", this, this.render_attachments);
-
-            // Emoji
-            this.$('.o_composer_button_emoji').popover({
-                placement: 'top',
-                content: function () {
-                    if (!self.$emojis) { // lazy rendering
-                        self.$emojis = $(QWeb.render('mail.ChatComposer.emojis', {
-                            emojis: chat_manager.get_emojis(),
-                        }));
-                        self.$emojis.filter('.o_mail_emoji').on('click', self, self.on_click_emoji_img);
-                    }
-                    return self.$emojis;
-                },
-                html: true,
-                container: '.' + self.emoji_container_classname,
-                trigger: 'focus',
-            });
-
-            // Mention
-            this.mention_manager.prependTo(this.$('.o_composer'));
-
-            return this._super();
-        },
-
-        destroy: function () {
-            $(window).off(this.fileupload_id);
-            return this._super.apply(this, arguments);
-        },
-
-        toggle: function (state) {
-            this.$el.toggle(state);
-        },
-
-        preprocess_message: function () {
-
-
-            console.log("处理消息")
-            // Return a deferred as this function is extended with asynchronous
-            // behavior for the chatter composer
-            var value = _.escape(this.$input.val()).replace(/\n|\r/g, '<br/>');
-            // prevent html space collapsing
-            value = value.replace(/ /g, '&nbsp;').replace(/([^>])&nbsp;([^<])/g, '$1 $2');
-
-            var value1 = _.escape(this.$in_msg.val()).replace(/\n|\r/g, '<br/>');
-            // prevent html space collapsing
-            value1 = value1.replace(/ /g, '&nbsp;').replace(/([^>])&nbsp;([^<])/g, '$1 $2');
-
-
-            var value2 = _.escape(this.$in_adc_msg.val());
-
-
-            for (var aces in this.$ace_msg_vle) {
-                // if (!aces.prop("checked")) {
-                // alert(this.$ace_msg_vle[aces].prop("name"));
-                // }
-            }
-
-            // console.log("我来看看你是什么")
-            // alert("提交后 处理消息")
-            // alert(value1)
-            // alert(value)
-            // alert(value2)
-            // alert(this.$in_adc_msg.val())
-
-            var commands = this.options.commands_enabled ? this.mention_manager.get_listener_selection('/') : [];
-            return $.when({
-                content: this.mention_manager.generate_links(value),
-                attachment_ids: _.pluck(this.get('attachment_ids'), 'id'),
-                partner_ids: _.uniq(_.pluck(this.mention_manager.get_listener_selection('@'), 'id')),
-                command: commands.length > 0 ? commands[0].name : undefined,
-            });
-        },
-
-        send_message: function () {
-            if (this.is_empty() || !this.do_check_attachment_upload()) {
-                return;
-            }
-
-            console.log("发送消息")
-
-
-            var self = this;
-
-
-            this.preprocess_message().then(function (message) {
-                self.trigger('post_message', message);
-
-                // Empty input, selected partners and attachments
-                self.$input.val('');
-                self.mention_manager.reset_selections();
-                self.set('attachment_ids', []);
-
-                self.$input.focus();
-            });
-        },
-
-        // Events
-        on_click_add_attachment: function () {
-            this.$('input.o_form_input_file').click();
-            this.$input.focus();
-        },
-
-        on_click_emoji_img: function (event) {
-            this.$input.val(this.$input.val() + " " + $(event.currentTarget).data('emoji') + " ");
-            this.$input.focus();
-        },
-
-        /**
-         * Send the message on ENTER, but go to new line on SHIFT+ENTER
-         */
-        should_send: function (event) {
-            return !event.shiftKey;
-        },
-
-        on_keydown: function (event) {
-            switch (event.which) {
-                // UP, DOWN: prevent moving cursor if navigation in mention propositions
-                case $.ui.keyCode.UP:
-                case $.ui.keyCode.DOWN:
-                    if (this.mention_manager.is_open()) {
-                        event.preventDefault();
-                    }
-                    break;
-                // ENTER: submit the message only if the dropdown mention proposition is not displayed
-                case $.ui.keyCode.ENTER:
-                    if (this.mention_manager.is_open()) {
-                        event.preventDefault();
-                    } else {
-                        var send_message = event.ctrlKey || this.should_send(event);
-                        if (send_message) {
-                            event.preventDefault();
-                            this.send_message();
-                        }
-                    }
-                    break;
-            }
-        },
-
-        on_keyup: function (event) {
-            switch (event.which) {
-                // ESCAPED KEYS: do nothing
-                case $.ui.keyCode.END:
-                case $.ui.keyCode.PAGE_UP:
-                case $.ui.keyCode.PAGE_DOWN:
-                    break;
-                // ESCAPE: close mention propositions
-                case $.ui.keyCode.ESCAPE:
-                    event.stopPropagation();
-                    this.mention_manager.reset_suggestions();
-                    break;
-                // ENTER, UP, DOWN: check if navigation in mention propositions
-                case $.ui.keyCode.ENTER:
-                case $.ui.keyCode.UP:
-                case $.ui.keyCode.DOWN:
-                    if (this.mention_manager.is_open()) {
-                        this.mention_manager.proposition_navigation(event.which);
-                    }
-                    break;
-                // Otherwise, check if a mention is typed
-                default:
-                    this.mention_manager.detect_delimiter();
-            }
-        },
-
-        // Attachments
-        on_attachment_change: function (event) {
-            var $target = $(event.target);
-            if ($target.val() !== '') {
-                var filename = $target.val().replace(/.*[\\\/]/, '');
-                // if the files exits for this answer, delete the file before upload
-                var attachments = [];
-                for (var i in this.get('attachment_ids')) {
-                    if ((this.get('attachment_ids')[i].filename || this.get('attachment_ids')[i].name) === filename) {
-                        if (this.get('attachment_ids')[i].upload) {
-                            return false;
-                        }
-                        this.AttachmentDataSet.unlink([this.get('attachment_ids')[i].id]);
-                    } else {
-                        attachments.push(this.get('attachment_ids')[i]);
-                    }
-                }
-                // submit filename
-                this.$('form.o_form_binary_form').submit();
-                this.$attachment_button.prop('disabled', true);
-
-                attachments.push({
-                    'id': 0,
-                    'name': filename,
-                    'filename': filename,
-                    'url': '',
-                    'upload': true,
-                    'mimetype': '',
+                this.mention_manager.register({
+                    delimiter: MENTION_CHANNEL_DELIMITER,
+                    fetch_callback: this.mention_fetch_channels.bind(this),
+                    generate_links: true,
+                    model: 'mail.channel',
+                    redirect_classname: 'o_channel_redirect',
+                    selection: this.options.default_mention_selections[MENTION_CHANNEL_DELIMITER],
+                    suggestion_template: 'mail.MentionChannelSuggestions',
                 });
-                this.set('attachment_ids', attachments);
-            }
-        },
-        on_attachment_loaded: function (event, result) {
-            var attachment_ids = [];
-            if (result.error || !result.id) {
-                this.do_warn(result.error);
-                attachment_ids = _.filter(this.get('attachment_ids'), function (val) {
-                    return !val.upload;
+                this.mention_manager.register({
+                    delimiter: MENTION_CANNED_RESPONSE_DELIMITER,
+                    fetch_callback: this.mention_get_canned_responses.bind(this),
+                    selection: this.options.default_mention_selections[MENTION_CANNED_RESPONSE_DELIMITER],
+                    suggestion_template: 'mail.MentionCannedResponseSuggestions',
                 });
-            } else {
-                _.each(this.get('attachment_ids'), function (a) {
-                    if (a.filename === result.filename && a.upload) {
-                        attachment_ids.push({
-                            'id': result.id,
-                            'name': result.name || result.filename,
-                            'filename': result.filename,
-                            'mimetype': result.mimetype,
-                            'url': session.url('/web/content', {'id': result.id, download: true}),
-                        });
-                    } else {
-                        attachment_ids.push(a);
-                    }
-                });
-            }
-            this.set('attachment_ids', attachment_ids);
-            this.$attachment_button.prop('disabled', false);
-        },
-        on_attachment_delete: function (event) {
-            event.stopPropagation();
-            var self = this;
-            var attachment_id = $(event.target).data("id");
-            if (attachment_id) {
-                var attachments = [];
-                _.each(this.get('attachment_ids'), function (attachment) {
-                    if (attachment_id !== attachment.id) {
-                        attachments.push(attachment);
-                    } else {
-                        self.AttachmentDataSet.unlink([attachment_id]);
-                    }
-                });
-                this.set('attachment_ids', attachments);
-            }
-        },
-        do_check_attachment_upload: function () {
-            if (_.find(this.get('attachment_ids'), function (file) {
-                    return file.upload;
-                })) {
-                this.do_warn(_t("Uploading error"), _t("Please, wait while the file is uploading."));
-                return false;
-            }
-            return true;
-        },
-        render_attachments: function () {
-            this.$attachments_list.html(QWeb.render('mail.ChatComposer.Attachments', {
-                attachments: this.get('attachment_ids'),
-            }));
-        },
-
-        // Mention
-        mention_fetch_throttled: function (model, method, kwargs) {
-            // Delays the execution of the RPC to prevent unnecessary RPCs when the user is still typing
-            var def = $.Deferred();
-            clearTimeout(this.mention_fetch_timer);
-            this.mention_fetch_timer = setTimeout(function () {
-                return model.call(method, kwargs).then(function (results) {
-                    def.resolve(results);
-                });
-            }, 200);
-            return def;
-        },
-        mention_fetch_channels: function (search) {
-            return this.mention_fetch_throttled(this.ChannelModel, 'get_mention_suggestions', {
-                limit: this.options.mention_fetch_limit,
-                search: search,
-            }).then(function (suggestions) {
-                return _.partition(suggestions, function (suggestion) {
-                    return _.contains(['public', 'groups'], suggestion.public);
-                });
-            });
-        },
-        mention_fetch_partners: function (search) {
-            var self = this;
-            return $.when(this.mention_prefetched_partners).then(function (prefetched_partners) {
-                // filter prefetched partners with the given search string
-                var suggestions = [];
-                var limit = self.options.mention_fetch_limit;
-                var search_regexp = new RegExp(_.str.escapeRegExp(utils.unaccent(search)), 'i');
-                _.each(prefetched_partners, function (partners) {
-                    if (limit > 0) {
-                        var filtered_partners = _.filter(partners, function (partner) {
-                            return partner.email && search_regexp.test(partner.email) ||
-                                partner.name && search_regexp.test(utils.unaccent(partner.name));
-                        });
-                        if (filtered_partners.length) {
-                            suggestions.push(filtered_partners.slice(0, limit));
-                            limit -= filtered_partners.length;
-                        }
-                    }
-                });
-                if (!suggestions.length && !self.options.mention_partners_restricted) {
-                    // no result found among prefetched partners, fetch other suggestions
-                    suggestions = self.mention_fetch_throttled(self.PartnerModel, 'get_mention_suggestions', {
-                        limit: limit,
-                        search: search,
+                if (this.options.commands_enabled) {
+                    this.mention_manager.register({
+                        beginning_only: true,
+                        delimiter: MENTION_COMMAND_DELIMITER,
+                        fetch_callback: this.mention_get_commands.bind(this),
+                        selection: this.options.default_mention_selections[MENTION_COMMAND_DELIMITER],
+                        suggestion_template: 'mail.MentionCommandSuggestions',
                     });
                 }
-                return suggestions;
-            });
-        },
-        mention_get_canned_responses: function (search) {
-            var canned_responses = chat_manager.get_canned_responses();
-            var matches = fuzzy.filter(utils.unaccent(search), _.pluck(canned_responses, 'source'));
-            var indexes = _.pluck(matches.slice(0, this.options.mention_fetch_limit), 'index');
-            return _.map(indexes, function (i) {
-                return canned_responses[i];
-            });
-        },
-        mention_get_commands: function (search) {
-            var search_regexp = new RegExp(_.str.escapeRegExp(utils.unaccent(search)), 'i');
-            return _.filter(this.mention_commands, function (command) {
-                return search_regexp.test(command.name);
-            }).slice(0, this.options.mention_fetch_limit);
-        },
-        mention_set_prefetched_partners: function (prefetched_partners) {
-            this.mention_prefetched_partners = prefetched_partners;
-        },
-        mention_set_enabled_commands: function (commands) {
-            this.mention_commands = commands;
-        },
-        mention_get_listener_selections: function () {
-            return this.mention_manager.get_listener_selections();
-        },
 
-        // Others
-        is_empty: function () {
-            return !this.$input.val().trim() && !this.$('.o_attachments').children().length;
-        },
-        focus: function () {
-            this.$input.focus();
-        },
-    });
+                // Emojis
+                this.emoji_container_classname = 'o_composer_emoji';
+
+                this.PartnerModel = new Model('res.partner');
+                this.ChannelModel = new Model('mail.channel');
+
+
+            },
+
+            start: function () {
+                var self = this;
+
+                this.$attachment_button = this.$(".o_composer_button_add_attachment");
+                this.$attachments_list = this.$('.o_composer_attachments_list');
+                this.$input = this.$('.o_composer_input textarea');
+
+                this.$in_msg = this.$('.o_composer_text_field_field');
+
+                this.$in_adc_msg = this.$('.o_chat_header_adc');
+
+                // alert("控件打开")
+
+                this.$input.focus(function () {
+                    self.trigger('input_focused');
+                });
+                this.$input.val(this.options.default_body);
+                dom_utils.autoresize(this.$input, {parent: this, min_height: this.options.input_min_height});
+
+                // Attachments
+                $(window).on(this.fileupload_id, this.on_attachment_loaded);
+                this.on("change:attachment_ids", this, this.render_attachments);
+
+                // Emoji
+                this.$('.o_composer_button_emoji').popover({
+                    placement: 'top',
+                    content: function () {
+                        if (!self.$emojis) { // lazy rendering
+                            self.$emojis = $(QWeb.render('mail.ChatComposer.emojis', {
+                                emojis: chat_manager.get_emojis(),
+                            }));
+                            self.$emojis.filter('.o_mail_emoji').on('click', self, self.on_click_emoji_img);
+                        }
+                        return self.$emojis;
+                    },
+                    html: true,
+                    container: '.' + self.emoji_container_classname,
+                    trigger: 'focus',
+                });
+
+                // Mention
+                this.mention_manager.prependTo(this.$('.o_composer'));
+
+                return this._super();
+            },
+
+            destroy: function () {
+                $(window).off(this.fileupload_id);
+                return this._super.apply(this, arguments);
+            },
+
+            toggle: function (state) {
+                this.$el.toggle(state);
+            },
+
+
+            on_click_inputs: function (event) {
+                console.log("hhhhhhhhhhhhhhhhhhh")
+
+                if ($(event.target).prop("checked")) {
+
+                    msg_checkbox.splice(0, 0, $(event.target).prop("name"));
+
+                } else {
+
+                    if (msg_checkbox.indexOf($(event.target).prop("name")) > 0) {
+                        // alert('Cts中包含Text字符串');
+                        msg_checkbox.pop($(event.target).prop("name"));
+                    }
+
+                }
+
+                // if ($(event.target).val() === "1") {
+                //     alert(11)
+                //
+                //     this.open_dialog().on('closed', this, function () {
+                //         this.$('input').first().prop("checked", true);
+                //     });
+                // }
+            }
+            ,
+
+            preprocess_message: function () {
+
+
+                console.log("处理消息")
+                // Return a deferred as this function is extended with asynchronous
+                // behavior for the chatter composer
+                var value = _.escape(this.$input.val()).replace(/\n|\r/g, '<br/>');
+                // prevent html space collapsing
+                value = value.replace(/ /g, '&nbsp;').replace(/([^>])&nbsp;([^<])/g, '$1 $2');
+
+                // var value1 = _.escape(this.$in_msg.val()).replace(/\n|\r/g, '<br/>');
+                // // prevent html space collapsing
+                // value1 = value1.replace(/ /g, '&nbsp;').replace(/([^>])&nbsp;([^<])/g, '$1 $2');
+
+
+                for (var aces in this.$in_adc_msg) {
+                    console.log(aces);
+
+                    // console.log(this.$in_adc_msg[aces]);
+                    // console.log(this.$in_adc_msg[aces]["value"]);
+                }
+
+                console.log("****************************")
+
+
+                var commands = this.options.commands_enabled ? this.mention_manager.get_listener_selection('/') : [];
+                return $.when({
+                    content: this.mention_manager.generate_links(value),
+                    attachment_ids: _.pluck(this.get('attachment_ids'), 'id'),
+                    partner_ids: _.uniq(_.pluck(this.mention_manager.get_listener_selection('@'), 'id')),
+                    command: commands.length > 0 ? commands[0].name : undefined,
+                });
+            }
+            ,
+
+            send_message: function () {
+                if (this.is_empty() || !this.do_check_attachment_upload()) {
+                    return;
+                }
+
+                console.log("发送消息")
+
+
+                var self = this;
+
+
+                this.preprocess_message().then(function (message) {
+                    self.trigger('post_message', message);
+
+                    // Empty input, selected partners and attachments
+                    self.$input.val('');
+                    self.mention_manager.reset_selections();
+                    self.set('attachment_ids', []);
+
+                    self.$input.focus();
+                });
+            }
+            ,
+
+            // Events
+            on_click_add_attachment: function () {
+                this.$('input.o_form_input_file').click();
+                this.$input.focus();
+            }
+            ,
+
+            on_click_emoji_img: function (event) {
+                this.$input.val(this.$input.val() + " " + $(event.currentTarget).data('emoji') + " ");
+                this.$input.focus();
+            }
+            ,
+
+            /**
+             * Send the message on ENTER, but go to new line on SHIFT+ENTER
+             */
+            should_send: function (event) {
+                return !event.shiftKey;
+            }
+            ,
+
+            on_keydown: function (event) {
+                switch (event.which) {
+                    // UP, DOWN: prevent moving cursor if navigation in mention propositions
+                    case $.ui.keyCode.UP:
+                    case $.ui.keyCode.DOWN:
+                        if (this.mention_manager.is_open()) {
+                            event.preventDefault();
+                        }
+                        break;
+                    // ENTER: submit the message only if the dropdown mention proposition is not displayed
+                    case $.ui.keyCode.ENTER:
+                        if (this.mention_manager.is_open()) {
+                            event.preventDefault();
+                        } else {
+                            var send_message = event.ctrlKey || this.should_send(event);
+                            if (send_message) {
+                                event.preventDefault();
+                                this.send_message();
+                            }
+                        }
+                        break;
+                }
+            }
+            ,
+
+            on_keyup: function (event) {
+                switch (event.which) {
+                    // ESCAPED KEYS: do nothing
+                    case $.ui.keyCode.END:
+                    case $.ui.keyCode.PAGE_UP:
+                    case $.ui.keyCode.PAGE_DOWN:
+                        break;
+                    // ESCAPE: close mention propositions
+                    case $.ui.keyCode.ESCAPE:
+                        event.stopPropagation();
+                        this.mention_manager.reset_suggestions();
+                        break;
+                    // ENTER, UP, DOWN: check if navigation in mention propositions
+                    case $.ui.keyCode.ENTER:
+                    case $.ui.keyCode.UP:
+                    case $.ui.keyCode.DOWN:
+                        if (this.mention_manager.is_open()) {
+                            this.mention_manager.proposition_navigation(event.which);
+                        }
+                        break;
+                    // Otherwise, check if a mention is typed
+                    default:
+                        this.mention_manager.detect_delimiter();
+                }
+            }
+            ,
+
+            // Attachments
+            on_attachment_change: function (event) {
+                var $target = $(event.target);
+                if ($target.val() !== '') {
+                    var filename = $target.val().replace(/.*[\\\/]/, '');
+                    // if the files exits for this answer, delete the file before upload
+                    var attachments = [];
+                    for (var i in this.get('attachment_ids')) {
+                        if ((this.get('attachment_ids')[i].filename || this.get('attachment_ids')[i].name) === filename) {
+                            if (this.get('attachment_ids')[i].upload) {
+                                return false;
+                            }
+                            this.AttachmentDataSet.unlink([this.get('attachment_ids')[i].id]);
+                        } else {
+                            attachments.push(this.get('attachment_ids')[i]);
+                        }
+                    }
+                    // submit filename
+                    this.$('form.o_form_binary_form').submit();
+                    this.$attachment_button.prop('disabled', true);
+
+                    attachments.push({
+                        'id': 0,
+                        'name': filename,
+                        'filename': filename,
+                        'url': '',
+                        'upload': true,
+                        'mimetype': '',
+                    });
+                    this.set('attachment_ids', attachments);
+                }
+            }
+            ,
+            on_attachment_loaded: function (event, result) {
+                var attachment_ids = [];
+                if (result.error || !result.id) {
+                    this.do_warn(result.error);
+                    attachment_ids = _.filter(this.get('attachment_ids'), function (val) {
+                        return !val.upload;
+                    });
+                } else {
+                    _.each(this.get('attachment_ids'), function (a) {
+                        if (a.filename === result.filename && a.upload) {
+                            attachment_ids.push({
+                                'id': result.id,
+                                'name': result.name || result.filename,
+                                'filename': result.filename,
+                                'mimetype': result.mimetype,
+                                'url': session.url('/web/content', {'id': result.id, download: true}),
+                            });
+                        } else {
+                            attachment_ids.push(a);
+                        }
+                    });
+                }
+                this.set('attachment_ids', attachment_ids);
+                this.$attachment_button.prop('disabled', false);
+            }
+            ,
+            on_attachment_delete: function (event) {
+                event.stopPropagation();
+                var self = this;
+                var attachment_id = $(event.target).data("id");
+                if (attachment_id) {
+                    var attachments = [];
+                    _.each(this.get('attachment_ids'), function (attachment) {
+                        if (attachment_id !== attachment.id) {
+                            attachments.push(attachment);
+                        } else {
+                            self.AttachmentDataSet.unlink([attachment_id]);
+                        }
+                    });
+                    this.set('attachment_ids', attachments);
+                }
+            }
+            ,
+            do_check_attachment_upload: function () {
+                if (_.find(this.get('attachment_ids'), function (file) {
+                        return file.upload;
+                    })) {
+                    this.do_warn(_t("Uploading error"), _t("Please, wait while the file is uploading."));
+                    return false;
+                }
+                return true;
+            }
+            ,
+            render_attachments: function () {
+                this.$attachments_list.html(QWeb.render('mail.ChatComposer.Attachments', {
+                    attachments: this.get('attachment_ids'),
+                }));
+            }
+            ,
+
+            // Mention
+            mention_fetch_throttled: function (model, method, kwargs) {
+                // Delays the execution of the RPC to prevent unnecessary RPCs when the user is still typing
+                var def = $.Deferred();
+                clearTimeout(this.mention_fetch_timer);
+                this.mention_fetch_timer = setTimeout(function () {
+                    return model.call(method, kwargs).then(function (results) {
+                        def.resolve(results);
+                    });
+                }, 200);
+                return def;
+            }
+            ,
+            mention_fetch_channels: function (search) {
+                return this.mention_fetch_throttled(this.ChannelModel, 'get_mention_suggestions', {
+                    limit: this.options.mention_fetch_limit,
+                    search: search,
+                }).then(function (suggestions) {
+                    return _.partition(suggestions, function (suggestion) {
+                        return _.contains(['public', 'groups'], suggestion.public);
+                    });
+                });
+            }
+            ,
+            mention_fetch_partners: function (search) {
+                var self = this;
+                return $.when(this.mention_prefetched_partners).then(function (prefetched_partners) {
+                    // filter prefetched partners with the given search string
+                    var suggestions = [];
+                    var limit = self.options.mention_fetch_limit;
+                    var search_regexp = new RegExp(_.str.escapeRegExp(utils.unaccent(search)), 'i');
+                    _.each(prefetched_partners, function (partners) {
+                        if (limit > 0) {
+                            var filtered_partners = _.filter(partners, function (partner) {
+                                return partner.email && search_regexp.test(partner.email) ||
+                                    partner.name && search_regexp.test(utils.unaccent(partner.name));
+                            });
+                            if (filtered_partners.length) {
+                                suggestions.push(filtered_partners.slice(0, limit));
+                                limit -= filtered_partners.length;
+                            }
+                        }
+                    });
+                    if (!suggestions.length && !self.options.mention_partners_restricted) {
+                        // no result found among prefetched partners, fetch other suggestions
+                        suggestions = self.mention_fetch_throttled(self.PartnerModel, 'get_mention_suggestions', {
+                            limit: limit,
+                            search: search,
+                        });
+                    }
+                    return suggestions;
+                });
+            }
+            ,
+            mention_get_canned_responses: function (search) {
+                var canned_responses = chat_manager.get_canned_responses();
+                var matches = fuzzy.filter(utils.unaccent(search), _.pluck(canned_responses, 'source'));
+                var indexes = _.pluck(matches.slice(0, this.options.mention_fetch_limit), 'index');
+                return _.map(indexes, function (i) {
+                    return canned_responses[i];
+                });
+            }
+            ,
+            mention_get_commands: function (search) {
+                var search_regexp = new RegExp(_.str.escapeRegExp(utils.unaccent(search)), 'i');
+                return _.filter(this.mention_commands, function (command) {
+                    return search_regexp.test(command.name);
+                }).slice(0, this.options.mention_fetch_limit);
+            }
+            ,
+            mention_set_prefetched_partners: function (prefetched_partners) {
+                this.mention_prefetched_partners = prefetched_partners;
+            }
+            ,
+            mention_set_enabled_commands: function (commands) {
+                this.mention_commands = commands;
+            }
+            ,
+            mention_get_listener_selections: function () {
+                return this.mention_manager.get_listener_selections();
+            }
+            ,
+
+            // Others
+            is_empty: function () {
+                return !this.$input.val().trim() && !this.$('.o_attachments').children().length;
+            }
+            ,
+            focus: function () {
+                this.$input.focus();
+            }
+            ,
+        })
+        ;
 
     var ExtendedComposer = BasicComposer.extend({
         init: function (parent, options) {

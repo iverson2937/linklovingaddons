@@ -21,7 +21,7 @@
 
     # any module necessary for this one to work correctly
     'depends': ['base', 'sale', 'product', 'sales_team', 'sale_stock', 'linkloving_stock_picking',
-                'linkloving_warehouse', 'delivery'],
+                'linkloving_warehouse', 'delivery', 'linkloving_crm'],
 
     # always loaded
     'data': [
