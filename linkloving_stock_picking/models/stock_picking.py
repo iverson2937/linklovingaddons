@@ -14,6 +14,11 @@ class StockPicking(models.Model):
         ('return_storage', u'退货入库'),
     ])
 
+    @api.multi
+    def unlink(self):
+        self.mapped('pack_operation_product_ids').unlink()  # Checks if moves are not done
+        return super(StockPicking, self).unlink()
+
     def _get_po_number(self):
         if self.origin:
             po = self.env['purchase.order'].search([('name', '=', self.origin)])
