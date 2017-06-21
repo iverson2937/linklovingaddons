@@ -272,11 +272,12 @@ class linkloving_mrp_automatic_plan(models.Model):
                     production_ids = pros.mapped("production_id")
                     if production_ids:
                         line.status_light = max(production_ids.mapped("status_light"))
+                        line.material_light = max(production_ids.mapped("material_light"))
 
             # so status light
             if so.order_line.mapped("status_light"):
                 so.status_light = max(so.order_line.mapped("status_light"))
-
+                so.material_light = max(production_ids.mapped("material_light"))
             # for mo in lv1_mo:
             #     lv = 0
             #     mo_relate_mo = []
@@ -394,6 +395,10 @@ class SaleOrderEx(models.Model):
                                                              (2, '黄'),
                                                              (1, '绿')], required=False, )
 
+    material_light = fields.Selection(string="物料状态", selection=[(3, '红'),
+                                                                (2, '黄'),
+                                                                (1, '绿')], )
+
     @api.multi
     def read(self, fields=None, load='_classic_read'):
         if len(self) == 1 and load == '_classic_read':
@@ -406,6 +411,9 @@ class SaleOrderLineEx(models.Model):
     status_light = fields.Selection(string="状态灯", selection=[(3, '红'),
                                                              (2, '黄'),
                                                              (1, '绿')], required=False, )
+    material_light = fields.Selection(string="物料状态", selection=[(3, '红'),
+                                                                (2, '黄'),
+                                                                (1, '绿')], )
 
 class MrpProductionEx(models.Model):
     _inherit = "mrp.production"
