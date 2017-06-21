@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="status_light_type" model="auto.plan">
+            <field name="name">状态灯</field>
+            <field name="type">status_light</field>
+        </record>
+        <record id="stock_picking_type" model="auto.plan">
+            <field name="name">入库单</field>
+            <field name="type">stock_picking</field>
+        </record>
+    </data>
+</odoo>

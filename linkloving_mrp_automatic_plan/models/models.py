@@ -9,10 +9,123 @@ import urllib
 from odoo.exceptions import MissingError
 
 
+class ll_auto_plan_kb(models.Model):
+    _name = 'auto.plan'
+
+    name = fields.Char()
+    type = fields.Char()
+    count_red = fields.Integer(compute='_compute_count_red')
+    count_green = fields.Integer(compute='_compute_count_green')
+    count_yellow = fields.Integer(compute='_compute_count_yellow')
+    count_qc = fields.Integer(compute='_compute_count_qc')
+    count_confirm = fields.Integer(compute='_compute_count_confirm')
+    count_inventory = fields.Integer(compute='_compute_count_inventory')
+
+    @api.multi
+    def _compute_count_red(self):
+        for plan in self:
+            plan.count_red = len(
+                self.env['purchase.order'].search([("status_light", '=', 3), ('state', '=', 'purchase')]))
+
+    @api.multi
+    def _compute_count_green(self):
+        for plan in self:
+            plan.count_green = len(
+                self.env['purchase.order'].search([("status_light", '=', 1), ('state', '=', 'purchase')]))
+
+    @api.multi
+    def _compute_count_yellow(self):
+        for plan in self:
+            plan.count_yellow = len(
+                self.env['purchase.order'].search([("status_light", '=', 2), ('state', '=', 'purchase')]))
+
+    @api.multi
+    def _compute_count_qc(self):
+        for plan in self:
+            plan.count_qc = len(self.env["stock.picking"].search([("state", '=', 'qc_check')]))
+
+    @api.multi
+    def _compute_count_confirm(self):
+        for plan in self:
+            plan.count_confirm = len(self.env["stock.picking"].search([("state", '=', 'validate')]))
+
+    @api.multi
+    def _compute_count_inventory(self):
+        for plan in self:
+            plan.count_inventory = len(self.env["stock.picking"].search([("state", '=', 'waiting_in')]))
+
+    @api.multi
+    def get_red_1(self):
+        red = self.env['purchase.order'].search([("status_light", '=', 3)])
+
+        return {
+            'name': u'红',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'purchase.order',
+            'target': 'current',
+            'domain': [('id', 'in', red.ids)]}
+
+    def get_green(self):
+        red = self.env['purchase.order'].search([("status_light", '=', 1)])
+
+        return {
+            'name': u'绿',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'purchase.order',
+            'target': 'current',
+            'domain': [('id', 'in', red.ids)]}
+
+    def get_yellow(self):
+        red = self.env['purchase.order'].search([("status_light", '=', 2)])
+        return {
+            'name': u'黄',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'purchase.order',
+            'target': 'current',
+            'domain': [('id', 'in', red.ids)]}
+
+    def get_stock_picking_qc(self):
+        qc_check = self.env["stock.picking"].search([("state", '=', 'qc_check')])
+        return {
+            'name': u'待品检',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'stock.picking',
+            'target': 'current',
+            'domain': [('id', 'in', qc_check.ids)]}
+
+    def get_stock_picking_purchase_confirm(self):
+        qc_check = self.env["stock.picking"].search([("state", '=', 'validate')])
+        return {
+            'name': u'待确认',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'stock.picking',
+            'target': 'current',
+            'domain': [('id', 'in', qc_check.ids)]}
+
+    def get_stock_picking_inventory(self):
+        qc_check = self.env["stock.picking"].search([("state", '=', 'waiting_in')])
+        return {
+            'name': u'待入库',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'stock.picking',
+            'target': 'current',
+            'domain': [('id', 'in', qc_check.ids)]}
+
 class linkloving_mrp_automatic_plan(models.Model):
     _name = 'linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan'
 
-#     name = fields.Char()
 #     value = fields.Integer()
 #     value2 = fields.Float(compute="_value_pc", store=True)
 #     description = fields.Text()
