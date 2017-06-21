@@ -23,7 +23,7 @@ class ll_auto_plan_kb(models.Model):
 
     @api.multi
     def _compute_count_red(self):
-        pos = self.env['purchase.order'].search([('state', '=', 'purchase')])
+        # pos = self.env['purchase.order'].search([('state', '=', 'purchase')])
         # self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].cal_po_light_status(pos)
         for plan in self:
             plan.count_red = len(
@@ -397,10 +397,10 @@ class PuchaseOrderEx(models.Model):
                                                              (1, '绿')], required=False, compute='_compute_status_light',
                                     store=True)
 
-    @api.depends('state', 'handle_date', 'picking_ids.state')
-    def _compute_status_light(self):
-        print("do compute status_light")
-        self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].cal_po_light_status(self)
+    # @api.depends('state', 'handle_date', 'picking_ids.state')
+    # def _compute_status_light(self):
+    #     print("do compute status_light")
+    #     self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].cal_po_light_status(self)
 
 class SaleOrderEx(models.Model):
     _inherit = "sale.order"
