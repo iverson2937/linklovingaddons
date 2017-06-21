@@ -297,6 +297,7 @@ class linkloving_mrp_automatic_plan(models.Model):
             orgin_pos = origin_mos.get(mo.id)
             if orgin_pos:
                 mo.status_light = max(orgin_pos.mapped("status_light"))
+                mo.material_light = max(orgin_pos.mapped("status_light"))
 
             # 如果状态为未排产 则直接红灯
             if mo.state in ["draft"]:
@@ -411,3 +412,7 @@ class MrpProductionEx(models.Model):
     status_light = fields.Selection(string="状态灯", selection=[(3, '红'),
                                                              (2, '黄'),
                                                              (1, '绿')], required=False, )
+
+    material_light = fields.Selection(string="物料状态", selection=[(3, '红'),
+                                                                (2, '黄'),
+                                                                (1, '绿')], )
