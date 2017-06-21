@@ -89,13 +89,13 @@
                                                         </t>
 
                                                          <t t-if="item.material_light == 3">
-                                                        <span style="margin-left:15px;color:red;" class="fa fa-circle" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
+                                                        <span style="margin-left:15px;color:red;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
                                                         </t>
                                                         <t t-if="item.material_light == 2">
-                                                        <span style="margin-left:15px;color:yellow;" class="fa fa-circle" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
+                                                        <span style="margin-left:15px;color:yellow;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
                                                         </t>
                                                         <t t-if="item.material_light == 1">
-                                                        <span style="margin-left:15px;color:green;" class="fa fa-circle" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
+                                                        <span style="margin-left:15px;color:green;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
                                                         </t>
 
                                                     </h4>
@@ -275,13 +275,13 @@
                                                         </t>
 
                                                         <t t-if="item.material_light == 3">
-                                                        <span style="margin-left:15px;color:red;" class="fa fa-circle" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
+                                                        <span style="margin-left:15px;color:red;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
                                                         </t>
                                                         <t t-if="item.material_light == 2">
-                                                        <span style="margin-left:15px;color:yellow;" class="fa fa-circle" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
+                                                        <span style="margin-left:15px;color:yellow;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
                                                         </t>
                                                         <t t-if="item.material_light == 1">
-                                                        <span style="margin-left:15px;color:green;" class="fa fa-circle" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
+                                                        <span style="margin-left:15px;color:green;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
                                                         </t>
                                                     </h4>
                                                 </div>
@@ -437,6 +437,16 @@
                         <t t-if="item.status_light == 1">
                         <span style="margin-left:15px;color:green;" class="fa fa-circle"></span>
                         </t>
+
+                        <t t-if="item.material_light == 3">
+                        <span style="margin-left:15px;color:red;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
+                        </t>
+                        <t t-if="item.material_light == 2">
+                        <span style="margin-left:15px;color:yellow;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
+                        </t>
+                        <t t-if="item.material_light == 1">
+                        <span style="margin-left:15px;color:green;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
+                        </t>
                     </h4>
                 </div>
                 <div class="panel-collapse collapse" t-att-id="'mo_source'+item.id">
@@ -476,13 +486,13 @@
                         </t>
 
                         <t t-if="item.material_light == 3">
-                        <span style="margin-left:15px;color:red;" class="fa fa-circle" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
+                        <span style="margin-left:15px;color:red;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
                         </t>
                         <t t-if="item.material_light == 2">
-                        <span style="margin-left:15px;color:yellow;" class="fa fa-circle" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
+                        <span style="margin-left:15px;color:yellow;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
                         </t>
                         <t t-if="item.material_light == 1">
-                        <span style="margin-left:15px;color:green;" class="fa fa-circle" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
+                        <span style="margin-left:15px;color:green;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
                         </t>
                     </h4>
                 </div>
