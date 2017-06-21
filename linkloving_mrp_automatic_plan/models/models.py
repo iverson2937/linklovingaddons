@@ -23,6 +23,8 @@ class ll_auto_plan_kb(models.Model):
 
     @api.multi
     def _compute_count_red(self):
+        pos = self.env['purchase.order'].search([('state', '=', 'purchase')])
+        # self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].cal_po_light_status(pos)
         for plan in self:
             plan.count_red = len(
                 self.env['purchase.order'].search([("status_light", '=', 3), ('state', '=', 'purchase')]))
@@ -57,7 +59,7 @@ class ll_auto_plan_kb(models.Model):
     @api.multi
     def get_red_1(self):
         red = self.env['purchase.order'].search([("status_light", '=', 3)])
-
+        self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].cal_po_light_status(red)
         return {
             'name': u'红',
             'type': 'ir.actions.act_window',
@@ -69,7 +71,7 @@ class ll_auto_plan_kb(models.Model):
 
     def get_green(self):
         red = self.env['purchase.order'].search([("status_light", '=', 1)])
-
+        self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].cal_po_light_status(red)
         return {
             'name': u'绿',
             'type': 'ir.actions.act_window',
@@ -81,6 +83,7 @@ class ll_auto_plan_kb(models.Model):
 
     def get_yellow(self):
         red = self.env['purchase.order'].search([("status_light", '=', 2)])
+        self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].cal_po_light_status(red)
         return {
             'name': u'黄',
             'type': 'ir.actions.act_window',
@@ -299,6 +302,8 @@ class linkloving_mrp_automatic_plan(models.Model):
             if orgin_pos:
                 mo.status_light = max(orgin_pos.mapped("status_light"))
                 mo.material_light = max(orgin_pos.mapped("status_light"))
+            else:
+                mo.material_light = 1
 
             # 如果状态为未排产 则直接红灯
             if mo.state in ["draft"]:
@@ -309,6 +314,8 @@ class linkloving_mrp_automatic_plan(models.Model):
             if mo.state in ["done", "waiting_inventory_material", "waiting_warehouse_inspection"]:
                 mo.status_light = max(1, mo.status_light)
                 continue
+
+            #
             index = 0
             for s in line:
                 if mo == s:
@@ -317,6 +324,7 @@ class linkloving_mrp_automatic_plan(models.Model):
             if index > 0:
                 child_mo = line[index - 1]
                 mo.status_light = max(mo.status_light, child_mo.status_light)
+                mo.material_light = max(mo.material_light, child_mo.material_light)
 
             if date_planned_start > date_planned_end:
                 mo.status_light = 3
@@ -386,8 +394,13 @@ class PuchaseOrderEx(models.Model):
     _inherit = "purchase.order"
     status_light = fields.Selection(string="状态灯", selection=[(3, '红'),
                                                              (2, '黄'),
-                                                             (1, '绿')], required=False, )
+                                                             (1, '绿')], required=False, compute='_compute_status_light',
+                                    store=True)
 
+    @api.depends('state', 'handle_date', 'picking_ids.state')
+    def _compute_status_light(self):
+        print("do compute status_light")
+        self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].cal_po_light_status(self)
 
 class SaleOrderEx(models.Model):
     _inherit = "sale.order"
