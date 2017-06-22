@@ -6,11 +6,13 @@ odoo.define('linkloving_core.notify', function (require) {
     core.action_registry.add('action_notify', function (element, action) {
         var params = action.params;
         if (params) {
-            var dialog = new Dialog({
+            var dialog = new Dialog(this, {
                 'title': params.title,
-                'subtitle': params.text
-            })
+                // 'subtitle': params.text,
+                $content: $("<div/>").html(params.text)
+            }).open()
         }
+        ;
         return {'type': 'ir.actions.act_window_close'};
     });
 
