@@ -1167,7 +1167,8 @@ class ReturnMaterialLine(models.Model):
 
     @api.multi
     def create_scraps(self):
-        boms, lines = self[0].return_id.production_id.bom_id.explode(self[0].return_id.production_id.product_id,
+        if len(self) > 0:
+            boms, lines = self[0].return_id.production_id.bom_id.explode(self[0].return_id.production_id.product_id,
                                                                      self[0].return_id.production_id.qty_produced)
 
         scrap_env = self.env["production.scrap"]
