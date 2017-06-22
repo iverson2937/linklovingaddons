@@ -7,6 +7,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='state']" position="after">
                     <field name="status_light" widget="statuslight"/>
+                    <field name="material_light" widget="starlight"/>
                 </xpath>
             </field>
         </record>

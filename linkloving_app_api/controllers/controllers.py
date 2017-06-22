@@ -15,8 +15,6 @@ from pip import download
 
 import odoo
 import odoo.modules.registry
-from odoo.addons.web.controllers.main import ensure_db
-
 from odoo import fields
 from odoo.osv import expression
 from odoo.tools import float_compare, SUPERUSER_ID, werkzeug, os, safe_eval
@@ -75,7 +73,6 @@ class JsonResponse(object):
             return data_dic
         return json.dumps(data_dic)
 
-
 class LinklovingAppApi(http.Controller):
 
     odoo10 = None
@@ -87,7 +84,8 @@ class LinklovingAppApi(http.Controller):
     #登录
     @http.route('/linkloving_app_api/login', type='json', auth="none", csrf=False)
     def login(self, **kw):
-        ensure_db()
+        request.session.db = request.jsonrequest["db"]
+        request.params["db"] = request.jsonrequest["db"]
         request.params['login_success'] = False
         values = request.params.copy()
         if not request.uid:

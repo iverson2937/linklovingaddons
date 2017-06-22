@@ -8,8 +8,6 @@ class CrmMailMessage(models.Model):
 
     messages_label_ids = fields.Many2many('message.label', 'message_label_mail_message_type_rel', string='记录类型')
 
-    # messages_label_body = fields.Char()
-
     postil = fields.Text(string='批注')
 
     @api.multi
@@ -159,6 +157,13 @@ class CrmMailMessage(models.Model):
             })
 
         return True
+
+    @api.model
+    def create(self, values):
+        if 'messages_label_ids' in values:  # needed to compute reply_to
+            values['messages_label_ids'] = [(6, 0, values['messages_label_ids'])]
+        message = super(CrmMailMessage, self).create(values)
+        return message
 
 
 class CrmMessageLabelStatus(models.Model):

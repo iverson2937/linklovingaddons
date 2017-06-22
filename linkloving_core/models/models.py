@@ -82,6 +82,7 @@ class ProductTemplate(models.Model):
             'date_planned_start': mo_id.date_planned_start,
             'state': MO_STATE[mo_id.state],
             'status_light': mo_id.status_light,
+            'material_light': mo_id.material_light,
         }
 
     @api.multi
@@ -133,6 +134,7 @@ class ProductTemplate(models.Model):
                     'state': MO_STATE[mo.state],
                     'date': mo.date_planned_start,
                     'status_light': mo.status_light,
+                    'material_light': mo.material_light,
                     # 'origin': mo.origin if mo.origin else '',
                 })
 

@@ -30,7 +30,9 @@
                        position="after">
                     <field name="detailed_address"/>
                 </xpath>
-                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='comment']"
+
+                <!--创建联系人 di第一栏-->
+              <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='comment']"
                        position="after">
                     <field name="whatsapp"/>
                 </xpath>
@@ -42,10 +44,14 @@
                        position="after">
                     <field name="skype"/>
                 </xpath>
+                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='skype']"
+                       position="after">
+                    <field name="qq"/>
+                </xpath>
 
                 <!--zuo-->
                 <xpath expr="//field[@name='country_id']" position="after">
-                    <field name="continent" placeholder="大州"/>
+                    <field name="continent" placeholder="大洲"/>
                 </xpath>
 
                 <xpath expr="//field[@name='category_id']" position="after">
@@ -92,7 +98,7 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_tree"/>
             <field name="arch" type="xml">
-                
+
                 <xpath expr="//field[@name='display_name']" position="after">
                     <field name="is_order"/>
                 </xpath>
