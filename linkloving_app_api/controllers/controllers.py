@@ -86,6 +86,7 @@ class LinklovingAppApi(http.Controller):
     def login(self, **kw):
         request.session.db = request.jsonrequest["db"]
         request.params["db"] = request.jsonrequest["db"]
+
         request.params['login_success'] = False
         values = request.params.copy()
         if not request.uid:
@@ -268,19 +269,25 @@ class LinklovingAppApi(http.Controller):
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
 
+    @classmethod
+    def get_today_time_and_tz(cls):
+        user = request.env["res.users"].sudo().browse(request.context.get("uid"))
+        timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
+        date_to_show = fields.datetime.utcnow()
+        date_to_show += timez
+        return date_to_show, timez
     # 单个工序
     @http.route('/linkloving_app_api/get_date_uncomplete_orders', type='json', auth='none', csrf=False)
     def get_date_uncomplete_orders(self, **kw):
+
         process_id = request.jsonrequest.get("process_id")
-        date_to_show = fields.datetime.now()
+        date_to_show, timez = LinklovingAppApi.get_today_time_and_tz()
         one_days_after = datetime.timedelta(days=1)
         today_time = fields.datetime.strptime(fields.datetime.strftime(date_to_show, '%Y-%m-%d'),
                                               '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
-        user = request.env["res.users"].sudo().browse(request.context.get("uid"))
         locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
         location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
         location_domain = locations.ids + location_cir
-        timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
         after_day = today_time + one_days_after
         order_delay = request.env["mrp.production"].sudo().read_group(
                 [('date_planned_start', '<', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
@@ -345,16 +352,15 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/get_order_count_by_process', type='json', auth='none', csrf=False)
     def get_order_count_by_process(self, **kw):
         process_ids = request.jsonrequest.get("process_ids")
-        date_to_show = fields.datetime.now()
+        date_to_show, timez = LinklovingAppApi.get_today_time_and_tz()
+
         one_days_after = datetime.timedelta(days=1)
         today_time = fields.datetime.strptime(fields.datetime.strftime(date_to_show, '%Y-%m-%d'),
                                               '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
-        user = request.env["res.users"].sudo().browse(request.context.get("uid"))
         locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
         location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
         location_domain = locations.ids + location_cir
 
-        timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
         after_day = today_time + one_days_after
         after_2_day = after_day + one_days_after
         after_3_day = after_2_day + one_days_after
@@ -369,11 +375,13 @@ class LinklovingAppApi(http.Controller):
                      ('location_ids', 'in', location_domain)]
                     , fields=["date_planned_start"],
                     groupby=["date_planned_start"])
+
             domain = [('date_planned_start', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
                       ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                       ('state', 'in', ['waiting_material', 'prepare_material_ing']),
                       ('process_id', '=', process_id),
                       ('location_ids', 'in', location_domain)]
+
             domain_tommorrow = [('date_planned_start', '>', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                                 ('date_planned_start', '<', (after_2_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                                 ('state', 'in', ['waiting_material', 'prepare_material_ing']),
@@ -487,15 +495,13 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/get_already_picking_orders_count', type='json', auth='none', csrf=False)
     def get_already_picking_orders_count(self, **kw):
         partner_id = request.jsonrequest.get("partner_id")
-        date_to_show = fields.datetime.now()
+        date_to_show, timez = LinklovingAppApi.get_today_time_and_tz()
         one_days_after = datetime.timedelta(days=1)
         today_time = fields.datetime.strptime(fields.datetime.strftime(date_to_show, '%Y-%m-%d'),
                                               '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
-        user = request.env["res.users"].sudo().browse(request.context.get("uid"))
         # locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
         # location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
         # location_domain = locations.ids + location_cir
-        timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
         after_day = today_time + one_days_after
 
         domain_uid = ['|', ('in_charge_id', '=', partner_id), ('create_uid', '=', partner_id)]
@@ -2470,3 +2476,30 @@ class LinklovingAppApi(http.Controller):
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data={"factory_mark": order.factory_remark or ''})
+
+    @http.route('/linkloving_app_api/create_material_remark', type='json', auth='none', csrf=False)
+    def create_material_remark(self, **kw):
+        content = request.jsonrequest.get("content")
+
+        remark = request.env["material.remark"].sudo().create({
+            "content": content,
+        })
+        all_remarks = request.env["material.remark"].sudo().search_read([])
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=all_remarks)
+
+    @http.route('/linkloving_app_api/get_material_remark', type='json', auth='none', csrf=False)
+    def get_material_remark(self, **kw):
+        remarks = request.env["material.remark"].sudo().search_read([])
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=remarks)
+
+    @http.route('/linkloving_app_api/add_material_remark', type='json', auth='none', csrf=False)
+    def add_material_remark(self, **kw):
+        order_id = request.jsonrequest.get("order_id")
+        remark_id = request.jsonrequest.get("remark_id")
+
+        order = request.env["mrp.production"].sudo().browse(order_id)
+        order.material_remark_id = remark_id
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data={})
