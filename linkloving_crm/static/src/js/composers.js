@@ -347,9 +347,8 @@ odoo.define('mail.composers', function (require) {
 
     });
 
-    var msg_checkbox = new Array();
     var BasicComposer = Widget.extend({
-            template: "mail.ChatComposers",
+            template: "mail.ChatComposer",
 
             events: {
                 "keydown .o_composer_input textarea": "on_keydown",
@@ -358,9 +357,7 @@ odoo.define('mail.composers', function (require) {
                 "click .o_composer_button_send": "send_message",
                 "click .o_composer_button_add_attachment": "on_click_add_attachment",
                 "click .o_attachment_delete": "on_attachment_delete",
-
                 'click input': 'on_click_inputs',
-
             },
 
             init: function (parent, options) {
@@ -425,8 +422,7 @@ odoo.define('mail.composers', function (require) {
 
                 this.PartnerModel = new Model('res.partner');
                 this.ChannelModel = new Model('mail.channel');
-
-
+                this.msg_checkbox = new Array();
             },
 
             start: function () {
@@ -435,13 +431,7 @@ odoo.define('mail.composers', function (require) {
                 this.$attachment_button = this.$(".o_composer_button_add_attachment");
                 this.$attachments_list = this.$('.o_composer_attachments_list');
                 this.$input = this.$('.o_composer_input textarea');
-
-                this.$in_msg = this.$('.o_composer_text_field_field');
-
-                this.$in_adc_msg = this.$('.o_chat_header_adc');
-
-                // alert("控件打开")
-
+                // console.log("控件打开")
                 this.$input.focus(function () {
                     self.trigger('input_focused');
                 });
@@ -486,58 +476,25 @@ odoo.define('mail.composers', function (require) {
 
 
             on_click_inputs: function (event) {
-                console.log("hhhhhhhhhhhhhhhhhhh")
-
                 if ($(event.target).prop("checked")) {
-
-                    msg_checkbox.splice(0, 0, $(event.target).prop("name"));
-
+                    this.msg_checkbox.splice(0, 0, parseInt($(event.target).prop("name")));
                 } else {
-
-                    if (msg_checkbox.indexOf($(event.target).prop("name")) > 0) {
-                        // alert('Cts中包含Text字符串');
-                        msg_checkbox.pop($(event.target).prop("name"));
+                    if ($.inArray(parseInt($(event.target).prop("name")), this.msg_checkbox) >= 0) {
+                        this.msg_checkbox.splice($.inArray(parseInt($(event.target).prop("name")), this.msg_checkbox), 1);
                     }
-
                 }
-
-                // if ($(event.target).val() === "1") {
-                //     alert(11)
-                //
-                //     this.open_dialog().on('closed', this, function () {
-                //         this.$('input').first().prop("checked", true);
-                //     });
-                // }
-            }
-            ,
+            },
 
             preprocess_message: function () {
-
-
                 console.log("处理消息")
                 // Return a deferred as this function is extended with asynchronous
                 // behavior for the chatter composer
                 var value = _.escape(this.$input.val()).replace(/\n|\r/g, '<br/>');
                 // prevent html space collapsing
                 value = value.replace(/ /g, '&nbsp;').replace(/([^>])&nbsp;([^<])/g, '$1 $2');
-
-                // var value1 = _.escape(this.$in_msg.val()).replace(/\n|\r/g, '<br/>');
-                // // prevent html space collapsing
-                // value1 = value1.replace(/ /g, '&nbsp;').replace(/([^>])&nbsp;([^<])/g, '$1 $2');
-
-
-                for (var aces in this.$in_adc_msg) {
-                    console.log(aces);
-
-                    // console.log(this.$in_adc_msg[aces]);
-                    // console.log(this.$in_adc_msg[aces]["value"]);
-                }
-
-                console.log("****************************")
-
-
                 var commands = this.options.commands_enabled ? this.mention_manager.get_listener_selection('/') : [];
                 return $.when({
+                    messages_label_ids: this.msg_checkbox,
                     content: this.mention_manager.generate_links(value),
                     attachment_ids: _.pluck(this.get('attachment_ids'), 'id'),
                     partner_ids: _.uniq(_.pluck(this.mention_manager.get_listener_selection('@'), 'id')),
@@ -550,13 +507,8 @@ odoo.define('mail.composers', function (require) {
                 if (this.is_empty() || !this.do_check_attachment_upload()) {
                     return;
                 }
-
                 console.log("发送消息")
-
-
                 var self = this;
-
-
                 this.preprocess_message().then(function (message) {
                     self.trigger('post_message', message);
 
