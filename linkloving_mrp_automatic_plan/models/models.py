@@ -126,6 +126,18 @@ class ll_auto_plan_kb(models.Model):
             'target': 'current',
             'domain': [('id', 'in', qc_check.ids)]}
 
+    def refresh_po(self):
+        pos = self.env["purchase.order"].search([("state", '=', 'purchase')])
+        self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].cal_po_light_status(pos)
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": u"刷新采购单状态",
+                "text": u"刷新成功",
+                "sticky": False
+            }
+        }
 class linkloving_mrp_automatic_plan(models.Model):
     _name = 'linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan'
 
@@ -280,7 +292,7 @@ class linkloving_mrp_automatic_plan(models.Model):
             # so status light
             if so.order_line.mapped("status_light"):
                 so.status_light = max(so.order_line.mapped("status_light"))
-                so.material_light = max(production_ids.mapped("material_light"))
+                so.material_light = max(so.order_line.mapped("material_light"))
             # for mo in lv1_mo:
             #     lv = 0
             #     mo_relate_mo = []
@@ -358,7 +370,7 @@ class linkloving_mrp_automatic_plan(models.Model):
                         continue
 
                     if po.shipping_status == "done":  # 如果已经收货完成 则绿灯
-                        po.status_light = 1
+                        po.status_light = False
                         continue
 
                     if handle_date - today_start < two_days:

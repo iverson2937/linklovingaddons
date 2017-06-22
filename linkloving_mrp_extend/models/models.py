@@ -368,6 +368,7 @@ class MrpProductionExtend(models.Model):
 
     factory_remark = fields.Text(string=u"工厂备注", track_visibility='onchange')
 
+    material_remark_id = fields.Many2one("material.remark", string=u"无法备料原因")
     # @api.multi
     # def _compute_bom_remark(self):
     #     for production in self:
@@ -1648,3 +1649,14 @@ class ProductionScrap(models.Model):
 #     product_uom_id = fields.Many2one(
 #         'product.uom', 'Unit of Measure',
 #         required=True, states={'done': [('readonly', True)]})
+class MaterialRemark(models.Model):
+    _name = 'material.remark'
+
+    content = fields.Text(string="备注", required=True, )
+
+    @api.multi
+    def name_get(self):
+        res = []
+        for remark in self:
+            res.append((remark.id, remark.content))
+        return res
