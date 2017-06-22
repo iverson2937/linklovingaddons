@@ -40,9 +40,8 @@ odoo.define('mail.Chatters', function (require) {
                 is_log: false,
             });
 
-
-            new Model('message.label').call('get_message_label_name', []).then(function (result) {
-                options.msg_type = result;
+            new Model('message.label').query(['name', 'id']).all().then(function (msg_result) {
+                options.msg_type = msg_result;
             });
             if (this.options.is_log) {
                 this.options.send_text = _t('Log');
