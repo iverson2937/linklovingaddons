@@ -6,18 +6,19 @@
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
         <field name="comment">the user will have access to his own data in the sales application.</field>
     </record>
-    <record id="group_sale_salesman_follow_orders" model="res.groups">
-        <field name="name">跟单员</field>
-        <field name="category_id" ref="base.module_category_sales_management"/>
-        <field name="implied_ids" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
-        <field name="comment">the user will have access to his own data in the sales application.</field>
-    </record>
+
 
     <record id="sales_team.group_sale_salesman_all_leads" model="res.groups">
         <field name="name">团队主管</field>
         <field name="category_id" ref="base.module_category_sales_management"/>
-        <field name="implied_ids" eval="[(4, ref('group_sale_salesman_follow_orders'))]"/>
+        <field name="implied_ids" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
         <field name="comment">the user will have access to all records of everyone in the sales application.</field>
+    </record>
+    <record id="group_sale_salesman_follow_orders" model="res.groups">
+        <field name="name">跟单员</field>
+        <field name="category_id" ref="base.module_category_sales_management"/>
+        <field name="implied_ids" eval="[(4, ref('sales_team.group_sale_salesman_all_leads'))]"/>
+        <field name="comment">the user will have access to his own data in the sales application.</field>
     </record>
 
     <record id="sales_team.group_sale_manager" model="res.groups">
@@ -25,7 +26,7 @@
         <field name="comment">the user will have an access to the sales configuration as well as statistic reports.
         </field>
         <field name="category_id" ref="base.module_category_sales_management"/>
-        <field name="implied_ids" eval="[(4, ref('sales_team.group_sale_salesman_all_leads'))]"/>
+        <field name="implied_ids" eval="[(4, ref('group_sale_salesman_follow_orders'))]"/>
         <field name="users" eval="[(4, ref('base.user_root'))]"/>
     </record>
 
