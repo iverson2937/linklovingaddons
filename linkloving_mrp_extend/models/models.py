@@ -4,6 +4,7 @@ import datetime
 import types
 
 import jpush
+import pytz
 from dateutil.relativedelta import relativedelta
 
 from odoo import models, fields, api, _
@@ -699,14 +700,23 @@ class MrpProductionExtend(models.Model):
         else:
             self._generate_raw_move(bom_line, line_data)
 
+    def get_today_time_and_tz(self):
+        timez = fields.datetime.now(pytz.timezone(self.env.user.tz)).tzinfo._utcoffset
+        date_to_show = fields.datetime.utcnow()
+        date_to_show += timez
+        return date_to_show, timez
+
     @api.model
     def _needaction_domain_get(self):
         """ Returns the domain to filter records that require an action
             :return: domain or False is no action
 
         """
-        today_time = fields.datetime.strptime(fields.datetime.strftime(fields.datetime.now(), '%Y-%m-%d'),
-                                              '%Y-%m-%d')
+        today_time, timez = self.get_today_time_and_tz()
+        today_time = fields.datetime.strptime(fields.datetime.strftime(today_time, '%Y-%m-%d'), '%Y-%m-%d')
+        today_time -= timez
+        # today_time = fields.datetime.strptime(fields.datetime.strftime(fields.datetime.now(), '%Y-%m-%d'),
+        #                                       '%Y-%m-%d')
         one_days_after = datetime.timedelta(days=3)
         after_day = today_time + one_days_after
 
