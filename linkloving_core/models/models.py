@@ -55,7 +55,7 @@ class ProductTemplate(models.Model):
             product_id.append(record.product_id)
             ids.append(record.id)
             qty += record.product_qty
-            origin = origin + '; ' + record.origin if record.origin else ''
+            origin = origin + ', ' + record.origin if record.origin else ''
             record.action_cancel()
         if len(set(product_id)) > 1:
             raise UserError(_('MO product must be same'))

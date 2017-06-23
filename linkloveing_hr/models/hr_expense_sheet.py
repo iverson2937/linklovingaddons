@@ -6,6 +6,7 @@ from odoo.exceptions import UserError
 
 class HrExpenseSheet(models.Model):
     _inherit = 'hr.expense.sheet'
+    _rec_name = 'expense_no'
 
     @api.depends('expense_line_ids')
     def _get_full_name(self):
