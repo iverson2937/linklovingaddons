@@ -842,8 +842,7 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/finish_prepare_material', type='json', auth='none', csrf=False)
     def finish_prepare_material(self, **kw):
         order_id = request.jsonrequest.get('order_id') #get paramter
-        mrp_production_model = request.env['mrp.production']
-        mrp_production = mrp_production_model.sudo().search([('id', '=', order_id)])[0]
+        mrp_production = request.env['mrp.production'].sudo().search([('id', '=', order_id)])[0]
 
         stock_moves = request.jsonrequest.get('stock_moves') #get paramter
         stock_move_lines = request.env["sim.stock.move"].sudo()
@@ -889,7 +888,7 @@ class LinklovingAppApi(http.Controller):
             #                                       res_data={"error":e.name})
             if all(sim_move.is_prepare_finished for sim_move in
                    stock_move_lines.filtered(lambda x: x.product_type != 'semi-finished')):
-                mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write(
+                mrp_production.write(
                         {'state': 'finish_prepare_material'})
 
                 JPushExtend.send_notification_push(audience=jpush.audience(
