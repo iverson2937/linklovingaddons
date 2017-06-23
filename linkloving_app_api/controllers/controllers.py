@@ -1125,9 +1125,9 @@ class LinklovingAppApi(http.Controller):
                                               res_data={'error' : _("MO not found")})
         try:
             if result == True:
-                feedback.sudo(request.context.get("uid") or SUPERUSER_ID).action_qc_success()
+                feedback.sudo().action_qc_success()
             else:
-                feedback.sudo(request.context.get("uid") or SUPERUSER_ID).action_qc_fail()
+                feedback.sudo().action_qc_fail()
         except UserError, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error": e.name})
@@ -1154,7 +1154,7 @@ class LinklovingAppApi(http.Controller):
         feedback_id = request.jsonrequest.get('feedback_id')  # get paramter
         feedback = LinklovingAppApi.get_model_by_id(feedback_id, request, 'mrp.qc.feedback')
         try:
-            feedback.sudo(request.context.get("uid") or SUPERUSER_ID).action_check_to_rework()
+            feedback.sudo().action_check_to_rework()
         except UserError, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error": e.name})
