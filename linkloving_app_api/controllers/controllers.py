@@ -432,7 +432,8 @@ class LinklovingAppApi(http.Controller):
         date_to_show = request.jsonrequest.get("date")
         process_id = request.jsonrequest.get("process_id")
         one_days_after = datetime.timedelta(days=1)
-        today_time = fields.datetime.strptime(fields.datetime.strftime(fields.datetime.now(), '%Y-%m-%d'),
+        today_time, timez = LinklovingAppApi.get_today_time_and_tz()
+        today_time = fields.datetime.strptime(fields.datetime.strftime(today_time, '%Y-%m-%d'),
                                               '%Y-%m-%d')
         locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
 
@@ -442,10 +443,8 @@ class LinklovingAppApi(http.Controller):
         one_millisec_before = datetime.timedelta(milliseconds=1)  #
         today_time = today_time - one_millisec_before  # 今天的最后一秒
         after_day = today_time + one_days_after
-        user = request.env["res.users"].sudo().browse(request.context.get("uid"))
         location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
         location_domain = locations.ids + location_cir
-        timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
         if not process_id:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "未找到工序id"})
 
@@ -582,7 +581,8 @@ class LinklovingAppApi(http.Controller):
         date_to_show = request.jsonrequest.get("date")
         partner_id = request.jsonrequest.get('partner_id')
         one_days_after = datetime.timedelta(days=1)
-        today_time = fields.datetime.strptime(fields.datetime.strftime(fields.datetime.now(), '%Y-%m-%d'),
+        today_time, timez = LinklovingAppApi.get_today_time_and_tz()
+        today_time = fields.datetime.strptime(fields.datetime.strftime(today_time, '%Y-%m-%d'),
                                               '%Y-%m-%d')
 
         domain_uid = ['|', ('in_charge_id', '=', partner_id), ('create_uid', '=', partner_id)]
@@ -818,7 +818,7 @@ class LinklovingAppApi(http.Controller):
         order_id = request.jsonrequest.get('order_id')
         mrp_production_model = request.env['mrp.production']
         mrp_production = mrp_production_model.sudo().search([('id', '=', order_id)])[0]
-        mrp_production.write({'state': 'prepare_material_ing'})
+        mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'prepare_material_ing'})
 
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
@@ -889,7 +889,8 @@ class LinklovingAppApi(http.Controller):
             #                                       res_data={"error":e.name})
             if all(sim_move.is_prepare_finished for sim_move in
                    stock_move_lines.filtered(lambda x: x.product_type != 'semi-finished')):
-                mrp_production.write({'state': 'finish_prepare_material'})
+                mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write(
+                        {'state': 'finish_prepare_material'})
 
                 JPushExtend.send_notification_push(audience=jpush.audience(
                         jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
@@ -941,7 +942,7 @@ class LinklovingAppApi(http.Controller):
         #     return JsonResponse.send_response(STATUS_CODE_ERROR,
         #                                       res_data={"error":e.name})
 
-        mrp_production.write({'state': 'already_picking',
+        mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'already_picking',
                               'picking_material_date': fields.datetime.now()})
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
@@ -951,7 +952,7 @@ class LinklovingAppApi(http.Controller):
     def start_produce(self, **kw):
         order_id = request.jsonrequest.get('order_id')  # get paramter
         mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
-        mrp_production.write({'state': 'progress'})
+        mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'progress'})
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
@@ -1086,7 +1087,7 @@ class LinklovingAppApi(http.Controller):
         if not feedback_id:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error': u"未找到对应的品检单"})
-        feedback.action_start_qc()
+        feedback.sudo(request.context.get("uid") or SUPERUSER_ID).action_start_qc()
 
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
@@ -1124,9 +1125,9 @@ class LinklovingAppApi(http.Controller):
                                               res_data={'error' : _("MO not found")})
         try:
             if result == True:
-                feedback.action_qc_success()
+                feedback.sudo(request.context.get("uid") or SUPERUSER_ID).action_qc_success()
             else:
-                feedback.action_qc_fail()
+                feedback.sudo(request.context.get("uid") or SUPERUSER_ID).action_qc_fail()
         except UserError, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error": e.name})
@@ -1153,7 +1154,7 @@ class LinklovingAppApi(http.Controller):
         feedback_id = request.jsonrequest.get('feedback_id')  # get paramter
         feedback = LinklovingAppApi.get_model_by_id(feedback_id, request, 'mrp.qc.feedback')
         try:
-            feedback.action_check_to_rework()
+            feedback.sudo(request.context.get("uid") or SUPERUSER_ID).action_check_to_rework()
         except UserError, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error": e.name})
@@ -1197,7 +1198,8 @@ class LinklovingAppApi(http.Controller):
                 returun_material_obj.production_id = mrp_production.id
 
             returun_material_obj.return_ids = return_lines
-            mrp_production.write({'state': 'waiting_warehouse_inspection'})
+            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write(
+                    {'state': 'waiting_warehouse_inspection'})
         else:
             return_material_model = request.env['mrp.return.material']
             returun_material_obj = return_material_model.sudo().search(
@@ -1218,7 +1220,7 @@ class LinklovingAppApi(http.Controller):
                     returun_material_obj._prepare_move_values(r))
                 move.action_done()
             returun_material_obj.return_ids.create_scraps()
-            mrp_production.write({'state': 'done'})
+            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'done'})
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
@@ -1237,7 +1239,7 @@ class LinklovingAppApi(http.Controller):
                                               res_data={'error' : _("MO not found")})
         return_lines = []
         if all(stock_move.get("return_qty") == 0 for stock_move in stock_move_ids):
-            mrp_production.write({'state': 'done'})
+            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'done'})
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
         if not is_check:
@@ -1263,7 +1265,8 @@ class LinklovingAppApi(http.Controller):
                 returun_material_obj.production_id = mrp_production.id
 
             returun_material_obj.return_ids = return_lines
-            mrp_production.write({'state': 'waiting_warehouse_inspection'})
+            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write(
+                    {'state': 'waiting_warehouse_inspection'})
         else:
             return_material_model = request.env['mrp.return.material']
             returun_material_obj = return_material_model.sudo().search([('production_id', '=', order_id),
@@ -1397,7 +1400,7 @@ class LinklovingAppApi(http.Controller):
     #根据id 和model  返回对应的实例
     @classmethod
     def get_model_by_id(cls, id, request, model):
-        model_obj = request.env[model].sudo().search([('id', '=', id)])
+        model_obj = request.env[model].sudo(request.context.get("uid") or SUPERUSER_ID).search([('id', '=', id)])
         if model_obj:
             return model_obj[0]
         else:

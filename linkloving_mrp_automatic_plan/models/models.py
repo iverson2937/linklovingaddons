@@ -227,7 +227,6 @@ class linkloving_mrp_automatic_plan(models.Model):
             if not pos and not mos:
                 continue
             lv1_mo = mos.filtered(lambda x: "WH" in x.origin)
-            all_mo_mo = []
 
             # 获取最底下的节点
             last_nodes = self.env["mrp.production"]  # 最底下的节点
@@ -362,7 +361,7 @@ class linkloving_mrp_automatic_plan(models.Model):
         two_days = datetime.timedelta(days=2)
         for po in pos:
             try:
-                if po.state == 'purchase':
+                if po.state in ['purchase', 'draft', 'make_by_mrp']:
                     if po.handle_date:
                         handle_date = fields.datetime.strptime(po.handle_date, '%Y-%m-%d %H:%M:%S')
                     else:  # 如果没有日期 则直接红灯
@@ -385,6 +384,62 @@ class linkloving_mrp_automatic_plan(models.Model):
                     continue
             except:
                 continue
+
+    def calc_orderpoint_light(self):
+        orderpoints = self.env["stock.warehouse.orderpoint"].search([("active", '=', True)])
+        productions = orderpoints.mapped("procurement_ids").mapped("production_id")
+        for production in productions:
+            pos = self.env["purchase.order"].search([("origin", 'like', production.name)])
+            mos = self.env["mrp.production"].search([("origin", 'like', production.name)]) + production
+            if not pos and not mos:
+                continue
+
+            # 获取最底下的节点
+            last_nodes = self.env["mrp.production"]  # 最底下的节点
+            for mo in mos:
+                relate_mos = mos.filtered(lambda x: mo.name in x.origin)
+                if not relate_mos:
+                    last_nodes += mo
+
+            # 根据最底下的节点 获取到每条线
+            lines = []
+            for mo in last_nodes:
+                node = mo
+                one_line = [node]
+                while True:
+                    if not node.origin:
+                        break
+                    origins = node.origin.split(",")
+                    need_break_after_while = False
+                    for ori in origins:
+                        if ':' in ori:
+                            origin = ori.split(":")[1]
+                            one_mo = mos.filtered(lambda x: x.name == origin)
+                            one_line.append(one_mo)
+                            node = one_mo
+                            if node in productions:
+                                break
+                        else:
+                            need_break_after_while = True
+                            break
+                    if need_break_after_while:
+                        break
+                    if node in productions:
+                        lines.append(one_line)
+                        break
+            # 获取到每张mo对应的 po
+            origin_mos = {}
+            for mo in mos:
+                origin_pos = pos.filtered(lambda x: mo.name in x.origin)
+                origin_mos[mo.id] = origin_pos
+
+                # 计算po单 状态灯
+            self.cal_po_light_status(pos)
+
+            # 开始计算灯状态
+            for line in lines:
+                for mo in line:
+                    self.cal_mo_light_status(mo, origin_mos, line)
 
     def get_today_start_end(self):
         timez = fields.datetime.now(pytz.timezone(self.env.user.tz)).tzinfo._utcoffset
@@ -442,6 +497,17 @@ class SaleOrderLineEx(models.Model):
 
 class MrpProductionEx(models.Model):
     _inherit = "mrp.production"
+    status_light = fields.Selection(string="状态灯", selection=[(3, '红'),
+                                                             (2, '黄'),
+                                                             (1, '绿')], required=False, )
+
+    material_light = fields.Selection(string="物料状态", selection=[(3, '红'),
+                                                                (2, '黄'),
+                                                                (1, '绿')], )
+
+
+class OrderPointEx(models.Model):
+    _inherit = "stock.warehouse.orderpoint"
     status_light = fields.Selection(string="状态灯", selection=[(3, '红'),
                                                              (2, '黄'),
                                                              (1, '绿')], required=False, )
