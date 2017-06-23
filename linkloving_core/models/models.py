@@ -4,6 +4,7 @@ import json
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 import uuid
+
 PRODUCT_TYPE = {
     'raw material': u'原料',
     'semi-finished': u'半成品',
@@ -32,8 +33,8 @@ MO_STATE = {
     'waiting_inventory_material': u'等待清点退料',
     'waiting_warehouse_inspection': u'等待检验退料',
     'waiting_post_inventory': u'等待入库',
-    'done':u'完成',
-    'cancel':u'取消'
+    'done': u'完成',
+    'cancel': u'取消'
 }
 
 
@@ -47,7 +48,7 @@ class ProductTemplate(models.Model):
         qty = 0
         product_id = []
         ids = []
-        origin = ''
+        origin = []
         for record in self.env['mrp.production'].browse(args):
             if record.state not in ['draft', 'confirmed', 'waiting_material']:
                 raise UserError(_("Only draft MO can combine."))
@@ -55,8 +56,10 @@ class ProductTemplate(models.Model):
             product_id.append(record.product_id)
             ids.append(record.id)
             qty += record.product_qty
-            origin = origin + ', ' + record.origin if record.origin else ''
+            if record.origin:
+                origin.append(record.origin)
             record.action_cancel()
+
         if len(set(product_id)) > 1:
             raise UserError(_('MO product must be same'))
         bom_id = product_id[0].bom_ids
@@ -66,7 +69,7 @@ class ProductTemplate(models.Model):
             'bom_id': bom_id.id,
             'product_uom_id': product_id[0].uom_id.id,
             'state': 'draft',
-            'origin': origin,
+            'origin': ','.join(origin),
             'process_id': bom_id.process_id.id,
             'unit_price': bom_id.process_id.unit_price,
             'hour_price': bom_id.hour_price,
@@ -78,7 +81,7 @@ class ProductTemplate(models.Model):
             'name': mo_id.name,
             'qty': mo_id.product_qty,
             'id': mo_id.id,
-            'product_id':mo_id.product_tmpl_id.id,
+            'product_id': mo_id.product_tmpl_id.id,
             'date_planned_start': mo_id.date_planned_start,
             'state': MO_STATE[mo_id.state],
             'status_light': mo_id.status_light,
@@ -186,7 +189,7 @@ class ProductTemplate(models.Model):
                     'service': line.product_id.order_ll_type,
                     'on_produce': line_on_produce,
                     'draft': line_draft_qty,
-                    'state_bom':state_bom_line,
+                    'state_bom': state_bom_line,
                     'purchase_ok': line.product_id.purchase_ok,
                     'stock': line.product_id.qty_available,
                     'require': line.product_id.outgoing_qty,
