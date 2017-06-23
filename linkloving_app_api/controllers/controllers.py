@@ -1400,7 +1400,7 @@ class LinklovingAppApi(http.Controller):
     #根据id 和model  返回对应的实例
     @classmethod
     def get_model_by_id(cls, id, request, model):
-        model_obj = request.env[model].sudo(request.context.get("uid") or SUPERUSER_ID).search([('id', '=', id)])
+        model_obj = request.env[model].sudo().search([('id', '=', id)])
         if model_obj:
             return model_obj[0]
         else:
