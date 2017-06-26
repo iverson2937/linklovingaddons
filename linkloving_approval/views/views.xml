@@ -1,0 +1,18 @@
+<openerp>
+    <data>
+        <record model="ir.actions.client" id="show_pdm_approval_action">
+            <field name="name">linkloving_mrp_automatic_plan window</field>
+            <field name="tag">date_manage</field>
+        </record>
+
+        <!-- This Menu Item will appear in the Upper bar, That's why It needs NO parent or action -->
+        <menuitem id="ll_approval_root" name="审批" sequence="9"/>
+
+        <!-- This Menu Item Must have a parent -->
+        <menuitem id="approval_pdm_cate" name="文件" parent="ll_approval_root" sequence="0"/>
+
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="approval_pdm" name="文件审核" parent="approval_pdm_cate" action="show_pdm_approval_action"
+                  sequence="0"/>
+    </data>
+</openerp>
