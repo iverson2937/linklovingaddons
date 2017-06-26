@@ -461,7 +461,7 @@ class PuchaseOrderEx(models.Model):
     _inherit = "purchase.order"
     status_light = fields.Selection(string="状态灯", selection=[(3, '红'),
                                                              (2, '黄'),
-                                                             (1, '绿')], required=False, compute='_compute_status_light',
+                                                             (1, '绿')], required=False,
                                     store=True)
 
     # @api.depends('state', 'handle_date', 'picking_ids.state')
