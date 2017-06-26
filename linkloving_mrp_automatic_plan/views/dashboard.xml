@@ -37,6 +37,16 @@
                                                     <field name="name"/>
                                                 </a>
                                             </div>
+                                            <t t-set="type" t-value="record.type.value"/>
+                                            <t t-if="type == 'status_light'">
+                                                <button class="btn btn-primary pull-right"
+                                                        name="refresh_po"
+                                                        type="object">
+                                                    <span>
+                                                        重新计算状态
+                                                    </span>
+                                                </button>
+                                            </t>
                                             <div class="o_secondary">
                                             </div>
                                         </div>

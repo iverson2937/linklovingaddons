@@ -4,6 +4,7 @@ import datetime
 import types
 
 import jpush
+import pytz
 from dateutil.relativedelta import relativedelta
 
 from odoo import models, fields, api, _
@@ -368,6 +369,7 @@ class MrpProductionExtend(models.Model):
 
     factory_remark = fields.Text(string=u"工厂备注", track_visibility='onchange')
 
+    material_remark_id = fields.Many2one("material.remark", string=u"无法备料原因")
     # @api.multi
     # def _compute_bom_remark(self):
     #     for production in self:
@@ -698,14 +700,23 @@ class MrpProductionExtend(models.Model):
         else:
             self._generate_raw_move(bom_line, line_data)
 
+    def get_today_time_and_tz(self):
+        timez = fields.datetime.now(pytz.timezone(self.env.user.tz)).tzinfo._utcoffset
+        date_to_show = fields.datetime.utcnow()
+        date_to_show += timez
+        return date_to_show, timez
+
     @api.model
     def _needaction_domain_get(self):
         """ Returns the domain to filter records that require an action
             :return: domain or False is no action
 
         """
-        today_time = fields.datetime.strptime(fields.datetime.strftime(fields.datetime.now(), '%Y-%m-%d'),
-                                              '%Y-%m-%d')
+        today_time, timez = self.get_today_time_and_tz()
+        today_time = fields.datetime.strptime(fields.datetime.strftime(today_time, '%Y-%m-%d'), '%Y-%m-%d')
+        today_time -= timez
+        # today_time = fields.datetime.strptime(fields.datetime.strftime(fields.datetime.now(), '%Y-%m-%d'),
+        #                                       '%Y-%m-%d')
         one_days_after = datetime.timedelta(days=3)
         after_day = today_time + one_days_after
 
@@ -1166,7 +1177,8 @@ class ReturnMaterialLine(models.Model):
 
     @api.multi
     def create_scraps(self):
-        boms, lines = self[0].return_id.production_id.bom_id.explode(self[0].return_id.production_id.product_id,
+        if len(self) > 0:
+            boms, lines = self[0].return_id.production_id.bom_id.explode(self[0].return_id.production_id.product_id,
                                                                      self[0].return_id.production_id.qty_produced)
 
         scrap_env = self.env["production.scrap"]
@@ -1648,3 +1660,14 @@ class ProductionScrap(models.Model):
 #     product_uom_id = fields.Many2one(
 #         'product.uom', 'Unit of Measure',
 #         required=True, states={'done': [('readonly', True)]})
+class MaterialRemark(models.Model):
+    _name = 'material.remark'
+
+    content = fields.Text(string="备注", required=True, )
+
+    @api.multi
+    def name_get(self):
+        res = []
+        for remark in self:
+            res.append((remark.id, remark.content))
+        return res
