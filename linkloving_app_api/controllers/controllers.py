@@ -2250,6 +2250,7 @@ class LinklovingAppApi(http.Controller):
                 'product_qty' : pack.product_qty,
                 'qty_done' : pack.qty_done,
             })
+
         data = {
             'picking_id' : stock_picking_obj.id,
             'complete_rate': stock_picking_obj.complete_rate,
@@ -2259,6 +2260,7 @@ class LinklovingAppApi(http.Controller):
             'picking_type_code' : stock_picking_obj.picking_type_code,
             'name': stock_picking_obj.name,
             'parnter_id': stock_picking_obj.partner_id.display_name,
+            'phone': stock_picking_obj.partner_id.mobile or stock_picking_obj.partner_id.phone or '',
             'origin': stock_picking_obj.origin,
             'state': stock_picking_obj.state,
             'min_date': stock_picking_obj.min_date,
