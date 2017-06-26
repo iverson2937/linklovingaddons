@@ -450,7 +450,7 @@ class MrpProductionExtend(models.Model):
 
     # 确认生产 等待备料
     def button_waiting_material(self):
-        if self.location_ids.filtered(lambda x: x.is_circulate_location == False):
+        if self.location_ids.filtered(lambda x: x.is_circulate_location == False) or not self.location_ids:
             self.write({'state': 'waiting_material'})
         else:
             self.write({'state': 'finish_prepare_material'})
