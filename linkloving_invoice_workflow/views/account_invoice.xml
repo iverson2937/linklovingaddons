@@ -81,7 +81,7 @@
                                                widget="many2many_tags"/>
                                         <field name="quantity"/>
                                         <field name="uom_id" groups="product.group_uom"/>
-                                        <field name="price_unit_o" string="Original Price Unit" readonly="1"/>
+                                        <field name="price_unit_o" string="原始单价" readonly="1"/>
                                         <field name="price_unit" readonly="1"/>
                                         <field name="discount" groups="sale.group_discount_per_so_line"/>
                                         <field name="invoice_line_tax_ids" widget="many2many_tags"

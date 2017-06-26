@@ -34,8 +34,8 @@ class AccountInvoice(models.Model):
 
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('post', u'Post'),
-        ('validate', u'Confirm'),
+        ('post', u'提交'),
+        ('validate', u'验证'),
         ('proforma', 'Pro-forma'),
         ('proforma2', 'Pro-forma'),
         ('open', 'Open'),
@@ -63,10 +63,10 @@ class AccountInvoice(models.Model):
                 amount_total_o += line.price_unit
             vals.update({'amount_total_o': amount_total_o})
         deduct_amount = vals.get('deduct_amount')
-        if deduct_amount:
-            if deduct_amount > (self.amount_total_o or vals.get('amount_total_o')):
-                raise UserError(_('Deduct Amount can not larger than Invoice Amount'))
-            rate = deduct_amount / (self.amount_total_o or vals.get('amount_total_o'))
+        if deduct_amount > (self.amount_total_o or vals.get('amount_total_o')):
+            raise UserError(_('Deduct Amount can not larger than Invoice Amount'))
+        if self.amount_total_o or vals.get('amount_total_o'):
+            rate = (deduct_amount if deduct_amount else 0.0)/ (self.amount_total_o or vals.get('amount_total_o'))
             for line in self.invoice_line_ids:
                 if line.price_unit_o:
                     line.price_unit = line.price_unit_o * (1 - rate)
