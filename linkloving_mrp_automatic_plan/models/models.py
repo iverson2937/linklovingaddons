@@ -6,7 +6,7 @@ from odoo import models, fields, api
 import json
 import urllib
 
-from odoo.exceptions import MissingError
+from odoo.exceptions import MissingError, UserError
 
 
 class ll_auto_plan_kb(models.Model):
@@ -126,6 +126,18 @@ class ll_auto_plan_kb(models.Model):
             'target': 'current',
             'domain': [('id', 'in', qc_check.ids)]}
 
+    def refresh_po(self):
+        pos = self.env["purchase.order"].search([("state", '=', 'purchase')])
+        self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].cal_po_light_status(pos)
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": u"刷新采购单状态",
+                "text": u"刷新成功",
+                "sticky": False
+            }
+        }
 class linkloving_mrp_automatic_plan(models.Model):
     _name = 'linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan'
 
@@ -215,7 +227,6 @@ class linkloving_mrp_automatic_plan(models.Model):
             if not pos and not mos:
                 continue
             lv1_mo = mos.filtered(lambda x: "WH" in x.origin)
-            all_mo_mo = []
 
             # 获取最底下的节点
             last_nodes = self.env["mrp.production"]  # 最底下的节点
@@ -280,7 +291,7 @@ class linkloving_mrp_automatic_plan(models.Model):
             # so status light
             if so.order_line.mapped("status_light"):
                 so.status_light = max(so.order_line.mapped("status_light"))
-                so.material_light = max(production_ids.mapped("material_light"))
+                so.material_light = max(so.order_line.mapped("material_light"))
             # for mo in lv1_mo:
             #     lv = 0
             #     mo_relate_mo = []
@@ -350,7 +361,7 @@ class linkloving_mrp_automatic_plan(models.Model):
         two_days = datetime.timedelta(days=2)
         for po in pos:
             try:
-                if po.state == 'purchase':
+                if po.state in ['purchase', 'draft', 'make_by_mrp']:
                     if po.handle_date:
                         handle_date = fields.datetime.strptime(po.handle_date, '%Y-%m-%d %H:%M:%S')
                     else:  # 如果没有日期 则直接红灯
@@ -358,7 +369,7 @@ class linkloving_mrp_automatic_plan(models.Model):
                         continue
 
                     if po.shipping_status == "done":  # 如果已经收货完成 则绿灯
-                        po.status_light = 1
+                        po.status_light = False
                         continue
 
                     if handle_date - today_start < two_days:
@@ -373,6 +384,62 @@ class linkloving_mrp_automatic_plan(models.Model):
                     continue
             except:
                 continue
+
+    def calc_orderpoint_light(self):
+        orderpoints = self.env["stock.warehouse.orderpoint"].search([("active", '=', True)])
+        productions = orderpoints.mapped("procurement_ids").mapped("production_id")
+        for production in productions:
+            pos = self.env["purchase.order"].search([("origin", 'like', production.name)])
+            mos = self.env["mrp.production"].search([("origin", 'like', production.name)]) + production
+            if not pos and not mos:
+                continue
+
+            # 获取最底下的节点
+            last_nodes = self.env["mrp.production"]  # 最底下的节点
+            for mo in mos:
+                relate_mos = mos.filtered(lambda x: mo.name in x.origin)
+                if not relate_mos:
+                    last_nodes += mo
+
+            # 根据最底下的节点 获取到每条线
+            lines = []
+            for mo in last_nodes:
+                node = mo
+                one_line = [node]
+                while True:
+                    if not node.origin:
+                        break
+                    origins = node.origin.split(",")
+                    need_break_after_while = False
+                    for ori in origins:
+                        if ':' in ori:
+                            origin = ori.split(":")[1]
+                            one_mo = mos.filtered(lambda x: x.name == origin)
+                            one_line.append(one_mo)
+                            node = one_mo
+                            if node in productions:
+                                break
+                        else:
+                            need_break_after_while = True
+                            break
+                    if need_break_after_while:
+                        break
+                    if node in productions:
+                        lines.append(one_line)
+                        break
+            # 获取到每张mo对应的 po
+            origin_mos = {}
+            for mo in mos:
+                origin_pos = pos.filtered(lambda x: mo.name in x.origin)
+                origin_mos[mo.id] = origin_pos
+
+                # 计算po单 状态灯
+            self.cal_po_light_status(pos)
+
+            # 开始计算灯状态
+            for line in lines:
+                for mo in line:
+                    self.cal_mo_light_status(mo, origin_mos, line)
 
     def get_today_start_end(self):
         timez = fields.datetime.now(pytz.timezone(self.env.user.tz)).tzinfo._utcoffset
@@ -394,7 +461,7 @@ class PuchaseOrderEx(models.Model):
     _inherit = "purchase.order"
     status_light = fields.Selection(string="状态灯", selection=[(3, '红'),
                                                              (2, '黄'),
-                                                             (1, '绿')], required=False, compute='_compute_status_light',
+                                                             (1, '绿')], required=False,
                                     store=True)
 
     # @api.depends('state', 'handle_date', 'picking_ids.state')
@@ -437,3 +504,28 @@ class MrpProductionEx(models.Model):
     material_light = fields.Selection(string="物料状态", selection=[(3, '红'),
                                                                 (2, '黄'),
                                                                 (1, '绿')], )
+
+
+class OrderPointEx(models.Model):
+    _inherit = "stock.warehouse.orderpoint"
+    status_light = fields.Selection(string="状态灯", selection=[(3, '红'),
+                                                             (2, '黄'),
+                                                             (1, '绿')], required=False, )
+
+    material_light = fields.Selection(string="物料状态", selection=[(3, '红'),
+                                                                (2, '黄'),
+                                                                (1, '绿')], )
+
+
+class ProcurementOrderResetWizard(models.TransientModel):
+    _name = 'procurement.order.reset.confirm'
+
+    @api.multi
+    def action_ok(self):
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+        procurements = self.env['procurement.order'].search([('id', 'in', active_ids)])
+        if all(p.state == "cancel" for p in procurements):
+            procurements.reset_to_confirmed()
+        else:
+            raise UserError(u"请确保所有的单据都为'取消'状态")

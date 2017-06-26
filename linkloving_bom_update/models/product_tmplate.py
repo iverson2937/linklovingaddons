@@ -64,6 +64,15 @@ class ProductTemplate(models.Model):
                               'waiting_warehouse_inspection', 'waiting_post_inventory']:
                 mo.is_bom_update = True
 
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": u"应用成功",
+                "text": u"已应用成功",
+                "sticky": False
+            }
+        }
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
@@ -116,3 +125,13 @@ class ProductProduct(models.Model):
                               'waiting_inspection_finish', 'waiting_rework', 'waiting_inventory_material',
                               'waiting_warehouse_inspection', 'waiting_post_inventory']:
                 mo.is_bom_update = True
+
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": u"应用成功",
+                "text": u"已应用成功",
+                "sticky": False
+            }
+        }

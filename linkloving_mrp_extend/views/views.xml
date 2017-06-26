@@ -1,5 +1,54 @@
 <openerp>
     <data>
+        <record id="mrp_production_refuse_tree" model="ir.ui.view">
+            <field name="name">mrp.production.tree</field>
+            <field name="model">mrp.production</field>
+            <field name="arch" type="xml">
+                <tree string="拒绝备料的订单">
+                    <field name="name"/>
+                    <field name="material_remark_id"/>
+                    <field name="date_planned_start" string="开始时间"/>
+                    <field name="product_id"/>
+                    <field name="product_qty" sum="Total Qty" string="Quantity"/>
+                    <field name="origin"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="mrp_production_action_refuse" model="ir.actions.act_window">
+            <field name="name">拒绝备料的订单</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">mrp.production</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="view_id" eval="mrp_production_refuse_tree"/>
+            <field name="domain">[('material_remark_id', '!=', False), ('state', 'in', ['waiting_material',
+                'prepare_material_ing'])]
+            </field>
+            <field name="context">{'state':['waiting_material','prepare_material_ing'],'refuse':True}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+                <p>
+                    A manufacturing order, based on a bill of materials, will
+                    consume raw materials and produce finished products.
+                </p>
+                <p>
+                    Manufacturing orders are usually proposed automatically based
+                    on customer requirements or automated rules like the minimum
+                    stock rule.
+                </p>
+            </field>
+        </record>
+
+        <menuitem action="mrp_production_action_refuse"
+                  id="menu_mrp_production_refuse"
+                  parent="mrp.menu_mrp_manufacturing"
+                  sequence="3"/>
+
+
         <record model="ir.actions.act_window" id="action_mrp_production_scrap_moves">
             <field name="name">Stock Moves</field>
             <field name="type">ir.actions.act_window</field>
