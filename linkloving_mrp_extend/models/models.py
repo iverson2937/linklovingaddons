@@ -701,10 +701,13 @@ class MrpProductionExtend(models.Model):
             self._generate_raw_move(bom_line, line_data)
 
     def get_today_time_and_tz(self):
-        timez = fields.datetime.now(pytz.timezone(self.env.user.tz)).tzinfo._utcoffset
-        date_to_show = fields.datetime.utcnow()
-        date_to_show += timez
-        return date_to_show, timez
+        if self.env.user.tz:
+            timez = fields.datetime.now(pytz.timezone(self.env.user.tz)).tzinfo._utcoffset
+            date_to_show = fields.datetime.utcnow()
+            date_to_show += timez
+            return date_to_show, timez
+        else:
+            raise UserError("未找到对应的时区, 请点击 右上角 -> 个人资料 -> 时区 -> Asia/Shanghai")
 
     @api.model
     def _needaction_domain_get(self):
