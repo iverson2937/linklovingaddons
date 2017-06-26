@@ -1,0 +1,15 @@
+.approval_page_container{
+    width:80%;
+    min-width: 900px;
+    margin:50px auto;
+    padding: 10px;
+    background: white;
+}
+.approval_page_container .active>a{
+    background-color: #337ab7!important;
+    color:white!important;
+}
+.approval_page_container>ul>li>a{
+    border:1px solid #dddede!important;
+    color: #000;
+}

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+    <t t-name="approval_load_page">
+        <div class="approval_page_container">
+
+        </div>
+    </t>
+    <t t-name="approval_load_detail">
+        <ul id="approval_tab" class="nav nav-tabs">
+            <li class="active"><a href="#to_submit" data-toggle="tab">待提交</a></li>
+            <li><a href="#submited" data-toggle="tab">已提交</a></li>
+            <li><a href="#to_approval" data-toggle="tab">待审批</a></li>
+            <li><a href="#approvaled" data-toggle="tab">已审批</a></li>
+        </ul>
+
+        <div id="myTabContent_Approval" class="tab-content">
+            <div class="tab-pane fade in active" id="to_submit">
+
+            </div>
+            <div class="tab-pane fade" id="submited">
+
+            </div>
+            <div class="tab-pane fade" id="to_approval">
+
+            </div>
+            <div class="tab-pane fade" id="approvaled">
+
+            </div>
+        </div>
+
+    </t>
+
+</templates>
