@@ -725,6 +725,12 @@ class MrpProductionExtend(models.Model):
 
         state = self._context.get('state')
         feedback_on_rework = self._context.get("feedback_on_rework")
+
+        refuse = self._context.get("refuse")
+        if refuse:
+            return [('material_remark_id', '!=', False),
+                    ('state', 'in', ['waiting_material',
+                                     'prepare_material_ing'])]
         if state and state in ['finish_prepare_material', 'already_picking', 'waiting_rework',
                                'waiting_inventory_material']:
 
