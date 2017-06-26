@@ -6,7 +6,7 @@ from odoo import models, fields, api
 import json
 import urllib
 
-from odoo.exceptions import MissingError
+from odoo.exceptions import MissingError, UserError
 
 
 class ll_auto_plan_kb(models.Model):
@@ -515,3 +515,17 @@ class OrderPointEx(models.Model):
     material_light = fields.Selection(string="物料状态", selection=[(3, '红'),
                                                                 (2, '黄'),
                                                                 (1, '绿')], )
+
+
+class ProcurementOrderResetWizard(models.TransientModel):
+    _name = 'procurement.order.reset.confirm'
+
+    @api.multi
+    def action_ok(self):
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+        procurements = self.env['procurement.order'].search([('id', 'in', active_ids)])
+        if all(p.state == "cancel" for p in procurements):
+            procurements.reset_to_confirmed()
+        else:
+            raise UserError(u"请确保所有的单据都为'取消'状态")
