@@ -1247,59 +1247,63 @@ class LinklovingAppApi(http.Controller):
             mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'done'})
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
-        if not is_check:
+        try:
+            if not is_check:
 
-            for l in stock_move_ids:
-                product_id = l['product_tmpl_id']
-                obj = request.env['return.material.line'].sudo().create({
-                    'return_qty': l['return_qty'],
-                    'product_id': product_id,
-                })
-                return_lines.append(obj.id)
+                for l in stock_move_ids:
+                    product_id = l['product_tmpl_id']
+                    obj = request.env['return.material.line'].sudo().create({
+                        'return_qty': l['return_qty'],
+                        'product_id': product_id,
+                    })
+                    return_lines.append(obj.id)
 
-            return_material_model = request.env['mrp.return.material']
-            returun_material_obj = return_material_model.sudo().search(
-                    [('production_id', '=', order_id),
-                     ('state', '=', 'draft')])
-            if not returun_material_obj:#如果没生成过就生成一遍， 防止出现多条记录
-                returun_material_obj = return_material_model.sudo().create({
-                    'production_id' : mrp_production.id,
-                })
+                return_material_model = request.env['mrp.return.material']
+                returun_material_obj = return_material_model.sudo().search(
+                        [('production_id', '=', order_id),
+                         ('state', '=', 'draft')])
+                if not returun_material_obj:  # 如果没生成过就生成一遍， 防止出现多条记录
+                    returun_material_obj = return_material_model.sudo().create({
+                        'production_id': mrp_production.id,
+                    })
 
+                else:
+                    returun_material_obj.production_id = mrp_production.id
+
+                returun_material_obj.return_ids = return_lines
+                mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write(
+                        {'state': 'waiting_warehouse_inspection'})
             else:
-                returun_material_obj.production_id = mrp_production.id
-
-            returun_material_obj.return_ids = return_lines
-            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write(
-                    {'state': 'waiting_warehouse_inspection'})
-        else:
-            return_material_model = request.env['mrp.return.material']
-            returun_material_obj = return_material_model.sudo().search([('production_id', '=', order_id),
-                                                                        ('state', '=', 'draft')])
-            if not returun_material_obj:
-                return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                                  res_data={'error' : _("Order of return material not found")})
-            returun_material_obj.state = 'done'
-            #退料信息 已经确认
-            for r in returun_material_obj.return_ids:
-                for new_qty_dic in stock_move_ids:
-                    if r.product_id.id == new_qty_dic['product_tmpl_id']:
-                        r.return_qty = new_qty_dic['return_qty']
-                if r.return_qty == 0:
-                    continue
-                move = request.env['stock.move'].sudo().create(
-                    returun_material_obj._prepare_move_values(r))
-                move.action_done()
-            returun_material_obj.return_ids.create_scraps()
-            mrp_production.write({'state': 'done'})
-            #
-            # location = request.env["stock.location"].sudo().search([("is_circulate_location", "=", True)], limit=1)
-            # if location and location.putaway_strategy_id and location.putaway_strategy_id.fixed_location_ids:
-            #     fixed_location_ids = location.putaway_strategy_id.fixed_location_ids
-            #
-            #     if mrp_production.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:  # 半成品入库
-            #     else:
-            #         mrp_production.write({'state': 'waiting_post_inventory'})
+                return_material_model = request.env['mrp.return.material']
+                returun_material_obj = return_material_model.sudo().search([('production_id', '=', order_id),
+                                                                            ('state', '=', 'draft')])
+                if not returun_material_obj:
+                    return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                                      res_data={'error': _("Order of return material not found")})
+                returun_material_obj.state = 'done'
+                # 退料信息 已经确认
+                for r in returun_material_obj.return_ids:
+                    for new_qty_dic in stock_move_ids:
+                        if r.product_id.id == new_qty_dic['product_tmpl_id']:
+                            r.return_qty = new_qty_dic['return_qty']
+                    if r.return_qty == 0:
+                        continue
+                    move = request.env['stock.move'].sudo().create(
+                            returun_material_obj._prepare_move_values(r))
+                    move.action_done()
+                returun_material_obj.return_ids.create_scraps()
+                mrp_production.write({'state': 'done'})
+                #
+                # location = request.env["stock.location"].sudo().search([("is_circulate_location", "=", True)], limit=1)
+                # if location and location.putaway_strategy_id and location.putaway_strategy_id.fixed_location_ids:
+                #     fixed_location_ids = location.putaway_strategy_id.fixed_location_ids
+                #
+                #     if mrp_production.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:  # 半成品入库
+                #     else:
+                #         mrp_production.write({'state': 'waiting_post_inventory'})
+        except Exception, e:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={"error": e.name})
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
