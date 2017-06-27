@@ -142,7 +142,7 @@ class project_work(models.Model):
     date = fields.Datetime('Date', select="1", default=lambda *a: fields.Datetime.now())
     task_id = fields.Many2one('project.task', 'Task', ondelete='cascade', required=True, select="1")
     hours = fields.Float('Time Spent')
-    progress = fields.Integer(string=u'完成进度')
+    progress = fields.Float(string=u'完成进度')
     user_id = fields.Many2one('res.users', 'Done by', required=True, select="1", default=lambda self: self.env.user)
     company_id = fields.Many2one('res.company', related='task_id.company_id', store=True, readonly=True)
 
@@ -154,23 +154,38 @@ class project_work(models.Model):
             self._cr.execute('update project_task set remaining_hours=remaining_hours - %s where id=%s',
                              (vals.get('hours', 0.0), vals['task_id']))
             self.env['project.task'].invalidate_cache(['remaining_hours'], [vals['task_id']])
-        return super(project_work, self).create(vals)
+
+        res = super(project_work, self).create(vals)
+
+        res.task_id.task_progress = res.progress
+        if res.progress == 100:
+            res.task_id.kanban_state = 'audit'
+        else:
+            res.task_id.kanban_state = 'normal'
+
+        return res
+
+
 
     @api.multi
     def write(self, vals):
-        if 'hours' in vals and (not vals['hours']):
-            vals['hours'] = 0.00
-        if 'hours' in vals:
-            task_obj = self.pool.get('project.task')
-            for work in self:
-                self._cr.execute('update project_task set remaining_hours=remaining_hours - %s + (%s) where id=%s',
-                                 (vals.get('hours', 0.0), work.hours, work.task_id.id))
-                task_obj.invalidate_cache(['remaining_hours'], [work.task_id.id])
+        if 'progress' in vals:
+            self.task_id.progress=vals['progress']
+            if vals['progress'] == 100:
+                self.task_id.kanban_state = 'audit'
+        # if 'hours' in vals and (not vals['hours']):
+        #     vals['hours'] = 0.00
+        # if 'hours' in vals:
+        #     task_obj = self.env['project.task']
+        #     for work in self:
+        #         self._cr.execute('update project_task set remaining_hours=remaining_hours - %s + (%s) where id=%s',
+        #                          (vals.get('hours', 0.0), work.hours, work.task_id.id))
+        #         task_obj.invalidate_cache(['remaining_hours'], [work.task_id.id])
         return super(project_work, self).write(vals)
 
     @api.multi
     def unlink(self):
-        task_obj = self.pool.get('project.task')
+        task_obj = self.env['project.task']
         for work in self:
             self._cr.execute('update project_task set remaining_hours=remaining_hours + %s where id=%s',
                              (work.hours, work.task_id.id))

@@ -188,6 +188,23 @@ class ProductAttachmentInfo(models.Model):
     #             return product_tmpl.product_variant_ids[0].id
     #         else:
     #             return res_id
+
+    def convert_attachment_info(self):
+        return {
+            'id': self.id,
+            'file_name': self.file_name or '',
+            'review_id': self.review_id.who_review_now.name or '',
+            'remote_path': self.remote_path or '',
+            'version': self.version or '',
+            'state': [self.state, ATTACHMENT_STATE[self.state]],
+            'has_right_to_review': self.has_right_to_review,
+            'review_line': self.review_id.get_review_line_list(),
+            'is_able_to_use': self.is_able_to_use,
+            'is_show_cancel': self.is_show_cancel,
+            'is_first_review': self.is_first_review,
+            'create_uid_name': self.create_uid.name,
+        }
+
     def get_download_filename(self):
         return self.type + '_' + str(self.version) + '_' + self.file_name
 
@@ -206,8 +223,9 @@ class ProductAttachmentInfo(models.Model):
         for info in self:
             attachs = self.env["product.attachment.info"].search([('product_tmpl_id', '=', info.product_tmpl_id.id),
                                                                   ('type', '=', info.type)])
-            if info.version == max(attachs.mapped("version")) and info.state == 'released':
-                info.is_able_to_use = True
+            if attachs.mapped("version"):
+                if info.version == max(attachs.mapped("version")) and info.state == 'released':
+                    info.is_able_to_use = True
 
     @api.multi
     def _compute_has_right_to_review(self):
@@ -392,24 +410,24 @@ class ProductTemplateExtend(models.Model):
                 [("type", "=", type), ("product_tmpl_id", '=', self.id)], order='version desc')
         json_list = []
         for a_file in files:
-            json_list.append(self.convert_attachment_info(a_file))
+            json_list.append(a_file.convert_attachment_info())
         return json_list
 
-    def convert_attachment_info(self, info):
-        return {
-            'id': info.id,
-            'file_name': info.file_name or '',
-            'review_id': info.review_id.who_review_now.name or '',
-            'remote_path': info.remote_path or '',
-            'version': info.version or '',
-            'state': [info.state, ATTACHMENT_STATE[info.state]],
-            'has_right_to_review': info.has_right_to_review,
-            'review_line': info.review_id.get_review_line_list(),
-            'is_able_to_use': info.is_able_to_use,
-            'is_show_cancel': info.is_show_cancel,
-            'is_first_review': info.is_first_review,
-            'create_uid_name': info.create_uid.name,
-        }
+    # def convert_attachment_info(self, info):
+    #     return {
+    #         'id': info.id,
+    #         'file_name': info.file_name or '',
+    #         'review_id': info.review_id.who_review_now.name or '',
+    #         'remote_path': info.remote_path or '',
+    #         'version': info.version or '',
+    #         'state': [info.state, ATTACHMENT_STATE[info.state]],
+    #         'has_right_to_review': info.has_right_to_review,
+    #         'review_line': info.review_id.get_review_line_list(),
+    #         'is_able_to_use': info.is_able_to_use,
+    #         'is_show_cancel': info.is_show_cancel,
+    #         'is_first_review': info.is_first_review,
+    #         'create_uid_name': info.create_uid.name,
+    #     }
 
     #####
 

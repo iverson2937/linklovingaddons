@@ -479,7 +479,8 @@ class MrpProductionExtend(models.Model):
 
     # 开始备料
     def button_start_prepare_material(self):
-        self.write({'state': 'prepare_material_ing'})
+        if self.state == 'waiting_material':
+            self.write({'state': 'prepare_material_ing'})
         return {'type': 'ir.actions.empty'}
 
 
@@ -1190,12 +1191,15 @@ class ReturnMaterialLine(models.Model):
 
     @api.multi
     def create_scraps(self):
+        if self[0].return_id.production_id.process_id.is_rework:  # 重工
+            return
         if len(self) > 0:
             boms, lines = self[0].return_id.production_id.bom_id.explode(self[0].return_id.production_id.product_id,
                                                                      self[0].return_id.production_id.qty_produced)
 
         scrap_env = self.env["production.scrap"]
         for line in self:
+            uom_qty = 0
             for bom_line, datas in lines:
                 if bom_line.product_id.id == line.product_id.id:
                     uom_qty = datas['qty']
@@ -1207,7 +1211,6 @@ class ReturnMaterialLine(models.Model):
                 return_qty = done_move.return_qty
             else:
                 raise UserError(u"异常数据")
-
             scrap_qty = done_qty - uom_qty - return_qty
             if scrap_qty <= 0:
                 continue

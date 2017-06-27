@@ -2439,7 +2439,7 @@ GanttChart.prototype.createPopUpInfo = function()
     var cellTaskInfo = document.createElement("td");
     rowTaskInfo.appendChild(cellTaskInfo);
     this.divInfo = divTaskInfo;
-    
+
     return divTaskInfo;
 };
 /**
@@ -2588,7 +2588,7 @@ GanttChart.prototype.addDayInPanelTime = function(row)
         for(var i=0; i<n; i++){
             cs += monthRow.cells[i].colSpan;
         }
-        if (idx>=cs) monthRow.cells[n-1].colSpan += 1; 
+        if (idx>=cs) monthRow.cells[n-1].colSpan += 1;
     }
 
     var w = date.getDay();
@@ -2795,11 +2795,16 @@ GanttChart.prototype.saveData = function(fileName)
  * @type: public
  * @topic: 0
  */
-GanttChart.prototype.create = function(divId)
+GanttChart.prototype.create = function(_content)
 {
     var self = this;
-    var content = document.getElementById(divId);
-    this.content = content;
+    // content = document.getElementById(_content);
+    // if(!content){
+    var contents = document.getElementsByClassName("o_view_manager_content");
+    var content = contents[0];
+    content.innerHTML = '';
+    // }
+    // var content = _content.parentNode;
     this.getBrowserType();
 
     //
@@ -2813,8 +2818,6 @@ GanttChart.prototype.create = function(divId)
         });
 
     } else {
-
-        alert(JSON.stringify(content));
 
         content.addEventListener('mousedown', function(e) {
             e.preventDefault();
@@ -2841,7 +2844,7 @@ GanttChart.prototype.create = function(divId)
     });
 
     //create Table
-    var tableControl = document.createElement("table");
+    var tableControl = _content;
     tableControl.cellPadding = "0";
     tableControl.cellSpacing = "0";
     tableControl.style.cssText = "width: 100%; position: relative;";
@@ -4020,7 +4023,7 @@ GanttTask.prototype.moveTaskItem = function(posX)
 {
     this.addDayInPanelTime();
     this.cTaskItem[0].style.left = posX + "px";
-    var date = this.getDateOnPosition(posX); 
+    var date = this.getDateOnPosition(posX);
     this.cTaskItem[0].childNodes[1].firstChild.rows[0].cells[0].innerHTML = date.getDate() + '.' + (date.getMonth() + 1) + '.' + date.getUTCFullYear();
 };
 /**
