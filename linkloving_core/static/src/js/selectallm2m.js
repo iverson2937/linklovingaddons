@@ -214,7 +214,7 @@ odoo.define('linkloving_core.selectallm2m', function (require){
                 self.$('tbody .o_list_record_selector input').prop('checked', $(this).prop('checked') || false);
                 self.$('tbody .m2mcheckbox').prop('checked', $(this).prop('checked') || false);
                 var selection = self.groups.get_selection();
-                console.log(selection)
+                console.log(selection);
                 $(self.groups).trigger('selected', [selection.ids, selection.records, selection.category_ids]);
             });
            this.$('tbody .o_group_name input').click(function(e) {
@@ -223,6 +223,7 @@ odoo.define('linkloving_core.selectallm2m', function (require){
                if($(target).parents('.o_group_header').nextAll().length == 0){
                     $(target).parents('tbody').next('.ui-sortable').find('input').prop('checked', $(this).prop('checked') || false);
                     var selection = self.groups.get_selection();
+                    console.log(selection);
                     $(self.groups).trigger('selected', [selection.ids, selection.records, selection.category_ids]);
                }
             });
