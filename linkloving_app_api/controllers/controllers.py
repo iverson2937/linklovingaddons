@@ -1307,21 +1307,18 @@ class LinklovingAppApi(http.Controller):
                                                                  ('state', '=', 'draft')], limit=1)
         return_material_obj = return_material_model.sudo().search([('production_id', '=', order_id),
                                                                    ('state', '=', 'draft')])
-        try:
-            if not return_lines:
-                return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                                  res_data={"error": u"退料单异常,请在网页端操作"})
-            return_lines[0]['product_ids'] = []
-            data = []
-            for return_line in return_material_obj.return_ids:
-                dic = {
-                    'product_tmpl_id': return_line.product_id.id,
-                    'product_id': return_line.product_id.display_name,
-                    'return_qty': return_line.return_qty,
-                }
-                data.append(dic)
-        except Exception, e:
-            print("get_return_detail_%s " % e.name)
+        if not return_lines:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={"error": u"退料单异常,请在网页端操作"})
+        return_lines[0]['product_ids'] = []
+        data = []
+        for return_line in return_material_obj.return_ids:
+            dic = {
+                'product_tmpl_id': return_line.product_id.id,
+                'product_id': return_line.product_id.display_name,
+                'return_qty': return_line.return_qty,
+            }
+            data.append(dic)
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=data)
 

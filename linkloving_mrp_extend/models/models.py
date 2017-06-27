@@ -479,7 +479,8 @@ class MrpProductionExtend(models.Model):
 
     # 开始备料
     def button_start_prepare_material(self):
-        self.write({'state': 'prepare_material_ing'})
+        if self.state == 'waiting_material':
+            self.write({'state': 'prepare_material_ing'})
         return {'type': 'ir.actions.empty'}
 
 
