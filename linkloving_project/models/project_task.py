@@ -34,6 +34,7 @@ class linkloving_project_task(models.Model):
                 res[task.id]['progress'] = round(min(100.0 * hours.get(task.id, 0.0) / res[task.id]['total_hours'], 99.99),2)
         return res
 
+
     reviewer_id = fields.Many2one('res.users', string='Reviewer', select=True, track_visibility='onchange',
                                   default=lambda self: self.env.user)
     planed_level = fields.Selection(AVAILABLE_PRIORITIES, string=u'计划星级')
@@ -42,6 +43,8 @@ class linkloving_project_task(models.Model):
     parent_ids = fields.Many2many('project.task', 'project_task_parent_rel', 'task_id', 'parent_id', 'Parent Tasks')
     child_ids = fields.Many2many('project.task', 'project_task_parent_rel', 'parent_id', 'task_id', 'Delegated Tasks')
     work_ids = fields.One2many('project.task.work', 'task_id', 'Work done')
+
+    task_progress = fields.Float(string='Progress (%)')
 
     # TODO 未实现
     effective_hours = fields.Float(compute=_hours_get, string='Hours Spent')
@@ -67,7 +70,8 @@ class linkloving_project_task(models.Model):
         ('close', u'关闭'),
         ('pending', u'暂停'),
         ('blocked', 'Blocked')
-    ], string='Kanban State',
+        ],
+        string='Kanban State',
         default='normal',
         track_visibility='onchange',
         required=True, copy=False,
@@ -119,3 +123,10 @@ class linkloving_project_task(models.Model):
     @api.onchange("planned_hours", "effective_hours")
     def onchange_planned(self):
         return {'value': {'remaining_hours': self.planned_hours - self.effective_hours}}
+
+    @api.onchange('user_id')
+    def onchange_user_id(self,  user_id):
+        vals = {}
+        if self.user_id:
+            vals['date_start'] = fields.datetime.now()
+        return {'value': vals}
