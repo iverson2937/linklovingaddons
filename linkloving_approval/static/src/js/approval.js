@@ -27,10 +27,11 @@ odoo.define('linkloving_approval.approval_core', function (require){
             // console.log($("body"))
 
             self.$el.append(QWeb.render('approval_load_detail'));
-            var model = new Model("approval.center")
+            var model = new Model("approval.center");
             //var info_model = new Model("product.attachment.info")
             model.call("fields_get", ["", ['type']]).then(function (result) {
-                console.log(result)
+                console.log(result.type);
+
             })
             return model.call("create", [{res_model: 'product.attachment.info', type: 'waiting_submit'}])
                 .then(function (result) {
