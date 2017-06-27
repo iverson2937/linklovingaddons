@@ -157,6 +157,18 @@ odoo.define('linkloving_core.selectallm2m', function (require){
             });
             return placeholder;
         },
+        // get_selection: function () {
+        //     var ids = [], records = [], category_ids = [];
+        //
+        //     _(this.children)
+        //         .each(function (child) {
+        //             var selection = child.get_selection();
+        //             ids.push.apply(ids, selection.ids);
+        //             records.push.apply(records, selection.records);
+        //             category_ids.push.apply(category_ids, selection.category_ids);
+        //         });
+        //     return {ids: ids, records: records, category_ids:category_ids};
+        // },
     });
 
     var selectall = listview.include({
@@ -173,7 +185,7 @@ odoo.define('linkloving_core.selectallm2m', function (require){
                 result.records.push(record.attributes);
             });
 
-            //添加(全选)
+            //添加(全选)6/26
            this.$current.find('th.o_group_name input:m2mcheckbox').closest('th').each(function () {
                var r = records.get($(this).data('id'));
                result.category_ids.push(r.get('id'));
@@ -202,7 +214,17 @@ odoo.define('linkloving_core.selectallm2m', function (require){
                 self.$('tbody .o_list_record_selector input').prop('checked', $(this).prop('checked') || false);
                 self.$('tbody .m2mcheckbox').prop('checked', $(this).prop('checked') || false);
                 var selection = self.groups.get_selection();
+                console.log(selection)
                 $(self.groups).trigger('selected', [selection.ids, selection.records, selection.category_ids]);
+            });
+           this.$('tbody .o_group_name input').click(function(e) {
+               var e = e||window.event;
+               var target = e.target || e.srcElement;
+               if($(target).parents('.o_group_header').nextAll().length == 0){
+                    $(target).parents('tbody').next('.ui-sortable').find('input').prop('checked', $(this).prop('checked') || false);
+                    var selection = self.groups.get_selection();
+                    $(self.groups).trigger('selected', [selection.ids, selection.records, selection.category_ids]);
+               }
             });
 
             // Sort
