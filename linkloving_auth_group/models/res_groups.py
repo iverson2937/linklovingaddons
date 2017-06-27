@@ -72,10 +72,10 @@ class GroupsView(models.Model):
         """ Modify the view with xmlid ``base.user_groups_view``, which inherits
             the user form view, and introduces the reified group fields.
         """
-        if self._context.get('install_mode'):
-            # use installation/admin language for translatable names in the view
-            user_context = self.env['hr.job'].context_get()
-            self = self.with_context(**user_context)
+        # if self._context.get('install_mode'):
+        #     # use installation/admin language for translatable names in the view
+        #     user_context = self.env['hr.job'].context_get()
+        #     self = self.with_context(**user_context)
 
         # We have to try-catch this, because at first init the view does not
         # exist but we are already creating some basic groups.

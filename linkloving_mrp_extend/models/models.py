@@ -459,6 +459,7 @@ class MrpProductionExtend(models.Model):
             'product_qty': self.product_qty,
         })
         qty_wizard.change_prod_qty()
+        return {'type': 'ir.actions.empty'}
         # from linkloving_app_api.models.models import JPushExtend
         # JPushExtend.send_push(audience=jpush.audience(
         #     jpush.tag(LinklovingAppApi.get_jpush_tags("warehouse"))
@@ -468,15 +469,19 @@ class MrpProductionExtend(models.Model):
     def button_action_confirm_draft(self):
         for production in self:
             production.write({'state': 'confirmed'})
+        return {'type': 'ir.actions.empty'}
 
     @api.multi
     def button_action_cancel_confirm(self):
         for production in self:
             production.write({'state': 'draft'})
+        return {'type': 'ir.actions.empty'}
 
     # 开始备料
     def button_start_prepare_material(self):
         self.write({'state': 'prepare_material_ing'})
+        return {'type': 'ir.actions.empty'}
+
 
     # 备料完成
     def button_finish_prepare_material(self):
@@ -701,10 +706,13 @@ class MrpProductionExtend(models.Model):
             self._generate_raw_move(bom_line, line_data)
 
     def get_today_time_and_tz(self):
-        timez = fields.datetime.now(pytz.timezone(self.env.user.tz)).tzinfo._utcoffset
-        date_to_show = fields.datetime.utcnow()
-        date_to_show += timez
-        return date_to_show, timez
+        if self.env.user.tz:
+            timez = fields.datetime.now(pytz.timezone(self.env.user.tz)).tzinfo._utcoffset
+            date_to_show = fields.datetime.utcnow()
+            date_to_show += timez
+            return date_to_show, timez
+        else:
+            raise UserError("未找到对应的时区, 请点击 右上角 -> 个人资料 -> 时区 -> Asia/Shanghai")
 
     @api.model
     def _needaction_domain_get(self):
@@ -722,6 +730,12 @@ class MrpProductionExtend(models.Model):
 
         state = self._context.get('state')
         feedback_on_rework = self._context.get("feedback_on_rework")
+
+        refuse = self._context.get("refuse")
+        if refuse:
+            return [('material_remark_id', '!=', False),
+                    ('state', 'in', ['waiting_material',
+                                     'prepare_material_ing'])]
         if state and state in ['finish_prepare_material', 'already_picking', 'waiting_rework',
                                'waiting_inventory_material']:
 
@@ -826,7 +840,6 @@ class ChangeProductionQty(models.TransientModel):
                 (moves_finished + moves_raw).write({'workorder_id': wo.id})
                 if wo.move_raw_ids.filtered(lambda x: x.product_id.tracking != 'none') and not wo.active_move_lot_ids:
                     wo._generate_lot_ids()
-        return {}
 
         # @api.multi
         # def change_prod_qty(self):
