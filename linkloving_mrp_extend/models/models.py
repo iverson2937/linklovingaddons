@@ -459,6 +459,7 @@ class MrpProductionExtend(models.Model):
             'product_qty': self.product_qty,
         })
         qty_wizard.change_prod_qty()
+        return {'type': 'ir.actions.empty'}
         # from linkloving_app_api.models.models import JPushExtend
         # JPushExtend.send_push(audience=jpush.audience(
         #     jpush.tag(LinklovingAppApi.get_jpush_tags("warehouse"))
@@ -468,15 +469,19 @@ class MrpProductionExtend(models.Model):
     def button_action_confirm_draft(self):
         for production in self:
             production.write({'state': 'confirmed'})
+        return {'type': 'ir.actions.empty'}
 
     @api.multi
     def button_action_cancel_confirm(self):
         for production in self:
             production.write({'state': 'draft'})
+        return {'type': 'ir.actions.empty'}
 
     # 开始备料
     def button_start_prepare_material(self):
         self.write({'state': 'prepare_material_ing'})
+        return {'type': 'ir.actions.empty'}
+
 
     # 备料完成
     def button_finish_prepare_material(self):
@@ -835,7 +840,6 @@ class ChangeProductionQty(models.TransientModel):
                 (moves_finished + moves_raw).write({'workorder_id': wo.id})
                 if wo.move_raw_ids.filtered(lambda x: x.product_id.tracking != 'none') and not wo.active_move_lot_ids:
                     wo._generate_lot_ids()
-        return {}
 
         # @api.multi
         # def change_prod_qty(self):
