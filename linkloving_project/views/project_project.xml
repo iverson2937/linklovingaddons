@@ -35,7 +35,7 @@
             <field name="res_model">project.project</field>
             <field name="view_type">form</field>
             <field name="domain">[]</field>
-            <field name="view_mode">kanban,form</field>
+            <field name="view_mode">kanban,form,gantt</field>
             <field name="search_view_id" ref="project.view_project_project_filter"/>
             <field name="target">main</field>
             <field name="help" type="html">
@@ -319,6 +319,7 @@ s
                             <group>
                                 <field name="date_deadline"/>
                                 <field name="tag_ids" widget="many2many_tags"/>
+                                <field name="task_progress" widget="progressbar"/>
                                 <field name="progress" widget="progressbar"
                                        groups="project.group_time_work_estimation_tasks"/>
                             </group>
@@ -331,7 +332,7 @@ s
                                     <tree string="Task Work" editable="top">
                                         <field name="name"/>
                                         <field name="hours" widget="float_time" sum="Spent Hours"/>
-                                        <field name="progress" />
+                                        <field name="progress" string="progress (%)" />
                                         <field name="date"/>
                                         <field name="user_id"
                                                context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'project.group_project_user']}"/>

@@ -21,7 +21,7 @@ class ApprovalCenter(models.TransientModel):
 
         attach_list = []
         for atta in attatchments:
-            attach_list.append(self.env["product.attachment.info"].convert_attachment_info(atta))
+            attach_list.append(atta.convert_attachment_info())
         return attach_list
 
     def fields_get(self, allfields=None, attributes=None):
