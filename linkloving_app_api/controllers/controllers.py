@@ -1175,30 +1175,33 @@ class LinklovingAppApi(http.Controller):
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
         if not is_check:
+            try:
+                for l in stock_move_ids:
+                    product_id = l['product_tmpl_id']
+                    obj = request.env['return.material.line'].sudo().create({
+                        'return_qty': l['return_qty'],
+                        'product_id': product_id,
+                    })
+                    return_lines.append(obj.id)
 
-            for l in stock_move_ids:
-                product_id = l['product_tmpl_id']
-                obj = request.env['return.material.line'].sudo().create({
-                    'return_qty': l['return_qty'],
-                    'product_id': product_id,
-                })
-                return_lines.append(obj.id)
+                return_material_model = request.env['mrp.return.material']
+                returun_material_obj = return_material_model.sudo().search(
+                        [('production_id', '=', order_id),
+                         ('state', '=', 'draft')])
+                if not returun_material_obj:  # 如果没生成过就生成一遍， 防止出现多条记录
+                    returun_material_obj = return_material_model.sudo().create({
+                        'production_id': mrp_production.id,
+                    })
 
-            return_material_model = request.env['mrp.return.material']
-            returun_material_obj = return_material_model.sudo().search(
-                    [('production_id', '=', order_id),
-                     ('state', '=', 'draft')])
-            if not returun_material_obj:  # 如果没生成过就生成一遍， 防止出现多条记录
-                returun_material_obj = return_material_model.sudo().create({
-                    'production_id': mrp_production.id,
-                })
+                else:
+                    returun_material_obj.production_id = mrp_production.id
 
-            else:
-                returun_material_obj.production_id = mrp_production.id
-
-            returun_material_obj.return_ids = return_lines
-            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write(
-                    {'state': 'waiting_warehouse_inspection'})
+                returun_material_obj.return_ids = return_lines
+                mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write(
+                        {'state': 'waiting_warehouse_inspection'})
+            except Exception, e:
+                return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                                  res_data={"error": e.name})
         else:
             return_material_model = request.env['mrp.return.material']
             returun_material_obj = return_material_model.sudo().search(
