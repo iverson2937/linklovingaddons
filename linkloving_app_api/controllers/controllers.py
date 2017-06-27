@@ -1175,7 +1175,6 @@ class LinklovingAppApi(http.Controller):
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
         if not is_check:
-            try:
                 for l in stock_move_ids:
                     product_id = l['product_tmpl_id']
                     obj = request.env['return.material.line'].sudo().create({
@@ -1199,11 +1198,7 @@ class LinklovingAppApi(http.Controller):
                 returun_material_obj.return_ids = return_lines
                 mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write(
                         {'state': 'waiting_warehouse_inspection'})
-            except Exception, e:
-                return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                                  res_data={"error": e.name})
         else:
-            try:
                 return_material_model = request.env['mrp.return.material']
                 returun_material_obj = return_material_model.sudo().search(
                         [('production_id', '=', order_id),
@@ -1224,9 +1219,6 @@ class LinklovingAppApi(http.Controller):
                     move.action_done()
                 returun_material_obj.return_ids.create_scraps()
                 mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'done'})
-            except Exception, e:
-                return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                                  res_data={"error": e.name})
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
@@ -1247,7 +1239,6 @@ class LinklovingAppApi(http.Controller):
             mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'done'})
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
-        try:
             if not is_check:
 
                 for l in stock_move_ids:
@@ -1301,10 +1292,6 @@ class LinklovingAppApi(http.Controller):
                 #     if mrp_production.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:  # 半成品入库
                 #     else:
                 #         mrp_production.write({'state': 'waiting_post_inventory'})
-        except Exception, e:
-            return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={"error": e.name})
-
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
