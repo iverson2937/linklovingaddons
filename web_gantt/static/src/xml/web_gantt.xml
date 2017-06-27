@@ -2,11 +2,14 @@
 
 <templates>
     <t t-name="GanttView">
-        <div>
-            <div t-att-id="widget.chart_id" class="oe_gantt"/>
-        </div>
+        <!--<div>-->
+            <!--<div t-att-id="widget.chart_id" class="oe_gantt"/>-->
+        <!--</div>-->
+        <table  t-att-id="widget.chart_id" class="oe_gantt">
+
+        </table>
     </t>
     <t t-name="GanttView-create-button">
-        <button class="oe_button oe_gantt_button_create">Create</button>
+        <!--<button class="oe_button oe_gantt_button_create">Create</button>-->
     </t>
 </templates>
