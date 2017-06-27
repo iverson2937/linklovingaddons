@@ -25,13 +25,20 @@ odoo.define('linkloving_approval.approval_core', function (require){
         start: function () {
             var self = this;
             // console.log($("body"))
-            $("body").attr("data-product-id", this.product_id);
-            // return new Model("product.template")
-            //     .call("get_file_type_list", [this.product_id])
-            //     .then(function (result) {
-            //         console.log(result)
-                    self.$el.append(QWeb.render('approval_load_detail'));
-                // })
+
+            self.$el.append(QWeb.render('approval_load_detail'));
+            var model = new Model("approval.center")
+            //var info_model = new Model("product.attachment.info")
+            model.call("fields_get", ["", ['type']]).then(function (result) {
+                console.log(result)
+            })
+            return model.call("create", [{res_model: 'product.attachment.info', type: 'waiting_submit'}])
+                .then(function (result) {
+                    model.call('get_attachment_info_by_type', [result])
+                        .then(function (result) {
+                            console.log(result)
+                        })
+                })
         }
     });
 
