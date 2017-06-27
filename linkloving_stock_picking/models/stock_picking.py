@@ -14,6 +14,11 @@ class StockPicking(models.Model):
         ('return_storage', u'退货入库'),
     ])
 
+    @api.multi
+    def unlink(self):
+        self.mapped('pack_operation_product_ids').unlink()  # Checks if moves are not done
+        return super(StockPicking, self).unlink()
+
     def _get_po_number(self):
         if self.origin:
             po = self.env['purchase.order'].search([('name', '=', self.origin)])
@@ -52,8 +57,8 @@ class StockPicking(models.Model):
         ('partially_available', 'Partially Available'),
         ('assigned', 'Available'),
         ('qc_check', u'品检'),
-        ('validate', u'待确认'),
-        ('waiting_in', u'待入库'),
+        ('validate', u'采购确认'),
+        ('waiting_in', u'入库'),
         ('done', 'Done'),
     ], string='Status', compute='_compute_state',
         copy=False, index=True, readonly=True, store=True, track_visibility='onchange',

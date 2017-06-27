@@ -35,7 +35,7 @@ class PurchaseOrder(models.Model):
     def _compute_shipping_status(self):
         for order in self:
 
-            if order.state == 'purchase' and all(picking.state in ["cancel", "done"] for picking in order.picking_ids):
+            if order.state == 'purchase' and all(picking.state in ["cancel", "done", "waiting_in"] for picking in order.picking_ids):
                 order.shipping_status = 'done'
             else:
                 order.shipping_status = 'no'

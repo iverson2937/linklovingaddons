@@ -18,7 +18,7 @@
             <t t-if="!widget.options.is_log">
                 <!-- Text for followers -->
                 <span class="o_chatter_composer_info">
-                    To: Followers of222222222222222
+                    To: Followers of
                     <t t-if="widget.options.record_name">
                         &quot;<t t-esc="widget.options.record_name"/>&quot;
                     </t>
@@ -29,19 +29,17 @@
                 <!-- List of followers -->
 
                 <div class="o_composer_suggested_partners">
-
-                    rrrrrrr
-
-
-                    <t t-foreach="widget.options" t-as="asdc">
-                        <t t-esc="asdc"/>
-                        <input type="checkbox" class="o_chat_header_adc" name="adc" tt-att-value="asdc"/>
-                    </t>
-
-
+                    <div class="js_msg_comments">
+                        <t t-foreach="widget.options.msg_type" t-as="msg">
+                            <input type="checkbox" class="o_chat_header_adc" t-att-name="msg.id">
+                                <t t-esc="msg.name"/>
+                            </input>
+                        </t>
+                    </div>
+                    <hr/>
                     <t t-foreach='widget.suggested_partners' t-as='recipient'>
-
-                        <div t-attf-title="Add as recipient and follower (reason: #{recipient.reason})">
+                        <div t-attf-title="Add as recipient and follower (reason: #{recipient.reason})"
+                             style="display:none;">
                             <input type="checkbox"
                                    t-att-checked="recipient.checked ? 'checked' : undefined"
                                    t-att-data-fullname="recipient.full_name"/>
@@ -50,7 +48,6 @@
                             </t>
                         </div>
                     </t>
-                    qqqqqqqq
                 </div>
 
             </t>

@@ -686,7 +686,7 @@ odoo.define('mail.chat_managers', function (require) {
             var body = utils.parse_and_transform(_.str.trim(data.content), utils.add_link);
 
 
-            alert(data)
+            // alert(data)
             var msg = {
                 partner_ids: data.partner_ids,
                 body: body,

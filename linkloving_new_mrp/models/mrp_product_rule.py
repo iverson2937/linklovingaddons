@@ -18,16 +18,20 @@ class MrpProductRule(models.Model):
         if not vals.get('name'):
             product_id = self.resolve_2many_commands('input_product_ids', vals.get('input_product_ids'))[0]
             vals['name'] = self.env['product.product'].browse(product_id.get('product_id')).name
-        print vals
         return super(MrpProductRule, self).create(vals)
 
 
 class MrpProductRuleLine(models.Model):
     _name = 'mrp.product.rule.line'
-    rule_id = fields.Many2one('mrp.product.rule')
+    rule_id = fields.Many2one('mrp.product.rule', on_delete="cascade")
     product_id = fields.Many2one('product.product')
     produce_qty = fields.Float(default=1.0)
     type = fields.Selection([
         ('input', '投入'),
         ('output', '产出'),
     ])
+
+    @api.multi
+    def write(self, vals):
+        if 'rule_id' in vals and not vals['rule_id']:
+            return super(MrpProductRuleLine, self).write(vals)

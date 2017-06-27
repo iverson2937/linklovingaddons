@@ -30,7 +30,7 @@ class HrEmployee(models.Model):
                 })
         return res
 
-    @api.multi
+    @api.model
     def create(self, vals):
         res = super(HrEmployee, self).create(vals)
         groups = []

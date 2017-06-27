@@ -16,7 +16,7 @@ odoo.define('linkloving_core.TreeView', function (require) {
         init: function () {
             var self = this;
             this._super.apply(this, arguments);
-            // console.log('yes')
+            console.log('yes')
         },
         start:function () {
             self.$(document).ajaxComplete(function (event, xhr, settings) {
@@ -35,7 +35,7 @@ odoo.define('linkloving_core.TreeView', function (require) {
                         $("tbody tr:first td").each(function (index) {
                             // $("thead tr:first th").eq(index).width($(this).width());
                             $("thead tr:first th").eq(index).css("width", index == 0 ? $(this).width() / $("thead tr:first").width() * 100 + '%' : $(this).width() + 10);
-                            console.log($(this).width())
+                            // console.log($(this).width())
                         })
                         if ($("tbody tr:first").hasClass("add_empty_tr")) {
 
@@ -56,7 +56,7 @@ odoo.define('linkloving_core.TreeView', function (require) {
                 $("tbody .add_empty_tr+tr td").each(function (index) {
                         // $("thead tr:first th").eq(index).width($(this).width());
                         $("thead tr:first th").eq(index).css("width",index==0 ? $(this).width()/$("thead tr:first").width()*100+'%':($(this).width()+10)/$("thead tr:first").width()*100+'%');
-                        console.log($(this).width())
+                        // console.log($(this).width())
                     })
                     // if($("tbody tr:first").hasClass("add_empty_tr")){
                     //

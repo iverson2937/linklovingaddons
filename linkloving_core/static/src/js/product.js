@@ -193,7 +193,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
                 return new Model("product.template")
                 .call("get_detail", [this.product_id])
                 .then(function (result) {
-                    // console.log(result);
+                    console.log(result);
                     var transform_service="";
                     var po_length = result.po_lines.length;
                     var bom_length = result.bom_lines.length;

@@ -9,11 +9,11 @@
 
                 <xpath expr="//field[@name='category_id']" position="after">
                     <field name="crm_source_id" string="来源" attrs="{'invisible': [('customer','!=', True)]}"
-                           options="{'no_create':True}" />
+                           options="{'no_create':True}"/>
                 </xpath>
 
                 <!--<xpath expr="//field[@name='category_id']" position="attributes">-->
-                    <!--<attribute name="required">True</attribute>-->
+                <!--<attribute name="required">True</attribute>-->
                 <!--</xpath>-->
 
                 <xpath expr="//field[@name='crm_source_id']" position="after">
@@ -30,7 +30,9 @@
                        position="after">
                     <field name="detailed_address"/>
                 </xpath>
-                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='comment']"
+
+                <!--创建联系人 di第一栏-->
+              <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='comment']"
                        position="after">
                     <field name="whatsapp"/>
                 </xpath>
@@ -42,10 +44,14 @@
                        position="after">
                     <field name="skype"/>
                 </xpath>
+                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='skype']"
+                       position="after">
+                    <field name="qq"/>
+                </xpath>
 
                 <!--zuo-->
                 <xpath expr="//field[@name='country_id']" position="after">
-                    <field name="continent" placeholder="大州"/>
+                    <field name="continent" placeholder="大洲"/>
                 </xpath>
 
                 <xpath expr="//field[@name='category_id']" position="after">
@@ -74,7 +80,7 @@
                 </xpath>
                 <xpath expr="//field[@name='lang']" position="after">
                     <field name="priority" widget="priority" attrs="{'invisible':[('customer','=', False)]}"
-                           />
+                    />
                 </xpath>
 
                 <xpath expr="//page[@name='accounting_disabled']" position="after">
@@ -82,6 +88,19 @@
                         <field name="interested_in_product" domain="[('sale_ok','=',True)]"
                                context="{'search_default_rteng':1,'search_default_filter_categ_id':1}"/>
                     </page>
+                </xpath>
+            </field>
+        </record>
+
+
+        <record id="linkloving_view_partner_tree" model="ir.ui.view">
+            <field name="name">res.partner.tree</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_tree"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='display_name']" position="after">
+                    <field name="is_order"/>
                 </xpath>
 
             </field>

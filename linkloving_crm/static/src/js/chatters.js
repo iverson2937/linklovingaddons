@@ -11,6 +11,8 @@ odoo.define('mail.Chatters', function (require) {
     var framework = require('web.framework');
     var pyeval = require('web.pyeval');
     var web_utils = require('web.utils');
+    var Model = require('web.DataModel');
+
 
     var _t = core._t;
     var QWeb = core.qweb;
@@ -23,6 +25,7 @@ odoo.define('mail.Chatters', function (require) {
 // popup when suggested partner is selected without email, or other
 // informations), and the button to open the full composer wizard.
 // -----------------------------------------------------------------------------
+
     var ChatterComposer = composer.BasicComposer.extend({
         template: 'mail.chatters.ChatComposers',
 
@@ -32,8 +35,13 @@ odoo.define('mail.Chatters', function (require) {
             this.suggested_partners = [];
             this.options = _.defaults(this.options, {
                 display_mode: 'textarea',
+                msg_type: '',
                 record_name: false,
                 is_log: false,
+            });
+
+            new Model('message.label').query(['name', 'id']).all().then(function (msg_result) {
+                options.msg_type = msg_result;
             });
             if (this.options.is_log) {
                 this.options.send_text = _t('Log');
@@ -48,7 +56,9 @@ odoo.define('mail.Chatters', function (require) {
                 return this._super.apply(this, arguments);
             }
             return $.when(this._super.apply(this, arguments), this.message_get_suggested_recipients());
-        },
+        }
+
+        ,
 
         should_send: function () {
             return false;
@@ -87,14 +97,16 @@ odoo.define('mail.Chatters', function (require) {
             });
 
             return def;
-        },
+        }
+        ,
 
         /**
          * Send the message on SHIFT+ENTER, but go to new line on ENTER
          */
         prevent_send: function (event) {
             return !event.shiftKey;
-        },
+        }
+        ,
 
         message_get_suggested_recipients: function () {
             var self = this;
@@ -117,7 +129,8 @@ odoo.define('mail.Chatters', function (require) {
                         }
                     });
                 });
-        },
+        }
+        ,
 
         /**
          * Get the list of selected suggested partners
@@ -133,7 +146,8 @@ odoo.define('mail.Chatters', function (require) {
                 }));
             });
             return checked_partners;
-        },
+        }
+        ,
 
         /**
          * Check the additional partners (not necessary registered partners), and open a popup form view
@@ -228,7 +242,8 @@ odoo.define('mail.Chatters', function (require) {
                 });
             });
             return check_done;
-        },
+        }
+        ,
 
         on_open_full_composer: function () {
             if (!this.do_check_attachment_upload()) {
@@ -288,36 +303,9 @@ odoo.define('mail.Chatters', function (require) {
         events: {
             "click .o_chatter_button_new_message": "on_open_composer_new_message",
             "click .o_chatter_button_log_note": "on_open_composer_log_note",
-
-
-            // "click .o_chatter_button_update_message": "on_open_full_composer_is_my",
-
-
-            // "click .o_composer_button_sendss": function () {
-            //     // if (this.is_empty() || !this.do_check_attachment_upload()) {
-            //     //     return;
-            //     // }
-            //
-            //     alert('wojinlaile')
-            //
-            //     var self = this;
-            //     composer.preprocess_message().then(function (message) {
-            //         self.trigger('post_message', message);
-            //
-            //         // Empty input, selected partners and attachments
-            //         self.$input.val('');
-            //         self.mention_manager.reset_selections();
-            //         self.set('attachment_ids', []);
-            //
-            //         self.$input.focus();
-            //     });
-            // },
-
-
             "click .o_chatter_button_update_messages": function (event) {
                 var message = $(event.currentTarget).data('message-id');
-
-                var action_two = {
+                var action_updata_view = {
                     type: 'ir.actions.act_window',
                     res_model: 'mail.message',
                     view_id: 'view_message_form_is_is',
@@ -326,10 +314,8 @@ odoo.define('mail.Chatters', function (require) {
                     res_id: message,
                     target: 'new'
                 }
-
-
                 var self = this;
-                self.do_action(action_two, {
+                self.do_action(action_updata_view, {
                     on_close: function () {
                         self.trigger('need_refresh');
                         var parent = self.getParent();

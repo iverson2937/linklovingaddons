@@ -9,14 +9,16 @@
             <field name="arch" type="xml">
                 <form string="">
                     <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
                         <h3>投入</h3>
                         <field name="input_product_ids" options="{'reload_on_button': True}"
                                context="{'default_type':'input'}">
                             <tree editable="bottom">
                                 <field name="product_id" readonly="0" options="{'no_create': True}" string="产品"/>
-                                <!--<field name="total_produce_qty"/>-->
                                 <field name="produce_qty" invisible="1"/>
-                                <field name="type"/>
+                                <field name="type" invisible="1"/>
                             </tree>
                         </field>
                         <h3>产出</h3>
@@ -24,16 +26,11 @@
                                context="{'default_type':'output'}">
                             <tree editable="bottom">
                                 <field name="product_id" readonly="0" options="{'no_create': True}" string="产品"/>
-                                <!--<field name="total_produce_qty"/>-->
                                 <field name="produce_qty" invisible="1"/>
-                                <field name="type"/>
+                                <field name="type" invisible="1"/>
                             </tree>
                         </field>
-
-
                     </sheet>
-
-
                 </form>
             </field>
         </record>

@@ -5,7 +5,8 @@
             <field name="inherit_id" ref="sale.view_order_tree"/>
             <field name="arch" type="xml">
                 <field name="invoice_status" position="after">
-                    <field name="status_light"/>
+                    <field name="status_light" widget="statuslight"/>
+                    <field name="material_light" widget="starlight"/>
                 </field>
             </field>
         </record>
@@ -18,7 +19,8 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//field[@name='order_line']/tree/field[@name='customer_lead']" position="after">
-                    <field name="status_light"/>
+                    <field class="statuslight" name="status_light" widget="statuslight"/>
+                    <field name="material_light" widget="starlight"/>
                 </xpath>
 
             </field>

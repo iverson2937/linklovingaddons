@@ -4,6 +4,7 @@ import datetime
 import types
 
 import jpush
+import pytz
 from dateutil.relativedelta import relativedelta
 
 from odoo import models, fields, api, _
@@ -162,7 +163,8 @@ class ProductTemplateExtend(models.Model):
 
 class StockMoveExtend(models.Model):
     _inherit = 'stock.move'
-
+    _order = 'create_date desc'
+    reason = fields.Char(u'备注')
     qty_available = fields.Float(string='On Hand', related='product_id.qty_available')
     virtual_available = fields.Float(string='Forecast Quantity', related='product_id.virtual_available')
     suggest_qty = fields.Integer(string='Suggest Quantity', help=u'建议数量 = 实际数量 + 预计报废数量', )
@@ -367,6 +369,7 @@ class MrpProductionExtend(models.Model):
 
     factory_remark = fields.Text(string=u"工厂备注", track_visibility='onchange')
 
+    material_remark_id = fields.Many2one("material.remark", string=u"无法备料原因")
     # @api.multi
     # def _compute_bom_remark(self):
     #     for production in self:
@@ -447,7 +450,7 @@ class MrpProductionExtend(models.Model):
 
     # 确认生产 等待备料
     def button_waiting_material(self):
-        if self.location_ids.filtered(lambda x: x.is_circulate_location == False):
+        if self.location_ids.filtered(lambda x: x.is_circulate_location == False) or not self.location_ids:
             self.write({'state': 'waiting_material'})
         else:
             self.write({'state': 'finish_prepare_material'})
@@ -456,6 +459,7 @@ class MrpProductionExtend(models.Model):
             'product_qty': self.product_qty,
         })
         qty_wizard.change_prod_qty()
+        return {'type': 'ir.actions.empty'}
         # from linkloving_app_api.models.models import JPushExtend
         # JPushExtend.send_push(audience=jpush.audience(
         #     jpush.tag(LinklovingAppApi.get_jpush_tags("warehouse"))
@@ -465,15 +469,19 @@ class MrpProductionExtend(models.Model):
     def button_action_confirm_draft(self):
         for production in self:
             production.write({'state': 'confirmed'})
+        return {'type': 'ir.actions.empty'}
 
     @api.multi
     def button_action_cancel_confirm(self):
         for production in self:
             production.write({'state': 'draft'})
+        return {'type': 'ir.actions.empty'}
 
     # 开始备料
     def button_start_prepare_material(self):
         self.write({'state': 'prepare_material_ing'})
+        return {'type': 'ir.actions.empty'}
+
 
     # 备料完成
     def button_finish_prepare_material(self):
@@ -697,19 +705,37 @@ class MrpProductionExtend(models.Model):
         else:
             self._generate_raw_move(bom_line, line_data)
 
+    def get_today_time_and_tz(self):
+        if self.env.user.tz:
+            timez = fields.datetime.now(pytz.timezone(self.env.user.tz)).tzinfo._utcoffset
+            date_to_show = fields.datetime.utcnow()
+            date_to_show += timez
+            return date_to_show, timez
+        else:
+            raise UserError("未找到对应的时区, 请点击 右上角 -> 个人资料 -> 时区 -> Asia/Shanghai")
+
     @api.model
     def _needaction_domain_get(self):
         """ Returns the domain to filter records that require an action
             :return: domain or False is no action
 
         """
-        today_time = fields.datetime.strptime(fields.datetime.strftime(fields.datetime.now(), '%Y-%m-%d'),
-                                              '%Y-%m-%d')
+        today_time, timez = self.get_today_time_and_tz()
+        today_time = fields.datetime.strptime(fields.datetime.strftime(today_time, '%Y-%m-%d'), '%Y-%m-%d')
+        today_time -= timez
+        # today_time = fields.datetime.strptime(fields.datetime.strftime(fields.datetime.now(), '%Y-%m-%d'),
+        #                                       '%Y-%m-%d')
         one_days_after = datetime.timedelta(days=3)
         after_day = today_time + one_days_after
 
         state = self._context.get('state')
         feedback_on_rework = self._context.get("feedback_on_rework")
+
+        refuse = self._context.get("refuse")
+        if refuse:
+            return [('material_remark_id', '!=', False),
+                    ('state', 'in', ['waiting_material',
+                                     'prepare_material_ing'])]
         if state and state in ['finish_prepare_material', 'already_picking', 'waiting_rework',
                                'waiting_inventory_material']:
 
@@ -814,7 +840,6 @@ class ChangeProductionQty(models.TransientModel):
                 (moves_finished + moves_raw).write({'workorder_id': wo.id})
                 if wo.move_raw_ids.filtered(lambda x: x.product_id.tracking != 'none') and not wo.active_move_lot_ids:
                     wo._generate_lot_ids()
-        return {}
 
         # @api.multi
         # def change_prod_qty(self):
@@ -1165,7 +1190,8 @@ class ReturnMaterialLine(models.Model):
 
     @api.multi
     def create_scraps(self):
-        boms, lines = self[0].return_id.production_id.bom_id.explode(self[0].return_id.production_id.product_id,
+        if len(self) > 0:
+            boms, lines = self[0].return_id.production_id.bom_id.explode(self[0].return_id.production_id.product_id,
                                                                      self[0].return_id.production_id.qty_produced)
 
         scrap_env = self.env["production.scrap"]
@@ -1647,3 +1673,14 @@ class ProductionScrap(models.Model):
 #     product_uom_id = fields.Many2one(
 #         'product.uom', 'Unit of Measure',
 #         required=True, states={'done': [('readonly', True)]})
+class MaterialRemark(models.Model):
+    _name = 'material.remark'
+
+    content = fields.Text(string="备注", required=True, )
+
+    @api.multi
+    def name_get(self):
+        res = []
+        for remark in self:
+            res.append((remark.id, remark.content))
+        return res

@@ -8,7 +8,7 @@
             <field name="inherit_id" ref="linkloving_process.mrp_process_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='is_outside']" position="after">
-                    <field name="is_rework"/>
+                    <field name="is_rework" invisible="1"/>
                 </xpath>
             </field>
 

@@ -7,3 +7,5 @@ access_worker_line,access_worker_line,model_worker_line,,1,1,1,1
 access_worker_time_line,access_worker_time_line,model_worker_time_line,,1,1,1,1
 access_mrp_qc_feedback,access_mrp_qc_feedback,model_mrp_qc_feedback,,1,1,1,1
 access_qc_feedback_img,access_qc_feedback_img,model_qc_feedback_img,,1,1,1,1
+access_production_scrap,access_production_scrap,model_production_scrap,,1,1,1,1
+

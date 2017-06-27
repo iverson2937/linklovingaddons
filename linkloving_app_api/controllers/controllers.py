@@ -15,8 +15,6 @@ from pip import download
 
 import odoo
 import odoo.modules.registry
-from odoo.addons.web.controllers.main import ensure_db
-
 from odoo import fields
 from odoo.osv import expression
 from odoo.tools import float_compare, SUPERUSER_ID, werkzeug, os, safe_eval
@@ -75,7 +73,6 @@ class JsonResponse(object):
             return data_dic
         return json.dumps(data_dic)
 
-
 class LinklovingAppApi(http.Controller):
 
     odoo10 = None
@@ -87,7 +84,9 @@ class LinklovingAppApi(http.Controller):
     #登录
     @http.route('/linkloving_app_api/login', type='json', auth="none", csrf=False)
     def login(self, **kw):
-        ensure_db()
+        request.session.db = request.jsonrequest["db"]
+        request.params["db"] = request.jsonrequest["db"]
+
         request.params['login_success'] = False
         values = request.params.copy()
         if not request.uid:
@@ -270,19 +269,25 @@ class LinklovingAppApi(http.Controller):
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
 
+    @classmethod
+    def get_today_time_and_tz(cls):
+        user = request.env["res.users"].sudo().browse(request.context.get("uid"))
+        timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
+        date_to_show = fields.datetime.utcnow()
+        date_to_show += timez
+        return date_to_show, timez
     # 单个工序
     @http.route('/linkloving_app_api/get_date_uncomplete_orders', type='json', auth='none', csrf=False)
     def get_date_uncomplete_orders(self, **kw):
+
         process_id = request.jsonrequest.get("process_id")
-        date_to_show = fields.datetime.now()
+        date_to_show, timez = LinklovingAppApi.get_today_time_and_tz()
         one_days_after = datetime.timedelta(days=1)
         today_time = fields.datetime.strptime(fields.datetime.strftime(date_to_show, '%Y-%m-%d'),
                                               '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
-        user = request.env["res.users"].sudo().browse(request.context.get("uid"))
         locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
         location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
         location_domain = locations.ids + location_cir
-        timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
         after_day = today_time + one_days_after
         order_delay = request.env["mrp.production"].sudo().read_group(
                 [('date_planned_start', '<', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
@@ -347,16 +352,15 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/get_order_count_by_process', type='json', auth='none', csrf=False)
     def get_order_count_by_process(self, **kw):
         process_ids = request.jsonrequest.get("process_ids")
-        date_to_show = fields.datetime.now()
+        date_to_show, timez = LinklovingAppApi.get_today_time_and_tz()
+
         one_days_after = datetime.timedelta(days=1)
         today_time = fields.datetime.strptime(fields.datetime.strftime(date_to_show, '%Y-%m-%d'),
                                               '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
-        user = request.env["res.users"].sudo().browse(request.context.get("uid"))
         locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
         location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
         location_domain = locations.ids + location_cir
 
-        timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
         after_day = today_time + one_days_after
         after_2_day = after_day + one_days_after
         after_3_day = after_2_day + one_days_after
@@ -371,11 +375,13 @@ class LinklovingAppApi(http.Controller):
                      ('location_ids', 'in', location_domain)]
                     , fields=["date_planned_start"],
                     groupby=["date_planned_start"])
+
             domain = [('date_planned_start', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
                       ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                       ('state', 'in', ['waiting_material', 'prepare_material_ing']),
                       ('process_id', '=', process_id),
                       ('location_ids', 'in', location_domain)]
+
             domain_tommorrow = [('date_planned_start', '>', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                                 ('date_planned_start', '<', (after_2_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                                 ('state', 'in', ['waiting_material', 'prepare_material_ing']),
@@ -426,19 +432,19 @@ class LinklovingAppApi(http.Controller):
         date_to_show = request.jsonrequest.get("date")
         process_id = request.jsonrequest.get("process_id")
         one_days_after = datetime.timedelta(days=1)
-        today_time = fields.datetime.strptime(fields.datetime.strftime(fields.datetime.now(), '%Y-%m-%d'),
+        today_time, timez = LinklovingAppApi.get_today_time_and_tz()
+        today_time = fields.datetime.strptime(fields.datetime.strftime(today_time, '%Y-%m-%d'),
                                               '%Y-%m-%d')
         locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
 
         if date_to_show != "delay":
             today_time = fields.datetime.strptime(date_to_show, '%Y-%m-%d')
+
         one_millisec_before = datetime.timedelta(milliseconds=1)  #
         today_time = today_time - one_millisec_before  # 今天的最后一秒
         after_day = today_time + one_days_after
-        user = request.env["res.users"].sudo().browse(request.context.get("uid"))
         location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
         location_domain = locations.ids + location_cir
-        timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
         if not process_id:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "未找到工序id"})
 
@@ -488,15 +494,13 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/get_already_picking_orders_count', type='json', auth='none', csrf=False)
     def get_already_picking_orders_count(self, **kw):
         partner_id = request.jsonrequest.get("partner_id")
-        date_to_show = fields.datetime.now()
+        date_to_show, timez = LinklovingAppApi.get_today_time_and_tz()
         one_days_after = datetime.timedelta(days=1)
         today_time = fields.datetime.strptime(fields.datetime.strftime(date_to_show, '%Y-%m-%d'),
                                               '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
-        user = request.env["res.users"].sudo().browse(request.context.get("uid"))
         # locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
         # location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
         # location_domain = locations.ids + location_cir
-        timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
         after_day = today_time + one_days_after
 
         domain_uid = ['|', ('in_charge_id', '=', partner_id), ('create_uid', '=', partner_id)]
@@ -577,7 +581,8 @@ class LinklovingAppApi(http.Controller):
         date_to_show = request.jsonrequest.get("date")
         partner_id = request.jsonrequest.get('partner_id')
         one_days_after = datetime.timedelta(days=1)
-        today_time = fields.datetime.strptime(fields.datetime.strftime(fields.datetime.now(), '%Y-%m-%d'),
+        today_time, timez = LinklovingAppApi.get_today_time_and_tz()
+        today_time = fields.datetime.strptime(fields.datetime.strftime(today_time, '%Y-%m-%d'),
                                               '%Y-%m-%d')
 
         domain_uid = ['|', ('in_charge_id', '=', partner_id), ('create_uid', '=', partner_id)]
@@ -813,7 +818,7 @@ class LinklovingAppApi(http.Controller):
         order_id = request.jsonrequest.get('order_id')
         mrp_production_model = request.env['mrp.production']
         mrp_production = mrp_production_model.sudo().search([('id', '=', order_id)])[0]
-        mrp_production.write({'state': 'prepare_material_ing'})
+        mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'prepare_material_ing'})
 
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
@@ -837,8 +842,7 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/finish_prepare_material', type='json', auth='none', csrf=False)
     def finish_prepare_material(self, **kw):
         order_id = request.jsonrequest.get('order_id') #get paramter
-        mrp_production_model = request.env['mrp.production']
-        mrp_production = mrp_production_model.sudo().search([('id', '=', order_id)])[0]
+        mrp_production = request.env['mrp.production'].sudo().search([('id', '=', order_id)])[0]
 
         stock_moves = request.jsonrequest.get('stock_moves') #get paramter
         stock_move_lines = request.env["sim.stock.move"].sudo()
@@ -884,7 +888,8 @@ class LinklovingAppApi(http.Controller):
             #                                       res_data={"error":e.name})
             if all(sim_move.is_prepare_finished for sim_move in
                    stock_move_lines.filtered(lambda x: x.product_type != 'semi-finished')):
-                mrp_production.write({'state': 'finish_prepare_material'})
+                mrp_production.write(
+                        {'state': 'finish_prepare_material'})
 
                 JPushExtend.send_notification_push(audience=jpush.audience(
                         jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
@@ -936,7 +941,7 @@ class LinklovingAppApi(http.Controller):
         #     return JsonResponse.send_response(STATUS_CODE_ERROR,
         #                                       res_data={"error":e.name})
 
-        mrp_production.write({'state': 'already_picking',
+        mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'already_picking',
                               'picking_material_date': fields.datetime.now()})
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
@@ -946,7 +951,7 @@ class LinklovingAppApi(http.Controller):
     def start_produce(self, **kw):
         order_id = request.jsonrequest.get('order_id')  # get paramter
         mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
-        mrp_production.write({'state': 'progress'})
+        mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'progress'})
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
@@ -1081,7 +1086,7 @@ class LinklovingAppApi(http.Controller):
         if not feedback_id:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error': u"未找到对应的品检单"})
-        feedback.action_start_qc()
+        feedback.sudo(request.context.get("uid") or SUPERUSER_ID).action_start_qc()
 
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
@@ -1119,9 +1124,9 @@ class LinklovingAppApi(http.Controller):
                                               res_data={'error' : _("MO not found")})
         try:
             if result == True:
-                feedback.action_qc_success()
+                feedback.sudo().action_qc_success()
             else:
-                feedback.action_qc_fail()
+                feedback.sudo().action_qc_fail()
         except UserError, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error": e.name})
@@ -1148,7 +1153,7 @@ class LinklovingAppApi(http.Controller):
         feedback_id = request.jsonrequest.get('feedback_id')  # get paramter
         feedback = LinklovingAppApi.get_model_by_id(feedback_id, request, 'mrp.qc.feedback')
         try:
-            feedback.action_check_to_rework()
+            feedback.sudo().action_check_to_rework()
         except UserError, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error": e.name})
@@ -1192,7 +1197,8 @@ class LinklovingAppApi(http.Controller):
                 returun_material_obj.production_id = mrp_production.id
 
             returun_material_obj.return_ids = return_lines
-            mrp_production.write({'state': 'waiting_warehouse_inspection'})
+            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write(
+                    {'state': 'waiting_warehouse_inspection'})
         else:
             return_material_model = request.env['mrp.return.material']
             returun_material_obj = return_material_model.sudo().search(
@@ -1213,7 +1219,7 @@ class LinklovingAppApi(http.Controller):
                     returun_material_obj._prepare_move_values(r))
                 move.action_done()
             returun_material_obj.return_ids.create_scraps()
-            mrp_production.write({'state': 'done'})
+            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'done'})
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
@@ -1232,7 +1238,7 @@ class LinklovingAppApi(http.Controller):
                                               res_data={'error' : _("MO not found")})
         return_lines = []
         if all(stock_move.get("return_qty") == 0 for stock_move in stock_move_ids):
-            mrp_production.write({'state': 'done'})
+            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'done'})
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
         if not is_check:
@@ -1258,7 +1264,8 @@ class LinklovingAppApi(http.Controller):
                 returun_material_obj.production_id = mrp_production.id
 
             returun_material_obj.return_ids = return_lines
-            mrp_production.write({'state': 'waiting_warehouse_inspection'})
+            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write(
+                    {'state': 'waiting_warehouse_inspection'})
         else:
             return_material_model = request.env['mrp.return.material']
             returun_material_obj = return_material_model.sudo().search([('production_id', '=', order_id),
@@ -1300,19 +1307,21 @@ class LinklovingAppApi(http.Controller):
                                                                  ('state', '=', 'draft')], limit=1)
         return_material_obj = return_material_model.sudo().search([('production_id', '=', order_id),
                                                                    ('state', '=', 'draft')])
-
-        if not return_lines:
-            return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={"error": u"退料单异常,请在网页端操作"})
-        return_lines[0]['product_ids'] = []
-        data = []
-        for return_line in return_material_obj.return_ids:
-            dic = {
-                'product_tmpl_id' : return_line.product_id.id,
-                'product_id' : return_line.product_id.display_name,
-                'return_qty' : return_line.return_qty,
-            }
-            data.append(dic)
+        try:
+            if not return_lines:
+                return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                                  res_data={"error": u"退料单异常,请在网页端操作"})
+            return_lines[0]['product_ids'] = []
+            data = []
+            for return_line in return_material_obj.return_ids:
+                dic = {
+                    'product_tmpl_id': return_line.product_id.id,
+                    'product_id': return_line.product_id.display_name,
+                    'return_qty': return_line.return_qty,
+                }
+                data.append(dic)
+        except Exception, e:
+            print("get_return_detail_%s " % e.name)
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=data)
 
@@ -2243,6 +2252,7 @@ class LinklovingAppApi(http.Controller):
                 'product_qty' : pack.product_qty,
                 'qty_done' : pack.qty_done,
             })
+
         data = {
             'picking_id' : stock_picking_obj.id,
             'complete_rate': stock_picking_obj.complete_rate,
@@ -2252,6 +2262,7 @@ class LinklovingAppApi(http.Controller):
             'picking_type_code' : stock_picking_obj.picking_type_code,
             'name': stock_picking_obj.name,
             'parnter_id': stock_picking_obj.partner_id.display_name,
+            'phone': stock_picking_obj.partner_id.mobile or stock_picking_obj.partner_id.phone or '',
             'origin': stock_picking_obj.origin,
             'state': stock_picking_obj.state,
             'min_date': stock_picking_obj.min_date,
@@ -2471,3 +2482,30 @@ class LinklovingAppApi(http.Controller):
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data={"factory_mark": order.factory_remark or ''})
+
+    @http.route('/linkloving_app_api/create_material_remark', type='json', auth='none', csrf=False)
+    def create_material_remark(self, **kw):
+        content = request.jsonrequest.get("content")
+
+        remark = request.env["material.remark"].sudo().create({
+            "content": content,
+        })
+        all_remarks = request.env["material.remark"].sudo().search_read([])
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=all_remarks)
+
+    @http.route('/linkloving_app_api/get_material_remark', type='json', auth='none', csrf=False)
+    def get_material_remark(self, **kw):
+        remarks = request.env["material.remark"].sudo().search_read([])
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=remarks)
+
+    @http.route('/linkloving_app_api/add_material_remark', type='json', auth='none', csrf=False)
+    def add_material_remark(self, **kw):
+        order_id = request.jsonrequest.get("order_id")
+        remark_id = request.jsonrequest.get("remark_id")
+
+        order = request.env["mrp.production"].sudo().browse(order_id)
+        order.material_remark_id = remark_id
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data={})

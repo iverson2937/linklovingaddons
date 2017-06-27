@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!--<record id="get_red" model="ir.actions.act_window">-->
+        <!--<field name="name">采购订单</field>-->
+        <!--<field name="res_model">purchase.order</field>-->
+        <!--<field name="type">ir.actions.act_window</field>-->
+        <!--<field name="view_type">form</field>-->
+        <!--<field name="view_mode">tree,form</field>-->
+        <!--<field name="domain">[('status_light','=',3), ('state', '=', 'purchase')]</field>-->
+        <!--<field name="help" type="html">-->
+        <!--<p class="oe_view_nocontent_create">-->
+        <!--Click here to create a new transfer.-->
+        <!--</p>-->
+        <!--</field>-->
+        <!--</record>-->
+
+        <record id="stock_picking_type_kanban" model="ir.ui.view">
+            <field name="name">auto.plan.kanban</field>
+            <field name="model">auto.plan</field>
+            <field name="arch" type="xml">
+                <kanban class="oe_background_grey o_kanban_dashboard o_stock_kanban" create="0">
+                    <field name="type"/>
+                    <field name="count_red"/>
+                    <field name="count_green"/>
+                    <field name="count_yellow"/>
+                    <field name="count_qc"/>
+                    <field name="count_confirm"/>
+                    <field name="count_inventory"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div name="stock_picking">
+                                    <div class="o_kanban_card_header">
+                                        <div class="o_kanban_card_header_title">
+                                            <div class="o_primary">
+                                                <a type="object" name="get_action_mrp_production_tree_to_confirm">
+                                                    <field name="name"/>
+                                                </a>
+                                            </div>
+                                            <t t-set="type" t-value="record.type.value"/>
+                                            <t t-if="type == 'status_light'">
+                                                <button class="btn btn-primary pull-right"
+                                                        name="refresh_po"
+                                                        type="object">
+                                                    <span>
+                                                        重新计算状态
+                                                    </span>
+                                                </button>
+                                            </t>
+                                            <div class="o_secondary">
+                                            </div>
+                                        </div>
+                                        <!--<div class="o_kanban_manage_button_section">-->
+                                        <!--<a class="o_kanban_manage_toggle_button" href="#">More-->
+                                        <!--<i class="fa fa-caret-down"/>-->
+                                        <!--</a>-->
+                                        <!--</div>-->
+                                    </div>
+                                <div class="container o_kanban_card_content o_visible">
+                                    <div class="row">
+                                        <t t-set="type" t-value="record.type.value"/>
+                                        <t t-if="type == 'status_light'">
+                                            <div class="col-xs-4 col-md-4 o_kanban_primary_left">
+                                                <button class="btn btn-primary"
+                                                        name="get_red_1"
+                                                        type="object">
+                                                    <span>
+                                                        <t t-esc="record.count_red.value"/>
+                                                        红
+                                                    </span>
+                                                </button>
+                                            </div>
+                                            <div class="col-xs-4 col-md-4 o_kanban_primary_left">
+                                                <button class="btn btn-primary"
+                                                        name="get_yellow"
+                                                        type="object">
+                                                    <span>
+                                                        <t t-esc="record.count_yellow.value"/>
+                                                        黄
+                                                    </span>
+                                                </button>
+                                            </div>
+                                            <div class="col-xs-4 col-md-4 o_kanban_primary_left">
+                                                <button class="btn btn-primary"
+                                                        name="get_green"
+                                                        type="object">
+                                                    <span>
+                                                        <t t-esc="record.count_green.value"/>
+                                                        绿
+                                                    </span>
+                                                </button>
+                                            </div>
+                                        </t>
+                                        <t t-if="type == 'stock_picking'">
+                                            <div class="col-xs-4 col-md-4 o_kanban_primary_left">
+                                                <button class="btn btn-primary"
+                                                        name="get_stock_picking_qc"
+                                                        type="object">
+                                                    <span>
+                                                        <t t-esc="record.count_qc.value"/>
+                                                        品 检
+                                                    </span>
+                                                </button>
+                                                </div>
+                                            <div class="col-xs-4 col-md-4 o_kanban_primary_left">
+                                                <button class="btn btn-primary"
+                                                        name="get_stock_picking_purchase_confirm"
+                                                        type="object">
+                                                    <span>
+                                                        <t t-esc="record.count_confirm.value"/>
+                                                        采购确认
+                                                    </span>
+                                                </button>
+                                            </div>
+
+                                            <div class="col-xs-4 col-md-4 o_kanban_primary_left">
+                                                <button class="btn btn-primary"
+                                                        name="get_stock_picking_inventory"
+                                                        type="object">
+                                                    <span>
+                                                        <t t-esc="record.count_inventory.value"/>
+                                                        待 入 库
+                                                    </span>
+                                                </button>
+                                            </div>
+                                        </t>
+                                        </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record id="auto_plan_kanban_action" model="ir.actions.act_window">
+            <field name="name">采购单状态看板</field>
+            <field name="res_model">auto.plan</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">kanban,form</field>
+            <field name="help" type="html">
+                <p>
+                </p>
+            </field>
+        </record>
+        <menuitem
+                action="auto_plan_kanban_action"
+                id="auto_plan_kanban_menu"
+                parent="purchase.menu_purchase_root" sequence="0"
+                name="采购单状态看板"/>
+
+    </data>
+</openerp>

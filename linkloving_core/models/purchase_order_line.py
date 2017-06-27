@@ -72,6 +72,7 @@ class PurchaseOrderLine(models.Model):
                                 'model': "mrp.production",
                                 'origin': mo_id.origin,
                                 'status_light': mo_id.status_light,
+                                'material_light': mo_id.material_light,
                             })
                 else:
                     so_id = self.env['sale.order'].sudo().search([('name', '=', s)])
@@ -86,6 +87,7 @@ class PurchaseOrderLine(models.Model):
                                 'product_qty': order_line_id.product_qty,
                                 'date': so_id.validity_date,
                                 'status_light': so_id.status_light,
+                                'material_light': so_id.material_light,
                             })
             return res
 
@@ -118,6 +120,7 @@ class PurchaseOrderLine(models.Model):
                                 'model': "mrp.production",
                                 'origin': mo_id.origin,
                                 'status_light': mo_id.status_light,
+                                'material_light': mo_id.material_light,
                             })
                 elif s.startswith('SO'):
                     so_id = self.env['sale.order'].search([('name', '=', s)])
@@ -133,6 +136,7 @@ class PurchaseOrderLine(models.Model):
                                 'product_qty': order_line_id.product_qty,
                                 'date': so_id.validity_date,
                                 'status_light': so_id.status_light,
+                                'material_light': so_id.material_light,
                             })
 
             return res

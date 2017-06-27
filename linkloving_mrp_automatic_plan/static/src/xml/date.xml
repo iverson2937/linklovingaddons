@@ -2,7 +2,7 @@
 
 <templates xml:space="preserve">
     <t t-name="Date_Container">
-        <div>
+        <div class="div1">
             <!--<t t-esc="widget.ceshi"/>-->
         </div>
     </t>
@@ -120,4 +120,6 @@
                 });
         </script>
     </t>
+
+
 </templates>

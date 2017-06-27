@@ -9,8 +9,10 @@ from odoo.exceptions import UserError
 
 class NewMrpProduction(models.Model):
     _inherit = 'mrp.production'
-    is_multi_output = fields.Boolean(default=True)
+    is_multi_output = fields.Boolean(related='process_id.is_multi_output')
     rule_id = fields.Many2one('mrp.product.rule')
+    stock_move_lines_finished = fields.One2many('stock.move.finished', 'production_id')
+    is_force_output = fields.Boolean(string=u'是否要求产出完整', default=True)
 
     product_id = fields.Many2one(
         'product.product', 'Product',
@@ -20,12 +22,45 @@ class NewMrpProduction(models.Model):
     output_product_ids = fields.One2many('mrp.product.rule.line', related='rule_id.output_product_ids')
     input_product_ids = fields.One2many('mrp.product.rule.line', related='rule_id.input_product_ids')
 
+    @api.multi
+    def _compute_done_stock_move_lines(self, new_pr):
+        list = []
+        for move in new_pr.move_finished_ids:
+            list.append(move.product_id.id)
+        a = set(list)  # 不重复的set集合
+        res_list = []
+        stock_move_lines_finished = self.env["stock.move.finished"].search([("production_id", "=", new_pr.id)])
+        if not stock_move_lines_finished:
+            for r in a:
+                dict = self._prepare_stock_move_done_values(r)
+                res = self.env['stock.move.finished'].create(dict)
+                res_list.append(res.id)
+                new_pr.stock_move_lines_finished = res_list
+        else:
+            new_pr.stock_move_lines_finished = stock_move_lines_finished
+            # else:
+            #     for r in a:
+            #         if r.product_id not in self.sim_stock_move_lines.mapped('product_id'):
+            #             dict = self._prepare_sim_stock_move_values(r)
+            #             res = self.env['sim.stock.move'].create(dict)
+            #             self.sim_stock_move_lines |= res
+            # return
+
+    def _prepare_stock_move_done_values(self, value):
+        return {
+            'product_id': value,
+            'production_id': self.id
+        }
+
+    @api.onchange('rule_id')
+    def _on_change_rule_id(self):
+        self.bom_id = False
+
     def button_waiting_material(self):
         if self.is_multi_output:
+
             if not self.output_product_ids or not self.input_product_ids:
                 raise UserError(u'请添加投入产出')
-            self._generate_moves()
-            self._compute_sim_stock_move_lines(self)
         self.write({'state': 'waiting_material'})
 
     @api.multi
@@ -35,6 +70,7 @@ class NewMrpProduction(models.Model):
             for finish_id in self.move_finished_ids:
                 if line.product_id.id == finish_id.product_id.id:
                     finish_id.quantity_done += line.produce_qty
+                    line.produce_qty=0
 
         if sum(move.quantity_done for move in self.move_raw_ids) < sum(
                 move.quantity_done for move in self.move_finished_ids):
@@ -42,8 +78,16 @@ class NewMrpProduction(models.Model):
 
     def button_produce_finish(self):
         if self.is_multi_output:
+            if self.is_force_output and sum(move.quantity_done for move in self.move_raw_ids) > sum(
+                    move.quantity_done for move in self.move_finished_ids):
+                raise UserError('尚未完全产出,不允许完成')
             self.post_inventory()
-            self.state = 'waiting_inventory_material'
+            if sum(move.quantity_done for move in self.move_raw_ids) == sum(
+                    move.quantity_done for move in self.move_finished_ids):
+                state = 'done'
+            else:
+                state = 'waiting_inventory_material'
+            self.state = state
             return
         else:
             super(NewMrpProduction, self).button_produce_finish()
@@ -101,74 +145,6 @@ class NewMrpProduction(models.Model):
                 #             'overpicking_invisible': overpicking_invisible,
                 #             'quantity_ready_invisible': quantity_ready_invisible},
                 'target': 'new'}
-
-    @api.multi
-    def change_prod_qty(self):
-        for wizard in self:
-            production = wizard.mo_id
-            produced = sum(production.move_finished_ids.mapped('quantity_done'))
-            if wizard.product_qty < produced:
-                raise UserError(
-                    _("You have already processed %d. Please input a quantity higher than %d ") % (produced, produced))
-            production.write({'product_qty': wizard.product_qty})
-            done_moves = production.move_finished_ids.filtered(
-                lambda x: x.state == 'done' and x.product_id == production.product_id)
-            qty_produced = production.product_id.uom_id._compute_quantity(sum(done_moves.mapped('product_qty')),
-                                                                          production.product_uom_id)
-            factor = production.product_uom_id._compute_quantity(production.product_qty - qty_produced,
-                                                                 production.bom_id.product_uom_id) / production.bom_id.product_qty
-            boms, lines = production.bom_id.explode(production.product_id, factor,
-                                                    picking_type=production.bom_id.picking_type_id)
-            if production.is_rework or production.is_multi_output:
-                for line in production.rework_material_line_ids:
-                    production.update_rework_material(line, production.product_qty)
-
-            else:
-                for line, line_data in lines:
-                    production._update_raw_move(line, line_data)
-            operation_bom_qty = {}
-            for bom, bom_data in boms:
-                for operation in bom.routing_id.operation_ids:
-                    operation_bom_qty[operation.id] = bom_data['qty']
-            self._update_product_to_produce(production, production.product_qty - qty_produced)
-            moves = production.move_raw_ids.filtered(lambda x: x.state not in ('done', 'cancel'))
-            moves.do_unreserve()
-            moves.action_assign()
-            for wo in production.workorder_ids:
-                operation = wo.operation_id
-                if operation_bom_qty.get(operation.id):
-                    cycle_number = math.ceil(
-                        operation_bom_qty[operation.id] / operation.workcenter_id.capacity)  # TODO: float_round UP
-                    wo.duration_expected = (operation.workcenter_id.time_start +
-                                            operation.workcenter_id.time_stop +
-                                            cycle_number * operation.time_cycle * 100.0 / operation.workcenter_id.time_efficiency)
-                if production.product_id.tracking == 'serial':
-                    quantity = 1.0
-                else:
-                    quantity = wo.qty_production - wo.qty_produced
-                    quantity = quantity if (quantity > 0) else 0
-                wo.qty_producing = quantity
-                if wo.qty_produced < wo.qty_production and wo.state == 'done':
-                    wo.state = 'progress'
-                # assign moves; last operation receive all unassigned moves
-                # TODO: following could be put in a function as it is similar as code in _workorders_create
-                # TODO: only needed when creating new moves
-                moves_raw = production.move_raw_ids.filtered(
-                    lambda move: move.operation_id == operation and move.state not in ('done', 'cancel'))
-                if wo == production.workorder_ids[-1]:
-                    moves_raw |= production.move_raw_ids.filtered(lambda move: not move.operation_id)
-                moves_finished = production.move_finished_ids.filtered(
-                    lambda move: move.operation_id == operation)  # TODO: code does nothing, unless maybe by_products?
-                moves_raw.mapped('move_lot_ids').write({'workorder_id': wo.id})
-                (moves_finished + moves_raw).write({'workorder_id': wo.id})
-                if wo.move_raw_ids.filtered(lambda x: x.product_id.tracking != 'none') and not wo.active_move_lot_ids:
-                    wo._generate_lot_ids()
-        return {}
-
-        # @api.multi
-        # def change_prod_qty(self):
-        #     # self.mo_id.write({'state': 'waiting_material'})
-        #     return super(ChangeProductionQty, self).change_prod_qty()
 
     def _generate_finished_moves(self):
         if self.is_multi_output:
@@ -244,13 +220,7 @@ class NewMrpProduction(models.Model):
                     'suggest_qty': self.product_qty,
                 }
                 moves.create(data)
-
-
-
-        else:
-            for bom_line, line_data in exploded_lines:
-                moves += self._generate_raw_move(bom_line, line_data)
-        return moves
+        return super(NewMrpProduction, self)._generate_raw_moves(exploded_lines)
 
     state = fields.Selection([
         ('draft', _('Draft')),
@@ -276,10 +246,14 @@ class NewMrpProduction(models.Model):
     @api.multi
     def _generate_moves(self):
         for production in self:
-            if production.state == 'draft' and production.is_multi_output:
-                return
+
+            production._compute_done_stock_move_lines(production)
             production._generate_finished_moves()
-            factor = 1
+            if production.bom_id:
+                factor = production.product_uom_id._compute_quantity(production.product_qty,
+                                                                     production.bom_id.product_uom_id) / production.bom_id.product_qty
+            else:
+                factor = 1
             boms, lines = production.bom_id.explode(production.product_id, factor,
                                                     picking_type=production.bom_id.picking_type_id)
             production._generate_raw_moves(lines)
@@ -288,15 +262,14 @@ class NewMrpProduction(models.Model):
             production.move_raw_ids.action_confirm()
         return True
 
-
-class MrpProductionMaterial(models.Model):
-    _name = 'mrp.production.material'
-    product_id = fields.Many2one('product.product', string=u'产品', required=True)
-    # total_produce_qty = fields.Float(string=u'累计产出数量')
-    produce_qty = fields.Float(string=u'产出数量')
-
-    mo_id = fields.Many2one('mrp.production', on_delete='cascade')
-    type = fields.Selection([
-        ('input', '输入'),
-        ('output', '输出')
-    ])
+# class MrpProductionMaterial(models.Model):
+#     _name = 'mrp.production.material'
+#     product_id = fields.Many2one('product.product', string=u'产品', required=True)
+#     # total_produce_qty = fields.Float(string=u'累计产出数量')
+#     produce_qty = fields.Float(string=u'产出数量')
+#
+#     mo_id = fields.Many2one('mrp.production', on_delete='cascade')
+#     type = fields.Selection([
+#         ('input', '输入'),
+#         ('output', '输出')
+#     ])
