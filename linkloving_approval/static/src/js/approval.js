@@ -29,13 +29,14 @@ odoo.define('linkloving_approval.approval_core', function (require){
             self.$("#approval_tab").attr("data-now-tab", approval_type);
 
             var model = new Model("approval.center");
-            return self.get_datas('product.attachment.info',approval_type);
+            return self.get_datas(this,'product.attachment.info',approval_type);
         },
 
         init: function (parent, action) {
             var self = this;
             self.begin = 1;
             self.limit = 15;
+            this.approval_type = null;
             this._super.apply(this, arguments);
             if (action.product_id) {
                 this.product_id = action.product_id;
@@ -110,28 +111,35 @@ odoo.define('linkloving_approval.approval_core', function (require){
 
                     this._limit = new_state.limit;
                     this.current_min = new_state.current_min;
-                    self.reload_content(this).then(function() {
-                        // Reset the scroll position to the top on page changed only
-                        if (!limit_changed) {
-                            self.set_scrollTop(0);
-                            self.trigger_up('scrollTo', {offset: 0});
-                        }
+                    self.reload_content(this).then(function () {
+                       // if (!limit_changed) {
+                        console.log(this)
+                        $('body').scrollTop(0);
+                            // this.set_scrollTop(0);
+                            // this.trigger_up('scrollTo', {offset: 0});
+                        // }
                     });
                 });
             }
         },
         reload_content : function (own) {
-            return own.get_datas('product.attachment.info', 'waiting_submit')
-            var approval_type = 'waiting_submit';
-            var model = new Model("approval.center");
-            return model.call("create", [{res_model: 'product.attachment.info', type: approval_type}])
-                .then(function (result) {
-                    model.call('get_attachment_info_by_type', [result,{offset:own.begin, limit:own.limit}])
-                        .then(function (result) {
-                            console.log(result);
-                            self.$("#"+approval_type).append(QWeb.render('approval_tab_content', {result:result}));
-                        })
-                })
+            var reloaded = $.Deferred();
+            console.log(this.approval_type)
+            var approval_type = own.approval_type[0][0];
+            own.get_datas(own,'product.attachment.info', approval_type);
+            reloaded.resolve();
+            return  reloaded.promise();
+            // var approval_type = own.approval_type[0][0];
+            // var model = new Model("approval.center");
+            // model.call("create", [{res_model: 'product.attachment.info', type: approval_type}])
+            //     .then(function (result) {
+            //         model.call('get_attachment_info_by_type', [result,{offset:own.begin, limit:own.limit}])
+            //             .then(function (result) {
+            //                 console.log(result);
+            //                 self.$("#"+approval_type).append(QWeb.render('approval_tab_content', {result:result}));
+            //             })
+            //     })
+            // return own
         },
         set_scrollTop:function(scrollTop) {
             this.scrollTop = scrollTop;
@@ -160,6 +168,8 @@ odoo.define('linkloving_approval.approval_core', function (require){
             //var info_model = new Model("product.attachment.info")
             model.call("fields_get", ["", ['type']]).then(function (result) {
                 console.log(result);
+                self.approval_type = result.type.selection;
+                console.log(self);
                 self.$el.append(QWeb.render('approval_load_detail', {result:result.type.selection}));
             });
 
