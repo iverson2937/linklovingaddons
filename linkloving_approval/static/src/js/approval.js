@@ -34,6 +34,7 @@ odoo.define('linkloving_approval.approval_core', function (require){
 
         init: function (parent, action) {
             var self = this;
+            self.flag = 1;
             self.begin = 1;
             self.limit = 15;
             this.approval_type = null;
@@ -45,81 +46,32 @@ odoo.define('linkloving_approval.approval_core', function (require){
             }
             //分页
             this.pager = null;
-            // this.render_pager();
-            // self.render_pager=function() {
-            //     var $node = $('<div/>').addClass('approval_pagination').appendTo($("#approval_tab"));
-            //     if (!this.pager) {
-            //         this.pager = new Pager(this, self.length, self.begin, self.limit);
-            //         this.pager.appendTo($node);
-            //
-            //         this.pager.on('pager_changed', this, function (new_state) {
-            //             var self = this;
-            //             var limit_changed = (this._limit !== new_state.limit);
-            //
-            //             this._limit = new_state.limit;
-            //             this.current_min = new_state.current_min;
-            //             self.reload_content().then(function() {
-            //                 // Reset the scroll position to the top on page changed only
-            //                 if (!limit_changed) {
-            //                     self.set_scrollTop(0);
-            //                     self.trigger_up('scrollTo', {offset: 0});
-            //                 }
-            //             });
-            //         });
-            //     }
-            // };
-            // self.reload_content = function () {
-            //     return self.get_datas('product.attachment.info', 'waiting_submit')
-            //     var approval_type = 'waiting_submit';
-            //     var model = new Model("approval.center");
-            //     return model.call("create", [{res_model: 'product.attachment.info', type: approval_type}])
-            //         .then(function (result) {
-            //             model.call('get_attachment_info_by_type', [result,{offset:self.begin, limit:self.limit}])
-            //                 .then(function (result) {
-            //                     console.log(result);
-            //                     self.$("#"+approval_type).append(QWeb.render('approval_tab_content', {result:result}));
-            //                 })
-            //         })
-            // };
-            // self.set_scrollTop=function(scrollTop) {
-            //     this.scrollTop = scrollTop;
-            // };
-            // self.get_datas = function (res_model,approval_type) {
-            //     var model = new Model("approval.center");
-            //     model.call("create", [{res_model: res_model, type: approval_type}])
-            //     .then(function (result) {
-            //         model.call('get_attachment_info_by_type', [result,{offset:self.begin, limit:self.limit}])
-            //             .then(function (result) {
-            //                 console.log(result.length);
-            //                 self.length = result.length;
-            //                 self.$("#"+approval_type).append(QWeb.render('approval_tab_content', {result:result}));
-            //                 self.render_pager();
-            //                 console.log($("#approval_tab"))
-            //             })
-            //     })
-            // };
         },
         render_pager:function() {
-            var $node = $('<div/>').addClass('approval_pagination').appendTo($("#approval_tab"));
-            if (!this.pager) {
-                this.pager = new Pager(this, this.length, this.begin, this.limit);
-                this.pager.appendTo($node);
+            console.log(this.flag);
+            if(this.flag==1){
+                var $node = $('<div/>').addClass('approval_pagination').appendTo($("#approval_tab"));
+                if (!this.pager) {
+                    this.pager = new Pager(this, this.length, this.begin, this.limit);
+                    this.pager.appendTo($node);
 
-                this.pager.on('pager_changed', this, function (new_state) {
-                    var self = this;
-                    var limit_changed = (this._limit !== new_state.limit);
+                    this.pager.on('pager_changed', this, function (new_state) {
+                        var self = this;
+                        var limit_changed = (this._limit !== new_state.limit);
 
-                    this._limit = new_state.limit;
-                    this.current_min = new_state.current_min;
-                    self.reload_content(this).then(function () {
-                       // if (!limit_changed) {
-                        console.log(this)
-                        $('body').scrollTop(0);
-                            // this.set_scrollTop(0);
-                            // this.trigger_up('scrollTo', {offset: 0});
-                        // }
+                        this._limit = new_state.limit;
+                        this.current_min = new_state.current_min;
+                        self.reload_content(this).then(function () {
+                           // if (!limit_changed) {
+                            console.log($("body"))
+                            $("#myTabContent_Approval").animate({"scrollTop": "200px"},100);
+                                // this.set_scrollTop(0);
+                                // this.trigger_up('scrollTo', {offset: 0});
+                            // }
+                        });
                     });
-                });
+                }
+                this.flag=2
             }
         },
         reload_content : function (own) {
@@ -129,17 +81,6 @@ odoo.define('linkloving_approval.approval_core', function (require){
             own.get_datas(own,'product.attachment.info', approval_type);
             reloaded.resolve();
             return  reloaded.promise();
-            // var approval_type = own.approval_type[0][0];
-            // var model = new Model("approval.center");
-            // model.call("create", [{res_model: 'product.attachment.info', type: approval_type}])
-            //     .then(function (result) {
-            //         model.call('get_attachment_info_by_type', [result,{offset:own.begin, limit:own.limit}])
-            //             .then(function (result) {
-            //                 console.log(result);
-            //                 self.$("#"+approval_type).append(QWeb.render('approval_tab_content', {result:result}));
-            //             })
-            //     })
-            // return own
         },
         set_scrollTop:function(scrollTop) {
             this.scrollTop = scrollTop;
@@ -150,11 +91,11 @@ odoo.define('linkloving_approval.approval_core', function (require){
             .then(function (result) {
                 model.call('get_attachment_info_by_type', [result,{offset:own.begin, limit:own.limit}])
                     .then(function (result) {
-                        console.log(result.length);
+                        // console.log(result.length);
                         own.length = result.length;
+                        self.$("#"+approval_type).html("");
                         self.$("#"+approval_type).append(QWeb.render('approval_tab_content', {result:result}));
                         own.render_pager(this);
-                        console.log($("#approval_tab"))
                     })
             })
         },
@@ -169,7 +110,7 @@ odoo.define('linkloving_approval.approval_core', function (require){
             model.call("fields_get", ["", ['type']]).then(function (result) {
                 console.log(result);
                 self.approval_type = result.type.selection;
-                console.log(self);
+                // console.log(self);
                 self.$el.append(QWeb.render('approval_load_detail', {result:result.type.selection}));
             });
 

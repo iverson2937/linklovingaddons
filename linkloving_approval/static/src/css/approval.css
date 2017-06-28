@@ -1,9 +1,10 @@
 .approval_page_container{
     width:80%;
     min-width: 900px;
-    margin:50px auto;
+    margin:0px auto;
     padding: 10px;
     background: white;
+    position: relative;
 }
 .approval_page_container .active>a{
     background-color: #337ab7!important;
@@ -66,6 +67,22 @@
     border:1px solid black;
     float: left;
     margin-bottom: 3px;
+}
+.approval_ul_wraper{
+    margin-bottom: 50px;
+    position: fixed;
+    z-index:1000000;
+    top:50px;
+    padding-top:40px;
+    background: white;
+    width: calc((100% - 219px)*0.78);
+    min-width: 880px;
+}
+#myTabContent_Approval{
+    margin-top: 100px;
+}
+.nav-tabs > li > a{
+    border: 1px solid #dddede;
 }
 
 .approval_page_container .tab_pane_display .tab_message_display>div{
