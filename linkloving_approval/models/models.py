@@ -16,8 +16,16 @@ class ApprovalCenter(models.TransientModel):
     res_model = fields.Char('Related Model', help='Model of the followed resource')
 
     def get_attachment_info_by_type(self, offset, limit):
-        attatchments = self.env[self.res_model].search([('create_uid', '=', self.env.user.id),
-                                                        ('state', '=', 'waiting_release')])
+        if self.type == 'waiting_submit':
+            attatchments = self.env[self.res_model].search([('create_uid', '=', self.env.user.id),
+                                                            ('state', '=', 'waiting_release')],
+                                                           limit=limit, offset=offset)
+        elif self.type == 'submitted':
+            pass
+        elif self.type == 'waiting_approval':
+            pass
+        elif self.type == 'approval':
+            pass
 
         attach_list = []
         for atta in attatchments:

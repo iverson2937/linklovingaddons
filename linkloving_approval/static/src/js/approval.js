@@ -89,7 +89,7 @@ odoo.define('linkloving_approval.approval_core', function (require){
             var model = new Model("approval.center");
             model.call("create", [{res_model: res_model, type: approval_type}])
             .then(function (result) {
-                model.call('get_attachment_info_by_type', [[result], {offset: own.begin, limit: own.limit}])
+                model.call('get_attachment_info_by_type', [result], {offset: own.begin, limit: own.limit})
                     .then(function (result) {
                         // console.log(result.length);
                         own.length = result.length;

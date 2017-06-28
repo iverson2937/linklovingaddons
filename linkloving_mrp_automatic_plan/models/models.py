@@ -21,12 +21,14 @@ class ll_auto_plan_kb(models.Model):
     count_confirm = fields.Integer(compute='_compute_count_confirm')
     count_inventory = fields.Integer(compute='_compute_count_inventory')
     count_waiting_file = fields.Integer(compute='_compute_count_waiting_file')
+
     @api.multi
     def _compute_count_waiting_file(self):
         for plan in self:
             if plan.type == 'waiting_file':
                 plan.count_waiting_file = len(
-                    self.env['purchase.order'].search([("waiting_file", '=', True), ('state', '=', 'purchase')]))
+                        self.env['purchase.order'].search(
+                                [("waiting_file", '=', True), ('state', 'in', ['purchase', 'done'])]))
 
     @api.multi
     def _compute_count_red(self):
@@ -66,7 +68,7 @@ class ll_auto_plan_kb(models.Model):
 
     @api.multi
     def get_waiting_file_po(self):
-        red = self.env['purchase.order'].search([("waiting_file", '=', True), ('state', '=', 'purchase')])
+        red = self.env['purchase.order'].search([("waiting_file", '=', True), ('state', 'in', ['purchase', 'done'])])
         return {
             'name': u'等待文件的订单',
             'type': 'ir.actions.act_window',
