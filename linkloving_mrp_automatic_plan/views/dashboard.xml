@@ -27,6 +27,7 @@
                     <field name="count_qc"/>
                     <field name="count_confirm"/>
                     <field name="count_inventory"/>
+                    <field name="count_waiting_file"/>
                     <templates>
                         <t t-name="kanban-box">
                             <div name="stock_picking">
@@ -120,6 +121,18 @@
                                                     <span>
                                                         <t t-esc="record.count_inventory.value"/>
                                                         待 入 库
+                                                    </span>
+                                                </button>
+                                            </div>
+                                        </t>
+                                        <t t-if="type == 'waiting_file'">
+                                            <div class="col-xs-4 col-md-4 o_kanban_primary_left">
+                                                <button class="btn btn-primary"
+                                                        name="get_waiting_file_po"
+                                                        type="object">
+                                                    <span>
+                                                        <t t-esc="record.count_waiting_file.value"/>
+                                                        等待文件
                                                     </span>
                                                 </button>
                                             </div>

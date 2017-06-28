@@ -20,6 +20,13 @@ class ll_auto_plan_kb(models.Model):
     count_qc = fields.Integer(compute='_compute_count_qc')
     count_confirm = fields.Integer(compute='_compute_count_confirm')
     count_inventory = fields.Integer(compute='_compute_count_inventory')
+    count_waiting_file = fields.Integer(compute='_compute_count_waiting_file')
+    @api.multi
+    def _compute_count_waiting_file(self):
+        for plan in self:
+            if plan.type == 'waiting_file':
+                plan.count_waiting_file = len(
+                    self.env['purchase.order'].search([("waiting_file", '=', True), ('state', '=', 'purchase')]))
 
     @api.multi
     def _compute_count_red(self):
@@ -56,9 +63,22 @@ class ll_auto_plan_kb(models.Model):
         for plan in self:
             plan.count_inventory = len(self.env["stock.picking"].search([("state", '=', 'waiting_in')]))
 
+
+    @api.multi
+    def get_waiting_file_po(self):
+        red = self.env['purchase.order'].search([("waiting_file", '=', True), ('state', '=', 'purchase')])
+        return {
+            'name': u'等待文件的订单',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'purchase.order',
+            'target': 'current',
+            'domain': [('id', 'in', red.ids)]}
+
     @api.multi
     def get_red_1(self):
-        red = self.env['purchase.order'].search([("status_light", '=', 3)])
+        red = self.env['purchase.order'].search([("status_light", '=', 3), ("state", '=', 'purchase')])
         self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].cal_po_light_status(red)
         return {
             'name': u'红',
@@ -70,7 +90,7 @@ class ll_auto_plan_kb(models.Model):
             'domain': [('id', 'in', red.ids)]}
 
     def get_green(self):
-        red = self.env['purchase.order'].search([("status_light", '=', 1)])
+        red = self.env['purchase.order'].search([("status_light", '=', 1), ("state", '=', 'purchase')])
         self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].cal_po_light_status(red)
         return {
             'name': u'绿',
@@ -82,7 +102,7 @@ class ll_auto_plan_kb(models.Model):
             'domain': [('id', 'in', red.ids)]}
 
     def get_yellow(self):
-        red = self.env['purchase.order'].search([("status_light", '=', 2)])
+        red = self.env['purchase.order'].search([("status_light", '=', 2), ("state", '=', 'purchase')])
         self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].cal_po_light_status(red)
         return {
             'name': u'黄',
@@ -213,7 +233,7 @@ class linkloving_mrp_automatic_plan(models.Model):
         #         pass
 
         if order_id:
-            sos = self.env["sale.order"].browse(order_id.id)
+            sos = order_id
         else:
             # sos = self.env["sale.order"].browse(order_id)
             sos = self.env["sale.order"].search([("state", '=', 'sale')])
@@ -250,14 +270,19 @@ class linkloving_mrp_automatic_plan(models.Model):
                             origin = ori.split(":")[1]
 
                             one_mo = mos.filtered(lambda x: x.name == origin)
-                            one_line.append(one_mo)
-                            node = one_mo
+                            if one_mo:
+                                need_break_after_while = False  # 如果有就不要跳出去了
+                                one_line.append(one_mo)
+                                node = one_mo
+                            else:
+                                need_break_after_while = True
                             if node in lv1_mo:
                                 break
                         else:
                             need_break_after_while = True
                             break
                     if need_break_after_while:
+                        lines.append(one_line)
                         break
 
                     if node in lv1_mo:
@@ -464,6 +489,7 @@ class PuchaseOrderEx(models.Model):
                                                              (1, '绿')], required=False,
                                     store=True)
 
+    waiting_file = fields.Boolean(string=u"是否等待文件", default=False)
     # @api.depends('state', 'handle_date', 'picking_ids.state')
     # def _compute_status_light(self):
     #     print("do compute status_light")

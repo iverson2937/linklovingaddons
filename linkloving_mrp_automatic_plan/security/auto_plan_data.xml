@@ -9,5 +9,9 @@
             <field name="name">入库单</field>
             <field name="type">stock_picking</field>
         </record>
+        <record id="waiting_file_type" model="auto.plan">
+            <field name="name">采购订单</field>
+            <field name="type">waiting_file</field>
+        </record>
     </data>
 </odoo>

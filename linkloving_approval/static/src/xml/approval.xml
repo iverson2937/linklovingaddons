@@ -7,17 +7,19 @@
         </div>
     </t>
     <t t-name="approval_load_detail">
-        <ul id="approval_tab" class="nav nav-tabs" data-now-tab="waiting_submit">
-           <t t-set="i" t-value="1"/>
-            <t t-foreach="result" t-as="item">
-                <li t-att-class="i ==1 ? 'active': ''">
-                    <a t-att-href="'#'+item[0]" data-toggle="tab" class="tab_toggle_a" t-att-data="item[0]">
-                         <t t-esc="item[1]"/>
-                    </a>
-                </li>
-                <t t-set="i" t-value="2"/>
-            </t>
-        </ul>
+        <div class="approval_ul_wraper">
+            <ul id="approval_tab" class="nav nav-tabs" data-now-tab="waiting_submit">
+               <t t-set="i" t-value="1"/>
+                <t t-foreach="result" t-as="item">
+                    <li t-att-class="i ==1 ? 'active': ''">
+                        <a t-att-href="'#'+item[0]" data-toggle="tab" class="tab_toggle_a" t-att-data="item[0]">
+                             <t t-esc="item[1]"/>
+                        </a>
+                    </li>
+                    <t t-set="i" t-value="2"/>
+                </t>
+            </ul>
+        </div>
 
         <div id="myTabContent_Approval" class="tab-content">
             <t t-set="j" t-value="1"/>

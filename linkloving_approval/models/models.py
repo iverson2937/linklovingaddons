@@ -15,7 +15,7 @@ class ApprovalCenter(models.TransientModel):
 
     res_model = fields.Char('Related Model', help='Model of the followed resource')
 
-    def get_attachment_info_by_type(self):
+    def get_attachment_info_by_type(self, offset, limit):
         attatchments = self.env[self.res_model].search([('create_uid', '=', self.env.user.id),
                                                         ('state', '=', 'waiting_release')])
 
@@ -24,8 +24,6 @@ class ApprovalCenter(models.TransientModel):
             attach_list.append(atta.convert_attachment_info())
         return attach_list
 
-    def fields_get(self, allfields=None, attributes=None):
-        return super(ApprovalCenter, self).fields_get(allfields, attributes)
     
 # class ProductAttachmentInfo(models.Model):
 #     _inherit = 'product.attachment.info'
