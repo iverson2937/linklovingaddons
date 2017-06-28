@@ -87,11 +87,12 @@ class ProductProduct(models.Model):
             'bom_id': self.product_tmpl_id.bom_ids[0].id
         }
 
-    @api.multi
-    def write(self, vals):
-        if 'RT-ENG' in self.name and not self.env.user.has_group('mrp.group_mrp_manager'):
-            raise UserError(u'只有库存管理员才可以修改基础物料')
-        return super(ProductProduct, self).write(vals)
+    # 由于选bom表的时候的bug 暂支取消
+    # @api.multi
+    # def write(self, vals):
+    #     if 'RT-ENG' in self.name and not self.env.user.has_group('mrp.group_mrp_manager'):
+    #         raise UserError(u'只有库存管理员才可以修改基础物料')
+    #     return super(ProductProduct, self).write(vals)
 
     @api.multi
     def unlink(self):
