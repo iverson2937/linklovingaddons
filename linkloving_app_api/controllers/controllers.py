@@ -140,6 +140,15 @@ class LinklovingAppApi(http.Controller):
             request.uid = request.session.uid
         # context = LinklovingAppApi.loadMenus()
         menu_data = LinklovingAppApi.loadMenus().get('children')
+        if menu_data:
+            menu_data = [{'id': 268,
+                          'name': "test",
+                          "parent_id": False,
+                          'sequence': 1,
+                          "web_icon": 0,
+                          "xml_name": "mrp.menu_mrp_production_action",
+                          "children": []
+                          }]
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=menu_data,jsonRequest=False)
 
     @classmethod
@@ -1250,18 +1259,15 @@ class LinklovingAppApi(http.Controller):
                     return_lines.append(obj.id)
 
                 return_material_model = request.env['mrp.return.material']
-                returun_material_obj = return_material_model.sudo().search(
-                        [('production_id', '=', order_id),
-                         ('state', '=', 'draft')])
-                if not returun_material_obj:  # 如果没生成过就生成一遍， 防止出现多条记录
-                    returun_material_obj = return_material_model.sudo().create({
-                        'production_id': mrp_production.id,
-                    })
+                returun_material_obj = return_material_model.sudo().search([('production_id', '=', order_id),
+                                                                            ])
+                returun_material_obj.unlink()
 
-                else:
-                    returun_material_obj.production_id = mrp_production.id
+                new_return_obj = return_material_model.sudo().create({
+                    'production_id': mrp_production.id,
+                })
 
-                returun_material_obj.return_ids = return_lines
+                new_return_obj.return_ids = return_lines
                 mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write(
                         {'state': 'waiting_warehouse_inspection'})
             else:
