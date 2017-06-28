@@ -13,3 +13,70 @@
     border:1px solid #dddede!important;
     color: #000;
 }
+.approval_page_container #myTabContent{
+    padding-top: 18px;
+}
+.approval_page_container .tab_message_display{
+    overflow: hidden;
+    width: 35%;
+}
+.approval_page_container .tab_message_display>div{
+    /*float: left;*/
+    margin-right: 30px;
+}
+.approval_page_container .tab_pane_display{
+    border: 1px solid #dddede;
+    padding: 10px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+.approval_page_container .tab_pane_display .document_review_list{
+    position: absolute;
+    top: 0px;
+    right: 90px;
+    padding: 10px;
+    padding-left: 60px;
+    /*background: pink;*/
+    width: 60%;
+    height:100%;
+}
+.approval_page_container .tab_pane_display .document_review_list>span{
+    width: 45px;
+    color: green;
+    float: left;
+    font-size: 36px;
+    margin-left: 8px;
+    /*margin-top: -2px;*/
+    display: block;
+    height: 32px;
+    margin-bottom: 3px;
+}
+.approval_page_container .tab_pane_display .document_review_list>.document_yellow{
+    color: darkorange!important;
+}
+.approval_page_container .tab_pane_display .document_review_list>.document_red{
+    color: red!important;
+}
+.approval_page_container .tab_pane_display .document_review_list>div{
+    padding-left: 3px;
+    padding-right: 3px;
+    line-height: 30px;
+    text-align: center;
+    border:1px solid black;
+    float: left;
+    margin-bottom: 3px;
+}
+
+.approval_page_container .tab_pane_display .tab_message_display>div{
+    margin-bottom: 8px;
+    margin-top: 8px;
+}
+.approval_page_container .tab_pane_display .document_btns{
+    position: absolute;
+    top: 7px;
+    right: 7px;
+}
+.approval_page_container .create_document{
+    margin-top: 18px;
+}
