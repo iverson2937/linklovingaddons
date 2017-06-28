@@ -80,3 +80,7 @@
 .approval_page_container .create_document{
     margin-top: 18px;
 }
+.approval_pagination{
+    width: 150px;
+    float: right;
+}
