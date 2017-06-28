@@ -47,7 +47,8 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//field[@name='mobile']" position="replace">
-                    <field name="mobile" required="0" invisible="1"/>
+                    <field name="mobile" required="0"
+                           attrs="{'invisible':[('customer','=',True),('is_company','=',True)]}"/>
                 </xpath>
                 <xpath expr="//field[@name='category_id']" position="before">
                     <field name="team_id"
@@ -67,8 +68,6 @@
                 <xpath expr="//field[@name='lang']" position="after">
                     <field name="level" attrs="{'invisible': [('customer','!=', True)]}"/>
                 </xpath>
-
-
 
 
                 <!--<xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='function']"-->
