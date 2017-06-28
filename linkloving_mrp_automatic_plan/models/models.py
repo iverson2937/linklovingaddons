@@ -233,7 +233,7 @@ class linkloving_mrp_automatic_plan(models.Model):
         #         pass
 
         if order_id:
-            sos = self.env["sale.order"].browse(order_id.id)
+            sos = order_id
         else:
             # sos = self.env["sale.order"].browse(order_id)
             sos = self.env["sale.order"].search([("state", '=', 'sale')])
@@ -271,15 +271,18 @@ class linkloving_mrp_automatic_plan(models.Model):
 
                             one_mo = mos.filtered(lambda x: x.name == origin)
                             if one_mo:
+                                need_break_after_while = False  # 如果有就不要跳出去了
                                 one_line.append(one_mo)
                                 node = one_mo
-
+                            else:
+                                need_break_after_while = True
                             if node in lv1_mo:
                                 break
                         else:
                             need_break_after_while = True
                             break
                     if need_break_after_while:
+                        lines.append(one_line)
                         break
 
                     if node in lv1_mo:
@@ -504,8 +507,8 @@ class SaleOrderEx(models.Model):
 
     @api.multi
     def read(self, fields=None, load='_classic_read'):
-        # if len(self) == 1 and load == '_classic_read':
-        # self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].calc_status_light(self)
+        if len(self) == 1 and load == '_classic_read':
+            self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].calc_status_light(self)
         return super(SaleOrderEx, self).read(fields, load)
 
 
