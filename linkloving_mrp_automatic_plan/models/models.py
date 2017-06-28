@@ -250,8 +250,10 @@ class linkloving_mrp_automatic_plan(models.Model):
                             origin = ori.split(":")[1]
 
                             one_mo = mos.filtered(lambda x: x.name == origin)
-                            one_line.append(one_mo)
-                            node = one_mo
+                            if one_mo:
+                                one_line.append(one_mo)
+                                node = one_mo
+
                             if node in lv1_mo:
                                 break
                         else:
