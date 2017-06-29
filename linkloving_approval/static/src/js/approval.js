@@ -17,7 +17,6 @@ odoo.define('linkloving_approval.approval_core', function (require){
         template:'approval_load_page',
         events:{
             'show.bs.tab .tab_toggle_a': 'approval_change_tabs',
-            // '':'render_pager'
         },
         //切换选项卡时重新渲染
         approval_change_tabs:function (e) {
@@ -25,7 +24,7 @@ odoo.define('linkloving_approval.approval_core', function (require){
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var approval_type = $(target).attr("data");
-            console.log(approval_type);
+            // console.log(approval_type);
             self.$("#approval_tab").attr("data-now-tab", approval_type);
 
             var model = new Model("approval.center");
@@ -48,7 +47,6 @@ odoo.define('linkloving_approval.approval_core', function (require){
             this.pager = null;
         },
         render_pager:function() {
-            console.log(this.flag);
             if(this.flag==1){
                 var $node = $('<div/>').addClass('approval_pagination').appendTo($("#approval_tab"));
                 if (!this.pager) {
@@ -63,8 +61,8 @@ odoo.define('linkloving_approval.approval_core', function (require){
                         this.current_min = new_state.current_min;
                         self.reload_content(this).then(function () {
                            // if (!limit_changed) {
-                            console.log($("body"))
-                            $("#myTabContent_Approval").animate({"scrollTop": "200px"},100);
+                            self.$el.animate({"scrollTop": "0px"},100);
+                            // $(".approval_page_container").offset({ top: 50})
                                 // this.set_scrollTop(0);
                                 // this.trigger_up('scrollTo', {offset: 0});
                             // }
@@ -76,7 +74,7 @@ odoo.define('linkloving_approval.approval_core', function (require){
         },
         reload_content : function (own) {
             var reloaded = $.Deferred();
-            console.log(this.approval_type)
+            // console.log(this.approval_type)
             var approval_type = own.approval_type[0][0];
             own.get_datas(own,'product.attachment.info', approval_type);
             reloaded.resolve();

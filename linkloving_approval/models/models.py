@@ -31,7 +31,9 @@ class ApprovalCenter(models.TransientModel):
         for atta in attatchments:
             attach_list.append(atta.convert_attachment_info())
         return attach_list
-
+    
+    def fields_get(self, allfields=None, attributes=None):
+        return super(ApprovalCenter, self).fields_get(allfields=allfields, attributes=attributes)
     
 # class ProductAttachmentInfo(models.Model):
 #     _inherit = 'product.attachment.info'
