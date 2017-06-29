@@ -220,7 +220,7 @@ class ProductAttachmentInfo(models.Model):
             'is_show_cancel': self.is_show_cancel,
             'is_first_review': self.is_first_review,
             'create_uid_name': self.create_uid.name,
-            'type': FILE_TYPE_DIC[self.type],
+            'type': FILE_TYPE_DIC.get(self.type or '') or '',
         }
 
     def get_download_filename(self):

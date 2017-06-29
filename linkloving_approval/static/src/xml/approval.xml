@@ -36,6 +36,8 @@
         <t t-foreach="result" t-as="item_files">
             <div class="tab_pane_display" t-att-data-id="item_files.id">
                 <div class="tab_message_display">
+                    <div class="approval_tab_pane_type"><t t-esc="item_files.type"/></div>
+                    <div>产品名字: <span t-att-product-id="item_files.product_id.id" class="approval_product_name"><t t-esc="item_files.product_id.name"/></span></div>
                     <div>文件：<span><t t-esc="item_files.file_name"/></span></div>
                     <div>审核人：<span><t t-esc="item_files.review_id"/></span></div>
                     <div>远程地址：<span><t t-esc="item_files.remote_path"/></span></div>

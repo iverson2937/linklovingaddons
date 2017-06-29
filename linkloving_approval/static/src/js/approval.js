@@ -19,6 +19,61 @@ odoo.define('linkloving_approval.approval_core', function (require){
             'show.bs.tab .tab_toggle_a': 'approval_change_tabs',
             'click .document_manage_btn': 'document_form_pop',
             'change .document_modify': 'document_modify_fn',
+            'click .approval_product_name':'product_pop',
+            'click .review_cancel':'cancel_approval'
+        },
+        //取消审核
+        cancel_approval:function (e) {
+            var tar = this;
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
+            var action = {
+                name: "填写取消审核原因",
+                type: 'ir.actions.act_window',
+                res_model: 'review.process.cancel.wizard',
+                view_type: 'form',
+                view_mode: 'tree,form',
+                views: [[false, 'form']],
+                context: {'default_product_attachment_info_id': parseInt(new_file_id)},
+                target: "new",
+            };
+            this.do_action(action);
+            self.$(document).ajaxComplete(function (event, xhr, settings) {
+                // "{"jsonrpc":"2.0","method":"call","params":{"model":"review.process.wizard","method":"search_read","args":[[["id","in",[10]]],["remark","partner_id","display_name","__last_update"]],"kwargs":{"context":{"lang":"zh_CN","tz":"Asia/Shanghai","uid":1,"default_product_attachment_info_id":"4","params":{},"bin_size":true,"active_test":false}}},"id":980816587}"
+                // console.log(settings)
+                var data = JSON.parse(settings.data)
+                if (data.params.model == 'review.process.cancel.wizard') {
+                    if (data.params.method == 'action_cancel_review') {
+                        var file_type = self.$("#approval_tab").attr("data-now-tab");
+                        var product_id = parseInt($("body").attr("data-product-id"));
+                        return new Model("product.template")
+                            .call("get_attachemnt_info_list", [product_id], {type: file_type})
+                            .then(function (result) {
+                                console.log(result);
+                                self.$("#" + file_type).html("");
+                                return tar.get_datas(tar,'product.attachment.info',file_type);
+                            })
+                    }
+                }
+            })
+        },
+        //点击产品名弹出框
+        product_pop:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var product_id = parseInt($(target).attr('product-id'));
+            var action = {
+                name:"产品详细",
+                type: 'ir.actions.act_window',
+                res_model:'product.template',
+                view_type: 'form',
+                view_mode: 'tree,form',
+                views: [[false, 'form']],
+                res_id: product_id,
+                target:"new"
+            };
+            this.do_action(action);
         },
         //文件修改
         document_modify_fn: function (e) {
@@ -146,7 +201,7 @@ odoo.define('linkloving_approval.approval_core', function (require){
             .then(function (result) {
                 model.call('get_attachment_info_by_type', [result], {offset: own.begin, limit: own.limit})
                     .then(function (result) {
-                        // console.log(result.length);
+                        console.log(result);
                         own.length = result.length;
                         self.$("#"+approval_type).html("");
                         self.$("#"+approval_type).append(QWeb.render('approval_tab_content', {result:result}));

@@ -20,6 +20,7 @@
 .approval_page_container .tab_message_display{
     overflow: hidden;
     width: 35%;
+    padding-top: 20px;
 }
 .approval_page_container .tab_message_display>div{
     /*float: left;*/
@@ -100,4 +101,18 @@
 .approval_pagination{
     width: 150px;
     float: right;
+}
+.approval_product_name{
+    cursor: pointer;
+    text-decoration: underline;
+}
+.approval_tab_pane_type{
+    padding: 2px;
+    color: white;
+    width: 50px;
+    text-align: center;
+    background: #337ab7;
+    position: absolute;
+    left:0;
+    top:0;
 }
