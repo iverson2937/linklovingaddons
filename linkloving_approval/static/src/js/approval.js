@@ -17,6 +17,62 @@ odoo.define('linkloving_approval.approval_core', function (require){
         template:'approval_load_page',
         events:{
             'show.bs.tab .tab_toggle_a': 'approval_change_tabs',
+            'click .document_manage_btn': 'document_form_pop',
+            'change .document_modify': 'document_modify_fn',
+        },
+        //文件修改
+        document_modify_fn: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            console.log($(target).parents(".tab_pane_display").children(".tab_message_display"));
+            $(target).parents(".tab_pane_display").children(".tab_message_display").prepend("<div class='document_modify_name'>新修改的文件：<span>" + target.files[0].name + "</span></div>");
+            $(".document_modify span").val(target.files[0].name);
+            var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
+            console.log(new_file_id);
+            console.log(target.files[0]);
+            var new_file = target.files[0];
+
+            var reader = new FileReader();
+            reader.readAsDataURL(new_file);
+            reader.onload = function () {
+                var encoded_file = reader.result;
+                var result = btoa(encoded_file);
+                return new Model("product.attachment.info")
+                    .call("update_attachment", [parseInt(new_file_id)], {file_binary: result, file_name: new_file.name})
+                    .then(function (result) {
+                    })
+            };
+        },
+        //审核操作
+        document_form_pop: function (e) {
+            var self = this;
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var file_id = $(target).attr("data-id");
+            var action = {
+                name: "详细",
+                type: 'ir.actions.act_window',
+                res_model: 'review.process.wizard',
+                view_type: 'form',
+                view_mode: 'tree,form',
+                views: [[false, 'form']],
+                context: {'default_product_attachment_info_id': file_id},
+                target: "new",
+            };
+            this.do_action(action);
+            self.$(document).ajaxComplete(function (event, xhr, settings) {
+                var data = JSON.parse(settings.data)
+                if (data.params.model == 'review.process.wizard') {
+                    if (data.params.method == 'action_to_next' ||
+                        data.params.method == 'action_pass' ||
+                        data.params.method == 'action_deny'
+                    ) {
+                        var approval_type = self.$("#approval_tab").attr("data-now-tab");
+                        // var product_id = parseInt($("body").attr("data-product-id"));
+                        return self.get_datas(this,'product.attachment.info',approval_type);
+                    }
+                }
+            })
         },
         //切换选项卡时重新渲染
         approval_change_tabs:function (e) {
