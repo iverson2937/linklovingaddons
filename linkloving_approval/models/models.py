@@ -4,8 +4,8 @@ from odoo import models, fields, api
 
 APPROVAL_TYPE = [('waiting_submit', '待提交'),
                  ('submitted', '已提交'),
-                 ('waiting_approval', '待审批'),
-                 ('approval', '已审批')]
+                 ('waiting_approval', '待我审批'),
+                 ('approval', '我已审批')]
 
 
 class ApprovalCenter(models.TransientModel):
@@ -21,11 +21,22 @@ class ApprovalCenter(models.TransientModel):
                                                             ('state', '=', 'waiting_release')],
                                                            limit=limit, offset=offset)
         elif self.type == 'submitted':
-            pass
+            attatchments = self.env[self.res_model].search([('create_uid', '=', self.env.user.id),
+                                                            (
+                                                            'state', 'not in', ['waiting_release', 'draft', 'cancel'])],
+                                                           limit=limit, offset=offset)
         elif self.type == 'waiting_approval':
-            pass
+            lines = self.env["review.process.line"].search([("state", '=', 'waiting_review'),
+                                                            ('partner_id', '=', self.env.user.partner_id.id)],
+                                                           limit=limit, offset=offset)
+            review_ids = lines.mapped("review_id")
+            attatchments = self.env[self.res_model].search([("review_id", "in", review_ids.ids)])
         elif self.type == 'approval':
-            pass
+            lines = self.env["review.process.line"].search([("state", 'not in', ['waiting_review', 'review_canceled']),
+                                                            ('partner_id', '=', self.env.user.partner_id.id)],
+                                                           limit=limit, offset=offset)
+            review_ids = lines.mapped("review_id")
+            attatchments = self.env[self.res_model].search([("review_id", "in", review_ids.ids)])
 
         attach_list = []
         for atta in attatchments:
