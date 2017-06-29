@@ -20,7 +20,16 @@ odoo.define('linkloving_approval.approval_core', function (require){
             'click .document_manage_btn': 'document_form_pop',
             'change .document_modify': 'document_modify_fn',
             'click .approval_product_name':'product_pop',
-            'click .review_cancel':'cancel_approval'
+            'click .review_cancel':'cancel_approval',
+            'click .document_download': 'document_download_fn'
+        },
+        //下载
+        document_download_fn:function () {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
+            // console.log(new_file_id)
+            window.location.href = '/download_file/?download=true&id=' + new_file_id;
         },
         //取消审核
         cancel_approval:function (e) {
