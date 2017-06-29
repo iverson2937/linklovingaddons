@@ -27,7 +27,7 @@
                                         <p t-field="o.bank_id.owner"/>
                                     </div>
                                     <div class="col-xs-2">
-                                        <strong>Account receivable:</strong>
+                                        <strong>银行账户:</strong>
                                         <p t-field="o.bank_id.acc_number"/>
                                     </div>
                                     <div class="col-xs-2">
@@ -121,16 +121,16 @@
                             </div>
 
                             <div class="col-xs-3">
-                                <strong>Manager:</strong>
+                                <strong>总经理:</strong>
                             </div>
                             <div class="col-xs-3">
-                                <strong>Accounting:</strong>
+                                <strong>财务:</strong>
                             </div>
                             <div class="col-xs-3">
-                                <strong>Supervisor:</strong>
+                                <strong>部门主管:</strong>
                             </div>
                             <div class="col-xs-3">
-                                <strong>Write by:</strong>
+                                <strong>制单人:</strong>
                                 <p t-field="o.create_uid.name"/>
                             </div>
 
