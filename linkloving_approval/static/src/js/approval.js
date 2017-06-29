@@ -45,7 +45,7 @@ odoo.define('linkloving_approval.approval_core', function (require){
         },
         //审核操作
         document_form_pop: function (e) {
-            var self = this;
+            var tar = this;
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var file_id = $(target).attr("data-id");
@@ -68,8 +68,9 @@ odoo.define('linkloving_approval.approval_core', function (require){
                         data.params.method == 'action_deny'
                     ) {
                         var approval_type = self.$("#approval_tab").attr("data-now-tab");
-                        // var product_id = parseInt($("body").attr("data-product-id"));
-                        return self.get_datas(this,'product.attachment.info',approval_type);
+                        self.$("#" + approval_type).html("");
+                        console.log(approval_type);
+                        return tar.get_datas(tar,'product.attachment.info',approval_type);
                     }
                 }
             })
@@ -157,7 +158,6 @@ odoo.define('linkloving_approval.approval_core', function (require){
 
         start: function () {
             var self = this;
-            // console.log($("body"))
 
             var model = new Model("approval.center");
             //var info_model = new Model("product.attachment.info")
@@ -167,8 +167,6 @@ odoo.define('linkloving_approval.approval_core', function (require){
                 // console.log(self);
                 self.$el.append(QWeb.render('approval_load_detail', {result:result.type.selection}));
             });
-
-
             return self.get_datas(this,'product.attachment.info', 'waiting_submit');
 
         }
