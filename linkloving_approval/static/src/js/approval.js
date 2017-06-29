@@ -91,7 +91,7 @@ odoo.define('linkloving_approval.approval_core', function (require){
         init: function (parent, action) {
             var self = this;
             self.flag = 1;
-            self.begin = 1;
+            self.begin = 0;
             self.limit = 15;
             this.approval_type = null;
             this._super.apply(this, arguments);

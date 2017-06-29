@@ -20,6 +20,7 @@ class ReviewProcess(models.Model):
     _name = 'review.process'
 
     @api.multi
+    @api.depends("review_line_ids")
     def _compute_who_review_now(self):
         for process in self:
             waiting_review_line = process.review_line_ids.filtered(lambda x: x.state == 'waiting_review')
@@ -41,7 +42,7 @@ class ReviewProcess(models.Model):
     res_id = fields.Integer('Related ID', index=True, help='Id of the followed resource')
     review_line_ids = fields.One2many("review.process.line", "review_id", string=u"审核过程")
 
-    who_review_now = fields.Many2one("res.partner", string=u'待...审核', compute="_compute_who_review_now")
+    who_review_now = fields.Many2one("res.partner", string=u'待...审核', compute="_compute_who_review_now", store=True)
     process_line_review_now = fields.Many2one("review.process.line", compute="_compute_process_line_review_now")
 
     @api.multi
@@ -56,15 +57,15 @@ class ReviewProcess(models.Model):
 
     # 开启一次审核流程
     def create_review_process(self, res_model, res_id):
+        line = self.env["review.process.line"].create({
+            'partner_id': self.env.user.partner_id.id,
+            'review_order_seq': 1,
+        })
         review_id = self.env["review.process"].create({
             'res_model': res_model,
             'res_id': res_id,
         })
-        self.env["review.process.line"].create({
-            'partner_id': self.env.user.partner_id.id,
-            'review_id': review_id.id,
-            'review_order_seq': 1,
-        })
+        line.review_id = review_id.id
         return review_id.id
 
     # 获得审核全流程
@@ -109,6 +110,13 @@ class ReviewProcessLine(models.Model):
                 or partner_id.id == self.env["final.review.partner"].get_final_review_partner_id().id:
             is_last_review = True
 
+        # 设置现有的这个审核条目状态等
+        self.write({
+            'review_time': fields.datetime.now(),
+            'state': 'review_success',
+            'remark': remark
+        })
+
         # 新建一个 审核条目 指向下一个审核人员
         self.env["review.process.line"].create({
             'partner_id': partner_id.id,
@@ -116,12 +124,6 @@ class ReviewProcessLine(models.Model):
             'last_review_line_id': self.id,
             'review_order_seq': self.review_order_seq + 1,
             'is_last_review': is_last_review,
-        })
-        # 设置现有的这个审核条目状态等
-        self.write({
-            'review_time': fields.datetime.now(),
-            'state': 'review_success',
-            'remark': remark
         })
 
     # 审核通过
