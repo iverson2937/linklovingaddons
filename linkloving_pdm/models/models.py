@@ -178,6 +178,17 @@ class ReviewProcessLine(models.Model):
             'review_order_seq': self.review_order_seq + 1,
         })
 
+
+FILE_TYPE = [('sip', 'SIP'),
+             ('sop', 'SOP'),
+             ('ipqc', 'IPQC'),
+             ('other', 'Other'),
+             ('design', 'Design')]
+FILE_TYPE_DIC = {'sip': 'SIP',
+                 'sop': 'SOP',
+                 'ipqc': 'IPQC',
+                 'other': 'Other',
+                 'design': 'Design'}
 class ProductAttachmentInfo(models.Model):
     _name = 'product.attachment.info'
 
@@ -193,6 +204,10 @@ class ProductAttachmentInfo(models.Model):
 
     def convert_attachment_info(self):
         return {
+            'product_id': {
+                'id': self.product_tmpl_id.id,
+                'name': self.product_tmpl_id.display_name,
+            },
             'id': self.id,
             'file_name': self.file_name or '',
             'review_id': self.review_id.who_review_now.name or '',
@@ -205,6 +220,7 @@ class ProductAttachmentInfo(models.Model):
             'is_show_cancel': self.is_show_cancel,
             'is_first_review': self.is_first_review,
             'create_uid_name': self.create_uid.name,
+            'type': FILE_TYPE_DIC[self.type],
         }
 
     def get_download_filename(self):
@@ -277,11 +293,7 @@ class ProductAttachmentInfo(models.Model):
                                 track_visibility='always',
                                 readonly=True, )
 
-    type = fields.Selection(string="类型", selection=[('sip', 'SIP'),
-                                                    ('sop', 'SOP'),
-                                                    ('ipqc', 'IPQC'),
-                                                    ('other', 'Other'),
-                                                    ('design', 'Design')], required=True, )
+    type = fields.Selection(string="类型", selection=FILE_TYPE, required=True, )
 
     @api.model
     def create(self, vals):
