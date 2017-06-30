@@ -58,7 +58,7 @@ class PurchaseOrderLine(models.Model):
                     mo_id = self.env['mrp.production'].sudo().search([('name', '=', s)])
                     for move_line in mo_id.sim_stock_move_lines:
                         if not mo_id.product_tmpl_id.product_variant_ids:
-                            raise UserError(u'此料号已经被归档')
+                            raise UserError(u'此料号已经被归档 %s') % mo_id.product_tmpl_id.name
 
 
                         if line.product_id.id == move_line.product_id.id:
