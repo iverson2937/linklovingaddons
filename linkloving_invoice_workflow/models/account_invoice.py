@@ -9,7 +9,7 @@ class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
     amount_total_o = fields.Monetary(string=u'Invoice Amount',
-                                     store=True, readonly=True, compute='_compute_amount', track_visibility='always')
+                                     store=True, readonly=True, track_visibility='always')
 
     @api.one
     def _get_po_number(self):
@@ -62,11 +62,11 @@ class AccountInvoice(models.Model):
                 line.price_unit_o = line.price_unit
                 amount_total_o += line.price_unit
             vals.update({'amount_total_o': amount_total_o})
-        deduct_amount = vals.get('deduct_amount')
-        if deduct_amount > (self.amount_total_o or vals.get('amount_total_o')):
-            raise UserError(_('Deduct Amount can not larger than Invoice Amount'))
-        if self.amount_total_o or vals.get('amount_total_o'):
-            rate = (deduct_amount if deduct_amount else 0.0)/ (self.amount_total_o or vals.get('amount_total_o'))
+        if 'deduct_amount' in vals:
+            deduct_amount = vals['deduct_amount']
+            if deduct_amount > (self.amount_total_o or vals.get('amount_total_o')):
+                raise UserError(_('Deduct Amount can not larger than Invoice Amount'))
+            rate = deduct_amount / (self.amount_total_o or vals.get('amount_total_o'))
             for line in self.invoice_line_ids:
                 if line.price_unit_o:
                     line.price_unit = line.price_unit_o * (1 - rate)
@@ -122,7 +122,7 @@ class AccountInvoiceLine(models.Model):
         sign = self.invoice_id.type in ['in_refund', 'out_refund'] and -1 or 1
         self.price_subtotal_signed = price_subtotal_signed * sign
 
-    @api.multi
+    @api.model
     def create(self, vals):
         """
         原始单价存起来
