@@ -14,25 +14,6 @@ class MrpProductionExtend(models.Model):
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
-
-    # @api.multi
-    # def write(self, vals):
-    #     if 'name' in vals and 'RT-ENG' in vals['name'] and not self.env.user.has_group('mrp.group_mrp_manager'):
-    #         raise UserError(u'只有库存管理员才可以修改基础物料')
-    #     return super(ProductTemplate, self).write(vals)
-    #
-    # @api.multi
-    # def unlink(self):
-    #     if 'RT-ENG' in self.name and not self.env.user.has_group('mrp.group_mrp_manager'):
-    #         raise UserError(u'只有库存管理员才可以删除基础物料')
-    #     return super(ProductTemplate, self).unlink()
-    #
-    # @api.model
-    # def create(self, vals):
-    #     if 'RT-ENG' in vals['name'] and not self.env.user.has_group('mrp.group_mrp_manager'):
-    #         raise UserError(u'只有库存管理员才可以创建基础物料')
-    #     return super(ProductTemplate, self).create(vals)
-
     @api.multi
     def bom_update(self):
         if not self.bom_ids:
