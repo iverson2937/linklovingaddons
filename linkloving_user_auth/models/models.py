@@ -2,14 +2,7 @@
 
 from odoo import models, fields, api
 
-# class linkloving_user_auth(models.Model):
-#     _name = 'linkloving_user_auth.linkloving_user_auth'
+class HrEmployeeExtend(models.Model):
+    _inherit = 'hr.employee'
 
-#     name = fields.Char()
-#     value = fields.Integer()
-#     value2 = fields.Float(compute="_value_pc", store=True)
-#     description = fields.Text()
-#
-#     @api.depends('value')
-#     def _value_pc(self):
-#         self.value2 = float(self.value) / 100
+    card_num = fields.Char(string=u"NFC卡号")

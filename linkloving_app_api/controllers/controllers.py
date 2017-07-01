@@ -727,11 +727,12 @@ class LinklovingAppApi(http.Controller):
 
     def get_worker_dict(self, worker):
         data = {
-            'name' : worker.name,
-            'worker_id' : worker.id,
-            'image' :self.get_worker_url(worker.id),
-            'barcode' : worker.barcode,
-            'job_name' : worker.job_id.name or '',
+            'name': worker.name,
+            'worker_id': worker.id,
+            'image': self.get_worker_url(worker.id),
+            'barcode': worker.barcode,
+            'job_name': worker.job_id.name or '',
+            'card_num': worker.card_num or '',
         }
         return data
 
@@ -2235,10 +2236,12 @@ class LinklovingAppApi(http.Controller):
     @classmethod
     def stock_picking_to_json(cls, stock_picking_obj):
         pack_list = []
+        move_lines = stock_picking_obj.move_lines
         for pack in stock_picking_obj.pack_operation_product_ids:
-            pack_list.append({
+
+            dic = {
                 'pack_id': pack.id,
-                'product_id':{
+                'product_id': {
                     'id': pack.product_id.id,
                     'name': pack.product_id.display_name,
                     'default_code': pack.product_id.default_code,
@@ -2248,17 +2251,20 @@ class LinklovingAppApi(http.Controller):
                         'area_name': pack.product_id.area_id.name or None,
                     }
                 },
-                'product_qty' : pack.product_qty,
-                'qty_done' : pack.qty_done,
-            })
+                'product_qty': pack.product_qty,
+                'qty_done': pack.qty_done,
+            }
+            if len(pack.linked_move_operation_ids) == 1:
+                dic["origin_qty"] = pack.linked_move_operation_ids.move_id.product_uom_qty
+            pack_list.append(dic)
 
         data = {
-            'picking_id' : stock_picking_obj.id,
+            'picking_id': stock_picking_obj.id,
             'complete_rate': stock_picking_obj.complete_rate,
             'has_attachment': LinklovingAppApi.is_has_attachment(stock_picking_obj.id, 'stock.picking'),
             'sale_note': stock_picking_obj.sale_id.remark,
             'delivery_rule': stock_picking_obj.delivery_rule or None,
-            'picking_type_code' : stock_picking_obj.picking_type_code,
+            'picking_type_code': stock_picking_obj.picking_type_code,
             'name': stock_picking_obj.name,
             'parnter_id': stock_picking_obj.partner_id.display_name,
             'phone': stock_picking_obj.partner_id.mobile or stock_picking_obj.partner_id.phone or '',

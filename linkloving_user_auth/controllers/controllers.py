@@ -22,6 +22,48 @@ class JsonResponse(object):
 
 
 class LinklovingUserAuth(http.Controller):
+    @http.route('/linkloving_user_auth/get_email_by_card_num', auth='none', type='json')
+    def get_email_by_card_num(self, **kw):
+        card_num = request.jsonrequest.get("card_num")
+        old_emplyee = request.env["hr.employee"].sudo().search([("card_num", "=", card_num)])
+        if old_emplyee:
+            return JsonResponse.send_response(STATUS_CODE_OK,
+                                              res_data=LinklovingUserAuth.hr_employee_to_json(old_emplyee))
+        else:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={"error": u'未找到对应的用户信息,请联系管理员%d' % len(old_emplyee)})
+
+    @http.route('/linkloving_user_auth/bind_nfc_card', auth='user', type='json')
+    def bind_nfc_card(self, **kw):
+        card_num = request.jsonrequest.get("card_num")
+        employee_id = request.jsonrequest.get("employee_id")
+        is_force = request.jsonrequest.get("is_force")
+        employee = request.env["hr.employee"].browse(employee_id)
+        old_emplyees = request.env["hr.employee"].search([("card_num", "=", card_num)])
+        if is_force:
+            old_emplyees.write({
+                'card_num': False
+            })
+            employee.card_num = card_num
+        else:
+            if employee and not old_emplyees:  # 没有强制 并且没有其他用户的话 就直接绑定
+                employee.card_num = card_num
+            else:
+                return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                                  res_data={"error": u"已绑定员工:%s, 是否强制绑定" % (old_emplyees.name)})
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingUserAuth.hr_employee_to_json(employee))
+
+    @http.route('/linkloving_user_auth/get_employee', auth='user', type='json')
+    def get_employee(self, **kw):
+        limit = request.jsonrequest.get("limit")
+        offset = request.jsonrequest.get("offset")
+        employees = request.env["hr.employee"].sudo().search([], limit=limit, offset=offset)
+        em_list = []
+        for em in employees:
+            em_list.append(LinklovingUserAuth.hr_employee_to_json(em))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=em_list)
+
     @http.route('/linkloving_user_auth/get_department_by_parent', auth='none', type='json')
     def get_department_by_parent(self, **kw):
         parent_id = request.jsonrequest.get("parent_id")
@@ -53,6 +95,7 @@ class LinklovingUserAuth(http.Controller):
     def hr_employee_to_json(cls, em):
         return {
             'employee_id': em.id,
-            'work_email': em.work_email,
+            'work_email': em.work_email or '',
             'name': em.name,
+            'card_num': em.card_num or '',
         }
