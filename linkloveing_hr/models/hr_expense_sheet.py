@@ -191,6 +191,8 @@ class HrExpenseSheet(models.Model):
 
         res = self.mapped('expense_line_ids').action_move_create()
         self.write({'state': 'post'})
+        if not self.accounting_date:
+            self.accounting_date = fields.date.today()
         return res
 
     @api.multi
