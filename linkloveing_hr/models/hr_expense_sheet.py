@@ -110,6 +110,12 @@ class HrExpenseSheet(models.Model):
         create_remark_comment(self, u'2级审核')
 
     @api.multi
+    def set_account_date(self):
+        sheet_ids=self.env['hr.expense.sheet'].search([('state','=','done'),('accounting_date','=',False)])
+        for sheet in sheet_ids:
+            sheet.accounting_date=sheet.write_date
+
+    @api.multi
     def hr_expense_sheet_post(self):
         for exp in self:
             if not exp.expense_line_ids:
