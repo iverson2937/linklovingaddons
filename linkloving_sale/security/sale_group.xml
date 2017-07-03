@@ -115,7 +115,7 @@
         <field name="groups" eval="[(4, ref('group_sale_salesman_follow_orders'))]"/>
     </record>
 
-        <record id="sale.sale_order_line_see_all" model="ir.rule">
+    <record id="all_orders" model="ir.rule">
         <field name="name">所有订单</field>
         <field ref="sale.model_sale_order" name="model_id"/>
         <field name="domain_force">
