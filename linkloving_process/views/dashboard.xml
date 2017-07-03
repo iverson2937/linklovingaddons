@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <record id="hr_timesheet_employee_extd_form" model="ir.ui.view">
-            <field name="name">hr.timesheet.employee.extd_form</field>
-            <field name="model">hr.employee</field>
-            <field name="inherit_id" ref="hr.view_employee_form"/>
-            <field name="arch" type="xml">
+        <!--<record id="hr_timesheet_employee_extd_form" model="ir.ui.view">-->
+        <!--<field name="name">hr.timesheet.employee.extd_form</field>-->
+        <!--<field name="model">hr.employee</field>-->
+        <!--<field name="inherit_id" ref="hr.view_employee_form"/>-->
+        <!--<field name="arch" type="xml">-->
 
-                <xpath expr="//field[@name='category_ids']" position="before">
-                    <group>
-                        <field name="is_in_charge"/>
-                    </group>
-                </xpath>
-            </field>
-        </record>
+        <!--<xpath expr="//field[@name='category_ids']" position="before">-->
+        <!--<group>-->
+        <!--<field name="is_in_charge"/>-->
+        <!--</group>-->
+        <!--</xpath>-->
+        <!--</field>-->
+        <!--</record>-->
 
         <record id="mrp_process_action" model="ir.actions.act_window">
             <field name="name">Dashboard</field>
