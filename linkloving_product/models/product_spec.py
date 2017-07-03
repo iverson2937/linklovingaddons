@@ -4,7 +4,9 @@ from odoo import models, fields, api
 
 
 class ProductSpecs(models.Model):
-    _name = 'product.specs'
+    _name = 'product.spec'
 
-    name = fields.Char(string=u'代码')
+    name = fields.Char(string=u'名称')
+    code = fields.Char(string=u'代码')
     categ_id = fields.Many2one('product.category')
+    is_sub = fields.Boolean(default=False)

@@ -20,13 +20,14 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['base', 'product', 'stock'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
         'views/product_category.xml',
-        'views/templates.xml',
+        'views/product_specs.xml',
+        'views/product_template.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

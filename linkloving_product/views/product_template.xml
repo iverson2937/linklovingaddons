@@ -1,0 +1,24 @@
+<odoo>
+    <data>
+        <!-- INHERITED FORM -->
+        <record id="product_template_form_inherit" model="ir.ui.view">
+            <field name="name">product.template.form.inherit</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='categ_id']" position="replace">
+
+                </xpath>
+
+
+                <xpath expr="//field[@name='default_code']" position="before">
+                    <field name="categ_id" options="{'no_create':True}"/>
+                    <field name="sub_spec_id" options="{'no_create':True}" domain="[('is_sub','=',True)]"/>
+                    <field name="spec_id" options="{'no_create':True}" domain="[('is_sub','=',False)]"/>
+                    <field name="partner_id"/>
+                </xpath>
+
+            </field>
+        </record>
+    </data>
+</odoo>

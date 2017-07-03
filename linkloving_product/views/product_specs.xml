@@ -1,0 +1,61 @@
+<odoo>
+    <data>
+
+        <!-- INHERITED FORM -->
+        <record id="product_spec_form" model="ir.ui.view">
+            <field name="name">product.category.form.inherit</field>
+            <field name="model">product.spec</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name" required="1"/>
+                            <field name="code" required="1"/>
+                            <field name="categ_id" options="{'no_create':True}" domain="[('code','!=',False)]"
+                                   string="产品类型"/>
+                        </group>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="product_spec_tree" model="ir.ui.view">
+            <field name="name">product.category.tree.inherit</field>
+            <field name="model">product.spec</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="categ_id" options="{'no_create':True}" string="产品类型"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="action_product_specs" model="ir.actions.act_window">
+            <field name="name">产品规格</field>
+            <field name="res_model">product.spec</field>
+            <field name="domain">[('is_sub','=',False)]</field>
+            <field name="view_type">form</field>
+        </record>
+
+        <record id="action_product_sub_category" model="ir.actions.act_window">
+            <field name="name">产品子类别</field>
+            <field name="res_model">product.spec</field>
+            <field name="domain">[('is_sub','=',True)]</field>
+            <field name="context">{'default_is_sub':True}</field>
+            <field name="view_type">form</field>
+        </record>
+        <menuitem action="action_product_sub_category" id="menu_action_product_sub_category"
+                  parent="stock.menu_product_in_config_stock"
+                  sequence="26"/>
+
+
+        <menuitem action="action_product_specs" id="menu_action_product_specs"
+                  parent="stock.menu_product_in_config_stock"
+                  sequence="27"/>
+
+
+    </data>
+</odoo>
