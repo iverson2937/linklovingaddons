@@ -3,7 +3,6 @@
  */
 odoo.define('linkloving_pdm.document_manage', function (require) {
     "use strict";
-
     var core = require('web.core');
     var Model = require('web.Model');
     var Widget = require('web.Widget');

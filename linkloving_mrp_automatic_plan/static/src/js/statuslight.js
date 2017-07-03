@@ -11,7 +11,7 @@ odoo.define('web.StatusLight', function (require) {
 
     var StatusLight = Column.extend({
         _format: function (row_data, options) {
-            console.log(row_data['status_light']["value"]);
+            // console.log(row_data['status_light']["value"]);
             //
             var value = row_data['status_light']["value"];
             var color = 'red'
@@ -26,7 +26,7 @@ odoo.define('web.StatusLight', function (require) {
             } else {
                 color = 'transparent'
             }
-            console.log(color);
+            // console.log(color);
             return _.template(
                 '<span class="fa fa-circle"  style="color:<%-value%>"></span>')({
                 value: color
@@ -51,7 +51,7 @@ odoo.define('web.StarLight', function (require) {
 
     var StarLight = Column.extend({
         _format: function (row_data, options) {
-            console.log(row_data['material_light']["value"]);
+            // console.log(row_data['material_light']["value"]);
             //
             var value = row_data['material_light']["value"];
             var color = 'red'
@@ -66,7 +66,7 @@ odoo.define('web.StarLight', function (require) {
             } else {
                 color = 'transparent'
             }
-            console.log(color);
+            // console.log(color);
             return _.template(
                 '<span class="fa fa-star"  style="color:<%-value%>"></span>')({
                 value: color
