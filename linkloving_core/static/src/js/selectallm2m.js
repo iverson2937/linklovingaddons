@@ -173,7 +173,7 @@ odoo.define('linkloving_core.selectallm2m', function (require){
                 result.records.push(record.attributes);
             });
 
-            //添加(全选)
+           //添加(全选)
            this.$current.find('th.o_group_name input:m2mcheckbox').closest('th').each(function () {
                var r = records.get($(this).data('id'));
                result.category_ids.push(r.get('id'));
