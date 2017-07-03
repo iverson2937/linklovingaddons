@@ -370,6 +370,8 @@ class MrpProductionExtend(models.Model):
     factory_remark = fields.Text(string=u"工厂备注", track_visibility='onchange')
 
     material_remark_id = fields.Many2one("material.remark", string=u"无法备料原因")
+    production_remark_id = fields.Many2one("material.remark", string=u"无法生产的原因")
+
     # @api.multi
     # def _compute_bom_remark(self):
     #     for production in self:
@@ -733,10 +735,14 @@ class MrpProductionExtend(models.Model):
         feedback_on_rework = self._context.get("feedback_on_rework")
 
         refuse = self._context.get("refuse")
-        if refuse:
+        if refuse == 'material':
             return [('material_remark_id', '!=', False),
                     ('state', 'in', ['waiting_material',
                                      'prepare_material_ing'])]
+        elif refuse == 'production':
+            return [('production_remark_id', '!=', False),
+                    ('state', 'in', ('finish_prepare_material', 'already_picking', 'progress'))]
+
         if state and state in ['finish_prepare_material', 'already_picking', 'waiting_rework',
                                'waiting_inventory_material']:
 
@@ -1676,11 +1682,15 @@ class ProductionScrap(models.Model):
 #     product_uom_id = fields.Many2one(
 #         'product.uom', 'Unit of Measure',
 #         required=True, states={'done': [('readonly', True)]})
+
+
 class MaterialRemark(models.Model):
     _name = 'material.remark'
 
     content = fields.Text(string="备注", required=True, )
-
+    type = fields.Selection(string=u"类型", selection=[('material', '备料反馈'), ('production', '生产反馈'), ],
+                            required=False,
+                            default='material')
     @api.multi
     def name_get(self):
         res = []

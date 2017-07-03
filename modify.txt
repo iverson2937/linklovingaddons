@@ -2,7 +2,9 @@
 1.
 
 #2017/05/09 去除代码 当MRP运算时,自动去保留调拨单
-/odoo-10.0/addons/stock/models/procurement.py  248行
+    /odoo-10.0/addons/stock/models/procurement.py  248行
+#级联删除po
+    /odoo-10/odoo/addons/purchase/models/purchase.py 822行
 
 #2017/07/03 修改search blur
-/odoo-10.0/addons/web/static/src/js/view/search_view.js
+    /odoo-10.0/addons/web/static/src/js/view/search_view.js
