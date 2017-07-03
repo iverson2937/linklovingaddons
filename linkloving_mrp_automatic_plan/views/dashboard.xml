@@ -38,16 +38,6 @@
                                                     <field name="name"/>
                                                 </a>
                                             </div>
-                                            <t t-set="type" t-value="record.type.value"/>
-                                            <t t-if="type == 'status_light'">
-                                                <button class="btn btn-primary pull-right"
-                                                        name="refresh_po"
-                                                        type="object">
-                                                    <span>
-                                                        重新计算状态
-                                                    </span>
-                                                </button>
-                                            </t>
                                             <div class="o_secondary">
                                             </div>
                                         </div>
@@ -61,49 +51,54 @@
                                     <div class="row">
                                         <t t-set="type" t-value="record.type.value"/>
                                         <t t-if="type == 'status_light'">
-                                            <div class="col-xs-4 col-md-4 o_kanban_primary_left">
+                                            <div class="col-xs-6 col-md-6 o_kanban_primary_left">
                                                 <button class="btn btn-primary"
-                                                        name="get_red_1"
+                                                        name="refresh_po"
                                                         type="object">
                                                     <span>
-                                                        <t t-esc="record.count_red.value"/>
-                                                        红
+                                                        重新计算状态
                                                     </span>
                                                 </button>
                                             </div>
-                                            <div class="col-xs-4 col-md-4 o_kanban_primary_left">
-                                                <button class="btn btn-primary"
-                                                        name="get_yellow"
+                                            <div class="col-md-6 col-xs-6 o_kanban_primary_right"
+                                                 style="min-height:150px">
+                                                <div class="row">
+                                                    <div class="col-xs-9">
+                                                        <a name="get_red_1"
                                                         type="object">
-                                                    <span>
-                                                        <t t-esc="record.count_yellow.value"/>
-                                                        黄
-                                                    </span>
-                                                </button>
-                                            </div>
-                                            <div class="col-xs-4 col-md-4 o_kanban_primary_left">
-                                                <button class="btn btn-primary"
-                                                        name="get_green"
+                                                            <i class="fa fa-circle" style="color:red"></i>
+                                                        </a>
+                                                    </div>
+                                                    <div class="col-xs-3">
+                                                        <field name="count_red"/>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-xs-9">
+                                                        <a name="get_yellow"
                                                         type="object">
-                                                    <span>
-                                                        <t t-esc="record.count_green.value"/>
-                                                        绿
-                                                    </span>
-                                                </button>
+                                                            <i class="fa fa-circle" style="color:yellow"></i>
+                                                        </a>
+                                                    </div>
+                                                    <div class="col-xs-3">
+                                                        <field name="count_yellow"/>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-xs-9">
+                                                        <a name="get_green"
+                                                           type="object">
+                                                            <i class="fa fa-circle" style="color:green"></i>
+                                                        </a>
+                                                    </div>
+                                                    <div class="col-xs-3">
+                                                        <field name="count_green"/>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </t>
                                         <t t-if="type == 'stock_picking'">
-                                            <div class="col-xs-4 col-md-4 o_kanban_primary_left">
-                                                <button class="btn btn-primary"
-                                                        name="get_stock_picking_qc"
-                                                        type="object">
-                                                    <span>
-                                                        <t t-esc="record.count_qc.value"/>
-                                                        品 检
-                                                    </span>
-                                                </button>
-                                                </div>
-                                            <div class="col-xs-4 col-md-4 o_kanban_primary_left">
+                                            <div class="col-xs-6 col-md-6 o_kanban_primary_left">
                                                 <button class="btn btn-primary"
                                                         name="get_stock_picking_purchase_confirm"
                                                         type="object">
@@ -114,15 +109,30 @@
                                                 </button>
                                             </div>
 
-                                            <div class="col-xs-4 col-md-4 o_kanban_primary_left">
-                                                <button class="btn btn-primary"
-                                                        name="get_stock_picking_inventory"
+                                            <div class="col-md-6 col-xs-6 o_kanban_primary_right"
+                                                 style="min-height:150px">
+                                                <div class="row">
+                                                    <div class="col-xs-9">
+                                                        <a name="get_stock_picking_qc"
                                                         type="object">
-                                                    <span>
-                                                        <t t-esc="record.count_inventory.value"/>
+                                                            品 检
+                                                        </a>
+                                                    </div>
+                                                    <div class="col-xs-3">
+                                                        <field name="count_qc"/>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-xs-9">
+                                                        <a name="get_stock_picking_inventory"
+                                                           type="object">
                                                         待 入 库
-                                                    </span>
-                                                </button>
+                                                        </a>
+                                                    </div>
+                                                    <div class="col-xs-3">
+                                                        <field name="count_inventory"/>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </t>
                                         <t t-if="type == 'waiting_file'">

@@ -1970,16 +1970,21 @@ class LinklovingAppApi(http.Controller):
             group.pop("__domain")
             if group.get("complete_rate") > 0 and group.get("complete_rate") < 100 or group.get("complete_rate") < 0:
                 complete_rate_count += group.get("complete_rate_count")
+            elif group.get("complete_rate") == False:
+                new_group.append({
+                    'complete_rate_count': group.get("complete_rate_count"),
+                    'complete_rate': -1,
+                })
             else:
                 new_group.append(group)
 
-        new_group.append({"complete_rate": complete_rate,
+        new_group.append({"complete_rate": complete_rate or -1,
                           "complete_rate_count": complete_rate_count})
         # group_complete[0].pop("__domain")
         group_done = {}
         if group_complete:
             group_done = group_complete[0]
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"complete_rate": new_group,
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"complete_rate": new_group or -1,
                                                                     "state": group_done})
 
     @http.route('/linkloving_app_api/do_unreserve_action', type='json', auth='none', csrf=False)
@@ -2117,6 +2122,9 @@ class LinklovingAppApi(http.Controller):
         picking_id = request.jsonrequest.get('picking_id')  # 订单id
 
         pack_operation_product_ids = request.jsonrequest.get('pack_operation_product_ids')  # 修改
+        for pacl in pack_operation_product_ids:
+            if pacl['pack_id'] == -1:
+                pack_operation_product_ids.pop(pacl)
         if not pack_operation_product_ids:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error': _("Pack Order not found")})
@@ -2254,13 +2262,33 @@ class LinklovingAppApi(http.Controller):
                 'product_qty': pack.product_qty,
                 'qty_done': pack.qty_done,
             }
-            if len(pack.linked_move_operation_ids) == 1:
-                dic["origin_qty"] = pack.linked_move_operation_ids.move_id.product_uom_qty
+            move_ids = pack.linked_move_operation_ids.mapped("move_id")
+            if len(move_ids) == 1:
+                dic["origin_qty"] = move_ids.product_uom_qty
+            if move_ids in move_lines:
+                move_lines -= move_ids
             pack_list.append(dic)
-
+        for move in move_lines:
+            dic = {
+                'pack_id': -1,
+                'product_id': {
+                    'id': move.product_id.id,
+                    'name': move.product_id.display_name,
+                    'default_code': move.product_id.default_code,
+                    'qty_available': move.product_id.qty_available,
+                    'area_id': {
+                        'area_id': move.product_id.area_id.id or None,
+                        'area_name': move.product_id.area_id.name or None,
+                    }
+                },
+                'product_qty': 0,
+                'qty_done': 0,
+                'origin_qty': move.product_uom_qty,
+            }
+            pack_list.append(dic)
         data = {
             'picking_id': stock_picking_obj.id,
-            'complete_rate': stock_picking_obj.complete_rate,
+            'complete_rate': stock_picking_obj.complete_rate or -1,
             'has_attachment': LinklovingAppApi.is_has_attachment(stock_picking_obj.id, 'stock.picking'),
             'sale_note': stock_picking_obj.sale_id.remark,
             'delivery_rule': stock_picking_obj.delivery_rule or None,
@@ -2491,9 +2519,12 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/create_material_remark', type='json', auth='none', csrf=False)
     def create_material_remark(self, **kw):
         content = request.jsonrequest.get("content")
-
+        remark_type = request.jsonrequest.get("type")
+        if not remark_type:
+            remark_type = 'material'
         remark = request.env["material.remark"].sudo().create({
             "content": content,
+            "type": remark_type,
         })
         all_remarks = request.env["material.remark"].sudo().search_read([])
         return JsonResponse.send_response(STATUS_CODE_OK,
@@ -2501,7 +2532,8 @@ class LinklovingAppApi(http.Controller):
 
     @http.route('/linkloving_app_api/get_material_remark', type='json', auth='none', csrf=False)
     def get_material_remark(self, **kw):
-        remarks = request.env["material.remark"].sudo().search_read([])
+        remark_type = request.jsonrequest.get("type")
+        remarks = request.env["material.remark"].sudo().search_read([("type", "=", remark_type)])
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=remarks)
 
@@ -2511,6 +2543,12 @@ class LinklovingAppApi(http.Controller):
         remark_id = request.jsonrequest.get("remark_id")
 
         order = request.env["mrp.production"].sudo().browse(order_id)
-        order.material_remark_id = remark_id
+        if order.state in ["waiting_material", "prepare_material_ing"]:
+            order.material_remark_id = remark_id
+        elif order.state in ["finish_prepare_material", "already_picking", "progress"]:
+            order.production_remark_id = remark_id
+        else:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={"error": u"该状态不能做此操作"})
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data={})
