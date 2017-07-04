@@ -1720,3 +1720,37 @@ class MaterialRemark(models.Model):
         for remark in self:
             res.append((remark.id, remark.content))
         return res
+
+
+class orderpoint_multi_create_wizard(models.TransientModel):
+    _name = 'orderpoint.multi.create.wizard'
+
+    min_qty = fields.Float(string=u"最小存货数量", default=0)
+    max_qty = fields.Float(string=u"最大存货数量", default=0)
+
+    @api.multi
+    def action_ok(self):
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+        products = self.env['product.template'].browse(active_ids)
+        pps = products.mapped("product_variant_id")
+        self.create_reorder_rule(pps, min_qty=self.min_qty, max_qty=self.max_qty)
+
+    def create_reorder_rule(self, pps, min_qty=0.0, max_qty=0.0, qty_multiple=1.0, overwrite=False):
+        swo_obj = self.env['stock.warehouse.orderpoint']
+        for rec in pps:
+            reorder_rules = swo_obj.search([('product_id', '=', rec.id)])
+            reorder_vals = {
+                'product_id': rec.id,
+                'product_min_qty': min_qty,
+                'product_max_qty': max_qty,
+                'qty_multiple': qty_multiple,
+                'active': True,
+                'product_uom': rec.uom_id.id,
+            }
+
+            if rec.type in ('product', 'consu') and not reorder_rules:
+                self.env['stock.warehouse.orderpoint'].create(reorder_vals)
+            elif rec.type in ('product', 'consu') and reorder_rules and overwrite:
+                for reorder_rule in reorder_rules:
+                    reorder_rule.write(reorder_vals)
