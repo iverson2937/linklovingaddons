@@ -6,7 +6,8 @@ odoo.define('web_gantt.GanttView', function (require) {
     var Model = require('web.DataModel');
     var formats = require('web.formats');
     var time = require('web.time');
-    var data = require('web.data')
+    var data = require('web.data');
+    var common = require('web.form_common');
 
     var _t = core._t;
     var _lt = core._lt;
@@ -87,7 +88,7 @@ odoo.define('web_gantt.GanttView', function (require) {
                 n_group_bys = group_bys;
             }
             // gather the fields to get
-            var fields = _.compact(_.map(["date_start", "date_delay", "date_stop", "progress"], function (key) {
+            var fields = _.compact(_.map(["date_start", "date_stop", "progress", "child_ids", "parent_ids"], function (key) {
                 return self.fields_view.arch.attrs[key] || '';
             }));
             fields = _.uniq(fields.concat(n_group_bys));
@@ -120,6 +121,7 @@ odoo.define('web_gantt.GanttView', function (require) {
             });
         },
         on_data_loaded_2: function (tasks, group_bys) {
+
             var self = this;
             //prevent more that 1 group by
             if (group_bys.length > 0) {
@@ -167,7 +169,14 @@ odoo.define('web_gantt.GanttView', function (require) {
                 }
                 var level = plevel || 0;
                 if (task.__is_group) {
-                    var task_infos = _.compact(_.map(task.tasks, function (sub_task) {
+                    var tasks = [];
+                    _.each(task.tasks, function(t){
+                       if(!t.parent_ids || t.parent_ids.length == 0){
+                           tasks.push(t);
+                       }
+                    });
+                    var task_infos = _.compact(_.map(tasks, function (sub_task) {
+                        sub_task.siblingTasks = task.tasks;
                         return generate_task_info(sub_task, level + 1);
                     }));
                     if (task_infos.length == 0)
@@ -193,7 +202,37 @@ odoo.define('web_gantt.GanttView', function (require) {
                         });
                         return {task_info: group, task_start: task_start, task_stop: task_stop};
                     }
-                } else {
+                } else if (task.child_ids && task.child_ids.length != 0) {
+                    var tasks = [];
+                    _.each(task.siblingTasks, function (sub_task) {
+                        if(contains(task.child_ids, sub_task.id)){
+                            tasks.push(sub_task);
+                        }
+                    });
+
+                    var task_infos = _.compact(_.map(tasks, function (sub_task) {
+                        sub_task.siblingTasks = task.siblingTasks;
+                        return generate_task_info(sub_task, level + 1);
+                    }));
+
+                    if (task_infos.length == 0)
+                        return;
+                    var task_start = _.reduce(_.pluck(task_infos, "task_start"), function (date, memo) {
+                        return memo === undefined || date < memo ? date : memo;
+                    }, undefined);
+                    var task_stop = _.reduce(_.pluck(task_infos, "task_stop"), function (date, memo) {
+                        return memo === undefined || date > memo ? date : memo;
+                    }, undefined);
+                    var duration = (task_stop.getTime() - task_start.getTime()) / (1000 * 60 * 60);
+                    var group_name = task.__name;
+
+                    var group = new GanttTaskInfo(_.uniqueId("gantt_project_task_"), group_name, task_start, duration || 1, percent);
+                    _.each(task_infos, function (el) {
+                        group.addChildTask(el.task_info);
+                    });
+                    return {task_info: group, task_start: task_start, task_stop: task_stop};
+                } else{
+
                     var task_name = task.__name;
                     var duration_in_business_hours = false;
                     var task_start = time.auto_str_to_date(task[self.fields_view.arch.attrs.date_start]);
@@ -218,6 +257,7 @@ odoo.define('web_gantt.GanttView', function (require) {
                         duration = (duration / 24) * 8;
                     }
                     var task_info = new GanttTaskInfo(id, task_name, task_start, (duration) || 1, percent);
+
                     task_info.internal_task = task;
                     task_ids[id] = task_info;
                     return {task_info: task_info, task_start: task_start, task_stop: task_stop};
@@ -225,11 +265,12 @@ odoo.define('web_gantt.GanttView', function (require) {
             }
 
             var gantt = new GanttChart();
-            _.each(_.compact(_.map(groups, function (e) {
-                return generate_task_info(e, 0);
+            _.each(_.compact(_.map(groups, function (e1) {
+                return generate_task_info(e1, 0);
             })), function (project) {
                 gantt.addProject(project);
             });
+
             gantt.setEditable(false);
             gantt.setImagePath("/web_gantt/static/lib/dhtmlxGantt/codebase/imgs/");
             gantt.attachEvent("onTaskEndDrag", function (task) {
@@ -286,7 +327,14 @@ odoo.define('web_gantt.GanttView', function (require) {
         on_task_display: function (task) {
             alert("on_task_display");
             var self = this;
-            var pop = new data.FormOpenPopup(self);
+
+            var pop = new common.FormViewDialog(self, {
+                res_model: self.node,
+                res_id: node_id,
+                context: self.context || self.dataset.context,
+                title: _t("Open: ") + self.title
+            }).open();
+
             pop.on('write_completed', self, self.reload);
             pop.show_element(
                 self.dataset.model,
@@ -311,6 +359,15 @@ odoo.define('web_gantt.GanttView', function (require) {
         },
     });
 
+    function contains(arr, obj) {
+        var index = arr.length;
+        while (index--) {
+            if (arr[index] === obj) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     var fields_view_get = function (args) {
         function postprocess(fvg) {

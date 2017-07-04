@@ -5059,6 +5059,7 @@ GanttTask.prototype.createTaskNameItem = function(hasChildren)
     if (hasChildren) divName.style.fontWeight = "bold";
     divName.className = "taskNameItem";
     divName.title = this.TaskInfo.Name;
+    // divName.innerHTML = '<span class="item">' + this.TaskInfo.Name + '</span>' + '<button>+</button>';
     divName.innerHTML = this.TaskInfo.Name;
     if (this.Chart.isShowConMenu)
     {
