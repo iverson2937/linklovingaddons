@@ -165,6 +165,12 @@ class AccountPayment(models.Model):
     account_id = fields.Many2one('account.account', domain=[('internal_type', '=', 'other')], string=u'收入科目')
 
     # origin = fields.Char(string=u'源单据')
+    @api.onchange('account_id')
+    def _onchange_account_id(self):
+        if self.move_line_ids:
+            for move in self.move_line_ids:
+                if move.account_id != self.journal_id.default_credit_account_id:
+                    move.account_id = self.account_id.id
 
     def set_to_done(self):
         if self.partner_type == 'customer' and not self.partner_id:
