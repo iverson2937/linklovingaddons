@@ -160,6 +160,28 @@ class ProductTemplateExtend(models.Model):
                 'search_default_bom_line_ids': self.default_code, }
         }
 
+    product_insufficient = fields.Boolean(compute='_compute_insufficient', store=True)
+
+    @api.depends('reordering_min_qty', 'qty_available')
+    def _compute_insufficient(self):
+
+        res = self._compute_quantities_dict()
+        ress = {k: {'nbr_reordering_rules': 0, 'reordering_min_qty': 0, 'reordering_max_qty': 0} for k in self.ids}
+        product_data = self.env['stock.warehouse.orderpoint'].read_group(
+            [('product_id.product_tmpl_id', 'in', self.ids)], ['product_id', 'product_min_qty', 'product_max_qty'],
+            ['product_id'])
+        for data in product_data:
+            product = self.env['product.product'].browse([data['product_id'][0]])
+            product_tmpl_id = product.product_tmpl_id.id
+            ress[product_tmpl_id]['reordering_min_qty'] = data['product_min_qty']
+
+        for products in self:
+            print res[products.id]['qty_available']
+            print ress[products.id]['reordering_min_qty']
+            print "完毕"
+            products.product_insufficient = True if res[products.id]['qty_available'] < ress[products.id][
+                'reordering_min_qty'] else False
+
 
 class StockMoveExtend(models.Model):
     _inherit = 'stock.move'
@@ -484,7 +506,6 @@ class MrpProductionExtend(models.Model):
         if self.state == 'waiting_material':
             self.write({'state': 'prepare_material_ing'})
         return {'type': 'ir.actions.empty'}
-
 
     # 备料完成
     def button_finish_prepare_material(self):
@@ -848,10 +869,10 @@ class ChangeProductionQty(models.TransientModel):
                 if wo.move_raw_ids.filtered(lambda x: x.product_id.tracking != 'none') and not wo.active_move_lot_ids:
                     wo._generate_lot_ids()
 
-        # @api.multi
-        # def change_prod_qty(self):
-        #     # self.mo_id.write({'state': 'waiting_material'})
-        #     return super(ChangeProductionQty, self).change_prod_qty()
+                    # @api.multi
+                    # def change_prod_qty(self):
+                    #     # self.mo_id.write({'state': 'waiting_material'})
+                    #     return super(ChangeProductionQty, self).change_prod_qty()
 
 
 class ConfirmProduction(models.TransientModel):
@@ -1201,7 +1222,7 @@ class ReturnMaterialLine(models.Model):
             return
         if len(self) > 0:
             boms, lines = self[0].return_id.production_id.bom_id.explode(self[0].return_id.production_id.product_id,
-                                                                     self[0].return_id.production_id.qty_produced)
+                                                                         self[0].return_id.production_id.qty_produced)
 
         scrap_env = self.env["production.scrap"]
         for line in self:
@@ -1674,6 +1695,7 @@ class ProductionScrap(models.Model):
             move = self.env["stock.move"].create(scrap._prepare_move_values())
             move.action_done()
 
+
 # class ProductionScrapLine(models.Model):
 #     _name = 'production.scrap.line'
 #
@@ -1691,6 +1713,7 @@ class MaterialRemark(models.Model):
     type = fields.Selection(string=u"类型", selection=[('material', '备料反馈'), ('production', '生产反馈'), ],
                             required=False,
                             default='material')
+
     @api.multi
     def name_get(self):
         res = []
