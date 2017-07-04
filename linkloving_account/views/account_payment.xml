@@ -51,6 +51,9 @@
                     <field name="account_id" options="{'no_create':True}"
                            attrs="{'invisible':[('partner_type','!=','other')],'required':[('partner_type','=','other')]}"/>
                 </xpath>
+                <xpath expr="//field[@name='partner_type']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('state','=','done')]}</attribute>
+                </xpath>
 
 
                 <xpath expr="//field[@name='state']" position="attributes">

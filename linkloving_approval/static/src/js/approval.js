@@ -113,6 +113,7 @@ odoo.define('linkloving_approval.approval_core', function (require){
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var file_id = $(target).attr("data-id");
+            var is_show_action_deny = $(target).attr("data-suibian");
             var action = {
                 name: "详细",
                 type: 'ir.actions.act_window',
@@ -120,7 +121,7 @@ odoo.define('linkloving_approval.approval_core', function (require){
                 view_type: 'form',
                 view_mode: 'tree,form',
                 views: [[false, 'form']],
-                context: {'default_product_attachment_info_id': file_id},
+                context: {'default_product_attachment_info_id': file_id, 'is_show_action_deny': is_show_action_deny},
                 target: "new",
             };
             this.do_action(action);

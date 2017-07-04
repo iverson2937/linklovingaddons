@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 
 from odoo import models, fields, api, _
 from odoo.tools.float_utils import float_is_zero
@@ -34,7 +35,6 @@ class linkloving_project_task(models.Model):
                 res[task.id]['progress'] = round(min(100.0 * hours.get(task.id, 0.0) / res[task.id]['total_hours'], 99.99),2)
         return res
 
-
     reviewer_id = fields.Many2one('res.users', string='Reviewer', select=True, track_visibility='onchange',
                                   default=lambda self: self.env.user)
     planed_level = fields.Selection(AVAILABLE_PRIORITIES, string=u'计划星级')
@@ -43,6 +43,11 @@ class linkloving_project_task(models.Model):
     parent_ids = fields.Many2many('project.task', 'project_task_parent_rel', 'task_id', 'parent_id', 'Parent Tasks')
     child_ids = fields.Many2many('project.task', 'project_task_parent_rel', 'parent_id', 'task_id', 'Delegated Tasks')
     work_ids = fields.One2many('project.task.work', 'task_id', 'Work done')
+
+    date_start = fields.Date(string='Starting Date',
+    default=fields.date.today(),
+    index=True, copy=False)
+    date_end = fields.Date(string='Ending Date', index=True, copy=False)
 
     task_progress = fields.Float(string='Progress (%)')
 

@@ -1973,18 +1973,18 @@ class LinklovingAppApi(http.Controller):
             elif group.get("complete_rate") == False:
                 new_group.append({
                     'complete_rate_count': group.get("complete_rate_count"),
-                    'complete_rate': -1,
+                    'complete_rate': 0,
                 })
             else:
                 new_group.append(group)
 
-        new_group.append({"complete_rate": complete_rate or -1,
+        new_group.append({"complete_rate": complete_rate or 0,
                           "complete_rate_count": complete_rate_count})
         # group_complete[0].pop("__domain")
         group_done = {}
         if group_complete:
             group_done = group_complete[0]
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"complete_rate": new_group or -1,
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"complete_rate": new_group or 0,
                                                                     "state": group_done})
 
     @http.route('/linkloving_app_api/do_unreserve_action', type='json', auth='none', csrf=False)
@@ -2288,7 +2288,7 @@ class LinklovingAppApi(http.Controller):
             pack_list.append(dic)
         data = {
             'picking_id': stock_picking_obj.id,
-            'complete_rate': stock_picking_obj.complete_rate or -1,
+            'complete_rate': stock_picking_obj.complete_rate or 0,
             'has_attachment': LinklovingAppApi.is_has_attachment(stock_picking_obj.id, 'stock.picking'),
             'sale_note': stock_picking_obj.sale_id.remark,
             'delivery_rule': stock_picking_obj.delivery_rule or None,
