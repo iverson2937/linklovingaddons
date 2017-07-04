@@ -64,8 +64,8 @@ class AccountInvoice(models.Model):
             vals.update({'amount_total_o': amount_total_o})
         if 'deduct_amount' in vals:
             deduct_amount = vals['deduct_amount']
-            if deduct_amount > (self.amount_total_o or vals.get('amount_total_o')):
-                raise UserError(_('Deduct Amount can not larger than Invoice Amount'))
+            # if deduct_amount > (self.amount_total_o or vals.get('amount_total_o')):
+            #     raise UserError(_('Deduct Amount can not larger than Invoice Amount'))
             rate = deduct_amount / (self.amount_total_o or vals.get('amount_total_o'))
             for line in self.invoice_line_ids:
                 if line.price_unit_o:
