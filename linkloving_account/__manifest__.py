@@ -26,6 +26,7 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'security/other_income_seq.xml',
         'views/payment_views.xml',
         'views/account_payment.xml',
         'views/account_invoice_views.xml',
@@ -38,7 +39,7 @@
         'views/account_employee.xml',
         'wizard/account_supplier_payment_wizard.xml',
         'report/report_payment_application.xml',
-        'report/report.xml'
+        'report/report.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

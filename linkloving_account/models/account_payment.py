@@ -162,14 +162,16 @@ class AccountPayment(models.Model):
     partner_id = fields.Many2one('res.partner', track_visibility='onchange')
     state = fields.Selection(selection_add=[('confirm', u'销售确认'), ('done', u'完成')], track_visibility='onchange')
     remark = fields.Text(string='备注')
+    account_id = fields.Many2one('account.account', domain=[('internal_type', '=', 'other')], string=u'收入科目')
 
     # origin = fields.Char(string=u'源单据')
 
     def set_to_done(self):
-        if not self.partner_id:
+        if self.partner_type == 'customer' and not self.partner_id:
             raise UserError(u'请填写客户')
-        for move in self.move_line_ids:
-            move.partner_id = self.partner_id
+        if self.partner_id:
+            for move in self.move_line_ids:
+                move.partner_id = self.partner_id
         self.state = 'done'
 
     @api.onchange('partner_type')
@@ -221,6 +223,7 @@ class AccountPayment(models.Model):
             sequence_code = 'account.payment.employee'
             if rec.payment_type == 'transfer':
                 sequence_code = 'account.payment.transfer'
+
             else:
                 if rec.partner_type == 'customer':
                     if rec.payment_type == 'inbound':
@@ -232,6 +235,8 @@ class AccountPayment(models.Model):
                         sequence_code = 'account.payment.supplier.refund'
                     if rec.payment_type == 'outbound':
                         sequence_code = 'account.payment.supplier.invoice'
+                elif rec.partner_type == 'other':
+                    sequence_code = 'account.payment.other'
             rec.name = self.env['ir.sequence'].with_context(ir_sequence_date=rec.payment_date).next_by_code(
                 sequence_code)
 
@@ -250,7 +255,7 @@ class AccountPayment(models.Model):
             for balance in rec.invoice_ids.balance_ids:
                 balance.state = 1
             state = 'posted'
-            if self._context.get('to_sales') and self.payment_type == 'inbound':
+            if self._context.get('to_sales') and self.partner_type == 'customer':
                 state = 'confirm'
             rec.write({'state': state, 'move_name': move.name})
 
@@ -261,3 +266,33 @@ class AccountPayment(models.Model):
         """
         state = self._context.get('state')
         return [('state', '=', state)]
+
+    def _get_counterpart_move_line_vals(self, invoice=False):
+        if self.payment_type == 'transfer':
+            name = self.name
+        else:
+            name = ''
+            if self.partner_type == 'customer':
+                if self.payment_type == 'inbound':
+                    name += _("Customer Payment")
+                elif self.payment_type == 'outbound':
+                    name += _("Customer Refund")
+            elif self.partner_type == 'supplier':
+                if self.payment_type == 'inbound':
+                    name += _("Vendor Refund")
+                elif self.payment_type == 'outbound':
+                    name += _("Vendor Payment")
+            if invoice:
+                name += ': '
+                for inv in invoice:
+                    if inv.move_id:
+                        name += inv.number + ', '
+                name = name[:len(name) - 2]
+
+        return {
+            'name': name,
+            'account_id': self.destination_account_id.id if self.destination_account_id else self.account_id.id,
+            'journal_id': self.journal_id.id,
+            'currency_id': self.currency_id != self.company_id.currency_id and self.currency_id.id or False,
+            'payment_id': self.id,
+        }
