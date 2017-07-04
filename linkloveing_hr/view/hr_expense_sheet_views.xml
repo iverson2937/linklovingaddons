@@ -18,8 +18,8 @@
                         <button name="to_do_journal_entry" states="approve" string="会计确认" type="object"
                                 context="{'employee_id':employee_id}"
                                 groups="account.group_account_user" class="oe_highlight o_expense_sheet_post"/>
-                        <button name="%(hr_expense.hr_expense_register_payment_wizard_action)d" type="action"
-                                string="Register Payment" class="oe_highlight o_expense_sheet_pay"
+                        <button name="register_payment_action" type="object"
+                                string="登记付款" class="oe_highlight o_expense_sheet_pay"
                                 attrs="{'invisible': [('state', '!=', 'post')]}"
                                 context="{'default_amount': total_amount, 'partner_id': address_id}"
                                 groups="account.group_account_user"/>

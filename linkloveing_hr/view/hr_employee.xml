@@ -17,20 +17,6 @@
         </record>
 
 
-        <!--next all code by me-->
-        <record model="ir.actions.act_window" id="factory_process_list_action">
-            <field name="name">factoryProcess</field>
-            <field name="res_model">hr.employee</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-            <field name="domain">[('is_in_charge','=',True)]</field>
-            <field name="context">{'default_is_in_charge':1}</field>
-            <field name="help" type="html">
-                <p class="oe_view_nocontent_create">Create the first course
-                </p>
-            </field>
-        </record>
-
         <record model="ir.actions.act_window" id="factory_operator_list_action">
             <field name="name">factoryOperator</field>
             <field name="res_model">hr.employee</field>
@@ -192,11 +178,6 @@
                 groups="hr.group_hr_manager"
                 sequence="90"/>
 
-        <menuitem id="menu_factory_process_header"
-                  name="Process Header"
-                  parent="menu_factory_resources_configuration"
-                  groups="hr.group_hr_manager"
-                  action="factory_process_list_action"/>
 
         <menuitem id="menu_factory_opeartor"
                   name="Factory Operator"

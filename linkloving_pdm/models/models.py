@@ -219,6 +219,7 @@ class ProductAttachmentInfo(models.Model):
             'is_able_to_use': self.is_able_to_use,
             'is_show_cancel': self.is_show_cancel,
             'is_first_review': self.is_first_review,
+            'is_show_action_deny': self.is_show_action_deny,
             'create_uid_name': self.create_uid.name,
             'type': FILE_TYPE_DIC.get(self.type or '') or '',
         }
@@ -263,6 +264,14 @@ class ProductAttachmentInfo(models.Model):
             if self.env.user.id == info.create_uid.id and info.state in ['draft', 'waiting_release', 'deny', 'cancel']:
                 info.is_first_review = True
 
+    @api.multi
+    def _compute_is_show_action_deny(self):
+        for info in self:
+            if info.create_uid.id == self.env.user.id and info.state in ['waiting_release', 'cancel', 'deny']:
+                info.is_show_action_deny = False
+            else:
+                info.is_show_action_deny = True
+
     is_first_review = fields.Boolean(compute='_compute_is_first_review')
     is_show_cancel = fields.Boolean(compute='_compute_is_show_cancel')
     file_name = fields.Char(u"文件名")
@@ -294,6 +303,7 @@ class ProductAttachmentInfo(models.Model):
                                 readonly=True, )
 
     type = fields.Selection(string="类型", selection=FILE_TYPE, required=True, )
+    is_show_action_deny = fields.Boolean(string=u'是否显示审核不通过', default=True, compute='_compute_is_show_action_deny')
 
     @api.model
     def create(self, vals):
@@ -498,7 +508,7 @@ class ReviewProcessWizard(models.TransientModel):
     review_process_line = fields.Many2one("review.process.line",
                                           related="product_attachment_info_id.review_id.process_line_review_now")
     remark = fields.Text(u"备注", required=True)
-
+    is_show_action_deny = fields.Boolean(default=True)
     # 送审
     def action_to_next(self):
         to_last_review = self._context.get("to_last_review")  # 是否送往终审
@@ -534,7 +544,10 @@ class ReviewProcessWizard(models.TransientModel):
         self.review_process_line.action_cancel(self.remark)
         self.product_attachment_info_id.action_cancel()
 
-
+    
+    @api.model
+    def create(self, vals):
+        return super(ReviewProcessWizard, self).create(vals)
 class FinalReviewPartner(models.Model):
     _name = 'final.review.partner'
 

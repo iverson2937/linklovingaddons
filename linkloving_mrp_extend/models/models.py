@@ -160,6 +160,28 @@ class ProductTemplateExtend(models.Model):
                 'search_default_bom_line_ids': self.default_code, }
         }
 
+    product_insufficient = fields.Boolean(compute='_compute_insufficient', store=True)
+
+    @api.depends('reordering_min_qty', 'qty_available')
+    def _compute_insufficient(self):
+
+        res = self._compute_quantities_dict()
+        ress = {k: {'nbr_reordering_rules': 0, 'reordering_min_qty': 0, 'reordering_max_qty': 0} for k in self.ids}
+        product_data = self.env['stock.warehouse.orderpoint'].read_group(
+            [('product_id.product_tmpl_id', 'in', self.ids)], ['product_id', 'product_min_qty', 'product_max_qty'],
+            ['product_id'])
+        for data in product_data:
+            product = self.env['product.product'].browse([data['product_id'][0]])
+            product_tmpl_id = product.product_tmpl_id.id
+            ress[product_tmpl_id]['reordering_min_qty'] = data['product_min_qty']
+
+        for products in self:
+            print res[products.id]['qty_available']
+            print ress[products.id]['reordering_min_qty']
+            print "完毕"
+            products.product_insufficient = True if res[products.id]['qty_available'] < ress[products.id][
+                'reordering_min_qty'] else False
+
 
 class StockMoveExtend(models.Model):
     _inherit = 'stock.move'
@@ -370,6 +392,8 @@ class MrpProductionExtend(models.Model):
     factory_remark = fields.Text(string=u"工厂备注", track_visibility='onchange')
 
     material_remark_id = fields.Many2one("material.remark", string=u"无法备料原因")
+    production_remark_id = fields.Many2one("material.remark", string=u"无法生产的原因")
+
     # @api.multi
     # def _compute_bom_remark(self):
     #     for production in self:
@@ -482,7 +506,6 @@ class MrpProductionExtend(models.Model):
         if self.state == 'waiting_material':
             self.write({'state': 'prepare_material_ing'})
         return {'type': 'ir.actions.empty'}
-
 
     # 备料完成
     def button_finish_prepare_material(self):
@@ -733,10 +756,14 @@ class MrpProductionExtend(models.Model):
         feedback_on_rework = self._context.get("feedback_on_rework")
 
         refuse = self._context.get("refuse")
-        if refuse:
+        if refuse == 'material':
             return [('material_remark_id', '!=', False),
                     ('state', 'in', ['waiting_material',
                                      'prepare_material_ing'])]
+        elif refuse == 'production':
+            return [('production_remark_id', '!=', False),
+                    ('state', 'in', ('finish_prepare_material', 'already_picking', 'progress'))]
+
         if state and state in ['finish_prepare_material', 'already_picking', 'waiting_rework',
                                'waiting_inventory_material']:
 
@@ -842,10 +869,10 @@ class ChangeProductionQty(models.TransientModel):
                 if wo.move_raw_ids.filtered(lambda x: x.product_id.tracking != 'none') and not wo.active_move_lot_ids:
                     wo._generate_lot_ids()
 
-        # @api.multi
-        # def change_prod_qty(self):
-        #     # self.mo_id.write({'state': 'waiting_material'})
-        #     return super(ChangeProductionQty, self).change_prod_qty()
+                    # @api.multi
+                    # def change_prod_qty(self):
+                    #     # self.mo_id.write({'state': 'waiting_material'})
+                    #     return super(ChangeProductionQty, self).change_prod_qty()
 
 
 class ConfirmProduction(models.TransientModel):
@@ -1195,7 +1222,7 @@ class ReturnMaterialLine(models.Model):
             return
         if len(self) > 0:
             boms, lines = self[0].return_id.production_id.bom_id.explode(self[0].return_id.production_id.product_id,
-                                                                     self[0].return_id.production_id.qty_produced)
+                                                                         self[0].return_id.production_id.qty_produced)
 
         scrap_env = self.env["production.scrap"]
         for line in self:
@@ -1668,6 +1695,7 @@ class ProductionScrap(models.Model):
             move = self.env["stock.move"].create(scrap._prepare_move_values())
             move.action_done()
 
+
 # class ProductionScrapLine(models.Model):
 #     _name = 'production.scrap.line'
 #
@@ -1676,10 +1704,15 @@ class ProductionScrap(models.Model):
 #     product_uom_id = fields.Many2one(
 #         'product.uom', 'Unit of Measure',
 #         required=True, states={'done': [('readonly', True)]})
+
+
 class MaterialRemark(models.Model):
     _name = 'material.remark'
 
     content = fields.Text(string="备注", required=True, )
+    type = fields.Selection(string=u"类型", selection=[('material', '备料反馈'), ('production', '生产反馈'), ],
+                            required=False,
+                            default='material')
 
     @api.multi
     def name_get(self):
@@ -1687,3 +1720,37 @@ class MaterialRemark(models.Model):
         for remark in self:
             res.append((remark.id, remark.content))
         return res
+
+
+class orderpoint_multi_create_wizard(models.TransientModel):
+    _name = 'orderpoint.multi.create.wizard'
+
+    min_qty = fields.Float(string=u"最小存货数量", default=0)
+    max_qty = fields.Float(string=u"最大存货数量", default=0)
+
+    @api.multi
+    def action_ok(self):
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+        products = self.env['product.template'].browse(active_ids)
+        pps = products.mapped("product_variant_id")
+        self.create_reorder_rule(pps, min_qty=self.min_qty, max_qty=self.max_qty)
+
+    def create_reorder_rule(self, pps, min_qty=0.0, max_qty=0.0, qty_multiple=1.0, overwrite=False):
+        swo_obj = self.env['stock.warehouse.orderpoint']
+        for rec in pps:
+            reorder_rules = swo_obj.search([('product_id', '=', rec.id)])
+            reorder_vals = {
+                'product_id': rec.id,
+                'product_min_qty': min_qty,
+                'product_max_qty': max_qty,
+                'qty_multiple': qty_multiple,
+                'active': True,
+                'product_uom': rec.uom_id.id,
+            }
+
+            if rec.type in ('product', 'consu') and not reorder_rules:
+                self.env['stock.warehouse.orderpoint'].create(reorder_vals)
+            elif rec.type in ('product', 'consu') and reorder_rules and overwrite:
+                for reorder_rule in reorder_rules:
+                    reorder_rule.write(reorder_vals)

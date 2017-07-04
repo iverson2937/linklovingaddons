@@ -74,7 +74,7 @@
                 </div>
                 <div class="document_btns">
                     <t t-if="item_files.has_right_to_review == true || item_files.is_first_review == true">
-                        <button class="btn btn-primary document_manage_btn" t-att-data-id="item_files.id">审核操作</button>
+                        <button class="btn btn-primary document_manage_btn" t-att-data-suibian="item_files.is_show_action_deny" t-att-data-id="item_files.id">审核操作</button>
                     </t>
                     <t t-if="item_files.state[0] == 'draft' || item_files.state[0] == 'waiting_release'||item_files.state[0] == 'deny'||item_files.state[0]=='cancel' ">
                         <a href="javascript:;" class="document_modify_wraper">文件修改

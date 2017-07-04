@@ -14,7 +14,7 @@ class MrpProcess(models.Model):
     description = fields.Text(string=u'Description')
     unit_price = fields.Float(string=u'Price Unit')
     partner_id = fields.Many2one('res.partner', string=u'Responsible By',
-                                 domain="[('is_in_charge','=',True)]")
+                                 )
     hour_price = fields.Float(string=u'Price Per Hour')
     color = fields.Integer("Color Index")
     count_mo_waiting = fields.Integer(compute='_compute_process_count')

@@ -1,0 +1,18 @@
+<odoo>
+    <data>
+
+
+        <!-- INHERITED FORM -->
+        <record id="stock_config_settings_inherit" model="ir.ui.view">
+            <field name="name">product.category.form.inherit</field>
+            <field name="model">product.category</field>
+            <field name="inherit_id" ref="product.product_category_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='parent_id']" position="after">
+                    <field name="code"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -28,7 +28,6 @@
         'views/mrp_process.xml',
         'views/mrp_bom.xml',
         'views/mrp_production.xml',
-        'views/hr_employee.xml',
         'views/dashboard.xml',
         'wizard/mrp_production_query_wizard.xml',
         'wizard/mrp_production_plan_wizard.xml'
