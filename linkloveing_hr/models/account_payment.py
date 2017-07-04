@@ -7,7 +7,7 @@ from odoo.exceptions import UserError
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
     # other 财务专用收入
-    partner_type = fields.Selection(selection_add=[('employee', 'Employee'), ('other', 'Other')])
+    partner_type = fields.Selection(selection_add=[('employee', u'员工'), ('other', u'其他')])
     receive_account_id = fields.Many2one('account.account')
 
     @api.one
