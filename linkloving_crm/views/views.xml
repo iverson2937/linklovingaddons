@@ -47,7 +47,7 @@
 
                 <xpath expr="//page[@name='extra']" position="after">
                     <page string="产品">
-                        <field name="interested_in_product" domain="[('sale_ok','=',True)]"
+                        <field name="interested_in_product" domain="[('sale_ok','=',True)]" widget="many2many_kanban"
                                context="{'search_default_rteng':1,'search_default_filter_categ_id':1}"/>
                     </page>
                 </xpath>
@@ -55,6 +55,20 @@
 
             </field>
         </record>
+
+
+        <!--<record id="linkloving_crm_partner_tree" model="ir.ui.view">-->
+        <!--<field name="name">res.partner.tree.crm</field>-->
+        <!--<field name="model">res.partner</field>-->
+        <!--<field name="inherit_id" ref="base.view_partner_tree"/>-->
+        <!--<field name="arch" type="xml">-->
+
+        <!--<xpath expr="//field[@name='display_name']" position="after">-->
+        <!--<field name="priority" string="自己测试星级" widget="nmd"/>-->
+        <!--</xpath>-->
+
+        <!--</field>-->
+        <!--</record>-->
 
 
         <record model="ir.ui.view" id="view_remark_record_form">
@@ -286,6 +300,9 @@
                 <xpath expr="//filter[@name='consumable']" position="after">
                     <separator/>
                     <filter string="RT-ENG" name="rteng" domain="[('name','ilike', 'RT-ENG')]"/>
+                    <separator/>
+                    <filter string="库存不足" domain="[('product_insufficient','=',True)]"/>
+                    <separator/>
                 </xpath>
             </field>
         </record>
