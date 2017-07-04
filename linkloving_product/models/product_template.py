@@ -34,7 +34,7 @@ class ProductTemplate11(models.Model):
                 if not versions:
                     final_version = 'B'
                 else:
-                    final_version = max(versions + 1)
+                    final_version = chr(max(versions) + 1)
             full_code = '.'.join([categ_code, full_specs, version1, final_version])
             self.default_code = full_code
 
@@ -47,7 +47,7 @@ class ProductTemplate11(models.Model):
                 versions = []
                 for product in products:
                     versions.append(product.default_code.split('.')[-1])
-                version1 = max(versions + 1)
+                version1 = str(max(versions) + 1)
             full_code = '.'.join([categ_code, full_specs, version1])
             self.default_code = full_code
 
