@@ -130,7 +130,7 @@ class linkloving_project_task(models.Model):
         return {'value': {'remaining_hours': self.planned_hours - self.effective_hours}}
 
     @api.onchange('user_id')
-    def onchange_user_id(self,  user_id):
+    def onchange_user_id(self):
         vals = {}
         if self.user_id:
             vals['date_start'] = fields.datetime.now()
