@@ -66,13 +66,13 @@
         <record id="project.act_project_project_2_project_task_all" model="ir.actions.act_window">
             <field name="name">Tasks</field>
             <field name="res_model">project.task</field>
-            <field name="view_mode">kanban,tree,form,calendar,pivot,gantt</field>
+            <field name="view_mode">kanban,tree,form,calendar,pivot</field>
             <field name="context">{
                 'group_by': 'stage_id',
                 'search_default_project_id': [active_id],
                 'default_project_id': active_id,
             }</field>
-            <field name="domain">[]</field>
+            <field name="domain">[('parent_ids','=',False)]</field>
             <field name="search_view_id" ref="project.view_task_search_form"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
@@ -309,7 +309,7 @@
             <field name="arch" type="xml">
                 <form string="Project">
                     <header>
-                        <field name="stage_id" widget="statusbar" clickable="True"
+                        <field name="stage_id" widget="statusbar" readonly="1" clickable="true"
                                options="{'fold_field': 'fold'}"/>
                     </header>
                     <sheet string="Task">
@@ -374,19 +374,16 @@ s
                             </page>
                             <!--groups="group_delegate_task"-->
                             <page string="Delegation">
-                                <button name="%(action_project_task_delegate)d" string="Delegate" type="action"/>
-                                <separator string="Parent Tasks"/>
-                                <field name="parent_ids"/>
                                 <separator string="Delegated tasks"/>
                                 <field name="child_ids">
                                     <tree string="Delegated tasks">
                                         <field name="name"/>
                                         <field name="user_id"/>
                                         <field name="stage_id"/>
-                                        <field name="effective_hours" widget="float_time"/>
-                                        <field name="progress" widget="progressbar"/>
-                                        <field name="remaining_hours" widget="float_time"/>
-                                        <field name="date_deadline"/>
+                                        <!--<field name="effective_hours" widget="float_time"/>-->
+                                        <field name="task_progress" widget="progressbar"/>
+                                        <field name="date_end" />
+                                        <!--<field name="remaining_hours" widget="float_time"/>-->
                                     </tree>
                                 </field>
                             </page>

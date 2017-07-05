@@ -2844,6 +2844,7 @@ GanttChart.prototype.create = function(_content)
     });
 
     //create Table
+    _content.innerHTML = '';
     var tableControl = _content;
     tableControl.cellPadding = "0";
     tableControl.cellSpacing = "0";

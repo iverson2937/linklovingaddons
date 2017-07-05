@@ -76,6 +76,13 @@ odoo.define('web_gantt.GanttView', function (require) {
         },
         do_search: function (domains, contexts, group_bys) {
             var self = this;
+            if(domains){
+                _.each(domains, function (domain, i) {
+                   if(domain && domain[0] == "parent_ids"){
+                       domains.splice(i, 1);
+                   }
+                });
+            }
             self.last_domains = domains;
             self.last_contexts = contexts;
             self.last_group_bys = group_bys;
@@ -218,8 +225,6 @@ odoo.define('web_gantt.GanttView', function (require) {
                         return generate_task_info(sub_task, level + 1);
                     }));
 
-                    if (task_infos.length == 0)
-                        return;
                    var task_start = time.auto_str_to_date(task[self.fields_view.arch.attrs.date_start]);
                     if (!task_start)
                         return;
