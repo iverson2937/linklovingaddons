@@ -21,7 +21,8 @@ odoo.define('linkloving_approval.approval_core', function (require){
             'change .document_modify': 'document_modify_fn',
             'click .approval_product_name':'product_pop',
             'click .review_cancel':'cancel_approval',
-            'click .document_download': 'document_download_fn'
+            'click .document_download': 'document_download_fn',
+            'click .download_file':'document_download_fn'
         },
         //下载
         document_download_fn:function () {
@@ -214,7 +215,7 @@ odoo.define('linkloving_approval.approval_core', function (require){
                         console.log(result);
                         own.length = result.length;
                         self.$("#"+approval_type).html("");
-                        self.$("#"+approval_type).append(QWeb.render('approval_tab_content', {result:result}));
+                        self.$("#"+approval_type).append(QWeb.render('approval_tab_content', {result:result,approval_type:approval_type}));
                         own.render_pager(this);
                     })
             })

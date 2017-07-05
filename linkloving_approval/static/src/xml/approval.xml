@@ -81,7 +81,7 @@
                         <input type="file" class="document_modify"/>
                         </a>
                     </t>
-                    <t t-if="item_files.is_able_to_use == true">
+                    <t t-if="item_files.is_able_to_use == true || approval_type=='waiting_submit' ||approval_type=='waiting_approval'">
                         <button class="btn btn-primary document_download">下载</button>
                     </t>
                 </div>
