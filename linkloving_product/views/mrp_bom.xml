@@ -11,7 +11,8 @@
                 </xpath>
                 <xpath expr="//field[@name='product_tmpl_id']" position="attributes">
                     <attribute name="options">{'no_quick_create':True}</attribute>
-                    <attribute name="context">{'default_type': 'product','form_view_ref':'new_product_form_wizard'}
+                    <attribute name="context">{'default_type':
+                        'product','form_view_ref':'linkloving_product.new_product_form_wizard'}
                     </attribute>
                 </xpath>
             </field>
