@@ -26,5 +26,23 @@
 
             </field>
         </record>
+
+        <odoo>
+            <data>
+                <record id="new_product_form_wizard" model="ir.ui.view">
+                    <field name="name">product.product</field>
+                    <field name="model">product.product</field>
+                    <field name="arch" type="xml">
+                        <form>
+                            <sheet>
+                                <group>
+                                    <field name="name"/>
+                                </group>
+                            </sheet>
+                        </form>
+                    </field>
+                </record>
+            </data>
+        </odoo>
     </data>
 </odoo>
