@@ -301,7 +301,7 @@
         <menuitem id="menu_account_payment_wait_pay_loan_can_return" name="可还款暂支" sequence="7"
                   parent="hr_expense.menu_hr_expense_accountant"
                   action="action_account_payment_can_return"/>
-        <menuitem id="menu_account_payment_wait_pay_loan_can_return" name="所有暂支" sequence="8"
+        <menuitem id="menu_account_payment_all_2" name="所有暂支" sequence="8"
                   parent="hr_expense.menu_hr_expense_accountant"
                   action="action_account_payment_all"/>
 
