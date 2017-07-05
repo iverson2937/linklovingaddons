@@ -13,6 +13,7 @@ AVAILABLE_PRIORITIES = [
     ('5', 'top level'),
 ]
 
+
 class linkloving_project_task(models.Model):
     _inherit = 'project.task'
 
@@ -22,17 +23,20 @@ class linkloving_project_task(models.Model):
     def _progress_rate(self):
         return 5.5
 
-
     def _hours_get(self):
         res = {}
-        self._cr.execute("SELECT task_id, COALESCE(SUM(hours),0) FROM project_task_work WHERE task_id IN %s GROUP BY task_id",(tuple(self._ids),))
+        self._cr.execute(
+            "SELECT task_id, COALESCE(SUM(hours),0) FROM project_task_work WHERE task_id IN %s GROUP BY task_id",
+            (tuple(self._ids),))
         hours = dict(self._cr.fetchall())
         for task in self:
-            res[task.id] = {'effective_hours': hours.get(task.id, 0.0), 'total_hours': (task.remaining_hours or 0.0) + hours.get(task.id, 0.0)}
+            res[task.id] = {'effective_hours': hours.get(task.id, 0.0),
+                            'total_hours': (task.remaining_hours or 0.0) + hours.get(task.id, 0.0)}
             res[task.id]['delay_hours'] = res[task.id]['total_hours'] - task.planned_hours
             res[task.id]['progress'] = 0.0
             if not float_is_zero(res[task.id]['total_hours'], precision_digits=2):
-                res[task.id]['progress'] = round(min(100.0 * hours.get(task.id, 0.0) / res[task.id]['total_hours'], 99.99),2)
+                res[task.id]['progress'] = round(
+                    min(100.0 * hours.get(task.id, 0.0) / res[task.id]['total_hours'], 99.99), 2)
         return res
 
     reviewer_id = fields.Many2one('res.users', string='Reviewer', select=True, track_visibility='onchange',
@@ -45,8 +49,8 @@ class linkloving_project_task(models.Model):
     work_ids = fields.One2many('project.task.work', 'task_id', 'Work done')
 
     date_start = fields.Date(string='Starting Date',
-    default=fields.date.today(),
-    index=True, copy=False)
+                             default=fields.date.today(),
+                             index=True, copy=False)
     date_end = fields.Date(string='Ending Date', index=True, copy=False)
 
     task_progress = fields.Float(string='Progress (%)')
@@ -75,7 +79,7 @@ class linkloving_project_task(models.Model):
         ('close', u'关闭'),
         ('pending', u'暂停'),
         ('blocked', 'Blocked')
-        ],
+    ],
         string='Kanban State',
         default='normal',
         track_visibility='onchange',
@@ -135,3 +139,19 @@ class linkloving_project_task(models.Model):
         if self.user_id:
             vals['date_start'] = fields.datetime.now()
         return {'value': vals}
+
+    @api.multi
+    def write(self, vals):
+
+        res = super(linkloving_project_task, self).write(vals)
+        if 'date_end' in vals:
+            self._change_parents_date_end()
+        return res
+
+    def _change_parents_date_end(self):
+        if self.parent_ids:
+            for parent_id in self.parent_ids:
+                end = max(parent_id.child_ids.mapped('date_end'))
+                if parent_id.date_end < end:
+                    parent_id.date_end = end
+                    parent_id._change_parents_date_end()
