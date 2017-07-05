@@ -119,4 +119,5 @@
 .document_download{
     width: 80px;
     height:30px;
+    display: block;
 }
