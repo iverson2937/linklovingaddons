@@ -12,12 +12,16 @@
 
 
                 <xpath expr="//field[@name='default_code']" position="before">
-                    <field name="categ_id" options="{'no_create':True}"/>
+                    <field name="categ_id" options="{'no_create':True}"
+                           groups="linkloving_product.group_product_manager"/>
                     <field name="sub_spec_id" options="{'no_create':True}"
-                           domain="[('is_sub','=',True),('categ_id','=',categ_id)]"/>
+                           domain="[('is_sub','=',True),('categ_id','=',categ_id)]"
+                           groups="linkloving_product.group_product_manager"/>
                     <field name="spec_id" options="{'no_create':True}"
-                           domain="[('is_sub','=',False),'|',('categ_id','=',False),('categ_id','=',categ_id)]"/>
-                    <field name="partner_id" options="{'no_create':True}"/>
+                           domain="[('is_sub','=',False),'|',('categ_id','=',False),('categ_id','=',categ_id)]"
+                           groups="linkloving_product.group_product_manager"/>
+                    <field name="partner_id" options="{'no_create':True}"
+                           groups="linkloving_product.group_product_manager"/>
                 </xpath>
 
             </field>

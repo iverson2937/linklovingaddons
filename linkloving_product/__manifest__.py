@@ -20,11 +20,12 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'product', 'stock'],
+    'depends': ['base', 'product', 'stock', 'mrp'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'security/product_groups.xml',
         'views/product_category.xml',
         'views/product_specs.xml',
         'views/product_template.xml',
