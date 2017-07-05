@@ -146,6 +146,20 @@ class linkloving_project_task(models.Model):
         res = super(linkloving_project_task, self).write(vals)
         if 'date_end' in vals:
             self._change_parents_date_end()
+
+        if 'child_ids' in vals:
+            child_ids = self.resolve_2many_commands('child_ids', vals.get('child_ids'))
+            for child in child_ids:
+                date_ends = []
+                if child.get('date_end'):
+                    date_ends.append(child.get('date_end'))
+                if date_ends:
+                    new_date_end = max(date_ends)
+                    if self.date_end < new_date_end:
+                        self.date_end = new_date_end
+            self._change_parents_date_end()
+
+
         return res
 
     def _change_parents_date_end(self):
