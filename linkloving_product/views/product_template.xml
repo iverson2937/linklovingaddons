@@ -16,7 +16,7 @@
                     <field name="sub_spec_id" options="{'no_create':True}"
                            domain="[('is_sub','=',True),('categ_id','=',categ_id)]"/>
                     <field name="spec_id" options="{'no_create':True}"
-                           domain="[('is_sub','=',False),('categ_id','=',categ_id)]"/>
+                           domain="[('is_sub','=',False),'|',('categ_id','=',False),('categ_id','=',categ_id)]"/>
                     <field name="partner_id" options="{'no_create':True}"/>
                 </xpath>
 
