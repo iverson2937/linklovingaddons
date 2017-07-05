@@ -8,3 +8,7 @@
 
 #2017/07/03 修改search blur
     /odoo-10.0/addons/web/static/src/js/view/search_view.js
+
+@2017/0509 datetimepicker
+    /addons/web/static/lib/bootstrap-datetimepicker.js
+    /addons/web/static/lib/bootstrap-datetimepicker.less
