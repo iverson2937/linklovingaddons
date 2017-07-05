@@ -148,7 +148,7 @@
                         <notebook colspan="4">
                             <page string="Supplier Invoice" autofocus="autofocus">
                                 <field name="invoice_ids" attrs="{'readonly': [('state', 'in', ['confirm','done'])]}"
-                                       domain="[('partner_id','=', partner_id),('state','=', 'open'),('remain_apply_balance','!=',0 )]"/>
+                                       domain="[('partner_id','=', partner_id),('state','=', 'open'),('remain_apply_balance','!=',0 ),('payment_ids','=',False)]"/>
 
                             </page>
                         </notebook>
