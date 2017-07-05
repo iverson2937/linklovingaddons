@@ -9,6 +9,7 @@ odoo.define('linkloving.task_kanban_view', function (require) {
     var utils = require('web.utils');
     var Widget = require('web.Widget');
     var kanban_widgets = require('web_kanban.widgets');
+    var KanbanRecord = require('web_kanban.Record');
 
     var QWeb = core.qweb;
 
@@ -110,5 +111,24 @@ odoo.define('linkloving.task_kanban_view', function (require) {
         },
 
     });
+
+    KanbanRecord.include({
+        on_card_clicked: function () {
+            if (this.model === 'project.task') {
+                var self = this;
+                this.do_action({
+                    type: 'ir.actions.act_window',
+                    res_model: "project.task",
+                    views: [[false, 'gantt']],
+                    target: '_blank',
+                    domain:[['project_id', '=', self.record.project_id.raw_value[0]]],
+                    context:{'group_by' : 'stage_id'}
+                });
+            } else {
+                this._super.apply(this, arguments);
+            }
+        }
+    });
+
 
 });
