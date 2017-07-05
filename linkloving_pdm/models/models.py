@@ -158,7 +158,7 @@ class ReviewProcessLine(models.Model):
         })
         # 新建一个 审核条目 指向最初的人
         self.env["review.process.line"].create({
-            'partner_id': self.create_uid.partner_id.id,
+            'partner_id': self.review_id.create_uid.partner_id.id,
             'review_id': self.review_id.id,
             'last_review_line_id': self.id,
             'review_order_seq': self.review_order_seq + 1,
@@ -322,7 +322,7 @@ class ProductAttachmentInfo(models.Model):
     @api.one
     def update_attachment(self, **kwargs):
 
-        if self.state not in ['waiting_release', 'draft']:
+        if self.state not in ['waiting_release', 'draft', 'deny', 'cancel']:
             raise UserError(u'文件正在处于审核中,请先取消审核,再进行操作')
         self.write({
             "file_binary": kwargs.get("file_binary"),

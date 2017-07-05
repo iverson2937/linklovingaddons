@@ -116,3 +116,8 @@
     left:0;
     top:0;
 }
+.document_download{
+    width: 80px;
+    height:30px;
+    display: block;
+}
