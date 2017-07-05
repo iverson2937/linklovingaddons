@@ -11,6 +11,7 @@
                         <group>
                             <field name="name" required="1"/>
                             <field name="code" required="1"/>
+                            <field name="remark" string="备注"/>
                             <field name="categ_id" options="{'no_create':True}" domain="[('code','!=',False)]"
                                    string="产品类型"/>
                         </group>
