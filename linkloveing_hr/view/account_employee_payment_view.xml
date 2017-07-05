@@ -132,7 +132,7 @@
                     <field name="remark"/>
                     <field name="apply_date" string="Apply Date"/>
                     <field name="state"/>
-                    <field name="can_return" invisible="0"/>
+                    <field name="can_return" invisible="1"/>
                     <field name="pre_payment_reminding"/>
                 </tree>
             </field>
@@ -146,6 +146,22 @@
                     <field name="employee_id" string="Employee"/>
                     <field name="name" string="SN"/>
                 </search>
+            </field>
+        </record>
+
+
+        <record id="action_account_payment_can_return" model="ir.actions.act_window">
+            <field name="name">Loan Application</field>
+            <field name="res_model">account.employee.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('can_return', '=', True)]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click here to create a new account payment.
+                </p>
+                <p>
+                    Once you have created your expense, submit it to your manager who will validate it.
+                </p>
             </field>
         </record>
         <record id="action_account_employee_payment_apply" model="ir.actions.act_window">
@@ -282,6 +298,12 @@
         <menuitem id="menu_account_payment_wait_pay_loan" name="待付款暂支" sequence="6"
                   parent="hr_expense.menu_hr_expense_accountant"
                   action="action_account_payment_wait_pay"/>
+        <menuitem id="menu_account_payment_wait_pay_loan_can_return" name="可还款暂支" sequence="7"
+                  parent="hr_expense.menu_hr_expense_accountant"
+                  action="action_account_payment_can_return"/>
+        <menuitem id="menu_account_payment_wait_pay_loan_can_return" name="所有暂支" sequence="8"
+                  parent="hr_expense.menu_hr_expense_accountant"
+                  action="action_account_payment_all"/>
 
 
     </data>
