@@ -196,10 +196,13 @@ odoo.define('web_gantt.GanttView', function (require) {
                         });
                         return group;
                     } else {
-                        var group = new GanttTaskInfo(_.uniqueId("gantt_project_task_"), group_name, task_start, duration || 1, percent);
+                        var id = _.uniqueId("gantt_project_task_");
+                        var group = new GanttTaskInfo(id, group_name, task_start, duration || 1, percent);
                         _.each(task_infos, function (el) {
                             group.addChildTask(el.task_info);
                         });
+                        group.internal_task = task;
+                        task_ids[id] = group;
                         return {task_info: group, task_start: task_start, task_stop: task_stop};
                     }
                 } else if (task.child_ids && task.child_ids.length != 0) {
@@ -217,19 +220,34 @@ odoo.define('web_gantt.GanttView', function (require) {
 
                     if (task_infos.length == 0)
                         return;
-                    var task_start = _.reduce(_.pluck(task_infos, "task_start"), function (date, memo) {
-                        return memo === undefined || date < memo ? date : memo;
-                    }, undefined);
-                    var task_stop = _.reduce(_.pluck(task_infos, "task_stop"), function (date, memo) {
-                        return memo === undefined || date > memo ? date : memo;
-                    }, undefined);
+                   var task_start = time.auto_str_to_date(task[self.fields_view.arch.attrs.date_start]);
+                    if (!task_start)
+                        return;
+                    var task_stop;
+                    if (self.fields_view.arch.attrs.date_stop) {
+                        task_stop = time.auto_str_to_date(task[self.fields_view.arch.attrs.date_stop]);
+                        if (!task_stop)
+                            task_stop = task_start;
+                    } else { // we assume date_duration is defined
+                        var tmp = formats.format_value(task[self.fields_view.arch.attrs.date_delay],
+                            self.fields[self.fields_view.arch.attrs.date_delay]);
+                        if (!tmp)
+                            return;
+                        task_stop = task_start.clone().addMilliseconds(formats.parse_value(tmp, {type: "float"}) * 60 * 60 * 1000);
+                        duration_in_business_hours = true;
+                    }
                     var duration = (task_stop.getTime() - task_start.getTime()) / (1000 * 60 * 60);
                     var group_name = task.__name;
-
-                    var group = new GanttTaskInfo(_.uniqueId("gantt_project_task_"), group_name, task_start, duration || 1, percent);
+                    var id = _.uniqueId("gantt_project_task_");
+                    if (!duration_in_business_hours) {
+                        duration = (duration / 24) * 8;
+                    }
+                    var group = new GanttTaskInfo(id, group_name, task_start, duration || 1, percent);
                     _.each(task_infos, function (el) {
                         group.addChildTask(el.task_info);
                     });
+                    group.internal_task = task;
+                    task_ids[id] = group;
                     return {task_info: group, task_start: task_start, task_stop: task_stop};
                 } else{
 
@@ -325,23 +343,16 @@ odoo.define('web_gantt.GanttView', function (require) {
             this.dataset.write(itask.id, data);
         },
         on_task_display: function (task) {
-            alert("on_task_display");
             var self = this;
-
-            var pop = new common.FormViewDialog(self, {
-                res_model: self.node,
-                res_id: node_id,
-                context: self.context || self.dataset.context,
-                title: _t("Open: ") + self.title
-            }).open();
-
-            pop.on('write_completed', self, self.reload);
-            pop.show_element(
-                self.dataset.model,
-                task.id,
-                null,
-                {}
-            );
+            this.do_action({
+                type: 'ir.actions.act_window',
+                res_model: "project.task",
+                res_id: task.id,
+                views: [[false, 'form']],
+                target: 'new'
+            },{
+                on_close: function(){ self.reload(); }
+            });
         },
         on_task_create: function () {
             alert("on_task_create");
