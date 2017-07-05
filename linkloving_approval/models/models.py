@@ -19,16 +19,16 @@ class ApprovalCenter(models.TransientModel):
         if self.type == 'waiting_submit':
             attatchments = self.env[self.res_model].search([('create_uid', '=', self.env.user.id),
                                                             ('state', 'in', ['waiting_release', 'cancel', 'deny'])],
-                                                           limit=limit, offset=offset)
+                                                           limit=limit, offset=offset, order='create_date desc')
         elif self.type == 'submitted':
             attatchments = self.env[self.res_model].search([('create_uid', '=', self.env.user.id),
                                                             (
                                                             'state', 'not in', ['waiting_release', 'draft', 'cancel'])],
-                                                           limit=limit, offset=offset)
+                                                           limit=limit, offset=offset, order='create_date desc')
         elif self.type == 'waiting_approval':
             lines = self.env["review.process.line"].search([("state", '=', 'waiting_review'),
                                                             ('partner_id', '=', self.env.user.partner_id.id)],
-                                                           limit=limit, offset=offset)
+                                                           limit=limit, offset=offset, order='create_date desc')
             review_ids = lines.mapped("review_id")
             attatchments = self.env[self.res_model].search([("review_id", "in", review_ids.ids),
                                                             ('state', 'in', ['review_ing'])])
@@ -36,9 +36,10 @@ class ApprovalCenter(models.TransientModel):
             lines = self.env["review.process.line"].search([("state", 'not in', ['waiting_review', 'review_canceled']),
                                                             ('partner_id', '=', self.env.user.partner_id.id),
                                                             ('review_order_seq', '!=', 1)],
-                                                           limit=limit, offset=offset)
+                                                           limit=limit, offset=offset, order='create_date desc')
             review_ids = lines.mapped("review_id")
-            attatchments = self.env[self.res_model].search([("review_id", "in", review_ids.ids)])
+            attatchments = self.env[self.res_model].search([("review_id", "in", review_ids.ids)],
+                                                           order='create_date desc')
 
         attach_list = []
         for atta in attatchments:
@@ -47,6 +48,3 @@ class ApprovalCenter(models.TransientModel):
     
     def fields_get(self, allfields=None, attributes=None):
         return super(ApprovalCenter, self).fields_get(allfields=allfields, attributes=attributes)
-    
-# class ProductAttachmentInfo(models.Model):
-#     _inherit = 'product.attachment.info'

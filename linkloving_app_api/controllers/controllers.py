@@ -2268,7 +2268,7 @@ class LinklovingAppApi(http.Controller):
             if move_ids in move_lines:
                 move_lines -= move_ids
             pack_list.append(dic)
-        for move in move_lines:
+        for move in move_lines.filtered(lambda x: x.state != 'cancel'):
             dic = {
                 'pack_id': -1,
                 'product_id': {
