@@ -35,11 +35,55 @@
                     <field name="arch" type="xml">
                         <form>
                             <sheet>
-                                <group>
-                                    <field name="name"/>
+                                <div class="oe_title">
+                                    <label class="oe_edit_only" for="name" string="产品名称"/>
+                                    <h1>
+                                        <field name="name" placeholder="产品名称"/>
+                                    </h1>
+                                </div>
+                                <div class="step1">
+                                    <h5>请确认该产品的物料类型</h5>
+                                    <field name="product_ll_type"/>
+                                </div>
+                                <div class="step2">
+                                    <h5>请确认该产品的购销属性</h5>
+                                    <group>
+                                        <field name="purchase_ok"/>
+                                        <field name="sale_ok"/>
+                                    </group>
+
+                                </div>
+                                <div class="step3">
+                                    <group>
+                                        <field name="default_code"/>
+                                        <field name="categ_id"/>
+                                        <field name="sub_spec_id"/>
+                                        <field name="spec_id"/>
+                                    </group>
+
+                                </div>
+                                <group class="step4">
+                                    <group>
+                                        <field name="order_ll_type"/>
+                                        <!--<field name="inner_code"/>-->
+                                        <field name="inner_spec"/>
+                                        <field name="product_specs"/>
+
+                                    </group>
+                                    <group>
+
+                                    </group>
+
                                 </group>
+
+                                <footer>
+                                    <button string="上一步" class="oe_highlight"/>
+                                    <button string="下一步" class="btn-primary"/>
+                                </footer>
+
                             </sheet>
                         </form>
+
                     </field>
                 </record>
             </data>
