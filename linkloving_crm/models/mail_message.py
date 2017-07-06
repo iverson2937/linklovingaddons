@@ -172,15 +172,16 @@ class CrmMailMessage(models.Model):
     @api.model
     def create(self, values):
 
-        if values['model'] == "sale.order":
+        if 'model' in values and values['model'] == "sale.order":
             sale_order_data = self.env['sale.order'].search([('id', '=', values['res_id'])])
-            if "question" in values['messages_label_ids']:
-                sale_order_data.write({'question_record_count': (sale_order_data.question_record_count + 1)})
-            if "inspection" in values['messages_label_ids']:
-                sale_order_data.write({'inspection_report_count': (sale_order_data.inspection_report_count + 1)})
-            values['sale_order_type'] = values['messages_label_ids'][0]
+            if "messages_label_ids" in values:
+                if "question" in values['messages_label_ids']:
+                    sale_order_data.write({'question_record_count': (sale_order_data.question_record_count + 1)})
+                if "inspection" in values['messages_label_ids']:
+                    sale_order_data.write({'inspection_report_count': (sale_order_data.inspection_report_count + 1)})
+                values['sale_order_type'] = values['messages_label_ids'][0]
 
-        if values['model'] == "res.partner":
+        if 'model' in values and values['model'] == "res.partner":
             if 'messages_label_ids' in values:  # needed to compute reply_to
                 msg_label_ids = []
                 for item in values['messages_label_ids']:
