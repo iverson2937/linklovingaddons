@@ -111,9 +111,9 @@ class HrExpenseSheet(models.Model):
 
     @api.multi
     def set_account_date(self):
-        sheet_ids=self.env['hr.expense.sheet'].search([('state','=','done'),('accounting_date','=',False)])
+        sheet_ids = self.env['hr.expense.sheet'].search([('state', '=', 'done'), ('accounting_date', '=', False)])
         for sheet in sheet_ids:
-            sheet.accounting_date=sheet.write_date
+            sheet.accounting_date = sheet.write_date
 
     @api.multi
     def hr_expense_sheet_post(self):
@@ -290,7 +290,7 @@ def create_remark_comment(data, body):
         'expense_sheet_id': data.id,
         'target_uid': data.to_approve_id.id
     }
-    # return data.env['hr.remark.comment'].create(values)
+    return data.env['hr.remark.comment'].create(values)
 
 
 class HrRemarkComment(models.Model):
