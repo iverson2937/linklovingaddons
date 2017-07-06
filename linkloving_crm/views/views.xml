@@ -305,6 +305,7 @@
                 <xpath expr="//filter[@name='consumable']" position="after">
                     <separator/>
                     <filter string="RT-ENG" name="rteng" domain="[('name','ilike', 'RT-ENG')]"/>
+                    <filter string="RT-CN" name="rtcn" domain="[('name','ilike', 'RT-CN')]"/>
                     <separator/>
                     <filter string="库存不足" domain="[('product_insufficient','=',True)]"/>
                     <separator/>

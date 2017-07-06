@@ -174,7 +174,7 @@ class CrmMailMessage(models.Model):
 
         if 'model' in values and values['model'] == "sale.order":
             sale_order_data = self.env['sale.order'].search([('id', '=', values['res_id'])])
-            if "messages_label_ids" in values:
+            if "messages_label_ids" in values and len(values['messages_label_ids']) > 0:
                 if "question" in values['messages_label_ids']:
                     sale_order_data.write({'question_record_count': (sale_order_data.question_record_count + 1)})
                 if "inspection" in values['messages_label_ids']:
@@ -196,9 +196,9 @@ class CrmMailMessage(models.Model):
 
         for mail_data in self:
             sale_order_data_item = self.env['sale.order'].search([('id', '=', mail_data['res_id'])])
-            if "question" in mail_data['sale_order_type']:
+            if mail_data['sale_order_type'] and "question" in mail_data['sale_order_type']:
                 sale_order_data_item.write({'question_record_count': (sale_order_data_item.question_record_count - 1)})
-            if "inspection" in mail_data['sale_order_type']:
+            if  mail_data['sale_order_type'] and "inspection" in mail_data['sale_order_type']:
                 sale_order_data_item.write(
                     {'inspection_report_count': (sale_order_data_item.inspection_report_count - 1)})
 
