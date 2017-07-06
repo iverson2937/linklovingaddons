@@ -160,7 +160,8 @@ class AccountPayment(models.Model):
     team_id = fields.Many2one('crm.team', related='partner_id.team_id')
     customer = fields.Boolean(related='partner_id.customer')
     partner_id = fields.Many2one('res.partner', track_visibility='onchange')
-    state = fields.Selection(selection_add=[('confirm', u'销售确认'), ('done', u'完成')], track_visibility='onchange')
+    state = fields.Selection(selection_add=[('confirm', u'销售确认'), ('cancel', u'取消')('done', u'完成')],
+                             track_visibility='onchange')
     remark = fields.Text(string='备注')
     account_id = fields.Many2one('account.account', domain=[('internal_type', '=', 'other')], string=u'收入科目')
 
