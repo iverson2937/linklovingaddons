@@ -21,6 +21,7 @@ odoo.define('web_gantt.GanttView', function (require) {
         display_name: _lt('Gantt'),
         template: "GanttView",
         view_type: "gantt",
+        icon: 'fa-align-left',
         init: function () {
             var self = this;
             this._super.apply(this, arguments);
