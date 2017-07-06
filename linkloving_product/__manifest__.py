@@ -29,7 +29,8 @@
         'views/product_category.xml',
         'views/product_specs.xml',
         'views/product_template.xml',
-        'views/mrp_bom.xml'
+        'views/mrp_bom.xml',
+        'views/views.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

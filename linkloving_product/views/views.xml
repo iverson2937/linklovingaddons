@@ -1,5 +1,11 @@
 <odoo>
     <data>
+        <template id="check_form" name="linkloving_product" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <!--<script type="text/javascript" src="/linkloving_product/static/src/js/check_form.js"/>-->
+                <link rel="stylesheet" type="text/css" href="/linkloving_product/static/src/css/check_form.css"/>
+            </xpath>
+        </template>
         <!-- explicit list view definition -->
         <!--
         <record model="ir.ui.view" id="linkloving_product.list">

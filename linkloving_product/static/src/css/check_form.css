@@ -1,0 +1,11 @@
+.step1{
+    background: yellow;
+}
+.step2{
+    background: pink;
+    display: none;
+}
+.step3{
+    background: cadetblue;
+    display: none;
+}

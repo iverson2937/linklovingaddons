@@ -77,10 +77,10 @@
                                 </group>
 
                                 <footer>
-                                    <button string="上一步" class="oe_highlight"/>
-                                    <button string="下一步" class="btn-primary"/>
+                                    <button string="上一步" class="oe_highlight pre_step"/>
+                                    <button string="下一步" class="btn-primary next_step"/>
                                 </footer>
-
+                                <script type="text/javascript" src="/linkloving_product/static/src/js/check_form.js"/>
                             </sheet>
                         </form>
 
