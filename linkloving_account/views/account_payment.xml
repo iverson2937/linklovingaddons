@@ -41,6 +41,15 @@
             <field name="inherit_id" ref="account.view_account_payment_form"/>
             <field name="arch" type="xml">
 
+
+                <xpath expr="//field[@name='amount']" position="replace">
+                    <field name="amount"/>
+                </xpath>
+
+                <xpath expr="//button[@name='post']" position="after">
+                    <button name="set_to_cancel" class="oe_highlight" string="取消" type="object" confirm="确定取消这张收款单吗？"/>
+                </xpath>
+
                 <xpath expr="//field[@name='payment_type']" position="attributes">
                     <attribute name="readonly">0</attribute>
                 </xpath>
