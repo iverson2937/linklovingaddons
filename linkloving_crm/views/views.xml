@@ -257,6 +257,9 @@
                         <group>
                             <group>
                                 <field name="subject"/>
+                                <field name="sale_order_type" invisible="1"/>
+                                <field name="attachment_ids"
+                                       attrs="{'invisible': [('sale_order_type','not in',('inspection','question'))]}"/>
                                 <field name="date" invisible="1"/>
                                 <field name="email_from" invisible="1"/>
                                 <field name="author_id" invisible="1"/>
@@ -264,7 +267,8 @@
                             </group>
                             <group>
                                 <field name="messages_label_ids" string="记录类型" widget="many2many_checkboxes"
-                                       options="{'no_create': True}"/>
+                                       options="{'no_create': True}"
+                                       attrs="{'invisible': [('sale_order_type','in',('inspection','question'))]}"/>
                                 <field name="parent_id" invisible="1"/>
                                 <field name="model" invisible="1"/>
                                 <field name="res_id" invisible="1"/>
@@ -278,7 +282,8 @@
                             </page>
                         </notebook>
                         <group>
-                            <field name="postil" string="批注" placeholder="批注..."/>
+                            <field name="postil" string="批注" placeholder="批注..."
+                                   attrs="{'invisible': [('sale_order_type','in',('inspection','question'))]}"/>
                         </group>
                     </sheet>
 
@@ -308,5 +313,21 @@
         </record>
 
 
+        <record model="ir.ui.view" id="mail.view_message_tree">
+            <field name="name">mail.message.tree</field>
+            <field name="model">mail.message</field>
+            <field name="priority">20</field>
+            <field name="arch" type="xml">
+                <tree string="Messages">
+                    <field name="date" widget="date"/>
+                    <field name="subject" string="关联的订单" invisible="1"/>
+                    <field name="compyter_body"/>
+                    <field name="attachment_ids"/>
+                    <field name="author_id"/>
+                </tree>
+            </field>
+        </record>
+
+<!--context="{'default_name':email}"-->
     </data>
 </openerp>

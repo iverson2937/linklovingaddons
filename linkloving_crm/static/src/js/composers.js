@@ -476,13 +476,25 @@ odoo.define('mail.composers', function (require) {
 
 
             on_click_inputs: function (event) {
-                if ($(event.target).prop("checked")) {
-                    this.msg_checkbox.splice(0, 0, parseInt($(event.target).prop("name")));
-                } else {
-                    if ($.inArray(parseInt($(event.target).prop("name")), this.msg_checkbox) >= 0) {
-                        this.msg_checkbox.splice($.inArray(parseInt($(event.target).prop("name")), this.msg_checkbox), 1);
+                if (event.target.name == 'inspection') {
+                    $(event.target).prev().prop("checked", false);
+                    if ($.inArray('question', this.msg_checkbox) >= 0) {
+                        this.msg_checkbox.splice($.inArray('question', this.msg_checkbox), 1);
+                    }
+                } else if (event.target.name == 'question') {
+                    $(event.target).next().prop("checked", false);
+                    if ($.inArray('inspection', this.msg_checkbox) >= 0) {
+                        this.msg_checkbox.splice($.inArray('inspection', this.msg_checkbox), 1);
                     }
                 }
+                if ($(event.target).prop("checked")) {
+                    this.msg_checkbox.splice(0, 0, event.target.name);
+                } else {
+                    if ($.inArray(event.target.name, this.msg_checkbox) >= 0) {
+                        this.msg_checkbox.splice($.inArray(event.target.name, this.msg_checkbox), 1);
+                    }
+                }
+
             },
 
             preprocess_message: function () {

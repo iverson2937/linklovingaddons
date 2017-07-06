@@ -119,6 +119,33 @@
                 </field>
                 <xpath expr="//tree/field[@name='sequence']" position="replace">
                 </xpath>
+
+                <xpath expr="//button[@name='action_view_invoice']" position="before">
+                    <field name="picking_ids" invisible="1"/>
+                    <button type="object"
+                            name="action_view_question"
+                            context="{'sale_type': 'question'}"
+                            class="oe_stat_button"
+                            icon="fa-commenting-o"
+                            attrs="{'invisible': [('delivery_count', '=', 0)]}" groups="base.group_user">
+                        <field name="question_record_count" widget="statinfo" string="问题记录"/>
+                    </button>
+
+
+                    <button type="object"
+                            name="action_view_question"
+                            context="{'sale_type': 'inspection'}"
+                            class="oe_stat_button"
+                            icon="fa-file-o"
+                            attrs="{'invisible': [('delivery_count', '=', 0)]}" groups="base.group_user">
+                        <field name="inspection_report_count" widget="statinfo" string="验货报告"/>
+                    </button>
+                </xpath>
+
+                <xpath expr="//div/field[@name='message_ids']" position="replace">
+                    <field name="message_ids" widget="sale_threads"/>
+                </xpath>
+
             </field>
         </record>
 
@@ -208,6 +235,16 @@
 
             </field>
         </record>
+
+
+        <template id="sale_static" name="linkloving_sale_assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+
+                <script type="text/javascript" src="/linkloving_sale/static/src/js/sale_chatters.js"/>
+
+            </xpath>
+        </template>
+
 
     </data>
 </openerp>

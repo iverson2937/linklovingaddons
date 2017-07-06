@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+import re
+
+import time
+
 from odoo import models, fields, api
 from odoo import tools
 
@@ -9,6 +13,13 @@ class CrmMailMessage(models.Model):
     messages_label_ids = fields.Many2many('message.label', 'message_label_mail_message_type_rel', string='记录类型')
 
     postil = fields.Text(string='批注')
+    sale_order_type = fields.Text(string='销售记录类型')
+
+    compyter_body = fields.Text(string='内容', compute='get_message_body')
+
+    def get_message_body(self):
+        for message_body in self:
+            message_body.compyter_body = filter_tags(message_body.body)
 
     @api.multi
     def send_message_action(self):
@@ -160,13 +171,87 @@ class CrmMailMessage(models.Model):
 
     @api.model
     def create(self, values):
-        if 'messages_label_ids' in values:  # needed to compute reply_to
-            values['messages_label_ids'] = [(6, 0, values['messages_label_ids'])]
+
+        if values['model'] == "sale.order":
+            sale_order_data = self.env['sale.order'].search([('id', '=', values['res_id'])])
+            if "question" in values['messages_label_ids']:
+                sale_order_data.write({'question_record_count': (sale_order_data.question_record_count + 1)})
+            if "inspection" in values['messages_label_ids']:
+                sale_order_data.write({'inspection_report_count': (sale_order_data.inspection_report_count + 1)})
+            values['sale_order_type'] = values['messages_label_ids'][0]
+
+        if values['model'] == "res.partner":
+            if 'messages_label_ids' in values:  # needed to compute reply_to
+                msg_label_ids = []
+                for item in values['messages_label_ids']:
+                    msg_label_ids.append(int(item))
+                values['messages_label_ids'] = [(6, 0, msg_label_ids)]
+
         message = super(CrmMailMessage, self).create(values)
         return message
+
+    @api.multi
+    def unlink(self):
+
+        for mail_data in self:
+            sale_order_data_item = self.env['sale.order'].search([('id', '=', mail_data['res_id'])])
+            if "question" in mail_data['sale_order_type']:
+                sale_order_data_item.write({'question_record_count': (sale_order_data_item.question_record_count - 1)})
+            if "inspection" in mail_data['sale_order_type']:
+                sale_order_data_item.write(
+                    {'inspection_report_count': (sale_order_data_item.inspection_report_count - 1)})
+
+        super(CrmMailMessage, self).unlink()
 
 
 class CrmMessageLabelStatus(models.Model):
     _name = 'message.order.status'
     name = fields.Char(string=u'订单状态')
     description = fields.Text(string=u'描述')
+
+
+def filter_tags(htmlstr):
+    # 先过滤CDATA
+    re_cdata = re.compile('//<!\[CDATA\[[^>]*//\]\]>', re.I)  # 匹配CDATA
+    re_script = re.compile('<\s*script[^>]*>[^<]*<\s*/\s*script\s*>', re.I)  # Script
+    re_style = re.compile('<\s*style[^>]*>[^<]*<\s*/\s*style\s*>', re.I)  # style
+    re_br = re.compile('<br\s*?/?>')  # 处理换行
+    re_h = re.compile('</?\w+[^>]*>')  # HTML标签
+    re_comment = re.compile('<!--[^>]*-->')  # HTML注释
+    s = re_cdata.sub('', htmlstr)  # 去掉CDATA
+    s = re_script.sub('', s)  # 去掉SCRIPT
+    s = re_style.sub('', s)  # 去掉style
+    s = re_br.sub('\n', s)  # 将br转换为换行
+    s = re_h.sub('', s)  # 去掉HTML 标签
+    s = re_comment.sub('', s)  # 去掉HTML注释
+    # 去掉多余的空行
+    blank_line = re.compile('\n+')
+    s = blank_line.sub('\n', s)
+    s = replaceCharEntity(s)  # 替换实体
+    return s
+
+
+def replaceCharEntity(htmlstr):
+    CHAR_ENTITIES = {'nbsp': ' ', '160': ' ',
+                     'lt': '<', '60': '<',
+                     'gt': '>', '62': '>',
+                     'amp': '&', '38': '&',
+                     'quot': '"', '34': '"', }
+
+    re_charEntity = re.compile(r'&#?(?P<name>\w+);')
+    sz = re_charEntity.search(htmlstr)
+    while sz:
+        entity = sz.group()  # entity全称，如&gt;
+        key = sz.group('name')  # 去除&;后entity,如&gt;为gt
+        try:
+            htmlstr = re_charEntity.sub(CHAR_ENTITIES[key], htmlstr, 1)
+            sz = re_charEntity.search(htmlstr)
+        except KeyError:
+            # 以空串代替
+            htmlstr = re_charEntity.sub('', htmlstr, 1)
+            sz = re_charEntity.search(htmlstr)
+    return htmlstr
+
+
+def repalce(s, re_exp, repl_string):
+    return re_exp.sub(repl_string, s)

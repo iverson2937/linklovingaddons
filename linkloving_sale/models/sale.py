@@ -102,6 +102,19 @@ class SaleOrder(models.Model):
 
         return report_pages
 
+    question_record_count = fields.Integer(string=u'问题记录')
+    inspection_report_count = fields.Integer(string=u'验货报告')
+
+    @api.multi
+    def action_view_question(self):
+        action = self.env.ref('mail.action_view_mail_message').read()[0]
+        # action = self.env.ref('crm.crm_action_view_mail_message').read()[0]
+
+        pickings = self.mapped('message_ids')
+        if len(pickings) > 1:
+            action['domain'] = [('id', 'in', pickings.ids), ('sale_order_type', '=', self._context['sale_type'])]
+        return action
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'

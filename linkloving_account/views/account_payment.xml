@@ -126,6 +126,19 @@
         </record>
 
 
+        <record model="ir.ui.view" id="view_account_payment_search_inherit">
+            <field name="name">linkloving.account.payment.tree</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='company_id']" position="after">
+                    <field name="remark"/>
+                </xpath>
+
+            </field>
+        </record>
+
+
     </data>
 
 
