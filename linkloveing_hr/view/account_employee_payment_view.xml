@@ -76,9 +76,10 @@
                             </group>
                         </group>
                         <notebook colspan="1">
-                            <page string='Expense Sheets' autofocus="autofocus" attrs="{}">
+                            <page string='Expense Sheets' autofocus="autofocus"
+                                  attrs="{'invisible':[('sheet_count','=',0)]}">
                                 <field name="payment_line_ids">
-                                    <tree create="1">
+                                    <tree create="0">
                                         <field name="expense_no"/>
                                         <field name="name"/>
                                         <field name="accounting_date"/>
