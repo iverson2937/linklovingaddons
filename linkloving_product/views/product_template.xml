@@ -89,9 +89,12 @@
 
                                 </group>
                                 <div class="step5">
-                                     <h2>保存成功</h2>
+                                    <h2>保存成功</h2>
                                     <group>
-                                       <div>您可以：<span class="continue_add_products">继续新建产品</span>或<span class="return_product_lists">返回产品列表</span></div>
+                                        <div>您可以：<button class="continue_add_products" name='create_new_product'
+                                                         string="继续新建产品"/>或
+                                            <button class="return_product_lists" name="product_list" string="返回产品列表"/>
+                                        </div>
                                     </group>
                                 </div>
 

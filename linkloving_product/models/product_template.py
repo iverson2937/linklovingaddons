@@ -11,6 +11,34 @@ class ProductTemplate11(models.Model):
     partner_id = fields.Many2one('res.partner', domain=[('customer', '=', True), ('is_company', '=', True)],
                                  string=u'客户')
 
+    @api.multi
+    def product_list(self):
+
+        form = self.env.ref('linkloving_product.new_product_form_wizard', False)
+
+        return {
+            'name': '新建',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'product.template',
+            'views': [(form.id, 'form')],
+            'view_id': form.id,
+            'target': 'new',
+        }
+
+    @api.multi
+    def create_new_product(self):
+        return {
+            'name': '产品',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'product.template',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            # 'domain': [('payment_id', 'in', self.ids)],
+        }
+
     @api.onchange('categ_id', 'sub_spec_id', 'spec_id', 'partner_id')
     def _get_default_code(self):
         if self.categ_id.code:
