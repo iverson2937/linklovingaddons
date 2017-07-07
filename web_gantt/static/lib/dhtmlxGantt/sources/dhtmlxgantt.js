@@ -173,7 +173,7 @@ GanttProjectInfo.prototype.getTaskByIdInTree = function(parentTask, id)
  * @type:  public
  * @topic: 0
  */
-function GanttTaskInfo(id, name, est, duration, percentCompleted, predecessorTaskId)
+function GanttTaskInfo(id, name, est, duration, percentCompleted, predecessorTaskId, dateStop, desc, qty, state)
 {
     this.Id = id;
     this.Name = name;
@@ -181,6 +181,10 @@ function GanttTaskInfo(id, name, est, duration, percentCompleted, predecessorTas
     this.Duration = duration;
     this.PercentCompleted = percentCompleted;
     this.PredecessorTaskId = predecessorTaskId;
+    this.DateStop = dateStop;
+    this.Desc = desc;
+    this.QTY = qty;
+    this.State = state;
     this.ChildTasks = [];
     this.ChildPredTasks = [];
     this.ParentTask = null;
@@ -3151,7 +3155,13 @@ GanttTask.prototype.getPopUpInfo = function(object, event)
     var tblInfo = this.Chart.divInfo.lastChild;
     tblInfo.rows[0].cells[0].innerHTML = "<div style='font-family: Arial, Helvetica, Sans-serif; font-size: 12px; font-weight: bold; color: #688060; margin: 0 0 4px 0;'>" + this.TaskInfo.Name + "</div>";
     tblInfo.rows[0].cells[0].innerHTML += "<span class='st'>EST:&nbsp;</span><span class='ut'>" + this.TaskInfo.EST.getDate() + "." + (this.TaskInfo.EST.getMonth() + 1) + "." + this.TaskInfo.EST.getFullYear() + "</span><br/>";
-    tblInfo.rows[0].cells[0].innerHTML += "<span class='st'>Duration:&nbsp;</span><span class='ut'>" + this.TaskInfo.Duration + " hours </span><br/>";
+    tblInfo.rows[0].cells[0].innerHTML += "<span class='st'>END:&nbsp;</span><span class='ut'>" + this.TaskInfo.DateStop.getDate() + "." + (this.TaskInfo.DateStop.getMonth() + 1) + "." + this.TaskInfo.DateStop.getFullYear() + "</span><br/>";
+    if(this.TaskInfo.Desc)
+        tblInfo.rows[0].cells[0].innerHTML += "<span class='st'>Name:&nbsp;</span><span class='ut'>" + this.TaskInfo.Desc + "</span><br/>";
+    if(this.TaskInfo.QTY)
+        tblInfo.rows[0].cells[0].innerHTML += "<span class='st'>QTY:&nbsp;</span><span class='ut'>" + this.TaskInfo.QTY + "</span><br/>";
+    if(this.TaskInfo.State)
+        tblInfo.rows[0].cells[0].innerHTML += "<span class='st'>State:&nbsp;</span><span class='ut'>" + this.TaskInfo.State + "</span><br/>";
     // tblInfo.rows[0].cells[0].innerHTML += "<span class='st'>Percent Complete:&nbsp;</span><span class='ut'>" + this.TaskInfo.PercentCompleted + "% </span><br/>";
 
     //show predecessor task
