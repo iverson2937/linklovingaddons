@@ -48,6 +48,7 @@
 
                 <xpath expr="//button[@name='post']" position="after">
                     <button name="set_to_cancel" class="oe_highlight" string="取消" states="posted,sent,confirm"
+                            groups="account.group_account_user"
                             type="object" confirm="确定取消这张收款单吗？"/>
                 </xpath>
 
