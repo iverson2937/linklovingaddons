@@ -10,7 +10,8 @@
                            attrs="{'invisible': [('state', 'not in', ('waiting_material', 'prepare_material_ing'))]}"/>
                     <field name="production_remark_id"
                            attrs="{'invisible': [('state', 'not in', ('finish_prepare_material', 'already_picking', 'progress'))]}"/>
-                    <field name="date_planned_start" string="开始时间"/>
+                    <field name="date_planned_start" string="开始"/>
+                    <field name="date_planned_finished" string="结束"/>
                     <field name="product_id"/>
                     <field name="product_qty" sum="Total Qty" string="Quantity"/>
                     <field name="origin"/>
