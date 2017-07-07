@@ -34,6 +34,7 @@
         'view/product_template.xml',
         'view/stock_picking.xml',
         'wizard/sale_order_cancel.xml',
+        'wizard/res_partner_assign_wizard.xml',
         'report/sale_order_report_templates.xml',
     ],
     # only loaded in demonstration mode
