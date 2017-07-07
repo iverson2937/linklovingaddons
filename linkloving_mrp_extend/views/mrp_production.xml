@@ -7,6 +7,9 @@
             <field name="model">mrp.production</field>
             <field name="arch" type="xml">
                 <gantt date_stop="date_planned_finished" date_start="date_planned_start" progress="progress"
+                       state="state"
+                       qty="product_qty"
+
                        string="Productions"
                        default_group_by="process_id">
                 </gantt>

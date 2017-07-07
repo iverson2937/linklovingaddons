@@ -36,7 +36,10 @@
                 </xpath>
 
                 <xpath expr="//field[@name='date_planned_start']" position="attributes">
-                    <attribute name="string">交期</attribute>
+                    <attribute name="string">开始</attribute>
+                </xpath>
+                <xpath expr="//field[@name='date_planned_finished']" position="attributes">
+                    <attribute name="string">结束</attribute>
                 </xpath>
                 <xpath expr="//field[@name='bom_id']" position="after">
                     <field name="is_outside" invisible="1"/>
@@ -70,7 +73,11 @@
                 </xpath>
 
                 <xpath expr="//field[@name='date_planned_start']" position="attributes">
-                    <attribute name="string">交期</attribute>
+                    <attribute name="string">开始</attribute>
+                    <attribute name="widget">date</attribute>
+                </xpath>
+                 <xpath expr="//field[@name='date_planned_start']" position="after">
+                    <field name="date_planned_finished" widget="date" string="结束"/>
                 </xpath>
 
             </field>
