@@ -44,7 +44,7 @@ odoo.define('linkloving_crm.list_views', function (require) {
     ];
 
 
-    ListView.include({
+    var List_View_New = ListView.extend({
         init: function () {
 
             var self = this;
@@ -653,6 +653,6 @@ odoo.define('linkloving_crm.list_views', function (require) {
 
 
     list_widget_registry.add('field.priorityw', FieldPriority);
-
+    list_widget_registry.add('field.list_new_view', List_View_New);
 
 })

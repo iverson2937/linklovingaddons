@@ -9,7 +9,7 @@
                 <script type="text/javascript" src="/linkloving_crm/static/src/js/chat_managers.js"/>
                 <script type="text/javascript" src="/linkloving_crm/static/src/js/composers.js"/>
 
-                <!--<script type="text/javascript" src="/linkloving_crm/static/src/js/list_views.js"/>-->
+                <script type="text/javascript" src="/linkloving_crm/static/src/js/list_views.js"/>
                 <script type="text/javascript" src="/linkloving_crm/static/src/js/priority_tree.js"/>
 
 
