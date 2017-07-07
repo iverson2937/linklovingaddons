@@ -33,13 +33,19 @@
                     <field name="name">product.product</field>
                     <field name="model">product.product</field>
                     <field name="arch" type="xml">
-                        <form>
+                        <form class="MySteps">
                             <sheet>
                                 <div class="oe_title">
                                     <label class="oe_edit_only" for="name" string="产品名称"/>
                                     <h1>
                                         <field name="name" placeholder="产品名称"/>
                                     </h1>
+                                </div>
+                                <div class="step_navs">
+                                    <div class="step_nav1 active_step">1.确定物料类型  <span class="arrow"></span></div>
+                                    <div class="step_nav2">2.生成料号  ⇒</div>
+                                    <div class="step_nav3">3.完善其他信息  ⇒</div>
+                                    <div class="step_nav4">4.完成</div>
                                 </div>
                                 <div class="step1">
                                     <h5>请确认该产品的物料类型</h5>
@@ -70,15 +76,12 @@
                                         <field name="product_specs"/>
 
                                     </group>
-                                    <group>
-
-                                    </group>
 
                                 </group>
 
                                 <footer>
-                                    <button string="上一步" class="oe_highlight pre_step"/>
-                                    <button string="下一步" class="btn-primary next_step"/>
+                                    <span class="oe_highlight pre_step">上一步</span>
+                                    <span class="btn-primary next_step">下一步</span>
                                 </footer>
                                 <script type="text/javascript" src="/linkloving_product/static/src/js/check_form.js"/>
                             </sheet>

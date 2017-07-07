@@ -225,7 +225,13 @@ class ProductAttachmentInfo(models.Model):
         }
 
     def get_download_filename(self):
-        return self.type + '_' + str(self.version) + '_' + self.file_name
+        dc = self.product_tmpl_id.default_code.replace(".", "_")
+        file_ext = self.file_name.split('.')[-1:][0]
+        if file_ext:
+            file_ext = '.' + file_ext
+        if self.state != 'released':
+            return 'Unrelease_' + self.type.upper() + '_' + dc + '_v' + str(self.version) + file_ext
+        return self.type.upper() + '_' + dc + '_v' + str(self.version) + file_ext
 
     def _default_version(self):
         model = self._context.get("model")
@@ -249,7 +255,7 @@ class ProductAttachmentInfo(models.Model):
     @api.multi
     def _compute_has_right_to_review(self):
         for info in self:
-            if self.env.user.id in info.review_id.who_review_now.user_ids.ids and info.state == 'review_ing':
+            if self.env.user.id in info.review_id.who_review_now.user_ids.ids and info.state in ['review_ing']:
                 info.has_right_to_review = True
 
     @api.multi
