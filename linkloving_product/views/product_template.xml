@@ -98,7 +98,7 @@
                                 <footer>
                                     <span class="oe_highlight pre_step">上一步</span>
                                     <span class="btn-primary next_step">下一步</span>
-                                    <!--<span class="oe_highlight mysteps_save" name="save">保存</span>-->
+                                    <button class="oe_highlight mysteps_save" name="save" string="保存"/>
                                 </footer>
                                 <script type="text/javascript" src="/linkloving_product/static/src/js/check_form.js"/>
                             </sheet>
