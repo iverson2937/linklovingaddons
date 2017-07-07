@@ -71,10 +71,16 @@
                                 <group class="step4">
                                     <group>
                                         <field name="order_ll_type"/>
-                                        <!--<field name="inner_code"/>-->
+                                        <field name="inner_code"/>
                                         <field name="inner_spec"/>
                                         <field name="product_specs"/>
 
+                                    </group>
+                                    <group>
+                                        <field name="standard_price"/>
+                                        <field name="uom_id"/>
+                                        <field name="uom_po_id"/>
+                                        <field name="purchase_method"/>
                                     </group>
 
                                 </group>
@@ -82,6 +88,7 @@
                                 <footer>
                                     <span class="oe_highlight pre_step">上一步</span>
                                     <span class="btn-primary next_step">下一步</span>
+                                    <button class="oe_highlight" name="save" string="保存"/>
                                 </footer>
                                 <script type="text/javascript" src="/linkloving_product/static/src/js/check_form.js"/>
                             </sheet>
