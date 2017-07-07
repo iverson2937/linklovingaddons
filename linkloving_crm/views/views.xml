@@ -46,9 +46,12 @@
                 <!--</xpath>-->
 
                 <xpath expr="//page[@name='extra']" position="after">
-                    <page string="产品">
+                    <page string="产品" attrs="{'invisible': True}">
                         <field name="interested_in_product" domain="[('sale_ok','=',True)]" widget="many2many_kanban"
                                context="{'search_default_rteng':1,'search_default_filter_categ_id':1}"/>
+                    </page>
+                    <page string="产品">
+                        <field name="product_series_ids"/>
                     </page>
                 </xpath>
 
@@ -192,6 +195,61 @@
                   sequence="2" name="线索来源"/>
 
 
+        <!--crm.product.series-->
+        <record model="ir.ui.view" id="view_crm_product_series_form">
+            <field name="name">crm.product.series.form</field>
+            <field name="model">crm.product.series</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <field name="detail"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_crm_product_series_tree" model="ir.ui.view">
+            <field name="name">crm.product.series.tree</field>
+            <field name="model">crm.product.series</field>
+            <field name="arch" type="xml">
+                <tree string="产品系列">
+                    <field name="name"/>
+                    <field name="detail"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_crm_product_series" model="ir.actions.act_window">
+            <field name="name">产品系列</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">crm.product.series</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click add product series.
+                </p>
+                <p>
+                    No Series Found!
+                </p>
+            </field>
+        </record>
+
+
+        <!--Receipt*-->
+        <menuitem action="action_crm_product_series"
+                  id="menu_crm_action_product_series"
+                  parent="sales_team.menu_sales"
+                  groups="sales_team.group_sale_manager"
+                  sequence="2" name="产品系列"/>
+
+
         <!--message.order.status-->
         <record model="ir.ui.view" id="view_message_order_status_form">
             <field name="name">message.order.status.form</field>
@@ -237,6 +295,36 @@
                 </p>
             </field>
         </record>
+
+        <record id="crm_sale_action_partner_form" model="ir.actions.act_window">
+            <field name="name">Customers.crm</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="domain">[('customer','=','1'),('is_company','=',True),('is_order','=',False)]</field>
+            <field name="context">{'default_customer':True,'default_is_company':True}</field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="base.view_res_partner_filter"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to add a contact in your address book.
+                </p>
+                <p>
+                    Odoo helps you easily track all activities related to
+                    a customer; discussions, history of business opportunities,
+                    documents, etc.
+                </p>
+            </field>
+        </record>
+
+
+        <!--Receipt*-->
+        <menuitem action="crm_sale_action_partner_form"
+                  id="menu_message_order_status_id"
+                  parent="sales_team.menu_sales"
+                  groups="sales_team.group_sale_manager"
+                  sequence="1" name="潜在客户"/>
 
 
         <!--Receipt*-->

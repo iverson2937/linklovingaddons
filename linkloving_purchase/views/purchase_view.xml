@@ -144,6 +144,15 @@
                         <field string="Vendor Bills." name="supplier_invoice_count" widget="statinfo"/>
                     </button>
                 </div>
+
+                <xpath expr="//div/button[@icon='fa-clock-o']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+
+                <xpath expr="//div/button/field[@name='meeting_count']" position="attributes">
+                    <attribute name="string">行事历</attribute>
+                </xpath>
+
             </field>
         </record>
 

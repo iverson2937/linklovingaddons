@@ -548,7 +548,7 @@ class linkloving_sale_extend(models.Model):
     def action_confirm(self):
         self.ensure_one()
         # 产生销售单时 根据销售单客户 更改客户 订单状态
-        # self.env['res.partner'].search([('id', '=', self.partner_id.id)]).write({'is_order': 'have'})
+        self.env['res.partner'].search([('id', '=', self.partner_id.id)]).write({'is_order': True})
         for line in self.order_line:
             if self.env.ref(
                     "mrp.route_warehouse0_manufacture") in line.product_id.route_ids and not line.product_id.bom_ids:

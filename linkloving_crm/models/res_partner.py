@@ -30,6 +30,10 @@ class ResPartner(models.Model):
     express_sample_record = fields.Char(string=u'快递账号')
     interested_in_product = fields.Many2many('product.template', 'res_interested_in_product_template_ref',
                                              string=u'感兴趣产品')
+
+    product_series_ids = fields.Many2many('crm.product.series', 'res_product_series_product_template_ref',
+                                          string=u'感兴趣系列')
+
     communication_identifier = fields.Char(string=u'其他沟通方式')
     qq = fields.Char(string=u'QQ')
 
@@ -40,7 +44,7 @@ class ResPartner(models.Model):
     crm_source_id = fields.Many2one('crm.lead.source', string=u'来源')
 
     customer_status = fields.Many2one('message.order.status', string=u'客户状态')
-    is_order = fields.Boolean(string=u'订单记录', readonly=True, compute='_compute_is_order')
+    is_order = fields.Boolean(string=u'订单记录', readonly=True, compute='_compute_is_order', store=True)
 
     user_id = fields.Many2one('res.users', string='Salesperson', default=lambda self: self.env.user,
                               help='The internal user that is in charge of communicating with this contact if any.')
@@ -118,3 +122,10 @@ class CrmLeadSource(models.Model):
 
     name = fields.Char(u'来源')
     detail = fields.Text(string=u'详细')
+
+
+class CrmProductSeries(models.Model):
+    _name = 'crm.product.series'
+
+    name = fields.Char(u'名称')
+    detail = fields.Text(string=u'描述')

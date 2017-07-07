@@ -34,6 +34,10 @@
                             <input type="checkbox" class="o_chat_header_adc" t-att-name="msg.id">
                                 <t t-esc="msg.name"/>
                             </input>
+
+                            <t t-if="msg.name== '会议'">
+                                <br/>
+                            </t>
                         </t>
                     </div>
                     <hr/>

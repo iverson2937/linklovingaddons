@@ -171,7 +171,7 @@
             <field name="inherit_id" ref="base.view_partner_tree"/>
             <field name="arch" type="xml">
                 <field name="display_name" position="before">
-                    <field name="customer_code"/>
+                    <field name="customer_code" invisible="1"/>
                     <field name="team_id" invisible="1"/>
                     <field name="user_id"/>
                 </field>

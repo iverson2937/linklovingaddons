@@ -4,3 +4,4 @@ access_linkloving_crm_crm_remark_record,linkloving_crm.crm_remark_record,model_c
 access_linkloving_crm_lead_source,linkloving_crm_crm_lead_source,model_crm_lead_source,,1,1,1,1
 access_linkloving_crm_message_label,linkloving_crm_message_label,model_message_label,,1,1,1,1
 access_linkloving_crm_message_order_status,linkloving_crm_message_order_status,model_message_order_status,,1,1,1,1
+access_linkloving_crm_crm_product_series,linkloving_crm_crm_product_series,model_crm_product_series,,1,1,1,1

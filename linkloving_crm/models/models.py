@@ -24,6 +24,9 @@ class CrmLead(models.Model):
     interested_in_product = fields.Many2many('product.template', 'crm_interested_in_product_template_ref',
                                              string=u'感兴趣产品')
 
+    product_series_ids = fields.Many2many('crm.product.series', 'crm_product_series_product_template_ref',
+                                          string=u'感兴趣系列')
+
     communication_identifier = fields.Char(string=u'其他沟通方式')
     qq = fields.Char(string=u'QQ')
     wechat = fields.Char(string=u'微信')
@@ -69,8 +72,10 @@ class CrmLead(models.Model):
         }
 
         alarm_record = set()
+        alarm_record1 = set()
 
         [alarm_record.add(adc.id) for adc in self.interested_in_product]
+        [alarm_record1.add(adc.id) for adc in self.product_series_ids]
 
         print list(alarm_record)
         values_company = {
@@ -82,7 +87,8 @@ class CrmLead(models.Model):
             'wechat': self.wechat,
             'continent': self.continent.id,
             'express_sample_record': self.express_sample_record,
-            'interested_in_product': [(6, 0, list(alarm_record))]
+            'interested_in_product': [(6, 0, list(alarm_record))],
+            'product_series_ids': [(6, 0, list(alarm_record1))]
         }
 
         if is_company:
