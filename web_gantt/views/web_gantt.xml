@@ -12,6 +12,7 @@
                 <script type="text/javascript" src="/web_gantt/static/lib/dhtmlxGantt/sources/dhtmlxcommon.js"></script>
                 <script type="text/javascript" src="/web_gantt/static/lib/dhtmlxGantt/sources/dhtmlxgantt.js"></script>
                 <script type="text/javascript" src="/web_gantt/static/src/js/gantt.js"></script>
+                <script type="text/javascript" src="/web_gantt/static/src/js/core.js"></script>
             </xpath>
         </template>
     </data>
