@@ -88,11 +88,17 @@
                                     </group>
 
                                 </group>
+                                <div class="step5">
+                                     <h2>保存成功</h2>
+                                    <group>
+                                       <div>您可以：<span class="continue_add_products">继续新建产品</span>或<span class="return_product_lists">返回产品列表</span></div>
+                                    </group>
+                                </div>
 
                                 <footer>
                                     <span class="oe_highlight pre_step">上一步</span>
                                     <span class="btn-primary next_step">下一步</span>
-                                    <button class="oe_highlight" name="save" string="保存"/>
+                                    <!--<span class="oe_highlight mysteps_save" name="save">保存</span>-->
                                 </footer>
                                 <script type="text/javascript" src="/linkloving_product/static/src/js/check_form.js"/>
                             </sheet>

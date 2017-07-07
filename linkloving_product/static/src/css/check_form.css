@@ -13,7 +13,27 @@
     display: none;
     text-align: center;
 }
-.pre_step,.next_step{
+.MySteps .step5{
+    display: none;
+}
+.MySteps .step5 h2{
+    text-align: center!important;
+}
+.MySteps .step5 div{
+    text-align: center;
+}
+.MySteps .mysteps_save{
+    display: none;
+}
+.MySteps .step5 .continue_add_products,.MySteps .step5 .return_product_lists{
+    background: #7c7bad;
+    padding: 5px 10px;
+    margin: 10px;
+    color: white;
+    cursor: pointer;
+    display: inline-block;
+}
+.pre_step,.next_step,.mysteps_save{
     background: #7c7bad;
     padding: 5px 10px;
     margin: 10px;
