@@ -47,7 +47,7 @@
 
                 <xpath expr="//page[@name='extra']" position="after">
                     <page string="产品" attrs="{'invisible': True}">
-                        <field name="interested_in_product" domain="[('sale_ok','=',True)]" widget="many2many_kanban"
+                        <field name="interested_in_product" domain="[('sale_ok','=',True)]" widget="list_new_view"
                                context="{'search_default_rteng':1,'search_default_filter_categ_id':1}"/>
                     </page>
                     <page string="产品">
