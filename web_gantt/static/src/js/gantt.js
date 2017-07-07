@@ -205,7 +205,7 @@ odoo.define('web_gantt.GanttView', function (require) {
                         return group;
                     } else {
                         var id = _.uniqueId("gantt_project_task_");
-                        var group = new GanttTaskInfo(id, group_name, task_start, duration || 1, percent);
+                        var group = new GanttTaskInfo(id, group_name, task_start, duration || 1, percent, undefined, task_stop, task.desc, task.qty, task.state);
                         _.each(task_infos, function (el) {
                             group.addChildTask(el.task_info);
                         });
@@ -248,7 +248,7 @@ odoo.define('web_gantt.GanttView', function (require) {
                     if (!duration_in_business_hours) {
                         duration = (duration / 24) * 8;
                     }
-                    var group = new GanttTaskInfo(id, group_name, task_start, duration || 1, percent);
+                    var group = new GanttTaskInfo(id, group_name, task_start, duration || 1, percent, undefined, task_stop, task.desc, task.qty, task.state);
                     _.each(task_infos, function (el) {
                         group.addChildTask(el.task_info);
                     });
@@ -280,7 +280,7 @@ odoo.define('web_gantt.GanttView', function (require) {
                     if (!duration_in_business_hours) {
                         duration = (duration / 24) * 8;
                     }
-                    var task_info = new GanttTaskInfo(id, task_name, task_start, (duration) || 1, percent);
+                    var task_info = new GanttTaskInfo(id, task_name, task_start, (duration) || 1, percent, undefined, task_stop, task.desc, task.qty, task.state);
 
                     task_info.internal_task = task;
                     task_ids[id] = task_info;
