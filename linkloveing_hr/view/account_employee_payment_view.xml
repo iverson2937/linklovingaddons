@@ -99,7 +99,8 @@
                             </page>
                             <page string='Other Info' attrs="{}">
                                 <group>
-                                    <field name="return_count"/>
+                                    <field name="return_count" invisible="1"/>
+                                    <field name="sheet_count" invisible="1"/>
                                     <field name="pre_payment_reminding" readonly="1"/>
                                     <field name="payment_return" readonly="1"
                                            attrs="{'invisible': [('return_count', '=', 0)]}"/>
