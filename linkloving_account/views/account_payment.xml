@@ -136,7 +136,7 @@
         </record>
 
 
-        <record model="ir.ui.view" id="view_account_payment_search_inherit">
+        <record model="ir.ui.view" id="linkloving_account_account_payment_tree">
             <field name="name">linkloving.account.payment.tree</field>
             <field name="model">account.payment</field>
             <field name="inherit_id" ref="account.view_account_payment_tree"/>
