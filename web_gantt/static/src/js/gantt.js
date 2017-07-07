@@ -289,13 +289,13 @@ odoo.define('web_gantt.GanttView', function (require) {
             }
 
             var gantt = new GanttChart();
-            _.each(_.compact(_.map(groups, function (e1) {
-                return generate_task_info(e1, 0);
+            _.each(_.compact(_.map(groups, function (e) {
+                return generate_task_info(e, 0);
             })), function (project) {
                 gantt.addProject(project);
             });
 
-            gantt.setEditable(false);
+            gantt.setEditable(true);
             gantt.setImagePath("/web_gantt/static/lib/dhtmlxGantt/codebase/imgs/");
             gantt.attachEvent("onTaskEndDrag", function (task) {
                 self.on_task_changed(task);
@@ -327,7 +327,6 @@ odoo.define('web_gantt.GanttView', function (require) {
             this.$el.find(".oe_gantt td:first > div, .oe_gantt td:eq(1) > div > div").css("overflow", "");
         },
         on_task_changed: function (task_obj) {
-            alert("on_task_changed");
             var self = this;
             var itask = task_obj.TaskInfo.internal_task;
             var start = task_obj.getEST();
@@ -352,7 +351,7 @@ odoo.define('web_gantt.GanttView', function (require) {
             var self = this;
             this.do_action({
                 type: 'ir.actions.act_window',
-                res_model: "project.task",
+                res_model: self.model,
                 res_id: task.id,
                 views: [[false, 'form']],
                 target: 'new'
@@ -375,6 +374,12 @@ odoo.define('web_gantt.GanttView', function (require) {
             );
         },
     });
+
+    function clone(date){
+        return new Date(date.getTime());
+    }
+
+
 
     function contains(arr, obj) {
         var index = arr.length;
