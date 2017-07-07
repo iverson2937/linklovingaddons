@@ -42,6 +42,8 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
         if not self.payment_ids:
             raise UserError('你还未选择暂支单')
         total_amount = self.sheet_id.total_amount
+        if not self.sheet_id:
+            raise UserError(u'未找到报销单')
         for payment_id in self.payment_ids:
             if total_amount:
                 line_id = self.env['account.employee.payment.line'].create({
