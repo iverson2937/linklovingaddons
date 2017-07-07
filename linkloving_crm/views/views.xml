@@ -259,7 +259,7 @@
                                 <field name="subject"/>
                                 <field name="sale_order_type" invisible="1"/>
                                 <field name="attachment_ids"
-                                       attrs="{'invisible': [('sale_order_type','not in',('inspection','question'))]}"/>
+                                       attrs="{'invisible': ['|',('sale_order_type','not in',('inspection','question')),('attachment_ids','=',[])]}"/>
                                 <field name="date" invisible="1"/>
                                 <field name="email_from" invisible="1"/>
                                 <field name="author_id" invisible="1"/>
@@ -329,6 +329,5 @@
             </field>
         </record>
 
-<!--context="{'default_name':email}"-->
     </data>
 </openerp>
