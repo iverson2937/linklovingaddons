@@ -2552,3 +2552,12 @@ class LinklovingAppApi(http.Controller):
                                               res_data={"error": u"该状态不能做此操作"})
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data={})
+
+    @http.route('/linkloving_oa_api/get_origin/', auth='none', type='http', csrf=False)
+    def get_origin(self, **kwargs):
+        # request.session.db = '0426'#'#request.jsonrequest["db"]
+        # request.params["db"] = '0426'#request.jsonrequest["db"]
+
+        sources = request.env["crm.lead.source"].sudo().search_read([], fields=['name'])
+        print sources
+        return sources
