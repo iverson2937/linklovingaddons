@@ -323,7 +323,7 @@
         <menuitem action="crm_sale_action_partner_form"
                   id="menu_message_order_status_id"
                   parent="sales_team.menu_sales"
-                  groups="sales_team.group_sale_manager"
+                  groups=""
                   sequence="1" name="潜在客户"/>
 
 

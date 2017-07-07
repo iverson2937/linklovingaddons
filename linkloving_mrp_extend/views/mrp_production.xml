@@ -10,7 +10,6 @@
                        state="state"
                        desc="product_tmpl_id"
                        qty="product_qty"
-
                        string="Productions"
                        default_group_by="process_id">
                 </gantt>

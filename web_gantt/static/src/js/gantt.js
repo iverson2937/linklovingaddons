@@ -251,8 +251,8 @@ odoo.define('web_gantt.GanttView', function (require) {
                         duration = (duration / 24) * 8;
                     }
                     var group = new GanttTaskInfo(id, group_name, task_start, duration || 1, percent, undefined, task_stop, task.desc, task.product_qty, task.state);
-                    _.each(task_infos, function (el) {
-                        group.addChildTask(el.task_info);
+                    _.each(task_infos, function (e) {
+                        group.addChildTask(e.task_info);
                     });
                     group.internal_task = task;
                     task_ids[id] = group;
@@ -283,7 +283,6 @@ odoo.define('web_gantt.GanttView', function (require) {
                         duration = (duration / 24) * 8;
                     }
                     var task_info = new GanttTaskInfo(id, task_name, task_start, (duration) || 1, percent, undefined, task_stop, task.product_tmpl_id[1], task.product_qty, task.state);
-
                     task_info.internal_task = task;
                     task_ids[id] = task_info;
                     return {task_info: task_info, task_start: task_start, task_stop: task_stop};

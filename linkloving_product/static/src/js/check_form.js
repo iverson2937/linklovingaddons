@@ -8,6 +8,8 @@ $(".pre_step").click(function () {
     if(flag==1){
 
     }else {
+        $(".next_step").show();
+        $(".mysteps_save").hide();
         $(".step"+flag).hide();
         $(".step_nav"+flag).removeClass("active_step");
         flag--;
@@ -20,7 +22,8 @@ $(".next_step").click(function () {
 
     }else {
         if(flag==3){
-            $(".next_step").html("保存");
+            $(".next_step").hide();
+            $(".mysteps_save").css("display","inline-block")
         }
         if(flag==4){
             $(".MySteps footer").hide();
