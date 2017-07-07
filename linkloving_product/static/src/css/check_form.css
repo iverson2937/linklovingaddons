@@ -1,11 +1,45 @@
 .step1{
-    background: yellow;
+    text-align: center;
 }
 .step2{
-    background: pink;
+    text-align: center;
     display: none;
 }
 .step3{
-    background: cadetblue;
+     text-align: center;
     display: none;
+}
+.MySteps .step4{
+    display: none;
+    text-align: center;
+}
+.pre_step,.next_step{
+    background: #7c7bad;
+    padding: 5px 10px;
+    margin: 10px;
+    cursor: pointer;
+}
+.MySteps select[name="product_ll_type"]{
+    width: 232px;
+}
+.MySteps footer{
+    text-align: center;
+    margin-top: 30px;
+}
+.MySteps .step2 .o_inner_group{
+    width: 28%;
+}
+.MySteps .step3 .o_inner_group{
+    width: 50%;
+}
+.MySteps .step_navs{
+    display: flex;
+    justify-content: space-around;
+    background: #f2f2f2;
+    padding: 8px;
+    border-top: 1px solid #c7c7c7;
+}
+.MySteps .step_navs .active_step{
+    color: #7c7bad;
+    font-weight: bolder;
 }

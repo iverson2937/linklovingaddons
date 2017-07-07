@@ -1,23 +1,25 @@
 /**
  * Created by 123 on 2017/7/6.
  */
-console.log($(".step2"));
+
 var flag = 1;
 $(".pre_step").click(function () {
     if(flag==1){
 
     }else {
-        $(".step"+flag).hide(100);
+        $(".step"+flag).hide();
+        $(".step_nav"+flag).removeClass("active_step");
         flag--;
-        $(".step"+flag).show(200);
+        $(".step"+flag).show();
     }
 });
 $(".next_step").click(function () {
-    if(flag==3){
+    if(flag==4){
 
     }else {
         $(".step"+flag).hide();
         flag++;
         $(".step"+flag).show();
+        $(".step_nav"+flag).addClass("active_step");
     }
 });
