@@ -1754,3 +1754,39 @@ class orderpoint_multi_create_wizard(models.TransientModel):
             elif rec.type in ('product', 'consu') and reorder_rules and overwrite:
                 for reorder_rule in reorder_rules:
                     reorder_rule.write(reorder_vals)
+
+
+class multi_force_assign(models.TransientModel):
+    _name = 'multi.force.assign'
+
+    @api.multi
+    def action_ok(self):
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+        pickings = self.env['stock.picking'].browse(active_ids)
+        pickings.filtered(lambda x: x.state not in ['done', 'cancel', 'draft']).force_assign()
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": u"强制可用成功",
+                "text": u"强制可用成功",
+                "sticky": False
+            }
+        }
+
+    @api.multi
+    def action_multi_unreserve(self):
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+        pickings = self.env['stock.picking'].browse(active_ids)
+        pickings.filtered(lambda x: x.state not in ['done', 'cancel', 'draft']).do_unreserve()
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": u"取消保留成功",
+                "text": u"取消保留成功",
+                "sticky": False
+            }
+        }

@@ -28,5 +28,53 @@
                     res_model="orderpoint.multi.create.wizard" src_model="product.template"
                     view_mode="form" target="new" view_type="form"/>
 
+
+        <record id="multi_force_assign_view" model="ir.ui.view">
+            <field name="name">multi.force.assign.form</field>
+            <field name="model">multi.force.assign</field>
+            <field name="arch" type="xml">
+                <form string="批量强制可用">
+                    <p class="oe_grey">
+                        是否将选中单据强制可用？
+                    </p>
+                    <footer>
+                        <button string="确定" name="action_ok" type="object" default_focus="1"
+                                class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+        <act_window id="action_multi_force_assign"
+                    multi="True"
+                    key2="client_action_multi" name="批量强制可用"
+                    res_model="multi.force.assign" src_model="stock.picking"
+                    view_mode="form" target="new" view_type="form"/>
+
+        <record id="multi_unreserve_view" model="ir.ui.view">
+            <field name="name">multi.force.assign.form</field>
+            <field name="model">multi.force.assign</field>
+            <field name="arch" type="xml">
+                <form string="批量取消保留">
+                    <p class="oe_grey">
+                        是否将选中单据取消保留？
+                    </p>
+                    <footer>
+                        <button string="确定" name="action_multi_unreserve" type="object" default_focus="1"
+                                class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+        <act_window id="action_multi_unreserve"
+                    multi="True"
+                    key2="client_action_multi" name="批量取消保留"
+                    res_model="multi.force.assign" src_model="stock.picking"
+                    view_mode="form" target="new" view_type="form" view_id="multi_unreserve_view"/>
     </data>
 </openerp>
