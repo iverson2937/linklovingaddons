@@ -25,26 +25,58 @@ class LinklovingOaApi(http.Controller):
     @http.route('/linkloving_oa_api/add_partner/', auth='none', type='json')
     def add_partner(self, **kwargs):
         name = request.jsonrequest.get("name")
-        company_name = request.jsonrequest.get("company_name")
+        company_real_name = company_name = request.jsonrequest.get("company_name")
         saleman_id = request.jsonrequest.get("saleman_id")
         saleteam_id = request.jsonrequest.get("saleteam_id")
         tag_list = request.jsonrequest.get("tag_list")
         star_cnt = request.jsonrequest.get("star_cnt")
         partner_lv = request.jsonrequest.get("partner_lv")
-        crm_source_id = request.jsonrequest.get("crm_source_id")
-
+        phone = request.jsonrequest.get("phone")
+        street = request.jsonrequest.get("street")
+        area = request.jsonrequest.get("area")
+        source_id = request.jsonrequest.get("crm_source_id")
+        partner_type = request.jsonrequest.get("partner_type")
         partners = request.env["res.partner"].sudo().search([("name", "ilike", name)])
         if partners:
             return {"error": u"该客户已存在"}
         else:
-            request.env["res.partner"].sudo().create({
-
+            if u"有限公司" in company_name:
+                company_name = company_name.replace(u"有限公司", "")
+            elif u'有限责任公司' in company_name:
+                company_name = company_name.replace(u"有限责任公司", "")
+            elif u'责任有限公司' in company_name:
+                company_name = company_name.replace(u"责任有限公司", "")
+            elif u'公司' in company_name:
+                company_name = company_name.replace(u"公司", "")
+            company = request.env["res.partner"].sudo().search([("name", "ilike", company_name)])
+            if not company:
+                company = request.env["res.partner"].sudo().create({
+                    "name": company_real_name,
+                    "street": street,
+                    "level": int(partner_lv),
+                    "priority": str(star_cnt),
+                    "category_id": [6, 0, (tag_list)],
+                    "team_id": saleteam_id,
+                    "user_id": saleman_id,
+                    "crm_source_id": source_id,
+                    "customer": partner_type == "customer",
+                    "supplier": partner_type == "supplier",
+                    "is_company": True
+                })
+                # company.company_type = "company"
+            s = request.env["res.partner"].sudo().create({
+                "name": name,
+                "company_type": "person",
+                "parent_id": company.id,
+                "mobile": phone,
+                "customer": partner_type == "customer",
+                "supplier": partner_type == "supplier"
             })
             return
 
     @http.route('/linkloving_oa_api/get_saleman_list/', auth='none', type='json')
     def get_saleman_list(self, **kwargs):
-        sources = request.env["res.partner"].sudo().search([('employee', '=', True)])
+        sources = request.env["res.users"].sudo().search([])
         json_list = []
         for src in sources:
             json_list.append(
