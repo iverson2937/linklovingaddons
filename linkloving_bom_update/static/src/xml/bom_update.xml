@@ -21,6 +21,7 @@
                     </a>
                     <span t-att-data-templ-id="result.product_tmpl_id" class="product_name">[<t t-esc="result.code"/>]<span><t t-esc="result.name"/></span></span>
                     <span style="margin-left:15px"><t t-esc="result.process_id"/></span>
+                    <span style="margin-left:30px;"><t t-esc="result.product_specs"/></span>
                     <t t-if="result.bom_ids.length>0">
                         <span style="margin-left:30px;cursor:pointer" class="fa fa-plus add_product"></span>
                     </t>
@@ -70,16 +71,16 @@
             </t>
             <div class="bom_review_list">
                 <t t-foreach="result.review_line" t-as="review_list">
-                    <div><t t-esc="review_list.name"/></div>
-                    <t t-if="review_list.state=='review_success'">
-                        <span class="fa fa-long-arrow-right" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark"></span>
+                    <div data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"><t t-esc="review_list.name"/></div>
+                    <t t-if="review_list.state[0]=='review_success'">
+                        <span class="fa fa-long-arrow-right" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"></span>
                     </t>
-                    <t t-if="review_list.state=='waiting_review'">
-                        <span class="fa fa-long-arrow-right document_yellow"></span>
-                        <div>等待</div>
+                    <t t-if="review_list.state[0]=='waiting_review'">
+                        <span class="fa fa-long-arrow-right document_yellow" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"></span>
+                        <div data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date">等待</div>
                     </t>
-                     <t t-if="review_list.state=='review_fail'||review_list.state=='review_canceled'">
-                        <span class="fa fa-long-arrow-right document_red" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark"></span>
+                     <t t-if="review_list.state[0]=='review_fail'||review_list.state[0]=='review_canceled'">
+                        <span class="fa fa-long-arrow-right document_red" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"></span>
                          <!--<div>审核不通过</div>-->
                     </t>
                 </t>
@@ -129,11 +130,12 @@
                     <span class="fa fa-caret-right open-sign"></span>
                 </t>
             </a>
-            <span t-att-data-templ-id="item.product_tmpl_id" t-att-data-id="item.product_id" t-att-data-product-id="item.id" class="product_name">[<t t-esc="item.code"/>]<span><t t-esc="item.name"/></span></span>
             <span style="margin-left:15px"><t t-esc="item.qty"/></span>
+            <span t-att-data-templ-id="item.product_tmpl_id" t-att-data-id="item.product_id" t-att-data-product-id="item.id" class="product_name">[<t t-esc="item.code"/>]<span><t t-esc="item.name"/></span></span>
             <t t-if="item.process_id != false">
                 <span style="margin-left:15px"><t t-esc="item.process_id"/></span>
             </t>
+            <span style="margin-left:30px;"><t t-esc="item.product_specs"/></span>
             <t t-if="item.bom_ids.length>0">
                 <span style="margin-left:30px;cursor:pointer" class="fa fa-plus add_product"></span>
             </t>
