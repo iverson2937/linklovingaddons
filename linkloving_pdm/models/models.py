@@ -79,7 +79,7 @@ class ReviewProcess(models.Model):
             line_list.append({
                 'name': line.partner_id.name,
                 'remark': line.remark or '',
-                'state': REVIEW_LINE_STATE[line.state],
+                'state': [line.state, REVIEW_LINE_STATE[line.state]],
                 'create_date': line.create_date,
             })
         return line_list
