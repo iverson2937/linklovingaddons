@@ -33,6 +33,9 @@
     </t>
 
     <t t-name="approval_tab_content">
+         <script>
+            $(function () { $("[data-toggle='tooltip']").tooltip(); });
+        </script>
         <t t-foreach="result" t-as="item_files">
             <div class="tab_pane_display" t-att-data-id="item_files.id">
                 <div class="tab_message_display">
