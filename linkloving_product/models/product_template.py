@@ -10,6 +10,13 @@ class ProductTemplate11(models.Model):
     spec_id = fields.Many2one('product.spec', string=u'型号')
     partner_id = fields.Many2one('res.partner', domain=[('customer', '=', True), ('is_company', '=', True)],
                                  string=u'客户')
+    is_updated = fields.Boolean()
+
+    @api.multi
+    def write(self, vals):
+        if 'default_code' in vals and vals['default_code'] != self.default_code:
+            vals.update({'is_updated': True})
+        return super(ProductTemplate11, self).write(vals)
 
     @api.multi
     def create_new_product(self):
@@ -31,7 +38,7 @@ class ProductTemplate11(models.Model):
     def product_list(self):
         return {
             'name': '产品',
-            'view_type': 'tree',
+            'view_type': 'form',
             'view_mode': 'tree,form',
             'res_model': 'product.template',
             'view_id': False,
@@ -41,7 +48,6 @@ class ProductTemplate11(models.Model):
 
     @api.onchange('categ_id', 'sub_spec_id', 'spec_id', 'partner_id')
     def _get_default_code(self):
-        print 'dddddddddddd'
         if self.categ_id.code:
             categ_code = self.categ_id.code
             sub_spec_id = self.sub_spec_id.code if self.sub_spec_id else '0'
