@@ -1223,8 +1223,11 @@ class ReturnMaterialLine(models.Model):
         if self[0].return_id.production_id.process_id.is_rework:  # 重工
             return
         if len(self) > 0:
+            total_qty = 0
+            for fd in self[0].return_id.production_id.qc_feedback_ids:
+                total_qty += fd.qty_produced
             boms, lines = self[0].return_id.production_id.bom_id.explode(self[0].return_id.production_id.product_id,
-                                                                         self[0].return_id.production_id.qty_produced)
+                                                                         total_qty)
 
         scrap_env = self.env["production.scrap"]
         for line in self:
@@ -1235,6 +1238,8 @@ class ReturnMaterialLine(models.Model):
                     break
             done_move = line.return_id.production_id.sim_stock_move_lines.filtered(
                 lambda x: x.product_id.id == line.product_id.id)
+            if uom_qty == 0:
+                raise UserError(u"异常数据")
             if done_move and len(done_move) == 1:
                 done_qty = done_move.quantity_done
                 return_qty = done_move.return_qty
