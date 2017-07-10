@@ -16,6 +16,12 @@ AVAILABLE_PRIORITIES = [
 ]
 
 
+def select_company(my_self, vals, type):
+    result = my_self.env['res.partner'].search(
+        [(type, '=', vals[type].strip()), ('customer', '=', True), ('is_company', '=', True)])
+    return result
+
+
 class ResPartner(models.Model):
     """"""
 
@@ -58,24 +64,32 @@ class ResPartner(models.Model):
             if line.sale_order_count > 0:
                 line.is_order = True
 
-    # @api.model
-    # def create(self, vals):
-    #     exist = self.env['res.partner'].search(
-    #             [('name', '=', vals['name'].strip()), ('customer', '=', True), ('is_company', '=', True)])
-    #     if exist:
-    #         raise UserError(u'该名称已经存在')
-    #     return super(ResPartner, self).create(vals)
+    @api.model
+    def create(self, vals):
+        if 'is_company' in vals and 'company_type' in vals:
+            if vals['is_company'] == True and vals['company_type'] == 'company':
+                if 'name' in vals:
+                    if select_company(self, vals, 'name'):
+                        raise UserError(u'此名称已绑定公司，请确认')
 
-    # @api.multi
-    # def write(self, vals):
-    #     exist = False
-    #     if 'name' in vals:
-    #         exist = self.env['res.partner'].search(
-    #             [('name', '=', vals['name'].strip()), ('customer', '=', True), ('is_company', '=', True)])
-    #
-    #     if exist:
-    #         raise UserError(u'该名称已经存在')
-    #     return super(ResPartner, self).write(vals)
+                if 'email' in vals:
+                    if select_company(self, vals, 'email'):
+                        raise UserError(u'此Email已绑定公司，请更换')
+
+        return super(ResPartner, self).create(vals)
+
+    @api.multi
+    def write(self, vals):
+        if 'is_company' in self and 'company_type' in self:
+            if self['is_company'] == True and self['company_type'] == 'company':
+                if 'name' in vals:
+                    if select_company(self, vals, 'name'):
+                        raise UserError(u'此名称已绑定公司，请确认')
+
+                if 'email' in vals:
+                    if select_company(self, vals, 'email'):
+                        raise UserError(u'此Email已绑定公司，请更换')
+        return super(ResPartner, self).write(vals)
 
     @api.depends('street', 'country_id', 'zip', 'state_id', 'city', 'street', 'street2')
     def _street_name(self):

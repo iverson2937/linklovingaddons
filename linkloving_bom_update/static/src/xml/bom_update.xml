@@ -21,7 +21,7 @@
                     </a>
                     <span t-att-data-templ-id="result.product_tmpl_id" class="product_name">[<t t-esc="result.code"/>]<span><t t-esc="result.name"/></span></span>
                     <span style="margin-left:15px"><t t-esc="result.process_id"/></span>
-                    <span style="margin-left:30px;"><t t-esc="result.product_specs"/></span>
+                    <!--<span style="margin-left:30px;"><t t-esc="result.product_specs"/></span>-->
                     <t t-if="result.bom_ids.length>0">
                         <span style="margin-left:30px;cursor:pointer" class="fa fa-plus add_product"></span>
                     </t>
@@ -135,7 +135,7 @@
             <t t-if="item.process_id != false">
                 <span style="margin-left:15px"><t t-esc="item.process_id"/></span>
             </t>
-            <span style="margin-left:30px;"><t t-esc="item.product_specs"/></span>
+            <!--<span style="margin-left:30px;"><t t-esc="item.product_specs"/></span>-->
             <t t-if="item.bom_ids.length>0">
                 <span style="margin-left:30px;cursor:pointer" class="fa fa-plus add_product"></span>
             </t>
