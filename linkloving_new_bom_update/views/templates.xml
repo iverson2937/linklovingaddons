@@ -1,0 +1,18 @@
+<odoo>
+    <data>
+        <record id="mrp_bom_form_view" model="ir.ui.view">
+            <field name="name">mrp.bom.form</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+            <field name="arch" type="xml">
+                <div name="button_box" position="inside">
+                    <button class="oe_stat_button" name="bom_detail" type="object"
+                            icon="fa-tasks" string="新BOM修改">
+                    </button>
+                </div>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>
