@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
 from odoo import tools
+from odoo.exceptions import UserError
 
 AVAILABLE_PRIORITIES = [
     ('0', 'badly'),
@@ -70,6 +71,13 @@ class CrmLead(models.Model):
             'type': 'contact',
             'priority': self.priority
         }
+
+        from .res_partner import select_company
+        if select_company(self, values, 'name'):
+            raise UserError(u'此名称已绑定公司，请确认')
+
+        if select_company(self, values, 'email'):
+            raise UserError(u'此Email已绑定公司，请更换')
 
         alarm_record = set()
         alarm_record1 = set()
