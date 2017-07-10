@@ -121,3 +121,7 @@
     height:30px;
     display: block;
 }
+.get_version_history{
+    display: block;
+    margin-top: 10px;
+}

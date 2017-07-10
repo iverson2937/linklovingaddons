@@ -15,7 +15,10 @@ from odoo import models, fields, api
 #         self.value2 = float(self.value) / 100
 from odoo.exceptions import UserError
 
-
+REVIEW_LINE_STATE = {'waiting_review': u'等待审核',
+                     'review_success': u'审核通过',
+                     'review_fail': u'审核不通过',
+                     'review_canceled': u'取消审核'}
 class ReviewProcess(models.Model):
     _name = 'review.process'
 
@@ -76,7 +79,8 @@ class ReviewProcess(models.Model):
             line_list.append({
                 'name': line.partner_id.name,
                 'remark': line.remark or '',
-                'state': line.state,
+                'state': [line.state, REVIEW_LINE_STATE[line.state]],
+                'create_date': line.create_date,
             })
         return line_list
 
