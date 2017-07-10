@@ -47,6 +47,7 @@ class MrpBom(models.Model):
             'bom_id': self.id,
             'product_id': self.product_tmpl_id.id,
             'product_tmpl_id': self.product_tmpl_id.id,
+            'product_specs': self.product_tmpl_id.product_specs,
             'name': self.product_tmpl_id.name,
             'code': self.product_tmpl_id.default_code,
             'process_id': self.process_id.name,
