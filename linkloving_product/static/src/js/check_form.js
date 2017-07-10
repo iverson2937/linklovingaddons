@@ -34,3 +34,18 @@ $(".next_step").click(function () {
         $(".step_nav"+flag).addClass("active_step");
     }
 });
+
+$(".mysteps_save").click(function () {
+    $(document).ajaxComplete(function (event, xhr, settings) {
+        // console.log(settings)
+        var data = JSON.parse(settings.data);
+        if(data.params.method == 'create'){
+            // $(".MySteps .step4").hide();
+            console.log(flag);
+            $(".step"+flag).hide();
+            $(".MySteps .step5").show();
+            console.log(flag);
+            $(".MySteps footer").hide();
+        }
+    })
+})
