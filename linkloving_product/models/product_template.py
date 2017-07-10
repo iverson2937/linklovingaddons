@@ -12,7 +12,7 @@ class ProductTemplate11(models.Model):
                                  string=u'客户')
 
     @api.multi
-    def product_list(self):
+    def create_new_product(self):
 
         form = self.env.ref('linkloving_product.new_product_form_wizard', False)
 
@@ -28,10 +28,10 @@ class ProductTemplate11(models.Model):
         }
 
     @api.multi
-    def create_new_product(self):
+    def product_list(self):
         return {
             'name': '产品',
-            'view_type': 'form',
+            'view_type': 'tree',
             'view_mode': 'tree,form',
             'res_model': 'product.template',
             'view_id': False,
@@ -41,6 +41,7 @@ class ProductTemplate11(models.Model):
 
     @api.onchange('categ_id', 'sub_spec_id', 'spec_id', 'partner_id')
     def _get_default_code(self):
+        print 'dddddddddddd'
         if self.categ_id.code:
             categ_code = self.categ_id.code
             sub_spec_id = self.sub_spec_id.code if self.sub_spec_id else '0'
@@ -85,3 +86,82 @@ class ProductTemplate11(models.Model):
                 self.default_code = full_code
 
     default_code = fields.Char(track_visibility='onchange')
+
+
+class ProductProduct(models.Model):
+    _inherit = 'product.product'
+
+    @api.onchange('categ_id', 'sub_spec_id', 'spec_id', 'partner_id')
+    def _get_default_code(self):
+        if self.categ_id.code:
+            categ_code = self.categ_id.code
+            sub_spec_id = self.sub_spec_id.code if self.sub_spec_id else '0'
+            spec_id = self.spec_id.code if self.spec_id else '000'
+            full_specs = str(sub_spec_id) + str(spec_id)
+
+            if self.partner_id:
+                print self.partner_id.name
+                version1 = self.partner_id.customer_code
+                if not version1:
+                    raise UserError('请设置该客户编码')
+                prefix = '.'.join([categ_code, full_specs, version1])
+                products = self.env['product.product'].search([('default_code', 'ilike', prefix)])
+                if not products:
+                    final_version = 'A'
+                else:
+                    versions = []
+                    for product in products:
+                        if len(product.default_code.split('.')) > 3:
+                            versions.append(product.default_code.split('.')[-1])
+                    if not versions:
+                        final_version = 'B'
+                    else:
+                        final_version = chr(ord(max(versions)) + 1)
+                full_code = '.'.join([categ_code, full_specs, version1, final_version])
+                self.default_code = full_code
+
+            else:
+                prefix = '.'.join([categ_code, full_specs])
+                products = self.env['product.product'].search([('default_code', 'ilike', prefix)])
+                if not products:
+                    version1 = '000'
+                else:
+                    versions = []
+                    for product in products:
+                        if len(product.default_code.split('.')) == 3:
+                            versions.append(product.default_code.split('.')[-1])
+                    if versions:
+                        version1 = '00' + str(int(max(versions)) + 1)
+                    else:
+                        version1 = '000'
+                full_code = '.'.join([categ_code, full_specs, version1])
+                self.default_code = full_code
+        print self.default_code
+
+    @api.multi
+    def create_new_product(self):
+
+        form = self.env.ref('linkloving_product.new_product_form_wizard', False)
+
+        return {
+            'name': '新建',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'product.template',
+            'views': [(form.id, 'form')],
+            'view_id': form.id,
+            'target': 'new',
+        }
+
+    @api.multi
+    def product_list(self):
+        return {
+            'name': '产品',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'product.template',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            # 'domain': [('payment_id', 'in', self.ids)],
+        }

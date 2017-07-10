@@ -38,8 +38,13 @@ $(".next_step").click(function () {
 $(".mysteps_save").click(function () {
     $(document).ajaxComplete(function (event, xhr, settings) {
         // console.log(settings)
+        console.log(event);
+        console.log(xhr);
         var data = JSON.parse(settings.data);
-        if(data.params.method == 'create'){
+        var result = JSON.parse(xhr.responseText);
+        console.log(result);
+        if (data.params.method == 'create' && !result.error) {
+            console.log(data);
             // $(".MySteps .step4").hide();
             console.log(flag);
             $(".step"+flag).hide();

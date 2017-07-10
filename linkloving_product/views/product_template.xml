@@ -63,7 +63,7 @@
                                 </div>
                                 <div class="step3">
                                     <group>
-                                        <field name="default_code" readonly="1" string="料号"/>
+                                        <field name="default_code" readonly="0" string="料号"/>
                                         <field name="categ_id" options="{'no_create':True}"/>
                                         <field name="sub_spec_id" options="{'no_create':True}"/>
                                         <field name="spec_id" options="{'no_create':True}"/>
@@ -75,8 +75,8 @@
                                     <group>
                                         <field name="order_ll_type"
                                                attrs="{'invisible': [('product_ll_type', '!=', 'finished')],'required':[('product_ll_type', '=', 'finished')]}"/>
-                                        <field name="inner_code"/>
-                                        <field name="inner_spec"/>
+                                        <field name="inner_code" string="国内简称"/>
+                                        <field name="inner_spec" string="国内型号"/>
                                         <field name="product_specs"/>
 
                                     </group>
@@ -92,8 +92,10 @@
                                     <h2>保存成功</h2>
                                     <group>
                                         <div>您可以：<button class="continue_add_products" name='create_new_product'
+                                                         type="object"
                                                          string="继续新建产品"/>或
-                                            <button class="return_product_lists" name="product_list" string="返回产品列表"/>
+                                            <button class="return_product_lists" name="product_list" type="object"
+                                                    string="返回产品列表"/>
                                         </div>
                                     </group>
                                 </div>
