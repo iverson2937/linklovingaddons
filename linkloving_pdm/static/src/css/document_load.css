@@ -17,7 +17,7 @@
 }
 .document_page_container .tab_message_display{
     overflow: hidden;
-    width: 35%;
+    width: 90%;
 }
 .document_page_container .tab_message_display>div{
     /*float: left;*/
@@ -31,13 +31,13 @@
     margin-bottom: 15px;
 }
 .document_page_container .tab_pane_display .document_review_list{
-    position: absolute;
-    top: 0px;
-    right: 90px;
+    /*position: absolute;*/
+    /*top: 0px;*/
+    /*right: 90px;*/
     padding: 10px;
-    padding-left: 60px;
+    padding-left: 0px;
     /*background: pink;*/
-    width: 60%;
+    width: 90%;
     height:100%;
 }
 .document_page_container .tab_pane_display .document_review_list>span{
