@@ -77,11 +77,11 @@ odoo.define('web_gantt.GanttView', function (require) {
         },
         do_search: function (domains, contexts, group_bys) {
             var self = this;
-            if(domains){
+            if (domains) {
                 _.each(domains, function (domain, i) {
-                   if(domain && domain[0] == "parent_ids"){
-                       domains.splice(i, 1);
-                   }
+                    if (domain && domain[0] == "parent_ids") {
+                        domains.splice(i, 1);
+                    }
                 });
             }
             self.last_domains = domains;
@@ -96,7 +96,7 @@ odoo.define('web_gantt.GanttView', function (require) {
                 n_group_bys = group_bys;
             }
             // gather the fields to get
-            var fields = _.compact(_.map(["date_start", "date_stop", "progress", "state","qty",'desc',"child_ids", "parent_ids"], function (key) {
+            var fields = _.compact(_.map(["date_start", "date_stop", "progress", "state", "qty", 'desc', "child_ids", "parent_ids", "top_task_id"], function (key) {
                 return self.fields_view.arch.attrs[key] || '';
             }));
             fields = _.uniq(fields.concat(n_group_bys));
@@ -148,16 +148,51 @@ odoo.define('web_gantt.GanttView', function (require) {
                 if (group_bys.length === 0)
                     return tasks;
                 var groups = [];
+                if (self.model == 'project.task') {
+                    groups = _.compact(_.map(tasks, function (task) {
+                        if (task.top_task_id == 0) {
+                            var group_name = task.__name;
+                            var group = {name: group_name, __is_group: true, groups:[], top_task: task};
+                            return group;
+                        }
+                    }));
+                }
                 _.each(tasks, function (task) {
-                    var group_name = task[_.first(group_bys)];
-                    var group = _.find(groups, function (group) {
-                        return _.isEqual(group.name, group_name);
-                    });
-                    if (group === undefined) {
-                        group = {name: group_name, tasks: [], __is_group: true};
-                        groups.push(group);
+                    var group_name;
+                    var group;
+                    var top_group;
+                    if (self.model == 'project.task') {
+
+                        if (task.top_task_id != 0) {
+                            group_name = task[_.first(group_bys)];
+                            top_group = _.find(groups, function (group) {
+                                return _.isEqual(group.top_task.id, task.top_task_id);
+                            });
+
+                            if(top_group){
+                                group = _.find(top_group.groups, function (group) {
+                                    return _.isEqual(group.name, group_name);
+                                });
+                                if (group === undefined) {
+                                    group = {name: group_name, tasks: [], __is_group: true};
+                                    top_group.groups.push(group);
+                                }
+                                group.tasks.push(task);
+                            }
+                        }
+
+                    } else {
+                        group_name = task[_.first(group_bys)];
+                        group = _.find(groups, function (group) {
+                            return _.isEqual(group.name, group_name);
+                        });
+
+                        if (group === undefined) {
+                            group = {name: group_name, tasks: [], __is_group: true};
+                            groups.push(group);
+                        }
+                        group.tasks.push(task);
                     }
-                    group.tasks.push(task);
                 });
                 _.each(groups, function (group) {
                     group.tasks = split_groups(group.tasks, _.rest(group_bys));
@@ -170,7 +205,6 @@ odoo.define('web_gantt.GanttView', function (require) {
             var task_ids = {};
             // creation of the chart
             var generate_task_info = function (task, plevel) {
-                console.log(task);
                 if (_.isNumber(task[self.fields_view.arch.attrs.progress])) {
                     var percent = task[self.fields_view.arch.attrs.progress] || 0;
                 } else {
@@ -179,10 +213,10 @@ odoo.define('web_gantt.GanttView', function (require) {
                 var level = plevel || 0;
                 if (task.__is_group) {
                     var tasks = [];
-                    _.each(task.tasks, function(t){
-                       if(!t.parent_ids || t.parent_ids.length == 0){
-                           tasks.push(t);
-                       }
+                    _.each(task.tasks, function (t) {
+                        if (!t.parent_ids || t.parent_ids.length == 0) {
+                            tasks.push(t);
+                        }
                     });
                     var task_infos = _.compact(_.map(tasks, function (sub_task) {
                         sub_task.siblingTasks = task.tasks;
@@ -218,7 +252,7 @@ odoo.define('web_gantt.GanttView', function (require) {
                 } else if (task.child_ids && task.child_ids.length != 0) {
                     var tasks = [];
                     _.each(task.siblingTasks, function (sub_task) {
-                        if(contains(task.child_ids, sub_task.id)){
+                        if (contains(task.child_ids, sub_task.id)) {
                             tasks.push(sub_task);
                         }
                     });
@@ -228,7 +262,7 @@ odoo.define('web_gantt.GanttView', function (require) {
                         return generate_task_info(sub_task, level + 1);
                     }));
 
-                   var task_start = time.auto_str_to_date(task[self.fields_view.arch.attrs.date_start]);
+                    var task_start = time.auto_str_to_date(task[self.fields_view.arch.attrs.date_start]);
                     if (!task_start)
                         return;
                     var task_stop;
@@ -257,7 +291,7 @@ odoo.define('web_gantt.GanttView', function (require) {
                     group.internal_task = task;
                     task_ids[id] = group;
                     return {task_info: group, task_start: task_start, task_stop: task_stop};
-                } else{
+                } else {
 
                     var task_name = task.__name;
                     var duration_in_business_hours = false;
@@ -282,7 +316,7 @@ odoo.define('web_gantt.GanttView', function (require) {
                     if (!duration_in_business_hours) {
                         duration = (duration / 24) * 8;
                     }
-                    var task_info = new GanttTaskInfo(id, task_name, task_start, (duration) || 1, percent, undefined, task_stop, task.product_tmpl_id[1], task.product_qty, task.state);
+                    var task_info = new GanttTaskInfo(id, task_name, task_start, (duration) || 1, percent, undefined, task_stop, task.desc, task.product_qty, task.state);
                     task_info.internal_task = task;
                     task_ids[id] = task_info;
                     return {task_info: task_info, task_start: task_start, task_stop: task_stop};
@@ -356,8 +390,10 @@ odoo.define('web_gantt.GanttView', function (require) {
                 res_id: task.id,
                 views: [[false, 'form']],
                 target: 'new'
-            },{
-                on_close: function(){ self.reload(); }
+            }, {
+                on_close: function () {
+                    self.reload();
+                }
             });
         },
         on_task_create: function () {
@@ -376,10 +412,9 @@ odoo.define('web_gantt.GanttView', function (require) {
         },
     });
 
-    function clone(date){
+    function clone(date) {
         return new Date(date.getTime());
     }
-
 
 
     function contains(arr, obj) {
