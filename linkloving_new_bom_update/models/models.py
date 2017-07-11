@@ -93,9 +93,13 @@ def _get_rec(object, level, qty=1.0, uom=False):
         if bom_id:
 
             process_id = bom_id[0].process_id.name
-            for line in bom_id[0].bom_line_ids:
-                if line.product_id == l.product_id:
-                    parent_id = line.id
+            print bom_id[0].bom_line_ids
+            parent_bom_id = l.bom_id
+            for bom_line in parent_bom_id.bom_line_ids:
+                print bom_line.product_id
+                print l.product_id
+                if bom_line.product_id == l.product_id:
+                    parent_id = bom_line.id
 
         res = {
             'name': l.product_id.name,
