@@ -6,6 +6,13 @@ from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
+
+class ResPartnerExtend(models.Model):
+    _inherit = 'res.partner'
+
+    simliar_companys = fields.Many2many(comodel_name="res.partner", relation="simliar_companys_rel",
+                                        column1="company_id", column2="company_id2", string=u"相似的公司名字", )
+
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
@@ -154,6 +161,23 @@ class CreateOrderPointWizard(models.TransientModel):
         # sos.action_draft()
         # sos.action_confirm()
 
+    def action_filter_partner(self):
+        # return
+        company2 = companys = self.env["res.partner"].search([("is_company", "=", True)], )
+        for company in companys:
+            company_obj = self.env["res.partner"]
+            for similar_company in company2.filtered(lambda x: x.id != company.id):
+                if ((similar_company.name and company.name and similar_company.name.upper() in company.name.upper()) or \
+                            (
+                                    similar_company.name and company.name and company.name.upper() in similar_company.name.upper()) or \
+                            (company.phone == similar_company.phone and company.phone and similar_company.phone) or \
+                            (
+                                    company.email and similar_company.email and company.email.upper() == similar_company.email.upper())):
+                    company_obj += similar_company
+
+            print(company_obj)
+            company.simliar_companys = company_obj
+        print("done")
 
 class SaleOrderExtend(models.Model):
     _inherit = "sale.order"
