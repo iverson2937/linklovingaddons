@@ -15,7 +15,7 @@ class MrpBom(models.Model):
                                 readonly=True, copy=False)
 
     @api.multi
-    def bom_detail(self):
+    def bom_detail_new(self):
 
         return {
             'type': 'ir.actions.client',
