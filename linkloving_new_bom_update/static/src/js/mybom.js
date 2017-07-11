@@ -16,7 +16,13 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
         template: 'my_bom_container',
         events: {
           'click .add_bom_data':'add_bom_data_fn',
-          'click .product_name':'product_name_fn'
+          'click .product_name':'product_name_fn',
+          'click .save_add_action':'save_add_action_fn'
+        },
+        save_add_action_fn:function () {
+            $(document).ajaxComplete(function (event, xhr, settings) {
+                console.log(settings)
+            })
         },
         //点击产品名弹出相应的产品页面
         product_name_fn:function (e) {
