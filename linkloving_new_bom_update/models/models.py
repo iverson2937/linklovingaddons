@@ -23,6 +23,7 @@ class MrpBom(models.Model):
             'bom_id': self.id
         }
 
+
     def get_bom(self):
         res = []
         for line in self.bom_line_ids:
@@ -63,6 +64,7 @@ class MrpBom(models.Model):
             'product_tmpl_id': line.product_id.product_tmpl_id.id,
             'is_highlight': line.is_highlight,
             'id': line.id,
+            'parent_id': line.bom_id.id,
             'product_specs': line.product_id.product_specs,
             'code': line.product_id.default_code,
             'uuid': str(uuid.uuid1()),
@@ -87,17 +89,23 @@ def _get_rec(object, level, qty=1.0, uom=False):
                 level -= 1
         bom_id = l.product_id.product_tmpl_id.bom_ids
         process_id = False
+        parent_id = False
         if bom_id:
+
             process_id = bom_id[0].process_id.name
+            for line in bom_id[0].bom_line_ids:
+                if line.product_id == l.product_id:
+                    parent_id = line.id
+
         res = {
             'name': l.product_id.name,
             'product_id': l.product_id.id,
             'product_tmpl_id': l.product_id.product_tmpl_id.id,
             'code': l.product_id.default_code,
-            'uuid': str(uuid.uuid1()),
             'product_specs': l.product_id.product_specs,
             'is_highlight': l.is_highlight,
             'id': l.id,
+            'parent_id': parent_id,
             'qty': l.product_qty,
             'process_id': process_id,
             'level': level,
