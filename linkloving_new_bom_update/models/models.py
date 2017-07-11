@@ -50,7 +50,7 @@ class MrpBom(models.Model):
             if level < 6:
                 level += 1
             for l in line.child_line_ids:
-                bom_line_ids.append(_get_rec(l, level))
+                bom_line_ids.append(_get_rec(l, level, line))
             if level > 0 and level < 6:
                 level -= 1
         bom_id = line.product_id.product_tmpl_id.bom_ids
@@ -77,14 +77,14 @@ class MrpBom(models.Model):
         return res
 
 
-def _get_rec(object, level, qty=1.0, uom=False):
+def _get_rec(object, level, line, qty=1.0, uom=False):
     for l in object:
         bom_line_ids = []
         if l.child_line_ids:
             if level < 6:
                 level += 1
             for line in l.child_line_ids:
-                bom_line_ids.append(_get_rec(line, level))
+                bom_line_ids.append(_get_rec(line, level, line))
             if level > 0 and level < 6:
                 level -= 1
         bom_id = l.product_id.product_tmpl_id.bom_ids
@@ -94,11 +94,13 @@ def _get_rec(object, level, qty=1.0, uom=False):
 
             process_id = bom_id[0].process_id.name
             print bom_id[0].bom_line_ids
-            parent_bom_id = l.bom_id
+            parent_bom_id = l.bom_id.product_tmpl_id.bom_ids[0]
+            print bom_id.product_tmpl_id.name
+            print l.bom_id.product_tmpl_id.name
             for bom_line in parent_bom_id.bom_line_ids:
-                print bom_line.product_id
-                print l.product_id
-                if bom_line.product_id == l.product_id:
+                print bom_line.product_id, 'dd'
+                print l.bom_id.product_tmpl_id.product_variant_ids[0], 'ww'
+                if bom_line.product_id.id == l.bom_id.product_tmpl_id.product_variant_ids[0].id:
                     parent_id = bom_line.id
 
         res = {
@@ -109,7 +111,7 @@ def _get_rec(object, level, qty=1.0, uom=False):
             'product_specs': l.product_id.product_specs,
             'is_highlight': l.is_highlight,
             'id': l.id,
-            'parent_id': parent_id,
+            'parent_id': line.id,
             'qty': l.product_qty,
             'process_id': process_id,
             'level': level,
