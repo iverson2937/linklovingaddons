@@ -1,4 +1,57 @@
 /**
  * Created by Administrator on 2017/7/3.
  */
+odoo.define('linkloving_crm.list_viewsss', function (require) {
+    "use strict";
+
+
+    var core = require('web.core');
+    var data = require('web.data');
+    var data_manager = require('web.data_manager');
+    var DataExport = require('web.DataExport');
+    var formats = require('web.formats');
+    var common = require('web.list_common');
+    var Model = require('web.DataModel');
+    var Pager = require('web.Pager');
+    var pyeval = require('web.pyeval');
+    var session = require('web.session');
+    var Sidebar = require('web.Sidebar');
+    var utils = require('web.utils');
+    var View = require('web.View');
+    var ListView = require('web.ListView');
+    var Widget = require('web.Widget');
+    var Priority = require('web.Priority');
+
+
+    var Class = core.Class;
+    var _t = core._t;
+    var _lt = core._lt;
+    var QWeb = core.qweb;
+    var list_widget_registry = core.list_widget_registry;
+
+    var ListView = core.view_registry.get('list');
+    var Column = ListView.Column;
+
+
+    var PriorityStar = Column.extend({
+        _format: function (row_data, options) {
+            var value = '';
+            var result = ' ';
+            var value = row_data['priority']['value'];
+            if (value) {
+                for (var i = 0; i < value; i++) {
+                    result += ' <a class="o_priority_star fa fa-star" style="color:gold"></a> '
+                }
+            }
+            return result
+        }
+    });
+
+
+    list_widget_registry
+        .add('field.priority_star', PriorityStar)
+})
+
+
+
 

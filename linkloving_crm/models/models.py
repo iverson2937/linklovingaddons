@@ -73,11 +73,12 @@ class CrmLead(models.Model):
         }
 
         from .res_partner import select_company
-        if select_company(self, values, 'name'):
-            raise UserError(u'此名称已绑定公司，请确认')
-
-        if select_company(self, values, 'email'):
-            raise UserError(u'此Email已绑定公司，请更换')
+        if type(values['name']) != bool:
+            if select_company(self, values, 'name'):
+                raise UserError(u'此名称已绑定公司，请确认')
+        if type(values['email']) != bool:
+            if select_company(self, values, 'email'):
+                raise UserError(u'此Email已绑定公司，请更换')
 
         alarm_record = set()
         alarm_record1 = set()
