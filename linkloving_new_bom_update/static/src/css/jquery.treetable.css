@@ -29,20 +29,21 @@ table.treetable span.indenter a {
 table.treetable {
   border: 1px solid #888;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1;
-  margin: 10px 0 30px 0;
+  margin: 70px 0 30px 0;
   width: 100%;
+  background: white;
 }
 
 
 table.treetable thead {
   /*background: #aaa url(/linkloving_new_bom_update/static/src/images/bg-table-thead.png) repeat-x top left;*/
-  background-color: #ddd;
+  background-color: rgba(221,221,221,.8)
 }
 
 table.treetable thead tr td {
-  border: 1px solid #888;
+  /*border: 1px solid #888;*/
   font-weight: normal;
   padding: 5px 15px 1px 15px;
   text-align: left;
@@ -50,7 +51,8 @@ table.treetable thead tr td {
 
 table.treetable tbody tr td {
   /*cursor: default;*/
-  padding: 5px 15px;
+  padding: 10px 15px;
+  line-height: 18px;
 }
 
 
@@ -110,10 +112,14 @@ table.treetable tr.expanded.accept td span.indenter a {
 
 
 
+#treeMenu tr{
+  border: 1px solid #ddd;
+}
 #treeMenu  thead tr td{
   padding-top: 15px;
   padding-bottom: 15px;
-  font-size:18px;
+  font-size:14px;
+  font-weight: bolder;
 }
 #treeMenu thead tr td:nth-child(3){
   width: 5%;
@@ -122,5 +128,10 @@ table.treetable tr.expanded.accept td span.indenter a {
   width: 35%;
 }
 .add_bom_data{
+  cursor: pointer;
+  color: #0499e3;
+  font-size: 16px;
+}
+.product_name{
   cursor: pointer;
 }

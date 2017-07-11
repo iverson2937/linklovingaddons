@@ -500,7 +500,7 @@ jQuery.TreeTable = function (tree_id, heads, tNodes) {
         var body_html = "<tbody>";
         for (var i = 0, l = newNodes.length; i < l; i++) {
             var node = newNodes[i];
-            body_html += "<tr data-tt-id='" + node.id + "' " + (node.pId ? "data-tt-parent-id='" + node.pId + "'" : "") + "><td class = 'td_left'><span class='" + (node.isParent ? "parent" : "children") + " product_name'>" + node.name + "</span></td>";
+            body_html += "<tr data-tt-id='" + node.id + "' " + (node.pId ? "data-tt-parent-id='" + node.pId + "'" : "") + "><td class = 'td_left'><span data-pt-id='"+ node.ptid +"' class='" + (node.isParent ? "parent" : "children") + " product_name'>" + node.name + "</span></td>";
             for (var j = 0; j < column_count - 1; j++) {
                 body_html += "<td>" + (node.td[j] ? node.td[j] : "") + "</td>";
             }
