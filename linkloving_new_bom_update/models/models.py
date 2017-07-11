@@ -15,7 +15,7 @@ class MrpBom(models.Model):
                                 readonly=True, copy=False)
 
     @api.multi
-    def bom_detail(self):
+    def bom_detail_new(self):
 
         return {
             'type': 'ir.actions.client',
@@ -88,9 +88,9 @@ def _get_rec(object, level, parnet, qty=1.0, uom=False):
                 level -= 1
         bom_id = l.product_id.product_tmpl_id.bom_ids
         process_id = False
-        parent_id = False
         if bom_id:
             process_id = bom_id[0].process_id.name
+
 
         res = {
             'name': l.product_id.name,

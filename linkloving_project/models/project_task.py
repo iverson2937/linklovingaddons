@@ -39,6 +39,19 @@ class linkloving_project_task(models.Model):
                     min(100.0 * hours.get(task.id, 0.0) / res[task.id]['total_hours'], 99.99), 2)
         return res
 
+
+    def _get_top_task_id(self):
+        for task in self:
+            if task.parent_ids:
+                for parent_id in task.parent_ids:
+                    if not parent_id.parent_ids:
+                        print parent_id.id
+                        return parent_id.id
+                    else:
+                        parent_id._get_top_task_id()
+        print 0
+        return 0
+
     reviewer_id = fields.Many2one('res.users', string='Reviewer', select=True, track_visibility='onchange',
                                   default=lambda self: self.env.user)
     planed_level = fields.Selection(AVAILABLE_PRIORITIES, string=u'计划星级')
@@ -47,6 +60,8 @@ class linkloving_project_task(models.Model):
     parent_ids = fields.Many2many('project.task', 'project_task_parent_rel', 'task_id', 'parent_id', 'Parent Tasks')
     child_ids = fields.Many2many('project.task', 'project_task_parent_rel', 'parent_id', 'task_id', 'Delegated Tasks')
     work_ids = fields.One2many('project.task.work', 'task_id', 'Work done')
+
+    top_task_id = fields.Integer(compute=_get_top_task_id, string='Top Task ID', store=True)
 
     date_start = fields.Date(string='Starting Date',
                              default=fields.date.today(),
@@ -140,6 +155,17 @@ class linkloving_project_task(models.Model):
             vals['date_start'] = fields.datetime.now()
         return {'value': vals}
 
+    @api.model
+    def create(self, vals):
+        res= super(linkloving_project_task, self).create(vals)
+
+        if not res.parent_ids:
+            res.top_task_id = res.id
+        else:
+            res._get_top_task_id()
+
+        return res
+
     @api.multi
     def write(self, vals):
 
@@ -159,7 +185,10 @@ class linkloving_project_task(models.Model):
                         self.date_end = new_date_end
             self._change_parents_date_end()
 
-
+        print self._get_top_task_id()
+        vals.update({
+            'top_task_id': self._get_top_task_id()
+        })
         return res
 
     def _change_parents_date_end(self):

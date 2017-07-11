@@ -309,7 +309,7 @@
             <field name="arch" type="xml">
                 <form string="Project">
                     <header>
-                        <field name="stage_id" widget="statusbar" readonly="1" clickable="true"
+                        <field name="stage_id" widget="statusbar" readonly="1"
                                options="{'fold_field': 'fold'}"/>
                     </header>
                     <sheet string="Task">
@@ -464,7 +464,8 @@ s
             <field name="model">project.task</field>
             <field eval="2" name="priority"/>
             <field name="arch" type="xml">
-                <gantt date_start="date_start" date_stop="date_end" progress="task_progress" string="Tasks" parent_ids="parent_ids" child_ids="child_ids"
+                <gantt date_start="date_start" date_stop="date_end" progress="task_progress" string="Tasks"
+                       parent_ids="parent_ids" child_ids="child_ids" top_task_id="top_task_id"
                        default_group_by="project_id">
                 </gantt>
             </field>
