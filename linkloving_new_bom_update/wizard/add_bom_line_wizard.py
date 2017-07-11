@@ -13,10 +13,13 @@ class AddBomLineWizard(models.TransientModel):
 
     @api.multi
     def action_post(self):
+        process_id = False
+        if self.product_id.product_tmpl_id.bom_ids:
+            process_id = self.product_id.product_tmpl_id.bom_ids.process_id.name
+
         return {
-            'product_id': self.product_id.id,
             'qty': self.qty,
+            'name': self.product_id.name_get(),
+            'process_id': process_id,
             'product_spec': self.product_specs
         }
-
-        return {'type': 'ir.actions.act_window_close'}
