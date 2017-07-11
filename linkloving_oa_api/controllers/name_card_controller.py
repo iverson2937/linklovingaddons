@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from odoo import http
+from odoo.exceptions import UserError
 from odoo.http import request
 
-
+STATUS_OK = 1
+STATUS_ERROR = -1
 class NameCardController(http.Controller):
     @http.route('/linkloving_oa_api/get_company_by_name/', auth='none', type='json')
     def get_company_by_name(self, **kwargs):
@@ -17,7 +19,7 @@ class NameCardController(http.Controller):
         elif u'公司' in name:
             name = name.replace(u"公司", "")
 
-        partners = request.env["res.partner"].sudo().search([("name", "ilike", name)])
+        partners = request.env["res.partner"].sudo().search([("name", "ilike", name), ("is_company", "=", True)])
         if partners:  # 如果有代表重复了
             json_list = []
             for partner in partners:
@@ -42,9 +44,9 @@ class NameCardController(http.Controller):
         area = request.jsonrequest.get("area")
         source_id = request.jsonrequest.get("crm_source_id")
         partner_type = request.jsonrequest.get("partner_type")
-        partners = request.env["res.partner"].sudo().search([("name", "ilike", name)])
+        partners = request.env["res.partner"].sudo().search([("name", "=", name)])
         if partners:
-            return {"error": u"该客户已存在"}
+            raise UserError(u"该客户已存在")
         else:
             if company_id:
                 new_company_id = company_id
@@ -57,7 +59,7 @@ class NameCardController(http.Controller):
                     company_name = company_name.replace(u"责任有限公司", "")
                 elif u'公司' in company_name:
                     company_name = company_name.replace(u"公司", "")
-                company = request.env["res.partner"].sudo().search([("name", "ilike", company_name)])
+                company = request.env["res.partner"].sudo().search([("name", "ilike", company_name)], limit=1)
                 if not company:
                     company = request.env["res.partner"].sudo().create({
                         "name": company_real_name,
@@ -76,13 +78,13 @@ class NameCardController(http.Controller):
                 # company.company_type = "company"
             s = request.env["res.partner"].sudo().create({
                 "name": name,
-                "company_type": "person",
                 "parent_id": new_company_id,
                 "mobile": phone,
                 "customer": partner_type == "customer",
-                "supplier": partner_type == "supplier"
+                "supplier": partner_type == "supplier",
+                "is_company": False
             })
-            return
+            return True
 
     @http.route('/linkloving_oa_api/get_saleman_list/', auth='none', type='json')
     def get_saleman_list(self, **kwargs):

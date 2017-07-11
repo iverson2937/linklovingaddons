@@ -87,14 +87,21 @@
                 <xpath expr="//notebook" position="inside">
                     <page string="相似的公司">
                         <group>
-                            <field name="simliar_companys" readonly="1" options="{'no_create': True}"/>
+                            <field name="simliar_companys" readonly="1"
+                                   options="{'no_create': True, 'reload_on_button': True}">
+                                <tree>
+                                    <field name="display_name" string="名字"/>
+                                    <field name="phone"/>
+                                    <field name="email"/>
+                                    <field name="user_id"/>
+                                    <button name="partner_unlink" string="删除" type="object" class="btn-primary"
+                                            confirm="确定删除吗？"/>
+                                </tree>
+                            </field>
                         </group>
                     </page>
                 </xpath>
-
-
             </field>
         </record>
-
     </data>
 </openerp>

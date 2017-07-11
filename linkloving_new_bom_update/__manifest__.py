@@ -27,6 +27,7 @@
         # 'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
+        'wizard/add_bom_line_wizard.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

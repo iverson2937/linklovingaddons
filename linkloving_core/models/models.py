@@ -214,7 +214,7 @@ class ProductTemplate(models.Model):
         }
 
     def get_draft_po_qty(self, product_id):
-        pos = self.env["purchase.order"].search([("state", "in", ("make_by_mrp", "draft"))])
+        pos = self.env["purchase.order"].search([("state", "in", ("make_by_mrp", "draft", "to approve"))])
         chose_po_lines = self.env["purchase.order.line"]
         total_draft_order_qty = 0
         for po in pos:

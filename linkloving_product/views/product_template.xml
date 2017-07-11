@@ -75,16 +75,14 @@
                                     <group>
                                         <field name="order_ll_type"
                                                attrs="{'invisible': [('product_ll_type', '!=', 'finished')],'required':[('product_ll_type', '=', 'finished')]}"/>
-                                        <field name="inner_code" string="国内简称"/>
-                                        <field name="inner_spec" string="国内型号"/>
-                                        <field name="product_specs"/>
+                                        <field name="product_specs" required="1"/>
 
                                     </group>
                                     <group>
                                         <field name="standard_price"/>
                                         <field name="uom_id" options="{'no_create':True}"/>
                                         <field name="uom_po_id" options="{'no_create':True}"/>
-                                        <field name="purchase_method"/>
+                                        <field name="purchase_method" invisible="1"/>
                                     </group>
 
                                 </group>

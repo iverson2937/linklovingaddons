@@ -13,6 +13,13 @@ class ResPartnerExtend(models.Model):
     simliar_companys = fields.Many2many(comodel_name="res.partner", relation="simliar_companys_rel",
                                         column1="company_id", column2="company_id2", string=u"相似的公司名字", )
 
+    @api.multi
+    def partner_unlink(self):
+        # partners = self.env["res.partner"].search([("simliar_companys", "in", self.ids)])
+        # for pa in partners:
+        #     pa.simliar_companys -= self
+        self.unlink()
+
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
@@ -177,7 +184,15 @@ class CreateOrderPointWizard(models.TransientModel):
 
             print(company_obj)
             company.simliar_companys = company_obj
-        print("done")
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": u"查重完成",
+                "text": u"查重完成",
+                "sticky": False
+            }
+        }
 
 class SaleOrderExtend(models.Model):
     _inherit = "sale.order"
