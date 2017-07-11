@@ -23,7 +23,6 @@ class MrpBom(models.Model):
             'bom_id': self.id
         }
 
-
     def get_bom(self):
         res = []
         for line in self.bom_line_ids:
@@ -50,7 +49,7 @@ class MrpBom(models.Model):
             if level < 6:
                 level += 1
             for l in line.child_line_ids:
-                bom_line_ids.append(_get_rec(l, level))
+                bom_line_ids.append(_get_rec(l, level, line))
             if level > 0 and level < 6:
                 level -= 1
         bom_id = line.product_id.product_tmpl_id.bom_ids
@@ -77,25 +76,21 @@ class MrpBom(models.Model):
         return res
 
 
-def _get_rec(object, level, qty=1.0, uom=False):
+def _get_rec(object, level, parnet, qty=1.0, uom=False):
     for l in object:
         bom_line_ids = []
         if l.child_line_ids:
             if level < 6:
                 level += 1
             for line in l.child_line_ids:
-                bom_line_ids.append(_get_rec(line, level))
+                bom_line_ids.append(_get_rec(line, level, l))
             if level > 0 and level < 6:
                 level -= 1
         bom_id = l.product_id.product_tmpl_id.bom_ids
         process_id = False
         parent_id = False
         if bom_id:
-
             process_id = bom_id[0].process_id.name
-            for line in bom_id[0].bom_line_ids:
-                if line.product_id == l.product_id:
-                    parent_id = line.id
 
         res = {
             'name': l.product_id.name,
@@ -105,7 +100,7 @@ def _get_rec(object, level, qty=1.0, uom=False):
             'product_specs': l.product_id.product_specs,
             'is_highlight': l.is_highlight,
             'id': l.id,
-            'parent_id': parent_id,
+            'parent_id': parnet.id,
             'qty': l.product_qty,
             'process_id': process_id,
             'level': level,
