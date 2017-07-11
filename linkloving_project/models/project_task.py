@@ -39,18 +39,23 @@ class linkloving_project_task(models.Model):
                     min(100.0 * hours.get(task.id, 0.0) / res[task.id]['total_hours'], 99.99), 2)
         return res
 
+    # def _get_top_task(self):
+    #     for task in self:
+    #         if task.parent_ids:
+    #             for parent_id in task.parent_ids:
+    #                 if not parent_id.parent_ids:
+    #                     return parent_id.id
+    #                 else:
+    #                     parent_id._get_top_task()
 
     def _get_top_task_id(self):
         for task in self:
             if task.parent_ids:
                 for parent_id in task.parent_ids:
                     if not parent_id.parent_ids:
-                        print parent_id.id
-                        return parent_id.id
+                        task.top_task_id = parent_id.id
                     else:
                         parent_id._get_top_task_id()
-        print 0
-        return 0
 
     reviewer_id = fields.Many2one('res.users', string='Reviewer', select=True, track_visibility='onchange',
                                   default=lambda self: self.env.user)
@@ -155,9 +160,20 @@ class linkloving_project_task(models.Model):
             vals['date_start'] = fields.datetime.now()
         return {'value': vals}
 
+    def _get_child_top_task(self, task_id):
+        if self.child_ids:
+            for child in self.child_ids:
+                if child.child_ids:
+                    child._get_child_top_task(task_id)
+                    child.top_task_id = task_id
+                else:
+                    child.top_task_id = task_id
+        else:
+            self.top_task_id = task_id
+
     @api.model
     def create(self, vals):
-        res= super(linkloving_project_task, self).create(vals)
+        res = super(linkloving_project_task, self).create(vals)
 
         if not res.parent_ids:
             res.top_task_id = res.id
@@ -168,12 +184,13 @@ class linkloving_project_task(models.Model):
 
     @api.multi
     def write(self, vals):
-
         res = super(linkloving_project_task, self).write(vals)
+
         if 'date_end' in vals:
             self._change_parents_date_end()
 
         if 'child_ids' in vals:
+            self._get_child_top_task(self.id)
             child_ids = self.resolve_2many_commands('child_ids', vals.get('child_ids'))
             for child in child_ids:
                 date_ends = []
@@ -184,11 +201,6 @@ class linkloving_project_task(models.Model):
                     if self.date_end < new_date_end:
                         self.date_end = new_date_end
             self._change_parents_date_end()
-
-        print self._get_top_task_id()
-        vals.update({
-            'top_task_id': self._get_top_task_id()
-        })
         return res
 
     def _change_parents_date_end(self):
