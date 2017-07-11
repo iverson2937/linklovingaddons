@@ -13,11 +13,22 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
 
 
     var NewBomUpdate = Widget.extend({
-        template:'my_bom_container',
+        template: 'my_bom_container',
         events: {
-          'click .add_bom_data':'add_bom_data_fn'
+            'click .add_bom_data': 'add_bom_data_fn'
         },
-        add_bom_data_fn:function () {
+        add_bom_data_fn: function () {
+            var action = {
+                name: "详细",
+                type: 'ir.actions.act_window',
+                res_model: 'add.bom.line.wizard',
+                view_type: 'form',
+                view_mode: 'tree,form',
+                views: [[false, 'form']],
+                target: "new"
+            };
+            this.do_action(action
+            )
 
         },
         init: function (parent, action) {
@@ -41,20 +52,31 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                         var tNodes = [];
 
                         //获取数据存入数组
-                        function get_datas(obj){
-                            for(var i=0;i<obj.length;i++){
-                                var s = {id:obj[i].id,pId:obj[i].parent_id,name:obj[i].name,td:[obj[i].product_specs,obj[i].qty,obj[i].process_id,"<span class='fa fa-plus add_bom_data'></span>"]};
+                        function get_datas(obj) {
+                            for (var i = 0; i < obj.length; i++) {
+                                var s = {
+                                    id: obj[i].id,
+                                    pId: obj[i].parent_id,
+                                    name: obj[i].name,
+                                    td: [obj[i].product_specs, obj[i].qty, obj[i].process_id, "<span class='fa fa-plus add_bom_data'></span>"]
+                                };
                                 tNodes.push(s);
-                                if(obj[i].bom_ids.length>0){
+                                if (obj[i].bom_ids.length > 0) {
                                     get_datas(obj[i].bom_ids);
                                 }
                             }
                         }
+
                         get_datas(result.bom_ids);
                         console.log(tNodes);
-                        tNodes.push({id:result.bom_id,pId:0,name:result.name,td:[result.product_specs,'',result.process_id,"<span class='fa fa-plus add_bom_data'></span>"]})
+                        tNodes.push({
+                            id: result.bom_id,
+                            pId: 0,
+                            name: result.name,
+                            td: [result.product_specs, '', result.process_id, "<span class='fa fa-plus add_bom_data'></span>"]
+                        })
 
-                        var heads = ["名字","规格","数量","工序","添加"];
+                        var heads = ["名字", "规格", "数量", "工序", "添加"];
                         // var tNodes = [
                         //     { id: 1, pId: 0, name: "父节点1", td: ["parent", "1"] },
                         //     { id: 111, pId: 1, name: "叶子节点111", td: ["<a href='javascript:void(0);' onclick=\"alert('内容为html');\">parent</a>", "111"] },
@@ -69,7 +91,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                             console.log($("#treeMenu").length);
 
                             $.TreeTable("treeMenu", heads, tNodes);
-                        },200)
+                        }, 200)
                     })
             }
         }
