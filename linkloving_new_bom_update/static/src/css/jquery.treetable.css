@@ -37,7 +37,8 @@ table.treetable {
 
 
 table.treetable thead {
-  background: #aaa url(/linkloving_new_bom_update/static/src/images/bg-table-thead.png) repeat-x top left;
+  /*background: #aaa url(/linkloving_new_bom_update/static/src/images/bg-table-thead.png) repeat-x top left;*/
+  background-color: #ddd;
 }
 
 table.treetable thead tr td {
@@ -48,7 +49,7 @@ table.treetable thead tr td {
 }
 
 table.treetable tbody tr td {
-  cursor: default;
+  /*cursor: default;*/
   padding: 5px 15px;
 }
 
@@ -82,16 +83,16 @@ table.treetable tr.expanded span.indenter a {
 
 
 table.treetable tr.selected {
-  background-color: #3875d7;
-  color: #fff;
+  /*background-color: #3875d7;*/
+  /*color: #fff;*/
 }
 
 table.treetable tr.collapsed.selected span.indenter a {
-  background-image: url(/linkloving_new_bom_update/static/src/images/expand-light.png);
+  /*background-image: url(/linkloving_new_bom_update/static/src/images/expand-light.png);*/
 }
 
 table.treetable tr.expanded.selected span.indenter a {
-  background-image: url(/linkloving_new_bom_update/static/src/images/collapse-light.png);
+  /*background-image: url(/linkloving_new_bom_update/static/src/images/collapse-light.png);*/
 }
 
 table.treetable tr.accept {
@@ -107,3 +108,19 @@ table.treetable tr.expanded.accept td span.indenter a {
   background-image: url(/linkloving_new_bom_update/static/src/images/collapse-light.png);
 }
 
+
+
+#treeMenu  thead tr td{
+  padding-top: 15px;
+  padding-bottom: 15px;
+  font-size:18px;
+}
+#treeMenu thead tr td:nth-child(3){
+  width: 5%;
+}
+#treeMenu thead tr td:nth-child(2){
+  width: 35%;
+}
+.add_bom_data{
+  cursor: pointer;
+}
