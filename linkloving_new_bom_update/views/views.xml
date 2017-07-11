@@ -1,5 +1,14 @@
 <odoo>
     <data>
+        <template id="new_bom_update_static" name="linkloving_new_bom_update_assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+
+                <script type="text/javascript" src="/linkloving_new_bom_update/static/src/js/mybom.js"/>
+                <script type="text/javascript" src="/linkloving_new_bom_update/static/src/js/jquery-ui.js"/>
+                <script type="text/javascript" src="/linkloving_new_bom_update/static/src/js/jquery.treetable.js"/>
+                <link rel="stylesheet" href="/linkloving_new_bom_update/static/src/css/jquery.treetable.css"/>
+            </xpath>
+        </template>
         <!-- explicit list view definition -->
         <!--
         <record model="ir.ui.view" id="linkloving_new_bom_update.list">

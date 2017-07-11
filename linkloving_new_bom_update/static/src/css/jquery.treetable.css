@@ -1,0 +1,109 @@
+#treeMenu,#treeMenu tr,#treeMenu td,#treeMenu .indenter{
+  box-sizing: content-box!important
+}
+table.treetable span.indenter {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  text-align: right;
+  user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  -webkit-user-select: none;
+  width: 19px;
+}
+
+table.treetable span.indenter a {
+  background-position: left center;
+  background-repeat: no-repeat;
+  display: inline-block;
+  text-decoration: none;
+  width: 19px;
+  box-sizing: inherit!important;
+}
+.td_left{
+  box-sizing: inherit!important;
+}
+
+table.treetable {
+  border: 1px solid #888;
+  border-collapse: collapse;
+  font-size: 12px;
+  line-height: 1;
+  margin: 10px 0 30px 0;
+  width: 100%;
+}
+
+
+table.treetable thead {
+  background: #aaa url(/linkloving_new_bom_update/static/src/images/bg-table-thead.png) repeat-x top left;
+}
+
+table.treetable thead tr td {
+  border: 1px solid #888;
+  font-weight: normal;
+  padding: 5px 15px 1px 15px;
+  text-align: left;
+}
+
+table.treetable tbody tr td {
+  cursor: default;
+  padding: 5px 15px;
+}
+
+
+
+table.treetable tbody tr td.td_left {
+  text-align:left;
+}
+
+table.treetable span {
+  background-position: center left;
+  background-repeat: no-repeat;
+  padding: 3px 0 3px 20px;
+}
+
+table.treetable span.children {
+  background-image: url(/linkloving_new_bom_update/static/src/images/file.png);
+}
+
+table.treetable span.parent {
+  background-image: url(/linkloving_new_bom_update/static/src/images/folder.png);
+}
+
+table.treetable tr.collapsed span.indenter a {
+  background-image: url(/linkloving_new_bom_update/static/src/images/expand.png);
+}
+
+table.treetable tr.expanded span.indenter a {
+  background-image: url(/linkloving_new_bom_update/static/src/images/collapse.png);
+}
+
+
+table.treetable tr.selected {
+  background-color: #3875d7;
+  color: #fff;
+}
+
+table.treetable tr.collapsed.selected span.indenter a {
+  background-image: url(/linkloving_new_bom_update/static/src/images/expand-light.png);
+}
+
+table.treetable tr.expanded.selected span.indenter a {
+  background-image: url(/linkloving_new_bom_update/static/src/images/collapse-light.png);
+}
+
+table.treetable tr.accept {
+  background-color: #a3bce4;
+  color: #fff
+}
+
+table.treetable tr.collapsed.accept td span.indenter a {
+  background-image: url(/linkloving_new_bom_update/static/src/images/expand-light.png);
+}
+
+table.treetable tr.expanded.accept td span.indenter a {
+  background-image: url(/linkloving_new_bom_update/static/src/images/collapse-light.png);
+}
+

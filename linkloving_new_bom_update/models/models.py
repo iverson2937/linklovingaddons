@@ -19,7 +19,7 @@ class MrpBom(models.Model):
 
         return {
             'type': 'ir.actions.client',
-            'tag': 'bom_update',
+            'tag': 'new_bom_update',
             'bom_id': self.id
         }
 

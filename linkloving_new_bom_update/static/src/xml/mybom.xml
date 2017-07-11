@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+     <t t-name="my_bom_container">
+       <div>
+           <table id="treeMenu" class="linetable">
+           </table>
+       </div>
+         <script>
+            <!--$(document).ready(function(){-->
+		<!--var heads = ["产品名","工序","td2"];-->
+		<!--var tNodes = [-->
+
+			<!--];-->
+		<!--$.TreeTable("treeMenu", heads, tNodes);-->
+        <!--$('#treeMenu').treetable('expandAll');-->
+	  <!--});-->
+         </script>
+    </t>
+
+</templates>
