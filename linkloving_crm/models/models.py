@@ -74,11 +74,11 @@ class CrmLead(models.Model):
 
         from .res_partner import select_company
         if is_company:
-            if type(values['name']) != bool:
+            if type(values.get('name')) != bool:
                 if select_company(self, values, 'name'):
                     values = {}
                     raise UserError(u'此名称已绑定公司，请确认')
-            if type(values['email']) != bool:
+            if type(values.get('email')) != bool:
                 if select_company(self, values, 'email'):
                     values = {}
                     raise UserError(u'此Email已绑定公司，请更换')

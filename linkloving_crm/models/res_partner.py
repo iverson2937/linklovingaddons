@@ -18,7 +18,7 @@ AVAILABLE_PRIORITIES = [
 
 def select_company(my_self, vals, type):
     result = my_self.env['res.partner'].search(
-        [(type, '=', vals[type].strip()), ('customer', '=', True), ('is_company', '=', True)])
+        [(type, '=', vals.get(type).strip()), ('customer', '=', True), ('is_company', '=', True)])
     return result
 
 
