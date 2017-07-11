@@ -66,8 +66,9 @@ class ResPartner(models.Model):
 
     @api.model
     def create(self, vals):
-        if 'is_company' in vals and type(vals['company_type']) != bool:
-            if vals['is_company'] == True and vals['company_type'] == 'company':
+        # if 'is_company' in vals and (vals['company_type'] == 'company' or vals['company_type'] == 'company'):
+        if not ('company_type' in vals and vals['company_type'] == 'person'):
+            if vals['is_company'] == True:
                 if type(vals['name']) != bool:
                     if select_company(self, vals, 'name'):
                         raise UserError(u'此名称已绑定公司，请确认')
