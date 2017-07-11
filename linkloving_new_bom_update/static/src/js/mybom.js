@@ -37,7 +37,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                         //获取数据存入数组
                         function get_datas(obj){
                             for(var i=0;i<obj.length;i++){
-                                var s = {id:obj[i].uuid,name:obj[i].name,product_id:obj[i].product_id,code:obj[i].code,process:obj[i].process_id};
+                                var s = {id:obj[i].id,name:obj[i].name,product_id:obj[i].product_id,code:obj[i].code,process:obj[i].process_id};
                                 Nodes.push(s);
                                 if(obj[i].bom_ids.length>0){
                                     get_datas(obj[i].bom_ids);

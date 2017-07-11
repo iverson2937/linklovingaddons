@@ -77,14 +77,14 @@ class MrpBom(models.Model):
         return res
 
 
-def _get_rec(object, level, line, qty=1.0, uom=False):
+def _get_rec(object, level, parnet, qty=1.0, uom=False):
     for l in object:
         bom_line_ids = []
         if l.child_line_ids:
             if level < 6:
                 level += 1
             for line in l.child_line_ids:
-                bom_line_ids.append(_get_rec(line, level, line))
+                bom_line_ids.append(_get_rec(line, level, parnet))
             if level > 0 and level < 6:
                 level -= 1
         bom_id = l.product_id.product_tmpl_id.bom_ids
@@ -111,7 +111,7 @@ def _get_rec(object, level, line, qty=1.0, uom=False):
             'product_specs': l.product_id.product_specs,
             'is_highlight': l.is_highlight,
             'id': l.id,
-            'parent_id': line.id,
+            'parent_id': parnet.id,
             'qty': l.product_qty,
             'process_id': process_id,
             'level': level,
