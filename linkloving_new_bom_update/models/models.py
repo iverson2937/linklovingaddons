@@ -84,7 +84,7 @@ def _get_rec(object, level, parnet, qty=1.0, uom=False):
             if level < 6:
                 level += 1
             for line in l.child_line_ids:
-                bom_line_ids.append(_get_rec(line, level, parnet))
+                bom_line_ids.append(_get_rec(line, level, l))
             if level > 0 and level < 6:
                 level -= 1
         bom_id = l.product_id.product_tmpl_id.bom_ids
