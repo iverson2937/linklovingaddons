@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import base64
 import json
+import logging
 from urllib2 import URLError
 
 import time
@@ -24,6 +25,7 @@ from odoo.http import content_disposition, dispatch_rpc, request, \
                       serialize_exception as _serialize_exception
 from odoo.exceptions import AccessError, UserError
 
+_logger = logging.getLogger(__name__)
 
 app_key = "6e6ce8723531335ce45edd34"
 master_secret = "64ec88028aac4dda6286400e"
@@ -855,6 +857,7 @@ class LinklovingAppApi(http.Controller):
         mrp_production = request.env['mrp.production'].sudo().search([('id', '=', order_id)])[0]
 
         stock_moves = request.jsonrequest.get('stock_moves') #get paramter
+        _logger.warning(u"charlie_0712_log:finish_prepare_material, mo:%s,moves:%s", mrp_production.name, stock_moves)
         print(u"charlie_0712_log:finish_prepare_material, mo:%s,moves:%s" % (mrp_production.name, stock_moves))
         stock_move_lines = request.env["sim.stock.move"].sudo()
         try:
