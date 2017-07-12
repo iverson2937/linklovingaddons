@@ -280,7 +280,8 @@ class BomUpdateWizard(models.TransientModel):
     @staticmethod
     def get_new_product_name(old_name, postfix):
         new_name = ''
-        old = re.findall(ur"[^({]+(?=[}）])", old_name)
+        old = re.findall(ur"\{(.*?)\}", old_name)
+
         if old and len(old) == 1:
             new_name = old_name.replace(old[0], postfix)
         elif len(old) > 1:
