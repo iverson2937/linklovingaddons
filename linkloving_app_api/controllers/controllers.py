@@ -875,7 +875,9 @@ class LinklovingAppApi(http.Controller):
                 rounding = sim_stock_move.stock_moves[0].product_uom.rounding
                 if float_compare(move['quantity_ready'], sim_stock_move.stock_moves[0].product_uom_qty,
                                  precision_rounding=rounding) > 0:
-                    _logger.warning(u"charlie_0712_log_1:move_qty:%s,uom_qty:%s", str(move['quantity_ready']),
+                    _logger.warning(u"charlie_0712_log_1:move_qty:%s,move_id:%d,uom_qty:%s",
+                                    str(move['quantity_ready']),
+                                    sim_stock_move.stock_moves[0].id,
                                     str(sim_stock_move.stock_moves[0].product_uom_qty))
 
                     qty_split = sim_stock_move.stock_moves[0].product_uom._compute_quantity(
