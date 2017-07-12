@@ -2,6 +2,10 @@
 
 <templates xml:space="preserve">
      <t t-name="my_bom_container">
+         <div class="new_bom_btns_wrap">
+             <button class="btn btn-primary new_bom_modify_submit">另存为</button>
+             <button class="btn btn-primary new_bom_modify_direct">替换</button>
+         </div>
        <div>
            <table id="treeMenu" class="linetable">
            </table>

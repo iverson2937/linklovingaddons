@@ -48,6 +48,40 @@ odoo.define('linkloving_crm.list_viewsss', function (require) {
     });
 
 
+    ListView.include({
+        do_delete: function (ids) {
+            if (!(ids.length)) {
+                return;
+            }
+            var self = this;
+
+            return $.when(this.dataset.unlink(ids)).done(function () {
+                _(ids).each(function (id) {
+                    self.records.remove(self.records.get(id));
+                });
+                // Hide the table if there is no more record in the dataset
+                if (self.display_nocontent_helper()) {
+                    self.no_result();
+                } else {
+                    if (self.records.length && self.current_min === 1) {
+                        // Reload the list view if we delete all the records of the first page
+                        self.reload();
+                    } else if (self.records.length && self.dataset.size() > 0) {
+                        // Load previous page if the current one is empty
+                        self.pager.previous();
+                    }
+                    // Reload the list view if we are not on the last page
+                    if (self.current_min + self._limit - 1 < self.dataset.size()) {
+                        self.reload();
+                    }
+                }
+                self.update_pager(self.dataset);
+                self.compute_aggregates();
+            });
+        },
+    });
+
+
     list_widget_registry
         .add('field.priority_star', PriorityStar)
 })

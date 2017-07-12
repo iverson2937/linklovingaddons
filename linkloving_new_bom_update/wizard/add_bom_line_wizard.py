@@ -7,9 +7,11 @@ from odoo.exceptions import UserError
 
 class AddBomLineWizard(models.TransientModel):
     _name = "add.bom.line.wizard"
-    product_id = fields.Many2one('product.product')
+    product_id = fields.Many2one('product.product', string='产品名称')
+    name = fields.Char(string='新产品名称')
+
     qty = fields.Float()
-    product_specs = fields.Char()
+    product_specs = fields.Text(related='product_id.product_specs')
 
     @api.multi
     def action_post(self):
@@ -21,5 +23,7 @@ class AddBomLineWizard(models.TransientModel):
             'qty': self.qty,
             'name': self.product_id.name_get(),
             'process_id': process_id,
+            'name': self.name,
+            'product_tmpl_id': self.product_id.product_tmpl_id.id,
             'product_spec': self.product_specs
         }

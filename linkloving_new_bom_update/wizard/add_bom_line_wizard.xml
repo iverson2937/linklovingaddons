@@ -15,7 +15,7 @@
                     </group>
                     <footer>
                         <button string="确定" name="action_post" type="object" default_focus="1"
-                                class="btn-primary"/>
+                                class="btn-primary save_add_action"/>
                         <button string="取消" class="btn-default" special="cancel"/>
                     </footer>
                 </form>
