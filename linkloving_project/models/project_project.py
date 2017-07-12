@@ -105,6 +105,14 @@ class linkloving_project(models.Model):
     #             res[id]['progress_rate'] = 0.0
     #     return res
 
+    def _compute_task_count(self):
+        for project in self:
+            count = 0
+            for task_id in project.task_ids:
+                if not task_id.parent_ids:
+                    count += 1
+            project.task_count = count
+
     # TODO 计算项目耗时, 未实现
     def _progress_rate(self):
         return 5.5

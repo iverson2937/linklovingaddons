@@ -66,7 +66,7 @@
         <record id="project.act_project_project_2_project_task_all" model="ir.actions.act_window">
             <field name="name">Tasks</field>
             <field name="res_model">project.task</field>
-            <field name="view_mode">kanban,tree,form,calendar,pivot</field>
+            <field name="view_mode">kanban,tree,form,calendar,pivot,gantt</field>
             <field name="context">{
                 'group_by': 'stage_id',
                 'search_default_project_id': [active_id],
@@ -317,6 +317,7 @@
                             <field name="kanban_state" class="oe_inline" widget="kanban_state_selection"/>
                         </div>
                         <h1>
+                            <field name="display_name" />
                             <field name="name" placeholder="Task summary..." class="oe_inline"/>
                         </h1>
                         <group>
@@ -375,7 +376,7 @@ s
                             <!--groups="group_delegate_task"-->
                             <page string="Delegation">
                                 <separator string="Delegated tasks"/>
-                                <field name="child_ids" domain="[('project_id','=',project_id)]" context="{'default_project_id': project_id, 'default_stage_id': stage_id}" >
+                                <field name="child_ids" domain="[('project_id','=',project_id),('top_task_id','=',0)]" context="{'default_project_id': project_id, 'default_stage_id': stage_id}" >
                                     <tree string="Delegated tasks">
                                         <field name="name"/>
                                         <field name="user_id"/>
@@ -465,7 +466,7 @@ s
             <field eval="2" name="priority"/>
             <field name="arch" type="xml">
                 <gantt date_start="date_start" date_stop="date_end" progress="task_progress" string="Tasks"
-                       parent_ids="parent_ids" child_ids="child_ids" stage_id="stage_id"
+                       parent_ids="parent_ids" child_ids="child_ids" stage_id="stage_id" top_task_id="top_task_id"
                        default_group_by="top_task_id">
                 </gantt>
             </field>
