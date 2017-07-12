@@ -60,9 +60,13 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 target: "new"
             };
             this.do_action(action);
+
+            //清空之前的数组，再执行查找父级id的函数
+            my.parentsid = [];
+            my.getParents($(target).parents("tr"));
+            console.log(my.parentsid);
+
             self.$(document).ajaxComplete(function (event, xhr, settings) {
-                // "{"jsonrpc":"2.0","method":"call","params":{"model":"review.process.wizard","method":"search_read","args":[[["id","in",[10]]],["remark","partner_id","display_name","__last_update"]],"kwargs":{"context":{"lang":"zh_CN","tz":"Asia/Shanghai","uid":1,"default_product_attachment_info_id":"4","params":{},"bin_size":true,"active_test":false}}},"id":980816587}"
-                // console.log(settings)
                 var data = JSON.parse(settings.data);
                 if (data.params.model == 'add.bom.line.wizard') {
                     if (data.params.method == 'action_post' && my.flag==true) {
@@ -81,14 +85,17 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                         var heads = ["名字", "规格", "数量", "工序", "添加"];
                         $.TreeTable("treeMenu", heads, my.xNodes);
 
-                        // var c = {
-                        //     modify_type : "add",
-                        //     qty: xhr.responseJSON.result.qty,
-                        //     product_id : xhr.responseJSON.result.name[0][0],
-                        //     input_changed_value: xhr.responseJSON.result.name[0][1],
-                        //     parents: ""
-                        // }
 
+
+                        var c = {
+                            modify_type : "add",
+                            qty: xhr.responseJSON.result.qty,
+                            product_id : xhr.responseJSON.result.name[0][0],
+                            input_changed_value: xhr.responseJSON.result.name[0][1],
+                            parents: my.parentsid
+                        }
+                        my.changes_back.push(c);
+                        console.log(my.changes_back);
                     }
                 }
             })
@@ -105,19 +112,26 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             var self = this;
             self.xNodes = [];
             self.flag = true;
+            //返回给后台的数组
             self.changes_back = [];
+            //存储父级id的数组
+            self.parentsid = [];
             $(".o_content").css("background","white")
         },
-        // getParents: function($obj) {
-        //     if ($obj.parents(".panel-collapse")) {
-        //         if ($obj.parents(".panel-collapse").length == 0) {
-        //             return;
-        //         }
-        //         arr.push($obj.parents(".panel-collapse").attr("data-return-id"));
-        //         $obj = $obj.parents(".panel-collapse");
-        //         getParents($obj);
-        //     }
-        // },
+
+        //查找父级的递归函数
+        getParents: function($obj) {
+            var self = this;
+            self.parentsid.push($obj.attr("data-tt-id"));
+            if($obj.attr("data-tt-parent-id")){
+                var p = $obj.attr("data-tt-parent-id");
+                $obj = $obj.prevAll("tr[data-tt-id="+p+"]");
+                self.getParents($obj);
+            }else {
+                return;
+            }
+        },
+
         start: function () {
             var self = this;
             if (this.bom_id) {
