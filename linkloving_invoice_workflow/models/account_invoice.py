@@ -55,7 +55,6 @@ class AccountInvoice(models.Model):
 
     @api.multi
     def write(self, vals):
-        print self.amount_total_o
         if not self.amount_total_o:
             amount_total_o = 0
             for line in self.invoice_line_ids:
