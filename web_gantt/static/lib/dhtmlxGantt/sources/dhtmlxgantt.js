@@ -173,7 +173,7 @@ GanttProjectInfo.prototype.getTaskByIdInTree = function(parentTask, id)
  * @type:  public
  * @topic: 0
  */
-function GanttTaskInfo(id, name, est, duration, percentCompleted, predecessorTaskId, dateStop, desc, qty, state)
+function GanttTaskInfo(id, name, est, duration, percentCompleted, predecessorTaskId, dateStop, currentStage, desc, qty, state)
 {
     this.Id = id;
     this.Name = name;
@@ -194,6 +194,7 @@ function GanttTaskInfo(id, name, est, duration, percentCompleted, predecessorTas
     this.previousChildTask = null;
     this.nextParentTask = null;
     this.previousParentTask = null;
+    this.currentStage = currentStage;
 }
 /**
  * @desc: Addition of child task to the parent task
@@ -5070,8 +5071,7 @@ GanttTask.prototype.createTaskNameItem = function(hasChildren)
     if (hasChildren) divName.style.fontWeight = "bold";
     divName.className = "taskNameItem";
     divName.title = this.TaskInfo.Name;
-    // divName.innerHTML = '<span class="item">' + this.TaskInfo.Name + '</span>' + '<button>+</button>';
-    divName.innerHTML = this.TaskInfo.Name;
+    divName.innerHTML =  this.TaskInfo.currentStage ? '<span style="color:blue;">' + this.TaskInfo.Name + '</span>' :  this.TaskInfo.Name;
     if (this.Chart.isShowConMenu)
     {
         var showContMenu = function(event) {

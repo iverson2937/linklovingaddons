@@ -375,7 +375,7 @@ s
                             <!--groups="group_delegate_task"-->
                             <page string="Delegation">
                                 <separator string="Delegated tasks"/>
-                                <field name="child_ids">
+                                <field name="child_ids" domain="[('project_id','=',project_id)]" context="{'default_project_id': project_id, 'default_stage_id': stage_id}" >
                                     <tree string="Delegated tasks">
                                         <field name="name"/>
                                         <field name="user_id"/>
@@ -465,8 +465,8 @@ s
             <field eval="2" name="priority"/>
             <field name="arch" type="xml">
                 <gantt date_start="date_start" date_stop="date_end" progress="task_progress" string="Tasks"
-                       parent_ids="parent_ids" child_ids="child_ids" top_task_id="top_task_id"
-                       default_group_by="project_id">
+                       parent_ids="parent_ids" child_ids="child_ids" stage_id="stage_id"
+                       default_group_by="top_task_id">
                 </gantt>
             </field>
         </record>
