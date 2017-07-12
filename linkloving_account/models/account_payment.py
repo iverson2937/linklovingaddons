@@ -163,22 +163,31 @@ class AccountPayment(models.Model):
     state = fields.Selection(selection_add=[('confirm', u'销售确认'), ('cancel', u'取消'), ('done', u'完成')],
                              track_visibility='onchange')
     remark = fields.Text(string='备注')
-    account_id = fields.Many2one('account.account', domain=[('internal_type', '=', 'other')], string=u'收入科目')
+    product_id = fields.Many2one('product.product')
 
     # origin = fields.Char(string=u'源单据')
     @api.multi
     def set_to_cancel(self):
-        if self.move_line_ids and len(self.move_line_ids) == 2:
-            raise UserError('已经生成分录,不可以取消')
+
+        # FIXME: 怎么样的可以取消
+        if self.move_line_ids and len(self.move_line_ids) == 2 and self.payment_type != 'transfer':
+            raise UserError('不可以取消,请联系系统管理员')
         else:
             self.state = 'cancel'
 
-    @api.onchange('account_id')
-    def _onchange_account_id(self):
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        if len(self.move_line_ids) > 2:
+            raise UserError(u'不允许修改')
+        if self.product_id and not self.product_id.property_account_income_id:
+            raise UserError(u'请设置产品收入科目')
         if self.move_line_ids:
             for move in self.move_line_ids:
+                if move.move_id.state == 'posted':
+                    raise UserError(u'不可修改已过账的分录')
                 if move.account_id != self.journal_id.default_credit_account_id:
-                    move.account_id = self.account_id.id
+                    move.account_id = self.product_id.property_account_income_id.id
+                    print move.account_id, 'sssssssssss'
 
     def set_to_done(self):
         if self.partner_type == 'customer' and not self.partner_id:
@@ -305,7 +314,7 @@ class AccountPayment(models.Model):
 
         return {
             'name': name,
-            'account_id': self.destination_account_id.id if self.destination_account_id else self.account_id.id,
+            'account_id': self.destination_account_id.id if self.destination_account_id else self.product_id.property_account_income_id.id,
             'journal_id': self.journal_id.id,
             'currency_id': self.currency_id != self.company_id.currency_id and self.currency_id.id or False,
             'payment_id': self.id,
