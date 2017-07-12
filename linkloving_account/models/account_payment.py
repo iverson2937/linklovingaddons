@@ -293,6 +293,8 @@ class AccountPayment(models.Model):
     def _get_counterpart_move_line_vals(self, invoice=False):
         if self.payment_type == 'transfer':
             name = self.name
+        elif self.payment_type=='other':
+            name=u'其他收入'
         else:
             name = ''
             if self.partner_type == 'customer':
