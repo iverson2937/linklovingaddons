@@ -115,14 +115,14 @@ odoo.define('linkloving.task_kanban_view', function (require) {
 
     KanbanRecord.include({
         on_card_clicked: function () {
+            var self = this;
             if (this.model === 'project.task') {
-                var self = this;
                 this.do_action({
                     type: 'ir.actions.act_window',
                     res_model: "project.task",
                     views: [[false, 'gantt']],
                     target: '_blank',
-                    domain: [['project_id', '=', self.record.project_id.raw_value[0]]],
+                    domain: [['project_id', '=', self.record.project_id.raw_value[0]], ['top_task_id', '=', self.record.id.raw_value]],
                     context: {'group_by': 'top_task_id', 'order_by': 'stage_id'}
                 });
             } else {
@@ -153,7 +153,7 @@ odoo.define('linkloving.task_kanban_view', function (require) {
                 n_group_bys = group_bys;
             }
             // gather the fields to get
-            var fields = _.compact(_.map(["date_start", "date_stop", "progress", "child_ids", "parent_ids", "stage_id"], function (key) {
+            var fields = _.compact(_.map(["date_start", "date_stop", "progress", "child_ids", "parent_ids", "stage_id", "top_task_id"], function (key) {
                 return self.fields_view.arch.attrs[key] || '';
             }));
             fields = _.uniq(fields.concat(n_group_bys));
@@ -171,23 +171,24 @@ odoo.define('linkloving.task_kanban_view', function (require) {
         on_data_loaded_2: function (tasks, group_bys) {
             var self = this;
             //prevent more that 1 group by
-            if (group_bys.length > 0) {
-                group_bys = [group_bys[0]];
-            }
-            // if there is no group by, simulate it
-            if (group_bys.length == 0) {
-                group_bys = ["_pseudo_group_by"];
-                _.each(tasks, function (el) {
-                    el._pseudo_group_by = "Gantt View";
-                });
-                this.fields._pseudo_group_by = {type: "string"};
-            }
+            // if (group_bys.length > 0) {
+            //     group_bys = [group_bys[0]];
+            // }
+            // // if there is no group by, simulate it
+            // if (group_bys.length == 0) {
+            //     group_bys = ["_pseudo_group_by"];
+            //     _.each(tasks, function (el) {
+            //         el._pseudo_group_by = "Gantt View";
+            //     });
+            //     this.fields._pseudo_group_by = {type: "string"};
+            // }
+            group_bys = ["top_task_id"];
 
             var child_tasks = [];
             var top_tasks = [];
             if (self.model == 'project.task') {
                 _.each(tasks, function (task) {
-                    if (task.top_task_id != 0) {
+                    if (task.top_task_id != task.id) {
                         child_tasks.push(task);
                     } else
                         top_tasks.push(task);
@@ -222,10 +223,10 @@ odoo.define('linkloving.task_kanban_view', function (require) {
                             c_group.current = false;
                         c_group.tasks.push(task);
                     } else {
-                        var task_group = {name: task.stage_id[1], tasks: [task], __is_group: true, current: true};
                         var __self = _.find(top_tasks, function (top) {
                             return _.isEqual(top.__name, group_name);
                         })
+                        var task_group = {name: task.stage_id[1], tasks: [task], __is_group: true, current: __self.stage_id[1] == task.stage_id[1]};
                         group = {name: group_name, tasks: [task_group], __is_group: true, __self: __self};
                         groups.push(group);
                     }
@@ -328,7 +329,7 @@ odoo.define('linkloving.task_kanban_view', function (require) {
                     var duration = (task_stop.getTime() - task_start.getTime()) / (1000 * 60 * 60);
                     var id = _.uniqueId("gantt_task_");
                     duration = (duration / 24) * 8;
-                    var task_info = new GanttTaskInfo(id, task_name, task_start, (duration) || 1, percent, undefined, task_stop, task.desc, task.product_qty, task.state);
+                    var task_info = new GanttTaskInfo(id, task_name, task_start, (duration) || 1, percent, undefined, task_stop);
                     task_info.internal_task = task;
                     task_ids[id] = task_info;
                     return {task_info: task_info, task_start: task_start, task_stop: task_stop};
@@ -342,7 +343,7 @@ odoo.define('linkloving.task_kanban_view', function (require) {
                 gantt.addProject(project);
             });
 
-            gantt.setEditable(true);
+            gantt.setEditable(false);
             gantt.setImagePath("/web_gantt/static/lib/dhtmlxGantt/codebase/imgs/");
             gantt.attachEvent("onTaskEndDrag", function (task) {
                 self.on_task_changed(task);

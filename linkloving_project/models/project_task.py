@@ -48,6 +48,12 @@ class linkloving_project_task(models.Model):
     #                 else:
     #                     parent_id._get_top_task()
 
+    def _get_display_name(self):
+        for task in self:
+            if task.parent_ids:
+                for parent_id in task.parent_ids:
+                        task.display_name = parent_id.name;
+
     def _get_top_task_id(self):
         for task in self:
             if task.parent_ids:
@@ -65,6 +71,8 @@ class linkloving_project_task(models.Model):
     parent_ids = fields.Many2many('project.task', 'project_task_parent_rel', 'task_id', 'parent_id', 'Parent Tasks')
     child_ids = fields.Many2many('project.task', 'project_task_parent_rel', 'parent_id', 'task_id', 'Delegated Tasks')
     work_ids = fields.One2many('project.task.work', 'task_id', 'Work done')
+
+    display_name = fields.Char(compute=_get_display_name, string='display name')
 
     top_task_id = fields.Integer(compute=_get_top_task_id, string='Top Task ID', store=True)
 
@@ -160,16 +168,16 @@ class linkloving_project_task(models.Model):
             vals['date_start'] = fields.datetime.now()
         return {'value': vals}
 
-    def _get_child_top_task(self, task_id):
+    def _get_child_top_task(self):
+        print '-------------------'
         if self.child_ids:
             for child in self.child_ids:
                 if child.child_ids:
-                    child._get_child_top_task(task_id)
-                    child.top_task_id = task_id
+                    child.top_task_id = self.top_task_id
+                    child._get_child_top_task()
                 else:
-                    child.top_task_id = task_id
-        else:
-            self.top_task_id = task_id
+                    child.top_task_id = self.top_task_id
+
 
     @api.model
     def create(self, vals):
@@ -190,7 +198,7 @@ class linkloving_project_task(models.Model):
             self._change_parents_date_end()
 
         if 'child_ids' in vals:
-            self._get_child_top_task(self.id)
+            self._get_child_top_task()
             child_ids = self.resolve_2many_commands('child_ids', vals.get('child_ids'))
             for child in child_ids:
                 date_ends = []
