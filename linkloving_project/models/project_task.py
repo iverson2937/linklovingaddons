@@ -165,11 +165,11 @@ class linkloving_project_task(models.Model):
             for child in self.child_ids:
                 if child.child_ids:
                     child._get_child_top_task(task_id)
-                    child.top_task_id = task_id
+                    # child.top_task_id = task_id
                 else:
                     child.top_task_id = task_id
         else:
-            self.top_task_id = task_id
+            self.top_task_id = 0
 
     @api.model
     def create(self, vals):
