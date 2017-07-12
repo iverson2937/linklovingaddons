@@ -197,7 +197,7 @@
                 </xpath>
                 <xpath expr="//sheet" position="before">
                     <header>
-                        <button name="set_to_release" type="object" states="draft" string="确认"
+                        <button name="set_to_release" type="object" states="draft,new" string="确认"
                                 class="oe_highlight"/>
                         <field name="state" widget="statusbar" readonly="1"/>
                     </header>
