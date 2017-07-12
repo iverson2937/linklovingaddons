@@ -31,7 +31,7 @@ table.treetable {
   border-collapse: collapse;
   font-size: 14px;
   line-height: 1;
-  margin: 70px 0 30px 0;
+  margin: 35px 0 30px 0;
   width: 100%;
   background: white;
 }
@@ -113,7 +113,7 @@ table.treetable tr.expanded.accept td span.indenter a {
 
 
 #treeMenu tr{
-  border: 1px solid #ddd;
+  border: 1px solid rgba(221,221,221,.3);
 }
 #treeMenu  thead tr td{
   padding-top: 15px;
@@ -134,4 +134,8 @@ table.treetable tr.expanded.accept td span.indenter a {
 }
 .product_name{
   cursor: pointer;
+}
+
+.new_bom_modify_submit,.new_bom_modify_direct{
+  margin-top: 20px;
 }

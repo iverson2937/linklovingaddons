@@ -130,8 +130,8 @@
                     <span class="fa fa-caret-right open-sign"></span>
                 </t>
             </a>
-            <span style="margin-left:15px"><t t-esc="item.qty"/></span>
             <span t-att-data-templ-id="item.product_tmpl_id" t-att-data-id="item.product_id" t-att-data-product-id="item.id" class="product_name">[<t t-esc="item.code"/>]<span><t t-esc="item.name"/></span></span>
+            <span style="margin-left:15px"><t t-esc="item.qty"/></span>
             <t t-if="item.process_id != false">
                 <span style="margin-left:15px"><t t-esc="item.process_id"/></span>
             </t>
