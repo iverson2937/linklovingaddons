@@ -10,6 +10,7 @@
 
                 <xpath expr="//field[@name='user_id']" position="after">
                     <field name="code"/>
+                    <field name="follow_id" options="{'no_create':True}"/>
                     <field name="is_domestic"/>
                 </xpath>
 
