@@ -34,6 +34,7 @@ class linkloving_project(models.Model):
                               ('close', 'Closed')],
                              'Status', copy=False, default='draft')
 
+
     #
     # # TODO 计算项目耗时, 未实现
     # def onchange_partner_id(self, part=False):

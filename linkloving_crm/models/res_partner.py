@@ -17,9 +17,11 @@ AVAILABLE_PRIORITIES = [
 
 
 def select_company(my_self, vals, type):
-    result = my_self.env['res.partner'].search(
-        [(type, '=', vals[type].strip()), ('customer', '=', True), ('is_company', '=', True)])
-    return result
+    strip_str =  vals.get(type)
+    if strip_str:
+        result = my_self.env['res.partner'].search(
+            [(type, '=', strip_str.strip()), ('customer', '=', True), ('is_company', '=', True)])
+        return result
 
 
 class ResPartner(models.Model):
@@ -66,13 +68,14 @@ class ResPartner(models.Model):
 
     @api.model
     def create(self, vals):
-        if 'is_company' in vals and type(vals['company_type']) != bool:
-            if vals['is_company'] == True and vals['company_type'] == 'company':
-                if type(vals['name']) != bool:
+        # if 'is_company' in vals and (vals['company_type'] == 'company' or vals['company_type'] == 'company'):
+        if not ('company_type' in vals and vals.get('company_type') == 'person'):
+            if vals.get('is_company') == True:
+                if type(vals.get('name')) != bool:
                     if select_company(self, vals, 'name'):
                         raise UserError(u'此名称已绑定公司，请确认')
 
-                if type(vals['email']) != bool:
+                if type(vals.get('email')) != bool:
                     if select_company(self, vals, 'email'):
                         raise UserError(u'此Email已绑定公司，请更换')
 
@@ -83,23 +86,23 @@ class ResPartner(models.Model):
 
         if self['company_type'] == 'company' and 'company_type' not in vals:
             if 'name' in vals:
-                if type(vals['name']) != bool:
+                if type(vals.get('name')) != bool:
                     if select_company(self, vals, 'name'):
                         raise UserError(u'此名称已绑定公司，请确认')
             if 'email' in vals:
-                if type(vals['email']) != bool:
+                if type(vals.get('email')) != bool:
                     if select_company(self, vals, 'email'):
                         raise UserError(u'此Email已绑定公司，请更换')
 
-        if self['company_type'] == 'person' and 'company_type' in vals and vals['company_type'] == 'company':
-            if 'name' in vals and type(vals['name']) != bool:
+        if self['company_type'] == 'person' and 'company_type' in vals and vals.get('company_type') == 'company':
+            if 'name' in vals and type(vals.get('name')) != bool:
                 if select_company(self, vals, 'name'):
                     raise UserError(u'此名称已绑定公司，请确认')
             elif 'name' not in vals and type(self['name']) != bool:
                 if select_company(self, self, 'name'):
                     raise UserError(u'此名称已绑定公司，请确认')
 
-            if 'email' in vals and type(vals['email']) != bool:
+            if 'email' in vals and type(vals.get('email')) != bool:
                 if select_company(self, vals, 'email'):
                     raise UserError(u'此Email已绑定公司，请更换')
             elif 'email' not in vals and type(self['email']) != bool:

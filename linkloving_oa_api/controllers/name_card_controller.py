@@ -44,7 +44,7 @@ class NameCardController(http.Controller):
         area = request.jsonrequest.get("area")
         source_id = request.jsonrequest.get("crm_source_id")
         partner_type = request.jsonrequest.get("partner_type")
-        partners = request.env["res.partner"].sudo().search([("name", "ilike", name)])
+        partners = request.env["res.partner"].sudo().search([("name", "=", name)])
         if partners:
             raise UserError(u"该客户已存在")
         else:
