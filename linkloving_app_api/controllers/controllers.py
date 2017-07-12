@@ -855,6 +855,7 @@ class LinklovingAppApi(http.Controller):
         mrp_production = request.env['mrp.production'].sudo().search([('id', '=', order_id)])[0]
 
         stock_moves = request.jsonrequest.get('stock_moves') #get paramter
+        print(u"charlie_0712_log:finish_prepare_material, mo:%s,moves:%s" % (mrp_production.name, stock_moves))
         stock_move_lines = request.env["sim.stock.move"].sudo()
         try:
             for move in stock_moves:
