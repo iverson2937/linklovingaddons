@@ -17,7 +17,7 @@ AVAILABLE_PRIORITIES = [
 
 
 def select_company(my_self, vals, type):
-    strip_str =  vals.get(type)
+    strip_str = vals.get(type)
     if strip_str:
         result = my_self.env['res.partner'].search(
             [(type, '=', strip_str.strip()), ('customer', '=', True), ('is_company', '=', True)])
@@ -68,46 +68,30 @@ class ResPartner(models.Model):
 
     @api.model
     def create(self, vals):
-        # if 'is_company' in vals and (vals['company_type'] == 'company' or vals['company_type'] == 'company'):
-        if not ('company_type' in vals and vals.get('company_type') == 'person'):
-            if vals.get('is_company') == True:
-                if type(vals.get('name')) != bool:
-                    if select_company(self, vals, 'name'):
-                        raise UserError(u'此名称已绑定公司，请确认')
-
-                if type(vals.get('email')) != bool:
-                    if select_company(self, vals, 'email'):
-                        raise UserError(u'此Email已绑定公司，请更换')
+        if not (vals.get('company_type') == 'person'):
+            if vals.get('is_company'):
+                if select_company(self, vals, 'name'):
+                    raise UserError(u'此名称已绑定公司，请确认')
+                if select_company(self, vals, 'email'):
+                    raise UserError(u'此Email已绑定公司，请更换')
 
         return super(ResPartner, self).create(vals)
 
     @api.multi
     def write(self, vals):
+        if not (self['company_type'] == 'company' and vals.get('company_type') == 'person'):
+            if self['is_company'] or vals.get('is_company'):
+                for item_type in ['name', 'email']:
+                    if select_company(self, vals, item_type):
+                        if item_type == 'name': item_type = u'公司名称'
+                        raise UserError(u'此' + item_type + u'已绑定公司，请确认')
 
-        if self['company_type'] == 'company' and 'company_type' not in vals:
-            if 'name' in vals:
-                if type(vals.get('name')) != bool:
-                    if select_company(self, vals, 'name'):
-                        raise UserError(u'此名称已绑定公司，请确认')
-            if 'email' in vals:
-                if type(vals.get('email')) != bool:
-                    if select_company(self, vals, 'email'):
-                        raise UserError(u'此Email已绑定公司，请更换')
-
-        if self['company_type'] == 'person' and 'company_type' in vals and vals.get('company_type') == 'company':
-            if 'name' in vals and type(vals.get('name')) != bool:
-                if select_company(self, vals, 'name'):
-                    raise UserError(u'此名称已绑定公司，请确认')
-            elif 'name' not in vals and type(self['name']) != bool:
-                if select_company(self, self, 'name'):
-                    raise UserError(u'此名称已绑定公司，请确认')
-
-            if 'email' in vals and type(vals.get('email')) != bool:
-                if select_company(self, vals, 'email'):
-                    raise UserError(u'此Email已绑定公司，请更换')
-            elif 'email' not in vals and type(self['email']) != bool:
-                if select_company(self, self, 'email'):
-                    raise UserError(u'此Email已绑定公司，请更换')
+        if self['company_type'] == 'person' and vals.get('company_type') == 'company':
+            for item_type in ['name', 'email']:
+                if not vals.get(item_type):
+                    if select_company(self, {item_type: self[item_type]}, item_type):
+                        if item_type == 'name': item_type = u'公司名称'
+                        raise UserError(u'此' + item_type + u'已绑定公司，请更换')
 
         return super(ResPartner, self).write(vals)
 

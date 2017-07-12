@@ -44,47 +44,47 @@ class NameCardController(http.Controller):
         area = request.jsonrequest.get("area")
         source_id = request.jsonrequest.get("crm_source_id")
         partner_type = request.jsonrequest.get("partner_type")
-        partners = request.env["res.partner"].sudo().search([("name", "=", name)])
-        if partners:
-            raise UserError(u"该客户已存在")
+        # partners = request.env["res.partner"].sudo().search([("name", "=", name)])
+        # if partners:
+        #     raise UserError(u"该客户已存在")
+        # else:
+        if company_id:
+            new_company_id = company_id
         else:
-            if company_id:
-                new_company_id = company_id
-            else:
-                if u"有限公司" in company_name:
-                    company_name = company_name.replace(u"有限公司", "")
-                elif u'有限责任公司' in company_name:
-                    company_name = company_name.replace(u"有限责任公司", "")
-                elif u'责任有限公司' in company_name:
-                    company_name = company_name.replace(u"责任有限公司", "")
-                elif u'公司' in company_name:
-                    company_name = company_name.replace(u"公司", "")
-                company = request.env["res.partner"].sudo().search([("name", "ilike", company_name)], limit=1)
-                if not company:
-                    company = request.env["res.partner"].sudo().create({
-                        "name": company_real_name,
-                        "street": street,
-                        "level": int(partner_lv),
-                        "priority": str(star_cnt),
-                        "category_id": [6, 0, (tag_list)],
-                        "team_id": saleteam_id,
-                        "user_id": saleman_id,
-                        "crm_source_id": source_id,
-                        "customer": partner_type == "customer",
-                        "supplier": partner_type == "supplier",
-                        "is_company": True
-                    })
-                new_company_id = company.id
-                # company.company_type = "company"
-            s = request.env["res.partner"].sudo().create({
-                "name": name,
-                "parent_id": new_company_id,
-                "mobile": phone,
-                "customer": partner_type == "customer",
-                "supplier": partner_type == "supplier",
-                "is_company": False
-            })
-            return True
+            if u"有限公司" in company_name:
+                company_name = company_name.replace(u"有限公司", "")
+            elif u'有限责任公司' in company_name:
+                company_name = company_name.replace(u"有限责任公司", "")
+            elif u'责任有限公司' in company_name:
+                company_name = company_name.replace(u"责任有限公司", "")
+            elif u'公司' in company_name:
+                company_name = company_name.replace(u"公司", "")
+            company = request.env["res.partner"].sudo().search([("name", "ilike", company_name)], limit=1)
+            if not company:
+                company = request.env["res.partner"].sudo().create({
+                    "name": company_real_name,
+                    "street": street,
+                    "level": int(partner_lv),
+                    "priority": str(star_cnt),
+                    "category_id": [6, 0, (tag_list)],
+                    "team_id": saleteam_id,
+                    "user_id": saleman_id,
+                    "crm_source_id": source_id,
+                    "customer": partner_type == "customer",
+                    "supplier": partner_type == "supplier",
+                    "is_company": True
+                })
+            new_company_id = company.id
+            # company.company_type = "company"
+        s = request.env["res.partner"].sudo().create({
+            "name": name,
+            "parent_id": new_company_id,
+            "mobile": phone,
+            "customer": partner_type == "customer",
+            "supplier": partner_type == "supplier",
+            "is_company": False
+        })
+        return True
 
     @http.route('/linkloving_oa_api/get_saleman_list/', auth='none', type='json')
     def get_saleman_list(self, **kwargs):
