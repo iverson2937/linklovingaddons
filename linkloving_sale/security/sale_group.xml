@@ -110,7 +110,7 @@
         <field name="name">我跟的订单</field>
         <field ref="sale.model_sale_order" name="model_id"/>
         <field name="domain_force">
-            [('create_uid','=',user.id),('user_id.sale_team_id.follow_id','',user_id)]
+            ['|',('create_uid','=',user.id),('user_id.sale_team_id.follow_id','=',user.id)]
         </field>
         <field name="groups" eval="[(4, ref('group_sale_salesman_follow_orders'))]"/>
     </record>
