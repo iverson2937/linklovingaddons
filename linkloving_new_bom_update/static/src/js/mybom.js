@@ -64,7 +64,6 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             //清空之前的数组，再执行查找父级id的函数
             my.parentsid = [];
             my.getParents($(target).parents("tr"));
-            console.log(my.parentsid);
 
             self.$(document).ajaxComplete(function (event, xhr, settings) {
                 var data = JSON.parse(settings.data);
@@ -76,16 +75,16 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                         var s = {
                             id: 100,
                             pId: pId,
+                            add : 1,
                             ptid:xhr.responseJSON.result.product_tmpl_id,
                             name:xhr.responseJSON.result.name[0][1],
-                            td:[xhr.responseJSON.result.product_spec,xhr.responseJSON.result.qty, xhr.responseJSON.result.process_id, "<span class='fa fa-plus add_bom_data'></span>"]
+                            td:[xhr.responseJSON.result.product_spec,xhr.responseJSON.result.qty, xhr.responseJSON.result.process_id,
+                                "<span class='fa fa-plus-square-o add_bom_data'></span>","<span class='fa fa-edit new_product_edit'></span>"]
                         };
                         my.xNodes.push(s);
                         $("#treeMenu").html("");
                         var heads = ["名字", "规格", "数量", "工序", "添加"];
                         $.TreeTable("treeMenu", heads, my.xNodes);
-
-
 
                         var c = {
                             modify_type : "add",
@@ -139,7 +138,6 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                     .call("get_bom", [this.bom_id])
                     .then(function (result) {
                         console.log(result);
-                        console.log(result.bom_ids);
                         var tNodes = [];
 
                         //获取数据存入数组
@@ -151,7 +149,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                                     pId: obj[i].parent_id,
                                     ptid: obj[i].product_tmpl_id,
                                     name: obj[i].name,
-                                    td: [obj[i].product_specs, obj[i].qty, obj[i].process_id, "<span class='fa fa-plus add_bom_data'></span>"]
+                                    td: [obj[i].product_specs, obj[i].qty, obj[i].process_id, "<span class='fa fa-plus-square-o add_bom_data'></span>","<span class='fa fa-edit new_product_edit'></span>"]
                                 };
                                 tNodes.push(s);
                                 if (obj[i].bom_ids.length > 0) {
@@ -166,13 +164,14 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                             pId: 0,
                             ptid: result.product_tmpl_id,
                             name: result.name,
-                            td: [result.product_specs, '', result.process_id, "<span class='fa fa-plus add_bom_data'></span>"]
+                            td: [result.product_specs, '', result.process_id, "<span class='fa fa-plus-square-o add_bom_data'></span>","<span class='fa fa-edit new_product_edit'></span>"]
                         })
                         self.xNodes = tNodes;
-                        var heads = ["名字", "规格", "数量", "工序", "添加"];
+                        var heads = ["名字", "规格", "数量", "工序", "添加","编辑"];
                         setTimeout(function () {
                             $("#treeMenu").attr("data-bom-id",result.bom_id)
                             $.TreeTable("treeMenu", heads, tNodes);
+                            $("#treeMenu").treetable("node",result.bom_id).toggle();
                         }, 200)
                     })
             }
