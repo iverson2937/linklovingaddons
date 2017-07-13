@@ -32,7 +32,7 @@
                 </xpath>
 
                 <!--创建联系人 di第一栏-->
-              <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='comment']"
+                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='comment']"
                        position="after">
                     <field name="whatsapp"/>
                 </xpath>
@@ -104,6 +104,10 @@
             <field name="inherit_id" ref="base.view_partner_tree"/>
             <field name="arch" type="xml">
 
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="default_order">write_date desc</attribute>
+                </xpath>
+
                 <xpath expr="//field[@name='display_name']" position="after">
                     <field name="is_order"/>
                 </xpath>
@@ -139,7 +143,9 @@
             <field name="arch" type="xml">
                 <xpath expr="//group[@name='group_by']/filter[@name='salesperson']" position="after">
                     <filter string="销售团队" name="team_id" context="{'group_by' : 'team_id'}" domain="[]"/>
+                    <filter string="客户星级" name="priority" context="{'group_by' : 'priority'}" domain="[]"/>
                 </xpath>
+
             </field>
         </record>
 
