@@ -81,6 +81,7 @@ class LinklovingAppApi(http.Controller):
     #获取数据库列表
     @http.route('/linkloving_app_api/get_db_list',type='http', auth='none')
     def get_db_list(self, **kw):
+        print("db_list")
         return JsonResponse.send_response(STATUS_CODE_OK, res_data= http.db_list(), jsonRequest=False)
 
     #登录
@@ -857,8 +858,8 @@ class LinklovingAppApi(http.Controller):
         mrp_production = request.env['mrp.production'].sudo().search([('id', '=', order_id)])[0]
 
         stock_moves = request.jsonrequest.get('stock_moves') #get paramter
-        _logger.warning(u"charlie_0712_log:finish_prepare_material, mo:%s,moves:%s", mrp_production.name, stock_moves)
-        print(u"charlie_0712_log:finish_prepare_material, mo:%s,moves:%s" % (mrp_production.name, stock_moves))
+        # _logger.warning(u"charlie_0712_log:finish_prepare_material, mo:%s,moves:%s", mrp_production.name, stock_moves)
+        # print(u"charlie_0712_log:finish_prepare_material, mo:%s,moves:%s" % (mrp_production.name, stock_moves))
         stock_move_lines = request.env["sim.stock.move"].sudo()
         try:
             for move in stock_moves:
@@ -875,43 +876,43 @@ class LinklovingAppApi(http.Controller):
                 rounding = sim_stock_move.stock_moves[0].product_uom.rounding
                 if float_compare(move['quantity_ready'], sim_stock_move.stock_moves[0].product_uom_qty,
                                  precision_rounding=rounding) > 0:
-                    _logger.warning(u"charlie_0712_log_1:move_qty:%s,move_id:%d,uom_qty:%s",
-                                    str(move['quantity_ready']),
-                                    sim_stock_move.stock_moves[0].id,
-                                    str(sim_stock_move.stock_moves[0].product_uom_qty))
+                    # _logger.warning(u"charlie_0712_log_1:move_qty:%s,move_id:%d,uom_qty:%s",
+                    #                 str(move['quantity_ready']),
+                    #                 sim_stock_move.stock_moves[0].id,
+                    #                 str(sim_stock_move.stock_moves[0].product_uom_qty))
 
                     qty_split = sim_stock_move.stock_moves[0].product_uom._compute_quantity(
                             move['quantity_ready'] - sim_stock_move.stock_moves[0].product_uom_qty,
                             sim_stock_move.stock_moves[0].product_id.uom_id)
-                    _logger.warning(u"charlie_0712_log_2:qty_split:%s,", str(qty_split))
+                    # _logger.warning(u"charlie_0712_log_2:qty_split:%s,", str(qty_split))
                     split_move = sim_stock_move.stock_moves[0].copy(
                             default={'quantity_done': qty_split, 'product_uom_qty': qty_split,
                                      'production_id': sim_stock_move.production_id.id,
                                      'raw_material_production_id': sim_stock_move.raw_material_production_id.id,
                                      'procurement_id': sim_stock_move.procurement_id.id or False,
                                      'is_over_picking': True})
-                    _logger.warning(u"charlie_0712_log_3:split_move_qty:%s,", split_move)
+                    # _logger.warning(u"charlie_0712_log_3:split_move_qty:%s,", split_move)
                     sim_stock_move.production_id.move_raw_ids = sim_stock_move.production_id.move_raw_ids + split_move
-                    _logger.warning(u"charlie_0712_log_4:len_move_raw_ids:%d,",
-                                    len(sim_stock_move.production_id.move_raw_ids))
+                    # _logger.warning(u"charlie_0712_log_4:len_move_raw_ids:%d,",
+                    #                 len(sim_stock_move.production_id.move_raw_ids))
                     split_move.write({'state': 'assigned',})
                     sim_stock_move.stock_moves[0].quantity_done = sim_stock_move.stock_moves[0].product_uom_qty
-                    _logger.warning(u"charlie_0712_log_5:len_move_raw_ids:%d,",
-                                    len(sim_stock_move.production_id.move_raw_ids))
+                    # _logger.warning(u"charlie_0712_log_5:len_move_raw_ids:%d,",
+                    #                 len(sim_stock_move.production_id.move_raw_ids))
                     split_move.action_done()
-                    _logger.warning(u"charlie_0712_log_6:len_move_raw_ids:%d,",
-                                    len(sim_stock_move.production_id.move_raw_ids))
+                    # _logger.warning(u"charlie_0712_log_6:len_move_raw_ids:%d,",
+                    #                 len(sim_stock_move.production_id.move_raw_ids))
                     sim_stock_move.stock_moves[0].action_done()
-                    _logger.warning(u"charlie_0712_log_7:len_move_raw_ids:%d,",
-                                    len(sim_stock_move.production_id.move_raw_ids))
+                    # _logger.warning(u"charlie_0712_log_7:len_move_raw_ids:%d,",
+                    #                 len(sim_stock_move.production_id.move_raw_ids))
                 else:
-                    _logger.warning(u"charlie_0712_log_8:move_qty:%s,uom_qty:%s", str(move['quantity_ready']),
-                                    str(sim_stock_move.stock_moves[0].product_uom_qty))
+                    # _logger.warning(u"charlie_0712_log_8:move_qty:%s,uom_qty:%s", str(move['quantity_ready']),
+                    #                 str(sim_stock_move.stock_moves[0].product_uom_qty))
                     sim_stock_move.stock_moves[0].quantity_done_store = move['quantity_ready']
                     sim_stock_move.stock_moves[0].quantity_done = move['quantity_ready']
                     sim_stock_move.stock_moves[0].action_done()
-                    _logger.warning(u"charlie_0712_log_9:len_move_raw_ids:%d",
-                                    len(sim_stock_move.production_id.move_raw_ids))
+                    # _logger.warning(u"charlie_0712_log_9:len_move_raw_ids:%d",
+                    #                 len(sim_stock_move.production_id.move_raw_ids))
                 sim_stock_move.quantity_ready = 0  # 清0
             # try:
             #     mrp_production.post_inventory()
@@ -930,7 +931,7 @@ class LinklovingAppApi(http.Controller):
         except Exception, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error": e.name})
-        _logger.warning(u"charlie_0712_log10:finish, mo:%s", LinklovingAppApi.model_convert_to_dict(order_id, request))
+        # _logger.warning(u"charlie_0712_log10:finish, mo:%s", LinklovingAppApi.model_convert_to_dict(order_id, request))
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 

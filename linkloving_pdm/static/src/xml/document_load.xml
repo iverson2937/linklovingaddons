@@ -52,7 +52,8 @@
                                 </div>
                                 <div class="document_review_list">
                                     <t t-foreach="item_files.review_line" t-as="review_list">
-                                        <div data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"><t t-esc="review_list.name"/></div>
+                                        <div data-html="true" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+'审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"><t t-esc="review_list.name"/></div>
+
                                         <t t-if="review_list.state[0]=='review_success'">
                                             <span class="fa fa-long-arrow-right" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"></span>
                                         </t>
@@ -115,7 +116,13 @@
                         <input type="hidden" class="" name="my_load_file_remote_path" value=""/>
                         <input type="hidden" class="" name="my_load_file_version" value=""/>
                         <!--<input type="text" class="my_load_file_remote_path" name="my_load_file_remote_path"/>-->
-                        <a href="javascript:;">选择文件
+                        <!--<t t-if=""-->
+
+                         <a id="my_load_file__a_1"  href="javascript:void(-1);">选择文件
+                            <!--<input type="file" class="my_load_file" name="my_load_file"/>-->
+                        </a>
+
+                        <a href="javascript:;" id="my_load_file_a">选择文件
                             <input type="file" class="my_load_file" name="my_load_file"/>
                         </a>
                         <!--<input type="text" class="my_load_file_version" name="my_load_file_version"/>-->
@@ -153,9 +160,9 @@
                 </div>
                  <div class="document_review_list">
                     <t t-foreach="item_files.review_line" t-as="review_list">
-                        <div data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"><t t-esc="review_list.name"/></div>
+                        <div data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'时间：'+review_list.create_date"><t t-esc="review_list.name"/></div>
                         <t t-if="review_list.state[0]=='review_success'">
-                            <span class="fa fa-long-arrow-right" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"></span>
+                            <span class="fa fa-long-arrow-right" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+'审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"></span>
                         </t>
                         <t t-if="review_list.state[0]=='waiting_review'">
                             <span class="fa fa-long-arrow-right document_yellow" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"></span>
