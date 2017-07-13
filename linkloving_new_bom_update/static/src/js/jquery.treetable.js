@@ -503,13 +503,14 @@ jQuery.TreeTable = function (tree_id, heads, tNodes) {
         var body_html = "<tbody>";
         for (var i = 0, l = newNodes.length; i < l; i++) {
             var node = newNodes[i];
+            var new_bg;
             //添加的  给新添加的数据背景色
             if(node.add == 1){
-                node.add = "add_class_name_test";
+                new_bg = "add_class_name_test";
             }else {
-                node.add = "";
+                new_bg = "";
             }
-            body_html += "<tr class='"+ node.add +"' data-tt-id='" + node.id + "' " + (node.pId ? "data-tt-parent-id='" + node.pId + "'" : "") + "><td class = 'td_left'><span data-id='"+ node +"' data-pt-id='"+ node.ptid +"' class='" + (node.isParent ? "parent" : "children") + " product_name'>" + node.name + "</span></td>";
+            body_html += "<tr class='" + new_bg + "' data-tt-id='" + node.id + "' " + (node.pId ? "data-tt-parent-id='" + node.pId + "'" : "") + "><td class = 'td_left'><span data-id='" + node + "' data-pt-id='" + node.ptid + "' class='" + (node.isParent ? "parent" : "children") + " product_name'>" + node.name + "</span></td>";
             for (var j = 0; j < column_count - 1; j++) {
                 body_html += "<td>" + (node.td[j] ? node.td[j] : "") + "</td>";
             }

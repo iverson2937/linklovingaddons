@@ -44,10 +44,8 @@ class NameCardController(http.Controller):
         area = request.jsonrequest.get("area")
         source_id = request.jsonrequest.get("crm_source_id")
         partner_type = request.jsonrequest.get("partner_type")
-        # partners = request.env["res.partner"].sudo().search([("name", "=", name)])
-        # if partners:
-        #     raise UserError(u"该客户已存在")
-        # else:
+        email = request.jsonrequest.get("email")
+        type = request.jsonrequest.get("type")
         if company_id:
             new_company_id = company_id
         else:
@@ -76,13 +74,19 @@ class NameCardController(http.Controller):
                 })
             new_company_id = company.id
             # company.company_type = "company"
+
+        partners = request.env["res.partner"].sudo().search([("name", "=", name), ("parent_id", '=', new_company_id)], )
+        if partners:
+            raise UserError(u"该客户已存在")
         s = request.env["res.partner"].sudo().create({
             "name": name,
             "parent_id": new_company_id,
             "mobile": phone,
             "customer": partner_type == "customer",
             "supplier": partner_type == "supplier",
-            "is_company": False
+            "is_company": False,
+            "email": email,
+            "type": type,
         })
         return True
 

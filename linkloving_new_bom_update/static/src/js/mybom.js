@@ -83,14 +83,15 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                         };
                         my.xNodes.push(s);
                         $("#treeMenu").html("");
-                        var heads = ["名字", "规格", "数量", "工序", "添加"];
+                        var heads = ["名字", "规格", "数量", "工序", "添加", "编辑"];
                         $.TreeTable("treeMenu", heads, my.xNodes);
+                        $("#treeMenu").treetable("node", $("#treeMenu").attr("data-bom-id")).toggle();
 
                         var c = {
                             modify_type : "add",
                             qty: xhr.responseJSON.result.qty,
                             product_id : xhr.responseJSON.result.name[0][0],
-                            input_changed_value: xhr.responseJSON.result.name[0][1],
+                            input_changed_value: xhr.responseJSON.result.new_name,
                             parents: my.parentsid
                         }
                         my.changes_back.push(c);
