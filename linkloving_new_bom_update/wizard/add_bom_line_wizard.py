@@ -23,7 +23,7 @@ class AddBomLineWizard(models.TransientModel):
             'qty': self.qty,
             'name': self.product_id.name_get(),
             'process_id': process_id,
-            'name': self.name,
+            'new_name': self.name,
             'product_tmpl_id': self.product_id.product_tmpl_id.id,
             'product_spec': self.product_specs
         }

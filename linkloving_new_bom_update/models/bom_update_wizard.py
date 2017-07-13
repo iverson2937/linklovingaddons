@@ -273,20 +273,6 @@ class BomUpdateWizard(models.TransientModel):
         new_code = '.'.join(spec)
         return new_code
 
-    @staticmethod
-    def get_new_product_name(old_name, postfix):
-        old = re.findall(ur"[^({]+(?=[}）])", old_name)
-        if old and len(old) == 1:
-            new_name = old_name.replace(old[0], postfix)
-        elif len(old) > 1:
-            UserError(u'产品名称不规范，找不到想要的版本')
-        else:
-            if postfix:
-                new_name = old_name + '{' + postfix + '}'
-            else:
-                new_name = old_name
-        return new_name
-
 
 def update_bom_line_copy(new_bom_id, new_product_id, old_product_id):
     if new_product_id:
