@@ -112,9 +112,12 @@
 
         Node.prototype.render = function () {
             var settings = this.settings, target;
-
+            // $("#treeMenu tbody tr:first a").parents("table").treetable("node", $("#treeMenu tbody tr:first a").parents("tr").data(settings.nodeIdAttr)).toggle();
             if (settings.expandable === true && this.isBranchNode()) {
                 this.indenter.html(this.expander);
+                // var $o = $("#treeMenu tbody tr:first a").eq(0);
+                // console.log($o.parents("table"));
+                // $o.parents("table").treetable("node", $o.parents("tr").data(settings.nodeIdAttr)).toggle();
                 target = settings.clickableNodeNames === true ? this.treeCell : this.expander;
                 target.unbind("click.treetable").bind("click.treetable", function (event) {
                     $(this).parents("table").treetable("node", $(this).parents("tr").data(settings.nodeIdAttr)).toggle();
@@ -500,7 +503,13 @@ jQuery.TreeTable = function (tree_id, heads, tNodes) {
         var body_html = "<tbody>";
         for (var i = 0, l = newNodes.length; i < l; i++) {
             var node = newNodes[i];
-            body_html += "<tr data-tt-id='" + node.id + "' " + (node.pId ? "data-tt-parent-id='" + node.pId + "'" : "") + "><td class = 'td_left'><span data-id='"+ node.id +"' data-pt-id='"+ node.ptid +"' class='" + (node.isParent ? "parent" : "children") + " product_name'>" + node.name + "</span></td>";
+            //添加的  给新添加的数据背景色
+            if(node.add == 1){
+                node.add = "add_class_name_test";
+            }else {
+                node.add = "";
+            }
+            body_html += "<tr class='"+ node.add +"' data-tt-id='" + node.id + "' " + (node.pId ? "data-tt-parent-id='" + node.pId + "'" : "") + "><td class = 'td_left'><span data-id='"+ node +"' data-pt-id='"+ node.ptid +"' class='" + (node.isParent ? "parent" : "children") + " product_name'>" + node.name + "</span></td>";
             for (var j = 0; j < column_count - 1; j++) {
                 body_html += "<td>" + (node.td[j] ? node.td[j] : "") + "</td>";
             }
