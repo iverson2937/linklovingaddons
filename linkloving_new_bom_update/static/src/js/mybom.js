@@ -18,7 +18,8 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             'click .add_bom_data': 'add_bom_data_fn',
             'click .product_name': 'product_name_fn',
             'click .new_bom_modify_submit': 'new_bom_modify_submit_fn',
-            'click .new_bom_modify_direct': 'new_bom_modify_submit_fn'
+            'click .new_bom_modify_direct': 'new_bom_modify_submit_fn',
+            'click .new_product_edit': 'edit_bom_line_fn'
         },
 
         //提交的动作
@@ -44,7 +45,12 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             };
             this.do_action(action);
         },
+        //编辑按钮的点击事件
         edit_bom_line_fn: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var product_id = $(target).parents("tr").attr("data-product-id");
+
             var action = {
                 name: "详细",
                 type: 'ir.actions.act_window',
@@ -53,11 +59,23 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 view_mode: 'tree,form',
                 views: [[false, 'form']],
                 context: {
-                    'default_product_id': this.view.dataset.model,
+                    'default_product_id': parseInt(product_id),
                 },
                 target: "new"
             };
+            this.do_action(action);
+            var my = this;
+            my.flag = true;
 
+            //self.$(document).ajaxComplete(function (event, xhr, settings) {
+            //    var data = JSON.parse(settings.data);
+            //    if (data.params.model == 'add.bom.line.wizard') {
+            //        if (data.params.method == 'action_edit' && my.flag == true) {
+            //            my.flag = false;
+            //            console.log(xhr);
+            //        }
+            //    }
+            //})
 
         },
         //添加按钮的点击事件
@@ -65,6 +83,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var pId = $(target).parents("tr").attr("data-tt-id");
+            console.log(pId);
             var my = this;
             my.flag = true;
             var action = {
@@ -85,14 +104,16 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             self.$(document).ajaxComplete(function (event, xhr, settings) {
                 var data = JSON.parse(settings.data);
                 if (data.params.model == 'add.bom.line.wizard') {
-                    if (data.params.method == 'action_post' && my.flag == true) {
+                    if (data.params.method == 'action_add' && my.flag == true) {
                         my.flag = false;
                         console.log(xhr);
+                        console.log(pId)
                         //table树重新渲染
                         var s = {
                             id: 100,
                             pId: pId,
                             add: 1,
+                            productid: xhr.responseJSON.result.name[0][0],
                             ptid: xhr.responseJSON.result.product_tmpl_id,
                             name: xhr.responseJSON.result.name[0][1],
                             td: [xhr.responseJSON.result.product_spec, xhr.responseJSON.result.qty, xhr.responseJSON.result.process_id,
@@ -113,6 +134,11 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                         }
                         my.changes_back.push(c);
                         console.log(my.changes_back);
+                    } else if (data.params.model == 'add.bom.line.wizard') {
+                        if (data.params.method == 'action_edit' && my.flag == true) {
+                            my.flag = false;
+                            console.log(xhr);
+                        }
                     }
                 }
             })
@@ -166,6 +192,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                                     id: obj[i].id,
                                     pId: obj[i].parent_id,
                                     ptid: obj[i].product_tmpl_id,
+                                    productid: obj[i].product_id,
                                     name: obj[i].name,
                                     td: [obj[i].product_specs, obj[i].qty, obj[i].process_id, "<span class='fa fa-plus-square-o add_bom_data'></span>", "<span class='fa fa-edit new_product_edit'></span>"]
                                 };
@@ -182,6 +209,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                             id: result.bom_id,
                             pId: 0,
                             ptid: result.product_tmpl_id,
+                            productid: result.product_id,
                             name: result.name,
                             td: [result.product_specs, '', result.process_id, "<span class='fa fa-plus-square-o add_bom_data'></span>", "<span class='fa fa-edit new_product_edit'></span>"]
                         })
