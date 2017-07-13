@@ -77,7 +77,8 @@
     <record id="my_follows_customer" model="ir.rule">
         <field name="name">我跟单的客户</field>
         <field ref="base.model_res_partner" name="model_id"/>
-        <field name="domain_force">['|',('team_id','=',user.sale_team_id.id),('is_company','=',False)]
+        <field name="domain_force">
+            ['|','|',('team_id.follow_id','=',user.id),('team_id','=',user.sale_team_id.id),('is_company','=',False)]
         </field>
         <field name="groups" eval="[(4, ref('group_sale_salesman_follow_orders'))]"/>
     </record>
