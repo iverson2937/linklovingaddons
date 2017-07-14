@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import uuid
 
 from odoo import api, models, fields, tools, _
 from odoo.exceptions import UserError
@@ -23,8 +24,10 @@ class AddBomLineWizard(models.TransientModel):
 
         return {
             'qty': self.qty,
+            'pid': self._context.get('pid'),
             'name': self.product_id.name_get(),
             'process_id': process_id,
+            'id': str(uuid.uuid1()),
             'new_name': self.name,
             'product_tmpl_id': self.product_id.product_tmpl_id.id,
             'product_spec': self.product_specs
@@ -40,6 +43,8 @@ class AddBomLineWizard(models.TransientModel):
             'qty': self.qty,
             'name': self.product_id.name_get(),
             'process_id': process_id,
+            'pid': self._context.get('pid'),
+            'id': str(uuid.uuid1()),
             'new_name': self.name,
             'product_tmpl_id': self.product_id.product_tmpl_id.id,
             'product_spec': self.product_specs
