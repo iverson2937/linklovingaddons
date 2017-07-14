@@ -51,7 +51,8 @@ table.treetable thead tr td {
 
 table.treetable tbody tr td {
   /*cursor: default;*/
-  padding: 10px 15px;
+  /*padding: 10px 15px;*/
+  padding: 10px;
   line-height: 18px;
 }
 
@@ -127,7 +128,12 @@ table.treetable tr.expanded.accept td span.indenter a {
 #treeMenu thead tr td:nth-child(2){
   width: 35%;
 }
-.add_bom_data,.new_product_edit{
+#treeMenu thead tr td:nth-child(5),#treeMenu thead tr td:nth-child(6),#treeMenu thead tr td:nth-child(7){
+  width:30px;
+  padding: 5px 10px 1px 10px!important;
+}
+
+.add_bom_data,.new_product_edit,.new_product_delete{
   cursor: pointer;
   color: #0499e3;
   font-size: 16px;
@@ -142,4 +148,7 @@ table.treetable tr.expanded.accept td span.indenter a {
 }
 .add_class_name_test{
   background: gold;
+}
+.edit_class_name_test{
+  background: lightgreen;
 }
