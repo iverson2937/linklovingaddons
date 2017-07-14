@@ -43,9 +43,13 @@ class NameCardController(http.Controller):
         street = request.jsonrequest.get("street")
         area = request.jsonrequest.get("area")
         source_id = request.jsonrequest.get("crm_source_id")
+        src_id = request.jsonrequest.get("source_id")
         partner_type = request.jsonrequest.get("partner_type")
         email = request.jsonrequest.get("email")
         type = request.jsonrequest.get("type")
+        country_id = request.jsonrequest.get("country_id")
+        product_series = request.jsonrequest.get("series_ids")
+
         if company_id:
             new_company_id = company_id
         else:
@@ -70,7 +74,10 @@ class NameCardController(http.Controller):
                     "crm_source_id": source_id,
                     "customer": partner_type == "customer",
                     "supplier": partner_type == "supplier",
-                    "is_company": True
+                    "is_company": True,
+                    'source_id': src_id,
+                    'country_id': country_id,
+                    'product_series_ids': product_series,
                 })
             new_company_id = company.id
             # company.company_type = "company"
@@ -127,5 +134,35 @@ class NameCardController(http.Controller):
         for src in sources:
             json_list.append(
                     {"src_id": src.id,
+                     "name": src.name or ''})
+        return json_list
+
+    @http.route('/linkloving_oa_api/get_sources/', auth='none', type='json')
+    def get_sources(self, **kwargs):
+        sources = request.env["res.partner.source"].sudo().search([])
+        json_list = []
+        for src in sources:
+            json_list.append(
+                    {"source_id": src.id,
+                     "name": src.name or ''})
+        return json_list
+
+    @http.route('/linkloving_oa_api/get_countries/', auth='none', type='json')
+    def get_countries(self, **kwargs):
+        sources = request.env["res.country"].sudo().search([])
+        json_list = []
+        for src in sources:
+            json_list.append(
+                    {"country_id": src.id,
+                     "name": src.name or ''})
+        return json_list
+
+    @http.route('/linkloving_oa_api/get_product_series/', auth='none', type='json')
+    def get_product_series(self, **kwargs):
+        sources = request.env["crm.product.series"].sudo().search([])
+        json_list = []
+        for src in sources:
+            json_list.append(
+                    {"series_id": src.id,
                      "name": src.name or ''})
         return json_list

@@ -79,13 +79,12 @@ class LinklovingAppApi(http.Controller):
 
     odoo10 = None
     #获取数据库列表
-    @http.route('/linkloving_app_api/get_db_list',type='http', auth='none')
+    @http.route('/linkloving_app_api/get_db_list', type='http', auth='none', cors='*')
     def get_db_list(self, **kw):
-        print("db_list")
         return JsonResponse.send_response(STATUS_CODE_OK, res_data= http.db_list(), jsonRequest=False)
 
     #登录
-    @http.route('/linkloving_app_api/login', type='json', auth="none", csrf=False)
+    @http.route('/linkloving_app_api/login', type='json', auth="none", csrf=False, cors='*')
     def login(self, **kw):
         request.session.db = request.jsonrequest["db"]
         request.params["db"] = request.jsonrequest["db"]
@@ -106,6 +105,11 @@ class LinklovingAppApi(http.Controller):
                 #get group ids
                 user = LinklovingAppApi.get_model_by_id(uid, request, 'res.users')
                 values['partner_id'] = user.partner_id.id
+                if user.sale_team_id:
+                    values['team'] = {
+                        'team_id': user.sale_team_id.id,
+                        'team_name': user.sale_team_id.name or '',
+                    }
                 group_names = request.env['ir.model.data'].sudo().search_read([('res_id', 'in', user.groups_id.ids),
                                                                                ('model', '=', 'res.groups')],
                                                                               fields=['name'])
