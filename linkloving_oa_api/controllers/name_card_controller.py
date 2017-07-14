@@ -49,7 +49,7 @@ class NameCardController(http.Controller):
         type = request.jsonrequest.get("type")
         country_id = request.jsonrequest.get("country_id")
         product_series = request.jsonrequest.get("series_ids")
-
+        job_title = request.jsonrequest.get("job_title")
         if company_id:
             new_company_id = company_id
         else:
@@ -95,6 +95,10 @@ class NameCardController(http.Controller):
             "email": email,
             "type": type,
         })
+        if type == 'contact':
+            s.write({
+                "function": job_title,
+            })
         return True
 
     @http.route('/linkloving_oa_api/get_saleman_list/', auth='none', type='json')
