@@ -29,7 +29,7 @@ class ResPartner(models.Model):
 
     _inherit = 'res.partner'
 
-    priority = fields.Selection(AVAILABLE_PRIORITIES, string=u'客户星级', index=True)
+    priority = fields.Selection(AVAILABLE_PRIORITIES, string=u'客户星级', index=True, default=AVAILABLE_PRIORITIES[0][0])
 
     detailed_address = fields.Char(string=u'地址', compute='_street_name')
 
