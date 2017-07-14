@@ -507,7 +507,10 @@ jQuery.TreeTable = function (tree_id, heads, tNodes) {
             //添加的  给新添加的数据背景色
             if(node.add == 1){
                 new_bg = "add_class_name_test";
-            }else {
+            }else if(node.add == 2){
+                new_bg = "edit_class_name_test";
+            }
+            else {
                 new_bg = "";
             }
             body_html += "<tr data-product-id='" + node.productid + "' class='" + new_bg + "' data-tt-id='" + node.id + "' " + (node.pId ? "data-tt-parent-id='" + node.pId + "'" : "") + "><td class = 'td_left'><span data-pt-id='" + node.ptid + "' class='" + (node.isParent ? "parent" : "children") + " product_name'>" + node.name + "</span></td>";

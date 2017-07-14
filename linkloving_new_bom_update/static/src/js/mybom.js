@@ -50,7 +50,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var product_id = $(target).parents("tr").attr("data-product-id");
-
+            var pId = $(target).parents("tr").attr("data-tt-id");
             var action = {
                 name: "详细",
                 type: 'ir.actions.act_window',
@@ -60,22 +60,60 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 views: [[false, 'form']],
                 context: {
                     'default_product_id': parseInt(product_id),
+                    'pid':pId
                 },
                 target: "new"
             };
             this.do_action(action);
             var my = this;
             my.flag = true;
+            my.parentsid = [];
+            my.getParents($(target).parents("tr"));
 
-            //self.$(document).ajaxComplete(function (event, xhr, settings) {
-            //    var data = JSON.parse(settings.data);
-            //    if (data.params.model == 'add.bom.line.wizard') {
-            //        if (data.params.method == 'action_edit' && my.flag == true) {
-            //            my.flag = false;
-            //            console.log(xhr);
-            //        }
-            //    }
-            //})
+            self.$(document).ajaxComplete(function (event, xhr, settings) {
+               var data = JSON.parse(settings.data);
+               if (data.params.model == 'add.bom.line.wizard') {
+                   if (data.params.method == 'action_edit' && my.flag == true) {
+                       my.flag = false;
+                       console.log(xhr.responseJSON.result);
+                       for(var i=0;i<my.xNodes.length;i++){
+                          if(my.xNodes[i].id == xhr.responseJSON.result.pid){
+                              console.log(my.xNodes[i]);
+
+                              //table树重新渲染
+                              if(xhr.responseJSON.result.new_name!=false){
+                                  my.xNodes[i].name = xhr.responseJSON.result.new_name;
+                              }else {
+                                   my.xNodes[i].name = xhr.responseJSON.result.name[0][1];
+                              }
+                              my.xNodes[i].id = xhr.responseJSON.result.id;
+                              my.xNodes[i].add = 2;
+                              my.xNodes[i].td = [xhr.responseJSON.result.product_spec,xhr.responseJSON.result.qty, xhr.responseJSON.result.process_id,
+                                        "<span class='fa fa-plus-square-o add_bom_data'></span>", "<span class='fa fa-edit new_product_edit'></span>",
+                              "<span class='fa fa-trash-o new_product_delete'></span>"]
+                              console.log(my.xNodes);
+                              $("#treeMenu").html("");
+                              var heads = ["名字", "规格", "数量", "工序", "添加", "编辑","删除"];
+                              $.TreeTable("treeMenu", heads, my.xNodes);
+                              $("#treeMenu").treetable("node", $("#treeMenu").attr("data-bom-id")).toggle();
+
+                              //传给后台的数据
+                              var c = {
+                                    modify_type: "edit",
+                                    qty: xhr.responseJSON.result.qty,
+                                    product_id: xhr.responseJSON.result.name[0][0],
+                                    input_changed_value: xhr.responseJSON.result.new_name,
+                                    parents: my.parentsid,
+                                    product_spec:xhr.responseJSON.result.product_spec
+                              }
+                              my.changes_back.push(c);
+                              console.log(my.changes_back);
+                              break;
+                          }
+                       }
+                   }
+               }
+            })
 
         },
         //添加按钮的点击事件
@@ -92,6 +130,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 res_model: 'add.bom.line.wizard',
                 view_type: 'form',
                 view_mode: 'tree,form',
+                context:{'pid':pId},
                 views: [[false, 'form']],
                 target: "new"
             };
@@ -103,25 +142,25 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
 
             self.$(document).ajaxComplete(function (event, xhr, settings) {
                 var data = JSON.parse(settings.data);
+                // console.log(settings);
                 if (data.params.model == 'add.bom.line.wizard') {
                     if (data.params.method == 'action_add' && my.flag == true) {
                         my.flag = false;
-                        console.log(xhr);
-                        console.log(pId)
                         //table树重新渲染
                         var s = {
-                            id: 100,
-                            pId: pId,
+                            id: xhr.responseJSON.result.id,
+                            pId: xhr.responseJSON.result.pid,
                             add: 1,
                             productid: xhr.responseJSON.result.name[0][0],
                             ptid: xhr.responseJSON.result.product_tmpl_id,
                             name: xhr.responseJSON.result.name[0][1],
                             td: [xhr.responseJSON.result.product_spec, xhr.responseJSON.result.qty, xhr.responseJSON.result.process_id,
-                                "<span class='fa fa-plus-square-o add_bom_data'></span>", "<span class='fa fa-edit new_product_edit'></span>"]
+                                "<span class='fa fa-plus-square-o add_bom_data'></span>", "<span class='fa fa-edit new_product_edit'></span>",
+                            "<span class='fa fa-trash-o new_product_delete'></span>"]
                         };
                         my.xNodes.push(s);
                         $("#treeMenu").html("");
-                        var heads = ["名字", "规格", "数量", "工序", "添加", "编辑"];
+                        var heads = ["名字", "规格", "数量", "工序", "添加", "编辑","删除"];
                         $.TreeTable("treeMenu", heads, my.xNodes);
                         $("#treeMenu").treetable("node", $("#treeMenu").attr("data-bom-id")).toggle();
 
@@ -134,11 +173,6 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                         }
                         my.changes_back.push(c);
                         console.log(my.changes_back);
-                    } else if (data.params.model == 'add.bom.line.wizard') {
-                        if (data.params.method == 'action_edit' && my.flag == true) {
-                            my.flag = false;
-                            console.log(xhr);
-                        }
                     }
                 }
             })
@@ -194,7 +228,8 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                                     ptid: obj[i].product_tmpl_id,
                                     productid: obj[i].product_id,
                                     name: obj[i].name,
-                                    td: [obj[i].product_specs, obj[i].qty, obj[i].process_id, "<span class='fa fa-plus-square-o add_bom_data'></span>", "<span class='fa fa-edit new_product_edit'></span>"]
+                                    td: [obj[i].product_specs, obj[i].qty, obj[i].process_id, "<span class='fa fa-plus-square-o add_bom_data'></span>",
+                                        "<span class='fa fa-edit new_product_edit'></span>","<span class='fa fa-trash-o new_product_delete'></span>"]
                                 };
                                 tNodes.push(s);
                                 if (obj[i].bom_ids.length > 0) {
@@ -211,10 +246,10 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                             ptid: result.product_tmpl_id,
                             productid: result.product_id,
                             name: result.name,
-                            td: [result.product_specs, '', result.process_id, "<span class='fa fa-plus-square-o add_bom_data'></span>", "<span class='fa fa-edit new_product_edit'></span>"]
+                            td: [result.product_specs, '', result.process_id, "<span class='fa fa-plus-square-o add_bom_data'></span>", "",""]
                         })
                         self.xNodes = tNodes;
-                        var heads = ["名字", "规格", "数量", "工序", "添加", "编辑"];
+                        var heads = ["名字", "规格", "数量", "工序", "添加", "编辑","删除"];
                         setTimeout(function () {
                             $("#treeMenu").attr("data-bom-id", result.bom_id)
                             $.TreeTable("treeMenu", heads, tNodes);
