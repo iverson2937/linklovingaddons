@@ -10,6 +10,7 @@ $(".pre_step").click(function () {
     }else {
         $(".next_step").show();
         $(".mysteps_save").hide();
+        console.log(flag)
         $(".step"+flag).hide();
         $(".step_nav"+flag).removeClass("active_step");
         flag--;
