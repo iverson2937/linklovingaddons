@@ -7,6 +7,8 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
     var core = require('web.core');
     var Model = require('web.Model');
     var Widget = require('web.Widget');
+    var View = require('web.View');
+    var Dialog = require('web.Dialog');
 
     var QWeb = core.qweb;
     var _t = core._t;
@@ -19,7 +21,64 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             'click .product_name': 'product_name_fn',
             'click .new_bom_modify_submit': 'new_bom_modify_submit_fn',
             'click .new_bom_modify_direct': 'new_bom_modify_submit_fn',
-            'click .new_product_edit': 'edit_bom_line_fn'
+            'click .new_product_edit': 'edit_bom_line_fn',
+            'click .new_product_delete': 'delete_bom_line_fn'
+        },
+
+        //删除的动作
+        delete_bom_line_fn:function(e){
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var del_id = $(target).parents("tr").attr("data-tt-id");
+            var self = this;
+
+            self.parentsid = [];
+            self.getParents($(target).parents("tr"));
+            var message = ("确定删除这条记录？");
+            var def = $.Deferred();
+            var options = {
+                title: _t("Warning"),
+                //确认删除的操作
+                confirm_callback: function() {
+                    console.log('yes');
+                    console.log(del_id);
+                    self.xNodes.forEach(function (v, i) {
+                        if(self.xNodes[i].id == del_id){
+                            console.log(self.xNodes[i]);
+                            self.xNodes.splice(i,1);
+                            $("#treeMenu").html("");
+                            var heads = ["名字", "规格", "数量", "工序", "添加", "编辑","删除"];
+                            $.TreeTable("treeMenu", heads, self.xNodes);
+                            $("#treeMenu").treetable("node", $("#treeMenu").attr("data-bom-id")).toggle();
+
+                            //返回给后台的数据
+                            var c = {
+                                    modify_type: "delete",
+                                    parents: self.parentsid
+                              }
+                              self.changes_back.push(c);
+                              console.log(self.changes_back);
+                            return;
+                        }
+                    })
+
+
+                    self.$el.removeClass('oe_form_dirty');
+                    this.on('closed', null, function() { // 'this' is the dialog widget
+                        def.resolve();
+                    });
+                },
+                cancel_callback: function() {
+                    console.log('no')
+                    def.reject();
+                },
+            };
+            var dialog = Dialog.confirm(this, message, options);
+            dialog.$modal.on('hidden.bs.modal', function() {
+                def.reject();
+            });
+
+            return def;
         },
 
         //提交的动作
