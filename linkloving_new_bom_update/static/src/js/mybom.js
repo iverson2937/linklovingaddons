@@ -20,9 +20,24 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             'click .add_bom_data': 'add_bom_data_fn',
             'click .product_name': 'product_name_fn',
             'click .new_bom_modify_submit': 'new_bom_modify_submit_fn',
-            'click .new_bom_modify_direct': 'new_bom_modify_submit_fn',
+            'click .new_bom_modify_direct': 'new_bom_modify_direct_fn',
             'click .new_product_edit': 'edit_bom_line_fn',
             'click .new_product_delete': 'delete_bom_line_fn'
+        },
+        //另存为的动作
+        new_bom_modify_submit_fn: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+
+
+        },
+
+        //替换的动作
+        new_bom_modify_direct_fn: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+
+
         },
 
         //删除的动作
@@ -81,13 +96,6 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             return def;
         },
 
-        //提交的动作
-        new_bom_modify_submit_fn: function (e) {
-            var e = e || window.event;
-            var target = e.target || e.srcElement;
-
-
-        },
         //点击产品名弹出相应的产品页面
         product_name_fn: function (e) {
             var e = e || window.event;
