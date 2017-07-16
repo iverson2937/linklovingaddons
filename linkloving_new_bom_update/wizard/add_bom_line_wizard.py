@@ -14,6 +14,12 @@ class AddBomLineWizard(models.TransientModel):
     qty = fields.Float()
     product_specs = fields.Text(string=u'规格')
 
+
+    @api.onchange('product_id')
+    def _on_product_id(self):
+        self.product_specs = self.product_id.product_specs
+        self.name = self.product_id.name
+
     def _get_return_vals(self):
         process_id = False
         if self.product_id.product_tmpl_id.bom_ids:
@@ -26,15 +32,15 @@ class AddBomLineWizard(models.TransientModel):
             'process_id': process_id,
             'to_add': self.to_add,
             'id': str(uuid.uuid1()),
-            'new_name': self.name,
+            'new_name': self.name if self.to_add else self.product_id.name,
             'product_tmpl_id': self.product_id.product_tmpl_id.id,
-            'product_spec': self.product_specs
+            'product_spec': self.product_specs if self.to_add else self.product_id.product_specs
         }
 
     @api.multi
     def action_add(self):
-        self._get_return_vals()
+        return self._get_return_vals()
 
     @api.multi
     def action_edit(self):
-        self._get_return_vals()
+        return self._get_return_vals()
