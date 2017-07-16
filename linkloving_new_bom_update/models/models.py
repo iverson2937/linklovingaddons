@@ -59,6 +59,7 @@ class MrpBom(models.Model):
 
         res = {
             'name': line.product_id.name,
+            'product_type': line.product_id.product_ll_type,
             'product_id': line.product_id.id,
             'product_tmpl_id': line.product_id.product_tmpl_id.id,
             'is_highlight': line.is_highlight,
@@ -91,7 +92,6 @@ def _get_rec(object, level, parnet, qty=1.0, uom=False):
         if bom_id:
             process_id = bom_id[0].process_id.name
 
-
         res = {
             'name': l.product_id.name,
             'product_id': l.product_id.id,
@@ -99,6 +99,7 @@ def _get_rec(object, level, parnet, qty=1.0, uom=False):
             'code': l.product_id.default_code,
             'product_specs': l.product_id.product_specs,
             'is_highlight': l.is_highlight,
+            'product_type': l.product_id.product_ll_type,
             'id': l.id,
             'parent_id': parnet.id,
             'qty': l.product_qty,
