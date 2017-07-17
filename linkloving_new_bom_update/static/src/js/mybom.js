@@ -37,7 +37,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 }
             })
             console.log(self.changes_back);
-
+            console.log(self.xNodes);
 
             if ($(target).hasClass("bom_modify_direct")) {
                 var btn_update = true;
