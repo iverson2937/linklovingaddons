@@ -28,72 +28,26 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
         new_bom_modify_submit_fn: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
-
-
-        },
-
-        //替换的动作
-        new_bom_modify_direct_fn: function (e) {
-            var e = e || window.event;
-            var target = e.target || e.srcElement;
-
-
-        },
-
-        //删除的动作
-        delete_bom_line_fn: function (e) {
-            var e = e || window.event;
-            var target = e.target || e.srcElement;
-            var del_id = $(target).parents("tr").attr("data-tt-id");
-            var self = this;
-
-            self.parentsid = [];
-            self.getParents($(target).parents("tr"));
-            var message = ("确定删除这条记录？");
-            var def = $.Deferred();
-            var options = {
-                title: _t("Warning"),
-                //确认删除的操作
-                confirm_callback: function () {
-                    console.log('yes');
-                    console.log(del_id);
-                    self.xNodes.forEach(function (v, i) {
-                        if (self.xNodes[i].id == del_id) {
-                            console.log(self.xNodes[i]);
-                            self.xNodes.splice(i, 1);
-                            $("#treeMenu").html("");
-                            var heads = ["名字", "规格", "数量", "工序", "添加", "编辑", "删除"];
-                            $.TreeTable("treeMenu", heads, self.xNodes);
-                            $("#treeMenu").treetable("node", $("#treeMenu").attr("data-bom-id")).toggle();
-
-                            //返回给后台的数据
-                            var c = {
-                                modify_type: "delete",
-                                parents: self.parentsid
-                            }
-                            self.changes_back.push(c);
-                            console.log(self.changes_back);
-                            return;
-                        }
-                    })
-
-
-                    self.$el.removeClass('oe_form_dirty');
-                    this.on('closed', null, function () { // 'this' is the dialog widget
-                        def.resolve();
-                    });
-                },
-                cancel_callback: function () {
-                    console.log('no')
-                    def.reject();
-                },
+            if ($(target).hasClass("bom_modify_direct")) {
+                var btn_update = true;
+            } else {
+                var btn_update = false;
+            }
+            var top_bom_id = $("#treeMenu").data("bom-id");
+            console.log(this.changes_back);
+            console.log(top_bom_id);
+            var action = {
+                name: "BOM",
+                type: 'ir.actions.act_window',
+                res_model: 'bom.update.wizard',
+                view_type: 'form',
+                view_mode: 'tree,form',
+                context: {'back_datas': this.changes_back, "bom_id": top_bom_id, "update": btn_update},
+                views: [[false, 'form']],
+                // res_id: act_id,
+                target: "new"
             };
-            var dialog = Dialog.confirm(this, message, options);
-            dialog.$modal.on('hidden.bs.modal', function () {
-                def.reject();
-            });
-
-            return def;
+            this.do_action(action);
         },
 
         //点击产品名弹出相应的产品页面
