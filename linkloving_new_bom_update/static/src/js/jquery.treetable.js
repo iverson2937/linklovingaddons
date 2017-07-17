@@ -508,6 +508,8 @@ jQuery.TreeTable = function (tree_id, heads, tNodes) {
             //添加的  给新添加的数据背景色
             if (node.add == 1 || node.add==2 || node.is_highlight) {
                 new_bg = "add_class_name_test";
+            }else {
+                new_bg = "";
             }
 
             if (node.modify_type && node.modify_type == 'delete') {
