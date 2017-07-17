@@ -20,7 +20,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             'click .add_bom_data': 'add_bom_data_fn',
             'click .product_name': 'product_name_fn',
             'click .new_bom_modify_submit': 'new_bom_modify_submit_fn',
-            'click .new_bom_modify_direct': 'new_bom_modify_direct_fn',
+            'click .new_bom_modify_direct': 'new_bom_modify_submit_fn',
             'click .new_product_edit': 'edit_bom_line_fn',
             'click .new_product_delete': 'delete_bom_line_fn'
         },
@@ -39,7 +39,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             console.log(self.changes_back);
 
 
-            if ($(target).hasClass("bom_modify_direct")) {
+            if ($(target).hasClass("new_bom_modify_direct")) {
                 var btn_update = true;
             } else {
                 var btn_update = false;
@@ -92,7 +92,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                             console.log(self.xNodes[i]);
 
                             self.xNodes[i].modify_type = 'delete';
-                            self.xNodes[i].parents =  self.parentsid;
+                            self.xNodes[i].parents = self.parentsid;
                             // var del_s = self.xNodes[i];
                             // self.xNodes.splice(i, 1);
                             $("#treeMenu").html("");
@@ -373,8 +373,8 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                                     pId: obj[i].parent_id,
                                     ptid: obj[i].product_tmpl_id,
                                     productid: obj[i].product_id,
-                                    product_specs: obj[i].product_specs,
                                     qty: obj[i].qty,
+                                    is_highlight: obj[i].is_highlight,
                                     name: obj[i].name,
                                     td: [obj[i].product_specs, obj[i].qty, obj[i].process_id, obj[i].product_type == 'raw material' ? "" : "<span class='fa fa-plus-square-o add_bom_data'></span>",
                                         "<span class='fa fa-edit new_product_edit'></span>", "<span class='fa fa-trash-o new_product_delete'></span>"]

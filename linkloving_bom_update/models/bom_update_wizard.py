@@ -135,7 +135,7 @@ class BomUpdateWizard(models.TransientModel):
                             update_bom_line_delete(new_bom_id, old_product_id)
                         elif product_id and old_product_id.id == product_id:
                             update_bom_line_update(new_bom_id, old_product_id, qty)
-                    elif modify_type == 'del':
+                    elif modify_type == 'delete':
                         old_product_id = line_obj.browse(int(last_bom_line_id)).product_id
                         update_bom_line_delete(new_bom_id, old_product_id)
             return {
@@ -147,16 +147,14 @@ class BomUpdateWizard(models.TransientModel):
         else:
             # 修改bOM
             for val in vals:
-                product_id = val.get('productid')
-                if product_id:
-                    product_id = int(product_id)
+                product_id = int(val.get('productid'))
                 parents = val.get('parents')
                 input_changed_value = val.get('input_changed_value')
                 last_bom_line_id = val.get('id')
                 qty = val.get('qty')
                 modify_type = val.get('modify_type')
 
-                to_update_bom_line_ids = parents.split(',')
+                to_update_bom_line_ids = parents
                 line = int(to_update_bom_line_ids[0])
                 if line != main_bom_id:
                     line_id = self.env['mrp.bom.line'].browse(int(line))
@@ -200,12 +198,12 @@ class BomUpdateWizard(models.TransientModel):
                         })
 
                 # 直接删除line无需添加
-                elif modify_type == 'del':
+                elif modify_type == 'delete':
                     old_product_id = line_obj.browse(last_bom_line_id).product_id
                     update_bom_line_delete(bom_id, old_product_id)
             return {
                 'type': 'ir.actions.client',
-                'tag': 'bom_update',
+                'tag': 'new_bom_update',
                 'bom_id': main_bom_id
             }
 
