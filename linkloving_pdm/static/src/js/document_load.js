@@ -31,12 +31,13 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 url: "http://localhost:2323",
                 // dataType: 'json/html',
                 success: function (data) {
+                    var url = "http://localhost:2323/savefile?id="+self.product_id+"&remotefile=/p/file";
                     if (data == '1') {
                         $.ajax({
                             type: "GET",
-                            url: "http://localhost:2323/savefile?id="+this.product_id+"&remote=/p/file",
+                            url: url,
                             success: function (data) {
-                                console.log(data);
+                                console.log(data, url);
                             },
                             error: function (error) {
                                 console.log(error);
@@ -48,7 +49,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                     }
                 },
                 error: function (error) {
-                    console.log(error);
+                        alert("请打开代理软件!");
                 }
             });
         },
