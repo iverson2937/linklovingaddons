@@ -167,7 +167,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                     'default_qty': qty,
                     'edit': true,
                     'default_to_add': isTrueSet,
-                    'default_name': name,
+                    // 'default_name': name,
                     'default_product_specs': product_specs,
                     'pid': pId
                 },
