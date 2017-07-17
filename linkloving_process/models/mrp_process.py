@@ -23,6 +23,9 @@ class MrpProcess(models.Model):
     count_mo_today = fields.Integer(compute='_compute_process_count')
     count_mo_tomorrow = fields.Integer(compute='_compute_process_count')
     count_mo_after_tomorrow = fields.Integer(compute='_compute_process_count')
+    count_mo_forth_day = fields.Integer(compute='_compute_process_count')
+    count_mo_fifth_day = fields.Integer(compute='_compute_process_count')
+    count_mo_sixth_day = fields.Integer(compute='_compute_process_count')
     count_mo_others = fields.Integer(compute='_compute_process_count')
     is_outside = fields.Boolean(string=u'是否为委外')
     sequence = fields.Integer()
@@ -45,7 +48,6 @@ class MrpProcess(models.Model):
             'target': 'current',
             'domain': [('id', 'in', ids)]}
 
-
     @api.multi
     def _get_total_qty(self):
         for process in self:
@@ -60,6 +62,15 @@ class MrpProcess(models.Model):
 
     def _after_tomorrow(self):
         return (datetime.date.today() + datetime.timedelta(days=3)).strftime('%Y-%m-%d %H:%M:%S')
+
+    def _forth_day(self):
+        return (datetime.date.today() + datetime.timedelta(days=4)).strftime('%Y-%m-%d %H:%M:%S')
+
+    def _fifth_day(self):
+        return (datetime.date.today() + datetime.timedelta(days=5)).strftime('%Y-%m-%d %H:%M:%S')
+
+    def _sixth_day(self):
+        return (datetime.date.today() + datetime.timedelta(days=6)).strftime('%Y-%m-%d %H:%M:%S')
 
     @api.multi
     def _compute_process_count(self):
@@ -79,6 +90,12 @@ class MrpProcess(models.Model):
                                   ('date_planned_start', '<', self._tomorrow())],
             'count_mo_after_tomorrow': [('date_planned_start', '>', self._tomorrow()),
                                         ('date_planned_start', '<', self._after_tomorrow())],
+            'count_mo_forth_day': [('date_planned_start', '>', self._after_tomorrow()),
+                                   ('date_planned_start', '<', self._forth_day())],
+            'count_mo_fifth_day': [('date_planned_start', '>', self._forth_day()),
+                                   ('date_planned_start', '<', self._fifth_day())],
+            'count_mo_sixth_day': [('date_planned_start', '>', self._fifth_day()),
+                                   ('date_planned_start', '<', self._sixth_day())],
             'count_mo_others': [('date_planned_start', '>', self._after_tomorrow())],
         }
         for field in domains:
@@ -148,6 +165,51 @@ class MrpProcess(models.Model):
     @api.multi
     def get_action_mrp_production_after_tomorrow(self):
         domain = [('date_planned_start', '>', self._tomorrow()), ('date_planned_start', '<', self._after_tomorrow()),
+                  ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel', 'draft'))]
+
+        return {
+            'name': _('The day after tomorrow MO'),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'mrp.production',
+            'target': 'current',
+            'domain': domain,
+        }
+
+    @api.multi
+    def get_action_mrp_production_forth_day(self):
+        domain = [('date_planned_start', '>', self._after_tomorrow()), ('date_planned_start', '<', self._forth_day()),
+                  ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel', 'draft'))]
+
+        return {
+            'name': _('The day after tomorrow MO'),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'mrp.production',
+            'target': 'current',
+            'domain': domain,
+        }
+
+    @api.multi
+    def get_action_mrp_production_fifth_day(self):
+        domain = [('date_planned_start', '>', self._forth_day()), ('date_planned_start', '<', self._fifth_day()),
+                  ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel', 'draft'))]
+
+        return {
+            'name': _('The day after tomorrow MO'),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'mrp.production',
+            'target': 'current',
+            'domain': domain,
+        }
+
+    @api.multi
+    def get_action_mrp_production_sixth_day(self):
+        domain = [('date_planned_start', '>', self._fifth_day()), ('date_planned_start', '<', self._sixth_day()),
                   ('process_id', '=', self.id), ('state', 'not in', ('done', 'cancel', 'draft'))]
 
         return {
