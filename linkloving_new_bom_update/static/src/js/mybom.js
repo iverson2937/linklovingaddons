@@ -28,6 +28,17 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
         new_bom_modify_submit_fn: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
+
+            var self = this;
+            self.changes_back = [];
+            self.xNodes.forEach(function (v, i) {
+                if(self.xNodes[i].modify_type){
+                    self.changes_back.push(self.xNodes[i]);
+                }
+            })
+            console.log(self.changes_back);
+
+
             if ($(target).hasClass("bom_modify_direct")) {
                 var btn_update = true;
             } else {
@@ -73,16 +84,20 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 title: _t("Warning"),
                 //确认删除的操作
                 confirm_callback: function () {
-                    console.log('yes');
                     console.log(del_id);
                     self.xNodes.forEach(function (v, i) {
                         if (self.xNodes[i].id == del_id) {
                             console.log(self.xNodes[i]);
-                            self.xNodes.splice(i, 1);
+
+                            self.xNodes[i].modify_type = 'delete';
+                            // var del_s = self.xNodes[i];
+                            // self.xNodes.splice(i, 1);
                             $("#treeMenu").html("");
                             var heads = ["名字", "规格", "数量", "工序", "添加", "编辑", "删除"];
                             $.TreeTable("treeMenu", heads, self.xNodes);
                             $("#treeMenu").treetable("node", $("#treeMenu").attr("data-bom-id")).toggle();
+
+
 
                             //返回给后台的数据
                             var c = {
@@ -140,7 +155,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             var to_add = $(target).parents("tr").data("to-add");
             var isTrueSet = (to_add == true);
             var product_spec = $(target).parents("tr").data("product_spec");
-            console.log(isTrueSet);
+            // console.log(isTrueSet);
             var action = {
                 name: "详细",
                 type: 'ir.actions.act_window',
@@ -162,6 +177,8 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             my.flag = true;
             my.parentsid = [];
             my.getParents($(target).parents("tr"));
+            //删除第一个
+            my.parentsid.shift();
 
             self.$(document).ajaxComplete(function (event, xhr, settings) {
                 var data = null;
@@ -185,13 +202,27 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                                 }
                                 my.xNodes[i].id = a_r.id;
                                 my.xNodes[i].add = 2;
+                                if(my.xNodes[i].modify_type){
+                                    if(my.xNodes[i].modify_type == 'add'){
+                                        my.xNodes[i].modify_type = 'add';
+                                    }else {
+                                        my.xNodes[i].modify_type = 'edit';
+                                    }
+                                }else {
+                                    my.xNodes[i].modify_type = 'edit';
+                                }
+                                my.xNodes[i].parents = my.parentsid;
+                                my.xNodes[i].input_changed_value = a_r.new_name;
+                                my.xNodes[i].productid = a_r.name[0][0];
+                                my.xNodes[i].product_spec = a_r.product_spec;
+
                                 my.xNodes[i].qty = a_r.qty;
                                 my.xNodes[i].product_spec = a_r.product_spec;
                                 my.xNodes[i].to_add = a_r.to_add;
                                 my.xNodes[i].td = [a_r.product_spec, a_r.qty, a_r.process_id,
                                     a_r.product_type=='raw material'?"":"<span class='fa fa-plus-square-o add_bom_data'></span>",
                                     "<span class='fa fa-edit new_product_edit'></span>",
-                                    "<span class='fa fa-trash-o new_product_delete'></span>"]
+                                    "<span class='fa fa-trash-o new_product_delete'></span>"];
                                 // console.log(my.xNodes);
                                 $("#treeMenu").html("");
                                 var heads = ["名字", "规格", "数量", "工序", "添加", "编辑", "删除"];
@@ -254,7 +285,11 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                             id: a_r.id,
                             pId: a_r.pid,
                             add: 1,
+                            modify_type:"add",
+                            qty: a_r.qty,
                             productid: a_r.name[0][0],
+                            input_changed_value: a_r.new_name,
+                            parents: my.parentsid,
                             ptid: a_r.product_tmpl_id,
                             name: a_r.name[0][1],
                             td: [a_r.product_spec, a_r.qty, a_r.process_id,
