@@ -78,6 +78,8 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
 
             self.parentsid = [];
             self.getParents($(target).parents("tr"));
+            //删除数组第一个元素
+            self.parentsid.shift();
             var message = ("确定删除这条记录？");
             var def = $.Deferred();
             var options = {
@@ -90,6 +92,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                             console.log(self.xNodes[i]);
 
                             self.xNodes[i].modify_type = 'delete';
+                            self.xNodes[i].parents =  self.parentsid;
                             // var del_s = self.xNodes[i];
                             // self.xNodes.splice(i, 1);
                             $("#treeMenu").html("");
