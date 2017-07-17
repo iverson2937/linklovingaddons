@@ -28,16 +28,15 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             var self = this;
             $.ajax({
                 type: "GET",
-                url: "http://localhost:2323",
+                url: "http://localhost:8088",
                 // dataType: 'json/html',
                 success: function (data) {
-                    var url = "http://localhost:2323/savefile?id="+self.product_id+"&remotefile=/p/file";
-                    if (data == '1') {
+                    if (data.result == '1') {
                         $.ajax({
                             type: "GET",
-                            url: url,
+                            url: "http://localhost:8088/uploadfile?id=" + this.product_id + "&remote=/p/file",
                             success: function (data) {
-                                console.log(data, url);
+                                console.log(data);
                             },
                             error: function (error) {
                                 console.log(error);
@@ -49,7 +48,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                     }
                 },
                 error: function (error) {
-                        alert("请打开代理软件!");
+                    console.log(error);
                 }
             });
         },
