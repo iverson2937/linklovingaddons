@@ -43,4 +43,6 @@ class AddBomLineWizard(models.TransientModel):
 
     @api.multi
     def action_edit(self):
-        return self._get_return_vals()
+        res = self._get_return_vals()
+        res['id'] = self._context.get('pid')
+        return res
