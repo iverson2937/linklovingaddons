@@ -154,22 +154,24 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                         for (var i = 0; i < my.xNodes.length; i++) {
                             if (my.xNodes[i].id == xhr.responseJSON.result.pid) {
                                 console.log(my.xNodes[i]);
+                                var a_r = xhr.responseJSON.result;
 
                                 //table树重新渲染
-                                if (xhr.responseJSON.result.new_name != false) {
-                                    my.xNodes[i].name = xhr.responseJSON.result.new_name;
+                                if (a_r.new_name != false) {
+                                    my.xNodes[i].name = a_r.new_name;
                                 } else {
-                                    my.xNodes[i].name = xhr.responseJSON.result.name[0][1];
+                                    my.xNodes[i].name = a_r.name[0][1];
                                 }
-                                my.xNodes[i].id = xhr.responseJSON.result.id;
+                                my.xNodes[i].id = a_r.id;
                                 my.xNodes[i].add = 2;
-                                my.xNodes[i].qty = xhr.responseJSON.result.qty;
-                                my.xNodes[i].product_spec = xhr.responseJSON.result.product_spec;
-                                my.xNodes[i].to_add = xhr.responseJSON.result.to_add;
-                                my.xNodes[i].td = [xhr.responseJSON.result.product_spec, xhr.responseJSON.result.qty, xhr.responseJSON.result.process_id,
-                                    "<span class='fa fa-plus-square-o add_bom_data'></span>", "<span class='fa fa-edit new_product_edit'></span>",
+                                my.xNodes[i].qty = a_r.qty;
+                                my.xNodes[i].product_spec = a_r.product_spec;
+                                my.xNodes[i].to_add = a_r.to_add;
+                                my.xNodes[i].td = [a_r.product_spec, a_r.qty, a_r.process_id,
+                                    a_r.product_type=='raw material'?"":"<span class='fa fa-plus-square-o add_bom_data'></span>",
+                                    "<span class='fa fa-edit new_product_edit'></span>",
                                     "<span class='fa fa-trash-o new_product_delete'></span>"]
-                                console.log(my.xNodes);
+                                // console.log(my.xNodes);
                                 $("#treeMenu").html("");
                                 var heads = ["名字", "规格", "数量", "工序", "添加", "编辑", "删除"];
                                 $.TreeTable("treeMenu", heads, my.xNodes);
@@ -224,16 +226,18 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 if (data.params.model == 'add.bom.line.wizard') {
                     if (data.params.method == 'action_add' && my.flag == true) {
                         my.flag = false;
+                        console.log(xhr.responseJSON.result);
+                        var a_r = xhr.responseJSON.result;
                         //table树重新渲染
                         var s = {
-                            id: xhr.responseJSON.result.id,
-                            pId: xhr.responseJSON.result.pid,
+                            id: a_r.id,
+                            pId: a_r.pid,
                             add: 1,
-                            productid: xhr.responseJSON.result.name[0][0],
-                            ptid: xhr.responseJSON.result.product_tmpl_id,
-                            name: xhr.responseJSON.result.name[0][1],
-                            td: [xhr.responseJSON.result.product_spec, xhr.responseJSON.result.qty, xhr.responseJSON.result.process_id,
-                                "<span class='fa fa-plus-square-o add_bom_data'></span>", "<span class='fa fa-edit new_product_edit'></span>",
+                            productid: a_r.name[0][0],
+                            ptid: a_r.product_tmpl_id,
+                            name: a_r.name[0][1],
+                            td: [a_r.product_spec, a_r.qty, a_r.process_id,
+                                a_r.product_type=='raw material'?"":"<span class='fa fa-plus-square-o add_bom_data'></span>", "<span class='fa fa-edit new_product_edit'></span>",
                                 "<span class='fa fa-trash-o new_product_delete'></span>"]
                         };
                         my.xNodes.push(s);

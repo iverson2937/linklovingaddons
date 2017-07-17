@@ -503,7 +503,7 @@ jQuery.TreeTable = function (tree_id, heads, tNodes) {
         var body_html = "<tbody>";
         for (var i = 0, l = newNodes.length; i < l; i++) {
             var node = newNodes[i];
-            console.log(node);
+            // console.log(node);
             var new_bg;
             //添加的  给新添加的数据背景色
             if (node.add == 1) {
