@@ -106,7 +106,12 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                     def.reject();
                 },
             };
-            this.do_action(action);
+            var dialog = Dialog.confirm(this, message, options);
+            dialog.$modal.on('hidden.bs.modal', function () {
+                def.reject();
+            });
+
+            return def;
         },
 
         //点击产品名弹出相应的产品页面
