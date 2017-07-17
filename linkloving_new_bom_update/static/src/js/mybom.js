@@ -37,7 +37,6 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 }
             })
             console.log(self.changes_back);
-            console.log(self.xNodes);
 
             if ($(target).hasClass("bom_modify_direct")) {
                 var btn_update = true;
@@ -158,6 +157,8 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             var to_add = $(target).parents("tr").data("to-add");
             var isTrueSet = (to_add == true);
             var product_spec = $(target).parents("tr").data("product_spec");
+            var default_name = $(target).parents("tr").find(".product_name").html();
+
             // console.log(isTrueSet);
             var action = {
                 name: "详细",
@@ -171,7 +172,8 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                     'default_qty': qty,
                     'default_to_add': isTrueSet,
                     'default_product_spec': product_spec,
-                    'pid': pId
+                    'pid': pId,
+                    'default_name': default_name
                 },
                 target: "new"
             };
