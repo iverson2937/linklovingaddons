@@ -9,6 +9,9 @@
             <field name="arch" type="xml">
                 <form string="">
                     <group>
+                        <group>
+                            <field name="process_id"/>
+                        </group>
                         <field name="product_id" domain="[('type','=','product')]" placeholder="选择产品"/>
                         <field name="qty" string="数量" required="1"/>
 

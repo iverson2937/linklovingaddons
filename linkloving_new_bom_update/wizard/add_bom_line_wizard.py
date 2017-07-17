@@ -13,7 +13,7 @@ class AddBomLineWizard(models.TransientModel):
     to_add = fields.Boolean(string='新建')
     qty = fields.Float()
     product_specs = fields.Text(string=u'规格')
-
+    process_id = fields.Many2one('mrp.process')
 
     @api.onchange('product_id')
     def _on_product_id(self):
