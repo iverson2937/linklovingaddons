@@ -164,7 +164,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 res_model: 'add.bom.line.wizard',
                 view_type: 'form',
                 view_mode: 'tree,form',
-                context: {'pid': pId},
+                context: {'pid': pId,'add':True},
                 views: [[false, 'form']],
                 target: "new"
             };
