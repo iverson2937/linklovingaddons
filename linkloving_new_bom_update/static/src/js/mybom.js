@@ -32,7 +32,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             var self = this;
             self.changes_back = [];
             self.xNodes.forEach(function (v, i) {
-                if(self.xNodes[i].modify_type){
+                if (self.xNodes[i].modify_type) {
                     self.changes_back.push(self.xNodes[i]);
                 }
             })
@@ -96,7 +96,6 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                             var heads = ["名字", "规格", "数量", "工序", "添加", "编辑", "删除"];
                             $.TreeTable("treeMenu", heads, self.xNodes);
                             $("#treeMenu").treetable("node", $("#treeMenu").attr("data-bom-id")).toggle();
-
 
 
                             //返回给后台的数据
@@ -204,22 +203,25 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                                 }
                                 my.xNodes[i].id = a_r.id;
                                 my.xNodes[i].add = 2;
-                                if(my.xNodes[i].modify_type){
-                                    if(my.xNodes[i].modify_type == 'add'){
+                                if (my.xNodes[i].modify_type) {
+                                    if (my.xNodes[i].modify_type == 'add') {
                                         my.xNodes[i].modify_type = 'add';
-                                    }else {
+                                    } else {
                                         my.xNodes[i].modify_type = 'edit';
                                     }
-                                }else {
+                                } else {
                                     my.xNodes[i].modify_type = 'edit';
                                 }
                                 my.xNodes[i].parents = my.parentsid;
-                                my.xNodes[i].input_changed_value = a_r.new_name;
+                                my.xNodes[i].input_changed_value = a_r.to_add;
                                 my.xNodes[i].productid = a_r.name[0][0];
-                                my.xNodes[i].product_spec = a_r.product_spec;
-
                                 my.xNodes[i].qty = a_r.qty;
-                                my.xNodes[i].name = a_r.name;
+                                if (a_r.to_add) {
+                                    my.xNodes[i].name = a_r.new_name;
+                                } else {
+                                    my.xNodes[i].name = a_r.name[0][1]
+                                }
+                                my.xNodes[i].name = a_r.new_name;
                                 my.xNodes[i].product_specs = a_r.product_specs;
                                 my.xNodes[i].to_add = a_r.to_add;
                                 my.xNodes[i].td = [a_r.product_specs, a_r.qty, a_r.process_id,
@@ -237,7 +239,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                                     modify_type: "edit",
                                     qty: xhr.responseJSON.result.qty,
                                     product_id: xhr.responseJSON.result.name[0][0],
-                                    input_changed_value: xhr.responseJSON.result.new_name,
+                                    input_changed_value: xhr.responseJSON.result.to_add,
                                     parents: my.parentsid,
                                     product_specs: xhr.responseJSON.result.product_specs
                                 }
@@ -288,10 +290,10 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                             id: a_r.id,
                             pId: a_r.pid,
                             add: 1,
-                            modify_type:"add",
+                            modify_type: "add",
                             qty: a_r.qty,
                             productid: a_r.name[0][0],
-                            input_changed_value: a_r.new_name,
+                            input_changed_value: a_r.to_add,
                             parents: my.parentsid,
                             ptid: a_r.product_tmpl_id,
                             name: a_r.new_name,
@@ -309,7 +311,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                             modify_type: "add",
                             qty: xhr.responseJSON.result.qty,
                             product_id: xhr.responseJSON.result.name[0][0],
-                            input_changed_value: xhr.responseJSON.result.new_name,
+                            input_changed_value: xhr.responseJSON.result.to_add,
                             parents: my.parentsid
                         }
                         my.changes_back.push(c);

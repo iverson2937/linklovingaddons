@@ -17,7 +17,6 @@ class BomUpdateWizard(models.TransientModel):
         context = self._context
         main_bom_id = int(context.get('bom_id'))
         postfix = self.postfix if self.postfix else ''
-        partner_id = self.partner_id
         update = context.get('update')
         vals = context.get('back_datas')
         line_obj = self.env['mrp.bom.line']
