@@ -34,7 +34,7 @@ class AddBomLineWizard(models.TransientModel):
             'id': str(uuid.uuid1()),
             'new_name': self.name if self.to_add else self.product_id.name,
             'product_tmpl_id': self.product_id.product_tmpl_id.id,
-            'product_spec': self.product_specs if self.to_add else self.product_id.product_specs
+            'product_specs': self.product_specs if self.to_add else self.product_id.product_specs
         }
 
     @api.multi
@@ -45,4 +45,5 @@ class AddBomLineWizard(models.TransientModel):
     def action_edit(self):
         res = self._get_return_vals()
         res['id'] = self._context.get('pid')
+        print res
         return res

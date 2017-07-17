@@ -17,10 +17,10 @@
                         <field name="product_specs" string="规格" attrs="{'invisible':[('to_add','!=',True)]}"/>
                     </group>
                     <footer>
-                        <button string="确定" name="action_add" type="object" default_focus="1"
+                        <button string="添加" name="action_add" type="object" default_focus="1"
+                                class="btn-primary save_add_action" invisible="context.get('edit', False)"/>
+                        <button string="修改" name="action_edit" type="object" default_focus="1"
                                 invisible="context.get('add', False)"
-                                class="btn-primary save_add_action"/>
-                        <button string="确定" name="action_edit" type="object" default_focus="1"
                                 class="btn-primary save_add_action"/>
                         <button string="取消" class="btn-default" special="cancel"/>
                     </footer>

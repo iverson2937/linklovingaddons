@@ -139,8 +139,8 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             var qty = parseFloat($(target).parents("tr").data("qty"));
             var to_add = $(target).parents("tr").data("to-add");
             var isTrueSet = (to_add == true);
-            var product_spec = $(target).parents("tr").data("product_spec");
-            console.log(isTrueSet);
+            var product_specs = $(target).parents("tr").data("product-specs");
+            var name = $(target).parents("tr").data("name");
             var action = {
                 name: "详细",
                 type: 'ir.actions.act_window',
@@ -151,8 +151,10 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 context: {
                     'default_product_id': parseInt(product_id),
                     'default_qty': qty,
+                    'edit': true,
                     'default_to_add': isTrueSet,
-                    'default_product_spec': product_spec,
+                    'default_name': name,
+                    'default_product_specs': product_specs,
                     'pid': pId
                 },
                 target: "new"
@@ -165,10 +167,10 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
 
             self.$(document).ajaxComplete(function (event, xhr, settings) {
                 var data = null;
-                if (settings.data){
-                  var data = JSON.parse(settings.data);
+                if (settings.data) {
+                    var data = JSON.parse(settings.data);
                 }
-                if (data.params.model == 'add.bom.line.wizard') {
+                if (data.params && data.params.model == 'add.bom.line.wizard') {
                     if (data.params.method == 'action_edit' && my.flag == true) {
                         my.flag = false;
                         console.log(xhr.responseJSON.result);
@@ -186,10 +188,11 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                                 my.xNodes[i].id = a_r.id;
                                 my.xNodes[i].add = 2;
                                 my.xNodes[i].qty = a_r.qty;
-                                my.xNodes[i].product_spec = a_r.product_spec;
+                                my.xNodes[i].name = a_r.name;
+                                my.xNodes[i].product_specs = a_r.product_specs;
                                 my.xNodes[i].to_add = a_r.to_add;
-                                my.xNodes[i].td = [a_r.product_spec, a_r.qty, a_r.process_id,
-                                    a_r.product_type=='raw material'?"":"<span class='fa fa-plus-square-o add_bom_data'></span>",
+                                my.xNodes[i].td = [a_r.product_specs, a_r.qty, a_r.process_id,
+                                    a_r.product_type == 'raw material' ? "" : "<span class='fa fa-plus-square-o add_bom_data'></span>",
                                     "<span class='fa fa-edit new_product_edit'></span>",
                                     "<span class='fa fa-trash-o new_product_delete'></span>"]
                                 // console.log(my.xNodes);
@@ -205,7 +208,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                                     product_id: xhr.responseJSON.result.name[0][0],
                                     input_changed_value: xhr.responseJSON.result.new_name,
                                     parents: my.parentsid,
-                                    product_spec: xhr.responseJSON.result.product_spec
+                                    product_specs: xhr.responseJSON.result.product_specs
                                 }
                                 my.changes_back.push(c);
                                 console.log(my.changes_back);
@@ -231,7 +234,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 res_model: 'add.bom.line.wizard',
                 view_type: 'form',
                 view_mode: 'tree,form',
-                context: {'pid': pId,'add':True},
+                context: {'pid': pId, 'add': true},
                 views: [[false, 'form']],
                 target: "new"
             };
@@ -256,9 +259,9 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                             add: 1,
                             productid: a_r.name[0][0],
                             ptid: a_r.product_tmpl_id,
-                            name: a_r.name[0][1],
-                            td: [a_r.product_spec, a_r.qty, a_r.process_id,
-                                a_r.product_type=='raw material'?"":"<span class='fa fa-plus-square-o add_bom_data'></span>", "<span class='fa fa-edit new_product_edit'></span>",
+                            name: a_r.new_name,
+                            td: [a_r.product_specs, a_r.qty, a_r.process_id,
+                                a_r.product_type == 'raw material' ? "" : "<span class='fa fa-plus-square-o add_bom_data'></span>", "<span class='fa fa-edit new_product_edit'></span>",
                                 "<span class='fa fa-trash-o new_product_delete'></span>"]
                         };
                         my.xNodes.push(s);
@@ -330,6 +333,8 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                                     pId: obj[i].parent_id,
                                     ptid: obj[i].product_tmpl_id,
                                     productid: obj[i].product_id,
+                                    product_specs: obj[i].product_specs,
+                                    qty: obj[i].qty,
                                     name: obj[i].name,
                                     td: [obj[i].product_specs, obj[i].qty, obj[i].process_id, obj[i].product_type == 'raw material' ? "" : "<span class='fa fa-plus-square-o add_bom_data'></span>",
                                         "<span class='fa fa-edit new_product_edit'></span>", "<span class='fa fa-trash-o new_product_delete'></span>"]
@@ -347,7 +352,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                             id: result.bom_id,
                             pId: 0,
                             qty: result.qty,
-                            product_spec: result.product_spec,
+                            product_specs: result.product_specs,
                             to_add: result.to_add,
                             ptid: result.product_tmpl_id,
                             productid: result.product_id,
