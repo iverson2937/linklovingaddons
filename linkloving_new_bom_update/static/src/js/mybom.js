@@ -368,6 +368,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                                     pId: obj[i].parent_id,
                                     ptid: obj[i].product_tmpl_id,
                                     productid: obj[i].product_id,
+                                    is_highlight: obj[i].is_highlight,
                                     name: obj[i].name,
                                     td: [obj[i].product_specs, obj[i].qty, obj[i].process_id, obj[i].product_type == 'raw material' ? "" : "<span class='fa fa-plus-square-o add_bom_data'></span>",
                                         "<span class='fa fa-edit new_product_edit'></span>", "<span class='fa fa-trash-o new_product_delete'></span>"]
