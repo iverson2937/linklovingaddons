@@ -21,9 +21,9 @@ class AddBomLineWizard(models.TransientModel):
         self.name = self.product_id.name
 
     def _get_return_vals(self):
-        process_id = False
-        if self.product_id.product_tmpl_id.bom_ids:
-            process_id = self.product_id.product_tmpl_id.bom_ids.process_id.name
+        process_id = []
+        if self.process_id:
+            process_id = [self.process_id.id, self.process_id.name]
         return {
             'qty': self.qty,
             'pid': self._context.get('pid'),

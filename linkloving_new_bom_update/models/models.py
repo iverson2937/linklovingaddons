@@ -27,6 +27,7 @@ class MrpBom(models.Model):
         res = []
         for line in self.bom_line_ids:
             res.append(self.get_bom_line(line))
+
         result = {
             'uuid': str(uuid.uuid1()),
             'bom_id': self.id,
@@ -35,7 +36,7 @@ class MrpBom(models.Model):
             'product_specs': self.product_tmpl_id.product_specs,
             'name': self.product_tmpl_id.name_get()[0][1],
             'code': self.product_tmpl_id.default_code,
-            'process_id': self.process_id.name,
+            'process_id': [self.process_id.id, self.process_id.name],
             'bom_ids': res,
             'state': self.state,
             'review_line': self.review_id.get_review_line_list(),
@@ -53,9 +54,9 @@ class MrpBom(models.Model):
             if level > 0 and level < 6:
                 level -= 1
         bom_id = line.product_id.product_tmpl_id.bom_ids
-        process_id = False
+        process_id = []
         if bom_id:
-            process_id = bom_id[0].process_id.name
+            process_id = [bom_id[0].process_id.id, bom_id[0].process_id.name]
 
         res = {
             'name': line.product_id.name_get()[0][1],
@@ -88,9 +89,9 @@ def _get_rec(object, level, parnet, qty=1.0, uom=False):
             if level > 0 and level < 6:
                 level -= 1
         bom_id = l.product_id.product_tmpl_id.bom_ids
-        process_id = False
+        process_id = []
         if bom_id:
-            process_id = bom_id[0].process_id.name
+            process_id = [bom_id[0].process_id.id, bom_id[0].process_id.name]
 
         res = {
             'name': l.product_id.name_get()[0][1],
