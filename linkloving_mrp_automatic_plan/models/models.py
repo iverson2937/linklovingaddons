@@ -349,10 +349,12 @@ class linkloving_mrp_automatic_plan(models.Model):
                 continue
 
             # mo状态为 等待退料,接受退料,结束(成品已入库)
-            if mo.state in ["done", "waiting_inventory_material", "waiting_warehouse_inspection"]:
+            if mo.state in ["waiting_inventory_material", "waiting_warehouse_inspection"]:
                 mo.status_light = max(1, mo.status_light)
                 continue
-
+            if mo.state == 'done':
+                mo.status_light = 1
+                continue
             #
             index = 0
             for s in line:
@@ -388,7 +390,7 @@ class linkloving_mrp_automatic_plan(models.Model):
         two_days = datetime.timedelta(days=2)
         for po in pos:
             try:
-                if po.state in ['purchase', 'draft', 'make_by_mrp']:
+                if po.state in ['purchase']:
                     if po.handle_date:
                         handle_date = fields.datetime.strptime(po.handle_date, '%Y-%m-%d %H:%M:%S')
                     else:  # 如果没有日期 则直接红灯
@@ -407,6 +409,8 @@ class linkloving_mrp_automatic_plan(models.Model):
                         po.status_light = 2
                     else:
                         po.status_light = 3
+                elif po.state in ['draft', 'make_by_mrp']:
+                    po.status_light = 3
                 else:
                     continue
             except:
