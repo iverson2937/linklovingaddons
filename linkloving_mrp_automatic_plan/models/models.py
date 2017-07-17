@@ -349,7 +349,7 @@ class linkloving_mrp_automatic_plan(models.Model):
                 continue
 
             # mo状态为 等待退料,接受退料,结束(成品已入库)
-            if mo.state in ["waiting_inventory_material", "waiting_warehouse_inspection"]:
+            if mo.state in ["done", "waiting_inventory_material", "waiting_warehouse_inspection"]:
                 mo.status_light = 1
                 mo.material_light = 1
                 continue
