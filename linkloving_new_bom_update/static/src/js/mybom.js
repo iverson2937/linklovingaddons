@@ -101,12 +101,12 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
 
 
                             //返回给后台的数据
-                            var c = {
-                                modify_type: "delete",
-                                parents: self.parentsid
-                            }
-                            self.changes_back.push(c);
-                            console.log(self.changes_back);
+                            // var c = {
+                            //     modify_type: "delete",
+                            //     parents: self.parentsid
+                            // }
+                            // self.changes_back.push(c);
+                            // console.log(self.changes_back);
                             return;
                         }
                     })
@@ -159,6 +159,8 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             var name = $(target).parents("tr").data("name");
             var product_spec = $(target).parents("tr").data("product_spec");
             var default_name = $(target).parents("tr").find(".product_name").html();
+            var process_id = $(target).parents("tr").data("process_id");
+            var product_type = $(target).parents("tr").data("product_type");
 
             var action = {
                 name: "详细",
@@ -175,7 +177,9 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                     'default_product_specs': product_specs,
                     'default_product_spec': product_spec,
                     'pid': pId,
-                    'default_name': default_name
+                    'default_name': default_name,
+                    'process_id':process_id,
+                    'product_type': product_type
                 },
                 target: "new"
             };
@@ -230,7 +234,8 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                                 my.xNodes[i].name = a_r.new_name;
                                 my.xNodes[i].product_specs = a_r.product_specs;
                                 my.xNodes[i].to_add = a_r.to_add;
-                                my.xNodes[i].td = [a_r.product_specs, a_r.qty, a_r.process_id,
+                                my.xNodes[i].process_id = a_r.process_id[0];
+                                my.xNodes[i].td = [a_r.product_specs, a_r.qty, a_r.process_id[1],
                                     a_r.product_type == 'raw material' ? "" : "<span class='fa fa-plus-square-o add_bom_data'></span>",
                                     "<span class='fa fa-edit new_product_edit'></span>",
                                     "<span class='fa fa-trash-o new_product_delete'></span>"];
@@ -241,16 +246,16 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                                 $("#treeMenu").treetable("node", $("#treeMenu").attr("data-bom-id")).toggle();
 
                                 //传给后台的数据
-                                var c = {
-                                    modify_type: "edit",
-                                    qty: xhr.responseJSON.result.qty,
-                                    product_id: xhr.responseJSON.result.name[0][0],
-                                    input_changed_value: xhr.responseJSON.result.to_add,
-                                    parents: my.parentsid,
-                                    product_specs: xhr.responseJSON.result.product_specs
-                                }
-                                my.changes_back.push(c);
-                                console.log(my.changes_back);
+                                // var c = {
+                                //     modify_type: "edit",
+                                //     qty: xhr.responseJSON.result.qty,
+                                //     product_id: xhr.responseJSON.result.name[0][0],
+                                //     input_changed_value: xhr.responseJSON.result.to_add,
+                                //     parents: my.parentsid,
+                                //     product_specs: xhr.responseJSON.result.product_specs
+                                // }
+                                // my.changes_back.push(c);
+                                // console.log(my.changes_back);
                                 break;
                             }
                         }
@@ -289,7 +294,6 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 if (data.params.model == 'add.bom.line.wizard') {
                     if (data.params.method == 'action_add' && my.flag == true) {
                         my.flag = false;
-                        console.log(xhr.responseJSON.result);
                         var a_r = xhr.responseJSON.result;
                         //table树重新渲染
                         var s = {
@@ -303,7 +307,9 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                             parents: my.parentsid,
                             ptid: a_r.product_tmpl_id,
                             name: a_r.new_name,
-                            td: [a_r.product_specs, a_r.qty, a_r.process_id,
+                            process_id:a_r.process_id[0],
+                            product_type:a_r.product_type,
+                            td: [a_r.product_specs, a_r.qty, a_r.process_id[1],
                                 a_r.product_type == 'raw material' ? "" : "<span class='fa fa-plus-square-o add_bom_data'></span>", "<span class='fa fa-edit new_product_edit'></span>",
                                 "<span class='fa fa-trash-o new_product_delete'></span>"]
                         };
@@ -313,15 +319,15 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                         $.TreeTable("treeMenu", heads, my.xNodes);
                         $("#treeMenu").treetable("node", $("#treeMenu").attr("data-bom-id")).toggle();
 
-                        var c = {
-                            modify_type: "add",
-                            qty: xhr.responseJSON.result.qty,
-                            product_id: xhr.responseJSON.result.name[0][0],
-                            input_changed_value: xhr.responseJSON.result.to_add,
-                            parents: my.parentsid
-                        }
-                        my.changes_back.push(c);
-                        console.log(my.changes_back);
+                        // var c = {
+                        //     modify_type: "add",
+                        //     qty: xhr.responseJSON.result.qty,
+                        //     product_id: xhr.responseJSON.result.name[0][0],
+                        //     input_changed_value: xhr.responseJSON.result.to_add,
+                        //     parents: my.parentsid
+                        // }
+                        // my.changes_back.push(c);
+                        // console.log(my.changes_back);
                     }
                 }
             })
@@ -379,7 +385,9 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                                     qty: obj[i].qty,
                                     is_highlight: obj[i].is_highlight,
                                     name: obj[i].name,
-                                    td: [obj[i].product_specs, obj[i].qty, obj[i].process_id, obj[i].product_type == 'raw material' ? "" : "<span class='fa fa-plus-square-o add_bom_data'></span>",
+                                    product_type: obj[i].product_type,
+                                    process_id: obj[i].process_id[0],
+                                    td: [obj[i].product_specs, obj[i].qty, obj[i].process_id[1], obj[i].product_type == 'raw material' ? "" : "<span class='fa fa-plus-square-o add_bom_data'></span>",
                                         "<span class='fa fa-edit new_product_edit'></span>", "<span class='fa fa-trash-o new_product_delete'></span>"]
                                 };
                                 tNodes.push(s);
@@ -400,7 +408,9 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                             ptid: result.product_tmpl_id,
                             productid: result.product_id,
                             name: result.name,
-                            td: [result.product_specs, '', result.process_id, "<span class='fa fa-plus-square-o add_bom_data'></span>", "", ""]
+                            product_type: result.product_type,
+                            process_id: result.process_id[0],
+                            td: [result.product_specs, '', result.process_id[1], "<span class='fa fa-plus-square-o add_bom_data'></span>", "", ""]
                         });
                         self.xNodes = tNodes;
                         var heads = ["名字", "规格", "数量", "工序", "添加", "编辑", "删除"];

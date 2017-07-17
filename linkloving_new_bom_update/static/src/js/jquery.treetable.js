@@ -515,7 +515,7 @@ jQuery.TreeTable = function (tree_id, heads, tNodes) {
             if (node.modify_type && node.modify_type == 'delete') {
 
             } else {
-                body_html += "<tr data-product-id='" + node.productid + "'data-to-add='" + node.to_add + "'data-product-specs='" + node.product_specs + "'data-qty='" + node.qty + "' class='" + new_bg + "' data-tt-id='" + node.id + "' " + (node.pId ? "data-tt-parent-id='" + node.pId + "'" : "") + "><td class = 'td_left'><span data-pt-id='" + node.ptid + "' class='" + (node.isParent ? "parent" : "children") + " product_name'>" + node.name + "</span></td>";
+                body_html += "<tr data-product-type='"+ node.product_type +"' data-process-id='"+ node.process_id +"' data-product-id='" + node.productid + "'data-to-add='" + node.to_add + "'data-product-specs='" + node.product_specs + "'data-qty='" + node.qty + "' class='" + new_bg + "' data-tt-id='" + node.id + "' " + (node.pId ? "data-tt-parent-id='" + node.pId + "'" : "") + "><td class = 'td_left'><span data-pt-id='" + node.ptid + "' class='" + (node.isParent ? "parent" : "children") + " product_name'>" + node.name + "</span></td>";
                 for (var j = 0; j < column_count - 1; j++) {
                     body_html += "<td>" + (node.td[j] ? node.td[j] : "") + "</td>";
                 }
