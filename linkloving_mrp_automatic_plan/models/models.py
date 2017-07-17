@@ -354,6 +354,7 @@ class linkloving_mrp_automatic_plan(models.Model):
                 continue
             if mo.state == 'done':
                 mo.status_light = 1
+                mo.material_light = 1
                 continue
             #
             index = 0
