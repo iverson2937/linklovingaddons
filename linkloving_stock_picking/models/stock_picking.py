@@ -219,5 +219,13 @@ class StockMove(models.Model):
             sgin = -1
         self.data_type = self.product_uom_qty * sgin
 
+    @api.multi
+    def action_view_qc_result(self):
+        view = self.env.ref('linkloving_stock_picking.ll_stock_picking_pop_form')
 
-
+        return {'type': 'ir.actions.act_window',
+                'res_model': 'stock.picking',
+                'view_mode': 'form',
+                'view_id': view.id,
+                'res_id': self.id,
+                'target': 'new'}
