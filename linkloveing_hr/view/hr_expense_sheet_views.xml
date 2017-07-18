@@ -420,7 +420,7 @@
                   action="action_hr_expense_sheet_to_receive"/>
 
         <record id="hr_expense_sheet_actions_my_draft" model="ir.actions.act_window">
-            <field name="name">hr.expense.sheet.draft.my</field>
+            <field name="name">我的报销单</field>
             <field name="res_model">hr.expense.sheet</field>
             <field name="domain">[('employee_id.user_id', '=', uid),('state','=','draft')]</field>
             <field name="view_ids" eval="[(5, 0, 0),
@@ -430,7 +430,7 @@
             <field name="view_mode">tree,form</field>
         </record>
         <record id="hr_expense_sheet_actions_my_cancel" model="ir.actions.act_window">
-            <field name="name">hr.expense.sheet.draft.my</field>
+            <field name="name">我被拒绝的报销单</field>
             <field name="res_model">hr.expense.sheet</field>
             <field name="domain">[('employee_id.user_id', '=', uid),('state','=','cancel')]</field>
             <field name="context">{'state':'cancel'}</field>
