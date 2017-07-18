@@ -67,6 +67,16 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
 
 
         },
+        //获得子孙
+        getchildren:function (x,i) {
+            var self = this;
+            self.childrenid.push(parseInt(x));
+            for(i;i<self.xNodes.length;i++){
+                if(self.xNodes[i].pId == x){
+                    self.getchildren(self.xNodes[i].id,i);
+                }
+            }
+        },
 
         //删除的动作
         delete_bom_line_fn: function (e) {
@@ -76,40 +86,31 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             var self = this;
 
             self.parentsid = [];
-            self.getParents($(target).parents("tr"));
-            //删除数组第一个元素
-            self.parentsid.shift();
             var message = ("确定删除这条记录？");
             var def = $.Deferred();
             var options = {
                 title: _t("Warning"),
                 //确认删除的操作
                 confirm_callback: function () {
-                    console.log(del_id);
+                    self.childrenid = [];
+                    self.getchildren(del_id,0);
+                    // console.log(self.childrenid);
+
                     self.xNodes.forEach(function (v, i) {
-                        if (self.xNodes[i].id == del_id) {
-                            console.log(self.xNodes[i]);
-
-                            self.xNodes[i].modify_type = 'delete';
-                            self.xNodes[i].parents = self.parentsid;
-                            // var del_s = self.xNodes[i];
-                            // self.xNodes.splice(i, 1);
-                            $("#treeMenu").html("");
-                            var heads = ["名字", "规格", "数量", "工序", "添加", "编辑", "删除"];
-                            $.TreeTable("treeMenu", heads, self.xNodes);
-                            $("#treeMenu").treetable("node", $("#treeMenu").attr("data-bom-id")).toggle();
-
-
-                            //返回给后台的数据
-                            // var c = {
-                            //     modify_type: "delete",
-                            //     parents: self.parentsid
-                            // }
-                            // self.changes_back.push(c);
-                            // console.log(self.changes_back);
-                            return;
-                        }
-                    })
+                        self.childrenid.forEach(function (ele,j) {
+                            if(self.xNodes[i].id == self.childrenid[j]){
+                                self.xNodes[i].modify_type = 'delete';
+                                self.parentsid = [];
+                                self.getParents($("#treeMenu tr[data-tt-id=" + self.xNodes[i].id + "]"));
+                                self.parentsid.shift();
+                                self.xNodes[i].parents = self.parentsid;
+                            }
+                        })
+                    });
+                    $("#treeMenu").html("");
+                    var heads = ["名字", "规格", "数量", "工序", "添加", "编辑", "删除"];
+                    $.TreeTable("treeMenu", heads, self.xNodes);
+                    $("#treeMenu").treetable("node", $("#treeMenu").attr("data-bom-id")).toggle();
 
 
                     self.$el.removeClass('oe_form_dirty');
@@ -349,6 +350,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             self.changes_back = [];
             //存储父级id的数组
             self.parentsid = [];
+            self.childrenid = [];
             $(".o_content").css("background", "white")
         },
 
