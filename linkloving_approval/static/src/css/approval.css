@@ -73,7 +73,7 @@
     margin-bottom: 50px;
     position: fixed;
     z-index: 999;
-    top:50px;
+    top:32px;
     padding-top:40px;
     background: white;
     width: calc((100% - 219px)*0.78);
