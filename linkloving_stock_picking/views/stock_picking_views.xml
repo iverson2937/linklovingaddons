@@ -200,5 +200,25 @@
 
             </field>
         </record>
+
+        <!-- Inherit Form View to Modify it -->
+        <record id="view_immediate_transfer_inherit" model="ir.ui.view">
+            <field name="name">stock.immediate.transfer.inherit</field>
+            <field name="model">stock.immediate.transfer</field>
+            <field name="inherit_id" ref="stock.view_immediate_transfer"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//group/p" position="replace">
+                    <p>
+                        未填写收货数量
+                    </p>
+                    <!-- Add your fields or attributes here -->
+                </xpath>
+                <xpath expr="//footer/button[@name='process']" position="attributes">
+                    <attribute name="string">批量收货</attribute>
+                </xpath>
+
+            </field>
+        </record>
     </data>
 </openerp>

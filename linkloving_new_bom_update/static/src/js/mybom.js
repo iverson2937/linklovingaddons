@@ -160,8 +160,9 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             var name = $(target).parents("tr").data("name");
             var product_spec = $(target).parents("tr").data("product_spec");
             var default_name = $(target).parents("tr").find(".product_name").html();
-            var process_id = $(target).parents("tr").data("process_id");
+            var process_id = $(target).parents("tr").data("process-id");
             var product_type = $(target).parents("tr").data("product_type");
+
 
             var action = {
                 name: "详细",
@@ -179,8 +180,8 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                     'default_product_spec': product_spec,
                     'pid': pId,
                     'default_name': default_name,
-                    'process_id':process_id,
-                    'product_type': product_type
+                    'default_process_id': process_id,
+                    'default_product_type': product_type
                 },
                 target: "new"
             };

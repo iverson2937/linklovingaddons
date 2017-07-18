@@ -2282,6 +2282,7 @@ class LinklovingAppApi(http.Controller):
                     'name': pack.product_id.display_name,
                     'default_code': pack.product_id.default_code,
                     'qty_available': pack.product_id.qty_available,
+                    'product_specs': pack.product_id.product_specs or '',
                     'area_id': {
                         'area_id': pack.product_id.area_id.id or None,
                         'area_name': pack.product_id.area_id.name or None,

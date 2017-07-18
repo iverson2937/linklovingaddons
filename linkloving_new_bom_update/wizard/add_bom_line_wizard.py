@@ -14,6 +14,9 @@ class AddBomLineWizard(models.TransientModel):
     qty = fields.Float()
     product_specs = fields.Text(string=u'规格')
     process_id = fields.Many2one('mrp.process')
+    product_type = fields.Selection(string="物料类型", selection=[('raw material', '原料'),
+                                                              ('semi-finished', '半成品'),
+                                                              ('finished', '成品')])
 
     @api.onchange('product_id')
     def _on_product_id(self):
@@ -45,5 +48,4 @@ class AddBomLineWizard(models.TransientModel):
     def action_edit(self):
         res = self._get_return_vals()
         res['id'] = self._context.get('pid')
-        print res
         return res
