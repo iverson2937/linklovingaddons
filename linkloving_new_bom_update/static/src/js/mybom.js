@@ -9,8 +9,6 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
     var Widget = require('web.Widget');
     var View = require('web.View');
     var Dialog = require('web.Dialog');
-
-    var QWeb = core.qweb;
     var _t = core._t;
 
 
@@ -20,7 +18,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             'click .add_bom_data': 'add_bom_data_fn',
             'click .product_name': 'product_name_fn',
             'click .new_bom_modify_submit': 'new_bom_modify_submit_fn',
-            'click .new_bom_modify_direct': 'new_bom_modify_direct_fn',
+            'click .new_bom_modify_direct': 'new_bom_modify_submit_fn',
             'click .new_product_edit': 'edit_bom_line_fn',
             'click .new_product_delete': 'delete_bom_line_fn'
         },
@@ -36,8 +34,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                     self.changes_back.push(self.xNodes[i]);
                 }
             })
-            console.log(self.changes_back);
-            if(self.changes_back.length==0){
+            if (self.changes_back.length == 0) {
                 var message = ("您没有做任何操作");
                 var def = $.Deferred();
                 var options = {
@@ -50,7 +47,6 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                         });
                     },
                     cancel_callback: function () {
-                        console.log('no')
                         def.reject();
                     },
                 };
@@ -68,40 +64,28 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 var btn_update = false;
             }
             var top_bom_id = $("#treeMenu").data("bom-id");
-            console.log(this.changes_back);
-            console.log(top_bom_id);
-            var action = {
-                name: "BOM",
-                type: 'ir.actions.act_window',
-                res_model: 'bom.update.wizard',
-                view_type: 'form',
-                view_mode: 'tree,form',
-                context: {'back_datas': this.changes_back, "bom_id": top_bom_id, "update": btn_update},
-                views: [[false, 'form']],
-                // res_id: act_id,
-                target: "new"
-            };
-            this.do_action(action);
-        },
-
-        //替换的动作
-        new_bom_modify_direct_fn: function (e) {
-            var e = e || window.event;
-            var self = this;
-            var target = e.target || e.srcElement;
-            self.xNodes.forEach(function (v, i) {
-                if (self.xNodes[i].modify_type) {
-                    self.changes_back.push(self.xNodes[i]);
-                }
-            });
-            var top_bom_id = $("#treeMenu").data("bom-id");
-            console.log(this.changes_back);
-            new Model("bom.update.wizard").call("bom_line_save", [this.changes_back, top_bom_id]).then(function (result) {
-
-            })
-
+            if (btn_update = false) {
+                var action = {
+                    name: "BOM",
+                    type: 'ir.actions.act_window',
+                    res_model: 'bom.update.wizard',
+                    view_type: 'form',
+                    view_mode: 'tree,form',
+                    context: {'back_datas': this.changes_back, "bom_id": top_bom_id, "update": btn_update},
+                    views: [[false, 'form']],
+                    // res_id: act_id,
+                    target: "new"
+                };
+                this.do_action(action);
+            } else {
+                new Model("bom.update.wizard").call("bom_line_save", [this.changes_back, top_bom_id]).then(function (result) {
+                    window.location.reload(true);
+                })
+            }
 
         },
+
+
         //获得子孙
         getchildren: function (x, i) {
             var self = this;
@@ -129,7 +113,6 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 confirm_callback: function () {
                     self.childrenid = [];
                     self.getchildren(del_id, 0);
-                    // console.log(self.childrenid);
 
                     self.xNodes.forEach(function (v, i) {
                         self.childrenid.forEach(function (ele, j) {
@@ -154,7 +137,6 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                     });
                 },
                 cancel_callback: function () {
-                    console.log('no')
                     def.reject();
                 },
             };
@@ -196,7 +178,10 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             var product_spec = $(target).parents("tr").data("product_spec");
             var default_name = $(target).parents("tr").find(".product_name").html();
             var process_id = $(target).parents("tr").data("process-id");
-            var product_type = $(target).parents("tr").data("product_type");
+            var product_type = $(target).parents("tr").data("product-type")
+            if (typeof(process_id) == "undefined") {
+                process_id = false
+            }
 
 
             var action = {
@@ -212,10 +197,9 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                     'edit': true,
                     'default_to_add': isTrueSet,
                     'default_product_specs': product_specs,
-                    'default_product_spec': product_spec,
                     'pid': pId,
                     'default_name': default_name,
-                    // 'default_process_id': process_id,
+                    'default_process_id': process_id,
                     'default_product_type': product_type
                 },
                 target: "new"
@@ -236,13 +220,9 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 if (data.params && data.params.model == 'add.bom.line.wizard') {
                     if (data.params.method == 'action_edit' && my.flag == true) {
                         my.flag = false;
-                        console.log(xhr.responseJSON.result);
                         for (var i = 0; i < my.xNodes.length; i++) {
                             if (my.xNodes[i].id == xhr.responseJSON.result.pid) {
-                                console.log(my.xNodes[i]);
                                 var a_r = xhr.responseJSON.result;
-                                console.log(a_r);
-
                                 //table树重新渲染
                                 my.xNodes[i].name = a_r.new_name;
                                 my.xNodes[i].id = a_r.id;
@@ -269,7 +249,6 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                                     a_r.product_type == 'raw material' ? "" : "<span class='fa fa-plus-square-o add_bom_data'></span>",
                                     "<span class='fa fa-edit new_product_edit'></span>",
                                     "<span class='fa fa-trash-o new_product_delete'></span>"];
-                                // console.log(my.xNodes);
                                 $("#treeMenu").html("");
                                 var heads = ["名字", "规格", "数量", "工序", "添加", "编辑", "删除"];
                                 $.TreeTable("treeMenu", heads, my.xNodes);
@@ -285,7 +264,6 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                                 //     product_specs: xhr.responseJSON.result.product_specs
                                 // }
                                 // my.changes_back.push(c);
-                                // console.log(my.changes_back);
                                 break;
                             }
                         }
@@ -299,7 +277,6 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var pId = $(target).parents("tr").attr("data-tt-id");
-            console.log(pId);
             var my = this;
             my.flag = true;
             var action = {
@@ -320,7 +297,6 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
 
             self.$(document).ajaxComplete(function (event, xhr, settings) {
                 var data = JSON.parse(settings.data);
-                // console.log(settings);
                 if (data.params.model == 'add.bom.line.wizard') {
                     if (data.params.method == 'action_add' && my.flag == true) {
                         my.flag = false;
@@ -357,7 +333,6 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                         //     parents: my.parentsid
                         // }
                         // my.changes_back.push(c);
-                        // console.log(my.changes_back);
                     }
                 }
             })
@@ -401,7 +376,6 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 return new Model("mrp.bom")
                     .call("get_bom", [this.bom_id])
                     .then(function (result) {
-                        console.log(result);
                         var tNodes = [];
 
                         //获取数据存入数组
@@ -429,7 +403,6 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                         }
 
                         get_datas(result.bom_ids);
-                        console.log(tNodes);
                         tNodes.push({
                             id: result.bom_id,
                             pId: 0,
