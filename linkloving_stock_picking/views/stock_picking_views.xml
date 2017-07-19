@@ -36,13 +36,15 @@
                     <!--<button name="stock_ready" string="备货完成"-->
                     <!--attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['prepare'])]}"-->
                     <!--groups="stock.group_stock_user" type="object" class="oe_highlight"/>-->
-
-                    <button name="do_new_transfer" string="Confirm Receipts"
+                    <button name="action_view_qc_result" string="查看品检结果"
                             attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
                             groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
-                    <button name="reject" string="Reject"
-                            attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
-                            groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
+                    <!--<button name="do_new_transfer" string="Confirm Receipts"-->
+                    <!--attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"-->
+                    <!--groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>-->
+                    <!--&lt;!&ndash;<button name="reject" string="Reject"&ndash;&gt;-->
+                    <!--attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"-->
+                    <!--groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>-->
                 </xpath>
                 <xpath expr="//button[@name='do_new_transfer']" position="after">
                     <button name="action_check_pass" states="qc_check" string="Quality Check Pass"
@@ -56,10 +58,6 @@
 
                 <xpath expr="//field[@name='location_id']" position="after">
                     <field name="tracking_number" string="Tracking Number"/>
-                </xpath>
-
-                <xpath expr="//field[@name='origin']" position="after">
-                    <field name="storage_type" string="入库类型"/>
                 </xpath>
 
                 <!--<xpath expr="//notebook/page[1]" position="after">-->
@@ -107,9 +105,6 @@
                     <field name="create_uid"/>
                 </xpath>
 
-                <xpath expr="//field[@name='partner_id']" position="after">
-                    <field name="storage_type" string="入库类型"/>
-                </xpath>
             </field>
         </record>
         <record id="action_stock_picking_confirm" model="ir.actions.act_window">
@@ -139,16 +134,6 @@
                 </xpath>
                 <xpath expr="//field[@name='partner_id']" position="after">
                     <field name="origin"/>
-                </xpath>
-
-                <xpath expr="//filter[@name='done']" position="after">
-                    <separator/>
-                    <filter string="采购入库" name="procurement_warehousing"
-                            domain="[('storage_type', '=', 'procurement_warehousing')]"/>
-                    <filter string="退料入库" name="return_of_materials_to_storeroom"
-                            domain="[('storage_type', '=', 'return_of_materials_to_storeroom')]"/>
-                    <filter string="退货入库" name="return_storage"
-                            domain="[('storage_type', '=', 'return_storage')]"/>
                 </xpath>
 
             </field>
