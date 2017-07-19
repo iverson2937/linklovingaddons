@@ -205,19 +205,5 @@
 
             </field>
         </record>
-
-        <record id="ll_stock_picking_pop_form" model="ir.ui.view">
-            <field name="name">stock.picking.form</field>
-            <field name="model">stock.picking</field>
-            <field name="arch" type="xml">
-                <form string="品检结果">
-                    <sheet>
-                        <group>
-                            <field name="qc_note"/>
-                        </group>
-                    </sheet>
-                </form>
-            </field>
-        </record>
     </data>
 </openerp>
