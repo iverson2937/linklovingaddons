@@ -20,7 +20,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             'click .add_bom_data': 'add_bom_data_fn',
             'click .product_name': 'product_name_fn',
             'click .new_bom_modify_submit': 'new_bom_modify_submit_fn',
-            'click .new_bom_modify_direct': 'new_bom_modify_submit_fn',
+            'click .new_bom_modify_direct': 'new_bom_modify_direct_fn',
             'click .new_product_edit': 'edit_bom_line_fn',
             'click .new_product_delete': 'delete_bom_line_fn'
         },
@@ -63,17 +63,28 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
         //替换的动作
         new_bom_modify_direct_fn: function (e) {
             var e = e || window.event;
+            var self = this;
             var target = e.target || e.srcElement;
+            self.xNodes.forEach(function (v, i) {
+                if (self.xNodes[i].modify_type) {
+                    self.changes_back.push(self.xNodes[i]);
+                }
+            });
+            var top_bom_id = $("#treeMenu").data("bom-id");
+            console.log(this.changes_back);
+            new Model("bom.update.wizard").call("bom_line_save", [this.changes_back, top_bom_id]).then(function (result) {
+
+            })
 
 
         },
         //获得子孙
-        getchildren:function (x,i) {
+        getchildren: function (x, i) {
             var self = this;
             self.childrenid.push(parseInt(x));
-            for(i;i<self.xNodes.length;i++){
-                if(self.xNodes[i].pId == x){
-                    self.getchildren(self.xNodes[i].id,i);
+            for (i; i < self.xNodes.length; i++) {
+                if (self.xNodes[i].pId == x) {
+                    self.getchildren(self.xNodes[i].id, i);
                 }
             }
         },
@@ -93,12 +104,12 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 //确认删除的操作
                 confirm_callback: function () {
                     self.childrenid = [];
-                    self.getchildren(del_id,0);
+                    self.getchildren(del_id, 0);
                     // console.log(self.childrenid);
 
                     self.xNodes.forEach(function (v, i) {
-                        self.childrenid.forEach(function (ele,j) {
-                            if(self.xNodes[i].id == self.childrenid[j]){
+                        self.childrenid.forEach(function (ele, j) {
+                            if (self.xNodes[i].id == self.childrenid[j]) {
                                 self.xNodes[i].modify_type = 'delete';
                                 self.parentsid = [];
                                 self.getParents($("#treeMenu tr[data-tt-id=" + self.xNodes[i].id + "]"));
@@ -180,7 +191,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                     'default_product_spec': product_spec,
                     'pid': pId,
                     'default_name': default_name,
-                    'default_process_id': process_id,
+                    // 'default_process_id': process_id,
                     'default_product_type': product_type
                 },
                 target: "new"
@@ -206,13 +217,10 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                             if (my.xNodes[i].id == xhr.responseJSON.result.pid) {
                                 console.log(my.xNodes[i]);
                                 var a_r = xhr.responseJSON.result;
+                                console.log(a_r);
 
                                 //table树重新渲染
-                                if (a_r.new_name != false) {
-                                    my.xNodes[i].name = a_r.new_name;
-                                } else {
-                                    my.xNodes[i].name = a_r.name[0][1];
-                                }
+                                my.xNodes[i].name = a_r.new_name;
                                 my.xNodes[i].id = a_r.id;
                                 my.xNodes[i].add = 2;
                                 if (my.xNodes[i].modify_type) {
@@ -228,11 +236,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                                 my.xNodes[i].input_changed_value = a_r.to_add;
                                 my.xNodes[i].productid = a_r.name[0][0];
                                 my.xNodes[i].qty = a_r.qty;
-                                if (a_r.to_add) {
-                                    my.xNodes[i].name = a_r.new_name;
-                                } else {
-                                    my.xNodes[i].name = a_r.name[0][1]
-                                }
+                                my.xNodes[i].name = a_r.new_name;
                                 my.xNodes[i].name = a_r.new_name;
                                 my.xNodes[i].product_specs = a_r.product_specs;
                                 my.xNodes[i].to_add = a_r.to_add;
@@ -309,8 +313,8 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                             parents: my.parentsid,
                             ptid: a_r.product_tmpl_id,
                             name: a_r.new_name,
-                            process_id:a_r.process_id[0],
-                            product_type:a_r.product_type,
+                            process_id: a_r.process_id[0],
+                            product_type: a_r.product_type,
                             td: [a_r.product_specs, a_r.qty, a_r.process_id[1],
                                 a_r.product_type == 'raw material' ? "" : "<span class='fa fa-plus-square-o add_bom_data'></span>", "<span class='fa fa-edit new_product_edit'></span>",
                                 "<span class='fa fa-trash-o new_product_delete'></span>"]
