@@ -192,13 +192,14 @@ odoo.define('linkloving_approval.approval_core', function (require){
                         });
                     });
                 }
-                this.flag=2
+                this.flag=2;
             }
         },
         reload_content : function (own) {
             var reloaded = $.Deferred();
             // console.log(this.approval_type)
             var approval_type = own.approval_type[0][0];
+            own.begin = own.begin + own.limit;
             own.get_datas(own,'product.attachment.info', approval_type);
             reloaded.resolve();
             return  reloaded.promise();
