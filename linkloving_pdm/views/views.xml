@@ -99,6 +99,7 @@
             <field name="arch" type="xml">
                 <tree string="终审人">
                     <field name="final_review_partner_id"/>
+                    <field name="final_type" string="审核类型"/>
                 </tree>
             </field>
         </record>

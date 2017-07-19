@@ -19,6 +19,8 @@ REVIEW_LINE_STATE = {'waiting_review': u'等待审核',
                      'review_success': u'审核通过',
                      'review_fail': u'审核不通过',
                      'review_canceled': u'取消审核'}
+
+
 class ReviewProcess(models.Model):
     _name = 'review.process'
 
@@ -105,10 +107,13 @@ class ReviewProcessLine(models.Model):
     remark = fields.Text(u"备注")
 
     def submit_to_next_reviewer(self, to_last_review=False, partner_id=None, remark=None):
+
         if not partner_id:
             raise UserError(u"请选择审核人!")
         if not self.env["final.review.partner"].get_final_review_partner_id():
             raise UserError(u'请联系管理员,设置终审人!')
+        if not self.env['final.review.partner'].search([('final_review_partner_id', '=', partner_id.id)]):
+            raise UserError('请选择终正确的终审人')
         is_last_review = False
         if to_last_review \
                 or partner_id.id == self.env["final.review.partner"].get_final_review_partner_id().id:
@@ -143,15 +148,15 @@ class ReviewProcessLine(models.Model):
             raise UserError(u"终审人才能进行审核")
 
     def action_approve(self, remark):
-            if self.review_id.who_review_now.id == self.env.user.partner_id.id:
-                self.write({
-                    'review_time': fields.datetime.now(),
-                    'state': 'review_success',
-                    'remark': remark
-                })
+        if self.review_id.who_review_now.id == self.env.user.partner_id.id:
+            self.write({
+                'review_time': fields.datetime.now(),
+                'state': 'review_success',
+                'remark': remark
+            })
 
-            else:
-                raise UserError(u"您不是审核人")
+        else:
+            raise UserError(u"您不是审核人")
 
     # 拒绝审核
     def action_deny(self, remark):
@@ -193,6 +198,8 @@ FILE_TYPE_DIC = {'sip': 'SIP',
                  'ipqc': 'IPQC',
                  'other': 'Other',
                  'design': 'Design'}
+
+
 class ProductAttachmentInfo(models.Model):
     _name = 'product.attachment.info'
 
@@ -441,7 +448,7 @@ class ProductTemplateExtend(models.Model):
 
     def convert_attendment_info_list(self, type):
         files = self.env["product.attachment.info"].search(
-                [("type", "=", type), ("product_tmpl_id", '=', self.id)], order='version desc')
+            [("type", "=", type), ("product_tmpl_id", '=', self.id)], order='version desc')
         json_list = []
         for a_file in files:
             json_list.append(a_file.convert_attachment_info())
@@ -509,6 +516,7 @@ class ReviewProcessWizard(models.TransientModel):
         self.review_process_line.action_cancel(self.remark)
         self.product_attachment_info_id.action_cancel()
 
+
 class ReviewProcessWizard(models.TransientModel):
     _name = 'review.process.wizard'
 
@@ -519,6 +527,7 @@ class ReviewProcessWizard(models.TransientModel):
                                           related="product_attachment_info_id.review_id.process_line_review_now")
     remark = fields.Text(u"备注", required=True)
     is_show_action_deny = fields.Boolean(default=True)
+
     # 送审
     def action_to_next(self):
         to_last_review = self._context.get("to_last_review")  # 是否送往终审
@@ -527,9 +536,9 @@ class ReviewProcessWizard(models.TransientModel):
 
         self.product_attachment_info_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
         self.product_attachment_info_id.review_id.process_line_review_now.submit_to_next_reviewer(
-                to_last_review=to_last_review,
-                partner_id=self.partner_id,
-                remark=self.remark)
+            to_last_review=to_last_review,
+            partner_id=self.partner_id,
+            remark=self.remark)
 
         return True
 
@@ -554,12 +563,16 @@ class ReviewProcessWizard(models.TransientModel):
         self.review_process_line.action_cancel(self.remark)
         self.product_attachment_info_id.action_cancel()
 
-    
     @api.model
     def create(self, vals):
         return super(ReviewProcessWizard, self).create(vals)
+
+
 class FinalReviewPartner(models.Model):
     _name = 'final.review.partner'
+    final_type = fields.Selection([
+        ('bom_review', u'BOM 终审人')
+    ], string=u'审核类型')
 
     final_review_partner_id = fields.Many2one(comodel_name="res.partner", string="终审人", required=False,
                                               domain=[('employee', '=', True)])
