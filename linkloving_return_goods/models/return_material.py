@@ -310,6 +310,7 @@ class ReturnMaterial(models.Model):
             'picking_type_id': picking_type.id,
             'partner_id': self.partner_id.id,
             'rma_id': self.id,
+            'pick_order_type': 'purchase_return',
             'location_id': location_id,
             'location_dest_id': location_dest_id,
             'origin': origin,
@@ -322,6 +323,7 @@ class ReturnMaterial(models.Model):
                 'product_uom_qty': line.product_uom_qty,
                 'product_uom': line.product_id.uom_id.id,
                 'rma_line_id': line.id,
+                'move_order_type': 'purchase_return',
                 'picking_id': picking_id.id,
                 'location_id': picking_id.location_id.id,
                 'location_dest_id': picking_id.location_dest_id.id

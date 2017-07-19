@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+        <!--crm.mutual.customer-->
+        <record model="ir.ui.view" id="crm_mutual_customer_form">
+            <field name="name">crm.mutual.customer.form</field>
+            <field name="model">crm.mutual.customer</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="group_name"/>
+                                <field name="reference_type"/>
+                            </group>
+                            <group>
+                                <field name="description"/>
+                                <field name="effective_time"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page name="members" string="组成员">
+                                <field name="customer_ids" widget="many2many_kanban" options="{'not_delete': True}"
+                                       context="{'default_customer':True,'default_is_company':True}"
+                                       domain="[('customer','=','1'),('is_company','=',True)]">
+                                    <kanban quick_create="false" create="true" delete="true">
+                                        <field name="name"/>
+                                        <templates>
+                                            <t t-name="kanban-box">
+                                                <div class="oe_kanban_global_click" style="position: relative">
+                                                    <a t-if="! read_only_mode" type="delete"
+                                                       style="position: absolute; right: 0; padding: 4px; diplay: inline-block">
+                                                        X
+                                                    </a>
+                                                    <div class="oe_module_vignette">
+                                                        <img t-att-src="kanban_image('res.users', 'image_small', record.id.value)"
+                                                             class="oe_avatar oe_kanban_avatar_smallbox"/>
+                                                        <div class="oe_module_desc">
+                                                            <field name="name"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </templates>
+                                    </kanban>
+                                </field>
+                            </page>
+                        </notebook>
+
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="crm_mutual_customer_tree" model="ir.ui.view">
+            <field name="name">crm.mutual.customer.tree</field>
+            <field name="model">crm.mutual.customer</field>
+            <field name="arch" type="xml">
+
+                <tree string="公海规则">
+                    <field name="group_name"/>
+                    <field name="reference_type"/>
+                    <field name="description"/>
+                    <field name="effective_time"/>
+                    <field name="customer_ids"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_crm_mutual_customer" model="ir.actions.act_window">
+            <field name="name">公海规则</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">crm.mutual.customer</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click add mutual customer.
+                </p>
+                <p>
+                    No source Found!
+                </p>
+            </field>
+        </record>
+
+
+        <!--Receipt*-->
+        <menuitem action="action_crm_mutual_customer"
+                  id="menu_crm_mutual_customer"
+                  parent="sales_team.menu_sales"
+                  groups=""
+                  sequence="2" name="公海"/>
+
+
+    </data>
+</openerp>

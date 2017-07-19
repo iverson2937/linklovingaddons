@@ -4,6 +4,9 @@ from odoo import fields, models, api, _, SUPERUSER_ID
 from itertools import groupby
 
 from odoo.tools import float_compare, float_is_zero
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, float_compare, float_round
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 
 class SaleOrder(models.Model):
@@ -14,6 +17,12 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
     tax_id = fields.Many2one('account.tax', required=True)
     product_count = fields.Float(compute='get_product_count')
+
+    sale_order_type = fields.Selection([
+        ('procurement_warehousing', u'采购入库'), ('purchase_return', u'采购退货'),
+        ('sell_return', u'销售退货'), ('sell_out', u'销售出库'),
+        ('return_of_materials_to_storeroom', u'退料入库'), ('return_storage', u'领料入库'),
+    ], string=u"订单类型", default='sell_out')
 
     @api.depends('product_count', 'order_line.qty_delivered')
     def _compute_shipping_rate(self):
@@ -229,3 +238,51 @@ class SaleOrderLine(models.Model):
                 line.invoice_status = 'invoiced'
             else:
                 line.invoice_status = 'no'
+
+
+class SaleProcurementOrder(models.Model):
+    _inherit = "procurement.order"
+
+    def _get_stock_move_values(self):
+        ''' Returns a dictionary of values that will be used to create a stock move from a procurement.
+        This function assumes that the given procurement has a rule (action == 'move') set on it.
+
+        :param procurement: browse record
+        :rtype: dictionary
+        '''
+        group_id = False
+        if self.rule_id.group_propagation_option == 'propagate':
+            group_id = self.group_id.id
+        elif self.rule_id.group_propagation_option == 'fixed':
+            group_id = self.rule_id.group_id.id
+        date_expected = (datetime.strptime(self.date_planned, DEFAULT_SERVER_DATETIME_FORMAT) - relativedelta(
+            days=self.rule_id.delay or 0)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+        # it is possible that we've already got some move done, so check for the done qty and create
+        # a new move with the correct qty
+        qty_done = sum(self.move_ids.filtered(lambda move: move.state == 'done').mapped('product_uom_qty'))
+        qty_left = max(self.product_qty - qty_done, 0)
+        return {
+            'name': self.name,
+            'company_id': self.rule_id.company_id.id or self.rule_id.location_src_id.company_id.id or self.rule_id.location_id.company_id.id or self.company_id.id,
+            'product_id': self.product_id.id,
+            'product_uom': self.product_uom.id,
+            'product_uom_qty': qty_left,
+            'partner_id': self.rule_id.partner_address_id.id or (
+                self.group_id and self.group_id.partner_id.id) or False,
+            'location_id': self.rule_id.location_src_id.id,
+            'location_dest_id': self.location_id.id,
+            'move_dest_id': self.move_dest_id and self.move_dest_id.id or False,
+            'procurement_id': self.id,
+            'rule_id': self.rule_id.id,
+            'procure_method': self.rule_id.procure_method,
+            'origin': self.origin,
+            'picking_type_id': self.rule_id.picking_type_id.id,
+            'group_id': group_id,
+            'route_ids': [(4, route.id) for route in self.route_ids],
+            'warehouse_id': self.rule_id.propagate_warehouse_id.id or self.rule_id.warehouse_id.id,
+            'date': date_expected,
+            'date_expected': date_expected,
+            'propagate': self.rule_id.propagate,
+            'priority': self.priority,
+            'move_order_type': self.sale_line_id.order_id.sale_order_type,
+        }

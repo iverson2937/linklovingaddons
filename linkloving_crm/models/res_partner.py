@@ -79,6 +79,7 @@ class ResPartner(models.Model):
 
     @api.multi
     def write(self, vals):
+        if len(self) > 1: return super(ResPartner, self).write(vals)
         if not (self['company_type'] == 'company' and vals.get('company_type') == 'person'):
             if self['is_company'] or vals.get('is_company'):
                 for item_type in ['name', 'email']:
@@ -112,6 +113,7 @@ class ResPartner(models.Model):
             record.detailed_address = asd.replace("False", "")
 
     remark_count = fields.Integer(u"备注", compute='_compute_remark_count')
+    mutual_rule_id = fields.Many2one('crm.mutual.customer')
 
     @api.multi
     def _compute_remark_count(self):

@@ -9,8 +9,8 @@
             <field name="inherit_id" ref="stock.view_move_tree"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='date_expected']" position="after">
-                    <field name="create_uid"/>
-                    <field name="reason"/>
+                    <field name="create_uid" invisible="1"/>
+                    <field name="reason" invisible="1"/>
 
                 </xpath>
             </field>
