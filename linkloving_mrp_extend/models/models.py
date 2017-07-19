@@ -207,6 +207,11 @@ class StockMoveExtend(models.Model):
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 
+    mrp_order_type = fields.Selection(
+        [('procurement_warehousing', u'采购入库'), ('purchase_return', u'采购退货'), ('sell_return', u'销售退货'),
+         ('sell_out', u'销售出库'), ('manufacturing_orders', u'制造入库'), ('manufacturing_picking', u'制造领料'),
+         ('null', u' '),('inventory_in', u'盘点入库'), ('inventory_out', u'盘点出库') ], string=u"订单类型", default='manufacturing_orders')
+
     @api.multi
     def action_view_qc_report(self):
         ids = []
@@ -688,6 +693,7 @@ class MrpProductionExtend(models.Model):
             'propagate': self.propagate,
             'unit_factor': quantity / original_quantity,
             'suggest_qty': line_data['suggest_qty'],
+            'move_order_type': 'manufacturing_picking' if self.move_finished_ids else 'null',
         }
         return self.env['stock.move'].create(data)
 
@@ -802,6 +808,27 @@ class MrpProductionExtend(models.Model):
             return_m.no_confirm_return()
             # return_m.do_retrurn()
         return res
+
+    def _generate_finished_moves(self):
+        move = self.env['stock.move'].create({
+            'name': self.name,
+            'date': self.date_planned_start,
+            'date_expected': self.date_planned_start,
+            'product_id': self.product_id.id,
+            'product_uom': self.product_uom_id.id,
+            'product_uom_qty': self.product_qty,
+            'location_id': self.product_id.property_stock_production.id,
+            'location_dest_id': self.location_dest_id.id,
+            'move_dest_id': self.procurement_ids and self.procurement_ids[0].move_dest_id.id or False,
+            'procurement_id': self.procurement_ids and self.procurement_ids[0].id or False,
+            'company_id': self.company_id.id,
+            'production_id': self.id,
+            'origin': self.name,
+            'group_id': self.procurement_group_id.id,
+            'move_order_type': 'null' if self.move_finished_ids else 'manufacturing_orders',
+        })
+        move.action_confirm()
+        return move
 
 
 class ChangeProductionQty(models.TransientModel):

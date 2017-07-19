@@ -21,7 +21,8 @@ class PurchaseOrder(models.Model):
     all_order_type = fields.Selection(
         [('procurement_warehousing', u'采购入库'), ('purchase_return', u'采购退货'),
         ('sell_return', u'销售退货'), ('sell_out', u'销售出库'),
-        ('return_of_materials_to_storeroom', u'退料入库'), ('return_storage', u'领料入库'), ], string=u'订单类型', default='procurement_warehousing')
+         ('manufacturing_orders', u'制造入库'), ('manufacturing_picking', u'制造领料'), ('null', u' '),
+         ('inventory_in', u'盘点入库'), ('inventory_out', u'盘点出库')], string=u'订单类型', default='procurement_warehousing')
     handle_date = fields.Datetime(string=u'交期')
     product_id = fields.Many2one(related='order_line.product_id')
     product_qty = fields.Float(related='order_line.product_qty')

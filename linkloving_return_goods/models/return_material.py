@@ -306,11 +306,17 @@ class ReturnMaterial(models.Model):
             location_dest_id = self.partner_id.property_stock_supplier.id
         print location_dest_id, ''''ddd'''
 
+        order_type = 'null'
+        if self.so_id:
+            order_type = 'sell_return'
+        if self.purchase_id:
+            order_type = 'purchase_return'
+
         picking_id = self.env['stock.picking'].create({
             'picking_type_id': picking_type.id,
             'partner_id': self.partner_id.id,
             'rma_id': self.id,
-            'pick_order_type': 'purchase_return',
+            'pick_order_type': order_type,
             'location_id': location_id,
             'location_dest_id': location_dest_id,
             'origin': origin,
@@ -323,7 +329,7 @@ class ReturnMaterial(models.Model):
                 'product_uom_qty': line.product_uom_qty,
                 'product_uom': line.product_id.uom_id.id,
                 'rma_line_id': line.id,
-                'move_order_type': 'purchase_return',
+                'move_order_type': order_type,
                 'picking_id': picking_id.id,
                 'location_id': picking_id.location_id.id,
                 'location_dest_id': picking_id.location_dest_id.id

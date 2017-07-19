@@ -13,7 +13,8 @@ class StockPicking(models.Model):
     pick_order_type = fields.Selection([
         ('procurement_warehousing', u'采购入库'), ('purchase_return', u'采购退货'),
         ('sell_return', u'销售退货'), ('sell_out', u'销售出库'),
-        ('return_of_materials_to_storeroom', u'退料入库'), ('return_storage', u'领料入库'),
+        ('manufacturing_orders', u'制造入库'), ('manufacturing_picking', u'制造领料'), ('null', u' '),
+        ('inventory_in', u'盘点入库'), ('inventory_out', u'盘点出库')
     ], string=u"订单类型")
 
     @api.multi
@@ -217,7 +218,8 @@ class StockMovePicking(models.Model):
     move_order_type = fields.Selection([
         ('procurement_warehousing', u'采购入库'), ('purchase_return', u'采购退货'),
         ('sell_return', u'销售退货'), ('sell_out', u'销售出库'),
-        ('return_of_materials_to_storeroom', u'退料入库'), ('return_storage', u'领料入库'),
+        ('manufacturing_orders', u'制造入库'), ('manufacturing_picking', u'制造领料'), ('null', u' '),
+        ('inventory_in', u'盘点入库'), ('inventory_out', u'盘点出库')
     ], string=u'类型')
 
     reason_stock = fields.Text(string="操作原因")
@@ -248,3 +250,11 @@ class StockMovePicking(models.Model):
             self.write({'stock_type': '入库'})
 
         self.data_type = self.product_uom_qty * sgin
+
+    @api.model
+    def create(self, vals):
+
+        print 1112
+        obj = super(StockMovePicking, self).create(vals)
+        return obj
+

@@ -21,7 +21,8 @@ class SaleOrder(models.Model):
     sale_order_type = fields.Selection([
         ('procurement_warehousing', u'采购入库'), ('purchase_return', u'采购退货'),
         ('sell_return', u'销售退货'), ('sell_out', u'销售出库'),
-        ('return_of_materials_to_storeroom', u'退料入库'), ('return_storage', u'领料入库'),
+        ('manufacturing_orders', u'制造入库'), ('manufacturing_picking', u'制造领料'), ('null', u' '),
+        ('inventory_in', u'盘点入库'), ('inventory_out', u'盘点出库')
     ], string=u"订单类型", default='sell_out')
 
     @api.depends('product_count', 'order_line.qty_delivered')

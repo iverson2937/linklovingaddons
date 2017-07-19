@@ -90,7 +90,7 @@
             <field name="arch" type="xml">
 
                 <!--<xpath expr="//tree" position="attributes">-->
-                    <!--<attribute name="default_order">state desc</attribute>-->
+                <!--<attribute name="default_order">state desc</attribute>-->
                 <!--</xpath>-->
 
                 <xpath expr="//field[@name='product_id']" position="after">
@@ -120,7 +120,7 @@
 
 
                 <xpath expr="//field[@name='name']" position="before">
-                    <field name="stock_types"/>
+                    <field name="stock_types" invisible="1"/>
                     <field name="move_order_type"/>
                     <field name="state"/>
                 </xpath>
