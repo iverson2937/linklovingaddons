@@ -37,6 +37,30 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 }
             })
             console.log(self.changes_back);
+            if(self.changes_back.length==0){
+                var message = ("您没有做任何操作");
+                var def = $.Deferred();
+                var options = {
+                    title: _t("Warning"),
+                    //确认删除的操作
+                    confirm_callback: function () {
+                        self.$el.removeClass('oe_form_dirty');
+                        this.on('closed', null, function () { // 'this' is the dialog widget
+                            def.resolve();
+                        });
+                    },
+                    cancel_callback: function () {
+                        console.log('no')
+                        def.reject();
+                    },
+                };
+                var dialog = Dialog.confirm(this, message, options);
+                dialog.$modal.on('hidden.bs.modal', function () {
+                    def.reject();
+                });
+                return def;
+            }
+
 
             if ($(target).hasClass("new_bom_modify_direct")) {
                 var btn_update = true;
