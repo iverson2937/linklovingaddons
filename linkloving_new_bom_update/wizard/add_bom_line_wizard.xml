@@ -9,16 +9,30 @@
             <field name="arch" type="xml">
                 <form string="">
                     <group>
-                        <field name="product_id" domain="[('type','=','product')]" placeholder="选择产品"/>
-                        <field name="to_add"/>
-                        <field name="name" string="新产品名称"/>
-                        <field name="qty" string="数量"/>
-                        <field name="product_specs" string="规格"/>
+
+                        <group>
+                            <field name="product_id" domain="[('type','=','product')]" placeholder="选择产品"/>
+                            <field name="to_add"/>
+
+                        </group>
+                        <group>
+                            <field name="qty" string="数量" required="1"/>
+                            <field name="process_id"
+                                   attrs="{'invisible':[('product_type','not in',['semi-finished','finished'])]}"
+                                   string="工序"/>
+                            <field name="product_type" invisible="1"/>
+                        </group>
+
+                        <field name="name" string="新产品名称" attrs="{'invisible':[('to_add','!=',True)]}"/>
+                        <field name="product_specs" string="规格" attrs="{'invisible':[('to_add','!=',True)]}"/>
+
+
                     </group>
                     <footer>
                         <button string="添加" name="action_add" type="object" default_focus="1"
-                                class="btn-primary save_add_action"/>
+                                class="btn-primary save_add_action" invisible="context.get('edit', False)"/>
                         <button string="修改" name="action_edit" type="object" default_focus="1"
+                                invisible="context.get('add', False)"
                                 class="btn-primary save_add_action"/>
                         <button string="取消" class="btn-default" special="cancel"/>
                     </footer>

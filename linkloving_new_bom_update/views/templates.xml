@@ -12,7 +12,20 @@
                 </div>
             </field>
         </record>
+        <record id='new_bom_update_wizard_form' model='ir.ui.view'>
+            <field name='name'>bom.update.wizard.form</field>
+            <field name='model'>bom.update.wizard</field>
+            <field name="inherit_id" ref="linkloving_bom_update.bom_update_wizard_form"/>
+            <field name='type'>form</field>
+            <field name='arch' type='xml'>
+                <xpath expr="//button[@name='bom_line_update']" position="attributes">
+                    <attributes name="name">new_bom_line_update</attributes>
+                </xpath>
+            </field>
+        </record>
 
 
     </data>
 </odoo>
+
+

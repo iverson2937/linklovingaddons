@@ -28,13 +28,13 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             var self = this;
             $.ajax({
                 type: "GET",
-                url: "http://localhost:2323",
+                url: "http://localhost:8088",
                 // dataType: 'json/html',
                 success: function (data) {
-                    if (data == '1') {
+                    if (data.result == '1') {
                         $.ajax({
                             type: "GET",
-                            url: "http://localhost:2323/savefile?id="+this.product_id+"&remote=/p/file",
+                            url: "http://localhost:8088/uploadfile?id=" + this.product_id + "&remote=/p/file",
                             success: function (data) {
                                 console.log(data);
                             },

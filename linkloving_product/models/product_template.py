@@ -12,6 +12,7 @@ class ProductTemplate11(models.Model):
                                  string=u'客户')
     is_updated = fields.Boolean()
 
+
     @api.multi
     def write(self, vals):
         if 'default_code' in vals and vals['default_code'] != self.default_code:

@@ -1,7 +1,10 @@
 /**
+ * Created by Administrator on 2017/7/18.
+ */
+/**
  * Created by 123 on 2017/6/26.
  */
-odoo.define('linkloving_approval.approval_core', function (require){
+odoo.define('linkloving_approval.approval_bom', function (require) {
     "use strict";
 
     var core = require('web.core');
@@ -14,26 +17,32 @@ odoo.define('linkloving_approval.approval_core', function (require){
     var _t = core._t;
 
     var Approval = Widget.extend({
-        template:'approval_load_page',
-        events:{
+        template: 'bom_approve_page',
+        events: {
             'show.bs.tab .tab_toggle_a': 'approval_change_tabs',
             'click .document_manage_btn': 'document_form_pop',
             'change .document_modify': 'document_modify_fn',
-            'click .approval_product_name':'product_pop',
-            'click .review_cancel':'cancel_approval',
-            'click .document_download': 'document_download_fn',
-            'click .download_file':'document_download_fn'
+            'click .approval_product_name': 'product_pop',
+            'click .review_cancel': 'cancel_approval',
+            'click .bom_view': 'bom_view_fn',
+            'click .download_file': 'document_download_fn'
         },
-        //下载
-        document_download_fn:function () {
+        //查看BOM
+        bom_view_fn: function () {
             var e = e || window.event;
             var target = e.target || e.srcElement;
-            var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
-            // console.log(new_file_id)
-            window.location.href = '/download_file/?download=true&id=' + new_file_id;
+            var bom_id = $(target).parents(".tab_pane_display").data("id");
+            var action = {
+                name: "BOM",
+                type: 'ir.actions.client',
+                'tag': 'new_bom_update',
+                'bom_id': parseInt(bom_id),
+                target: "new",
+            };
+            this.do_action(action);
         },
         //取消审核
-        cancel_approval:function (e) {
+        cancel_approval: function (e) {
             var tar = this;
             var e = e || window.event;
             var target = e.target || e.srcElement;
@@ -57,72 +66,50 @@ odoo.define('linkloving_approval.approval_core', function (require){
                     if (data.params.method == 'action_cancel_review') {
                         var file_type = self.$("#approval_tab").attr("data-now-tab");
                         var product_id = parseInt($("body").attr("data-product-id"));
-                        return new Model("product.template")
-                            .call("get_attachemnt_info_list", [product_id], {type: file_type})
-                            .then(function (result) {
-                                console.log(result);
-                                self.$("#" + file_type).html("");
-                                return tar.get_datas(tar,'product.attachment.info',file_type);
-                            })
+                        // return new Model("product.template")
+                        //     .call("get_attachemnt_info_list", [product_id], {type: file_type})
+                        //     .then(function (result) {
+                        //         console.log(result);
+                        //         self.$("#" + file_type).html("");
+                        //         return tar.get_datas(tar, 'mrp.bom', file_type);
+                        //     })
                     }
                 }
             })
         },
         //点击产品名弹出框
-        product_pop:function (e) {
+        product_pop: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var product_id = parseInt($(target).attr('product-id'));
             var action = {
-                name:"产品详细",
+                name: "产品详细",
                 type: 'ir.actions.act_window',
-                res_model:'product.template',
+                res_model: 'product.template',
                 view_type: 'form',
                 view_mode: 'tree,form',
                 views: [[false, 'form']],
                 res_id: product_id,
-                target:"new"
+                target: "new"
             };
             this.do_action(action);
         },
-        //文件修改
-        document_modify_fn: function (e) {
-            var e = e || window.event;
-            var target = e.target || e.srcElement;
-            console.log($(target).parents(".tab_pane_display").children(".tab_message_display"));
-            $(target).parents(".tab_pane_display").children(".tab_message_display").prepend("<div class='document_modify_name'>新修改的文件：<span>" + target.files[0].name + "</span></div>");
-            $(".document_modify span").val(target.files[0].name);
-            var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
-            console.log(new_file_id);
-            console.log(target.files[0]);
-            var new_file = target.files[0];
 
-            var reader = new FileReader();
-            reader.readAsDataURL(new_file);
-            reader.onload = function () {
-                var encoded_file = reader.result;
-                var result = btoa(encoded_file);
-                return new Model("product.attachment.info")
-                    .call("update_attachment", [parseInt(new_file_id)], {file_binary: result, file_name: new_file.name})
-                    .then(function (result) {
-                    })
-            };
-        },
         //审核操作
         document_form_pop: function (e) {
             var tar = this;
             var e = e || window.event;
             var target = e.target || e.srcElement;
-            var file_id = $(target).attr("data-id");
+            var bom_id = $(target).parents(".tab_pane_display").data("id");
             var is_show_action_deny = $(target).attr("data-suibian");
             var action = {
                 name: "详细",
                 type: 'ir.actions.act_window',
-                res_model: 'review.process.wizard',
+                res_model: 'review.bom.wizard',
                 view_type: 'form',
                 view_mode: 'tree,form',
                 views: [[false, 'form']],
-                context: {'default_product_attachment_info_id': file_id, 'is_show_action_deny': is_show_action_deny},
+                context: {'default_bom_id': parseInt(bom_id)},
                 target: "new",
             };
             this.do_action(action);
@@ -136,13 +123,13 @@ odoo.define('linkloving_approval.approval_core', function (require){
                         var approval_type = self.$("#approval_tab").attr("data-now-tab");
                         self.$("#" + approval_type).html("");
                         console.log(approval_type);
-                        return tar.get_datas(tar,'product.attachment.info',approval_type);
+                        return tar.get_datas(tar, 'mrp.bom', approval_type);
                     }
                 }
             })
         },
         //切换选项卡时重新渲染
-        approval_change_tabs:function (e) {
+        approval_change_tabs: function (e) {
             var self = this;
             var e = e || window.event;
             var target = e.target || e.srcElement;
@@ -151,7 +138,7 @@ odoo.define('linkloving_approval.approval_core', function (require){
             self.$("#approval_tab").attr("data-now-tab", approval_type);
 
             var model = new Model("approval.center");
-            return self.get_datas(this,'product.attachment.info',approval_type);
+            return self.get_datas(this, 'mrp.bom', approval_type);
         },
 
         init: function (parent, action) {
@@ -169,8 +156,8 @@ odoo.define('linkloving_approval.approval_core', function (require){
             //分页
             this.pager = null;
         },
-        render_pager:function() {
-            if(this.flag==1){
+        render_pager: function () {
+            if (this.flag == 1) {
                 var $node = $('<div/>').addClass('approval_pagination').appendTo($("#approval_tab"));
                 if (!this.pager) {
                     this.pager = new Pager(this, this.length, this.begin, this.limit);
@@ -183,43 +170,45 @@ odoo.define('linkloving_approval.approval_core', function (require){
                         this._limit = new_state.limit;
                         this.current_min = new_state.current_min;
                         self.reload_content(this).then(function () {
-                           // if (!limit_changed) {
-                            self.$el.animate({"scrollTop": "0px"},100);
+                            // if (!limit_changed) {
+                            self.$el.animate({"scrollTop": "0px"}, 100);
                             // $(".approval_page_container").offset({ top: 50})
-                                // this.set_scrollTop(0);
-                                // this.trigger_up('scrollTo', {offset: 0});
+                            // this.set_scrollTop(0);
+                            // this.trigger_up('scrollTo', {offset: 0});
                             // }
                         });
                     });
                 }
-                this.flag=2;
+                this.flag = 2
             }
         },
-        reload_content : function (own) {
+        reload_content: function (own) {
             var reloaded = $.Deferred();
             // console.log(this.approval_type)
             var approval_type = own.approval_type[0][0];
-            own.begin = own.begin + own.limit;
-            own.get_datas(own,'product.attachment.info', approval_type);
+            own.get_datas(own, 'mrp.bom', approval_type);
             reloaded.resolve();
-            return  reloaded.promise();
+            return reloaded.promise();
         },
-        set_scrollTop:function(scrollTop) {
+        set_scrollTop: function (scrollTop) {
             this.scrollTop = scrollTop;
         },
-        get_datas : function (own, res_model,approval_type) {
+        get_datas: function (own, res_model, approval_type) {
             var model = new Model("approval.center");
             model.call("create", [{res_model: res_model, type: approval_type}])
-            .then(function (result) {
-                model.call('get_attachment_info_by_type', [result], {offset: own.begin, limit: own.limit})
-                    .then(function (result) {
-                        console.log(result);
-                        own.length = result.length;
-                        self.$("#"+approval_type).html("");
-                        self.$("#"+approval_type).append(QWeb.render('approval_tab_content', {result:result,approval_type:approval_type}));
-                        own.render_pager(this);
-                    })
-            })
+                .then(function (result) {
+                    model.call('get_bom_info_by_type', [result], {offset: own.begin, limit: own.limit})
+                        .then(function (result) {
+                            console.log(result);
+                            own.length = result.length;
+                            self.$("#" + approval_type).html("");
+                            self.$("#" + approval_type).append(QWeb.render('bom_approval_tab_content', {
+                                result: result,
+                                approval_type: approval_type
+                            }));
+                            own.render_pager(this);
+                        })
+                })
         },
 
 
@@ -227,19 +216,18 @@ odoo.define('linkloving_approval.approval_core', function (require){
             var self = this;
 
             var model = new Model("approval.center");
-            //var info_model = new Model("product.attachment.info")
             model.call("fields_get", ["", ['type']]).then(function (result) {
                 console.log(result);
                 self.approval_type = result.type.selection;
                 // console.log(self);
-                self.$el.append(QWeb.render('approval_load_detail', {result:result.type.selection}));
+                self.$el.append(QWeb.render('approval_load_detail', {result: result.type.selection}));
             });
-            return self.get_datas(this,'product.attachment.info', 'waiting_submit');
+            return self.get_datas(this, 'mrp.bom', 'waiting_submit');
 
         }
     });
 
-    core.action_registry.add('approval_core', Approval);
+    core.action_registry.add('approval_bom', Approval);
 
     return Approval;
 

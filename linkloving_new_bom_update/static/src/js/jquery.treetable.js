@@ -1,10 +1,10 @@
 /*
-* jQuery treeTable Plugin 3.0.0
-* http://ludo.cubicphuse.nl/jquery-treetable
-*
-* Copyright 2013, Ludo van den Boom
-* Dual licensed under the MIT or GPL Version 2 licenses.
-*/
+ * jQuery treeTable Plugin 3.0.0
+ * http://ludo.cubicphuse.nl/jquery-treetable
+ *
+ * Copyright 2013, Ludo van den Boom
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ */
 (function () {
     var $, Node, Tree, methods;
 
@@ -503,26 +503,29 @@ jQuery.TreeTable = function (tree_id, heads, tNodes) {
         var body_html = "<tbody>";
         for (var i = 0, l = newNodes.length; i < l; i++) {
             var node = newNodes[i];
+            // console.log(node);
             var new_bg;
             //添加的  给新添加的数据背景色
-            if(node.add == 1){
+            if (node.add == 1 || node.add==2 || node.is_highlight) {
                 new_bg = "add_class_name_test";
-            }else if(node.add == 2){
-                new_bg = "edit_class_name_test";
-            }
-            else {
+            }else {
                 new_bg = "";
             }
-            body_html += "<tr data-product-id='" + node.productid + "' class='" + new_bg + "' data-tt-id='" + node.id + "' " + (node.pId ? "data-tt-parent-id='" + node.pId + "'" : "") + "><td class = 'td_left'><span data-pt-id='" + node.ptid + "' class='" + (node.isParent ? "parent" : "children") + " product_name'>" + node.name + "</span></td>";
-            for (var j = 0; j < column_count - 1; j++) {
-                body_html += "<td>" + (node.td[j] ? node.td[j] : "") + "</td>";
+
+            if (node.modify_type && node.modify_type == 'delete') {
+
+            } else {
+                body_html += "<tr data-product-type='"+ node.product_type +"' data-process-id='"+ node.process_id +"' data-product-id='" + node.productid + "'data-to-add='" + node.to_add + "'data-product-specs='" + node.product_specs + "'data-qty='" + node.qty + "' class='" + new_bg + "' data-tt-id='" + node.id + "' " + (node.pId ? "data-tt-parent-id='" + node.pId + "'" : "") + "><td class = 'td_left'><span data-pt-id='" + node.ptid + "' class='" + (node.isParent ? "parent" : "children") + " product_name'>" + node.name + "</span></td>";
+                for (var j = 0; j < column_count - 1; j++) {
+                    body_html += "<td>" + (node.td[j] ? node.td[j] : "") + "</td>";
+                }
+                body_html += "</tr>";
             }
-            body_html += "</tr>";
         }
         body_html += "</tbody>";
         $("#" + tree_id).html(head_html + body_html);
 
-        $("#" + tree_id).treetable({ expandable: true });
+        $("#" + tree_id).treetable({expandable: true});
         // Highlight selected row
         $("#" + tree_id + " tbody tr").mousedown(function () {
             $("tr.selected").removeClass("selected");

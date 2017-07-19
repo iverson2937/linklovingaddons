@@ -1,0 +1,25 @@
+<openerp>
+    <data>
+        <!--<template id="approval" name="linkloving_approval" inherit_id="web.assets_backend">-->
+        <!--<xpath expr="." position="inside">-->
+        <!--<script type="text/javascript" src="/linkloving_approval/static/src/js/approval.js"/>-->
+        <!--<link rel="stylesheet" href="/linkloving_approval/static/src/css/approval.css"/>-->
+        <!--</xpath>-->
+        <!--</template>-->
+
+        <record model="ir.actions.client" id="action_bom_approve">
+            <field name="name">BOM审核</field>
+            <field name="tag">approval_bom</field>
+        </record>
+
+        <!--&lt;!&ndash; This Menu Item will appear in the Upper bar, That's why It needs NO parent or action &ndash;&gt;-->
+        <!--<menuitem id="ll_approval_root" name="工程审批" sequence="9"/>-->
+
+        <!-- This Menu Item Must have a parent -->
+        <menuitem id="approval_bom" name="BOM审核" parent="ll_approval_root" sequence="0"/>
+
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="my_bom" name="我的审核" parent="approval_bom" action="action_bom_approve"
+                  sequence="0"/>
+    </data>
+</openerp>

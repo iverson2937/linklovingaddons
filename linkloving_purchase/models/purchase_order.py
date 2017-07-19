@@ -155,7 +155,6 @@ class PurchaseOrderLine(models.Model):
             elif float_compare(line.qty_received, line.product_qty,
                                precision_digits=precision) == 0 and line.product_id.type in (
                     'consu', 'product'):
-                print 'dddddddddddddddddddddd'
                 line.shipping_status = 'done'
 
             else:

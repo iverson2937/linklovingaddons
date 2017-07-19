@@ -36,13 +36,15 @@
                     <!--<button name="stock_ready" string="备货完成"-->
                     <!--attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['prepare'])]}"-->
                     <!--groups="stock.group_stock_user" type="object" class="oe_highlight"/>-->
-
-                    <button name="do_new_transfer" string="Confirm Receipts"
+                    <button name="action_view_qc_result" string="查看品检结果"
                             attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
                             groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
-                    <button name="reject" string="Reject"
-                            attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
-                            groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
+                    <!--<button name="do_new_transfer" string="Confirm Receipts"-->
+                    <!--attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"-->
+                    <!--groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>-->
+                    <!--&lt;!&ndash;<button name="reject" string="Reject"&ndash;&gt;-->
+                    <!--attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"-->
+                    <!--groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>-->
                 </xpath>
                 <xpath expr="//button[@name='do_new_transfer']" position="after">
                     <button name="action_check_pass" states="qc_check" string="Quality Check Pass"
@@ -61,7 +63,6 @@
                 <xpath expr="//field[@name='origin']" position="after">
                     <field name="pick_order_type" string="订单类型"/>
                 </xpath>
-
                 <!--<xpath expr="//notebook/page[1]" position="after">-->
                 <!--<page string="采购单信息">-->
                 <!--<field name="purchase_order_line"/>-->
@@ -318,6 +319,26 @@
                 <xpath expr="//field[@name='partner_shipping_id']" position="after">
                     <!-- Add your fields or attributes here -->
                     <field name="delivery_rule"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!-- Inherit Form View to Modify it -->
+        <record id="view_immediate_transfer_inherit" model="ir.ui.view">
+            <field name="name">stock.immediate.transfer.inherit</field>
+            <field name="model">stock.immediate.transfer</field>
+            <field name="inherit_id" ref="stock.view_immediate_transfer"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//group/p" position="replace">
+                    <p>
+                        未填写收货数量
+                    </p>
+                    <!-- Add your fields or attributes here -->
+                </xpath>
+                <xpath expr="//footer/button[@name='process']" position="attributes">
+                    <attribute name="string">批量收货</attribute>
                 </xpath>
 
             </field>
