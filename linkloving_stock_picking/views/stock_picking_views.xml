@@ -60,6 +60,9 @@
                     <field name="tracking_number" string="Tracking Number"/>
                 </xpath>
 
+                <xpath expr="//field[@name='origin']" position="after">
+                    <field name="pick_order_type" string="订单类型"/>
+                </xpath>
                 <!--<xpath expr="//notebook/page[1]" position="after">-->
                 <!--<page string="采购单信息">-->
                 <!--<field name="purchase_order_line"/>-->
@@ -80,11 +83,16 @@
         </record>
 
 
-        <record id="view_move_trees" model="ir.ui.view">
-            <field name="name">stock.move.tree</field>
+        <record id="view_move_trees_stock" model="ir.ui.view">
+            <field name="name">stock.move.tree.stock</field>
             <field name="model">stock.move</field>
             <field name="inherit_id" ref="stock.view_move_tree"/>
             <field name="arch" type="xml">
+
+                <!--<xpath expr="//tree" position="attributes">-->
+                <!--<attribute name="default_order">state desc</attribute>-->
+                <!--</xpath>-->
+
                 <xpath expr="//field[@name='product_id']" position="after">
                     <field name="data_type" string="数量"/>
                 </xpath>
@@ -92,6 +100,123 @@
                 <xpath expr="//field[@name='product_uom_qty']" position="attributes">
                     <attribute name="invisible">True</attribute>
                 </xpath>
+
+
+                <xpath expr="//field[@name='state']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='product_id']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='location_id']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='location_dest_id']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+
+
+                <xpath expr="//field[@name='name']" position="before">
+                    <field name="stock_types" invisible="1"/>
+                    <field name="move_order_type"/>
+                    <field name="state"/>
+                </xpath>
+
+                <xpath expr="//field[@name='date']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='product_uom']" position="after">
+                    <field name="create_uid"/>
+                </xpath>
+
+
+                <xpath expr="//field[@name='date_expected']" position="after">
+                    <field name="write_uid" string="操作人"/>
+                    <field name="write_date" string="操作日期"/>
+                </xpath>
+
+
+            </field>
+        </record>
+
+
+        <record id="stock_view_move_search" model="ir.ui.view">
+            <field name="name">stock.move.search.stock</field>
+            <field name="model">stock.move</field>
+            <field name="inherit_id" ref="stock.view_move_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='groupby_date']" position="after">
+                    <filter string="出/入库" name="stock_type" context="{'group_by' : 'stock_type'}" domain="[]"/>
+                </xpath>
+
+            </field>
+        </record>
+
+
+        <record id="delivery.view_move_withweight_form" model="ir.ui.view">
+            <field name="name">stock.move.form.weight</field>
+            <field name="model">stock.move</field>
+            <field name="inherit_id" ref="stock.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='main_grp']" position="inside">
+                    <group>
+                        <label for="weight"/>
+                        <div>
+                            <field name="weight" nolabel="1" class="oe_inline"/>
+                            <field name="weight_uom_id" nolabel="1" class="oe_inline"/>
+                        </div>
+
+                        <field name="picking_type_id"/>
+                        <field name="priority"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+
+        <record id="stock_move_linkloving_stock" model="ir.ui.view">
+            <field name="name">stock.move.form.stock</field>
+            <field name="model">stock.move</field>
+            <field name="inherit_id" ref="stock.view_move_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='picking_type_id']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='create_date']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='move_dest_id']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='priority']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+
+
+                <xpath expr="//field[@name='date']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='date']" position="after">
+                    <field name="date" string="操作日期"/>
+                    <field name="reason_stock"/>
+                </xpath>
+
+
+                <xpath expr="//field[@name='date']" position="before">
+                    <field name="create_uid"/>
+                    <field name="date_expected"/>
+                    <field name="write_uid" string="操作人"/>
+                </xpath>
+
             </field>
         </record>
 
@@ -105,6 +230,9 @@
                     <field name="create_uid"/>
                 </xpath>
 
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="pick_order_type" string="订单类型"/>
+                </xpath>
             </field>
         </record>
         <record id="action_stock_picking_confirm" model="ir.actions.act_window">
@@ -134,6 +262,16 @@
                 </xpath>
                 <xpath expr="//field[@name='partner_id']" position="after">
                     <field name="origin"/>
+                </xpath>
+
+                <xpath expr="//filter[@name='done']" position="after">
+                    <separator/>
+                    <filter string="采购入库" name="procurement_warehousing"
+                            domain="[('pick_order_type', '=', 'procurement_warehousing')]"/>
+                    <filter string="退料入库" name="return_of_materials_to_storeroom"
+                            domain="[('pick_order_type', '=', 'return_of_materials_to_storeroom')]"/>
+                    <filter string="退货入库" name="return_storage"
+                            domain="[('pick_order_type', '=', 'return_storage')]"/>
                 </xpath>
 
             </field>
