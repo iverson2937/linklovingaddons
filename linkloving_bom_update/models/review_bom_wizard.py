@@ -17,11 +17,13 @@ class ReviewBOMWizard(models.TransientModel):
     # 送审
     def send_to_review(self):
         to_last_review = self._context.get("to_last_review")  # 是否送往终审
+        review_type = self._context.get("review_type")
         if not self.bom_id.review_id:  # 如果没审核过
             self.bom_id.action_send_to_review()
 
         self.bom_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
         self.bom_id.review_id.process_line_review_now.submit_to_next_reviewer(
+            review_type=review_type,
             to_last_review=to_last_review,
             partner_id=self.partner_id,
             remark=self.remark)

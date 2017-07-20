@@ -49,6 +49,7 @@ class MrpBom(models.Model):
             # 'is_first_review': self.is_first_review,
             'is_show_action_deny': self.is_show_action_deny,
             'create_uid_name': self.create_uid.name,
+            'create_date': self.create_date
         }
 
     review_id = fields.Many2one("review.process",

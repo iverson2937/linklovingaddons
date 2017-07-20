@@ -64,7 +64,10 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 var btn_update = false;
             }
             var top_bom_id = $("#treeMenu").data("bom-id");
-            if (btn_update = false) {
+            alert(btn_update);
+
+
+            if (!btn_update) {
                 var action = {
                     name: "BOM",
                     type: 'ir.actions.act_window',
