@@ -168,6 +168,7 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
                     this.pager.on('pager_changed', this, function (new_state) {
                         var self = this;
                         var limit_changed = (this._limit !== new_state.limit);
+                        console.log(new_state);
 
                         this._limit = new_state.limit;
                         this.current_min = new_state.current_min;
@@ -186,6 +187,7 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
         },
         reload_content: function (own) {
             var reloaded = $.Deferred();
+            own.begin = own.current_min;
             // console.log(this.approval_type)
             var approval_type = own.approval_type[0][0];
             own.get_datas(own, 'mrp.bom', approval_type);
