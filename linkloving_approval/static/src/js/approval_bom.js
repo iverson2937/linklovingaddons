@@ -25,8 +25,9 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
             'click .approval_product_name': 'product_pop',
             'click .review_cancel': 'cancel_approval',
             'click .bom_view': 'bom_view_fn',
-            'click .download_file': 'document_download_fn'
+            'click .download_file': 'document_download_fn',
         },
+
         //查看BOM
         bom_view_fn: function () {
             var e = e || window.event;
@@ -46,7 +47,7 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
             var tar = this;
             var e = e || window.event;
             var target = e.target || e.srcElement;
-            var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
+            var new_file_id = $(target).parents(".tab_pane_display").data("id");
             var action = {
                 name: "填写取消审核原因",
                 type: 'ir.actions.act_window',
@@ -54,7 +55,7 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
                 view_type: 'form',
                 view_mode: 'tree,form',
                 views: [[false, 'form']],
-                context: {'default_product_attachment_info_id': parseInt(new_file_id)},
+                context: {'default_bom_id': parseInt(new_file_id), 'review_type': 'bom_review'},
                 target: "new",
             };
             this.do_action(action);
@@ -65,14 +66,8 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
                 if (data.params.model == 'review.process.cancel.wizard') {
                     if (data.params.method == 'action_cancel_review') {
                         var file_type = self.$("#approval_tab").attr("data-now-tab");
-                        var product_id = parseInt($("body").attr("data-product-id"));
-                        // return new Model("product.template")
-                        //     .call("get_attachemnt_info_list", [product_id], {type: file_type})
-                        //     .then(function (result) {
-                        //         console.log(result);
-                        //         self.$("#" + file_type).html("");
-                        //         return tar.get_datas(tar, 'mrp.bom', file_type);
-                        //     })
+
+                        return tar.get_datas(tar, 'mrp.bom', file_type);
                     }
                 }
             })
@@ -102,17 +97,24 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
             var target = e.target || e.srcElement;
             var bom_id = $(target).parents(".tab_pane_display").data("id");
             var is_show_action_deny = $(target).data("action-deny");
+            if (!is_show_action_deny) {
+                is_show_action_deny = 'false'
+            }
+            ;
             var action = {
                 name: "详细",
                 type: 'ir.actions.act_window',
-                res_model: 'review.bom.wizard',
+                res_model: 'review.process.wizard',
                 view_type: 'form',
                 view_mode: 'tree,form',
                 views: [[false, 'form']],
-                context: {'default_bom_id': parseInt(bom_id), 'is_show_action_deny': is_show_action_deny},
+                context: {
+                    'default_bom_id': parseInt(bom_id),
+                    'is_show_action_deny': is_show_action_deny,
+                    'review_type': 'bom_review'
+                },
                 'target': "new",
             };
-            console.log(action)
             this.do_action(action);
             self.$(document).ajaxComplete(function (event, xhr, settings) {
                 var data = JSON.parse(settings.data)

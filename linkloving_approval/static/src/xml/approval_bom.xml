@@ -47,13 +47,14 @@
                         <div>工序：<span><t t-esc="item_files.process_name"/></span></div>
                     </t>
                     <div>数量：<span><t t-esc="item_files.product_qty"/></span></div>
-                    <div>产品计量单位：<span><t t-esc="item_files.uom_name"/></span></div>
+                    <!--<div>产品计量单位：<span><t t-esc="item_files.uom_name"/></span></div>-->
                     <div>状态：<span><t t-esc="item_files.state[1]"/></span>
                         <t t-if="item_files.is_show_cancel">
                             <button class="btn btn-primary review_cancel">取消审核</button>
                         </t>
                     </div>
-                    <!--<div>创建人：<span><t t-esc="item_files.create_uid_name"/></span></div>-->
+                    <div>创建人：<span><t t-esc="item_files.create_uid_name"/></span></div>
+                    <div>创建日期：<span><t t-esc="item_files.create_date"/></span></div>
 
                 </div>
                 <div class="document_review_list">

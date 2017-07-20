@@ -527,6 +527,7 @@ class ReviewProcessWizard(models.TransientModel):
     cur_partner_id = fields.Many2one('res.partner', default=lambda self: self.env.user.partner_id)
     partner_id = fields.Many2one("res.partner", string=u'提交给...审核', domain=[('employee', '=', True), ])
     product_attachment_info_id = fields.Many2one("product.attachment.info")
+    bom_id = fields.Many2one('mrp.bom')
     review_process_line = fields.Many2one("review.process.line",
                                           related="product_attachment_info_id.review_id.process_line_review_now")
     remark = fields.Text(u"备注", required=True)
@@ -536,38 +537,60 @@ class ReviewProcessWizard(models.TransientModel):
     def action_to_next(self):
         to_last_review = self._context.get("to_last_review")  # 是否送往终审
         review_type = self._context.get("review_type")
-        if not self.product_attachment_info_id.review_id:  # 如果没审核过
-            self.product_attachment_info_id.action_send_to_review()
+        if review_type == 'bom_review':
+            if not self.bom_id.review_id:  # 如果没审核过
+                self.bom_id.action_send_to_review()
 
-        self.product_attachment_info_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
-        self.product_attachment_info_id.review_id.process_line_review_now.submit_to_next_reviewer(
+            self.bom_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
+            self.bom_id.review_id.process_line_review_now.submit_to_next_reviewer(
                 review_type=review_type,
-            to_last_review=to_last_review,
-            partner_id=self.partner_id,
-            remark=self.remark)
+                to_last_review=to_last_review,
+                partner_id=self.partner_id,
+                remark=self.remark)
+
+            return True
+        elif review_type == 'file_review':
+            if not self.product_attachment_info_id.review_id:  # 如果没审核过
+                self.product_attachment_info_id.action_send_to_review()
+
+            self.product_attachment_info_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
+            self.product_attachment_info_id.review_id.process_line_review_now.submit_to_next_reviewer(
+                review_type=review_type,
+                to_last_review=to_last_review,
+                partner_id=self.partner_id,
+                remark=self.remark)
 
         return True
 
     # 终审 审核通过
     def action_pass(self):
+        review_type = self._context.get("review_type")
+        if review_type == 'bom_review':
+            self.bom_id.action_released()
+        elif review_type == 'file_review':
+            self.product_attachment_info_id.action_released()
         # 审核通过
         self.review_process_line.action_pass(self.remark)
-        # 改变文件状态
-        self.product_attachment_info_id.action_released()
-
         return True
 
     # 审核不通过
     def action_deny(self):
         self.review_process_line.action_deny(self.remark)
         # 改变文件状态
-        self.product_attachment_info_id.action_deny()
-
+        review_type = self._context.get('review_type')
+        if review_type == 'bom_review':
+            self.bom_id.action_deny()
+        elif review_type == 'file_review':
+            self.product_attachment_info_id.action_deny()
         return True
 
     def action_cancel_review(self):
         self.review_process_line.action_cancel(self.remark)
-        self.product_attachment_info_id.action_cancel()
+        review_type = self._context.get('review_type')
+        if review_type == 'bom_review':
+            self.bom_id.action_cancel()
+        elif review_type == 'file_review':
+            self.product_attachment_info_id.action_cancel()
 
     @api.model
     def create(self, vals):
