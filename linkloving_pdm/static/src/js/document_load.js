@@ -168,7 +168,10 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             // };
             // this.do_action(action);
             $("#document_tab").attr("data-product-id", this.product_id);
-            $(".my_load_file_name").val("");
+
+            document.getElementById("document_form").reset();
+
+
             $(".load_container").show();
             var cur_type = $("#document_tab li.active>a").attr("data");
             console.log(cur_type);
