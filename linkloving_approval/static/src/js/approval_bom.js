@@ -102,7 +102,6 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
             var target = e.target || e.srcElement;
             var bom_id = $(target).parents(".tab_pane_display").data("id");
             var is_show_action_deny = $(target).data("action-deny");
-            alert(is_show_action_deny);
             var action = {
                 name: "详细",
                 type: 'ir.actions.act_window',
