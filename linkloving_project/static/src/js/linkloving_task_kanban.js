@@ -286,7 +286,12 @@ odoo.define('linkloving.task_kanban_view', function (require) {
                     }
                 }
                 else {
+
                     var task_name = task.__name;
+
+                     if(task.top_task_id)
+                         task_name = task.top_task_id[1] + ' - ' + task_name;
+
                     var duration_in_business_hours = false;
                     var task_start = time.auto_str_to_date(task[self.fields_view.arch.attrs.date_start]);
                     if (!task_start)
@@ -382,7 +387,7 @@ odoo.define('linkloving.task_kanban_view', function (require) {
             var top_tasks = [];
             if (self.model == 'project.task') {
                 _.each(tasks, function (task) {
-                    if (task.top_task_id != task.id) {
+                    if (task.top_task_id  && task.top_task_id[0] != task.id) {
                         child_tasks.push(task);
                     } else
                         top_tasks.push(task);
