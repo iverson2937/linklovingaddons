@@ -34,9 +34,13 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                     if (data.result == '1') {
                         $.ajax({
                             type: "GET",
-                            url: "http://localhost:8088/uploadfile?id=" + this.product_id + "&remote=/p/file",
+                            url: "http://localhost:8088/uploadfile?id=" + this.product_id + "&remotefile=/charlie/a/b/test.txt",
                             success: function (data) {
                                 console.log(data);
+                                if (data.result == '1') {
+                                    $(".my_load_file_name").val(data.choose_file_name)
+                                    $(".my_load_file_remote_path").val(data.path)
+                                }
                             },
                             error: function (error) {
                                 console.log(error);

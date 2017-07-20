@@ -113,7 +113,7 @@
                         <input type="hidden" class="file_active_id" name="active_id"/>
                         <input type="hidden" class="file_active_type" name="active_type"/>
                         <input type="text" class="my_load_file_name" name="my_load_file_name"/>
-                        <input type="hidden" class="" name="my_load_file_remote_path" value=""/>
+                        <input type="hidden" class="my_load_file_remote_path" name="my_load_file_remote_path" value=""/>
                         <input type="hidden" class="" name="my_load_file_version" value=""/>
                         <!--<input type="text" class="my_load_file_remote_path" name="my_load_file_remote_path"/>-->
                         <!--<t t-if=""-->
