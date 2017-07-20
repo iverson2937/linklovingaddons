@@ -20,4 +20,7 @@ class SaleOrderCancel(models.TransientModel):
         for record in self.env['res.partner'].browse(active_ids):
             if record.customer and record.is_company:
                 record.user_id = self.user_id.id
+                if record.child_ids:
+                    for child in record.child_ids:
+                        child.user_id = self.user_id.id
         return {'type': 'ir.actions.act_window_close'}

@@ -346,8 +346,11 @@
                             <group>
                                 <field name="subject"/>
                                 <field name="sale_order_type" invisible="1"/>
-                                <field name="attachment_ids"
-                                       attrs="{'invisible': ['|',('sale_order_type','not in',('inspection','question')),('attachment_ids','=',[])]}"/>
+                                <field name="attachment_ids" attrs="{'invisible': [('attachment_ids','=',[])]}">
+                                    <tree create="0">
+                                        <field name="name"/>
+                                    </tree>
+                                </field>
                                 <field name="date" invisible="1"/>
                                 <field name="email_from" invisible="1"/>
                                 <field name="author_id" invisible="1"/>

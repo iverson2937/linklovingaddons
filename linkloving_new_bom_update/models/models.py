@@ -27,15 +27,16 @@ class MrpBom(models.Model):
         res = []
         for line in self.bom_line_ids:
             res.append(self.get_bom_line(line))
+
         result = {
             'uuid': str(uuid.uuid1()),
             'bom_id': self.id,
             'product_id': self.product_tmpl_id.id,
             'product_tmpl_id': self.product_tmpl_id.id,
             'product_specs': self.product_tmpl_id.product_specs,
-            'name': self.product_tmpl_id.name,
+            'name': self.product_tmpl_id.name_get()[0][1],
             'code': self.product_tmpl_id.default_code,
-            'process_id': self.process_id.name,
+            'process_id': [self.process_id.id, self.process_id.name],
             'bom_ids': res,
             'state': self.state,
             'review_line': self.review_id.get_review_line_list(),
@@ -53,12 +54,13 @@ class MrpBom(models.Model):
             if level > 0 and level < 6:
                 level -= 1
         bom_id = line.product_id.product_tmpl_id.bom_ids
-        process_id = False
+        process_id = []
         if bom_id:
-            process_id = bom_id[0].process_id.name
+            process_id = [bom_id[0].process_id.id, bom_id[0].process_id.name]
 
         res = {
-            'name': line.product_id.name,
+            'name': line.product_id.name_get()[0][1],
+            'product_type': line.product_id.product_ll_type,
             'product_id': line.product_id.id,
             'product_tmpl_id': line.product_id.product_tmpl_id.id,
             'is_highlight': line.is_highlight,
@@ -87,18 +89,18 @@ def _get_rec(object, level, parnet, qty=1.0, uom=False):
             if level > 0 and level < 6:
                 level -= 1
         bom_id = l.product_id.product_tmpl_id.bom_ids
-        process_id = False
+        process_id = []
         if bom_id:
-            process_id = bom_id[0].process_id.name
-
+            process_id = [bom_id[0].process_id.id, bom_id[0].process_id.name]
 
         res = {
-            'name': l.product_id.name,
+            'name': l.product_id.name_get()[0][1],
             'product_id': l.product_id.id,
             'product_tmpl_id': l.product_id.product_tmpl_id.id,
             'code': l.product_id.default_code,
             'product_specs': l.product_id.product_specs,
             'is_highlight': l.is_highlight,
+            'product_type': l.product_id.product_ll_type,
             'id': l.id,
             'parent_id': parnet.id,
             'qty': l.product_qty,

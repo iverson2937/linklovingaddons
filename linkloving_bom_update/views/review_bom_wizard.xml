@@ -1,6 +1,6 @@
 <openerp>
     <data>
-        <record id="review_process_wizard_form" model="ir.ui.view">
+        <record id="review_bom_wizard_form" model="ir.ui.view">
             <field name="name">选择审核人</field>
             <field name="model">review.bom.wizard</field>
             <field name="arch" type="xml">
@@ -10,15 +10,20 @@
                             <field name="cur_partner_id" invisible="1"/>
                             <field name="partner_id" require="1"
                                    domain="[('id','!=',cur_partner_id),('employee', '=', True)]" string="审核人" options="{'no_create':True}"/>
-                            <field name="remark" string="备注"/>
+                            <field name="remark" string="备注" require="1"/>
                         </group>
                     </sheet>
                     <footer>
-                        <button name='send_to_review' type='object' string='送审' class='oe_highlight review_reload'/>
+                        <button name='send_to_review' type='object' string='送审' class='oe_highlight review_reload'
+                                context="{'review_type': 'bom_review'}"/>
+                        <button name='send_to_review' type='object' string='送往终审' class='oe_highlight review_reload'
+                                context="{'to_last_review':True, 'review_type': 'bom_review'}"/>
                         <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
-                                groups=""/>
-                        <button name='action_deny' type='object' string='审核不通过' class='oe_highlight review_reload'
-                                groups=""/>
+                                groups="linkloving_pdm.group_final_review_partner"/>
+                        <button name='action_deny' type='object' string='审核不通过'
+                                invisible="context.get('is_show_action_deny') == 'false'"
+                                class='oe_highlight review_reload'
+                        />
 
                         <button string='取消' class='oe_link review_reload' special='cancel'/>
                     </footer>

@@ -41,6 +41,9 @@
                     <field name="count_mo_today"/>
                     <field name="count_mo_tomorrow"/>
                     <field name="count_mo_after_tomorrow"/>
+                    <field name="count_mo_forth_day"/>
+                    <field name="count_mo_fifth_day"/>
+                    <field name="count_mo_sixth_day"/>
                     <field name="count_mo_others"/>
                     <templates>
                         <t t-name="kanban-box">
@@ -128,6 +131,39 @@
                                                 </div>
                                                 <div class="col-xs-3">
                                                     <field name="count_mo_after_tomorrow"/>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-xs-9">
+                                                    <a class="oe_kanban_stock_picking_type_list"
+                                                       name="get_action_mrp_production_forth_day" type="object">
+                                                        第四天
+                                                    </a>
+                                                </div>
+                                                <div class="col-xs-3">
+                                                    <field name="count_mo_forth_day"/>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-xs-9">
+                                                    <a class="oe_kanban_stock_picking_type_list"
+                                                       name="get_action_mrp_production_fifth_day" type="object">
+                                                        第五天
+                                                    </a>
+                                                </div>
+                                                <div class="col-xs-3">
+                                                    <field name="count_mo_fifth_day"/>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-xs-9">
+                                                    <a class="oe_kanban_stock_picking_type_list"
+                                                       name="get_action_mrp_production_sixth_day" type="object">
+                                                        第六天
+                                                    </a>
+                                                </div>
+                                                <div class="col-xs-3">
+                                                    <field name="count_mo_sixth_day"/>
                                                 </div>
                                             </div>
 

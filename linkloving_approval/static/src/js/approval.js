@@ -192,13 +192,15 @@ odoo.define('linkloving_approval.approval_core', function (require){
                         });
                     });
                 }
-                this.flag=2
+                this.flag=2;
             }
         },
         reload_content : function (own) {
             var reloaded = $.Deferred();
             // console.log(this.approval_type)
+            own.begin = own.current_min;
             var approval_type = own.approval_type[0][0];
+            own.begin = own.begin + own.limit;
             own.get_datas(own,'product.attachment.info', approval_type);
             reloaded.resolve();
             return  reloaded.promise();
@@ -215,7 +217,10 @@ odoo.define('linkloving_approval.approval_core', function (require){
                         console.log(result);
                         own.length = result.length;
                         self.$("#"+approval_type).html("");
-                        self.$("#"+approval_type).append(QWeb.render('approval_tab_content', {result:result,approval_type:approval_type}));
+                        self.$("#" + approval_type).append(QWeb.render('approval_tab_content', {
+                            result: result.records,
+                            approval_type: approval_type
+                        }));
                         own.render_pager(this);
                     })
             })

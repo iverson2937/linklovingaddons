@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+    <t t-name="bom_approve_page">
+        <div class="approval_page_container">
+
+        </div>
+    </t>
+    <t t-name="approval_load_detail">
+        <div class="approval_ul_wraper">
+            <ul id="approval_tab" class="nav nav-tabs" data-now-tab="waiting_submit">
+               <t t-set="i" t-value="1"/>
+                <t t-foreach="result" t-as="item">
+                    <li t-att-class="i ==1 ? 'active': ''">
+                        <a t-att-href="'#'+item[0]" data-toggle="tab" class="tab_toggle_a" t-att-data="item[0]">
+                             <t t-esc="item[1]"/>
+                        </a>
+                    </li>
+                    <t t-set="i" t-value="2"/>
+                </t>
+            </ul>
+        </div>
+
+        <div id="myTabContent_Approval" class="tab-content">
+            <t t-set="j" t-value="1"/>
+            <t t-foreach="result" t-as="item">
+                <div t-att-class=" j==1 ? 'tab-pane fade in active':'tab-pane fade'" t-att-id="item[0]">
+
+                </div>
+                <t t-set="j" t-value="2"/>
+            </t>
+        </div>
+    </t>
+
+    <t t-name="bom_approval_tab_content">
+         <script>
+            $(function () { $("[data-toggle='tooltip']").tooltip(); });
+        </script>
+        <t t-foreach="result" t-as="item_files">
+            <div class="tab_pane_display" t-att-data-id="item_files.id">
+                <div class="tab_message_display">
+                    <div class="approval_tab_pane_type"><t t-esc="item_files.type"/></div>
+                    <div>产品名字: <span t-att-product-id="item_files.product_id.id" class="approval_product_name"><t t-esc="item_files.product_id.name"/></span></div>
+                    <div>规格：<span><t t-esc="item_files.product_id.product_specs"/></span></div>
+                    <!--<div>审核人：<span><t t-esc="item_files.review_id"/></span></div>-->
+                    <t t-if="item_files.process_name!=''">
+                        <div>工序：<span><t t-esc="item_files.process_name"/></span></div>
+                    </t>
+                    <div>数量：<span><t t-esc="item_files.product_qty"/></span></div>
+                    <div>产品计量单位：<span><t t-esc="item_files.uom_name"/></span></div>
+                    <div>状态：<span><t t-esc="item_files.state[1]"/></span>
+                        <t t-if="item_files.is_show_cancel">
+                            <button class="btn btn-primary review_cancel">取消审核</button>
+                        </t>
+                    </div>
+                    <!--<div>创建人：<span><t t-esc="item_files.create_uid_name"/></span></div>-->
+
+                </div>
+                <div class="document_review_list">
+                    <t t-foreach="item_files.review_line" t-as="review_list">
+                        <div data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"><t t-esc="review_list.name"/></div>
+                        <t t-if="review_list.state[0]=='review_success'">
+                            <span class="fa fa-long-arrow-right" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"></span>
+                        </t>
+                        <t t-if="review_list.state[0]=='waiting_review'">
+                            <span class="fa fa-long-arrow-right document_yellow" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"></span>
+                            <div data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date">等待</div>
+                        </t>
+                         <t t-if="review_list.state[0]=='review_fail'||review_list.state[0]=='review_canceled'">
+                            <span class="fa fa-long-arrow-right document_red" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"></span>
+                             <!--<div>审核不通过</div>-->
+                        </t>
+                    </t>
+                    <t t-if="item_files.state[0] == 'released'">
+                         <div><t t-esc="item_files.state[1]" /></div>
+                    </t>
+
+                </div>
+
+                   <div class="document_btns">
+                         <t t-if="item_files.is_able_to_use == true || approval_type=='waiting_submit' ||approval_type=='waiting_approval'">
+                        <button t-att-data-action-deny="item_files.is_show_action_deny" class="btn btn-primary document_manage_btn">审核操作</button>
+                    </t>
+                        <button class="btn btn-primary bom_view">查看BOM</button>
+                </div>
+            </div>
+        </t>
+    </t>
+
+</templates>

@@ -79,15 +79,17 @@ class LinklovingAppApi(http.Controller):
 
     odoo10 = None
     #获取数据库列表
-    @http.route('/linkloving_app_api/get_db_list',type='http', auth='none')
+    @http.route('/linkloving_app_api/get_db_list', type='http', auth='none', cors='*')
     def get_db_list(self, **kw):
         return JsonResponse.send_response(STATUS_CODE_OK, res_data= http.db_list(), jsonRequest=False)
 
     #登录
-    @http.route('/linkloving_app_api/login', type='json', auth="none", csrf=False)
+    @http.route('/linkloving_app_api/login', type='json', auth="none", csrf=False, cors='*')
     def login(self, **kw):
         request.session.db = request.jsonrequest["db"]
         request.params["db"] = request.jsonrequest["db"]
+        print 'ssssssssss'
+        print request.session
 
         request.params['login_success'] = False
         values = request.params.copy()
@@ -104,7 +106,16 @@ class LinklovingAppApi(http.Controller):
                 values['user_id'] = request.uid
                 #get group ids
                 user = LinklovingAppApi.get_model_by_id(uid, request, 'res.users')
+
                 values['partner_id'] = user.partner_id.id
+                values['company'] = user.company_id.name
+                # values['phone'] = user.employee_ids.mobile_phone
+
+                if user.sale_team_id:
+                    values['team'] = {
+                        'team_id': user.sale_team_id.id,
+                        'team_name': user.sale_team_id.name or '',
+                    }
                 group_names = request.env['ir.model.data'].sudo().search_read([('res_id', 'in', user.groups_id.ids),
                                                                                ('model', '=', 'res.groups')],
                                                                               fields=['name'])
@@ -857,8 +868,8 @@ class LinklovingAppApi(http.Controller):
         mrp_production = request.env['mrp.production'].sudo().search([('id', '=', order_id)])[0]
 
         stock_moves = request.jsonrequest.get('stock_moves') #get paramter
-        _logger.warning(u"charlie_0712_log:finish_prepare_material, mo:%s,moves:%s", mrp_production.name, stock_moves)
-        print(u"charlie_0712_log:finish_prepare_material, mo:%s,moves:%s" % (mrp_production.name, stock_moves))
+        # _logger.warning(u"charlie_0712_log:finish_prepare_material, mo:%s,moves:%s", mrp_production.name, stock_moves)
+        # print(u"charlie_0712_log:finish_prepare_material, mo:%s,moves:%s" % (mrp_production.name, stock_moves))
         stock_move_lines = request.env["sim.stock.move"].sudo()
         try:
             for move in stock_moves:
@@ -875,43 +886,43 @@ class LinklovingAppApi(http.Controller):
                 rounding = sim_stock_move.stock_moves[0].product_uom.rounding
                 if float_compare(move['quantity_ready'], sim_stock_move.stock_moves[0].product_uom_qty,
                                  precision_rounding=rounding) > 0:
-                    _logger.warning(u"charlie_0712_log_1:move_qty:%s,move_id:%d,uom_qty:%s",
-                                    str(move['quantity_ready']),
-                                    sim_stock_move.stock_moves[0].id,
-                                    str(sim_stock_move.stock_moves[0].product_uom_qty))
+                    # _logger.warning(u"charlie_0712_log_1:move_qty:%s,move_id:%d,uom_qty:%s",
+                    #                 str(move['quantity_ready']),
+                    #                 sim_stock_move.stock_moves[0].id,
+                    #                 str(sim_stock_move.stock_moves[0].product_uom_qty))
 
                     qty_split = sim_stock_move.stock_moves[0].product_uom._compute_quantity(
                             move['quantity_ready'] - sim_stock_move.stock_moves[0].product_uom_qty,
                             sim_stock_move.stock_moves[0].product_id.uom_id)
-                    _logger.warning(u"charlie_0712_log_2:qty_split:%s,", str(qty_split))
+                    # _logger.warning(u"charlie_0712_log_2:qty_split:%s,", str(qty_split))
                     split_move = sim_stock_move.stock_moves[0].copy(
                             default={'quantity_done': qty_split, 'product_uom_qty': qty_split,
                                      'production_id': sim_stock_move.production_id.id,
                                      'raw_material_production_id': sim_stock_move.raw_material_production_id.id,
                                      'procurement_id': sim_stock_move.procurement_id.id or False,
                                      'is_over_picking': True})
-                    _logger.warning(u"charlie_0712_log_3:split_move_qty:%s,", split_move)
+                    # _logger.warning(u"charlie_0712_log_3:split_move_qty:%s,", split_move)
                     sim_stock_move.production_id.move_raw_ids = sim_stock_move.production_id.move_raw_ids + split_move
-                    _logger.warning(u"charlie_0712_log_4:len_move_raw_ids:%d,",
-                                    len(sim_stock_move.production_id.move_raw_ids))
+                    # _logger.warning(u"charlie_0712_log_4:len_move_raw_ids:%d,",
+                    #                 len(sim_stock_move.production_id.move_raw_ids))
                     split_move.write({'state': 'assigned',})
                     sim_stock_move.stock_moves[0].quantity_done = sim_stock_move.stock_moves[0].product_uom_qty
-                    _logger.warning(u"charlie_0712_log_5:len_move_raw_ids:%d,",
-                                    len(sim_stock_move.production_id.move_raw_ids))
+                    # _logger.warning(u"charlie_0712_log_5:len_move_raw_ids:%d,",
+                    #                 len(sim_stock_move.production_id.move_raw_ids))
                     split_move.action_done()
-                    _logger.warning(u"charlie_0712_log_6:len_move_raw_ids:%d,",
-                                    len(sim_stock_move.production_id.move_raw_ids))
+                    # _logger.warning(u"charlie_0712_log_6:len_move_raw_ids:%d,",
+                    #                 len(sim_stock_move.production_id.move_raw_ids))
                     sim_stock_move.stock_moves[0].action_done()
-                    _logger.warning(u"charlie_0712_log_7:len_move_raw_ids:%d,",
-                                    len(sim_stock_move.production_id.move_raw_ids))
+                    # _logger.warning(u"charlie_0712_log_7:len_move_raw_ids:%d,",
+                    #                 len(sim_stock_move.production_id.move_raw_ids))
                 else:
-                    _logger.warning(u"charlie_0712_log_8:move_qty:%s,uom_qty:%s", str(move['quantity_ready']),
-                                    str(sim_stock_move.stock_moves[0].product_uom_qty))
+                    # _logger.warning(u"charlie_0712_log_8:move_qty:%s,uom_qty:%s", str(move['quantity_ready']),
+                    #                 str(sim_stock_move.stock_moves[0].product_uom_qty))
                     sim_stock_move.stock_moves[0].quantity_done_store = move['quantity_ready']
                     sim_stock_move.stock_moves[0].quantity_done = move['quantity_ready']
                     sim_stock_move.stock_moves[0].action_done()
-                    _logger.warning(u"charlie_0712_log_9:len_move_raw_ids:%d",
-                                    len(sim_stock_move.production_id.move_raw_ids))
+                    # _logger.warning(u"charlie_0712_log_9:len_move_raw_ids:%d",
+                    #                 len(sim_stock_move.production_id.move_raw_ids))
                 sim_stock_move.quantity_ready = 0  # 清0
             # try:
             #     mrp_production.post_inventory()
@@ -930,7 +941,7 @@ class LinklovingAppApi(http.Controller):
         except Exception, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error": e.name})
-        _logger.warning(u"charlie_0712_log10:finish, mo:%s", LinklovingAppApi.model_convert_to_dict(order_id, request))
+        # _logger.warning(u"charlie_0712_log10:finish, mo:%s", LinklovingAppApi.model_convert_to_dict(order_id, request))
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
@@ -2277,6 +2288,7 @@ class LinklovingAppApi(http.Controller):
                     'name': pack.product_id.display_name,
                     'default_code': pack.product_id.default_code,
                     'qty_available': pack.product_id.qty_available,
+                    'product_specs': pack.product_id.product_specs or '',
                     'area_id': {
                         'area_id': pack.product_id.area_id.id or None,
                         'area_name': pack.product_id.area_id.name or None,

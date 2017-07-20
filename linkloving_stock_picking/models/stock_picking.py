@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _, SUPERUSER_ID
+from odoo.tools.float_utils import float_is_zero, float_compare
+from odoo.exceptions import UserError, AccessError
 
 
 class StockPicking(models.Model):
@@ -8,11 +10,23 @@ class StockPicking(models.Model):
     _inherit = ['stock.picking', 'ir.needaction_mixin']
     tracking_number = fields.Char(string=u'Tracking Number')
 
-    storage_type = fields.Selection([
-        ('procurement_warehousing', u'采购入库'),
-        ('return_of_materials_to_storeroom', u'退料入库'),
-        ('return_storage', u'退货入库'),
-    ])
+    pick_order_type = fields.Selection([
+        ('procurement_warehousing', u'采购入库'), ('purchase_return', u'采购退货'),
+        ('sell_return', u'销售退货'), ('sell_out', u'销售出库'),
+        ('manufacturing_orders', u'制造入库'), ('manufacturing_picking', u'制造领料'), ('null', u' '),
+        ('inventory_in', u'盘点入库'), ('inventory_out', u'盘点出库')
+    ], string=u"订单类型")
+
+    @api.multi
+    def action_view_qc_result(self):
+        view = self.env.ref('linkloving_mrp_extend.ll_stock_picking_pop_form')
+
+        return {'type': 'ir.actions.act_window',
+                'res_model': 'stock.picking',
+                'view_mode': 'form',
+                'view_id': view.id,
+                'res_id': self.id,
+                'target': 'new'}
 
     @api.multi
     def unlink(self):
@@ -42,7 +56,9 @@ class StockPicking(models.Model):
 
     delivery_rule = fields.Selection(compute="_compute_delivery_rule", selection=[('delivery_once', u'一次性发齐货'),
                                                                                   ('create_backorder', u'允许部分发货,并产生欠单'),
-                                                                                  ('cancel_backorder', u'允许部分发货,不产生欠单')],
+                                                                                  (
+                                                                                      'cancel_backorder',
+                                                                                      u'允许部分发货,不产生欠单')],
                                      )
 
     # actual_state = fields.Selection(string="", selection=[('', ''), ('', ''), ], required=False, )
@@ -188,20 +204,29 @@ class SaleOrderExtend(models.Model):
     _inherit = "sale.order"
 
     delivery_rule = fields.Selection(string=u"交货规则", selection=[('delivery_once', u'一次性发齐货'),
-                                                               ('create_backorder', u'允许部分发货,并产生欠单'),
-                                                               ('cancel_backorder', u'允许部分发货,不产生欠单')],
+                                                                ('create_backorder', u'允许部分发货,并产生欠单'),
+                                                                ('cancel_backorder', u'允许部分发货,不产生欠单')],
                                      required=False, default="delivery_once")
 
 
-class StockMove(models.Model):
+class StockMovePicking(models.Model):
     _inherit = "stock.move"
 
     data_type = fields.Float(string=u'数量', required=True, default=0.0, compute='_compute_qty')
+    stock_type = fields.Char(string=u'出/入库', compute='_compute_qty', store=True)
+    stock_types = fields.Char(string=u'出/入库', compute='_compute_qty')
+    move_order_type = fields.Selection([
+        ('procurement_warehousing', u'采购入库'), ('purchase_return', u'采购退货'),
+        ('sell_return', u'销售退货'), ('sell_out', u'销售出库'),
+        ('manufacturing_orders', u'制造入库'), ('manufacturing_picking', u'制造领料'), ('null', u' '),
+        ('inventory_in', u'盘点入库'), ('inventory_out', u'盘点出库')
+    ], string=u'类型')
+
+    reason_stock = fields.Text(string="操作原因")
 
     @api.one
     @api.depends('company_id')
     def _compute_qty(self):
-
         domain_quant_loc, domain_move_in_loc, domain_move_out_loc = self.env['product.product']._get_domain_locations()
         domain_move_in_todo = [('state', 'in', ['done'])] + [
             ('product_id', 'in', [self.product_id.id])] + domain_move_in_loc
@@ -217,7 +242,19 @@ class StockMove(models.Model):
         sgin = 1
         if self in self.product_id.env['stock.move'].search(domain_move_out_todo):
             sgin = -1
+            self.stock_types = "出库"
+            self.write({'stock_type': '出库'})
+
+        if self in self.product_id.env['stock.move'].search(domain_move_in_todo):
+            self.stock_types = "入库"
+            self.write({'stock_type': '入库'})
+
         self.data_type = self.product_uom_qty * sgin
 
+    @api.model
+    def create(self, vals):
 
+        print 1112
+        obj = super(StockMovePicking, self).create(vals)
+        return obj
 

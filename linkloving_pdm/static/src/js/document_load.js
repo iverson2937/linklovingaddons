@@ -17,14 +17,48 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             'click .document_manage_btn': 'document_form_pop',
             'click .create_document_btn': 'create_document_fn',
             'click .load_container_close': 'close_document_container',
+            'click .submit_file_no':'close_document_container',
             'change .my_load_file': 'get_file_name',
             'click .submit_file_yes': 'load_file',
             'change .document_modify': 'document_modify_fn',
             'click .document_download': 'document_download_fn',
-            'click .review_cancel':'cancel_review'
+            'click .review_cancel': 'cancel_review',
+            'click #my_load_file__a_1': 'request_local_server_pdm',
         },
-        cancel_review:function (e) {
-             var e = e || window.event;
+        request_local_server_pdm: function (e) {
+            var self = this;
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8088",
+                // dataType: 'json/html',
+                success: function (data) {
+                    if (data.result == '1') {
+                        $.ajax({
+                            type: "GET",
+                            url: "http://localhost:8088/uploadfile?id=" + this.product_id + "&remotefile=/charlie/a/b/test.txt",
+                            success: function (data) {
+                                console.log(data);
+                                if (data.result == '1') {
+                                    $(".my_load_file_name").val(data.choose_file_name)
+                                    $(".my_load_file_remote_path").val(data.path)
+                                }
+                            },
+                            error: function (error) {
+                                console.log(error);
+                            }
+                        });
+                    }
+                    else {
+                        alert("请打开代理软件!");
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        },
+        cancel_review: function (e) {
+            var e = e || window.event;
             var target = e.target || e.srcElement;
             var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
             console.log(new_file_id);
@@ -65,7 +99,6 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             console.log(new_file_id)
             // return '/web/content/?download=true&model=product.attachment.info&id=' + new_file_id + '&field=file_binary';
             window.location.href = '/download_file/?download=true&id=' + new_file_id;
-
 
 
         },
@@ -113,7 +146,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             // $(".my_load_file_remote_path").val("");
             // $(".my_load_file_version").val("");
             $(".load_container").hide();
-            $.blockUI({ message: '<img src="linkloving_pdm/static/src/css/spin.png" style="animation: fa-spin 1s infinite steps(12);"/><h3>请稍后</h3>' });
+            $.blockUI({message: '<img src="linkloving_pdm/static/src/css/spin.png" style="animation: fa-spin 1s infinite steps(12);"/><h3>请稍后</h3>'});
         },
         get_file_name: function (e) {
             var e = e || window.event;
@@ -135,13 +168,35 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             // };
             // this.do_action(action);
             $("#document_tab").attr("data-product-id", this.product_id);
+
+            document.getElementById("document_form").reset();
+            $(".file_active_id").val("");
+            $(".file_func").val("");
+            $(".file_active_type").val("");
+            $(".my_load_file_remote_path").val("");
+            $(".my_load_file_version").val("");
+
+
+
             $(".load_container").show();
+            var cur_type = $("#document_tab li.active>a").attr("data");
+            console.log(cur_type);
+            if (cur_type == 'sip' ||
+                cur_type == 'sop' ||
+                cur_type == 'ipqc') {
+                $("#my_load_file__a_1").hide();
+                $("#my_load_file_a").show();
+            }
+            else {
+                $("#my_load_file__a_1").show();
+                $("#my_load_file_a").hide();
+            }
             $(".file_active_id").val($(this)[0].product_id);
             $(".file_active_type").val($("li.active>a.tab_toggle_a").attr("data"));
             var callback = _.uniqueId('func_');
             $(".file_func").val(callback);
             window[callback] = function (result) {
-                if(result.error){
+                if (result.error) {
                     alert(result.error)
                 }
                 console.log(result)
