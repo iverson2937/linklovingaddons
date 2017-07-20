@@ -62,6 +62,7 @@ class LinklovingPdm(http.Controller):
         # attachment_id = request..get("attachment_id")  # 附件id
         # file = request.jsonrequest.get("file")  # 远程地址
         # result = request.jsonrequest.get("result")
+        print result
         return json.dumps({
             "msg": u"得到的参数",
             "attachment_id": attachment_id,

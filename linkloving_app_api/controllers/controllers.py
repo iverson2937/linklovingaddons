@@ -88,6 +88,8 @@ class LinklovingAppApi(http.Controller):
     def login(self, **kw):
         request.session.db = request.jsonrequest["db"]
         request.params["db"] = request.jsonrequest["db"]
+        print 'ssssssssss'
+        print request.session
 
         request.params['login_success'] = False
         values = request.params.copy()
