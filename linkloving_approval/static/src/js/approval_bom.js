@@ -101,7 +101,8 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var bom_id = $(target).parents(".tab_pane_display").data("id");
-            var is_show_action_deny = $(target).attr("data-suibian");
+            var is_show_action_deny = $(target).data("action-deny");
+            alert(is_show_action_deny);
             var action = {
                 name: "详细",
                 type: 'ir.actions.act_window',
@@ -109,13 +110,14 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
                 view_type: 'form',
                 view_mode: 'tree,form',
                 views: [[false, 'form']],
-                context: {'default_bom_id': parseInt(bom_id)},
-                target: "new",
+                context: {'default_bom_id': parseInt(bom_id), 'is_show_action_deny': is_show_action_deny},
+                'target': "new",
             };
+            console.log(action)
             this.do_action(action);
             self.$(document).ajaxComplete(function (event, xhr, settings) {
                 var data = JSON.parse(settings.data)
-                if (data.params.model == 'review.process.wizard') {
+                if (data.params && data.params.model == 'review.process.wizard') {
                     if (data.params.method == 'action_to_next' ||
                         data.params.method == 'action_pass' ||
                         data.params.method == 'action_deny'
@@ -197,13 +199,14 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
             var model = new Model("approval.center");
             model.call("create", [{res_model: res_model, type: approval_type}])
                 .then(function (result) {
+                    console.log(result);
                     model.call('get_bom_info_by_type', [result], {offset: own.begin, limit: own.limit})
                         .then(function (result) {
                             console.log(result);
                             own.length = result.length;
                             self.$("#" + approval_type).html("");
                             self.$("#" + approval_type).append(QWeb.render('bom_approval_tab_content', {
-                                result: result,
+                                result: result.bom_list,
                                 approval_type: approval_type
                             }));
                             own.render_pager(this);

@@ -79,9 +79,9 @@
 
                    <div class="document_btns">
                          <t t-if="item_files.is_able_to_use == true || approval_type=='waiting_submit' ||approval_type=='waiting_approval'">
-                        <button class="btn btn-primary document_manage_btn">审核操作</button>
+                        <button t-att-data-action-deny="item_files.is_show_action_deny" class="btn btn-primary document_manage_btn">审核操作</button>
                     </t>
-                        <button class="btn btn-primary document_download">查看BOM</button>
+                        <button class="btn btn-primary bom_view">查看BOM</button>
                 </div>
             </div>
         </t>
