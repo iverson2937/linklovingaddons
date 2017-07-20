@@ -10,11 +10,18 @@ class AccountEmployeePayment(models.Model):
     _order = 'create_date desc'
     name = fields.Char()
 
+    @api.multi
+    def set_account_date(self):
+        sheet_ids = self.env['account.employee.payment'].search(
+            [('state', '=', 'paid'), ('accounting_date', '=', False)])
+        for sheet in sheet_ids:
+            sheet.accounting_date = sheet.write_date
+
     def _get_account_date(self):
         for p in self:
             p.accounting_date = p.apply_date
 
-    accounting_date = fields.Date(compute='_get_account_date', string=u'会计日期', store=True)
+    accounting_date = fields.Date(string=u'会计日期')
     employee_id = fields.Many2one('hr.employee',
                                   default=lambda self: self.env['hr.employee'].search([('user_id', '=', self.env.uid)],
                                                                                       limit=1))
