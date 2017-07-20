@@ -58,27 +58,33 @@ class ApprovalCenter(models.TransientModel):
         return {'bom_list': bom_list, 'length': length}
 
     def get_attachment_info_by_type(self, offset, limit):
+
         if self.type == 'waiting_submit':
-            attatchments = self.env[self.res_model].search([('create_uid', '=', self.env.user.id),
-                                                            ('state', 'in', ['waiting_release', 'cancel', 'deny'])],
+            domain = [('create_uid', '=', self.env.user.id),
+                      ('state', 'in', ['waiting_release', 'cancel', 'deny'])]
+            attatchments = self.env[self.res_model].search(domain,
                                                            limit=limit, offset=offset, order='create_date desc')
         elif self.type == 'submitted':
-            attatchments = self.env[self.res_model].search([('create_uid', '=', self.env.user.id),
-                                                            (
+            domain = [('create_uid', '=', self.env.user.id),
+                      (
                                                                 'state', 'not in',
-                                                                ['waiting_release', 'draft', 'cancel'])],
+                                                                ['waiting_release', 'draft', 'cancel'])]
+            attatchments = self.env[self.res_model].search(domain,
                                                            limit=limit, offset=offset, order='create_date desc')
         elif self.type == 'waiting_approval':
-            lines = self.env["review.process.line"].search([("state", '=', 'waiting_review'),
-                                                            ('partner_id', '=', self.env.user.partner_id.id)],
+            domain = [("state", '=', 'waiting_review'),
+                      ('partner_id', '=', self.env.user.partner_id.id)]
+            lines = self.env["review.process.line"].search(domain,
                                                            limit=limit, offset=offset, order='create_date desc')
             review_ids = lines.mapped("review_id")
             attatchments = self.env[self.res_model].search([("review_id", "in", review_ids.ids),
                                                             ('state', 'in', ['review_ing'])])
         elif self.type == 'approval':
-            lines = self.env["review.process.line"].search([("state", 'not in', ['waiting_review', 'review_canceled']),
-                                                            ('partner_id', '=', self.env.user.partner_id.id),
-                                                            ('review_order_seq', '!=', 1)],
+            domain = [("state", 'not in', ['waiting_review', 'review_canceled']),
+                      ('partner_id', '=', self.env.user.partner_id.id),
+                      ('review_order_seq', '!=', 1)]
+
+            lines = self.env["review.process.line"].search(domain,
                                                            limit=limit, offset=offset, order='create_date desc')
             review_ids = lines.mapped("review_id")
             attatchments = self.env[self.res_model].search([("review_id", "in", review_ids.ids)],
@@ -87,7 +93,11 @@ class ApprovalCenter(models.TransientModel):
         attach_list = []
         for atta in attatchments:
             attach_list.append(atta.convert_attachment_info())
-        return attach_list
+
+        length = self.env[self.res_model].search_count(domain)
+        return {"records": attach_list,
+                "length": length
+                }
 
     def fields_get(self, allfields=None, attributes=None):
         return super(ApprovalCenter, self).fields_get(allfields=allfields, attributes=attributes)
