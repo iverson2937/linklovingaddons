@@ -72,22 +72,23 @@ class ApprovalCenter(models.TransientModel):
             attatchments = self.env[self.res_model].search(domain,
                                                            limit=limit, offset=offset, order='create_date desc')
         elif self.type == 'waiting_approval':
-            domain = [("state", '=', 'waiting_review'),
-                      ('partner_id', '=', self.env.user.partner_id.id)]
-            lines = self.env["review.process.line"].search(domain,
-                                                           limit=limit, offset=offset, order='create_date desc')
-            review_ids = lines.mapped("review_id")
-            attatchments = self.env[self.res_model].search([("review_id", "in", review_ids.ids),
-                                                            ('state', 'in', ['review_ing'])])
-        elif self.type == 'approval':
-            domain = [("state", 'not in', ['waiting_review', 'review_canceled']),
-                      ('partner_id', '=', self.env.user.partner_id.id),
-                      ('review_order_seq', '!=', 1)]
 
-            lines = self.env["review.process.line"].search(domain,
+            lines = self.env["review.process.line"].search([("state", '=', 'waiting_review'),
+                                                            ('partner_id', '=', self.env.user.partner_id.id)],
                                                            limit=limit, offset=offset, order='create_date desc')
             review_ids = lines.mapped("review_id")
-            attatchments = self.env[self.res_model].search([("review_id", "in", review_ids.ids)],
+            domain = [("review_id", "in", review_ids.ids),
+                      ('state', 'in', ['review_ing'])]
+            attatchments = self.env[self.res_model].search(domain)
+        elif self.type == 'approval':
+
+            lines = self.env["review.process.line"].search([("state", 'not in', ['waiting_review', 'review_canceled']),
+                                                            ('partner_id', '=', self.env.user.partner_id.id),
+                                                            ('review_order_seq', '!=', 1)],
+                                                           limit=limit, offset=offset, order='create_date desc')
+            review_ids = lines.mapped("review_id")
+            domain = [("review_id", "in", review_ids.ids)]
+            attatchments = self.env[self.res_model].search(domain,
                                                            order='create_date desc')
 
         attach_list = []
