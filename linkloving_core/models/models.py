@@ -155,7 +155,8 @@ class ProductTemplate(models.Model):
                 line_draft_qty = line_on_produce = 0.0
 
                 if line.product_id.purchase_ok:
-                    line_draft_qty = self.get_draft_po_qty(line.product_id.product_variant_ids[0])
+                    if line.product_id.product_variant_ids:
+                        line_draft_qty = self.get_draft_po_qty(line.product_id.product_variant_ids[0])
                     line_on_produce = line.product_id.incoming_qty
                 else:
                     line_draft_qty = self.get_draft_mo(line.product_id.product_tmpl_id.id)
