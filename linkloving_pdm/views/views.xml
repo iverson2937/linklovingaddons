@@ -99,13 +99,13 @@
             <field name="arch" type="xml">
                 <tree string="终审人">
                     <field name="final_review_partner_id"/>
-                    <field name="final_type" string="审核类型"/>
+                    <field name="review_type" string="审核类型"/>
                 </tree>
             </field>
         </record>
 
         <record model="ir.actions.act_window" id="action_final_review_partner">
-            <field name="name">文件终审人设置</field>
+            <field name="name">终审人设置</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">final.review.partner</field>
             <field name="view_type">form</field>
@@ -123,7 +123,7 @@
         <menuitem id="final_review_partner_menu"
                   parent="stock.menu_stock_config_settings"
                   action="action_final_review_partner"
-                  sequence="50" groups="base.group_no_one"/>
+                  sequence="50"/>
 
         <record id="review_process_wizard_form" model="ir.ui.view">
             <field name="name">选择下一个审核人</field>
@@ -139,9 +139,10 @@
                         </group>
                     </sheet>
                     <footer>
-                        <button name='action_to_next' type='object' string='送审' class='oe_highlight review_reload'/>
+                        <button name='action_to_next' type='object' string='送审' class='oe_highlight review_reload'
+                                context="{'review_type': 'file_review'}"/>
                         <button string='送往终审' type='object' name='action_to_next' class='oe_link review_reload'
-                                context="{'to_last_review':True}"/>
+                                context="{'to_last_review':True, 'review_type':'file_review'}"/>
                         <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
                                 groups="linkloving_pdm.group_final_review_partner"/>
                         <button name='action_deny' invisible="context.get('is_show_action_deny') == 'false'"
