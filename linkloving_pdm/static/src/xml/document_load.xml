@@ -110,7 +110,7 @@
                     <form enctype="multipart/form-data" action="/linkloving_pdm/upload_attachment_info" method="post" target="id_iframe" id="document_form">
                         <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
                         <input type="hidden" class="file_func" name="func"/>
-                        <input type="hidden" class="file_active_id" name="active_id"/>
+                        <input type="hidden" class="file_active_id" name="active_id" value=""/>
                         <input type="hidden" class="file_active_type" name="active_type"/>
                         <input type="text" class="my_load_file_name" name="my_load_file_name"/>
                         <input type="hidden" class="my_load_file_remote_path" name="my_load_file_remote_path" value=""/>

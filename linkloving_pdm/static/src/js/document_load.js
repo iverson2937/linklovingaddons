@@ -170,6 +170,12 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             $("#document_tab").attr("data-product-id", this.product_id);
 
             document.getElementById("document_form").reset();
+            $(".file_active_id").val("");
+            $(".file_func").val("");
+            $(".file_active_type").val("");
+            $(".my_load_file_remote_path").val("");
+            $(".my_load_file_version").val("");
+
 
 
             $(".load_container").show();
