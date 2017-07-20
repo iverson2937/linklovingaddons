@@ -4,7 +4,7 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 
-class ReviewProcessWizard(models.TransientModel):
+class ReviewBOMWizard(models.TransientModel):
     _name = 'review.bom.wizard'
     cur_partner_id = fields.Many2one('res.partner', default=lambda self: self.env.user.partner_id)
     bom_id = fields.Many2one("mrp.bom")
@@ -22,6 +22,7 @@ class ReviewProcessWizard(models.TransientModel):
 
         self.bom_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
         self.bom_id.review_id.process_line_review_now.submit_to_next_reviewer(
+            to_last_review=to_last_review,
             partner_id=self.partner_id,
             remark=self.remark)
 

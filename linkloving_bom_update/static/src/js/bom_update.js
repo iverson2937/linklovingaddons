@@ -1,7 +1,7 @@
 /**
  * Created by 123 on 2017/5/10.
  */
-odoo.define('linkloving_bom_update.bom_update', function (require) {
+odoo.define('linkloving_bom_update.bom_update1', function (require) {
     "use strict";
 
     var core = require('web.core');
@@ -451,7 +451,7 @@ odoo.define('linkloving_bom_update.bom_update', function (require) {
 
     })
 
-    core.action_registry.add('bom_update', BomUpdate);
+    core.action_registry.add('bom_update1', BomUpdate);
 
     return BomUpdate;
 })
