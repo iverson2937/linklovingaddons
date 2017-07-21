@@ -100,7 +100,6 @@
                 </xpath>
                 <xpath expr="//div[@name='carrier_selection']" position="after">
                     <field name="remark"/>
-                    <field name="sale_order_type"/>
                 </xpath>
 
 

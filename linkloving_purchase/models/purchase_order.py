@@ -18,11 +18,6 @@ class PurchaseOrder(models.Model):
     product_count = fields.Float(compute='get_product_count')
     tax_id = fields.Many2one('account.tax', string='Tax')
     remark = fields.Text(string='Remark')
-    all_order_type = fields.Selection(
-        [('procurement_warehousing', u'采购入库'), ('purchase_return', u'采购退货'),
-        ('sell_return', u'销售退货'), ('sell_out', u'销售出库'),
-         ('manufacturing_orders', u'制造入库'), ('manufacturing_picking', u'制造领料'), ('null', u' '),
-         ('inventory_in', u'盘点入库'), ('inventory_out', u'盘点出库')], string=u'订单类型', default='procurement_warehousing')
     handle_date = fields.Datetime(string=u'交期')
     product_id = fields.Many2one(related='order_line.product_id')
     product_qty = fields.Float(related='order_line.product_qty')
@@ -111,7 +106,6 @@ class PurchaseOrder(models.Model):
             'partner_id': self.partner_id.id,
             'date': self.date_order,
             'origin': self.name,
-            'pick_order_type': self.all_order_type,
             'location_dest_id': self._get_destination_location(),
             'location_id': self.partner_id.property_stock_supplier.id,
             'company_id': self.company_id.id,
@@ -262,7 +256,7 @@ class PurchaseOrderLine(models.Model):
                 'route_ids': line.order_id.picking_type_id.warehouse_id and [
                     (6, 0, [x.id for x in line.order_id.picking_type_id.warehouse_id.route_ids])] or [],
                 'warehouse_id': line.order_id.picking_type_id.warehouse_id.id,
-                'move_order_type': picking.pick_order_type,
+                'move_order_type': 'procurement_warehousing',
             }
             # Fullfill all related procurements with this po line
             diff_quantity = line.product_qty - qty
@@ -378,7 +372,6 @@ class PurchaseReturnPicking(models.TransientModel):
             'picking_type_id': picking_type_id,
             'state': 'draft',
             'origin': picking.name,
-            'pick_order_type': 'purchase_return',
             'location_id': picking.location_dest_id.id,
             'location_dest_id': self.location_id.id})
         new_picking.message_post_with_view('mail.message_origin_link',
