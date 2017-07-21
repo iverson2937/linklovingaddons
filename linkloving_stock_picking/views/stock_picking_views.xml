@@ -61,7 +61,6 @@
                 </xpath>
 
                 <xpath expr="//field[@name='origin']" position="after">
-                    <field name="pick_order_type" string="订单类型"/>
                 </xpath>
                 <!--<xpath expr="//notebook/page[1]" position="after">-->
                 <!--<page string="采购单信息">-->
@@ -231,7 +230,6 @@
                 </xpath>
 
                 <xpath expr="//field[@name='partner_id']" position="after">
-                    <field name="pick_order_type" string="订单类型"/>
                 </xpath>
             </field>
         </record>
@@ -262,16 +260,6 @@
                 </xpath>
                 <xpath expr="//field[@name='partner_id']" position="after">
                     <field name="origin"/>
-                </xpath>
-
-                <xpath expr="//filter[@name='done']" position="after">
-                    <separator/>
-                    <filter string="采购入库" name="procurement_warehousing"
-                            domain="[('pick_order_type', '=', 'procurement_warehousing')]"/>
-                    <filter string="退料入库" name="return_of_materials_to_storeroom"
-                            domain="[('pick_order_type', '=', 'return_of_materials_to_storeroom')]"/>
-                    <filter string="退货入库" name="return_storage"
-                            domain="[('pick_order_type', '=', 'return_storage')]"/>
                 </xpath>
 
             </field>

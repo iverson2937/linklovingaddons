@@ -10,13 +10,6 @@ class StockPicking(models.Model):
     _inherit = ['stock.picking', 'ir.needaction_mixin']
     tracking_number = fields.Char(string=u'Tracking Number')
 
-    pick_order_type = fields.Selection([
-        ('procurement_warehousing', u'采购入库'), ('purchase_return', u'采购退货'),
-        ('sell_return', u'销售退货'), ('sell_out', u'销售出库'),
-        ('manufacturing_orders', u'制造入库'), ('manufacturing_picking', u'制造领料'), ('null', u' '),
-        ('inventory_in', u'盘点入库'), ('inventory_out', u'盘点出库')
-    ], string=u"订单类型")
-
     @api.multi
     def action_view_qc_result(self):
         view = self.env.ref('linkloving_mrp_extend.ll_stock_picking_pop_form')

@@ -316,7 +316,6 @@ class ReturnMaterial(models.Model):
             'picking_type_id': picking_type.id,
             'partner_id': self.partner_id.id,
             'rma_id': self.id,
-            'pick_order_type': order_type,
             'location_id': location_id,
             'location_dest_id': location_dest_id,
             'origin': origin,

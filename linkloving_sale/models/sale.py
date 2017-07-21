@@ -18,12 +18,6 @@ class SaleOrder(models.Model):
     tax_id = fields.Many2one('account.tax', required=True)
     product_count = fields.Float(compute='get_product_count')
 
-    sales_order_type = fields.Selection([
-        ('procurement_warehousing', u'采购入库'), ('purchase_return', u'采购退货'),
-        ('sell_return', u'销售退货'), ('sell_out', u'销售出库'),
-        ('manufacturing_orders', u'制造入库'), ('manufacturing_picking', u'制造领料'), ('null', u' '),
-    ], string=u"订单类型", default='sell_out')
-
     @api.depends('product_count', 'order_line.qty_delivered')
     def _compute_shipping_rate(self):
         for r in self:
