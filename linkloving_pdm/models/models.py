@@ -19,6 +19,8 @@ REVIEW_LINE_STATE = {'waiting_review': u'等待审核',
                      'review_success': u'审核通过',
                      'review_fail': u'审核不通过',
                      'review_canceled': u'取消审核'}
+
+
 class ReviewProcess(models.Model):
     _name = 'review.process'
 
@@ -104,11 +106,18 @@ class ReviewProcessLine(models.Model):
     review_order_seq = fields.Integer(string=u'审核顺序', help=u"从1开始")  # 从1开始
     remark = fields.Text(u"备注")
 
-    def submit_to_next_reviewer(self, to_last_review=False, partner_id=None, remark=None):
+    def submit_to_next_reviewer(self, review_type, to_last_review=False, partner_id=None, remark=None):
+
         if not partner_id:
             raise UserError(u"请选择审核人!")
         if not self.env["final.review.partner"].get_final_review_partner_id():
             raise UserError(u'请联系管理员,设置终审人!')
+
+        if to_last_review:
+            if not self.env['final.review.partner'].search([('final_review_partner_id', '=', partner_id.id),
+                                                            ('review_type', '=', review_type)]):
+                raise UserError('请选择终正确的终审人')
+
         is_last_review = False
         if to_last_review \
                 or partner_id.id == self.env["final.review.partner"].get_final_review_partner_id().id:
@@ -143,15 +152,15 @@ class ReviewProcessLine(models.Model):
             raise UserError(u"终审人才能进行审核")
 
     def action_approve(self, remark):
-            if self.review_id.who_review_now.id == self.env.user.partner_id.id:
-                self.write({
-                    'review_time': fields.datetime.now(),
-                    'state': 'review_success',
-                    'remark': remark
-                })
+        if self.review_id.who_review_now.id == self.env.user.partner_id.id:
+            self.write({
+                'review_time': fields.datetime.now(),
+                'state': 'review_success',
+                'remark': remark
+            })
 
-            else:
-                raise UserError(u"您不是审核人")
+        else:
+            raise UserError(u"您不是审核人")
 
     # 拒绝审核
     def action_deny(self, remark):
@@ -193,6 +202,8 @@ FILE_TYPE_DIC = {'sip': 'SIP',
                  'ipqc': 'IPQC',
                  'other': 'Other',
                  'design': 'Design'}
+
+
 class ProductAttachmentInfo(models.Model):
     _name = 'product.attachment.info'
 
@@ -441,7 +452,7 @@ class ProductTemplateExtend(models.Model):
 
     def convert_attendment_info_list(self, type):
         files = self.env["product.attachment.info"].search(
-                [("type", "=", type), ("product_tmpl_id", '=', self.id)], order='version desc')
+            [("type", "=", type), ("product_tmpl_id", '=', self.id)], order='version desc')
         json_list = []
         for a_file in files:
             json_list.append(a_file.convert_attachment_info())
@@ -500,6 +511,7 @@ class ReviewProcessWizard(models.TransientModel):
     _name = 'review.process.cancel.wizard'
 
     product_attachment_info_id = fields.Many2one("product.attachment.info")
+    bom_id=fields.Many2one("mrp.bom")
     review_process_line = fields.Many2one("review.process.line",
                                           related="product_attachment_info_id.review_id.process_line_review_now")
 
@@ -507,7 +519,13 @@ class ReviewProcessWizard(models.TransientModel):
 
     def action_cancel_review(self):
         self.review_process_line.action_cancel(self.remark)
-        self.product_attachment_info_id.action_cancel()
+        print self._context,'dddddddd'
+        if self._context.get('review_type')=='bom_review':
+
+            self.bom_id.action_cancel()
+        elif self._context.get('review_type')=='file_review':
+            self.product_attachment_info_id.action_cancel()
+
 
 class ReviewProcessWizard(models.TransientModel):
     _name = 'review.process.wizard'
@@ -515,18 +533,37 @@ class ReviewProcessWizard(models.TransientModel):
     cur_partner_id = fields.Many2one('res.partner', default=lambda self: self.env.user.partner_id)
     partner_id = fields.Many2one("res.partner", string=u'提交给...审核', domain=[('employee', '=', True), ])
     product_attachment_info_id = fields.Many2one("product.attachment.info")
+    bom_id = fields.Many2one('mrp.bom')
     review_process_line = fields.Many2one("review.process.line",
                                           related="product_attachment_info_id.review_id.process_line_review_now")
+    review_bom_line=fields.Many2one("review.process.line",
+                                    related="bom_id.review_id.process_line_review_now")
     remark = fields.Text(u"备注", required=True)
     is_show_action_deny = fields.Boolean(default=True)
+
     # 送审
     def action_to_next(self):
         to_last_review = self._context.get("to_last_review")  # 是否送往终审
-        if not self.product_attachment_info_id.review_id:  # 如果没审核过
-            self.product_attachment_info_id.action_send_to_review()
+        review_type = self._context.get("review_type")
+        if review_type == 'bom_review':
+            if not self.bom_id.review_id:  # 如果没审核过
+                self.bom_id.action_send_to_review()
 
-        self.product_attachment_info_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
-        self.product_attachment_info_id.review_id.process_line_review_now.submit_to_next_reviewer(
+            self.bom_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
+            self.bom_id.review_id.process_line_review_now.submit_to_next_reviewer(
+                review_type=review_type,
+                to_last_review=to_last_review,
+                partner_id=self.partner_id,
+                remark=self.remark)
+
+            return True
+        elif review_type == 'file_review':
+            if not self.product_attachment_info_id.review_id:  # 如果没审核过
+                self.product_attachment_info_id.action_send_to_review()
+
+            self.product_attachment_info_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
+            self.product_attachment_info_id.review_id.process_line_review_now.submit_to_next_reviewer(
+                review_type=review_type,
                 to_last_review=to_last_review,
                 partner_id=self.partner_id,
                 remark=self.remark)
@@ -535,34 +572,58 @@ class ReviewProcessWizard(models.TransientModel):
 
     # 终审 审核通过
     def action_pass(self):
+        review_type = self._context.get("review_type")
+        if review_type == 'bom_review':
+            self.bom_id.action_released()
+            self.review_bom_line.action_pass(self.remark)
+        elif review_type == 'file_review':
+            self.product_attachment_info_id.action_released()
         # 审核通过
-        self.review_process_line.action_pass(self.remark)
-        # 改变文件状态
-        self.product_attachment_info_id.action_released()
-
+            self.review_process_line.action_pass(self.remark)
         return True
 
     # 审核不通过
     def action_deny(self):
         self.review_process_line.action_deny(self.remark)
         # 改变文件状态
-        self.product_attachment_info_id.action_deny()
-
+        review_type = self._context.get('review_type')
+        if review_type == 'bom_review':
+            self.bom_id.action_deny()
+            self.review_bom_line.action_deny(self.remark)
+        elif review_type == 'file_review':
+            self.product_attachment_info_id.action_deny()
+            self.review_process_line.action_deny(self.remark)
         return True
 
     def action_cancel_review(self):
         self.review_process_line.action_cancel(self.remark)
-        self.product_attachment_info_id.action_cancel()
+        review_type = self._context.get('review_type')
+        if review_type == 'bom_review':
+            self.bom_id.action_cancel()
+            self.review_bom_line.action_cancel(self.remark)
+        elif review_type == 'file_review':
+            self.product_attachment_info_id.action_cancel()
+            self.review_process_line.action_cancel(self.remark)
 
-    
     @api.model
     def create(self, vals):
         return super(ReviewProcessWizard, self).create(vals)
+
+
 class FinalReviewPartner(models.Model):
     _name = 'final.review.partner'
+    review_type = fields.Selection([
+        ('bom_review', u'BOM 终审人'),
+        ('file_review', u'文件终审人')
+    ], string=u'审核类型')
 
     final_review_partner_id = fields.Many2one(comodel_name="res.partner", string="终审人", required=False,
                                               domain=[('employee', '=', True)])
+
+    _sql_constraints = {
+        ('review_type_unique', 'unique( review_type)',
+         '每个类型的终审人只能有一个')
+    }
 
     def get_final_review_partner_id(self):
         final = self.env["final.review.partner"].search([], limit=1)
@@ -575,22 +636,29 @@ class FinalReviewPartner(models.Model):
     def create(self, vals):
         res = super(FinalReviewPartner, self).create(vals)
         users = res.final_review_partner_id.user_ids
+        review_type_ref = self.get_review_type_ref(vals.get("review_type"))
         for user in users:
-            user.groups_id = [(4, self.env.ref("linkloving_pdm.group_final_review_partner").id)]
+            user.groups_id = [(4, self.env.ref(review_type_ref).id)]
         return res
         # group_final_review_partner
 
     @api.multi
     def unlink(self):
         user_ids = self.final_review_partner_id.user_ids
+        review_type_ref = self.get_review_type_ref(self.review_type)
         for user in user_ids:
-            user.groups_id = [(2, self.env.ref("linkloving_pdm.group_final_review_partner").id)]
+            user.groups_id = [(2, self.env.ref(review_type_ref).id)]
 
         return super(FinalReviewPartner, self).unlink()
 
     @api.multi
     def write(self, vals):
-        group = self.env.ref("linkloving_pdm.group_final_review_partner").id
+        if vals.get("review_type"):
+            review_type_ref = self.get_review_type_ref(vals.get("review_type"))
+        else:
+            review_type_ref = self.get_review_type_ref(self.review_type)
+
+        group = self.env.ref(review_type_ref).id
         user_ids = self.final_review_partner_id.user_ids
         for user in user_ids:
             user.groups_id = [(2, group)]
@@ -602,3 +670,13 @@ class FinalReviewPartner(models.Model):
             user.groups_id = [(4, group)]
 
         return res
+
+    def get_review_type_ref(self, val):
+        if val == 'file_review':
+            review_type_ref = 'linkloving_pdm.group_final_review_partner'
+        elif val == 'bom_review':
+            review_type_ref = 'linkloving_pdm.group_final_review_partner_bom'
+        else:
+            raise UserError(u"数据异常,未找到对应的审核人类型")
+
+        return review_type_ref

@@ -6,23 +6,15 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
 
+
 class MrpBom(models.Model):
     _inherit = 'mrp.bom'
-
-    review_id = fields.Many2one("review.process",
-                                string=u'待...审核',
-                                track_visibility='always',
-                                readonly=True, copy=False)
-
-    @api.multi
-    def action_send_to_review(self):
-        if not self.review_id:
-            self.review_id = self.env["review.process"].create_review_process('mrp.bom', self.id)
 
     @api.multi
     def action_deny(self):
         for line in self.bom_line_ids:
             reject_bom_line_product_bom(line)
+
 
     @api.multi
     def action_released(self):
@@ -130,7 +122,7 @@ class MrpBomLine(models.Model):
     def write(self, vals):
 
         if (
-                'RT-ENG' in self.bom_id.product_tmpl_id.name or self.bom_id.product_tmpl_id.product_ll_type == 'semi-finished') \
+                        'RT-ENG' in self.bom_id.product_tmpl_id.name or self.bom_id.product_tmpl_id.product_ll_type == 'semi-finished') \
                 and not self.env.user.has_group('mrp.group_mrp_manager'):
             raise UserError(u'你没有权限修改请联系管理员')
         return super(MrpBomLine, self).write(vals)
@@ -138,7 +130,7 @@ class MrpBomLine(models.Model):
     @api.multi
     def unlink(self):
         if (
-                'RT-ENG' in self.bom_id.product_tmpl_id.name or self.bom_id.product_tmpl_id.product_ll_type == 'semi-finished') \
+                        'RT-ENG' in self.bom_id.product_tmpl_id.name or self.bom_id.product_tmpl_id.product_ll_type == 'semi-finished') \
                 and not self.env.user.has_group('mrp.group_mrp_manager'):
             raise UserError(u'你没有权限修改请联系管理员')
         return super(MrpBomLine, self).unlink()
@@ -170,6 +162,7 @@ def get_next_default_code(default_code):
 
 def set_bom_line_product_bom_released(line):
     line.bom_id.state = 'release'
+    print line.bom_id.state, 'ddddddddd'
     if line.child_line_ids:
         for l in line.child_line_ids:
             set_bom_line_product_bom_released(l)

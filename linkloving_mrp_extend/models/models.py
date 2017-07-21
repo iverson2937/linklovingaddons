@@ -16,6 +16,7 @@ from odoo.addons import decimal_precision as dp
 
 class MrpBomExtend(models.Model):
     _inherit = 'mrp.bom'
+    _order = 'write_date desc'
 
     product_specs = fields.Text(string=u'Product Specification', related='product_tmpl_id.product_specs')
 
@@ -25,11 +26,18 @@ class MrpBomExtend(models.Model):
         help="If a product variant is defined the BOM is available only for this product.", copy=False)
     state = fields.Selection([
         ('new', u'新建'),
-        ('reject', u'已拒绝'),
+        ('deny', u'已拒绝'),
+        ('cancel', u'取消'),
         ('draft', u'草稿'),
         ('review_ing', u'审核中'),
         ('release', u'正式')
     ], u'状态', track_visibility='onchange', default='new')
+
+    @api.multi
+    def action_cancel(self):
+        self.write({
+            'state': 'cancel'
+        })
 
     bom_remark = fields.Text(string=u"备注", track_visibility='onchange')
 
@@ -804,26 +812,26 @@ class MrpProductionExtend(models.Model):
             # return_m.do_retrurn()
         return res
 
-    def _generate_finished_moves(self):
-        move = self.env['stock.move'].create({
-            'name': self.name,
-            'date': self.date_planned_start,
-            'date_expected': self.date_planned_start,
-            'product_id': self.product_id.id,
-            'product_uom': self.product_uom_id.id,
-            'product_uom_qty': self.product_qty,
-            'location_id': self.product_id.property_stock_production.id,
-            'location_dest_id': self.location_dest_id.id,
-            'move_dest_id': self.procurement_ids and self.procurement_ids[0].move_dest_id.id or False,
-            'procurement_id': self.procurement_ids and self.procurement_ids[0].id or False,
-            'company_id': self.company_id.id,
-            'production_id': self.id,
-            'origin': self.name,
-            'group_id': self.procurement_group_id.id,
-            'move_order_type': 'null' if self.move_finished_ids else 'manufacturing_orders',
-        })
-        move.action_confirm()
-        return move
+        # def _generate_finished_moves(self):
+        #     move = self.env['stock.move'].create({
+        #         'name': self.name,
+        #         'date': self.date_planned_start,
+        #         'date_expected': self.date_planned_start,
+        #         'product_id': self.product_id.id,
+        #         'product_uom': self.product_uom_id.id,
+        #         'product_uom_qty': self.product_qty,
+        #         'location_id': self.product_id.property_stock_production.id,
+        #         'location_dest_id': self.location_dest_id.id,
+        #         'move_dest_id': self.procurement_ids and self.procurement_ids[0].move_dest_id.id or False,
+        #         'procurement_id': self.procurement_ids and self.procurement_ids[0].id or False,
+        #         'company_id': self.company_id.id,
+        #         'production_id': self.id,
+        #         'origin': self.name,
+        #         'group_id': self.procurement_group_id.id,
+        #         'move_order_type': 'null' if self.move_finished_ids else 'manufacturing_orders',
+        #     })
+        #     move.action_confirm()
+        #     return move
 
 
 class ChangeProductionQty(models.TransientModel):

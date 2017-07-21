@@ -33,6 +33,10 @@
                                 states="confirm,manager1_approve,manager2_approve,manager3_approve" string="Reject"
                                 groups="hr_expense.group_hr_expense_user"
                                 type="object"/>
+                        <button name="set_account_date" class="oe_link"
+                                states="paid" string="设置会计日期"
+                                groups="base.group_erp_manager"
+                                type="object"/>
                         <field name="state" widget="statusbar"
                                statusbar_visible="draft,confirm,manager1_approve,manager2_approve,paid"/>
                     </header>
@@ -72,6 +76,8 @@
                             <group>
                                 <field name="apply_date" attrs="{'readonly': [('state', '!=', 'draft')]}"
                                        string="Apply Date"/>
+                                <field name="accounting_date" string="会计日期"
+                                       attrs="{'invisible': [('state', 'not in', ('approve','paid'))],'required': [('state', 'in', ('approve','paid'))]}"/>
 
                             </group>
                         </group>

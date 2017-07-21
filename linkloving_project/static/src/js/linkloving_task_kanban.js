@@ -168,27 +168,226 @@ odoo.define('linkloving.task_kanban_view', function (require) {
             });
         },
 
+        on_data_loaded: function (tasks, group_bys) {
+            var self = this;
+            var ids = _.pluck(tasks, "id");
+            return this.dataset.name_get(ids).then(function (names) {
+                var ntasks = _.map(tasks, function (task) {
+                    return _.extend({
+                        __name: _.detect(names, function (name) {
+                            return name[0] == task.id;
+                        })[1]
+                    }, task);
+                });
+                if (group_bys && group_bys[0] === "user_id")
+                    return self.on_data_loaded_hr(ntasks, group_bys);
+                else
+                    return self.on_data_loaded_2(ntasks, group_bys);
+            });
+        },
+        on_data_loaded_hr: function (tasks, group_bys) {
+            var self = this;
+            var split_groups = function (tasks, group_bys) {
+                if (group_bys.length === 0)
+                    return tasks;
+                var groups = [];
+                _.each(tasks, function (task) {
+                    var group_name = task[_.first(group_bys)];
+                    var group = _.find(groups, function (group) {
+                        return _.isEqual(group.name, group_name[1]);
+                    });
+                    if (group === undefined) {
+                        group = {name: group_name[1], user_id: group_name[0], tasks: [], __is_group: true};
+                        groups.push(group);
+                    }
+                    group.tasks.push(task);
+                    group.tasks.sort(by("date_start"));
+                });
+                _.each(groups, function (group) {
+                    group.tasks = split_groups(group.tasks, _.rest(group_bys));
+                });
+                groups.sort(by("name"));
+                return groups;
+            }
+            var groups = split_groups(tasks, group_bys);
+
+            // track ids of task items for context menu
+            var task_ids = {};
+
+            // creation of the chart
+            var generate_task_info = function (task, plevel) {
+                var percent = 100;
+                var level = plevel || 0;
+                if (task.__is_group) {
+                    var task_infos = _.compact(_.map(task.tasks, function (sub_task) {
+                        return generate_task_info(sub_task, level + 1);
+                    }));
+                    if (task_infos.length == 0)
+                        return;
+                    var task_start = _.reduce(_.pluck(task_infos, "task_start"), function (date, memo) {
+                        return memo === undefined || date < memo ? date : memo;
+                    }, undefined);
+                    var task_stop = _.reduce(_.pluck(task_infos, "task_stop"), function (date, memo) {
+                        return memo === undefined || date > memo ? date : memo;
+                    }, undefined);
+                    var duration = (task_stop.getTime() - task_start.getTime()) / (1000 * 60 * 60);
+                    var group_name = task.name;// ? formats.format_value(task.name, self.fields[group_bys[level]]) : "-";
+                    if (level == 0) {
+                        var group = new GanttProjectInfo(_.uniqueId("gantt_project_"), group_name, task_start, true);
+
+                        task_infos.sort(by("task_start"));
+                        task_infos[0].task_info.line = 1;
+
+                        var hasNextLine = function (line) {
+                            var next = false;
+                            _.each(task_infos, function (el) {
+                                var line_tasks = _.compact(_.map(task_infos, function (e) {
+                                    if(e.task_info.line && e.task_info.line === line){
+                                        return e;
+                                    }
+                                }));
+                                if (!el.task_info.line) {
+                                    var isInline = true;
+                                    _.each(line_tasks, function (task) {
+                                        //这里已经排序所以只需考虑这一种情况
+                                        if(task.task_stop - el.task_start > 0){
+                                            isInline = false;
+                                        }
+                                    })
+                                    if(isInline)
+                                        el.task_info.line = line;
+                                    else{
+                                        if(!next){
+                                            el.task_info.line = line + 1;
+                                            next = true;
+                                        }
+                                    }
+                                }
+                            })
+                            if(next)
+                                hasNextLine(line + 1);
+                        }
+
+                        hasNextLine(1);
+
+                        _.each(task_infos, function (el) {
+                            group.addTask(el.task_info);
+                        });
+                        return group;
+                    } else {
+                        var id = _.uniqueId("gantt_project_task_");
+                        var group = new GanttTaskInfo(id, group_name, task_start, duration || 1, percent, undefined);
+                        _.each(task_infos, function (el) {
+                            group.addChildTask(el.task_info);
+                        });
+                        group.internal_task = task;
+                        task_ids[id] = group;
+                        return {task_info: group, task_start: task_start, task_stop: task_stop};
+                    }
+                }
+                else {
+
+                    var task_name = task.__name;
+
+                     if(task.top_task_id)
+                         task_name = task.top_task_id[1] + ' - ' + task_name;
+
+                    var duration_in_business_hours = false;
+                    var task_start = time.auto_str_to_date(task[self.fields_view.arch.attrs.date_start]);
+                    if (!task_start)
+                        return;
+                    var task_stop;
+                    if (self.fields_view.arch.attrs.date_stop) {
+                        task_stop = time.auto_str_to_date(task[self.fields_view.arch.attrs.date_stop]);
+                        if (!task_stop)
+                            task_stop = task_start;
+                    } else { // we assume date_duration is defined
+                        var tmp = formats.format_value(task[self.fields_view.arch.attrs.date_delay],
+                            self.fields[self.fields_view.arch.attrs.date_delay]);
+                        if (!tmp)
+                            return;
+                        task_stop = task_start.clone().addMilliseconds(formats.parse_value(tmp, {type: "float"}) * 60 * 60 * 1000);
+                        duration_in_business_hours = true;
+                    }
+                    var duration = (task_stop.getTime() - task_start.getTime()) / (1000 * 60 * 60);
+                    var id = _.uniqueId("gantt_task_");
+                    if (!duration_in_business_hours) {
+                        duration = (duration / 24) * 8;
+                    }
+
+                    var task_info = new GanttTaskInfo(id, task_name, task_start, (duration) || 1, percent, undefined);
+                    task_info.internal_task = task;
+                    task_ids[id] = task_info;
+                    return {task_info: task_info, task_start: task_start, task_stop: task_stop};
+                }
+            }
+
+            var gantt = new GanttChart();
+            _.each(_.compact(_.map(groups, function (e) {
+                return generate_task_info(e, 0);
+            })), function (project) {
+                gantt.addProject(project);
+            });
+
+            gantt.setEditable(true);
+            gantt.setImagePath("/web_gantt/static/lib/dhtmlxGantt/codebase/imgs/");
+            gantt.attachEvent("onTaskEndDrag", function (task) {
+                self.on_task_changed(task);
+            });
+            gantt.attachEvent("onTaskEndResize", function (task) {
+                self.on_task_changed(task);
+            });
+
+            gantt.create($(this.$el).get(0));
+
+            if (this.is_action_enabled('create')) {
+                // insertion of create button
+                var td = $($("td", self.$el)[0]);
+                var rendered = QWeb.render("GanttView-create-button");
+                $(rendered).prependTo(td);
+                $(".oe_gantt_button_create", this.$el).click(this.on_task_create);
+            }
+            // Fix for IE to display the content of gantt view.
+            this.$el.find(".oe_gantt td:first > div, .oe_gantt td:eq(1) > div > div").css("overflow", "");
+        },
+
+        on_task_changed: function (task_obj) {
+            var self = this;
+            var itask = task_obj.TaskInfo.internal_task;
+            var start = task_obj.getEST();
+            var duration = task_obj.getDuration();
+            var duration_in_business_hours = !!self.fields_view.arch.attrs.date_delay;
+            if (!duration_in_business_hours) {
+                duration = (duration / 8 ) * 24;
+            }
+            var end = start.clone().addMilliseconds(duration * 60 * 60 * 1000);
+            var data = {};
+            data[self.fields_view.arch.attrs.date_start] =
+                time.auto_date_to_str(start, self.fields[self.fields_view.arch.attrs.date_start].type);
+            if (self.fields_view.arch.attrs.date_stop) {
+                data[self.fields_view.arch.attrs.date_stop] =
+                    time.auto_date_to_str(end, self.fields[self.fields_view.arch.attrs.date_stop].type);
+            } else { // we assume date_duration is defined
+                data[self.fields_view.arch.attrs.date_delay] = duration;
+            }
+
+
+            return $.when(self.dataset.write(itask.id, data)).then(function () {
+                self.reload();
+            });
+
+        }
+        ,
+
         on_data_loaded_2: function (tasks, group_bys) {
             var self = this;
-            //prevent more that 1 group by
-            // if (group_bys.length > 0) {
-            //     group_bys = [group_bys[0]];
-            // }
-            // // if there is no group by, simulate it
-            // if (group_bys.length == 0) {
-            //     group_bys = ["_pseudo_group_by"];
-            //     _.each(tasks, function (el) {
-            //         el._pseudo_group_by = "Gantt View";
-            //     });
-            //     this.fields._pseudo_group_by = {type: "string"};
-            // }
             group_bys = ["top_task_id"];
 
             var child_tasks = [];
             var top_tasks = [];
             if (self.model == 'project.task') {
                 _.each(tasks, function (task) {
-                    if (task.top_task_id != task.id) {
+                    if (task.top_task_id  && task.top_task_id[0] != task.id) {
                         child_tasks.push(task);
                     } else
                         top_tasks.push(task);
@@ -217,7 +416,7 @@ odoo.define('linkloving.task_kanban_view', function (require) {
                             group.tasks.push(c_group);
                             group.tasks.sort(by("name"));
                         }
-                        if (group.__self.stage_id[1] === c_group_name)
+                        if (group.__self && group.__self.stage_id[1] === c_group_name)
                             c_group.current = true;
                         else
                             c_group.current = false;
@@ -226,7 +425,12 @@ odoo.define('linkloving.task_kanban_view', function (require) {
                         var __self = _.find(top_tasks, function (top) {
                             return _.isEqual(top.__name, group_name);
                         })
-                        var task_group = {name: task.stage_id[1], tasks: [task], __is_group: true, current: __self.stage_id[1] == task.stage_id[1]};
+                        var task_group = {
+                            name: task.stage_id[1],
+                            tasks: [task],
+                            __is_group: true,
+                            current: __self && __self.stage_id[1] == task.stage_id[1]
+                        };
                         group = {name: group_name, tasks: [task_group], __is_group: true, __self: __self};
                         groups.push(group);
                     }
@@ -271,7 +475,7 @@ odoo.define('linkloving.task_kanban_view', function (require) {
                     }, undefined);
                     duration = (task_stop.getTime() - task_start.getTime()) / (1000 * 60 * 60);
                     duration = (duration / 24) * 8;
-                    var group_name = task.name;// ? formats.format_value(task.name, self.fields[group_bys[level]]) : "-";
+                    var group_name = task.__name;// ? formats.format_value(task.name, self.fields[group_bys[level]]) : "-";
                     if (level == 0) {
                         var group = new GanttProjectInfo(_.uniqueId("gantt_project_"), group_name, task_start);
                         _.each(task_infos, function (el) {
@@ -335,7 +539,6 @@ odoo.define('linkloving.task_kanban_view', function (require) {
                     return {task_info: task_info, task_start: task_start, task_stop: task_stop};
                 }
             }
-
             var gantt = new GanttChart();
             _.each(_.compact(_.map(groups, function (e) {
                 return generate_task_info(e, 0);
@@ -343,7 +546,7 @@ odoo.define('linkloving.task_kanban_view', function (require) {
                 gantt.addProject(project);
             });
 
-            gantt.setEditable(false);
+            gantt.setEditable(true);
             gantt.setImagePath("/web_gantt/static/lib/dhtmlxGantt/codebase/imgs/");
             gantt.attachEvent("onTaskEndDrag", function (task) {
                 self.on_task_changed(task);
@@ -353,15 +556,15 @@ odoo.define('linkloving.task_kanban_view', function (require) {
             });
 
             gantt.create($(this.$el).get(0));
-            // gantt.create(2);
+            // gantt.create(2);11111111111111111111111111\
 
             // bind event to display task when we click the item in the tree
-            $(".taskNameItem", self.$el).click(function (event) {
-                var task_info = task_ids[event.target.id];
-                if (task_info) {
-                    self.on_task_display(task_info.internal_task);
-                }
-            });
+            // $(".taskNameItem", self.$el).click(function (event) {
+            //     var task_info = task_ids[event.target.id];
+            //     if (task_info) {
+            //         self.on_task_display(task_info.internal_task);
+            //     }
+            // });
 
 
             if (this.is_action_enabled('create')) {
@@ -373,7 +576,8 @@ odoo.define('linkloving.task_kanban_view', function (require) {
             }
             // Fix for IE to display the content of gantt view.
             this.$el.find(".oe_gantt td:first > div, .oe_gantt td:eq(1) > div > div").css("overflow", "");
-        },
+        }
+        ,
     });
 
     var by = function (name, minor) {
@@ -404,4 +608,5 @@ odoo.define('linkloving.task_kanban_view', function (require) {
         }
         return false;
     }
-});
+})
+;

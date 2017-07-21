@@ -3,7 +3,6 @@
 import uuid
 
 from odoo import api, models, fields, tools, _
-from odoo.exceptions import UserError
 
 
 class AddBomLineWizard(models.TransientModel):
@@ -11,7 +10,7 @@ class AddBomLineWizard(models.TransientModel):
     product_id = fields.Many2one('product.product', string='产品名称')
     name = fields.Char(string='新产品名称')
     to_add = fields.Boolean(string='新建')
-    qty = fields.Float()
+    qty = fields.Float(default=1.0)
     product_specs = fields.Text(string=u'规格')
     process_id = fields.Many2one('mrp.process')
     product_type = fields.Selection(string="物料类型", selection=[('raw material', '原料'),
@@ -35,9 +34,9 @@ class AddBomLineWizard(models.TransientModel):
             'process_id': process_id,
             'to_add': self.to_add,
             'id': str(uuid.uuid1()),
-            'new_name': self.name if self.to_add else self.product_id.name,
+            'new_name': self.name,
             'product_tmpl_id': self.product_id.product_tmpl_id.id,
-            'product_specs': self.product_specs if self.to_add else self.product_id.product_specs
+            'product_specs': self.product_specs
         }
 
     @api.multi
@@ -48,4 +47,5 @@ class AddBomLineWizard(models.TransientModel):
     def action_edit(self):
         res = self._get_return_vals()
         res['id'] = self._context.get('pid')
+        print res
         return res

@@ -20,7 +20,8 @@ class MrpBom(models.Model):
         return {
             'type': 'ir.actions.client',
             'tag': 'new_bom_update',
-            'bom_id': self.id
+            'bom_id': self.id,
+            'is_show':True,
         }
 
     def get_bom(self):

@@ -1,9 +1,9 @@
 //v.1.3 build 100805
 
 /*
-Copyright DHTMLX LTD. http://www.dhtmlx.com
-To use this component please contact sales@dhtmlx.com to obtain license
-*/
+ Copyright DHTMLX LTD. http://www.dhtmlx.com
+ To use this component please contact sales@dhtmlx.com to obtain license
+ */
 
 /*_TOPICS_
  * @0:Initialization
@@ -24,12 +24,12 @@ To use this component please contact sales@dhtmlx.com to obtain license
  *  @type:  public
  *  @topic: 0
  */
-function GanttProjectInfo(id, name, startDate)
-{
+function GanttProjectInfo(id, name, startDate, isInline) {
     this.Id = id;
     this.Name = name;
     this.StartDate = startDate;
     this.ParentTasks = [];
+    this.isInline = isInline;
 }
 /**
  * @desc:  Delete specified task
@@ -38,8 +38,7 @@ function GanttProjectInfo(id, name, startDate)
  * @topic: 1
  * @edition: Professional
  */
-GanttProjectInfo.prototype.deleteTask = function(id)
-{
+GanttProjectInfo.prototype.deleteTask = function (id) {
     var task = this.getTaskById(id);
     if (task) {
         if (!task.ParentTask) {
@@ -69,8 +68,7 @@ GanttProjectInfo.prototype.deleteTask = function(id)
                 }
             }
 
-        } else
-        {
+        } else {
             var parentTask = task.ParentTask;
             for (var i = 0; i < parentTask.ChildTasks.length; i++) {
 
@@ -108,8 +106,7 @@ GanttProjectInfo.prototype.deleteTask = function(id)
  * @type:  public
  * @topic: 1
  */
-GanttProjectInfo.prototype.addTask = function(task)
-{
+GanttProjectInfo.prototype.addTask = function (task) {
     this.ParentTasks.push(task);
     task.setProject(this);
 };
@@ -119,10 +116,8 @@ GanttProjectInfo.prototype.addTask = function(task)
  * @type: public
  * @topic: 2
  */
-GanttProjectInfo.prototype.getTaskById = function(id)
-{
-    for (var j = 0; j < this.ParentTasks.length; j++)
-    {
+GanttProjectInfo.prototype.getTaskById = function (id) {
+    for (var j = 0; j < this.ParentTasks.length; j++) {
         var task = this.getTaskByIdInTree(this.ParentTasks[j], id);
         if (task) return task;
     }
@@ -135,24 +130,18 @@ GanttProjectInfo.prototype.getTaskById = function(id)
  * @type: private
  * @topic: 2
  */
-GanttProjectInfo.prototype.getTaskByIdInTree = function(parentTask, id)
-{
-    if (parentTask.Id == id)
-    {
+GanttProjectInfo.prototype.getTaskByIdInTree = function (parentTask, id) {
+    if (parentTask.Id == id) {
         return parentTask;
 
-    } else
-    {
+    } else {
         for (var i = 0; i < parentTask.ChildTasks.length; i++) {
 
-            if (parentTask.ChildTasks[i].Id == id)
-            {
+            if (parentTask.ChildTasks[i].Id == id) {
                 return parentTask.ChildTasks[i];
             }
-            if (parentTask.ChildTasks[i].ChildTasks.length > 0)
-            {
-                if (parentTask.ChildTasks[i].ChildTasks.length > 0)
-                {
+            if (parentTask.ChildTasks[i].ChildTasks.length > 0) {
+                if (parentTask.ChildTasks[i].ChildTasks.length > 0) {
                     var cTask = this.getTaskByIdInTree(parentTask.ChildTasks[i], id);
                     if (cTask) return cTask;
                 }
@@ -173,8 +162,8 @@ GanttProjectInfo.prototype.getTaskByIdInTree = function(parentTask, id)
  * @type:  public
  * @topic: 0
  */
-function GanttTaskInfo(id, name, est, duration, percentCompleted, predecessorTaskId, dateStop, currentStage, desc, qty, state)
-{
+
+function GanttTaskInfo(id, name, est, duration, percentCompleted, predecessorTaskId, dateStop, currentStage, desc, qty, state) {
     this.Id = id;
     this.Name = name;
     this.EST = est;
@@ -195,15 +184,16 @@ function GanttTaskInfo(id, name, est, duration, percentCompleted, predecessorTas
     this.nextParentTask = null;
     this.previousParentTask = null;
     this.currentStage = currentStage;
+    this.line = null;
 }
+
 /**
  * @desc: Addition of child task to the parent task
  * @param: task - (object) task
  * @type: public
  * @topic: 1
  */
-GanttTaskInfo.prototype.addChildTask = function(task)
-{
+GanttTaskInfo.prototype.addChildTask = function (task) {
     this.ChildTasks.push(task);
     task.ParentTask = this;
 };
@@ -213,11 +203,9 @@ GanttTaskInfo.prototype.addChildTask = function(task)
  * @type: private
  * @topic: 0
  */
-GanttTaskInfo.prototype.setProject = function(project)
-{
+GanttTaskInfo.prototype.setProject = function (project) {
     this.Project = project;
-    for (var j = 0; j < this.ChildTasks.length; j++)
-    {
+    for (var j = 0; j < this.ChildTasks.length; j++) {
         this.ChildTasks[j].setProject(project);
     }
 };
@@ -229,8 +217,7 @@ GanttTaskInfo.prototype.setProject = function(project)
  * @type:  public
  * @topic: 0
  */
-function GanttTask(taskInfo, project, chart)
-{
+function GanttTask(taskInfo, project, chart) {
     this.isTask = true;
 
     this.Chart = chart;
@@ -273,8 +260,7 @@ function GanttTask(taskInfo, project, chart)
  * @type:  public
  * @topic: 0
  */
-function GanttProject(Chart, projectInfo)
-{
+function GanttProject(Chart, projectInfo) {
     this.isProject = true;
 
     this.nextProject = null;
@@ -297,10 +283,8 @@ function GanttProject(Chart, projectInfo)
  *  @type: private
  *  @topic: 4
  */
-GanttProject.prototype.checkWidthProjectNameItem = function()
-{
-    if (this.projectNameItem.offsetWidth + this.projectNameItem.offsetLeft > this.Chart.maxWidthPanelNames)
-    {
+GanttProject.prototype.checkWidthProjectNameItem = function () {
+    if (this.projectNameItem.offsetWidth + this.projectNameItem.offsetLeft > this.Chart.maxWidthPanelNames) {
         var width = this.projectNameItem.offsetWidth + this.projectNameItem.offsetLeft - this.Chart.maxWidthPanelNames;
         var countChar = Math.round(width / (this.projectNameItem.offsetWidth / this.projectNameItem.firstChild.length));
         var pName = this.Project.Name.substring(0, this.projectNameItem.firstChild.length - countChar - 3);
@@ -313,17 +297,25 @@ GanttProject.prototype.checkWidthProjectNameItem = function()
  *  @type: private
  *  @topic: 0
  */
-GanttProject.prototype.create = function()
-{
+GanttProject.prototype.create = function () {
     var containerTasks = this.Chart.oData.firstChild;
 
     this.posX = (this.Project.StartDate - this.Chart.startDate) / (60 * 60 * 1000) * this.Chart.hourInPixels;
 
-    if (this.previousProject)
-    {
+    if (this.previousProject) {
         if (this.previousProject.arrTasks.length > 0) {
-            var lastChildTask = this.Chart.getLastChildTask(this.previousProject.arrTasks[this.previousProject.arrTasks.length - 1]);
-            this.posY = parseInt(lastChildTask.cTaskItem[0].style.top) + this.Chart.heightTaskItem + 11;
+
+            var line = _.reduce(_.pluck(this.previousProject.arrTasks, "TaskInfo"), function (line, memo) {
+                return memo === undefined || line > memo.line ? line : memo.line;
+            }, undefined);
+
+            if (line || line == 0) {
+                this.posY = parseInt(this.previousProject.projectItem[0].style.top) + (this.Chart.heightTaskItem + 11) * (line + 1);
+            }
+            else {
+                var lastChildTask = this.Chart.getLastChildTask(this.previousProject.arrTasks[this.previousProject.arrTasks.length - 1]);
+                this.posY = parseInt(lastChildTask.cTaskItem[0].style.top) + this.Chart.heightTaskItem + 11;
+            }
         } else {
             this.posY = parseInt(this.previousProject.projectItem[0].style.top) + this.Chart.heightTaskItem + 11;
         }
@@ -339,7 +331,7 @@ GanttProject.prototype.create = function()
         this.checkWidthProjectNameItem();
 
     }
-    this.projectItem = [this.createProjectItem(),[]];
+    this.projectItem = [this.createProjectItem(), []];
     containerTasks.appendChild(this.projectItem[0]);
 
     if (this.Chart.isShowDescProject) {
@@ -353,8 +345,7 @@ GanttProject.prototype.create = function()
  *  @type: public
  *  @topic: 0
  */
-function GanttChart()
-{
+function GanttChart() {
     this.Error = new GanttError();
     this.dhtmlXMLSenderObject = new dhtmlXMLSenderObject(this);
 
@@ -431,8 +422,7 @@ function GanttChart()
  * @topic: 0
  * @before_init: 1
  */
-GanttChart.prototype.setImagePath = function(newPath)
-{
+GanttChart.prototype.setImagePath = function (newPath) {
     this.imgs = newPath;
 };
 /**
@@ -442,8 +432,7 @@ GanttChart.prototype.setImagePath = function(newPath)
  * @topic: 0
  * @before_init: 1
  */
-GanttChart.prototype.setStylePath = function(newPath)
-{
+GanttChart.prototype.setStylePath = function (newPath) {
     this.stylePath = newPath;
 };
 /**
@@ -453,8 +442,7 @@ GanttChart.prototype.setStylePath = function(newPath)
  * @topic: 6
  * @before_init: 1
  */
-GanttChart.prototype.setSavePath = function(newPath)
-{
+GanttChart.prototype.setSavePath = function (newPath) {
     this.savePath = newPath;
 };
 /**
@@ -464,12 +452,10 @@ GanttChart.prototype.setSavePath = function(newPath)
  * @topic: 6
  * @before_init: 1
  */
-GanttChart.prototype.setLoadPath = function(newPath)
-{
+GanttChart.prototype.setLoadPath = function (newPath) {
     this.loadPath = newPath;
 };
-GanttChart.prototype.setCorrectError = function(isCorrectError)
-{
+GanttChart.prototype.setCorrectError = function (isCorrectError) {
     this.correctError = isCorrectError;
 };
 
@@ -481,13 +467,11 @@ GanttChart.prototype.setCorrectError = function(isCorrectError)
  * @topic: 3
  * @before_init: 1
  */
-GanttChart.prototype.showDescTask = function(isShowDescTask, param)
-{
+GanttChart.prototype.showDescTask = function (isShowDescTask, param) {
     this.isShowDescTask = isShowDescTask;
     var arrValues = new Array(5);
 
-    if (this.isShowDescTask)
-    {
+    if (this.isShowDescTask) {
         if (param) {
             var arrParam = param.split(",");
             for (var i = 0; i < arrParam.length; i++) {
@@ -510,13 +494,11 @@ GanttChart.prototype.showDescTask = function(isShowDescTask, param)
  * @topic: 3
  * @before_init: 1
  */
-GanttChart.prototype.showDescProject = function(isShowDescProject, param)
-{
+GanttChart.prototype.showDescProject = function (isShowDescProject, param) {
     this.isShowDescProject = isShowDescProject;
     var arrValues = new Array(4);
 
-    if (this.isShowDescProject)
-    {
+    if (this.isShowDescProject) {
         if (param) {
             var arrParam = param.split(",");
             for (var i = 0; i < arrParam.length; i++) {
@@ -538,8 +520,7 @@ GanttChart.prototype.showDescProject = function(isShowDescProject, param)
  * @topic: 3
  * @before_init: 1
  */
-GanttChart.prototype.showContextMenu = function(show)
-{
+GanttChart.prototype.showContextMenu = function (show) {
     this.isShowConMenu = show;
 };
 
@@ -550,8 +531,7 @@ GanttChart.prototype.showContextMenu = function(show)
  * @topic: 3
  * @before_init: 1
  */
-GanttChart.prototype.setContextMenu = function(menu)
-{
+GanttChart.prototype.setContextMenu = function (menu) {
     this.showContextMenu(true);
     this.contextMenu = menu;
 };
@@ -563,13 +543,11 @@ GanttChart.prototype.setContextMenu = function(menu)
  * @topic: 3
  * @before_init: 1
  */
-GanttChart.prototype.showNewProject = function(show)
-{
+GanttChart.prototype.showNewProject = function (show) {
     this.isShowNewProject = show;
 };
 
-GanttChart.prototype.getParamShowTask = function(param)
-{
+GanttChart.prototype.getParamShowTask = function (param) {
     switch (param) {
         case 'n':
             //name
@@ -597,8 +575,7 @@ GanttChart.prototype.getParamShowTask = function(param)
     }
 };
 
-GanttChart.prototype.getParamShowProject = function(param)
-{
+GanttChart.prototype.getParamShowProject = function (param) {
     switch (param) {
         case 'n':
             //name
@@ -622,12 +599,10 @@ GanttChart.prototype.getParamShowProject = function(param)
     }
 };
 
-GanttChart.prototype.getValueShowTask = function(param)
-{
+GanttChart.prototype.getValueShowTask = function (param) {
     var arrValues = [];
     for (var i = 0; i < param.length; i++) {
-        if (param[i])
-        {
+        if (param[i]) {
             switch (i) {
                 case 0:
                     arrValues.push('Name');
@@ -652,13 +627,11 @@ GanttChart.prototype.getValueShowTask = function(param)
     return arrValues;
 };
 
-GanttChart.prototype.getValueShowProject = function(param)
-{
+GanttChart.prototype.getValueShowProject = function (param) {
     var arrValues = [];
     for (var i = 0; i < param.length; i++) {
 
-        if (param[i])
-        {
+        if (param[i]) {
             switch (i) {
                 case 0:
                     arrValues.push('Name');
@@ -688,8 +661,7 @@ GanttChart.prototype.getValueShowProject = function(param)
  * @topic: 0
  * @before_init: 1
  */
-GanttChart.prototype.setEditable = function(isEditable)
-{
+GanttChart.prototype.setEditable = function (isEditable) {
     this.isEditable = isEditable;
 };
 //#__pro_feature:01102007{
@@ -701,8 +673,7 @@ GanttChart.prototype.setEditable = function(isEditable)
  * @before_init: 1
  * @edition: Professional
  */
-GanttChart.prototype.showTreePanel = function(show)
-{
+GanttChart.prototype.showTreePanel = function (show) {
     this._showTreePanel = show;
 };
 /**
@@ -712,8 +683,7 @@ GanttChart.prototype.showTreePanel = function(show)
  * @topic: 0
  * @before_init: 1
  */
-GanttChart.prototype.showTooltip = function(show)
-{
+GanttChart.prototype.showTooltip = function (show) {
     this._showTooltip = show;
 };
 //#}
@@ -723,13 +693,11 @@ GanttChart.prototype.showTooltip = function(show)
  * @type: public
  * @topic: 2
  */
-GanttChart.prototype.getProjectById = function(id)
-{
+GanttChart.prototype.getProjectById = function (id) {
 
     for (var i = 0; i < this.arrProjects.length; i++) {
 
-        if (this.arrProjects[i].Project.Id == id)
-        {
+        if (this.arrProjects[i].Project.Id == id) {
             return this.arrProjects[i];
         }
     }
@@ -740,19 +708,15 @@ GanttChart.prototype.getProjectById = function(id)
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.getBrowserType = function()
-{
+GanttChart.prototype.getBrowserType = function () {
 
-    if (navigator.appName.indexOf('Explorer') != -1)
-    {
+    if (navigator.appName.indexOf('Explorer') != -1) {
         this._isIE = true;
 
-    } else if (navigator.userAgent.indexOf('Mozilla') != -1)
-    {
+    } else if (navigator.userAgent.indexOf('Mozilla') != -1) {
         this._isFF = true;
 
-    } else if (navigator.userAgent.indexOf('Opera') != -1)
-    {
+    } else if (navigator.userAgent.indexOf('Opera') != -1) {
         this._isOpera = true;
     }
 };
@@ -763,8 +727,7 @@ GanttChart.prototype.getBrowserType = function()
  * @topic: 0
  * @before_init: 1
  */
-GanttChart.prototype.addProject = function(projectInfo)
-{
+GanttChart.prototype.addProject = function (projectInfo) {
     this.Project.push(projectInfo);
 };
 /**
@@ -773,8 +736,7 @@ GanttChart.prototype.addProject = function(projectInfo)
  * @type: public
  * @topic: 1
  */
-GanttProject.prototype.deleteTask = function(id)
-{
+GanttProject.prototype.deleteTask = function (id) {
     var task = this.getTaskById(id);
     if (task) {
         this.deleteChildTask(task);
@@ -788,14 +750,11 @@ GanttProject.prototype.deleteTask = function(id)
  * @type: public
  * @topic: 1
  */
-GanttChart.prototype.deleteProject = function(id)
-{
+GanttChart.prototype.deleteProject = function (id) {
     var project = this.getProjectById(id);
 
-    if (project)
-    {
-        if (project.arrTasks.length > 0)
-        {
+    if (project) {
+        if (project.arrTasks.length > 0) {
             while (project.arrTasks.length > 0) {
                 project.deleteChildTask(project.arrTasks[0]);
             }
@@ -812,22 +771,18 @@ GanttChart.prototype.deleteProject = function(id)
 
 
         if ((project.previousProject) &&
-                (project.nextProject))
-        {
+            (project.nextProject)) {
             var previousProject = project.previousProject;
             previousProject.nextProject = project.nextProject;
         }
 
-        if ((project.previousProject) &&
-                !(project.nextProject))
-        {
+        if ((project.previousProject) && !(project.nextProject)) {
             var previousProject = project.previousProject;
             previousProject.nextProject = null;
 
         }
         if (!(project.previousProject) &&
-                (project.nextProject))
-        {
+            (project.nextProject)) {
             var nextProject = project.nextProject;
             nextProject.previousProject = null;
 
@@ -835,8 +790,7 @@ GanttChart.prototype.deleteProject = function(id)
 
         for (var i = 0; i < this.arrProjects.length; i++) {
 
-            if (this.arrProjects[i].Project.Id == id)
-            {
+            if (this.arrProjects[i].Project.Id == id) {
                 this.arrProjects.splice(i, 1);
             }
         }
@@ -853,10 +807,8 @@ GanttChart.prototype.deleteProject = function(id)
 
         this._oDataHeight -= 11 + this.heightTaskItem;
 
-        if (this.Project.length == 0)
-        {
-            if (this.isShowNewProject)
-            {
+        if (this.Project.length == 0) {
+            if (this.isShowNewProject) {
                 var d = new Date(this.startDate);
                 var t = new Date(d.setDate(d.getDate() + 1));
 
@@ -880,12 +832,10 @@ GanttChart.prototype.deleteProject = function(id)
  * @type: public
  * @topic: 0
  */
-GanttProject.prototype.setName = function(name)
-{
+GanttProject.prototype.setName = function (name) {
     if ((name != "") && (name != null)) {
         this.Project.Name = name;
-        if (this.Chart._showTreePanel)
-        {
+        if (this.Chart._showTreePanel) {
             this.projectNameItem.innerHTML = name;
             this.projectNameItem.title = name;
             this.checkWidthProjectNameItem();
@@ -901,61 +851,49 @@ GanttProject.prototype.setName = function(name)
  * @type: public
  * @topic: 0
  */
-GanttProject.prototype.setPercentCompleted = function(percentCompleted)
-{
+GanttProject.prototype.setPercentCompleted = function (percentCompleted) {
     percentCompleted = parseInt(percentCompleted);
-    if (isNaN(percentCompleted))
-    {
+    if (isNaN(percentCompleted)) {
         this.Chart.Error.throwError("DATA_INSERT_ERROR", 6, null);
         return false;
     }
 
-    if (percentCompleted > 100)
-    {
+    if (percentCompleted > 100) {
         this.Chart.Error.throwError("DATA_INSERT_ERROR", 7, null);
         return false;
 
-    } else if (percentCompleted < 0)
-    {
+    } else if (percentCompleted < 0) {
         this.Chart.Error.throwError("DATA_INSERT_ERROR", 8, null);
         return false;
     }
 
-    if ((percentCompleted > 0) && (percentCompleted < 100) && (this.percentCompleted > 0) && (this.percentCompleted < 100))
-    {
+    if ((percentCompleted > 0) && (percentCompleted < 100) && (this.percentCompleted > 0) && (this.percentCompleted < 100)) {
         this.projectItem[0].firstChild.rows[0].cells[0].width = parseInt(percentCompleted) + "%";
         this.projectItem[0].firstChild.rows[0].cells[0].firstChild.style.width = (percentCompleted * this.Duration * this.Chart.hourInPixelsWork) / 100 + "px";
         this.projectItem[0].firstChild.rows[0].cells[1].width = (100 - parseInt(percentCompleted)) + "%";
         this.projectItem[0].firstChild.rows[0].cells[1].firstChild.style.width = ((100 - percentCompleted) * this.Duration * this.Chart.hourInPixelsWork) / 100 + "px";
 
-    } else if (((percentCompleted == 0) || (percentCompleted == 100)) && (this.percentCompleted > 0) && (this.percentCompleted < 100))
-    {
-        if (percentCompleted == 0)
-        {
+    } else if (((percentCompleted == 0) || (percentCompleted == 100)) && (this.percentCompleted > 0) && (this.percentCompleted < 100)) {
+        if (percentCompleted == 0) {
             this.projectItem[0].firstChild.rows[0].cells[0].parentNode.removeChild(this.projectItem[0].firstChild.rows[0].cells[0]);
             this.projectItem[0].firstChild.rows[0].cells[0].width = 100 + "%";
             this.projectItem[0].firstChild.rows[0].cells[0].firstChild.style.width = this.Duration * this.Chart.hourInPixelsWork + "px";
 
-        } else if (percentCompleted == 100)
-        {
+        } else if (percentCompleted == 100) {
             this.projectItem[0].firstChild.rows[0].cells[1].parentNode.removeChild(this.projectItem[0].firstChild.rows[0].cells[1]);
             this.projectItem[0].firstChild.rows[0].cells[0].width = 100 + "%";
             this.projectItem[0].firstChild.rows[0].cells[0].firstChild.style.width = this.Duration * this.Chart.hourInPixelsWork + "px";
         }
 
-    } else if (((percentCompleted == 0) || (percentCompleted == 100)) && ((this.percentCompleted == 0) || (this.percentCompleted == 100)))
-    {
-        if ((percentCompleted == 0) && (this.percentCompleted == 100))
-        {
+    } else if (((percentCompleted == 0) || (percentCompleted == 100)) && ((this.percentCompleted == 0) || (this.percentCompleted == 100))) {
+        if ((percentCompleted == 0) && (this.percentCompleted == 100)) {
             this.projectItem[0].firstChild.rows[0].cells[0].firstChild.src = this.Chart.imgs + "progress_bg.png";
 
-        } else if ((percentCompleted == 100) && (this.percentCompleted == 0))
-        {
+        } else if ((percentCompleted == 100) && (this.percentCompleted == 0)) {
             this.projectItem[0].firstChild.rows[0].cells[0].firstChild.src = this.Chart.imgs + "parentnode_filled.png";
         }
 
-    } else if (((percentCompleted > 0) || (percentCompleted < 100)) && ((this.percentCompleted == 0) || (this.percentCompleted == 100)))
-    {
+    } else if (((percentCompleted > 0) || (percentCompleted < 100)) && ((this.percentCompleted == 0) || (this.percentCompleted == 100))) {
         this.projectItem[0].firstChild.rows[0].cells[0].parentNode.removeChild(this.projectItem[0].firstChild.rows[0].cells[0]);
 
         var cellprojectItem = document.createElement("TD");
@@ -979,14 +917,11 @@ GanttProject.prototype.setPercentCompleted = function(percentCompleted)
         cellprojectItem.appendChild(imgPr);
         imgPr.src = this.Chart.imgs + "progress_bg.png";
 
-    } else if (this.percentCompleted == -1)
-    {
-        if (percentCompleted == 100)
-        {
+    } else if (this.percentCompleted == -1) {
+        if (percentCompleted == 100) {
             this.projectItem[0].firstChild.rows[0].cells[0].firstChild.src = this.Chart.imgs + "parentnode_filled.png";
 
-        } else if (percentCompleted < 100 && percentCompleted > 0)
-        {
+        } else if (percentCompleted < 100 && percentCompleted > 0) {
 
             this.projectItem[0].firstChild.rows[0].cells[0].parentNode.removeChild(this.projectItem[0].firstChild.rows[0].cells[0]);
 
@@ -1023,17 +958,14 @@ GanttProject.prototype.setPercentCompleted = function(percentCompleted)
  * @type: private
  * @topic: 1
  */
-GanttProject.prototype.deleteChildTask = function(task)
-{
-    if (task)
-    {
+GanttProject.prototype.deleteChildTask = function (task) {
+    if (task) {
         if (task.cTaskItem[0].style.display == "none") {
             this.Chart.openTree(task.parentTask);
         }
         //delete of connecting lines
         if (task.childPredTask.length > 0) {
-            for (var i = 0; i < task.childPredTask.length; i++)
-            {
+            for (var i = 0; i < task.childPredTask.length; i++) {
                 for (var t = 0; t < task.childPredTask[i].cTaskItem[1].length; t++) {
                     task.childPredTask[i].cTaskItem[1][t].parentNode.removeChild(task.childPredTask[i].cTaskItem[1][t]);
                 }
@@ -1086,8 +1018,7 @@ GanttProject.prototype.deleteChildTask = function(task)
         }
 
         //delete object task
-        if (task.parentTask)
-        {
+        if (task.parentTask) {
             if (task.previousChildTask) {
                 if (task.nextChildTask) {
                     task.previousChildTask.nextChildTask = task.nextChildTask;
@@ -1098,8 +1029,7 @@ GanttProject.prototype.deleteChildTask = function(task)
             }
 
             var parentTask = task.parentTask;
-            for (var i = 0; i < parentTask.childTask.length; i++)
-            {
+            for (var i = 0; i < parentTask.childTask.length; i++) {
                 if (parentTask.childTask[i].TaskInfo.Id == task.TaskInfo.Id) {
                     parentTask.childTask[i] = null;
                     parentTask.childTask.splice(i, 1);
@@ -1112,10 +1042,8 @@ GanttProject.prototype.deleteChildTask = function(task)
                     parentTask.cTaskNameItem[2] = null;
                 }
             }
-        } else
-        {
-            if (task.previousParentTask)
-            {
+        } else {
+            if (task.previousParentTask) {
                 if (task.nextParentTask) {
                     task.previousParentTask.nextParentTask = task.nextParentTask;
                 } else {
@@ -1167,8 +1095,7 @@ GanttProject.prototype.deleteChildTask = function(task)
  * @type: public
  * @topic: 1
  */
-GanttProject.prototype.insertTask = function(id, name, EST, Duration, PercentCompleted, predecessorTaskId, parentTaskId)
-{
+GanttProject.prototype.insertTask = function (id, name, EST, Duration, PercentCompleted, predecessorTaskId, parentTaskId) {
     var task = null;
     var _task = null;
 
@@ -1206,14 +1133,14 @@ GanttProject.prototype.insertTask = function(id, name, EST, Duration, PercentCom
 
         EST = EST || parentTask.EST;
         if (EST < parentTask.EST) {
-            this.Chart.Error.throwError("DATA_INSERT_ERROR", 20, [id,parentTaskId]);
+            this.Chart.Error.throwError("DATA_INSERT_ERROR", 20, [id, parentTaskId]);
             return false;
         }
 
         task = new GanttTaskInfo(id, name, EST, Duration, PercentCompleted, predecessorTaskId);
 
         if (!this.Chart.checkPosParentTask(parentTask, task)) {
-            this.Chart.Error.throwError("DATA_INSERT_ERROR", 19, [parentTaskId,id]);
+            this.Chart.Error.throwError("DATA_INSERT_ERROR", 19, [parentTaskId, id]);
             return false;
         }
         task.ParentTask = parentTask;
@@ -1237,8 +1164,7 @@ GanttProject.prototype.insertTask = function(id, name, EST, Duration, PercentCom
             }
         }
 
-        if (predecessorTaskId != "")
-        {
+        if (predecessorTaskId != "") {
             var predTask = this.Project.getTaskById(predecessorTaskId);
             if (!predTask) {
                 this.Chart.Error.throwError("DATA_INSERT_ERROR", 27, [predecessorTaskId]);
@@ -1247,11 +1173,11 @@ GanttProject.prototype.insertTask = function(id, name, EST, Duration, PercentCom
 
             if (predTask.ParentTask) {
                 if (predTask.ParentTask.Id != task.ParentTask.Id) {
-                    this.Chart.Error.throwError("DATA_INSERT_ERROR", 32, [predTask.Id,task.Id]);
+                    this.Chart.Error.throwError("DATA_INSERT_ERROR", 32, [predTask.Id, task.Id]);
                     return false;
                 }
             } else {
-                this.Chart.Error.throwError("DATA_INSERT_ERROR", 32, [predTask.Id,task.Id]);
+                this.Chart.Error.throwError("DATA_INSERT_ERROR", 32, [predTask.Id, task.Id]);
                 return false;
             }
 
@@ -1265,8 +1191,7 @@ GanttProject.prototype.insertTask = function(id, name, EST, Duration, PercentCom
         var isAdd = false;
 
         if (sortRequired) for (var i = 0; i < parentTask.ChildTasks.length; i++) {
-            if (task.EST < parentTask.ChildTasks[i].EST)
-            {
+            if (task.EST < parentTask.ChildTasks[i].EST) {
                 parentTask.ChildTasks.splice(i, 0, task);
                 if (i > 0) {
                     parentTask.ChildTasks[i - 1].nextChildTask = parentTask.ChildTasks[i];
@@ -1300,8 +1225,7 @@ GanttProject.prototype.insertTask = function(id, name, EST, Duration, PercentCom
         _task.addDayInPanelTime();
         _task.shiftCurrentTasks(_task, 23);
 
-    } else
-    {
+    } else {
 
         EST = EST || this.Project.StartDate;
 
@@ -1324,7 +1248,7 @@ GanttProject.prototype.insertTask = function(id, name, EST, Duration, PercentCom
             }
 
             if (predTask.ParentTask) {
-                this.Chart.Error.throwError("DATA_INSERT_ERROR", 15, [task.Id,predTask.Id]);
+                this.Chart.Error.throwError("DATA_INSERT_ERROR", 15, [task.Id, predTask.Id]);
                 return false;
             }
             task.PredecessorTask = predTask;
@@ -1333,8 +1257,7 @@ GanttProject.prototype.insertTask = function(id, name, EST, Duration, PercentCom
 
         if (sortRequired) for (var i = 0; i < this.Project.ParentTasks.length; i++) {
 
-            if (EST < this.Project.ParentTasks[i].EST)
-            {
+            if (EST < this.Project.ParentTasks[i].EST) {
                 this.Project.ParentTasks.splice(i, 0, task);
                 if (i > 0) {
                     this.Project.ParentTasks[i - 1].nextParentTask = task;
@@ -1385,16 +1308,14 @@ GanttProject.prototype.insertTask = function(id, name, EST, Duration, PercentCom
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.checkPosPredecessorTask = function(predTask, task)
-{
+GanttChart.prototype.checkPosPredecessorTask = function (predTask, task) {
     var widthPred = this.getWidthOnDuration(predTask.Duration);
     var posPred = this.getPosOnDate(predTask.EST);
     var posChild = this.getPosOnDate(task.EST);
     return (widthPred + posPred) <= posChild;
 
 };
-GanttChart.prototype.correctPosPredecessorTask = function(predTask, ctask, ctaskObj)
-{
+GanttChart.prototype.correctPosPredecessorTask = function (predTask, ctask, ctaskObj) {
     var newDate = new Date(predTask.EST);
     newDate.setHours(newDate.getHours() + (predTask.Duration / this.hoursInDay * 24));
     if (newDate.getHours() > 0) {
@@ -1405,28 +1326,23 @@ GanttChart.prototype.correctPosPredecessorTask = function(predTask, ctask, ctask
     if (ctaskObj) ctaskObj.setEST(newDate, true);
     else ctask.EST = newDate;
 
-    if (ctask.ParentTask)
-    {
-        if (!this.checkPosParentTask(ctask.ParentTask, ctask))
-        {
+    if (ctask.ParentTask) {
+        if (!this.checkPosParentTask(ctask.ParentTask, ctask)) {
             var newDate2 = new Date(ctask.ParentTask.EST);
             newDate2.setHours(newDate2.getHours() + (ctask.ParentTask.Duration / this.hoursInDay * 24));
             ctask.Duration = parseInt((parseInt((newDate2 - ctask.EST) / (1000 * 60 * 60))) * this.hoursInDay / 24);
         }
     }
 };
-GanttChart.prototype.correctPosParentTask = function(parentTask, ctask)
-{
-    if (!ctask.PredecessorTask)
-    {
+GanttChart.prototype.correctPosParentTask = function (parentTask, ctask) {
+    if (!ctask.PredecessorTask) {
         if (parentTask.EST > ctask.EST) {
             ctask.EST = new Date(parentTask.EST);
         }
         if (!this.checkPosParentTask(parentTask, ctask)) {
             ctask.Duration = parentTask.Duration;
         }
-    } else
-    {
+    } else {
         this.correctPosPredecessorTask(ctask.PredecessorTask, ctask);
     }
 };
@@ -1437,33 +1353,28 @@ GanttChart.prototype.correctPosParentTask = function(parentTask, ctask)
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.checkPosParentTaskInTree = function(parentTask)
-{
+GanttChart.prototype.checkPosParentTaskInTree = function (parentTask) {
     var isError = false;
-    for (var t = 0; t < parentTask.ChildTasks.length; t++)
-    {
+    for (var t = 0; t < parentTask.ChildTasks.length; t++) {
 
-        if (!this.checkPosParentTask(parentTask, parentTask.ChildTasks[t]))
-        {
+        if (!this.checkPosParentTask(parentTask, parentTask.ChildTasks[t])) {
             if (!this.correctError) {
-                this.Error.throwError("DATA_ERROR", 28, [parentTask.Id,parentTask.ChildTasks[t].Id]);
+                this.Error.throwError("DATA_ERROR", 28, [parentTask.Id, parentTask.ChildTasks[t].Id]);
                 return true;
             } else {
                 this.correctPosParentTask(parentTask, parentTask.ChildTasks[t]);
             }
         }
-        if (parentTask.EST > parentTask.ChildTasks[t].EST)
-        {
+        if (parentTask.EST > parentTask.ChildTasks[t].EST) {
             if (!this.correctError) {
-                this.Error.throwError("DATA_ERROR", 33, [parentTask.Id,parentTask.ChildTasks[t].Id]);
+                this.Error.throwError("DATA_ERROR", 33, [parentTask.Id, parentTask.ChildTasks[t].Id]);
                 return true;
             } else {
                 this.correctPosParentTask(parentTask, parentTask.ChildTasks[t]);
             }
         }
 
-        if (parentTask.ChildTasks[t].ChildTasks.length > 0)
-        {
+        if (parentTask.ChildTasks[t].ChildTasks.length > 0) {
             isError = this.checkPosParentTaskInTree(parentTask.ChildTasks[t]);
         }
 
@@ -1476,13 +1387,11 @@ GanttChart.prototype.checkPosParentTaskInTree = function(parentTask)
  * @type: private
  * @topic: 0
  */
-GanttChart.prototype.setPredTask = function(project)
-{
+GanttChart.prototype.setPredTask = function (project) {
     var isError = false;
     for (var k = 0; k < project.ParentTasks.length; k++) {
 
-        if (!this.isEmpty(project.ParentTasks[k].PredecessorTaskId))
-        {
+        if (!this.isEmpty(project.ParentTasks[k].PredecessorTaskId)) {
             project.ParentTasks[k].PredecessorTask = project.getTaskById(project.ParentTasks[k].PredecessorTaskId);
             if (!project.ParentTasks[k].PredecessorTask) {
                 if (!this.correctError) {
@@ -1494,11 +1403,10 @@ GanttChart.prototype.setPredTask = function(project)
             project.ParentTasks[k].PredecessorTask.ChildPredTasks.push(project.ParentTasks[k]);
         }
 
-        if (project.ParentTasks[k].PredecessorTask)
-        {
+        if (project.ParentTasks[k].PredecessorTask) {
             if (!this.checkPosPredecessorTask(project.ParentTasks[k].PredecessorTask, project.ParentTasks[k])) {
                 if (!this.correctError) {
-                    this.Error.throwError("DATA_ERROR", 26, [project.ParentTasks[k].PredecessorTask.Id,project.ParentTasks[k].Id]);
+                    this.Error.throwError("DATA_ERROR", 26, [project.ParentTasks[k].PredecessorTask.Id, project.ParentTasks[k].Id]);
                     return true;
                 } else {
                     this.correctPosPredecessorTask(project.ParentTasks[k].PredecessorTask, project.ParentTasks[k]);
@@ -1518,16 +1426,12 @@ GanttChart.prototype.setPredTask = function(project)
  * @type: private
  * @topic: 0
  */
-GanttChart.prototype.setPredTaskInTree = function(parentTask)
-{
+GanttChart.prototype.setPredTaskInTree = function (parentTask) {
     var isError = false;
-    for (var t = 0; t < parentTask.ChildTasks.length; t++)
-    {
-        if (!this.isEmpty(parentTask.ChildTasks[t].PredecessorTaskId))
-        {
+    for (var t = 0; t < parentTask.ChildTasks.length; t++) {
+        if (!this.isEmpty(parentTask.ChildTasks[t].PredecessorTaskId)) {
             parentTask.ChildTasks[t].PredecessorTask = parentTask.Project.getTaskById(parentTask.ChildTasks[t].PredecessorTaskId);
-            if (!parentTask.ChildTasks[t].PredecessorTask)
-            {
+            if (!parentTask.ChildTasks[t].PredecessorTask) {
                 if (!this.correctError) {
                     this.Error.throwError("DATA_ERROR", 27, [parentTask.ChildTasks[t].PredecessorTaskId]);
                     return true;
@@ -1535,10 +1439,9 @@ GanttChart.prototype.setPredTaskInTree = function(parentTask)
 
             }
 
-            if (!this.checkPosPredecessorTask(parentTask.ChildTasks[t].PredecessorTask, parentTask.ChildTasks[t]))
-            {
+            if (!this.checkPosPredecessorTask(parentTask.ChildTasks[t].PredecessorTask, parentTask.ChildTasks[t])) {
                 if (!this.correctError) {
-                    this.Error.throwError("DATA_ERROR", 26, [parentTask.ChildTasks[t].PredecessorTask.Id,parentTask.ChildTasks[t].Id]);
+                    this.Error.throwError("DATA_ERROR", 26, [parentTask.ChildTasks[t].PredecessorTask.Id, parentTask.ChildTasks[t].Id]);
                     return true;
                 } else {
                     this.correctPosPredecessorTask(parentTask.ChildTasks[t].PredecessorTask, parentTask.ChildTasks[t]);
@@ -1547,8 +1450,7 @@ GanttChart.prototype.setPredTaskInTree = function(parentTask)
             parentTask.ChildTasks[t].PredecessorTask.ChildPredTasks.push(parentTask.ChildTasks[t]);
         }
 
-        if (parentTask.ChildTasks[t].ChildTasks.length > 0)
-        {
+        if (parentTask.ChildTasks[t].ChildTasks.length > 0) {
             isError = this.setPredTaskInTree(parentTask.ChildTasks[t]);
         }
 
@@ -1562,8 +1464,7 @@ GanttChart.prototype.setPredTaskInTree = function(parentTask)
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.checkPosParentTask = function(parentTask, task)
-{
+GanttChart.prototype.checkPosParentTask = function (parentTask, task) {
     var widthParent = this.getWidthOnDuration(parentTask.Duration);
     var posParent = this.getPosOnDate(parentTask.EST);
     var posChild = this.getPosOnDate(task.EST);
@@ -1578,10 +1479,8 @@ GanttChart.prototype.checkPosParentTask = function(parentTask, task)
  * @type: public
  * @topic: 1
  */
-GanttChart.prototype.insertProject = function(id, name, startDate)
-{
-    if (this._isError)
-    {
+GanttChart.prototype.insertProject = function (id, name, startDate) {
+    if (this._isError) {
         this.clearData();
         this.clearItems();
         this.hidePanelErrors();
@@ -1647,22 +1546,21 @@ GanttChart.prototype.insertProject = function(id, name, startDate)
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype._showContextMenu = function(event, obj)
-{
+GanttChart.prototype._showContextMenu = function (event, obj) {
     if (this.contextMenu.isDhtmlxMenuObject) {
         var res = this.callEvent("onBeforeContextMenu", [this.contextMenu, obj]);
         if (res === false) return;
 
         var x, y;
-        if (_isIE){
-            var dEl0 = window.document.documentElement, dEl1 = window.document.body, corrector = new Array((dEl0.scrollLeft||dEl1.scrollLeft),(dEl0.scrollTop||dEl1.scrollTop));
+        if (_isIE) {
+            var dEl0 = window.document.documentElement, dEl1 = window.document.body, corrector = new Array((dEl0.scrollLeft || dEl1.scrollLeft), (dEl0.scrollTop || dEl1.scrollTop));
             x = event.clientX + corrector[0];
             y = event.clientY + corrector[1];
         } else {
             x = event.pageX;
             y = event.pageY;
         }
-        this.contextMenu.showContextMenu(x-1, y-1);
+        this.contextMenu.showContextMenu(x - 1, y - 1);
     } else {
         var elem = event.srcElement || event.target;
         this.contextMenu.showContextMenu(elem.style.left, elem.style.top, obj);
@@ -1675,8 +1573,7 @@ GanttChart.prototype._showContextMenu = function(event, obj)
  * @type: private
  * @topic: 3
  */
-GanttChart.prototype.openTree = function(parentTask)
-{
+GanttChart.prototype.openTree = function (parentTask) {
     var lastParentTask = this.getLastCloseParent(parentTask);
     if (parentTask.TaskInfo.Id != lastParentTask.TaskInfo.Id) {
 
@@ -1693,10 +1590,8 @@ GanttChart.prototype.openTree = function(parentTask)
  * @type: private
  * @topic: 3
  */
-GanttChart.prototype.openNode = function(parentTask)
-{
-    if (!parentTask._isOpen)
-    {
+GanttChart.prototype.openNode = function (parentTask) {
+    if (!parentTask._isOpen) {
         parentTask.cTaskNameItem[2].src = this.imgs + "minus.gif";
         parentTask._isOpen = true;
         parentTask.shiftCurrentTasks(parentTask, parentTask._heightHideTasks);
@@ -1710,12 +1605,10 @@ GanttChart.prototype.openNode = function(parentTask)
  * @type: private
  * @topic: 2
  */
-GanttChart.prototype.getLastCloseParent = function(task)
-{
-    if (task.parentTask)
-    {
+GanttChart.prototype.getLastCloseParent = function (task) {
+    if (task.parentTask) {
         if ((!task.parentTask._isOpen) ||
-                (task.parentTask.cTaskNameItem[2].style.display == "none")) {
+            (task.parentTask.cTaskNameItem[2].style.display == "none")) {
             return this.getLastCloseParent(task.parentTask);
 
         } else {
@@ -1732,11 +1625,9 @@ GanttChart.prototype.getLastCloseParent = function(task)
  * @type: public
  * @topic: 0
  */
-GanttTask.prototype.setPredecessor = function(predecessorTaskId)
-{
+GanttTask.prototype.setPredecessor = function (predecessorTaskId) {
     if (predecessorTaskId == "") this.clearPredTask();
-    else
-    {
+    else {
         var task = this.TaskInfo;
         if (task.Id == predecessorTaskId) {
             this.Chart.Error.throwError("DATA_INSERT_ERROR", 36);
@@ -1751,7 +1642,7 @@ GanttTask.prototype.setPredecessor = function(predecessorTaskId)
         var predTask = predTaskObj.TaskInfo;
         var a1 = predTask.ParentTask == null, a2 = task.ParentTask == null;
         if (a1 && !a2 || !a1 && a2 || !a1 && !a2 && (predTask.ParentTask.Id != task.ParentTask.Id)) {
-            this.Chart.Error.throwError("DATA_INSERT_ERROR", 32, [predTask.Id,task.Id]);
+            this.Chart.Error.throwError("DATA_INSERT_ERROR", 32, [predTask.Id, task.Id]);
             return false;
         }
 
@@ -1777,7 +1668,7 @@ GanttTask.prototype.setPredecessor = function(predecessorTaskId)
  *  @type: private
  *  @topic: 0
  */
-GanttTask.prototype.clearPredTask = function() {
+GanttTask.prototype.clearPredTask = function () {
     if (this.predTask) {
         var ch = this.predTask.childPredTask;
         for (var i = 0; i < ch.length; i++) {
@@ -1804,22 +1695,19 @@ GanttTask.prototype.clearPredTask = function() {
  * @type: public
  * @topic: 0
  */
-GanttTask.prototype.setEST = function(est, shiftChild)
-{
+GanttTask.prototype.setEST = function (est, shiftChild) {
     this.moveChild = shiftChild;
     this.getMoveInfo();
 
     var pos = this.Chart.getPosOnDate(est);
-    if ((parseInt(this.cTaskItem[0].firstChild.firstChild.width) + pos > this.maxPosXMove) && (this.maxPosXMove != -1))
-    {
+    if ((parseInt(this.cTaskItem[0].firstChild.firstChild.width) + pos > this.maxPosXMove) && (this.maxPosXMove != -1)) {
         this.Chart.Error.throwError("DATA_INSERT_ERROR", 12, [this.TaskInfo.Id]);
         this.maxPosXMove = -1;
         this.minPosXMove = -1;
         return false;
     }
 
-    if (pos < this.minPosXMove)
-    {
+    if (pos < this.minPosXMove) {
         this.Chart.Error.throwError("DATA_INSERT_ERROR", 11, [this.TaskInfo.Id]);
         this.maxPosXMove = -1;
         this.minPosXMove = -1;
@@ -1844,16 +1732,13 @@ GanttTask.prototype.setEST = function(est, shiftChild)
  *  @type: public
  *  @topic: 0
  */
-GanttTask.prototype.setDuration = function(duration)
-{
+GanttTask.prototype.setDuration = function (duration) {
     this.getResizeInfo();
     var width = this.Chart.getWidthOnDuration(duration);
-    if ((width > this.maxWidthResize) && (this.maxWidthResize != -1))
-    {
+    if ((width > this.maxWidthResize) && (this.maxWidthResize != -1)) {
         this.Chart.Error.throwError("DATA_INSERT_ERROR", 10, [this.TaskInfo.Id]);
         return false;
-    } else if (width < this.minWidthResize)
-    {
+    } else if (width < this.minWidthResize) {
         this.Chart.Error.throwError("DATA_INSERT_ERROR", 9, [this.TaskInfo.Id]);
         return false;
     } else {
@@ -1871,35 +1756,28 @@ GanttTask.prototype.setDuration = function(duration)
  * @type: public
  * @topic: 0
  */
-GanttTask.prototype.setPercentCompleted = function(percentCompleted)
-{
+GanttTask.prototype.setPercentCompleted = function (percentCompleted) {
     percentCompleted = parseInt(percentCompleted);
-    if (isNaN(percentCompleted))
-    {
+    if (isNaN(percentCompleted)) {
         this.Chart.Error.throwError("DATA_INSERT_ERROR", 6, null);
         return false;
     }
 
-    if (percentCompleted > 100)
-    {
+    if (percentCompleted > 100) {
         this.Chart.Error.throwError("DATA_INSERT_ERROR", 7, null);
         return false;
     }
-    if (percentCompleted < 0)
-    {
+    if (percentCompleted < 0) {
         this.Chart.Error.throwError("DATA_INSERT_ERROR", 8, null);
         return false;
     }
 
-    if ((percentCompleted != 0) && (percentCompleted != 100))
-    {
-        if ((this.TaskInfo.PercentCompleted != 0) && (this.TaskInfo.PercentCompleted != 100))
-        {
+    if ((percentCompleted != 0) && (percentCompleted != 100)) {
+        if ((this.TaskInfo.PercentCompleted != 0) && (this.TaskInfo.PercentCompleted != 100)) {
             this.cTaskItem[0].childNodes[0].firstChild.rows[0].cells[0].width = percentCompleted + "%";
             this.cTaskItem[0].childNodes[0].firstChild.rows[0].cells[1].width = 100 - percentCompleted + "%";
 
-        } else if ((this.TaskInfo.PercentCompleted == 0) || (this.TaskInfo.PercentCompleted == 100))
-        {
+        } else if ((this.TaskInfo.PercentCompleted == 0) || (this.TaskInfo.PercentCompleted == 100)) {
             this.cTaskItem[0].childNodes[0].firstChild.rows[0].cells[0].parentNode.removeChild(this.cTaskItem[0].childNodes[0].firstChild.rows[0].cells[0]);
 
             var cellTblTask = document.createElement("td");
@@ -1924,28 +1802,22 @@ GanttTask.prototype.setPercentCompleted = function(percentCompleted)
             cellTblTask.appendChild(imgPrF);
             imgPrF.src = this.Chart.imgs + "progress_bg.png";
         }
-    } else if (percentCompleted == 0)
-    {
-        if ((this.TaskInfo.PercentCompleted != 0) && (this.TaskInfo.PercentCompleted != 100))
-        {
+    } else if (percentCompleted == 0) {
+        if ((this.TaskInfo.PercentCompleted != 0) && (this.TaskInfo.PercentCompleted != 100)) {
             this.cTaskItem[0].childNodes[0].firstChild.rows[0].cells[0].parentNode.removeChild(this.cTaskItem[0].childNodes[0].firstChild.rows[0].cells[0]);
             this.cTaskItem[0].childNodes[0].firstChild.rows[0].cells[0].width = 100 + "%";
 
-        } else
-        {
+        } else {
             this.cTaskItem[0].childNodes[0].firstChild.rows[0].cells[0].firstChild.src = this.Chart.imgs + "progress_bg.png";
         }
 
-    } else if (percentCompleted == 100)
-    {
+    } else if (percentCompleted == 100) {
 
-        if ((this.TaskInfo.PercentCompleted != 0) && (this.TaskInfo.PercentCompleted != 100))
-        {
+        if ((this.TaskInfo.PercentCompleted != 0) && (this.TaskInfo.PercentCompleted != 100)) {
             this.cTaskItem[0].childNodes[0].firstChild.rows[0].cells[1].parentNode.removeChild(this.cTaskItem[0].childNodes[0].firstChild.rows[0].cells[1]);
             this.cTaskItem[0].childNodes[0].firstChild.rows[0].cells[0].width = 100 + "%";
 
-        } else
-        {
+        } else {
             this.cTaskItem[0].childNodes[0].firstChild.rows[0].cells[0].firstChild.src = this.Chart.imgs + "progress_filled.png";
         }
     }
@@ -1963,13 +1835,11 @@ GanttTask.prototype.setPercentCompleted = function(percentCompleted)
  * @type: public
  * @topic: 0
  */
-GanttTask.prototype.setName = function(name)
-{
+GanttTask.prototype.setName = function (name) {
 
     if ((name != "") && (name != null)) {
         this.TaskInfo.Name = name;
-        if (this.Chart._showTreePanel)
-        {
+        if (this.Chart._showTreePanel) {
             this.cTaskNameItem[0].innerHTML = name;
             this.cTaskNameItem[0].title = name;
             this.checkWidthTaskNameItem();
@@ -1985,14 +1855,11 @@ GanttTask.prototype.setName = function(name)
  * @type: private
  * @topic: 2
  */
-GanttChart.prototype.getProjectInfoById = function(id)
-{
+GanttChart.prototype.getProjectInfoById = function (id) {
 
-    for (var i = 0; i < this.Project.length; i++)
-    {
-        if (this.Project[i].Id == id)
-        {
-            return     this.Project[i];
+    for (var i = 0; i < this.Project.length; i++) {
+        if (this.Project[i].Id == id) {
+            return this.Project[i];
         }
     }
     return null;
@@ -2006,16 +1873,13 @@ GanttChart.prototype.getProjectInfoById = function(id)
  * @type: public
  * @topic: 6
  */
-GanttChart.prototype.loadData = function(content, isFile, isLocal)
-{
+GanttChart.prototype.loadData = function (content, isFile, isLocal) {
     this.clearData();
 
-    if ((isFile == null) || (isFile == 'undefined'))
-    {
+    if ((isFile == null) || (isFile == 'undefined')) {
         isFile = false;
     }
-    if ((isLocal == null) || (isLocal == 'undefined'))
-    {
+    if ((isLocal == null) || (isLocal == 'undefined')) {
         isLocal = false;
     }
     this.loadXML(content, isFile, isLocal);
@@ -2027,10 +1891,8 @@ GanttChart.prototype.loadData = function(content, isFile, isLocal)
     //this.panelTime.removeChild(this.panelTime.firstChild);
     //this.panelTime.appendChild(this.createPanelTime());
 
-    for (var i = 0; i < this.Project.length; i++)
-    {
-        for (var k = 0; k < this.Project[i].ParentTasks.length; k++)
-        {
+    for (var i = 0; i < this.Project.length; i++) {
+        for (var k = 0; k < this.Project[i].ParentTasks.length; k++) {
             if ((this.Project[i].ParentTasks[k].EST != null) && (this.Project[i].ParentTasks[k].EST != '')) {
                 this.setESTChild(this.Project[i].ParentTasks[k]);
             }
@@ -2044,7 +1906,7 @@ GanttChart.prototype.loadData = function(content, isFile, isLocal)
 
         for (var k = 0; k < this.Project[i].ParentTasks.length; k++) {
             if (this.Project[i].ParentTasks[k].EST < this.Project[i].StartDate) {
-                this.Error.throwError("DATA_ERROR", 24, [this.Project[i].ParentTasks[k].Id,this.Project[i].Id]);
+                this.Error.throwError("DATA_ERROR", 24, [this.Project[i].ParentTasks[k].Id, this.Project[i].Id]);
                 return;
             }
             if (this.checkPosParentTaskInTree(this.Project[i].ParentTasks[k])) return;
@@ -2054,13 +1916,11 @@ GanttChart.prototype.loadData = function(content, isFile, isLocal)
 
     }
 
-    for (var i = 0; i < this.Project.length; i++)
-    {
+    for (var i = 0; i < this.Project.length; i++) {
 
         var project = new GanttProject(this, this.Project[i]);
 
-        if (this.arrProjects.length > 0)
-        {
+        if (this.arrProjects.length > 0) {
             var previousProject = this.arrProjects[this.arrProjects.length - 1];
             project.previousProject = previousProject;
             previousProject.nextProject = project;
@@ -2081,8 +1941,7 @@ GanttChart.prototype.loadData = function(content, isFile, isLocal)
  * @type: public
  * @topic: 1
  */
-GanttChart.prototype.clearAll = function()
-{
+GanttChart.prototype.clearAll = function () {
     this._oDataHeight = 0;
     this.startDate = null;
     this._isError = false;
@@ -2097,8 +1956,7 @@ GanttChart.prototype.clearAll = function()
  * @type: private
  * @topic: 1
  */
-GanttChart.prototype.clearData = function()
-{
+GanttChart.prototype.clearData = function () {
     this._oDataHeight = 0;
     this.startDate = null;
     this._isError = false;
@@ -2113,14 +1971,12 @@ GanttChart.prototype.clearData = function()
  * @type: private
  * @topic: 1
  */
-GanttChart.prototype.clearItems = function()
-{
+GanttChart.prototype.clearItems = function () {
     this.oData.removeChild(this.oData.firstChild);
     this.oData.appendChild(this.createPanelTasks());
     this.oData.firstChild.appendChild(this.divInfo);
     this.oData.firstChild.appendChild(this.panelErrors);
-    if (this._showTreePanel)
-    {
+    if (this._showTreePanel) {
         this.panelNames.removeChild(this.panelNames.firstChild);
         this.panelNames.appendChild(this.createPanelNamesTasks());
     }
@@ -2136,36 +1992,29 @@ GanttChart.prototype.clearItems = function()
  * @type: private
  * @topic: 6
  */
-GanttChart.prototype.loadXML = function(content, isFile, isLocal)
-{
-    if (isFile && (content == null || content == ""))
-    {
+GanttChart.prototype.loadXML = function (content, isFile, isLocal) {
+    if (isFile && (content == null || content == "")) {
         this.Error.throwError("DATA_SEND_ERROR", 4, null);
         return;
     }
 
     this.xmlLoader = new dtmlXMLLoaderObject(null, this, false);
 
-    try
-    {
+    try {
         if (!isFile)
             try {
                 this.xmlLoader.loadXMLString(content);
             } catch (e) {
                 this.Error.throwError("DATA_LOAD_ERROR", 37, [content]);
-            } else
-        if (!isLocal)
-        {
+            } else if (!isLocal) {
             this.xmlLoader.loadXML(this.loadPath + "?path=" + content + "&rnd=" + (new Date() - 0), false);
 
-        } else
-        {
+        } else {
             this.xmlLoader.loadXML(content + "?rnd=" + (new Date() - 0), false);
         }
         this.doLoadDetails(isLocal);
 
-    } catch(e)
-    {
+    } catch (e) {
         this.Error.throwError("DATA_LOAD_ERROR", 5, [content]);
     }
 
@@ -2175,23 +2024,19 @@ GanttChart.prototype.loadXML = function(content, isFile, isLocal)
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.doLoadDetails = function(isLocal)
-{
+GanttChart.prototype.doLoadDetails = function (isLocal) {
     switch (this.xmlLoader.xmlDoc.status) {
         case 0:
-            if (!isLocal)
-            {
+            if (!isLocal) {
                 this.Error.throwError("DATA_LOAD_ERROR", 1, null);
                 return;
             }
             break;
         case 404:
-            if (!isLocal)
-            {
+            if (!isLocal) {
                 this.Error.throwError("DATA_LOAD_ERROR", 5, [this.loadPath]);
 
-            } else
-            {
+            } else {
                 this.Error.throwError("DATA_LOAD_ERROR", 5, [this.xmlLoader.filePath])
             }
             return;
@@ -2216,8 +2061,7 @@ GanttChart.prototype.doLoadDetails = function(isLocal)
     //var rootTagProject = this.xmlLoader.getXMLTopNode("projects");
     var projectArr = this.xmlLoader.doXPath("//project");
 
-    for (var j = 0; j < projectArr.length; j++)
-    {
+    for (var j = 0; j < projectArr.length; j++) {
         var startDateTemp = projectArr[j].getAttribute("startdate");
         var startDate = startDateTemp.split(",");
         var project = new GanttProjectInfo(projectArr[j].getAttribute("id"), projectArr[j].getAttribute("name"), new Date(startDate[0], (parseInt(startDate[1]) - 1), startDate[2]));
@@ -2254,8 +2098,7 @@ GanttChart.prototype.doLoadDetails = function(isLocal)
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.readChildTasksXML = function(parentTask, childTasksArrXML)
-{
+GanttChart.prototype.readChildTasksXML = function (parentTask, childTasksArrXML) {
 
     var name = null;
     var id = null;
@@ -2264,8 +2107,7 @@ GanttChart.prototype.readChildTasksXML = function(parentTask, childTasksArrXML)
     var percentCompleted = null;
     var predecessorTaskId = null;
 
-    for (var i = 0; i < childTasksArrXML.length; i ++)
-    {
+    for (var i = 0; i < childTasksArrXML.length; i++) {
         id = childTasksArrXML[i].getAttribute("id");
         name = (this.xmlLoader.doXPath("./name", childTasksArrXML[i])[0].firstChild == null) ? "" : this.xmlLoader.doXPath("./name", childTasksArrXML[i])[0].firstChild.nodeValue;
         var estTemp = (this.xmlLoader.doXPath("./est", childTasksArrXML[i])[0].firstChild == null) ? "" : this.xmlLoader.doXPath("./est", childTasksArrXML[i])[0].firstChild.nodeValue;
@@ -2280,8 +2122,7 @@ GanttChart.prototype.readChildTasksXML = function(parentTask, childTasksArrXML)
 
         var childTasksNode = this.xmlLoader.doXPath("./childtasks", childTasksArrXML[i]);
         var childTasksArr = this.xmlLoader.doXPath("./task", childTasksNode[0]);
-        if (childTasksArr.length != 0)
-        {
+        if (childTasksArr.length != 0) {
             this.readChildTasksXML(task, childTasksArr);
         }
 
@@ -2293,16 +2134,13 @@ GanttChart.prototype.readChildTasksXML = function(parentTask, childTasksArrXML)
  * @type: public
  * @topic: 6
  */
-GanttChart.prototype.getXML = function()
-{
+GanttChart.prototype.getXML = function () {
     var strXML = "<projects>";
 
-    for (var i = 0; i < this.Project.length; i++)
-    {
+    for (var i = 0; i < this.Project.length; i++) {
         strXML += "<project id ='" + this.Project[i].Id + "' name= '" + this.Project[i].Name + "' startdate = '" + this.Project[i].StartDate.getFullYear() + "," + (this.Project[i].StartDate.getMonth() + 1) + "," + this.Project[i].StartDate.getDate() + "'>";
 
-        for (var j = 0; j < this.Project[i].ParentTasks.length; j++)
-        {
+        for (var j = 0; j < this.Project[i].ParentTasks.length; j++) {
             strXML += "<task id ='" + this.Project[i].ParentTasks[j].Id + "'>";
             strXML += "<name>" + this.Project[i].ParentTasks[j].Name + "</name>";
             strXML += "<est>" + this.Project[i].ParentTasks[j].EST.getFullYear() + "," + (this.Project[i].ParentTasks[j].EST.getMonth() + 1) + "," + this.Project[i].ParentTasks[j].EST.getDate() + "</est>";
@@ -2328,19 +2166,16 @@ GanttChart.prototype.getXML = function()
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.createChildTasksXML = function(childTasks)
-{
+GanttChart.prototype.createChildTasksXML = function (childTasks) {
     var strXML = "";
-    for (var n = 0; n < childTasks.length; n++)
-    {
+    for (var n = 0; n < childTasks.length; n++) {
         strXML += "<task id='" + childTasks[n].Id + "'>";
         strXML += "<name>" + childTasks[n].Name + "</name>";
         strXML += "<est>" + childTasks[n].EST.getFullYear() + "," + (childTasks[n].EST.getMonth() + 1) + "," + childTasks[n].EST.getDate() + "</est>";
         strXML += "<duration>" + childTasks[n].Duration + "</duration>";
         strXML += "<percentcompleted>" + childTasks[n].PercentCompleted + "</percentcompleted>";
         strXML += "<predecessortasks>" + childTasks[n].PredecessorTaskId + "</predecessortasks>";
-        if (childTasks[n].ChildTasks)
-        {
+        if (childTasks[n].ChildTasks) {
             strXML += "<childtasks>";
             strXML += this.createChildTasksXML(childTasks[n].ChildTasks);
             strXML += "</childtasks>";
@@ -2355,8 +2190,7 @@ GanttChart.prototype.createChildTasksXML = function(childTasks)
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.sort_byEST = function(a, b)
-{
+GanttChart.prototype.sort_byEST = function (a, b) {
     if (a.EST < b.EST) return -1;
     if (a.EST > b.EST) return 1;
     return 0;
@@ -2366,8 +2200,7 @@ GanttChart.prototype.sort_byEST = function(a, b)
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.sort_byStartDate = function(a, b)
-{
+GanttChart.prototype.sort_byStartDate = function (a, b) {
     if (a["StartDate"] < b["StartDate"]) return -1;
     if (a["StartDate"] > b["StartDate"]) return 1;
     return 0;
@@ -2379,12 +2212,9 @@ GanttChart.prototype.sort_byStartDate = function(a, b)
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.setESTChild = function(parentTask)
-{
-    for (var t = 0; t < parentTask.ChildTasks.length; t++)
-    {
-        if ((parentTask.ChildTasks[t].EST == null ) || (parentTask.ChildTasks[t].EST == ""))
-        {
+GanttChart.prototype.setESTChild = function (parentTask) {
+    for (var t = 0; t < parentTask.ChildTasks.length; t++) {
+        if ((parentTask.ChildTasks[t].EST == null ) || (parentTask.ChildTasks[t].EST == "")) {
             parentTask.ChildTasks[t].EST = parentTask.EST;
         }
 
@@ -2398,15 +2228,14 @@ GanttChart.prototype.setESTChild = function(parentTask)
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.createPanelTasks = function()
-{
+GanttChart.prototype.createPanelTasks = function () {
     var divTasks = document.createElement("div");
     divTasks.className = "taskPanel";
     divTasks.style.cssText = "position:relative;";
     divTasks.style.height = this.contentHeight - 63 + "px";
-    var w = this.startDate ? (this.startDate.getDay()-1) : ((new Date(0)).getDay()-1);
-    if (w==-1) w=6;
-    divTasks.style.background = "url(" + this.imgs + "bg_week.png) -"+(w*24)+"px 0px";
+    var w = this.startDate ? (this.startDate.getDay() - 1) : ((new Date(0)).getDay() - 1);
+    if (w == -1) w = 6;
+    divTasks.style.background = "url(" + this.imgs + "bg_week.png) -" + (w * 24) + "px 0px";
     this.panelTasks = divTasks;
     return divTasks;
 };
@@ -2415,8 +2244,7 @@ GanttChart.prototype.createPanelTasks = function()
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.createPanelNamesTasks = function()
-{
+GanttChart.prototype.createPanelNamesTasks = function () {
     var divListNames = document.createElement("div");
     divListNames.innerHTML = "&nbsp;";
     divListNames.style.cssText = "position:relative;background:url(" + this.imgs + "bg.png)";
@@ -2430,8 +2258,7 @@ GanttChart.prototype.createPanelNamesTasks = function()
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.createPopUpInfo = function()
-{
+GanttChart.prototype.createPopUpInfo = function () {
     var divTaskInfo = document.createElement("div");
     divTaskInfo.style.cssText = 'display: none;';
 
@@ -2452,8 +2279,7 @@ GanttChart.prototype.createPopUpInfo = function()
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.createPopUpTimeInfo = function()
-{
+GanttChart.prototype.createPopUpTimeInfo = function () {
     var divTimeInfo = document.createElement("div");
     divTimeInfo.style.display = "none";
 
@@ -2473,8 +2299,7 @@ GanttChart.prototype.createPopUpTimeInfo = function()
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.createPanelTime = function()
-{
+GanttChart.prototype.createPanelTime = function () {
     var panelTime = document.createElement("div");
     panelTime.style.position = "relative";
 
@@ -2491,13 +2316,12 @@ GanttChart.prototype.createPanelTime = function()
     var newRow = tblTime.insertRow(tblTime.rows.length);
 
     //creating cells for tblTime
-    for (var i = 0; i < this.countDays; i++)
-    {
+    for (var i = 0; i < this.countDays; i++) {
         this.addPointInTimePanel(newRow, panelTime);
         this.addDayInPanelTime(newRow);
     }
 
-    return  panelTime;
+    return panelTime;
 };
 /**
  * @desc: creation of point in panel time
@@ -2506,15 +2330,14 @@ GanttChart.prototype.createPanelTime = function()
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.addPointInTimePanel = function(row, panelTime)
-{
+GanttChart.prototype.addPointInTimePanel = function (row, panelTime) {
     var leftLine = document.createElement("div");
     leftLine.style.cssText = "position:absolute;left:" + ( row.cells.length * this.dayInPixels ) + "px;top:20px;height:20px;width:1px;font-size:1px;margin-left:0px;margin-right:0px;margin-top:0px;margin-bottom:0px;background:#f1f3f1;";
     panelTime.appendChild(leftLine);
 };
-GanttChart.prototype._calculateMonthColSpan = function(date, maxLen) {
+GanttChart.prototype._calculateMonthColSpan = function (date, maxLen) {
     var m1 = date.getMonth();
-    for(var i=1; i<=maxLen; i++) {
+    for (var i = 1; i <= maxLen; i++) {
         date.setDate(date.getDate() + 1);
         var m2 = date.getMonth();
         if (m2 != m1) return i;
@@ -2527,8 +2350,8 @@ GanttChart.prototype._calculateMonthColSpan = function(date, maxLen) {
  * @type: public, overridable
  * @topic: 3
  */
-GanttChart.prototype.getMonthScaleLabel = function(date) {
-    return (this._useShortMonthNames ? this.shortMonthNames : this.monthNames)[date.getMonth()] + " '" + (""+date.getFullYear()).substring(2);
+GanttChart.prototype.getMonthScaleLabel = function (date) {
+    return (this._useShortMonthNames ? this.shortMonthNames : this.monthNames)[date.getMonth()] + " '" + ("" + date.getFullYear()).substring(2);
 };
 /**
  * @desc: Use short or full month name in the month label axis. Default is true.
@@ -2537,7 +2360,7 @@ GanttChart.prototype.getMonthScaleLabel = function(date) {
  * @topic: 3
  * @before_init: 1
  */
-GanttChart.prototype.useShortMonthNames = function(flag) {
+GanttChart.prototype.useShortMonthNames = function (flag) {
     this._useShortMonthNames = flag;
 };
 /**
@@ -2547,7 +2370,7 @@ GanttChart.prototype.useShortMonthNames = function(flag) {
  * @topic: 3
  * @before_init: 1
  */
-GanttChart.prototype.setShortMonthNames = function(names) {
+GanttChart.prototype.setShortMonthNames = function (names) {
     this.shortMonthNames = names;
 };
 /**
@@ -2557,7 +2380,7 @@ GanttChart.prototype.setShortMonthNames = function(names) {
  * @topic: 3
  * @before_init: 1
  */
-GanttChart.prototype.setMonthNames = function(names) {
+GanttChart.prototype.setMonthNames = function (names) {
     this.monthNames = names;
 };
 /**
@@ -2566,8 +2389,7 @@ GanttChart.prototype.setMonthNames = function(names) {
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.addDayInPanelTime = function(row)
-{
+GanttChart.prototype.addDayInPanelTime = function (row) {
     var self = this, idx = row.cells.length, date = new Date(this.startDate);
 
     var newCell = row.insertCell(idx);
@@ -2581,31 +2403,30 @@ GanttChart.prototype.addDayInPanelTime = function(row)
     newCell.setAttribute("idx", idx);
 
     var monthRow = row.parentNode.parentNode.rows[0];
-    if (idx==0 || day==1) {
+    if (idx == 0 || day == 1) {
         var newCell2 = monthRow.insertCell(monthRow.cells.length);
         newCell2.className = "monthName";
         newCell2.style.height = "20px";
-        if (monthRow.cells.length%2 == 0) newCell2.style.backgroundColor = "#f7f8f7";
-        newCell2.colSpan = this._calculateMonthColSpan(new Date(date), Math.max(1,this.countDays-idx));
+        if (monthRow.cells.length % 2 == 0) newCell2.style.backgroundColor = "#f7f8f7";
+        newCell2.colSpan = this._calculateMonthColSpan(new Date(date), Math.max(1, this.countDays - idx));
         newCell2.innerHTML = this.getMonthScaleLabel(date);
     } else {
-        var n = monthRow.cells.length, cs=0;
-        for(var i=0; i<n; i++){
+        var n = monthRow.cells.length, cs = 0;
+        for (var i = 0; i < n; i++) {
             cs += monthRow.cells[i].colSpan;
         }
-        if (idx>=cs) monthRow.cells[n-1].colSpan += 1;
+        if (idx >= cs) monthRow.cells[n - 1].colSpan += 1;
     }
 
     var w = date.getDay();
-    if (w==0 || w==6) newCell.style.backgroundColor = "#f7f8f7";
+    if (w == 0 || w == 6) newCell.style.backgroundColor = "#f7f8f7";
 };
 /**
  * @desc: increment Height of Panel Tasks
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.incHeightPanelTasks = function(height)
-{
+GanttChart.prototype.incHeightPanelTasks = function (height) {
     var containerTasks = this.oData.firstChild;
     containerTasks.style.height = parseInt(containerTasks.style.height) + height + "px";
 };
@@ -2614,8 +2435,7 @@ GanttChart.prototype.incHeightPanelTasks = function(height)
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.incHeightPanelNames = function(height)
-{
+GanttChart.prototype.incHeightPanelNames = function (height) {
     var containerNames = this.panelNames.firstChild;
     containerNames.style.height = parseInt(containerNames.style.height) + height + "px";
 };
@@ -2624,8 +2444,7 @@ GanttChart.prototype.incHeightPanelNames = function(height)
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.checkHeighPanelTasks = function()
-{
+GanttChart.prototype.checkHeighPanelTasks = function () {
     this._oDataHeight += 11 + this.heightTaskItem;
     if ((parseInt(this.oData.firstChild.style.height) <= this._oDataHeight)) {
         this.incHeightPanelTasks(this.heightTaskItem + 11);
@@ -2638,12 +2457,10 @@ GanttChart.prototype.checkHeighPanelTasks = function()
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.sortTasksByEST = function(project)
-{
+GanttChart.prototype.sortTasksByEST = function (project) {
     project.ParentTasks.sort(this.sort_byEST);
 
-    for (var i = 0; i < project.ParentTasks.length; i++)
-    {
+    for (var i = 0; i < project.ParentTasks.length; i++) {
         project.ParentTasks[i] = this.sortChildTasks(project.ParentTasks[i]);
     }
 
@@ -2654,12 +2471,10 @@ GanttChart.prototype.sortTasksByEST = function(project)
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.sortChildTasks = function(parenttask)
-{
+GanttChart.prototype.sortChildTasks = function (parenttask) {
     parenttask.ChildTasks.sort(this.sort_byEST);
 
-    for (var i = 0; i < parenttask.ChildTasks.length; i++)
-    {
+    for (var i = 0; i < parenttask.ChildTasks.length; i++) {
         if (parenttask.ChildTasks[i].ChildTasks.length > 0) this.sortChildTasks(parenttask.ChildTasks[i]);
     }
     return parenttask;
@@ -2672,10 +2487,8 @@ GanttChart.prototype.sortChildTasks = function(parenttask)
  * @type: private
  * @topic: 5
  */
-GanttChart.prototype.errorDataHandler = function(type, descr, params)
-{
-    if (!this._isError)
-    {
+GanttChart.prototype.errorDataHandler = function (type, descr, params) {
+    if (!this._isError) {
         this.clearData();
         this.showPanelErrors();
         this._isError = true;
@@ -2687,8 +2500,7 @@ GanttChart.prototype.errorDataHandler = function(type, descr, params)
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.createPanelErrors = function()
-{
+GanttChart.prototype.createPanelErrors = function () {
     var tbl = document.createElement("table");
     tbl.width = "100%";
     tbl.style.display = "none";
@@ -2703,8 +2515,7 @@ GanttChart.prototype.createPanelErrors = function()
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.showPanelErrors = function()
-{
+GanttChart.prototype.showPanelErrors = function () {
     this.panelErrors.style.display = "inline";
 };
 /**
@@ -2712,8 +2523,7 @@ GanttChart.prototype.showPanelErrors = function()
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.hidePanelErrors = function()
-{
+GanttChart.prototype.hidePanelErrors = function () {
     for (var i = 0; i < this.panelErrors.rows.length; i++) {
 
         this.panelErrors.rows[i].parentNode.removeChild(this.panelErrors.rows[i]);
@@ -2725,8 +2535,7 @@ GanttChart.prototype.hidePanelErrors = function()
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.addErrorInPanelErrors = function(type, descr)
-{
+GanttChart.prototype.addErrorInPanelErrors = function (type, descr) {
     var row = this.panelErrors.insertRow(this.panelErrors.rows.length);
     var cell = document.createElement("td");
     cell.style.height = "20px";
@@ -2746,8 +2555,7 @@ GanttChart.prototype.addErrorInPanelErrors = function(type, descr)
  * @type: private
  * @topic: 5
  */
-GanttChart.prototype.errorSendDataHandler = function(type, descr, params)
-{
+GanttChart.prototype.errorSendDataHandler = function (type, descr, params) {
     alert(descr);
 };
 /**
@@ -2758,8 +2566,7 @@ GanttChart.prototype.errorSendDataHandler = function(type, descr, params)
  * @type: private
  * @topic: 5
  */
-GanttChart.prototype.errorLoadDataHandler = function(type, descr, params)
-{
+GanttChart.prototype.errorLoadDataHandler = function (type, descr, params) {
     alert(descr);
 };
 /**
@@ -2770,8 +2577,7 @@ GanttChart.prototype.errorLoadDataHandler = function(type, descr, params)
  * @type: private
  * @topic: 5
  */
-GanttChart.prototype.errorAPIHandler = function(type, descr, params)
-{
+GanttChart.prototype.errorAPIHandler = function (type, descr, params) {
     alert(descr);
 };
 /**
@@ -2780,12 +2586,10 @@ GanttChart.prototype.errorAPIHandler = function(type, descr, params)
  * @type: public
  * @topic: 6
  */
-GanttChart.prototype.saveData = function(fileName)
-{
+GanttChart.prototype.saveData = function (fileName) {
     try {
 
-        if (!this.dhtmlXMLSenderObject.isProcessed)
-        {
+        if (!this.dhtmlXMLSenderObject.isProcessed) {
             this.dhtmlXMLSenderObject.sendData(fileName, this.savePath, this.getXML());
         }
 
@@ -2800,8 +2604,7 @@ GanttChart.prototype.saveData = function(fileName)
  * @type: public
  * @topic: 0
  */
-GanttChart.prototype.create = function(_content)
-{
+GanttChart.prototype.create = function (_content) {
     var self = this;
     // content = document.getElementById(_content);
     // if(!content){
@@ -2814,37 +2617,37 @@ GanttChart.prototype.create = function(_content)
 
     //
     if (this._isIE) {
-        document.body.attachEvent('onselectstart', function() {
+        document.body.attachEvent('onselectstart', function () {
             window.event.returnValue = false;
         });
 
-        document.body.attachEvent('onkeydown', function() {
+        document.body.attachEvent('onkeydown', function () {
             if (event.keyCode == 65 && event.ctrlKey) window.event.returnValue = false;
         });
 
     } else {
 
-        content.addEventListener('mousedown', function(e) {
+        content.addEventListener('mousedown', function (e) {
             e.preventDefault();
         }, true);
 
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.keyCode == 65 && e.ctrlKey) e.preventDefault();
         }, true);
 
     }
 
     //init handlers
-    this.Error.catchError("DATA_ERROR", function(type, descr, params) {
+    this.Error.catchError("DATA_ERROR", function (type, descr, params) {
         self.errorDataHandler(type, descr, params)
     });
-    this.Error.catchError("DATA_SEND_ERROR", function(type, descr, params) {
+    this.Error.catchError("DATA_SEND_ERROR", function (type, descr, params) {
         self.errorSendDataHandler(type, descr, params)
     });
-    this.Error.catchError("DATA_INSERT_ERROR", function(type, descr, params) {
+    this.Error.catchError("DATA_INSERT_ERROR", function (type, descr, params) {
         self.errorAPIHandler(type, descr, params)
     });
-    this.Error.catchError("DATA_LOAD_ERROR", function(type, descr, params) {
+    this.Error.catchError("DATA_LOAD_ERROR", function (type, descr, params) {
         self.errorLoadDataHandler(type, descr, params)
     });
 
@@ -2880,8 +2683,7 @@ GanttChart.prototype.create = function(_content)
     this.oData.firstChild.appendChild(this.createPanelErrors());
 
     //Creation panel of names
-    if (this._showTreePanel)
-    {
+    if (this._showTreePanel) {
         this.panelNames = document.createElement("div");
         newCellTblControl = document.createElement("td");
         newCellTblControl.vAlign = "top";
@@ -2907,7 +2709,7 @@ GanttChart.prototype.create = function(_content)
         this.panelNames.style.width = this.maxWidthPanelNames + "px";
         this.oData.style.width = (this.contentWidth - this.maxWidthPanelNames) + "px";
         this.panelTasks.style.width = this.dayInPixels * this.countDays + "px";
-        this.panelTime.style.width = (this.contentWidth - this.maxWidthPanelNames - 0*18) + "px";
+        this.panelTime.style.width = (this.contentWidth - this.maxWidthPanelNames - 0 * 18) + "px";
         this.panelTime.firstChild.style.width = this.dayInPixels * this.countDays + "px";
         if (this.isShowConMenu && this.contextMenu == null) this.contextMenu = new contextMenu(this);
     } else {
@@ -2916,12 +2718,12 @@ GanttChart.prototype.create = function(_content)
     }
 
     if (this._isOpera) {
-        this.oData.onmousewheel = function() {
+        this.oData.onmousewheel = function () {
             return false;
         }
     }
 
-    this.oData.onscroll = function() {
+    this.oData.onscroll = function () {
         self.panelTime.scrollLeft = this.scrollLeft;
 
         if (self.panelNames) {
@@ -2941,11 +2743,9 @@ GanttChart.prototype.create = function(_content)
     //this.Project.sort(this.sort_byStartDate);
     //this.startDate = this.getStartDate();
 
-    for (var i = 0; i < this.Project.length; i++)
-    {
+    for (var i = 0; i < this.Project.length; i++) {
 
-        for (var k = 0; k < this.Project[i].ParentTasks.length; k++)
-        {
+        for (var k = 0; k < this.Project[i].ParentTasks.length; k++) {
             if (this.isEmpty(this.Project[i].ParentTasks[k].EST)) {
                 this.Project[i].ParentTasks[k].EST = this.Project[i].StartDate;
             }
@@ -2958,7 +2758,7 @@ GanttChart.prototype.create = function(_content)
             if (this.Project[i].ParentTasks[k].EST < this.Project[i].StartDate) {
 
                 if (!this.correctError) {
-                    this.Error.throwError("DATA_ERROR", 24, [this.Project[i].ParentTasks[k].Id,this.Project[i].Id]);
+                    this.Error.throwError("DATA_ERROR", 24, [this.Project[i].ParentTasks[k].Id, this.Project[i].Id]);
                     return;
                 } else {
                     this.Project[i].ParentTasks[k].EST = this.Project[i].StartDate;
@@ -2971,13 +2771,11 @@ GanttChart.prototype.create = function(_content)
 
     }
 
-    for (var i = 0; i < this.Project.length; i++)
-    {
+    for (var i = 0; i < this.Project.length; i++) {
         //creation project
         var project = new GanttProject(this, this.Project[i]);
 
-        if (this.arrProjects.length > 0)
-        {
+        if (this.arrProjects.length > 0) {
             var previousProject = this.arrProjects[this.arrProjects.length - 1];
             project.previousProject = previousProject;
             previousProject.nextProject = project;
@@ -2994,8 +2792,7 @@ GanttChart.prototype.create = function(_content)
     return this;
 };
 
-GanttChart.prototype.isEmpty = function(value)
-{
+GanttChart.prototype.isEmpty = function (value) {
     return (value == null || value == '');
 };
 
@@ -3004,22 +2801,21 @@ GanttChart.prototype.isEmpty = function(value)
  * @type: public
  * @topic: 7
  */
-GanttChart.prototype.getPrintableHTML = function()
-{
+GanttChart.prototype.getPrintableHTML = function () {
     var w = parseInt(this.oData.firstChild.style.width) - parseInt(this.oData.style.width);
     var h = parseInt(this.panelTasks.style.height) - parseInt(this.panelTasks.parentNode.style.height);
 
-    this.oData.setAttribute("id","ganttPrint02");
-    this.panelNames.setAttribute("id","ganttPrint03");
+    this.oData.setAttribute("id", "ganttPrint02");
+    this.panelNames.setAttribute("id", "ganttPrint03");
 
-    var res = '<html><head><link type="text/css" rel="stylesheet" href="'+this.stylePath+'"><scr'+'ipt>onload=function(){var w=' + w + ',h=' + h +
-            ',c1=document.getElementById("ganttPrint01"),c2=document.getElementById("ganttPrint02"),c3=document.getElementById("ganttPrint03");' +
-            'c2.style.width=parseInt(c2.style.width)+w+"px";c2.previousSibling.style.width=c2.style.width;c1.style.width=parseInt(c1.style.width)+w+"px";c2.style.height=parseInt(c2.style.height)+h+"px";' +
-            'c2.style.overflow="hidden";c3.style.height=c3.firstChild.style.height;c1.style.height=parseInt(c1.style.height)+h+"px";}</scr'+'ipt></head>' +
-            '<body><div id="ganttPrint01" style="' + this.content.style.cssText + '">' + this.content.innerHTML + '</div></body></html>';
+    var res = '<html><head><link type="text/css" rel="stylesheet" href="' + this.stylePath + '"><scr' + 'ipt>onload=function(){var w=' + w + ',h=' + h +
+        ',c1=document.getElementById("ganttPrint01"),c2=document.getElementById("ganttPrint02"),c3=document.getElementById("ganttPrint03");' +
+        'c2.style.width=parseInt(c2.style.width)+w+"px";c2.previousSibling.style.width=c2.style.width;c1.style.width=parseInt(c1.style.width)+w+"px";c2.style.height=parseInt(c2.style.height)+h+"px";' +
+        'c2.style.overflow="hidden";c3.style.height=c3.firstChild.style.height;c1.style.height=parseInt(c1.style.height)+h+"px";}</scr' + 'ipt></head>' +
+        '<body><div id="ganttPrint01" style="' + this.content.style.cssText + '">' + this.content.innerHTML + '</div></body></html>';
 
-    this.oData.setAttribute("id",null);
-    this.panelNames.setAttribute("id",null);
+    this.oData.setAttribute("id", null);
+    this.panelNames.setAttribute("id", null);
 
     return res;
 };
@@ -3030,13 +2826,12 @@ GanttChart.prototype.getPrintableHTML = function()
  * @type: public
  * @topic: 7
  */
-GanttChart.prototype.printToWindow = function(message)
-{
+GanttChart.prototype.printToWindow = function (message) {
     var o = window.open();
     o.document.write(this.getPrintableHTML());
     o.document.close();
-    if (message!==null) {
-        o.alert(message ? message : "Use browser's menu \"File->Print preview\" to setup page layout." );
+    if (message !== null) {
+        o.alert(message ? message : "Use browser's menu \"File->Print preview\" to setup page layout.");
     }
 };
 
@@ -3045,8 +2840,7 @@ GanttChart.prototype.printToWindow = function(message)
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.getStartDate = function()
-{
+GanttChart.prototype.getStartDate = function () {
     for (var i = 0; i < this.Project.length; i++) {
 
         if (this.startDate) {
@@ -3073,8 +2867,7 @@ GanttChart.prototype.getStartDate = function()
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.getCountDays = function()
-{
+GanttChart.prototype.getCountDays = function () {
 
     if (this._showTreePanel) {
         return parseInt((this.contentWidth - this.maxWidthPanelNames) / (this.hourInPixels * 24));
@@ -3090,12 +2883,9 @@ GanttChart.prototype.getCountDays = function()
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.createTasks = function(project)
-{
-    for (var j = 0; j < project.Project.ParentTasks.length; j++)
-    {
-        if (j > 0)
-        {
+GanttChart.prototype.createTasks = function (project) {
+    for (var j = 0; j < project.Project.ParentTasks.length; j++) {
+        if (j > 0) {
             project.Project.ParentTasks[j - 1].nextParentTask = project.Project.ParentTasks[j];
             project.Project.ParentTasks[j].previousParentTask = project.Project.ParentTasks[j - 1];
         }
@@ -3106,8 +2896,7 @@ GanttChart.prototype.createTasks = function(project)
 
         this.checkHeighPanelTasks();
 
-        if (project.Project.ParentTasks[j].ChildTasks.length > 0)
-        {
+        if (project.Project.ParentTasks[j].ChildTasks.length > 0) {
             this.createChildItemControls(project.Project.ParentTasks[j].ChildTasks, project);
         }
     }
@@ -3119,12 +2908,10 @@ GanttChart.prototype.createTasks = function(project)
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.createChildItemControls = function(arrChildTasks, project)
-{
+GanttChart.prototype.createChildItemControls = function (arrChildTasks, project) {
     for (var i = 0; i < arrChildTasks.length; i++) {
 
-        if (i > 0)
-        {
+        if (i > 0) {
             arrChildTasks[i].previousChildTask = arrChildTasks[i - 1];
             arrChildTasks[i - 1].nextChildTask = arrChildTasks[i];
         }
@@ -3133,8 +2920,7 @@ GanttChart.prototype.createChildItemControls = function(arrChildTasks, project)
 
         this.checkHeighPanelTasks();
 
-        if (arrChildTasks[i].ChildTasks.length > 0)
-        {
+        if (arrChildTasks[i].ChildTasks.length > 0) {
             this.createChildItemControls(arrChildTasks[i].ChildTasks, project);
         }
     }
@@ -3146,8 +2932,7 @@ GanttChart.prototype.createChildItemControls = function(arrChildTasks, project)
  * @type: private
  * @topic: 4
  */
-GanttTask.prototype.getPopUpInfo = function(object, event)
-{
+GanttTask.prototype.getPopUpInfo = function (object, event) {
     //this.cTaskItem[0]
     var posY = object.offsetTop + this.Chart.heightTaskItem + 6;
     var posX = object.offsetLeft + ((event.layerX == null) ? event.offsetX : event.layerX);
@@ -3156,18 +2941,19 @@ GanttTask.prototype.getPopUpInfo = function(object, event)
     var tblInfo = this.Chart.divInfo.lastChild;
     tblInfo.rows[0].cells[0].innerHTML = "<div style='font-family: Arial, Helvetica, Sans-serif; font-size: 12px; font-weight: bold; color: #688060; margin: 0 0 4px 0;'>" + this.TaskInfo.Name + "</div>";
     tblInfo.rows[0].cells[0].innerHTML += "<span class='st'>EST:&nbsp;</span><span class='ut'>" + this.TaskInfo.EST.getDate() + "." + (this.TaskInfo.EST.getMonth() + 1) + "." + this.TaskInfo.EST.getFullYear() + "</span><br/>";
-    tblInfo.rows[0].cells[0].innerHTML += "<span class='st'>END:&nbsp;</span><span class='ut'>" + this.TaskInfo.DateStop.getDate() + "." + (this.TaskInfo.DateStop.getMonth() + 1) + "." + this.TaskInfo.DateStop.getFullYear() + "</span><br/>";
-    if(this.TaskInfo.Desc)
+    tblInfo.rows[0].cells[0].innerHTML += "<span class='st'>LINE:&nbsp;</span><span class='ut'>" + this.TaskInfo.line + "</span><br/>";
+    if (this.TaskInfo.DateStop)
+        tblInfo.rows[0].cells[0].innerHTML += "<span class='st'>END:&nbsp;</span><span class='ut'>" + this.TaskInfo.DateStop.getDate() + "." + (this.TaskInfo.DateStop.getMonth() + 1) + "." + this.TaskInfo.DateStop.getFullYear() + "</span><br/>";
+    if (this.TaskInfo.Desc)
         tblInfo.rows[0].cells[0].innerHTML += "<span class='st'>Name:&nbsp;</span><span class='ut'>" + this.TaskInfo.Desc + "</span><br/>";
-    if(this.TaskInfo.QTY)
+    if (this.TaskInfo.QTY)
         tblInfo.rows[0].cells[0].innerHTML += "<span class='st'>QTY:&nbsp;</span><span class='ut'>" + this.TaskInfo.QTY + "</span><br/>";
-    if(this.TaskInfo.State)
+    if (this.TaskInfo.State)
         tblInfo.rows[0].cells[0].innerHTML += "<span class='st'>State:&nbsp;</span><span class='ut'>" + this.TaskInfo.State + "</span><br/>";
     // tblInfo.rows[0].cells[0].innerHTML += "<span class='st'>Percent Complete:&nbsp;</span><span class='ut'>" + this.TaskInfo.PercentCompleted + "% </span><br/>";
 
     //show predecessor task
-    if (this.predTask)
-    {
+    if (this.predTask) {
         tblInfo.rows[0].cells[0].innerHTML += "<span class='st'>Predecessor Task:&nbsp;</span>";
         tblInfo.rows[0].cells[0].innerHTML += "<span class='lt'>*" + this.TaskInfo.PredecessorTask.Name + "</span>";
     }
@@ -3175,8 +2961,7 @@ GanttTask.prototype.getPopUpInfo = function(object, event)
     //show child tasks
     if (this.TaskInfo.ChildTasks.length != 0) {
         tblInfo.rows[0].cells[0].innerHTML += "<span class='st'>Child Tasks:&nbsp;</span>";
-        for (var i = 0; i < this.TaskInfo.ChildTasks.length; i++)
-        {
+        for (var i = 0; i < this.TaskInfo.ChildTasks.length; i++) {
             tblInfo.rows[0].cells[0].innerHTML += (i == this.TaskInfo.ChildTasks.length - 1) ? ("<span class='lt'>*" + this.TaskInfo.ChildTasks[i].Name + "</span>") : ("<span class='lt'>*" + this.TaskInfo.ChildTasks[i].Name + "</span>");
         }
     }
@@ -3209,8 +2994,7 @@ GanttTask.prototype.getPopUpInfo = function(object, event)
  * @type: private
  * @topic: 4
  */
-GanttTask.prototype.closePopUpInfo = function()
-{
+GanttTask.prototype.closePopUpInfo = function () {
     this.Chart.divInfo.style.display = "none";
 };
 /**
@@ -3218,29 +3002,28 @@ GanttTask.prototype.closePopUpInfo = function()
  * @type: private
  * @topic: 4
  */
-GanttTask.prototype.createConnectingLinesPN = function()
-{
+GanttTask.prototype.createConnectingLinesPN = function () {
     var arrConnectingLinesNames = [];
 
     /*var lineVerticalLeft = document.createElement("div");
-    lineVerticalLeft.style.cssText = "border-width: 0px 0px 0px 1px; border-style: dotted; border-color: #C0C4C0; margin: 0px; padding: 0px;z-index:10;position: absolute;" +
-            "height:" + (this.cTaskNameItem[0].offsetTop - this.parentTask.cTaskNameItem[0].offsetTop) + "px;" +
-            "top:" + (this.parentTask.cTaskNameItem[0].offsetTop + 5) + "px;" +
-            "left:" + (this.parentTask.cTaskNameItem[0].offsetLeft - 9) + "px;";
-    lineVerticalLeft.innerHTML = "&nbsp;";
-    this.Chart.panelNames.firstChild.appendChild(lineVerticalLeft);
+     lineVerticalLeft.style.cssText = "border-width: 0px 0px 0px 1px; border-style: dotted; border-color: #C0C4C0; margin: 0px; padding: 0px;z-index:10;position: absolute;" +
+     "height:" + (this.cTaskNameItem[0].offsetTop - this.parentTask.cTaskNameItem[0].offsetTop) + "px;" +
+     "top:" + (this.parentTask.cTaskNameItem[0].offsetTop + 5) + "px;" +
+     "left:" + (this.parentTask.cTaskNameItem[0].offsetLeft - 9) + "px;";
+     lineVerticalLeft.innerHTML = "&nbsp;";
+     this.Chart.panelNames.firstChild.appendChild(lineVerticalLeft);
 
-    var LineHorizontalLeft = document.createElement("div");
-    LineHorizontalLeft.noShade = true;
-    LineHorizontalLeft.color = "#000000";
-    LineHorizontalLeft.style.cssText = "left:" + (this.parentTask.cTaskNameItem[0].offsetLeft - 9) + "px;top:" + (this.cTaskNameItem[0].offsetTop + 5) + "px;z-index:10;" +
-            "height:" + 1 + "px;width:" + (this.cTaskNameItem[0].offsetLeft - this.parentTask.cTaskNameItem[0].offsetLeft + 4 ) + "px;position: absolute;border-width: 1px 0px 0px 0px;font-size: 1px;border-style: dotted; border-color: #C0C4C0;margin: 0px; padding: 0px;";
-    this.Chart.panelNames.firstChild.appendChild(LineHorizontalLeft);
+     var LineHorizontalLeft = document.createElement("div");
+     LineHorizontalLeft.noShade = true;
+     LineHorizontalLeft.color = "#000000";
+     LineHorizontalLeft.style.cssText = "left:" + (this.parentTask.cTaskNameItem[0].offsetLeft - 9) + "px;top:" + (this.cTaskNameItem[0].offsetTop + 5) + "px;z-index:10;" +
+     "height:" + 1 + "px;width:" + (this.cTaskNameItem[0].offsetLeft - this.parentTask.cTaskNameItem[0].offsetLeft + 4 ) + "px;position: absolute;border-width: 1px 0px 0px 0px;font-size: 1px;border-style: dotted; border-color: #C0C4C0;margin: 0px; padding: 0px;";
+     this.Chart.panelNames.firstChild.appendChild(LineHorizontalLeft);
 
-    arrConnectingLinesNames.push(lineVerticalLeft);
-    arrConnectingLinesNames.push(LineHorizontalLeft);*/
+     arrConnectingLinesNames.push(lineVerticalLeft);
+     arrConnectingLinesNames.push(LineHorizontalLeft);*/
 
-    return  arrConnectingLinesNames;
+    return arrConnectingLinesNames;
 
 };
 /**
@@ -3248,8 +3031,7 @@ GanttTask.prototype.createConnectingLinesPN = function()
  * @type: private
  * @topic: 4
  */
-GanttTask.prototype.createConnectingLinesDS = function()
-{
+GanttTask.prototype.createConnectingLinesDS = function () {
     var oData = this.Chart.oData.firstChild;
     var arrLines = [];
 
@@ -3272,21 +3054,20 @@ GanttTask.prototype.createConnectingLinesDS = function()
     var widthChildTask = parseInt(this.predTask.cTaskItem[0].firstChild.firstChild.width);
     var widthPredecessorTask = parseInt(this.predTask.cTaskItem[0].firstChild.firstChild.width);
 
-    if (posYPredecessorTask < posYChildTask)
-    {
+    if (posYPredecessorTask < posYChildTask) {
         lineVerticalRight.style.cssText = "border-width: 0px 0px 0px 1px; border-style: solid; border-color: #4A8F43;margin: 0px; padding: 0px;z-index:0;font-size: 1px;position: absolute;" +
-                "height:" + (posYChildTask - this.Chart.heightTaskItem / 2 - posYPredecessorTask - 3) + "px;width:" + 1 + "px;left:" + (posXPredecessorTask + widthPredecessorTask - 20 ) + "px;top:" + (posYPredecessorTask + this.Chart.heightTaskItem) + "px;";
+            "height:" + (posYChildTask - this.Chart.heightTaskItem / 2 - posYPredecessorTask - 3) + "px;width:" + 1 + "px;left:" + (posXPredecessorTask + widthPredecessorTask - 20 ) + "px;top:" + (posYPredecessorTask + this.Chart.heightTaskItem) + "px;";
 
         lineHorizontal.style.cssText = "height:1px;border-color: #4A8F43;border-style: solid;border-width: 1px 0px 0px 0px;margin: 0px; padding: 0px;z-index:0;position: absolute;" +
-                "width:" + (15 + (posXChildTask - (widthPredecessorTask + posXPredecessorTask))) + "px;left:" + (posXPredecessorTask + widthPredecessorTask - 20 ) + "px;top:" + (posYChildTask + 2) + "px;";
+            "width:" + (15 + (posXChildTask - (widthPredecessorTask + posXPredecessorTask))) + "px;left:" + (posXPredecessorTask + widthPredecessorTask - 20 ) + "px;top:" + (posYChildTask + 2) + "px;";
 
         arrowImg.style.cssText = "margin: 0px; padding: 0px;width:7px;height:14px;position: absolute;left:" + (posXChildTask - 7) + "px;top:" + (posYChildTask - 1) + "px;";
     } else {
         lineVerticalRight.style.cssText = "border-width: 0px 0px 0px 1px; border-style: solid; border-color: #4A8F43;margin: 0px; padding: 0px;z-index:0;font-size: 1px;position: absolute;" +
-                "height:" + (posYPredecessorTask + 2 - posYChildTask) + "px;width:" + 1 + "px;left:" + (posXPredecessorTask + widthPredecessorTask - 20 ) + "px;top:" + (posYChildTask + 2) + "px;";
+            "height:" + (posYPredecessorTask + 2 - posYChildTask) + "px;width:" + 1 + "px;left:" + (posXPredecessorTask + widthPredecessorTask - 20 ) + "px;top:" + (posYChildTask + 2) + "px;";
 
         lineHorizontal.style.cssText = "height:1px;border-color: #4A8F43;border-style: solid;border-width: 1px 0px 0px 0px;margin: 0px; padding: 0px;z-index:0;position: absolute;" +
-                "width:" + (15 + (posXChildTask - (widthPredecessorTask + posXPredecessorTask))) + "px;left:" + (posXPredecessorTask + widthPredecessorTask - 20 ) + "px;top:" + (posYChildTask + 2) + "px;";
+            "width:" + (15 + (posXChildTask - (widthPredecessorTask + posXPredecessorTask))) + "px;left:" + (posXPredecessorTask + widthPredecessorTask - 20 ) + "px;top:" + (posYChildTask + 2) + "px;";
 
         arrowImg.style.cssText = "margin: 0px; padding: 0px;width:7px;height:14px;position: absolute;left:" + (posXChildTask - 7) + "px;top:" + (posYChildTask - 1) + "px;";
     }
@@ -3306,12 +3087,9 @@ GanttTask.prototype.createConnectingLinesDS = function()
  * @type: private
  * @topic: 3
  */
-GanttTask.prototype.showChildTasks = function(task, isOpen)
-{
-    if (isOpen)
-    {
-        for (var i = 0; i < task.childTask.length; i++)
-        {
+GanttTask.prototype.showChildTasks = function (task, isOpen) {
+    if (isOpen) {
+        for (var i = 0; i < task.childTask.length; i++) {
             if (task.childTask[i].cTaskItem[0].style.display == "none") {
                 task.childTask[i].cTaskItem[0].style.display = "inline";
                 task.childTask[i].cTaskNameItem[0].style.display = "inline";
@@ -3350,12 +3128,9 @@ GanttTask.prototype.showChildTasks = function(task, isOpen)
  * @type: private
  * @topic: 3
  */
-GanttTask.prototype.hideChildTasks = function(task)
-{
-    for (var i = 0; i < task.childTask.length; i++)
-    {
-        if (task.childTask[i].cTaskItem[0].style.display != "none")
-        {
+GanttTask.prototype.hideChildTasks = function (task) {
+    for (var i = 0; i < task.childTask.length; i++) {
+        if (task.childTask[i].cTaskItem[0].style.display != "none") {
             task.childTask[i].cTaskItem[0].style.display = "none";
             task.childTask[i].cTaskNameItem[0].style.display = "none";
             if (this.Chart.isShowDescTask) {
@@ -3390,22 +3165,19 @@ GanttTask.prototype.hideChildTasks = function(task)
  * @type: private
  * @topic: 4
  */
-GanttTask.prototype.shiftCurrentTasks = function(task, height)
-{
+GanttTask.prototype.shiftCurrentTasks = function (task, height) {
     this.shiftNextTask(this, height);
     task.Project.shiftNextProject(task.Project, height);
 };
 
-GanttProject.prototype.shiftNextProject = function(project, height)
-{
+GanttProject.prototype.shiftNextProject = function (project, height) {
     if (project.nextProject) {
         project.nextProject.shiftProject(height);
         this.shiftNextProject(project.nextProject, height);
     }
 
 };
-GanttProject.prototype.shiftProject = function(height)
-{
+GanttProject.prototype.shiftProject = function (height) {
     this.projectItem[0].style.top = parseInt(this.projectItem[0].style.top) + height + "px";
     if (this.Chart.isShowDescProject) {
         this.descrProject.style.top = parseInt(this.descrProject.style.top) + height + "px";
@@ -3418,16 +3190,14 @@ GanttProject.prototype.shiftProject = function(height)
         this.shiftNextParentTask(this.arrTasks[0], height);
 
 };
-GanttProject.prototype.shiftTask = function(task, height)
-{
+GanttProject.prototype.shiftTask = function (task, height) {
     if (this.Chart._showTreePanel) {
 
         task.cTaskNameItem[0].style.top = parseInt(task.cTaskNameItem[0].style.top) + height + "px";
         if (task.cTaskNameItem[2]) {
             task.cTaskNameItem[2].style.top = parseInt(task.cTaskNameItem[2].style.top) + height + "px";
         }
-        if (task.parentTask && task.cTaskNameItem[1][0])
-        {
+        if (task.parentTask && task.cTaskNameItem[1][0]) {
             task.cTaskNameItem[1][0].style.top = parseInt(task.cTaskNameItem[1][0].style.top) + height + "px";
             task.cTaskNameItem[1][1].style.top = parseInt(task.cTaskNameItem[1][1].style.top) + height + "px";
         }
@@ -3437,15 +3207,13 @@ GanttProject.prototype.shiftTask = function(task, height)
     if (this.Chart.isShowDescTask) {
         task.descrTask.style.top = parseInt(task.descrTask.style.top) + height + "px";
     }
-    if (task.cTaskItem[1][0])
-    {
+    if (task.cTaskItem[1][0]) {
         task.cTaskItem[1][0].style.top = parseInt(task.cTaskItem[1][0].style.top) + height + "px";
         task.cTaskItem[1][1].style.top = parseInt(task.cTaskItem[1][1].style.top) + height + "px";
         task.cTaskItem[1][2].style.top = parseInt(task.cTaskItem[1][2].style.top) + height + "px";
     }
 };
-GanttProject.prototype.shiftNextParentTask = function(task, height)
-{
+GanttProject.prototype.shiftNextParentTask = function (task, height) {
     this.shiftTask(task, height);
     this.shiftChildTasks(task, height);
 
@@ -3454,10 +3222,8 @@ GanttProject.prototype.shiftNextParentTask = function(task, height)
     }
 
 };
-GanttProject.prototype.shiftChildTasks = function(task, height)
-{
-    for (var i = 0; i < task.childTask.length; i++)
-    {
+GanttProject.prototype.shiftChildTasks = function (task, height) {
+    for (var i = 0; i < task.childTask.length; i++) {
         this.shiftTask(task.childTask[i], height);
         if (task.childTask[i].childTask.length > 0) {
             this.shiftChildTasks(task.childTask[i], height);
@@ -3466,17 +3232,15 @@ GanttProject.prototype.shiftChildTasks = function(task, height)
     }
 };
 
-GanttTask.prototype.shiftTask = function(task, height)
-{
+GanttTask.prototype.shiftTask = function (task, height) {
     if (this.Chart._showTreePanel) {
         task.cTaskNameItem[0].style.top = parseInt(task.cTaskNameItem[0].style.top) + height + "px";
         if (task.cTaskNameItem[2]) {
             task.cTaskNameItem[2].style.top = parseInt(task.cTaskNameItem[2].style.top) + height + "px";
         }
-        if (task.parentTask)
-        {
+        if (task.parentTask) {
             if (task.cTaskNameItem[1].length > 0) if ((parseInt(this.cTaskNameItem[0].style.top) > parseInt(task.parentTask.cTaskNameItem[0].style.top))
-                    && (task.cTaskNameItem[1][0].style.display != "none")) {
+                && (task.cTaskNameItem[1][0].style.display != "none")) {
                 task.cTaskNameItem[1][0].style.height = parseInt(task.cTaskNameItem[1][0].style.height) + height + "px";
             } else {
                 task.cTaskNameItem[1][0].style.top = parseInt(task.cTaskNameItem[1][0].style.top) + height + "px";
@@ -3489,11 +3253,10 @@ GanttTask.prototype.shiftTask = function(task, height)
     if (this.Chart.isShowDescTask) {
         task.descrTask.style.top = parseInt(task.descrTask.style.top) + height + "px";
     }
-    if (task.predTask)
-    {
+    if (task.predTask) {
         if (task.cTaskItem[1].length > 0) if (((parseInt(this.cTaskItem[0].style.top) > parseInt(task.predTask.cTaskItem[0].style.top)) ||
-                (this.cTaskItem[0].id == task.predTask.TaskInfo.Id)) &&
-                task.cTaskItem[1][0].style.display != "none") {
+            (this.cTaskItem[0].id == task.predTask.TaskInfo.Id)) &&
+            task.cTaskItem[1][0].style.display != "none") {
             task.cTaskItem[1][0].style.height = parseInt(task.cTaskItem[1][0].style.height) + height + "px";
         } else {
             task.cTaskItem[1][0].style.top = parseInt(task.cTaskItem[1][0].style.top) + height + "px";
@@ -3504,8 +3267,7 @@ GanttTask.prototype.shiftTask = function(task, height)
         }
     }
 };
-GanttTask.prototype.shiftNextTask = function(task, height)
-{
+GanttTask.prototype.shiftNextTask = function (task, height) {
     if (task.nextChildTask) {
         this.shiftTask(task.nextChildTask, height);
         this.shiftChildTask(task.nextChildTask, height);
@@ -3520,10 +3282,8 @@ GanttTask.prototype.shiftNextTask = function(task, height)
         this.shiftNextTask(task.nextParentTask, height);
     }
 };
-GanttTask.prototype.shiftChildTask = function(task, height)
-{
-    for (var i = 0; i < task.childTask.length; i++)
-    {
+GanttTask.prototype.shiftChildTask = function (task, height) {
+    for (var i = 0; i < task.childTask.length; i++) {
         this.shiftTask(task.childTask[i], height);
         if (task.childTask[i].childTask.length > 0) {
             this.shiftChildTask(task.childTask[i], height);
@@ -3537,9 +3297,8 @@ GanttTask.prototype.shiftChildTask = function(task, height)
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.getPosOnDate = function(est)
-{
-    return  (est - this.startDate) / (60 * 60 * 1000) * this.hourInPixels;
+GanttChart.prototype.getPosOnDate = function (est) {
+    return (est - this.startDate) / (60 * 60 * 1000) * this.hourInPixels;
 };
 /**
  * @desc: get width on duration
@@ -3547,8 +3306,7 @@ GanttChart.prototype.getPosOnDate = function(est)
  * @type: private
  * @topic: 4
  */
-GanttChart.prototype.getWidthOnDuration = function(duration)
-{
+GanttChart.prototype.getWidthOnDuration = function (duration) {
     return Math.round(this.hourInPixelsWork * duration);
 };
 /**
@@ -3556,13 +3314,12 @@ GanttChart.prototype.getWidthOnDuration = function(duration)
  * @type: private
  * @topic: 5
  */
-GanttTask.prototype.endMove = function()
-{
+GanttTask.prototype.endMove = function () {
     var width = parseInt(this.cTaskItem[0].style.left) - this.posX;
     var est = this.getDateOnPosition(parseInt(this.cTaskItem[0].style.left));
     est = this.checkPos(est);
 
-    this.wasMoved = this.TaskInfo.EST.valueOf() !=  est.valueOf();
+    this.wasMoved = this.TaskInfo.EST.valueOf() != est.valueOf();
 
     if (this.checkMove) {
         width = this.Chart.getPosOnDate(est) - this.posX;
@@ -3580,32 +3337,27 @@ GanttTask.prototype.endMove = function()
     if (this.Chart._isIE) this.cTaskItem[0].childNodes[2].childNodes[0].style.cursor = "";
 };
 
-GanttTask.prototype.checkPos = function(est)
-{
+GanttTask.prototype.checkPos = function (est) {
     var h = est.getHours();
-    if (h >= 12)
-    {
+    if (h >= 12) {
         est.setDate(est.getDate() + 1);
         est.setHours(0);
 
-        if ((parseInt(this.cTaskItem[0].firstChild.firstChild.width) + this.Chart.getPosOnDate(est) > this.maxPosXMove) && (this.maxPosXMove != -1))
-        {
+        if ((parseInt(this.cTaskItem[0].firstChild.firstChild.width) + this.Chart.getPosOnDate(est) > this.maxPosXMove) && (this.maxPosXMove != -1)) {
             est.setDate(est.getDate() - 1);
             est.setHours(0);
         }
 
 
-    } else if ((h < 12) && (h != 0))
-    {
+    } else if ((h < 12) && (h != 0)) {
         est.setHours(0);
-        if ((this.Chart.getPosOnDate(est) < this.minPosXMove))
-        {
+        if ((this.Chart.getPosOnDate(est) < this.minPosXMove)) {
             est.setDate(est.getDate() + 1);
         }
     }
     this.cTaskItem[0].style.left = this.Chart.getPosOnDate(est) + "px";
 
-    return  est;
+    return est;
 
 };
 
@@ -3614,16 +3366,13 @@ GanttTask.prototype.checkPos = function(est)
  * @type: private
  * @topic: 4
  */
-GanttTask.prototype.getMaxPosPredChildTaskItem = function()
-{
+GanttTask.prototype.getMaxPosPredChildTaskItem = function () {
     var posPredChildTaskItem = 0;
     var nextPosPredChildTaskItem = 0;
 
-    for (var i = 0; i < this.childPredTask.length; i++)
-    {
+    for (var i = 0; i < this.childPredTask.length; i++) {
         nextPosPredChildTaskItem = this.getMaxPosPredChildTaskItemInTree(this.childPredTask[i]);
-        if (nextPosPredChildTaskItem > posPredChildTaskItem)
-        {
+        if (nextPosPredChildTaskItem > posPredChildTaskItem) {
             posPredChildTaskItem = nextPosPredChildTaskItem;
         }
     }
@@ -3636,27 +3385,22 @@ GanttTask.prototype.getMaxPosPredChildTaskItem = function()
  * @type: private
  * @topic: 4
  */
-GanttTask.prototype.getMaxPosPredChildTaskItemInTree = function(task)
-{
+GanttTask.prototype.getMaxPosPredChildTaskItemInTree = function (task) {
     var currentPos = parseInt(task.cTaskItem[0].firstChild.firstChild.width) + parseInt(task.cTaskItem[0].style.left);
     var posPredChildTaskItem = 0;
     var nextPosPredChildTaskItem = 0;
 
-    for (var i = 0; i < task.childPredTask.length; i++)
-    {
+    for (var i = 0; i < task.childPredTask.length; i++) {
         nextPosPredChildTaskItem = this.getMaxPosPredChildTaskItemInTree(task.childPredTask[i]);
-        if (nextPosPredChildTaskItem > posPredChildTaskItem)
-        {
+        if (nextPosPredChildTaskItem > posPredChildTaskItem) {
             posPredChildTaskItem = nextPosPredChildTaskItem;
         }
     }
 
-    if (posPredChildTaskItem > currentPos)
-    {
+    if (posPredChildTaskItem > currentPos) {
         return posPredChildTaskItem;
     }
-    else
-    {
+    else {
         return currentPos;
     }
 
@@ -3667,10 +3411,8 @@ GanttTask.prototype.getMaxPosPredChildTaskItemInTree = function(task)
  * @type: public
  * @topic: 2
  */
-GanttProject.prototype.getTaskById = function(id)
-{
-    for (var i = 0; i < this.arrTasks.length; i++)
-    {
+GanttProject.prototype.getTaskById = function (id) {
+    for (var i = 0; i < this.arrTasks.length; i++) {
         var task = this.searchTaskInTree(this.arrTasks[i], id);
         if (task) return task;
 
@@ -3684,24 +3426,17 @@ GanttProject.prototype.getTaskById = function(id)
  * @type: private
  * @topic: 2
  */
-GanttProject.prototype.searchTaskInTree = function(task, id)
-{
-    if (task.TaskInfo.Id == id)
-    {
+GanttProject.prototype.searchTaskInTree = function (task, id) {
+    if (task.TaskInfo.Id == id) {
         return task;
 
-    } else
-    {
-        for (var i = 0; i < task.childTask.length; i++)
-        {
-            if (task.childTask[i].TaskInfo.Id == id)
-            {
+    } else {
+        for (var i = 0; i < task.childTask.length; i++) {
+            if (task.childTask[i].TaskInfo.Id == id) {
                 return task.childTask[i];
             }
-            else
-            {
-                if (task.childTask[i].childTask.length > 0)
-                {
+            else {
+                if (task.childTask[i].childTask.length > 0) {
                     var cTask = this.searchTaskInTree(task.childTask[i], id);
                     if (cTask) return cTask;
                 }
@@ -3716,16 +3451,14 @@ GanttProject.prototype.searchTaskInTree = function(task, id)
  * @type: private
  * @topic: 4
  */
-GanttProject.prototype.shiftProjectItem = function()
-{
+GanttProject.prototype.shiftProjectItem = function () {
     var posItemL = null;
     var posItemR = null;
     var posProjectItemL = parseInt(this.projectItem[0].style.left);
     var posProjectItemR = parseInt(this.projectItem[0].firstChild.style.width) + parseInt(this.projectItem[0].style.left);
     var widthProjectItem = parseInt(this.projectItem[0].firstChild.style.width);
 
-    for (var t = 0; t < this.arrTasks.length; t++)
-    {
+    for (var t = 0; t < this.arrTasks.length; t++) {
         var tmpPosItemL = parseInt(this.arrTasks[t].cTaskItem[0].style.left);
         var tmpPosItemR = parseInt(this.arrTasks[t].cTaskItem[0].style.left) + parseInt(this.arrTasks[t].cTaskItem[0].firstChild.firstChild.width);
 
@@ -3747,8 +3480,7 @@ GanttProject.prototype.shiftProjectItem = function()
 
     }
 
-    if (posItemL != posProjectItemL)
-    {
+    if (posItemL != posProjectItemL) {
         this.Project.StartDate = new Date(this.Chart.startDate);
         this.Project.StartDate.setHours(this.Project.StartDate.getHours() + (posItemL / this.Chart.hourInPixels));
     }
@@ -3768,26 +3500,23 @@ GanttProject.prototype.shiftProjectItem = function()
  * @type: private
  * @topic: 4
  */
-GanttProject.prototype.addDayInPanelTime = function()
-{
+GanttProject.prototype.addDayInPanelTime = function () {
     var width = parseInt(this.projectItem[0].style.left) + parseInt(this.projectItem[0].firstChild.style.width) + 20;
     if (this.Chart.isShowDescProject) {
         width += this.descrProject.offsetWidth;
     }
 
     var table = this.Chart.panelTime.firstChild, tbody = table.firstChild;
-    if (parseInt(tbody.offsetWidth) < width)
-    {
+    if (parseInt(tbody.offsetWidth) < width) {
         var countDays = Math.round((width - parseInt(tbody.offsetWidth)) / this.Chart.dayInPixels);
         var row = tbody.rows[1];
-        for (var n = 0; n < countDays; n++)
-        {
+        for (var n = 0; n < countDays; n++) {
             this.Chart.addPointInTimePanel(row, table);
             this.Chart.addDayInPanelTime(row);
         }
         var w = this.Chart.dayInPixels * (row.cells.length);
         tbody.style.width = w + "px";
-        this.Chart.panelTasks.style.width = (w-18) + "px";
+        this.Chart.panelTasks.style.width = (w - 18) + "px";
     }
 };
 /**
@@ -3798,8 +3527,7 @@ GanttProject.prototype.addDayInPanelTime = function()
  * @type: private
  * @topic: 5
  */
-GanttProject.prototype.addEvent = function (elm, evType, fn, useCapture)
-{
+GanttProject.prototype.addEvent = function (elm, evType, fn, useCapture) {
     if (elm.addEventListener) {
         elm.addEventListener(evType, fn, useCapture);
         return true;
@@ -3817,8 +3545,7 @@ GanttProject.prototype.addEvent = function (elm, evType, fn, useCapture)
  * @type: private
  * @topic: 4
  */
-GanttProject.prototype.getPopUpInfo = function(object, event)
-{
+GanttProject.prototype.getPopUpInfo = function (object, event) {
     //this.projectItem[0]
     var posX = object.offsetLeft + ((event.layerX == null) ? event.offsetX : event.layerX);
     var posY = object.offsetTop + this.Chart.heightTaskItem + 6;
@@ -3831,16 +3558,14 @@ GanttProject.prototype.getPopUpInfo = function(object, event)
 
     this.Chart.divInfo.style.cssText = "z-index:2;position: absolute;display: inline;";
 
-    if (posY + this.Chart.divInfo.lastChild.offsetHeight + 6 > this.Chart.oData.offsetHeight + this.Chart.oData.scrollTop)
-    {
+    if (posY + this.Chart.divInfo.lastChild.offsetHeight + 6 > this.Chart.oData.offsetHeight + this.Chart.oData.scrollTop) {
         this.Chart.divInfo.style.top = (posY - this.Chart.divInfo.lastChild.offsetHeight - 10 - this.Chart.heightTaskItem) + "px";
     }
     else {
         this.Chart.divInfo.style.top = posY + "px";
     }
 
-    if (this.Chart.divInfo.lastChild.offsetWidth + posX + 10 > this.Chart.oData.offsetWidth + this.Chart.oData.scrollLeft)
-    {
+    if (this.Chart.divInfo.lastChild.offsetWidth + posX + 10 > this.Chart.oData.offsetWidth + this.Chart.oData.scrollLeft) {
         this.Chart.divInfo.style.left = posX - (this.Chart.divInfo.lastChild.offsetWidth + posX + 20 - (this.Chart.oData.offsetWidth + this.Chart.oData.scrollLeft)) + "px";
 
     } else {
@@ -3852,8 +3577,7 @@ GanttProject.prototype.getPopUpInfo = function(object, event)
  * @type: private
  * @topic: 4
  */
-GanttProject.prototype.closePopUpInfo = function()
-{
+GanttProject.prototype.closePopUpInfo = function () {
     this.Chart.divInfo.style.display = "none";
 };
 /**
@@ -3862,11 +3586,9 @@ GanttProject.prototype.closePopUpInfo = function()
  * @type: private
  * @topic: 4
  */
-GanttProject.prototype.resizeProjectItem = function(width)
-{
+GanttProject.prototype.resizeProjectItem = function (width) {
     var percentCompleted = this.percentCompleted;
-    if (percentCompleted > 0 && percentCompleted < 100)
-    {
+    if (percentCompleted > 0 && percentCompleted < 100) {
         this.projectItem[0].firstChild.style.width = width + "px";
         this.projectItem[0].firstChild.width = width + "px";
         this.projectItem[0].style.width = width + "px";
@@ -3874,8 +3596,7 @@ GanttProject.prototype.resizeProjectItem = function(width)
         this.projectItem[0].firstChild.rows[0].cells[1].firstChild.style.width = Math.round(width * (100 - percentCompleted) / 100) + "px";
         this.projectItem[0].lastChild.firstChild.width = width + "px";
 
-    } else if (percentCompleted == 0 || percentCompleted == 100)
-    {
+    } else if (percentCompleted == 0 || percentCompleted == 100) {
         this.projectItem[0].firstChild.style.width = width + "px";
         this.projectItem[0].firstChild.width = width + "px";
         this.projectItem[0].style.width = width + "px";
@@ -3890,8 +3611,7 @@ GanttProject.prototype.resizeProjectItem = function(width)
  * @type: private
  * @topic: 4
  */
-GanttTask.prototype.moveCurrentTaskItem = function(width, moveChild)
-{
+GanttTask.prototype.moveCurrentTaskItem = function (width, moveChild) {
     var taskItem = this.cTaskItem[0];
     this.TaskInfo.EST = new Date(this.Chart.startDate);
     this.TaskInfo.EST.setHours(this.TaskInfo.EST.getHours() + (parseInt(taskItem.style.left) / this.Chart.hourInPixels));
@@ -3923,12 +3643,10 @@ GanttTask.prototype.moveCurrentTaskItem = function(width, moveChild)
  * @type: private
  * @topic: 4
  */
-GanttTask.prototype.moveChildTaskItems = function(task, width, moveChild)
-{
+GanttTask.prototype.moveChildTaskItems = function (task, width, moveChild) {
     var taskItem = task.cTaskItem[0];
 
-    if (moveChild)
-    {
+    if (moveChild) {
         taskItem.style.left = parseInt(taskItem.style.left) + width + "px";
         task.addDayInPanelTime();
         task.TaskInfo.EST = new Date(this.Chart.startDate);
@@ -3948,10 +3666,8 @@ GanttTask.prototype.moveChildTaskItems = function(task, width, moveChild)
             this.moveChildTaskItems(task.childPredTask[i], width, moveChild);
         }
     }
-    else
-    {
-        if (task.cTaskItem[1].length > 0)
-        {
+    else {
+        if (task.cTaskItem[1].length > 0) {
             task.cTaskItem[1][2].style.left = parseInt(task.cTaskItem[1][2].style.left) + width + "px";
             task.cTaskItem[1][2].style.width = parseInt(task.cTaskItem[1][2].style.width) - width + "px";
             task.cTaskItem[1][0].style.left = parseInt(task.cTaskItem[1][0].style.left) + width + "px";
@@ -3966,8 +3682,7 @@ GanttTask.prototype.moveChildTaskItems = function(task, width, moveChild)
  * @type: private
  * @topic: 4
  */
-GanttTask.prototype.addDayInPanelTime = function()
-{
+GanttTask.prototype.addDayInPanelTime = function () {
     var taskItem = this.cTaskItem[0];
     var width = parseInt(taskItem.style.left) + parseInt(taskItem.firstChild.firstChild.width) + 20;
     if (this.Chart.isShowDescTask) {
@@ -3975,18 +3690,16 @@ GanttTask.prototype.addDayInPanelTime = function()
     }
 
     var table = this.Chart.panelTime.firstChild, tbody = table.firstChild;
-    if (parseInt(tbody.offsetWidth) < width)
-    {
+    if (parseInt(tbody.offsetWidth) < width) {
         var row = tbody.rows[1];
         var countDays = Math.round((width + 20 - parseInt(tbody.offsetWidth)) / this.Chart.dayInPixels);
-        for (var n = 0; n < countDays; n++)
-        {
+        for (var n = 0; n < countDays; n++) {
             this.Chart.addPointInTimePanel(row, table);
             this.Chart.addDayInPanelTime(row);
         }
         var w = this.Chart.dayInPixels * (row.cells.length);
         tbody.style.width = w + "px";
-        this.Chart.panelTasks.style.width = (w-18) + "px";
+        this.Chart.panelTasks.style.width = (w - 18) + "px";
     }
 };
 /**
@@ -3995,8 +3708,7 @@ GanttTask.prototype.addDayInPanelTime = function()
  * @type: private
  * @topic: 4
  */
-GanttTask.prototype.getDateOnPosition = function(position)
-{
+GanttTask.prototype.getDateOnPosition = function (position) {
     var date = new Date(this.Chart.startDate);
     date.setHours(date.getHours() + (position / this.Chart.hourInPixels));
     return date;
@@ -4007,20 +3719,17 @@ GanttTask.prototype.getDateOnPosition = function(position)
  * @type: private
  * @topic: 4
  */
-GanttTask.prototype.moveItem = function(event)
-{
+GanttTask.prototype.moveItem = function (event) {
     var pageX = event.screenX;
     var posTaskItem = (this.posX + (pageX - this.MouseX));
     var widthTaskItem = parseInt(this.cTaskItem[0].childNodes[0].firstChild.width);
     var posTaskItemR = posTaskItem + widthTaskItem;
 
-    if (this.checkMove)
-    {
+    if (this.checkMove) {
         var date = this.getDateOnPosition(posTaskItem);
-        var res = this.Chart.callEvent("onTaskDragging", [this,date])!==false;
+        var res = this.Chart.callEvent("onTaskDragging", [this, date]) !== false;
         if (res && ((this.minPosXMove <= posTaskItem))
-                && ((posTaskItemR <= this.maxPosXMove) || (this.maxPosXMove == -1)))
-        {
+            && ((posTaskItemR <= this.maxPosXMove) || (this.maxPosXMove == -1))) {
             this.moveTaskItem(posTaskItem);
         }
     }
@@ -4031,8 +3740,7 @@ GanttTask.prototype.moveItem = function(event)
  * @type: private
  * @topic: 4
  */
-GanttTask.prototype.moveTaskItem = function(posX)
-{
+GanttTask.prototype.moveTaskItem = function (posX) {
     this.addDayInPanelTime();
     this.cTaskItem[0].style.left = posX + "px";
     var date = this.getDateOnPosition(posX);
@@ -4044,35 +3752,27 @@ GanttTask.prototype.moveTaskItem = function(posX)
  * @type: private
  * @topic: 4
  */
-GanttTask.prototype.resizeItem = function(event)
-{
-    if (this.checkResize)
-    {
+GanttTask.prototype.resizeItem = function (event) {
+    if (this.checkResize) {
         var MouseX = event.screenX;
         var widthTaskItem = this.taskItemWidth + (MouseX - this.MouseX);
 
         var countHours = Math.round(widthTaskItem / this.Chart.hourInPixelsWork);
-        if (this.Chart.callEvent("onTaskResizing", [this,countHours])===false) return;
+        if (this.Chart.callEvent("onTaskResizing", [this, countHours]) === false) return;
 
-        if (widthTaskItem >= this.taskItemWidth)
-        {
-            if ((widthTaskItem <= this.maxWidthResize) || (this.maxWidthResize == -1))
-            {
+        if (widthTaskItem >= this.taskItemWidth) {
+            if ((widthTaskItem <= this.maxWidthResize) || (this.maxWidthResize == -1)) {
                 this.resizeTaskItem(widthTaskItem);
                 this.addDayInPanelTime();
 
-            } else if ((this.maxWidthResize != -1) && (widthTaskItem > this.maxWidthResize))
-            {
+            } else if ((this.maxWidthResize != -1) && (widthTaskItem > this.maxWidthResize)) {
                 this.resizeTaskItem(this.maxWidthResize);
             }
-        } else if (widthTaskItem <= this.taskItemWidth)
-        {
-            if (widthTaskItem >= this.minWidthResize)
-            {
+        } else if (widthTaskItem <= this.taskItemWidth) {
+            if (widthTaskItem >= this.minWidthResize) {
                 this.resizeTaskItem(widthTaskItem);
             }
-            else if (widthTaskItem < this.minWidthResize)
-            {
+            else if (widthTaskItem < this.minWidthResize) {
                 this.resizeTaskItem(this.minWidthResize);
             }
         }
@@ -4084,18 +3784,15 @@ GanttTask.prototype.resizeItem = function(event)
  * @type: private
  * @topic: 4
  */
-GanttTask.prototype.resizeTaskItem = function(width)
-{
+GanttTask.prototype.resizeTaskItem = function (width) {
     var taskItem = this.cTaskItem[0];
     var countHours = Math.round(width / this.Chart.hourInPixelsWork);
     var c = taskItem.childNodes[0].firstChild.rows[0].cells[0];
-    if (c)
-    {
+    if (c) {
         c.firstChild.style.width = parseInt(c.width) * width / 100 + "px";
     }
     c = taskItem.childNodes[0].firstChild.rows[0].cells[1];
-    if (c)
-    {
+    if (c) {
         c.firstChild.style.width = parseInt(c.width) * width / 100 + "px";
     }
 
@@ -4113,19 +3810,15 @@ GanttTask.prototype.resizeTaskItem = function(width)
  * @type: private
  * @topic: 4
  */
-GanttTask.prototype.endResizeItem = function()
-{
+GanttTask.prototype.endResizeItem = function () {
     var taskItem = this.cTaskItem[0];
     this.wasResized = this.taskItemWidth != parseInt(taskItem.childNodes[0].firstChild.width);
-    if (this.wasResized)
-    {
+    if (this.wasResized) {
         var posXL = taskItem.offsetLeft;
         var posXR = taskItem.offsetLeft + parseInt(taskItem.childNodes[0].firstChild.width);
         this.TaskInfo.Duration = Math.round((posXR - posXL) / this.Chart.hourInPixelsWork);
-        if (this.childPredTask.length > 0)
-        {
-            for (var j = 0; j < this.childPredTask.length; j++)
-            {
+        if (this.childPredTask.length > 0) {
+            for (var j = 0; j < this.childPredTask.length; j++) {
                 this.childPredTask[j].cTaskItem[1][2].style.width = parseInt(this.childPredTask[j].cTaskItem[1][2].style.width) - (parseInt(taskItem.childNodes[0].firstChild.width) - this.taskItemWidth) + "px";
                 this.childPredTask[j].cTaskItem[1][2].style.left = parseInt(this.childPredTask[j].cTaskItem[1][2].style.left) + (parseInt(taskItem.childNodes[0].firstChild.width) - this.taskItemWidth) + "px";
                 this.childPredTask[j].cTaskItem[1][0].style.left = parseInt(this.childPredTask[j].cTaskItem[1][0].style.left) + (parseInt(taskItem.childNodes[0].firstChild.width) - this.taskItemWidth) + "px";
@@ -4144,27 +3837,23 @@ GanttTask.prototype.endResizeItem = function()
     if (this.Chart._isFF) document.body.style.cursor = "";
 };
 
-GanttProject.prototype.moveDescrProject = function()
-{
+GanttProject.prototype.moveDescrProject = function () {
     this.descrProject.style.left = (parseInt(this.projectItem[0].style.left) + this.Duration * this.Chart.hourInPixelsWork + 10);
     this.descrProject.innerHTML = this.getDescStr();
 };
 
-GanttProject.prototype.showDescrProject = function()
-{
+GanttProject.prototype.showDescrProject = function () {
     var posX = (parseInt(this.projectItem[0].style.left) + this.Duration * this.Chart.hourInPixelsWork + 10);
     this.descrProject.style.left = posX + "px";
     this.descrProject.style.visibility = 'visible';
     this.descrProject.innerHTML = this.getDescStr();
 };
 
-GanttProject.prototype.hideDescrProject = function()
-{
+GanttProject.prototype.hideDescrProject = function () {
     this.descrProject.style.visibility = 'hidden';
 };
 
-GanttProject.prototype.getDescStr = function()
-{
+GanttProject.prototype.getDescStr = function () {
     var str = '', delim = ", ";
 
     for (var i = 0; i < this.Chart.paramShowProject.length; i++) {
@@ -4197,8 +3886,7 @@ GanttProject.prototype.getDescStr = function()
 };
 
 
-GanttProject.prototype.createDescrProject = function()
-{
+GanttProject.prototype.createDescrProject = function () {
     var posX = (this.posX + this.Duration * this.Chart.hourInPixelsWork + 10);
     var divDesc = document.createElement("div");
     divDesc.style.cssText += ";z-index:1;position:absolute;left:" + posX + "px;top:" + this.posY + "px;";
@@ -4210,20 +3898,19 @@ GanttProject.prototype.createDescrProject = function()
         this.descrProject.style.visibility = 'hidden';
     }
 
-    if (this.Chart._showTooltip)
-    {
+    if (this.Chart._showTooltip) {
         var self = this;
-        var getPopUpInfo = function(e) {
+        var getPopUpInfo = function (e) {
             if ((!self.Chart._isMove) && (!self.Chart._isResize))  self.getPopUpInfo(self.descrProject, e);
         };
-        var closePopUpInfo = function() {
+        var closePopUpInfo = function () {
             self.closePopUpInfo();
         };
 
         this.addEvent(divDesc, 'mouseover', getPopUpInfo, false);
         this.addEvent(divDesc, 'mouseout', closePopUpInfo, false);
     }
-    return  divDesc;
+    return divDesc;
 };
 
 /**
@@ -4231,8 +3918,7 @@ GanttProject.prototype.createDescrProject = function()
  * @type: private
  * @topic: 0
  */
-GanttProject.prototype.createProjectItem = function()
-{
+GanttProject.prototype.createProjectItem = function () {
     var self = this;
     this.percentCompleted = this.getPercentCompleted();
     this.Duration = this.getDuration();
@@ -4253,10 +3939,8 @@ GanttProject.prototype.createProjectItem = function()
 
     var rowprojectItem = tblProjectItem.insertRow(tblProjectItem.rows.length);
 
-    if (this.percentCompleted != -1)
-    {
-        if (this.percentCompleted != 0)
-        {
+    if (this.percentCompleted != -1) {
+        if (this.percentCompleted != 0) {
             var cellprojectItem = document.createElement("TD");
             rowprojectItem.appendChild(cellprojectItem);
             cellprojectItem.width = this.percentCompleted + "%";
@@ -4269,8 +3953,7 @@ GanttProject.prototype.createProjectItem = function()
 
         }
 
-        if (this.percentCompleted != 100)
-        {
+        if (this.percentCompleted != 100) {
             var cellprojectItem = document.createElement("TD");
             rowprojectItem.appendChild(cellprojectItem);
             cellprojectItem.width = (100 - this.percentCompleted) + "%";
@@ -4282,8 +3965,7 @@ GanttProject.prototype.createProjectItem = function()
             imgPr.src = this.Chart.imgs + "progress_bg.png";
         }
 
-    } else
-    {
+    } else {
         var cellprojectItem = document.createElement("TD");
         rowprojectItem.appendChild(cellprojectItem);
         cellprojectItem.width = "1px";
@@ -4317,18 +3999,16 @@ GanttProject.prototype.createProjectItem = function()
     rowTaskInfo.appendChild(cellTaskInfo);
     projectItem.appendChild(divTaskInfo);
 
-    if (this.Project.ParentTasks.length == 0)
-    {
+    if (this.Project.ParentTasks.length == 0) {
         projectItem.style.display = "none";
 
     }
 
-    if (this.Chart._showTooltip)
-    {
-        var getPopUpInfo = function(e) {
+    if (this.Chart._showTooltip) {
+        var getPopUpInfo = function (e) {
             if ((!self.Chart._isMove) && (!self.Chart._isResize))  self.getPopUpInfo(self.projectItem[0], e);
         };
-        var closePopUpInfo = function() {
+        var closePopUpInfo = function () {
             self.closePopUpInfo();
         };
 
@@ -4342,30 +4022,26 @@ GanttProject.prototype.createProjectItem = function()
  * @type: private
  * @topic: 0
  */
-GanttProject.prototype.createProjectNameItem = function()
-{
+GanttProject.prototype.createProjectNameItem = function () {
     var self = this;
     var divName = document.createElement("div");
     divName.style.cssText = "cursor:pointer;color:#003366;font-weight:bold;font-size:12px;font-family:Tahoma,Arial;white-space:nowrap;height:15px;z-index:1;position:absolute;left:" + 5 + "px;top:" + this.posY + "px;";
     divName.innerHTML = this.Project.Name;
     divName.title = this.Project.Name;
-    if (this.Chart.isShowConMenu)
-    {
-        var showContMenu = function(event) {
+    if (this.Chart.isShowConMenu) {
+        var showContMenu = function (event) {
 
             if (self.Chart.contextMenu.clear) self.Chart.contextMenu.clear();
 
             var hideContMenu = null;
-            if (!self.Chart._isIE)
-            {
-                hideContMenu = function() {
+            if (!self.Chart._isIE) {
+                hideContMenu = function () {
                     self.Chart.contextMenu.hideContextMenu();
                     self.Chart.content.removeEventListener("mousedown", hideContMenu, false);
                 };
 
-            } else
-            {
-                hideContMenu = function() {
+            } else {
+                hideContMenu = function () {
                     self.Chart.contextMenu.hideContextMenu();
                     self.Chart.content.detachEvent("mousedown", hideContMenu);
                 };
@@ -4373,12 +4049,10 @@ GanttProject.prototype.createProjectNameItem = function()
 
             self.Chart.content.onmousedown = hideContMenu;
 
-            if (!self.Chart._isIE)
-            {
+            if (!self.Chart._isIE) {
                 event.stopPropagation();
 
-            } else
-            {
+            } else {
                 event.cancelBubble = true;
             }
 
@@ -4386,16 +4060,14 @@ GanttProject.prototype.createProjectNameItem = function()
 
         };
 
-        if (this.Chart._isIE)
-        {
-            this.addEvent(divName, "contextmenu", function(e) {
+        if (this.Chart._isIE) {
+            this.addEvent(divName, "contextmenu", function (e) {
                 showContMenu(e);
                 return false;
             }, false);
 
-        } else
-        {
-            this.addEvent(divName, "contextmenu", function(e) {
+        } else {
+            this.addEvent(divName, "contextmenu", function (e) {
                 e.preventDefault();
                 showContMenu(e);
             }, false);
@@ -4409,8 +4081,7 @@ GanttProject.prototype.createProjectNameItem = function()
  * @type: public
  * @topic: 0
  */
-GanttProject.prototype.getPercentCompleted = function()
-{
+GanttProject.prototype.getPercentCompleted = function () {
     var sum = 0;
     var percentCompleted = 0;
 
@@ -4418,10 +4089,10 @@ GanttProject.prototype.getPercentCompleted = function()
         sum += parseInt(this.Project.ParentTasks[i].PercentCompleted);
     }
     if (this.Project.ParentTasks.length != 0) {
-        return  percentCompleted = Math.round(sum / this.Project.ParentTasks.length);
+        return percentCompleted = Math.round(sum / this.Project.ParentTasks.length);
     }
     else {
-        return  percentCompleted = -1;
+        return percentCompleted = -1;
     }
 };
 /**
@@ -4429,24 +4100,19 @@ GanttProject.prototype.getPercentCompleted = function()
  * @type: public
  * @topic: 0
  */
-GanttProject.prototype.getDuration = function()
-{
+GanttProject.prototype.getDuration = function () {
     var duration = 0;
     var tmpDuration = 0;
-    if (this.Project.ParentTasks.length > 0)
-    {
-        for (var i = 0; i < this.Project.ParentTasks.length; i++)
-        {
+    if (this.Project.ParentTasks.length > 0) {
+        for (var i = 0; i < this.Project.ParentTasks.length; i++) {
             tmpDuration = this.Project.ParentTasks[i].Duration * 24 / this.Chart.hoursInDay + (this.Project.ParentTasks[i].EST - this.Chart.startDate) / (60 * 60 * 1000);
-            if (tmpDuration > duration)
-            {
+            if (tmpDuration > duration) {
                 duration = tmpDuration;
             }
         }
         return ((duration - this.posX) / 24) * this.Chart.hoursInDay;
 
-    } else
-    {
+    } else {
         return 0;
     }
 
@@ -4456,8 +4122,7 @@ GanttProject.prototype.getDuration = function()
  * @type: public
  * @topic: 0
  */
-GanttProject.prototype.getId = function()
-{
+GanttProject.prototype.getId = function () {
     return this.Project.Id;
 };
 /**
@@ -4465,8 +4130,7 @@ GanttProject.prototype.getId = function()
  * @type: public
  * @topic: 0
  */
-GanttProject.prototype.getName = function()
-{
+GanttProject.prototype.getName = function () {
     return this.Project.Name;
 };
 /**
@@ -4474,8 +4138,7 @@ GanttProject.prototype.getName = function()
  * @type: public
  * @topic: 0
  */
-GanttProject.prototype.getStartDate = function()
-{
+GanttProject.prototype.getStartDate = function () {
     return this.Project.StartDate;
 };
 
@@ -4487,8 +4150,7 @@ GanttProject.prototype.getStartDate = function()
  * @type:  private
  * @topic: 5
  */
-GanttTask.prototype.addEvent = function (elm, evType, fn, useCapture)
-{
+GanttTask.prototype.addEvent = function (elm, evType, fn, useCapture) {
     if (elm.addEventListener) {
         elm.addEventListener(evType, fn, useCapture);
         return true;
@@ -4506,8 +4168,7 @@ GanttTask.prototype.addEvent = function (elm, evType, fn, useCapture)
  * @type:  private
  * @topic: 5
  */
-GanttTask.prototype.startMove = function (event)
-{
+GanttTask.prototype.startMove = function (event) {
     this.moveChild = event.ctrlKey;
     this.MouseX = event.screenX;
 
@@ -4522,20 +4183,17 @@ GanttTask.prototype.startMove = function (event)
     if (this.Chart._isIE) event.srcElement.style.cursor = "move";
 };
 
-GanttTask.prototype.showDescTask = function()
-{
+GanttTask.prototype.showDescTask = function () {
     var posX = (parseInt(this.cTaskItem[0].style.left) + this.TaskInfo.Duration * this.Chart.hourInPixelsWork + 10);
     this.descrTask.style.left = posX + "px";
     this.descrTask.innerHTML = this.getDescStr();
     this.descrTask.style.visibility = 'visible';
 
 };
-GanttTask.prototype.hideDescTask = function()
-{
+GanttTask.prototype.hideDescTask = function () {
     this.descrTask.style.visibility = 'hidden';
 };
-GanttTask.prototype.getDescStr = function()
-{
+GanttTask.prototype.getDescStr = function () {
     var str = '', delim = ", ";
     for (var i = 0; i < this.Chart.paramShowTask.length; i++) {
         var prop = this.Chart.paramShowTask[i], propValue = this.TaskInfo[prop];
@@ -4574,8 +4232,7 @@ GanttTask.prototype.getDescStr = function()
  * @type: public
  * @topic: 0
  */
-GanttTask.prototype.getId = function()
-{
+GanttTask.prototype.getId = function () {
     return this.TaskInfo.Id;
 };
 /**
@@ -4583,8 +4240,7 @@ GanttTask.prototype.getId = function()
  * @type: public
  * @topic: 0
  */
-GanttTask.prototype.getName = function()
-{
+GanttTask.prototype.getName = function () {
     return this.TaskInfo.Name;
 };
 /**
@@ -4592,8 +4248,7 @@ GanttTask.prototype.getName = function()
  * @type: public
  * @topic: 0
  */
-GanttTask.prototype.getDuration = function()
-{
+GanttTask.prototype.getDuration = function () {
     return this.TaskInfo.Duration;
 };
 /**
@@ -4601,8 +4256,7 @@ GanttTask.prototype.getDuration = function()
  * @type: public
  * @topic: 0
  */
-GanttTask.prototype.getEST = function()
-{
+GanttTask.prototype.getEST = function () {
     return this.TaskInfo.EST;
 };
 /**
@@ -4610,10 +4264,9 @@ GanttTask.prototype.getEST = function()
  * @type: public
  * @topic: 0
  */
-GanttTask.prototype.getFinishDate = function()
-{
+GanttTask.prototype.getFinishDate = function () {
     var date = new Date(this.TaskInfo.EST);
-    date.setDate(date.getDate() + parseInt((this.TaskInfo["Duration"]-1)/this.Chart.hoursInDay+1)-1);
+    date.setDate(date.getDate() + parseInt((this.TaskInfo["Duration"] - 1) / this.Chart.hoursInDay + 1) - 1);
     return date;
 };
 /**
@@ -4621,8 +4274,7 @@ GanttTask.prototype.getFinishDate = function()
  * @type: public
  * @topic: 0
  */
-GanttTask.prototype.getPercentCompleted = function()
-{
+GanttTask.prototype.getPercentCompleted = function () {
     return this.TaskInfo.PercentCompleted;
 };
 /**
@@ -4630,8 +4282,7 @@ GanttTask.prototype.getPercentCompleted = function()
  * @type: public
  * @topic: 0
  */
-GanttTask.prototype.getPredecessorTaskId = function()
-{
+GanttTask.prototype.getPredecessorTaskId = function () {
     return this.TaskInfo.PredecessorTaskId ? this.TaskInfo.PredecessorTaskId : null;
 };
 /**
@@ -4639,13 +4290,11 @@ GanttTask.prototype.getPredecessorTaskId = function()
  * @type: public
  * @topic: 0
  */
-GanttTask.prototype.getParentTaskId = function()
-{
+GanttTask.prototype.getParentTaskId = function () {
     return this.parentTask ? this.parentTask.getId() : null;
 };
 
-GanttTask.prototype.moveDescTask = function()
-{
+GanttTask.prototype.moveDescTask = function () {
     var posX = (parseInt(this.cTaskItem[0].style.left) + this.TaskInfo.Duration * this.Chart.hourInPixelsWork + 10);
     this.descrTask.style.left = posX + "px";
 };
@@ -4655,8 +4304,7 @@ GanttTask.prototype.moveDescTask = function()
  * @type:  private
  * @topic: 4
  */
-GanttTask.prototype.getMoveInfo = function()
-{
+GanttTask.prototype.getMoveInfo = function () {
     this.posX = parseInt(this.cTaskItem[0].style.left);
     var widthTaskItem = parseInt(this.cTaskItem[0].childNodes[0].firstChild.width);
     var posParentTaskItem = (this.parentTask == null) ? 0 : parseInt(this.parentTask.cTaskItem[0].style.left);
@@ -4666,35 +4314,27 @@ GanttTask.prototype.getMoveInfo = function()
     var childPredPosX = 0;
     var childParentPosX = 0;
     var childParentPosXR = 0;
-    if (this.childPredTask.length > 0)
-    {
+    if (this.childPredTask.length > 0) {
         var posChildTaskItem = null;
-        for (var n = 0; n < this.childPredTask.length; n++)
-        {
-            if ((!posChildTaskItem) || ((posChildTaskItem) && (posChildTaskItem > parseInt(this.childPredTask[n].cTaskItem[0].style.left))))
-            {
+        for (var n = 0; n < this.childPredTask.length; n++) {
+            if ((!posChildTaskItem) || ((posChildTaskItem) && (posChildTaskItem > parseInt(this.childPredTask[n].cTaskItem[0].style.left)))) {
                 posChildTaskItem = parseInt(this.childPredTask[n].cTaskItem[0].style.left);
             }
         }
         childPredPosX = posChildTaskItem;
     }
-    if (this.childTask.length > 0)
-    {
+    if (this.childTask.length > 0) {
         var posChildTaskItemR = null;
-        for (var n = 0; n < this.childTask.length; n++)
-        {
-            if ((!posChildTaskItemR) || ((posChildTaskItemR) && (posChildTaskItemR > (parseInt(this.childTask[n].cTaskItem[0].style.left)))))
-            {
+        for (var n = 0; n < this.childTask.length; n++) {
+            if ((!posChildTaskItemR) || ((posChildTaskItemR) && (posChildTaskItemR > (parseInt(this.childTask[n].cTaskItem[0].style.left))))) {
                 posChildTaskItemR = parseInt(this.childTask[n].cTaskItem[0].style.left);
             }
         }
         childParentPosXR = posChildTaskItemR;
 
         var posChildTaskItem = null;
-        for (var n = 0; n < this.childTask.length; n++)
-        {
-            if ((!posChildTaskItem) || ((posChildTaskItem) && (posChildTaskItem < (parseInt(this.childTask[n].cTaskItem[0].style.left) + parseInt(this.childTask[n].cTaskItem[0].firstChild.firstChild.width)))))
-            {
+        for (var n = 0; n < this.childTask.length; n++) {
+            if ((!posChildTaskItem) || ((posChildTaskItem) && (posChildTaskItem < (parseInt(this.childTask[n].cTaskItem[0].style.left) + parseInt(this.childTask[n].cTaskItem[0].firstChild.firstChild.width))))) {
                 posChildTaskItem = parseInt(this.childTask[n].cTaskItem[0].style.left) + parseInt(this.childTask[n].cTaskItem[0].firstChild.firstChild.width);
             }
         }
@@ -4702,8 +4342,7 @@ GanttTask.prototype.getMoveInfo = function()
         childParentPosX = posChildTaskItem;
     }
 
-    if (!this.moveChild)
-    {
+    if (!this.moveChild) {
         if (this.childPredTask.length > 0) {
             if (this.maxPosXMove < childPredPosX) this.maxPosXMove = childPredPosX;
         }
@@ -4713,8 +4352,7 @@ GanttTask.prototype.getMoveInfo = function()
             this.minPosXMove = (childParentPosX - widthTaskItem);
         }
 
-        if (posParentTaskItem > 0)
-        {
+        if (posParentTaskItem > 0) {
             if ((!(this.childPredTask.length > 0)) && (this.childTask.length > 0)) {
                 if (this.maxPosXMove > posParentTaskItem + widthParentTaskItem) {
                     this.maxPosXMove = posParentTaskItem + widthParentTaskItem;
@@ -4743,31 +4381,25 @@ GanttTask.prototype.getMoveInfo = function()
                 this.minPosXMove = this.Chart.initialPos;
             }
         }
-    } else
-    {
-        if ((posParentTaskItem > 0) && (posPredTaskItem == 0))
-        {
+    } else {
+        if ((posParentTaskItem > 0) && (posPredTaskItem == 0)) {
             this.minPosXMove = posParentTaskItem;
             this.maxPosXMove = posParentTaskItem + widthParentTaskItem;
 
-        } else if ((posParentTaskItem == 0) && (posPredTaskItem == 0))
-        {
+        } else if ((posParentTaskItem == 0) && (posPredTaskItem == 0)) {
             this.minPosXMove = this.Chart.initialPos;
             this.maxPosXMove = -1;
 
-        } else if ((posParentTaskItem > 0) && (posPredTaskItem > 0))
-        {
+        } else if ((posParentTaskItem > 0) && (posPredTaskItem > 0)) {
             this.minPosXMove = posPredTaskItem;
             this.maxPosXMove = posParentTaskItem + widthParentTaskItem;
 
-        } else if ((posParentTaskItem == 0) && (posPredTaskItem > 0))
-        {
+        } else if ((posParentTaskItem == 0) && (posPredTaskItem > 0)) {
             this.minPosXMove = posPredTaskItem;
             this.maxPosXMove = -1;
         }
 
-        if ((this.parentTask) && (this.childPredTask.length > 0))
-        {
+        if ((this.parentTask) && (this.childPredTask.length > 0)) {
             var posChildTaskItem = this.getMaxPosPredChildTaskItem(this);
             var posParentTaskItem = parseInt(this.parentTask.cTaskItem[0].style.left) + parseInt(this.parentTask.cTaskItem[0].firstChild.firstChild.width);
             this.maxPosXMove = this.posX + widthTaskItem + posParentTaskItem - posChildTaskItem;
@@ -4775,100 +4407,17 @@ GanttTask.prototype.getMoveInfo = function()
     }
 };
 /**
- * @desc: The beginning of extension of task
- * @param: event - (object) event
- * @type:  private
- * @topic: 5
- */
-GanttTask.prototype.startResize = function(event)
-{
-    this.MouseX = event.screenX;
-    this.getResizeInfo();
-    if (this.Chart.isShowDescTask) {
-        this.hideDescTask();
-    }
-    this.checkResize = true;
-    this.taskItemWidth = parseInt(this.cTaskItem[0].firstChild.firstChild.width);
-    if (this.Chart._isFF)document.body.style.cursor = "e-resize";
-
-};
-/**
- * @desc:  Defines max and min position of stretchings
- * @type:  private
- * @topic: 4
- */
-GanttTask.prototype.getResizeInfo = function()
-{
-    var taskItem = this.cTaskItem[0];
-    var posParentTaskItem = (this.parentTask == null) ? 0 : parseInt(this.parentTask.cTaskItem[0].style.left);
-    var widthParentTaskItem = (this.parentTask == null) ? 0 : parseInt(this.parentTask.cTaskItem[0].childNodes[0].firstChild.width);
-    var posTaskItem = parseInt(this.cTaskItem[0].style.left);
-
-    var childPredPosX = 0;
-    var childParentPosX = 0;
-    if (this.childPredTask.length > 0)
-    {
-        var posChildTaskItem = null;
-        for (var n = 0; n < this.childPredTask.length; n++)
-        {
-            if ((!posChildTaskItem) || ((posChildTaskItem) && (posChildTaskItem > parseInt(this.childPredTask[n].cTaskItem[0].style.left))))
-            {
-                posChildTaskItem = parseInt(this.childPredTask[n].cTaskItem[0].style.left);
-
-            }
-        }
-        childPredPosX = posChildTaskItem;
-    }
-
-    if (this.childTask.length > 0)
-    {
-        var posChildTaskItem = null;
-        for (var n = 0; n < this.childTask.length; n++)
-        {
-            if ((!posChildTaskItem) || ((posChildTaskItem) && (posChildTaskItem < (parseInt(this.childTask[n].cTaskItem[0].style.left) + parseInt(this.childTask[n].cTaskItem[0].firstChild.firstChild.width)))))
-            {
-                posChildTaskItem = parseInt(this.childTask[n].cTaskItem[0].style.left) + parseInt(this.childTask[n].cTaskItem[0].firstChild.firstChild.width);
-            }
-        }
-
-        childParentPosX = posChildTaskItem;
-    }
-
-    this.minWidthResize = this.Chart.minWidthResize;
-
-    if (this.childTask.length > 0)
-    {
-        this.minWidthResize = childParentPosX - posTaskItem;
-    }
-
-    if ((this.childPredTask.length > 0) && (!this.parentTask))
-    {
-        this.maxWidthResize = childPredPosX - posTaskItem;
-
-    } else if ((this.childPredTask.length > 0) && (this.parentTask))
-    {
-        var w1 = posParentTaskItem + widthParentTaskItem - posTaskItem;
-        var w2 = childPredPosX - posTaskItem;
-        this.maxWidthResize = Math.min(w1, w2);
-
-    } else if ((this.childPredTask.length == 0) && (this.parentTask))
-    {
-        this.maxWidthResize = posParentTaskItem + widthParentTaskItem - posTaskItem;
-    }
-
-};
-/**
  * @desc: creation of taskItem
  * @type: private
  * @topic: 0
  */
-GanttTask.prototype.createTaskItem = function()
-{
+GanttTask.prototype.createTaskItem = function () {
     var self = this;
     this.posX = this.Chart.getPosOnDate(this.TaskInfo.EST);
 
     var itemControl = document.createElement("div");
     itemControl.id = this.TaskInfo.Id;
+
     itemControl.style.cssText = ";z-index:1;position:absolute;left:" + this.posX + "px;top:" + this.posY + "px;";
 
     var divTaskItem = document.createElement("div");
@@ -4884,8 +4433,7 @@ GanttTask.prototype.createTaskItem = function()
 
     var rowTblTask = tblTaskItem.insertRow(tblTaskItem.rows.length);
 
-    if (this.TaskInfo.PercentCompleted != 0)
-    {
+    if (this.TaskInfo.PercentCompleted != 0) {
         var cellTblTask = document.createElement("td");
         rowTblTask.appendChild(cellTblTask);
         cellTblTask.height = this.Chart.heightTaskItem + "px";
@@ -4898,8 +4446,7 @@ GanttTask.prototype.createTaskItem = function()
         imgPr.src = this.Chart.imgs + "progress_filled.png";
     }
 
-    if (this.TaskInfo.PercentCompleted != 100)
-    {
+    if (this.TaskInfo.PercentCompleted != 100) {
         var cellTblTask = document.createElement("td");
         rowTblTask.appendChild(cellTblTask);
         cellTblTask.height = this.Chart.heightTaskItem + "px";
@@ -4913,8 +4460,7 @@ GanttTask.prototype.createTaskItem = function()
 
     }
 
-    if (this.Chart.isEditable)
-    {
+    if (this.Chart.isEditable) {
         var divTaskInfo = document.createElement("div");
         divTaskInfo.style.cssText = "text-align:center;font-size:9px;z-index:2;position: absolute;left:0px;top:0px;";
 
@@ -4941,9 +4487,11 @@ GanttTask.prototype.createTaskItem = function()
     divTaskName.style.cssText = ";z-index:2;position: absolute;left:0px;top:0px;";
 
     var divMove = document.createElement("div");
-    divMove.innerHTML = "<input type='text' style='visibility:hidden;width:1px;height:1px;'/>";
-    if (this.Chart._isIE)
-    {
+    if(this.Project.Project.isInline)
+         divMove.innerHTML= this.TaskInfo.Name;
+    else
+        divMove.innerHTML = "<input type='text' style='visibility:hidden;width:1px;height:1px;'/>";
+    if (this.Chart._isIE) {
         divMove.style.background = "#000000";
         divMove.style.filter = "alpha(opacity=0)";
     }
@@ -4951,12 +4499,11 @@ GanttTask.prototype.createTaskItem = function()
     divMove.style.width = this.TaskInfo.Duration * this.Chart.hourInPixelsWork + "px";
     divTaskName.appendChild(divMove);
 
-    if (this.Chart._showTooltip)
-    {
-        var getPopUpInfo = function(e) {
+    if (this.Chart._showTooltip) {
+        var getPopUpInfo = function (e) {
             if ((!self.Chart._isMove) && (!self.Chart._isResize)) self.getPopUpInfo(self.cTaskItem[0], e);
         };
-        var closePopUpInfo = function() {
+        var closePopUpInfo = function () {
             self.closePopUpInfo();
         };
 
@@ -4964,13 +4511,12 @@ GanttTask.prototype.createTaskItem = function()
         this.addEvent(divMove, 'mouseout', closePopUpInfo, false);
     }
 
-    var taskClick = function() {
+    var taskClick = function () {
         self.Chart.callEvent("onTaskClick", [self]);
     };
     this.addEvent(divMove, 'click', taskClick, false);
 
-    if (this.Chart.isEditable)
-    {
+    if (this.Chart.isEditable) {
         //Create resize area
         var divResize = document.createElement("div");
         divResize.style.cssText = ";z-index:10;position: absolute;left:" + (this.TaskInfo.Duration * this.Chart.hourInPixelsWork - 10) + "px;top:0px;";
@@ -4979,18 +4525,17 @@ GanttTask.prototype.createTaskItem = function()
         divResize.innerHTML = "<input type='text' style='visibility:hidden;width:1px;height:1px;'/>";
         divTaskName.appendChild(divResize);
 
-        var startMove = function(e) {
-            if (self.Chart.callEvent("onTaskStartDrag", [self])===false) return;
+        var startMove = function (e) {
+            if (self.Chart.callEvent("onTaskStartDrag", [self]) === false) return;
 
-            var moveItem = function(e1) {
+            var moveItem = function (e1) {
                 if (self.checkMove) self.moveItem(e1);
             };
-            var endMove = function() {
+            var endMove = function () {
                 if (self.checkMove) {
                     self.endMove();
                     self.Chart._isMove = false;
-                    if (self.Chart._isIE)
-                    {
+                    if (self.Chart._isIE) {
                         document.body.releaseCapture();
                         document.detachEvent("onmousemove", moveItem);
                         document.detachEvent("onmouseup", endMove);
@@ -5010,19 +4555,18 @@ GanttTask.prototype.createTaskItem = function()
             if (self.Chart._isIE) document.body.setCapture(false);
         };
 
-        var startResize = function(e) {
-            if (self.Chart.callEvent("onTaskStartResize", [self])===false) return;
+        var startResize = function (e) {
+            if (self.Chart.callEvent("onTaskStartResize", [self]) === false) return;
 
-            var resizeItem = function(e1) {
+            var resizeItem = function (e1) {
                 if (self.checkResize)self.resizeItem(e1);
             };
 
-            var endResizeItem = function() {
+            var endResizeItem = function () {
                 if (self.checkResize) {
                     self.endResizeItem();
                     self.Chart._isResize = false;
-                    if (self.Chart._isIE)
-                    {
+                    if (self.Chart._isIE) {
                         document.body.releaseCapture();
                         document.detachEvent("onmousemove", resizeItem);
                         document.detachEvent("onmouseup", endResizeItem);
@@ -5045,11 +4589,11 @@ GanttTask.prototype.createTaskItem = function()
         this.addEvent(divMove, 'mousedown', startMove, false);
         this.addEvent(divResize, 'mousedown', startResize, false);
 
-        var setCursorResize = function(e2) {
-            if (!self.Chart._isMove) (e2.srcElement?e2.srcElement:e2.target).style.cursor = "e-resize";
+        var setCursorResize = function (e2) {
+            if (!self.Chart._isMove) (e2.srcElement ? e2.srcElement : e2.target).style.cursor = "e-resize";
         };
-        var setCursorStandart = function(e3) {
-            if (!self.checkResize) (e3.srcElement?e3.srcElement:e3.target).style.cursor = "";
+        var setCursorStandart = function (e3) {
+            if (!self.checkResize) (e3.srcElement ? e3.srcElement : e3.target).style.cursor = "";
         };
 
         this.addEvent(divResize, 'mouseover', setCursorResize, false);
@@ -5058,27 +4602,101 @@ GanttTask.prototype.createTaskItem = function()
     return itemControl;
 };
 /**
+ * @desc: The beginning of extension of task
+ * @param: event - (object) event
+ * @type:  private
+ * @topic: 5
+ */
+GanttTask.prototype.startResize = function (event) {
+    this.MouseX = event.screenX;
+    this.getResizeInfo();
+    if (this.Chart.isShowDescTask) {
+        this.hideDescTask();
+    }
+    this.checkResize = true;
+    this.taskItemWidth = parseInt(this.cTaskItem[0].firstChild.firstChild.width);
+    if (this.Chart._isFF)document.body.style.cursor = "e-resize";
+
+};
+/**
+ * @desc:  Defines max and min position of stretchings
+ * @type:  private
+ * @topic: 4
+ */
+GanttTask.prototype.getResizeInfo = function () {
+    var taskItem = this.cTaskItem[0];
+    var posParentTaskItem = (this.parentTask == null) ? 0 : parseInt(this.parentTask.cTaskItem[0].style.left);
+    var widthParentTaskItem = (this.parentTask == null) ? 0 : parseInt(this.parentTask.cTaskItem[0].childNodes[0].firstChild.width);
+    var posTaskItem = parseInt(this.cTaskItem[0].style.left);
+
+    var childPredPosX = 0;
+    var childParentPosX = 0;
+    if (this.childPredTask.length > 0) {
+        var posChildTaskItem = null;
+        for (var n = 0; n < this.childPredTask.length; n++) {
+            if ((!posChildTaskItem) || ((posChildTaskItem) && (posChildTaskItem > parseInt(this.childPredTask[n].cTaskItem[0].style.left)))) {
+                posChildTaskItem = parseInt(this.childPredTask[n].cTaskItem[0].style.left);
+
+            }
+        }
+        childPredPosX = posChildTaskItem;
+    }
+
+    if (this.childTask.length > 0) {
+        var posChildTaskItem = null;
+        for (var n = 0; n < this.childTask.length; n++) {
+            if ((!posChildTaskItem) || ((posChildTaskItem) && (posChildTaskItem < (parseInt(this.childTask[n].cTaskItem[0].style.left) + parseInt(this.childTask[n].cTaskItem[0].firstChild.firstChild.width))))) {
+                posChildTaskItem = parseInt(this.childTask[n].cTaskItem[0].style.left) + parseInt(this.childTask[n].cTaskItem[0].firstChild.firstChild.width);
+            }
+        }
+
+        childParentPosX = posChildTaskItem;
+    }
+
+    this.minWidthResize = this.Chart.minWidthResize;
+
+    if (this.childTask.length > 0) {
+        this.minWidthResize = childParentPosX - posTaskItem;
+    }
+
+    if ((this.childPredTask.length > 0) && (!this.parentTask)) {
+        this.maxWidthResize = childPredPosX - posTaskItem;
+
+    } else if ((this.childPredTask.length > 0) && (this.parentTask)) {
+        var w1 = posParentTaskItem + widthParentTaskItem - posTaskItem;
+        var w2 = childPredPosX - posTaskItem;
+        this.maxWidthResize = Math.min(w1, w2);
+
+    } else if ((this.childPredTask.length == 0) && (this.parentTask)) {
+        this.maxWidthResize = posParentTaskItem + widthParentTaskItem - posTaskItem;
+    }
+
+};
+/**
  * @desc: creation of taskNameItem
  * @type: private
  * @topic: 0
  */
-GanttTask.prototype.createTaskNameItem = function(hasChildren)
-{
+GanttTask.prototype.createTaskNameItem = function (hasChildren) {
     var self = this;
     var divName = document.createElement("div");
+
+    if (this.TaskInfo.Project.isInline)
+        return divName;
+
     divName.id = this.TaskInfo.Id;
     divName.style.cssText = "cursor:pointer;white-space:nowrap;height:15px;z-index:1;position:absolute;left:20px;top: " + this.posY + "px;";
     if (hasChildren) divName.style.fontWeight = "bold";
     divName.className = "taskNameItem";
     divName.title = this.TaskInfo.Name;
-    divName.innerHTML =  this.TaskInfo.currentStage ? '<span style="color:blue;">' + this.TaskInfo.Name + '</span>' :  this.TaskInfo.Name;
-    if (this.Chart.isShowConMenu)
-    {
-        var showContMenu = function(event) {
+    divName.innerHTML = this.TaskInfo.currentStage ? '<span style="color:blue;">' + this.TaskInfo.Name + '</span>' : this.TaskInfo.Name;
+
+    if (this.Chart.isShowConMenu) {
+        var showContMenu = function (event) {
 
             if (self.Chart.contextMenu.clear) self.Chart.contextMenu.clear();
 
-            var hideContMenu = function() {
+            var hideContMenu = function () {
                 self.Chart.contextMenu.hideContextMenu();
                 if (self.Chart._isIE)
                     self.Chart.content.detachEvent("mousedown", hideContMenu);
@@ -5088,11 +4706,9 @@ GanttTask.prototype.createTaskNameItem = function(hasChildren)
 
             self.Chart.content.onmousedown = hideContMenu;
 
-            if (!self.Chart._isIE)
-            {
+            if (!self.Chart._isIE) {
                 event.stopPropagation();
-            } else
-            {
+            } else {
                 event.cancelBubble = true;
             }
 
@@ -5100,16 +4716,14 @@ GanttTask.prototype.createTaskNameItem = function(hasChildren)
 
         };
 
-        if (this.Chart._isIE)
-        {
-            this.addEvent(divName, "contextmenu", function(e) {
+        if (this.Chart._isIE) {
+            this.addEvent(divName, "contextmenu", function (e) {
                 showContMenu(e);
                 return false;
             }, false);
 
-        } else
-        {
-            this.addEvent(divName, "contextmenu", function(e) {
+        } else {
+            this.addEvent(divName, "contextmenu", function (e) {
                 e.preventDefault();
                 showContMenu(e);
             }, false);
@@ -5119,8 +4733,7 @@ GanttTask.prototype.createTaskNameItem = function(hasChildren)
 };
 
 
-GanttTask.prototype.createTaskDescItem = function()
-{
+GanttTask.prototype.createTaskDescItem = function () {
     var posX = (this.posX + this.TaskInfo.Duration * this.Chart.hourInPixelsWork + 10);
     var divDesc = document.createElement("div");
     divDesc.style.cssText += ";z-index:1;position:absolute;left:" + posX + "px;top:" + this.posY + "px;";
@@ -5128,20 +4741,19 @@ GanttTask.prototype.createTaskDescItem = function()
     divDesc.className = "descTask";
     this.descrTask = divDesc;
 
-    if (this.Chart._showTooltip)
-    {
+    if (this.Chart._showTooltip) {
         var self = this;
-        var getPopUpInfo = function(e) {
+        var getPopUpInfo = function (e) {
             if ((!self.Chart._isMove) && (!self.Chart._isResize)) self.getPopUpInfo(self.descrTask, e);
         };
-        var closePopUpInfo = function() {
+        var closePopUpInfo = function () {
             self.closePopUpInfo();
         };
 
         this.addEvent(divDesc, 'mouseover', getPopUpInfo, false);
         this.addEvent(divDesc, 'mouseout', closePopUpInfo, false);
     }
-    return  divDesc;
+    return divDesc;
 };
 
 /**
@@ -5149,10 +4761,8 @@ GanttTask.prototype.createTaskDescItem = function()
  * @type: private
  * @topic: 4
  */
-GanttTask.prototype.checkWidthTaskNameItem = function()
-{
-    if (this.cTaskNameItem[0].offsetWidth + this.cTaskNameItem[0].offsetLeft > this.Chart.maxWidthPanelNames)
-    {
+GanttTask.prototype.checkWidthTaskNameItem = function () {
+    if (this.cTaskNameItem[0].offsetWidth + this.cTaskNameItem[0].offsetLeft > this.Chart.maxWidthPanelNames) {
         var width = this.cTaskNameItem[0].offsetWidth + this.cTaskNameItem[0].offsetLeft - this.Chart.maxWidthPanelNames;
         var countChar = Math.round(width / (this.cTaskNameItem[0].offsetWidth / this.cTaskNameItem[0].firstChild.length));
         var tName = this.TaskInfo.Name.substring(0, this.cTaskNameItem[0].firstChild.length - countChar - 3);
@@ -5166,8 +4776,7 @@ GanttTask.prototype.checkWidthTaskNameItem = function()
  * @type: private
  * @topic: 0
  */
-GanttTask.prototype.create = function()
-{
+GanttTask.prototype.create = function () {
     var containerTasks = this.Chart.oData.firstChild;
     var containerNames = null;
     if (this.Chart._showTreePanel) containerNames = this.Chart.panelNames.firstChild;
@@ -5179,19 +4788,21 @@ GanttTask.prototype.create = function()
     this.cTaskItem = [];
     this.cTaskNameItem = [];
 
-    //creation arrTasks
-    if (!parentTask)
-    {
-        if (this.TaskInfo.previousParentTask) {
-            this.previousParentTask = this.Project.getTaskById(this.TaskInfo.previousParentTask.Id);
-            var lastChildTask = this.Chart.getLastChildTask(this.previousParentTask);
-            this.posY = parseInt(lastChildTask.cTaskItem[0].style.top) + this.Chart.heightTaskItem + 11;
-            this.previousParentTask.nextParentTask = this;
+    if (this.TaskInfo.line || this.TaskInfo.line === 0)
+        this.posY = parseInt(this.Project.projectItem[0].style.top) + (this.Chart.heightTaskItem + 11) * parseInt(this.TaskInfo.line);
+    else
+        //creation arrTasks
+        if (!parentTask) {
+            if (this.TaskInfo.previousParentTask) {
+                this.previousParentTask = this.Project.getTaskById(this.TaskInfo.previousParentTask.Id);
+                var lastChildTask = this.Chart.getLastChildTask(this.previousParentTask);
+                this.posY = parseInt(lastChildTask.cTaskItem[0].style.top) + this.Chart.heightTaskItem + 11;
+                this.previousParentTask.nextParentTask = this;
 
-        } else {
-            this.posY = parseInt(this.Project.projectItem[0].style.top) + this.Chart.heightTaskItem + 11;
+            } else {
+                this.posY = parseInt(this.Project.projectItem[0].style.top) + this.Chart.heightTaskItem + 11;
+            }
         }
-    }
 
     if (parentTask) {
         var task = this.Project.getTaskById(this.TaskInfo.ParentTask.Id);
@@ -5233,12 +4844,10 @@ GanttTask.prototype.create = function()
     if (predecessorTask) arrConnectingLines = this.createConnectingLinesDS();
     this.cTaskItem.push(arrConnectingLines);
 
-    if (this.Chart.panelNames)
-    {
+    if (this.Chart.panelNames) {
         //Create Connecting Lines
         var arrConnectingLinesNames = [];
-        if (parentTask)
-        {
+        if (parentTask) {
             this.cTaskNameItem[0].style.left = parseInt(this.parentTask.cTaskNameItem[0].style.left) + 15 + "px";
             arrConnectingLinesNames = this.createConnectingLinesPN();
         }
@@ -5259,24 +4868,20 @@ GanttTask.prototype.create = function()
  * @type: private
  * @topic: 4
  */
-GanttTask.prototype.createTreeImg = function()
-{
+GanttTask.prototype.createTreeImg = function () {
     var self = this;
     var treeImg = new Image();
     treeImg.src = this.Chart.imgs + "minus.gif";
     treeImg.id = this.TaskInfo.Id;
 
-    treeImg.onclick = function()
-    {
-        if (self._isOpen)
-        {
+    treeImg.onclick = function () {
+        if (self._isOpen) {
             this.src = self.Chart.imgs + "plus.gif";
             self._isOpen = false;
             self.hideChildTasks(self);
             self.shiftCurrentTasks(self, -self._heightHideTasks);
         }
-        else
-        {
+        else {
             this.src = self.Chart.imgs + "minus.gif";
             self._isOpen = true;
             self.shiftCurrentTasks(self, self._heightHideTasks);
@@ -5295,25 +4900,22 @@ GanttTask.prototype.createTreeImg = function()
  * @type: private
  * @topic: 2
  */
-GanttChart.prototype.getLastChildTask = function(task)
-{
-    if (task.childTask.length > 0)
-    {
+GanttChart.prototype.getLastChildTask = function (task) {
+    if (task.childTask.length > 0) {
         return this.getLastChildTask(task.childTask[task.childTask.length - 1]);
 
-    } else
-    {
-        return  task;
+    } else {
+        return task;
     }
 
 };
+
 /**
  * @desc: dhtmlXMLSenderObject constructor
  * @type: public
  * @topic: 0
  */
-dhtmlXMLSenderObject = function(ganttChart)
-{
+dhtmlXMLSenderObject = function (ganttChart) {
     this.xmlHttp = this.createXMLHttpRequest();
     this.isProcessed = false;
     this.path = null;
@@ -5325,8 +4927,7 @@ dhtmlXMLSenderObject = function(ganttChart)
  * @type: private
  * @topic: 4
  */
-dhtmlXMLSenderObject.prototype.createXMLHttpRequest = function()
-{
+dhtmlXMLSenderObject.prototype.createXMLHttpRequest = function () {
     if (window.XMLHttpRequest) {
         return new XMLHttpRequest();
     }
@@ -5339,34 +4940,30 @@ dhtmlXMLSenderObject.prototype.createXMLHttpRequest = function()
  * @type: private
  * @topic: 6
  */
-dhtmlXMLSenderObject.prototype.sendData = function(filename, path, xmlData)
-{
+dhtmlXMLSenderObject.prototype.sendData = function (filename, path, xmlData) {
     var self = this;
     this.path = path;
     this.filename = filename;
 
-    if ((this.path == null) || (this.path == ""))
-    {
+    if ((this.path == null) || (this.path == "")) {
         this.Chart.Error.throwError("DATA_SEND_ERROR", 3, null);
         return;
     }
-    if ((this.filename == null) || (this.filename == ""))
-    {
+    if ((this.filename == null) || (this.filename == "")) {
         this.Chart.Error.throwError("DATA_SEND_ERROR", 4, null);
         return;
     }
 
     this.isProcessed = true;
     this.xmlHttp.open("POST", this.path, true);
-    if (this.Chart._isFF)
-    {
-        this.xmlHttp.onerror = function() {
+    if (this.Chart._isFF) {
+        this.xmlHttp.onerror = function () {
             self.xmlHttp.onreadystatechange = null;
             self.xmlHttp.abort();
             self.isProcessed = false;
         }
     }
-    this.xmlHttp.onreadystatechange = function() {
+    this.xmlHttp.onreadystatechange = function () {
         self.getStatus();
     };
     this.xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -5379,16 +4976,14 @@ dhtmlXMLSenderObject.prototype.sendData = function(filename, path, xmlData)
  * @type: private
  * @topic: 4
  */
-dhtmlXMLSenderObject.prototype.getStatus = function()
-{
-    if (this.xmlHttp.readyState == 4)
-    {
+dhtmlXMLSenderObject.prototype.getStatus = function () {
+    if (this.xmlHttp.readyState == 4) {
 
         var _status = "";
         try {
             _status = this.xmlHttp.status;
 
-        } catch(e) {
+        } catch (e) {
             this.Chart.Error.throwError("DATA_SEND_ERROR", 1, null);
             return 0;
         }
@@ -5412,8 +5007,7 @@ dhtmlXMLSenderObject.prototype.getStatus = function()
                 //this.xmlHttp.abort();
                 break;
             default:
-                if (!(_status >= 200 && _status < 300 || _status == 304))
-                {
+                if (!(_status >= 200 && _status < 300 || _status == 304)) {
                     this.Chart.Error.throwError("DATA_SEND_ERROR", 0, null);
                     //this.xmlHttp.abort();
                 }
@@ -5441,8 +5035,7 @@ function GanttError() {
  *  @type: private
  *  @topic: 4
  */
-GanttError.prototype._init = function()
-{
+GanttError.prototype._init = function () {
     //connection errors
     this._errors[0] = "Connection error";
     this._errors[1] = "Cannot connect";
@@ -5492,7 +5085,7 @@ GanttError.prototype._init = function()
  * @type: private
  * @topic: 4
  */
-GanttError.prototype.catchError = function(type, handler) {
+GanttError.prototype.catchError = function (type, handler) {
 
     this.catches[type] = handler;
 };
@@ -5503,8 +5096,7 @@ GanttError.prototype.catchError = function(type, handler) {
  * @type: private
  * @topic: 4
  */
-GanttError.prototype.getErrorString = function(str, params)
-{
+GanttError.prototype.getErrorString = function (str, params) {
     if (!params) {
         return str;
     } else {
@@ -5525,18 +5117,16 @@ GanttError.prototype.getErrorString = function(str, params)
  * @type: private
  * @topic: 4
  */
-GanttError.prototype.throwError = function(type, description, params) {
-    if (this.catches[type])
-    {
+GanttError.prototype.throwError = function (type, description, params) {
+    if (this.catches[type]) {
         var index = parseInt(description);
         var errorStr = this.getErrorString(this._errors[index], params);
-        return  this.catches[type](type, errorStr, params);
+        return this.catches[type](type, errorStr, params);
     }
     return null;
 };
 
-function contextMenu(chart)
-{
+function contextMenu(chart) {
     this.Chart = chart;
     this.TabContainer = null;
     this.MenuPanel = null;
@@ -5547,8 +5137,7 @@ function contextMenu(chart)
     this._init();
 }
 
-contextMenu.prototype._init = function()
-{
+contextMenu.prototype._init = function () {
     this.createMenuPanel();
     this.createHideDiv();
     this.createTabContainer();
@@ -5558,285 +5147,283 @@ contextMenu.prototype._init = function()
     var arrItems = [];
 
     var tab1 = this.createTab(1, "Rename task", "t", true, this);
-    tab1.addItem(1, "New name", document.createElement("input"), "text", function() {
+    tab1.addItem(1, "New name", document.createElement("input"), "text", function () {
         tab1.arrItems[0].control.focus();
     });
     tab1.addItem(2, "Rename", document.createElement("input"), "button",
-            function() {
-                var name = tab1.arrItems[0].control.value;
-                try {
-                    tab1.object.setName(name);
-                    tab1.hide();
-                } catch(e) {
+        function () {
+            var name = tab1.arrItems[0].control.value;
+            try {
+                tab1.object.setName(name);
+                tab1.hide();
+            } catch (e) {
 
-                }
             }
-            );
+        }
+    );
 
     var tab2 = this.createTab(2, "Delete task", "t", true, this);
     tab2.addItem(1, "Delete", document.createElement("input"), "button",
-            function()
-            {
-                try {
-                    tab2.object.Project.deleteTask(tab2.object.TaskInfo.Id);
-                    tab2.hide();
-                }
-                catch(e) {
-
-                }
+        function () {
+            try {
+                tab2.object.Project.deleteTask(tab2.object.TaskInfo.Id);
+                tab2.hide();
             }
-            );
+            catch (e) {
+
+            }
+        }
+    );
     var tab3 = this.createTab(3, "Set EST", "t", true, this);
-    tab3.addItem(1, "EST", document.createElement("input"), "text", function() {
+    tab3.addItem(1, "EST", document.createElement("input"), "text", function () {
         tab3.arrItems[0].control.focus();
     });
-    tab3.addItem(2, "Move children", document.createElement("input"), "checkbox", function() {
+    tab3.addItem(2, "Move children", document.createElement("input"), "checkbox", function () {
         tab3.arrItems[1].control.focus();
     });
     tab3.addItem(3, "Update", document.createElement("input"), "button",
-            function() {
-                var isMoveChild = tab3.arrItems[1].control.checked;
-                var arr = tab3.arrItems[0].control.value.split(".");
-                var est = (arr.length < 3) ? null : (new Date(arr[2], parseInt(arr[1]) - 1, arr[0]));
-                try {
-                    if (tab3.object.setEST(est, isMoveChild)) tab3.hide();
-                } catch(e) {
+        function () {
+            var isMoveChild = tab3.arrItems[1].control.checked;
+            var arr = tab3.arrItems[0].control.value.split(".");
+            var est = (arr.length < 3) ? null : (new Date(arr[2], parseInt(arr[1]) - 1, arr[0]));
+            try {
+                if (tab3.object.setEST(est, isMoveChild)) tab3.hide();
+            } catch (e) {
 
-                }
             }
-            );
+        }
+    );
 
     var tab4 = this.createTab(4, "Set duration", "t", true, this);
-    tab4.addItem(1, "Duration", document.createElement("input"), "text", function() {
+    tab4.addItem(1, "Duration", document.createElement("input"), "text", function () {
         tab4.arrItems[0].control.focus();
     });
     tab4.addItem(2, "Update", document.createElement("input"), "button",
-            function() {
-                var d = tab4.arrItems[0].control.value;
-                try {
-                    if (tab4.object.setDuration(d)) tab4.hide();
-                } catch(e) {
+        function () {
+            var d = tab4.arrItems[0].control.value;
+            try {
+                if (tab4.object.setDuration(d)) tab4.hide();
+            } catch (e) {
 
-                }
             }
-            );
+        }
+    );
 
     var tab5 = this.createTab(5, "Set % complete", "t", true, this);
-    tab5.addItem(1, "Percent Complete", document.createElement("input"), "text", function() {
+    tab5.addItem(1, "Percent Complete", document.createElement("input"), "text", function () {
         tab5.arrItems[0].control.focus();
     });
     tab5.addItem(2, "Update", document.createElement("input"), "button",
-            function() {
-                var p = tab5.arrItems[0].control.value;
-                try {
-                    if (tab5.object.setPercentCompleted(p)) tab5.hide();
-                } catch(e) {
+        function () {
+            var p = tab5.arrItems[0].control.value;
+            try {
+                if (tab5.object.setPercentCompleted(p)) tab5.hide();
+            } catch (e) {
 
-                }
             }
-            );
+        }
+    );
 
     var tab13 = this.createTab(13, "Set predecessor", "t", true, this);
-    tab13.addItem(1, "Predecessor", document.createElement("input"), "text", function() {
+    tab13.addItem(1, "Predecessor", document.createElement("input"), "text", function () {
         tab13.arrItems[0].control.focus();
     });
     tab13.addItem(2, "Update", document.createElement("input"), "button",
-            function() {
-                var p = tab13.arrItems[0].control.value;
-                try {
-                    if (tab13.object.setPredecessor(p)) tab13.hide();
-                } catch(e) {
+        function () {
+            var p = tab13.arrItems[0].control.value;
+            try {
+                if (tab13.object.setPredecessor(p)) tab13.hide();
+            } catch (e) {
 
-                }
             }
-            );
+        }
+    );
 
     var tab6 = this.createTab(6, "Rename project", "p", true, this);
-    tab6.addItem(1, "New name", document.createElement("input"), "text", function() {
+    tab6.addItem(1, "New name", document.createElement("input"), "text", function () {
         tab6.arrItems[0].control.focus();
     });
     tab6.addItem(2, "Rename", document.createElement("input"), "button",
-            function() {
-                var name = tab6.arrItems[0].control.value;
-                try {
-                    tab6.object.setName(name);
-                    tab6.hide();
-                } catch(e) {
+        function () {
+            var name = tab6.arrItems[0].control.value;
+            try {
+                tab6.object.setName(name);
+                tab6.hide();
+            } catch (e) {
 
-                }
             }
-            );
+        }
+    );
 
     var tab7 = this.createTab(7, "Delete project", "p", true, this);
     tab7.addItem(1, "Delete", document.createElement("input"), "button",
-            function() {
-                try {
-                    tab7.object.Chart.deleteProject(tab7.object.Project.Id);
-                    tab7.hide();
-                } catch(e) {
+        function () {
+            try {
+                tab7.object.Chart.deleteProject(tab7.object.Project.Id);
+                tab7.hide();
+            } catch (e) {
 
-                }
             }
-            );
+        }
+    );
 
     var tab8 = this.createTab(8, "Set % complete", "p", true, this);
-    tab8.addItem(1, "Percent Complete", document.createElement("input"), "text", function() {
+    tab8.addItem(1, "Percent Complete", document.createElement("input"), "text", function () {
         tab8.arrItems[0].control.focus();
     });
     tab8.addItem(2, "Update", document.createElement("input"), "button",
-            function() {
-                var p = tab8.arrItems[0].control.value;
-                try {
-                    if (tab8.object.setPercentCompleted(p)) tab8.hide();
-                } catch(e) {
+        function () {
+            var p = tab8.arrItems[0].control.value;
+            try {
+                if (tab8.object.setPercentCompleted(p)) tab8.hide();
+            } catch (e) {
 
-                }
             }
-            );
+        }
+    );
 
     var tab9 = this.createTab(9, "Add new task", "p", true, this);
-    tab9.addItem(1, "Id", document.createElement("input"), "text", function() {
+    tab9.addItem(1, "Id", document.createElement("input"), "text", function () {
         tab9.arrItems[0].control.focus();
     });
-    tab9.addItem(2, "Name", document.createElement("input"), "text", function() {
+    tab9.addItem(2, "Name", document.createElement("input"), "text", function () {
         tab9.arrItems[1].control.focus();
     });
-    tab9.addItem(3, "EST", document.createElement("input"), "text", function() {
+    tab9.addItem(3, "EST", document.createElement("input"), "text", function () {
         tab9.arrItems[2].control.focus();
     });
-    tab9.addItem(4, "Duration", document.createElement("input"), "text", function() {
+    tab9.addItem(4, "Duration", document.createElement("input"), "text", function () {
         tab9.arrItems[3].control.focus();
     });
-    tab9.addItem(5, "Percent complete", document.createElement("input"), "text", function() {
+    tab9.addItem(5, "Percent complete", document.createElement("input"), "text", function () {
         tab9.arrItems[4].control.focus();
     });
-    tab9.addItem(6, "Parent task id", document.createElement("input"), "text", function() {
+    tab9.addItem(6, "Parent task id", document.createElement("input"), "text", function () {
         tab9.arrItems[5].control.focus();
     });
-    tab9.addItem(7, "Pred task id", document.createElement("input"), "text", function() {
+    tab9.addItem(7, "Pred task id", document.createElement("input"), "text", function () {
         tab9.arrItems[6].control.focus();
     });
 
     tab9.addItem(9, "Insert", document.createElement("input"), "button",
-            function() {
-                try {
-                    var id = tab9.arrItems[0].control.value;
-                    var name = tab9.arrItems[1].control.value;
-                    var arr = tab9.arrItems[2].control.value.split(".");
-                    var est = (arr.length < 3) ? null : (new Date(arr[2], parseInt(arr[1]) - 1, arr[0]));
-                    var duration = tab9.arrItems[3].control.value;
-                    var pc = tab9.arrItems[4].control.value;
-                    var parentTaskId = tab9.arrItems[5].control.value;
-                    var predTaskId = tab9.arrItems[6].control.value;
-                    if (tab9.object.insertTask(id, name, est, duration, pc, predTaskId, parentTaskId)) tab9.hide();
+        function () {
+            try {
+                var id = tab9.arrItems[0].control.value;
+                var name = tab9.arrItems[1].control.value;
+                var arr = tab9.arrItems[2].control.value.split(".");
+                var est = (arr.length < 3) ? null : (new Date(arr[2], parseInt(arr[1]) - 1, arr[0]));
+                var duration = tab9.arrItems[3].control.value;
+                var pc = tab9.arrItems[4].control.value;
+                var parentTaskId = tab9.arrItems[5].control.value;
+                var predTaskId = tab9.arrItems[6].control.value;
+                if (tab9.object.insertTask(id, name, est, duration, pc, predTaskId, parentTaskId)) tab9.hide();
 
-                } catch(e) {
+            } catch (e) {
 
-                }
             }
-            );
+        }
+    );
 
     var tab11 = this.createTab(11, "Add successor task", "t", true, this);
-    tab11.addItem(1, "Id", document.createElement("input"), "text", function() {
+    tab11.addItem(1, "Id", document.createElement("input"), "text", function () {
         tab11.arrItems[0].control.focus();
     });
-    tab11.addItem(2, "Name", document.createElement("input"), "text", function() {
+    tab11.addItem(2, "Name", document.createElement("input"), "text", function () {
         tab11.arrItems[1].control.focus();
     });
-    tab11.addItem(3, "EST", document.createElement("input"), "text", function() {
+    tab11.addItem(3, "EST", document.createElement("input"), "text", function () {
         tab11.arrItems[2].control.focus();
     });
-    tab11.addItem(4, "Duration", document.createElement("input"), "text", function() {
+    tab11.addItem(4, "Duration", document.createElement("input"), "text", function () {
         tab11.arrItems[3].control.focus();
     });
-    tab11.addItem(5, "Percent complete", document.createElement("input"), "text", function() {
+    tab11.addItem(5, "Percent complete", document.createElement("input"), "text", function () {
         tab11.arrItems[4].control.focus();
     });
     tab11.addItem(6, "Insert", document.createElement("input"), "button",
-            function() {
-                try {
-                    var pr = tab11.object.Project;
-                    var id = tab11.arrItems[0].control.value;
-                    var name = tab11.arrItems[1].control.value;
-                    var arr = tab11.arrItems[2].control.value.split(".");
-                    var est = (arr.length < 3) ? null : (new Date(arr[2], parseInt(arr[1]) - 1, arr[0]));
-                    var duration = tab11.arrItems[3].control.value;
-                    var pc = tab11.arrItems[4].control.value;
-                    var parentTaskId = (tab11.object.parentTask == null) ? "" : tab11.object.parentTask.TaskInfo.Id;
-                    var predTaskId = tab11.object.TaskInfo.Id;
-                    if (pr.insertTask(id, name, est, duration, pc, predTaskId, parentTaskId)) tab11.hide();
+        function () {
+            try {
+                var pr = tab11.object.Project;
+                var id = tab11.arrItems[0].control.value;
+                var name = tab11.arrItems[1].control.value;
+                var arr = tab11.arrItems[2].control.value.split(".");
+                var est = (arr.length < 3) ? null : (new Date(arr[2], parseInt(arr[1]) - 1, arr[0]));
+                var duration = tab11.arrItems[3].control.value;
+                var pc = tab11.arrItems[4].control.value;
+                var parentTaskId = (tab11.object.parentTask == null) ? "" : tab11.object.parentTask.TaskInfo.Id;
+                var predTaskId = tab11.object.TaskInfo.Id;
+                if (pr.insertTask(id, name, est, duration, pc, predTaskId, parentTaskId)) tab11.hide();
 
-                } catch(e) {
-                    //
-                }
+            } catch (e) {
+                //
             }
-            );
+        }
+    );
 
     var tab10 = this.createTab(10, "Add child task", "t", true, this);
-    tab10.addItem(1, "Id", document.createElement("input"), "text", function() {
+    tab10.addItem(1, "Id", document.createElement("input"), "text", function () {
         tab10.arrItems[0].control.focus();
     });
-    tab10.addItem(2, "Name", document.createElement("input"), "text", function() {
+    tab10.addItem(2, "Name", document.createElement("input"), "text", function () {
         tab10.arrItems[1].control.focus();
     });
-    tab10.addItem(3, "EST", document.createElement("input"), "text", function() {
+    tab10.addItem(3, "EST", document.createElement("input"), "text", function () {
         tab10.arrItems[2].control.focus();
     });
-    tab10.addItem(4, "Duration", document.createElement("input"), "text", function() {
+    tab10.addItem(4, "Duration", document.createElement("input"), "text", function () {
         tab10.arrItems[3].control.focus();
     });
-    tab10.addItem(5, "Percent complete", document.createElement("input"), "text", function() {
+    tab10.addItem(5, "Percent complete", document.createElement("input"), "text", function () {
         tab10.arrItems[4].control.focus();
     });
     tab10.addItem(6, "Insert", document.createElement("input"), "button",
-            function() {
-                try {
-                    var pr = tab10.object.Project;
-                    var id = tab10.arrItems[0].control.value;
-                    var name = tab10.arrItems[1].control.value;
-                    var arr = tab10.arrItems[2].control.value.split(".");
-                    var est = (arr.length < 3) ? null : (new Date(arr[2], parseInt(arr[1]) - 1, arr[0]));
-                    var duration = tab10.arrItems[3].control.value;
-                    var pc = tab10.arrItems[4].control.value;
-                    var parentTaskId = tab10.object.TaskInfo.Id;
-                    var predTaskId = "";
-                    if (pr.insertTask(id, name, est, duration, pc, predTaskId, parentTaskId)) tab10.hide();
+        function () {
+            try {
+                var pr = tab10.object.Project;
+                var id = tab10.arrItems[0].control.value;
+                var name = tab10.arrItems[1].control.value;
+                var arr = tab10.arrItems[2].control.value.split(".");
+                var est = (arr.length < 3) ? null : (new Date(arr[2], parseInt(arr[1]) - 1, arr[0]));
+                var duration = tab10.arrItems[3].control.value;
+                var pc = tab10.arrItems[4].control.value;
+                var parentTaskId = tab10.object.TaskInfo.Id;
+                var predTaskId = "";
+                if (pr.insertTask(id, name, est, duration, pc, predTaskId, parentTaskId)) tab10.hide();
 
-                } catch(e) {
-                    //
-                }
+            } catch (e) {
+                //
             }
-            );
+        }
+    );
 
     var tab12 = this.createTab(12, "-Insert new project-", "p", false, this);
-    tab12.addItem(1, "Id", document.createElement("input"), "text", function() {
+    tab12.addItem(1, "Id", document.createElement("input"), "text", function () {
         tab12.arrItems[0].control.focus();
     });
-    tab12.addItem(2, "Name", document.createElement("input"), "text", function() {
+    tab12.addItem(2, "Name", document.createElement("input"), "text", function () {
         tab12.arrItems[1].control.focus();
     });
-    tab12.addItem(3, "Start date", document.createElement("input"), "text", function() {
+    tab12.addItem(3, "Start date", document.createElement("input"), "text", function () {
         tab12.arrItems[2].control.focus();
     });
     tab12.addItem(4, "Insert", document.createElement("input"), "button",
-            function() {
-                try {
+        function () {
+            try {
 
-                    var id = tab12.arrItems[0].control.value;
-                    var namePr = tab12.arrItems[1].control.value;
-                    var arr = tab12.arrItems[2].control.value.split(".");
-                    var startDatePr = (arr.length < 3) ? null : (new Date(arr[2], parseInt(arr[1]) - 1, arr[0]));
-                    if (self.Chart.insertProject(id, namePr, startDatePr)) tab12.hide();
+                var id = tab12.arrItems[0].control.value;
+                var namePr = tab12.arrItems[1].control.value;
+                var arr = tab12.arrItems[2].control.value.split(".");
+                var startDatePr = (arr.length < 3) ? null : (new Date(arr[2], parseInt(arr[1]) - 1, arr[0]));
+                if (self.Chart.insertProject(id, namePr, startDatePr)) tab12.hide();
 
-                } catch(e) {
+            } catch (e) {
 
-                }
             }
-            );
+        }
+    );
 };
 
-contextMenu.prototype.createHideDiv = function()
-{
+contextMenu.prototype.createHideDiv = function () {
     this.hideDiv = document.createElement("div");
     this.hideDiv.style.position = "absolute";
     this.hideDiv.style.left = "0px";
@@ -5851,8 +5438,7 @@ contextMenu.prototype.createHideDiv = function()
 
 };
 
-contextMenu.prototype.createMenuPanel = function()
-{
+contextMenu.prototype.createMenuPanel = function () {
     this.MenuPanel = document.createElement("div");
     this.MenuPanel.style.visibility = "hidden";
     this.MenuPanel.style.cssText += ";z-index:10;";
@@ -5865,8 +5451,7 @@ contextMenu.prototype.createMenuPanel = function()
     this.MenuPanel.firstChild.cellSpacing = 0;
     this.MenuPanel.firstChild.style.cssText += ";background:url(" + this.Chart.imgs + "menu/menu_bg.png);";
 };
-contextMenu.prototype.createTabPanel = function()
-{
+contextMenu.prototype.createTabPanel = function () {
     this.tabPanel = document.createElement("div");
     this.tabPanel.style.visibility = "hidden";
     this.tabPanel.style.zIndex = "30";
@@ -5885,45 +5470,39 @@ contextMenu.prototype.createTabPanel = function()
     this.tabPanel.firstChild.rows[1].cells[0].align = "center";
 };
 
-contextMenu.prototype.addItemMenuPanel = function(tab)
-{
+contextMenu.prototype.addItemMenuPanel = function (tab) {
     var self = this;
     var row = this.MenuPanel.firstChild.insertRow(this.MenuPanel.firstChild.rows.length);
     var cell = document.createElement('td');
     cell.innerHTML = tab.Description;
     cell.style.cssText = "padding-left:10px;height:18px;";
 
-    this.addEvent(cell, "mousedown", function() {
+    this.addEvent(cell, "mousedown", function () {
         tab.show();
     }, false);
 
 
-    cell.onmouseover = function() {
+    cell.onmouseover = function () {
         this.style.background = "url(" + self.Chart.imgs + "menu/menu_selection.png)";
     };
-    cell.onmouseout = function() {
+    cell.onmouseout = function () {
         this.style.background = "";
     };
 
     row.appendChild(cell);
 };
 
-contextMenu.prototype.showContextMenu = function(x, y, object)
-{
-    if (object.constructor == GanttTask)
-    {
+contextMenu.prototype.showContextMenu = function (x, y, object) {
+    if (object.constructor == GanttTask) {
         for (var i = 0; i < this.arrTabs.length; i++) {
-            if (this.arrTabs[i].type == "t")
-            {
+            if (this.arrTabs[i].type == "t") {
                 this.arrTabs[i].object = object;
                 this.addItemMenuPanel(this.arrTabs[i]);
             }
         }
-    } else if (object.constructor == GanttProject)
-    {
+    } else if (object.constructor == GanttProject) {
         for (var i = 0; i < this.arrTabs.length; i++) {
-            if (this.arrTabs[i].type == "p")
-            {
+            if (this.arrTabs[i].type == "p") {
                 this.arrTabs[i].object = object;
                 this.addItemMenuPanel(this.arrTabs[i]);
             }
@@ -5938,14 +5517,12 @@ contextMenu.prototype.showContextMenu = function(x, y, object)
     this.MenuPanel.style.left = x;
 
 };
-contextMenu.prototype.hideContextMenu = function()
-{
+contextMenu.prototype.hideContextMenu = function () {
     this.isShow = false;
     this.MenuPanel.style.visibility = "hidden";
 
 };
-contextMenu.prototype.clear = function()
-{
+contextMenu.prototype.clear = function () {
     this.MenuPanel.removeChild(this.MenuPanel.firstChild);
     this.MenuPanel.innerHTML = "<table></table>";
     this.MenuPanel.firstChild.className = "contextMenu";
@@ -5953,14 +5530,12 @@ contextMenu.prototype.clear = function()
     this.MenuPanel.firstChild.cellSpacing = 0;
     this.MenuPanel.firstChild.style.cssText += ";background:url(" + this.Chart.imgs + "menu/menu_bg.png);";
 };
-contextMenu.prototype.createTab = function(id, desc, type, showOInfo, menu)
-{
+contextMenu.prototype.createTab = function (id, desc, type, showOInfo, menu) {
     var tab = new contextMenuTab(id, desc, type, showOInfo, menu);
     this.arrTabs.push(tab);
     return tab;
 };
-contextMenu.prototype.createTabContainer = function()
-{
+contextMenu.prototype.createTabContainer = function () {
     this.TabContainer = document.createElement("div");
     this.TabContainer.style.position = "absolute";
     this.TabContainer.style.top = "0px";
@@ -5976,8 +5551,7 @@ contextMenu.prototype.createTabContainer = function()
 
 };
 
-contextMenu.prototype.getTabById = function(id)
-{
+contextMenu.prototype.getTabById = function (id) {
     for (var i = 0; i < this.arrTabs.length; i++) {
         if (this.arrTabs[i].Id == id) {
             return this.arrTabs[i];
@@ -5985,8 +5559,7 @@ contextMenu.prototype.getTabById = function(id)
     }
     return null;
 };
-function contextMenuTab(id, description, type, showOInfo, contextMenu)
-{
+function contextMenuTab(id, description, type, showOInfo, contextMenu) {
     this.Id = id;
     this.arrItems = [];
     this.TabItemContainer = null;
@@ -6006,8 +5579,7 @@ function contextMenuTab(id, description, type, showOInfo, contextMenu)
  * @type:  private
  * @topic: 5
  */
-contextMenu.prototype.addEvent = function (elm, evType, fn, useCapture)
-{
+contextMenu.prototype.addEvent = function (elm, evType, fn, useCapture) {
     if (elm.addEventListener) {
         elm.addEventListener(evType, fn, useCapture);
         return true;
@@ -6020,22 +5592,19 @@ contextMenu.prototype.addEvent = function (elm, evType, fn, useCapture)
     }
 };
 
-contextMenuTab.prototype.addItem = function(id, name, control, type, handler)
-{
+contextMenuTab.prototype.addItem = function (id, name, control, type, handler) {
     if (handler) {
         control.onclick = handler;
     }
     control.type = type;
-    if (type == "button")
-    {
+    if (type == "button") {
         control.value = name;
     }
     var tabItem = new contextMenuTabItem(id, name, control, this);
     this.arrItems.push(tabItem);
 };
 
-contextMenuTab.prototype.show = function()
-{
+contextMenuTab.prototype.show = function () {
     this.contextMenu.hideDiv.style.display = "inline";
     this.contextMenu.TabContainer.style.visibility = "visible";
 
@@ -6043,10 +5612,9 @@ contextMenuTab.prototype.show = function()
     this.contextMenu.tabPanel.firstChild.rows[0].cells[0].innerHTML = this.Description;
     this.contextMenu.tabPanel.style.visibility = "visible";
     var t = this.contextMenu.tabPanel.firstChild.rows[1].cells[0].firstChild;
-    var c,c2,r = null;
+    var c, c2, r = null;
 
-    if (this.showObjectInfo)
-    {
+    if (this.showObjectInfo) {
         if (this.object) {
             if (this.object.constructor == GanttTask) {
                 this.insertData(t, "Id", this.object.TaskInfo.Id);
@@ -6055,8 +5623,7 @@ contextMenuTab.prototype.show = function()
                 this.insertData(t, "Percent complete", this.object.TaskInfo.PercentCompleted + "%");
                 this.insertData(t, "EST", this.object.TaskInfo.EST.getDate() + "." + (this.object.TaskInfo.EST.getMonth() + 1) + "." + this.object.TaskInfo.EST.getFullYear());
                 this.insertData(t, "Predecessor", this.object.TaskInfo.PredecessorTaskId);
-            } else
-            {
+            } else {
                 this.insertData(t, "Id", this.object.Project.Id);
                 this.insertData(t, "Name", this.object.Project.Name);
                 this.insertData(t, "Start date", this.object.Project.StartDate.getDate() + "." + (this.object.Project.StartDate.getMonth() + 1) + "." + this.object.Project.StartDate.getFullYear());
@@ -6066,15 +5633,13 @@ contextMenuTab.prototype.show = function()
 
     var btnCell = null;
     for (var i = 0; i < this.arrItems.length; i++) {
-        if (this.arrItems[i].control.type == "button")
-        {
+        if (this.arrItems[i].control.type == "button") {
             r = t.insertRow(t.rows.length);
             c = r.insertCell(r.cells.length);
             btnCell = r.insertCell(r.cells.length);
             btnCell.appendChild(this.arrItems[i].control);
 
-        } else
-        {
+        } else {
             r = t.insertRow(t.rows.length);
             c = r.insertCell(r.cells.length);
             c2 = r.insertCell(r.cells.length);
@@ -6087,8 +5652,7 @@ contextMenuTab.prototype.show = function()
     var b = document.createElement("input");
     b.type = "button";
     b.value = "Cancel";
-    b.onclick = function()
-    {
+    b.onclick = function () {
         self.hide();
     };
 
@@ -6101,8 +5665,7 @@ contextMenuTab.prototype.show = function()
     }
     btnCell.appendChild(b);
 };
-contextMenuTab.prototype.hide = function()
-{
+contextMenuTab.prototype.hide = function () {
     this.contextMenu.tabPanel.style.visibility = "hidden";
     var t = this.contextMenu.tabPanel.firstChild.rows[1].cells[0].firstChild;
     t.parentNode.removeChild(t);
@@ -6113,9 +5676,8 @@ contextMenuTab.prototype.hide = function()
     this.contextMenu.TabContainer.style.visibility = "hidden";
 };
 
-contextMenuTab.prototype.insertData = function(t, name, value)
-{
-    var c,c2,r = null;
+contextMenuTab.prototype.insertData = function (t, name, value) {
+    var c, c2, r = null;
     r = t.insertRow(t.rows.length);
     c = r.insertCell(r.cells.length);
     c.style.cssText = "width:100px";
@@ -6124,9 +5686,8 @@ contextMenuTab.prototype.insertData = function(t, name, value)
     c2.innerHTML = value;
 
 };
-contextMenuTab.prototype.insertControl = function(t, name, value)
-{
-    var c,c2,r = null;
+contextMenuTab.prototype.insertControl = function (t, name, value) {
+    var c, c2, r = null;
     r = t.insertRow(t.rows.length);
     c = r.insertCell(r.cells.length);
     c.innerHTML = name;
@@ -6134,8 +5695,7 @@ contextMenuTab.prototype.insertControl = function(t, name, value)
     c2.appendChild(value);
 };
 
-function contextMenuTabItem(id, name, control, tab)
-{
+function contextMenuTabItem(id, name, control, tab) {
     this.Id = id;
     this.Name = name;
     this.control = control;

@@ -17,6 +17,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             'click .document_manage_btn': 'document_form_pop',
             'click .create_document_btn': 'create_document_fn',
             'click .load_container_close': 'close_document_container',
+            'click .submit_file_no':'close_document_container',
             'change .my_load_file': 'get_file_name',
             'click .submit_file_yes': 'load_file',
             'change .document_modify': 'document_modify_fn',
@@ -34,9 +35,13 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                     if (data.result == '1') {
                         $.ajax({
                             type: "GET",
-                            url: "http://localhost:8088/uploadfile?id=" + this.product_id + "&remote=/p/file",
+                            url: "http://localhost:8088/uploadfile?id=" + this.product_id + "&remotefile=/charlie/a/b/test.txt",
                             success: function (data) {
                                 console.log(data);
+                                if (data.result == '1') {
+                                    $(".my_load_file_name").val(data.choose_file_name)
+                                    $(".my_load_file_remote_path").val(data.path)
+                                }
                             },
                             error: function (error) {
                                 console.log(error);
@@ -163,6 +168,16 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             // };
             // this.do_action(action);
             $("#document_tab").attr("data-product-id", this.product_id);
+
+            document.getElementById("document_form").reset();
+            $(".file_active_id").val("");
+            $(".file_func").val("");
+            $(".file_active_type").val("");
+            $(".my_load_file_remote_path").val("");
+            $(".my_load_file_version").val("");
+
+
+
             $(".load_container").show();
             var cur_type = $("#document_tab li.active>a").attr("data");
             console.log(cur_type);

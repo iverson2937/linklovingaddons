@@ -47,13 +47,14 @@
                         <div>工序：<span><t t-esc="item_files.process_name"/></span></div>
                     </t>
                     <div>数量：<span><t t-esc="item_files.product_qty"/></span></div>
-                    <div>产品计量单位：<span><t t-esc="item_files.uom_name"/></span></div>
+                    <!--<div>产品计量单位：<span><t t-esc="item_files.uom_name"/></span></div>-->
                     <div>状态：<span><t t-esc="item_files.state[1]"/></span>
                         <t t-if="item_files.is_show_cancel">
                             <button class="btn btn-primary review_cancel">取消审核</button>
                         </t>
                     </div>
-                    <!--<div>创建人：<span><t t-esc="item_files.create_uid_name"/></span></div>-->
+                    <div>创建人：<span><t t-esc="item_files.create_uid_name"/></span></div>
+                    <div>创建日期：<span><t t-esc="item_files.create_date"/></span></div>
 
                 </div>
                 <div class="document_review_list">
@@ -79,9 +80,9 @@
 
                    <div class="document_btns">
                          <t t-if="item_files.is_able_to_use == true || approval_type=='waiting_submit' ||approval_type=='waiting_approval'">
-                        <button class="btn btn-primary document_manage_btn">审核操作</button>
+                        <button t-att-data-action-deny="item_files.is_show_action_deny" class="btn btn-primary document_manage_btn">审核操作</button>
                     </t>
-                        <button class="btn btn-primary document_download">查看BOM</button>
+                        <button class="btn btn-primary bom_view">查看BOM</button>
                 </div>
             </div>
         </t>

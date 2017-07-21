@@ -19,7 +19,8 @@ class MrpBom(models.Model):
 
     @api.depends('cost', 'hour_price')
     def _get_product_cost(self):
-        self.cost = (float(self.cycle_time) / 3600) * self.hour_price
+        for bom in self:
+            bom.cost = (float(bom.cycle_time) / 3600) * bom.hour_price
 
     cost = fields.Monetary(string=u'Cost', compute=_get_product_cost, currency_field='currency_id')
     currency_id = fields.Many2one('res.currency', string='Currency', required=True,

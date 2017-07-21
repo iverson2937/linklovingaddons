@@ -17,7 +17,7 @@ class LinklovingPdm(http.Controller):
         out = """<script type='text/javascript'>
             window.parent['%s'](%s, %s);
         </script>"""
-        if not active_type or not my_load_file or not active_id:
+        if not active_type or not (my_load_file or my_load_file_remote_path) or not active_id:
             error = u"缺少必要的参数"
             args = {"error": error}
             return out % (func, json.dumps(args), json.dumps({}))
@@ -32,8 +32,10 @@ class LinklovingPdm(http.Controller):
                 'version': Model.with_context({"product_id": int(active_id),
                                                "type": active_type})._default_version(),
             })
+            filename = attach.get_download_filename()
+            attach.file_name = filename
             args = {
-                'filename': my_load_file.filename,
+                'filename': filename,
                 'mimetype': my_load_file.content_type,
                 'id': attach.id
             }
@@ -62,6 +64,7 @@ class LinklovingPdm(http.Controller):
         # attachment_id = request..get("attachment_id")  # 附件id
         # file = request.jsonrequest.get("file")  # 远程地址
         # result = request.jsonrequest.get("result")
+        print result
         return json.dumps({
             "msg": u"得到的参数",
             "attachment_id": attachment_id,

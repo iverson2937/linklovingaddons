@@ -23,8 +23,8 @@
                             <field name="product_type" invisible="1"/>
                         </group>
 
-                        <field name="name" string="新产品名称" attrs="{'invisible':[('to_add','!=',True)]}"/>
-                        <field name="product_specs" string="规格" attrs="{'invisible':[('to_add','!=',True)]}"/>
+                        <field name="name" string="新产品名称" attrs=""/>
+                        <field name="product_specs" string="规格" attrs=""/>
 
 
                     </group>

@@ -88,6 +88,8 @@ class LinklovingAppApi(http.Controller):
     def login(self, **kw):
         request.session.db = request.jsonrequest["db"]
         request.params["db"] = request.jsonrequest["db"]
+        print 'ssssssssss'
+        print request.session
 
         request.params['login_success'] = False
         values = request.params.copy()
@@ -104,7 +106,11 @@ class LinklovingAppApi(http.Controller):
                 values['user_id'] = request.uid
                 #get group ids
                 user = LinklovingAppApi.get_model_by_id(uid, request, 'res.users')
+
                 values['partner_id'] = user.partner_id.id
+                values['company'] = user.company_id.name
+                # values['phone'] = user.employee_ids.mobile_phone
+
                 if user.sale_team_id:
                     values['team'] = {
                         'team_id': user.sale_team_id.id,

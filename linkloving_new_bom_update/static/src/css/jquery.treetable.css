@@ -152,3 +152,6 @@ table.treetable tr.expanded.accept td span.indenter a {
 .edit_class_name_test{
   background: lightgreen;
 }
+.submit_to_approval{
+  margin-top: 20px;
+}

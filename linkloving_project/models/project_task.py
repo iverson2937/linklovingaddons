@@ -74,7 +74,7 @@ class linkloving_project_task(models.Model):
 
     display_name = fields.Char(compute=_get_display_name, string='display name')
 
-    top_task_id = fields.Integer(compute=_get_top_task_id, string='Top Task ID', store=True)
+    top_task_id = fields.Many2one("project.task", compute=_get_top_task_id, string='Top Task ID', store=True)
 
     date_start = fields.Date(string='Starting Date',
                              default=fields.date.today(),
