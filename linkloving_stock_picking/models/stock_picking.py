@@ -251,10 +251,3 @@ class StockMovePicking(models.Model):
 
         self.data_type = self.product_uom_qty * sgin
 
-    @api.model
-    def create(self, vals):
-
-        print 1112
-        obj = super(StockMovePicking, self).create(vals)
-        return obj
-
