@@ -169,7 +169,7 @@ def set_bom_line_product_bom_released(line):
 
 
 def reject_bom_line_product_bom(line):
-    line.bom_id.state = 'reject'
+    line.bom_id.state = 'deny'
     if line.child_line_ids:
         for l in line.child_line_ids:
             reject_bom_line_product_bom(l)
