@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+from .hr_expense_sheet import create_remark_comment
 
 
 class AccountEmployeePayment(models.Model):
@@ -9,6 +9,8 @@ class AccountEmployeePayment(models.Model):
     _inherit = ['mail.thread', 'ir.needaction_mixin']
     _order = 'create_date desc'
     name = fields.Char()
+
+    remark_comments_ids = fields.One2many('hr.remark.comment', 'employee_payment_id', string=u'审核记录')
 
     @api.multi
     def set_account_date(self):
@@ -131,6 +133,8 @@ class AccountEmployeePayment(models.Model):
                 raise UserError(u'请设置部门审核人')
             self.to_approve_id = self.employee_id.department_id.manager_id.user_id.id
 
+        create_remark_comment(self, u"送审")
+
     @api.multi
     def manager1_approve(self):
         # if self.employee_id == self.employee_id.department_id.manager_id:
@@ -152,10 +156,14 @@ class AccountEmployeePayment(models.Model):
 
             self.write({'state': 'manager1_approve', 'approve_ids': [(4, self.env.user.id)]})
 
+        create_remark_comment(self, u'1级审核')
+
     @api.multi
     def reject(self):
         self.state = 'draft'
         self.to_approve_id = False
+
+        create_remark_comment(self, u'拒绝')
 
     @api.multi
     def manager2_approve(self):
@@ -174,6 +182,8 @@ class AccountEmployeePayment(models.Model):
             self.to_approve_id = department.parent_id.manager_id.user_id.id
 
             self.write({'state': 'manager2_approve', 'approve_ids': [(4, self.env.user.id)]})
+
+        create_remark_comment(self, u'2级审核')
 
     @api.multi
     def manager3_approve(self):

@@ -287,8 +287,8 @@ def create_remark_comment(data, body):
     values = {
         'body': body,
         'message_type': data.state,
-        'expense_sheet_id': data.id,
-        'target_uid': data.to_approve_id.id
+        'target_uid': data.to_approve_id.id,
+        'employee_payment_id' if data._name == 'account.employee.payment' else 'expense_sheet_id': data.id
     }
     return data.env['hr.remark.comment'].create(values)
 
@@ -298,6 +298,7 @@ class HrRemarkComment(models.Model):
 
     body = fields.Char(string=u'内容')
     target_uid = fields.Many2one('res.users')
+
     message_type = fields.Selection([
         ('draft', u'草稿'),
         ('submit', u'送审'),
@@ -309,9 +310,12 @@ class HrRemarkComment(models.Model):
         ('manager3_approve', u'3级审核'),
         ('approve', u'批准'),
         ('post', 'Posted'),
-        ('cancel', u'拒绝')
+        ('cancel', u'拒绝'),
+        ('confirm', u'Confirm'),
+        ('paid', u'Paid'),
     ], default='draft')
     expense_sheet_id = fields.Many2one('hr.expense.sheet', string=u'审核对象')
+    employee_payment_id = fields.Many2one('account.employee.payment', string=u'暂支审核对象')
 
 
 class HrExpenseRefuseWizard(models.TransientModel):

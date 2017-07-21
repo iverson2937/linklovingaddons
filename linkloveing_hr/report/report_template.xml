@@ -98,21 +98,72 @@
                                     </div>
                                 </div>
 
-                                <div class="col-xs-3">
-                                    <strong>总经理:</strong>
-                                </div>
-                                <div class="col-xs-3">
-                                    <strong>财务:</strong>
-                                </div>
-                                <div class="col-xs-3">
-                                    <strong>部门主管:</strong>
-                                </div>
-                                <div class="col-xs-3">
-                                    <strong>制单人:</strong>
-                                    <span t-field="o.create_uid.name"></span>
-                                </div>
+                                <!--<div class="col-xs-3">-->
+                                <!--<strong>总经理:</strong>-->
+                                <!--</div>-->
+                                <!--<div class="col-xs-3">-->
+                                <!--<strong>财务:</strong>-->
+                                <!--</div>-->
+                                <!--<div class="col-xs-3">-->
+                                <!--<strong>部门主管:</strong>-->
+                                <!--</div>-->
+                                <!--<div class="col-xs-3">-->
+                                <!--<strong>制单人:</strong>-->
+                                <!--<span t-field="o.create_uid.name"></span>-->
+                                <!--</div>-->
 
+
+                                <div class="row">
+                                    <div class="col-xs-offset-9">
+                                        <strong>制单人:</strong>
+                                        <span t-field="o.create_uid.name"></span>
+                                    </div>
+                                </div>
+                                <br/>
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <strong>总经理:</strong>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <strong>财务:</strong>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <strong>部门主管:</strong>
+                                    </div>
+                                    <div class="col-xs-offset-9">
+                                        <strong>收款人:</strong>
+                                        <!--<span t-field="o.create_uid.name"></span>-->
+                                    </div>
+                                </div>
                                 <div class="oe_structure"/>
+
+                                <br/>
+                                <br/>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <strong>以下是送审记录</strong>
+                                    </div>
+                                </div>
+                                <table class="table table-condensed">
+                                    <div class="row">
+                                        <t t-set="i" t-value="1"/>
+                                        <tr t-foreach="o.remark_comments_ids" t-as="lines">
+                                            <td>
+                                                <span t-esc="i"/>
+                                            </td>
+                                            <t t-set="i" t-value="i+1"/>
+                                            <td>
+                                                <span t-field="lines.body"/>:
+                                                <span t-field="lines.create_uid"/>-->
+
+                                                <span t-field="lines.target_uid"/>;
+                                                <span t-field="lines.create_date"/>
+                                            </td>
+                                        </tr>
+                                    </div>
+                                </table>
+
+
                             </div>
                         </t>
                     </t>
