@@ -6,7 +6,8 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
     var core = require('web.core');
     var Model = require('web.Model');
     var Widget = require('web.Widget');
-
+    var Dialog = require('web.Dialog');
+    var framework = require('web.framework');
     var QWeb = core.qweb;
     var _t = core._t;
 
@@ -26,17 +27,31 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             'click #my_load_file__a_1': 'request_local_server_pdm',
         },
         request_local_server_pdm: function (e) {
+            framework.blockUI();
             var self = this;
+            console.log(self.product_info);
             $.ajax({
                 type: "GET",
                 url: "http://localhost:8088",
                 // dataType: 'json/html',
                 success: function (data) {
                     if (data.result == '1') {
-                        $.ajax({
+                        var cur_type = $("#document_tab li.active>a").attr("data");
+                        new Model("product.attachment.info").call('default_version', [self.product_id], {
+                            context: {
+                                "product_id": self.product_info.product_id,
+                                type: cur_type
+                            }
+                        }).then(function (ret) {
+                            var default_code = self.product_info.default_code.trim()
+                            var remote_file = cur_type.toUpperCase() + '/' + default_code.split('.').join('/') +
+                                '/' + cur_type.toUpperCase() + '_' + default_code.split('.').join('_') + '_v' + ret
+                            console.log(ret);
+                            $.ajax({
                             type: "GET",
-                            url: "http://localhost:8088/uploadfile?id=" + this.product_id + "&remotefile=/charlie/a/b/test.txt",
+                                url: "http://localhost:8088/uploadfile?id=" + this.product_id + "&remotefile=" + remote_file,
                             success: function (data) {
+                                framework.unblockUI();
                                 console.log(data);
                                 if (data.result == '1') {
                                     $(".my_load_file_name").val(data.choose_file_name)
@@ -44,15 +59,22 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                                 }
                             },
                             error: function (error) {
+                                framework.unblockUI();
+                                Dialog.alert("上传失败");
                                 console.log(error);
                             }
                         });
+                        })
+
                     }
                     else {
-                        alert("请打开代理软件!");
+                        framework.unblockUI();
+                        Dialog.alert("请打开代理软件!");
                     }
                 },
                 error: function (error) {
+                    framework.unblockUI();
+                    Dialog.alert(e.target, "上传失败");
                     console.log(error);
                 }
             });
@@ -92,15 +114,41 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 }
             })
         },
-        document_download_fn: function (e) {
+        document_download_fn: function () {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
-            console.log(new_file_id)
-            // return '/web/content/?download=true&model=product.attachment.info&id=' + new_file_id + '&field=file_binary';
-            window.location.href = '/download_file/?download=true&id=' + new_file_id;
-
-
+            // console.log(new_file_id)
+            console.log($(target))
+            var type = $(target).attr("data").toUpperCase()
+            var remote_path = $("#remote_path").text()
+            if (remote_path[0] == '/') {
+                remote_path[0] = '';
+            }
+            console.log(remote_path)
+            if (type == 'SIP' || type == 'SOP' || type == 'IPQC') {
+                window.location.href = '/download_file/?download=true&id=' + new_file_id;
+            } else {
+                $.ajax({
+                    type: "GET",
+                    url: "http://localhost:8088/downloadfile?remotefile=" + remote_path,
+                    success: function (data) {
+                        console.log(data);
+                        if (data.result == '1') {
+                            Dialog.alert("已下载至指定目录");
+                        }
+                        else if (data.result == '2') {
+                            Dialog.alert("下载失败, 未选择存储路径");
+                        }
+                        else {
+                            Dialog.alert("下载失败");
+                        }
+                    },
+                    error: function (error) {
+                        Dialog.alert("下载失败,请检查是否打开了代理软件");
+                    }
+                })
+            }
         },
         document_modify_fn: function (e) {
             var e = e || window.event;
@@ -177,7 +225,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             $(".file_func").val(callback);
             window[callback] = function (result) {
                 if (result.error) {
-                    alert(result.error)
+                    Dialog.alert(result.error)
                 }
                 console.log(result)
                 // window.location.reload()
@@ -261,7 +309,8 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 .call("get_file_type_list", [this.product_id])
                 .then(function (result) {
                     console.log(result)
-                    self.$el.append(QWeb.render('document_load_detail', {result: result}));
+                    self.$el.append(QWeb.render('document_load_detail', {result: result.list}));
+                    self.product_info = result.info;
                 })
         }
 

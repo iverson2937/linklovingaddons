@@ -9,10 +9,10 @@ odoo.define('linkloving_approval.approval_core', function (require){
     var Widget = require('web.Widget');
     var Pager = require('web.Pager');
     var ListView = require('web.ListView');
-
+    var Dialog = require('web.Dialog');
     var QWeb = core.qweb;
     var _t = core._t;
-
+    var framework = require('web.framework');
     var Approval = Widget.extend({
         template:'approval_load_page',
         events:{
@@ -30,7 +30,36 @@ odoo.define('linkloving_approval.approval_core', function (require){
             var target = e.target || e.srcElement;
             var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
             // console.log(new_file_id)
-            window.location.href = '/download_file/?download=true&id=' + new_file_id;
+            console.log($(target))
+            var type = $(target).attr("data").toUpperCase()
+            var remote_path = $("#remote_path").text()
+            if (remote_path[0] == '/') {
+                remote_path[0] = '';
+            }
+            console.log(remote_path)
+            if (type == 'SIP' || type == 'SOP' || type == 'IPQC') {
+                window.location.href = '/download_file/?download=true&id=' + new_file_id;
+            } else {
+                $.ajax({
+                    type: "GET",
+                    url: "http://localhost:8088/downloadfile?remotefile=" + remote_path,
+                    success: function (data) {
+                        console.log(data);
+                        if (data.result == '1') {
+                            Dialog.alert("已下载至指定目录");
+                        }
+                        else if (data.result == '2') {
+
+                        }
+                        else {
+                            Dialog.alert("下载失败");
+                        }
+                    },
+                    error: function (error) {
+                        Dialog.alert("下载失败,请打开代理软件");
+                    }
+                })
+            }
         },
         //取消审核
         cancel_approval:function (e) {
@@ -228,7 +257,6 @@ odoo.define('linkloving_approval.approval_core', function (require){
 
         start: function () {
             var self = this;
-
             var model = new Model("approval.center");
             //var info_model = new Model("product.attachment.info")
             model.call("fields_get", ["", ['type']]).then(function (result) {
