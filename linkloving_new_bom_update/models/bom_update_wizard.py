@@ -203,7 +203,10 @@ class BomUpdateWizard(models.TransientModel):
                     old_product_id = line_obj.browse(int(last_bom_line_id)).product_id
                     update_bom_line_delete(new_bom_id, old_product_id)
             return {
+                'type': 'ir.actions.client',
+                'tag': 'new_bom_update',
                 'bom_id': new_bom_id.id,
+                'context': {'default_active_id': new_bom_id.id},
             }
 
     @api.multi
@@ -211,7 +214,7 @@ class BomUpdateWizard(models.TransientModel):
         main_bom_id = int(self._context.get('bom_id'))
         return {
             'type': 'ir.actions.client',
-            'tag': 'bom_update',
+            'tag': 'new_bom_update',
             'bom_id': main_bom_id
         }
 
