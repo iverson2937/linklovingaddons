@@ -511,6 +511,7 @@ class ReviewProcessWizard(models.TransientModel):
     _name = 'review.process.cancel.wizard'
 
     product_attachment_info_id = fields.Many2one("product.attachment.info")
+    bom_id=fields.Many2one("mrp.bom")
     review_process_line = fields.Many2one("review.process.line",
                                           related="product_attachment_info_id.review_id.process_line_review_now")
 
@@ -518,7 +519,12 @@ class ReviewProcessWizard(models.TransientModel):
 
     def action_cancel_review(self):
         self.review_process_line.action_cancel(self.remark)
-        self.product_attachment_info_id.action_cancel()
+        print self._context,'dddddddd'
+        if self._context.get('review_type')=='bom_review':
+
+            self.bom_id.action_cancel()
+        elif self._context.get('review_type')=='file_review':
+            self.product_attachment_info_id.action_cancel()
 
 
 class ReviewProcessWizard(models.TransientModel):
@@ -530,6 +536,8 @@ class ReviewProcessWizard(models.TransientModel):
     bom_id = fields.Many2one('mrp.bom')
     review_process_line = fields.Many2one("review.process.line",
                                           related="product_attachment_info_id.review_id.process_line_review_now")
+    review_bom_line=fields.Many2one("review.process.line",
+                                    related="bom_id.review_id.process_line_review_now")
     remark = fields.Text(u"备注", required=True)
     is_show_action_deny = fields.Boolean(default=True)
 
@@ -567,10 +575,11 @@ class ReviewProcessWizard(models.TransientModel):
         review_type = self._context.get("review_type")
         if review_type == 'bom_review':
             self.bom_id.action_released()
+            self.review_bom_line.action_pass(self.remark)
         elif review_type == 'file_review':
             self.product_attachment_info_id.action_released()
         # 审核通过
-        self.review_process_line.action_pass(self.remark)
+            self.review_process_line.action_pass(self.remark)
         return True
 
     # 审核不通过
@@ -580,8 +589,10 @@ class ReviewProcessWizard(models.TransientModel):
         review_type = self._context.get('review_type')
         if review_type == 'bom_review':
             self.bom_id.action_deny()
+            self.review_bom_line.action_deny(self.remark)
         elif review_type == 'file_review':
             self.product_attachment_info_id.action_deny()
+            self.review_process_line.action_deny(self.remark)
         return True
 
     def action_cancel_review(self):
@@ -589,8 +600,10 @@ class ReviewProcessWizard(models.TransientModel):
         review_type = self._context.get('review_type')
         if review_type == 'bom_review':
             self.bom_id.action_cancel()
+            self.review_bom_line.action_cancel(self.remark)
         elif review_type == 'file_review':
             self.product_attachment_info_id.action_cancel()
+            self.review_process_line.action_cancel(self.remark)
 
     @api.model
     def create(self, vals):

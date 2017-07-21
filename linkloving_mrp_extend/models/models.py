@@ -16,7 +16,7 @@ from odoo.addons import decimal_precision as dp
 
 class MrpBomExtend(models.Model):
     _inherit = 'mrp.bom'
-    _order = 'create_date desc'
+    _order = 'write_date desc'
 
     product_specs = fields.Text(string=u'Product Specification', related='product_tmpl_id.product_specs')
 
@@ -26,11 +26,18 @@ class MrpBomExtend(models.Model):
         help="If a product variant is defined the BOM is available only for this product.", copy=False)
     state = fields.Selection([
         ('new', u'新建'),
-        ('reject', u'已拒绝'),
+        ('deny', u'已拒绝'),
+        ('cancel', u'取消'),
         ('draft', u'草稿'),
         ('review_ing', u'审核中'),
         ('release', u'正式')
     ], u'状态', track_visibility='onchange', default='new')
+
+    @api.multi
+    def action_cancel(self):
+        self.write({
+            'state': 'cancel'
+        })
 
     bom_remark = fields.Text(string=u"备注", track_visibility='onchange')
 
@@ -211,7 +218,8 @@ class MrpProductionExtend(models.Model):
     mrp_order_type = fields.Selection(
         [('procurement_warehousing', u'采购入库'), ('purchase_return', u'采购退货'), ('sell_return', u'销售退货'),
          ('sell_out', u'销售出库'), ('manufacturing_orders', u'制造入库'), ('manufacturing_picking', u'制造领料'),
-         ('null', u' '),('inventory_in', u'盘点入库'), ('inventory_out', u'盘点出库') ], string=u"订单类型", default='manufacturing_orders')
+         ('null', u' '), ('inventory_in', u'盘点入库'), ('inventory_out', u'盘点出库')], string=u"订单类型",
+        default='manufacturing_orders')
 
     @api.multi
     def action_view_qc_report(self):

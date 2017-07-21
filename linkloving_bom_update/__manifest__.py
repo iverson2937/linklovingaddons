@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'mrp', 'linkloving_pdm'],
+    'depends': ['base', 'mrp'],
 
     # always loaded
     'data': [
@@ -29,7 +29,7 @@
         'views/templates.xml',
         'views/res_partner.xml',
         'views/product_product.xml',
-        'views/review_bom_wizard.xml',
+        # 'views/review_bom_wizard.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

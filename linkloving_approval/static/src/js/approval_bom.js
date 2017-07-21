@@ -38,6 +38,7 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
                 type: 'ir.actions.client',
                 'tag': 'new_bom_update',
                 'bom_id': parseInt(bom_id),
+                'is_show':false,
                 target: "new",
             };
             this.do_action(action);
