@@ -17,18 +17,18 @@ class HrEmployee(models.Model):
 
     hr_job_ids = fields.Many2many('hr.job', 'hr_job_hr_employee_rel', 'job_id', 'employee_id')
 
-
-    @api.multi
-    def write(self, vals):
-        res = super(HrEmployee, self).write(vals)
-        groups = []
-        for job in self.hr_job_ids:
-            for group in job.groups_id:
-                groups.append(group.id)
-                self.env['res.users'].browse(self.user_id.id).write({
-                    'groups_id': [(6, 0, groups)]
-                })
-        return res
+    #
+    # @api.multi
+    # def write(self, vals):
+    #     res = super(HrEmployee, self).write(vals)
+    #     groups = []
+    #     for job in self.hr_job_ids:
+    #         for group in job.groups_id:
+    #             groups.append(group.id)
+    #             self.env['res.users'].browse(self.user_id.id).write({
+    #                 'groups_id': [(6, 0, groups)]
+    #             })
+    #     return res
 
     @api.model
     def create(self, vals):
