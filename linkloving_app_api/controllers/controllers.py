@@ -1503,6 +1503,9 @@ class LinklovingAppApi(http.Controller):
             'order_id': production.id,
             'display_name': production.display_name,
             'product_name': production.product_id.display_name,
+            'sop_file_url': request.env["product.attachment.info"].get_file_download_url('sop',
+                                                                                         request.httprequest.host_url,
+                                                                                         production.product_tmpl_id.id),
             'product_id': {
                 'product_id': production.product_id.id,
                 'product_name': production.product_id.display_name,
