@@ -28,6 +28,7 @@ class MrpBomExtend(models.Model):
         ('new', u'新建'),
         ('deny', u'已拒绝'),
         ('cancel', u'取消'),
+        ('updated', u'更新'),
         ('draft', u'草稿'),
         ('review_ing', u'审核中'),
         ('release', u'正式')

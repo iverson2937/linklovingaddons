@@ -30,7 +30,7 @@
         'views/views.xml',
         'views/stock_location.xml',
         'views/templates.xml',
-        'views/stock_move.xml',
+        # 'views/stock_move.xml',
         'views/mrp_production.xml',
         'report/mrp_bom_structure_report_templates.xml',
         'report/mrp_production_templates.xml',
