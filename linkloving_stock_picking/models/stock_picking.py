@@ -206,8 +206,6 @@ class StockMovePicking(models.Model):
     _inherit = "stock.move"
 
     data_type = fields.Float(string=u'数量', required=True, default=0.0, compute='_compute_qty')
-    stock_type = fields.Char(string=u'出/入库', compute='_compute_qty', store=True)
-    stock_types = fields.Char(string=u'出/入库', compute='_compute_qty')
     move_order_type = fields.Selection([
         ('procurement_warehousing', u'采购入库'), ('purchase_return', u'采购退货'),
         ('sell_return', u'销售退货'), ('sell_out', u'销售出库'),
@@ -235,12 +233,6 @@ class StockMovePicking(models.Model):
         sgin = 1
         if self in self.product_id.env['stock.move'].search(domain_move_out_todo):
             sgin = -1
-            self.stock_types = "出库"
-            self.write({'stock_type': '出库'})
-
-        if self in self.product_id.env['stock.move'].search(domain_move_in_todo):
-            self.stock_types = "入库"
-            self.write({'stock_type': '入库'})
 
         self.data_type = self.product_uom_qty * sgin
 
