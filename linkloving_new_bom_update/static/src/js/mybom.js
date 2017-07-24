@@ -9,10 +9,13 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
     var Widget = require('web.Widget');
     var View = require('web.View');
     var Dialog = require('web.Dialog');
+    var ControlPanelMixin = require('web.ControlPanelMixin');
+    var SearchView = require('web.SearchView');
+    var data = require('web.data');
     var _t = core._t;
 
 
-    var NewBomUpdate = Widget.extend({
+    var NewBomUpdate = Widget.extend(ControlPanelMixin, {
         template: 'my_bom_container',
         events: {
             'click .add_bom_data': 'add_bom_data_fn',
@@ -22,6 +25,19 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             'click .new_product_edit': 'edit_bom_line_fn',
             'click .new_product_delete': 'delete_bom_line_fn',
             'click .submit_to_approval': 'submit_to_approval_fn'
+        },
+
+
+        update_cp: function () {
+            this.update_control_panel({
+                breadcrumbs: this.action_manager.get_breadcrumbs(),
+                cp_content: {
+                    $buttons: this.$buttons,
+                    $searchview: this.searchview.$el,
+                    $searchview_buttons: this.$searchview_buttons,
+                },
+                searchview: this.searchview,
+            });
         },
 
         submit_to_approval_fn: function () {
@@ -46,6 +62,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             };
             this.do_action(action);
         },
+
         //另存为的动作
         new_bom_modify_submit_fn: function (e) {
             var e = e || window.event;
@@ -364,9 +381,13 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             })
 
         },
+
+
         init: function (parent, action) {
             this._super.apply(this, arguments);
             this.bom_id = action.bom_id;
+            this.dataset = new data.DataSetSearch(this, 'mail.message');
+            this.domain = [];
             this.is_show = action.is_show;
             if (action.bom_id) {
                 this.bom_id = action.bom_id;
@@ -396,7 +417,9 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 return;
             }
         },
+on_search:function () {
 
+},
         start: function () {
             var self = this;
             if (this.is_show === false) {
@@ -405,6 +428,15 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
 
 
             }
+            ;
+            var options = {
+                $buttons: $("<div>"),
+                action: this.action,
+                disable_groupby: true,
+            };
+
+            this.searchview = new SearchView(this, this.dataset, this.fields_view, options);
+            this.searchview.on('search_data', this, this.on_search);
 
             if (this.bom_id) {
                 return new Model("mrp.bom")

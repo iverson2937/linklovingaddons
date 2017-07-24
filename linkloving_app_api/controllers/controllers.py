@@ -83,6 +83,17 @@ class LinklovingAppApi(http.Controller):
     def get_db_list(self, **kw):
         return JsonResponse.send_response(STATUS_CODE_OK, res_data= http.db_list(), jsonRequest=False)
 
+    #换头像
+    @http.route('/linkloving_app_api/change_img', type='json', auth="none", csrf=False, cors='*')
+    def change_img(self, **kw):
+        uid = request.context.get("uid")
+        user = LinklovingAppApi.get_model_by_id(uid, request, 'res.users')
+        user.partner_id.image = request.jsonrequest['img']
+        cur_user = request.env['res.users'].browse(uid)
+        values = {}
+        values['user_ava'] = LinklovingAppApi.get_img_url(cur_user.id, "res.users", "image_medium")
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=values)
+
     #登录
     @http.route('/linkloving_app_api/login', type='json', auth="none", csrf=False, cors='*')
     def login(self, **kw):
@@ -109,7 +120,13 @@ class LinklovingAppApi(http.Controller):
 
                 values['partner_id'] = user.partner_id.id
                 values['company'] = user.company_id.name
-                # values['phone'] = user.employee_ids.mobile_phone
+                if user.employee_ids:
+                    values['barcode'] = user.employee_ids[0].barcode
+                    values['phone'] = user.employee_ids[0].mobile_phone
+                    values['department'] = user.employee_ids[0].department_id.name
+                    values['job'] = user.employee_ids[0].job_id.name
+                    values['bank_number'] = user.employee_ids[0].bank_account_id.acc_number
+                    values['bank_name'] = user.employee_ids[0].bank_account_id.bank_name
 
                 if user.sale_team_id:
                     values['team'] = {

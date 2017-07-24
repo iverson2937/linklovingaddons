@@ -123,28 +123,8 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                     .then(function (result) {
                     })
             };
-
-            //$.ajax({
-            //    type:"post",
-            //    url:"/linkloving_pdm/update_attachment_info",
-            //    //async:true,
-            //    data:{
-            //        'new_file':new_file,
-            //        'attachment_id':new_file_id
-            //    },
-            //    success:function(){
-            //        console.log('1');
-            //    },
-            //    error:function(){
-            //        console.log('0');
-            //    }
-            //});
-
         },
         load_file: function () {
-            // $(".my_load_file_name").val("");
-            // $(".my_load_file_remote_path").val("");
-            // $(".my_load_file_version").val("");
             $(".load_container").hide();
             $.blockUI({message: '<img src="linkloving_pdm/static/src/css/spin.png" style="animation: fa-spin 1s infinite steps(12);"/><h3>请稍后</h3>'});
         },

@@ -12,11 +12,12 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
     var Widget = require('web.Widget');
     var Pager = require('web.Pager');
     var ListView = require('web.ListView');
+    var ControlPanelMixin = require('web.ControlPanelMixin');
 
     var QWeb = core.qweb;
     var _t = core._t;
 
-    var Approval = Widget.extend({
+    var Approval = Widget.extend(ControlPanelMixin, {
         template: 'bom_approve_page',
         events: {
             'show.bs.tab .tab_toggle_a': 'approval_change_tabs',
@@ -27,6 +28,7 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
             'click .bom_view': 'bom_view_fn',
             'click .download_file': 'document_download_fn',
         },
+
 
         //查看BOM
         bom_view_fn: function () {
