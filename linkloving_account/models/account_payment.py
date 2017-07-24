@@ -32,6 +32,17 @@ class AccountPaymentRegister(models.Model):
     name = fields.Char()
     balance_ids = fields.One2many('account.payment.register.balance', 'payment_id')
     amount = fields.Float(string=u'Amount', compute='get_amount', store=True)
+    company_id = fields.Many2one('res.company', 'Company',
+                                 default=lambda self: self.env['res.company']._company_default_get('account.payment.register'))
+
+    @api.model
+    @api.returns('self', lambda value: value.id)
+    def _company_default_get(self, object=False, field=False):
+        """ Returns the default company (usually the user's company).
+        The 'object' and 'field' arguments are ignored but left here for
+        backward compatibility and potential override.
+        """
+        return self.env['res.users']._get_company()
 
     @api.multi
     def register_payment(self):
