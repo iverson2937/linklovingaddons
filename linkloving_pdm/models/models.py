@@ -239,6 +239,15 @@ class ProductAttachmentInfo(models.Model):
             'type': FILE_TYPE_DIC.get(self.type or '') or '',
         }
 
+    def get_file_download_url(self, type, host, product_tmpl_id):
+        files = self.search([('product_tmpl_id', '=', product_tmpl_id), ('type', '=', type)])
+        file = files.filtered(lambda x: x.is_able_to_use)
+        if len(file) == 1:
+            return host + 'download_file/?download=true&id=' + str(file[0].id)
+        elif len(file) == 0:
+            return ''
+        else:
+            raise u"数据异常,有两个可用的文件"
     def get_download_filename(self):
         dc = self.product_tmpl_id.default_code.replace(".", "_")
         file_ext = self.file_name.split('.')[-1:][0]

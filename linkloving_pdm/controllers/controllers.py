@@ -72,11 +72,11 @@ class LinklovingPdm(http.Controller):
             "result": result,
         })
 
-    @http.route('/download_file', type='http', auth='public')
+    @http.route('/download_file', type='http', auth='user')
     def content_common(self, xmlid=None, model='product.attachment.info', id=None, field='file_binary', filename=None,
                        filename_field='datas_fname', unique=None, mimetype=None, download=None, data=None, token=None):
         if not filename:
-            info = request.env[model].browse(int(id))
+            info = request.env[model].sudo().browse(int(id))
             filename = info.get_download_filename()
         status, headers, content = request.registry['ir.http'].binary_content(xmlid=xmlid, model=model, id=id,
                                                                               field=field, unique=unique,

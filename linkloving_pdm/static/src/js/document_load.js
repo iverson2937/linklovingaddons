@@ -91,7 +91,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 view_type: 'form',
                 view_mode: 'tree,form',
                 views: [[false, 'form']],
-                context: {'default_product_attachment_info_id': parseInt(new_file_id)},
+                context: {'default_product_attachment_info_id': parseInt(new_file_id), 'review_type': 'file_review'},
                 target: "new",
             };
             this.do_action(action);
@@ -252,7 +252,10 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 view_type: 'form',
                 view_mode: 'tree,form',
                 views: [[false, 'form']],
-                context: {'default_product_attachment_info_id': file_id},
+                context: {
+                    'default_product_attachment_info_id': file_id,
+                    'review_type': 'file_review'
+                },
                 target: "new",
             };
             this.do_action(action);

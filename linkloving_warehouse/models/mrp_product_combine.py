@@ -21,6 +21,8 @@ class MrpProductionCombine(models.TransientModel):
         ids = []
         origin = ''
         for record in self.env['mrp.production'].browse(active_ids):
+            if record.product_tmpl_id.product_ll_type == 'finished' and record.product_tmpl_id.order_ll_type == 'ordering':
+                raise UserError(u"订单制产品的MO不能合并!")
             if record.state not in ['draft', 'confirmed', 'waiting_material']:
                 raise UserError(_("Only draft MO can combine."))
 
