@@ -15,7 +15,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
     var _t = core._t;
 
 
-    var NewBomUpdate = Widget.extend(ControlPanelMixin, {
+    var NewBomUpdate = Widget.extend({
         template: 'my_bom_container',
         events: {
             'click .add_bom_data': 'add_bom_data_fn',
