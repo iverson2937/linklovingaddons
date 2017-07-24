@@ -119,7 +119,6 @@
 
 
                 <xpath expr="//field[@name='name']" position="before">
-                    <field name="stock_types" invisible="1"/>
                     <field name="move_order_type"/>
                     <field name="state"/>
                 </xpath>
@@ -149,7 +148,7 @@
             <field name="inherit_id" ref="stock.view_move_search"/>
             <field name="arch" type="xml">
                 <xpath expr="//filter[@name='groupby_date']" position="after">
-                    <filter string="出/入库" name="stock_type" context="{'group_by' : 'stock_type'}" domain="[]"/>
+                    <filter string="出/入库" name="move_order_type" context="{'group_by' : 'move_order_type'}" domain="[]"/>
                 </xpath>
 
             </field>

@@ -168,6 +168,7 @@ class NameCardController(http.Controller):
             "is_company": False,
             "email": email,
             "type": type,
+            "user_id": saleman_id,
         })
         if type == 'contact':
             s.write({

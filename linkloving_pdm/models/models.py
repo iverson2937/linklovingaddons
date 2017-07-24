@@ -248,6 +248,9 @@ class ProductAttachmentInfo(models.Model):
             return 'Unrelease_' + self.type.upper() + '_' + dc + '_v' + str(self.version) + file_ext
         return self.type.upper() + '_' + dc + '_v' + str(self.version) + file_ext
 
+    def default_version(self):
+        return self._default_version()
+
     def _default_version(self):
         model = self._context.get("model")
         res_id = self._context.get("product_id")
@@ -426,8 +429,11 @@ class ProductTemplateExtend(models.Model):
 
     #####
     def get_file_type_list(self):
-
-        return [
+        pinfo = {
+            'default_code': self.default_code,
+            'product_id': self.id,
+        }
+        return {'list': [
             {'name': 'SIP',
              'type': 'sip',
              'files': self.convert_attendment_info_list(type='sip')},
@@ -439,7 +445,8 @@ class ProductTemplateExtend(models.Model):
              'type': 'other'},
             {'name': 'Design',
              'type': 'design'},
-        ]
+        ],
+            'info': pinfo}
 
     def get_attachemnt_info_list(self, **kwargs):
         type = kwargs.get('type')

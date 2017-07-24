@@ -115,7 +115,7 @@
                     Click to add a Barcode Nomenclature .
                 </p>
                 <p>
-                    文件终审人设置
+                    终审人设置
                 </p>
             </field>
         </record>
@@ -123,7 +123,7 @@
         <menuitem id="final_review_partner_menu"
                   parent="stock.menu_stock_config_settings"
                   action="action_final_review_partner"
-                  sequence="50"/>
+                  sequence="50" groups=""/>
 
         <record id="review_process_wizard_form" model="ir.ui.view">
             <field name="name">选择下一个审核人</field>

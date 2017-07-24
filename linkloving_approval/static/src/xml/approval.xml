@@ -44,7 +44,7 @@
                     <div>文件：<span><t t-esc="item_files.file_name"/></span></div>
                     <!--<div>审核人：<span><t t-esc="item_files.review_id"/></span></div>-->
                     <t t-if="item_files.remote_path!=''">
-                        <div>远程地址：<span><t t-esc="item_files.remote_path"/></span></div>
+                        <div>远程地址：<span id="remote_path"><t t-esc="item_files.remote_path"/></span></div>
                     </t>
                     <div>版本：<span><t t-esc="item_files.version"/></span></div>
                     <div>状态：<span><t t-esc="item_files.state[1]"/></span>
@@ -85,7 +85,7 @@
                         </a>
                     </t>
                     <t t-if="item_files.is_able_to_use == true || approval_type=='waiting_submit' ||approval_type=='waiting_approval'">
-                        <button class="btn btn-primary document_download">下载</button>
+                        <button class="btn btn-primary document_download" t-att-data="item_files.type">下载</button>
                     </t>
                     <button class="btn btn-primary get_version_history">查看历史版本</button>
                 </div>
