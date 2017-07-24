@@ -16,12 +16,10 @@ class ApprovalCenter(models.TransientModel):
     res_model = fields.Char('Related Model', help='Model of the followed resource')
 
     def get_bom_info_by_type(self, offset, limit):
-        print self.res_model, 'ddddddddddddd'
-        print self.type
         if self.type == 'waiting_submit':
             domain = [('create_uid', '=', self.env.user.id),
                       ('state', 'in',
-                       ['waiting_release', 'cancel', 'deny', 'draft', 'new'])]
+                       ['waiting_release', 'cancel', 'deny', 'new'])]
             bom_ids = self.env[self.res_model].search(domain,
                                                       limit=limit, offset=offset, order='create_date desc')
         elif self.type == 'submitted':
