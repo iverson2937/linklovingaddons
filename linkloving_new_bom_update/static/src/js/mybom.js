@@ -40,7 +40,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             });
         },
 
-        submit_to_approval_fn: function () {
+        submit_to_approval_fn: function (e) {
             var tar = this;
             var e = e || window.event;
             var target = e.target || e.srcElement;
