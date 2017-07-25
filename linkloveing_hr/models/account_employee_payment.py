@@ -40,7 +40,7 @@ class AccountEmployeePayment(models.Model):
     remark = fields.Text(string='Remark')
     address_home_id = fields.Many2one('res.partner', related='employee_id.address_home_id')
     bank_account_id = fields.Many2one('res.partner.bank', related='employee_id.bank_account_id')
-    sheet_ids = fields.One2many('hr.expense.sheet', 'sheet_id')
+    sheet_ids = fields.One2many('account.employee.payment.line', 'sheet_id')
     return_ids = fields.One2many('account.employee.payment.return', 'payment_id')
 
     # FIXME:USE BETTER WAY TO HIDE THE BUTTON
