@@ -204,6 +204,10 @@
                     <field name="expense_no" string="Expense No"/>
                     <field name="create_date"/>
                 </xpath>
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="product_id" string="产品"/>
+                </xpath>
+
             </field>
         </record>
 
