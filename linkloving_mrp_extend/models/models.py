@@ -1530,6 +1530,12 @@ class StcokPickingExtend(models.Model):
     express_img = fields.Binary("物流图片")
 
 
+class StockPackOperationExtend(models.Model):
+    _inherit = 'stock.pack.operation'
+
+    rejects_qty = fields.Float(string=u"不良品", default=0)
+
+
 class ProcurementOrderExtend(models.Model):
     _inherit = 'procurement.order'
 
