@@ -75,7 +75,7 @@
                 <tbody>
                     <tr t-foreach="o.order_line" t-as="line">
                         <td>
-                            <span t-field="line.name"/>
+                            <span t-field="line.product_id.name"/>
                         </td>
                         <td>
                             <span t-field="line.product_id.product_specs"/>

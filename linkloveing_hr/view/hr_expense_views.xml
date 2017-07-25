@@ -104,7 +104,7 @@
                 </field>
                 <field name="name" position="after">
                     <field name="expense_no" string="报销单号" filter_domain="[('expense_no','ilike',self)]"/>
-                    <field name="expense_line_ids" string="产品" filter_domain="[('expense_line_ids','ilike',self)]"/>
+                    <field name="product_id" string="产品"/>
                 </field>
             </field>
         </record>
