@@ -194,6 +194,14 @@ class CreateOrderPointWizard(models.TransientModel):
             }
         }
 
+    # 批量改变产品的所属公司 DIY系统用  id: 131, 132
+    def action_change_product_company(self):
+        ps = self.env["product.template"].search([('categ_id', 'in', [131, 132])])
+        ps.write({
+            'company_id': 3,
+        })
+
+
 class SaleOrderExtend(models.Model):
     _inherit = "sale.order"
 
