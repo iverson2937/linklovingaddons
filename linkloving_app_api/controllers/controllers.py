@@ -2187,11 +2187,15 @@ class LinklovingAppApi(http.Controller):
                 [('id', 'in', map(lambda a: a['pack_id'], pack_operation_product_ids))])
         # 仓库或者采购修改了数量
         qty_done_map = map(lambda a: a['qty_done'], pack_operation_product_ids)
+        rejects_qty_map = map(lambda a: a.get('rejects_qty') or 0, pack_operation_product_ids)
 
         def x(a, b):
             a.qty_done = b
 
+        def y(a, b):
+            a.rejects_qty = b
         map(x, pack_list, qty_done_map)
+        map(y, pack_list, rejects_qty_map)
 
         picking_obj = request.env['stock.picking'].sudo().search(
                 [('id', '=', picking_id)])
@@ -2316,6 +2320,7 @@ class LinklovingAppApi(http.Controller):
                 },
                 'product_qty': pack.product_qty,
                 'qty_done': pack.qty_done,
+                'rejects_qty': pack.rejects_qty,
             }
             move_ids = pack.linked_move_operation_ids.mapped("move_id")
             if len(move_ids) == 1:
