@@ -171,8 +171,16 @@
             <field name="inherit_id" ref="base.view_partner_tree"/>
             <field name="arch" type="xml">
 
+                 <xpath expr="//field[@name='phone']" position="attributes">
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='email']" position="attributes">
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+
                 <xpath expr="//field[@name='phone']" position="before">
                     <field name="level"/>
+                    <field name="write_date" string="最近操作时间"/>
                 </xpath>
 
             </field>
