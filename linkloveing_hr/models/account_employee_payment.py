@@ -15,9 +15,9 @@ class AccountEmployeePayment(models.Model):
     @api.multi
     def set_account_date(self):
         sheet_ids = self.env['account.employee.payment'].search(
-            [('state', '=', 'paid'), ('accounting_date', '=', False)])
+            [('state', '=', 'paid')])
         for sheet in sheet_ids:
-            sheet.accounting_date = sheet.write_date
+            sheet.accounting_date = sheet.create_date
 
     def _get_account_date(self):
         for p in self:
