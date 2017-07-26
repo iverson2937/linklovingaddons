@@ -31,6 +31,18 @@ class MrpProcess(models.Model):
     sequence = fields.Integer()
     total_qty = fields.Integer(compute="_get_total_qty")
 
+    company_id = fields.Many2one('res.company', 'Company',
+                                 default=lambda self: self.env['res.company']._company_default_get('mrp.process'))
+
+    @api.model
+    @api.returns('self', lambda value: value.id)
+    def _company_default_get(self, object=False, field=False):
+        """ Returns the default company (usually the user's company).
+        The 'object' and 'field' arguments are ignored but left here for
+        backward compatibility and potential override.
+        """
+        return self.env['res.users']._get_company()
+
     @api.multi
     def get_stock_detail(self):
         ids = []

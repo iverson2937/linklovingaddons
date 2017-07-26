@@ -1344,6 +1344,15 @@
                             <field name="qc_img" readonly="1" widget="image" string="品检图片"/>
                             <field name="post_area_id" readonly="1" string="库位"/>
                             <field name="express_img" readonly="1" widget="image"/>
+                            <field name="pack_operation_product_ids" readonly="1">
+                                <tree string="详情">
+                                    <field name="product_id"/>
+                                    <field name="product_uom_id"/>
+                                    <field name="product_qty"/>
+                                    <field name="qty_done"/>
+                                    <field name="rejects_qty"/>
+                                </tree>
+                            </field>
                         </group>
                     </sheet>
                     <footer>
@@ -1355,6 +1364,22 @@
                     </footer>
 
                 </form>
+            </field>
+        </record>
+
+        <!-- Inherit Form View to Modify it -->
+        <record id="view_picking_form_ll" model="ir.ui.view">
+            <field name="name">stock.picking.form.inherit</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='qty_done']" position="after">
+                    <!-- Add your fields or attributes here -->
+                    <field name="rejects_qty"
+                           attrs="{'invisible': [('state', 'not in', ['qc_check', 'validate', 'waiting_in', 'done'])]}"/>
+                </xpath>
+
             </field>
         </record>
     </data>

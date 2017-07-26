@@ -15,9 +15,9 @@ class AccountEmployeePayment(models.Model):
     @api.multi
     def set_account_date(self):
         sheet_ids = self.env['account.employee.payment'].search(
-            [('state', '=', 'paid'), ('accounting_date', '=', False)])
+            [('state', '=', 'paid')])
         for sheet in sheet_ids:
-            sheet.accounting_date = sheet.write_date
+            sheet.accounting_date = sheet.create_date
 
     def _get_account_date(self):
         for p in self:
@@ -40,7 +40,7 @@ class AccountEmployeePayment(models.Model):
     remark = fields.Text(string='Remark')
     address_home_id = fields.Many2one('res.partner', related='employee_id.address_home_id')
     bank_account_id = fields.Many2one('res.partner.bank', related='employee_id.bank_account_id')
-    sheet_ids = fields.One2many('hr.expense.sheet', 'payment_id')
+    sheet_ids = fields.One2many('account.employee.payment.line', 'sheet_id')
     return_ids = fields.One2many('account.employee.payment.return', 'payment_id')
 
     # FIXME:USE BETTER WAY TO HIDE THE BUTTON
@@ -111,6 +111,7 @@ class AccountEmployeePayment(models.Model):
 
         """
         for payment in self:
+            print len(set(self.sheet_ids.ids))
             payment.update({
                 'sheet_count': len(set(self.sheet_ids.ids)),
                 'return_count': len(set(self.return_ids.ids))
