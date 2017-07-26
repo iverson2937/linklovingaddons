@@ -9,6 +9,10 @@ class HrExpense(models.Model):
     department_id = fields.Many2one('hr.department', string=u'部门')
     doc = fields.Binary(attachment=True, string=u'附件')
     sale_id = fields.Many2one('sale.order')
+    product_id = fields.Many2one('product.product', string='Product', readonly=True,
+                                 states={'draft': [('readonly', False)], 'refused': [('readonly', False)],
+                                         'done': [('readonly', False)]},
+                                 domain=[('can_be_expensed', '=', True)], required=True)
 
     @api.depends('sheet_id', 'sheet_id.account_move_id', 'sheet_id.state')
     def _compute_state(self):
