@@ -340,11 +340,13 @@
             <field name="model">mail.message</field>
             <field name="priority">20</field>
             <field name="arch" type="xml">
-                <form string="Message">
+                <form string="Message" create="false">
                     <sheet>
                         <group>
                             <group>
                                 <field name="subject"/>
+                                <field name="solution"
+                                       attrs="{'invisible': [('sale_order_type','not in',('inspection','question'))]}"/>
                                 <field name="sale_order_type" invisible="1"/>
                                 <field name="attachment_ids" attrs="{'invisible': [('attachment_ids','=',[])]}">
                                     <tree create="0">
@@ -360,6 +362,12 @@
                                 <field name="messages_label_ids" string="记录类型" widget="many2many_checkboxes"
                                        options="{'no_create': True}"
                                        attrs="{'invisible': [('sale_order_type','in',('inspection','question'))]}"/>
+
+                                <field name="measure"
+                                       attrs="{'invisible': [('sale_order_type','not in',('inspection','question'))]}"/>
+                                <field name="anticipated_loss"
+                                       attrs="{'invisible': [('sale_order_type','not in',('inspection','question'))]}"/>
+
                                 <field name="parent_id" invisible="1"/>
                                 <field name="model" invisible="1"/>
                                 <field name="res_id" invisible="1"/>
@@ -368,9 +376,20 @@
                             </group>
                         </group>
                         <notebook>
-                            <page string="Body">
+                            <page string="问题描述">
                                 <field name="body" options="{'style-inline': true}"/>
                             </page>
+
+                            <page string="责任人"
+                                  attrs="{'invisible': [('sale_order_type','not in',('inspection','question'))]}">
+                                <field name="person_in_charge_ids">
+                                    <tree>
+                                        <field name="person_in_charge"/>
+                                        <field name="person_in_charge_proportion"/>
+                                    </tree>
+                                </field>
+                            </page>
+
                         </notebook>
                         <group>
                             <field name="postil" string="批注" placeholder="批注..."
@@ -378,7 +397,7 @@
                         </group>
                     </sheet>
 
-                    <footer>
+                    <footer attrs="{'invisible': [('sale_order_type','in',('inspection','question'))]}">
                         <button string="修改" name="send_message_action" type="object" class="btn-primary"/>
                         <!--<button string="修改" type="button" class="btn btn-sm btn-primary o_composer_button_sendss"/>-->
                         <button string="取消" class="btn-default" special="cancel"/>
@@ -410,12 +429,16 @@
             <field name="model">mail.message</field>
             <field name="priority">20</field>
             <field name="arch" type="xml">
-                <tree string="Messages">
+                <tree string="Messages" create="false">
                     <field name="date" widget="date"/>
                     <field name="subject" string="关联的订单" invisible="1"/>
                     <field name="compyter_body"/>
                     <field name="attachment_ids"/>
                     <field name="author_id"/>
+                    <field name="solution"/>
+                    <field name="measure"/>
+                    <field name="anticipated_loss"/>
+                    <field name="person_in_charge_ids"/>
                 </tree>
             </field>
         </record>
