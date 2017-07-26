@@ -21,6 +21,7 @@ class HrExpenseSheet(models.Model):
     is_deduct_payment = fields.Boolean(default=False)
     pre_payment_reminding = fields.Float(related='employee_id.pre_payment_reminding')
     product_id = fields.Many2one(related='expense_line_ids.product_id')
+    account_id = fields.Many2one(related='expense_line_ids.account_id')
     payment_id = fields.Many2one('account.employee.payment')
     income = fields.Boolean(default=False)
     partner_id = fields.Many2one('res.partner')
