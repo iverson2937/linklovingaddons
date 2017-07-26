@@ -44,7 +44,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                             }
                         }).then(function (ret) {
                             var default_code = self.product_info.default_code.trim()
-                            var remote_file = cur_type.toUpperCase() + '/' + default_code.split('.').join('/') +
+                            var remote_file = cur_type.toUpperCase() + '/' + default_code.split('.').join('/') + '/v'+ ret +
                                 '/' + cur_type.toUpperCase() + '_' + default_code.split('.').join('_') + '_v' + ret
                             console.log(ret);
                             $.ajax({

@@ -94,13 +94,12 @@ class LinklovingAppApi(http.Controller):
         values['user_ava'] = LinklovingAppApi.get_img_url(cur_user.id, "res.users", "image_medium")
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=values)
 
+
     #登录
     @http.route('/linkloving_app_api/login', type='json', auth="none", csrf=False, cors='*')
     def login(self, **kw):
         request.session.db = request.jsonrequest["db"]
         request.params["db"] = request.jsonrequest["db"]
-        print 'ssssssssss'
-        print request.session
 
         request.params['login_success'] = False
         values = request.params.copy()
@@ -2304,7 +2303,6 @@ class LinklovingAppApi(http.Controller):
         pack_list = []
         move_lines = stock_picking_obj.move_lines
         for pack in stock_picking_obj.pack_operation_product_ids:
-
             dic = {
                 'pack_id': pack.id,
                 'product_id': {
@@ -2320,6 +2318,7 @@ class LinklovingAppApi(http.Controller):
                 },
                 'product_qty': pack.product_qty,
                 'qty_done': pack.qty_done,
+                'to_location': pack.to_loc,
                 'rejects_qty': pack.rejects_qty,
             }
             move_ids = pack.linked_move_operation_ids.mapped("move_id")
@@ -2358,6 +2357,13 @@ class LinklovingAppApi(http.Controller):
             'phone': stock_picking_obj.partner_id.mobile or stock_picking_obj.partner_id.phone or '',
             'origin': stock_picking_obj.origin,
             'state': stock_picking_obj.state,
+
+            'back_order_id': stock_picking_obj.backorder_id.name,
+            'emergency': stock_picking_obj.is_emergency,
+            'creater': stock_picking_obj.create_uid.name,
+            'location_id': stock_picking_obj.location_id.complete_name,
+            'tracking_number': stock_picking_obj.tracking_number,
+
             'min_date': stock_picking_obj.min_date,
             'pack_operation_product_ids': pack_list,
             'qc_note': stock_picking_obj.qc_note,
