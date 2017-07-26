@@ -1368,19 +1368,19 @@
         </record>
 
         <!-- Inherit Form View to Modify it -->
-        <!--<record id="view_picking_form_ll" model="ir.ui.view">-->
-        <!--<field name="name">stock.picking.form.inherit</field>-->
-        <!--<field name="model">stock.picking</field>-->
-        <!--<field name="inherit_id" ref="stock.view_picking_form"/>-->
-        <!--<field name="arch" type="xml">-->
+        <record id="view_picking_form_ll" model="ir.ui.view">
+            <field name="name">stock.picking.form.inherit</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
 
-        <!--<xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='qty_done']" position="after">-->
-        <!--&lt;!&ndash; Add your fields or attributes here &ndash;&gt;-->
-        <!--<field name="rejects_qty"-->
-        <!--attrs="{'invisible': [('state', 'not in', ['qc_check', 'validate', 'waiting_in', 'done'])]}"/>-->
-        <!--</xpath>-->
+                <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='qty_done']" position="after">
+                    <!-- Add your fields or attributes here -->
+                    <field name="rejects_qty"
+                           attrs="{'invisible': [('state', 'not in', ['qc_check', 'validate', 'waiting_in', 'done'])]}"/>
+                </xpath>
 
-        <!--</field>-->
-        <!--</record>-->
+            </field>
+        </record>
     </data>
 </openerp>
