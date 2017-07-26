@@ -1,125 +1,134 @@
-# # -*- coding: utf-8 -*-
-# from odoo import http
-# from odoo.http import request
-#
-#
-# class LinklovingOaApi(http.Controller):
-#     @http.route('/linkloving_oa_api/get_company_by_name/', auth='none', type='json')
-#     def get_company_by_name(self, **kwargs):
-#         # db = request.jsonrequest["db"]
-#         name = request.jsonrequest.get("name")
-#         if u"有限公司" in name:
-#             name = name.replace(u"有限公司", "")
-#         elif u'有限责任公司' in name:
-#             name = name.replace(u"有限责任公司", "")
-#         elif u'责任有限公司' in name:
-#             name = name.replace(u"责任有限公司", "")
-#         elif u'公司' in name:
-#             name = name.replace(u"公司", "")
-#
-#         partners = request.env["res.partner"].sudo().search([("name", "ilike", name)])
-#         if partners:  # 如果有代表重复了
-#             json_list = []
-#             for partner in partners:
-#                 json_list.append({
-#                     "partner_id": partner.id,
-#                     "name": partner.name,
-#                 })
-#             return json_list
-#
-#     @http.route('/linkloving_oa_api/add_partner/', auth='none', type='json')
-#     def add_partner(self, **kwargs):
-#         name = request.jsonrequest.get("name")
-#         company_real_name = company_name = request.jsonrequest.get("company_name")
-#         company_id = request.jsonrequest.get("company_id")
-#         saleman_id = request.jsonrequest.get("saleman_id")
-#         saleteam_id = request.jsonrequest.get("saleteam_id")
-#         tag_list = request.jsonrequest.get("tag_list")
-#         star_cnt = request.jsonrequest.get("star_cnt")
-#         partner_lv = request.jsonrequest.get("partner_lv")
-#         phone = request.jsonrequest.get("phone")
-#         street = request.jsonrequest.get("street")
-#         area = request.jsonrequest.get("area")
-#         source_id = request.jsonrequest.get("crm_source_id")
-#         partner_type = request.jsonrequest.get("partner_type")
-#         partners = request.env["res.partner"].sudo().search([("name", "ilike", name)])
-#         if partners:
-#             return {"error": u"该客户已存在"}
-#         else:
-#             if company_id:
-#                 new_company_id = company_id
-#             else:
-#                 if u"有限公司" in company_name:
-#                     company_name = company_name.replace(u"有限公司", "")
-#                 elif u'有限责任公司' in company_name:
-#                     company_name = company_name.replace(u"有限责任公司", "")
-#                 elif u'责任有限公司' in company_name:
-#                     company_name = company_name.replace(u"责任有限公司", "")
-#                 elif u'公司' in company_name:
-#                     company_name = company_name.replace(u"公司", "")
-#                 company = request.env["res.partner"].sudo().search([("name", "ilike", company_name)])
-#                 if not company:
-#                     company = request.env["res.partner"].sudo().create({
-#                         "name": company_real_name,
-#                         "street": street,
-#                         "level": int(partner_lv),
-#                         "priority": str(star_cnt),
-#                         "category_id": [6, 0, (tag_list)],
-#                         "team_id": saleteam_id,
-#                         "user_id": saleman_id,
-#                         "crm_source_id": source_id,
-#                         "customer": partner_type == "customer",
-#                         "supplier": partner_type == "supplier",
-#                         "is_company": True
-#                     })
-#                 new_company_id = company.id
-#                 # company.company_type = "company"
-#             s = request.env["res.partner"].sudo().create({
-#                 "name": name,
-#                 "company_type": "person",
-#                 "parent_id": new_company_id,
-#                 "mobile": phone,
-#                 "customer": partner_type == "customer",
-#                 "supplier": partner_type == "supplier"
-#             })
-#             return
-#
-#     @http.route('/linkloving_oa_api/get_saleman_list/', auth='none', type='json')
-#     def get_saleman_list(self, **kwargs):
-#         sources = request.env["res.users"].sudo().search([])
-#         json_list = []
-#         for src in sources:
-#             json_list.append(
-#                     {"partner_id": src.id,
-#                      "name": src.name or ''})
-#         return json_list
-#
-#     @http.route('/linkloving_oa_api/get_saleteam_list/', auth='none', type='json')
-#     def get_saleteam_list(self, **kwargs):
-#         sources = request.env["crm.team"].sudo().search([])
-#         json_list = []
-#         for src in sources:
-#             json_list.append(
-#                     {"team_id": src.id,
-#                      "name": src.name or ''})
-#         return json_list
-#
-#     @http.route('/linkloving_oa_api/get_partner_tag_list/', auth='none', type='json')
-#     def get_partner_tag_list(self, **kwargs):
-#         sources = request.env["res.partner.category"].sudo().search([])
-#         json_list = []
-#         for src in sources:
-#             json_list.append(
-#                     {"category_id": src.id,
-#                      "name": src.name or ''})
-#         return json_list
-#
-#     @http.route('/linkloving_oa_api/get_origins/', auth='none', type='json')
-#     def get_origins(self, **kwargs):
-#         sources = request.env["crm.lead.source"].sudo().search([])
-#         json_list = []
-#         for src in sources:
-#             json_list.append(
-#                     {"src_id": src.id,
-#                      "name": src.name or ''})
-#         return json_list
+# -*- coding: utf-8 -*-
+import base64
+import json
+import logging
+from urllib2 import URLError
+
+import time
+
+import operator
+
+import datetime
+
+import jpush
+import pytz
+from pip import download
+
+import odoo
+import odoo.modules.registry
+
+from odoo import fields
+from odoo.osv import expression
+from odoo.tools import float_compare, SUPERUSER_ID, werkzeug, os, safe_eval
+from odoo.tools.translate import _
+from odoo import http
+from odoo.http import content_disposition, dispatch_rpc, request, \
+                      serialize_exception as _serialize_exception
+from odoo.exceptions import AccessError, UserError
+
+
+STATUS_CODE_OK = 1
+STATUS_CODE_ERROR = -1
+
+#返回的json 封装
+class JsonResponse(object):
+    @classmethod
+    def send_response(cls, res_code, res_msg='', res_data=None, jsonRequest=True):
+        data_dic = {'res_code': res_code,
+                    'res_msg': res_msg,}
+        if res_data:
+            data_dic['res_data'] = res_data
+        if jsonRequest:
+            return data_dic
+        return json.dumps(data_dic)
+
+class LinklovingOAApi(http.Controller):
+    # 获取供应商
+    @http.route('/linkloving_oa_api/get_supplier', type='json', auth="none", csrf=False, cors='*')
+    def get_supplier(self, **kw):
+        limit = request.jsonrequest.get("limit")
+        offset = request.jsonrequest.get("offset")
+        feedbacks = request.env['res.partner'].sudo().search([('supplier', '=', True)],
+                                                             limit=limit,
+                                                             offset=offset,
+                                                             order='id desc')
+
+        json_list = []
+        for feedback in feedbacks:
+            json_list.append(self.supplier_feedback_to_json(feedback))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    def supplier_feedback_to_json(self, feedback):
+        data = {
+            'internal_code': feedback.internal_code,
+            'city': feedback.city,
+            'company_name': feedback.commercial_company_name,
+            'email': feedback.email,
+            'phone': feedback.phone
+        }
+        return data
+
+    #获取采购订单
+    @http.route('/linkloving_oa_api/get_po', type='json', auth="none", csrf=False, cors='*')
+    def get_po(self, **kw):
+        limit = request.jsonrequest.get("limit")
+        offset = request.jsonrequest.get("offset")
+        state = request.jsonrequest.get("state")
+
+        #判断若传入了id则表示是要获取详细的orderlines
+        if(request.jsonrequest.get("id")):
+            po_detail_object = request.env['purchase.order'].sudo().browse(request.jsonrequest.get("id"))
+
+            po_order_detail = {}
+            po_order_detail['name'] = po_detail_object.name
+            po_order_detail['data_order'] = po_detail_object.date_order   #单据日期
+            po_order_detail['handle_date'] = po_detail_object.handle_date  #交期
+            po_order_detail['tax'] = {
+                'tax_id':po_detail_object.tax_id.name
+            }
+            po_order_detail['currency'] = {
+                'currency_name':po_detail_object.currency_id.name,
+            }  #币种
+            po_order_detail['amount_untaxed'] = po_detail_object.amount_untaxed  # 未含税金额
+            po_order_detail['amount_tax'] = po_detail_object.amount_tax  # 税金
+            po_order_detail['amount_total'] = po_detail_object.amount_total  # 总计
+            po_order_detail['product_count'] = po_detail_object.product_count  # 总数量
+            po_order_detail['notes'] = po_detail_object.notes
+            po_order_detail['order_lines'] = []
+            po_order_lines = po_detail_object.order_line
+            for order_line in po_order_lines:
+                po_order_detail['order_lines'].append(
+                    {'name': order_line.product_id.name_get()[0][1],
+                     'product_uom': order_line.product_uom.name,
+                     'specs': order_line.product_id.product_specs,
+                     'price_unit': order_line.price_unit,   #单价
+                     'product_qty': order_line.product_qty,   #数量
+                     'price_subtotal': order_line.price_subtotal,  #小计
+                     'qty_invoiced': order_line.qty_invoiced,  #开单数量
+                     'qty_received': order_line.qty_received,  #已接收数量
+                     'price_tax': order_line.taxes_id.name,    #税金
+                     }
+                )
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data=po_order_detail)
+
+
+        PO_orders = request.env['purchase.order'].sudo().search([('state','=',state)],
+                                                                limit=limit,
+                                                                offset=offset,
+                                                                order='id desc')
+        json_list = []
+        for po_order in PO_orders:
+            json_list.append(self.po_order_to_json(po_order))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    def po_order_to_json(self, po_order):
+        data = {
+            'id': po_order.id,
+            'name': po_order.name,
+            'creater': po_order.create_uid.name,
+            'supplier': po_order.partner_id.commercial_company_name,
+            'status_light': po_order.status_light,
+            'product_count': po_order.product_count, #总数量
+            'amount_total': po_order.amount_total  #总金额
+        }
+        return data
