@@ -13,7 +13,7 @@ class BomUpdateWizard(models.TransientModel):
     partner_id = fields.Many2one('res.partner', domain=[('customer', '=', True), ('is_company', '=', True)])
 
     @api.model
-    def bom_line_save(self, params, bom_id):
+    def bom_line_save(self, params, main_bom_id):
         line_obj = self.env['mrp.bom.line']
         bom_obj = self.env['mrp.bom']
         product_id_obj = self.env['product.product']
@@ -29,7 +29,7 @@ class BomUpdateWizard(models.TransientModel):
 
             to_update_bom_line_ids = parents
             line = int(to_update_bom_line_ids[0])
-            if line != bom_id:
+            if line != main_bom_id:
                 line_id = self.env['mrp.bom.line'].browse(int(line))
                 bom_id = line_id.product_id.product_tmpl_id.bom_ids[0]
             else:
@@ -65,7 +65,6 @@ class BomUpdateWizard(models.TransientModel):
                         'product_specs': product_specs
                     })
                     # 只是修改名名称和规格 继续下一个循环
-                    continue
 
                 currnet_bom_line_id = line_obj.browse(int(val.get('id')))
                 if product_id:

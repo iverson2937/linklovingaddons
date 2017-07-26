@@ -242,7 +242,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                     'default_product_specs': product_specs,
                     'pid': pId,
                     'default_name': default_name,
-                    'default_process_id': process_id,
+                    // 'default_process_id': process_id,
                     'default_product_type': product_type
                 },
                 target: "new"
