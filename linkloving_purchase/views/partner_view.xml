@@ -2,6 +2,13 @@
 <openerp>
     <data>
 
+        <template id="purchase_mo_questions" name="linkloving_purchase" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+
+                <script type="text/javascript" src="/linkloving_purchase/static/src/js/mo_ques.js"/>
+            </xpath>
+        </template>
+
 
         <record id="official_seal_company" model="ir.ui.view">
             <field name="name">res.company.sheet</field>
