@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+
+        <!-- Multi -->
+        <record model="ir.rule" id="mrp_production_rule">
+            <field name="name">mrp_process multi-company</field>
+            <field name="model_id" search="[('model','=','account.payment.register')]" model="ir.model"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|',('company_id','child_of',[user.company_id.id]),('company_id','=',False)]
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

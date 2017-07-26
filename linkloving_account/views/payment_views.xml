@@ -138,7 +138,7 @@
                             <field name="amount" readonly="1"
                                    required="0"/>
                             <field name="receive_date" required="1"
-                                   attrs="{'readonly': [('state', 'in', ['confirm','done'])]}"
+                                   attrs=""
                                    string="Payment Date"/>
 
                             <field name="account_id" string="Income Account" required="0"
