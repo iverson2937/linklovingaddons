@@ -250,7 +250,8 @@ class NewMrpProduction(models.Model):
 
 
             production._generate_finished_moves()
-            production._compute_done_stock_move_lines(production)
+            if production.is_multi_output:
+                production._compute_done_stock_move_lines(production)
             if production.bom_id:
                 factor = production.product_uom_id._compute_quantity(production.product_qty,
                                                                      production.bom_id.product_uom_id) / production.bom_id.product_qty
