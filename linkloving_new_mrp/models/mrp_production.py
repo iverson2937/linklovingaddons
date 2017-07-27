@@ -12,7 +12,7 @@ class NewMrpProduction(models.Model):
     is_multi_output = fields.Boolean(related='process_id.is_multi_output')
     rule_id = fields.Many2one('mrp.product.rule')
     stock_move_lines_finished = fields.One2many('stock.move.finished', 'production_id')
-    is_force_output = fields.Boolean(string=u'是否要求产出完整', default=True)
+    is_force_output = fields.Boolean(string=u'是否要求产出完整', default=False)
 
     product_id = fields.Many2one(
         'product.product', 'Product',
