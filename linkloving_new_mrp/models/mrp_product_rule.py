@@ -33,5 +33,6 @@ class MrpProductRuleLine(models.Model):
 
     @api.multi
     def write(self, vals):
-        if 'rule_id' in vals and not vals['rule_id']:
-            return super(MrpProductRuleLine, self).write(vals)
+        if 'rule_id' in vals:
+            vals.pop('rule_id')
+        return super(MrpProductRuleLine, self).write(vals)
