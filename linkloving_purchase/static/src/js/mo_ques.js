@@ -1,9 +1,6 @@
 /**
  * Created by 123 on 2017/7/26.
  */
-/**
- * Created by 123 on 2017/7/10.
- */
 odoo.define('linkloving_purchase.mo_ques', function (require) {
     "use strict";
 

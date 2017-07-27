@@ -108,6 +108,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
 
 
             if (!btn_update) {
+                $(".o_content").html("");
                 var action = {
                     name: "BOM",
                     type: 'ir.actions.act_window',

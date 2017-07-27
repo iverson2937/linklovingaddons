@@ -111,8 +111,10 @@ class LinklovingOAApi(http.Controller):
                 )
             return JsonResponse.send_response(STATUS_CODE_OK, res_data=po_order_detail)
 
-
-        PO_orders = request.env['purchase.order'].sudo().search([('state','=',state)],
+        domain = [('state', '=', state)]
+        if state == 'purchase':
+            domain = [('state', 'in', ('to approval','done','purchase'))]
+        PO_orders = request.env['purchase.order'].sudo().search(domain,
                                                                 limit=limit,
                                                                 offset=offset,
                                                                 order='id desc')
@@ -130,5 +132,29 @@ class LinklovingOAApi(http.Controller):
             'status_light': po_order.status_light,
             'product_count': po_order.product_count, #总数量
             'amount_total': po_order.amount_total  #总金额
+        }
+        return data
+
+    #采购退货
+    @http.route('/linkloving_oa_api/get_prma', type='json', auth="none", csrf=False, cors='*')
+    def get_prma(self, *kw):
+        limit = request.jsonrequest.get("limit")
+        offset = request.jsonrequest.get("offset")
+        prma_lists = request.env['return.goods'].sudo().search([],
+                                                    limit=limit,
+                                                    offset=offset,
+                                                    order='id desc')
+        json_list = []
+        for prma_list in prma_lists:
+            json_list.append(self.prma_list_to_json(prma_list))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    def prma_list_to_json(self,prma_list):
+        data = {
+            'id': prma_list.id,
+            'name': prma_list.name,
+            'date': prma_list.date,
+            'supplier': prma_list.partner_id.display_name,
+            'remark': prma_list.remark
         }
         return data
