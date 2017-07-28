@@ -2169,7 +2169,7 @@ class LinklovingAppApi(http.Controller):
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=order.bom_id.get_bom())
 
-    @http.route('/linkloving_app_api/change_stock_picking_state', type='json', auth='none', csrf=False)
+    @http.route('/linkloving_app_api/change_stock_picking_state', type='json', auth='none', csrf=False, cors='*')
     def change_stock_picking_state(self, **kw):
         state = request.jsonrequest.get('state')  # 状态
         picking_id = request.jsonrequest.get('picking_id')  # 订单id
