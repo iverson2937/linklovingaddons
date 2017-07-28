@@ -23,10 +23,11 @@ class ApprovalCenter(models.TransientModel):
             bom_ids = self.env[self.res_model].search(domain,
                                                       limit=limit, offset=offset, order='create_date desc')
         elif self.type == 'submitted':
-            bom_ids = self.env[self.res_model].search([('create_uid', '=', self.env.user.id),
-                                                       (
+            domain = [('create_uid', '=', self.env.user.id),
+                      (
                                                            'state', 'in',
-                                                           ['review_ing'])],
+                                                           ['review_ing'])]
+            bom_ids = self.env[self.res_model].search(domain,
                                                       limit=limit, offset=offset, order='create_date desc')
         elif self.type == 'waiting_approval':
             lines = self.env["review.process.line"].search([("state", '=', 'waiting_review'),
