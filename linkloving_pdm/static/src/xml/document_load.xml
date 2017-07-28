@@ -15,7 +15,7 @@
             <t t-set="i" t-value="1"/>
             <t t-foreach="result" t-as="item">
                 <li t-att-class="i ==1 ? 'active': ''">
-                    <a t-att-href="'#'+item.type" data-toggle="tab" class="tab_toggle_a" t-att-data="item.type" t-att-load_type="item.upload_type">
+                    <a t-att-href="'#'+item.type" data-toggle="tab" class="tab_toggle_a" t-att-data="item.type">
                          <t t-esc="item.name"/>
                     </a>
                 </li>
@@ -130,6 +130,7 @@
                     </form>
                     <iframe id="id_iframe" name="id_iframe" style="display:none;"></iframe>
                 </div>
+                <div class="load_remark">(仅支持上传单个文件；如有多个文件，请打包为zip文件)</div>
                  <div class="submit_file">
                     <!--<button class="btn btn-info submit_file_yes">上传</button>-->
                     <button class="btn btn-default submit_file_no">取消</button>
