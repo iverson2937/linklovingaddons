@@ -1340,6 +1340,7 @@
                 <form string="品检结果">
                     <sheet>
                         <group>
+                            <field name="qc_result" readonly="1" style="color:red;"/>
                             <field name="qc_note" readonly="1" string="品检批注"/>
                             <field name="qc_img" readonly="1" widget="image" string="品检图片"/>
                             <field name="post_area_id" readonly="1" string="库位"/>

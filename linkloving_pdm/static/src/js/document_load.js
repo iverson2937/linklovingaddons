@@ -60,7 +60,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                             },
                             error: function (error) {
                                 framework.unblockUI();
-                                Dialog.alert("上传失败");
+                                Dialog.alert("上传失败,请打开代理软件");
                                 console.log(error);
                             }
                         });
@@ -74,7 +74,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 },
                 error: function (error) {
                     framework.unblockUI();
-                    Dialog.alert(e.target, "上传失败");
+                    Dialog.alert(e.target, "上传失败,请打开代理软件");
                     console.log(error);
                 }
             });

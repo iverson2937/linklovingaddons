@@ -239,7 +239,7 @@ class LinklovingAppApi(http.Controller):
             domain.append(('create_uid', '=', partner_id))
 
         if request.jsonrequest.get('state'):
-            domain.append(('state','=',request.jsonrequest['state']))
+            domain.append(('state', '=', request.jsonrequest['state']))
             if request.jsonrequest.get('state') == 'progress':
                 domain.append(('feedback_on_rework', '=', None))
         if request.jsonrequest.get('process_id'):
@@ -2218,14 +2218,17 @@ class LinklovingAppApi(http.Controller):
             qc_img = request.jsonrequest.get('qc_img')
             picking_obj.qc_note = qc_note
             picking_obj.qc_img = qc_img
-            # if state == 'qc_ok':
+            if state == 'qc_ok':
+                picking_obj.qc_result = 'success'
+            elif state == 'qc_failed':
+                picking_obj.qc_result = 'fail'
             picking_obj.action_check_pass()
             # else:
             #     picking_obj.action_check_fail()
         elif state == 'reject':#退回
             picking_obj.reject()
-        elif state == 'process':#创建欠单
-            ####判断库存是否不够
+        elif state == 'process':  # 创建欠单
+            #### 判断库存是否不够
             if picking_obj.picking_type_code == "outgoing":
                 for pack in pack_list:
                     if pack.qty_done > pack.product_id.qty_available:
@@ -2367,6 +2370,7 @@ class LinklovingAppApi(http.Controller):
             'min_date': stock_picking_obj.min_date,
             'pack_operation_product_ids': pack_list,
             'qc_note': stock_picking_obj.qc_note,
+            'qc_result': stock_picking_obj.qc_result,
             'qc_img': LinklovingAppApi.get_stock_picking_img_url(stock_picking_obj.id, 'qc_img'),
             'post_img': LinklovingAppApi.get_stock_picking_img_url(stock_picking_obj.id, 'post_img'),
             'post_area_id':

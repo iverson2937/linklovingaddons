@@ -1528,7 +1528,9 @@ class StcokPickingExtend(models.Model):
     post_img = fields.Binary()
     post_area_id = fields.Many2one('stock.location.area')
     express_img = fields.Binary("物流图片")
-
+    qc_result = fields.Selection(string=u"品检结果", selection=[('no_result', u'为以前的品检单,无品检结果记录'),
+                                                            ('fail', u'品检失败'),
+                                                            ('success', u'品检通过'), ], default='no_result', )
 
 class StockPackOperationExtend(models.Model):
     _inherit = 'stock.pack.operation'
