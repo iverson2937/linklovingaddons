@@ -241,3 +241,12 @@ class linkloving_project_task(models.Model):
         search_domain += list(domain)
         # perform search, return the first found
         return self.env['project.task.type'].search(search_domain, order=order, limit=1).id
+
+    @api.onchange('project_id')
+    def _onchange_project(self):
+        if self.project_id:
+            if not self.partner_id:
+                self.partner_id = self.project_id.partner_id
+            self.stage_id = self.stage_find(self.project_id.id, [('fold', '=', False)])
+        else:
+            self.stage_id = False

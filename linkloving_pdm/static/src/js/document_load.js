@@ -60,7 +60,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                             },
                             error: function (error) {
                                 framework.unblockUI();
-                                Dialog.alert("上传失败");
+                                Dialog.alert("上传失败,请打开代理软件");
                                 console.log(error);
                             }
                         });
@@ -74,7 +74,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 },
                 error: function (error) {
                     framework.unblockUI();
-                    Dialog.alert(e.target, "上传失败");
+                    Dialog.alert(e.target, "上传失败,请打开代理软件");
                     console.log(error);
                 }
             });
@@ -207,11 +207,9 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
 
 
             $(".load_container").show();
-            var cur_type = $("#document_tab li.active>a").attr("data");
+            var cur_type = $("#document_tab li.active>a").attr("load_type");
             console.log(cur_type);
-            if (cur_type == 'sip' ||
-                cur_type == 'sop' ||
-                cur_type == 'ipqc') {
+            if (cur_type == 'sys') {
                 $("#my_load_file__a_1").hide();
                 $("#my_load_file_a").show();
             }

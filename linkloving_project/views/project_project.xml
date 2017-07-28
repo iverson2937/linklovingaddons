@@ -337,6 +337,7 @@
                         </h1>
                         <group>
                             <group>
+                                <field name="partner_id" invisible="1"/>
                                 <field name="project_id" domain="[('state','not in', ('close', 'cancelled'))]"
                                        context="{'default_use_tasks':1}"/>
                                 <field name="user_id"

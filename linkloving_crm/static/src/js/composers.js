@@ -357,7 +357,11 @@ odoo.define('mail.composers', function (require) {
                 "click .o_composer_button_send": "send_message",
                 "click .o_composer_button_add_attachment": "on_click_add_attachment",
                 "click .o_attachment_delete": "on_attachment_delete",
-                'click input': 'on_click_inputs',
+                'click input.o_chat_header_adc': 'on_click_inputs',
+                "click button[class='create_person_in_charge']": 'on_click_inputs_create',
+
+                "click span.delect_person_in_charge": 'on_click_inputs_delect',
+
             },
 
             init: function (parent, options) {
@@ -475,17 +479,79 @@ odoo.define('mail.composers', function (require) {
             },
 
 
+            on_click_inputs_delect: function (event) {
+                event.target.parentNode.remove()
+            },
+
+            on_click_inputs_create: function (event) {
+
+
+                var div_man = event.target.parentElement
+
+                var main_div = document.createElement("div");
+                main_div.className = 'row';
+                main_div.setAttribute("style", "margin-top:10px");
+
+
+                var div_person_in_charge = document.createElement("div");
+                div_person_in_charge.className = 'col-xs-3';
+
+                var div_person_in_charge_input = document.createElement("input");
+                div_person_in_charge_input.className = 'sale_person_in_charge';
+                div_person_in_charge_input.setAttribute("type", "text");
+                div_person_in_charge_input.setAttribute("placeholder", "责任人");
+                div_person_in_charge.appendChild(div_person_in_charge_input);
+
+
+                var div_person_proportion = document.createElement("div");
+                div_person_proportion.className = 'col-xs-2';
+
+                var div_person_proportion_input = document.createElement("input");
+                div_person_proportion_input.className = 'sale_person_in_charge_proportion';
+                div_person_proportion_input.setAttribute("type", "number");
+                div_person_proportion_input.setAttribute("placeholder", "占比%");
+                div_person_proportion.appendChild(div_person_proportion_input);
+
+
+                var div_body = document.createElement("div");
+                div_body.className = 'col-xs-1';
+                div_body.innerHTML = "%";
+
+                var div_body_aa = document.createElement("span");
+                div_body_aa.className = 'col-xs-1 delect_person_in_charge fa font-icons-icon fa-remove';
+
+                main_div.appendChild(div_person_in_charge);
+                main_div.appendChild(div_person_proportion);
+                main_div.appendChild(div_body);
+                main_div.appendChild(div_body_aa);
+
+                div_man.append(main_div);
+
+            },
+
+
             on_click_inputs: function (event) {
                 if (event.target.name == 'inspection') {
                     $(event.target).prev().prop("checked", false);
                     if ($.inArray('question', this.msg_checkbox) >= 0) {
                         this.msg_checkbox.splice($.inArray('question', this.msg_checkbox), 1);
                     }
+                    $('.row_sale_subject').hide()
+                    $('.row_create_person_in_charge').hide()
+                    $('.row_o_composer_text_field_project').hide()
+                    $('.row_o_composer_text_field_measure').hide()
+                    $('.row_sale_anticipated_loss').hide()
+
                 } else if (event.target.name == 'question') {
                     $(event.target).next().prop("checked", false);
                     if ($.inArray('inspection', this.msg_checkbox) >= 0) {
                         this.msg_checkbox.splice($.inArray('inspection', this.msg_checkbox), 1);
                     }
+                    $('.row_sale_subject').show()
+                    $('.row_create_person_in_charge').show()
+                    $('.row_o_composer_text_field_project').show()
+                    $('.row_o_composer_text_field_measure').show()
+                    $('.row_sale_anticipated_loss').show()
                 }
                 if ($(event.target).prop("checked")) {
                     this.msg_checkbox.splice(0, 0, event.target.name);
@@ -505,12 +571,32 @@ odoo.define('mail.composers', function (require) {
                 // prevent html space collapsing
                 value = value.replace(/ /g, '&nbsp;').replace(/([^>])&nbsp;([^<])/g, '$1 $2');
                 var commands = this.options.commands_enabled ? this.mention_manager.get_listener_selection('/') : [];
+
+                var person_in_charge_value = new Array();
+
+                for (var item = 0; item < this.$('.sale_person_in_charge').length; item++) {
+                    if (this.$('.sale_person_in_charge')[item].value) {
+                        var person_value = {
+                            'person_in_charge': this.$('.sale_person_in_charge')[item].value,
+                            'person_in_charge_proportion': this.$('.sale_person_in_charge_proportion')[item].value
+                        }
+                        person_in_charge_value.splice(0, 0, person_value)
+                    }
+                }
+
                 return $.when({
                     messages_label_ids: this.msg_checkbox,
                     content: this.mention_manager.generate_links(value),
                     attachment_ids: _.pluck(this.get('attachment_ids'), 'id'),
                     partner_ids: _.uniq(_.pluck(this.mention_manager.get_listener_selection('@'), 'id')),
                     command: commands.length > 0 ? commands[0].name : undefined,
+
+                    question_subject: this.$('.sale_subject').val() || "",
+                    solution: this.$('.o_composer_text_field_project').val() || "",
+                    measure: this.$('.o_composer_text_field_measure').val() || "",
+                    anticipated_loss: this.$('.sale_anticipated_loss').val() || "",
+                    person_in_charge_value: person_in_charge_value,
+
                 });
             }
             ,

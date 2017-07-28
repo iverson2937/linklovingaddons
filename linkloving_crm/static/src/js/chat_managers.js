@@ -124,6 +124,11 @@ odoo.define('mail.chat_managers', function (require) {
             id: data.id,
             author_id: data.author_id,
             body: data.body || "",
+
+            solution: data.solution || "",
+            measure: data.measure || "",
+            anticipated_loss: data.anticipated_loss || "",
+
             date: moment(time.str_to_datetime(data.date)),
             message_type: data.message_type,
             subtype_description: data.subtype_description,
@@ -696,6 +701,24 @@ odoo.define('mail.chat_managers', function (require) {
             if ('subject' in data) {
                 msg.subject = data.subject;
             }
+
+            if ('solution' in data) {
+                msg.solution = data.solution;
+            }
+            if ('measure' in data) {
+                msg.measure = data.measure;
+            }
+            if ('anticipated_loss' in data) {
+                msg.anticipated_loss = data.anticipated_loss;
+            }
+            if ('person_in_charge_value' in data) {
+                msg.person_in_charge_value = data.person_in_charge_value;
+            }
+            if ('question_subject' in data) {
+                msg.question_subject = data.question_subject;
+            }
+
+
             if ('channel_id' in options) {
                 // post a message in a channel or execute a command
                 return ChannelModel.call(data.command ? 'execute_command' : 'message_post', [options.channel_id], _.extend(msg, {

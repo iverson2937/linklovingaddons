@@ -10,12 +10,20 @@ from odoo import tools
 class CrmMailMessage(models.Model):
     _inherit = 'mail.message'
 
-    messages_label_ids = fields.Many2many('message.label', 'message_label_mail_message_type_rel', string='记录类型')
+    messages_label_ids = fields.Many2many('message.label', 'message_label_mail_message_type_rel', string=u'记录类型')
 
-    postil = fields.Text(string='批注')
-    sale_order_type = fields.Text(string='销售记录类型')
+    postil = fields.Text(string=u'批注')
+    # sale_order_type = fields.Text(string=u'销售记录类型')
 
-    compyter_body = fields.Text(string='内容', compute='get_message_body')
+    sale_order_type = fields.Selection([('question', u'问题记录'), ('inspection', u'验货报告')], string=u'销售记录类型')
+
+    compyter_body = fields.Text(string=u'内容', compute='get_message_body')
+
+    solution = fields.Text(string=u'解决方案')
+    measure = fields.Text(string=u'后续措施')
+    anticipated_loss = fields.Float(string=u'预计损失')
+
+    person_in_charge_ids = fields.One2many('order.person.in.charge', 'mail_message_person_id', string=u'责任人')
 
     def get_message_body(self):
         for message_body in self:
@@ -44,6 +52,7 @@ class CrmMailMessage(models.Model):
             'needaction_partner_ids',  # list of partner ids for whom the message is a needaction
             'starred_partner_ids',  # list of partner ids for whom the message is starred
             'messages_label_ids',
+            'solution', 'anticipated_loss', 'measure',
         ])
         message_tree = dict((m.id, m) for m in self.sudo())
         self._message_read_dict_postprocess(message_values, message_tree)
@@ -172,7 +181,7 @@ class CrmMailMessage(models.Model):
     @api.model
     def create(self, values):
 
-        if 'model' in values and values['model'] == "sale.order":
+        if values.get('model') == "sale.order":
             sale_order_data = self.env['sale.order'].search([('id', '=', values['res_id'])])
             if "messages_label_ids" in values and len(values['messages_label_ids']) > 0:
                 if "question" in values['messages_label_ids']:
@@ -181,8 +190,17 @@ class CrmMailMessage(models.Model):
                     sale_order_data.write({'inspection_report_count': (sale_order_data.inspection_report_count + 1)})
                 values['sale_order_type'] = values['messages_label_ids'][0]
 
-        if 'model' in values and values['model'] == "res.partner":
-            if 'messages_label_ids' in values:  # needed to compute reply_to
+            else:
+                values['sale_order_type'] = 'question'
+
+            if values.get('person_in_charge_value'):
+                values['person_in_charge_ids'] = [(0, 0, vals) for vals in values.get('person_in_charge_value')]
+
+            if values.get('question_subject'):
+                values['subject'] = values['question_subject']
+
+        if values.get('model') == "res.partner":
+            if values.get('messages_label_ids'):  # needed to compute reply_to
                 msg_label_ids = []
                 for item in values['messages_label_ids']:
                     msg_label_ids.append(int(item))
@@ -198,7 +216,7 @@ class CrmMailMessage(models.Model):
             sale_order_data_item = self.env['sale.order'].search([('id', '=', mail_data['res_id'])])
             if mail_data['sale_order_type'] and "question" in mail_data['sale_order_type']:
                 sale_order_data_item.write({'question_record_count': (sale_order_data_item.question_record_count - 1)})
-            if  mail_data['sale_order_type'] and "inspection" in mail_data['sale_order_type']:
+            if mail_data['sale_order_type'] and "inspection" in mail_data['sale_order_type']:
                 sale_order_data_item.write(
                     {'inspection_report_count': (sale_order_data_item.inspection_report_count - 1)})
 
@@ -209,6 +227,14 @@ class CrmMessageLabelStatus(models.Model):
     _name = 'message.order.status'
     name = fields.Char(string=u'订单状态')
     description = fields.Text(string=u'描述')
+
+
+class CrmPersonInCharge(models.Model):
+    _name = 'order.person.in.charge'
+    person_in_charge = fields.Char(string=u'责任人')
+    person_in_charge_proportion = fields.Float(string=u'占比%')
+
+    mail_message_person_id = fields.Many2one('mail.message', string=u'销售订单')
 
 
 def filter_tags(htmlstr):
