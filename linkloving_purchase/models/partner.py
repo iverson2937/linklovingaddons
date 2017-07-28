@@ -11,18 +11,9 @@ class Partner(models.Model):
     payment_count = fields.Integer(compute='_compute_payment_count', string='# Payment')
     payment_ids = fields.One2many('account.payment.register', 'partner_id')
 
-    order_partner_question_count = fields.Integer(compute='_compute_order_partner_question', string=u'客户问题汇总')
-
     def _compute_payment_count(self):
         for partner in self:
             partner.payment_count = len(partner.payment_ids)
-
-    def _compute_order_partner_question(self):
-        for partner in self:
-            count = 0
-            for sale_order in partner.sale_order_ids:
-                count += len(sale_order.message_ids)
-            partner.order_partner_question_count = len(partner.message_ids) + count
 
     @api.multi
     def action_view_question_order(self):

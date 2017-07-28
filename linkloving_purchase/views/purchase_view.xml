@@ -153,16 +153,6 @@
                 <!--<attribute name="string">行事历</attribute>-->
                 <!--</xpath>-->
 
-                <xpath expr="//div[@name='button_box']" position="inside">
-                    <button type="object"
-                            name="action_view_question_order"
-                            context="{'sale_type': 'question'}"
-                            class="oe_stat_button"
-                            icon="fa-commenting-o">
-                        <field name="order_partner_question_count" widget="statinfo" string="问题概览"/>
-                    </button>
-                </xpath>
-
             </field>
         </record>
 

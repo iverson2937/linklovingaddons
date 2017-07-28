@@ -60,6 +60,15 @@ class ResPartner(models.Model):
                               default=lambda self: self.env['crm.team'].sudo()._get_default_team_id(
                                   user_id=self.env.uid))
 
+    order_partner_question_count = fields.Integer(compute='_compute_order_partner_question', string=u'客户问题汇总')
+
+    def _compute_order_partner_question(self):
+        for partner in self:
+            count = 0
+            for sale_order in partner.sale_order_ids:
+                count += len(sale_order.message_ids)
+            partner.order_partner_question_count = len(partner.message_ids) + count
+
     @api.multi
     def _compute_is_order(self):
         for line in self:
