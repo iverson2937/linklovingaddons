@@ -12,12 +12,13 @@ class AccountEmployeePayment(models.Model):
 
     remark_comments_ids = fields.One2many('hr.remark.comment', 'employee_payment_id', string=u'审核记录')
 
-    @api.multi
-    def set_account_date(self):
-        sheet_ids = self.env['account.employee.payment'].search(
-            [('state', '=', 'paid')])
-        for sheet in sheet_ids:
-            sheet.accounting_date = sheet.create_date
+    #
+    # @api.multi
+    # def set_account_date(self):
+    #     sheet_ids = self.env['account.employee.payment'].search(
+    #         [('state', '=', 'paid')])
+    #     for sheet in sheet_ids:
+    #         sheet.accounting_date = sheet.create_date
 
     def _get_account_date(self):
         for p in self:

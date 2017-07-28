@@ -8,8 +8,12 @@
             <field name="priority" eval="100"/>
             <field name="arch" type="xml">
                 <form string="产出">
-                    <field name="input_product_ids"  invisible="1"/>
-                    <field name="output_product_ids" options="{'reload_on_button': True}">
+                    <field name="input_product_ids" invisible="1">
+                        <tree>
+                            <field name="product_id"/>
+                        </tree>
+                    </field>
+                    <field name="output_product_ids">
                         <tree editable="bottom">
                             <field name="product_id" readonly="1" options="{'no_create': True}"/>
                             <!--<field name="total_produce_qty"/>-->
@@ -19,6 +23,7 @@
 
                     <footer>
                         <button name="confirm_output" string="确认"
+                                context="{'no_update':True}"
                                 colspan="1" type="object" class="btn-primary"/>
                         <button string="取消" class="btn-default" special="cancel"/>
                     </footer>
@@ -89,7 +94,7 @@
                             <field name="production_state" readonly="1" invisible="1" autofocus="autofocus"/>
                             <field name="product_id" readonly="1" options="{'no_create': True}"/>
                             <field name="qty_available" string="库存"/>
-                            <field name="virtual_available" string="预测数量" invisible="1"/>
+                            <field name="virtual_available" string="预测数量" invisible=""/>
                             <field name="suggest_qty" readonly="1" string="建议数量" invisible="1"/>
                             <field name="quantity_available" string="系统可用" invisible="1"/>
                             <field name="product_uom_qty" string="实际需求物料数量" invisible="1"/>
@@ -162,7 +167,8 @@
 
                 <xpath expr="//field[@name='bom_id']" position="attributes">
                     <attribute name="required">0</attribute>
-                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)],'readonly':[('state','not in',['draft','confirmed'])]}
+                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)],
+                        'readonly':[('state','not in',['draft','confirmed'])]}
                     </attribute>
                 </xpath>
 
@@ -219,9 +225,9 @@
                                 <field name="product_id" string="产品" options="{'no_create':True}"/>
                                 <field name="qty_available" string="库存"/>
                                 <field name="virtual_available" string="预测数量"/>
-                                <field name="suggest_qty" string="建议数量" invisible="1"/>
-                                <field name="quantity_available" string="系统可用" invisible="1"/>
-                                <field name="product_uom_qty" string="需求数量" invisible="1"/>
+                                <field name="suggest_qty" string="建议数量" invisible="0"/>
+                                <field name="quantity_available" string="系统可用" invisible="0"/>
+                                <field name="product_uom_qty" string="需求数量" invisible="0"/>
                                 <field name="quantity_done" string="备料数量"/>
                                 <field name="return_qty" readonly="1" string="退料数量"/>
                             </tree>

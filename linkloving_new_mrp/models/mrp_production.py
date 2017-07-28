@@ -12,7 +12,7 @@ class NewMrpProduction(models.Model):
     is_multi_output = fields.Boolean(related='process_id.is_multi_output')
     rule_id = fields.Many2one('mrp.product.rule')
     stock_move_lines_finished = fields.One2many('stock.move.finished', 'production_id')
-    is_force_output = fields.Boolean(string=u'是否要求产出完整', default=True)
+    is_force_output = fields.Boolean(string=u'是否要求产出完整', default=False)
 
     product_id = fields.Many2one(
         'product.product', 'Product',
@@ -245,10 +245,13 @@ class NewMrpProduction(models.Model):
 
     @api.multi
     def _generate_moves(self):
+        print 'AAAAAAAAAAAAAAAAAAAAAAAAA'
         for production in self:
 
-            production._compute_done_stock_move_lines(production)
+
             production._generate_finished_moves()
+            if production.is_multi_output:
+                production._compute_done_stock_move_lines(production)
             if production.bom_id:
                 factor = production.product_uom_id._compute_quantity(production.product_qty,
                                                                      production.bom_id.product_uom_id) / production.bom_id.product_qty

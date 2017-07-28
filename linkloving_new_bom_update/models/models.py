@@ -14,13 +14,6 @@ class MrpBom(models.Model):
                                 track_visibility='always',
                                 readonly=True, copy=False)
 
-    # @api.multi
-    # def write(self, vals):
-    #     vals.update({
-    #         'state': 'updated'
-    #     })
-    #     return super(MrpBom, self).write(vals)
-
     @api.multi
     def bom_detail_new(self):
 

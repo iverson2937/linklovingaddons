@@ -2087,7 +2087,7 @@ class LinklovingAppApi(http.Controller):
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
 
     #获取stock.PICKING列表
-    @http.route('/linkloving_app_api/get_stock_picking_list', type='json', auth='none', csrf=False)
+    @http.route('/linkloving_app_api/get_stock_picking_list', type='json', auth='none', csrf=False, cors='*')
     def get_stock_picking_list(self, **kw):
         limit = request.jsonrequest.get('limit')
         offset = request.jsonrequest.get('offset')

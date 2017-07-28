@@ -27,6 +27,7 @@
     'data': [
         'security/ir.model.access.csv',
         'security/other_income_seq.xml',
+        'security/rules.xml',
         'views/payment_views.xml',
         'views/account_payment.xml',
         'views/account_invoice_views.xml',

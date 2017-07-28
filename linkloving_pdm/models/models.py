@@ -110,8 +110,7 @@ class ReviewProcessLine(models.Model):
 
         if not partner_id:
             raise UserError(u"请选择审核人!")
-        if not self.env["final.review.partner"].get_final_review_partner_id():
-            raise UserError(u'请联系管理员,设置终审人!')
+
 
         if to_last_review:
             if not self.env['final.review.partner'].search([('final_review_partner_id', '=', partner_id.id),
@@ -120,7 +119,7 @@ class ReviewProcessLine(models.Model):
 
         is_last_review = False
         if to_last_review \
-                or partner_id.id == self.env["final.review.partner"].get_final_review_partner_id().id:
+                or partner_id.id == self.env["final.review.partner"].get_final_review_partner_id(review_type).id:
             is_last_review = True
 
         # 设置现有的这个审核条目状态等
@@ -141,7 +140,9 @@ class ReviewProcessLine(models.Model):
 
     # 审核通过
     def action_pass(self, remark):
-        if self.env["final.review.partner"].get_final_review_partner_id().id == self.env.user.partner_id.id:
+        review_type = self._context.get('review_type')
+
+        if self.env["final.review.partner"].get_final_review_partner_id(review_type).id == self.env.user.partner_id.id:
             self.write({
                 'review_time': fields.datetime.now(),
                 'state': 'review_success',
@@ -595,6 +596,7 @@ class ReviewProcessWizard(models.TransientModel):
         elif review_type == 'file_review':
             self.product_attachment_info_id.action_released()
         # 审核通过
+
             self.review_process_line.action_pass(self.remark)
         return True
 
@@ -641,8 +643,8 @@ class FinalReviewPartner(models.Model):
          '每个类型的终审人只能有一个')
     }
 
-    def get_final_review_partner_id(self):
-        final = self.env["final.review.partner"].search([], limit=1)
+    def get_final_review_partner_id(self, review_type):
+        final = self.env["final.review.partner"].search([('review_type', '=', review_type)], limit=1)
         if final:
             return final[0].final_review_partner_id
         else:
