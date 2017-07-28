@@ -178,6 +178,8 @@ odoo.define('linkloving_approval.approval_core', function (require) {
         approval_change_tabs: function (e) {
             var self = this;
             var e = e || window.event;
+            self.flag = 1;
+            self.begin=1;
             var target = e.target || e.srcElement;
             var approval_type = $(target).attr("data");
             // console.log(approval_type);
@@ -190,7 +192,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
         init: function (parent, action) {
             var self = this;
             self.flag = 1;
-            self.begin = 0;
+            self.begin = 1;
             self.limit = 15;
             this.approval_type = null;
             this._super.apply(this, arguments);
@@ -204,8 +206,11 @@ odoo.define('linkloving_approval.approval_core', function (require) {
         },
         render_pager: function () {
             if (this.flag == 1) {
+                if($(".approval_pagination")){
+                    $(".approval_pagination").remove()
+                }
                 var $node = $('<div/>').addClass('approval_pagination').appendTo($("#approval_tab"));
-                if (!this.pager) {
+                // if (!this.pager) {
                     this.pager = new Pager(this, this.length, this.begin, this.limit);
                     this.pager.appendTo($node);
 
@@ -224,7 +229,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                             // }
                         });
                     });
-                }
+                // }
                 this.flag = 2;
             }
         },
@@ -245,7 +250,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             var model = new Model("approval.center");
             model.call("create", [{res_model: res_model, type: approval_type}])
                 .then(function (result) {
-                    model.call('get_attachment_info_by_type', [result], {offset: own.begin, limit: own.limit})
+                    model.call('get_attachment_info_by_type', [result], {offset: own.begin-1, limit: own.limit})
                         .then(function (result) {
                             console.log(result);
                             own.length = result.length;
