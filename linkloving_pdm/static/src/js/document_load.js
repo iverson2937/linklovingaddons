@@ -207,11 +207,9 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
 
 
             $(".load_container").show();
-            var cur_type = $("#document_tab li.active>a").attr("data");
+            var cur_type = $("#document_tab li.active>a").attr("load_type");
             console.log(cur_type);
-            if (cur_type == 'sip' ||
-                cur_type == 'sop' ||
-                cur_type == 'ipqc') {
+            if (cur_type == 'sys') {
                 $("#my_load_file__a_1").hide();
                 $("#my_load_file_a").show();
             }

@@ -52,7 +52,6 @@ class LinklovingOAApi(http.Controller):
                                                              limit=limit,
                                                              offset=offset,
                                                              order='id desc')
-
         json_list = []
         for feedback in feedbacks:
             json_list.append(self.supplier_feedback_to_json(feedback))
@@ -64,7 +63,8 @@ class LinklovingOAApi(http.Controller):
             'city': feedback.city,
             'company_name': feedback.commercial_company_name,
             'email': feedback.email,
-            'phone': feedback.phone
+            'phone': feedback.phone,
+            'id': feedback.id
         }
         return data
 
