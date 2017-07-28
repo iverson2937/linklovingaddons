@@ -140,6 +140,8 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var approval_type = $(target).attr("data");
+            self.flag = 1;
+            self.begin=1;
             // console.log(approval_type);
             self.$("#approval_tab").attr("data-now-tab", approval_type);
 
@@ -150,8 +152,8 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
         init: function (parent, action) {
             var self = this;
             self.flag = 1;
-            self.begin = 0;
-            self.limit = 15;
+            self.begin = 1;
+            self.limit = 5;
             this.approval_type = null;
             this._super.apply(this, arguments);
             if (action.product_id) {
@@ -163,9 +165,13 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
             this.pager = null;
         },
         render_pager: function () {
+            console.log(this.length, this.begin, this.limit);
             if (this.flag == 1) {
+                if($(".approval_pagination")){
+                    $(".approval_pagination").remove()
+                }
                 var $node = $('<div/>').addClass('approval_pagination').appendTo($("#approval_tab"));
-                if (!this.pager) {
+                // if (!this.pager) {
                     this.pager = new Pager(this, this.length, this.begin, this.limit);
                     this.pager.appendTo($node);
 
@@ -185,7 +191,7 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
                             // }
                         });
                     });
-                }
+                // }
                 this.flag = 2
             }
         },
@@ -205,17 +211,18 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
             var model = new Model("approval.center");
             model.call("create", [{res_model: res_model, type: approval_type}])
                 .then(function (result) {
-                    console.log(result);
-                    model.call('get_bom_info_by_type', [result], {offset: own.begin, limit: own.limit})
+                    console.log(result,own.begin,own.limit);
+                    model.call('get_bom_info_by_type', [result], {offset: own.begin-1, limit: own.limit})
                         .then(function (result) {
                             console.log(result);
                             own.length = result.length;
+                            console.log(own.length,result.length)
                             self.$("#" + approval_type).html("");
                             self.$("#" + approval_type).append(QWeb.render('bom_approval_tab_content', {
                                 result: result.bom_list,
                                 approval_type: approval_type
                             }));
-                            own.render_pager(this);
+                            own.render_pager();
                         })
                 })
         },
