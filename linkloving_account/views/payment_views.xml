@@ -3,7 +3,6 @@
     <data>
 
 
-
         <!--收款登记form-->
         <record id="account_receive_register_form" model="ir.ui.view">
             <field name="name">account.receive.register.form</field>
@@ -129,11 +128,13 @@
                         </h1>
                         <group>
                             <field name="partner_id" string="Supplier"
+                                   options="{'no_create':True}"
                                    attrs="{'required': [('state', '=', 'posted')],'readonly': [('state', 'in', ['confirm','done'])]}"
                                    domain="[('supplier', '=', True),('is_company', '=', True)]"/>
                             <field name="bank_id"
                                    attrs="{'readonly':[('state','!=','draft')],'readonly': [('state', 'in', ['confirm','done'])]}"
-                                   context="{'default_partner_id':partner_id}">
+                                   context="{'default_partner_id':partner_id}" options="{'no_create':True}"
+                                   string="银行账户">
                             </field>
                             <field name="amount" readonly="1"
                                    required="0"/>
