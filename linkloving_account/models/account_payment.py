@@ -33,7 +33,8 @@ class AccountPaymentRegister(models.Model):
     balance_ids = fields.One2many('account.payment.register.balance', 'payment_id')
     amount = fields.Float(string=u'Amount', compute='get_amount', store=True)
     company_id = fields.Many2one('res.company', 'Company',
-                                 default=lambda self: self.env['res.company']._company_default_get('account.payment.register'))
+                                 default=lambda self: self.env['res.company']._company_default_get(
+                                     'account.payment.register'))
 
     @api.model
     @api.returns('self', lambda value: value.id)
@@ -179,12 +180,28 @@ class AccountPayment(models.Model):
     # origin = fields.Char(string=u'源单据')
     @api.multi
     def set_to_cancel(self):
+        payment_ids = self.env['account.payment'].search([('payment_type', '=', 'inbound')])
+        ids = []
+        for payment in payment_ids:
 
-        # FIXME: 怎么样的可以取消
-        if self.move_line_ids and len(self.move_line_ids) == 2 and self.payment_type != 'transfer':
-            raise UserError('不可以取消,请联系系统管理员')
-        else:
-            self.state = 'cancel'
+            if payment.partner_id:
+                ids.append(payment.id)
+                print payment.partner_id.name
+                for move in self.move_line_ids:
+                    if not move.partner_id:
+                        move.partner_id = payment.partner_id.id
+                        print move.partner_id.name
+        print ids
+
+
+
+
+
+        # # FIXME: 怎么样的可以取消
+        # if self.move_line_ids and len(self.move_line_ids) == 2 and self.payment_type != 'transfer':
+        #     raise UserError('不可以取消,请联系系统管理员')
+        # else:
+        #     self.state = 'cancel'
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
@@ -198,7 +215,6 @@ class AccountPayment(models.Model):
                     raise UserError(u'不可修改已过账的分录')
                 if move.account_id != self.journal_id.default_credit_account_id:
                     move.account_id = self.product_id.property_account_income_id.id
-                    print move.account_id, 'sssssssssss'
 
     def set_to_done(self):
         if self.partner_type == 'customer' and not self.partner_id:
@@ -289,7 +305,7 @@ class AccountPayment(models.Model):
             for balance in rec.invoice_ids.balance_ids:
                 balance.state = 1
             state = 'posted'
-            if self._context.get('to_sales') and self.partner_type == 'customer':
+            if self.partner_type == 'customer' and self.payment_type == 'inbound':
                 state = 'confirm'
             rec.write({'state': state, 'move_name': move.name})
 
@@ -304,8 +320,8 @@ class AccountPayment(models.Model):
     def _get_counterpart_move_line_vals(self, invoice=False):
         if self.payment_type == 'transfer':
             name = self.name
-        elif self.payment_type=='other':
-            name=u'其他收入'
+        elif self.payment_type == 'other':
+            name = u'其他收入'
         else:
             name = ''
             if self.partner_type == 'customer':
