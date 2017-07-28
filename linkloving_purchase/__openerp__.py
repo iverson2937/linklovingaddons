@@ -38,6 +38,6 @@
     # only loaded in demonstration mode
     'demo': [
         'demo.xml',
-
     ],
+    'qweb': ['static/src/xml/*.xml'],
 }

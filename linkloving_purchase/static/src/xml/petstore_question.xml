@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+    <t t-name="HomePageQuestion">
+        <div class="panel-group" id="accordion">
+
+        </div>
+    </t>
+
+
+
+    <t t-name="show_bom_line_tr_ggg">
+
+       <div class="panel-body">
+
+
+           <t t-foreach="sale_partner_msg" t-as="item">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" class="click_tag_a" data-level="true"
+                           t-att-href="'#'+item.id">
+                           <span class="fa fa-caret-down open-sign"></span>
+                        <t t-esc="item.so_name"/>
+                        </a>
+                        数量<t t-esc="item.num"/>
+
+                    </h4>
+                </div>
+
+                <div t-att-id="item.id" class="panel-collapse collapse">
+                    <div class="panel-body">
+
+                        <t t-foreach="item.so_partner" t-as="meg_item">
+
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+
+                                        <span class="show_msg_number" t-att-data-id="meg_item.id" style="cursor: pointer;"><t t-esc="meg_item.msg_data"/></span>
+
+                                    </h4>
+                                </div>
+                            </div>
+                        </t>
+
+                    </div>
+                </div>
+
+
+           </t>
+        </div>
+
+    </t>
+
+</templates>

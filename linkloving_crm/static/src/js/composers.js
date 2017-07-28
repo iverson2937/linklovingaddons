@@ -509,7 +509,7 @@ odoo.define('mail.composers', function (require) {
                 var div_person_proportion_input = document.createElement("input");
                 div_person_proportion_input.className = 'sale_person_in_charge_proportion';
                 div_person_proportion_input.setAttribute("type", "number");
-                div_person_proportion_input.setAttribute("placeholder", "占比");
+                div_person_proportion_input.setAttribute("placeholder", "占比%");
                 div_person_proportion.appendChild(div_person_proportion_input);
 
 

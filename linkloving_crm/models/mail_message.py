@@ -13,7 +13,9 @@ class CrmMailMessage(models.Model):
     messages_label_ids = fields.Many2many('message.label', 'message_label_mail_message_type_rel', string=u'记录类型')
 
     postil = fields.Text(string=u'批注')
-    sale_order_type = fields.Text(string=u'销售记录类型')
+    # sale_order_type = fields.Text(string=u'销售记录类型')
+
+    sale_order_type = fields.Selection([('question', u'问题记录'), ('inspection', u'验货报告')], string=u'销售记录类型')
 
     compyter_body = fields.Text(string=u'内容', compute='get_message_body')
 
@@ -188,7 +190,11 @@ class CrmMailMessage(models.Model):
                     sale_order_data.write({'inspection_report_count': (sale_order_data.inspection_report_count + 1)})
                 values['sale_order_type'] = values['messages_label_ids'][0]
 
-            values['person_in_charge_ids'] = [(0, 0, vals) for vals in values.get('person_in_charge_value')]
+            else:
+                values['sale_order_type'] = 'question'
+
+            if values.get('person_in_charge_value'):
+                values['person_in_charge_ids'] = [(0, 0, vals) for vals in values.get('person_in_charge_value')]
 
             if values.get('question_subject'):
                 values['subject'] = values['question_subject']
@@ -226,7 +232,7 @@ class CrmMessageLabelStatus(models.Model):
 class CrmPersonInCharge(models.Model):
     _name = 'order.person.in.charge'
     person_in_charge = fields.Char(string=u'责任人')
-    person_in_charge_proportion = fields.Float(string=u'占比')
+    person_in_charge_proportion = fields.Float(string=u'占比%')
 
     mail_message_person_id = fields.Many2one('mail.message', string=u'销售订单')
 
