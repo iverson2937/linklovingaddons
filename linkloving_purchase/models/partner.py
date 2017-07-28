@@ -41,8 +41,9 @@ class Partner(models.Model):
 
             order_question_msg[i] = {'id': sale_data.id, 'so_name': sale_data.name, 'num': len(sale_data.message_ids),
                                      'so_partner': [{'id': so_order.id,
-                                                     'msg_data': so_order.subject if so_order.subject else so_order.record_name + u'(通知)'}
-                                                    for so_order in sale_data.message_ids]}
+                                                     'msg_data': so_order.subject if so_order.subject else so_order.record_name + (
+                                                     u' ' if so_order.sale_order_type == 'inspection' else u' (通知)')} for
+                                                    so_order in sale_data.message_ids]}
             i += 1
 
         return {
