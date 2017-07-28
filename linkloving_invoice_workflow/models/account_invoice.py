@@ -99,9 +99,10 @@ class AccountInvoice(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
-    price_unit_o = fields.Float(digits=dp.get_precision('Price Deduct'), string=u'原始单价')
+    price_unit_o = fields.Float(digits=dp.get_precision('Product Price'), string=u'原始单价')
     price_subtotal_o = fields.Monetary(string='Amount',
                                        store=True, readonly=True, compute='_compute_price')
+    price_unit = fields.Float(digits=dp.get_precision('Price Deduct'), string=u'单价')
 
     # 添加原始总价在invoice_line
     @api.one
