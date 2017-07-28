@@ -50,10 +50,8 @@ class ApprovalCenter(models.TransientModel):
         bom_list = []
         for bom in bom_ids:
             bom_list.append(bom.convert_bom_info())
-        if limit and len(bom_ids) == limit:
-            length = self.env[self.res_model].search_count(domain)
-        else:
-            length = len(bom_ids) + (offset or 0)
+        length = self.env[self.res_model].search_count(domain)
+
         return {'bom_list': bom_list, 'length': length}
 
     def get_attachment_info_by_type(self, offset, limit):
