@@ -234,3 +234,8 @@
     display: block;
     margin-top: 10px;
 }
+.load_remark{
+    color: red;
+    margin-left: 60px;
+    position: absolute;
+}
