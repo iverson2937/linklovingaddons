@@ -180,24 +180,28 @@ class AccountPayment(models.Model):
     # origin = fields.Char(string=u'源单据')
     @api.multi
     def set_to_cancel(self):
-        payment_ids = self.env['account.payment'].search([('payment_type', '=', 'inbound')])
-        ids = []
-        for payment in payment_ids:
-            if payment.partner_id:
-                for move in payment.move_line_ids:
-                    if not move.partner_id:
-                        ids.append(payment.id)
-                        move.partner_id = payment.partner_id.id
+        account_invoices = self.env['account.invoice'].search([('type', '=', 'in_invoice')])
+        print len(account_invoices)
+        for invoice in account_invoices:
+            invoice.journal_id = 2
+            # payment_ids = self.env['account.payment'].search([('payment_type', '=', 'inbound')])
+            # ids = []
+            # for payment in payment_ids:
+            #     if payment.partner_id:
+            #         for move in payment.move_line_ids:
+            #             if not move.partner_id:
+            #                 ids.append(payment.id)
+            #                 move.partner_id = payment.partner_id.id
 
 
 
 
 
-        # # FIXME: 怎么样的可以取消
-        # if self.move_line_ids and len(self.move_line_ids) == 2 and self.payment_type != 'transfer':
-        #     raise UserError('不可以取消,请联系系统管理员')
-        # else:
-        #     self.state = 'cancel'
+            # # FIXME: 怎么样的可以取消
+            # if self.move_line_ids and len(self.move_line_ids) == 2 and self.payment_type != 'transfer':
+            #     raise UserError('不可以取消,请联系系统管理员')
+            # else:
+            #     self.state = 'cancel'
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
