@@ -183,15 +183,11 @@ class AccountPayment(models.Model):
         payment_ids = self.env['account.payment'].search([('payment_type', '=', 'inbound')])
         ids = []
         for payment in payment_ids:
-
             if payment.partner_id:
-                ids.append(payment.id)
-                print payment.partner_id.name
-                for move in self.move_line_ids:
+                for move in payment.move_line_ids:
                     if not move.partner_id:
+                        ids.append(payment.id)
                         move.partner_id = payment.partner_id.id
-                        print move.partner_id.name
-        print ids
 
 
 
