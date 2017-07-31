@@ -15,7 +15,7 @@
             <t t-set="i" t-value="1"/>
             <t t-foreach="result" t-as="item">
                 <li t-att-class="i ==1 ? 'active': ''">
-                    <a t-att-href="'#'+item.type" data-toggle="tab" class="tab_toggle_a" t-att-data="item.type">
+                    <a t-att-href="'#'+item.type" data-toggle="tab" class="tab_toggle_a" t-att-data="item.type" t-att-load_type="item.upload_type">
                          <t t-esc="item.name"/>
                     </a>
                 </li>
@@ -37,7 +37,7 @@
                                     <div>文件：<span><t t-esc="item_files.file_name"/></span></div>
                                     <!--<div>审核人：<span><t t-esc="item_files.review_id"/></span></div>-->
                                     <t t-if="item_files.remote_path!=''">
-                                        <div>远程地址：<span id="remote_path"><t t-esc="item_files.remote_path"/></span></div>
+                                        <div>远程地址：<span class="remote_path"><t t-esc="item_files.remote_path"/></span></div>
                                     </t>
                                     <div>版本：<span><t t-esc="item_files.version"/></span></div>
                                     <div>状态：<span><t t-esc="item_files.state[1]"/></span>
