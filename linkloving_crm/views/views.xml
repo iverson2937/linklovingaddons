@@ -319,7 +319,6 @@
         </record>
 
 
-        <!--Receipt*-->
         <menuitem action="crm_sale_action_partner_form"
                   id="menu_message_order_status_id"
                   parent="sales_team.menu_sales"
@@ -327,7 +326,14 @@
                   sequence="1" name="潜在客户"/>
 
 
-        <!--Receipt*-->
+        <!--&lt;!&ndash;Receipt*&ndash;&gt;-->
+        <!--<menuitem action="crm_sale_action_partner_form"-->
+                  <!--id="menu_mutual_customer_id"-->
+                  <!--parent="sales_team.menu_sales"-->
+                  <!--groups=""-->
+                  <!--sequence="2" name="公海客户"/>-->
+
+
         <menuitem action="action_message_order_status"
                   id="menu_message_order_status"
                   parent="sales_team.menu_sales"
@@ -346,7 +352,7 @@
                             <group>
                                 <field name="subject"/>
                                 <field name="solution"
-                                       attrs="{'invisible': [('sale_order_type','not in',('inspection','question'))]}"/>
+                                       attrs="{'invisible': [('sale_order_type','not in',('inspection','question','partner_question'))]}"/>
                                 <field name="sale_order_type" invisible="1"/>
                                 <field name="attachment_ids" attrs="{'invisible': [('attachment_ids','=',[])]}">
                                     <tree create="0">
@@ -361,12 +367,12 @@
                             <group>
                                 <field name="messages_label_ids" string="记录类型" widget="many2many_checkboxes"
                                        options="{'no_create': True}"
-                                       attrs="{'invisible': [('sale_order_type','in',('inspection','question'))]}"/>
+                                       attrs="{'invisible': [('sale_order_type','in',('inspection','question','partner_question'))]}"/>
 
                                 <field name="measure"
-                                       attrs="{'invisible': [('sale_order_type','not in',('inspection','question'))]}"/>
+                                       attrs="{'invisible': [('sale_order_type','not in',('inspection','question','partner_question'))]}"/>
                                 <field name="anticipated_loss"
-                                       attrs="{'invisible': [('sale_order_type','not in',('inspection','question'))]}"/>
+                                       attrs="{'invisible': [('sale_order_type','not in',('inspection','question','partner_question'))]}"/>
 
                                 <field name="parent_id" invisible="1"/>
                                 <field name="model" invisible="1"/>
@@ -381,7 +387,7 @@
                             </page>
 
                             <page string="责任人"
-                                  attrs="{'invisible': [('sale_order_type','not in',('inspection','question'))]}">
+                                  attrs="{'invisible': [('sale_order_type','not in',('inspection','question','partner_question'))]}">
                                 <field name="person_in_charge_ids">
                                     <tree>
                                         <field name="person_in_charge"/>
@@ -393,12 +399,12 @@
                         </notebook>
                         <group>
                             <field name="postil" string="批注" placeholder="批注..."
-                                   attrs="{'invisible': [('sale_order_type','in',('inspection','question'))]}"/>
+                                   attrs="{'invisible': [('sale_order_type','in',('inspection','question','partner_question'))]}"/>
                         </group>
                     </sheet>
 
                     <footer>
-                        <button string="修改" name="send_message_action" type="object" class="btn-primary" groups=""/>
+                        <button string="修改" name="update_message_action" type="object" class="btn-primary" groups=""/>
                         <!--<button string="修改" type="button" class="btn btn-sm btn-primary o_composer_button_sendss"/>-->
                         <button string="取消" class="btn-default" special="cancel"/>
                     </footer>
