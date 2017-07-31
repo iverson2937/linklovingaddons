@@ -121,7 +121,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             // console.log(new_file_id)
             console.log($(target))
             var type = $(target).attr("data").toUpperCase()
-            var remote_path = $("#remote_path").text()
+            var remote_path = $(target).parents(".tab_pane_display").find(".remote_path").text()
             if (remote_path[0] == '/') {
                 remote_path[0] = '';
             }

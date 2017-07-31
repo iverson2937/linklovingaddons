@@ -53,7 +53,7 @@ class LinklovingOAApi(http.Controller):
             supplier_details = {}
             supplier_details["name"] = supplier_detail_object.name
             supplier_details["phone"] = supplier_detail_object.phone
-            supplier_details["street"] = supplier_detail_object.street
+            supplier_details["street"] = supplier_detail_object.street2
             supplier_details["email"] = supplier_detail_object.email
             supplier_details["website"] = supplier_detail_object.website
             supplier_details["express_sample_record"] = supplier_detail_object.express_sample_record
