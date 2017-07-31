@@ -114,7 +114,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 }
             })
         },
-        document_download_fn: function () {
+        document_download_fn: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");

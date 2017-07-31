@@ -45,7 +45,7 @@
                 <div class="o_composer_suggested_partners">
                     <div class="js_msg_comments">
 
-                        <input type="checkbox" class="o_chat_header_adc" name="question">
+                        <input type="checkbox" class="o_chat_header_adc" name="question" checked="checked">
                             问题记录
                         </input>
                         <input type="checkbox" class="o_chat_header_adc" name="inspection">

@@ -50,31 +50,45 @@ class LinklovingOAApi(http.Controller):
         offset = request.jsonrequest.get("offset")
         if request.jsonrequest.get("id"):
             supplier_detail_object = request.env['res.partner'].sudo().browse(request.jsonrequest.get("id"))
-            supplier_details = {}
-            supplier_details["name"] = supplier_detail_object.name
-            supplier_details["phone"] = supplier_detail_object.phone
-            supplier_details["street"] = supplier_detail_object.street2
-            supplier_details["email"] = supplier_detail_object.email
-            supplier_details["website"] = supplier_detail_object.website
-            supplier_details["express_sample_record"] = supplier_detail_object.express_sample_record
-            supplier_details["lang"] = supplier_detail_object.lang
-            supplier_details["contracts_count"] = len(supplier_detail_object.child_ids)  #联系人&地址个数
-            supplier_details["purchase_order_count"] = supplier_detail_object.purchase_order_count  #订单数量
-            supplier_details["invoice"] = supplier_detail_object.supplier_invoice_count   #对账
-            supplier_details["payment_count"] = supplier_detail_object.payment_count   #付款申请
-            supplier_details["put_in_storage"] = request.env['stock.picking'].sudo().search_count([('partner_id', '=', request.jsonrequest.get("id")),('state','=','waiting_in')])   #入库
-
-            return JsonResponse.send_response(STATUS_CODE_OK, res_data=supplier_details)
-
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.supplier_detail_object_to_json(supplier_detail_object))
 
         feedbacks = request.env['res.partner'].sudo().search([('supplier', '=', True)],
                                                              limit=limit,
                                                              offset=offset,
-                                                             order='id desc')
+                                                             order='id asc')
         json_list = []
         for feedback in feedbacks:
             json_list.append(self.supplier_feedback_to_json(feedback))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    def supplier_detail_object_to_json(self,supplier_detail_object):
+        supplier_details = {
+            "name": supplier_detail_object.name,
+            "phone": supplier_detail_object.phone,
+            "street": supplier_detail_object.street2,
+            "email": supplier_detail_object.email,
+            "website": supplier_detail_object.website,
+            "express_sample_record": supplier_detail_object.express_sample_record,
+            "lang": supplier_detail_object.lang,
+            "contracts_count": len(supplier_detail_object.child_ids),  #联系人&地址个数
+            "contracts": self.get_contracts_in_supplier(supplier_detail_object.child_ids),
+
+            "purchase_order_count": supplier_detail_object.purchase_order_count,  #订单数量
+            "invoice": supplier_detail_object.supplier_invoice_count,  #对账
+            "payment_count": supplier_detail_object.payment_count,   #付款申请
+            "put_in_storage": request.env['stock.picking'].sudo().search_count([('partner_id', '=', request.jsonrequest.get("id")),('state','=','waiting_in')]),   #入库
+        }
+        return supplier_details
+
+    def get_contracts_in_supplier(self, objs):
+        json_lists = []
+        for obj in objs:
+            json_lists.append({
+                "name": obj.name,
+                "phone": obj.phone,
+                "email": obj.email
+            })
+        return json_lists
 
     def supplier_feedback_to_json(self, feedback):
         data = {

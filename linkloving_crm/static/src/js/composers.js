@@ -426,7 +426,7 @@ odoo.define('mail.composers', function (require) {
 
                 this.PartnerModel = new Model('res.partner');
                 this.ChannelModel = new Model('mail.channel');
-                this.msg_checkbox = new Array();
+                this.msg_checkbox = new Array('question');
             },
 
             start: function () {

@@ -75,10 +75,16 @@
                         title="Send a message">
                     新建消息
                 </button>
-                <button t-if="widget.options.display_log_button" class="btn btn-sm btn-link o_chatter_button_log_note"
-                        title="Log a note. Followers will not be notified.">
-                    追踪记录
+
+                <button type="button" class="btn btn-sm btn-primary o_chatter_button_new_message_sale"
+                        title="Send a message">
+                    客户问题记录
                 </button>
+
+                <!--<button t-if="widget.options.display_log_button" class="btn btn-sm btn-link o_chatter_button_log_note"-->
+                        <!--title="Log a note. Followers will not be notified.">-->
+                    <!--追踪记录-->
+                <!--</button>-->
 
             </div>
         </div>
