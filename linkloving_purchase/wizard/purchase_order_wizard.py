@@ -30,6 +30,9 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
                 'create_uid': purchase.create_uid.name,
                 'date_order': purchase.date_order,
                 'order_price': purchase.amount_total,
+                'remaining_amount': purchase.remaining_amount,
+                'invoiced_amount': purchase.invoiced_amount
+
             }
             for line in purchase.order_line:
                 returnDict[purchase.id]['line'].update({line.id: {
