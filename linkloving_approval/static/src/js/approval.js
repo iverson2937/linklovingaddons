@@ -25,7 +25,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             'click .download_file': 'document_download_fn'
         },
         //下载
-        document_download_fn: function () {
+        document_download_fn: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");

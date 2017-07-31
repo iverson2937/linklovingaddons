@@ -2367,6 +2367,19 @@ class LinklovingAppApi(http.Controller):
             'location_id': stock_picking_obj.location_id.complete_name,
             'tracking_number': stock_picking_obj.tracking_number,
 
+            'move_type': stock_picking_obj.move_type,  #交货类型
+            'picking_type': {
+                'picking_type_id': stock_picking_obj.picking_type_id.id,
+                'picking_type_name': stock_picking_obj.picking_type_id.name
+            },  #分拣类型
+            'group_id': stock_picking_obj.group_id.name,  #补货组
+            'priority': stock_picking_obj.priority,  #优先级
+            'carrier': stock_picking_obj.carrier_id.name,  #承运商
+            'carrier_tracking_ref': stock_picking_obj.carrier_tracking_ref,  #跟踪参考
+            'weight': stock_picking_obj.weight, #重量
+            'shipping_weight': stock_picking_obj.shipping_weight, #航空重量
+            'number_of_packages': stock_picking_obj.number_of_packages,#包裹件数
+
             'min_date': stock_picking_obj.min_date,
             'pack_operation_product_ids': pack_list,
             'qc_note': stock_picking_obj.qc_note,
