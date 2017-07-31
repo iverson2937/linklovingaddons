@@ -134,6 +134,7 @@
                         <group>
                             <field name="cur_partner_id" invisible="1"/>
                             <field name="partner_id" require="1"
+                                   options="{'no_create':True}"
                                    domain="[('id','!=',cur_partner_id),('employee', '=', True)]"/>
                             <field name="remark"/>
                         </group>
