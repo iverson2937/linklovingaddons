@@ -180,7 +180,7 @@ class AccountPayment(models.Model):
     # origin = fields.Char(string=u'源单据')
     @api.multi
     def set_to_cancel(self):
-        account_invoices = self.env['account.invoice'].search([('type', '=', 'in_invoice')], limit=200, offset=2000)
+        account_invoices = self.env['account.invoice'].search([('type', '=', 'in_invoice')], limit=300, offset=2200)
         print len(account_invoices)
         for invoice in account_invoices:
             if invoice.partner_id.supplier:
