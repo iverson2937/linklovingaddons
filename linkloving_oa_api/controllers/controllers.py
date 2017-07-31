@@ -48,6 +48,25 @@ class LinklovingOAApi(http.Controller):
     def get_supplier(self, **kw):
         limit = request.jsonrequest.get("limit")
         offset = request.jsonrequest.get("offset")
+        if request.jsonrequest.get("id"):
+            supplier_detail_object = request.env['res.partner'].sudo().browse(request.jsonrequest.get("id"))
+            supplier_details = {}
+            supplier_details["name"] = supplier_detail_object.name
+            supplier_details["phone"] = supplier_detail_object.phone
+            supplier_details["street"] = supplier_detail_object.street
+            supplier_details["email"] = supplier_detail_object.email
+            supplier_details["website"] = supplier_detail_object.website
+            supplier_details["express_sample_record"] = supplier_detail_object.express_sample_record
+            supplier_details["lang"] = supplier_detail_object.lang
+            supplier_details["contracts_count"] = supplier_detail_object.contracts_count  #联系人&地址个数
+            supplier_details["purchase_order_count"] = supplier_detail_object.purchase_order_count  #订单数量
+            supplier_details["invoice"] = supplier_detail_object.supplier_invoice_count   #对账
+            supplier_details["payment_count"] = supplier_detail_object.payment_count   #付款申请
+            supplier_details["put_in_storage"] = request.env['stock.picking'].sudo().search_count([('partner_id', '=', request.jsonrequest.get("id")),('state','=','waiting_in')])   #入库
+
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data=supplier_details)
+
+
         feedbacks = request.env['res.partner'].sudo().search([('supplier', '=', True)],
                                                              limit=limit,
                                                              offset=offset,

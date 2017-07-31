@@ -46,17 +46,17 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                     success: function (data) {
                         console.log(data);
                         if (data.result == '1') {
-                            Dialog.alert("已下载至指定目录");
+                            Dialog.alert( target, "已下载至指定目录");
                         }
                         else if (data.result == '2') {
 
                         }
                         else {
-                            Dialog.alert("下载失败");
+                            Dialog.alert(target, "下载失败");
                         }
                     },
                     error: function (error) {
-                        Dialog.alert("下载失败,请打开代理软件");
+                        Dialog.alert(target, "下载失败,请打开代理软件");
                     }
                 })
             }
