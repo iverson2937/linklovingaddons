@@ -72,7 +72,7 @@ class LinklovingPdm(http.Controller):
             "result": result,
         })
 
-    @http.route('/download_file', type='http', auth='user')
+    @http.route('/download_file', type='http', auth='none')
     def content_common(self, xmlid=None, model='product.attachment.info', id=None, field='file_binary', filename=None,
                        filename_field='datas_fname', unique=None, mimetype=None, download=None, data=None, token=None):
         if not filename:
