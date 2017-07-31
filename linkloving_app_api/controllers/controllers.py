@@ -2175,9 +2175,11 @@ class LinklovingAppApi(http.Controller):
         picking_id = request.jsonrequest.get('picking_id')  # 订单id
 
         pack_operation_product_ids = request.jsonrequest.get('pack_operation_product_ids')  # 修改
+        i = 0
         for pacl in pack_operation_product_ids:
             if pacl['pack_id'] == -1:
-                pack_operation_product_ids.pop(pacl)
+                pack_operation_product_ids.pop(i)
+            i = i + 1
         if not pack_operation_product_ids:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error': _("Pack Order not found")})
