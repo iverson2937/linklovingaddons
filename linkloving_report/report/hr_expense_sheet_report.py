@@ -35,7 +35,7 @@ class ReportHrExpenseSheet(http.Controller):
             )
 
             header_list = [
-                u'支出日期', u'报销单号', u'部门', u'产品', u'费用说明', u'金额', u'人员',u'暂支单'
+                u'支出日期', u'报销单号', u'部门', u'产品', u'费用说明', u'金额', u'人员', u'报销单金额', u'暂支单'
             ]
 
             [data_sheet.write(0, row, line, style) for row, line in enumerate(header_list)]
@@ -48,6 +48,7 @@ class ReportHrExpenseSheet(http.Controller):
                                  style)
                 data_sheet.write(current_row, 1, vals.get('expense_no') and vals.get('expense_no') or '', style)
                 data_sheet.write(current_row, 2, vals.get('department') and vals.get('department') or '', style)
+                data_sheet.write(current_row, 7, vals.get('total_amount') and vals.get('total_amount') or '', style)
 
                 if not record.get('line'):
                     current_row += 1
@@ -64,7 +65,8 @@ class ReportHrExpenseSheet(http.Controller):
                     data_sheet.write(current_row, 4, line.get('name') and line.get('name') or '', style)
                     data_sheet.write(current_row, 5, line.get('total_amount') and line.get('total_amount') or '', style)
                     data_sheet.write(current_row, 6, line.get('employee') and line.get('employee') or '', style)
-                    data_sheet.write(current_row, 7, line.get('payment_line_ids') and line.get('payment_line_ids') or '', style)
+                    data_sheet.write(current_row, 8,
+                                     line.get('payment_line_ids') and line.get('payment_line_ids') or '', style)
 
                     current_row += 1
                     i += 1
