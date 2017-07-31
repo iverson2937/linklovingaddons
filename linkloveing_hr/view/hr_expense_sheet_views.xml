@@ -7,9 +7,9 @@
                 <form string="Expense Reports" class="o_expense_sheet">
                     <header>
 
-                        <button name="set_account_date" states="done" string="设置日期"
-                                type="object" groups="base.group_erp_manager"
-                                class="oe_highlight o_expense_sheet_post"/>
+                        <!--<button name="set_account_date" states="done" string="设置日期"-->
+                        <!--type="object" groups="base.group_erp_manager"-->
+                        <!--class="oe_highlight o_expense_sheet_post"/>-->
 
 
                         <button name="hr_expense_sheet_post" states="draft" string="提交审核"

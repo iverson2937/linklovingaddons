@@ -113,11 +113,12 @@ class HrExpenseSheet(models.Model):
 
     @api.multi
     def set_account_date(self):
-        sheet_ids = self.env['hr.expense.sheet'].search([])
-        for sheet in sheet_ids:
-            for line in sheet.expense_line_ids:
-                if not line.department_id:
-                    line.department_id = sheet.department_id.id
+        pass
+        # sheet_ids = self.env['hr.expense.sheet'].search([])
+        # for sheet in sheet_ids:
+        #     for line in sheet.expense_line_ids:
+        #         if not line.department_id:
+        #             line.department_id = sheet.department_id.id
                     # sheet_ids = self.env['hr.expense.sheet'].search([('state', '=', 'done'), ('accounting_date', '=', False)])
                     # for sheet in sheet_ids:
                     #     sheet.accounting_date = sheet.write_date
