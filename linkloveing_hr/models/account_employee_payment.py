@@ -247,6 +247,6 @@ class AccountEmployeePayment(models.Model):
 
     @api.multi
     def unlink(self):
-        if self.state in ['paid', 'deduct']:
-            raise UserError('Can not delete the Expense Sheet which already paid.')
+        if self.state not in ['draft']:
+            raise UserError('只可以删除草稿状态的暂支.')
         return super(AccountEmployeePayment, self).unlink()
