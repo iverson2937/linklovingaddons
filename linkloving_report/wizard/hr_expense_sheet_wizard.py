@@ -155,6 +155,7 @@ class HrExpenseSheetWizard(models.TransientModel):
 
         hr_expense_sheet_ids = hr_expense_sheet.search([
             ('income', '=', True),
+            ('state', 'not in', ('draft', 'cancel')),
             ('accounting_date', '>=', date1), ('accounting_date', '<=', date2)], order='expense_no desc')
 
         sheet_sequence = 1
@@ -183,20 +184,20 @@ class HrExpenseSheetWizard(models.TransientModel):
 
         hr_expense_sheet_ids = hr_expense_sheet.search([
             ('income', '=', False),
+            ('state', 'not in', ('draft', 'cancel')),
             ('accounting_date', '>=', date1), ('accounting_date', '<=', date2)], order='expense_no desc')
 
         sheet_sequence = 1
         for sheet in hr_expense_sheet_ids:
-            ids=[]
+            ids = []
             if sheet.payment_line_ids:
-                ids=';'.join(line.payment_id.name for line in sheet.payment_line_ids)
+                ids = ';'.join(line.payment_id.name for line in sheet.payment_line_ids)
             returnDict[sheet.id] = {'data': {}, 'line': {}}
             returnDict[sheet.id]['data'] = {
                 'sequence': sheet_sequence,
                 'accounting_date': sheet.accounting_date,
                 'expense_no': sheet.expense_no,
                 'department': sheet.department_id.name,
-
 
                 'total_amount': sheet.total_amount,
             }
