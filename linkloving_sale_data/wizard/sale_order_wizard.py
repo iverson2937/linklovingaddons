@@ -2,24 +2,25 @@
 import datetime
 
 from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 
 class PurchaseOrderListPrintWizard(models.TransientModel):
     _name = 'sale.order.list.wizard'
 
     team_ids = fields.Many2many('crm.team', string='Sale Team', required=True,
-                                   default=lambda self: self.env['crm.team'].search([]))
+                                default=lambda self: self.env['crm.team'].search([]))
 
     start_date = fields.Date(u'订单开始日期',
                              default=(datetime.date.today().replace(day=1) - datetime.timedelta(1)).replace(day=1))
     end_date = fields.Date(u'订单截至日期', default=datetime.datetime.now())
 
-    def _get_data_by_purchase(self, date1, date2):
+    def _get_data_by_sale(self, date1, date2):
         returnDict = {}
         sale_obj = self.env['sale.order']
 
         sale_orders = sale_obj.search([
-            ('state', '=', 'purchase'),
+            ('state', '=', 'sale'),
             ('date_order', '>=', date1), ('date_order', '<=', date2)], order='name desc')
 
         sale_sequence = 1
@@ -31,7 +32,9 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
                 'partner': sale_order.partner_id.name,
                 'create_uid': sale_order.create_uid.name,
                 'date_order': sale_order.date_order,
-                'order_price': sale_order.amount_total,
+                'amount_total': sale_order.amount_total,
+                'invoiced_amount': sale_order.invoiced_amount if sale_order.invoiced_amount else 0.0,
+                'remaining_amount': sale_order.remaining_amount if sale_order.remaining_amount else 0.0
             }
             for line in sale_order.order_line:
                 returnDict[sale_order.id]['line'].update({line.id: {
@@ -40,7 +43,7 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
                     'price_unit': line.price_unit,
                     'product_specs': line.product_specs,
                     'quantity': line.product_qty,
-                    'qty_received': line.qty_received,
+                    'qty_received': line.qty_delivered,
                     'qty_invoiced': line.qty_invoiced,
                     'price_subtotal': line.price_subtotal,
                 }})
@@ -49,11 +52,10 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
     @api.multi
     def print_report(self):
         for report in self:
-            return {
-                'name': 'Go to website',
-                'tag': 'petstore.homepage',
-                'type': 'ir.actions.client',
-                'context':{'sss':'sss'},
-                'target': 'self',
-                'url': '/sale_orders/'
-            }
+            datas = self._get_data_by_sale(report.start_date, report.end_date)
+            report_name = 'linkloving_sale_data.sale_order_report'
+
+            if not datas:
+                raise UserError(u'没找到相关数据')
+
+            return self.env['report'].get_action(self, report_name, datas)

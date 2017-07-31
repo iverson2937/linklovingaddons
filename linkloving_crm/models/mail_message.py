@@ -15,7 +15,8 @@ class CrmMailMessage(models.Model):
     postil = fields.Text(string=u'批注')
     # sale_order_type = fields.Text(string=u'销售记录类型')
 
-    sale_order_type = fields.Selection([('question', u'问题记录'), ('inspection', u'验货报告')], string=u'销售记录类型')
+    sale_order_type = fields.Selection(
+        [('question', u'问题记录'), ('inspection', u'验货报告'), ('partner_question', u'客户问题记录')], string=u'销售记录类型')
 
     compyter_body = fields.Text(string=u'内容', compute='get_message_body')
 
@@ -183,28 +184,30 @@ class CrmMailMessage(models.Model):
 
         if values.get('model') == "sale.order":
             sale_order_data = self.env['sale.order'].search([('id', '=', values['res_id'])])
-            if "messages_label_ids" in values and len(values['messages_label_ids']) > 0:
+            # if "messages_label_ids" in values and len(values['messages_label_ids']) > 0:
+            if values.get('messages_label_ids'):
                 if "question" in values['messages_label_ids']:
                     sale_order_data.write({'question_record_count': (sale_order_data.question_record_count + 1)})
                 if "inspection" in values['messages_label_ids']:
                     sale_order_data.write({'inspection_report_count': (sale_order_data.inspection_report_count + 1)})
                 values['sale_order_type'] = values['messages_label_ids'][0]
 
-            else:
-                values['sale_order_type'] = 'question'
-
-            if values.get('person_in_charge_value'):
-                values['person_in_charge_ids'] = [(0, 0, vals) for vals in values.get('person_in_charge_value')]
-
-            if values.get('question_subject'):
-                values['subject'] = values['question_subject']
-
         if values.get('model') == "res.partner":
             if values.get('messages_label_ids'):  # needed to compute reply_to
-                msg_label_ids = []
-                for item in values['messages_label_ids']:
-                    msg_label_ids.append(int(item))
-                values['messages_label_ids'] = [(6, 0, msg_label_ids)]
+                if str(values.get('messages_label_ids')) in ["[u'inspection']", "[u'question']"]:
+                    if values.get('question_subject'):
+                        values['sale_order_type'] = 'partner_question'
+                else:
+                    msg_label_ids = []
+                    for item in values['messages_label_ids']:
+                        if item not in ["inspection", "question"]:
+                            msg_label_ids.append(int(item))
+                    values['messages_label_ids'] = [(6, 0, msg_label_ids)]
+
+        if values.get('person_in_charge_value'):
+            values['person_in_charge_ids'] = [(0, 0, vals) for vals in values.get('person_in_charge_value')]
+        if values.get('question_subject'):
+            values['subject'] = values['question_subject']
 
         message = super(CrmMailMessage, self).create(values)
         return message
@@ -221,6 +224,9 @@ class CrmMailMessage(models.Model):
                     {'inspection_report_count': (sale_order_data_item.inspection_report_count - 1)})
 
         super(CrmMailMessage, self).unlink()
+
+    def update_message_action(self):
+        pass
 
 
 class CrmMessageLabelStatus(models.Model):

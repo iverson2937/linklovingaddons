@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+        <record id='action_sale_order_report' model='ir.actions.report.xml'>
+            <field name="name">销售单</field>
+            <field name='report_type'>controller</field>
+            <field name='model'>sale.order</field>
+            <field name='report_rml'>/report/linkloving_sale_data.sale_order_report</field>
+            <field name="report_name">linkloving_sale_data.sale_order_report</field>
+        </record>
+        <menuitem
+                id="sale_order_report"
+                name="销售报告"
+                parent="sales_team.menu_sale_report"
+                action="action_sale_order_wizard"
+        />
+
+    </data>
+</openerp>
