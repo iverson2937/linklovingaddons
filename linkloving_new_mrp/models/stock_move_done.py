@@ -4,6 +4,9 @@ from odoo import models, fields, api, _
 
 
 class StockMoveFinished(models.Model):
+    """
+    计算产成品model
+    """
     _name = 'stock.move.finished'
     product_id = fields.Many2one('product.product', )
     production_id = fields.Many2one('mrp.production')
