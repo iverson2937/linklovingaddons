@@ -17,6 +17,20 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
     tax_id = fields.Many2one('account.tax', required=True)
     product_count = fields.Float(compute='get_product_count')
+    invoiced_amount = fields.Float(compute='_compute_invoice_amount')
+    remaining_amount = fields.Float(compute='_compute_invoice_amount')
+
+    @api.multi
+    @api.depends('invoice_ids')
+    def _compute_invoice_amount(self):
+        for order in self:
+            invoiced_amount = remaining_amount = 0.0
+            for invoice in order.invoice_ids:
+                invoiced_amount += invoice.amount_total
+                remaining_amount += invoice.residual
+            order.invoiced_amount = invoiced_amount
+
+            order.remaining_amount = remaining_amount
 
     @api.depends('product_count', 'order_line.qty_delivered')
     def _compute_shipping_rate(self):

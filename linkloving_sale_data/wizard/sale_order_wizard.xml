@@ -37,9 +37,5 @@
 
             <field name='target'>new</field>
         </record>
-
-
-        <menuitem id="menu_sale_order_list_export" name="报表" parent="sales_team.menu_base_partner"
-                  action="action_sale_order_wizard"/>
     </data>
 </openerp>
