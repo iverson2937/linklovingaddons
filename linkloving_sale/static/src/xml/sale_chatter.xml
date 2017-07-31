@@ -10,7 +10,7 @@
         <t t-jquery=".o_composer_input" t-operation="replace">
             <div class="row row_sale_anticipated_loss" style="margin-top:10px">
                 <div class="col-xs-2">
-                    <strong>预计损失:</strong>
+                    <strong>实际损失:</strong>
                 </div>
                 <div class="col-xs-3">
                     <input class="sale_anticipated_loss" type="number" placeholder="预计损失"/>
