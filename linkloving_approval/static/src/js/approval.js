@@ -37,28 +37,29 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                 remote_path[0] = '';
             }
             console.log(remote_path)
-            if (type == 'SIP' || type == 'SOP' || type == 'IPQC') {
-                window.location.href = '/download_file/?download=true&id=' + new_file_id;
-            } else {
+             if (type == 'OTHER' || type == 'DESIGN') {
                 $.ajax({
                     type: "GET",
                     url: "http://localhost:8088/downloadfile?remotefile=" + remote_path,
                     success: function (data) {
                         console.log(data);
                         if (data.result == '1') {
-                            Dialog.alert( target, "已下载至指定目录");
+                            Dialog.alert(target, "已下载至指定目录");
                         }
                         else if (data.result == '2') {
-
+                            Dialog.alert(target, "下载失败, 未选择存储路径");
                         }
                         else {
                             Dialog.alert(target, "下载失败");
                         }
                     },
                     error: function (error) {
-                        Dialog.alert(target, "下载失败,请打开代理软件");
+                        Dialog.alert(target, "下载失败,请检查是否打开了代理软件");
                     }
                 })
+            } else {
+               window.location.href = '/download_file/?download=true&id=' + new_file_id;
+
             }
         },
         //取消审核

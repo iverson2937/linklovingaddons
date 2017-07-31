@@ -126,9 +126,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 remote_path[0] = '';
             }
             console.log(remote_path)
-            if (type == 'SIP' || type == 'SOP' || type == 'IPQC') {
-                window.location.href = '/download_file/?download=true&id=' + new_file_id;
-            } else {
+            if (type == 'OTHER' || type == 'DESIGN') {
                 $.ajax({
                     type: "GET",
                     url: "http://localhost:8088/downloadfile?remotefile=" + remote_path,
@@ -148,6 +146,9 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                         Dialog.alert(target, "下载失败,请检查是否打开了代理软件");
                     }
                 })
+            } else {
+               window.location.href = '/download_file/?download=true&id=' + new_file_id;
+
             }
         },
         document_modify_fn: function (e) {

@@ -58,7 +58,7 @@ class LinklovingOAApi(http.Controller):
             supplier_details["website"] = supplier_detail_object.website
             supplier_details["express_sample_record"] = supplier_detail_object.express_sample_record
             supplier_details["lang"] = supplier_detail_object.lang
-            supplier_details["contracts_count"] = supplier_detail_object.contracts_count  #联系人&地址个数
+            supplier_details["contracts_count"] = len(supplier_detail_object.child_ids)  #联系人&地址个数
             supplier_details["purchase_order_count"] = supplier_detail_object.purchase_order_count  #订单数量
             supplier_details["invoice"] = supplier_detail_object.supplier_invoice_count   #对账
             supplier_details["payment_count"] = supplier_detail_object.payment_count   #付款申请
