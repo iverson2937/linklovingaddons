@@ -481,6 +481,8 @@ class MrpProductionExtend(models.Model):
 
     # 确认生产 等待备料
     def button_waiting_material(self):
+        if self.bom_id.state not in ('draft', 'release'):
+            raise UserError('BOM还没通过审核,请联系相关负责人')
         if self.location_ids.filtered(lambda x: x.is_circulate_location == False) or not self.location_ids:
             self.write({'state': 'waiting_material'})
         else:
@@ -498,6 +500,8 @@ class MrpProductionExtend(models.Model):
 
     @api.multi
     def button_action_confirm_draft(self):
+        if self.bom_id.state not in ('draft', 'release'):
+            raise UserError('BOM还没通过审核,请联系相关负责人')
         for production in self:
             production.write({'state': 'confirmed'})
         return {'type': 'ir.actions.empty'}
@@ -1529,6 +1533,7 @@ class StcokPickingExtend(models.Model):
     qc_result = fields.Selection(string=u"品检结果", selection=[('no_result', u'为以前的品检单,无品检结果记录'),
                                                             ('fail', u'品检失败'),
                                                             ('success', u'品检通过'), ], default='no_result', )
+
 
 class StockPackOperationExtend(models.Model):
     _inherit = 'stock.pack.operation'
