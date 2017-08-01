@@ -16,8 +16,6 @@ from odoo.addons import decimal_precision as dp
 
 class MrpBomExtend(models.Model):
     _inherit = 'mrp.bom'
-    _order = 'write_date desc'
-
     product_specs = fields.Text(string=u'Product Specification', related='product_tmpl_id.product_specs')
 
     product_id = fields.Many2one(
