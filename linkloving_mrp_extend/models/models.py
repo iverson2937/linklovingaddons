@@ -1270,7 +1270,7 @@ class ReturnMaterialLine(models.Model):
             done_move = line.return_id.production_id.sim_stock_move_lines.filtered(
                 lambda x: x.product_id.id == line.product_id.id)
             if uom_qty == 0:
-                raise UserError(u"异常数据")
+                continue
             if done_move and len(done_move) == 1:
                 done_qty = done_move.quantity_done
                 return_qty = done_move.return_qty
