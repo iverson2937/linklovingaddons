@@ -52,7 +52,7 @@ class LinklovingOAApi(http.Controller):
             supplier_detail_object = request.env['res.partner'].sudo().browse(request.jsonrequest.get("id"))
             return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.supplier_detail_object_to_json(supplier_detail_object))
 
-        feedbacks = request.env['res.partner'].sudo().search([('supplier', '=', True)],
+        feedbacks = request.env['res.partner'].sudo().search([('supplier', '=', True), ("is_company", '=', True)],
                                                              limit=limit,
                                                              offset=offset,
                                                              order='id asc')
@@ -61,7 +61,7 @@ class LinklovingOAApi(http.Controller):
             json_list.append(self.supplier_feedback_to_json(feedback))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
 
-    def supplier_detail_object_to_json(self,supplier_detail_object):
+    def supplier_detail_object_to_json(self, supplier_detail_object):
         supplier_details = {
             "name": supplier_detail_object.name,
             "phone": supplier_detail_object.phone,
@@ -86,7 +86,8 @@ class LinklovingOAApi(http.Controller):
             json_lists.append({
                 "name": obj.name,
                 "phone": obj.phone,
-                "email": obj.email
+                "email": obj.email,
+                "street": obj.street
             })
         return json_lists
 

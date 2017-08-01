@@ -432,6 +432,7 @@ class ProductTemplateExtend(models.Model):
     @api.multi
     def document_load(self):
         return {
+            'name': '文件',
             'type': 'ir.actions.client',
             'tag': 'document_manage',
             'product_id': self.id

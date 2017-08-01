@@ -5,6 +5,12 @@
         <div class="document_page_container">
 
         </div>
+        <!--<script>-->
+            <!--console.log($(".document_page_container"))-->
+            <!--$(".document_page_container").parents(".o_main_content").find(".o_cp_searchview").hide();-->
+            <!--$(".document_page_container").parents(".o_main_content").find(".o_cp_left").hide();-->
+            <!--$(".document_page_container").parents(".o_main_content").find(".o_cp_right").hide();-->
+        <!--</script>-->
     </t>
 
     <t t-name="document_load_detail">
@@ -146,6 +152,7 @@
         <t t-foreach="result.files" t-as="item_files">
             <div class="tab_pane_display" t-att-data-id="item_files.id">
                 <div class="tab_message_display">
+                    <div>产品名字：<span t-att-product-id="item_files.product_id.id" class="approval_product_name"><t t-esc="item_files.product_id.name"/></span></div>
                     <div>文件：<span><t t-esc="item_files.file_name"/></span></div>
                     <!--<div>审核人：<span><t t-esc="item_files.review_id"/></span></div>-->
                     <t t-if="item_files.remote_path!=''">

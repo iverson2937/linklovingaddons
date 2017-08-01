@@ -5,13 +5,15 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
     "use strict";
     var core = require('web.core');
     var Model = require('web.Model');
+    var ControlPanelMixin = require('web.ControlPanelMixin');
+    var ControlPanel = require('web.ControlPanel');
     var Widget = require('web.Widget');
     var Dialog = require('web.Dialog');
     var framework = require('web.framework');
     var QWeb = core.qweb;
     var _t = core._t;
 
-    var DocumentManage = Widget.extend({
+    var DocumentManage = Widget.extend(ControlPanelMixin,{
         template: 'document_load_page',
         events: {
             'show.bs.tab .tab_toggle_a': 'document_change_tabs',
@@ -25,6 +27,24 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             'click .document_download': 'document_download_fn',
             'click .review_cancel': 'cancel_review',
             'click #my_load_file__a_1': 'request_local_server_pdm',
+            'click .approval_product_name': 'product_pop',
+        },
+         //点击产品名弹出框
+        product_pop: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var product_id = parseInt($(target).attr('product-id'));
+            var action = {
+                name: "产品详细",
+                type: 'ir.actions.act_window',
+                res_model: 'product.template',
+                view_type: 'form',
+                view_mode: 'tree,form',
+                views: [[false, 'form']],
+                res_id: product_id,
+                target: "new"
+            };
+            this.do_action(action);
         },
         request_local_server_pdm: function (e) {
             framework.blockUI();
@@ -295,7 +315,11 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 })
         },
         init: function (parent, action) {
+            this._super(parent)
             this._super.apply(this, arguments);
+            if (parent && parent.action_stack.length > 0){
+                this.action_manager = parent.action_stack[0].widget.action_manager
+            }
             if (action.product_id) {
                 this.product_id = action.product_id;
             } else {
@@ -305,7 +329,14 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
         },
         start: function () {
             var self = this;
-            // console.log($("body"))
+
+            var cp_status = {
+                breadcrumbs: self.action_manager && self.action_manager.get_breadcrumbs(),
+                // cp_content: _.extend({}, self.searchview_elements, {}),
+            };
+            self.update_control_panel(cp_status);
+
+
             $("body").attr("data-product-id", this.product_id);
             return new Model("product.template")
                 .call("get_file_type_list", [this.product_id])
@@ -313,9 +344,8 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                     console.log(result)
                     self.$el.append(QWeb.render('document_load_detail', {result: result.list}));
                     self.product_info = result.info;
-                })
+                });
         }
-
     })
 
     core.action_registry.add('document_manage', DocumentManage);
