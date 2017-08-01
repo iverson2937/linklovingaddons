@@ -33,8 +33,9 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
                 'create_uid': sale_order.create_uid.name,
                 'date_order': sale_order.date_order,
                 'amount_total': sale_order.amount_total,
-                'invoiced_amount': sale_order.invoiced_amount if sale_order.invoiced_amount else 0.0,
-                'remaining_amount': sale_order.remaining_amount if sale_order.remaining_amount else 0.0
+                'invoiced_amount': sale_order.invoiced_amount,
+                'remaining_amount': sale_order.remaining_amount,
+                'shipped_amount': sale_order.shipped_amount
             }
             for line in sale_order.order_line:
                 returnDict[sale_order.id]['line'].update({line.id: {
