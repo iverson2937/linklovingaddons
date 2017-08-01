@@ -24,10 +24,11 @@
 
     # always loaded
     'data': [
+        'wizard/sale_order_wizard.xml',
 
         'report/sale_order_report.xml',
         # 'security/ir.model.access.csv',
-        'wizard/sale_order_wizard.xml',
+
         # 'views/templates.xml',
     ],
     # only loaded in demonstration mode
