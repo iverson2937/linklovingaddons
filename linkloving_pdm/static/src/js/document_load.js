@@ -28,6 +28,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             'click .review_cancel': 'cancel_review',
             'click #my_load_file__a_1': 'request_local_server_pdm',
             'click .approval_product_name': 'product_pop',
+            'click .document_modify_2': 'document_modify_2_fn',
         },
          //点击产品名弹出框
         product_pop: function (e) {
@@ -170,6 +171,40 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                window.location.href = '/download_file/?download=true&id=' + new_file_id;
 
             }
+        },
+        document_modify_2_fn: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var default_code = self.product_info.default_code.trim()
+            var remote_file = cur_type.toUpperCase() + '/' + default_code.split('.').join('/') + '/v' + ret +
+                '/' + cur_type.toUpperCase() + '_' + default_code.split('.').join('_') + '_v' + ret
+            console.log(ret);
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8088/uploadfile?id=" + this.product_id + "&remotefile=" + remote_file,
+                success: function (data) {
+                    framework.unblockUI();
+                    console.log(data);
+                    if (data.result == '1') {
+                        $(target).parents(".tab_pane_display").children(".tab_message_display").prepend("<div class='document_modify_name'>新修改的文件：<span>" + data.choose_file_name + "</span></div>");
+                        var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
+                        console.log(data);
+                        return new Model("product.attachment.info")
+                            .call("update_attachment", [parseInt(new_file_id)], {remote_path: data.path})
+                            .then(function (result) {
+                                Dialog.alert(target, "修改成功");
+                            })
+                        //$(".my_load_file_name").val(data.choose_file_name)
+                        //$(".my_load_file_remote_path").val(data.path)
+                    }
+                },
+                error: function (error) {
+                    framework.unblockUI();
+                    Dialog.alert("上传失败,请打开代理软件");
+                    console.log(error);
+                }
+            })
+
         },
         document_modify_fn: function (e) {
             var e = e || window.event;
@@ -346,6 +381,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                     self.product_info = result.info;
                 });
         }
+
     })
 
     core.action_registry.add('document_manage', DocumentManage);

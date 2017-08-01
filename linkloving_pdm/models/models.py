@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 
 from odoo import models, fields, api
 
@@ -250,10 +251,12 @@ class ProductAttachmentInfo(models.Model):
         else:
             raise u"数据异常,有两个可用的文件"
     def get_download_filename(self):
-        dc = self.product_tmpl_id.default_code.replace(".", "_")
+        dc = self.product_tmpl_id.default_code  # .replace(".", "_")
         file_ext = self.file_name.split('.')[-1:][0]
         if file_ext:
             file_ext = '.' + file_ext
+        else:
+            file_ext = ''
         if self.state != 'released':
             return 'Unrelease_' + self.type.upper() + '_' + dc + '_v' + str(self.version) + file_ext
         return self.type.upper() + '_' + dc + '_v' + str(self.version) + file_ext
@@ -344,7 +347,6 @@ class ProductAttachmentInfo(models.Model):
         if (vals.get("file_binary") or vals.get("remote_path")):
             vals['state'] = 'waiting_release'
         res = super(ProductAttachmentInfo, self).create(vals)
-
         return res
 
     @api.multi
@@ -355,13 +357,17 @@ class ProductAttachmentInfo(models.Model):
 
     @api.one
     def update_attachment(self, **kwargs):
-
+        update_dic = {}
+        if kwargs.get("file_binary"):
+            update_dic["file_binary"] = kwargs.get("file_binary")
+        if kwargs.get("file_name"):
+            update_dic["file_name"] = kwargs.get("file_name")
+        if kwargs.get("remote_path"):
+            update_dic["remote_path"] = kwargs.get("remote_path")
+            update_dic["file_name"] = os.path.basename(kwargs.get("remote_path"))
         if self.state not in ['waiting_release', 'draft', 'deny', 'cancel']:
             raise UserError(u'文件正在处于审核中,请先取消审核,再进行操作')
-        self.write({
-            "file_binary": kwargs.get("file_binary"),
-            'file_name': kwargs.get("file_name"),
-        })
+        self.write(update_dic)
         return True
 
     # @api.multi
