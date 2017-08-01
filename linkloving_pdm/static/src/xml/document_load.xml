@@ -45,7 +45,7 @@
                                     <t t-if="item_files.remote_path!=''">
                                         <div>远程地址：<span class="remote_path"><t t-esc="item_files.remote_path"/></span></div>
                                     </t>
-                                    <div>版本：<span><t t-esc="item_files.version"/></span></div>
+                                    <div>版本：<span class="version_span"><t t-esc="item_files.version"/></span></div>
                                     <div>状态：<span><t t-esc="item_files.state[1]"/></span>
                                         <t t-if="item_files.is_show_cancel">
                                             <button class="btn btn-primary review_cancel">取消审核</button>
@@ -82,9 +82,15 @@
                                         <button class="btn btn-primary document_manage_btn" t-att-data-id="item_files.id">审核操作</button>
                                     </t>
                                     <t t-if="item_files.state[0] == 'draft' || item_files.state[0] == 'waiting_release'||item_files.state[0] == 'deny'||item_files.state[0]=='cancel' ">
+                                        <t t-if="item.type == 'other' || item.type == 'design'">
+                                            <a href="javascript:;" class="document_modify_wraper document_modify_2" >文件修改
+                                            </a>
+                                        </t>
+                                    <t t-else="">
                                         <a href="javascript:;" class="document_modify_wraper">文件修改
                                         <input type="file" class="document_modify"/>
                                         </a>
+                                    </t>
                                     </t>
                                     <t t-if="item_files.is_able_to_use == true">
                                         <button class="btn btn-primary document_download">下载</button>
@@ -158,7 +164,7 @@
                     <t t-if="item_files.remote_path!=''">
                         <div>远程地址：<span><t t-esc="item_files.remote_path"/></span></div>
                     </t>
-                    <div>版本：<span><t t-esc="item_files.version"/></span></div>
+                    <div>版本：<span class="version_span"><t t-esc="item_files.version"/></span></div>
                     <div>状态：<span><t t-esc="item_files.state[1]"/></span>
                                         <t t-if="item_files.is_show_cancel">
                                             <button class="btn btn-primary review_cancel" >取消审核</button>
@@ -191,9 +197,16 @@
                         <button class="btn btn-primary document_manage_btn" t-att-data-id="item_files.id">审核操作</button>
                     </t>
                     <t t-if="item_files.state[0] == 'draft' || item_files.state[0] == 'waiting_release'||item_files.state[0] == 'deny'||item_files.state[0]=='cancel' ">
-                        <a href="javascript:;" class="document_modify_wraper">文件修改
-                        <input type="file" class="document_modify"/>
-                        </a>
+                        <t t-if="result.type == 'other' || result.type == 'design'">
+                            <a href="javascript:;" class="document_modify_wraper document_modify_2" >文件修改
+                            </a>
+                        </t>
+                        <t t-else="">
+                            <a href="javascript:;" class="document_modify_wraper">文件修改
+                            <input type="file" class="document_modify"/>
+                            </a>
+                        </t>
+
                     </t>
 
                     <t t-if="item_files.is_able_to_use == true">

@@ -40,13 +40,13 @@
             <div class="tab_pane_display" t-att-data-id="item_files.id">
                 <div class="tab_message_display">
                     <div class="approval_tab_pane_type"><t t-esc="item_files.type"/></div>
-                    <div>产品名字: <span t-att-product-id="item_files.product_id.id" class="approval_product_name"><t t-esc="item_files.product_id.name"/></span></div>
+                    <div>产品名字: <span t-att-product-id="item_files.product_id.id" t-att-default-code="item_files.product_id.default_code" class="approval_product_name"><t t-esc="item_files.product_id.name"/></span></div>
                     <div>文件：<span><t t-esc="item_files.file_name"/></span></div>
                     <!--<div>审核人：<span><t t-esc="item_files.review_id"/></span></div>-->
                     <t t-if="item_files.remote_path!=''">
                         <div>远程地址：<span class="remote_path"><t t-esc="item_files.remote_path"/></span></div>
                     </t>
-                    <div>版本：<span><t t-esc="item_files.version"/></span></div>
+                    <div>版本：<span class="version_span"><t t-esc="item_files.version"/></span></div>
                     <div>状态：<span><t t-esc="item_files.state[1]"/></span>
                         <t t-if="item_files.is_show_cancel">
                             <button class="btn btn-primary review_cancel">取消审核</button>
@@ -80,9 +80,15 @@
                         <button class="btn btn-primary document_manage_btn" t-att-data-suibian="item_files.is_show_action_deny" t-att-data-id="item_files.id">审核操作</button>
                     </t>
                     <t t-if="item_files.state[0] == 'draft' || item_files.state[0] == 'waiting_release'||item_files.state[0] == 'deny'||item_files.state[0]=='cancel' ">
-                        <a href="javascript:;" class="document_modify_wraper">文件修改
-                        <input type="file" class="document_modify"/>
-                        </a>
+                        <t t-if="item_files.type == 'Other' || item_files.type == 'Design'">
+                            <a href="javascript:;" class="document_modify_wraper document_modify_2" >文件修改
+                            </a>
+                        </t>
+                        <t t-else="">
+                            <a href="javascript:;" class="document_modify_wraper">文件修改
+                            <input type="file" class="document_modify"/>
+                            </a>
+                        </t>
                     </t>
                     <t t-if="item_files.is_able_to_use == true || approval_type=='waiting_submit' ||approval_type=='waiting_approval'">
                         <button class="btn btn-primary document_download" t-att-data="item_files.type">下载</button>

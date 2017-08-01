@@ -22,7 +22,45 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             'click .approval_product_name': 'product_pop',
             'click .review_cancel': 'cancel_approval',
             'click .document_download': 'document_download_fn',
-            'click .download_file': 'document_download_fn'
+            'click .download_file': 'document_download_fn',
+            'click .document_modify_2': 'document_modify_2_fn',
+        },
+        document_modify_2_fn: function (e) {
+            var self = this;
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var default_code = $(target).parents(".tab_pane_display").find(".approval_product_name").attr("default-code").trim()
+            var cur_type = $(target).parents(".document_btns").find(".document_download").attr("data");
+            var ret = $(target).parents(".tab_pane_display").find(".version_span").text()
+            var remote_file = cur_type.toUpperCase() + '/' + default_code.split('.').join('/') + '/v' + ret +
+                '/' + cur_type.toUpperCase() + '_' + default_code.split('.').join('_') + '_v' + ret
+            console.log(ret);
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8088/uploadfile?id=" + this.product_id + "&remotefile=" + remote_file,
+                success: function (data) {
+                    framework.unblockUI();
+                    console.log(data);
+                    if (data.result == '1') {
+                        $(target).parents(".tab_pane_display").children(".tab_message_display").prepend("<div class='document_modify_name'>新修改的文件：<span>" + data.choose_file_name + "</span></div>");
+                        var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
+                        console.log(data);
+                        return new Model("product.attachment.info")
+                            .call("update_attachment", [parseInt(new_file_id)], {remote_path: data.path})
+                            .then(function (result) {
+                                Dialog.alert(target, "修改成功");
+                            })
+                        //$(".my_load_file_name").val(data.choose_file_name)
+                        //$(".my_load_file_remote_path").val(data.path)
+                    }
+                },
+                error: function (error) {
+                    framework.unblockUI();
+                    Dialog.alert(target, "上传失败,请打开代理软件");
+                    console.log(error);
+                }
+            })
+
         },
         //下载
         document_download_fn: function (e) {
