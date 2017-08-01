@@ -35,7 +35,7 @@ class report_purchase(http.Controller):
             header_list = [
                 _('Order No'), _('Supplier'), _('Create By'), _('Order Date'), _('Product'),
                 _('Inner Code'), _('Specification'), _('Unit Price'), _('Order qty'), _('Receive qty'),
-                _('Invoiced qty'), _('Sub Total'), _('Total Amount'), u'开单金额', u'截止金额'
+                _('Invoiced qty'), _('Sub Total'), _('Total Amount'), u'收货金额', u'开单金额', u'截止金额'
 
             ]
 
@@ -49,10 +49,12 @@ class report_purchase(http.Controller):
                 data_sheet.write(current_row, 1, vals.get('partner') and vals.get('partner') or '', style)
                 data_sheet.write(current_row, 2, vals.get('create_uid') and vals.get('create_uid') or '', style)
                 data_sheet.write(current_row, 3, vals.get('date_order') and vals.get('date_order') or '', style)
-                data_sheet.write(current_row, 12, vals.get('order_price') and vals.get('order_price') or '', style)
-                data_sheet.write(current_row, 13, vals.get('invoiced_amount') and vals.get('invoiced_amount') or '',
+                data_sheet.write(current_row, 12, vals.get('order_price') and vals.get('order_price') or 0.0, style)
+                data_sheet.write(current_row, 13, vals.get('shipped_amount') and vals.get('shipped_amount') or 0.0,
                                  style)
-                data_sheet.write(current_row, 14, vals.get('remaining_amount') and vals.get('remaining_amount') or '',
+                data_sheet.write(current_row, 14, vals.get('invoiced_amount') and vals.get('invoiced_amount') or 0.0,
+                                 style)
+                data_sheet.write(current_row, 15, vals.get('remaining_amount') and vals.get('remaining_amount') or 0.0,
                                  style)
 
                 if not record.get('line'):

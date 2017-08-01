@@ -31,7 +31,8 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
                 'date_order': purchase.date_order,
                 'order_price': purchase.amount_total,
                 'remaining_amount': purchase.remaining_amount,
-                'invoiced_amount': purchase.invoiced_amount
+                'invoiced_amount': purchase.invoiced_amount,
+                'shipped_amount': purchase.shipped_amount
 
             }
             for line in purchase.order_line:

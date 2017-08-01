@@ -23,17 +23,22 @@ class PurchaseOrder(models.Model):
     product_qty = fields.Float(related='order_line.product_qty')
     invoiced_amount = fields.Float(compute='_compute_invoice_amount')
     remaining_amount = fields.Float(compute='_compute_invoice_amount')
+    shipped_amount = fields.Float(compute='_compute_invoice_amount')
 
     @api.multi
     @api.depends('invoice_ids')
     def _compute_invoice_amount(self):
         for order in self:
-            invoiced_amount = remaining_amount = 0.0
+            invoiced_amount = remaining_amount = shipped_amount = 0.0
+            for line in order.order_line:
+                shipped_amount += line.qty_received * line.price_unit
             for invoice in order.invoice_ids:
                 invoiced_amount += invoice.amount_total
                 remaining_amount += invoice.residual
             order.invoiced_amount = invoiced_amount
             order.remaining_amount = remaining_amount
+            order.shipped_amount = shipped_amount
+
 
     @api.depends('product_count', 'order_line.qty_received')
     def _compute_shipping_rate(self):
