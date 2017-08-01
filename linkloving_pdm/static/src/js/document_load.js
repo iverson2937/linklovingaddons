@@ -173,9 +173,12 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             }
         },
         document_modify_2_fn: function (e) {
+            var self = this;
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var default_code = self.product_info.default_code.trim()
+            var cur_type = $("#document_tab li.active>a").attr("data");
+            var ret = $(target).parents(".tab_pane_display").find(".version_span").text()
             var remote_file = cur_type.toUpperCase() + '/' + default_code.split('.').join('/') + '/v' + ret +
                 '/' + cur_type.toUpperCase() + '_' + default_code.split('.').join('_') + '_v' + ret
             console.log(ret);
@@ -200,7 +203,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 },
                 error: function (error) {
                     framework.unblockUI();
-                    Dialog.alert("上传失败,请打开代理软件");
+                    Dialog.alert(target, "上传失败,请打开代理软件");
                     console.log(error);
                 }
             })
@@ -355,8 +358,9 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             if (parent && parent.action_stack.length > 0){
                 this.action_manager = parent.action_stack[0].widget.action_manager
             }
-            if (action.product_id) {
-                this.product_id = action.product_id;
+            console.log(parent);
+            if (action.context.active_id) {
+                this.product_id = action.context.active_id;
             } else {
                 this.product_id = action.params.active_id;
             }

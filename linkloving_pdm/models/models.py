@@ -224,6 +224,7 @@ class ProductAttachmentInfo(models.Model):
             'product_id': {
                 'id': self.product_tmpl_id.id,
                 'name': self.product_tmpl_id.display_name,
+                'default_code': self.product_tmpl_id.default_code,
             },
             'id': self.id,
             'file_name': self.file_name or '',
