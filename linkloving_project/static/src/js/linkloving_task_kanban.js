@@ -400,7 +400,7 @@ odoo.define('linkloving.task_kanban_view', function (require) {
                 _.each(tasks, function (task) {
                     var group_name;
                     _.each(top_tasks, function (t) {
-                        if (t.id == task[_.first(group_bys)])
+                        if (t.id == task[_.first(group_bys)][0])
                             group_name = t.__name;
                     });
                     var group = _.find(groups, function (group) {
