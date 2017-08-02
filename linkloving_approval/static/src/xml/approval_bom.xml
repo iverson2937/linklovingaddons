@@ -72,7 +72,7 @@
                              <!--<div>审核不通过</div>-->
                         </t>
                     </t>
-                    <t t-if="item_files.state[0] == 'released'">
+                    <t t-if="item_files.state[0] == 'release'">
                          <div><t t-esc="item_files.state[1]" /></div>
                     </t>
 

@@ -9,7 +9,8 @@ BOM_STATE = {
     'release': u'已发布',
     'deny': u'被拒',
     'cancel': u"已取消",
-    'new': u'新建'
+    'new': u'新建',
+    'updated': u'更改'
 }
 
 

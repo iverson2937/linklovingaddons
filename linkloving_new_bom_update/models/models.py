@@ -8,11 +8,48 @@ from odoo.exceptions import UserError
 
 class MrpBom(models.Model):
     _inherit = 'mrp.bom'
+    _order = 'sequence,write_date'
 
     review_id = fields.Many2one("review.process",
                                 string=u'待...审核',
                                 track_visibility='always',
                                 readonly=True, copy=False)
+    current_review_id = fields.Many2one('res.users', compute='get_current_review_id', store=True)
+
+    @api.multi
+    def get_current_review_id(self):
+        for bom in self:
+            bom.current_review_id = bom.create_uid.id
+
+    sequence = fields.Integer(compute='_get_sequence', store=True)
+
+    def check_can_update(self):
+        updateable_states = ('draft', 'confirmed', 'waiting_material', 'done', 'cancel')
+        mo_ids = self.env['mrp.production'].search([('product_tmpl_id', '=', self.product_tmpl_id.id), (
+            'state', 'not in', updateable_states)])
+        if mo_ids:
+            raise UserError('有相关生产单在生产中,不可以修改改产品BOM,请联系生产管理员')
+
+    # bom的排序
+    @api.multi
+    @api.depends('product_tmpl_id.product_ll_type')
+    def _get_sequence(self):
+        for bom in self:
+            if bom.product_tmpl_id.product_ll_type == 'finished':
+                bom.sequence = 1
+            else:
+                bom.sequence = 2
+
+    @api.multi
+    def write(self, vals):
+        self.check_can_update()
+
+        if 'bom_line_ids' in vals:
+            vals.update({
+                'current_review_id': self.env.user.id,
+                'state': 'updated',
+            })
+        return super(MrpBom, self).write(vals)
 
     @api.multi
     def bom_detail_new(self):
@@ -111,3 +148,22 @@ def _get_rec(object, level, parnet, qty=1.0, uom=False):
         }
 
     return res
+
+
+class MrpBomLine(models.Model):
+    _inherit = 'mrp.bom.line'
+
+    @api.model
+    def create(self, vals):
+        print vals, 'create'
+        return super(MrpBomLine, self).create(vals)
+
+    @api.multi
+    def write(self, vals):
+        print vals, 'write'
+        return super(MrpBomLine, self).write(vals)
+
+    @api.multi
+    def unlink(self):
+        print self, 'unlink'
+        return super(MrpBomLine, self).unlink()
