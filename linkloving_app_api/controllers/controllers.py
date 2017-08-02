@@ -2267,6 +2267,13 @@ class LinklovingAppApi(http.Controller):
         elif state == 'cancel_backorder':  # 取消欠单\
             wiz = request.env['stock.backorder.confirmation'].sudo().create({'pick_id': picking_id})
             wiz.process_cancel_backorder()
+        elif state == 'transfer_way':  # 入库方式: 全部入库 or 良品入库
+            is_all = request.jsonrequest.get("is_all")
+            if is_all:
+                picking_obj.transfer_way = is_all
+            else:
+                raise UserError(u"请选择入库方式")
+
         elif state == 'transfer':#入库
             picking_obj.to_stock()
         elif state == 'start_prepare_stock': #开始备货

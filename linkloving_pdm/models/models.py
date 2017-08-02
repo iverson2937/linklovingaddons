@@ -187,7 +187,7 @@ class ReviewProcessLine(models.Model):
         })
         # 新建一个 审核条目 指向最初的人
         self.env["review.process.line"].create({
-            'partner_id': self.create_uid.partner_id.id,
+            'partner_id': self.review_id.create_uid.partner_id.id,
             'review_id': self.review_id.id,
             'last_review_line_id': self.id,
             'review_order_seq': self.review_order_seq + 1,
@@ -411,6 +411,10 @@ class ProductAttachmentInfo(models.Model):
     # 等待发布 -> 被拒
     @api.multi
     def action_deny(self):
+        for info in self:
+            if info.state in ['deny', 'waiting_release']:
+                raise UserError(u"该文件不在审核中,无法审核不通过")
+
         self.write({
             'state': 'deny'
         })
@@ -624,7 +628,6 @@ class ReviewProcessWizard(models.TransientModel):
 
     # 审核不通过
     def action_deny(self):
-        self.review_process_line.action_deny(self.remark)
         # 改变文件状态
         review_type = self._context.get('review_type')
         if review_type == 'bom_review':
@@ -636,7 +639,6 @@ class ReviewProcessWizard(models.TransientModel):
         return True
 
     def action_cancel_review(self):
-        self.review_process_line.action_cancel(self.remark)
         review_type = self._context.get('review_type')
         if review_type == 'bom_review':
             self.bom_id.action_cancel()
