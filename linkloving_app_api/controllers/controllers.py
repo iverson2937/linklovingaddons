@@ -2334,10 +2334,13 @@ class LinklovingAppApi(http.Controller):
                 'rejects_qty': pack.rejects_qty,
             }
             move_ids = pack.linked_move_operation_ids.mapped("move_id")
-            if len(move_ids) == 1:
-                dic["origin_qty"] = move_ids.product_uom_qty
-            if move_ids in move_lines:
-                move_lines -= move_ids
+            origin_qty = 0
+            for move in move_ids:
+                # if len(move_ids) == 1:
+                origin_qty += move.product_uom_qty
+                if move in move_lines:
+                    move_lines -= move
+            dic["origin_qty"] = origin_qty
             pack_list.append(dic)
         for move in move_lines.filtered(lambda x: x.state != 'cancel'):
             dic = {
