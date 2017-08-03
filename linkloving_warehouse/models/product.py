@@ -43,6 +43,60 @@ class ProductProduct(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    reordering_min_qty = fields.Float(compute='_compute_nbr_reordering_rules', store=True,
+                                      inverse='_set_nbr_reordering_rules')
+    reordering_max_qty = fields.Float(compute='_compute_nbr_reordering_rules', store=True,
+                                      inverse='_set_nbr_reordering_rules')
+
+    @api.multi
+    def view_product_id(self):
+        for product in self:
+            return {
+                'type': 'ir.actions.act_window',
+                'res_model': 'product.template',
+                'view_mode': 'form',
+                'view_type': 'form',
+                'views': [[False, 'form']],
+                'target': 'current',
+                'res_id': product.id
+            }
+
+    @api.multi
+    def _set_nbr_reordering_rules(self):
+        OrderPoint = self.env['stock.warehouse.orderpoint']
+        for product_tmplate in self:
+            if product_tmplate.reordering_max_qty < product_tmplate.reordering_min_qty:
+                raise UserError(u'最小数量不能大于最大数量')
+
+            orderpoint = OrderPoint.search([('product_id', '=', product_tmplate.product_variant_ids[0].id)])
+            if not orderpoint:
+                orderpoint.create({
+                    'product_id': product_tmplate.product_variant_ids[0].id,
+                    'product_max_qty': product_tmplate.reordering_max_qty if product_tmplate.reordering_max_qty else 0.0,
+                    'product_min_qty': product_tmplate.reordering_min_qty if product_tmplate.reordering_min_qty else 0.0,
+                })
+            elif len(orderpoint) > 1:
+                raise UserError(u'有多条存货规则,请确认')
+            elif len(orderpoint) == 1:
+                orderpoint.product_max_qty = product_tmplate.reordering_max_qty
+                orderpoint.product_min_qty = product_tmplate.reordering_min_qty
+
+    def _compute_nbr_reordering_rules(self):
+        res = {k: {'nbr_reordering_rules': 0, 'reordering_min_qty': 0, 'reordering_max_qty': 0} for k in self.ids}
+        product_data = self.env['stock.warehouse.orderpoint'].read_group(
+            [('product_id.product_tmpl_id', 'in', self.ids)], ['product_id', 'product_min_qty', 'product_max_qty'],
+            ['product_id'])
+        for data in product_data:
+            product = self.env['product.product'].browse([data['product_id'][0]])
+            product_tmpl_id = product.product_tmpl_id.id
+            res[product_tmpl_id]['nbr_reordering_rules'] += int(data['product_id_count'])
+            res[product_tmpl_id]['reordering_min_qty'] = data['product_min_qty']
+            res[product_tmpl_id]['reordering_max_qty'] = data['product_max_qty']
+        for template in self:
+            template.nbr_reordering_rules = res[template.id]['nbr_reordering_rules']
+            template.reordering_min_qty = res[template.id]['reordering_min_qty']
+            template.reordering_max_qty = res[template.id]['reordering_max_qty']
+
     # @api.multi
     # def write(self, vals):
     #     if 'uom_id' in vals:
@@ -95,4 +149,3 @@ class ProductTemplate(models.Model):
                 [('product_tmpl_id', '=', record.id), ('active', '=', active)])
             for product in products:
                 product.active = not product.active
-
