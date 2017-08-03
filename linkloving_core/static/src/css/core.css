@@ -84,24 +84,28 @@
 }
 
 
-/*.fix_table{*/
+
+.o_list_editable .o_form_view.o_list_editable_form .o_form_textarea{
+    border: none;
+}
+.fix_table{
     /*position: relative;*/
-/*}*/
-/*.fix_table_thead{*/
-    /*position: fixed;*/
-    /*width: calc(100% - 237px);*/
-/*}*/
-/*.table-responsive .not_full_thead{*/
-    /*position: fixed;*/
-    /*width: calc(100% - 220px)!important;*/
-/*}*/
-/*.fix_table_thead_tr{*/
-    /*width: 100%;*/
-    /*display: block;*/
-/*}*/
-/*.fix_table_thead_tr_th{*/
-    /*padding-right: 0;*/
-/*}*/
+}
+.fix_table_thead{
+    position: fixed;
+    width: calc(100% - 237px);
+}
+.table-responsive .not_full_thead{
+    position: fixed;
+    width: calc(100% - 220px)!important;
+}
+.fix_table_thead_tr{
+    width: 100%;
+    display: block;
+}
+.fix_table_thead_tr_th{
+    padding-right: 0;
+}
 
 
 
