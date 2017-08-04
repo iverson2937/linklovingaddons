@@ -177,12 +177,13 @@
                         ('availability', 'not in', ['partially_available', 'assigned']), ('state', 'not in',
                         ('progress')), ('routing_id', '!=', False),('is_multi_output','=',True)]}
                     </attribute>
-
-
-                    <!--<button name="add_input_out_products" class="oe_highlight"-->
-                    <!--attrs="{'invisible': [('state', '!=', 'draft')]}" type="object"-->
-                    <!--string="添加投入产出" groups="linkloving_mrp_extend.group_charge_inspection"/>-->
                 </xpath>
+
+                    <xpath expr="//button[@name='button_produce_finish']" position="attributes">
+                        <attribute name="attrs">{'invisible': [('state', '!=', 'progress')]}</attribute>
+                </xpath>
+
+
                 <xpath expr="//button[@name='open_produce_product']" position="after">
 
                     <button name="button_multi_output" class="oe_highlight"
