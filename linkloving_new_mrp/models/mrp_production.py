@@ -72,9 +72,9 @@ class NewMrpProduction(models.Model):
                     finish_id.quantity_done += line.produce_qty
                     line.produce_qty=0
 
-        if sum(move.quantity_done for move in self.move_raw_ids) < sum(
-                move.quantity_done for move in self.move_finished_ids):
-            raise UserError('产出大于投入')
+                    # if sum(move.quantity_done for move in self.move_raw_ids) < sum(
+                    #         move.quantity_done for move in self.move_finished_ids):
+                    #     raise UserError('产出大于投入')
 
     def button_produce_finish(self):
         if self.is_multi_output:
