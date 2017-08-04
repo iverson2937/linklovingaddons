@@ -80,7 +80,7 @@ class hr_analytic_timesheet(models.Model):
     general_account_id = fields.Many2one('account.account', 'General Account', required=True, ondelete='restrict',
                                          default=1)
     journal_id = fields.Many2one('account.analytic.journal', 'Analytic Journal', required=True, ondelete='restrict',
-                                 select=True, default=1)
+                                 index=True, default=1)
     date = fields.Date(default=fields.date.today())
     user_id = fields.Many2one('res.users')
 

@@ -63,7 +63,7 @@ class linkloving_project_task(models.Model):
                     else:
                         parent_id._get_top_task_id()
 
-    reviewer_id = fields.Many2one('res.users', string='Reviewer', select=True, track_visibility='onchange',
+    reviewer_id = fields.Many2one('res.users', string='Reviewer', index=True, track_visibility='onchange',
                                   default=lambda self: self.env.user)
     planed_level = fields.Selection(AVAILABLE_PRIORITIES, string=u'计划星级')
     actual_level = fields.Selection(AVAILABLE_PRIORITIES, string=u'质量星级')
