@@ -297,12 +297,35 @@
         </record>
 
         <record id="crm_sale_action_partner_form" model="ir.actions.act_window">
-            <field name="name">Customers.crm</field>
+            <field name="name">潜在客户</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">res.partner</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,kanban,form</field>
-            <field name="domain">[('customer','=','1'),('is_company','=',True),('is_order','=',False)]</field>
+            <field name="domain">[('customer','=','1'),('is_company','=',True),('is_order','=',False),('public_partners','!=','public')]</field>
+            <field name="context">{'default_customer':True,'default_is_company':True}</field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="base.view_res_partner_filter"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to add a contact in your address book.
+                </p>
+                <p>
+                    Odoo helps you easily track all activities related to
+                    a customer; discussions, history of business opportunities,
+                    documents, etc.
+                </p>
+            </field>
+        </record>
+
+
+        <record id="crm_public_partner_form" model="ir.actions.act_window">
+            <field name="name">公海客户</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="domain">[('customer','=','1'),('is_company','=',True),('public_partners','=','public')]</field>
             <field name="context">{'default_customer':True,'default_is_company':True}</field>
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="base.view_res_partner_filter"/>
@@ -327,11 +350,11 @@
 
 
         <!--&lt;!&ndash;Receipt*&ndash;&gt;-->
-        <!--<menuitem action="crm_sale_action_partner_form"-->
-                  <!--id="menu_mutual_customer_id"-->
-                  <!--parent="sales_team.menu_sales"-->
-                  <!--groups=""-->
-                  <!--sequence="2" name="公海客户"/>-->
+        <menuitem action="crm_public_partner_form"
+                  id="menu_public_partner_id"
+                  parent="sales_team.menu_sales"
+                  groups=""
+                  sequence="2" name="公海客户"/>
 
 
         <menuitem action="action_message_order_status"

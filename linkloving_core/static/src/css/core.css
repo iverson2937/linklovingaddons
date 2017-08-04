@@ -5,82 +5,97 @@
     border: 1px solid black;
     border-radius: 3px;
 }
-.oe_petstore_top{
+
+.oe_petstore_top {
     padding: 30px;
-    border:1px solid #c8c8d3;
+    border: 1px solid #c8c8d3;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     font-size: 22px;
     margin: 50px;
 }
-.tables{
-    margin:0 auto;
+
+.tables {
+    margin: 0 auto;
     margin-top: 100px;
     width: 70%;
 }
-.tables thead tr th{
+
+.tables thead tr th {
     background-color: #5B899E;
 }
-.tables tbody tr td:nth-child(1){
+
+.tables tbody tr td:nth-child(1) {
     width: 30px;
 }
 
-.oe_petstore_homepage .te .fa{
+.oe_petstore_homepage .te .fa {
     display: table-cell !important;
 }
 
-
-.o_web_client{
+.o_web_client {
     /*overflow: scroll!important;*/
     /*width:100%!important;*/
     /*min-width: 1400px;!important;*/
 }
-#accordion{
+
+#accordion {
     margin-top: 30px;
     /*width: 100%;*/
     /*min-width: 1200px;*/
 }
-#accordion h4,#accordion a,#accordion span{
-    font-size: 13px!important;
-    font-weight:500!important;
+
+#accordion h4, #accordion a, #accordion span {
+    font-size: 13px !important;
+    font-weight: 500 !important;
 }
-#accordion .panel{
-    border:none!important;
+
+#accordion .panel {
+    border: none !important;
     box-shadow: none !important;
     -webkit-box-shadow: none !important;
 }
-#accordion .panel-body{
+
+#accordion .panel-body {
     padding-top: 3px;
     padding-bottom: 1px;
     padding-left: 25px;
 }
-#accordion>.panel>.panel-collapse>.panel-body{
+
+#accordion > .panel > .panel-collapse > .panel-body {
     padding-bottom: 50px;
 }
-#accordion .panel-success{
-    margin-left: 15px!important;
+
+#accordion .panel-success {
+    margin-left: 15px !important;
 }
-#accordion .btn{
+
+#accordion .btn {
     padding: 6px 8px;
     font-size: 12px;
     line-height: 0.9;
 }
-#accordion .open-sign{
-    font-size: 20px!important;
+
+#accordion .open-sign {
+    font-size: 20px !important;
     margin-left: -10px;
 }
 
-
-
-.o_content header{
+.o_content header {
     position: fixed;
     z-index: 100;
     width: calc(100% - 236px);
 }
-.o_content .o_form_sheet{
-    margin:100px auto!important;
+
+.o_content .o_form_sheet {
+    margin: 100px auto !important;
 }
-.chk_all_mo,.po_details{
-    margin-right: 15px!important;
+
+.chk_all_mo, .po_details {
+    margin-right: 15px !important;
+}
+
+.o_list_editable .o_form_view.o_list_editable_form .o_form_textarea {
+    border: none;
 }
 
 .fix_table {
@@ -106,10 +121,8 @@
     padding-right: 0;
 }
 
-
-
-.m2mcheckbox{
-    margin-right: 5px!important;
+.m2mcheckbox {
+    margin-right: 5px !important;
 }
 
 .o_list_editable .o_form_view.o_list_editable_form .o_form_textarea {

@@ -875,9 +875,10 @@ odoo.define('mail.composers', function (require) {
             }
             ,
             focus: function () {
-                this.$input.focus();
-            }
-            ,
+                if (this.$input) {
+                    this.$input.focus();
+                }
+            },
         })
         ;
 
