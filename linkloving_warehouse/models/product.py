@@ -47,12 +47,13 @@ class ProductTemplate(models.Model):
                                       inverse='_set_nbr_reordering_rules')
     reordering_max_qty = fields.Float(compute='_compute_nbr_reordering_rules', store=True,
                                       inverse='_set_nbr_reordering_rules')
-    last1_month_qty = fields.Float(string=u'上月销量')
-    last2_month_qty = fields.Float(string=u'上上月销量')
-    last3_month_qty = fields.Float(string=u'上上上月销量')
 
-    def compute_sale_qty(self):
-        products = f
+    # last1_month_qty = fields.Float(string=u'上月销量')
+    # last2_month_qty = fields.Float(string=u'上上月销量')
+    # last3_month_qty = fields.Float(string=u'上上上月销量')
+
+    # def compute_sale_qty(self):
+    #     products = f
 
     @api.multi
     def view_product_id(self):
