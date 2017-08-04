@@ -2269,11 +2269,16 @@ class LinklovingAppApi(http.Controller):
             wiz.process_cancel_backorder()
         elif state == 'transfer_way':  # 入库方式: 全部入库 or 良品入库
             is_all = request.jsonrequest.get("is_all")
-            if is_all:
-                picking_obj.transfer_way = is_all
+            if is_all == 'all':
+                is_all_in = True
+            elif is_all == 'part':
+                is_all_in = False
             else:
                 raise UserError(u"请选择入库方式")
-
+            request.env["stock.transfer.way"].with_context({'is_all_transfer_in': is_all_in}).sudo().create({
+                'picking_id': picking_obj.id,
+            }).choose_transfer_way()
+            # way.with_context({'is_all_transfer_in': is_all_in}).choose_transfer_way()
         elif state == 'transfer':#入库
             picking_obj.to_stock()
         elif state == 'start_prepare_stock': #开始备货
