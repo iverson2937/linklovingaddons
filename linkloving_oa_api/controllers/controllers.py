@@ -196,9 +196,9 @@ class LinklovingOAApi(http.Controller):
         data = {
             'id': po_order.id,
             'name': po_order.name,
-            'order_line': po_order.order_line[0].product_id.name_get()[0][1],
+            'order_line': po_order.order_line[0].product_id.display_name if po_order.order_line else '',
             'creater': po_order.create_uid.name,
-            'supplier': po_order.partner_id.commercial_company_name,
+            'supplier': po_order.partner_id.commercial_company_name or '',
             'status_light': po_order.status_light,
             'product_count': po_order.amount_total, #总数量
             'amount_total': po_order.product_count  #总金额
