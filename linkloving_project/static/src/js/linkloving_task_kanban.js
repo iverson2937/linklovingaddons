@@ -475,7 +475,7 @@ odoo.define('linkloving.task_kanban_view', function (require) {
                     }, undefined);
                     duration = (task_stop.getTime() - task_start.getTime()) / (1000 * 60 * 60);
                     duration = (duration / 24) * 8;
-                    var group_name = task.__name;// ? formats.format_value(task.name, self.fields[group_bys[level]]) : "-";
+                    var group_name = task.__name ? task.__name : task.name;// ? formats.format_value(task.name, self.fields[group_bys[level]]) : "-";
                     if (level == 0) {
                         var group = new GanttProjectInfo(_.uniqueId("gantt_project_"), group_name, task_start);
                         _.each(task_infos, function (el) {
