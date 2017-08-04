@@ -33,6 +33,7 @@ class MrpProductRuleLine(models.Model):
 
     @api.multi
     def write(self, vals):
+        pass
         # if self._context.get('no_update') and 'rule_id' in vals:
         #     vals.pop('rule_id')
-        pass
+        # return super(MrpProductRuleLine, self).write(vals)

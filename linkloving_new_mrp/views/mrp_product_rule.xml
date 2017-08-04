@@ -16,7 +16,8 @@
                         <field name="input_product_ids" options="{'reload_on_button': True}"
                                context="{'default_type':'input'}">
                             <tree editable="bottom">
-                                <field name="product_id" readonly="0" options="{'no_create': True}" string="产品"/>
+                                <field name="product_id" readonly="0" options="{'no_create': True}" string="产品"
+                                       required="1"/>
                                 <field name="produce_qty" invisible="1"/>
                                 <field name="type" invisible="1"/>
                             </tree>
@@ -25,7 +26,8 @@
                         <field name="output_product_ids" options="{'reload_on_button': True}"
                                context="{'default_type':'output'}">
                             <tree editable="bottom">
-                                <field name="product_id" readonly="0" options="{'no_create': True}" string="产品"/>
+                                <field name="product_id" readonly="0" options="{'no_create': True}" string="产品"
+                                       required="1"/>
                                 <field name="produce_qty" invisible="1"/>
                                 <field name="type" invisible="1"/>
                             </tree>
