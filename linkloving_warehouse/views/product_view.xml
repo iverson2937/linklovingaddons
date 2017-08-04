@@ -48,10 +48,9 @@
 
                 <xpath expr="//field[@name='virtual_available']" position="after">
                     <field name="reordering_min_qty"/>
-                </xpath>
-
-                <xpath expr="//field[@name='virtual_available']" position="after">
                     <field name="reordering_max_qty"/>
+                    <field name="create_uid" groups="stock.group_stock_user" readonly="1"/>
+                    <field name="create_date" groups="stock.group_stock_user" readonly="1"/>
                 </xpath>
 
 

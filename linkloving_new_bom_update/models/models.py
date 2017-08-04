@@ -42,7 +42,7 @@ class MrpBom(models.Model):
 
     @api.multi
     def write(self, vals):
-        self.check_can_update()
+        # self.check_can_update()
 
         if 'bom_line_ids' in vals:
             vals.update({

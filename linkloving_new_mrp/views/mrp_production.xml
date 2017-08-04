@@ -182,7 +182,8 @@
                 <xpath expr="//button[@name='open_produce_product']" position="after">
 
                     <button name="button_multi_output" class="oe_highlight"
-                            attrs="{'invisible': [('state', '!=', 'progress')]}" type="object"
+                            attrs="{'invisible': [('state', '!=', 'progress'),('is_multi_output','!=',True)]}"
+                            type="object"
                             string="产出" groups="linkloving_mrp_extend.group_charge_inspection"/>
                 </xpath>
 
