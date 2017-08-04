@@ -18,3 +18,18 @@ class CrmMutualCustomer(models.Model):
     customer_ids = fields.One2many('res.partner', 'mutual_rule_id', u'客户')
 
     # customer_ids = fields.Many2many('res.partner', 'crm_mutual_customer_in_res_partner_ref', u'客户')
+
+    @api.multi
+    def action_apply_all_partner(self):
+        for mutual in self:
+            domain = [('customer', '=', True), ('is_company', '=', True)]
+            partner_list = self.env['res.partner'].search(domain)
+
+            for partner_one in partner_list:
+                if partner_one.user_id and (not partner_one.mutual_rule_id):
+                    partner_one.write({'mutual_rule_id': mutual.id})
+
+            # 取消应用于全部
+            # for partner_one in partner_list:
+            #     if partner_one.user_id:
+            #         partner_one.write({'mutual_rule_id': ''})
