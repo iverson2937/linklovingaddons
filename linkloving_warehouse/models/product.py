@@ -47,6 +47,12 @@ class ProductTemplate(models.Model):
                                       inverse='_set_nbr_reordering_rules')
     reordering_max_qty = fields.Float(compute='_compute_nbr_reordering_rules', store=True,
                                       inverse='_set_nbr_reordering_rules')
+    last1_month_qty = fields.Float(string=u'上月销量')
+    last2_month_qty = fields.Float(string=u'上上月销量')
+    last3_month_qty = fields.Float(string=u'上上上月销量')
+
+    def compute_sale_qty(self):
+        products = f
 
     @api.multi
     def view_product_id(self):
@@ -63,23 +69,24 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def _set_nbr_reordering_rules(self):
-        OrderPoint = self.env['stock.warehouse.orderpoint']
-        for product_tmplate in self:
-            if product_tmplate.reordering_max_qty < product_tmplate.reordering_min_qty:
-                raise UserError(u'最小数量不能大于最大数量')
-
-            orderpoint = OrderPoint.search([('product_id', '=', product_tmplate.product_variant_ids[0].id)])
-            if not orderpoint:
-                orderpoint.create({
-                    'product_id': product_tmplate.product_variant_ids[0].id,
-                    'product_max_qty': product_tmplate.reordering_max_qty if product_tmplate.reordering_max_qty else 0.0,
-                    'product_min_qty': product_tmplate.reordering_min_qty if product_tmplate.reordering_min_qty else 0.0,
-                })
-            elif len(orderpoint) > 1:
-                raise UserError(u'有多条存货规则,请确认')
-            elif len(orderpoint) == 1:
-                orderpoint.product_max_qty = product_tmplate.reordering_max_qty
-                orderpoint.product_min_qty = product_tmplate.reordering_min_qty
+        pass
+        # OrderPoint = self.env['stock.warehouse.orderpoint']
+        # for product_tmplate in self:
+        #     if product_tmplate.reordering_max_qty < product_tmplate.reordering_min_qty:
+        #         raise UserError(u'最小数量不能大于最大数量')
+        #
+        #     orderpoint = OrderPoint.search([('product_id', '=', product_tmplate.product_variant_ids[0].id)])
+        #     if not orderpoint:
+        #         orderpoint.create({
+        #             'product_id': product_tmplate.product_variant_ids[0].id,
+        #             'product_max_qty': product_tmplate.reordering_max_qty if product_tmplate.reordering_max_qty else 0.0,
+        #             'product_min_qty': product_tmplate.reordering_min_qty if product_tmplate.reordering_min_qty else 0.0,
+        #         })
+        #     elif len(orderpoint) > 1:
+        #         raise UserError(u'有多条存货规则,请确认')
+        #     elif len(orderpoint) == 1:
+        #         orderpoint.product_max_qty = product_tmplate.reordering_max_qty
+        #         orderpoint.product_min_qty = product_tmplate.reordering_min_qty
 
     def _compute_nbr_reordering_rules(self):
         res = {k: {'nbr_reordering_rules': 0, 'reordering_min_qty': 0, 'reordering_max_qty': 0} for k in self.ids}
