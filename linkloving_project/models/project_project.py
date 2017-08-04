@@ -148,11 +148,11 @@ class project_work(models.Model):
     _order = "date desc"
 
     name = fields.Char('Work summary')
-    date = fields.Datetime('Date', select="1", default=lambda *a: fields.Datetime.now())
-    task_id = fields.Many2one('project.task', 'Task', ondelete='cascade', required=True, select="1")
+    date = fields.Datetime('Date', index="1", default=lambda *a: fields.Datetime.now())
+    task_id = fields.Many2one('project.task', 'Task', ondelete='cascade', required=True, index="1")
     hours = fields.Float('Time Spent')
     progress = fields.Float(string=u'完成进度')
-    user_id = fields.Many2one('res.users', 'Done by', required=True, select="1", default=lambda self: self.env.user)
+    user_id = fields.Many2one('res.users', 'Done by', required=True, index="1", default=lambda self: self.env.user)
     company_id = fields.Many2one('res.company', related='task_id.company_id', store=True, readonly=True)
 
     @api.model
