@@ -3,6 +3,7 @@
 # For copyright and license notices, see __openerp__.py file in module root
 # directory
 ##############################################################################
+from datetime import date, time, datetime, timedelta
 from odoo import fields, api, models
 from odoo.exceptions import UserError
 
@@ -62,6 +63,10 @@ class ResPartner(models.Model):
 
     order_partner_question_count = fields.Integer(compute='_compute_order_partner_question', string=u'客户问题汇总')
 
+    public_partners = fields.Selection([('public', '公海'), ('buffer', '缓冲区'), ('private', '私有')], string=u'公海')
+
+    old_user_id = fields.Char(string=u'前销售员')
+
     def _compute_order_partner_question(self):
         for partner in self:
             count = 0
@@ -90,6 +95,10 @@ class ResPartner(models.Model):
                 if select_company(self, vals, 'email'):
                     raise UserError(u'此Email已绑定公司，请更换')
 
+                if vals.get('user_id'):
+                    vals['public_partners'] = 'private'
+                    vals['old_user_id'] = vals.get('user_id')
+
         return super(ResPartner, self).create(vals)
 
     @api.multi
@@ -108,6 +117,16 @@ class ResPartner(models.Model):
                     if select_company(self, {item_type: self[item_type]}, item_type):
                         if item_type == 'name': item_type = u'公司名称'
                         raise UserError(u'此' + item_type + u'已绑定公司，请更换')
+
+        if 'user_id' in vals:
+            if vals.get('user_id'):
+                if vals.get('user_id') == int(self.old_user_id):
+                    raise UserError(u'此用户不允许被领取')
+                else:
+                    vals['public_partners'] = 'private'
+                    vals['old_user_id'] = vals.get('user_id')
+            else:
+                vals['public_partners'] = 'public'
 
         return super(ResPartner, self).write(vals)
 
@@ -128,7 +147,7 @@ class ResPartner(models.Model):
             record.detailed_address = asd.replace("False", "")
 
     remark_count = fields.Integer(u"备注", compute='_compute_remark_count')
-    mutual_rule_id = fields.Many2one('crm.mutual.customer')
+    mutual_rule_id = fields.Many2one('crm.mutual.customer', string=u'公海规则')
 
     @api.multi
     def _compute_remark_count(self):
@@ -137,6 +156,71 @@ class ResPartner(models.Model):
         mapped_data = {act['partner_id'][0]: act['partner_id_count'] for act in activity_data}
         for partner in self:
             partner.remark_count = mapped_data.get(partner.id, 0)
+
+    @api.multi
+    def crm_public_partner(self):
+        domain = [('customer', '=', '1'), ('is_company', '=', True)]
+        partner_list = self.env['res.partner'].search(domain)
+        for partner_one in partner_list:
+            mutual_rule = partner_one.mutual_rule_id if partner_one.mutual_rule_id else ''  # 规则对象
+
+            finally_order_time = partner_one.sale_order_ids[0].create_date if len(
+                partner_one.sale_order_ids) > 0 else ''  # 最后下单时间
+            finally_message_time = partner_one.message_ids[0].write_date if len(
+                partner_one.message_ids) > 0 else ''  # 最后跟进时间
+
+            if mutual_rule:
+                abort_time = mutual_rule.effective_time  # 截止时间
+                abort_time_date = datetime.strptime(abort_time.split(' ')[0], '%Y-%m-%d')
+
+                overdue_time = mutual_rule.description  # 过期时间
+                overdue_time_date = int(overdue_time)
+
+                now_time = datetime.now()  # 现在时间
+                now_time_date = datetime.strptime(str(now_time).split(' ')[0], '%Y-%m-%d')
+
+                no_contact_time = finally_message_time  # 未联系时间 差值 difference
+                if mutual_rule.reference_type == 'Order':
+                    no_contact_time = finally_order_time
+                elif mutual_rule.reference_type == 'Follow':
+                    no_contact_time = finally_message_time
+                if not no_contact_time:
+                    no_contact_time = partner_one.create_date
+                no_contact_time_difference = datetime.strptime(no_contact_time.split(' ')[0], '%Y-%m-%d')
+                no_contact_time_date = now_time_date - no_contact_time_difference
+
+                # 判断开始
+                interval_time = abort_time_date - now_time_date  # 》0 还没有到截止时间   《0 已经过了截止时间
+                if interval_time.days == 0:
+                    print '刚好是截止时间'
+                    if no_contact_time_date.days > overdue_time_date:
+                        print '设置为公海 取消销售员绑定'
+                        partner_one.write({'public_partners': 'public'})
+                        partner_one.write({'user_id': ''})
+                    print '取消公海规则'
+                    partner_one.write({'mutual_rule_id': ''})
+                else:
+                    if interval_time.days > 0:
+                        if no_contact_time_date.days > overdue_time_date:
+                            print '设置为警告用户'
+                            partner_one.write({'public_partners': 'buffer'})
+                    if interval_time.days < 0:
+                        if (no_contact_time_date.days - abs(interval_time.days)) > overdue_time_date:
+                            print '设置为公海 取消销售员绑定'
+                            partner_one.write({'public_partners': 'public'})
+                            partner_one.write({'user_id': ''})
+                        print '取消规则'
+                        partner_one.write({'mutual_rule_id': ''})
+
+    @api.multi
+    def init_public_partner_crm(self):
+        domain = [('customer', '=', True), ('is_company', '=', True)]
+        partner_list = self.env['res.partner'].search(domain)
+        for partner_one in partner_list:
+            if partner_one.user_id:
+                partner_one.write({'public_partners': 'private', 'old_user_id': partner_one.user_id.id})
+            else:
+                partner_one.write({'public_partners': 'public'})
 
 
 class CrmRemarkRecord(models.Model):

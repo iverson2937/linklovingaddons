@@ -1,20 +1,11 @@
 # -*- coding: utf-8 -*-
 from odoo import http
 
-# class LinklovingCrm(http.Controller):
-#     @http.route('/linkloving_crm/linkloving_crm/', auth='public')
-#     def index(self, **kw):
-#         return "Hello, world"
 
-#     @http.route('/linkloving_crm/linkloving_crm/objects/', auth='public')
-#     def list(self, **kw):
-#         return http.request.render('linkloving_crm.listing', {
-#             'root': '/linkloving_crm/linkloving_crm',
-#             'objects': http.request.env['linkloving_crm.linkloving_crm'].search([]),
-#         })
+class LinklovingCrm(http.Controller):
+    @http.route('/linkloving_crm/init_partner/', auth='public')
+    def init_partner(self, **kw):
+        ssr = http.request.env['res.partner']
+        ssr.init_public_partner_crm()
 
-#     @http.route('/linkloving_crm/linkloving_crm/objects/<model("linkloving_crm.linkloving_crm"):obj>/', auth='public')
-#     def object(self, obj, **kw):
-#         return http.request.render('linkloving_crm.object', {
-#             'object': obj
-#         })
+        return "init partner"

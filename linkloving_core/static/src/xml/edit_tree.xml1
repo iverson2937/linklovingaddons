@@ -1,0 +1,14 @@
+<tmplate>
+    <t t-name="EditTree.EditTree">
+        <button t-if="!widget.no_leaf and widget.options.action_buttons !== false" type="button"
+                class="btn btn-sm btn-default o_tree_button_edit">
+            我的编辑
+        </button>
+    </t>
+    <t t-extend="ListView.buttons">
+        <t t-jquery="button.o_list_button_add" t-operation="after">
+            <t t-call="EditTree.EditTree"/>
+        </t>
+    </t>
+</tmplate>
+

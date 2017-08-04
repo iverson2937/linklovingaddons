@@ -23,6 +23,9 @@ odoo.define('linkloving_crm.list_viewsss', function (require) {
     var Priority = require('web.Priority');
 
 
+    var Composer = require('mail.composer');
+
+
     var Class = core.Class;
     var _t = core._t;
     var _lt = core._lt;
@@ -80,6 +83,15 @@ odoo.define('linkloving_crm.list_viewsss', function (require) {
             });
         },
     });
+
+
+    Composer.BasicComposer.include({
+        focus: function () {
+            if (this.$input) {
+                this.$input.focus();
+            }
+        },
+    })
 
 
     list_widget_registry

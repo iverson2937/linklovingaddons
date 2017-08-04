@@ -32,10 +32,11 @@
         # 'views/stock_picking_view.xml',
         'views/product_view.xml',
         'views/product_config.xml',
-        'templates.xml',
+        # 'views/assets.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
         'demo.xml',
     ],
+    'qweb': ['static/src/xml/*.xml'],
 }
