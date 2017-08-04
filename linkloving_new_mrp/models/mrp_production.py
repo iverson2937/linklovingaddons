@@ -14,9 +14,9 @@ class NewMrpProduction(models.Model):
     stock_move_lines_finished = fields.One2many('stock.move.finished', 'production_id')
     is_force_output = fields.Boolean(string=u'是否要求产出完整', default=False)
 
-    @api.onchange('rule_id')
-    def on_change_rule_id(self):
-        self.product_tmpl_id = False
+    # @api.onchange('rule_id')
+    # def on_change_rule_id(self):
+    #     self.product_tmpl_id = False
 
     product_id = fields.Many2one(
         'product.product', 'Product',
