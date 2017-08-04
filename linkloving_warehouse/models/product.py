@@ -74,19 +74,21 @@ class ProductTemplate(models.Model):
         for product_tmplate in self:
             if product_tmplate.reordering_max_qty < product_tmplate.reordering_min_qty:
                 raise UserError(u'最小数量不能大于最大数量')
+            if product_tmplate.product_variant_ids:
+                product_id = product_tmplate.product_variant_ids[0].id
 
-            orderpoint = OrderPoint.search([('product_id', '=', product_tmplate.product_variant_ids[0].id)])
-            if not orderpoint:
-                orderpoint.create({
-                    'product_id': product_tmplate.product_variant_ids[0].id,
-                    'product_max_qty': product_tmplate.reordering_max_qty if product_tmplate.reordering_max_qty else 0.0,
-                    'product_min_qty': product_tmplate.reordering_min_qty if product_tmplate.reordering_min_qty else 0.0,
-                })
-            elif len(orderpoint) > 1:
-                raise UserError(u'有多条存货规则,请确认')
-            elif len(orderpoint) == 1:
-                orderpoint.product_max_qty = product_tmplate.reordering_max_qty
-                orderpoint.product_min_qty = product_tmplate.reordering_min_qty
+                orderpoint = OrderPoint.search([('product_id', '=', product_id)])
+                if not orderpoint:
+                    orderpoint.create({
+                        'product_id': product_tmplate.product_variant_ids[0].id,
+                        'product_max_qty': product_tmplate.reordering_max_qty if product_tmplate.reordering_max_qty else 0.0,
+                        'product_min_qty': product_tmplate.reordering_min_qty if product_tmplate.reordering_min_qty else 0.0,
+                    })
+                elif len(orderpoint) > 1:
+                    raise UserError(u'有多条存货规则,请确认')
+                elif len(orderpoint) == 1:
+                    orderpoint.product_max_qty = product_tmplate.reordering_max_qty
+                    orderpoint.product_min_qty = product_tmplate.reordering_min_qty
 
     def _compute_nbr_reordering_rules(self):
         res = {k: {'nbr_reordering_rules': 0, 'reordering_min_qty': 0, 'reordering_max_qty': 0} for k in self.ids}
