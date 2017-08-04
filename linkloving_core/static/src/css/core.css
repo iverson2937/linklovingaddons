@@ -84,7 +84,7 @@
 }
 
 .fix_table {
-    position: relative;
+    /*position: relative;*/
 }
 
 .fix_table_thead {
@@ -110,4 +110,8 @@
 
 .m2mcheckbox{
     margin-right: 5px!important;
+}
+
+.o_list_editable .o_form_view.o_list_editable_form .o_form_textarea {
+    border: none;
 }
