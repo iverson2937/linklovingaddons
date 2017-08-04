@@ -68,6 +68,15 @@ class NewMrpProduction(models.Model):
         self.write({'state': 'waiting_material'})
 
     @api.multi
+    def _compute_qty_unpost(self):
+        for production in self:
+            if production.is_multi_output:
+                production.qty_unpost = sum(production.stock_move_lines_finished.mapped('quantity_done_finished'))
+            else:
+                feedbacks = production.qc_feedback_ids.filtered(lambda x: x.state not in ["check_to_rework"])
+                production.qty_unpost = sum(feedbacks.mapped("qty_produced"))
+
+    @api.multi
     def confirm_output(self):
 
         for line in self.output_product_ids:
