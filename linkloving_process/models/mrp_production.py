@@ -96,6 +96,9 @@ class MrpProduction(models.Model):
         self.unit_price = self.bom_id.unit_price
         self.mo_type = self.bom_id.mo_type
         self.hour_price = self.bom_id.hour_price
+
+    @api.onchange('process_id')
+    def on_change_process_id(self):
         self.in_charge_id = self.process_id.partner_id
 
     @api.multi
