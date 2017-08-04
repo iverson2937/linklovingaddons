@@ -57,10 +57,10 @@ class NewMrpProduction(models.Model):
         self.bom_id = False
 
     def button_waiting_material(self):
-        if self.is_multi_output:
-
-            if not self.output_product_ids or not self.input_product_ids:
-                raise UserError(u'请添加投入产出')
+        # if self.is_multi_output:
+        #
+        #     if not self.output_product_ids or not self.input_product_ids:
+        #         raise UserError(u'请添加投入产出')
         self.write({'state': 'waiting_material'})
 
     @api.multi
