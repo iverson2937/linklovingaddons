@@ -112,7 +112,7 @@ class MrpProcess(models.Model):
         }
         for field in domains:
             data = self.env['mrp.production'].read_group(domains[field] +
-                                                         [('state', 'not in', ('done', 'cancel', 'draft')),
+                                                         [('state', 'not in', ('done', 'cancel')),
                                                           ('process_id', 'in', self.ids)], ['process_id'],
                                                          ['process_id']
                                                          )
