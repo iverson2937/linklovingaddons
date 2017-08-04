@@ -14,6 +14,10 @@ class NewMrpProduction(models.Model):
     stock_move_lines_finished = fields.One2many('stock.move.finished', 'production_id')
     is_force_output = fields.Boolean(string=u'是否要求产出完整', default=False)
 
+    @api.onchange('rule_id')
+    def on_change_rule_id(self):
+        self.product_tmpl_id = False
+
     product_id = fields.Many2one(
         'product.product', 'Product',
         domain=[('type', 'in', ['product', 'consu'])],
@@ -70,7 +74,7 @@ class NewMrpProduction(models.Model):
             for finish_id in self.move_finished_ids:
                 if line.product_id.id == finish_id.product_id.id:
                     finish_id.quantity_done += line.produce_qty
-                    line.produce_qty=0
+                    line.produce_qty = 0
 
                     # if sum(move.quantity_done for move in self.move_raw_ids) < sum(
                     #         move.quantity_done for move in self.move_finished_ids):
@@ -247,7 +251,6 @@ class NewMrpProduction(models.Model):
     def _generate_moves(self):
         print 'AAAAAAAAAAAAAAAAAAAAAAAAA'
         for production in self:
-
 
             production._generate_finished_moves()
             if production.is_multi_output:
