@@ -179,7 +179,7 @@
                 </xpath>
 
                 <xpath expr="//field[@name='phone']" position="before">
-                    <field name="level"/>
+                    <field name="level" invisible="1"/>
                     <field name="write_date" string="最近操作时间"/>
                 </xpath>
 

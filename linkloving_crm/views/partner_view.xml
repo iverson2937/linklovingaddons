@@ -123,6 +123,7 @@
                     <attribute name="default_order">write_date desc</attribute>
                 </xpath>
                 <xpath expr="//field[@name='display_name']" position="after">
+                    <field name="website"/>
                     <field name="priority" widget="priority_star"/>
                     <field name="country_id"/>
                     <field name="customer_status"/>
