@@ -10,6 +10,17 @@
             <field name="arch" type="xml">
                 <form>
                     <sheet>
+
+                        <div class="oe_button_box" name="button_box">
+                            <button type="object" string="应用于所有客户 "
+                                    name="action_apply_all_partner"
+                                    context="{'sale_type': 'inspection'}"
+                                    class="oe_stat_button"
+                                    icon="fa-file-o">
+                                    <!--attrs="{'invisible': [('delivery_count', '=', 0)]}" groups="base.group_user">-->
+                            </button>
+                        </div>
+
                         <group>
                             <group>
                                 <field name="group_name"/>
