@@ -173,7 +173,11 @@
                 </xpath>
 
                 <xpath expr="//button[@name='open_produce_product']" position="attributes">
-                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)]}</attribute>
+                    <attribute name="attrs">{'invisible': ['|','|', '|', '|', ('check_to_done', '=', True),
+                        ('availability', 'not in', ['partially_available', 'assigned']), ('state', 'not in',
+                        ('progress')), ('routing_id', '!=', False),('is_multi_output','=',True)]}
+                    </attribute>
+
 
                     <!--<button name="add_input_out_products" class="oe_highlight"-->
                     <!--attrs="{'invisible': [('state', '!=', 'draft')]}" type="object"-->
@@ -182,7 +186,7 @@
                 <xpath expr="//button[@name='open_produce_product']" position="after">
 
                     <button name="button_multi_output" class="oe_highlight"
-                            attrs="{'invisible': [('state', '!=', 'progress'),('is_multi_output','!=',True)]}"
+                            attrs="{'invisible': ['|',('state', '!=', 'progress'),('is_multi_output','!=',True)]}"
                             type="object"
                             string="产出" groups="linkloving_mrp_extend.group_charge_inspection"/>
                 </xpath>
