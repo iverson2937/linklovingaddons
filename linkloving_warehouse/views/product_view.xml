@@ -42,8 +42,8 @@
 
                 <xpath expr="//field[@name='categ_id']" position="replace">
                 </xpath>
-                <xpath expr="//field[@name='uom_id']" position="replace">
-                </xpath>
+                <!--<xpath expr="//field[@name='uom_id']" position="replace">-->
+                <!--</xpath>-->
 
 
                 <xpath expr="//field[@name='virtual_available']" position="after">

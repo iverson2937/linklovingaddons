@@ -68,24 +68,30 @@ class LinklovingOAApi(http.Controller):
         feedbacks = request.env['res.partner'].sudo().search([('supplier', '=', True), ("is_company", '=', True)],
                                                              limit=limit,
                                                              offset=offset,
-                                                             order='id asc')
+                                                             order='id desc')
         json_list = []
         for feedback in feedbacks:
             json_list.append(self.supplier_feedback_to_json(feedback))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    def get_supplier_tags(self,objs):
+        data = []
+        for obj in objs:
+            data.append(obj.display_name)
+        return data
 
     def supplier_detail_object_to_json(self, supplier_detail_object):
         supplier_details = {
             "name": supplier_detail_object.name,
             "phone": supplier_detail_object.phone,
             "street": supplier_detail_object.street2,
-            "email": supplier_detail_object.email,
-            "website": supplier_detail_object.website,
-            "express_sample_record": supplier_detail_object.express_sample_record,
+            "email": supplier_detail_object.email or '',
+            "website": supplier_detail_object.website or '',
+            "express_sample_record": supplier_detail_object.express_sample_record or '',
             "lang": supplier_detail_object.lang,
             "contracts_count": len(supplier_detail_object.child_ids),  #联系人&地址个数
             "contracts": self.get_contracts_in_supplier(supplier_detail_object.child_ids),
-
+            'category': self.get_supplier_tags(supplier_detail_object.category_id),
             "purchase_order_count": supplier_detail_object.purchase_order_count,  #订单数量
             "invoice": supplier_detail_object.supplier_invoice_count,  #对账
             "payment_count": supplier_detail_object.payment_count,   #付款申请
@@ -269,6 +275,46 @@ class LinklovingOAApi(http.Controller):
         }
         return data
 
+    #订单搜索
+    @http.route('/linkloving_oa_api/search_purchase_order', type='json', auth="none", csrf=False, cors='*')
+    def search_purchase_order(self, *kw):
+        model = request.jsonrequest.get("model")
+        name = request.jsonrequest.get("po_number")
+        search_supplier_results = request.env[model].sudo().search(
+            [("name", 'ilike', name)],
+            limit=10,
+            offset=0,
+            order='id desc')
+        json_list = []
+        for feedback in search_supplier_results:
+            if model == 'purchase.order':
+                json_list.append(self.search_po_feedback_to_json(feedback))
+            else:
+                json_list.append(self.prma_list_to_json(feedback))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    def search_po_feedback_to_json(self, feedback):
+        data = {
+            'name': feedback.name,
+            'supplier': feedback.partner_id.display_name,
+            'product_count': feedback.amount_total, #总数量
+            'amount_total': feedback.product_count if feedback.product_count else '',  #总金额
+            'product': feedback.product_id.display_name,
+            'state': LinklovingOAApi.selection_get_map("purchase.order", "state", feedback.state),
+            'create': feedback.create_uid.display_name
+        }
+        return data
+
+    # def search_prma_feedback_to_json(self, feedback):
+    #     data = {
+    #         'name': feedback.name,
+    #         'supplier': feedback.partner_id.display_name,
+    #         'date': feedback.date,
+    #         'state': LinklovingOAApi.selection_get_map("return.goods", "state", feedback.state),
+    #         'remark': feedback.remark
+    #     }
+    #     return data
+
 
     # 送货单详情页
     # 若是采购退货，除了id还要传一个prma  值随意
@@ -293,6 +339,9 @@ class LinklovingOAApi(http.Controller):
             'is_emergency': obj.is_emergency,   #加急
             'min_date': obj.min_date,  #安排的日期
             'origin': obj.origin,   #源单据
+            'state': LinklovingOAApi.selection_get_map("stock.picking", "state", obj.state),
+            'creater': obj.create_uid.display_name,
+            'backorder': obj.backorder_id.display_name or '',  #欠单于
             'move_type': LinklovingOAApi.selection_get_map("stock.picking", "move_type", obj.move_type),  #交货类型
             'picking_type': obj.picking_type_id.display_name,  #分拣类型
             'group': obj.group_id.display_name,  #补货组
@@ -383,7 +432,7 @@ class LinklovingOAApi(http.Controller):
 
         limit = request.jsonrequest.get("limit")
         offset = request.jsonrequest.get("offset")
-        payment_request_lists = request.env['account.payment.register'].sudo().search([],
+        payment_request_lists = request.env['account.payment.register'].sudo().search([('payment_type','=','1')],
                                                                                       limit=limit,
                                                                                       offset=offset,
                                                                                       order='id desc')
@@ -409,6 +458,7 @@ class LinklovingOAApi(http.Controller):
         return {
             'name': obj.name,
             'supplier': obj.partner_id.display_name,
+            'bank': obj.bank_id.display_name,
             'amount': obj.amount,
             'receive_date': obj.receive_date,
             'remark': obj.remark or '',
@@ -421,7 +471,7 @@ class LinklovingOAApi(http.Controller):
             data.append({
                 'supplier': obj.partner_id.display_name,
                 'number': obj.number,
-                'write_date': obj.write_date,
+                'date_invoice': obj.date_invoice, #开票日期
                 'date_due': obj.date_due or '',  #截止日期
                 'remain_apply_balance': obj.remain_apply_balance,  #待申请付款金额
                 'name': obj.name,
@@ -429,4 +479,71 @@ class LinklovingOAApi(http.Controller):
                 'amount_total': obj.amount_total, #总计
                 'state': LinklovingOAApi.selection_get_map("account.invoice", "state", obj.state)
             })
+        return data
+
+    # 对账-供应商账单
+    @http.route('/linkloving_oa_api/get_account_checking_lists_tab2', type='json', auth="none", csrf=False, cors='*')
+    def get_account_checking_lists_tab2(self, *kw):
+        #若传入了id  则获取详情页
+        if request.jsonrequest.get("id"):
+            bill_detail_object = request.env['account.invoice'].sudo().browse(request.jsonrequest.get("id"))
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.bill_detail_object_parse(bill_detail_object))
+
+        limit = request.jsonrequest.get("limit")
+        offset = request.jsonrequest.get("offset")
+        type = request.jsonrequest.get("type")     #供应商账单in_invoice   退货对账单in_refund
+        bill_lists = request.env['account.invoice'].sudo().search([('type', '=', type)],
+                                                                  limit=limit,
+                                                                  offset=offset,
+                                                                  order='id desc')
+        json_list = []
+        for bill_list in bill_lists:
+            json_list.append(self.bill_list_to_json(bill_list))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    def bill_detail_object_parse(self, obj):
+        return {
+            'supllier': obj.partner_id.display_name,   #供应商
+            'deduct_amount': obj.deduct_amount,  #扣款
+            'po': obj.po_id.display_name,  #采购单
+            'origin': obj.origin,   #源单据
+            'amount_untaxed': obj.amount_untaxed,  #未含税金额
+            'amount_tax': obj.amount_tax,  #税金
+            'amount_total': obj.amount_tax,  #总计
+            # 'payments_widget': obj.payments_widget if obj.payments_widget else '',  #已付金额
+            'residual': obj.residual if obj.residual is not None else '',   #截止金额
+            'bill_detail_lists': self.get_bill_detail_lists(obj.invoice_line_ids)
+        }
+
+    def get_bill_detail_lists(self, objs):
+        data = []
+        for obj in objs:
+            data.append({
+                'id': obj.id,
+                'product': obj.product_id.display_name,  #产品
+                'explain': obj.name,  #说明
+                'price_unit': obj.price_unit,  #单价
+                'price_unit_o': obj.price_unit_o,    #original price
+                'uom': obj.uom_id.display_name,
+                'subject': obj.account_id.display_name,  #科目
+                'quantity': obj.quantity,
+                'price_subtotal': obj.price_subtotal,  #金额
+                'tax': obj.invoice_line_tax_ids.name,   #税金
+            })
+        return data
+
+    def bill_list_to_json(self, obj):
+        data = {
+            'client': obj.partner_id.display_name,
+            'date_invoice': obj.date_invoice or '',
+            'number': obj.number,
+            'date_due': obj.date_due or '',
+            # 'commercial_partner': obj.commercial_partner_id.display_name,
+            'state': LinklovingOAApi.selection_get_map("account.invoice", "state", obj.state),
+            'origin': obj.origin or '',
+            'residual_signed': obj.residual_signed,    #待支付
+            'amount_total_signed': obj.amount_total_signed,    #总计
+            'remain_apply_balance': obj.remain_apply_balance,  #待申请付款金额
+            'id': obj.id
+        }
         return data
