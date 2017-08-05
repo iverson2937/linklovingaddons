@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'mrp', 'purchase', 'sale', 'linkloving_purchase'],
+    'depends': ['base', 'mrp', 'purchase', 'sale', 'linkloving_purchase', 'linkloving_process'],
 
     # always loaded
     'data': [
@@ -30,6 +30,7 @@
         'views/sale_order_view.xml',
         'views/mrp_production_view.xml',
         'views/purchase_view.xml',
+        'views/mrp_equipment.xml',
         'views/views.xml',
         'views/templates.xml',
     ],

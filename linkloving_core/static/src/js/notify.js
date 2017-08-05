@@ -1,6 +1,5 @@
 odoo.define('linkloving_core.notify', function (require) {
     "use strict";
-
     var core = require('web.core');
     var Dialog = require('web.Dialog');
     core.action_registry.add('action_notify', function (element, action) {
@@ -15,5 +14,4 @@ odoo.define('linkloving_core.notify', function (require) {
         ;
         return {'type': 'ir.actions.act_window_close'};
     });
-
 });

@@ -1,0 +1,166 @@
+<openerp>
+    <data>
+
+        <!-- Inherit Form View to Modify it -->
+        <record id="mrp_process_form_inherit" model="ir.ui.view">
+            <field name="name">mrp.process.form.inherit</field>
+            <field name="model">mrp.process</field>
+            <field name="inherit_id" ref="linkloving_process.mrp_process_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//group" position="after">
+                    <!-- Add your fields or attributes here -->
+                    <notebook>
+                        <page string="产线">
+                            <field name="production_line_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="employee_id"/>
+                                    <field name="euiqpment_names"/>
+                                    <field name="line_employee_names"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="mrp_production_line_tree" model="ir.ui.view">
+            <field name="name">mrp.production.line.tree</field>
+            <field name="model">mrp.production.line</field>
+            <field name="arch" type="xml">
+                <tree string="产线">
+                    <field name="name"/>
+                    <field name="process_id"/>
+                    <field name="employee_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="mrp_process_equipment_tree" model="ir.ui.view">
+            <field name="name">mrp.process.equipment.tree</field>
+            <field name="model">mrp.process.equipment</field>
+            <field name="arch" type="xml">
+                <tree string="设备">
+                    <field name="name"/>
+                    <field name="production_line_id" string="所属产线"/>
+                    <field name="process_id"/>
+                    <field name="employee_id"/>
+                </tree>
+            </field>
+        </record>
+        <record id="mrp_process_equipment_form" model="ir.ui.view">
+            <field name="name">mrp.process.equipment</field>
+            <field name="model">mrp.process.equipment</field>
+            <field name="arch" type="xml">
+                <form string="设备">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="process_id"/>
+                            </group>
+                            <group>
+                                <field name="employee_id"/>
+                                <field name="production_line_id" string="所属产线"/>
+                            </group>
+
+                        </group>
+                        <!--<notebook>-->
+                        <!--<page string="设备">-->
+                        <!--<field name="equipment_ids"/>-->
+                        <!--</page>-->
+                        <!--</notebook>-->
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="work_type_form" model="ir.ui.view">
+            <field name="name">work.type.form</field>
+            <field name="model">work.type</field>
+            <field name="arch" type="xml">
+                <form string="工种">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="hourly_wage"/>
+                        </group>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="mrp_production_line_form" model="ir.ui.view">
+            <field name="name">mrp.production.line</field>
+            <field name="model">mrp.production.line</field>
+            <field name="arch" type="xml">
+                <form string="产线">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="process_id"/>
+                                <field name="employee_id"/>
+                            </group>
+
+                        </group>
+                        <notebook>
+                            <page string="设备">
+                                <field name="equipment_ids"/>
+                            </page>
+                            <page string="人员">
+                                <field name="line_employee_ids" widget="many2many"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="action_mrp_production_line" model="ir.actions.act_window">
+            <field name="name">mrp.production.line</field>
+            <field name="res_model">mrp.production.line</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_mrp_production_line_config" name="产线" parent="mrp.menu_mrp_configuration" sequence="31"
+                  action="action_mrp_production_line"/>
+
+        <record id="action_mrp_equipment" model="ir.actions.act_window">
+            <field name="name">mrp.process.equipment</field>
+            <field name="res_model">mrp.process.equipment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_mrp_equipment_config" name="设备" parent="mrp.menu_mrp_configuration" sequence="32"
+                  action="action_mrp_equipment"/>
+
+        <record id="work_type_tree" model="ir.ui.view">
+            <field name="name">work.type.tree</field>
+            <field name="model">work.type</field>
+            <field name="arch" type="xml">
+                <tree string="工种">
+                    <field name="name"/>
+                    <field name="hourly_wage"/>
+                </tree>
+            </field>
+        </record>
+        <record id="action_mrp_work_type" model="ir.actions.act_window">
+            <field name="name">work.type</field>
+            <field name="res_model">work.type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_mrp_work_type_config" name="工种" parent="mrp.menu_mrp_configuration" sequence="33"
+                  action="action_mrp_work_type"/>
+
+    </data>
+</openerp>

@@ -27,11 +27,12 @@
                                     <field name="cycle_time"/>
                                     <field name="cycle_time_time_unit" options="{'no_open':True,'no_create':True}"/>
                                 </div>
+                                <field name="produced_spend_per_pcs"/>
+                            </group>
+                            <group>
                                 <field name="hour_price"/>
                                 <field name="cost"/>
-
                             </group>
-
 
                         </group>
 

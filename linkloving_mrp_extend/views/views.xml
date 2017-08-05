@@ -1357,10 +1357,10 @@
                         </group>
                     </sheet>
                     <footer>
-                        <button name="do_new_transfer" string="确认入库"
+                        <button name="confirm_transfer_way" string="确认入库"
                                 groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
                         <button name="reject" string="回退"
-                                groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
+                                groups="purchase.group_purchase_user" type="object" class="oe_highlight" confirm="是否确定回退?"/>
                         <button string="取消" class="btn-default" special="cancel"/>
                     </footer>
 
@@ -1374,7 +1374,9 @@
             <field name="model">stock.picking</field>
             <field name="inherit_id" ref="stock.view_picking_form"/>
             <field name="arch" type="xml">
-
+                <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='qty_done']" position="before">
+                    <field name="receivied_qty"/>
+                </xpath>
                 <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='qty_done']" position="after">
                     <!-- Add your fields or attributes here -->
                     <field name="rejects_qty"
@@ -1383,5 +1385,25 @@
 
             </field>
         </record>
+
+
+        <record id="view_choose_transfer_way" model="ir.ui.view">
+        <field name="name">stock.transfer.way.form</field>
+        <field name="model">stock.transfer.way</field>
+        <field name="arch" type="xml">
+            <form string="选择入库方式">
+                <group>
+                    <p>
+                       请选择入库方式
+                    </p>
+                </group>
+                <footer>
+                    <button name="choose_transfer_way" string="全部入库" type="object" class="btn-primary" context="{'is_all_transfer_in':True}"/>
+                    <button name="choose_transfer_way" string="仅良品入库,不良品退回" type="object" class="btn-primary"/>
+                    <button string="取消" class="btn-default" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
     </data>
 </openerp>

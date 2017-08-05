@@ -1533,12 +1533,96 @@ class StcokPickingExtend(models.Model):
     qc_result = fields.Selection(string=u"品检结果", selection=[('no_result', u'为以前的品检单,无品检结果记录'),
                                                             ('fail', u'品检失败'),
                                                             ('success', u'品检通过'), ], default='no_result', )
+    transfer_way = fields.Selection(string=u'入库方式', selection=[('draft', u'未选择'),
+                                                               ('all', u'全部入库'),
+                                                               ('part', u'仅良品入库,不良品退回')], default='draft')
+
+    @api.multi
+    def action_check_pass(self):
+        self.write({
+            'qc_result': 'success'
+        })
+        return super(StcokPickingExtend, self).action_check_pass()
+
+    @api.multi
+    def action_check_fail(self):
+        self.write({
+            'qc_result': 'fail'
+        })
+        return super(StcokPickingExtend, self).action_check_fail()
+
+    def confirm_transfer_way(self):
+        if any([x.rejects_qty > 0.0 for x in self.pack_operation_ids]):# 若有一个不良品大于0
+            view = self.env.ref('linkloving_mrp_extend.view_choose_transfer_way')
+            return {
+                'name': u'选择入库方式',
+                'type': 'ir.actions.act_window',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'stock.transfer.way',
+                'views': [(view.id, 'form')],
+                'view_id': view.id,
+                'target': 'new',
+                'context': {'default_picking_id': self.id },
+            }
+        else:
+            return self.do_new_transfer()
+
+class stock_transfer_way(models.TransientModel):
+    _name = 'stock.transfer.way'
+
+    picking_id = fields.Many2one("stock.picking")
+
+    def choose_transfer_way(self):
+        is_all = self._context.get("is_all_transfer_in")
+        last_transfer_way = self.picking_id.transfer_way
+        if last_transfer_way == 'part':
+            for pack in self.picking_id.pack_operation_product_ids:
+                pack.qty_done = pack.qty_done + pack.rejects_qty
+
+        if is_all:# 全部入库
+            self.picking_id.transfer_way = 'all'
+        else:
+            self.picking_id.transfer_way = 'part'
+        if not self.picking_id.check_backorder(): #此条件是货全都收全了, 所以要提前修改数量
+            if self.picking_id.transfer_way == 'part':
+                for pack in self.picking_id.pack_operation_product_ids:
+                    pack.qty_done = pack.qty_done - pack.rejects_qty
+
+        return self.picking_id.do_new_transfer()
+
+class StockBackorderConfirmation(models.TransientModel):
+    _inherit = 'stock.backorder.confirmation'
+
+    def qty_done_recompute_transfer_way(self):
+        if self.pick_id.transfer_way == 'part':
+            for pack in self.pick_id.pack_operation_product_ids:
+                pack.qty_done = pack.qty_done - pack.rejects_qty
+    @api.multi
+    def process(self):
+        self.qty_done_recompute_transfer_way()
+        return super(StockBackorderConfirmation, self).process()
+
+    @api.multi
+    def process_cancel_backorder(self):
+        self.qty_done_recompute_transfer_way()
+        return super(StockBackorderConfirmation, self).process_cancel_backorder()
 
 
 class StockPackOperationExtend(models.Model):
     _inherit = 'stock.pack.operation'
 
+    @api.multi
+    def _compute_receivied_qty(self):
+        for pack in self:
+            if pack.picking_id.transfer_way == 'part':
+                pack.receivied_qty = pack.qty_done + pack.rejects_qty
+            else:
+                pack.receivied_qty = pack.qty_done
+
     rejects_qty = fields.Float(string=u"不良品", default=0)
+    receivied_qty = fields.Float(string=u'收到的数量', compute='_compute_receivied_qty')
+    # accept_qty = fields.Float(string=u'良品', compute='_compute_accept_qty')
 
 
 class ProcurementOrderExtend(models.Model):

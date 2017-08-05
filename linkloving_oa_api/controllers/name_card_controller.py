@@ -85,6 +85,110 @@ class NameCardController(http.Controller):
                 })
             return json_list
 
+    @http.route('/linkloving_oa_api/add_partners/', auth='none', type='json')
+    def add_partners(self, **kwargs):
+        partners = request.jsonrequest.get("partners")
+        for partner in partners:
+            NameCardController.add_one_partner(partner)
+        return True
+
+    # 解析
+    @classmethod
+    def add_one_partner(cls, dic):
+        members = dic.get("members")
+        # name = dic.get("name")
+        company_real_name = company_name = dic.get("company_name")
+        company_id = dic.get("company_id")
+        saleman_id = dic.get("saleman_id")
+        saleteam_id = dic.get("saleteam_id")
+        tag_list = dic.get("tag_list") or None
+        star_cnt = dic.get("star_cnt")
+        partner_lv = dic.get("partner_lv")
+        phone = dic.get("phone")
+        street = members[0].get("street")
+        area = dic.get("area")
+        source_id = dic.get("crm_source_id")
+        src_id = dic.get("source_id")
+        partner_type = dic.get("partner_type")
+        # email = dic.get("email")
+        # type = dic.get("type")
+        country_id = dic.get("country_id")
+        product_series = dic.get("series_ids") or []
+        # job_title = dic.get("job_title")
+        if company_id:
+            new_company_id = company_id
+        else:
+            if u"有限公司" in company_name:
+                company_name = company_name.replace(u"有限公司", "")
+            elif u'有限责任公司' in company_name:
+                company_name = company_name.replace(u"有限责任公司", "")
+            elif u'责任有限公司' in company_name:
+                company_name = company_name.replace(u"责任有限公司", "")
+            elif u'公司' in company_name:
+                company_name = company_name.replace(u"公司", "")
+            company = request.env["res.partner"].sudo().search([("name", "ilike", company_name)], limit=1)
+            if not company:
+                company = request.env["res.partner"].sudo().create({
+                    "name": company_real_name,
+                    "street": street,
+                    "level": int(partner_lv),
+                    "priority": str(star_cnt),
+                    "team_id": saleteam_id,
+                    "user_id": saleman_id,
+                    "crm_source_id": source_id,
+                    "customer": partner_type == "customer",
+                    "supplier": partner_type == "supplier",
+                    "is_company": True,
+                    'source_id': src_id,
+                    'country_id': country_id,
+                    'product_series_ids': product_series or [],
+                })
+                company.category_id = [tag_list] if tag_list else []
+
+            else:
+                company.sudo().write({
+                    "name": company_real_name,
+                    "street": street,
+                    "level": int(partner_lv),
+                    "priority": str(star_cnt),
+                    "team_id": saleteam_id,
+                    "user_id": saleman_id,
+                    "crm_source_id": source_id,
+                    "customer": partner_type == "customer",
+                    "supplier": partner_type == "supplier",
+                    "is_company": True,
+                    'source_id': src_id,
+                    'country_id': country_id,
+                    'product_series_ids': product_series or [],
+                })
+                company.category_id = [tag_list] if tag_list else []
+            new_company_id = company.id
+            # company.company_type = "company"
+
+        for me in members:
+
+            partners = request.env["res.partner"].sudo().search(
+                    [("name", "=", me.get("name")), ("parent_id", '=', new_company_id)], )
+            if partners:
+                continue
+            s = request.env["res.partner"].sudo().create({
+                "name": me.get("name"),
+                "parent_id": new_company_id,
+                "mobile": me.get("phone"),
+                "customer": partner_type == "customer",
+                "supplier": partner_type == "supplier",
+                "street": me.get("street"),
+                "is_company": False,
+                "email": me.get("email"),
+                "type": me.get("type"),
+                "user_id": saleman_id,
+            })
+            if type == 'contact':
+                s.write({
+                    "function": me.get("job_title"),
+                })
+
+
     @http.route('/linkloving_oa_api/add_partner/', auth='none', type='json')
     def add_partner(self, **kwargs):
         name = request.jsonrequest.get("name")
@@ -207,7 +311,7 @@ class NameCardController(http.Controller):
         return json_list
 
     @http.route('/linkloving_oa_api/get_origins/', auth='none', type='json')
-    def get_origins(self, **kwargs):
+    def ll_get_origins(self, **kwargs):
         sources = request.env["crm.lead.source"].sudo().search([])
         json_list = []
         for src in sources:
