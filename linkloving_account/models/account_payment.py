@@ -184,7 +184,7 @@ class AccountPayment(models.Model):
 
     @api.multi
     def set_to_cancel(self):
-        account_invoices = self.env['account.invoice'].search([('type', '=', 'out_invoice'), ('state', '=', 'open')],limit=50)
+        account_invoices = self.env['account.invoice'].search([('type', '=', 'out_invoice'), ('state', '=', 'open')])
         for invoice in account_invoices:
             invoice.auto_set_to_done()
 
