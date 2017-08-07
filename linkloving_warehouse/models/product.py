@@ -22,6 +22,9 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
+import calendar
+import datetime
+
 from odoo import api
 from odoo import fields, models, _
 from odoo.exceptions import UserError
@@ -52,6 +55,35 @@ class ProductTemplate(models.Model):
     last2_month_qty = fields.Float(string=u'上上月销量')
     last3_month_qty = fields.Float(string=u'上上上月销量')
     pack_rate = fields.Float(string=u'装箱率')
+
+    def getMonthFirstDayAndLastDay(year=None, month=None):
+        """
+        :param year: 年份，默认是本年，可传int或str类型
+        :param month: 月份，默认是本月，可传int或str类型
+        :return: firstDay: 当月的第一天，datetime.date类型
+                  lastDay: 当月的最后一天，datetime.date类型
+        """
+        if year:
+            year = int(year)
+        else:
+            year = datetime.date.today().year
+
+        if month:
+            month = int(month)
+        else:
+            month = datetime.date.today().month
+
+            # 获取当月第一天的星期和当月的总天数
+        firstDayWeekDay, monthRange = calendar.monthrange(year, month)
+
+        # 获取当月的第一天
+        firstDay = datetime.date(year=year, month=month, day=1)
+        lastDay = datetime.date(year=year, month=month, day=monthRange)
+        print firstDay,
+
+        return firstDay, lastDay
+
+    getMonthFirstDayAndLastDay()
 
     def compute_sale_qty(self):
         products = self.env['product.template'].search([('sale_ok', '=', True)])
