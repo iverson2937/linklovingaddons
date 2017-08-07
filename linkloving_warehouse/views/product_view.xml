@@ -11,9 +11,6 @@
                 <field name="name" position="before">
                     <button name="view_product_id" type="object" icon="fa-arrow-right"/>
                 </field>
-                <field name="name" position="after">
-                    <field name="product_specs" readonly="1" groups="stock.group_stock_user"/>
-                </field>
                 <xpath expr="//field[@name='default_code']" position="attributes">
                     <attribute name="string">料号</attribute>
                     <attribute name="readonly">1</attribute>
@@ -42,15 +39,14 @@
 
                 <xpath expr="//field[@name='categ_id']" position="replace">
                 </xpath>
-                <!--<xpath expr="//field[@name='uom_id']" position="replace">-->
-                <!--</xpath>-->
+                <xpath expr="//field[@name='uom_id']" position="replace">
+                </xpath>
 
 
                 <xpath expr="//field[@name='virtual_available']" position="after">
                     <field name="reordering_min_qty"/>
                     <field name="reordering_max_qty"/>
-                    <field name="create_uid" groups="stock.group_stock_manager" readonly="1"/>
-                    <field name="create_date" groups="stock.group_stock_manager" readonly="1"/>
+                    <field name="product_specs" readonly="1" groups="stock.group_stock_user"/>
                 </xpath>
 
 
