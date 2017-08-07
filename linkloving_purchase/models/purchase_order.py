@@ -24,6 +24,7 @@ class PurchaseOrder(models.Model):
     invoiced_amount = fields.Float(compute='_compute_invoice_amount')
     remaining_amount = fields.Float(compute='_compute_invoice_amount')
     shipped_amount = fields.Float(compute='_compute_invoice_amount')
+    pre_payment_amount = fields.Float(compute='_compute_invoice_amount')
 
     @api.multi
     @api.depends('invoice_ids')
@@ -31,14 +32,23 @@ class PurchaseOrder(models.Model):
         for order in self:
             invoiced_amount = remaining_amount = shipped_amount = 0.0
             for line in order.order_line:
-                shipped_amount += line.qty_received * line.price_unit
-            for invoice in order.invoice_ids:
-                invoiced_amount += invoice.amount_total
+                if line.product_id.type in ['consu', 'product']:
+                    shipped_amount += line.qty_received * line.price_unit
+                else:
+                    shipped_amount += line.product_qty * line.price_unit
+            for invoice in order.invoice_ids.filtered(lambda x: x.state not in ['draft', 'post']):
+                sign = invoice.type in ['in_refund', 'out_refund'] and -1 or 1
+                invoiced_amount += invoice.amount_total * sign
                 remaining_amount += invoice.residual
             order.invoiced_amount = invoiced_amount
             order.remaining_amount = remaining_amount
             order.shipped_amount = shipped_amount
-
+            order.pre_payment_amount = 0.0
+            if float_compare(invoiced_amount, shipped_amount, precision_digits=2) > 0:
+                print invoice.name
+                print invoiced_amount
+                print shipped_amount
+                order.pre_payment_amount = invoiced_amount - shipped_amount
 
     @api.depends('product_count', 'order_line.qty_received')
     def _compute_shipping_rate(self):
