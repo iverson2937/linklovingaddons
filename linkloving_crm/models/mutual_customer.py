@@ -22,14 +22,14 @@ class CrmMutualCustomer(models.Model):
     @api.multi
     def action_apply_all_partner(self):
         for mutual in self:
-            domain = [('customer', '=', True), ('is_company', '=', True)]
+            domain = [('customer', '=', True), ('is_company', '=', True), ('is_order', '=', False)]
             partner_list = self.env['res.partner'].search(domain)
 
             for partner_one in partner_list:
                 if partner_one.user_id and (not partner_one.mutual_rule_id):
                     partner_one.write({'mutual_rule_id': mutual.id})
 
-            # 取消应用于全部
-            # for partner_one in partner_list:
-            #     if partner_one.user_id:
-            #         partner_one.write({'mutual_rule_id': ''})
+                    # 取消应用于全部
+                    # for partner_one in partner_list:
+                    #     if partner_one.user_id:
+                    #         partner_one.write({'mutual_rule_id': ''})

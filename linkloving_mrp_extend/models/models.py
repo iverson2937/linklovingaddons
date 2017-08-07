@@ -1173,11 +1173,12 @@ class SimStockMove(models.Model):
 
     def _default_suggest_qty(self):
         for sim_move in self:
-            if sim_move.stock_moves:
-                for move in sim_move.stock_moves:
-                    if move.state != "cancel":
-                        sim_move.suggest_qty = move.suggest_qty
-                        break
+            sim_move.suggest_qty = sim_move.product_uom_qty * (1 + sim_move.bom_line_id.scrap_rate * 0.01)
+            # if sim_move.stock_moves:
+            #     for move in sim_move.stock_moves:
+            #         if move.state != "cancel":
+            #             sim_move.suggest_qty = move.suggest_qty
+            #             break
 
     def _compute_quantity_available(self):
         for sim_move in self:
@@ -1220,6 +1221,16 @@ class SimStockMove(models.Model):
             else:
                 sim.product_type = "material"
 
+    @api.multi
+    def _compute_bom_line_id(self):
+        for sim_move in self:
+            boms, lines = sim_move.production_id.bom_id.explode(sim_move.production_id.product_id,
+                                                                sim_move.production_id.product_qty)
+            if sim_move.stock_moves:
+                for bom_line, datas in lines:
+                    if bom_line.product_id.id == sim_move.product_id.id:
+                        sim_move.bom_line_id = bom_line.id
+
     product_id = fields.Many2one('product.product', )
     production_id = fields.Many2one('mrp.production')
     stock_moves = fields.One2many('stock.move', compute=_compute_stock_moves)
@@ -1243,6 +1254,7 @@ class SimStockMove(models.Model):
                                     required=False, compute="_compute_product_type")
     is_prepare_finished = fields.Boolean(u"是否备货完成")
 
+    bom_line_id = fields.Many2one(comodel_name='mrp.bom.line', compute='_compute_bom_line_id')
 
 class ReturnMaterialLine(models.Model):
     _name = 'return.material.line'
