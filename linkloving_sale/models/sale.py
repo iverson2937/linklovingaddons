@@ -27,8 +27,10 @@ class SaleOrder(models.Model):
         for order in self:
             invoiced_amount = remaining_amount = shipped_amount = 0.0
             for line in order.order_line:
-                shipped_amount += line.qty_delivered * line.price_unit
-
+                if line.product_id.type in ['consu', 'product']:
+                    shipped_amount += line.qty_delivered * line.price_unit
+                else:
+                    shipped_amount += line.product_uom_qty * line.price_unit
             for invoice in order.invoice_ids:
                 invoiced_amount += invoice.amount_total
                 remaining_amount += invoice.residual
