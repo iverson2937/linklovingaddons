@@ -12,13 +12,6 @@ class AccountEmployeePayment(models.Model):
 
     remark_comments_ids = fields.One2many('hr.remark.comment', 'employee_payment_id', string=u'审核记录')
 
-    #
-    # @api.multi
-    # def set_account_date(self):
-    #     sheet_ids = self.env['account.employee.payment'].search(
-    #         [('state', '=', 'paid')])
-    #     for sheet in sheet_ids:
-    #         sheet.accounting_date = sheet.create_date
 
     def _get_account_date(self):
         for p in self:
@@ -41,7 +34,6 @@ class AccountEmployeePayment(models.Model):
     remark = fields.Text(string='Remark')
     address_home_id = fields.Many2one('res.partner', related='employee_id.address_home_id')
     bank_account_id = fields.Many2one('res.partner.bank', related='employee_id.bank_account_id')
-    sheet_ids = fields.One2many('account.employee.payment.line', 'sheet_id')
     return_ids = fields.One2many('account.employee.payment.return', 'payment_id')
 
     # FIXME:USE BETTER WAY TO HIDE THE BUTTON
@@ -60,11 +52,11 @@ class AccountEmployeePayment(models.Model):
 
     payment_return = fields.Float(string='Return amount', compute=_get_return_balance)
     return_count = fields.Integer(compute='_get_count')
-    sheet_count = fields.Integer(compute='_get_count')
+    payment_count = fields.Integer(compute='_get_count')
     payment_line_ids = fields.One2many('account.employee.payment.line', 'payment_id')
 
     @api.one
-    @api.depends('sheet_ids', 'payment_return')
+    @api.depends('payment_count', 'payment_return')
     def _get_pre_payment_reminding_balance(self):
         self.pre_payment_reminding = 0.0
         used_payment = 0
@@ -106,16 +98,15 @@ class AccountEmployeePayment(models.Model):
                              readonly=True, default='draft', copy=False, string="Status", store=True,
                              track_visibility='onchange')
 
-    @api.depends('sheet_ids', 'return_ids')
+    @api.depends('payment_line_ids', 'return_ids')
     def _get_count(self):
         """
 
         """
         for payment in self:
-            print len(set(self.sheet_ids.ids))
             payment.update({
-                'sheet_count': len(set(self.sheet_ids.ids)),
-                'return_count': len(set(self.return_ids.ids))
+                'payment_count': len(set(payment.payment_line_ids.ids)),
+                'return_count': len(set(payment.return_ids.ids))
             })
 
     @api.multi
