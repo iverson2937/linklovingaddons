@@ -16,7 +16,7 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
         purchase_obj = self.env['purchase.order']
         purchase_line_pool = self.env['purchase.order.line']
 
-        purchase_ids = purchase_obj.search([
+        purchase_ids = purchase_obj.sudo().search([
             ('state', 'in', ['sent', 'to approve', 'purchase']),
             ('date_order', '>=', date1), ('date_order', '<=', date2)], order='name desc')
 
