@@ -114,13 +114,10 @@ def _get_rec(object, level, qty=1.0, uom=False):
 
 class MrpBomLine(models.Model):
     _inherit = 'mrp.bom.line'
-    is_highlight = fields.Boolean(default=True)
+    is_highlight = fields.Boolean()
 
     @api.multi
     def write(self, vals):
-        vals.update({
-            'is_highlight': True
-        })
 
         if (
                         'RT-ENG' in self.bom_id.product_tmpl_id.name or self.bom_id.product_tmpl_id.product_ll_type == 'semi-finished') \

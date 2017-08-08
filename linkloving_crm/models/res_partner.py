@@ -91,9 +91,9 @@ class ResPartner(models.Model):
         if not (vals.get('company_type') == 'person'):
             if vals.get('is_company'):
                 if select_company(self, vals, 'name'):
-                    raise UserError(u'此名称已绑定公司，请确认')
+                    raise UserError(u'此名称' + vals.get('name') + u'已绑定公司，请确认')
                 if select_company(self, vals, 'email'):
-                    raise UserError(u'此Email已绑定公司，请更换')
+                    raise UserError(u'此邮件' + vals.get('email') + u'已绑定公司，请更换')
 
                 if vals.get('user_id'):
                     vals['public_partners'] = 'private'
@@ -108,15 +108,13 @@ class ResPartner(models.Model):
             if self['is_company'] or vals.get('is_company'):
                 for item_type in ['name', 'email']:
                     if select_company(self, vals, item_type):
-                        if item_type == 'name': item_type = u'公司名称'
-                        raise UserError(u'此' + item_type + u'已绑定公司，请确认')
+                        raise UserError(u'此' + item_type + vals.get(item_type) + u'已绑定公司，请确认')
 
         if self['company_type'] == 'person' and vals.get('company_type') == 'company':
             for item_type in ['name', 'email']:
                 if not vals.get(item_type):
                     if select_company(self, {item_type: self[item_type]}, item_type):
-                        if item_type == 'name': item_type = u'公司名称'
-                        raise UserError(u'此' + item_type + u'已绑定公司，请更换')
+                        raise UserError(u'此' + item_type + vals.get(item_type) + u'已绑定公司，请更换')
 
         if 'user_id' in vals:
             if vals.get('user_id'):
