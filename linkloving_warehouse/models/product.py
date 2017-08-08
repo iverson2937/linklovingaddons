@@ -32,10 +32,9 @@ from odoo.exceptions import UserError
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
-    area_id = fields.Many2one('stock.location.area', string='Area')
+    area_id = fields.Many2one('stock.location.area', string='Area', copy=False)
     location_x = fields.Char()
     location_y = fields.Char()
-
     product_specs = fields.Text(string=u'Product Specification', related='product_tmpl_id.product_specs')
     _sql_constraints = [
         ('default_code_uniq', 'unique (default_code)', _('Default Code already exist!')),
@@ -50,6 +49,23 @@ class ProductTemplate(models.Model):
                                       inverse='_set_nbr_reordering_rules')
     reordering_max_qty = fields.Float(compute='_compute_nbr_reordering_rules', store=True,
                                       inverse='_set_nbr_reordering_rules')
+
+    image = fields.Binary(
+        "Image", attachment=True,
+        copy=False,
+        help="This field holds the image used as image for the product, limited to 1024x1024px.")
+    image_medium = fields.Binary(
+        "Medium-sized image", attachment=True,
+        copy=False,
+        help="Medium-sized image of the product. It is automatically "
+             "resized as a 128x128px image, with aspect ratio preserved, "
+             "only when the image exceeds one of those sizes. Use this field in form views or some kanban views.")
+    image_small = fields.Binary(
+        "Small-sized image", attachment=True,
+        copy=False,
+        help="Small-sized image of the product. It is automatically "
+             "resized as a 64x64px image, with aspect ratio preserved. "
+             "Use this field anywhere a small image is required.")
 
     # last1_month_qty = fields.Float(string=u'上月销量')
     # last2_month_qty = fields.Float(string=u'上上月销量')
