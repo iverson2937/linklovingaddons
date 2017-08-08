@@ -51,10 +51,10 @@ class ProductTemplate(models.Model):
     reordering_max_qty = fields.Float(compute='_compute_nbr_reordering_rules', store=True,
                                       inverse='_set_nbr_reordering_rules')
 
-    last1_month_qty = fields.Float(string=u'上月销量')
-    last2_month_qty = fields.Float(string=u'上上月销量')
-    last3_month_qty = fields.Float(string=u'上上上月销量')
-    pack_rate = fields.Float(string=u'装箱率')
+    # last1_month_qty = fields.Float(string=u'上月销量')
+    # last2_month_qty = fields.Float(string=u'上上月销量')
+    # last3_month_qty = fields.Float(string=u'上上上月销量')
+    # pack_rate = fields.Float(string=u'装箱率')
 
     def getMonthFirstDayAndLastDay(year=None, month=None):
         """
