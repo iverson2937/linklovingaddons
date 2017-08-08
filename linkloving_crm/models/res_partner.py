@@ -120,11 +120,13 @@ class ResPartner(models.Model):
 
         if 'user_id' in vals:
             if vals.get('user_id'):
-                if vals.get('user_id') == int(self.old_user_id):
-                    raise UserError(u'此用户不允许被领取')
-                else:
-                    vals['public_partners'] = 'private'
-                    vals['old_user_id'] = vals.get('user_id')
+                vals['public_partners'] = 'private'
+                vals['old_user_id'] = vals.get('user_id')
+                # if vals.get('user_id') == int(self.old_user_id):
+                #     raise UserError(u'此用户不允许被领取')
+                # else:
+                #     vals['public_partners'] = 'private'
+                #     vals['old_user_id'] = vals.get('user_id')
             else:
                 vals['public_partners'] = 'public'
 
