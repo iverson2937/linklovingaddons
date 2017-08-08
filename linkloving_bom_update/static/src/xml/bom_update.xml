@@ -66,9 +66,9 @@
         </div>
 
         <div class="bom_review">
-             <t t-if="result.state != 'release'">
-                <button class="btn btn-primary bom_review_operate_btn">审核操作</button>
-            </t>
+             <!--<t t-if="result.state != 'release'">-->
+            <!--<button class="btn btn-primary bom_review_operate_btn">审核操作</button>-->
+            <!--</t>-->
             <div class="bom_review_list">
                 <t t-foreach="result.review_line" t-as="review_list">
                     <div data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"><t t-esc="review_list.name"/></div>
