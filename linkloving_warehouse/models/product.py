@@ -157,17 +157,16 @@ class ProductTemplate(models.Model):
             template.reordering_min_qty = res[template.id]['reordering_min_qty']
             template.reordering_max_qty = res[template.id]['reordering_max_qty']
 
-    # @api.multi
-    # def write(self, vals):
-    #     if 'uom_id' in vals:
-    #         new_uom = self.env['product.uom'].browse(vals['uom_id'])
-    #         updated = self.filtered(lambda template: template.uom_id != new_uom)
-    #         done_moves = self.env['stock.move'].search(
-    #             [('product_id', 'in', updated.mapped('product_variant_ids').ids)])
-    #         for move in done_moves:
-    #             if move.state != 'done':
-    #                 move.product_uom = vals['uom_id']
-    #     return super(ProductTemplate, self).write(vals)
+    @api.multi
+    def write(self, vals):
+        if 'uom_id' in vals:
+            new_uom = self.env['product.uom'].browse(vals['uom_id'])
+            updated = self.filtered(lambda template: template.uom_id != new_uom)
+            bom_line_ids = self.env['mrp.bom.line'].search(
+                [('product_id', 'in', updated.mapped('product_variant_ids').ids)])
+            for line in bom_line_ids:
+                line.product_uom_id = vals['uom_id']
+        return super(ProductTemplate, self).write(vals)
 
     def _get_default_uom_id(self):
         return self.env["product.uom"].search([], limit=1, order='id').id
