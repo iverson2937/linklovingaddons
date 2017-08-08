@@ -6,7 +6,6 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
 
-
 class MrpBom(models.Model):
     _inherit = 'mrp.bom'
 
@@ -14,7 +13,6 @@ class MrpBom(models.Model):
     def action_deny(self):
         for line in self.bom_line_ids:
             reject_bom_line_product_bom(line)
-
 
     @api.multi
     def action_released(self):
@@ -116,10 +114,13 @@ def _get_rec(object, level, qty=1.0, uom=False):
 
 class MrpBomLine(models.Model):
     _inherit = 'mrp.bom.line'
-    is_highlight = fields.Boolean()
+    is_highlight = fields.Boolean(default=True)
 
     @api.multi
     def write(self, vals):
+        vals.update({
+            'is_highlight': True
+        })
 
         if (
                         'RT-ENG' in self.bom_id.product_tmpl_id.name or self.bom_id.product_tmpl_id.product_ll_type == 'semi-finished') \
