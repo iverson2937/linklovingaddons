@@ -80,6 +80,7 @@ class ReviewProcess(models.Model):
         line_list = []
         for line in sorted_line:
             line_list.append({
+                'id': line.id,
                 'name': line.partner_id.name,
                 'remark': line.remark or '',
                 'state': [line.state, REVIEW_LINE_STATE[line.state]],

@@ -21,18 +21,18 @@ class ApprovalCenter(models.TransientModel):
                       ('state', 'in',
                        ['waiting_release', 'cancel', 'deny', 'new', 'updated'])]
             bom_ids = self.env[self.res_model].search(domain,
-                                                      limit=limit, offset=offset, order='create_date desc')
+                                                      limit=limit, offset=offset, order='sequence,write_date desc')
         elif self.type == 'submitted':
             domain = [('current_review_id', '=', self.env.user.id),
                       (
                                                            'state', 'in',
                                                            ['review_ing'])]
             bom_ids = self.env[self.res_model].search(domain,
-                                                      limit=limit, offset=offset, order='create_date desc')
+                                                      limit=limit, offset=offset, order='sequence,write_date desc')
         elif self.type == 'waiting_approval':
             lines = self.env["review.process.line"].search([("state", '=', 'waiting_review'),
                                                             ('partner_id', '=', self.env.user.partner_id.id)],
-                                                           limit=limit, offset=offset, order='create_date desc')
+                                                           limit=limit, offset=offset, order='write_date desc')
             review_ids = lines.mapped("review_id")
             domain = [("review_id", "in", review_ids.ids),
                       ('state', 'in', ['review_ing'])]
@@ -41,11 +41,11 @@ class ApprovalCenter(models.TransientModel):
             lines = self.env["review.process.line"].search([("state", 'not in', ['waiting_review', 'review_canceled']),
                                                             ('partner_id', '=', self.env.user.partner_id.id),
                                                             ('review_order_seq', '!=', 1)],
-                                                           limit=limit, offset=offset, order='create_date desc')
+                                                           limit=limit, offset=offset, order='write_date desc')
             review_ids = lines.mapped("review_id")
             domain = [("review_id", "in", review_ids.ids)]
             bom_ids = self.env[self.res_model].search(domain,
-                                                      order='create_date desc')
+                                                      order='sequence,write_date desc')
 
         bom_list = []
         for bom in bom_ids:

@@ -28,6 +28,7 @@
                                     <field name="cycle_time_time_unit" options="{'no_open':True,'no_create':True}"/>
                                 </div>
                                 <field name="produced_spend_per_pcs"/>
+                                <field name="prepare_time"/>
                             </group>
                             <group>
                                 <field name="hour_price"/>

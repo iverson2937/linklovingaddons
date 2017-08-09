@@ -204,6 +204,8 @@ class HrExpenseSheetWizard(models.TransientModel):
             for line in sheet.expense_line_ids:
                 returnDict[sheet.id]['line'].update({line.id: {
                     'product': line.product_id.name,
+                    'quantity': line.quantity,
+                    'unit_amount': line.unit_amount,
                     'name': line.name,
                     'employee': sheet.employee_id.name,
                     'payment_line_ids': ids,

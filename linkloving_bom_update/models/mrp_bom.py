@@ -114,18 +114,51 @@ def _get_rec(object, level, qty=1.0, uom=False):
 
 class MrpBomLine(models.Model):
     _inherit = 'mrp.bom.line'
-    is_highlight = fields.Boolean(default=True)
+    is_highlight = fields.Boolean()
+
+    @api.model
+    def create(self, vals):
+        line_id = super(MrpBomLine, self).create(vals)
+        if line_id.bom_id and line_id.bom_id.state != 'new':
+            body = (u"添加物料<br/><ul class=o_timeline_tracking_value_list>"
+                    + u"<li>产品<span> : </span><span class=o_timeline_tracking_value>%s</span></li>"
+                    + u"<li>规格<span> : </span><span class=o_timeline_tracking_value>%s</span></li>"
+                    + u"<li>数量<span> : </span><span class=o_timeline_tracking_value>%s</span></li></ul>") % (
+                       line_id.product_id.name, line_id.product_specs, line_id.product_qty)
+            line_id.bom_id.message_post(body=body)
+        return line_id
 
     @api.multi
     def write(self, vals):
-        vals.update({
-            'is_highlight': True
-        })
 
         if (
                         'RT-ENG' in self.bom_id.product_tmpl_id.name or self.bom_id.product_tmpl_id.product_ll_type == 'semi-finished') \
                 and not self.env.user.has_group('mrp.group_mrp_manager'):
             raise UserError(u'你没有权限修改请联系管理员')
+
+        if self.bom_id.state != 'new':
+            body = u"BOM被修改.<br/><ul class=o_timeline_tracking_value_list>"
+            product_id = False
+            if 'product_id' in vals:
+                product_id = vals.get('product_id')
+                new_product = self.env['product.product'].browse(product_id).name
+                body += (u"<li>产品<span> : </span><span class=o_timeline_tracking_value>%s-->%s</span></li>") % (
+                    self.product_id.name, new_product)
+            elif 'product_qty' in vals:
+                product_id = product_id if product_id else self.product_id.name
+
+                body += (u"<li>%s数量<span> : </span><span class=o_timeline_tracking_value>%s-->%s</span></li>") % (
+                    product_id,
+                    self.product_qty, vals.get('product_qty'))
+            elif 'product_specs' in vals:
+                product_id = product_id if product_id else self.product_id.name
+                body += (u"<li>%s规格<span> : </span><span class=o_timeline_tracking_value>%s-->%s</span></li>") % (
+                    product_id,
+                    self.product_specs, vals.get('product_specs'))
+            else:
+                body += '</ul>'
+
+            self.bom_id.message_post(body=body)
         return super(MrpBomLine, self).write(vals)
 
     @api.multi
@@ -134,6 +167,14 @@ class MrpBomLine(models.Model):
                         'RT-ENG' in self.bom_id.product_tmpl_id.name or self.bom_id.product_tmpl_id.product_ll_type == 'semi-finished') \
                 and not self.env.user.has_group('mrp.group_mrp_manager'):
             raise UserError(u'你没有权限修改请联系管理员')
+        if self.bom_id and self.bom_id.state != 'new':
+            for line_id in self:
+                body = (u"删除物料<br/><ul class=o_timeline_tracking_value_list>"
+                        + u"<li>产品<span> : </span><span class=o_timeline_tracking_value>%s</span></li>"
+                        + u"<li>规格<span> : </span><span class=o_timeline_tracking_value>%s</span></li>"
+                        + u"<li>数量<span> : </span><span class=o_timeline_tracking_value>%s</span></li></ul>") % (
+                           line_id.product_id.name, line_id.product_specs, line_id.product_qty)
+                self.bom_id.message_post(body=body)
         return super(MrpBomLine, self).unlink()
 
     # @api.model
@@ -163,7 +204,6 @@ def get_next_default_code(default_code):
 
 def set_bom_line_product_bom_released(line):
     line.bom_id.state = 'release'
-    print line.bom_id.state, 'ddddddddd'
     if line.child_line_ids:
         for l in line.child_line_ids:
             set_bom_line_product_bom_released(l)
@@ -171,6 +211,3 @@ def set_bom_line_product_bom_released(line):
 
 def reject_bom_line_product_bom(line):
     line.bom_id.state = 'deny'
-    if line.child_line_ids:
-        for l in line.child_line_ids:
-            reject_bom_line_product_bom(l)

@@ -42,19 +42,32 @@
                     <div class="approval_tab_pane_type"><t t-esc="item_files.type"/></div>
                     <div>产品名字: <span t-att-product-id="item_files.product_id.id" class="approval_product_name"><t t-esc="item_files.product_id.name"/></span></div>
                     <div>规格：<span><t t-esc="item_files.product_id.product_specs"/></span></div>
-                    <!--<div>审核人：<span><t t-esc="item_files.review_id"/></span></div>-->
-                    <t t-if="item_files.process_name!=''">
-                        <div>工序：<span><t t-esc="item_files.process_name"/></span></div>
-                    </t>
-                    <div>数量：<span><t t-esc="item_files.product_qty"/></span></div>
+
+                    <!--<t t-if="item_files.process_name!=''">-->
+                    <!--<div>工序：<span><t t-esc="item_files.process_name"/></span></div>-->
+                    <!--</t>-->
+                    <!--<div>数量：<span><t t-esc="item_files.product_qty"/></span></div>-->
                     <!--<div>产品计量单位：<span><t t-esc="item_files.uom_name"/></span></div>-->
-                    <div>状态：<span><t t-esc="item_files.state[1]"/></span>
+
+
+                    <div class="row">
+                          <div class="col-xs-6" >状态：<span><t t-esc="item_files.state[1]"/></span>
                         <t t-if="item_files.is_show_cancel">
                             <button class="btn btn-primary review_cancel">取消审核</button>
                         </t>
                     </div>
-                    <div>创建人：<span><t t-esc="item_files.create_uid_name"/></span></div>
-                    <div>创建日期：<span><t t-esc="item_files.create_date"/></span></div>
+                        <div class="col-xs-6">创建人：<span><t t-esc="item_files.create_uid_name"/></span></div>
+                        <div class="col-xs-6">
+                             创建日期：<span><t t-esc="item_files.create_date"/></span>
+                        </div>
+                       <div class="col-xs-6">
+                           修改日期:<span><t t-esc="item_files.write_date"/></span>
+                       </div>
+                    </div>
+                    <t t-if="item_files.review_id">
+                    <div>审核人：<span><t t-esc="item_files.review_id"/></span></div>
+                    </t>
+
 
                 </div>
                 <div class="document_review_list">

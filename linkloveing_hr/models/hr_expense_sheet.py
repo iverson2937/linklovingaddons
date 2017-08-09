@@ -27,6 +27,13 @@ class HrExpenseSheet(models.Model):
     partner_id = fields.Many2one('res.partner')
     payment_line_ids = fields.One2many('account.employee.payment.line', 'sheet_id')
     remark_comments_ids = fields.One2many('hr.remark.comment', 'expense_sheet_id', string=u'审核记录')
+    department_id = fields.Many2one('hr.department', string='Department',
+                                    states={'post': [('readonly', True)], 'done': [('readonly', False)]})
+
+    @api.onchange('department_id')
+    def _onchange_department_id(self):
+        for line in self.expense_line_ids:
+            line.department_id = line.sheet_id.department_id.id
 
     @api.multi
     def action_sheet_move_create(self):
@@ -119,9 +126,9 @@ class HrExpenseSheet(models.Model):
         #     for line in sheet.expense_line_ids:
         #         if not line.department_id:
         #             line.department_id = sheet.department_id.id
-                    # sheet_ids = self.env['hr.expense.sheet'].search([('state', '=', 'done'), ('accounting_date', '=', False)])
-                    # for sheet in sheet_ids:
-                    #     sheet.accounting_date = sheet.write_date
+        # sheet_ids = self.env['hr.expense.sheet'].search([('state', '=', 'done'), ('accounting_date', '=', False)])
+        # for sheet in sheet_ids:
+        #     sheet.accounting_date = sheet.write_date
 
     @api.multi
     def hr_expense_sheet_post(self):
@@ -182,18 +189,7 @@ class HrExpenseSheet(models.Model):
 
     @api.multi
     def reset_expense_sheets(self):
-        if self.employee_id == self.employee_id.department_id.manager_id:
-            department = self.to_approve_id.employee_ids.department_id
-            if department.allow_amount and self.total_amount > department.allow_amount:
-                self.write({'state': 'approve'})
-            else:
-                self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
-        else:
-            self.to_approve_id = self.employee_id.department_id.manager_id.user_id.id
-
-        create_remark_comment(self, u'重新提交')
-
-        return self.write({'state': 'submit'})
+        self.hr_expense_sheet_post()
 
     @api.multi
     def process(self):

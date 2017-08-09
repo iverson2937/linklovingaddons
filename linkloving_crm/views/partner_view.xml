@@ -106,6 +106,14 @@
                             icon="fa-commenting-o">
                         <field name="order_partner_question_count" widget="statinfo" string="问题概览"/>
                     </button>
+
+                    <button type="object"
+                            name="action_view_partner_img"
+                            class="oe_stat_button"
+                            icon="fa-photo fa-image fa-picture-o">
+                        <field name="partner_img_count" widget="statinfo" string="客户照片"/>
+                    </button>
+
                 </xpath>
 
 
@@ -171,6 +179,20 @@
                 <xpath expr="//group[@name='group_by']/filter[@name='salesperson']" position="after">
                     <filter string="销售团队" name="team_id" context="{'group_by' : 'team_id'}" domain="[]"/>
                     <filter string="客户星级" name="priority" context="{'group_by' : 'priority'}" domain="[]"/>
+                </xpath>
+
+            </field>
+        </record>
+
+
+        <record id="crm_view_document_file_kanban_img" model="ir.ui.view">
+            <field name="name">ir.attachment kanban crm</field>
+            <field name="model">ir.attachment</field>
+            <field name="inherit_id" ref="mail.view_document_file_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="res_name" invisible="1"/>
+                    <field name="partner_img_id" invisible="1"/>
                 </xpath>
 
             </field>
