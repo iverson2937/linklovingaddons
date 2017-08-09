@@ -256,10 +256,7 @@
                 <xpath expr="//group/filter[1]" position="replace">
                 </xpath>
                 <xpath expr="//filter[@name='picking_type']" position="after">
-
-
-                    <!--<filter name="picking_state" string="Status666666" domain="[('state','not in',('cancel', False))]" context="{'group_by':'state'}"/>-->
-                    <filter name="picking_state" string="Status666666"
+                    <filter name="picking_state" string="Status"
                             domain="[('state','in',('draft','waiting','confirmed','partially_available','assigned','qc_check','validate','waiting_in','done' ))]"
                             context="{'group_by':'state'}"/>
                 </xpath>
