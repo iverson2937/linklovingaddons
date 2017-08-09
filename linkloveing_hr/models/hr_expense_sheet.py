@@ -189,18 +189,7 @@ class HrExpenseSheet(models.Model):
 
     @api.multi
     def reset_expense_sheets(self):
-        if self.employee_id == self.employee_id.department_id.manager_id:
-            department = self.to_approve_id.employee_ids.department_id
-            if department.allow_amount and self.total_amount > department.allow_amount:
-                self.write({'state': 'approve'})
-            else:
-                self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
-        else:
-            self.to_approve_id = self.employee_id.department_id.manager_id.user_id.id
-
-        create_remark_comment(self, u'重新提交')
-
-        return self.write({'state': 'submit'})
+        self.hr_expense_sheet_post()
 
     @api.multi
     def process(self):
