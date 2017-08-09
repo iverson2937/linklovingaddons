@@ -148,7 +148,8 @@
             <field name="inherit_id" ref="stock.view_move_search"/>
             <field name="arch" type="xml">
                 <xpath expr="//filter[@name='groupby_date']" position="after">
-                    <filter string="出/入库" name="move_order_type" context="{'group_by' : 'move_order_type'}" domain="[]"/>
+                    <filter string="出/入库" name="move_order_type" context="{'group_by' : 'move_order_type'}"
+                            domain="[]"/>
                 </xpath>
 
             </field>
@@ -255,7 +256,12 @@
                 <xpath expr="//group/filter[1]" position="replace">
                 </xpath>
                 <xpath expr="//filter[@name='picking_type']" position="after">
-                    <filter name="picking_state" string="Status" domain="[]" context="{'group_by':'state'}"/>
+
+
+                    <!--<filter name="picking_state" string="Status666666" domain="[('state','not in',('cancel', False))]" context="{'group_by':'state'}"/>-->
+                    <filter name="picking_state" string="Status666666"
+                            domain="[('state','in',('draft','waiting','confirmed','partially_available','assigned','qc_check','validate','waiting_in','done' ))]"
+                            context="{'group_by':'state'}"/>
                 </xpath>
                 <xpath expr="//field[@name='partner_id']" position="after">
                     <field name="origin"/>
