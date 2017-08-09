@@ -6,6 +6,16 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
 
+class MultiApplyBom(models.Model):
+    _name = 'multi.apply.bom'
+
+    @api.multi
+    def action_ok(self):
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+        product_ts = self.env['product.template'].search([('id', 'in', active_ids)])
+        product_ts.apply_bom_update()
+
 class MrpProductionExtend(models.Model):
     _inherit = 'mrp.production'
 
@@ -26,24 +36,29 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def apply_bom_update(self):
-        bom_id = self.bom_ids[0]
-        mos = self.env["mrp.production"].search([('bom_id', '=', bom_id.id), ('state', 'not in', ['cancel', 'done'])])
-        for mo in mos:
-            if mo.state in ['draft', 'confirmed', 'waiting_material']:
-                mo.action_cancel()
-                if mo.procurement_ids.move_dest_id.procurement_id:  # 订单制
-                    mo.procurement_ids.cancel()
-                    mo.procurement_ids.move_dest_id.procurement_id.reset_to_confirmed()
-                    mo.procurement_ids.move_dest_id.procurement_id.run()
-                elif mo.procurement_ids:
-                    mo.procurement_ids.run()
-                else:
-                    new_mo = mo.copy()
-                    new_mo.state = "draft"
-            elif mo.state in ['prepare_material_ing', 'finish_prepare_material', 'already_picking', 'progress',
-                              'waiting_inspection_finish', 'waiting_rework', 'waiting_inventory_material',
-                              'waiting_warehouse_inspection', 'waiting_post_inventory']:
-                mo.is_bom_update = True
+        for product_t in self:
+            if product_t.bom_ids:
+                bom_id = product_t.bom_ids[0]
+            else:
+                raise UserError(u"%s 没有Bom" % (product_t.name))
+            mos = self.env["mrp.production"].search(
+                    [('bom_id', '=', bom_id.id), ('state', 'not in', ['cancel', 'done'])])
+            for mo in mos:
+                if mo.state in ['draft', 'confirmed', 'waiting_material']:
+                    mo.action_cancel()
+                    if mo.procurement_ids.move_dest_id.procurement_id:  # 订单制
+                        mo.procurement_ids.cancel()
+                        mo.procurement_ids.move_dest_id.procurement_id.reset_to_confirmed()
+                        mo.procurement_ids.move_dest_id.procurement_id.run()
+                    elif mo.procurement_ids:
+                        mo.procurement_ids.run()
+                    else:
+                        new_mo = mo.copy()
+                        new_mo.state = "draft"
+                elif mo.state in ['prepare_material_ing', 'finish_prepare_material', 'already_picking', 'progress',
+                                  'waiting_inspection_finish', 'waiting_rework', 'waiting_inventory_material',
+                                  'waiting_warehouse_inspection', 'waiting_post_inventory']:
+                    mo.is_bom_update = True
 
         return {
             "type": "ir.actions.client",
@@ -89,24 +104,26 @@ class ProductProduct(models.Model):
 
 
     def apply_bom_update(self):
-        bom_id = self.product_tmpl_id.bom_ids[0]
-        mos = self.env["mrp.production"].search([('bom_id', '=', bom_id.id), ('state', 'not in', ['cancel', 'done'])])
-        for mo in mos:
-            if mo.state in ['draft', 'confirmed', 'waiting_material']:
-                mo.action_cancel()
-                if mo.procurement_ids.move_dest_id.procurement_id:  # 订单制
-                    mo.procurement_ids.cancel()
-                    mo.procurement_ids.move_dest_id.procurement_id.reset_to_confirmed()
-                    mo.procurement_ids.move_dest_id.procurement_id.run()
-                elif mo.procurement_ids:
-                    mo.procurement_ids.run()
-                else:
-                    new_mo = mo.copy()
-                    new_mo.state = "draft"
-            elif mo.state in ['prepare_material_ing', 'finish_prepare_material', 'already_picking', 'progress',
-                              'waiting_inspection_finish', 'waiting_rework', 'waiting_inventory_material',
-                              'waiting_warehouse_inspection', 'waiting_post_inventory']:
-                mo.is_bom_update = True
+        for product in self:
+            bom_id = product.product_tmpl_id.bom_ids[0]
+            mos = self.env["mrp.production"].search(
+                    [('bom_id', '=', bom_id.id), ('state', 'not in', ['cancel', 'done'])])
+            for mo in mos:
+                if mo.state in ['draft', 'confirmed', 'waiting_material']:
+                    mo.action_cancel()
+                    if mo.procurement_ids.move_dest_id.procurement_id:  # 订单制
+                        mo.procurement_ids.cancel()
+                        mo.procurement_ids.move_dest_id.procurement_id.reset_to_confirmed()
+                        mo.procurement_ids.move_dest_id.procurement_id.run()
+                    elif mo.procurement_ids:
+                        mo.procurement_ids.run()
+                    else:
+                        new_mo = mo.copy()
+                        new_mo.state = "draft"
+                elif mo.state in ['prepare_material_ing', 'finish_prepare_material', 'already_picking', 'progress',
+                                  'waiting_inspection_finish', 'waiting_rework', 'waiting_inventory_material',
+                                  'waiting_warehouse_inspection', 'waiting_post_inventory']:
+                    mo.is_bom_update = True
 
         return {
             "type": "ir.actions.client",

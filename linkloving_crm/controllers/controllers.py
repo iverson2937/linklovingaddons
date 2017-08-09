@@ -8,4 +8,4 @@ class LinklovingCrm(http.Controller):
         ssr = http.request.env['res.partner']
         ssr.init_public_partner_crm()
 
-        return "init partner"
+        return "init partner succeed"
