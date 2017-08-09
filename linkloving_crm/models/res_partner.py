@@ -25,6 +25,12 @@ def select_company(my_self, vals, type):
         return result
 
 
+def action_crm_channel(my_self, body):
+    my_self.env['mail.channel'].message_post(body=body, subject=None, message_type='comment',
+                                             subtype='mail.mt_comment', parent_id=False, attachments=None,
+                                             content_subtype='html', **{'author_id': 3})
+
+
 class ResPartner(models.Model):
     """"""
 
@@ -159,25 +165,24 @@ class ResPartner(models.Model):
 
     @api.multi
     def crm_public_partner(self):
-        domain = [('customer', '=', '1'), ('is_company', '=', True)]
-        partner_list = self.env['res.partner'].search(domain)
-        for partner_one in partner_list:
-            mutual_rule = partner_one.mutual_rule_id if partner_one.mutual_rule_id else ''  # 规则对象
+        mutual_rule_list = self.env['crm.mutual.customer'].search([])
+        for mutual_rule in mutual_rule_list:
 
-            finally_order_time = partner_one.sale_order_ids[0].create_date if len(
-                partner_one.sale_order_ids) > 0 else ''  # 最后下单时间
-            finally_message_time = partner_one.message_ids[0].write_date if len(
-                partner_one.message_ids) > 0 else ''  # 最后跟进时间
+            abort_time = mutual_rule.effective_time  # 截止时间
+            abort_time_date = datetime.strptime(abort_time.split(' ')[0], '%Y-%m-%d')
 
-            if mutual_rule:
-                abort_time = mutual_rule.effective_time  # 截止时间
-                abort_time_date = datetime.strptime(abort_time.split(' ')[0], '%Y-%m-%d')
+            overdue_time = mutual_rule.description  # 过期时间
+            overdue_time_date = int(overdue_time)
 
-                overdue_time = mutual_rule.description  # 过期时间
-                overdue_time_date = int(overdue_time)
+            now_time = datetime.now()  # 现在时间
+            now_time_date = datetime.strptime(str(now_time).split(' ')[0], '%Y-%m-%d')
 
-                now_time = datetime.now()  # 现在时间
-                now_time_date = datetime.strptime(str(now_time).split(' ')[0], '%Y-%m-%d')
+            for partner_one in mutual_rule.customer_ids:
+
+                finally_order_time = partner_one.sale_order_ids[0].create_date if len(
+                    partner_one.sale_order_ids) > 0 else ''  # 最后下单时间
+                finally_message_time = partner_one.message_ids[0].write_date if len(
+                    partner_one.message_ids) > 0 else ''  # 最后跟进时间
 
                 no_contact_time = finally_message_time  # 未联系时间 差值 difference
                 if mutual_rule.reference_type == 'Order':
@@ -192,24 +197,27 @@ class ResPartner(models.Model):
                 # 判断开始
                 interval_time = abort_time_date - now_time_date  # 》0 还没有到截止时间   《0 已经过了截止时间
                 if interval_time.days == 0:
-                    print '刚好是截止时间'
+                    # '刚好是截止时间'
                     if no_contact_time_date.days > overdue_time_date:
-                        print '设置为公海 取消销售员绑定'
+                        # '设置为公海 取消销售员绑定'
                         partner_one.write({'public_partners': 'public'})
                         partner_one.write({'user_id': ''})
-                    print '取消公海规则'
+                        action_crm_channel(self, u'客户' + partner_one.name + u'掉入公海')
+                    # '取消公海规则'
                     partner_one.write({'mutual_rule_id': ''})
                 else:
                     if interval_time.days > 0:
                         if no_contact_time_date.days > overdue_time_date:
-                            print '设置为警告用户'
+                            # '设置为警告用户'
                             partner_one.write({'public_partners': 'buffer'})
+                            action_crm_channel(self, u'客户' + partner_one.name + u'进入警告期')
                     if interval_time.days < 0:
                         if (no_contact_time_date.days - abs(interval_time.days)) > overdue_time_date:
-                            print '设置为公海 取消销售员绑定'
+                            # '设置为公海 取消销售员绑定'
                             partner_one.write({'public_partners': 'public'})
                             partner_one.write({'user_id': ''})
-                        print '取消规则'
+                            action_crm_channel(self, u'客户' + partner_one.name + u'掉入公海')
+                        # '取消规则'
                         partner_one.write({'mutual_rule_id': ''})
 
     @api.multi
@@ -248,3 +256,18 @@ class CrmProductSeries(models.Model):
 
     name = fields.Char(u'名称')
     detail = fields.Text(string=u'描述')
+
+
+class ChannelCrm(models.Model):
+    _inherit = 'mail.channel'
+
+    @api.multi
+    @api.returns('self', lambda value: value.id)
+    def message_post(self, body='', subject=None, message_type='notification', subtype=None, parent_id=False,
+                     attachments=None, content_subtype='html', **kwargs):
+        print kwargs.get('author_id')
+        if len(self) <= 0:
+            # self = self.env['mail.channel'].browse(7)
+            self = self.env['mail.channel'].search([('name', '=', '公海通知')])
+        return super(ChannelCrm, self).message_post(body, subject, message_type, subtype, parent_id, attachments,
+                                                    content_subtype, **kwargs)
