@@ -48,7 +48,20 @@ class MrpBom(models.Model):
         if 'bom_line_ids' in vals:
             if self.state == 'review_ing':
                 raise UserError('此bom正在审核中,请取消审核后再做修改')
-            if self.state != 'new':
+            if self.state not in ('new', 'updated', 'deny'):
+                if not self.review_id:
+                    self.review_id = self.env["review.process"].create_review_process('mrp.bom',
+                                                                                      self.id)
+                else:
+                    line_ids = self.review_id.get_review_line_list()
+                    self.env["review.process.line"].create({
+                        'partner_id': self.env.user.partner_id.id,
+                        'review_id': self.review_id.id,
+                        'remark': '%s----->%s' % (self.state, u'更新'),
+                        'last_review_line_id': line_ids[-1].get('id') if line_ids else False,
+                        'review_order_seq': max([line.review_order_seq for line in self.review_id.review_line_ids]) + 1
+                    })
+
                 vals.update({
                     'current_review_id': self.env.user.id,
                     'state': 'updated',
