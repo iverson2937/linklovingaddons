@@ -69,6 +69,8 @@ class ResPartner(models.Model):
 
     order_partner_question_count = fields.Integer(compute='_compute_order_partner_question', string=u'客户问题汇总')
 
+    partner_img_count = fields.Integer(compute='_compute_order_partner_question', string=u'客户照片')
+
     public_partners = fields.Selection([('public', '公海'), ('buffer', '缓冲区'), ('private', '私有')], string=u'公海')
 
     old_user_id = fields.Char(string=u'前销售员')
@@ -85,6 +87,7 @@ class ResPartner(models.Model):
                 if partner_count.sale_order_type == 'partner_question':
                     count += 1
             partner.order_partner_question_count = count
+            partner.partner_img_count = len(partner.img_ids)
 
     @api.multi
     def _compute_is_order(self):
@@ -230,6 +233,15 @@ class ResPartner(models.Model):
             else:
                 partner_one.write({'public_partners': 'public'})
 
+    img_ids = fields.One2many('ir.attachment', 'partner_img_id')
+
+    @api.multi
+    def action_view_partner_img(self):
+        action = self.env.ref('base.action_attachment').read()[0]
+        action['domain'] = [('partner_img_id', 'in', self.ids)]
+        # action['domain'] = [('res_id', 'in', self.ids)]
+        return action
+
 
 class CrmRemarkRecord(models.Model):
     """
@@ -271,3 +283,18 @@ class ChannelCrm(models.Model):
             self = self.env['mail.channel'].search([('name', '=', '公海通知')])
         return super(ChannelCrm, self).message_post(body, subject, message_type, subtype, parent_id, attachments,
                                                     content_subtype, **kwargs)
+
+
+class CrmIrAttachment(models.Model):
+    _inherit = 'ir.attachment'
+
+    partner_img_id = fields.Many2one('res.partner', string=u'照片客户')
+
+    @api.model
+    @api.returns('self', lambda value: value.id)
+    def create(self, vals):
+        if not (vals.get('res_model') or vals.get('res_id')):
+            vals['partner_img_id'] = self.env.context.get('active_ids')[0] if len(
+                self.env.context.get('active_ids')) > 0 else ''
+
+        return super(CrmIrAttachment, self).create(vals)
