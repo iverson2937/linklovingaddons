@@ -24,6 +24,27 @@
             </field>
         </record>
 
+        <record id="linkloving_mrp_bom_tree_view" model="ir.ui.view">
+            <field name="name">mrp.bom.tree.inherit</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.mrp_bom_tree_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree/field[@name='product_uom_id']" position="before">
+                    <field name="who_review_now"/>
+                </xpath>
+                <xpath expr="//tree/field[@name='product_uom_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//tree/field[@name='product_qty']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//tree/field[@name='routing_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
 
     </data>
 </odoo>

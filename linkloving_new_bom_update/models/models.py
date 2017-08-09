@@ -14,6 +14,7 @@ class MrpBom(models.Model):
                                 string=u'待...审核',
                                 track_visibility='always',
                                 readonly=True, copy=False)
+    who_review_now = fields.Many2one("res.partner", related='review_id.who_review_now')
     current_review_id = fields.Many2one('res.users', compute='get_current_review_id', store=True)
 
     @api.multi
@@ -45,10 +46,13 @@ class MrpBom(models.Model):
         # self.check_can_update()
 
         if 'bom_line_ids' in vals:
-            vals.update({
-                'current_review_id': self.env.user.id,
-                'state': 'updated',
-            })
+            if self.state == 'review_ing':
+                raise UserError('此bom正在审核中,请取消审核后再做修改')
+            if self.state != 'new':
+                vals.update({
+                    'current_review_id': self.env.user.id,
+                    'state': 'updated',
+                })
         return super(MrpBom, self).write(vals)
 
     @api.multi

@@ -503,7 +503,7 @@ on_search:function () {
                             $("#treeMenu").attr("data-bom-id", result.bom_id);
                             $.TreeTable("treeMenu", heads, tNodes);
                             $("#treeMenu").treetable("node", result.bom_id).toggle();
-                            if (result.state == 'new' || result.state == 'draft') {
+                            if (result.state == 'new' || result.state == 'draft' || result.state == 'updated') {
                                 if (!this.is_show) {
                                     $(".new_bom_btns_wrap").append('<button class="btn btn-primary btn-sm submit_to_approval">提交审核</button>')
                                 }
