@@ -33,7 +33,6 @@ class HrExpenseSheet(models.Model):
     @api.onchange('department_id')
     def _onchange_department_id(self):
         for line in self.expense_line_ids:
-            print line.sheet_id.department_id.name
             line.department_id = line.sheet_id.department_id.id
 
     @api.multi
