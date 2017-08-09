@@ -39,3 +39,4 @@ class StockMoveFinished(models.Model):
 
     quantity_done_finished = fields.Float(default=0, compute=_compute_quantity_done_finished)
     quantity_done = fields.Float(default=0, compute=_compute_quantity_done_finished)
+    produce_qty=fields.Float(string=u'产出数量')

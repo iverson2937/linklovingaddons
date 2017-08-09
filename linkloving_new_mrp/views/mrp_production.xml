@@ -8,12 +8,7 @@
             <field name="priority" eval="100"/>
             <field name="arch" type="xml">
                 <form string="产出">
-                    <field name="input_product_ids" invisible="1">
-                        <tree>
-                            <field name="product_id"/>
-                        </tree>
-                    </field>
-                    <field name="output_product_ids">
+                    <field name="stock_move_lines_finished">
                         <tree editable="bottom">
                             <field name="product_id" readonly="1" options="{'no_create': True}"/>
                             <!--<field name="total_produce_qty"/>-->
@@ -122,12 +117,12 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='product_uom_id']" position="replace">
                     <field name="product_uom_id" options="{'no_open':True,'no_create':True}" groups="product.group_uom"
-                           attrs="{'readonly': [('has_moves', '=', True)],'required':[('is_multi_output','!=',True)],'invisible':[('is_multi_output','=',True)]}"/>
+                           attrs="{'readonly': [('has_moves', '=', True)],'required':[('is_multi_output','!=',True),('is_random_output','!=',True)],'invisible':[('is_random_output','=',True)]}"/>
 
                 </xpath>
                 <xpath expr="//field[@name='product_id']" position="attributes">
                     <attribute name="attrs">
-                        {'invisible':[('is_multi_output','=',True)],
+                       {'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)],
                         'readonly':[('state','not in',['draft','confirmed'])]}
                     </attribute>
 
@@ -135,28 +130,28 @@
 
                 <xpath expr="//label[@for='product_qty']" position="attributes">
 
-                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)]}</attribute>
+                    <attribute name="attrs">{'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}</attribute>
                 </xpath>
 
 
                 <xpath expr="//field[@name='product_qty']" position="attributes">
                     <attribute name="attrs">
                         {'readonly':[('state','not in',['draft','confirmed'])],
-                        'invisible':[('is_multi_output','=',True)]}
+                      'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}
                     </attribute>
 
 
                 </xpath>
                 <xpath expr="//field[@name='unit_price']" position="attributes">
-                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)]}</attribute>
+                    <attribute name="attrs">{'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}</attribute>
 
                 </xpath>
                 <xpath expr="//field[@name='mo_type']" position="attributes">
-                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)]}</attribute>
+                    <attribute name="attrs">{'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}</attribute>
 
                 </xpath>
                 <xpath expr="//field[@name='hour_price']" position="attributes">
-                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)]}</attribute>
+                    <attribute name="attrs">{'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}</attribute>
                 </xpath>
 
                 <xpath expr="//field[@name='product_id']" position="after">
@@ -167,27 +162,27 @@
 
                 <xpath expr="//field[@name='bom_id']" position="attributes">
                     <attribute name="required">0</attribute>
-                    <attribute name="attrs">{'invisible':[('is_multi_output','=',True)],
+                    <attribute name="attrs">{'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)],
                         'readonly':[('state','not in',['draft','confirmed'])]}
                     </attribute>
                 </xpath>
 
                 <xpath expr="//button[@name='open_produce_product']" position="attributes">
-                    <attribute name="attrs">{'invisible': ['|','|', '|', '|', ('check_to_done', '=', True),
+                    <attribute name="attrs">{'invisible': ['|','|', '|', '|','|', ('check_to_done', '=', True),
                         ('availability', 'not in', ['partially_available', 'assigned']), ('state', 'not in',
-                        ('progress')), ('routing_id', '!=', False),('is_multi_output','=',True)]}
+                        ('progress')), ('routing_id', '!=', False),('is_multi_output','=',True),('is_random_output','=',True)]}
                     </attribute>
                 </xpath>
 
-                    <xpath expr="//button[@name='button_produce_finish']" position="attributes">
-                        <attribute name="attrs">{'invisible': [('state', '!=', 'progress')]}</attribute>
+                <xpath expr="//button[@name='button_produce_finish']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('state', '!=', 'progress')]}</attribute>
                 </xpath>
 
 
                 <xpath expr="//button[@name='open_produce_product']" position="after">
 
                     <button name="button_multi_output" class="oe_highlight"
-                            attrs="{'invisible': ['|',('state', '!=', 'progress'),('is_multi_output','!=',True)]}"
+                            attrs="{'invisible': ['|',('state', '!=', 'progress'),('is_multi_output','!=',True),('is_random_output','!=',True)]}"
                             type="object"
                             string="产出" groups="linkloving_mrp_extend.group_charge_inspection"/>
                 </xpath>
@@ -195,6 +190,7 @@
 
                 <xpath expr="//field[@name='bom_id']" position="after">
                     <field name="is_multi_output" invisible="1"/>
+                    <field name="is_random_output" invisible="1"/>
                     <field name="is_force_output"
                            attrs="{'readonly':[('state','not in',['draft','confirmed'])],'invisible':[('is_multi_output','!=',True)]}"/>
                 </xpath>
@@ -205,25 +201,25 @@
                 </xpath>
 
                 <xpath expr="//notebook/page[2]" position="replace">
-                    <!--<page string="投入" attrs="{'invisible':[('state','not in',['draft','confirmed'])]}">-->
-                    <!--<field name="input_product_ids" readonly="1">-->
-                    <!--<tree editable="bottom" create="0" delete="0">-->
-                    <!--<field name="product_id" options="{'no_create':True}" string="产品"/>-->
-                    <!--<field name="type" invisible="1"/>-->
-                    <!--</tree>-->
-                    <!--</field>-->
-                    <!--</page>-->
-                    <!--<page string="产出" attrs="{'invisible':[('state','not in',['draft','confirmed'])]}">-->
-                    <!--<field name="output_product_ids" readonly="1" create="0">-->
-                    <!--<tree editable="bottom" create="0" delete="0">-->
-                    <!--<field name="product_id" options="{'no_create':True}" string="产品"/>-->
-                    <!--<field name="type" invisible="1"/>-->
-                    <!--</tree>-->
-                    <!--</field>-->
-                    <!--</page>-->
+                    <page string="投入" attrs="{'invisible':[('is_random_output','!=',True)]}">
+                        <field name="input_product_ids" context="{'default_type':'input'}">
+                            <tree editable="bottom" create="1" delete="1">
+                                <field name="product_id" options="{'no_create':True}" string="产品"/>
+                                <field name="type" invisible="1"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page string="产出" attrs="{'invisible':[('is_random_output','!=',True)]}">
+                        <field name="output_product_ids" context="{'default_type':'output'}">
+                            <tree editable="bottom">
+                                <field name="product_id" options="{'no_create':True}" string="产品"/>
+                                <field name="type" invisible="1"/>
+                            </tree>
+                        </field>
+                    </page>
 
 
-                    <page string="投入">
+                    <page string="消耗的物料">
                         <field name="sim_stock_move_lines">
                             <tree editable="bottom" delete="0" decoration-warning="quantity_done&gt;product_uom_qty"
                                   decoration-success="quantity_done>=product_uom_qty"

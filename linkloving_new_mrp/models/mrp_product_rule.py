@@ -24,11 +24,12 @@ class MrpProductRule(models.Model):
 class MrpProductRuleLine(models.Model):
     _name = 'mrp.product.rule.line'
     rule_id = fields.Many2one('mrp.product.rule', on_delete="cascade")
+    mo_id = fields.Many2one('mrp.product.rule', on_delete="cascade")
     product_id = fields.Many2one('product.product')
     produce_qty = fields.Float(default=1.0)
     type = fields.Selection([
-        ('input', '投入'),
-        ('output', '产出'),
+        ('input', u'投入'),
+        ('output', u'产出'),
     ])
 
     @api.multi

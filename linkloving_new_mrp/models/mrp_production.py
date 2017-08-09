@@ -10,6 +10,7 @@ from odoo.exceptions import UserError
 class NewMrpProduction(models.Model):
     _inherit = 'mrp.production'
     is_multi_output = fields.Boolean(related='process_id.is_multi_output')
+    is_random_output = fields.Boolean(related='process_id.is_random_output')
     rule_id = fields.Many2one('mrp.product.rule')
     stock_move_lines_finished = fields.One2many('stock.move.finished', 'production_id')
     is_force_output = fields.Boolean(string=u'是否要求产出完整', default=False)
@@ -23,8 +24,13 @@ class NewMrpProduction(models.Model):
         domain=[('type', 'in', ['product', 'consu'])],
         readonly=True, required=False,
         states={'confirmed': [('readonly', False)]})
-    output_product_ids = fields.One2many('mrp.product.rule.line', related='rule_id.output_product_ids')
-    input_product_ids = fields.One2many('mrp.product.rule.line', related='rule_id.input_product_ids')
+    output_product_ids = fields.One2many('mrp.product.rule.line','mo_id',domain=[('type', '=', 'output')])
+    input_product_ids = fields.One2many('mrp.product.rule.line','mo_id',domain=[('type', '=', 'input')])
+
+    @api.onchange('rule_id')
+    def onchange_rule_id(self):
+        self.output_product_ids = self.rule_id.output_product_ids
+        self.input_product_ids = self.rule_id.input_product_ids
 
     @api.multi
     def _compute_done_stock_move_lines(self, new_pr):
@@ -79,7 +85,7 @@ class NewMrpProduction(models.Model):
     @api.multi
     def confirm_output(self):
 
-        for line in self.output_product_ids:
+        for line in self.stock_move_lines_finished:
             for finish_id in self.move_finished_ids:
                 if line.product_id.id == finish_id.product_id.id:
                     finish_id.quantity_done += line.produce_qty
@@ -161,9 +167,9 @@ class NewMrpProduction(models.Model):
 
     def _generate_finished_moves(self):
         if self.is_multi_output:
-            if not self.output_product_ids:
-                raise UserError(u'请添加产出物料')
-            for line in self.output_product_ids:
+            if not self.rule_id:
+                raise UserError(u' 请选择规则')
+            for line in self.rule_id.output_product_ids:
                 move = self.env['stock.move'].create({
                     'name': self.name,
                     'date': self.date_planned_start,
@@ -211,9 +217,9 @@ class NewMrpProduction(models.Model):
         moves = self.env['stock.move']
         source_location = self.picking_type_id.default_location_src_id
         if self.is_multi_output:
-            if not self.input_product_ids:
+            if not self.rule_id:
                 raise UserError('请添加投入物料')
-            for line_id in self.input_product_ids:
+            for line_id in self.rule_id.input_product_ids:
                 data = {
                     'name': self.name,
                     'date': self.date_planned_start,
@@ -258,7 +264,6 @@ class NewMrpProduction(models.Model):
 
     @api.multi
     def _generate_moves(self):
-        print 'AAAAAAAAAAAAAAAAAAAAAAAAA'
         for production in self:
 
             production._generate_finished_moves()
