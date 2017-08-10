@@ -24,13 +24,8 @@ class NewMrpProduction(models.Model):
         domain=[('type', 'in', ['product', 'consu'])],
         readonly=True, required=False,
         states={'confirmed': [('readonly', False)]})
-    output_product_ids = fields.One2many('mrp.product.rule.line','mo_id',domain=[('type', '=', 'output')])
-    input_product_ids = fields.One2many('mrp.product.rule.line','mo_id',domain=[('type', '=', 'input')])
-
-    @api.onchange('rule_id')
-    def onchange_rule_id(self):
-        self.output_product_ids = self.rule_id.output_product_ids
-        self.input_product_ids = self.rule_id.input_product_ids
+    output_product_ids = fields.One2many('mrp.product.rule.line', 'mo_id', domain=[('type', '=', 'output')])
+    input_product_ids = fields.One2many('mrp.product.rule.line', 'mo_id', domain=[('type', '=', 'input')])
 
     @api.multi
     def _compute_done_stock_move_lines(self, new_pr):
@@ -67,16 +62,18 @@ class NewMrpProduction(models.Model):
         self.bom_id = False
 
     def button_waiting_material(self):
-        # if self.is_multi_output:
-        #
-        #     if not self.output_product_ids or not self.input_product_ids:
-        #         raise UserError(u'请添加投入产出')
+        if self.is_multi_output:
+            if not self.rule_id:
+                raise UserError(u'请添加物料规则')
+        if self.is_random_output:
+            if not self.input_product_ids or not self.output_product_ids:
+                raise UserError(u'请添加投入产出')
         self.write({'state': 'waiting_material'})
 
     @api.multi
     def _compute_qty_unpost(self):
         for production in self:
-            if production.is_multi_output:
+            if production.is_multi_output or production.is_random_output:
                 production.qty_unpost = sum(production.stock_move_lines_finished.mapped('quantity_done_finished'))
             else:
                 feedbacks = production.qc_feedback_ids.filtered(lambda x: x.state not in ["check_to_rework"])
@@ -96,10 +93,12 @@ class NewMrpProduction(models.Model):
                     #     raise UserError('产出大于投入')
 
     def button_produce_finish(self):
-        if self.is_multi_output:
+        if self.is_multi_output or self.is_random_output:
+            if sum(move.quantity_done for move in self.move_finished_ids) < 1:
+                raise UserError(u'尚未完全产出,不允许完成')
             if self.is_force_output and sum(move.quantity_done for move in self.move_raw_ids) > sum(
                     move.quantity_done for move in self.move_finished_ids):
-                raise UserError('尚未完全产出,不允许完成')
+                raise UserError(u'尚未完全产出,不允许完成')
             self.post_inventory()
             if sum(move.quantity_done for move in self.move_raw_ids) == sum(
                     move.quantity_done for move in self.move_finished_ids):
@@ -166,10 +165,13 @@ class NewMrpProduction(models.Model):
                 'target': 'new'}
 
     def _generate_finished_moves(self):
-        if self.is_multi_output:
-            if not self.rule_id:
-                raise UserError(u' 请选择规则')
-            for line in self.rule_id.output_product_ids:
+        if self.is_multi_output or self.is_random_output:
+            if self.is_multi_output:
+                output_product_ids=self.rule_id.output_product_ids
+            if self.is_random_output:
+                output_product_ids = self.output_product_ids
+
+            for line in output_product_ids:
                 move = self.env['stock.move'].create({
                     'name': self.name,
                     'date': self.date_planned_start,
@@ -216,10 +218,15 @@ class NewMrpProduction(models.Model):
         self.ensure_one()
         moves = self.env['stock.move']
         source_location = self.picking_type_id.default_location_src_id
-        if self.is_multi_output:
-            if not self.rule_id:
-                raise UserError('请添加投入物料')
-            for line_id in self.rule_id.input_product_ids:
+        if self.is_multi_output or self.is_random_output:
+            if self.is_multi_output:
+                input_product_ids = self.rule_id.input_product_ids
+            if self.is_random_output:
+                if not self.input_product_ids or not self.output_product_ids:
+                    raise UserError('请添加投入产出')
+                input_product_ids = self.input_product_ids
+
+            for line_id in input_product_ids:
                 data = {
                     'name': self.name,
                     'date': self.date_planned_start,
@@ -267,7 +274,7 @@ class NewMrpProduction(models.Model):
         for production in self:
 
             production._generate_finished_moves()
-            if production.is_multi_output:
+            if production.is_multi_output or production.is_random_output:
                 production._compute_done_stock_move_lines(production)
             if production.bom_id:
                 factor = production.product_uom_id._compute_quantity(production.product_qty,
@@ -282,14 +289,6 @@ class NewMrpProduction(models.Model):
             production.move_raw_ids.action_confirm()
         return True
 
-# class MrpProductionMaterial(models.Model):
-#     _name = 'mrp.production.material'
-#     product_id = fields.Many2one('product.product', string=u'产品', required=True)
-#     # total_produce_qty = fields.Float(string=u'累计产出数量')
-#     produce_qty = fields.Float(string=u'产出数量')
-#
-#     mo_id = fields.Many2one('mrp.production', on_delete='cascade')
-#     type = fields.Selection([
-#         ('input', '输入'),
-#         ('output', '输出')
-#     ])
+    @api.model
+    def create(self, vals):
+        return super(NewMrpProduction, self).create(vals)

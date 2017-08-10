@@ -24,7 +24,7 @@ class MrpProductRule(models.Model):
 class MrpProductRuleLine(models.Model):
     _name = 'mrp.product.rule.line'
     rule_id = fields.Many2one('mrp.product.rule', on_delete="cascade")
-    mo_id = fields.Many2one('mrp.product.rule', on_delete="cascade")
+    mo_id = fields.Many2one('mrp.production', on_delete="cascade")
     product_id = fields.Many2one('product.product')
     produce_qty = fields.Float(default=1.0)
     type = fields.Selection([
