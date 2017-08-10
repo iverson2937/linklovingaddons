@@ -128,3 +128,8 @@
 .o_list_editable .o_form_view.o_list_editable_form .o_form_textarea {
     border: none;
 }
+
+.xs{
+    color: #999999!important;
+    font-size: 12px;
+}
