@@ -487,8 +487,11 @@ class MrpProductionExtend(models.Model):
                    'view_mode': 'form',
                    'view_id': view.id,
                    'target': 'new'}
+
             res['context'] = {'default_production_id': self.id,
-                              'return_ids.product_ids': self.move_raw_ids.mapped('product_id').ids}
+                              'return_ids.product_ids': self.move_raw_ids.mapped('product_id').ids
+                              }
+            print self.move_raw_ids.mapped('product_id').ids, 'ddddddddd'
         return res
 
     # 确认生产 等待备料
@@ -1276,6 +1279,9 @@ class ReturnMaterialLine(models.Model):
     return_qty = fields.Float('Return Quantity', readonly=False)
     return_id = fields.Many2one('mrp.return.material')
 
+    @api.model
+    def create(self, vals):
+        return super(ReturnMaterialLine, self).create(vals)
     @api.multi
     def create_scraps(self):
         if self[0].return_id.production_id.process_id.is_rework:  # 重工
