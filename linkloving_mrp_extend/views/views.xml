@@ -203,8 +203,8 @@
                 </xpath>
                 <xpath expr="//sheet" position="before">
                     <header>
-                        <button name="set_to_release" type="object" states="draft,new" string="确认"
-                                class="oe_highlight"/>
+                        <!--<button name="set_to_release" type="object" states="draft,new" string="确认"-->
+                        <!--class="oe_highlight"/>-->
                         <field name="state" widget="statusbar" readonly="1"/>
                     </header>
                 </xpath>
@@ -476,7 +476,7 @@
                    eval="[(4, ref('mrp.group_mrp_user')),(4, ref('sales_team.group_sale_salesman')),(4, ref('purchase.group_purchase_user'))]"/>
             <field name="arch" type="xml">
                 <div name="button_box" position="inside">
-                    <button class="oe_stat_button" name="%(mrp.template_open_bom)d" type="action"
+                    <button class="oe_stat_button" name="action_template_open_bom" type="object"
                             attrs="{'invisible':[('type', 'not in', ['product', 'consu'])]}" icon="fa-flask">
                         <field string="Bill of Materials" name="bom_count" widget="statinfo"/>
                     </button>

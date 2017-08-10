@@ -105,6 +105,7 @@ class MrpBomLineExtend(models.Model):
             'res_id': self.product_id.product_tmpl_id.id
         }
 
+
     @api.multi
     def action_see_bom_structure_reverse(self):
         bom_tree_view = self.env.ref('linkloving_mrp_extend.linkloving_mrp_bom_tree_view')
@@ -148,6 +149,17 @@ class ProductProductExtend(models.Model):
 
 class ProductTemplateExtend(models.Model):
     _inherit = 'product.template'
+
+    @api.multi
+    def action_template_open_bom(self):
+        action = self.env.ref('mrp.template_open_bom').read()[0]
+        bom_ids = self.mapped('bom_ids')
+        if len(bom_ids) > 1:
+            action['domain'] = [('id', 'in', bom_ids.ids)]
+        elif bom_ids:
+            action['views'] = [(self.env.ref('mrp.mrp_bom_form_view').id, 'form')]
+            action['res_id'] = bom_ids.id
+        return action
 
     @api.multi
     def action_see_bom_structure_reverse(self):
@@ -1256,6 +1268,7 @@ class SimStockMove(models.Model):
 
     bom_line_id = fields.Many2one(comodel_name='mrp.bom.line', compute='_compute_bom_line_id')
 
+
 class ReturnMaterialLine(models.Model):
     _name = 'return.material.line'
 
@@ -1564,7 +1577,7 @@ class StcokPickingExtend(models.Model):
         return super(StcokPickingExtend, self).action_check_fail()
 
     def confirm_transfer_way(self):
-        if any([x.rejects_qty > 0.0 for x in self.pack_operation_ids]):# 若有一个不良品大于0
+        if any([x.rejects_qty > 0.0 for x in self.pack_operation_ids]):  # 若有一个不良品大于0
             view = self.env.ref('linkloving_mrp_extend.view_choose_transfer_way')
             return {
                 'name': u'选择入库方式',
@@ -1575,10 +1588,11 @@ class StcokPickingExtend(models.Model):
                 'views': [(view.id, 'form')],
                 'view_id': view.id,
                 'target': 'new',
-                'context': {'default_picking_id': self.id },
+                'context': {'default_picking_id': self.id},
             }
         else:
             return self.do_new_transfer()
+
 
 class stock_transfer_way(models.TransientModel):
     _name = 'stock.transfer.way'
@@ -1592,16 +1606,17 @@ class stock_transfer_way(models.TransientModel):
             for pack in self.picking_id.pack_operation_product_ids:
                 pack.qty_done = pack.qty_done + pack.rejects_qty
 
-        if is_all:# 全部入库
+        if is_all:  # 全部入库
             self.picking_id.transfer_way = 'all'
         else:
             self.picking_id.transfer_way = 'part'
-        if not self.picking_id.check_backorder(): #此条件是货全都收全了, 所以要提前修改数量
+        if not self.picking_id.check_backorder():  # 此条件是货全都收全了, 所以要提前修改数量
             if self.picking_id.transfer_way == 'part':
                 for pack in self.picking_id.pack_operation_product_ids:
                     pack.qty_done = pack.qty_done - pack.rejects_qty
 
         return self.picking_id.do_new_transfer()
+
 
 class StockBackorderConfirmation(models.TransientModel):
     _inherit = 'stock.backorder.confirmation'
@@ -1610,6 +1625,7 @@ class StockBackorderConfirmation(models.TransientModel):
         if self.pick_id.transfer_way == 'part':
             for pack in self.pick_id.pack_operation_product_ids:
                 pack.qty_done = pack.qty_done - pack.rejects_qty
+
     @api.multi
     def process(self):
         self.qty_done_recompute_transfer_way()
