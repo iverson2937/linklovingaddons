@@ -16,7 +16,7 @@ odoo.define('linkloving_core.TreeView', function (require) {
         init: function () {
             var self = this;
             this._super.apply(this, arguments);
-            console.log('yes')
+            // console.log('yes')
         },
         start:function () {
             self.$(document).ajaxComplete(function (event, xhr, settings) {
@@ -72,6 +72,29 @@ odoo.define('linkloving_core.TreeView', function (require) {
                    // }
             })
 
+            if($(".o_form_field_number")){
+                $(".o_form_field_number").each(function () {
+                    var s = $(this).text().toString();
+                    for (var i=0;i<s.length;i++){
+                        if(s[i] == '.'){
+                            var k=i;
+                            $(this).html("");
+                            var zs=[],xs=[];
+                            for(var j=0;j<s.length;j++){
+                                if(j<k){
+                                    zs.push(s[j]);
+                                }
+                                if(j>k){
+                                    xs.push(s[j]);
+                                }
+                            }
+                            $(this).append('<span class="zs">'+ zs.join("") +'.</span>');
+                            $(this).append('<span class="xs">'+ xs.join("") +'</span>');
+                            break;
+                        }
+                    }
+                })
+            }
         }
     })
     core.view_registry.add('oe_list', oe_ListView);
