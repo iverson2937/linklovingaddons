@@ -27,7 +27,8 @@
         # 'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
-        'views/bom_view.xml'
+        'views/bom_view.xml',
+        'wizard/batch_approval_wizard.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
