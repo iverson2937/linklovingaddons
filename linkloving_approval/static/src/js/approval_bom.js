@@ -31,7 +31,7 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
 
 
         //查看BOM
-        bom_view_fn: function () {
+        bom_view_fn: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var bom_id = $(target).parents(".tab_pane_display").data("id");
