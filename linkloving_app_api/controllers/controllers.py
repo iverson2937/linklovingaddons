@@ -2375,14 +2375,14 @@ class LinklovingAppApi(http.Controller):
             'name': stock_picking_obj.name,
             'parnter_id': stock_picking_obj.partner_id.display_name,
             'phone': stock_picking_obj.partner_id.mobile or stock_picking_obj.partner_id.phone or '',
-            'origin': stock_picking_obj.origin,
+            'origin': stock_picking_obj.origin or '',
             'state': stock_picking_obj.state,
 
-            'back_order_id': stock_picking_obj.backorder_id.name,
-            'emergency': stock_picking_obj.is_emergency,
-            'creater': stock_picking_obj.create_uid.name,
-            'location_id': stock_picking_obj.location_id.complete_name,
-            'tracking_number': stock_picking_obj.tracking_number,
+            'back_order_id': stock_picking_obj.backorder_id.name or '',
+            'emergency': stock_picking_obj.is_emergency or '',
+            'creater': stock_picking_obj.create_uid.name or '',
+            'location_id': stock_picking_obj.location_id.complete_name or '',
+            'tracking_number': stock_picking_obj.tracking_number or '',
 
             'move_type': stock_picking_obj.move_type,  #交货类型
             'picking_type': {
@@ -2399,7 +2399,7 @@ class LinklovingAppApi(http.Controller):
 
             'min_date': stock_picking_obj.min_date,
             'pack_operation_product_ids': pack_list,
-            'qc_note': stock_picking_obj.qc_note,
+            'qc_note': stock_picking_obj.qc_note or '',
             'qc_result': stock_picking_obj.qc_result,
             'qc_img': LinklovingAppApi.get_stock_picking_img_url(stock_picking_obj.id, 'qc_img'),
             'post_img': LinklovingAppApi.get_stock_picking_img_url(stock_picking_obj.id, 'post_img'),
