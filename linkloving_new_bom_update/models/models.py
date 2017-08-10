@@ -38,10 +38,10 @@ class MrpBom(models.Model):
 
     @api.model
     def create(self, vals):
-        vals.update({
-            'current_review_id': vals['create_uid']
-        })
-        return super(MrpBom, self).create(vals)
+
+        bom = super(MrpBom, self).create(vals)
+        bom.current_review_id = bom.create_uid
+        return bom
 
     @api.multi
     def write(self, vals):
