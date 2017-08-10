@@ -46,16 +46,6 @@
                     <!--attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"-->
                     <!--groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>-->
                 </xpath>
-                <xpath expr="//button[@name='do_new_transfer']" position="after">
-                    <button name="action_check_pass" states="qc_check" string="Quality Check Pass"
-                            groups="stock.group_stock_user"
-                            type="object" class="oe_highlight"/>
-                    <button name="action_check_fail" states="qc_check" string="Quality Check Fail"
-                            groups="stock.group_stock_user"
-                            type="object"/>
-
-                </xpath>
-
                 <xpath expr="//field[@name='location_id']" position="after">
                     <field name="tracking_number" string="Tracking Number"/>
                 </xpath>
