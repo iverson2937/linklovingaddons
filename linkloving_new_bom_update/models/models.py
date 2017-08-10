@@ -15,12 +15,7 @@ class MrpBom(models.Model):
                                 track_visibility='always',
                                 readonly=True, copy=False)
     who_review_now = fields.Many2one("res.partner", related='review_id.who_review_now')
-    current_review_id = fields.Many2one('res.users', compute='get_current_review_id', store=True)
-
-    @api.multi
-    def get_current_review_id(self):
-        for bom in self:
-            bom.current_review_id = bom.create_uid.id
+    current_review_id = fields.Many2one('res.users')
 
     sequence = fields.Integer(compute='_get_sequence', store=True)
 
@@ -40,6 +35,13 @@ class MrpBom(models.Model):
                 bom.sequence = 1
             else:
                 bom.sequence = 2
+
+    @api.model
+    def create(self, vals):
+        vals.update({
+            'current_review_id': vals['create_uid']
+        })
+        return super(MrpBom, self).create(vals)
 
     @api.multi
     def write(self, vals):
