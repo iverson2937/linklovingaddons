@@ -39,7 +39,9 @@ class BatchApprovalWizard(models.TransientModel):
         for record in self.env['mrp.bom'].browse(active_ids):
             if not record.review_id:
                 raise UserError(u'%s没经过送审' % record.product_tmpl_id.name)
-            if record.review_id and record.review_id.who_review_now != self.env.user.id:
-                raise UserError(u'%s不属于你的审核' % record.product_tmpl_id.name)
+            if record.review_id and (
+                            record.current_review_id != self.env.user.id or record.review_id.review_line_ids.filtered(
+                        lambda x: x.state == 'waiting_review').partner_id != self.env.user.partner_id):
+                raise UserError(u'%s不属于你提交' % record.product_tmpl_id.name)
             record.action_released()
             record.review_id.review_line_ids.filtered(lambda x: x.state == 'waiting_review').action_pass(self.remark)
