@@ -1,5 +1,14 @@
 <openerp>
   <data>
+
+     <template id="core_static" name="linkloving_project_assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/linkloving_project/static/src/js/new_gantt.js"/>
+                <script type="text/javascript" src="/linkloving_project/static/src/js/dhtmlxgantt.js"/>
+                <link rel="stylesheet" href="/linkloving_project/static/src/css/dhtmlxgantt.css"/>
+
+            </xpath>
+        </template>
     <!-- explicit list view definition -->
     <!--
     <record model="ir.ui.view" id="linkloving_project.list">

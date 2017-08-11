@@ -120,6 +120,9 @@ class MrpBomLine(models.Model):
     def create(self, vals):
         line_id = super(MrpBomLine, self).create(vals)
         if line_id.bom_id and line_id.bom_id.state != 'new':
+            vals.update({
+                'is_highlight': True
+            })
             body = (u"添加物料<br/><ul class=o_timeline_tracking_value_list>"
                     + u"<li>产品<span> : </span><span class=o_timeline_tracking_value>%s</span></li>"
                     + u"<li>规格<span> : </span><span class=o_timeline_tracking_value>%s</span></li>"
@@ -137,6 +140,9 @@ class MrpBomLine(models.Model):
             raise UserError(u'你没有权限修改请联系管理员')
 
         if self.bom_id.state != 'new':
+            vals.update({
+                'is_highlight': True
+            })
             body = u"BOM被修改.<br/><ul class=o_timeline_tracking_value_list>"
             product_id = False
             if 'product_id' in vals:

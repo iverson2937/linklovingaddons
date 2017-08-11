@@ -39,6 +39,7 @@
         'wizard/change_product_qty_wizard.xml',
         'report/stock_picking_report.xml',
         'views/qc_feedback.xml',
+        'views/stock_picking.xml',
         'security/mrp_qc_feedback_seq.xml'
     ],
     # only loaded in demonstration mode

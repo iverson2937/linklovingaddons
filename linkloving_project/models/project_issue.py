@@ -11,6 +11,20 @@ AVAILABLE_PRIORITIES = [
     ('5', 'top level'),
 ]
 
+class NewGantt(models.Model):
+    _inherit = 'ir.ui.view'
+    type = fields.Selection([('tree', 'Tree'),
+                             ('form', 'Form'),
+                             ('graph', 'Graph'),
+                             ('pivot', 'Pivot'),
+                             ('calendar', 'Calendar'),
+                             ('wangke', 'wangke'),
+                             ('diagram', 'Diagram'),
+                             ('gantt', 'Gantt'),
+                             ('kanban', 'Kanban'),
+                             ('search', 'Search'),
+                             ('qweb', 'QWeb')], string='View Type')
+
 
 class project_issue(models.Model):
     _inherit = 'project.issue'

@@ -5,6 +5,7 @@ from odoo import models, fields, api, _
 
 class ReturnOfMaterial1(models.Model):
     _inherit = 'mrp.return.material'
+
     @api.model
     def _default_return_line(self):
         if self._context.get('active_id') and self._context.get('active_model') == "mrp.production":
@@ -14,9 +15,11 @@ class ReturnOfMaterial1(models.Model):
                 product_ids = mrp_production_order.product_id.bom_ids[0].bom_line_ids.mapped(
                     'product_id').ids
             if mrp_production_order.is_multi_output:
+                product_ids = mrp_production_order.rule_id.input_product_ids.mapped(
+                    'product_id').ids
+            if mrp_production_order.is_random_output:
                 product_ids = mrp_production_order.input_product_ids.mapped(
                     'product_id').ids
-                print product_ids
             lines = []
             for l in product_ids:
                 obj = self.env['return.material.line'].create({

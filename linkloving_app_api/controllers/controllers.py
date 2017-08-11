@@ -2375,14 +2375,14 @@ class LinklovingAppApi(http.Controller):
             'name': stock_picking_obj.name,
             'parnter_id': stock_picking_obj.partner_id.display_name,
             'phone': stock_picking_obj.partner_id.mobile or stock_picking_obj.partner_id.phone or '',
-            'origin': stock_picking_obj.origin,
+            'origin': stock_picking_obj.origin or '',
             'state': stock_picking_obj.state,
 
-            'back_order_id': stock_picking_obj.backorder_id.name,
+            'back_order_id': stock_picking_obj.backorder_id.name or '',
             'emergency': stock_picking_obj.is_emergency,
-            'creater': stock_picking_obj.create_uid.name,
-            'location_id': stock_picking_obj.location_id.complete_name,
-            'tracking_number': stock_picking_obj.tracking_number,
+            'creater': stock_picking_obj.create_uid.name or '',
+            'location_id': stock_picking_obj.location_id.complete_name or '',
+            'tracking_number': stock_picking_obj.tracking_number or '',
 
             'move_type': stock_picking_obj.move_type,  #交货类型
             'picking_type': {
@@ -2391,15 +2391,15 @@ class LinklovingAppApi(http.Controller):
             },  #分拣类型
             'group_id': stock_picking_obj.group_id.name,  #补货组
             'priority': stock_picking_obj.priority,  #优先级
-            'carrier': stock_picking_obj.carrier_id.name,  #承运商
-            'carrier_tracking_ref': stock_picking_obj.carrier_tracking_ref,  #跟踪参考
+            'carrier': stock_picking_obj.carrier_id.name or '',  # 承运商
+            'carrier_tracking_ref': stock_picking_obj.carrier_tracking_ref or '',  # 跟踪参考
             'weight': stock_picking_obj.weight, #重量
             'shipping_weight': stock_picking_obj.shipping_weight, #航空重量
             'number_of_packages': stock_picking_obj.number_of_packages,#包裹件数
 
             'min_date': stock_picking_obj.min_date,
             'pack_operation_product_ids': pack_list,
-            'qc_note': stock_picking_obj.qc_note,
+            'qc_note': stock_picking_obj.qc_note or '',
             'qc_result': stock_picking_obj.qc_result,
             'qc_img': LinklovingAppApi.get_stock_picking_img_url(stock_picking_obj.id, 'qc_img'),
             'post_img': LinklovingAppApi.get_stock_picking_img_url(stock_picking_obj.id, 'post_img'),
@@ -2437,7 +2437,7 @@ class LinklovingAppApi(http.Controller):
 
 
     @classmethod
-    def res_partner_to_json(cls, res_partner):
+    def res_partner_to_json(cls, res_partner, exact_dict=None):
         data = {
             'partner_id': res_partner.id,
             'name' : res_partner.name or '',
@@ -2445,6 +2445,7 @@ class LinklovingAppApi(http.Controller):
             'comment' : res_partner.comment or '',
             'x_qq' : res_partner.x_qq or '',
         }
+        data.update(exact_dict or {})
         return data
 
 
@@ -2661,3 +2662,113 @@ class LinklovingAppApi(http.Controller):
         sources = request.env["crm.lead.source"].sudo().search_read([], fields=['name'])
         print sources
         return sources
+
+    ######### 销售出货 新版接口  ###############3
+    # 销售团队
+    @http.route('/linkloving_app_api/get_sale_team/', auth='user', type='json', csrf=False)
+    def get_sale_team(self, **kwargs):
+        sale_teams = request.env["crm.team"].sudo().search([])
+
+        json_list = []
+        for team in sale_teams:
+            data = {
+                'team_id': team.id,
+                'name': team.name,
+            }
+            json_list.append(data)
+
+        json_list.append({"team_id": -999,
+                          "name": u"未定义"})
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=json_list)
+
+    # 根据销售团队获取客户
+    @http.route('/linkloving_app_api/get_partner_by_team/', auth='user', type='json', csrf=False)
+    def get_partner_by_team(self, **kwargs):
+        team_id = request.jsonrequest.get("team_id")
+        name = request.jsonrequest.get("name")
+        limit = request.jsonrequest.get("limit")
+        offset = request.jsonrequest.get("offset")
+
+        domain = [('is_company', '=', True), ('customer', '=', True)]
+        if team_id:
+            if team_id == -999:
+                domain = expression.AND([domain, [('team_id', '=', None)]])
+            else:
+                domain = expression.AND([domain, [('team_id', '=', team_id)]])
+        if name:
+            domain = expression.AND([domain, [('name', 'ilike', name)]])
+        partners = request.env["res.partner"].sudo().search(domain)
+        partners = partners.filtered(lambda x: x.sale_order_count > 0)
+        json_list = []
+
+        for partner in partners:
+            picing_info = self.get_picking_info_by_partner(partner.id)
+            if len(picing_info["waiting_data"]):
+                json_list.append(LinklovingAppApi.res_partner_to_json(partner, exact_dict={
+                    'waiting_data': len(picing_info["waiting_data"]),
+                    'able_to_data': len(picing_info["able_to_data"])}))
+
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=json_list)
+
+    # 单号搜索
+    @http.route('/linkloving_app_api/get_picking_by_origin/', auth='user', type='json', csrf=False)
+    def get_picking_by_origin(self, **kwargs):
+        order_name = request.jsonrequest.get("order_name")
+        domain = [("origin", 'ilike', order_name), ('picking_type_code', '=', 'outgoing'), ]
+        # domain = expression.OR([domain, [('name', 'ilike', order_name)]])
+        pickings = request.env["stock.picking"].sudo().search(domain)
+
+        json_list = self.get_picking_info_by_picking(pickings)
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=json_list)
+
+    # 根据客户搜索
+    @http.route('/linkloving_app_api/get_stock_picking_by_partner/', auth='user', type='json', csrf=False)
+    def get_stock_picking_by_partner(self, **kwargs):
+        partner_id = request.jsonrequest.get("partner_id")
+
+        json_list = self.get_picking_info_by_partner(partner_id)
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=json_list)
+
+    def get_picking_info_by_partner(self, partner_id):
+        domain = [('partner_id', 'child_of', partner_id), ('picking_type_code', '=', 'outgoing'),
+                  ("state", 'not in', ['cancel', 'done'])]
+        pickings = request.env["stock.picking"].sudo().search(domain)
+        # if type == 'able_to': #可处理
+        return self.get_picking_info_by_picking(pickings)
+
+    def get_picking_info_by_picking(self, pickings):
+        final_pickings = request.env["stock.picking"]
+        for picking in pickings:
+            if picking.state == 'assigned':  # 可用状态的直接就是可处理
+                final_pickings += picking
+                continue
+            if picking.available_rate > 0 and picking.available_rate < 100:
+                if picking.delivery_rule != 'delivery_once':  # 如果是一次性发货
+                    final_pickings += picking
+            elif picking.available_rate == 100:
+                final_pickings += picking
+
+        json_list = {'waiting_data': [],
+                     'able_to_data': [],}
+        for picking in final_pickings:
+            json_list['able_to_data'].append(self.stock_picking_to_json_simple(picking))
+
+        for picking in pickings:
+            json_list['waiting_data'].append(self.stock_picking_to_json_simple(picking))
+        return json_list
+
+    def stock_picking_to_json_simple(self, picking):
+        data = {
+            'picking_id': picking.id,
+            'has_attachment': LinklovingAppApi.is_has_attachment(picking.id, 'stock.picking'),
+            'name': picking.name,
+            'origin': picking.origin,
+            'state': picking.state,
+            'back_order_id': picking.backorder_id.name or '',
+            'emergency': picking.is_emergency,
+        }
+        return data

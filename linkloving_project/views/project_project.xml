@@ -477,7 +477,7 @@ s
         </record>
 
         <record id="view_task_gantt" model="ir.ui.view">
-            <field name="name">project.task.gantt</field>
+            <field name="name">project.task.gantt11111</field>
             <field name="model">project.task</field>
             <field eval="2" name="priority"/>
             <field name="arch" type="xml">
@@ -488,6 +488,18 @@ s
             </field>
         </record>
 
+             <record id="view_task_new_wangke" model="ir.ui.view">
+            <field name="name">project.task.wangke2222</field>
+            <field name="model">project.task</field>
+            <field eval="2" name="priority"/>
+            <field name="arch" type="xml">
+                <wangke date_start="date_start" date_stop="date_end" progress="task_progress" string="Tasks"
+                       parent_ids="parent_ids" child_ids="child_ids" stage_id="stage_id" top_task_id="top_task_id"
+                       default_group_by="top_task_id">
+                </wangke>
+            </field>
+        </record>
+
         <record id="project_category_action" model="ir.actions.act_window">
             <field name="name">Tags</field>
             <field name="res_model">project.category</field>
@@ -495,6 +507,21 @@ s
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
                     Click to add a new tag.
+                </p>
+            </field>
+        </record>
+
+        <record id="show_new_gantt" model="ir.actions.act_window">
+            <field name="name">Waiting Audit Tasks</field>
+            <field name="res_model">project.task</field>
+            <field name="view_mode">wangke</field>
+            <field name="context">{
+                'group_by': 'user_id',
+            }</field>
+            <field name="search_view_id" ref="project.view_task_search_form"/>
+            <field name="help" type="html">
+                <p>
+                    Odoo's project management allows you to manage the pipeline of your tasks efficiently. You can track progress, discuss on tasks, attach documents, etc.
                 </p>
             </field>
         </record>
@@ -513,6 +540,12 @@ s
             action="act_project_project_2_project_task_human_resources"
             parent="project.menu_project_management"
             sequence="12"/>
+
+        <menuitem id="menu_action_view_new_gantt"
+            name="test_new_gantt"
+            action="show_new_gantt"
+            parent="project.menu_project_management"
+            sequence="13"/>
 
 
     </data>
