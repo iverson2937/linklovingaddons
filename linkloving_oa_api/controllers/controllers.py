@@ -114,9 +114,9 @@ class LinklovingOAApi(http.Controller):
         for obj in objs:
             json_lists.append({
                 "name": obj.name,
-                "phone": obj.phone,
+                "phone": obj.phone or '',
                 "email": obj.email or '',
-                "street": obj.street2,
+                "street": obj.street2 or '',
                 "type": LinklovingOAApi.selection_get_map("res.partner", "type", obj.type),
             })
         return json_lists
@@ -284,7 +284,7 @@ class LinklovingOAApi(http.Controller):
             'name': prma_list.name,
             'date': prma_list.date,
             'supplier': prma_list.partner_id.display_name,
-            'remark': prma_list.remark,
+            'remark': prma_list.remark or '',
             'amount_total': prma_list.amount_total
         }
         return data
@@ -354,7 +354,7 @@ class LinklovingOAApi(http.Controller):
             'partner': obj.partner_id.display_name,  #合作伙伴
             'location_id': obj.location_id.display_name,  #源位置区域
             'tracking_number': obj.tracking_number or '',  #快递单号
-            'is_emergency': obj.is_emergency,   #加急
+            'is_emergency': obj.is_emergency or '',   #加急
             'min_date': obj.min_date,  #安排的日期
             'origin': obj.origin,   #源单据
             'state': LinklovingOAApi.selection_get_map("stock.picking", "state", obj.state),
@@ -817,7 +817,7 @@ class LinklovingOAApi(http.Controller):
             'state': LinklovingOAApi.selection_get_map("return.goods", "state", return_so_object.state),
             'invoice_address': return_so_object.partner_invoice_id.display_name or '',    #开票地址
             'shipping_address': return_so_object.partner_shipping_id.display_name or '',   #退货地址
-            'so': return_so_object.so_id.display_name,   #参考订单号
+            'so': return_so_object.so_id.display_name or '',   #参考订单号
             'tracking_number': return_so_object.tracking_number or '',   #物流信息
             'remark': return_so_object.remark,  #退货原因
             'date': return_so_object.date,
