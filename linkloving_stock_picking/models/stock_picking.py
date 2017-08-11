@@ -192,6 +192,20 @@ class StockPicking(models.Model):
                 picking_contain += pick
         return picking_contain
 
+    attachment_img_count = fields.Integer(compute='_compute_attachment_img_count', string=u'物流照片')
+
+    def _compute_attachment_img_count(self):
+        for attachment_one in self:
+            attachment_one.attachment_img_count = len(
+                self.env['ir.attachment'].search([('res_id', '=', attachment_one.id)]))
+
+    @api.multi
+    def stock_img_count(self):
+        action = self.env.ref('base.action_attachment').read()[0]
+        # action['domain'] = [('partner_img_id', 'in', self.ids)]
+        action['domain'] = [('res_id', 'in', self.ids)]
+        return action
+
 
 class SaleOrderExtend(models.Model):
     _inherit = "sale.order"
@@ -235,4 +249,3 @@ class StockMovePicking(models.Model):
             sgin = -1
 
         self.data_type = self.product_uom_qty * sgin
-
