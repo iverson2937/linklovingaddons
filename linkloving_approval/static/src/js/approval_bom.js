@@ -153,7 +153,7 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
             var self = this;
             self.flag = 1;
             self.begin = 1;
-            self.limit = 3;
+            self.limit = 20;
             this.approval_type = null;
             this._super.apply(this, arguments);
             if (action.product_id) {
