@@ -93,7 +93,6 @@ class StockPicking(models.Model):
                 order = 'in_date'
             domain = domain if domain is not None else [('qty', '>', 0.0)]
             quants = stock_quant.search(domain, order=order)
-            print(quants)
             move_quants[move.id] = quants
         return move_quants
 

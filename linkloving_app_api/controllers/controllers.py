@@ -2191,6 +2191,8 @@ class LinklovingAppApi(http.Controller):
         rejects_qty_map = map(lambda a: a.get('rejects_qty') or 0, pack_operation_product_ids)
 
         def x(a, b):
+            if not a:
+                raise UserError(u"找不到对应的出货单")
             a.qty_done = b
 
         def y(a, b):
@@ -2319,6 +2321,9 @@ class LinklovingAppApi(http.Controller):
     def stock_picking_to_json(cls, stock_picking_obj):
         pack_list = []
         move_lines = stock_picking_obj.move_lines
+        quants = request.env["stock.quant"]
+        if stock_picking_obj.picking_type_code == 'outgoing':
+            quants = stock_picking_obj.reserveration_qty()
         for pack in stock_picking_obj.pack_operation_product_ids:
             dic = {
                 'pack_id': pack.id,
@@ -2339,6 +2344,11 @@ class LinklovingAppApi(http.Controller):
                 'rejects_qty': pack.rejects_qty,
             }
             move_ids = pack.linked_move_operation_ids.mapped("move_id")
+            if move_ids and quants:
+                if quants.get(move_ids[0].id):
+                    quant = quants.get(move_ids[0].id).filtered(lambda x: x.reservation_id.id not in move_lines.ids)
+                    reserved_qty = sum(quant.mapped("qty") if quant else [])
+                    dic["reserved_qty"] = reserved_qty
             origin_qty = 0
             for move in move_ids:
                 # if len(move_ids) == 1:
@@ -2689,7 +2699,7 @@ class LinklovingAppApi(http.Controller):
         name = request.jsonrequest.get("name")
         limit = request.jsonrequest.get("limit")
         offset = request.jsonrequest.get("offset")
-
+        # self.a(team_id)
         domain = [('is_company', '=', True), ('customer', '=', True)]
         if team_id:
             if team_id == -999:
@@ -2701,14 +2711,14 @@ class LinklovingAppApi(http.Controller):
         partners = request.env["res.partner"].sudo().search(domain)
         partners = partners.filtered(lambda x: x.sale_order_count > 0)
         json_list = []
-
+        print("start:%s" % fields.datetime.utcnow())
         for partner in partners:
             picing_info = self.get_picking_info_by_partner(partner.id)
             if len(picing_info["waiting_data"]):
                 json_list.append(LinklovingAppApi.res_partner_to_json(partner, exact_dict={
                     'waiting_data': len(picing_info["waiting_data"]),
                     'able_to_data': len(picing_info["able_to_data"])}))
-
+        print("end:%s" % fields.datetime.utcnow())
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=json_list)
 
@@ -2721,6 +2731,22 @@ class LinklovingAppApi(http.Controller):
         pickings = request.env["stock.picking"].sudo().search(domain)
 
         json_list = self.get_picking_info_by_picking(pickings)
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=json_list)
+
+    # 搜索完成的单据
+    @http.route('/linkloving_app_api/get_done_picking/', auth='user', type='json', csrf=False)
+    def get_done_picking(self, **kwargs):
+        partner_id = request.jsonrequest.get("partner_id")
+        limit = request.jsonrequest.get("limit")
+        offset = request.jsonrequest.get("offset")
+
+        domain = [('partner_id', 'child_of', partner_id), ('picking_type_code', '=', 'outgoing'),
+                  ("state", '=', 'done')]
+        pickings = request.env["stock.picking"].sudo().search(domain, limit=limit, offset=offset)
+        json_list = []
+        for picking in pickings:
+            json_list.append(self.stock_picking_to_json_simple(picking))
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=json_list)
 
@@ -2738,6 +2764,7 @@ class LinklovingAppApi(http.Controller):
                   ("state", 'not in', ['cancel', 'done'])]
         pickings = request.env["stock.picking"].sudo().search(domain)
         # if type == 'able_to': #可处理
+        print('length =%d' % len(pickings))
         return self.get_picking_info_by_picking(pickings)
 
     def get_picking_info_by_picking(self, pickings):
@@ -2772,3 +2799,28 @@ class LinklovingAppApi(http.Controller):
             'emergency': picking.is_emergency,
         }
         return data
+
+        # def a(self, team_id):
+        #     pickings = request.env["stock.picking"].sudo().search([('picking_type_code', '=', 'outgoing'), ("state", 'not in', ['cancel', 'done'])]) #待处理单子
+        #     filtered_pickings = pickings.filtered(lambda x: x.partner_id.parent_id.team_id.id == team_id or x.partner_id.team_id.id == team_id)
+        #     print( fields.datetime.utcnow())
+        #     able_to_pickings = self.get_picking_info_by_picking(filtered_pickings) #可处理的单子
+        #     print( fields.datetime.utcnow())
+        #     # self.split_pickings_by_partner(able_to_pickings)
+        #
+        # def split_pickings_by_partner(self, pickings, extra_pickings):
+        #     picking_groups = {}
+        #     for picking in pickings:
+        #         if picking.partner_id.parent_id:
+        #             partner_id = picking.partner_id.parent_id
+        #         else:
+        #             partner_id = picking.partner_id
+        #
+        #         if picking_groups.get(partner_id):
+        #             picking_groups[partner_id].append(picking)
+        #         else:
+        #             picking_groups[partner_id] = [picking]
+        #
+        #     for picking in extra_pickings:
+        #
+        #     return picking_groups
