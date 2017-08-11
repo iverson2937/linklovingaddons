@@ -152,17 +152,25 @@ class NewMrpProduction(models.Model):
                 'target': 'new'}
 
     @api.multi
-    def button_multi_output(self):
-        view = self.env.ref('linkloving_new_mrp.output_material_form')
-        return {'type': 'ir.actions.act_window',
-                'res_model': 'mrp.production',
-                'view_mode': 'form',
-                'view_id': view.id,
-                'res_id': self.id,
-                # 'context': {'picking_mode': picking_mode,
-                #             'overpicking_invisible': overpicking_invisible,
-                #             'quantity_ready_invisible': quantity_ready_invisible},
-                'target': 'new'}
+    def open_produce_product(self):
+
+        self.ensure_one()
+        if self.is_multi_output or self.is_random_output:
+            view = self.env.ref('linkloving_new_mrp.output_material_form')
+            return {'type': 'ir.actions.act_window',
+                    'res_model': 'mrp.production',
+                    'view_mode': 'form',
+                    'view_id': view.id,
+                    'res_id': self.id,
+                    # 'context': {'picking_mode': picking_mode,
+                    #             'overpicking_invisible': overpicking_invisible,
+                    #             'quantity_ready_invisible': quantity_ready_invisible},
+                    'target': 'new'}
+
+        action = self.env.ref('mrp.act_mrp_product_produce').read()[0]
+        return action
+
+
 
     def _generate_finished_moves(self):
         if self.is_multi_output or self.is_random_output:
