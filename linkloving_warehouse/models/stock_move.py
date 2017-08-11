@@ -48,7 +48,7 @@ class StockMove(models.Model):
                     # procurements.search([('move_dest_id', '=', move.id)]).cancel()
             else:
                 if move.move_dest_id:
-                    if move.propagate and move.move_dest_id.state!='done':
+                    if move.propagate and move.move_dest_id.state != 'done':
                         move.move_dest_id.action_cancel()
                     elif move.move_dest_id.state == 'waiting':
                         # If waiting, the chain will be broken and we are not sure if we can still wait for it (=> could take from stock instead)
