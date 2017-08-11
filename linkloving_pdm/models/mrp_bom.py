@@ -54,7 +54,7 @@ class MrpBom(models.Model):
             'is_show_cancel': self.is_show_cancel,
             # 'is_first_review': self.is_first_review,
             'is_show_action_deny': self.is_show_action_deny,
-            'create_uid_name': self.create_uid.name,
+            'create_uid_name': self.sudo().create_uid.name,
             'create_date': self.create_date,
             'write_date': self.write_date
         }
