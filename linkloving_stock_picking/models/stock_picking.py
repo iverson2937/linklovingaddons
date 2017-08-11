@@ -21,6 +21,90 @@ class StockPicking(models.Model):
                 'res_id': self.id,
                 'target': 'new'}
 
+    def reserveration_qty(self):
+        self.ensure_one()
+        operations = {}  # self.env['stock.pack.operation']
+        moves_to_do = self.env['stock.move']
+        main_domain = {}
+        moves = self.mapped('move_lines').filtered(lambda move: move.state not in ('draft', 'cancel', 'done'))
+        for move in moves:
+            if move.location_id.usage not in ('supplier', 'inventory', 'production'):
+                ancestors = move.find_move_ancestors()
+                if move.product_id.type != 'consu' or ancestors:
+                    moves_to_do |= move
+                    main_domain[move.id] = [('reservation_id', '!=', False), ('qty', '>', 0)]
+
+                if move.state == 'waiting' and not ancestors:
+                    # if the waiting move hasn't yet any ancestor (PO/MO not confirmed yet), don't find any quant available in stock
+                    main_domain[move.id] += [('id', '=', False)]
+                elif ancestors:
+                    main_domain[move.id] += [('history_ids', 'in', ancestors.ids)]
+
+                    # if the move is returned from another, restrict the choice of quants to the ones that follow the returned move
+                if move.origin_returned_move_id:
+                    main_domain[move.id] += [('history_ids', 'in', move.origin_returned_move_id.id)]
+                for link in move.linked_move_operation_ids:
+                    operations[move.id] = link.operation_id
+
+        move_quants = {}
+        for move in moves_to_do:
+            stock_quant = self.env["stock.quant"]
+            op = operations.get(move.id)
+            pack_op_param = None
+            lot_param = None
+            if op:
+                op.sorted(
+                        key=lambda x: ((x.package_id and not x.product_id) and -4 or 0) + (x.package_id and -2 or 0) + (
+                            x.pack_lot_ids and -1 or 0))
+                for ops in op:
+                    # TDE FIXME: this code seems to be in action_done, isn't it ?
+                    # first try to find quants based on specific domains given by linked operations for the case where we want to rereserve according to existing pack operations
+                    if not (ops.product_id and ops.pack_lot_ids):
+                        for record in ops.linked_move_operation_ids:
+                            move = record.move_id
+                            if move.id in main_domain:
+                                qty = record.qty
+                                domain = main_domain[move.id]
+                                if qty:
+                                    pack_op_param = ops
+                    else:
+                        lot_qty = {}
+                        rounding = ops.product_id.uom_id.rounding
+                        for pack_lot in ops.pack_lot_ids:
+                            lot_qty[pack_lot.lot_id.id] = ops.product_uom_id._compute_quantity(pack_lot.qty,
+                                                                                               ops.product_id.uom_id)
+                        for record in ops.linked_move_operation_ids:
+                            move_qty = record.qty
+                            move = record.move_id
+                            for lot in lot_qty:
+                                if float_compare(lot_qty[lot], 0, precision_rounding=rounding) > 0 and float_compare(
+                                        move_qty, 0, precision_rounding=rounding) > 0:
+                                    lot_param = lot
+                                    continue
+            domain = stock_quant._quants_get_reservation_domain(move,
+                                                                lot_id=lot_param,
+                                                                pack_operation_id=pack_op_param.id or False if pack_op_param else False,
+                                                                company_id=self.env.context.get('company_id', False),
+                                                                initial_domain=main_domain[move.id])
+            removal_strategy = move.get_removal_strategy()
+            if removal_strategy:
+                order = self._quants_removal_get_order(removal_strategy)
+            else:
+                order = 'in_date'
+            domain = domain if domain is not None else [('qty', '>', 0.0)]
+            quants = stock_quant.search(domain, order=order)
+            print(quants)
+            move_quants[move.id] = quants
+        return move_quants
+
+    def _quants_removal_get_order(self, removal_strategy=None):
+        if removal_strategy == 'fifo':
+            return 'in_date, id'
+        elif removal_strategy == 'lifo':
+            return 'in_date desc, id desc'
+        raise UserError(_('Removal strategy %s not implemented.') % (removal_strategy,))
+
+
     @api.multi
     def unlink(self):
         self.mapped('pack_operation_product_ids').unlink()  # Checks if moves are not done
@@ -55,8 +139,8 @@ class StockPicking(models.Model):
                                      )
 
     # actual_state = fields.Selection(string="", selection=[('', ''), ('', ''), ], required=False, )
-    complete_rate = fields.Integer("可用产品比率", compute="_compute_complete_rate", store=True)
-
+    complete_rate = fields.Integer(u"可用产品比率", compute="_compute_complete_rate", store=True)
+    available_rate = fields.Integer(u"可用率", compute="_compute_available_rate")
     po_id = fields.Many2one('purchase.order', compute=_get_so_number)
     so_id = fields.Many2one('sale.order', compute=_get_so_number)
     state = fields.Selection([
@@ -158,7 +242,6 @@ class StockPicking(models.Model):
         pickings = self.filtered(lambda move: move.state not in [
             ("state", "in", ["waiting", "partially_available", "assigned"])])
         for picking in pickings:
-
             if picking.move_lines:
                 require_qty = 0
                 stock_qty = 0
@@ -175,6 +258,54 @@ class StockPicking(models.Model):
                     picking.complete_rate = int(stock_qty * 100 / require_qty)
                 else:
                     picking.complete_rate = 0
+
+    @api.multi
+    def _compute_available_rate(self):
+        pickings = self.filtered(lambda move: move.state in ["waiting", "confirmed", "partially_available", "assigned"])
+
+        for picking in pickings:
+            quants = picking.reserveration_qty()
+            total_quants_qty = {}
+            for key in quants.keys():
+                quant = quants[key].filtered(lambda x: x.reservation_id.id not in picking.move_lines.ids)
+                total_quants_qty[key] = quant
+            is_available = []
+            for move in picking.move_lines:
+                if move.state in ["cancel", "done"]:
+                    continue
+                sum_reserve_qty = sum(total_quants_qty.get(move.id).mapped("qty")) if total_quants_qty.get(
+                        move.id) else 0
+                if move.product_id.qty_available - sum_reserve_qty >= move.product_uom_qty:
+                    is_available.append(True)
+                else:
+                    is_available.append(False)
+            if all(is_available):  # 全是True
+                picking.available_rate = 100
+            else:
+                true_len = 0
+                for ava in is_available:
+                    if ava:
+                        true_len = true_len + 1
+                if is_available:
+                    picking.available_rate = int(true_len * 100 / len(is_available))
+                else:
+                    picking.available_rate = 0
+                    # if move.product_id.qty_available > move.product_uom_qty:
+                    #     require_qty += move.product_uom_qty
+                    #     stock_qty += move.product_uom_qty
+                    # else:
+                    #     require_qty += move.product_uom_qty
+                    #     stock_qty += move.product_id.qty_available
+
+                    # stock_qty = stock_qty - total_quants_qty
+                    # if require_qty != 0:
+                    #     available_rate = int(stock_qty * 100 / require_qty)
+                    #     if available_rate > 100:
+                    #         available_rate = 100
+                    #     elif available_rate < 0:
+                    #         available_rate = 0
+                    #     picking.available_rate = available_rate
+
 
     @api.multi
     def is_start_prepare(self):
