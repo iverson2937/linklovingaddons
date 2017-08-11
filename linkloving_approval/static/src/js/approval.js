@@ -277,7 +277,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             var reloaded = $.Deferred();
             // console.log(this.approval_type)
             own.begin = own.current_min;
-            var approval_type = own.approval_type[0][0];
+            var approval_type = $("#approval_tab").attr("data-now-tab");
             own.begin = own.begin + own.limit;
             own.get_datas(own, 'product.attachment.info', approval_type);
             reloaded.resolve();

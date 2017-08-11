@@ -153,7 +153,7 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
             var self = this;
             self.flag = 1;
             self.begin = 1;
-            self.limit = 10;
+            self.limit = 3;
             this.approval_type = null;
             this._super.apply(this, arguments);
             if (action.product_id) {
@@ -198,8 +198,7 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
         reload_content: function (own) {
             var reloaded = $.Deferred();
             own.begin = own.current_min;
-            // console.log(this.approval_type)
-            var approval_type = own.approval_type[0][0];
+            var approval_type = $("#approval_tab").attr("data-now-tab");
             own.get_datas(own, 'mrp.bom', approval_type);
             reloaded.resolve();
             return reloaded.promise();
@@ -214,7 +213,7 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
                     console.log(result,own.begin,own.limit);
                     model.call('get_bom_info_by_type', [result], {offset: own.begin-1, limit: own.limit})
                         .then(function (result) {
-                            console.log(result);
+                            console.log(own.begin-1,own.limit);
                             own.length = result.length;
                             console.log(own.length,result.length)
                             self.$("#" + approval_type).html("");

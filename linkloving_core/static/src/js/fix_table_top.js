@@ -23,9 +23,9 @@ odoo.define('linkloving_core.TreeView', function (require) {
                 // console.log(settings)
                 // var data = JSON.parse(settings.data)
                 if(settings.url == '/web/dataset/search_read'){
-                    // if($(".o_view_manager_content>.o_form_view")){
-                    //     console.log('ssss')
-                    // }else {
+                        if($(".modal-content").length==1){
+                            return
+                        }
                         $(".table-responsive table").addClass("fix_table");
                         $(".table-responsive thead").addClass("fix_table_thead");
                         $(".table-responsive thead tr").addClass("fix_table_thead_tr");
@@ -33,9 +33,7 @@ odoo.define('linkloving_core.TreeView', function (require) {
 
 
                         $("tbody tr:first td").each(function (index) {
-                            // $("thead tr:first th").eq(index).width($(this).width());
                             $("thead tr:first th").eq(index).css("width", index == 0 ? $(this).width() / $("thead tr:first").width() * 100 + '%' : $(this).width() + 10);
-                            // console.log($(this).width())
                         })
                         if ($("tbody tr:first").hasClass("add_empty_tr")) {
 
@@ -49,29 +47,16 @@ odoo.define('linkloving_core.TreeView', function (require) {
                         }else {
                              $(".table-responsive thead").removeClass("not_full_thead");
                         }
-                    // }
                 }
             })
             $(window).resize(function () {
                 $("tbody .add_empty_tr+tr td").each(function (index) {
-                        // $("thead tr:first th").eq(index).width($(this).width());
                         $("thead tr:first th").eq(index).css("width",index==0 ? $(this).width()/$("thead tr:first").width()*100+'%':($(this).width()+10)/$("thead tr:first").width()*100+'%');
-                        // console.log($(this).width())
                     })
-                    // if($("tbody tr:first").hasClass("add_empty_tr")){
-                    //
-                    // }else {
-                    //     $("tbody").prepend("<tr class='add_empty_tr'><td> </td></tr>");
-                    // }
                     $("tbody tr:first td").height($("thead tr th").height());
-
-                   // if($(".table-responsive>table").height() < $(".o_view_manager_content").height()){
-                   //     $(".table-responsive thead").addClass("not_full_thead")
-                   // }else {
-                   //     $(".table-responsive thead").removeClass("not_full_thead");
-                   // }
             })
 
+            //小数和整数部分区分展示
             if($(".o_form_field_number")){
                 $(".o_form_field_number").each(function () {
                     var s = $(this).text().toString();
