@@ -253,7 +253,7 @@ class LinklovingOAApi(http.Controller):
             "refer_po": prma_detail_object.purchase_id.name,  # 参考订单号
             "refer_po_amount_total": prma_detail_object.purchase_id.amount_total,  # 参考订单号的总金额
             "tracking_number": prma_detail_object.tracking_number or '',  # 物流信息
-            "remark": prma_detail_object.remark,  # 退货原因
+            "remark": prma_detail_object.remark or '',  # 退货原因
             "date": prma_detail_object.date,  # 退货日期
             "tax": prma_detail_object.tax_id.display_name or '',
             "amount_untaxed": prma_detail_object.amount_untaxed,  #未含税金额
