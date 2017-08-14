@@ -157,6 +157,8 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def write(self, vals):
+        if 'product_specs' in vals and self.product_specs == vals['product_specs']:
+            vals.pop('product_specs')
         if ('name' in vals or 'product_specs' in vals or 'default_code' in vals) and not self.env.user.has_group(
                 'linkloving_warehouse.group_document_control_user'):
             raise UserError('你没有权限修改物料，请联系文控管理员')

@@ -108,10 +108,8 @@
                            domain="[('type_tax_use','&lt;&gt;','purchase')]" string="税金"
                            attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                 </xpath>
-                <xpath expr="//field[@name='note']" position="before">
-                    <group>
-                        <field name="product_count" readonly="1" string="Total Amount"/>
-                    </group>
+                <xpath expr="//field[@name='amount_untaxed']" position="before">
+                    <field name="product_count" string="总数量"/>
                 </xpath>
                 <field name="partner_shipping_id" position="after">
                     <field name="pi_number"/>
