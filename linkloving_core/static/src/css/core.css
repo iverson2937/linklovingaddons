@@ -133,3 +133,9 @@
     color: #999999!important;
     font-size: 12px;
 }
+.o_list_view.table td{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 220px;
+}
