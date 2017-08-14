@@ -198,12 +198,14 @@ class ReviewProcessLine(models.Model):
 FILE_TYPE = [('sip', 'SIP'),
              ('sop', 'SOP'),
              ('ipqc', 'IPQC'),
+             ('project', u'工程'),
              ('other', 'Other'),
              ('design', 'Design')]
 FILE_TYPE_DIC = {'sip': 'SIP',
                  'sop': 'SOP',
                  'ipqc': 'IPQC',
-                 'other': 'Other',
+                 'project': u'工程',
+                'other': 'Other',
                  'design': 'Design'}
 
 
@@ -472,7 +474,7 @@ class ProductTemplateExtend(models.Model):
              },
             {'name': u'工程',
              'type': 'project',
-             'upload_type': 'ftp',
+             'upload_type': 'sys',
              },
             {'name': 'OTHER',
              'type': 'other',

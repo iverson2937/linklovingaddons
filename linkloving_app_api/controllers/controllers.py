@@ -2086,6 +2086,17 @@ class LinklovingAppApi(http.Controller):
             json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
 
+    # 搜索stock picking
+    @http.route('/linkloving_app_api/search_stock_picking_name', type='json', auth='none', csrf=False, cors='*')
+    def search_stock_picking_name(self):
+        name = request.jsonrequest.get("name")
+        domain = [('name','ilike',name),('state','=','validate'),('picking_type_code','=','incoming')]
+        picking_list = request.env['stock.picking'].sudo().search(domain,limit=10,offset=0,order='id desc')
+        json_list = []
+        for picking in picking_list:
+            json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
     #获取stock.PICKING列表
     @http.route('/linkloving_app_api/get_stock_picking_list', type='json', auth='none', csrf=False, cors='*')
     def get_stock_picking_list(self, **kw):
@@ -2406,7 +2417,6 @@ class LinklovingAppApi(http.Controller):
             'weight': stock_picking_obj.weight, #重量
             'shipping_weight': stock_picking_obj.shipping_weight, #航空重量
             'number_of_packages': stock_picking_obj.number_of_packages,#包裹件数
-
             'min_date': stock_picking_obj.min_date,
             'pack_operation_product_ids': pack_list,
             'qc_note': stock_picking_obj.qc_note or '',

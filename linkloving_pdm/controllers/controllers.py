@@ -40,6 +40,7 @@ class LinklovingPdm(http.Controller):
                 'id': attach.id
             }
         except Exception:
+            args = {}
             error = {'error': _("Something horrible happened")}
             _logger.exception("Fail to upload attachment %s" % my_load_file.filename)
         return out % (func, json.dumps(args), json.dumps({}))
