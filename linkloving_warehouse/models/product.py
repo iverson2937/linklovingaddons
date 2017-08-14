@@ -104,8 +104,6 @@ class ProductTemplate(models.Model):
     def compute_sale_qty(self):
         products = self.env['product.template'].search([('sale_ok', '=', True)])
 
-
-
     @api.multi
     def view_product_id(self):
         for product in self:
@@ -159,6 +157,11 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def write(self, vals):
+        if ('name' in vals or 'product_specs' in vals or 'default_code' in vals) and not self.env.user.has_group(
+                'linkloving_warehouse.group_document_control_user'):
+            raise UserError('你没有权限修改物料，请联系文控管理员')
+
+        # 单位修改,批量修改BOM line 里面的单位
         if 'uom_id' in vals:
             new_uom = self.env['product.uom'].browse(vals['uom_id'])
             updated = self.filtered(lambda template: template.uom_id != new_uom)

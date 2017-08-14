@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record model="ir.module.category" id="linkloving_warehouse.module_engineering_document_management">
+            <field name="name">工程</field>
+            <field name="description">Helps you handle your quotations, sale orders and invoicing.</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="group_document_control_user" model="res.groups">
+            <field name="name">文空专员</field>
+            <field name="category_id" ref="module_engineering_document_management"/>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        </record>
+        <record id="group_document_control_manager" model="res.groups">
+            <field name="name">文控管理员</field>
+            <field name="category_id" ref="module_engineering_document_management"/>
+            <field name="implied_ids" eval="[(4, ref('linkloving_warehouse.group_document_control_user'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        </record>
+
+    </data>
+</odoo>
