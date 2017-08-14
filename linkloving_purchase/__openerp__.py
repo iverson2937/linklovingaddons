@@ -32,6 +32,7 @@
         'views/purchase_config_view.xml',
         'views/partner_view.xml',
         'views/sale_view.xml',
+        'views/product_template.xml',
         'wizard/purchase_order_wizard.xml',
         'templates.xml',
     ],
