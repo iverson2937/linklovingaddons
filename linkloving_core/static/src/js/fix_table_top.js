@@ -48,6 +48,7 @@ odoo.define('linkloving_core.TreeView', function (require) {
                              $(".table-responsive thead").removeClass("not_full_thead");
                         }
                 }
+                numberChange("o_list_number");
             })
             $(window).resize(function () {
                 $("tbody .add_empty_tr+tr td").each(function (index) {
@@ -57,29 +58,33 @@ odoo.define('linkloving_core.TreeView', function (require) {
             })
 
             //小数和整数部分区分展示
-            if($(".o_form_field_number")){
-                $(".o_form_field_number").each(function () {
-                    var s = $(this).text().toString();
-                    for (var i=0;i<s.length;i++){
-                        if(s[i] == '.'){
-                            var k=i;
-                            $(this).html("");
-                            var zs=[],xs=[];
-                            for(var j=0;j<s.length;j++){
-                                if(j<k){
-                                    zs.push(s[j]);
+            function numberChange(className) {
+                if($("."+ className +"")){
+                    $("."+ className +"").each(function () {
+                        var s = $(this).text().toString();
+                        for (var i=0;i<s.length;i++){
+                            if(s[i] == '.'){
+                                var k=i;
+                                $(this).html("");
+                                var zs=[],xs=[];
+                                for(var j=0;j<s.length;j++){
+                                    if(j<k){
+                                        zs.push(s[j]);
+                                    }
+                                    if(j>k){
+                                        xs.push(s[j]);
+                                    }
                                 }
-                                if(j>k){
-                                    xs.push(s[j]);
-                                }
+                                $(this).append('<span class="zs">'+ zs.join("") +'.</span>');
+                                $(this).append('<span class="xs">'+ xs.join("") +'</span>');
+                                break;
                             }
-                            $(this).append('<span class="zs">'+ zs.join("") +'.</span>');
-                            $(this).append('<span class="xs">'+ xs.join("") +'</span>');
-                            break;
                         }
-                    }
-                })
+                    })
+                }
             }
+            numberChange("o_form_field_number");
+            numberChange("o_list_number");
         }
     })
     core.view_registry.add('oe_list', oe_ListView);
