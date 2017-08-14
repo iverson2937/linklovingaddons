@@ -168,9 +168,7 @@
                 </xpath>
 
                 <xpath expr="//button[@name='open_produce_product']" position="attributes">
-                    <attribute name="attrs">{'invisible': ['|','|', '|', '|','|', ('check_to_done', '=', True),
-                        ('availability', 'not in', ['partially_available', 'assigned']), ('state', 'not in',
-                        ('progress')), ('routing_id', '!=', False),('is_multi_output','=',True),('is_random_output','=',True)]}
+                    <attribute name="attrs">{'invisible': [('state', 'not in',('progress'))]}
                     </attribute>
                 </xpath>
 
