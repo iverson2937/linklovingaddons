@@ -42,6 +42,9 @@
                         <button string="修改产品所属公司" name="action_change_product_company" type="object"
                                 default_focus="1"
                                 class="btn-primary"/>
+                        <button string="计算销量" name="compute_sale_qty" type="object"
+                                default_focus="1"
+                                class="btn-primary"/>
                     </footer>
                 </form>
             </field>

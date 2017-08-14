@@ -41,6 +41,24 @@ class ProductProduct(models.Model):
         # ('name_uniq', 'unique (name)', u'产品名称已存在!')
     ]
 
+    def count_amount(self, start, end):
+        domain = [('product_id', '=', self.id), ('state', '=', 'sale'), ('date_order', '>=', start),
+                  ('date_order', '<=', end)]
+        print domain
+        orders = self.env['sale.order'].search(
+            [('product_id', '=', self.id), ('state', '=', 'sale'), ('date_order', '>=', start),
+             ('date_order', '<=', end)])
+        res=0
+        for order in orders:
+            for line in order.order_line:
+                if line.product_id==self:
+                    print line.product_id.id
+                    print self.id
+                    res+=line.product_uom_qty
+
+        print res
+        return res
+
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
@@ -67,42 +85,11 @@ class ProductTemplate(models.Model):
              "resized as a 64x64px image, with aspect ratio preserved. "
              "Use this field anywhere a small image is required.")
 
-    # last1_month_qty = fields.Float(string=u'上月销量')
-    # last2_month_qty = fields.Float(string=u'上上月销量')
-    # last3_month_qty = fields.Float(string=u'上上上月销量')
+    last1_month_qty = fields.Float(string=u'上月销量')
+    last2_month_qty = fields.Float(string=u'上上月销量')
+    last3_month_qty = fields.Float(string=u'上上上月销量')
+
     # pack_rate = fields.Float(string=u'装箱率')
-
-    def getMonthFirstDayAndLastDay(year=None, month=None):
-        """
-        :param year: 年份，默认是本年，可传int或str类型
-        :param month: 月份，默认是本月，可传int或str类型
-        :return: firstDay: 当月的第一天，datetime.date类型
-                  lastDay: 当月的最后一天，datetime.date类型
-        """
-        if year:
-            year = int(year)
-        else:
-            year = datetime.date.today().year
-
-        if month:
-            month = int(month)
-        else:
-            month = datetime.date.today().month
-
-            # 获取当月第一天的星期和当月的总天数
-        firstDayWeekDay, monthRange = calendar.monthrange(year, month)
-
-        # 获取当月的第一天
-        firstDay = datetime.date(year=year, month=month, day=1)
-        lastDay = datetime.date(year=year, month=month, day=monthRange)
-        print firstDay,
-
-        return firstDay, lastDay
-
-    getMonthFirstDayAndLastDay()
-
-    def compute_sale_qty(self):
-        products = self.env['product.template'].search([('sale_ok', '=', True)])
 
     @api.multi
     def view_product_id(self):
@@ -201,6 +188,7 @@ class ProductTemplate(models.Model):
     #             [('product_id', 'in', updated.mapped('product_variant_ids').ids)], limit=1)
     #
     #     return super(models.Model, self).write(vals)
+
 
     @api.multi
     def toggle_active(self):

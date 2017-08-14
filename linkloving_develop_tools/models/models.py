@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+import calendar
 import logging
+
+import datetime
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
@@ -201,7 +204,49 @@ class CreateOrderPointWizard(models.TransientModel):
             'company_id': 3,
         })
 
+    def compute_sale_qty(self):
+        this_month = datetime.datetime.now().month
+        last1_month = this_month - 1
+        date1_start, date1_end = getMonthFirstDayAndLastDay(month=last1_month)
+        last2_month = this_month - 2
+        date2_start, date2_end = getMonthFirstDayAndLastDay(month=last2_month)
+        last3_month = this_month - 3
+        date3_start, date3_end = getMonthFirstDayAndLastDay(month=last3_month)
+        products = self.env['product.template'].search([('sale_ok', '=', True)])
+        for product in products:
+            if product.product_variant_ids:
+                product_id = product.product_variant_ids[0]
+                last1_month_qty = product_id.count_amount(date1_start, date1_end)
+                last2_month_qty = product_id.count_amount(date2_start, date2_end)
+                last3_month_qty = product_id.count_amount(date3_start, date3_end)
+                product.last1_month_qty = last1_month_qty
+                product.last2_month_qty = last2_month_qty
+                product.last3_month_qty = last3_month_qty
 
+def getMonthFirstDayAndLastDay(year=None, month=None):
+    """
+    :param year: 年份，默认是本年，可传int或str类型
+    :param month: 月份，默认是本月，可传int或str类型
+    :return: firstDay: 当月的第一天，datetime.date类型
+              lastDay: 当月的最后一天，datetime.date类型
+    """
+    if year:
+        year = int(year)
+    else:
+        year = datetime.date.today().year
+    if month <= 0:
+        print month,'dddddddd'
+        year = -1
+        month = 12 + month
+        # 获取当月第一天的星期和当月的总天数
+    firstDayWeekDay, monthRange = calendar.monthrange(year, month)
+
+    # 获取当月的第一天
+    firstDay = datetime.date(year=year, month=month, day=1).strftime('%Y-%m-%d')
+    lastDay = datetime.date(year=year, month=month, day=monthRange).strftime('%Y-%m-%d')
+    print type(firstDay)
+
+    return firstDay, lastDay
 class SaleOrderExtend(models.Model):
     _inherit = "sale.order"
 
