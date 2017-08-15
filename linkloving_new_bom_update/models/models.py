@@ -80,6 +80,15 @@ class MrpBom(models.Model):
             'is_show': True,
         }
 
+    @api.multi
+    def bom_approval(self):
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'bom_approval',
+            'bom_id': self.id,
+        }
+
     def get_bom(self):
         res = []
         for line in self.bom_line_ids:

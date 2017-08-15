@@ -9,6 +9,9 @@
                     <button class="oe_stat_button" name="bom_detail_new" type="object"
                             icon="fa-tasks" string="BOM修改">
                     </button>
+                    <button class="oe_stat_button" name="bom_approval" type="object"
+                            icon="fa-tasks" string="审核操作">
+                    </button>
                 </div>
             </field>
         </record>
