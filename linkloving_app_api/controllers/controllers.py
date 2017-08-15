@@ -2383,6 +2383,11 @@ class LinklovingAppApi(http.Controller):
                 'qty_done': 0,
                 'origin_qty': move.product_uom_qty,
             }
+            if move and quants:
+                if quants.get(move.id):
+                    quant = quants.get(move.id).filtered(lambda x: x.reservation_id.id not in move_lines.ids)
+                    reserved_qty = sum(quant.mapped("qty") if quant else [])
+                    dic["reserved_qty"] = reserved_qty
             pack_list.append(dic)
         data = {
             'picking_id': stock_picking_obj.id,
