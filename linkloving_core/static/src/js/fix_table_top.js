@@ -48,7 +48,7 @@ odoo.define('linkloving_core.TreeView', function (require) {
                              $(".table-responsive thead").removeClass("not_full_thead");
                         }
                 }
-                numberChange("o_list_number");
+                // numberChange("o_list_number");
             })
             $(window).resize(function () {
                 $("tbody .add_empty_tr+tr td").each(function (index) {
@@ -83,8 +83,9 @@ odoo.define('linkloving_core.TreeView', function (require) {
                     })
                 }
             }
-            numberChange("o_form_field_number");
-            numberChange("o_list_number");
+
+            // numberChange("o_form_field_number");
+            // numberChange("o_list_number");
         }
     })
     core.view_registry.add('oe_list', oe_ListView);
