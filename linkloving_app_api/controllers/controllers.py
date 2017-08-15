@@ -2234,12 +2234,10 @@ class LinklovingAppApi(http.Controller):
             picking_obj.qc_note = qc_note
             picking_obj.qc_img = qc_img
             if state == 'qc_ok':
-                picking_obj.qc_result = 'success'
+                picking_obj.action_check_pass()
             elif state == 'qc_failed':
-                picking_obj.qc_result = 'fail'
-            picking_obj.action_check_pass()
-            # else:
-            #     picking_obj.action_check_fail()
+                picking_obj.action_check_fail()
+
         elif state == 'reject':#退回
             picking_obj.reject()
         elif state == 'process':  # 创建欠单
@@ -2784,9 +2782,9 @@ class LinklovingAppApi(http.Controller):
                 final_pickings += picking
                 continue
             if picking.available_rate > 0 and picking.available_rate < 100:
-                if picking.delivery_rule != 'delivery_once':  # 如果是一次性发货
+                if picking.delivery_rule != 'delivery_once' and picking.state != 'waiting':  # 不是一次性发货并且 不是等待其他作业的状态
                     final_pickings += picking
-            elif picking.available_rate == 100:
+            elif picking.available_rate == 100 and picking.state != 'waiting':  # 可用率为100 并且不是等待其他作业的状态
                 final_pickings += picking
 
         json_list = {'waiting_data': [],
