@@ -42,21 +42,12 @@ class ProductProduct(models.Model):
     ]
 
     def count_amount(self, start, end):
-        domain = [('product_id', '=', self.id), ('state', '=', 'sale'), ('date_order', '>=', start),
-                  ('date_order', '<=', end)]
-        print domain
-        orders = self.env['sale.order'].search(
-            [('product_id', '=', self.id), ('state', '=', 'sale'), ('date_order', '>=', start),
-             ('date_order', '<=', end)])
-        res=0
-        for order in orders:
-            for line in order.order_line:
-                if line.product_id==self:
-                    print line.product_id.id
-                    print self.id
-                    res+=line.product_uom_qty
-
+        orders = self.env['sale.order.line'].search(
+            [('product_id', '=', self.id), ('state', '=', 'sale'), ('order_id.date_order', '>=', start),
+             ('order_id.date_order', '<=', end)])
+        res = sum(order.product_uom_qty for order in orders)
         print res
+
         return res
 
 
