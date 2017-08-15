@@ -12,7 +12,6 @@ class AccountEmployeePayment(models.Model):
 
     remark_comments_ids = fields.One2many('hr.remark.comment', 'employee_payment_id', string=u'审核记录')
 
-
     def _get_account_date(self):
         for p in self:
             p.accounting_date = p.apply_date
@@ -122,9 +121,11 @@ class AccountEmployeePayment(models.Model):
                     raise UserError(u'上级部门未设置审核人')
                 self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
         else:
-            if not self.employee_id.department_id:
-                raise UserError(u'请设置部门审核人')
-            self.to_approve_id = self.employee_id.department_id.manager_id.user_id.id
+            if not self.employee_id.department_id.manager_id:
+                manager_id = self.employee_id.department_id.parent_id.manager_id
+            else:
+                manager_id = self.employee_id.department_id.manager_id
+            self.to_approve_id = manager_id.user_id.id
 
         create_remark_comment(self, u"送审")
 
