@@ -584,7 +584,7 @@ class ReviewProcessWizard(models.TransientModel):
                                           related="product_attachment_info_id.review_id.process_line_review_now")
     review_bom_line=fields.Many2one("review.process.line",
                                     related="bom_id.review_id.process_line_review_now")
-    remark = fields.Text(u"备注", required=True)
+    remark = fields.Text(u"备注")
     is_show_action_deny = fields.Boolean(default=True)
 
     # 送审
