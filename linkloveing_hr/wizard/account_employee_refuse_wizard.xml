@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="account_employee_refuse_wizard_form" model="ir.ui.view">
+        <field name="name">account.employee.refuse.wizard.form</field>
+        <field name="model">account.employee.refuse.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Expense refuse reason">
+                <separator string="拒绝的原因"/>
+                <field name="description"/>
+                <footer>
+                    <button string='拒绝' name="prepayment_refuse_reason" type="object" class="oe_highlight"/>
+                    or
+                    <button string="取消" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="account_employee_refuse_wizard_action" model="ir.actions.act_window">
+        <field name="name">Refuse Expense</field>
+        <field name="res_model">account.employee.refuse.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="account_employee_refuse_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

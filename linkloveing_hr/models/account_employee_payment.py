@@ -21,6 +21,18 @@ class AccountEmployeePayment(models.Model):
                                   default=lambda self: self.env['hr.employee'].search([('user_id', '=', self.env.uid)],
                                                                                       limit=1))
 
+    @api.multi
+    def refuse_payment(self, reason):
+        self.write({'state': 'cancel'})
+        for sheet in self:
+            body = (_(
+                "Your Expense %s has been refused.<br/><ul class=o_timeline_tracking_value_list><li>Reason<span> : </span><span class=o_timeline_tracking_value>%s</span></li></ul>") % (
+                        sheet.name, reason))
+            sheet.message_post(body=body)
+            sheet.to_approve_id = False
+
+            create_remark_comment(sheet, u'拒绝')
+
     def _get_account_date(self):
         for p in self:
             p.department_id = p.employee_id.department_id.id
@@ -92,6 +104,7 @@ class AccountEmployeePayment(models.Model):
                               ('manager2_approve', u'2nd Approved'),
                               ('manager3_approve', u'General Manager Approve'),
                               ('approve', u'Approved'),
+                              ('cancel', u'取消'),
                               ('paid', u'Paid'),
                               ],
                              readonly=True, default='draft', copy=False, string="Status", store=True,
@@ -153,11 +166,12 @@ class AccountEmployeePayment(models.Model):
         create_remark_comment(self, u'1级审核')
 
     @api.multi
-    def reject(self):
-        self.state = 'draft'
-        self.to_approve_id = False
+    def cancel(self):
 
-        create_remark_comment(self, u'拒绝')
+        self.state = 'cancel'
+
+
+
 
     @api.multi
     def manager2_approve(self):
