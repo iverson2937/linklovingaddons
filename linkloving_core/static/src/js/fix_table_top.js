@@ -74,12 +74,8 @@ odoo.define('linkloving_core.TreeView', function (require) {
                                         xs.push(s[j]);
                                     }
                                 }
-                                if($(this).parents("tr").find($("td[data-field='uom_id']")).html() == "PCS"){
-                                    $(this).append('<span class="zs">'+ zs.join("") +'</span>');
-                                }else {
-                                    $(this).append('<span class="zs">'+ zs.join("") +'.</span>');
-                                    $(this).append('<span class="xs">'+ xs.join("") +'</span>');
-                                }
+                                $(this).append('<span class="zs">'+ zs.join("") +'.</span>');
+                                $(this).append('<span class="xs">'+ xs.join("") +'</span>');
                                 break;
                             }
                         }
