@@ -133,6 +133,56 @@ class CrmLead(models.Model):
     priority = fields.Selection(AVAILABLE_PRIORITIES, string='Rating', index=True,
                                 default=AVAILABLE_PRIORITIES[0][0])
 
+    @api.multi
+    def action_tree_list_view(self):
+
+        domain = [('crm_product_type', '=', 'brand')]
+        brand_data = self.env['crm.product.series'].search(domain)
+
+        msg_data_my = [
+            {'name': brand_data_one.name,
+             'code': brand_data_one.id,
+             'type': brand_data_one.crm_product_type,
+             'icon': 'icon-th',
+             'child': [
+                 {
+                     'name': series_data_one.name,
+                     'code': series_data_one.id,
+                     'type': series_data_one.crm_product_type,
+                     'icon': 'icon-minus-sign',
+                     'parentCode': series_data_one.crm_Parent_id.id,
+                     'child': [
+                         {
+                             'name': version_data_one.name,
+                             'code': version_data_one.id,
+                             'type': version_data_one.crm_product_type,
+                             'icon': '',
+                             'parentCode': version_data_one.crm_Parent_id.id,
+                             'child': []}
+                         for version_data_one in series_data_one.crm_Parent_ontomany_ids]}
+                 for series_data_one in brand_data_one.crm_Parent_ontomany_ids]}
+            for brand_data_one in brand_data]
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'crm_tree_list_js',
+            'products_data': msg_data_my,
+            'leads_id': self.id,
+            'model_lead_partner': 'crm.lead',
+        }
+
+    @api.model
+    def add_partner_to_lead(self, id_one, version_list, models_view):
+        res = self.env['res.partner'].browse(id_one)
+        if models_view == 'crm.lead':
+            res = self.env['crm.lead'].browse(id_one)
+        res_reuslt = res.write({'product_series_ids': [(6, 0, version_list)]})
+
+        if res_reuslt:
+            return 'ok'
+        else:
+            raise UserError(u'操作失败')
+
 
 class CrmContinent(models.Model):
     _name = 'crm.continent'

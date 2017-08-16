@@ -9,9 +9,9 @@ class MrpProductionExtend(models.Model):
 
     @api.multi
     def action_cancel(self):
-        for mo in self:
-            if mo.product_tmpl_id.product_ll_type == 'finished' and mo.product_tmpl_id.order_ll_type == 'ordering':
-                raise UserError(u"订单制产品的MO不能取消!")
+        # for mo in self:
+        #     if mo.product_tmpl_id.product_ll_type == 'finished' and mo.product_tmpl_id.order_ll_type == 'ordering':
+        #         raise UserError(u"订单制产品的MO不能取消!")
         return super(MrpProductionExtend, self).action_cancel()
 class MrpProductionCombine(models.TransientModel):
     """
