@@ -2813,27 +2813,4 @@ class LinklovingAppApi(http.Controller):
         }
         return data
 
-        # def a(self, team_id):
-        #     pickings = request.env["stock.picking"].sudo().search([('picking_type_code', '=', 'outgoing'), ("state", 'not in', ['cancel', 'done'])]) #待处理单子
-        #     filtered_pickings = pickings.filtered(lambda x: x.partner_id.parent_id.team_id.id == team_id or x.partner_id.team_id.id == team_id)
-        #     print( fields.datetime.utcnow())
-        #     able_to_pickings = self.get_picking_info_by_picking(filtered_pickings) #可处理的单子
-        #     print( fields.datetime.utcnow())
-        #     # self.split_pickings_by_partner(able_to_pickings)
-        #
-        # def split_pickings_by_partner(self, pickings, extra_pickings):
-        #     picking_groups = {}
-        #     for picking in pickings:
-        #         if picking.partner_id.parent_id:
-        #             partner_id = picking.partner_id.parent_id
-        #         else:
-        #             partner_id = picking.partner_id
-        #
-        #         if picking_groups.get(partner_id):
-        #             picking_groups[partner_id].append(picking)
-        #         else:
-        #             picking_groups[partner_id] = [picking]
-        #
-        #     for picking in extra_pickings:
-        #
-        #     return picking_groups
+        ######### 生产 新版接口  ###############
