@@ -847,6 +847,7 @@ class MrpProductionExtend(models.Model):
             'origin': self.name,
             'group_id': self.procurement_group_id.id,
             'move_order_type': 'null' if self.move_finished_ids else 'manufacturing_orders',
+            # 'propagate': False,
         })
         move.action_confirm()
         return move
@@ -1616,31 +1617,33 @@ class stock_transfer_way(models.TransientModel):
             self.picking_id.transfer_way = 'all'
         else:
             self.picking_id.transfer_way = 'part'
-        if not self.picking_id.check_backorder():  # 此条件是货全都收全了, 所以要提前修改数量
-            if self.picking_id.transfer_way == 'part':
-                for pack in self.picking_id.pack_operation_product_ids:
-                    pack.qty_done = pack.qty_done - pack.rejects_qty
+        # if not self.picking_id.check_backorder():  # 此条件是货全都收全了, 所以要提前修改数量
+        if self.picking_id.transfer_way == 'part':
+            for pack in self.picking_id.pack_operation_product_ids:
+                pack.qty_done = pack.qty_done - pack.rejects_qty
 
         return self.picking_id.do_new_transfer()
 
 
-class StockBackorderConfirmation(models.TransientModel):
-    _inherit = 'stock.backorder.confirmation'
-
-    def qty_done_recompute_transfer_way(self):
-        if self.pick_id.transfer_way == 'part':
-            for pack in self.pick_id.pack_operation_product_ids:
-                pack.qty_done = pack.qty_done - pack.rejects_qty
-
-    @api.multi
-    def process(self):
-        self.qty_done_recompute_transfer_way()
-        return super(StockBackorderConfirmation, self).process()
-
-    @api.multi
-    def process_cancel_backorder(self):
-        self.qty_done_recompute_transfer_way()
-        return super(StockBackorderConfirmation, self).process_cancel_backorder()
+#
+# class StockBackorderConfirmation(models.TransientModel):
+#     _inherit = 'stock.backorder.confirmation'
+#
+#     def qty_done_recompute_transfer_way(self):
+#         pass
+#         # if self.pick_id.transfer_way == 'part':
+#         #     for pack in self.pick_id.pack_operation_product_ids:
+#         #         pack.qty_done = pack.qty_done - pack.rejects_qty
+#
+#     @api.multi
+#     def process(self):
+#         self.qty_done_recompute_transfer_way()
+#         return super(StockBackorderConfirmation, self).process()
+#
+#     @api.multi
+#     def process_cancel_backorder(self):
+#         self.qty_done_recompute_transfer_way()
+#         return super(StockBackorderConfirmation, self).process_cancel_backorder()
 
 
 class StockPackOperationExtend(models.Model):
@@ -1675,6 +1678,7 @@ class ProcurementOrderExtend(models.Model):
                     'in_charge_id': bom.process_id.partner_id.id,
                     'product_qty': self.get_actual_require_qty(),
                     'date_planned_start': fields.Datetime.to_string(self._get_date_planned_from_today()),
+                    # 'date_planned_finished':
                     })
         return res
 
