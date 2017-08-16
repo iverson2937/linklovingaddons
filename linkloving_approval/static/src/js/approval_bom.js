@@ -40,7 +40,7 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
                 type: 'ir.actions.client',
                 'tag': 'new_bom_update',
                 'bom_id': parseInt(bom_id),
-                'is_show':false,
+                'is_show': false,
                 target: "new",
             };
             this.do_action(action);
@@ -141,7 +141,7 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
             var target = e.target || e.srcElement;
             var approval_type = $(target).attr("data");
             self.flag = 1;
-            self.begin=1;
+            self.begin = 1;
             // console.log(approval_type);
             self.$("#approval_tab").attr("data-now-tab", approval_type);
 
@@ -154,48 +154,52 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
             self.flag = 1;
             self.begin = 1;
             self.limit = 20;
+            this.bom_id = action.bom_id;
             this.approval_type = null;
             this._super.apply(this, arguments);
-            if (action.product_id) {
-                this.product_id = action.product_id;
-            } else {
-                this.product_id = action.params.active_id;
-            }
+            // if (action.product_id) {
+            //     this.product_id = action.product_id;
+            //     console.log(this.product_id)
+            // } else {
+            //     this.product_id = action.params.active_id;
+            //     console.log(this.product_id)
+            // }
             //分页
             this.pager = null;
         },
         render_pager: function () {
             console.log(this.length, this.begin, this.limit);
             if (this.flag == 1) {
-                if($(".approval_pagination")){
+                if ($(".approval_pagination")) {
                     $(".approval_pagination").remove()
                 }
                 var $node = $('<div/>').addClass('approval_pagination').appendTo($("#approval_tab"));
                 // if (!this.pager) {
-                    this.pager = new Pager(this, this.length, this.begin, this.limit);
-                    this.pager.appendTo($node);
+                this.pager = new Pager(this, this.length, this.begin, this.limit);
+                this.pager.appendTo($node);
 
-                    this.pager.on('pager_changed', this, function (new_state) {
-                        var self = this;
-                        var limit_changed = (this._limit !== new_state.limit);
-                        console.log(new_state);
+                this.pager.on('pager_changed', this, function (new_state) {
+                    var self = this;
+                    var limit_changed = (this._limit !== new_state.limit);
+                    console.log(new_state);
 
-                        this._limit = new_state.limit;
-                        this.current_min = new_state.current_min;
-                        self.reload_content(this).then(function () {
-                            // if (!limit_changed) {
-                            self.$el.animate({"scrollTop": "0px"}, 100);
-                            // $(".approval_page_container").offset({ top: 50})
-                            // this.set_scrollTop(0);
-                            // this.trigger_up('scrollTo', {offset: 0});
-                            // }
-                        });
+                    this._limit = new_state.limit;
+                    this.current_min = new_state.current_min;
+                    self.reload_content(this).then(function () {
+                        // if (!limit_changed) {
+                        self.$el.animate({"scrollTop": "0px"}, 100);
+                        // $(".approval_page_container").offset({ top: 50})
+                        // this.set_scrollTop(0);
+                        // this.trigger_up('scrollTo', {offset: 0});
+                        // }
                     });
+                });
                 // }
                 this.flag = 2
             }
         },
         reload_content: function (own) {
+
             var reloaded = $.Deferred();
             own.begin = own.current_min;
             var approval_type = $("#approval_tab").attr("data-now-tab");
@@ -206,16 +210,26 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
         set_scrollTop: function (scrollTop) {
             this.scrollTop = scrollTop;
         },
+        get_bom_detail: function (bom_id) {
+            var self = this;
+            new Model("mrp.bom")
+                .call("convert_bom_info", [bom_id])
+                .then(function (result) {
+                    self.$el.append(QWeb.render('bom_approval_tab_content', {result: [result]}))
+
+                })
+
+        },
         get_datas: function (own, res_model, approval_type) {
             var model = new Model("approval.center");
             model.call("create", [{res_model: res_model, type: approval_type}])
                 .then(function (result) {
-                    console.log(result,own.begin,own.limit);
-                    model.call('get_bom_info_by_type', [result], {offset: own.begin-1, limit: own.limit})
+                    console.log(result, own.begin, own.limit);
+                    model.call('get_bom_info_by_type', [result], {offset: own.begin - 1, limit: own.limit})
                         .then(function (result) {
-                            console.log(own.begin-1,own.limit);
+                            console.log(own.begin - 1, own.limit);
                             own.length = result.length;
-                            console.log(own.length,result.length)
+                            console.log(own.length, result.length)
                             self.$("#" + approval_type).html("");
                             self.$("#" + approval_type).append(QWeb.render('bom_approval_tab_content', {
                                 result: result.bom_list,
@@ -229,15 +243,19 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
 
         start: function () {
             var self = this;
+            if (self.bom_id) {
+                return self.get_bom_detail(self.bom_id)
+            } else {
+                var model = new Model("approval.center");
+                model.call("fields_get", ["", ['type']]).then(function (result) {
+                    console.log(result);
+                    self.approval_type = result.type.selection;
+                    // console.log(self);
+                    self.$el.append(QWeb.render('approval_load_detail', {result: result.type.selection}));
+                });
+                return self.get_datas(this, 'mrp.bom', 'waiting_submit');
+            }
 
-            var model = new Model("approval.center");
-            model.call("fields_get", ["", ['type']]).then(function (result) {
-                console.log(result);
-                self.approval_type = result.type.selection;
-                // console.log(self);
-                self.$el.append(QWeb.render('approval_load_detail', {result: result.type.selection}));
-            });
-            return self.get_datas(this, 'mrp.bom', 'waiting_submit');
 
         }
     });

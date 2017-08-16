@@ -44,6 +44,14 @@ class MrpBom(models.Model):
         return bom
 
     @api.multi
+    def bom_approval_status(self):
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'approval_bom',
+            'bom_id': self.id,
+        }
+
+    @api.multi
     def write(self, vals):
         # self.check_can_update()
 
