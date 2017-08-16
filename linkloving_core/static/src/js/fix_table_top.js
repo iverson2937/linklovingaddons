@@ -16,15 +16,14 @@ odoo.define('linkloving_core.TreeView', function (require) {
         init: function () {
             var self = this;
             this._super.apply(this, arguments);
-            // console.log('yes')
         },
         start:function () {
             self.$(document).ajaxComplete(function (event, xhr, settings) {
-                // console.log(settings)
-                // var data = JSON.parse(settings.data)
+                // numberChange("o_form_field_number");
+                // numberChange("o_list_number");
                 if(settings.url == '/web/dataset/search_read'){
                         if($(".modal-content").length==1){
-                            return
+                            return;
                         }
                         $(".table-responsive table").addClass("fix_table");
                         $(".table-responsive thead").addClass("fix_table_thead");
@@ -52,9 +51,9 @@ odoo.define('linkloving_core.TreeView', function (require) {
             })
             $(window).resize(function () {
                 $("tbody .add_empty_tr+tr td").each(function (index) {
-                        $("thead tr:first th").eq(index).css("width",index==0 ? $(this).width()/$("thead tr:first").width()*100+'%':($(this).width()+10)/$("thead tr:first").width()*100+'%');
-                    })
-                    $("tbody tr:first td").height($("thead tr th").height());
+                    $("thead tr:first th").eq(index).css("width",index==0 ? $(this).width()/$("thead tr:first").width()*100+'%':($(this).width()+10)/$("thead tr:first").width()*100+'%');
+                })
+                $("tbody tr:first td").height($("thead tr th").height());
             })
 
             //小数和整数部分区分展示
@@ -83,9 +82,6 @@ odoo.define('linkloving_core.TreeView', function (require) {
                     })
                 }
             }
-
-            // numberChange("o_form_field_number");
-            // numberChange("o_list_number");
         }
     })
     core.view_registry.add('oe_list', oe_ListView);
