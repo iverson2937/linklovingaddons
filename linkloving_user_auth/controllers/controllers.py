@@ -2,6 +2,7 @@
 import json
 
 from odoo import http
+from odoo.exceptions import UserError
 from odoo.http import request
 
 STATUS_CODE_OK = 1
@@ -78,6 +79,26 @@ class LinklovingUserAuth(http.Controller):
         for de in des:
             des_list.append(LinklovingUserAuth.hr_department_to_json(de))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=des_list)
+
+    # 是否有仓库权限
+    @http.route('/linkloving_user_auth/auth_warehouse_manager', auth='none', type='json')
+    def auth_warehouse_manager(self, **kw):
+        card_num = request.jsonrequest.get("card_num")
+        old_emplyee = request.env["hr.employee"].sudo().search([("card_num", "=", card_num)])
+        if not card_num:
+            raise UserError(u'此卡卡号为空')
+        if old_emplyee:
+            if len(old_emplyee) == 1:
+                locations = request.env["stock.location"].sudo().search([])
+                user_ids = locations.mapped("user_ids")
+                if old_emplyee.user_id and old_emplyee.user_id.id in user_ids.ids:
+                    return JsonResponse.send_response(STATUS_CODE_OK, res_data=True)
+                else:
+                    return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": u"非仓库人员,请勿打卡"})
+            else:
+                raise UserError(u"该卡同时绑定了多个用户,请联系管理员")
+        else:
+            raise UserError(u'此卡未绑定任何用户')
 
     @classmethod
     def hr_department_to_json(cls, de):
