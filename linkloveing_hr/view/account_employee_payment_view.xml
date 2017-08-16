@@ -77,7 +77,7 @@
                                 <field name="apply_date" attrs="{'readonly': [('state', '!=', 'draft')]}"
                                        string="Apply Date"/>
                                 <field name="accounting_date" string="会计日期"
-                                       attrs="{'invisible': [('state', 'not in', ('approve','paid'))],'required': [('state', 'in', ('approve','paid'))]}"/>
+                                       attrs="{'invisible': [('state', 'not in', ('approve','paid'))]}"/>
 
                             </group>
                         </group>

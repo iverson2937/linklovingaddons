@@ -64,6 +64,7 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
         employee_payment = self.env['account.employee.payment'].browse(active_ids)
         payment_type = context.get('default_payment_type')
         # Create payment and post it
+        employee_payment.accounting_date = self.payment_date
         payment = self.env['account.payment'].create({
             'partner_type': 'employee',
             'payment_type': payment_type,
