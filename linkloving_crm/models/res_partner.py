@@ -242,6 +242,43 @@ class ResPartner(models.Model):
         # action['domain'] = [('res_id', 'in', self.ids)]
         return action
 
+    @api.multi
+    def action_tree_list_view_res(self):
+        domain = [('crm_product_type', '=', 'brand')]
+        brand_data = self.env['crm.product.series'].search(domain)
+
+        msg_data_my = [
+            {'name': brand_data_one.name,
+             'code': brand_data_one.id,
+             'type': brand_data_one.crm_product_type,
+             'icon': 'icon-th',
+             'child': [
+                 {
+                     'name': series_data_one.name,
+                     'code': series_data_one.id,
+                     'type': series_data_one.crm_product_type,
+                     'icon': 'icon-minus-sign',
+                     'parentCode': series_data_one.crm_Parent_id.id,
+                     'child': [
+                         {
+                             'name': version_data_one.name,
+                             'code': version_data_one.id,
+                             'type': version_data_one.crm_product_type,
+                             'icon': '',
+                             'parentCode': version_data_one.crm_Parent_id.id,
+                             'child': []}
+                         for version_data_one in series_data_one.crm_Parent_ontomany_ids]}
+                 for series_data_one in brand_data_one.crm_Parent_ontomany_ids]}
+            for brand_data_one in brand_data]
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'crm_tree_list_js',
+            'products_data': msg_data_my,
+            'leads_id': self.id,
+            'model_lead_partner': 'res.partner',
+        }
+
 
 class CrmRemarkRecord(models.Model):
     """
@@ -268,6 +305,9 @@ class CrmProductSeries(models.Model):
 
     name = fields.Char(u'名称')
     detail = fields.Text(string=u'描述')
+    crm_Parent_id = fields.Many2one('crm.product.series', string=u'上级')
+    crm_product_type = fields.Selection([('brand', u'品牌'), ('series', u'系列'), ('version', u'型号')], string=u'类型')
+    crm_Parent_ontomany_ids = fields.One2many('crm.product.series', 'crm_Parent_id', string=u'下级列表')
 
 
 class ChannelCrm(models.Model):
