@@ -61,7 +61,7 @@ class MrpBom(models.Model):
 
     review_id = fields.Many2one("review.process",
                                 string=u'待...审核',
-                                track_visibility='always',
+                                track_visibility='onchange',
                                 readonly=True, copy=False)
 
     @api.multi
