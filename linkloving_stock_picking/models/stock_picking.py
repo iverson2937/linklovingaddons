@@ -172,7 +172,7 @@ class StockPicking(models.Model):
 
     @api.multi
     def action_check_fail(self):
-        self.state = 'assigned'
+        self.state = 'validate'
 
     @api.multi
     def to_stock(self):
