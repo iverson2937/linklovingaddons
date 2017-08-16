@@ -22,7 +22,7 @@ odoo.define('linkloving_core.TreeView', function (require) {
                 // numberChange("o_form_field_number");
                 // numberChange("o_list_number");
                 if(settings.url == '/web/dataset/search_read'){
-                        if($(".modal-content").length==1){
+                        if($(".modal-content").length==1 || $(".o_treeview_table").length==1){
                             return;
                         }
                         $(".table-responsive table").addClass("fix_table");
