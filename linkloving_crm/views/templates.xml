@@ -13,6 +13,10 @@
                 <script type="text/javascript" src="/linkloving_crm/static/src/js/priority_tree.js"/>
 
 
+                <script type="text/javascript" src="/linkloving_crm/static/src/js/crm_tree_list.js"/>
+                <link rel="stylesheet" href="/linkloving_crm/static/src/css/style.css"/>
+
+
             </xpath>
         </template>
     </data>

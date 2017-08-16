@@ -92,7 +92,16 @@
                     </page>
 
                     <page string="产品">
-                        <field name="product_series_ids"/>
+                        <field name="product_series_ids" widget="crm_tree_list_js" attrs="">
+                            <tree string="产品系列" default_order="crm_product_type" create="0">
+                                <field name="crm_product_type"/>
+                                <field name="name"/>
+                                <field name="detail"/>
+                                <field name="crm_Parent_id"/>
+                                <field name="crm_Parent_ontomany_ids"/>
+                            </tree>
+                        </field>
+                        <button string="添加型号" name="action_tree_list_view_res" type="object" class="btn-primary" groups=""/>
                     </page>
 
                 </xpath>
