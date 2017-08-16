@@ -496,8 +496,8 @@ class MrpProductionExtend(models.Model):
 
     # 确认生产 等待备料
     def button_waiting_material(self):
-        # if self.bom_id.state not in ('draft', 'release'):
-        #     raise UserError('BOM还没通过审核,请联系相关负责人')
+        if self.bom_id.state not in ('draft', 'release'):
+            raise UserError('BOM还没通过审核,请联系相关负责人')
         if self.location_ids.filtered(lambda x: x.is_circulate_location == False) or not self.location_ids:
             self.write({'state': 'waiting_material'})
         else:
@@ -515,8 +515,8 @@ class MrpProductionExtend(models.Model):
 
     @api.multi
     def button_action_confirm_draft(self):
-        # if self.bom_id.state not in ('draft', 'release'):
-        #     raise UserError('BOM还没通过审核,请联系相关负责人')
+        if self.bom_id.state not in ('draft', 'release'):
+            raise UserError('BOM还没通过审核,请联系相关负责人')
         for production in self:
             production.write({'state': 'confirmed'})
         return {'type': 'ir.actions.empty'}
