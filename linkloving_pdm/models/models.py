@@ -113,7 +113,6 @@ class ReviewProcessLine(models.Model):
         if not partner_id:
             raise UserError(u"请选择审核人!")
 
-
         if to_last_review:
             if not self.env['final.review.partner'].search([('final_review_partner_id', '=', partner_id.id),
                                                             ('review_type', '=', review_type)]):
@@ -205,7 +204,7 @@ FILE_TYPE_DIC = {'sip': 'SIP',
                  'sop': 'SOP',
                  'ipqc': 'IPQC',
                  'project': u'工程',
-                'other': 'Other',
+                 'other': 'Other',
                  'design': 'Design'}
 
 
@@ -254,6 +253,7 @@ class ProductAttachmentInfo(models.Model):
             return ''
         else:
             raise u"数据异常,有两个可用的文件"
+
     def get_download_filename(self):
         dc = self.product_tmpl_id.default_code  # .replace(".", "_")
         file_ext = self.file_name.split('.')[-1:][0]
@@ -553,11 +553,11 @@ class ProductTemplateExtend(models.Model):
                                    required=False, )
 
 
-class ReviewProcessWizard(models.TransientModel):
+class ReviewProcessCancelWizard(models.TransientModel):
     _name = 'review.process.cancel.wizard'
 
     product_attachment_info_id = fields.Many2one("product.attachment.info")
-    bom_id=fields.Many2one("mrp.bom")
+    bom_id = fields.Many2one("mrp.bom")
     review_process_line = fields.Many2one("review.process.line",
                                           related="product_attachment_info_id.review_id.process_line_review_now")
 
@@ -565,11 +565,11 @@ class ReviewProcessWizard(models.TransientModel):
 
     def action_cancel_review(self):
         self.review_process_line.action_cancel(self.remark)
-        print self._context,'dddddddd'
-        if self._context.get('review_type')=='bom_review':
+        print self._context, 'dddddddd'
+        if self._context.get('review_type') == 'bom_review':
 
             self.bom_id.action_cancel()
-        elif self._context.get('review_type')=='file_review':
+        elif self._context.get('review_type') == 'file_review':
             self.product_attachment_info_id.action_cancel()
 
 
@@ -580,12 +580,33 @@ class ReviewProcessWizard(models.TransientModel):
     partner_id = fields.Many2one("res.partner", string=u'提交给...审核', domain=[('employee', '=', True), ])
     product_attachment_info_id = fields.Many2one("product.attachment.info")
     bom_id = fields.Many2one('mrp.bom')
-    # need_sop=fields.Char
-    # sop_name=fields.Char(string=)
+
+    @api.model
+    def _get_default_need_sop(self):
+        files = self.env['product.attachment.info'].search(
+            [('product_tmpl_id', '=', self.bom_id.product_tmpl_id.id), ('type', '=', 'sop')])
+        if files:
+            return 1
+
+    @api.model
+    def _get_default_value(self):
+        files = self.env['product.attachment.info'].search(
+            [('product_tmpl_id', '=', self.bom_id.product_tmpl_id.id), ('type', '=', 'sop')])
+        if files:
+            sop_name = files[0].file_name
+        else:
+            sop_name = u'未上传'
+        return sop_name
+
+    need_sop = fields.Selection([
+        (1, u'需要'),
+        (2, u'不需要'),
+    ], string=u'是否需要SOP文件', default=_get_default_need_sop)
+    sop_name = fields.Char(string=u'SOP文件', default=_get_default_value)
     review_process_line = fields.Many2one("review.process.line",
                                           related="product_attachment_info_id.review_id.process_line_review_now")
-    review_bom_line=fields.Many2one("review.process.line",
-                                    related="bom_id.review_id.process_line_review_now")
+    review_bom_line = fields.Many2one("review.process.line",
+                                      related="bom_id.review_id.process_line_review_now")
     remark = fields.Text(u"备注")
     is_show_action_deny = fields.Boolean(default=True)
 
@@ -594,9 +615,11 @@ class ReviewProcessWizard(models.TransientModel):
         to_last_review = self._context.get("to_last_review")  # 是否送往终审
         review_type = self._context.get("review_type")
         if review_type == 'bom_review':
+            if not self.need_sop:
+                raise UserError(u'请选择是否需要SOP文件')
             if not self.bom_id.review_id:  # 如果没审核过
                 self.bom_id.action_send_to_review()
-
+            self.bom_id.need_sop = self.need_sop
             self.bom_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
             self.bom_id.review_id.process_line_review_now.submit_to_next_reviewer(
                 review_type=review_type,
@@ -620,13 +643,16 @@ class ReviewProcessWizard(models.TransientModel):
 
     # 终审 审核通过
     def action_pass(self):
+        if not self.need_sop:
+            raise UserError(u'请选择是否需要SOP文件')
         review_type = self._context.get("review_type")
         if review_type == 'bom_review':
+            self.bom_id.need_sop = self.need_sop
             self.bom_id.action_released()
             self.review_bom_line.action_pass(self.remark)
         elif review_type == 'file_review':
             self.product_attachment_info_id.action_released()
-        # 审核通过
+            # 审核通过
 
             self.review_process_line.action_pass(self.remark)
         return True
