@@ -105,7 +105,6 @@ class MrpBomLineExtend(models.Model):
             'res_id': self.product_id.product_tmpl_id.id
         }
 
-
     @api.multi
     def action_see_bom_structure_reverse(self):
         bom_tree_view = self.env.ref('linkloving_mrp_extend.linkloving_mrp_bom_tree_view')
@@ -482,16 +481,17 @@ class MrpProductionExtend(models.Model):
                 self.state = "done"
                 res = {}
         else:
-            res = {'type': 'ir.actions.act_window',
-                   'res_model': 'mrp.return.material',
-                   'view_mode': 'form',
-                   'view_id': view.id,
-                   'target': 'new'}
-
-            res['context'] = {'default_production_id': self.id,
-                              'return_ids.product_ids': self.move_raw_ids.mapped('product_id').ids
-                              }
-            print self.move_raw_ids.mapped('product_id').ids, 'ddddddddd'
+            res = {
+                'type': 'ir.actions.act_window',
+                'res_model': 'mrp.return.material',
+                'view_mode': 'form',
+                'view_id': view.id,
+                'target': 'new',
+                'context': {
+                    'default_production_id': self.id,
+                    'return_ids.product_ids': self.move_raw_ids.mapped('product_id').ids
+                }
+            }
         return res
 
     # 确认生产 等待备料
@@ -1283,6 +1283,7 @@ class ReturnMaterialLine(models.Model):
     @api.model
     def create(self, vals):
         return super(ReturnMaterialLine, self).create(vals)
+
     @api.multi
     def create_scraps(self):
         if self[0].return_id.production_id.process_id.is_rework:  # 重工
