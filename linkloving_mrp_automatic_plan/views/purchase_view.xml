@@ -6,7 +6,7 @@
             <field name="inherit_id" ref="linkloving_purchase.purchase_order_tree_ll"/>
             <field name="arch" type="xml">
 
-                <xpath expr="//field[@name='create_uid']" position="after">
+                <xpath expr="//field[@name='state']" position="after">
                     <!-- Add new fields here -->
                     <field name="status_light" widget="statuslight"/>
                 </xpath>

@@ -92,7 +92,8 @@ class LinklovingUserAuth(http.Controller):
                 locations = request.env["stock.location"].sudo().search([])
                 user_ids = locations.mapped("user_ids")
                 if old_emplyee.user_id and old_emplyee.user_id.id in user_ids.ids:
-                    return JsonResponse.send_response(STATUS_CODE_OK, res_data=True)
+                    return JsonResponse.send_response(STATUS_CODE_OK,
+                                                      res_data=LinklovingUserAuth.hr_employee_to_json(old_emplyee))
                 else:
                     return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": u"非仓库人员,请勿打卡"})
             else:
