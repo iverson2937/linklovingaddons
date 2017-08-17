@@ -84,6 +84,7 @@
                     <field name="product_id" options="{'no_create': True}"/>
                     <field name="inner_code" string="国内简称" readonly="1"/>
                     <field name="inner_spec" string="国内型号" readonly="1"/>
+                    <field name="qty_available"/>
                 </xpath>
                 <xpath expr="//tree/field[@name='tax_id']" position="attributes">
                     <attribute name='invisible'>1</attribute>
