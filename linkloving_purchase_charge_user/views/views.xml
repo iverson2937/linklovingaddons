@@ -34,7 +34,7 @@
         <record id="purchase_order_tree_inherit" model="ir.ui.view">
             <field name="name">purchase.order.tree.inherit</field>
             <field name="model">purchase.order</field>
-            <field name="inherit_id" ref="linkloving_purchase.purchase_order_tree_ll"/>
+            <field name="inherit_id" ref="purchase.purchase_order_tree"/>
             <field name="arch" type="xml">
 
                 <xpath expr="//field[@name='state']" position="after">
