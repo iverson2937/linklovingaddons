@@ -1,7 +1,31 @@
 # -*- coding: utf-8 -*-
+from datetime import timedelta
+
+from dateutil.relativedelta import relativedelta
+
 from odoo import models, fields, api
 
 
+class ProcurementOrderExtend(models.Model):
+    _inherit = 'procurement.order'
+
+    def _prepare_mo_vals(self, bom):
+        res = super(ProcurementOrderExtend, self)._prepare_mo_vals(bom)
+        #
+        # produced_spend = res["product_qty"] * bom.produced_spend_per_pcs + bom.prepare_time
+        #
+        # res.update({'state': 'draft',
+        #             'process_id': bom.process_id.id,
+        #             'unit_price': bom.process_id.unit_price,
+        #             'mo_type': bom.mo_type,
+        #             'hour_price': bom.hour_price,
+        #             'in_charge_id': bom.process_id.partner_id.id,
+        #             'product_qty': self.get_actual_require_qty(),
+        #             'date_planned_start': fields.Datetime.to_string(self._get_date_planned_from_today()),
+        #             'date_planned_finished': fields.Datetime.from_string(self.date_planned) + relativedelta(
+        #                 seconds=produced_spend)
+        #             })
+        return res
 # 设备
 class MrpProcessEquipment(models.Model):
     _name = 'mrp.process.equipment'
@@ -66,5 +90,4 @@ class MrpProcessExtend(models.Model):
     _inherit = 'mrp.process'
 
     work_type_id = fields.Many2one(comodel_name="work.type", string=u"工种", required=False, )
-    prepare_time = fields.Integer(string=u"准备时间(秒)", default=0, )
     production_line_ids = fields.One2many(comodel_name='mrp.production.line', inverse_name='process_id', string=u'产线')
