@@ -223,6 +223,12 @@ class CreateOrderPointWizard(models.TransientModel):
                 product.last2_month_qty = last2_month_qty
                 product.last3_month_qty = last3_month_qty
 
+    def recompute_po_chager(self):
+        pos = self.env["purchase.order"].search([])
+        for po in pos:
+            po.user_id = po.create_uid.id
+
+
 def getMonthFirstDayAndLastDay(year=None, month=None):
     """
     :param year: 年份，默认是本年，可传int或str类型
