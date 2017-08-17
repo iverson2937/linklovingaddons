@@ -132,7 +132,8 @@
 .xs{
     color: #999999!important;
 }
-.o_list_view.table td{
+
+.o_list_view.table .o_list_text {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
