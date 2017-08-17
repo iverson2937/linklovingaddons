@@ -714,7 +714,10 @@ class LinklovingOAApi(http.Controller):
     @classmethod
     def get_today_time_and_tz(cls):
         user = request.env["res.users"].sudo().browse(request.context.get("uid"))
-        timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
+        if user.tz:
+            timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
+        else:
+            timez = 8 * 3600
         date_to_show = fields.datetime.utcnow()
         date_to_show += timez
         return date_to_show, timez
