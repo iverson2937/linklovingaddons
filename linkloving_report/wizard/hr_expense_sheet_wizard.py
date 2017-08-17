@@ -11,6 +11,7 @@ class HrExpenseSheetWizard(models.TransientModel):
     start_date = fields.Date(u'开始时间',
                              default=(datetime.date.today().replace(day=1) - datetime.timedelta(1)).replace(day=1))
     end_date = fields.Date(u'结束时间', default=datetime.datetime.now())
+    employee_ids = fields.Many2many('hr.employee')
 
     def _get_data_by_turn_payment(self, date1, date2):
         returnDict = {}
@@ -101,10 +102,14 @@ class HrExpenseSheetWizard(models.TransientModel):
     def _get_data_by_pre_payment_deduct(self, date1, date2):
         returnDict = {}
         employee_payment = self.env['account.employee.payment']
-
-        payment_ids = employee_payment.search([
+        domain = [
             ('state', '=', 'paid'),
-            ('accounting_date', '>=', date1), ('accounting_date', '<=', date2)], order='name desc')
+            ('accounting_date', '>=', date1), ('accounting_date', '<=', date2)]
+        if self.employee_ids:
+            employee_ids = self.employee_ids.ids
+            domain.append(('employee_id', 'in', employee_ids))
+
+        payment_ids = employee_payment.search(domain, order='name desc')
 
         sheet_sequence = 1
         for payment in payment_ids:
@@ -130,10 +135,13 @@ class HrExpenseSheetWizard(models.TransientModel):
     def _get_data_by_pre_payment_income(self, date1, date2):
         returnDict = {}
         employee_payment = self.env['account.employee.payment']
-
-        payment_ids = employee_payment.search([
+        domain = [
             ('state', '=', 'paid'),
-            ('accounting_date', '>=', date1), ('accounting_date', '<=', date2)], order='name desc')
+            ('accounting_date', '>=', date1), ('accounting_date', '<=', date2)]
+        if self.employee_ids:
+            employee_ids = self.employee_ids.ids
+            domain.append(('employee_id', 'in', employee_ids))
+        payment_ids = employee_payment.search(domain, order='name desc')
 
         sheet_sequence = 1
         for payment in payment_ids:
