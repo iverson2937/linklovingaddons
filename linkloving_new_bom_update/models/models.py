@@ -59,7 +59,7 @@ class MrpBom(models.Model):
             if self.state == 'review_ing':
                 raise UserError('此bom正在审核中,请取消审核后再做修改')
             product_ids = self.product_tmpl_id.product_variant_ids
-
+            # 有未出货的bom 不允许修改
             if product_ids:
                 line = self.env['sale.order.line'].search(
                     [('product_id', '=', product_ids.ids[0]), ('state', 'in', ('sale', 'done'))]).filtered(
