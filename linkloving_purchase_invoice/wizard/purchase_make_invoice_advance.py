@@ -35,7 +35,8 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
 
     @api.model
     def _default_product_id(self):
-        product_id = self.env['ir.values'].get_default('sale.config.settings', 'deposit_product_id_setting')
+        product_id = self.env['ir.values'].get_default('sale.config.settings', 'deposit_product_id_setting',
+                                                       company_id=self.env.user.company_id.id)
         if not product_id:
             raise UserError('请设置预付款产品')
         return self.env['product.product'].browse(product_id)

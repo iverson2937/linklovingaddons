@@ -137,6 +137,8 @@
                                    options="{'no_create':True}"
                                    domain="[('id','!=',cur_partner_id),('employee', '=', True)]"/>
                             <field name="remark"/>
+                            <field name="need_sop" widget="radio" invisible="context.get('review_type')!='bom_review'"/>
+                            <field name="sop_name" readonly="1" invisible="context.get('review_type')!='bom_review'"/>
                         </group>
                     </sheet>
                     <footer>

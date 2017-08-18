@@ -148,6 +148,7 @@ class SaleOrderLine(models.Model):
     price_subtotal = fields.Monetary(string='Subtotal', readonly=True, store=True, compute=None)
     price_tax = fields.Monetary(string='Taxes', readonly=True, store=True, compute=None)
     price_total = fields.Monetary(string='Total', readonly=True, store=True, compute=None)
+    qty_available = fields.Float(string=u'库存', related='product_id.qty_available')
 
     # FIXME:allen  how to remove this
     @api.onchange('product_uom_qty', 'product_uom', 'route_id')

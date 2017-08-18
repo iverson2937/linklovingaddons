@@ -17,6 +17,10 @@ BOM_STATE = {
 class MrpBom(models.Model):
     _inherit = 'mrp.bom'
     is_show_action_deny = fields.Boolean(string=u'是否显示审核不通过', default=True, compute='_compute_is_show_action_deny')
+    need_sop = fields.Selection([
+        (1, u'需要'),
+        (2, u'不需要'),
+    ], string=u'是否需要SOP文件')
 
     @api.multi
     def _compute_is_show_cancel(self):
@@ -46,7 +50,7 @@ class MrpBom(models.Model):
             'uom_name': self.product_uom_id.name,
             'process_name': self.process_id.name,
             'product_qty': self.product_qty,
-            'review_id': self.review_id.who_review_now.name or '',
+            'review_id': self.sudo().review_id.who_review_now.name or '',
             'state': [self.state, BOM_STATE[self.state]],
             # 'has_right_to_review': self.has_right_to_review,
             'review_line': self.review_id.get_review_line_list(),
