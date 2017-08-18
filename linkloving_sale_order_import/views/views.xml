@@ -11,9 +11,11 @@
                         <button name="import_tb_sale_order" string="测试按钮" type="object" class="btn-primary"/>
                     </header>
 
+                    <group>
+                        <field name="login_url"/>
+                        <field name="common_url"/>
+                    </group>
 
-                    <field name="login_url"/>
-                    <field name="common_url"/>
 
                 </form>
             </field>
@@ -25,6 +27,7 @@
             <field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree string="Backups">
+
                     <field name="login_url"/>
                     <field name="common_url"/>
 

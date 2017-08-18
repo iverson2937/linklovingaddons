@@ -7,7 +7,7 @@ class TBSaleOrder(models.Model):
     _inherit = 'eb.order'
 
     total_amount = fields.Float(string=u'订单金额')
-    deal_date = fields.datetime(string=u'成交日期')
+    deal_date = fields.Datetime(string=u'成交日期')
 
     def create_eb_sale_order(self, vals):
         line_ids = []

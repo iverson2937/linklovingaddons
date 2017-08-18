@@ -3,24 +3,25 @@ import json
 import re
 import sys
 
-from fetch_tianmao_data2 import limit_scrapy_data_in_days
+import datetime
+
 from odoo import models, fields, api
 from selenium import webdriver
 import time
 
 driver = webdriver.Chrome()
+driver.maximize_window()
 
 
 class ImportSaleOrderSetting(models.Model):
     _name = 'import.sale.order.setting'
     login_url = fields.Char(string=u'登录地址')
     common_url = fields.Char(string=u'访问地址')
-
     @api.multi
     def login(self):
         for data in self:
             # open the login in page
-            driver.get(data.loginurl)
+            driver.get(data.login_url)
             time.sleep(3)
             # sign in the username
             try:
@@ -49,7 +50,7 @@ class ImportSaleOrderSetting(models.Model):
 
             curpage_url = driver.current_url
             print 'currpage_url ' + curpage_url
-            while (curpage_url == data.loginurl):
+            while (curpage_url == data.login_url):
                 # print 'please input the verify code:'
                 print 'please input the verify code:'
                 verifycode = sys.stdin.readline()  # 关于验证码中的需求,在目前的的爬虫中没有,但是可能在以后的场景出现,所以还是放在其中
@@ -86,7 +87,6 @@ class ImportSaleOrderSetting(models.Model):
 
                     # 也是在第一次的时候，处理搜索的范围 接下来的操作在于是通过获取所需求的30天之内数据来
                     limit_scrapy_data_in_days()
-
                 time.sleep(5)
 
                 order_lists = driver.find_elements_by_xpath('//tr[@class="itemtop"]')
@@ -293,7 +293,6 @@ class ImportSaleOrderSetting(models.Model):
 
             # 关闭redis 连接池
             close_redis(redis_list)
-
     @api.multi
     def import_tb_sale_order(self):
         for line in self:
@@ -303,3 +302,43 @@ class ImportSaleOrderSetting(models.Model):
             time.sleep(10)
             driver.quit()
             print u'爬虫工作完成!!!'
+
+
+def limit_scrapy_data_in_days():
+    # 获取当前的日期时间 如: xxxx-xx-xx
+    today = datetime.date.today()
+
+    # 默认获取前30天的日期的时间
+
+    prev30_today = today - datetime.timedelta(days=30)
+
+    print 'today is %s   prev30_today is %s' % (prev30_today, today)
+
+    # 输入开始日期
+    driver.find_element_by_xpath('//*[@id="J_BeginDate"]').send_keys(str(prev30_today))
+    # time.sleep(1)
+    # 输入开始小时
+
+    driver.find_element_by_xpath('//select[@name="beginHours"]').send_keys('0')
+    # time.sleep(1)
+    # 输入开始分钟
+    driver.find_element_by_xpath('//select[@name="beginMinutes"]').send_keys('0')
+    # time.sleep(1)
+
+
+
+
+    # 输入结束时间
+    driver.find_element_by_xpath('//*[@id="J_EndDate"]').send_keys(str(today))
+    # time.sleep(1)
+    # 输入结束小时
+    driver.find_element_by_xpath('//select[@name="endHours"]').send_keys('0')
+    # time.sleep(1)
+    # 输入结束分钟
+    driver.find_element_by_xpath('//select[@name="endMinutes"]').send_keys('0')
+
+    time.sleep(3)
+    # 过滤出30天的数据
+    # driver.find_element_by_xpath('//*[@id="J_searchb"]/tbody/tr[3]/td[4]/span/button').click()
+    driver.find_element_by_xpath('//button[@class="sui-btn btn-primary btn-large"]').click()
+    print u'点击搜索之后,获得需要的结果'
