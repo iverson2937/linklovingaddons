@@ -11,10 +11,10 @@ class TBSaleOrder(models.Model):
 
     def create_eb_sale_order(self, vals):
         line_ids = []
-        for line in vals.items:
-            product_id = self.env['product.product'].search([('default_code', '=', product_id.product)])
+        for line in vals.get('items'):
+            product_id = self.env['product.product'].search([('default_code', '=', '98.0A4000.104')])
             line_id = self.env['eb.order.line'].create({
-                'product': line.product,
+                'product': line.get('product'),
                 'product_id': product_id.id,
                 'price_unit': line.price_unit,
                 'product_qty': line.product_qty,

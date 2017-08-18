@@ -17,6 +17,7 @@ class ImportSaleOrderSetting(models.Model):
     _name = 'import.sale.order.setting'
     login_url = fields.Char(string=u'登录地址')
     common_url = fields.Char(string=u'访问地址')
+
     @api.multi
     def login(self):
         for data in self:
@@ -116,7 +117,7 @@ class ImportSaleOrderSetting(models.Model):
                     print '\n' + order_distribution_code + '\n'
 
                     # 把分销流水号放入到order_detail_info结构中，以便写入redis
-                    order_detail_info[u'分销流水号'] = order_distribution_code.split(u':')[1]
+                    order_detail_info['SN'] = order_distribution_code.split(u':')[1]
 
                     # 在天猫获取的数据中订单数据的格式为 '订单编号：30801863041516905'  可以通过正则表达式来获取
                     # 这里有一个坑,这里的'订单编号：'中的冒号是中文字符的冒号,所以在想匹配的时候,需要写到正则实例中
@@ -124,7 +125,7 @@ class ImportSaleOrderSetting(models.Model):
                     print '\n' + order_code + '\n'
 
                     # 把订单编号放入到order_detail_info结构中，以便写入redis
-                    order_detail_info[u'订单编号'] = order_code.split(u'：')[1]
+                    order_detail_info['name'] = order_code.split(u'：')[1]
 
                     # 把收货人放入到order_detail_info结构中，以便写入到redis中
                     buyer_person = order_list.find_element_by_xpath('./td[1]/span[4]').text
@@ -134,7 +135,7 @@ class ImportSaleOrderSetting(models.Model):
                     print '\n' + deal_time + '\n'
 
                     # 把成交时间放入到order_detail_info结构中，以便写入redis
-                    order_detail_info[u'成交时间'] = deal_time[deal_time.find(u':') + 1:]
+                    order_detail_info['deal_date'] = deal_time[deal_time.find(u':') + 1:]
 
                     # 获取每个订单号的详细的信息
                     order_info = order_list.find_element_by_xpath('./following-sibling::tr[@class="item "][1]')
@@ -236,6 +237,8 @@ class ImportSaleOrderSetting(models.Model):
                     order_detail_info['total_amount'] = total_price_and_delivery
                     order_detail_info['customer_info'] = buyer_person
 
+                    # self.env['eb.order'].create_eb_sale_order(order_detail_info)
+
                     # 这是一步真正的存储的过程
                     # save_to_redis(order_detail_info[u'订单编号'], order_detail_info)
                 print '*' * 50
@@ -293,6 +296,7 @@ class ImportSaleOrderSetting(models.Model):
 
             # 关闭redis 连接池
             close_redis(redis_list)
+
     @api.multi
     def import_tb_sale_order(self):
         for line in self:
