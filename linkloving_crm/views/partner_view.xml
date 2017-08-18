@@ -101,10 +101,16 @@
                                 <field name="crm_Parent_ontomany_ids"/>
                             </tree>
                         </field>
-                        <button string="添加型号" name="action_tree_list_view_res" type="object" class="btn-primary" groups=""/>
+                        <button string="添加型号" name="action_tree_list_view_res" type="object" class="btn-primary"
+                                groups=""/>
                     </page>
 
                 </xpath>
+
+
+                <!--<xpath expr="//page[@name='sales_purchases']/group/group/field[@name='user_id']" position="attributes">-->
+                <!--<attribute name="string">负责人</attribute>-->
+                <!--</xpath>-->
 
 
                 <xpath expr="//div[@name='button_box']" position="inside">
