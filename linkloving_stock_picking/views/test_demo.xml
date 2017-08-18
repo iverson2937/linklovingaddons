@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <template id="order_status_show" name="orderstatus" page="True">
+
+
+            <html>
+
+                <head>
+                    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+                    <meta charset="utf-8"/>
+                    <meta http-equiv="pragma" content="no-cache"/>
+                    <meta http-equiv="cache-control" content="no-cache"/>
+                    <meta http-equiv="expires" content="0"/>
+                    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
+
+                    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+                    <script type="text/javascript" src="/linkloving_stock_picking/static/js/demo_my.js"></script>
+
+                    <title>
+                        订单确认
+                    </title>
+
+                </head>
+
+                <body>
+
+                    <a href="javascript:history.go(-2);">返回上一页</a>
+                    <strong>
+                        <t t-esc="transaction"/>
+                    </strong>
+                </body>
+            </html>
+
+        </template>
+    </data>
+</openerp>

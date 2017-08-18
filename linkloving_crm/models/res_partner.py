@@ -279,6 +279,20 @@ class ResPartner(models.Model):
             'model_lead_partner': 'res.partner',
         }
 
+    @api.onchange('customer')
+    def on_change_customer(self):
+        if self.customer:
+            self.supplier = False
+        else:
+            self.supplier = True
+
+    @api.onchange('supplier')
+    def on_change_supplier(self):
+        if self.supplier:
+            self.customer = False
+        else:
+            self.customer = True
+
 
 class CrmRemarkRecord(models.Model):
     """

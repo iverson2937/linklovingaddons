@@ -251,6 +251,53 @@
             </field>
         </record>
 
+
+        <record model="ir.ui.view" id="mail.view_document_file_kanban">
+            <field name="name">ir.attachment kanban</field>
+            <field name="model">ir.attachment</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="id"/>
+                    <field name="mimetype"/>
+                    <field name="type"/>
+                    <field name="datas_fname"/>
+                    <field name="name"/>
+
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click_ss">
+                                <div class="oe_kanban_vignette">
+                                    <div class="oe_attachment">
+                                        <div class="oe_name">
+                                            <field name="name"/>
+
+                                            <a t-attf-href="/web/content/#{record.id.value}?download=1">下载</a>
+
+                                        </div>
+                                        <div t-if="record.type.raw_value == 'binary'">
+
+                                            <a t-attf-href="/web/content/#{record.id.value}" target="_blank">
+                                                <!--<a t-attf-href="/web/content/#{record.id.value}">-->
+                                                <t t-set="webimage"
+                                                   t-value="new RegExp('image.*(gif|jpeg|jpg|png)').test(record.mimetype.value)"/>
+                                                <div t-if="!webimage" class="o_image"
+                                                     t-att-data-mimetype="record.mimetype.value"/>
+                                                <div t-if="webimage" class="o_kanban_attachment_image">
+                                                    <img t-attf-src="/web/image/#{record.id.value}"/>
+                                                </div>
+                                            </a>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+
         <record model="ir.ui.view" id="view_picking_internal_search_inherit">
             <field name="name">stock.picking.search.inherit</field>
             <field name="model">stock.picking</field>
@@ -316,6 +363,34 @@
 
             </field>
         </record>
+
+
+        <!-- stock.inventory.tree -->
+        <record id="linkloving_stock_view_inventory_tree" model="ir.ui.view">
+            <field name="name">stock.inventory.tree</field>
+            <field name="model">stock.inventory</field>
+            <field name="inherit_id" ref="stock.view_inventory_tree"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='state']" position="after">
+                    <field name="create_uid"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="linkloving_stock_view_inventory_form" model="ir.ui.view">
+            <field name="name">partner.vendor.form</field>
+            <field name="model">stock.inventory</field>
+            <field name="inherit_id" ref="stock.view_inventory_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='filter']" position="after">
+                    <field name="create_uid"/>
+                </xpath>
+
+            </field>
+        </record>
+
 
         <!-- Inherit Form View to Modify it -->
         <record id="view_immediate_transfer_inherit" model="ir.ui.view">

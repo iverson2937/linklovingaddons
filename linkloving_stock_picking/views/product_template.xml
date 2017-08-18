@@ -38,5 +38,15 @@
             </field>
         </record>
 
+
+        <template id="stock_crm_static" name="linkloving_stock_picking" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+
+                <!--<script type="text/javascript" src="/linkloving_stock_picking/static/js/demo_my.js"/>-->
+
+            </xpath>
+        </template>
+
+
     </data>
 </openerp>
