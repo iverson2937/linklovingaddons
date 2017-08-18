@@ -4,21 +4,33 @@ from odoo import models, fields, api
 
 
 class TBSaleOrder(models.Model):
-    _name = 'tb.sale.order'
-    name = fields.Char(string=u'订单编号')
-    partner_id = fields.Many2one('res.partner', string=u'来源')
+    _inherit = 'eb.order'
+
     total_amount = fields.Float(string=u'订单金额')
-    deal_date = fields.datetime(string=u'成交时间')
-    state = fields.Selection([
-        ('', ''),
-        ('', ''),
-        ('', ''),
-    ])
+    deal_date = fields.datetime(string=u'成交日期')
+
+    def create_eb_sale_order(self, vals):
+        line_ids = []
+        for line in vals.items:
+            product_id = self.env['product.product'].search([('default_code', '=', product_id.product)])
+            line_id = self.env['eb.order.line'].create({
+                'product': line.product,
+                'product_id': product_id.id,
+                'price_unit': line.price_unit,
+                'product_qty': line.product_qty,
+            })
+            line_ids.append(line_id)
+        self.create({
+            'name': vals.name,
+            'partner_id': vals.get('partner_id'),
+            'deal_date': vals.get('deal_date'),
+            'total_amount': vals.total_amount,
+            'eb_order_line_ids': line_ids,
+        })
 
 
 class TBSaleOrderLine(models.Model):
-    _name = 'tb.sale.order.line'
-    order_id = fields.Many2one('tb.sale.order')
+    _inherit = 'eb.order.line'
     product = fields.Char(string=u'产品')
     price_unit = fields.Float(string=u'采购价')
-    product_qty = fields.Float(string=u'')
+    product_qty = fields.Float(string=u'采购数量')
