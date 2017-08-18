@@ -682,9 +682,9 @@ class ReviewProcessWizard(models.TransientModel):
 
     @api.model
     def create(self, vals):
-        if 'need_sop' in vals:
-            print vals
-            self.bom_id.need_sop = vals['need_sop']
+        # if 'need_sop' in vals:
+        #     print vals
+        #     self.bom_id.need_sop = vals['need_sop']
 
         return super(ReviewProcessWizard, self).create(vals)
 
