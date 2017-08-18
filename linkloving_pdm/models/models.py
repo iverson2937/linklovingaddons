@@ -649,6 +649,7 @@ class ReviewProcessWizard(models.TransientModel):
         if review_type == 'bom_review':
             self.bom_id.need_sop = self.need_sop
             self.bom_id.action_released()
+            self.bom_id.product_tmpl_id.apply_bom_update()
             self.review_bom_line.action_pass(self.remark)
         elif review_type == 'file_review':
             self.product_attachment_info_id.action_released()
@@ -680,6 +681,7 @@ class ReviewProcessWizard(models.TransientModel):
 
     @api.model
     def create(self, vals):
+
         return super(ReviewProcessWizard, self).create(vals)
 
 
