@@ -317,6 +317,34 @@
             </field>
         </record>
 
+
+        <!-- stock.inventory.tree -->
+        <record id="linkloving_stock_view_inventory_tree" model="ir.ui.view">
+            <field name="name">stock.inventory.tree</field>
+            <field name="model">stock.inventory</field>
+            <field name="inherit_id" ref="stock.view_inventory_tree"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='state']" position="after">
+                    <field name="create_uid"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="linkloving_stock_view_inventory_form" model="ir.ui.view">
+            <field name="name">partner.vendor.form</field>
+            <field name="model">stock.inventory</field>
+            <field name="inherit_id" ref="stock.view_inventory_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='filter']" position="after">
+                    <field name="create_uid"/>
+                </xpath>
+
+            </field>
+        </record>
+
+
         <!-- Inherit Form View to Modify it -->
         <record id="view_immediate_transfer_inherit" model="ir.ui.view">
             <field name="name">stock.immediate.transfer.inherit</field>
