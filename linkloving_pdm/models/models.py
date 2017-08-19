@@ -650,7 +650,7 @@ class ReviewProcessWizard(models.TransientModel):
                 raise UserError(u'请选择是否需要SOP文件')
             self.bom_id.need_sop = self.need_sop
             self.bom_id.action_released()
-            self.bom_id.product_tmpl_id.apply_bom_update()
+            # self.bom_id.product_tmpl_id.apply_bom_update()
             self.review_bom_line.action_pass(self.remark)
         elif review_type == 'file_review':
             self.product_attachment_info_id.action_released()
