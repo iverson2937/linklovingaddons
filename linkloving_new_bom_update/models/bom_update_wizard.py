@@ -31,7 +31,12 @@ class BomUpdateWizard(models.TransientModel):
             line = int(to_update_bom_line_ids[0])
             if line != main_bom_id:
                 line_id = self.env['mrp.bom.line'].browse(int(line))
-                bom_id = line_id.product_id.product_tmpl_id.bom_ids[0]
+                if  line_id.product_id.product_tmpl_id.bom_ids:
+                    bom_id=line_id.product_id.product_tmpl_id.bom_ids
+                else:
+                    bom_id=self.env['mrp.bom'].create({
+                        'product_tmpl_id':line_id.product_id.product_tmpl_id.id
+                    })
             else:
                 bom_id = bom_obj.browse(line)
 
@@ -157,6 +162,7 @@ class BomUpdateWizard(models.TransientModel):
                     temp_old_product_id = old_line_id.product_id.id
 
                 if modify_type == 'add':
+                    print 'dddddddddd'
                     if input_changed_value:
                         product_tmpl_id = product_id_obj.browse(product_id).product_tmpl_id
                         new_name = self.get_new_product_name(input_changed_value, postfix)
@@ -201,12 +207,12 @@ class BomUpdateWizard(models.TransientModel):
                     last_bom_line_id = val.get('id')
                     old_product_id = line_obj.browse(int(last_bom_line_id)).product_id
                     update_bom_line_delete(new_bom_id, old_product_id)
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'new_bom_update',
-                'bom_id': new_bom_id.id,
-                'context': {'default_active_id': new_bom_id.id},
-            }
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'new_bom_update',
+            'bom_id': new_bom_id.id,
+            'context': {'default_active_id': new_bom_id.id},
+        }
 
     @api.multi
     def create_cancel(self):
