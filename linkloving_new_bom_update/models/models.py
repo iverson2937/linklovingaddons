@@ -66,7 +66,7 @@ class MrpBom(models.Model):
                     lambda x: x.product_uom_qty != x.qty_delivered)
                 if lines:
                     for line in lines:
-                        if line.procurement_ids.filtered(lambda x: x.state != 'cancel'):
+                        if line.procurement_ids.filtered(lambda x: x.state not in ('cancel', 'cancel')):
                             raise UserError(_(u'销售单 %s 未发完货,不可以修改BOM,请联系销售取消相关销售单') % (line.order_id.name,))
 
             if self.state not in ('new', 'updated', 'deny'):
