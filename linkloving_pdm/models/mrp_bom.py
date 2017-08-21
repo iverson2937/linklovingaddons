@@ -25,7 +25,7 @@ class MrpBom(models.Model):
     @api.multi
     def _compute_is_show_cancel(self):
         for info in self:
-            if self.env.user.id == info.create_uid.id and info.state == 'review_ing':
+            if self.env.user.id == info.current_review_id.id and info.state == 'review_ing':
                 info.is_show_cancel = True
 
     is_show_cancel = fields.Boolean(compute='_compute_is_show_cancel')
