@@ -717,7 +717,7 @@ class LinklovingOAApi(http.Controller):
         if user.tz:
             timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
         else:
-            timez = 8 * 3600
+            timez = datetime.timedelta(seconds=8 * 3600)
         date_to_show = fields.datetime.utcnow()
         date_to_show += timez
         return date_to_show, timez
@@ -739,7 +739,7 @@ class LinklovingOAApi(http.Controller):
             })
         return data
 
-    def get_so_orders_return_lists(self,so_orders):
+    def get_so_orders_return_lists(self, so_orders):
         data = []
         for so_order in so_orders:
             data.append({

@@ -210,6 +210,8 @@ def get_next_default_code(default_code):
 
 def set_bom_line_product_bom_released(line):
     line.bom_id.state = 'release'
+    # line.bom_id.product_tmpl_id.apply_bom_update()
+
     if line.child_line_ids:
         for l in line.child_line_ids:
             set_bom_line_product_bom_released(l)
