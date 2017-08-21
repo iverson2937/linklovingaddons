@@ -1,59 +1,49 @@
 <openerp>
     <data>
-        <!-- explicit list view definition -->
-        <!--
-        <record model="ir.ui.view" id="linkloving_sale_order_import.list">
-          <field name="name">linkloving_sale_order_import list</field>
-          <field name="model">linkloving_sale_order_import.linkloving_sale_order_import</field>
-          <field name="arch" type="xml">
-            <tree>
-              <field name="name"/>
-              <field name="value"/>
-              <field name="value2"/>
-            </tree>
-          </field>
-        </record>
-        -->
 
-        <!-- actions opening views on models -->
-        <!--
-        <record model="ir.actions.act_window" id="linkloving_sale_order_import.action_window">
-          <field name="name">linkloving_sale_order_import window</field>
-          <field name="res_model">linkloving_sale_order_import.linkloving_sale_order_import</field>
-          <field name="view_mode">tree,form</field>
-        </record>
-        -->
+        <record model="ir.ui.view" id="import_sale_order_setting_form">
+            <field name="name">淘宝</field>
+            <field name="model">import.sale.order.setting</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Backups">
+                    <header>
+                        <button name="import_tb_sale_order" string="测试按钮" type="object" class="btn-primary"/>
+                    </header>
 
-        <!-- server action to the one above -->
-        <!--
-        <record model="ir.actions.server" id="linkloving_sale_order_import.action_server">
-          <field name="name">linkloving_sale_order_import server</field>
-          <field name="model_id" ref="model_linkloving_sale_order_import_linkloving_sale_order_import"/>
-          <field name="code">
-            action = {
-              "type": "ir.actions.act_window",
-              "view_mode": "tree,form",
-              "res_model": self._name,
-            }
-          </field>
-        </record>
-        -->
+                    <group>
+                        <field name="login_url"/>
+                        <field name="common_url"/>
+                    </group>
 
-        <!-- Top menu item -->
-        <!--
-        <menuitem name="linkloving_sale_order_import" id="linkloving_sale_order_import.menu_root"/>
-        -->
-        <!-- menu categories -->
-        <!--
-        <menuitem name="Menu 1" id="linkloving_sale_order_import.menu_1" parent="linkloving_sale_order_import.menu_root"/>
-        <menuitem name="Menu 2" id="linkloving_sale_order_import.menu_2" parent="linkloving_sale_order_import.menu_root"/>
-        -->
-        <!-- actions -->
-        <!--
-        <menuitem name="List" id="linkloving_sale_order_import.menu_1_list" parent="linkloving_sale_order_import.menu_1"
-                  action="linkloving_sale_order_import.action_window"/>
-        <menuitem name="Server to list" id="linkloving_sale_order_import" parent="linkloving_sale_order_import.menu_2"
-                  action="linkloving_sale_order_import.action_server"/>
-        -->
+
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="import_sale_order_setting_tree">
+            <field name="name">淘宝</field>
+            <field name="model">import.sale.order.setting</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Backups">
+
+                    <field name="login_url"/>
+                    <field name="common_url"/>
+
+                </tree>
+            </field>
+        </record>
+
+
+        <record model="ir.actions.act_window" id="action_tb_sale_order">
+            <field name="name">淘宝</field>
+            <field name="res_model">import.sale.order.setting</field>
+            <field name="view_type">form</field>
+            <field name='view_mode'>tree,form</field>
+        </record>
+
+        <menuitem id="import_taobao_sale_order" name="电商订单导入" parent="base.menu_custom"/>
+        <menuitem parent="import_taobao_sale_order" action="action_tb_sale_order" id="tb_sale_order"/>
     </data>
 </openerp>

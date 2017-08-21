@@ -643,12 +643,14 @@ class ReviewProcessWizard(models.TransientModel):
 
     # 终审 审核通过
     def action_pass(self):
-        if not self.need_sop:
-            raise UserError(u'请选择是否需要SOP文件')
+
         review_type = self._context.get("review_type")
         if review_type == 'bom_review':
+            if not self.need_sop:
+                raise UserError(u'请选择是否需要SOP文件')
             self.bom_id.need_sop = self.need_sop
             self.bom_id.action_released()
+            # self.bom_id.product_tmpl_id.apply_bom_update()
             self.review_bom_line.action_pass(self.remark)
         elif review_type == 'file_review':
             self.product_attachment_info_id.action_released()
@@ -680,6 +682,10 @@ class ReviewProcessWizard(models.TransientModel):
 
     @api.model
     def create(self, vals):
+        # if 'need_sop' in vals:
+        #     print vals
+        #     self.bom_id.need_sop = vals['need_sop']
+
         return super(ReviewProcessWizard, self).create(vals)
 
 

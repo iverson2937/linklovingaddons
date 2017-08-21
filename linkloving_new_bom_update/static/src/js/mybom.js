@@ -75,6 +75,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                     self.changes_back.push(self.xNodes[i]);
                 }
             })
+            console.log(self.changes_back);
             if (self.changes_back.length == 0) {
                 var message = ("您没有做任何操作");
                 var def = $.Deferred();
@@ -429,7 +430,6 @@ on_search:function () {
 
 
             }
-            ;
             var options = {
                 $buttons: $("<div>"),
                 action: this.action,

@@ -1084,7 +1084,7 @@ class LinklovingAppApi(http.Controller):
         if mrp_production.qty_unpost == 0:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error':_("Product qty can not be 0 ")})
-        if mrp_production.qty_unpost <= mrp_production.product_qty and mrp_production.production_order_type == 'ordering':
+        if mrp_production.qty_unpost < mrp_production.product_qty and mrp_production.production_order_type == 'ordering':
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error': _("Ordering MO need to produce all the products")})
         else:
@@ -1281,7 +1281,6 @@ class LinklovingAppApi(http.Controller):
                 mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'done'})
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
-
 
 
     #退料
@@ -2814,3 +2813,87 @@ class LinklovingAppApi(http.Controller):
         return data
 
         ######### 生产 新版接口  ###############
+
+    # 备料完成
+    @http.route('/linkloving_app_api/new_prepare_material', type='json', auth='none', csrf=False)
+    def new_prepare_material(self, **kw):
+        order_id = request.jsonrequest.get('order_id')  # get paramter
+        mrp_production = request.env['mrp.production'].sudo().search([('id', '=', order_id)])[0]
+
+        stock_moves = [request.jsonrequest.get('stock_move')] #get paramter
+        # _logger.warning(u"charlie_0712_log:finish_prepare_material, mo:%s,moves:%s", mrp_production.name, stock_moves)
+        # print(u"charlie_0712_log:finish_prepare_material, mo:%s,moves:%s" % (mrp_production.name, stock_moves))
+        stock_move_lines = request.env["sim.stock.move"].sudo()
+        try:
+            for move in stock_moves:
+                sim_stock_move = LinklovingAppApi.get_model_by_id(move['stock_move_lines_id'], request,
+                                                                  'sim.stock.move')
+                stock_move_lines += sim_stock_move
+                if not sim_stock_move.stock_moves:
+                    continue
+
+                if move['quantity_ready'] > 0:
+                    sim_stock_move.is_prepare_finished = True
+                else:
+                    continue
+                rounding = sim_stock_move.stock_moves[0].product_uom.rounding
+                if float_compare(move['quantity_ready'], sim_stock_move.stock_moves[0].product_uom_qty,
+                                 precision_rounding=rounding) > 0:
+                    # _logger.warning(u"charlie_0712_log_1:move_qty:%s,move_id:%d,uom_qty:%s",
+                    #                 str(move['quantity_ready']),
+                    #                 sim_stock_move.stock_moves[0].id,
+                    #                 str(sim_stock_move.stock_moves[0].product_uom_qty))
+
+                    qty_split = sim_stock_move.stock_moves[0].product_uom._compute_quantity(
+                            move['quantity_ready'] - sim_stock_move.stock_moves[0].product_uom_qty,
+                            sim_stock_move.stock_moves[0].product_id.uom_id)
+                    # _logger.warning(u"charlie_0712_log_2:qty_split:%s,", str(qty_split))
+                    split_move = sim_stock_move.stock_moves[0].copy(
+                            default={'quantity_done': qty_split, 'product_uom_qty': qty_split,
+                                     'production_id': sim_stock_move.production_id.id,
+                                     'raw_material_production_id': sim_stock_move.raw_material_production_id.id,
+                                     'procurement_id': sim_stock_move.procurement_id.id or False,
+                                     'is_over_picking': True})
+                    # _logger.warning(u"charlie_0712_log_3:split_move_qty:%s,", split_move)
+                    sim_stock_move.production_id.move_raw_ids = sim_stock_move.production_id.move_raw_ids + split_move
+                    # _logger.warning(u"charlie_0712_log_4:len_move_raw_ids:%d,",
+                    #                 len(sim_stock_move.production_id.move_raw_ids))
+                    split_move.write({'state': 'assigned',})
+                    sim_stock_move.stock_moves[0].quantity_done = sim_stock_move.stock_moves[0].product_uom_qty
+                    # _logger.warning(u"charlie_0712_log_5:len_move_raw_ids:%d,",
+                    #                 len(sim_stock_move.production_id.move_raw_ids))
+                    split_move.action_done()
+                    # _logger.warning(u"charlie_0712_log_6:len_move_raw_ids:%d,",
+                    #                 len(sim_stock_move.production_id.move_raw_ids))
+                    sim_stock_move.stock_moves[0].action_done()
+                    # _logger.warning(u"charlie_0712_log_7:len_move_raw_ids:%d,",
+                    #                 len(sim_stock_move.production_id.move_raw_ids))
+                else:
+                    # _logger.warning(u"charlie_0712_log_8:move_qty:%s,uom_qty:%s", str(move['quantity_ready']),
+                    #                 str(sim_stock_move.stock_moves[0].product_uom_qty))
+                    sim_stock_move.stock_moves[0].quantity_done_store = move['quantity_ready']
+                    sim_stock_move.stock_moves[0].quantity_done = move['quantity_ready']
+                    sim_stock_move.stock_moves[0].action_done()
+                    # _logger.warning(u"charlie_0712_log_9:len_move_raw_ids:%d",
+                    #                 len(sim_stock_move.production_id.move_raw_ids))
+                sim_stock_move.quantity_ready = 0  # 清0
+            # try:
+            #     mrp_production.post_inventory()
+            # except UserError, e:.filtered(lambda x: x.product_type != 'semi-finished')
+            #     return JsonResponse.send_response(STATUS_CODE_ERROR,
+            #                                       res_data={"error":e.name})
+            # if all(sim_move.is_prepare_finished for sim_move in
+            #        stock_move_lines.filtered(lambda x: x.product_type != 'semi-finished')):
+            #     mrp_production.write(
+            #             {'state': 'finish_prepare_material'})
+            #
+            #     JPushExtend.send_notification_push(audience=jpush.audience(
+            #             jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
+            #     ), notification=mrp_production.product_id.name,
+            #             body=_("Qty:%d,Finish picking！") % (mrp_production.product_qty))
+        except Exception, e:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={"error": e.name})
+        # _logger.warning(u"charlie_0712_log10:finish, mo:%s", LinklovingAppApi.model_convert_to_dict(order_id, request))
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
