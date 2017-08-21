@@ -16,9 +16,6 @@
 
                     <!--<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>-->
 
-                    <script type="text/javascript"
-                            src="/linkloving_stock_picking/static/js/jquery/1.11.3/jquery.min.js"></script>
-
                     <title>
                         订单确认
                     </title>
