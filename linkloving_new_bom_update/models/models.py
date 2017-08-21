@@ -61,11 +61,13 @@ class MrpBom(models.Model):
             product_ids = self.product_tmpl_id.product_variant_ids
             # 有未出货的bom 不允许修改
             if product_ids:
-                line = self.env['sale.order.line'].search(
+                lines = self.env['sale.order.line'].search(
                     [('product_id', '=', product_ids.ids[0]), ('state', 'in', ('sale', 'done'))]).filtered(
                     lambda x: x.product_uom_qty != x.qty_delivered)
-                if line:
-                    raise UserError(u'有未发货的销售单,不可以修改BOM,请联系销售取消相关销售单')
+                if lines:
+                    for line in lines:
+                        if line.procurement_ids.filtered(lambda x: x.state != 'cancel'):
+                            raise UserError(_(u'销售单 %s 未发完货,不可以修改BOM,请联系销售取消相关销售单') % (line.order_id.name,))
 
             if self.state not in ('new', 'updated', 'deny'):
                 if not self.review_id:

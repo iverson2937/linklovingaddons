@@ -236,8 +236,8 @@ class ImportSaleOrderSetting(models.Model):
                     order_detail_info['state'] = purchage_result
                     order_detail_info['total_amount'] = total_price_and_delivery
                     order_detail_info['customer_info'] = buyer_person
-
-                    # self.env['eb.order'].create_eb_sale_order(order_detail_info)
+                    print order_detail_info
+                    self.env['eb.order'].create_eb_sale_order(order_detail_info)
 
                     # 这是一步真正的存储的过程
                     # save_to_redis(order_detail_info[u'订单编号'], order_detail_info)
