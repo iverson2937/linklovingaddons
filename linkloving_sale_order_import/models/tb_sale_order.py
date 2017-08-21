@@ -63,10 +63,12 @@ class TBSaleOrder(models.Model):
 
                 }) for item in vals.get('items')],
             })
+            # 添加运费
             if delivery_fee:
                 delivery_fee_id = self.env['product.product'].search([('default_code', '=', '003')])
                 self.env['eb.order.line'].create({
                     'product_id': delivery_fee_id.id,
+                    'product': u'运费',
                     'price_unit': delivery_fee,
                     'qty': 1,
                     'eb_order_id': eb_order_id,
