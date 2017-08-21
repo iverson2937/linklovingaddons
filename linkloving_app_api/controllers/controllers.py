@@ -1084,7 +1084,7 @@ class LinklovingAppApi(http.Controller):
         if mrp_production.qty_unpost == 0:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error':_("Product qty can not be 0 ")})
-        if mrp_production.qty_unpost <= mrp_production.product_qty and mrp_production.production_order_type == 'ordering':
+        if mrp_production.qty_unpost < mrp_production.product_qty and mrp_production.production_order_type == 'ordering':
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error': _("Ordering MO need to produce all the products")})
         else:
