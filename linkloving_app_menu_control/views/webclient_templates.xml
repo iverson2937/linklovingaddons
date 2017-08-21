@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="menu_link_inherit" inherit_id="web.menu_link" name="menu Inherit">
+
+            <xpath expr="//a/span[@class='oe_menu_text']" position="replace">
+                <script>
+                    $(function () { $("[data-toggle='tooltip']").tooltip(); });
+                </script>
+                <span class="oe_menu_text">
+                    <div data-toggle="tooltip" data-placement="right" t-att-title="menu['tip_text']">
+                    <t t-esc="menu['name']"/>
+                    </div>
+                </span>
+            </xpath>
+        </template>
+    </data>
+</openerp>

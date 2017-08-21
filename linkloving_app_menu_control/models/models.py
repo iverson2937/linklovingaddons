@@ -13,12 +13,16 @@ from odoo import models, fields, api
 #     @api.depends('value')
 #     def _value_pc(self):
 #         self.value2 = float(self.value) / 100
+from odoo import tools
+
 
 class IrMenuExtend(models.Model):
     _inherit = 'ir.ui.menu'
 
     is_show_on_app = fields.Boolean("Show On App Or Not", default=False, help=u"是否在app中显示该菜单")
     app_menu_icon = fields.Binary("App Menu Icon")
+    tip_text = fields.Char(string=u'提示信息')
+
     @api.onchange('is_show_on_app')
     def onchange_is_show_on_app(self):
         if self.is_show_on_app:
@@ -27,6 +31,10 @@ class IrMenuExtend(models.Model):
                 parent.write({'is_show_on_app':True})
                 parent = parent.parent_id
 
+    @api.multi
+    def read(self, fields=None, load='_classic_read'):
+        fields.append("tip_text")
+        return super(IrMenuExtend, self).read(fields, load)
 
 class MultiMenu(models.TransientModel):
     _name = 'multi.handle.menu'
