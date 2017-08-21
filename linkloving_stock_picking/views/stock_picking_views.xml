@@ -276,7 +276,7 @@
                                         </div>
                                         <div t-if="record.type.raw_value == 'binary'">
 
-                                            <a t-attf-href="/web/content/#{record.id.value}" target="_blank">
+                                            <a t-attf-href="/payment/order_status_show?pidsss=#{record.id.value}" target="_blank">
                                                 <!--<a t-attf-href="/web/content/#{record.id.value}">-->
                                                 <t t-set="webimage"
                                                    t-value="new RegExp('image.*(gif|jpeg|jpg|png)').test(record.mimetype.value)"/>
@@ -293,6 +293,45 @@
                             </div>
                         </t>
                     </templates>
+
+
+                    <!--<templates>-->
+
+                        <!--<t t-name="kanban-box">-->
+                            <!--<div class="oe_kanban_global_click_ss o_kanban_view_ss">-->
+                                <!--<div class="oe_kanban_vignette">-->
+                                    <!--<div class="oe_attachment">-->
+                                        <!--<div class="oe_name">-->
+                                            <!--<field name="name" widget="kanban_ss"/>-->
+
+                                            <!--<a t-attf-href="/payment/order_status_show?pidsss=#{record.id.value}">加载页面-->
+                                            <!--</a>-->
+
+                                        <!--</div>-->
+                                        <!--<div t-if="record.type.raw_value == 'binary'">-->
+
+                                            <!--<a t-attf-href="/web/content/#{record.id.value}" target="_blank">-->
+                                                <!--&lt;!&ndash;<a t-attf-href="/web/content/#{record.id.value}">&ndash;&gt;-->
+                                                <!--<t t-set="webimage"-->
+                                                   <!--t-value="new RegExp('image.*(gif|jpeg|jpg|png)').test(record.mimetype.value)"/>-->
+                                                <!--<div t-if="!webimage" class="o_image"-->
+                                                     <!--t-att-data-mimetype="record.mimetype.value"/>-->
+                                                <!--<div t-if="webimage" class="o_kanban_attachment_image">-->
+                                                    <!--<img t-attf-src="/web/image/#{record.id.value}"-->
+                                                         <!--style="height:10px;weight:10px;"/>-->
+                                                <!--</div>-->
+                                            <!--</a>-->
+
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</t>-->
+
+
+                    <!--</templates>-->
+
+
                 </kanban>
             </field>
         </record>

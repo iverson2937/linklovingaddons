@@ -14,21 +14,59 @@
                     <meta http-equiv="expires" content="0"/>
                     <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
 
-                    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-                    <script type="text/javascript" src="/linkloving_stock_picking/static/js/demo_my.js"></script>
+                    <!--<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>-->
+
+                    <script type="text/javascript"
+                            src="/linkloving_stock_picking/static/js/jquery/1.11.3/jquery.min.js"></script>
 
                     <title>
                         订单确认
                     </title>
 
+                    <script language="javascript">
+
+
+                        window.onload = function(){
+
+                        var current = 0;
+
+                        document.getElementById('target').onclick = function(){
+
+                        current = (current+90)%360;
+
+                        this.style.transform = 'rotate('+current+'deg)';
+                        }
+                        };
+
+
+                        function bigimg(i)
+                        {
+                        var zoom = parseInt(i.style.zoom,10)||100;
+                        zoom += event.wheelDelta / 12;
+                        if(zoom > 0 )
+                        i.style.zoom=zoom+'%';
+                        return false;
+                        }
+
+                    </script>
+
+
                 </head>
 
                 <body>
+                    <div>
+                        <div style="height:20px;weight:100%;">
+                            <!--<a href="javascript:history.go(-2);">返回上一页</a>-->
+                        </div>
+                        <div>
+                            <center>
+                                <img id="target" t-attf-src="/web/image/{{ transaction }}" border="1"
+                                     onmousewheel="return bigimg(this)"/>
+                            </center>
 
-                    <a href="javascript:history.go(-2);">返回上一页</a>
-                    <strong>
-                        <t t-esc="transaction"/>
-                    </strong>
+                        </div>
+                    </div>
+
                 </body>
             </html>
 

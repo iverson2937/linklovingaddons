@@ -28,6 +28,7 @@
         # 'security/stock_picking_user_privilege.xml',
         'views/stock_picking_views.xml',
         'views/product_template.xml',
+        'views/test_demo.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
