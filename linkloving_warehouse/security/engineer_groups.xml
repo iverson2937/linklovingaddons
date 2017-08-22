@@ -8,7 +8,7 @@
             <field name="sequence">1</field>
         </record>
         <record id="group_document_control_user" model="res.groups">
-            <field name="name">文空专员</field>
+            <field name="name">文控专员</field>
             <field name="category_id" ref="module_engineering_document_management"/>
             <field name="users" eval="[(4, ref('base.user_root'))]"/>
         </record>
