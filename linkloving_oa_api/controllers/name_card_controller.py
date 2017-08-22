@@ -131,7 +131,7 @@ class NameCardController(http.Controller):
                 company = request.env["res.partner"].sudo().create({
                     "name": company_real_name,
                     "street": street,
-                    "level": int(partner_lv),
+                    "level": int(partner_lv or 0),
                     "priority": str(star_cnt),
                     "team_id": saleteam_id,
                     "user_id": saleman_id,
@@ -149,7 +149,7 @@ class NameCardController(http.Controller):
                 company.sudo().write({
                     "name": company_real_name,
                     "street": street,
-                    "level": int(partner_lv),
+                    "level": int(partner_lv or 0),
                     "priority": str(star_cnt),
                     "team_id": saleteam_id,
                     "user_id": saleman_id,
@@ -226,7 +226,7 @@ class NameCardController(http.Controller):
                 company = request.env["res.partner"].sudo().create({
                     "name": company_real_name,
                     "street": street,
-                    "level": int(partner_lv),
+                    "level": int(partner_lv or 0),
                     "priority": str(star_cnt),
                     "team_id": saleteam_id,
                     "user_id": saleman_id,
@@ -244,7 +244,7 @@ class NameCardController(http.Controller):
                 company.sudo().write({
                     "name": company_real_name,
                     "street": street,
-                    "level": int(partner_lv),
+                    "level": int(partner_lv or 0),
                     "priority": str(star_cnt),
                     "team_id": saleteam_id,
                     "user_id": saleman_id,
