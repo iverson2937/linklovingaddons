@@ -56,17 +56,7 @@
                     <attribute name="options">{'no_create':True}</attribute>
                 </xpath>
 
-                <xpath expr="//field[@name='move_lines']" position="inside">
-                    <tree editable="bottom">
-                        <field name="product_id" options="{'no_create':True}"/>
-                        <field name="product_uom_qty"/>
-                        <field name="product_uom" readonly="0"/>
-                        <field name="state"/>
 
-
-                    </tree>
-
-                </xpath>
 
                 <xpath expr="//field[@name='origin']" position="after">
                 </xpath>
