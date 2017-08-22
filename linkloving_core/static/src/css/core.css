@@ -104,7 +104,7 @@
 
 .fix_table_thead {
     position: fixed;
-    width: calc(100% - 237px);
+    /*width: calc(100% - 237px);*/
 }
 
 .table-responsive .not_full_thead {
