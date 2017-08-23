@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+from odoo.tools import float_is_zero
 from .hr_expense_sheet import create_remark_comment
 
 
@@ -85,7 +86,8 @@ class AccountEmployeePayment(models.Model):
         payment_return = sum([return_id.amount for return_id in self.return_ids])
         used_payment = sum([payment.amount for payment in self.payment_line_ids])
         remaining = self.amount - used_payment - payment_return
-        if not remaining:
+
+        if not float_is_zero(remaining, 2):
             self.can_return = False
 
     can_return = fields.Boolean(compute=_is_can_return, store=True)
@@ -169,9 +171,6 @@ class AccountEmployeePayment(models.Model):
     def cancel(self):
 
         self.state = 'cancel'
-
-
-
 
     @api.multi
     def manager2_approve(self):

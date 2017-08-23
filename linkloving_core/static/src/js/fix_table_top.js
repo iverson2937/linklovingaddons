@@ -25,8 +25,12 @@ odoo.define('linkloving_core.TreeView', function (require) {
                         if($(".modal-content").length>=1 || $(".o_treeview_table").length>=1){
                             return;
                         }
+
+                        var w = $(".o_sub_menu").width()+18
                         $(".table-responsive table").addClass("fix_table");
                         $(".table-responsive thead").addClass("fix_table_thead");
+                        $(".table-responsive thead").css("width","calc(100% - "+ w +"px)")
+
                         $(".table-responsive thead tr").addClass("fix_table_thead_tr");
                         $(".table-responsive thead tr th").addClass("fix_table_thead_tr_th");
 

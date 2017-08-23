@@ -1460,7 +1460,7 @@ class LinklovingAppApi(http.Controller):
     @classmethod
     def model_convert_to_dict(cls,order_id, request, ):
         mrp_production = request.env['mrp.production'].sudo()
-        production = mrp_production.search([('id','=',order_id)], limit=1)
+        production = mrp_production.search([('id', '=', order_id)], limit=1)
 
         stock_move = request.env['sim.stock.move'].sudo().search_read([('id', 'in', production.sim_stock_move_lines.ids)],
                                                                       fields=['product_id',
@@ -2815,10 +2815,24 @@ class LinklovingAppApi(http.Controller):
         ######### 生产 新版接口  ###############
 
     # 备料完成
+    @http.route('/linkloving_app_api/new_finish_prepare_material', type='json', auth='none', csrf=False)
+    def new_finish_prepare_material(self, **kw):
+        order_id = request.jsonrequest.get('order_id')  # get paramter
+        mrp_production = request.env['mrp.production'].sudo().search([('id', '=', order_id)])[0]
+
+        # stock_moves = request.jsonrequest.get('stock_move') #get paramter
+        # stock_move_lines = request.env["sim.stock.move"].sudo()
+        mrp_production.write({'state': 'finish_prepare_material'})
+        # _logger.warning(u"charlie_0712_log10:finish, mo:%s", LinklovingAppApi.model_convert_to_dict(order_id, request))
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
+
+    # 备料
     @http.route('/linkloving_app_api/new_prepare_material', type='json', auth='none', csrf=False)
     def new_prepare_material(self, **kw):
         order_id = request.jsonrequest.get('order_id')  # get paramter
         mrp_production = request.env['mrp.production'].sudo().search([('id', '=', order_id)])[0]
+
 
         stock_moves = [request.jsonrequest.get('stock_move')] #get paramter
         # _logger.warning(u"charlie_0712_log:finish_prepare_material, mo:%s,moves:%s", mrp_production.name, stock_moves)
@@ -2837,15 +2851,24 @@ class LinklovingAppApi(http.Controller):
                 else:
                     continue
                 rounding = sim_stock_move.stock_moves[0].product_uom.rounding
-                if float_compare(move['quantity_ready'], sim_stock_move.stock_moves[0].product_uom_qty,
-                                 precision_rounding=rounding) > 0:
+                total_qty = move['quantity_ready'] + sim_stock_move.quantity_done
+                if float_compare(total_qty, sim_stock_move.product_uom_qty, precision_rounding=rounding) > 0:
+
+                    # if float_compare(move['quantity_ready'], sim_stock_move.stock_moves[0].product_uom_qty,
+                    #                  precision_rounding=rounding) > 0:
                     # _logger.warning(u"charlie_0712_log_1:move_qty:%s,move_id:%d,uom_qty:%s",
                     #                 str(move['quantity_ready']),
                     #                 sim_stock_move.stock_moves[0].id,
                     #                 str(sim_stock_move.stock_moves[0].product_uom_qty))
-
+                    # 如果已完成的数量大于等于需求数量,则生成的库存移动单的数量就是本次备料的数量
+                    if float_compare(sim_stock_move.quantity_done, sim_stock_move.product_uom_qty,
+                                     precision_rounding=rounding) >= 0:
+                        split_qty_unuom = move['quantity_ready']  # 未经过单位换算的数量
+                    else:
+                        # 如果已完成的数量大于等于需求数量,则是 总数量 - 需求数量
+                        split_qty_unuom = total_qty - sim_stock_move.product_uom_qty
                     qty_split = sim_stock_move.stock_moves[0].product_uom._compute_quantity(
-                            move['quantity_ready'] - sim_stock_move.stock_moves[0].product_uom_qty,
+                            split_qty_unuom,
                             sim_stock_move.stock_moves[0].product_id.uom_id)
                     # _logger.warning(u"charlie_0712_log_2:qty_split:%s,", str(qty_split))
                     split_move = sim_stock_move.stock_moves[0].copy(
@@ -2871,12 +2894,15 @@ class LinklovingAppApi(http.Controller):
                 else:
                     # _logger.warning(u"charlie_0712_log_8:move_qty:%s,uom_qty:%s", str(move['quantity_ready']),
                     #                 str(sim_stock_move.stock_moves[0].product_uom_qty))
+
                     sim_stock_move.stock_moves[0].quantity_done_store = move['quantity_ready']
                     sim_stock_move.stock_moves[0].quantity_done = move['quantity_ready']
                     sim_stock_move.stock_moves[0].action_done()
+
                     # _logger.warning(u"charlie_0712_log_9:len_move_raw_ids:%d",
                     #                 len(sim_stock_move.production_id.move_raw_ids))
                 sim_stock_move.quantity_ready = 0  # 清0
+                sim_stock_move.quantity_done = sim_stock_move.quantity_done + move['quantity_ready']
             # try:
             #     mrp_production.post_inventory()
             # except UserError, e:.filtered(lambda x: x.product_type != 'semi-finished')
@@ -2893,7 +2919,7 @@ class LinklovingAppApi(http.Controller):
             #             body=_("Qty:%d,Finish picking！") % (mrp_production.product_qty))
         except Exception, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={"error": e.name})
+                                              res_data={"error": e})
         # _logger.warning(u"charlie_0712_log10:finish, mo:%s", LinklovingAppApi.model_convert_to_dict(order_id, request))
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))

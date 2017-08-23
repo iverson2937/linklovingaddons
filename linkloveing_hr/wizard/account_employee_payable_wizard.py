@@ -44,7 +44,7 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
         total_amount = self.sheet_id.total_amount
         if not self.sheet_id:
             raise UserError(u'未找到报销单')
-        for payment_id in self.payment_ids:
+        for payment_id in sorted(self.payment_ids, key=lambda x: x.pre_payment_reminding):
             if total_amount:
                 line_id = self.env['account.employee.payment.line'].create({
                     'payment_id': payment_id.id,
@@ -52,7 +52,7 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
                     'amount': payment_id.pre_payment_reminding if payment_id.pre_payment_reminding <= total_amount else total_amount
                 })
                 total_amount -= line_id.amount
-        #报销单金额大于所以暂支单金额
+        # 报销单金额大于所以暂支单金额
         self.sheet_id.process()
         if total_amount > 0:
 

@@ -96,7 +96,9 @@ class LinklovingOAApi(http.Controller):
             "purchase_order_count": supplier_detail_object.purchase_order_count,  #订单数量
             "invoice": supplier_detail_object.supplier_invoice_count,  #对账
             "payment_count": supplier_detail_object.payment_count,   #付款申请
-            "put_in_storage": request.env['stock.picking'].sudo().search_count([('partner_id', '=', request.jsonrequest.get("id")),('state','=','waiting_in')]),   #入库
+            "put_in_storage": request.env['stock.picking'].sudo().search_count(
+                    [('partner_id', '=', request.jsonrequest.get("id")), ('state', '=', 'waiting_in')]),
+            # 入库
         }
         return supplier_details
 
