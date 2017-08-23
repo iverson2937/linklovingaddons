@@ -2822,7 +2822,9 @@ class LinklovingAppApi(http.Controller):
 
         # stock_moves = request.jsonrequest.get('stock_move') #get paramter
         # stock_move_lines = request.env["sim.stock.move"].sudo()
-        mrp_production.write({'state': 'finish_prepare_material'})
+        # mrp_production.write({'state': 'finish_prepare_material'})
+        mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'already_picking',
+                                                                               'picking_material_date': fields.datetime.now()})
         # _logger.warning(u"charlie_0712_log10:finish, mo:%s", LinklovingAppApi.model_convert_to_dict(order_id, request))
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
