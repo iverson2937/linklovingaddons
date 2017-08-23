@@ -326,7 +326,8 @@ class StockPicking(models.Model):
     def _compute_attachment_img_count(self):
         for attachment_one in self:
             attachment_one.attachment_img_count = len(
-                self.env['ir.attachment'].search(['&', ('res_id', '=', attachment_one.id), ('name', 'ilike', '物流')]))
+                # self.env['ir.attachment'].search(['&', ('res_id', '=', attachment_one.id), ('name', 'ilike', '物流')]))
+                self.env['ir.attachment'].search([('res_id', '=', attachment_one.id)]))
             attachment_one.qc_img_count = len(
                 self.env['ir.attachment'].search(['&', ('res_id', '=', attachment_one.id), ('name', 'ilike', '品检')]))
 
@@ -337,7 +338,11 @@ class StockPicking(models.Model):
         action = self.env.ref('base.action_attachment').read()[0]
         # action['domain'] = [('partner_img_id', 'in', self.ids)]
         # action['domain'] = [('res_id', 'in', self.ids)]
-        action['domain'] = ['&', ('res_id', 'in', self.ids), ('name', 'ilike', type_btn)]
+
+        action['domain'] = [('res_id', 'in', self.ids)]
+
+        if type_btn == "":
+            action['domain'] = ['&', ('res_id', 'in', self.ids), ('name', 'ilike', type_btn)]
 
         return action
 
