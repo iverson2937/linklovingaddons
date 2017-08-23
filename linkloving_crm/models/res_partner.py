@@ -107,6 +107,8 @@ class ResPartner(models.Model):
                 if vals.get('user_id'):
                     vals['public_partners'] = 'private'
                     vals['old_user_id'] = vals.get('user_id')
+                else:
+                    vals['public_partners'] = 'public'
 
         return super(ResPartner, self).create(vals)
 
