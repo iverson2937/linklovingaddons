@@ -1304,6 +1304,7 @@ class LinklovingAppApi(http.Controller):
                 obj = request.env['return.material.line'].sudo().create({
                     'return_qty': l['return_qty'],
                     'product_id': product_id,
+                    'product_type': l['product_type'],
                 })
                 return_lines.append(obj.id)
             return_material_model = request.env['mrp.return.material']
@@ -1369,6 +1370,7 @@ class LinklovingAppApi(http.Controller):
                 'product_tmpl_id': return_line.product_id.id,
                 'product_id': return_line.product_id.display_name,
                 'return_qty': return_line.return_qty,
+                'product_type': return_line.product_type,
             }
             data.append(dic)
         return JsonResponse.send_response(STATUS_CODE_OK,
