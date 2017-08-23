@@ -214,7 +214,9 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             var target = e.target || e.srcElement;
             console.log($(target).parents(".tab_pane_display").children(".tab_message_display"));
             $(target).parents(".tab_pane_display").children(".tab_message_display").prepend("<div class='document_modify_name'>新修改的文件：<span>" + target.files[0].name + "</span></div>");
-            $(".document_modify span").val(target.files[0].name);
+            if (target.files){
+                $(".document_modify span").val(target.files[0].name);
+            }
             var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
             console.log(new_file_id);
             console.log(target.files[0]);
@@ -224,9 +226,13 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             reader.readAsDataURL(new_file);
             reader.onload = function () {
                 var encoded_file = reader.result;
-                var result = btoa(encoded_file);
+                var position = encoded_file.indexOf("base64,");
+                if (position > -1){
+                    encoded_file = encoded_file.slice(position + "base64,".length);
+                }
+                // var result = btoa(encoded_file);
                 return new Model("product.attachment.info")
-                    .call("update_attachment", [parseInt(new_file_id)], {file_binary: result, file_name: new_file.name})
+                    .call("update_attachment", [parseInt(new_file_id)], {file_binary: encoded_file, file_name: new_file.name})
                     .then(function (result) {
                     })
             };
