@@ -112,8 +112,8 @@
                                 <field name="attachment_number" string=" "/>
                                 <button name="action_get_attachment_view" string="View Attachments" type="object"
                                         icon="fa-paperclip"/>
-                                <field name="analytic_account_id" string="项目"/>
-                                <field name="sale_id" string="订单"/>
+                                <field name="analytic_account_id" string="项目" options="{'no_create':True}"/>
+                                <field name="sale_id" string="订单" options="{'no_create':True}"/>
                                 <field name="quantity" groups="account.group_account_user"/>
                                 <field name="tax_ids" widget="many2many_tags"/>
                                 <field name="name"/>
