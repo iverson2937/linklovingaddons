@@ -71,10 +71,21 @@
 
                 <xpath expr="//button[@name='open_website_url']" position="before">
 
+
                     <button type="object"
                             name="stock_img_count"
                             class="oe_stat_button"
                             icon="fa-photo fa-image fa-picture-o"
+                            context="{'type_btn':'品检'}"
+                            attrs="" groups="">
+                        <field name="qc_img_count" widget="statinfo" string="品检信息"/>
+                    </button>
+
+                    <button type="object"
+                            name="stock_img_count"
+                            class="oe_stat_button"
+                            icon="fa-photo fa-image fa-picture-o"
+                            context="{'type_btn':'物流'}"
                             attrs="" groups="">
                         <field name="attachment_img_count" widget="statinfo" string="物流信息"/>
                     </button>
@@ -276,7 +287,8 @@
                                         </div>
                                         <div t-if="record.type.raw_value == 'binary'">
 
-                                            <a t-attf-href="/payment/order_status_show?pidsss=#{record.id.value}" target="_blank">
+                                            <a t-attf-href="/payment/order_status_show?pidsss=#{record.id.value}"
+                                               target="_blank">
                                                 <!--<a t-attf-href="/web/content/#{record.id.value}">-->
                                                 <t t-set="webimage"
                                                    t-value="new RegExp('image.*(gif|jpeg|jpg|png)').test(record.mimetype.value)"/>
@@ -297,36 +309,36 @@
 
                     <!--<templates>-->
 
-                        <!--<t t-name="kanban-box">-->
-                            <!--<div class="oe_kanban_global_click_ss o_kanban_view_ss">-->
-                                <!--<div class="oe_kanban_vignette">-->
-                                    <!--<div class="oe_attachment">-->
-                                        <!--<div class="oe_name">-->
-                                            <!--<field name="name" widget="kanban_ss"/>-->
+                    <!--<t t-name="kanban-box">-->
+                    <!--<div class="oe_kanban_global_click_ss o_kanban_view_ss">-->
+                    <!--<div class="oe_kanban_vignette">-->
+                    <!--<div class="oe_attachment">-->
+                    <!--<div class="oe_name">-->
+                    <!--<field name="name" widget="kanban_ss"/>-->
 
-                                            <!--<a t-attf-href="/payment/order_status_show?pidsss=#{record.id.value}">加载页面-->
-                                            <!--</a>-->
+                    <!--<a t-attf-href="/payment/order_status_show?pidsss=#{record.id.value}">加载页面-->
+                    <!--</a>-->
 
-                                        <!--</div>-->
-                                        <!--<div t-if="record.type.raw_value == 'binary'">-->
+                    <!--</div>-->
+                    <!--<div t-if="record.type.raw_value == 'binary'">-->
 
-                                            <!--<a t-attf-href="/web/content/#{record.id.value}" target="_blank">-->
-                                                <!--&lt;!&ndash;<a t-attf-href="/web/content/#{record.id.value}">&ndash;&gt;-->
-                                                <!--<t t-set="webimage"-->
-                                                   <!--t-value="new RegExp('image.*(gif|jpeg|jpg|png)').test(record.mimetype.value)"/>-->
-                                                <!--<div t-if="!webimage" class="o_image"-->
-                                                     <!--t-att-data-mimetype="record.mimetype.value"/>-->
-                                                <!--<div t-if="webimage" class="o_kanban_attachment_image">-->
-                                                    <!--<img t-attf-src="/web/image/#{record.id.value}"-->
-                                                         <!--style="height:10px;weight:10px;"/>-->
-                                                <!--</div>-->
-                                            <!--</a>-->
+                    <!--<a t-attf-href="/web/content/#{record.id.value}" target="_blank">-->
+                    <!--&lt;!&ndash;<a t-attf-href="/web/content/#{record.id.value}">&ndash;&gt;-->
+                    <!--<t t-set="webimage"-->
+                    <!--t-value="new RegExp('image.*(gif|jpeg|jpg|png)').test(record.mimetype.value)"/>-->
+                    <!--<div t-if="!webimage" class="o_image"-->
+                    <!--t-att-data-mimetype="record.mimetype.value"/>-->
+                    <!--<div t-if="webimage" class="o_kanban_attachment_image">-->
+                    <!--<img t-attf-src="/web/image/#{record.id.value}"-->
+                    <!--style="height:10px;weight:10px;"/>-->
+                    <!--</div>-->
+                    <!--</a>-->
 
-                                        <!--</div>-->
-                                    <!--</div>-->
-                                <!--</div>-->
-                            <!--</div>-->
-                        <!--</t>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--</t>-->
 
 
                     <!--</templates>-->

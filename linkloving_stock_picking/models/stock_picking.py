@@ -54,8 +54,8 @@ class StockPicking(models.Model):
             lot_param = None
             if op:
                 op.sorted(
-                        key=lambda x: ((x.package_id and not x.product_id) and -4 or 0) + (x.package_id and -2 or 0) + (
-                            x.pack_lot_ids and -1 or 0))
+                    key=lambda x: ((x.package_id and not x.product_id) and -4 or 0) + (x.package_id and -2 or 0) + (
+                        x.pack_lot_ids and -1 or 0))
                 for ops in op:
                     # TDE FIXME: this code seems to be in action_done, isn't it ?
                     # first try to find quants based on specific domains given by linked operations for the case where we want to rereserve according to existing pack operations
@@ -102,7 +102,6 @@ class StockPicking(models.Model):
         elif removal_strategy == 'lifo':
             return 'in_date desc, id desc'
         raise UserError(_('Removal strategy %s not implemented.') % (removal_strategy,))
-
 
     @api.multi
     def unlink(self):
@@ -273,7 +272,7 @@ class StockPicking(models.Model):
                 if move.state in ["cancel", "done"]:
                     continue
                 sum_reserve_qty = sum(total_quants_qty.get(move.id).mapped("qty")) if total_quants_qty.get(
-                        move.id) else 0
+                    move.id) else 0
                 if move.product_id.qty_available - sum_reserve_qty >= move.product_uom_qty:
                     is_available.append(True)
                 else:
@@ -305,7 +304,6 @@ class StockPicking(models.Model):
                     #         available_rate = 0
                     #     picking.available_rate = available_rate
 
-
     @api.multi
     def is_start_prepare(self):
         picking_un_start_prepare = self.env["stock.picking"]
@@ -322,18 +320,25 @@ class StockPicking(models.Model):
                 picking_contain += pick
         return picking_contain
 
-    attachment_img_count = fields.Integer(compute='_compute_attachment_img_count', string=u'物流照片')
+    attachment_img_count = fields.Integer(compute='_compute_attachment_img_count', string=u'物流信息')
+    qc_img_count = fields.Integer(compute='_compute_attachment_img_count', string=u'品检信息')
 
     def _compute_attachment_img_count(self):
         for attachment_one in self:
             attachment_one.attachment_img_count = len(
-                self.env['ir.attachment'].search([('res_id', '=', attachment_one.id)]))
+                self.env['ir.attachment'].search(['&', ('res_id', '=', attachment_one.id), ('name', 'ilike', '物流')]))
+            attachment_one.qc_img_count = len(
+                self.env['ir.attachment'].search(['&', ('res_id', '=', attachment_one.id), ('name', 'ilike', '品检')]))
 
     @api.multi
     def stock_img_count(self):
+
+        type_btn = self._context.get('type_btn', False)
         action = self.env.ref('base.action_attachment').read()[0]
         # action['domain'] = [('partner_img_id', 'in', self.ids)]
-        action['domain'] = [('res_id', 'in', self.ids)]
+        # action['domain'] = [('res_id', 'in', self.ids)]
+        action['domain'] = ['&', ('res_id', 'in', self.ids), ('name', 'ilike', type_btn)]
+
         return action
 
 
