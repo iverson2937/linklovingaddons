@@ -1,0 +1,78 @@
+<odoo>
+    <data>
+
+        <record id="action_stock_transfer" model="ir.actions.act_window">
+            <field name="name">物料转换</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">stock.transfer</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    添加单据
+                </p>
+                <p>
+
+                </p>
+            </field>
+        </record>
+
+        <record id="stock_transfer_form" model="ir.ui.view">
+            <field name="name">物料转换</field>
+            <field name="model">stock.transfer</field>
+            <field name="inherit_id" ref="base.view_partner_tree"/>
+            <field name="arch" type="xml">
+                <form>
+
+                    <header>
+                        <button name="confirm" states="draft" string="确认" type="object" state="draft"
+                                class="oe_highlight" groups="stock.group_stock_manager"/>
+                        <button name="confirm_transfer" states="confirm" string="库存转换" type="object"
+                                class="oe_highlight" groups="stock.group_stock_manager"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" placeholder="名称"/>
+                            </h1>
+                        </div>
+
+                        <notebook attrs="{'invisible':[('state','=','draft')]}">
+                            <page string="消耗物料">
+
+                                <field name="input_product_ids" string="Inventory Details"
+                                       attrs="{'readonly': [('state', '=', 'done')]}">
+                                    <tree string="Inventory Details" editable="bottom"
+                                          context="{'default_product_type':'input'}">
+                                        <field name="product_id" domain="[('type','=','product')]"
+                                               options="{'no_create':True}"/>
+                                        <field name="product_qty"/>
+                                        <field name="product_type" invisible="1"/>
+                                    </tree>
+                                </field>
+
+                            </page>
+                            <page string="生成物料" attrs="{'readonly': [('state', '=', 'done')]}">
+                                <field name="output_product_ids" context="{'default_product_type':'output'}">
+                                    <tree string="Stock Moves">
+                                        <field name="product_id" options="{'no_create':True}"/>
+                                        <field name="product_qty"/>
+                                        <field name="product_type" invisible="1"/>
+
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+
+                </form>
+
+
+            </field>
+        </record>
+
+    </data>
+</odoo>
