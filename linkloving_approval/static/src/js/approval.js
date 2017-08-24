@@ -3,13 +3,21 @@
  */
 odoo.define('linkloving_approval.approval_core', function (require) {
     "use strict";
-
+    var data_manager = require('web.data_manager');
     var core = require('web.core');
     var Model = require('web.Model');
     var Widget = require('web.Widget');
     var Pager = require('web.Pager');
     var ListView = require('web.ListView');
     var Dialog = require('web.Dialog');
+    var data = require('web.data');
+    var pyeval = require('web.pyeval');
+
+
+    var ViewManager = require('web.ViewManager');
+
+    var SearchView = require('web.SearchView');
+
     var QWeb = core.qweb;
     var _t = core._t;
     var framework = require('web.framework');
@@ -25,6 +33,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             'click .download_file': 'document_download_fn',
             'click .document_modify_2': 'document_modify_2_fn',
         },
+
         document_modify_2_fn: function (e) {
             var self = this;
             var e = e || window.event;
@@ -76,7 +85,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                 remote_path[0] = '';
             }
             console.log(remote_path)
-             if (type == 'OTHER' || type == 'DESIGN') {
+            if (type == 'OTHER' || type == 'DESIGN') {
                 $.ajax({
                     type: "GET",
                     url: "http://localhost:8088/downloadfile?remotefile=" + remote_path,
@@ -97,7 +106,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                     }
                 })
             } else {
-               window.location.href = '/download_file/?download=true&id=' + new_file_id;
+                window.location.href = '/download_file/?download=true&id=' + new_file_id;
 
             }
         },
@@ -158,27 +167,21 @@ odoo.define('linkloving_approval.approval_core', function (require) {
         document_modify_fn: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
-            // console.log($(target).parents(".tab_pane_display").children(".tab_message_display"));
+            console.log($(target).parents(".tab_pane_display").children(".tab_message_display"));
             $(target).parents(".tab_pane_display").children(".tab_message_display").prepend("<div class='document_modify_name'>新修改的文件：<span>" + target.files[0].name + "</span></div>");
-            if (target.files){
-                $(".document_modify span").val(target.files[0].name);
-            }
+            $(".document_modify span").val(target.files[0].name);
             var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
-            // console.log(new_file_id);
-            // console.log(target.files[0]);
+            console.log(new_file_id);
+            console.log(target.files[0]);
             var new_file = target.files[0];
 
             var reader = new FileReader();
             reader.readAsDataURL(new_file);
             reader.onload = function () {
                 var encoded_file = reader.result;
-                var position = encoded_file.indexOf("base64,");
-                if (position > -1){
-                    encoded_file = encoded_file.slice(position + "base64,".length);
-                }
-                // var result = btoa(encoded_file);
+                var result = btoa(encoded_file);
                 return new Model("product.attachment.info")
-                    .call("update_attachment", [parseInt(new_file_id)], {file_binary: encoded_file, file_name: new_file.name})
+                    .call("update_attachment", [parseInt(new_file_id)], {file_binary: result, file_name: new_file.name})
                     .then(function (result) {
                     })
             };
@@ -225,7 +228,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             var self = this;
             var e = e || window.event;
             self.flag = 1;
-            self.begin=1;
+            self.begin = 1;
             var target = e.target || e.srcElement;
             var approval_type = $(target).attr("data");
             // console.log(approval_type);
@@ -249,32 +252,139 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             }
             //分页
             this.pager = null;
+            this.registry = core.view_registry;
+        },
+
+
+        setup_search_view: function () {
+            var self = this;
+            if (this.searchview) {
+                this.searchview.destroy();
+            }
+
+            var search_defaults = {};
+            // var context = this.action.context || [];
+            // _.each(context, function (value, key) {
+            //     var match = /^search_default_(.*)$/.exec(key);
+            //     if (match) {
+            //         search_defaults[match[1]] = value;
+            //     }
+            // });
+
+            var options = {
+                hidden: true,
+                disable_custom_filters: true,
+                $buttons: $("<div>"),
+                action: this.action,
+                search_defaults: search_defaults,
+            };
+            self.dataset = new data.DataSetSearch(this, "product.attachment.info", {}, false);
+            $.when(self.load_views()).done(function () {
+                // Instantiate the SearchView, but do not append it nor its buttons to the DOM as this will
+                // be done later, simultaneously to all other ControlPanel elements
+                self.searchview = new SearchView(self, self.dataset, self.search_fields_view, options);
+                var $node1 = $('<div/>').addClass('approval_searchview')
+                $(".approval_page_container").prepend($node1);
+                self.searchview.on('search_data', self, self.search.bind(self));
+                $.when(self.searchview.appendTo($node1)).done(function () {
+                    self.searchview_elements = {};
+                    self.searchview_elements.$searchview = self.searchview.$el;
+                    self.searchview_elements.$searchview_buttons = self.searchview.$buttons.contents();
+                    self.searchview.do_show();
+                });
+            });
+
+        },
+        load_views: function (load_fields) {
+            var self = this;
+            var views = [];
+            _.each(this.views, function (view) {
+                if (!view.fields_view) {
+                    views.push([view.view_id, view.type]);
+                }
+            });
+            var options = {
+                load_fields: load_fields,
+            };
+            if (!this.search_fields_view) {
+                options.load_filters = true;
+                views.push([false, 'search']);
+            }
+            return data_manager.load_views(this.dataset, views, options).then(function (fields_views) {
+                _.each(fields_views, function (fields_view, view_type) {
+                    if (view_type === 'search') {
+                        self.search_fields_view = fields_view;
+                    } else {
+                        self.views[view_type].fields_view = fields_view;
+                    }
+                });
+            });
+        },
+        search: function (domains, contexts, groupbys) {
+            var self = this;
+
+            var res_model = 'product.attachment.info';
+
+
+            // var approval_type = 'waiting_submit';
+            var approval_type = $("#approval_tab").attr("data-now-tab");
+            console.log($("#approval_tab").attr("data-now-tab"));
+
+            var own = this;
+
+
+            var model = new Model("approval.center");
+            model.call("create", [{res_model: res_model, type: approval_type}])
+                .then(function (result) {
+                    model.call('get_attachment_info_by_types', [result], {
+                        offset: own.begin - 1,
+                        limit: own.limit,
+                        domains: domains,
+                        contexts: contexts,
+                        groupbys: groupbys
+                    })
+                        .then(function (result) {
+                            console.log(result);
+                            own.length = result.length;
+                            self.$("#" + approval_type).html("");
+                            self.$("#" + approval_type).append(QWeb.render('approval_tab_content', {
+                                result: result.records,
+                                approval_type: approval_type
+                            }));
+                            own.render_pager(this);
+                        })
+                })
+
+
         },
         render_pager: function () {
             if (this.flag == 1) {
-                if($(".approval_pagination")){
+                if ($(".approval_pagination")) {
                     $(".approval_pagination").remove()
                 }
                 var $node = $('<div/>').addClass('approval_pagination').appendTo($("#approval_tab"));
                 // if (!this.pager) {
-                    this.pager = new Pager(this, this.length, this.begin, this.limit);
-                    this.pager.appendTo($node);
+                this.pager = new Pager(this, this.length, this.begin, this.limit);
+                this.pager.appendTo($node);
 
-                    this.pager.on('pager_changed', this, function (new_state) {
-                        var self = this;
-                        var limit_changed = (this._limit !== new_state.limit);
 
-                        this._limit = new_state.limit;
-                        this.current_min = new_state.current_min;
-                        self.reload_content(this).then(function () {
-                            // if (!limit_changed) {
-                            self.$el.animate({"scrollTop": "0px"}, 100);
-                            // $(".approval_page_container").offset({ top: 50})
-                            // this.set_scrollTop(0);
-                            // this.trigger_up('scrollTo', {offset: 0});
-                            // }
-                        });
+                this.setup_search_view();
+
+                this.pager.on('pager_changed', this, function (new_state) {
+                    var self = this;
+                    var limit_changed = (this._limit !== new_state.limit);
+
+                    this._limit = new_state.limit;
+                    this.current_min = new_state.current_min;
+                    self.reload_content(this).then(function () {
+                        // if (!limit_changed) {
+                        self.$el.animate({"scrollTop": "0px"}, 100);
+                        // $(".approval_page_container").offset({ top: 50})
+                        // this.set_scrollTop(0);
+                        // this.trigger_up('scrollTo', {offset: 0});
+                        // }
                     });
+                });
                 // }
                 this.flag = 2;
             }
@@ -295,7 +405,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             var model = new Model("approval.center");
             model.call("create", [{res_model: res_model, type: approval_type}])
                 .then(function (result) {
-                    model.call('get_attachment_info_by_type', [result], {offset: own.begin-1, limit: own.limit})
+                    model.call('get_attachment_info_by_type', [result], {offset: own.begin - 1, limit: own.limit})
                         .then(function (result) {
                             console.log(result);
                             own.length = result.length;

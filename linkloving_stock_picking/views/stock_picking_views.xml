@@ -83,7 +83,7 @@
                             name="stock_img_count"
                             class="oe_stat_button"
                             icon="fa-photo fa-image fa-picture-o"
-                            context="{'type_btn':'品检'}"
+                            context="{'type_btn':'Inspection'}"
                             attrs="" groups="">
                         <field name="qc_img_count" widget="statinfo" string="品检信息"/>
                     </button>
@@ -92,7 +92,7 @@
                             name="stock_img_count"
                             class="oe_stat_button"
                             icon="fa-photo fa-image fa-picture-o"
-                            context="{'type_btn':'物流'}"
+                            context="{'type_btn':'Logistical'}"
                             attrs="" groups="">
                         <field name="attachment_img_count" widget="statinfo" string="物流信息"/>
                     </button>

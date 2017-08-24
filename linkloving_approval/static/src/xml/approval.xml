@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <templates xml:space="preserve">
+
+
     <t t-name="approval_load_page">
-        <div class="approval_page_container">
+
+        <div class="approval_page_container" style="top:60px;">
 
         </div>
     </t>
