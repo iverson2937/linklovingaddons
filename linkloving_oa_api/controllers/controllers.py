@@ -1107,3 +1107,19 @@ class LinklovingOAApi(http.Controller):
                 'tax_id': [(6, 0, [int(data.get('tax'))])]
             }) for p in data.get('productions')]
         })
+
+    #取消订单的接口
+    @http.route('/linkloving_oa_api/cancel_order', type='json', auth="none", csrf=False, cors='*')
+    def cancel_order(self, *kw):
+        order_id = request.jsonrequest.get("id")
+        cancel_order = request.env["sale.order"].sudo().browse(order_id)
+        cancel_order.action_cancel()
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success":1})
+
+    # 确认销售的接口
+    @http.route('/linkloving_oa_api/confirm_order', type='json', auth="none", csrf=False, cors='*')
+    def order_confirm(self, *kw):
+        order_id = request.jsonrequest.get("id")
+        confirm_order = request.env["sale.order"].sudo().browse(order_id)
+        confirm_order.action_confirm()
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})

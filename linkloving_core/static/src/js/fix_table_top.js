@@ -23,6 +23,7 @@ odoo.define('linkloving_core.TreeView', function (require) {
                 // numberChange("o_list_number");
                 if(settings.url == '/web/dataset/search_read'){
                         if($(".modal-content").length>=1 || $(".o_treeview_table").length>=1){
+
                             return;
                         }
 
@@ -78,8 +79,12 @@ odoo.define('linkloving_core.TreeView', function (require) {
                                         xs.push(s[j]);
                                     }
                                 }
-                                $(this).append('<span class="zs">'+ zs.join("") +'.</span>');
-                                $(this).append('<span class="xs">'+ xs.join("") +'</span>');
+                                if($(this).parents("tr").find($("td[data-field='uom_id']")).html() == "PCS"){
+                                    $(this).append('<span class="zs">'+ zs.join("") +'</span>');
+                                }else {
+                                    $(this).append('<span class="zs">'+ zs.join("") +'.</span>');
+                                    $(this).append('<span class="xs">'+ xs.join("") +'</span>');
+                                }
                                 break;
                             }
                         }
