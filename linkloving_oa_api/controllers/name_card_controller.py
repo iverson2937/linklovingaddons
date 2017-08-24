@@ -6,7 +6,7 @@ from odoo.http import request
 STATUS_OK = 1
 STATUS_ERROR = -1
 class NameCardController(http.Controller):
-    @http.route('/linkloving_oa_api/get_company_by_id/', auth='none', type='json')
+    @http.route('/linkloving_oa_api/get_company_by_id/', auth='none', type='json', csrf=False, cors='*')
     def get_company_by_id(self, **kwargs):
         # db = request.jsonrequest["db"]
         company_id = request.jsonrequest.get("company_id")
@@ -62,7 +62,7 @@ class NameCardController(http.Controller):
                 })
             return partner_json
 
-    @http.route('/linkloving_oa_api/get_company_by_name/', auth='none', type='json')
+    @http.route('/linkloving_oa_api/get_company_by_name/', auth='none', type='json', csrf=False, cors='*')
     def get_company_by_name(self, **kwargs):
         # db = request.jsonrequest["db"]
         name = request.jsonrequest.get("name")
@@ -85,7 +85,7 @@ class NameCardController(http.Controller):
                 })
             return json_list
 
-    @http.route('/linkloving_oa_api/add_partners/', auth='none', type='json')
+    @http.route('/linkloving_oa_api/add_partners/', auth='none', type='json', csrf=False, cors='*')
     def add_partners(self, **kwargs):
         partners = request.jsonrequest.get("partners")
         for partner in partners:
@@ -189,7 +189,7 @@ class NameCardController(http.Controller):
                 })
 
 
-    @http.route('/linkloving_oa_api/add_partner/', auth='none', type='json')
+    @http.route('/linkloving_oa_api/add_partner/', auth='none', type='json', csrf=False, cors='*')
     def add_partner(self, **kwargs):
         name = request.jsonrequest.get("name")
         company_real_name = company_name = request.jsonrequest.get("company_name")
@@ -280,7 +280,7 @@ class NameCardController(http.Controller):
             })
         return True
 
-    @http.route('/linkloving_oa_api/get_saleman_list/', auth='none', type='json')
+    @http.route('/linkloving_oa_api/get_saleman_list/', auth='none', type='json', csrf=False, cors='*')
     def get_saleman_list(self, **kwargs):
         sources = request.env["res.users"].sudo().search([])
         json_list = []
@@ -290,7 +290,7 @@ class NameCardController(http.Controller):
                      "name": src.name or ''})
         return json_list
 
-    @http.route('/linkloving_oa_api/get_saleteam_list/', auth='none', type='json')
+    @http.route('/linkloving_oa_api/get_saleteam_list/', auth='none', type='json', csrf=False, cors='*')
     def get_saleteam_list(self, **kwargs):
         sources = request.env["crm.team"].sudo().search([])
         json_list = []
@@ -300,7 +300,7 @@ class NameCardController(http.Controller):
                      "name": src.name or ''})
         return json_list
 
-    @http.route('/linkloving_oa_api/get_partner_tag_list/', auth='none', type='json')
+    @http.route('/linkloving_oa_api/get_partner_tag_list/', auth='none', type='json', csrf=False, cors='*')
     def get_partner_tag_list(self, **kwargs):
         sources = request.env["res.partner.category"].sudo().search([])
         json_list = []
@@ -310,7 +310,7 @@ class NameCardController(http.Controller):
                      "name": src.name or ''})
         return json_list
 
-    @http.route('/linkloving_oa_api/get_origins/', auth='none', type='json')
+    @http.route('/linkloving_oa_api/get_origins/', auth='none', type='json', csrf=False, cors='*')
     def ll_get_origins(self, **kwargs):
         sources = request.env["crm.lead.source"].sudo().search([])
         json_list = []
@@ -320,7 +320,7 @@ class NameCardController(http.Controller):
                      "name": src.name or ''})
         return json_list
 
-    @http.route('/linkloving_oa_api/get_sources/', auth='none', type='json')
+    @http.route('/linkloving_oa_api/get_sources/', auth='none', type='json', csrf=False, cors='*')
     def get_sources(self, **kwargs):
         sources = request.env["res.partner.source"].sudo().search([])
         json_list = []
@@ -330,7 +330,7 @@ class NameCardController(http.Controller):
                      "name": src.name or ''})
         return json_list
 
-    @http.route('/linkloving_oa_api/get_countries/', auth='none', type='json')
+    @http.route('/linkloving_oa_api/get_countries/', auth='none', type='json', csrf=False, cors='*')
     def get_countries(self, **kwargs):
         sources = request.env["res.country"].sudo().search([])
         json_list = []
@@ -340,7 +340,7 @@ class NameCardController(http.Controller):
                      "name": src.name or ''})
         return json_list
 
-    @http.route('/linkloving_oa_api/get_product_series/', auth='none', type='json')
+    @http.route('/linkloving_oa_api/get_product_series/', auth='none', type='json', csrf=False, cors='*')
     def get_product_series(self, **kwargs):
         sources = request.env["crm.product.series"].sudo().search([])
         json_list = []
