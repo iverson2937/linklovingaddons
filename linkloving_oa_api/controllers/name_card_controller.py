@@ -183,7 +183,7 @@ class NameCardController(http.Controller):
                 "type": me.get("type"),
                 "user_id": saleman_id,
             })
-            if type == 'contact':
+            if me.get("type") == 'contact':
                 s.write({
                     "function": me.get("job_title"),
                 })
