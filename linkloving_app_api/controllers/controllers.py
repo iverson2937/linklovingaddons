@@ -323,9 +323,9 @@ class LinklovingAppApi(http.Controller):
         one_days_after = datetime.timedelta(days=1)
         today_time = fields.datetime.strptime(fields.datetime.strftime(date_to_show, '%Y-%m-%d'),
                                               '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
-        locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
-        location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
-        location_domain = locations.ids + location_cir
+        # locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
+        # location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
+        # location_domain = locations.ids + location_cir
         after_day = today_time + one_days_after
         order_delay = request.env["mrp.production"].sudo().read_group(
                 [('date_planned_start', '<', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
@@ -333,7 +333,8 @@ class LinklovingAppApi(http.Controller):
                  ('state', 'in', ['waiting_material', 'prepare_material_ing']),
 
                  ('process_id', '=', process_id),
-                 ('location_ids', 'in', location_domain)]
+                 # ('location_ids', 'in', location_domain)
+                 ]
                 , fields=["date_planned_start"],
                 groupby=["date_planned_start"])
 
@@ -341,21 +342,24 @@ class LinklovingAppApi(http.Controller):
                   ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                   ('state', 'in', ['waiting_material', 'prepare_material_ing']),
                   ('process_id', '=', process_id),
-                  ('location_ids', 'in', location_domain)]
+                  # ('location_ids', 'in', location_domain)
+                  ]
         today_time = today_time + one_days_after
         after_day = after_day + one_days_after
         domain_tommorrow = [('date_planned_start', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
                             ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                             ('state', 'in', ['waiting_material', 'prepare_material_ing']),
                             ('process_id', '=', process_id),
-                            ('location_ids', 'in', location_domain)]
+                            # ('location_ids', 'in', location_domain)
+                            ]
         today_time = today_time + one_days_after
         after_day = after_day + one_days_after
         domain_after_day = [('date_planned_start', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
                             ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                             ('state', 'in', ['waiting_material', 'prepare_material_ing']),
                             ('process_id', '=', process_id),
-                            ('location_ids', 'in', location_domain)]
+                            # ('location_ids', 'in', location_domain)
+                            ]
 
         order_today = request.env["mrp.production"].sudo().read_group(domain, fields=["date_planned_start"],
                                                                       groupby=["date_planned_start"])
@@ -395,9 +399,9 @@ class LinklovingAppApi(http.Controller):
         one_days_after = datetime.timedelta(days=1)
         today_time = fields.datetime.strptime(fields.datetime.strftime(date_to_show, '%Y-%m-%d'),
                                               '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
-        locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
-        location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
-        location_domain = locations.ids + location_cir
+        # locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
+        # location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
+        # location_domain = locations.ids + location_cir
 
         after_day = today_time + one_days_after
         after_2_day = after_day + one_days_after
@@ -410,7 +414,8 @@ class LinklovingAppApi(http.Controller):
                      ('state', 'in', ['waiting_material', 'prepare_material_ing']),
 
                      ('process_id', '=', process_id),
-                     ('location_ids', 'in', location_domain)]
+                     # ('location_ids', 'in', location_domain)
+                     ]
                     , fields=["date_planned_start"],
                     groupby=["date_planned_start"])
 
@@ -418,18 +423,21 @@ class LinklovingAppApi(http.Controller):
                       ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                       ('state', 'in', ['waiting_material', 'prepare_material_ing']),
                       ('process_id', '=', process_id),
-                      ('location_ids', 'in', location_domain)]
+                      # ('location_ids', 'in', location_domain)
+                      ]
 
             domain_tommorrow = [('date_planned_start', '>', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                                 ('date_planned_start', '<', (after_2_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                                 ('state', 'in', ['waiting_material', 'prepare_material_ing']),
                                 ('process_id', '=', process_id),
-                                ('location_ids', 'in', location_domain)]
+                                # ('location_ids', 'in', location_domain)
+                                ]
             domain_after_day = [('date_planned_start', '>', (after_2_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                                 ('date_planned_start', '<', (after_3_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                                 ('state', 'in', ['waiting_material', 'prepare_material_ing']),
                                 ('process_id', '=', process_id),
-                                ('location_ids', 'in', location_domain)]
+                                # ('location_ids', 'in', location_domain)
+                                ]
 
             order_today = request.env["mrp.production"].sudo().read_group(domain, fields=["date_planned_start"],
                                                                           groupby=["date_planned_start"])
@@ -473,7 +481,7 @@ class LinklovingAppApi(http.Controller):
         today_time, timez = LinklovingAppApi.get_today_time_and_tz()
         today_time = fields.datetime.strptime(fields.datetime.strftime(today_time, '%Y-%m-%d'),
                                               '%Y-%m-%d')
-        locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
+        # locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
 
         if date_to_show != "delay":
             today_time = fields.datetime.strptime(date_to_show, '%Y-%m-%d')
@@ -481,8 +489,8 @@ class LinklovingAppApi(http.Controller):
         one_millisec_before = datetime.timedelta(milliseconds=1)  #
         today_time = today_time - one_millisec_before  # 今天的最后一秒
         after_day = today_time + one_days_after
-        location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
-        location_domain = locations.ids + location_cir
+        # location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
+        # location_domain = locations.ids + location_cir
         if not process_id:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "未找到工序id"})
 
@@ -490,14 +498,16 @@ class LinklovingAppApi(http.Controller):
             domain = [('date_planned_start', '<', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
                       ('state', 'in', ['waiting_material', 'prepare_material_ing']),
                       ('process_id', '=', process_id),
-                      ('location_ids', 'in', location_domain)]
+                      # ('location_ids', 'in', location_domain)
+                      ]
         else:
             domain = [
             ('date_planned_start', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
             ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
                 ('state', 'in', ['waiting_material', 'prepare_material_ing']),
                 ('process_id', '=', process_id),
-                ('location_ids', 'in', location_domain)]
+                # ('location_ids', 'in', location_domain)
+            ]
 
         orders_today = request.env['mrp.production'].sudo().search(domain, limit=limit, offset=offset)
 
@@ -1643,7 +1653,7 @@ class LinklovingAppApi(http.Controller):
         order_id = request.jsonrequest.get('order_id') #生产单号
         img = request.jsonrequest.get('img')
         area_name = request.jsonrequest.get('area_name')
-        if type == 'prepare_material_ing':
+        if type in ['prepare_material_ing', 'already_picking']:
             mrp_order = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
             area = request.env['stock.location.area'].sudo().search(
                     [('name', '=', area_name)])

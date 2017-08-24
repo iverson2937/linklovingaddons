@@ -807,11 +807,11 @@ class MrpProductionExtend(models.Model):
                         ('feedback_on_rework', '!=', None),
                         ('date_planned_start', '<', after_day.strftime('%Y-%m-%d %H:%M:%S'))]
         else:
-            locations = self.env["stock.location"].sudo().get_semi_finished_location_by_user(self._context.get("uid"))
-            location_cir = self.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
-            location_domain = locations.ids + location_cir
+            # locations = self.env["stock.location"].sudo().get_semi_finished_location_by_user(self._context.get("uid"))
+            # location_cir = self.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
+            # location_domain = locations.ids + location_cir
             return [('state', '=', state),
-                    ('location_ids', 'in', location_domain),
+                    # ('location_ids', 'in', location_domain),
                     ('date_planned_start', '<', after_day.strftime('%Y-%m-%d %H:%M:%S'))]
 
     @api.multi
