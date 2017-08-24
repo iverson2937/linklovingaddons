@@ -1276,10 +1276,31 @@ class SimStockMove(models.Model):
 class ReturnMaterialLine(models.Model):
     _name = 'return.material.line'
 
+    @api.multi
+    def _compute_product_type(self):
+        circulate_location = self.env["stock.location"].search([("is_circulate_location", "=", True)], limit=1)
+        semi_finished_location = self.env["stock.location"].search([("is_semi_finished_location", "=", True)], limit=1)
+        fixed_location_ids = self.env["stock.fixed.putaway.strat"]
+        semi_finished_fixed_location_ids = self.env["stock.fixed.putaway.strat"]
+        if circulate_location and circulate_location.putaway_strategy_id and circulate_location.putaway_strategy_id.fixed_location_ids:
+            fixed_location_ids = circulate_location.putaway_strategy_id.fixed_location_ids
+        if semi_finished_location and semi_finished_location.putaway_strategy_id and semi_finished_location.putaway_strategy_id.fixed_location_ids:
+            semi_finished_fixed_location_ids = semi_finished_location.putaway_strategy_id.fixed_location_ids
+        for sim in self:
+            if sim.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:
+                sim.product_type = "semi-finished"  # 半成品流转
+            elif sim.product_id.categ_id.id in semi_finished_fixed_location_ids.mapped("category_id").ids:
+                sim.product_type = "real_semi_finished"  # 半成品
+            else:
+                sim.product_type = "material"
+
     product_id = fields.Many2one('product.product')
     return_qty = fields.Float('Return Quantity', readonly=False)
     return_id = fields.Many2one('mrp.return.material')
-
+    product_type = fields.Selection(string="物料类型", selection=[('semi-finished', '流转品'),
+                                                              ('material', '原材料'),
+                                                              ('real_semi_finished', '半成品')],
+                                    required=False, compute="_compute_product_type")
     @api.model
     def create(self, vals):
         return super(ReturnMaterialLine, self).create(vals)

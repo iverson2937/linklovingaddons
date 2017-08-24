@@ -329,7 +329,7 @@ class StockPicking(models.Model):
                 # self.env['ir.attachment'].search(['&', ('res_id', '=', attachment_one.id), ('name', 'ilike', '物流')]))
                 self.env['ir.attachment'].search([('res_id', '=', attachment_one.id)]))
             attachment_one.qc_img_count = len(
-                self.env['ir.attachment'].search(['&', ('res_id', '=', attachment_one.id), ('name', 'ilike', '品检')]))
+                self.env['ir.attachment'].search(['&', ('res_id', '=', attachment_one.id), ('name', 'ilike', 'Inspection')]))
 
     @api.multi
     def stock_img_count(self):
@@ -341,7 +341,7 @@ class StockPicking(models.Model):
 
         action['domain'] = [('res_id', 'in', self.ids)]
 
-        if type_btn == "":
+        if type_btn == "Inspection":
             action['domain'] = ['&', ('res_id', 'in', self.ids), ('name', 'ilike', type_btn)]
 
         return action

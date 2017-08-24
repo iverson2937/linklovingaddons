@@ -69,6 +69,22 @@
         <!--</field>-->
         <!--</record>-->
 
+        <record id="pdm_view_product_attachment_filter" model="ir.ui.view">
+            <field name="name">product attachment info</field>
+            <field name="model">product.attachment.info</field>
+            <field name="arch" type="xml">
+                <search string="Search product">
+                    <field name="file_name" string="文件名称"/>
+                    <field name="product_tmpl_id" string="产品名称"/>
+                    <group expand="0" string="Group By">
+                        <filter string="状态" domain="[]" context="{'group_by':'state'}"/>
+                        <filter string="类型" domain="[]" context="{'group_by':'type'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+
         <record id="product_attachment_info" model="ir.ui.view">
             <field name="name">product.attachment.info.form</field>
             <field name="model">product.attachment.info</field>
