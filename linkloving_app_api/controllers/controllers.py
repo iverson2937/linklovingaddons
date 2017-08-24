@@ -323,9 +323,9 @@ class LinklovingAppApi(http.Controller):
         one_days_after = datetime.timedelta(days=1)
         today_time = fields.datetime.strptime(fields.datetime.strftime(date_to_show, '%Y-%m-%d'),
                                               '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
-        locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
-        location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
-        location_domain = locations.ids + location_cir
+        # locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
+        # location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
+        # location_domain = locations.ids + location_cir
         after_day = today_time + one_days_after
         order_delay = request.env["mrp.production"].sudo().read_group(
                 [('date_planned_start', '<', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
@@ -399,9 +399,9 @@ class LinklovingAppApi(http.Controller):
         one_days_after = datetime.timedelta(days=1)
         today_time = fields.datetime.strptime(fields.datetime.strftime(date_to_show, '%Y-%m-%d'),
                                               '%Y-%m-%d')  # fields.datetime.strftime(date_to_show, '%Y-%m-%d')
-        locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
-        location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
-        location_domain = locations.ids + location_cir
+        # locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
+        # location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
+        # location_domain = locations.ids + location_cir
 
         after_day = today_time + one_days_after
         after_2_day = after_day + one_days_after
@@ -481,7 +481,7 @@ class LinklovingAppApi(http.Controller):
         today_time, timez = LinklovingAppApi.get_today_time_and_tz()
         today_time = fields.datetime.strptime(fields.datetime.strftime(today_time, '%Y-%m-%d'),
                                               '%Y-%m-%d')
-        locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
+        # locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
 
         if date_to_show != "delay":
             today_time = fields.datetime.strptime(date_to_show, '%Y-%m-%d')
@@ -489,8 +489,8 @@ class LinklovingAppApi(http.Controller):
         one_millisec_before = datetime.timedelta(milliseconds=1)  #
         today_time = today_time - one_millisec_before  # 今天的最后一秒
         after_day = today_time + one_days_after
-        location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
-        location_domain = locations.ids + location_cir
+        # location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
+        # location_domain = locations.ids + location_cir
         if not process_id:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "未找到工序id"})
 
