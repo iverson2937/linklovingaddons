@@ -71,7 +71,6 @@
 }
 .approval_ul_wraper{
     margin-bottom: 50px;
-    position: fixed;
     z-index: 999;
     top:153px;
     padding-top:40px;
