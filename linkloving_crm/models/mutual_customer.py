@@ -6,10 +6,12 @@ from odoo import tools
 class CrmMutualCustomer(models.Model):
     _name = 'crm.mutual.customer'
 
-    group_name = fields.Char(string=u'分组名称')
+    name = fields.Char(string=u'分组名称')
 
     reference_type = fields.Selection([(u'Follow', u'跟进记录'), (u'Mail', u'接收邮件'), (u'Order', u'订单')], string=u'参考类型',
                                       default=u'Follow')
+
+    category_id = fields.Many2many('crm.reference.type', string=u'参照物')
 
     description = fields.Char(string=u'移入规则')
 
@@ -33,3 +35,12 @@ class CrmMutualCustomer(models.Model):
                     # for partner_one in partner_list:
                     #     if partner_one.user_id:
                     #         partner_one.write({'mutual_rule_id': ''})
+
+
+class CrmReferenceType(models.Model):
+    _name = 'crm.reference.type'
+
+    # type_name = fields.Char(u'类型')
+    name = fields.Selection([(u'Follow', u'跟进记录'), (u'Mail', u'接收邮件'), (u'Order', u'订单')], string=u'参考类型',
+                            default=u'Follow')
+    describe_name = fields.Text(string=u'描述')

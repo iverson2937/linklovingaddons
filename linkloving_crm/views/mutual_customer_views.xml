@@ -17,19 +17,22 @@
                                     context="{'sale_type': 'inspection'}"
                                     class="oe_stat_button"
                                     icon="fa-file-o">
-                                    <!--attrs="{'invisible': [('delivery_count', '=', 0)]}" groups="base.group_user">-->
+                                <!--attrs="{'invisible': [('delivery_count', '=', 0)]}" groups="base.group_user">-->
                             </button>
                         </div>
 
                         <group>
                             <group>
-                                <field name="group_name"/>
-                                <field name="reference_type"/>
+                                <field name="name"/>
+                                <field name="reference_type" invisible="1"/>
                             </group>
                             <group>
                                 <field name="description"/>
                                 <field name="effective_time"/>
                             </group>
+                        </group>
+                        <group>
+                            <field name="category_id" widget="many2many_tags"/>
                         </group>
 
                         <notebook>
@@ -74,8 +77,8 @@
             <field name="arch" type="xml">
 
                 <tree string="公海规则">
-                    <field name="group_name"/>
-                    <field name="reference_type"/>
+                    <field name="name"/>
+                    <field name="reference_type" invisible="1"/>
                     <field name="description"/>
                     <field name="effective_time"/>
                     <field name="customer_ids"/>
@@ -103,9 +106,26 @@
         <!--Receipt*-->
         <menuitem action="action_crm_mutual_customer"
                   id="menu_crm_mutual_customer"
-                  parent="sales_team.menu_sales"
+                  parent="sales_team.menu_sale_config"
                   groups=""
-                  sequence="2" name="公海"/>
+                  sequence="13" name="公海规则设置"/>
+
+
+        <record model="ir.ui.view" id="crm_crm_reference_type_form">
+            <field name="name">crm.reference.type.form</field>
+            <field name="model">crm.reference.type</field>
+            <field name="arch" type="xml">
+                <form>
+
+                    <group>
+                        <field name="name"/>
+                    </group>
+                    <group>
+                        <field name="describe_name"/>
+                    </group>
+                </form>
+            </field>
+        </record>
 
 
     </data>
