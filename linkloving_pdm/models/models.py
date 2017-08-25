@@ -652,7 +652,7 @@ class ReviewProcessWizard(models.TransientModel):
             self.bom_id.action_released()
 
             self.review_bom_line.action_pass(self.remark)
-            self.bom_id.product_tmpl_id.apply_bom_update()
+            # self.bom_id.product_tmpl_id.apply_bom_update()
         elif review_type == 'file_review':
             self.product_attachment_info_id.action_released()
             # 审核通过
