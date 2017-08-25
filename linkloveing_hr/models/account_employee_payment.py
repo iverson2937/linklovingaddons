@@ -87,7 +87,7 @@ class AccountEmployeePayment(models.Model):
         used_payment = sum([payment.amount for payment in self.payment_line_ids])
         remaining = self.amount - used_payment - payment_return
 
-        if not float_is_zero(remaining, 2):
+        if float_is_zero(remaining, 2):
             self.can_return = False
 
     can_return = fields.Boolean(compute=_is_can_return, store=True)
