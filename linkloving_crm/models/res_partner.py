@@ -31,6 +31,19 @@ def action_crm_channel(my_self, body):
                                              content_subtype='html', **{'author_id': 3})
 
 
+def result_time_val(date_time):
+    if len(date_time) > 1:
+        result_date = date_time[0]
+        for time_one in range(1, len(date_time)):
+            if datetime.strptime(date_time[time_one].split(' ')[0], '%Y-%m-%d') > datetime.strptime(
+                    result_date.split(' ')[0], '%Y-%m-%d'):
+                result_date = date_time[time_one]
+        return result_date
+    elif len(date_time) == 1:
+        return date_time[0]
+    return ''
+
+
 class ResPartner(models.Model):
     """"""
 
@@ -75,6 +88,14 @@ class ResPartner(models.Model):
 
     old_user_id = fields.Char(string=u'前销售员')
 
+    customer_code = fields.Char(string=u'客户简码')
+    customer_alias = fields.Char(string=u'客户简称')
+
+    _sql_constraints = [
+        ('customer_code', 'unique (customer_code)', u'客户简码不能重复.'),
+        ('customer_alias', 'unique (customer_code)', u'客户简称不能重复.'),
+    ]
+
     def _compute_order_partner_question(self):
         for partner in self:
             count = 0
@@ -103,12 +124,18 @@ class ResPartner(models.Model):
                     raise UserError(u'此名称' + vals.get('name') + u'已绑定公司，请确认')
                 if select_company(self, vals, 'email'):
                     raise UserError(u'此邮件' + vals.get('email') + u'已绑定公司，请更换')
+                # if not vals.get('mutual_rule_id'):
+                #     raise UserError(u'请选择客户适用公海规则')
 
                 if vals.get('user_id'):
                     vals['public_partners'] = 'private'
                     vals['old_user_id'] = vals.get('user_id')
                 else:
                     vals['public_partners'] = 'public'
+
+                    # if vals.get('mutual_customer_id'):
+                    #     # mutual_rule_id
+                    #     vals['mutual_rule_id'] = vals.get('mutual_customer_id')
 
         return super(ResPartner, self).create(vals)
 
@@ -185,21 +212,42 @@ class ResPartner(models.Model):
             for partner_one in mutual_rule.customer_ids:
 
                 finally_order_time = partner_one.sale_order_ids[0].create_date if len(
-                    partner_one.sale_order_ids) > 0 else ''  # 最后下单时间
+                    partner_one.sale_order_ids) > 0 else partner_one.create_date  # 最后下单时间
                 finally_message_time = partner_one.message_ids[0].write_date if len(
-                    partner_one.message_ids) > 0 else ''  # 最后跟进时间
+                    partner_one.message_ids) > 0 else partner_one.create_date  # 最后跟进时间
 
-                no_contact_time = finally_message_time  # 未联系时间 差值 difference
-                if mutual_rule.reference_type == 'Order':
-                    no_contact_time = finally_order_time
-                elif mutual_rule.reference_type == 'Follow':
-                    no_contact_time = finally_message_time
+                # no_contact_time = finally_message_time  # 未联系时间 差值 difference
+                # 原来只能一个参照物判断
+                # if mutual_rule.reference_type == 'Order':
+                #     no_contact_time = finally_order_time
+                # elif mutual_rule.reference_type == 'Follow':
+                #     no_contact_time = finally_message_time
+                # if not no_contact_time:
+                #     no_contact_time = partner_one.create_date
+
+                # 判断多选开始
+                temp_date_list = []
+
+                for category_one in mutual_rule.category_id:
+                    if category_one.name == 'Order':
+                        temp_date_list.append(finally_order_time)
+                    elif category_one.name == 'Follow':
+                        temp_date_list.append(finally_message_time)
+                    elif category_one.name == 'Mail':
+                        temp_date_list.append(partner_one.create_date)
+
+                no_contact_time = result_time_val(temp_date_list)
+
+                # 判断多选结束
+
                 if not no_contact_time:
                     no_contact_time = partner_one.create_date
+
                 no_contact_time_difference = datetime.strptime(no_contact_time.split(' ')[0], '%Y-%m-%d')
                 no_contact_time_date = now_time_date - no_contact_time_difference
 
                 # 判断开始
+
                 interval_time = abort_time_date - now_time_date  # 》0 还没有到截止时间   《0 已经过了截止时间
                 if interval_time.days == 0:
                     # '刚好是截止时间'
@@ -354,3 +402,41 @@ class CrmIrAttachment(models.Model):
                 self.env.context.get('active_ids')) > 0 else ''
 
         return super(CrmIrAttachment, self).create(vals)
+
+
+class CrmModelLead2OpportunityPartner(models.TransientModel):
+    _inherit = 'crm.lead2opportunity.partner'
+
+    mutual_customer_id = fields.Many2one('crm.mutual.customer', string=u'设置公海规则')
+
+    @api.multi
+    def action_apply(self):
+        """ Convert lead to opportunity or merge lead and opportunity and open
+            the freshly created opportunity view.
+        """
+        self.ensure_one()
+        values = {
+            'team_id': self.team_id.id,
+        }
+
+        if self.partner_id:
+            values['partner_id'] = self.partner_id.id
+
+        if self.name == 'merge':
+            leads = self.opportunity_ids.merge_opportunity()
+            if leads.type == "lead":
+                values.update({'lead_ids': leads.ids, 'user_ids': [self.user_id.id]})
+                self.with_context(active_ids=leads.ids)._convert_opportunity(values)
+            elif not self._context.get('no_force_assignation') or not leads.user_id:
+                values['user_id'] = self.user_id.id
+                leads.write(values)
+        else:
+            leads = self.env['crm.lead'].browse(self._context.get('active_ids', []))
+            leads.write({'mutual_rule_id': self.mutual_customer_id.id})
+            values.update({'lead_ids': leads.ids, 'user_ids': [self.user_id.id]})
+            self._convert_opportunity(values)
+            for lead in leads:
+                if lead.partner_id and lead.partner_id.user_id != lead.user_id:
+                    self.env['res.partner'].browse(lead.partner_id.id).write({'user_id': lead.user_id.id})
+
+        return leads[0].redirect_opportunity_view()
