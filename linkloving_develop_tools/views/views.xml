@@ -48,6 +48,10 @@
                         <button string="重新计算po负责人" name="recompute_po_chager" type="object"
                                 default_focus="1"
                                 class="btn-primary"/>
+                        <button string="计算指定天数内无库存移动的" name="compute_product_sale_situtaion" type="object"
+                                default_focus="1"
+                                class="btn-primary"/>
+
                     </footer>
                 </form>
             </field>
