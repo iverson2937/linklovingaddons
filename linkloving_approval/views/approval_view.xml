@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+        <record model="ir.ui.view" id="approval_project_picking_form">
+            <field name="name">approval.project.picking.form</field>
+            <field name="model">approval.project.picking</field>
+            <field name="arch" type="xml">
+
+                <form>
+                    <header>
+                        <button string="Apply" type="object"
+                                name="" class="oe_highlight"/>
+                        <button string="Cancel" type="object" name="cancel"
+                                class="oe_link"/>
+                        <field name="picking_state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <!--<div>-->
+                            <!--<h1>-->
+                            <!--<field name="name"/>-->
+                            <!--</h1>-->
+                            <!--</div>-->
+
+                            <div class="oe_title">
+                                <label for="name" class="oe_edit_only"/>
+                                <h1>
+                                    <field name="name" placeholder="名称"/>
+                                </h1>
+                            </div>
+
+                        </group>
+                        <group>
+                            <group>
+                                <field name="picking_type"/>
+                                <field name="Materials_development_way"/>
+
+                            </group>
+                            <group>
+                                <field name="delivery_date"/>
+                                <field name="to_approve_id"/>
+                            </group>
+
+                        </group>
+                        <group>
+                            <field name="picking_cause"/>
+                        </group>
+                        <group>
+                            <field name="remark"/>
+                        </group>
+
+                        <group>
+                            <field name="reference_product_ids" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <notebook>
+                                <page string="BOM清单">
+                                    <field name="approval_bom_ids"/>
+                                </page>
+                            </notebook>
+                        </group>
+                    </sheet>
+                </form>
+
+            </field>
+        </record>
+
+
+        <record id="approval_project_picking_tree" model="ir.ui.view">
+            <field name="name">approval.project.picking.tree</field>
+            <field name="model">approval.project.picking</field>
+            <field name="arch" type="xml">
+                <tree string="工程领料">
+                    <field name="name"/>
+                    <field name="picking_type"/>
+                    <field name="picking_cause"/>
+                    <field name="Materials_development_way"/>
+                    <field name="picking_state"/>
+                    <field name="delivery_date"/>
+                    <field name="to_approve_id"/>
+                    <!--<field name="reference_product_ids"/>-->
+                    <!--<field name="approval_bom_ids"/>-->
+                    <field name="remark"/>
+                </tree>
+
+            </field>
+        </record>
+
+        <record id="action_approval_project_picking" model="ir.actions.act_window">
+            <field name="name">工程领料</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">approval.project.picking</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click add pick.
+                </p>
+                <p>
+                    No source Found!
+                </p>
+            </field>
+        </record>
+
+
+        <!--Receipt*-->
+        <menuitem action="action_approval_project_picking"
+                  id="menu_approval_project_picking"
+                  parent="ll_approval_root"
+                  groups=""
+                  sequence="1" name="工程领料"/>
+
+
+    </data>
+</openerp>

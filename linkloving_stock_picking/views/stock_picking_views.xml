@@ -114,7 +114,8 @@
                 <!--</xpath>-->
 
                 <xpath expr="//field[@name='product_id']" position="after">
-                    <field name="data_type" string="数量"/>
+                    <field name="data_type" string="出入库数量"/>
+                    <field name="quantity_adjusted_qty" string="当前库存"/>
                 </xpath>
 
                 <xpath expr="//field[@name='product_uom_qty']" position="attributes">

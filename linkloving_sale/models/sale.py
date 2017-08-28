@@ -300,4 +300,5 @@ class SaleProcurementOrder(models.Model):
             'propagate': self.rule_id.propagate,
             'priority': self.priority,
             'move_order_type': 'sell_out',
+            'quantity_adjusted_qty': self.product_id.qty_available - qty_left
         }

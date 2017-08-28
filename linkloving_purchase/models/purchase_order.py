@@ -285,6 +285,7 @@ class PurchaseOrderLine(models.Model):
                     (6, 0, [x.id for x in line.order_id.picking_type_id.warehouse_id.route_ids])] or [],
                 'warehouse_id': line.order_id.picking_type_id.warehouse_id.id,
                 'move_order_type': 'procurement_warehousing',
+                'quantity_adjusted_qty': line.product_id.qty_available + line.product_qty,
             }
             # Fullfill all related procurements with this po line
             diff_quantity = line.product_qty - qty

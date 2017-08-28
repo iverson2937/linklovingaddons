@@ -32,6 +32,8 @@ class MrpBomExtend(models.Model):
         ('release', u'正式')
     ], u'状态', track_visibility='onchange', default='new')
 
+    # bom_approval_id = fields.Many2one('approval.project.picking', string=u'工程领料bom',store=True)
+
     @api.multi
     def action_cancel(self):
         self.write({
@@ -715,6 +717,7 @@ class MrpProductionExtend(models.Model):
             'unit_factor': quantity / original_quantity,
             'suggest_qty': line_data['suggest_qty'],
             'move_order_type': 'manufacturing_picking' if self.move_finished_ids else 'null',
+            'quantity_adjusted_qty': bom_line.product_id.qty_available - quantity,
         }
         return self.env['stock.move'].create(data)
 
@@ -847,6 +850,7 @@ class MrpProductionExtend(models.Model):
             'origin': self.name,
             'group_id': self.procurement_group_id.id,
             'move_order_type': 'null' if self.move_finished_ids else 'manufacturing_orders',
+            'quantity_adjusted_qty': self.product_id.qty_available + self.product_qty,
             # 'propagate': False,
         })
         move.action_confirm()

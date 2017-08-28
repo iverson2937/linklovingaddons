@@ -76,9 +76,14 @@
                     <attribute name="string">开始</attribute>
                     <attribute name="widget">date</attribute>
                 </xpath>
-                 <xpath expr="//field[@name='date_planned_start']" position="after">
+                <xpath expr="//field[@name='date_planned_start']" position="after">
                     <field name="date_planned_finished" widget="date" string="结束"/>
                 </xpath>
+
+                <xpath expr="//field[@name='origin']" position="attributes">
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+
 
             </field>
         </record>
