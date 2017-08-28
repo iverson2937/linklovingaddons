@@ -1932,6 +1932,11 @@ class LinklovingAppApi(http.Controller):
             'state' : stock_move.state,
             'location': stock_move.location_id.display_name,
             'location_dest' : stock_move.location_dest_id.display_name,
+            'write_uid': stock_move.write_uid.name if stock_move.write_uid else '',
+            'write_date':stock_move.write_date if stock_move.write_date else '',
+            'move_order_type':stock_move.move_order_type if stock_move.move_order_type else '',
+            'picking_id':stock_move.picking_id.name if stock_move.picking_id else '',
+            'quantity_adjusted_qty':stock_move.quantity_adjusted_qty if stock_move.quantity_adjusted_qty else 0,
         }
         return data
     @classmethod
