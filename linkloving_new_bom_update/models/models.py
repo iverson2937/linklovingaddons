@@ -60,14 +60,14 @@ class MrpBom(models.Model):
                 raise UserError('此bom正在审核中,请取消审核后再做修改')
             product_ids = self.product_tmpl_id.product_variant_ids
             # 有未出货的bom 不允许修改
-            if product_ids:
-                lines = self.env['sale.order.line'].search(
-                    [('product_id', '=', product_ids.ids[0]), ('state', 'in', ('sale', 'done'))]).filtered(
-                    lambda x: x.product_uom_qty > x.qty_delivered)
-                if lines:
-                    for line in lines:
-                        if line.procurement_ids.filtered(lambda x: x.state not in ('cancel', 'done')):
-                            raise UserError(_(u'销售单 %s 未发完货,不可以修改BOM,请联系销售取消相关销售单') % (line.order_id.name,))
+            # if product_ids:
+            #     lines = self.env['sale.order.line'].search(
+            #         [('product_id', '=', product_ids.ids[0]), ('state', 'in', ('sale', 'done'))]).filtered(
+            #         lambda x: x.product_uom_qty > x.qty_delivered)
+            #     if lines:
+            #         for line in lines:
+            #             if line.procurement_ids.filtered(lambda x: x.state not in ('cancel', 'done')):
+            #                 raise UserError(_(u'销售单 %s 未发完货,不可以修改BOM,请联系销售取消相关销售单') % (line.order_id.name,))
 
             if self.state not in ('new', 'updated', 'deny'):
                 if not self.review_id:
