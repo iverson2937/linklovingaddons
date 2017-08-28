@@ -4,6 +4,8 @@ import logging
 
 import datetime
 
+import pytz
+
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
@@ -26,6 +28,7 @@ class ResPartnerExtend(models.Model):
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
+    is_move_in_recent = fields.Boolean(string=u"近期是否移动过")
     @api.multi
     def create_reorder_rule(self, min_qty=0.0, max_qty=0.0, qty_multiple=1.0, overwrite=False):
         swo_obj = self.env['stock.warehouse.orderpoint']
@@ -228,7 +231,50 @@ class CreateOrderPointWizard(models.TransientModel):
         for po in pos:
             po.user_id = po.create_uid.id
 
+    def compute_product_sale_situtaion(self):
+        today_time, timez = self.get_today_time_and_tz()
+        today_time = fields.datetime.strptime(fields.datetime.strftime(today_time, '%Y-%m-%d'), '%Y-%m-%d')
+        today_time -= timez
+        # today_time = fields.datetime.strptime(fields.datetime.strftime(fields.datetime.now(), '%Y-%m-%d'),
+        #                                       '%Y-%m-%d')
+        one_days_after = datetime.timedelta(days=60)
+        after_day = today_time - one_days_after
 
+        moves = self.env["stock.move"].search([("create_date", ">=", after_day.strftime('%Y-%m-%d %H:%M:%S'))])
+        group_list = self.env["stock.move"].read_group([("create_date", ">=", after_day.strftime('%Y-%m-%d %H:%M:%S'))],
+                                                       fields=["product_id"], groupby=["product_id"])
+        ids = []
+        for group in group_list:
+            ids.append(group["product_id"][0])
+
+        all_products = self.env["product.product"].search([])
+        all_products.write({
+            'is_move_in_recent': False
+        })
+        products = self.env["product.product"].browse(ids)
+        products.write({
+            "is_move_in_recent": True
+        })
+        print(moves)
+
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": u"计算完成",
+                "text": u"计算完成",
+                "sticky": False
+            }
+        }
+
+    def get_today_time_and_tz(self):
+        if self.env.user.tz:
+            timez = fields.datetime.now(pytz.timezone(self.env.user.tz)).tzinfo._utcoffset
+            date_to_show = fields.datetime.utcnow()
+            date_to_show += timez
+            return date_to_show, timez
+        else:
+            raise UserError("未找到对应的时区, 请点击 右上角 -> 个人资料 -> 时区 -> Asia/Shanghai")
 def getMonthFirstDayAndLastDay(year=None, month=None):
     """
     :param year: 年份，默认是本年，可传int或str类型

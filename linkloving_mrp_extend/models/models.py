@@ -500,10 +500,10 @@ class MrpProductionExtend(models.Model):
     def button_waiting_material(self):
         if self.bom_id.state not in ('draft', 'release'):
             raise UserError('BOM还没通过审核,请联系相关负责人')
-        if self.location_ids.filtered(lambda x: x.is_circulate_location == False) or not self.location_ids:
-            self.write({'state': 'waiting_material'})
-        else:
-            self.write({'state': 'finish_prepare_material'})
+        # if self.location_ids.filtered(lambda x: x.is_circulate_location == False) or not self.location_ids:
+        self.write({'state': 'waiting_material'})
+        # else:
+        #     self.write({'state': 'finish_prepare_material'})
         qty_wizard = self.env['change.production.qty'].create({
             'mo_id': self.id,
             'product_qty': self.product_qty,
