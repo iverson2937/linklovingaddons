@@ -128,7 +128,7 @@ class NameCardController(http.Controller):
                 company_name = company_name.replace(u"公司", "")
             company = request.env["res.partner"].sudo().search([("name", "ilike", company_name)], limit=1)
             if not company:
-                company = request.env["res.partner"].sudo().create({
+                company = request.env["res.partner"].sudo(request.context.get("uid")).create({
                     "name": company_real_name,
                     "street": street,
                     "level": int(partner_lv or 0),
@@ -172,7 +172,7 @@ class NameCardController(http.Controller):
                     [("name", "=", me.get("name")), ("parent_id", '=', new_company_id)], )
             if partners:
                 continue
-            s = request.env["res.partner"].sudo().create({
+            s = request.env["res.partner"].sudo(request.context.get("uid")).create({
                 "name": me.get("name"),
                 "parent_id": new_company_id,
                 "mobile": me.get("phone"),
