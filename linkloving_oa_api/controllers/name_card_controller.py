@@ -141,10 +141,10 @@ class NameCardController(http.Controller):
                     "is_company": True,
                     'source_id': src_id,
                     'country_id': country_id,
-                    'product_series_ids': product_series or [],
+                    # 'product_series_ids': (6, 0, product_series) or [],
                 })
                 company.category_id = [tag_list] if tag_list else []
-
+                company.product_series_ids = product_series
             else:
                 company.sudo().write({
                     "name": company_real_name,
@@ -159,9 +159,10 @@ class NameCardController(http.Controller):
                     "is_company": True,
                     'source_id': src_id,
                     'country_id': country_id,
-                    'product_series_ids': product_series or [],
+                    # 'product_series_ids': (6, 0, product_series) or [],
                 })
                 company.category_id = [tag_list] if tag_list else []
+                company.product_series_ids = product_series
             new_company_id = company.id
             # company.company_type = "company"
 
