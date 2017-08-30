@@ -1937,6 +1937,7 @@ class LinklovingAppApi(http.Controller):
             'move_order_type':stock_move.move_order_type if stock_move.move_order_type else '',
             'picking_id':stock_move.picking_id.name if stock_move.picking_id else '',
             'quantity_adjusted_qty':stock_move.quantity_adjusted_qty if stock_move.quantity_adjusted_qty else 0,
+            'origin': stock_move.origin if stock_move.origin else '',
         }
         return data
     @classmethod
