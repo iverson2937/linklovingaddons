@@ -24,7 +24,7 @@ class CrmMutualCustomer(models.Model):
     @api.multi
     def action_apply_all_partner(self):
         for mutual in self:
-            domain = [('customer', '=', True), ('is_company', '=', True), ('is_order', '=', False)]
+            domain = [('customer', '=', True), ('is_company', '=', True)]
             partner_list = self.env['res.partner'].search(domain)
 
             for partner_one in partner_list:
