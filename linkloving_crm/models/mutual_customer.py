@@ -24,17 +24,23 @@ class CrmMutualCustomer(models.Model):
     @api.multi
     def action_apply_all_partner(self):
         for mutual in self:
-            domain = [('customer', '=', True), ('is_company', '=', True)]
-            partner_list = self.env['res.partner'].search(domain)
+            parnter_type = self._context.get('parnter_type', False)
 
-            for partner_one in partner_list:
-                if partner_one.user_id and (not partner_one.mutual_rule_id):
-                    partner_one.write({'mutual_rule_id': mutual.id})
-
-                    # 取消应用于全部
-                    # for partner_one in partner_list:
-                    #     if partner_one.user_id:
-                    #         partner_one.write({'mutual_rule_id': ''})
+            if parnter_type == 'delect_all':
+                for par_one in mutual.customer_ids:
+                    par_one.write({'mutual_rule_id': ''})
+            else:
+                domain = [('customer', '=', True), ('is_company', '=', True)]
+                if parnter_type == 'latent':
+                    domain.append(('is_order', '=', False))
+                partner_list = self.env['res.partner'].search(domain)
+                for partner_one in partner_list:
+                    if partner_one.user_id and (not partner_one.mutual_rule_id):
+                        partner_one.write({'mutual_rule_id': mutual.id})
+                        # 取消应用于全部
+                        # for partner_one in partner_list:
+                        #     if partner_one.user_id:
+                        #         partner_one.write({'mutual_rule_id': ''})
 
 
 class CrmReferenceType(models.Model):
