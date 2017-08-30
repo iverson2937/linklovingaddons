@@ -58,7 +58,9 @@ class MrpBom(models.Model):
         if 'bom_line_ids' in vals:
             if self.state == 'review_ing':
                 raise UserError('此bom正在审核中,请取消审核后再做修改')
-            product_ids = self.product_tmpl_id.product_variant_ids
+
+            # 2017/08/29 还是取消这样的限制,销售单太多取消太麻烦，取消后会重新生成出库单，很困扰
+            # product_ids = self.product_tmpl_id.product_variant_ids
             # 有未出货的bom 不允许修改
             # if product_ids:
             #     lines = self.env['sale.order.line'].search(

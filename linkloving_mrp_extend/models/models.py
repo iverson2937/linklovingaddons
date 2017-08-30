@@ -214,6 +214,18 @@ class StockMoveExtend(models.Model):
     is_return_material = fields.Boolean(default=False)
     is_over_picking = fields.Boolean(default=False)
     is_scrap = fields.Boolean(default=False)
+
+    authorizer_id = fields.Many2one("hr.employee", string=u'授权人', )
+    authorizee_id = fields.Many2one("res.users", string=u"被授权人")
+
+    @api.multi
+    # 授权人 和被授权人
+    def authorized_stock_move(self, authorizer_id=None, authorizee_id=None):
+        self.write({
+            "authorizer_id": authorizer_id,
+            "authorizee_id": authorizee_id,
+        })
+
     # @api.multi
     # def _qty_available(self):
     #     for move in self:
@@ -1703,7 +1715,7 @@ class ProcurementOrderExtend(models.Model):
                     'hour_price': bom.hour_price,
                     'in_charge_id': bom.process_id.partner_id.id,
                     'product_qty': self.get_actual_require_qty(),
-                    'date_planned_start': fields.Datetime.to_string(self._get_date_planned_from_today()),
+                    # 'date_planned_start': fields.Datetime.to_string(self._get_date_planned_from_today()),
                     # 'date_planned_finished':
                     })
         return res

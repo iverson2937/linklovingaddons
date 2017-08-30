@@ -179,9 +179,16 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             reader.readAsDataURL(new_file);
             reader.onload = function () {
                 var encoded_file = reader.result;
-                var result = btoa(encoded_file);
+                var position = encoded_file.indexOf("base64,");
+                if (position > -1) {
+                    encoded_file = encoded_file.slice(position + "base64,".length);
+                }
+                // var result = btoa(encoded_file);
                 return new Model("product.attachment.info")
-                    .call("update_attachment", [parseInt(new_file_id)], {file_binary: result, file_name: new_file.name})
+                    .call("update_attachment", [parseInt(new_file_id)], {
+                        file_binary: encoded_file,
+                        file_name: new_file.name
+                    })
                     .then(function (result) {
                     })
             };
