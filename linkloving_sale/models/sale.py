@@ -44,7 +44,7 @@ class SaleOrder(models.Model):
             order.remaining_amount = remaining_amount
             order.shipped_amount = shipped_amount
             order.pre_payment_amount = 0.0
-            if order.invoice_status == 'no':
+            if order.invoice_status == 'no' and order.shipping_status == 'no':
                 order.pre_payment_amount = invoiced_amount
             else:
                 order.invoiced_amount = invoiced_amount
