@@ -26,6 +26,7 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
         sale_sequence = 1
         for sale_order in sale_orders:
             returnDict[sale_order.id] = {'data': {}, 'line': {}}
+            print sale_order.invoiced_amount
             returnDict[sale_order.id]['data'] = {
                 'sequence': sale_sequence,
                 'name': sale_order.name,

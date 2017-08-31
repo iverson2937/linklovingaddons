@@ -40,12 +40,15 @@ class SaleOrder(models.Model):
             for invoice in order.invoice_ids:
                 invoiced_amount += invoice.amount_total
                 remaining_amount += invoice.residual
-            order.invoiced_amount = invoiced_amount
+
             order.remaining_amount = remaining_amount
             order.shipped_amount = shipped_amount
             order.pre_payment_amount = 0.0
-            if order.state == 'to invoice':
-                order.pre_payment_amount = order.invoiced_amount
+            if order.invoice_status == 'no':
+                order.pre_payment_amount = invoiced_amount
+            else:
+                order.invoiced_amount = invoiced_amount
+
 
     @api.depends('product_count', 'order_line.qty_delivered')
     def _compute_shipping_rate(self):

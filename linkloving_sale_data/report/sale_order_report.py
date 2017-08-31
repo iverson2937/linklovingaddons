@@ -57,10 +57,10 @@ class SaleOrder(http.Controller):
                 data_sheet.write(current_row, 10, vals.get('invoiced_amount') and vals.get('invoiced_amount') or 0.0,
                                  style)
                 data_sheet.write(current_row, 11,
-                                 vals.get('pre_payment_amount') and vals.get('pre_payment_amount') or '',
+                                 vals.get('pre_payment_amount') and vals.get('pre_payment_amount') or 0.0,
                                  style)
                 data_sheet.write(current_row, 12,
-                                 vals.get('remaining_amount') and vals.get('pre_payment_amount') or 0.0,
+                                 vals.get('remaining_amount') and vals.get('remaining_amount') or 0.0,
                                  style)
                 data_sheet.write(current_row, 13, vals.get('create_uid') and vals.get('create_uid') or '',
                                  style)
