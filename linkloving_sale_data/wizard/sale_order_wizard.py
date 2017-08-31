@@ -21,7 +21,7 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
 
         sale_orders = sale_obj.search([
             ('state', '=', 'sale'),
-            ('date_order', '>=', date1), ('date_order', '<=', date2)], order='date_order asc')
+            ('date_order', '>=', date1), ('date_order', '<=', date2)], order='date_order')
 
         sale_sequence = 1
         for sale_order in sale_orders:
