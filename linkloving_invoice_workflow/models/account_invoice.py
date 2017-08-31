@@ -55,24 +55,25 @@ class AccountInvoice(models.Model):
 
     @api.multi
     def write(self, vals):
-        if not self.amount_total_o:
-            amount_total_o = 0
-            for line in self.invoice_line_ids:
-                line.price_unit_o = line.price_unit
-                amount_total_o += line.price_unit_o * line.quantity
-            vals.update({'amount_total_o': amount_total_o})
-        if 'deduct_amount' in vals:
-            deduct_amount = vals['deduct_amount']
-            if deduct_amount > (self.amount_total_o or vals.get('amount_total_o')):
-                raise UserError(_('Deduct Amount can not larger than Invoice Amount'))
-            if self.amount_total_o or vals.get('amount_total_o'):
-                rate = deduct_amount / (self.amount_total_o or vals.get('amount_total_o'))
-                for line in self.invoice_line_ids:
-                    if line.price_unit_o:
-                        line.price_unit = line.price_unit_o * (1 - rate)
-                    else:
-                        line.price_unit = line.price_unit * (1 - rate)
-        return super(AccountInvoice, self).write(vals)
+        for invoice in self:
+            if not invoice.amount_total_o:
+                amount_total_o = 0
+                for line in invoice.invoice_line_ids:
+                    line.price_unit_o = line.price_unit
+                    amount_total_o += line.price_unit_o * line.quantity
+                vals.update({'amount_total_o': amount_total_o})
+            if 'deduct_amount' in vals:
+                deduct_amount = vals['deduct_amount']
+                if deduct_amount > (invoice.amount_total_o or vals.get('amount_total_o')):
+                    raise UserError(_('Deduct Amount can not larger than Invoice Amount'))
+                if invoice.amount_total_o or vals.get('amount_total_o'):
+                    rate = deduct_amount / (invoice.amount_total_o or vals.get('amount_total_o'))
+                    for line in invoice.invoice_line_ids:
+                        if line.price_unit_o:
+                            line.price_unit = line.price_unit_o * (1 - rate)
+                        else:
+                            line.price_unit = line.price_unit * (1 - rate)
+            return super(AccountInvoice, invoice).write(vals)
 
     @api.multi
     def action_reject(self):
