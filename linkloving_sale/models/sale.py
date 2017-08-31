@@ -20,6 +20,12 @@ class SaleOrder(models.Model):
     invoiced_amount = fields.Float(compute='_compute_invoice_amount')
     remaining_amount = fields.Float(compute='_compute_invoice_amount')
     shipped_amount = fields.Float(compute='_compute_invoice_amount')
+    pre_payment_amount = fields.Float(compute='_compute_invoice_amount')
+
+    # 重新计算收货数量由于出入库bug临时使用
+    def recompute_receive_amount(self):
+        for line in self.order_line:
+            line.qty_delivered = line.product_uom_qty
 
     @api.multi
     @api.depends('invoice_ids')
@@ -37,6 +43,9 @@ class SaleOrder(models.Model):
             order.invoiced_amount = invoiced_amount
             order.remaining_amount = remaining_amount
             order.shipped_amount = shipped_amount
+            order.pre_payment_amount = 0.0
+            if order.state == 'to invoice':
+                order.pre_payment_amount = order.invoiced_amount
 
     @api.depends('product_count', 'order_line.qty_delivered')
     def _compute_shipping_rate(self):

@@ -21,7 +21,7 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
 
         sale_orders = sale_obj.search([
             ('state', '=', 'sale'),
-            ('date_order', '>=', date1), ('date_order', '<=', date2)], order='name desc')
+            ('date_order', '>=', date1), ('date_order', '<=', date2)], order='create_date desc')
 
         sale_sequence = 1
         for sale_order in sale_orders:
@@ -35,7 +35,8 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
                 'amount_total': sale_order.amount_total,
                 'invoiced_amount': sale_order.invoiced_amount,
                 'remaining_amount': sale_order.remaining_amount,
-                'shipped_amount': sale_order.shipped_amount
+                'shipped_amount': sale_order.shipped_amount,
+                'pre_payment_amount': sale_order.pre_payment_amount
             }
             for line in sale_order.order_line:
                 returnDict[sale_order.id]['line'].update({line.id: {
