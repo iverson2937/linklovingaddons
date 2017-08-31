@@ -62,6 +62,7 @@
                             </tree>
                         </field>
                         <button string="添加型号" name="action_tree_list_view" type="object" class="btn-primary" groups=""/>
+                        <div class="oe_clear"/>
                     </page>
 
                 </xpath>
