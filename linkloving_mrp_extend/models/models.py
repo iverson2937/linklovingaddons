@@ -32,6 +32,8 @@ class MrpBomExtend(models.Model):
         ('release', u'正式')
     ], u'状态', track_visibility='onchange', default='new')
 
+    # bom_approval_id = fields.Many2one('approval.project.picking', string=u'工程领料bom',store=True)
+
     @api.multi
     def action_cancel(self):
         self.write({
@@ -212,6 +214,18 @@ class StockMoveExtend(models.Model):
     is_return_material = fields.Boolean(default=False)
     is_over_picking = fields.Boolean(default=False)
     is_scrap = fields.Boolean(default=False)
+
+    authorizer_id = fields.Many2one("hr.employee", string=u'授权人', )
+    authorizee_id = fields.Many2one("res.users", string=u"被授权人")
+
+    @api.multi
+    # 授权人 和被授权人
+    def authorized_stock_move(self, authorizer_id=None, authorizee_id=None):
+        self.write({
+            "authorizer_id": authorizer_id,
+            "authorizee_id": authorizee_id,
+        })
+
     # @api.multi
     # def _qty_available(self):
     #     for move in self:
@@ -498,10 +512,10 @@ class MrpProductionExtend(models.Model):
     def button_waiting_material(self):
         if self.bom_id.state not in ('draft', 'release'):
             raise UserError('BOM还没通过审核,请联系相关负责人')
-        if self.location_ids.filtered(lambda x: x.is_circulate_location == False) or not self.location_ids:
-            self.write({'state': 'waiting_material'})
-        else:
-            self.write({'state': 'finish_prepare_material'})
+        # if self.location_ids.filtered(lambda x: x.is_circulate_location == False) or not self.location_ids:
+        self.write({'state': 'waiting_material'})
+        # else:
+        #     self.write({'state': 'finish_prepare_material'})
         qty_wizard = self.env['change.production.qty'].create({
             'mo_id': self.id,
             'product_qty': self.product_qty,
@@ -715,6 +729,7 @@ class MrpProductionExtend(models.Model):
             'unit_factor': quantity / original_quantity,
             'suggest_qty': line_data['suggest_qty'],
             'move_order_type': 'manufacturing_picking' if self.move_finished_ids else 'null',
+            'quantity_adjusted_qty': bom_line.product_id.qty_available - quantity,
         }
         return self.env['stock.move'].create(data)
 
@@ -847,6 +862,7 @@ class MrpProductionExtend(models.Model):
             'origin': self.name,
             'group_id': self.procurement_group_id.id,
             'move_order_type': 'null' if self.move_finished_ids else 'manufacturing_orders',
+            'quantity_adjusted_qty': self.product_id.qty_available + self.product_qty,
             # 'propagate': False,
         })
         move.action_confirm()
@@ -1699,7 +1715,7 @@ class ProcurementOrderExtend(models.Model):
                     'hour_price': bom.hour_price,
                     'in_charge_id': bom.process_id.partner_id.id,
                     'product_qty': self.get_actual_require_qty(),
-                    'date_planned_start': fields.Datetime.to_string(self._get_date_planned_from_today()),
+                    # 'date_planned_start': fields.Datetime.to_string(self._get_date_planned_from_today()),
                     # 'date_planned_finished':
                     })
         return res

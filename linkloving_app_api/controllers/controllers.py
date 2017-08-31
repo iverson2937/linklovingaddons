@@ -51,9 +51,9 @@ class JPushExtend:
         try:
             response = push.send()
         except jpush.common.Unauthorized:
-            raise jpush.common.Unauthorized("Unauthorized")
+            print ("Unauthorized")
         except jpush.common.APIConnectionException:
-            raise jpush.common.APIConnectionException("conn")
+            print ("APIConnectionException")
         except jpush.common.JPushFailure:
             print ("JPushFailure")
         except:
@@ -1932,6 +1932,12 @@ class LinklovingAppApi(http.Controller):
             'state' : stock_move.state,
             'location': stock_move.location_id.display_name,
             'location_dest' : stock_move.location_dest_id.display_name,
+            'write_uid': stock_move.write_uid.name if stock_move.write_uid else '',
+            'write_date':stock_move.write_date if stock_move.write_date else '',
+            'move_order_type':stock_move.move_order_type if stock_move.move_order_type else '',
+            'picking_id':stock_move.picking_id.name if stock_move.picking_id else '',
+            'quantity_adjusted_qty':stock_move.quantity_adjusted_qty if stock_move.quantity_adjusted_qty else 0,
+            'origin': stock_move.origin if stock_move.origin else '',
         }
         return data
     @classmethod
@@ -2845,6 +2851,10 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/new_prepare_material', type='json', auth='none', csrf=False)
     def new_prepare_material(self, **kw):
         order_id = request.jsonrequest.get('order_id')  # get paramter
+        employee_id = request.jsonrequest.get("employee_id")
+        uid = request.context.get("uid")
+        # if employee_id:
+
         mrp_production = request.env['mrp.production'].sudo().search([('id', '=', order_id)])[0]
 
 
@@ -2866,6 +2876,11 @@ class LinklovingAppApi(http.Controller):
                     continue
                 rounding = sim_stock_move.stock_moves[0].product_uom.rounding
                 total_qty = move['quantity_ready'] + sim_stock_move.quantity_done
+                need_qty = 0
+                for o_move in sim_stock_move.stock_moves:
+                    if o_move.state != 'cancel':
+                        need_qty += o_move.product_uom_qty
+                # if float_compare(need_qty, sim_stock_move.product_uom_qty, precision_rounding=rounding) < 0:
                 if float_compare(total_qty, sim_stock_move.product_uom_qty, precision_rounding=rounding) > 0:
 
                     # if float_compare(move['quantity_ready'], sim_stock_move.stock_moves[0].product_uom_qty,
@@ -2881,6 +2896,7 @@ class LinklovingAppApi(http.Controller):
                     else:
                         # 如果已完成的数量大于等于需求数量,则是 总数量 - 需求数量
                         split_qty_unuom = total_qty - sim_stock_move.product_uom_qty
+
                     qty_split = sim_stock_move.stock_moves[0].product_uom._compute_quantity(
                             split_qty_unuom,
                             sim_stock_move.stock_moves[0].product_id.uom_id)
@@ -2903,15 +2919,54 @@ class LinklovingAppApi(http.Controller):
                     # _logger.warning(u"charlie_0712_log_6:len_move_raw_ids:%d,",
                     #                 len(sim_stock_move.production_id.move_raw_ids))
                     sim_stock_move.stock_moves[0].action_done()
+                    split_move.authorized_stock_move(employee_id, uid)
+                    sim_stock_move.stock_moves[0].authorized_stock_move(employee_id, uid)
                     # _logger.warning(u"charlie_0712_log_7:len_move_raw_ids:%d,",
                     #                 len(sim_stock_move.production_id.move_raw_ids))
                 else:
                     # _logger.warning(u"charlie_0712_log_8:move_qty:%s,uom_qty:%s", str(move['quantity_ready']),
                     #                 str(sim_stock_move.stock_moves[0].product_uom_qty))
-
-                    sim_stock_move.stock_moves[0].quantity_done_store = move['quantity_ready']
-                    sim_stock_move.stock_moves[0].quantity_done = move['quantity_ready']
-                    sim_stock_move.stock_moves[0].action_done()
+                    if sim_stock_move.stock_moves:
+                        true_list = []
+                        for move1 in sim_stock_move.stock_moves:
+                            if move1.state in ["cancel", "done"]:
+                                true_list.append(True)
+                            else:
+                                true_list.append(False)
+                                #     states = sim_stock_move.stock_moves.mapped("state")
+                                #     if states in ["cancel", "done"]:
+                        if all(true_list):
+                            split_move = sim_stock_move.stock_moves[0].copy(
+                                    default={'quantity_done': move['quantity_ready'],
+                                             'product_uom_qty': move['quantity_ready'],
+                                             'production_id': sim_stock_move.production_id.id,
+                                             'raw_material_production_id': sim_stock_move.raw_material_production_id.id,
+                                             'procurement_id': sim_stock_move.procurement_id.id or False,
+                                             'is_over_picking': True})
+                            sim_stock_move.production_id.move_raw_ids = sim_stock_move.production_id.move_raw_ids + split_move
+                            split_move.write({'state': 'assigned',})
+                            split_move.action_done()
+                            split_move.authorized_stock_move(employee_id, uid)
+                        else:
+                            simss_stock_moves = sim_stock_move.stock_moves.filtered(
+                                    lambda x: x.state not in ["cancel", "done"])
+                            if simss_stock_moves and simss_stock_moves[0]:
+                                # sim_stock_move.stock_moves[0].quantity_done_store = move['quantity_ready']
+                                simss_stock_moves[0].quantity_done = move['quantity_ready']
+                                simss_stock_moves[0].action_done()
+                                simss_stock_moves[0].authorized_stock_move(employee_id, uid)
+                            else:
+                                split_move = sim_stock_move.stock_moves[0].copy(
+                                        default={'quantity_done': move['quantity_ready'],
+                                                 'product_uom_qty': move['quantity_ready'],
+                                                 'production_id': sim_stock_move.production_id.id,
+                                                 'raw_material_production_id': sim_stock_move.raw_material_production_id.id,
+                                                 'procurement_id': sim_stock_move.procurement_id.id or False,
+                                                 'is_over_picking': True})
+                                sim_stock_move.production_id.move_raw_ids = sim_stock_move.production_id.move_raw_ids + split_move
+                                split_move.write({'state': 'assigned',})
+                                split_move.action_done()
+                                split_move.authorized_stock_move(employee_id, uid)
 
                     # _logger.warning(u"charlie_0712_log_9:len_move_raw_ids:%d",
                     #                 len(sim_stock_move.production_id.move_raw_ids))

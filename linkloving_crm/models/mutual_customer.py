@@ -6,10 +6,12 @@ from odoo import tools
 class CrmMutualCustomer(models.Model):
     _name = 'crm.mutual.customer'
 
-    group_name = fields.Char(string=u'分组名称')
+    name = fields.Char(string=u'分组名称')
 
     reference_type = fields.Selection([(u'Follow', u'跟进记录'), (u'Mail', u'接收邮件'), (u'Order', u'订单')], string=u'参考类型',
                                       default=u'Follow')
+
+    category_id = fields.Many2many('crm.reference.type', string=u'参照物')
 
     description = fields.Char(string=u'移入规则')
 
@@ -22,14 +24,29 @@ class CrmMutualCustomer(models.Model):
     @api.multi
     def action_apply_all_partner(self):
         for mutual in self:
-            domain = [('customer', '=', True), ('is_company', '=', True), ('is_order', '=', False)]
-            partner_list = self.env['res.partner'].search(domain)
+            parnter_type = self._context.get('parnter_type', False)
 
-            for partner_one in partner_list:
-                if partner_one.user_id and (not partner_one.mutual_rule_id):
-                    partner_one.write({'mutual_rule_id': mutual.id})
+            if parnter_type == 'delect_all':
+                for par_one in mutual.customer_ids:
+                    par_one.write({'mutual_rule_id': ''})
+            else:
+                domain = [('customer', '=', True), ('is_company', '=', True)]
+                if parnter_type == 'latent':
+                    domain.append(('is_order', '=', False))
+                partner_list = self.env['res.partner'].search(domain)
+                for partner_one in partner_list:
+                    if partner_one.user_id and (not partner_one.mutual_rule_id):
+                        partner_one.write({'mutual_rule_id': mutual.id})
+                        # 取消应用于全部
+                        # for partner_one in partner_list:
+                        #     if partner_one.user_id:
+                        #         partner_one.write({'mutual_rule_id': ''})
 
-                    # 取消应用于全部
-                    # for partner_one in partner_list:
-                    #     if partner_one.user_id:
-                    #         partner_one.write({'mutual_rule_id': ''})
+
+class CrmReferenceType(models.Model):
+    _name = 'crm.reference.type'
+
+    # type_name = fields.Char(u'类型')
+    name = fields.Selection([(u'Follow', u'跟进记录'), (u'Mail', u'接收邮件'), (u'Order', u'订单')], string=u'参考类型',
+                            default=u'Follow')
+    describe_name = fields.Text(string=u'描述')

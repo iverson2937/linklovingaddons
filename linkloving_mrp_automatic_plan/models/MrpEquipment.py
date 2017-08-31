@@ -11,21 +11,28 @@ class ProcurementOrderExtend(models.Model):
 
     def _prepare_mo_vals(self, bom):
         res = super(ProcurementOrderExtend, self)._prepare_mo_vals(bom)
-        #
-        # produced_spend = res["product_qty"] * bom.produced_spend_per_pcs + bom.prepare_time
-        #
-        # res.update({'state': 'draft',
-        #             'process_id': bom.process_id.id,
-        #             'unit_price': bom.process_id.unit_price,
-        #             'mo_type': bom.mo_type,
-        #             'hour_price': bom.hour_price,
-        #             'in_charge_id': bom.process_id.partner_id.id,
-        #             'product_qty': self.get_actual_require_qty(),
-        #             'date_planned_start': fields.Datetime.to_string(self._get_date_planned_from_today()),
-        #             'date_planned_finished': fields.Datetime.from_string(self.date_planned) + relativedelta(
-        #                 seconds=produced_spend)
-        #             })
+
+        produced_spend = res["product_qty"] * bom.produced_spend_per_pcs + bom.prepare_time
+        date_planned_start = fields.Datetime.to_string(self._get_date_planned_from_date_planned())
+        res.update({'state': 'draft',
+                    # 'process_id': bom.process_id.id,
+                    # 'unit_price': bom.process_id.unit_price,
+                    # 'mo_type': bom.mo_type,
+                    # 'hour_price': bom.hour_price,
+                    # 'in_charge_id': bom.process_id.partner_id.id,
+                    # 'product_qty': self.get_actual_require_qty(),
+                    'date_planned_start': fields.Datetime.from_string(date_planned_start) - relativedelta(
+                            seconds=produced_spend),
+                    'date_planned_finished': date_planned_start
+
+                    })
         return res
+
+    def _get_date_planned_from_date_planned(self):
+        format_date_planned = fields.Datetime.from_string(self.date_planned)
+        date_planned = format_date_planned - relativedelta(days=self.product_id.produce_delay or 0.0)
+        date_planned = date_planned - relativedelta(days=self.company_id.manufacturing_lead)
+        return date_planned
 # 设备
 class MrpProcessEquipment(models.Model):
     _name = 'mrp.process.equipment'

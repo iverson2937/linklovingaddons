@@ -34,6 +34,8 @@ class CrmLead(models.Model):
     whatsapp = fields.Char(string=u'WhatsApp')
     skype = fields.Char(string=u'Skype')
 
+    mutual_rule_id = fields.Integer()
+
     @api.multi
     def _lead_create_contact(self, name, is_company, parent_id=False, customer=False):
         """ extract data from lead to create a partner
@@ -96,7 +98,8 @@ class CrmLead(models.Model):
             'continent': self.continent.id,
             'express_sample_record': self.express_sample_record,
             'interested_in_product': [(6, 0, list(alarm_record))],
-            'product_series_ids': [(6, 0, list(alarm_record1))]
+            'product_series_ids': [(6, 0, list(alarm_record1))],
+            'mutual_rule_id': self.mutual_rule_id
         }
 
         if is_company:

@@ -33,15 +33,11 @@ class SaleOrder(http.Controller):
                 'borders: left thin, right thin, top thin, bottom thin;'
                 'align: vertical center, horizontal center;'
             )
-            header_list = [
-                _('Order No'), _('Supplier'), _('Create By'), _('Order Date'), _('Product'),
-                _('Inner Code'), _('Specification'), _('Unit Price'), _('Order qty'), _('Receive qty'),
-                _('Invoiced qty'), _('Sub Total'), _('Total Amount')
 
-            ]
 
             header_list = [
-                u'订单号', u'客户', u'订单日期', u'产品', u'规格', u'单价', u'订购数量', u'送货数量', u'订单金额', u'出货金额', u'开单金额', u'截止金额',
+                u'订单号', u'客户', u'订单日期', u'产品', u'规格', u'单价', u'订购数量', u'送货数量', u'订单金额', u'出货金额', u'开单金额',
+                u'预付金额', u'截止金额',
                 u'创建人'
             ]
 
@@ -60,9 +56,13 @@ class SaleOrder(http.Controller):
                                  style)
                 data_sheet.write(current_row, 10, vals.get('invoiced_amount') and vals.get('invoiced_amount') or 0.0,
                                  style)
-                data_sheet.write(current_row, 11, vals.get('remaining_amount') and vals.get('remaining_amount') or 0.0,
+                data_sheet.write(current_row, 11,
+                                 vals.get('pre_payment_amount') and vals.get('pre_payment_amount') or 0.0,
                                  style)
-                data_sheet.write(current_row, 12, vals.get('create_uid') and vals.get('create_uid') or '',
+                data_sheet.write(current_row, 12,
+                                 vals.get('remaining_amount') and vals.get('remaining_amount') or 0.0,
+                                 style)
+                data_sheet.write(current_row, 13, vals.get('create_uid') and vals.get('create_uid') or '',
                                  style)
 
                 if not record.get('line'):

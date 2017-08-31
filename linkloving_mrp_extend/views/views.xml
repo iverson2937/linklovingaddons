@@ -3,6 +3,7 @@
         <record id="mrp_production_refuse_tree" model="ir.ui.view">
             <field name="name">mrp.production.tree</field>
             <field name="model">mrp.production</field>
+            <field name="priority">99</field>
             <field name="arch" type="xml">
                 <tree string="拒绝备料的订单">
                     <field name="name"/>
@@ -1295,9 +1296,9 @@
                 <xpath expr="//field[@name='availability']" position="replace">
                     <field name="availability" string="材料状况"/>
                 </xpath>
-                <xpath expr="//field[@name='origin']" position="replace">
-                    <field name="total_spent_money" string="加工总费用"/>
-                </xpath>
+                <!--<xpath expr="//field[@name='origin']" position="replace">-->
+                <!--<field name="total_spent_money" string="加工总费用"/>-->
+                <!--</xpath>-->
             </field>
         </record>
 

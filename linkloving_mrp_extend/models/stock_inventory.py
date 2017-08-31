@@ -42,6 +42,7 @@ class InventoryLine(models.Model):
                 'restrict_lot_id': line.prod_lot_id.id,
                 'restrict_partner_id': line.partner_id.id,
                 'move_order_type': 'inventory_out' if diff > 0 else 'inventory_in',
+                'quantity_adjusted_qty': line.product_qty,
             }
             if diff < 0:  # found more than expected
                 vals['location_id'] = line.product_id.property_stock_inventory.id

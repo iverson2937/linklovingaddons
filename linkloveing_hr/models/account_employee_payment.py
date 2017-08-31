@@ -87,7 +87,7 @@ class AccountEmployeePayment(models.Model):
         used_payment = sum([payment.amount for payment in self.payment_line_ids])
         remaining = self.amount - used_payment - payment_return
 
-        if not float_is_zero(remaining, 2):
+        if float_is_zero(remaining, 2):
             self.can_return = False
 
     can_return = fields.Boolean(compute=_is_can_return, store=True)
@@ -128,8 +128,8 @@ class AccountEmployeePayment(models.Model):
         self.state = 'confirm'
 
         if self.employee_id == self.employee_id.department_id.manager_id:
-            department = self.to_approve_id.employee_ids.department_id
-            if not department.parent_id or (department.allow_amount and self.amount > department.allow_amount):
+            department = self.employee_id.department_id
+            if not department.parent_id or (department.allow_amount and self.amount < department.allow_amount):
                 self.write({'state': 'approve'})
             else:
                 if not self.employee_id.department_id.parent_id.manager_id:

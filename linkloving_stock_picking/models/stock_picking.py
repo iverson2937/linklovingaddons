@@ -329,7 +329,8 @@ class StockPicking(models.Model):
                 # self.env['ir.attachment'].search(['&', ('res_id', '=', attachment_one.id), ('name', 'ilike', '物流')]))
                 self.env['ir.attachment'].search([('res_id', '=', attachment_one.id)]))
             attachment_one.qc_img_count = len(
-                self.env['ir.attachment'].search(['&', ('res_id', '=', attachment_one.id), ('name', 'ilike', 'Inspection')]))
+                self.env['ir.attachment'].search(
+                    ['&', ('res_id', '=', attachment_one.id), ('name', 'ilike', 'Inspection')]))
 
     @api.multi
     def stock_img_count(self):
@@ -368,6 +369,8 @@ class StockMovePicking(models.Model):
     ], string=u'类型')
 
     reason_stock = fields.Text(string="操作原因")
+
+    quantity_adjusted_qty = fields.Float(string=u'调整后数量')
 
     @api.one
     @api.depends('company_id')

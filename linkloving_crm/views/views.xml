@@ -13,6 +13,7 @@
                 <!--右-->
                 <xpath expr="//field[@name='tag_ids']" position="after">
                     <field name="qq"/>
+                    <field name="mutual_rule_id" invisible="1"/>
                 </xpath>
 
                 <xpath expr="//field[@name='qq']" position="after">
@@ -61,6 +62,7 @@
                             </tree>
                         </field>
                         <button string="添加型号" name="action_tree_list_view" type="object" class="btn-primary" groups=""/>
+                        <div class="oe_clear"/>
                     </page>
 
                 </xpath>

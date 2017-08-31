@@ -109,12 +109,13 @@
             <field name="inherit_id" ref="stock.view_move_tree"/>
             <field name="arch" type="xml">
 
-                <!--<xpath expr="//tree" position="attributes">-->
-                <!--<attribute name="default_order">state desc</attribute>-->
-                <!--</xpath>-->
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="default_order">state desc,write_date</attribute>
+                </xpath>
 
                 <xpath expr="//field[@name='product_id']" position="after">
-                    <field name="data_type" string="数量"/>
+                    <field name="data_type" string="出入库数量"/>
+                    <field name="quantity_adjusted_qty" string="当前库存"/>
                 </xpath>
 
                 <xpath expr="//field[@name='product_uom_qty']" position="attributes">
@@ -148,14 +149,14 @@
                     <attribute name="invisible">True</attribute>
                 </xpath>
 
-                <xpath expr="//field[@name='product_uom']" position="after">
-                    <field name="create_uid"/>
-                </xpath>
+                <!--<xpath expr="//field[@name='product_uom']" position="after">-->
+                    <!--<field name="create_uid"/>-->
+                <!--</xpath>-->
 
 
                 <xpath expr="//field[@name='date_expected']" position="after">
                     <field name="write_uid" string="操作人"/>
-                    <field name="write_date" string="操作日期"/>
+                    <!--<field name="write_date" string="操作日期"/>-->
                 </xpath>
 
 
