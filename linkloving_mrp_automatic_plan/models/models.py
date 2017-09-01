@@ -511,7 +511,7 @@ class SaleOrderEx(models.Model):
 
     @api.multi
     def read(self, fields=None, load='_classic_read'):
-        if len(self) == 1 and load == '_classic_read':
+        if len(self) == 1 and load == '_classic_read' and False:
             self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].calc_status_light(self)
         return super(SaleOrderEx, self).read(fields, load)
 

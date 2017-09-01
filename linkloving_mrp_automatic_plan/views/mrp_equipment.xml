@@ -162,5 +162,18 @@
         <menuitem id="menu_mrp_work_type_config" name="工种" parent="mrp.menu_mrp_configuration" sequence="33"
                   action="action_mrp_work_type"/>
 
+
+
+        <record model="ir.actions.client" id="test_pc_action">
+            <field name="name">linkloving_mrp_automatic_plan window</field>
+            <field name="tag">arrange_production</field>
+        </record>
+
+         <menuitem id="test_pc"
+            name="生产排产"
+            action="test_pc_action"
+            parent="mrp.menu_mrp_manufacturing"
+            sequence="13"/>
+
     </data>
 </openerp>

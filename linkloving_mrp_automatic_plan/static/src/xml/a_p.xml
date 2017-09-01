@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+    <t t-name="arrange_production_tmp">
+        <div class="arrange_production_container">
+            <div id="a_p_left">
+                <div class="production_line">产线1</div>
+                <div class="production_lists_wrap">A</div>
+                <div class="production_line">产线2</div>
+                <div class="production_lists_wrap">B</div>
+                <div class="production_line">产线3</div>
+                <div class="production_lists_wrap">C</div>
+                <div class="production_line">产线4</div>
+                <div class="production_lists_wrap">D</div>
+                <div class="production_line">产线5</div>
+                <div class="production_lists_wrap">E</div>
+            </div>
+            <div id="a_p_right">
+                <div class="ap_item_wrap">1</div>
+                <div class="ap_item_wrap">2</div>
+                <div class="ap_item_wrap">3</div>
+            </div>
+        </div>
+    </t>
+</templates>
