@@ -120,7 +120,7 @@ odoo.define('linkloving.task_kanban_view', function (require) {
                 this.do_action({
                     type: 'ir.actions.act_window',
                     res_model: "project.task",
-                    views: [[false, 'gantt']],
+                    views: [[false, 'wangke']],
                     target: '_blank',
                     domain: [['project_id', '=', self.record.project_id.raw_value[0]], ['top_task_id', '=', self.record.id.raw_value]],
                     context: {'group_by': 'top_task_id', 'order_by': 'stage_id'}
@@ -153,7 +153,7 @@ odoo.define('linkloving.task_kanban_view', function (require) {
                 n_group_bys = group_bys;
             }
             // gather the fields to get
-            var fields = _.compact(_.map(["date_start", "date_stop", "progress", "child_ids", "parent_ids", "stage_id", "top_task_id"], function (key) {
+            var fields = _.compact(_.map(["date_start", "date_stop", "progress", "child_ids", "parent_ids", "stage_id", "top_task_id", "after_task_id"], function (key) {
                 return self.fields_view.arch.attrs[key] || '';
             }));
             fields = _.uniq(fields.concat(n_group_bys));
@@ -371,7 +371,6 @@ odoo.define('linkloving.task_kanban_view', function (require) {
                 data[self.fields_view.arch.attrs.date_delay] = duration;
             }
 
-
             return $.when(self.dataset.write(itask.id, data)).then(function () {
                 self.reload();
             });
@@ -412,7 +411,7 @@ odoo.define('linkloving.task_kanban_view', function (require) {
                             return _.isEqual(group.name, c_group_name);
                         });
                         if (c_group === undefined) {
-                            c_group = {name: c_group_name, tasks: [], __is_group: true};
+                            c_group = {name: c_group_name, tasks: [], __is_group: true, __is_stage: true};
                             group.tasks.push(c_group);
                             group.tasks.sort(by("name"));
                         }
@@ -556,16 +555,6 @@ odoo.define('linkloving.task_kanban_view', function (require) {
             });
 
             gantt.create($(this.$el).get(0));
-            // gantt.create(2);11111111111111111111111111\
-
-            // bind event to display task when we click the item in the tree
-            // $(".taskNameItem", self.$el).click(function (event) {
-            //     var task_info = task_ids[event.target.id];
-            //     if (task_info) {
-            //         self.on_task_display(task_info.internal_task);
-            //     }
-            // });
-
 
             if (this.is_action_enabled('create')) {
                 // insertion of create button

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-import json
 
 from odoo import models, fields, api, _
 from odoo.tools.float_utils import float_is_zero
+import datetime, time
 
 AVAILABLE_PRIORITIES = [
     ('0', 'badly'),
@@ -52,7 +52,7 @@ class linkloving_project_task(models.Model):
         for task in self:
             if task.parent_ids:
                 for parent_id in task.parent_ids:
-                        task.display_name = parent_id.name;
+                    task.display_name = parent_id.name;
 
     def _get_top_task_id(self):
         for task in self:
@@ -99,6 +99,9 @@ class linkloving_project_task(models.Model):
     legend_close = fields.Char(related='stage_id.legend_close', string='Kanban Close Explanation', readonly=True)
 
     legend_pending = fields.Char(related='stage_id.legend_pending', string='Kanban Pending Explanation', readonly=True)
+
+    pre_task_ids = fields.One2many("project.task", "after_task_id", string='Pre Task ID')
+    after_task_id = fields.Many2one('project.task')
 
     kanban_state = fields.Selection([
         ('normal', 'In Progress'),
@@ -178,7 +181,6 @@ class linkloving_project_task(models.Model):
                 else:
                     child.top_task_id = self.top_task_id
 
-
     @api.model
     def create(self, vals):
         res = super(linkloving_project_task, self).create(vals)
@@ -250,3 +252,56 @@ class linkloving_project_task(models.Model):
             self.stage_id = self.stage_find(self.project_id.id, [('fold', '=', False)])
         else:
             self.stage_id = False
+
+    def _check_pre_task_id(self, target_id):
+        for task_id in self.pre_task_ids:
+            if task_id == target_id:
+                return False
+            if task_id.pre_task_ids:
+                return task_id._check_pre_task_id(target_id)
+        return True
+
+    def on_link_task(self, target_id):
+        target = self.env['project.task'].browse(target_id)
+
+        res = []
+        if target.parent_ids and self.parent_ids:
+            if target.parent_ids[0] == self.parent_ids[0]:
+                if self.pre_task_ids:
+                    if self._check_pre_task_id(target):
+                        self.after_task_id = target_id
+                        self.after_task_id._update_task_duration(res)
+                else:
+                    self.after_task_id = target_id
+                    self.after_task_id._update_task_duration(res)
+
+        return res
+
+    def _update_task_duration(self, res):
+        if self.task_progress <= 0:
+            max_date_end = max([datetime.datetime.strptime(pre_task.date_end, '%Y-%m-%d') for pre_task in self.pre_task_ids])
+            date_start = datetime.datetime.strptime(self.date_start, '%Y-%m-%d')
+            differ = (date_start - max_date_end).days
+
+            date_end = datetime.datetime.strptime(self.date_end, '%Y-%m-%d') - datetime.timedelta(days=differ)
+
+            vals = {"date_start": max_date_end, "date_end": date_end}
+            self.write(vals)
+            res.append({"id": self.id, "start_date": max_date_end.strftime("%Y-%m-%d"), "end_date": date_end.strftime("%Y-%m-%d")},)
+            if self.after_task_id:
+                self.after_task_id._update_task_duration(res)
+            return res
+
+    def on_task_change(self, vals):
+        self.write(vals)
+        res = []
+        if self.after_task_id:
+            self.after_task_id._update_task_duration(res)
+        return res
+
+    def on_task_relation_delete(self, target_id):
+        if self.after_task_id:
+            if self.after_task_id.id == target_id:
+                self.after_task_id = False
+                return True
+        return False
