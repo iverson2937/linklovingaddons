@@ -42,7 +42,7 @@ class report_purchase(http.Controller):
             [data_sheet.write(0, row, line, style) for row, line in enumerate(header_list)]
 
             current_row = 1
-            for record in data.itervalues():
+            for record in sorted(data.itervalues(), key=lambda a: a['data']['date_order']):
                 vals = record.get('data')
 
                 data_sheet.write(current_row, 0, vals.get('name') and vals.get('name') or '', style)
