@@ -99,7 +99,7 @@ class NameCardController(http.Controller):
     def add_one_partner(cls, dic):
         members = dic.get("members") or []
         # name = dic.get("name")
-        company_real_name = company_name = dic.get("company_name")
+        company_real_name = company_name = dic.get("company_name") or ''
         company_id = dic.get("company_id")
         saleman_id = dic.get("saleman_id")
         saleteam_id = dic.get("saleteam_id")
@@ -121,14 +121,14 @@ class NameCardController(http.Controller):
         if company_id:
             new_company_id = company_id
         else:
-            if u"有限公司" in company_name:
-                company_name = company_name.replace(u"有限公司", "")
-            elif u'有限责任公司' in company_name:
-                company_name = company_name.replace(u"有限责任公司", "")
-            elif u'责任有限公司' in company_name:
-                company_name = company_name.replace(u"责任有限公司", "")
-            elif u'公司' in company_name:
-                company_name = company_name.replace(u"公司", "")
+            # if u"有限公司" in company_name:
+            #     company_name = company_name.replace(u"有限公司", "")
+            # elif u'有限责任公司' in company_name:
+            #     company_name = company_name.replace(u"有限责任公司", "")
+            # elif u'责任有限公司' in company_name:
+            #     company_name = company_name.replace(u"责任有限公司", "")
+            # elif u'公司' in company_name:
+            #     company_name = company_name.replace(u"公司", "")
             company = request.env["res.partner"].sudo().search([("name", "ilike", company_name)], limit=1)
             if not company:
                 company = request.env["res.partner"].sudo(request.context.get("uid")).create({
