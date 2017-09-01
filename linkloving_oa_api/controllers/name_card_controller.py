@@ -88,6 +88,8 @@ class NameCardController(http.Controller):
     @http.route('/linkloving_oa_api/add_partners/', auth='none', type='json', csrf=False, cors='*')
     def add_partners(self, **kwargs):
         partners = request.jsonrequest.get("partners")
+        if not partners:
+            raise UserError(u"请确认导入的信息")
         for partner in partners:
             NameCardController.add_one_partner(partner)
         return True
@@ -95,7 +97,7 @@ class NameCardController(http.Controller):
     # 解析
     @classmethod
     def add_one_partner(cls, dic):
-        members = dic.get("members")
+        members = dic.get("members") or []
         # name = dic.get("name")
         company_real_name = company_name = dic.get("company_name")
         company_id = dic.get("company_id")
@@ -104,6 +106,7 @@ class NameCardController(http.Controller):
         tag_list = dic.get("tag_list") or None
         star_cnt = dic.get("star_cnt")
         partner_lv = dic.get("partner_lv")
+        website = dic.get("website")
         phone = dic.get("phone")
         street = members[0].get("street")
         area = dic.get("area")
@@ -141,6 +144,7 @@ class NameCardController(http.Controller):
                     "is_company": True,
                     'source_id': src_id,
                     'country_id': country_id,
+                    'website': website,
                     # 'product_series_ids': (6, 0, product_series) or [],
                 })
                 company.category_id = [tag_list] if tag_list else []
@@ -159,13 +163,13 @@ class NameCardController(http.Controller):
                     "is_company": True,
                     'source_id': src_id,
                     'country_id': country_id,
+                    'website': website,
                     # 'product_series_ids': (6, 0, product_series) or [],
                 })
                 company.category_id = [tag_list] if tag_list else []
                 company.product_series_ids = product_series
             new_company_id = company.id
             # company.company_type = "company"
-
         for me in members:
 
             partners = request.env["res.partner"].sudo().search(

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta
-
+import datetime
+import pytz
 from dateutil.relativedelta import relativedelta
 
 from odoo import models, fields, api
@@ -13,7 +13,8 @@ class ProcurementOrderExtend(models.Model):
         res = super(ProcurementOrderExtend, self)._prepare_mo_vals(bom)
 
         produced_spend = res["product_qty"] * bom.produced_spend_per_pcs + bom.prepare_time
-        date_planned_start = fields.Datetime.to_string(self._get_date_planned_from_date_planned())
+        date_planned_end = fields.Datetime.to_string(self._get_date_planned_from_date_planned())
+        start_time, end_time = self.compute_mo_start_time(self._get_date_planned_from_date_planned(), produced_spend)
         res.update({'state': 'draft',
                     # 'process_id': bom.process_id.id,
                     # 'unit_price': bom.process_id.unit_price,
@@ -21,10 +22,8 @@ class ProcurementOrderExtend(models.Model):
                     # 'hour_price': bom.hour_price,
                     # 'in_charge_id': bom.process_id.partner_id.id,
                     # 'product_qty': self.get_actual_require_qty(),
-                    'date_planned_start': fields.Datetime.from_string(date_planned_start) - relativedelta(
-                            seconds=produced_spend),
-                    'date_planned_finished': date_planned_start
-
+                    'date_planned_start': fields.Datetime.to_string(start_time),
+                    'date_planned_finished': fields.Datetime.to_string(end_time)
                     })
         return res
 
@@ -33,6 +32,80 @@ class ProcurementOrderExtend(models.Model):
         date_planned = format_date_planned - relativedelta(days=self.product_id.produce_delay or 0.0)
         date_planned = date_planned - relativedelta(days=self.company_id.manufacturing_lead)
         return date_planned
+
+    def compute_mo_start_time(self, end_time, spent_time):
+        tz_offset = pytz.timezone(self.env.user.tz)._utcoffset
+        end_time_with_zone = (end_time + tz_offset)
+        corrected_end_time = self.correct_work_time(end_time_with_zone)
+        day_start_time = fields.datetime.strptime(fields.datetime.strftime(corrected_end_time, '%Y-%m-%d'),
+                                                  '%Y-%m-%d')  # 今日的0点
+        work_start_time = day_start_time + relativedelta(seconds=8 * 60 * 60)
+        off_work_time = day_start_time + relativedelta(seconds=16 * 60 * 60)
+        theoretics_start_time = corrected_end_time - relativedelta(seconds=spent_time)  # 理论的时间- (不计算上下班时间,节假日的)
+        if theoretics_start_time <= off_work_time and theoretics_start_time >= work_start_time:  # 当天能完成 不做操作
+            real_start_time = theoretics_start_time
+
+        else:  # 跨天了
+            arrange_time = corrected_end_time - work_start_time  # 今天的结束时间 - 今天上班时间 = 今天所安排的时间
+            left_time = spent_time - arrange_time.seconds  # 剩余安排时间
+            move_corrected_time = corrected_end_time
+            while left_time > 0:
+                move_corrected_time = move_corrected_time - relativedelta(days=1)
+                new_day_0_time = fields.datetime.strptime(fields.datetime.strftime(move_corrected_time, '%Y-%m-%d'),
+                                                          '%Y-%m-%d')  # 这一天的0点
+                new_day_work_start_time = new_day_0_time + relativedelta(seconds=8 * 60 * 60)  # 这一天的上班时间
+                # new_day_off_work_time = new_day_0_time + relativedelta(seconds=16 * 60 * 60)#这一天的下班时间
+                theoretics_move_start_time = move_corrected_time - relativedelta(seconds=left_time)  # 理论的时间
+                if self.is_time_in_work_time(theoretics_move_start_time):
+                    real_start_time = theoretics_move_start_time
+                    left_time = 0
+                else:
+                    left_time = spent_time - (move_corrected_time + new_day_work_start_time)
+                    # if theoretics_move_start_time <= new_day_off_work_time and theoretics_move_start_time >= new_day_work_start_time:
+        if not real_start_time:
+            raise UserWarning(u"出错了")
+        return real_start_time, corrected_end_time
+
+    # 是否是工作时间
+    def is_time_in_work_time(self, planned_time_with_zone):
+        # tz_offset = pytz.timezone(self.env.user.tz)._utcoffset
+        # planned_time_with_zone = (planned_time + tz_offset)
+        dayOfWeek = planned_time_with_zone.weekday()
+        if dayOfWeek == 6:  # 暂定周天为休息日
+            return False
+        else:
+            current_day_start_time = fields.datetime.strptime(
+                fields.datetime.strftime(planned_time_with_zone, '%Y-%m-%d'), '%Y-%m-%d')  # 今日的开始时间
+            work_start_time = current_day_start_time + relativedelta(seconds=8 * 60 * 60)
+            off_work_time = current_day_start_time + relativedelta(seconds=16 * 60 * 60)
+            # current_day_end_time = current_day_start_time + relativedelta(days=1) - relativedelta(microseconds=1)  # 今日的结束时间
+            # print(current_day_end_time)
+            if planned_time_with_zone < work_start_time or planned_time_with_zone > off_work_time:
+                return False
+            else:
+                return True
+
+    # 如果当前时间不是工作时间 则调整到是工作时间以及调整的时间相差了多少,方便计算剩余工时,如果是则不做操作直接返回
+    def correct_work_time(self, planned_time_with_zone):
+
+        is_work_time = self.is_time_in_work_time(planned_time_with_zone)
+        if is_work_time:
+            return planned_time_with_zone
+        else:
+            current_day_start_time = fields.datetime.strptime(
+                fields.datetime.strftime(planned_time_with_zone, '%Y-%m-%d'), '%Y-%m-%d')  # 今日的开始时间
+            yesterday_off_work_time = current_day_start_time - relativedelta(days=1) + relativedelta(
+                seconds=16 * 60 * 60)
+            while not self.is_time_in_work_time(yesterday_off_work_time):
+                # if self.is_time_in_work_time(yesterday_off_work_time):
+                #     return yesterday_off_work_time
+                # else:
+                yesterday_off_work_time = yesterday_off_work_time - relativedelta(days=1) + relativedelta(
+                    seconds=16 * 60 * 60)
+
+            return yesterday_off_work_time
+
+
 # 设备
 class MrpProcessEquipment(models.Model):
     _name = 'mrp.process.equipment'

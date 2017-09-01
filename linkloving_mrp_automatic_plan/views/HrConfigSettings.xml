@@ -1,0 +1,34 @@
+<openerp>
+    <data>
+        <record id="view_hr_config_setting" model="ir.ui.view">
+            <field name="name">设置</field>
+            <field name="model">hr.config.settings</field>
+            <field name="arch" type="xml">
+                <form string="设置" class="oe_form_configuration">
+                    <header>
+                        <button string="应用" type="object" name="execute" class="oe_highlight"/>
+                        <button string="取消" type="object" name="cancel" class="oe_link"/>
+                    </header>
+
+                    <group string="工厂时间设置">
+                        <field name="factory_work_start_time" widget="float_time"/>
+                        <field name="factory_work_end_time" widget="float_time"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record id="action_hr_config_settings" model="ir.actions.act_window">
+            <field name="name">Configure</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+        </record>
+
+        <menuitem id="he_config_setting"
+                  name="设置"
+                  parent="hr.menu_human_resources_configuration"
+                  groups="hr.group_hr_manager"
+                  action="action_hr_config_settings"/>
+    </data>
+</openerp>
