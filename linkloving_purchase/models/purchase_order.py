@@ -44,11 +44,10 @@ class PurchaseOrder(models.Model):
             order.remaining_amount = remaining_amount
             order.shipped_amount = shipped_amount
             order.pre_payment_amount = 0.0
-            if float_compare(invoiced_amount, shipped_amount, precision_digits=2) > 0:
-                print invoice.name
-                print invoiced_amount
-                print shipped_amount
-                order.pre_payment_amount = invoiced_amount - shipped_amount
+            if order.invoice_status == 'no' and order.shipping_rate < 10:
+                order.pre_payment_amount = invoiced_amount
+            else:
+                order.invoiced_amount = invoiced_amount
 
     @api.depends('product_count', 'order_line.qty_received')
     def _compute_shipping_rate(self):
