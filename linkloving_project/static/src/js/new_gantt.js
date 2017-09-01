@@ -1,7 +1,7 @@
 /**
  * Created by 123 on 2017/7/24.
  */
-odoo.define('linkloving_project.new_gantt', function (require){
+odoo.define('linkloving_project.new_gantt', function (require) {
     "use strict";
 
     var core = require('web.core');
@@ -10,10 +10,30 @@ odoo.define('linkloving_project.new_gantt', function (require){
     var formats = require('web.formats');
     var time = require('web.time');
     var data = require('web.data');
+    var Dialog = require('web.Dialog');
     var QWeb = core.qweb;
+    var _t = core._t;
+
+    Date.prototype.Format = function (fmt) { //author: meizz
+        var o = {
+            "M+": this.getMonth() + 1,                 //月份
+            "d+": this.getDate(),                    //日
+            "h+": this.getHours(),                   //小时
+            "m+": this.getMinutes(),                 //分
+            "s+": this.getSeconds(),                 //秒
+            "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+            "S": this.getMilliseconds()             //毫秒
+        };
+        if (/(y+)/.test(fmt))
+            fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+            if (new RegExp("(" + k + ")").test(fmt))
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+    }
 
     var New_Gantt = View.extend({
-        template:'new_gantt',
+        template: 'new_gantt',
         view_type: "wangke",
         init: function (parent, options) {
             var self = this;
@@ -45,11 +65,6 @@ odoo.define('linkloving_project.new_gantt', function (require){
             }
             return this.alive(view_loaded_def).then(function (r) {
                 self.fields_view = r;
-                // add css classes that reflect the (absence of) access rights
-                // self.$el.addClass('oe_view')
-                //     .toggleClass('oe_cannot_create', !self.is_action_enabled('create'))
-                //     .toggleClass('oe_cannot_edit', !self.is_action_enabled('edit'))
-                //     .toggleClass('oe_cannot_delete', !self.is_action_enabled('delete'));
                 return $.when(self.view_loading(r)).then(function () {
                     self.trigger('view_loaded', r);
                 });
@@ -82,7 +97,7 @@ odoo.define('linkloving_project.new_gantt', function (require){
                 n_group_bys = group_bys;
             }
             // gather the fields to get
-            var fields = _.compact(_.map(["date_start", "date_stop", "progress"], function (key) {
+            var fields = _.compact(_.map(["date_start", "date_stop", "progress", "child_ids", "parent_ids", "stage_id", "top_task_id", "after_task_id"], function (key) {
                 return self.fields_view.arch.attrs[key] || '';
             }));
             fields = _.uniq(fields.concat(n_group_bys));
@@ -115,81 +130,150 @@ odoo.define('linkloving_project.new_gantt', function (require){
             });
         },
         on_data_loaded_2: function (tasks, group_bys) {
-
-
-             // var self = this;
-            // $(".o_content").append("<div class='o_view_manager_content'></div>")
-            // gantt.init("gantt_here_");
-            // var para=document.createElement("div");
-            // para.className="o_view_manager_content";
-            // var div1 = $("<div class='o_view_manager_content'></div>");
-            // $(div1).append($(".gantt_container"));
-            // $(".o_content").append($(div1));
-            // console.log($(".o_view_manager_content"));
-            // gantt.create(2);
-
+            var data_tasks = [];
+            var data_links = [];
+            _.each(tasks, function (task, i) {
+                var t;
+                if (task.top_task_id && task.top_task_id[0] != task.id) {
+                    t = {
+                        "id": task.id,
+                        "text": task.__name,
+                        "start_date": new Date(task.date_start).Format("dd-MM-yyyy"),
+                        "duration": (new Date(task.date_end).getTime() - new Date(task.date_start).getTime()) / (1000 * 60 * 60) / 24,
+                        "parent": task.parent_ids ? task.parent_ids[0] : task.top_task_id[0],
+                        "progress": task.task_progress / 100,
+                        "open": false
+                    };
+                } else {
+                    t = {
+                        "id": task.id,
+                        "text": task.__name,
+                        "start_date": new Date(task.date_start).Format("dd-MM-yyyy"),
+                        "duration": (new Date(task.date_end).getTime() - new Date(task.date_start).getTime()) / (1000 * 60 * 60) / 24,
+                        "progress": task.task_progress / 100,
+                        "open": true
+                    };
+                }
+                data_tasks.push(t);
+                if (task.after_task_id) {
+                    var l = {"id": i + 1, "source": task.id, "target": task.after_task_id[0], "type": "0"}
+                    data_links.push(l);
+                }
+            })
+            var data = {
+                "data": data_tasks,
+                "links": data_links
+            }
             var self = this;
             $(".o_content").append(self.$el[0]);
-            console.log(self.$el);
             gantt.init(self.$el[0]);
-            gantt.parse(demo_tasks)
-            // gantt.create(2);
+            gantt.clearAll();
+            gantt.parse(data);
 
-            // bind event to display task when we click the item in the tree
-            // $(".taskNameItem", self.$el).click(function (event) {
-            //     var task_info = task_ids[event.target.id];
-            //     if (task_info) {
-            //         self.on_task_display(task_info.internal_task);
-            //     }
-            // });
+            gantt.attachEvent("onBeforeLinkAdd", function (link) {
+                return self.on_link_add(link);
+            });
 
-            // if (this.is_action_enabled('create')) {
-            //     // insertion of create button
-            //     var td = $($("td", self.$el)[0]);
-            //     var rendered = QWeb.render("GanttView-create-button");
-            //     $(rendered).prependTo(td);
-            //     $(".oe_gantt_button_create", this.$el).click(this.on_task_create);
-            // }
-            // // Fix for IE to display the content of gantt view.
-            // this.$el.find(".oe_gantt td:first > div, .oe_gantt td:eq(1) > div > div").css("overflow", "");
+            gantt.attachEvent("onBeforeTaskUpdate", function (task) {
+                return self.on_task_changed(task);
+            });
+
+            gantt.attachEvent("onBeforeLinkDelete", function (link) {
+                return self.on_delete_link(link);
+            });
+
+            gantt.attachEvent("onTaskAdd", function (id) {
+                return self.on_task_create(id);
+            });
+
+            gantt.attachEvent("onTaskDblClick", function (id) {
+                return self.on_task_display(id);
+            });
+
+
+        },
+        on_link_add: function (link) {
+            if (link.type != 0)
+                return false;
+            new Model("project.task")
+                .call("on_link_task", [parseInt(link.source), parseInt(link.target)])
+
+                .then(function (result) {
+                    if (result || result.length > 0) {
+                        gantt._lpull[link.id] = link;
+                        gantt._sync_links();
+                        gantt._render_link(link.id);
+
+                        _.each(result, function (task) {
+                            var old_t = gantt.getTask(task.id)
+                            old_t.start_date = new Date(task.start_date.replace(/-/g, "/"));
+                            old_t.end_date = new Date(task.end_date.replace(/-/g, "/"));
+                            gantt.updateTask(task.id, old_t);
+                        });
+                        gantt.refreshData();
+                    }
+                })
         },
         on_task_changed: function (task_obj) {
-            var self = this;
-            var itask = task_obj.TaskInfo.internal_task;
-            var start = task_obj.getEST();
-            var duration = task_obj.getDuration();
-            var duration_in_business_hours = !!self.fields_view.arch.attrs.date_delay;
-            if (!duration_in_business_hours) {
-                duration = (duration / 8 ) * 24;
-            }
-            var end = start.clone().addMilliseconds(duration * 60 * 60 * 1000);
-            var data = {};
-            data[self.fields_view.arch.attrs.date_start] =
-                time.auto_date_to_str(start, self.fields[self.fields_view.arch.attrs.date_start].type);
-            if (self.fields_view.arch.attrs.date_stop) {
-                data[self.fields_view.arch.attrs.date_stop] =
-                    time.auto_date_to_str(end, self.fields[self.fields_view.arch.attrs.date_stop].type);
-            } else { // we assume date_duration is defined
-                data[self.fields_view.arch.attrs.date_delay] = duration;
-            }
-            this.dataset.write(itask.id, data);
+
+            var message = ("确定修改该任务时间?");
+            var options = {
+                title: _t("Warning"),
+                confirm_callback: function () {
+
+                    var data = {};
+                    data["date_start"] = task_obj.start_date.Format("yyyy-MM-dd");
+                    data["date_end"] = task_obj.end_date.Format("yyyy-MM-dd");
+                    data["task_progress"] = task_obj.progress * 100;
+
+                    new Model("project.task")
+                        .call("on_task_change", [parseInt(task_obj.id), data])
+
+                        .then(function (result) {
+                            if (result || result.length > 0) {
+                                _.each(result, function (task) {
+                                    var old_t = gantt.getTask(task.id)
+                                    old_t.start_date = new Date(task.start_date.replace(/-/g, "/"));
+                                    old_t.end_date = new Date(task.end_date.replace(/-/g, "/"));
+                                    gantt.updateTask(task.id, old_t);
+                                });
+                            }
+                        })
+
+                },
+                cancel_callback: function () {
+                    gantt.refreshData();
+                },
+            };
+            var dialog = Dialog.confirm(this, message, options);
+            dialog.$modal.on('hidden.bs.modal', function () {
+                gantt.refreshData();
+            });
         },
-        on_task_display: function (task) {
+
+        on_delete_link: function (link) {
+            return new Model("project.task")
+                .call("on_task_relation_delete", [parseInt(link.source), parseInt(link.target)])
+                .then(function (result) {
+                    return result
+                })
+        },
+        on_task_display: function (id) {
             var self = this;
             this.do_action({
                 type: 'ir.actions.act_window',
                 res_model: self.model,
-                res_id: task.id,
+                res_id: parseInt(id),
                 views: [[false, 'form']],
                 target: 'new'
             }, {
                 on_close: function () {
-                    self.reload();
+                    // self.reload();
                 }
             });
         },
-        on_task_create: function () {
-            alert("on_task_create");
+        on_task_create: function (id) {
+            alert("on_task_create" + id);
             var self = this;
             var pop = new data.SelectCreatePopup(this);
             pop.on("elements_selected", self, function () {
@@ -267,58 +351,240 @@ odoo.define('linkloving_project.new_gantt', function (require){
     };
 
     var demo_tasks = {
-	"data":[
-		{"id":11, "text":"Project #1", "start_date":"28-03-2013", "duration":"11", "progress": 0.6, "open": true},
-		{"id":1, "text":"Project #2", "start_date":"01-04-2013", "duration":"18", "progress": 0.4, "open": true},
+        "data": [
+            {
+                "id": 11,
+                "text": "Project #1",
+                "start_date": "28-03-2013",
+                "duration": "11",
+                "progress": 0.6,
+                "open": true
+            },
+            {
+                "id": 1,
+                "text": "Project #2",
+                "start_date": "01-04-2013",
+                "duration": "18",
+                "progress": 0.4,
+                "open": true
+            },
 
-		{"id":2, "text":"Task #1", "start_date":"02-04-2013", "duration":"8", "parent":"1", "progress":0.5, "open": true},
-		{"id":3, "text":"Task #2", "start_date":"11-04-2013", "duration":"8", "parent":"1", "progress": 0.6, "open": true},
-		{"id":4, "text":"Task #3", "start_date":"13-04-2013", "duration":"6", "parent":"1", "progress": 0.5, "open": true},
-		{"id":5, "text":"Task #1.1", "start_date":"02-04-2013", "duration":"7", "parent":"2", "progress": 0.6, "open": true},
-		{"id":6, "text":"Task #1.2", "start_date":"03-04-2013", "duration":"7", "parent":"2", "progress": 0.6, "open": true},
-		{"id":7, "text":"Task #2.1", "start_date":"11-04-2013", "duration":"8", "parent":"3", "progress": 0.6, "open": true},
-		{"id":8, "text":"Task #3.1", "start_date":"14-04-2013", "duration":"5", "parent":"4", "progress": 0.5, "open": true},
-		{"id":9, "text":"Task #3.2", "start_date":"14-04-2013", "duration":"4", "parent":"4", "progress": 0.5, "open": true},
-		{"id":10, "text":"Task #3.3", "start_date":"14-04-2013", "duration":"3", "parent":"4", "progress": 0.5, "open": true},
+            {
+                "id": 2,
+                "text": "Task #1",
+                "start_date": "02-04-2013",
+                "duration": "8",
+                "parent": "1",
+                "progress": 0.5,
+                "open": true
+            },
+            {
+                "id": 3,
+                "text": "Task #2",
+                "start_date": "11-04-2013",
+                "duration": "8",
+                "parent": "1",
+                "progress": 0.6,
+                "open": true
+            },
+            {
+                "id": 4,
+                "text": "Task #3",
+                "start_date": "13-04-2013",
+                "duration": "6",
+                "parent": "1",
+                "progress": 0.5,
+                "open": true
+            },
+            {
+                "id": 5,
+                "text": "Task #1.1",
+                "start_date": "02-04-2013",
+                "duration": "7",
+                "parent": "2",
+                "progress": 0.6,
+                "open": true
+            },
+            {
+                "id": 6,
+                "text": "Task #1.2",
+                "start_date": "03-04-2013",
+                "duration": "7",
+                "parent": "2",
+                "progress": 0.6,
+                "open": true
+            },
+            {
+                "id": 7,
+                "text": "Task #2.1",
+                "start_date": "11-04-2013",
+                "duration": "8",
+                "parent": "3",
+                "progress": 0.6,
+                "open": true
+            },
+            {
+                "id": 8,
+                "text": "Task #3.1",
+                "start_date": "14-04-2013",
+                "duration": "5",
+                "parent": "4",
+                "progress": 0.5,
+                "open": true
+            },
+            {
+                "id": 9,
+                "text": "Task #3.2",
+                "start_date": "14-04-2013",
+                "duration": "4",
+                "parent": "4",
+                "progress": 0.5,
+                "open": true
+            },
+            {
+                "id": 10,
+                "text": "Task #3.3",
+                "start_date": "14-04-2013",
+                "duration": "3",
+                "parent": "4",
+                "progress": 0.5,
+                "open": true
+            },
 
-		{"id":12, "text":"Task #1", "start_date":"03-04-2013", "duration":"5", "parent":"11", "progress": 1, "open": true},
-		{"id":13, "text":"Task #2", "start_date":"02-04-2013", "duration":"7", "parent":"11", "progress": 0.5, "open": true},
-		{"id":14, "text":"Task #3", "start_date":"02-04-2013", "duration":"6", "parent":"11", "progress": 0.8, "open": true},
-		{"id":15, "text":"Task #4", "start_date":"02-04-2013", "duration":"5", "parent":"11", "progress": 0.2, "open": true},
-		{"id":16, "text":"Task #5", "start_date":"02-04-2013", "duration":"7", "parent":"11", "progress": 0, "open": true},
+            {
+                "id": 12,
+                "text": "Task #1",
+                "start_date": "03-04-2013",
+                "duration": "5",
+                "parent": "11",
+                "progress": 1,
+                "open": true
+            },
+            {
+                "id": 13,
+                "text": "Task #2",
+                "start_date": "02-04-2013",
+                "duration": "7",
+                "parent": "11",
+                "progress": 0.5,
+                "open": true
+            },
+            {
+                "id": 14,
+                "text": "Task #3",
+                "start_date": "02-04-2013",
+                "duration": "6",
+                "parent": "11",
+                "progress": 0.8,
+                "open": true
+            },
+            {
+                "id": 15,
+                "text": "Task #4",
+                "start_date": "02-04-2013",
+                "duration": "5",
+                "parent": "11",
+                "progress": 0.2,
+                "open": true
+            },
+            {
+                "id": 16,
+                "text": "Task #5",
+                "start_date": "02-04-2013",
+                "duration": "7",
+                "parent": "11",
+                "progress": 0,
+                "open": true
+            },
 
-		{"id":17, "text":"Task #2.1", "start_date":"03-04-2013", "duration":"2", "parent":"13", "progress": 1, "open": true},
-		{"id":18, "text":"Task #2.2", "start_date":"06-04-2013", "duration":"3", "parent":"13", "progress": 0.8, "open": true},
-		{"id":19, "text":"Task #2.3", "start_date":"10-04-2013", "duration":"4", "parent":"13", "progress": 0.2, "open": true},
-		{"id":20, "text":"Task #2.4", "start_date":"10-04-2013", "duration":"4", "parent":"13", "progress": 0, "open": true},
-		{"id":21, "text":"Task #4.1", "start_date":"03-04-2013", "duration":"4", "parent":"15", "progress": 0.5, "open": true},
-		{"id":22, "text":"Task #4.2", "start_date":"03-04-2013", "duration":"4", "parent":"15", "progress": 0.1, "open": true},
-		{"id":23, "text":"Task #4.3", "start_date":"03-04-2013", "duration":"5", "parent":"15", "progress": 0, "open": true}
-	],
-	"links":[
-		{"id":"1","source":"1","target":"2","type":"1"},
-		{"id":"2","source":"2","target":"3","type":"0"},
-		{"id":"3","source":"3","target":"4","type":"0"},
-		{"id":"4","source":"2","target":"5","type":"2"},
-		{"id":"5","source":"2","target":"6","type":"2"},
-		{"id":"6","source":"3","target":"7","type":"2"},
-		{"id":"7","source":"4","target":"8","type":"2"},
-		{"id":"8","source":"4","target":"9","type":"2"},
-		{"id":"9","source":"4","target":"10","type":"2"},
-		{"id":"10","source":"11","target":"12","type":"1"},
-		{"id":"11","source":"11","target":"13","type":"1"},
-		{"id":"12","source":"11","target":"14","type":"1"},
-		{"id":"13","source":"11","target":"15","type":"1"},
-		{"id":"14","source":"11","target":"16","type":"1"},
-		{"id":"15","source":"13","target":"17","type":"1"},
-		{"id":"16","source":"17","target":"18","type":"0"},
-		{"id":"17","source":"18","target":"19","type":"0"},
-		{"id":"18","source":"19","target":"20","type":"0"},
-		{"id":"19","source":"15","target":"21","type":"2"},
-		{"id":"20","source":"15","target":"22","type":"2"},
-		{"id":"21","source":"15","target":"23","type":"2"}
-	]
-};
+            {
+                "id": 17,
+                "text": "Task #2.1",
+                "start_date": "03-04-2013",
+                "duration": "2",
+                "parent": "13",
+                "progress": 1,
+                "open": true
+            },
+            {
+                "id": 18,
+                "text": "Task #2.2",
+                "start_date": "06-04-2013",
+                "duration": "3",
+                "parent": "13",
+                "progress": 0.8,
+                "open": true
+            },
+            {
+                "id": 19,
+                "text": "Task #2.3",
+                "start_date": "10-04-2013",
+                "duration": "4",
+                "parent": "13",
+                "progress": 0.2,
+                "open": true
+            },
+            {
+                "id": 20,
+                "text": "Task #2.4",
+                "start_date": "10-04-2013",
+                "duration": "4",
+                "parent": "13",
+                "progress": 0,
+                "open": true
+            },
+            {
+                "id": 21,
+                "text": "Task #4.1",
+                "start_date": "03-04-2013",
+                "duration": "4",
+                "parent": "15",
+                "progress": 0.5,
+                "open": true
+            },
+            {
+                "id": 22,
+                "text": "Task #4.2",
+                "start_date": "03-04-2013",
+                "duration": "4",
+                "parent": "15",
+                "progress": 0.1,
+                "open": true
+            },
+            {
+                "id": 23,
+                "text": "Task #4.3",
+                "start_date": "03-04-2013",
+                "duration": "5",
+                "parent": "15",
+                "progress": 0,
+                "open": true
+            }
+        ],
+        "links": [
+            {"id": "1", "source": "1", "target": "2", "type": "0"},
+            {"id": "2", "source": "2", "target": "3", "type": "0"},
+            {"id": "3", "source": "3", "target": "4", "type": "0"},
+            {"id": "4", "source": "2", "target": "5", "type": "0"},
+            {"id": "5", "source": "2", "target": "6", "type": "0"},
+            {"id": "6", "source": "3", "target": "7", "type": "0"},
+            {"id": "7", "source": "4", "target": "8", "type": "0"},
+            {"id": "8", "source": "4", "target": "9", "type": "0"},
+            {"id": "9", "source": "4", "target": "10", "type": "0"},
+            {"id": "10", "source": "11", "target": "12", "type": "0"},
+            {"id": "11", "source": "11", "target": "13", "type": "0"},
+            {"id": "12", "source": "11", "target": "14", "type": "0"},
+            {"id": "13", "source": "11", "target": "15", "type": "0"},
+            {"id": "14", "source": "11", "target": "16", "type": "0"},
+            {"id": "15", "source": "13", "target": "17", "type": "0"},
+            {"id": "16", "source": "17", "target": "18", "type": "0"},
+            {"id": "17", "source": "18", "target": "19", "type": "0"},
+            {"id": "18", "source": "19", "target": "20", "type": "0"},
+            {"id": "19", "source": "15", "target": "21", "type": "0"},
+            {"id": "20", "source": "15", "target": "22", "type": "0"},
+            {"id": "21", "source": "15", "target": "23", "type": "0"}
+        ]
+    };
 
     core.view_registry.add('wangke', New_Gantt);
     return New_Gantt;
