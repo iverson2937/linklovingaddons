@@ -95,6 +95,7 @@
             </field>
         </record>
 
+
         <menuitem
                 id="mrp_production_qc_inspection"
                 parent="mrp.menu_mrp_manufacturing"
