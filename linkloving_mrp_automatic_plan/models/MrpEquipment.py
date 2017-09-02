@@ -15,16 +15,16 @@ class ProcurementOrderExtend(models.Model):
         produced_spend = res["product_qty"] * bom.produced_spend_per_pcs + bom.prepare_time
         date_planned_end = fields.Datetime.to_string(self._get_date_planned_from_date_planned())
         start_time, end_time = self.compute_mo_start_time(self._get_date_planned_from_date_planned(), produced_spend)
-        res.update({'state': 'draft',
-                    # 'process_id': bom.process_id.id,
-                    # 'unit_price': bom.process_id.unit_price,
-                    # 'mo_type': bom.mo_type,
-                    # 'hour_price': bom.hour_price,
-                    # 'in_charge_id': bom.process_id.partner_id.id,
-                    # 'product_qty': self.get_actual_require_qty(),
-                    'date_planned_start': fields.Datetime.to_string(start_time),
-                    'date_planned_finished': fields.Datetime.to_string(end_time)
-                    })
+        # res.update({'state': 'draft',
+        #             # 'process_id': bom.process_id.id,
+        #             # 'unit_price': bom.process_id.unit_price,
+        #             # 'mo_type': bom.mo_type,
+        #             # 'hour_price': bom.hour_price,
+        #             # 'in_charge_id': bom.process_id.partner_id.id,
+        #             # 'product_qty': self.get_actual_require_qty(),
+        #             'date_planned_start': fields.Datetime.to_string(start_time),
+        #             'date_planned_finished': fields.Datetime.to_string(end_time)
+        #             })
         return res
 
     def _get_date_planned_from_date_planned(self):
