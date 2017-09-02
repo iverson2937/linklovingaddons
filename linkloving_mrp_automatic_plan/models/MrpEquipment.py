@@ -12,9 +12,9 @@ class ProcurementOrderExtend(models.Model):
     def _prepare_mo_vals(self, bom):
         res = super(ProcurementOrderExtend, self)._prepare_mo_vals(bom)
 
-        produced_spend = res["product_qty"] * bom.produced_spend_per_pcs + bom.prepare_time
-        date_planned_end = fields.Datetime.to_string(self._get_date_planned_from_date_planned())
-        start_time, end_time = self.compute_mo_start_time(self._get_date_planned_from_date_planned(), produced_spend)
+        # produced_spend = res["product_qty"] * bom.produced_spend_per_pcs + bom.prepare_time
+        # date_planned_end = fields.Datetime.to_string(self._get_date_planned_from_date_planned())
+        # start_time, end_time = self.compute_mo_start_time(self._get_date_planned_from_date_planned(), produced_spend)
         # res.update({'state': 'draft',
         #             # 'process_id': bom.process_id.id,
         #             # 'unit_price': bom.process_id.unit_price,
