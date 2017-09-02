@@ -60,7 +60,7 @@ class ProcurementOrderExtend(models.Model):
                     real_start_time = theoretics_move_start_time
                     left_time = 0
                 else:
-                    left_time = spent_time - (move_corrected_time + new_day_work_start_time)
+                    left_time = spent_time - (move_corrected_time - new_day_work_start_time).seconds
                     # if theoretics_move_start_time <= new_day_off_work_time and theoretics_move_start_time >= new_day_work_start_time:
         if not real_start_time:
             raise UserWarning(u"出错了")
