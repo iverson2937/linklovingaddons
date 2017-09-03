@@ -41,7 +41,7 @@ class MrpBom(models.Model):
             'name': self.product_tmpl_id.name,
             'code': self.product_tmpl_id.default_code,
             'process_id': self.process_id.name,
-            'bom_ids': res,
+            'bom_ids': sorted(res, key=lambda product : product['code']),
             'state': self.state,
             'review_line': self.review_id.get_review_line_list(),
         }
@@ -114,7 +114,6 @@ def _get_rec(object, level, qty=1.0, uom=False):
 
 class MrpBomLine(models.Model):
     _inherit = 'mrp.bom.line'
-    _order = 'product_id'
     is_highlight = fields.Boolean()
 
     @api.model
