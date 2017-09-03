@@ -114,6 +114,7 @@ def _get_rec(object, level, qty=1.0, uom=False):
 
 class MrpBomLine(models.Model):
     _inherit = 'mrp.bom.line'
+    _order = 'product_id'
     is_highlight = fields.Boolean()
 
     @api.model
