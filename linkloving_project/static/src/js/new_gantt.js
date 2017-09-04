@@ -137,7 +137,7 @@ odoo.define('linkloving_project.new_gantt', function (require) {
                 if (task.top_task_id && task.top_task_id[0] != task.id) {
                     t = {
                         "id": task.id,
-                        "text": task.__name,
+                        "text": task.__name + "," + task.id,
                         "start_date": new Date(task.date_start).Format("dd-MM-yyyy"),
                         "duration": (new Date(task.date_end).getTime() - new Date(task.date_start).getTime()) / (1000 * 60 * 60) / 24,
                         "parent": task.parent_ids ? task.parent_ids[0] : task.top_task_id[0],
@@ -147,7 +147,7 @@ odoo.define('linkloving_project.new_gantt', function (require) {
                 } else {
                     t = {
                         "id": task.id,
-                        "text": task.__name,
+                        "text": task.__name + "," + task.id,
                         "start_date": new Date(task.date_start).Format("dd-MM-yyyy"),
                         "duration": (new Date(task.date_end).getTime() - new Date(task.date_start).getTime()) / (1000 * 60 * 60) / 24,
                         "progress": task.task_progress / 100,
@@ -174,7 +174,7 @@ odoo.define('linkloving_project.new_gantt', function (require) {
                 return self.on_link_add(link);
             });
 
-            gantt.attachEvent("onBeforeTaskUpdate", function (task) {
+            gantt.attachEvent("onTaskChanged", function (task) {
                 return self.on_task_changed(task);
             });
 
@@ -186,15 +186,17 @@ odoo.define('linkloving_project.new_gantt', function (require) {
                 return self.on_task_create(id);
             });
 
-            gantt.attachEvent("onTaskDblClick", function (id) {
+            gantt.attachEvent("onTaskDisplay", function (id) {
                 return self.on_task_display(id);
             });
 
 
         },
         on_link_add: function (link) {
-            if (link.type != 0)
+            if (link.type != 0){
+                Dialog.alert("关系设定必须又前置任务尾部连至后置任务头部!")
                 return false;
+            }
             new Model("project.task")
                 .call("on_link_task", [parseInt(link.source), parseInt(link.target)])
 
@@ -215,40 +217,24 @@ odoo.define('linkloving_project.new_gantt', function (require) {
                 })
         },
         on_task_changed: function (task_obj) {
+            var data = {};
+            data["date_start"] = (task_obj.start_date).Format("yyyy-MM-dd");
+            data["date_end"] = (task_obj.end_date).Format("yyyy-MM-dd");
+            data["task_progress"] = task_obj.progress * 100;
 
-            var message = ("确定修改该任务时间?");
-            var options = {
-                title: _t("Warning"),
-                confirm_callback: function () {
+            new Model("project.task")
+                .call("on_task_change", [parseInt(task_obj.id), data])
 
-                    var data = {};
-                    data["date_start"] = task_obj.start_date.Format("yyyy-MM-dd");
-                    data["date_end"] = task_obj.end_date.Format("yyyy-MM-dd");
-                    data["task_progress"] = task_obj.progress * 100;
-
-                    new Model("project.task")
-                        .call("on_task_change", [parseInt(task_obj.id), data])
-
-                        .then(function (result) {
-                            if (result || result.length > 0) {
-                                _.each(result, function (task) {
-                                    var old_t = gantt.getTask(task.id)
-                                    old_t.start_date = new Date(task.start_date.replace(/-/g, "/"));
-                                    old_t.end_date = new Date(task.end_date.replace(/-/g, "/"));
-                                    gantt.updateTask(task.id, old_t);
-                                });
-                            }
-                        })
-
-                },
-                cancel_callback: function () {
-                    gantt.refreshData();
-                },
-            };
-            var dialog = Dialog.confirm(this, message, options);
-            dialog.$modal.on('hidden.bs.modal', function () {
-                gantt.refreshData();
-            });
+                .then(function (result) {
+                    if (result || result.length > 0) {
+                        _.each(result, function (task) {
+                            var old_t = gantt.getTask(task.id)
+                            old_t.start_date = new Date(task.start_date.replace(/-/g, "/"));
+                            old_t.end_date = new Date(task.end_date.replace(/-/g, "/"));
+                            gantt.updateTask(task.id, old_t);
+                        });
+                    }
+                })
         },
 
         on_delete_link: function (link) {
@@ -260,15 +246,27 @@ odoo.define('linkloving_project.new_gantt', function (require) {
         },
         on_task_display: function (id) {
             var self = this;
+            var task_id = parseInt(id);
             this.do_action({
                 type: 'ir.actions.act_window',
                 res_model: self.model,
-                res_id: parseInt(id),
+                res_id: task_id,
                 views: [[false, 'form']],
                 target: 'new'
             }, {
                 on_close: function () {
-                    // self.reload();
+                    new Model("project.task")
+                        .call("on_refresh_task", [task_id])
+                        .then(function (task_obj) {
+                            if (task_obj && task_id == task_obj.id) {
+                                var old_t = gantt.getTask(task_id)
+                                old_t.start_date = new Date(task_obj.start_date.replace(/-/g, "/"));
+                                old_t.end_date = new Date(task_obj.end_date.replace(/-/g, "/"));
+                                old_t.progress = task_obj.progress / 100;
+                                old_t.text = task_obj.text;
+                                gantt.updateTask(task_obj.id, old_t);
+                            }
+                        })
                 }
             });
         },

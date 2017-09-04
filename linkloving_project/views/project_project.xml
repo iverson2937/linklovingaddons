@@ -67,7 +67,7 @@
         </record>
 
         <record id="act_project_project_2_project_task_human_resources" model="ir.actions.act_window">
-            <field name="name">Waiting Audit Tasks</field>
+            <field name="name">Human Resources</field>
             <field name="res_model">project.task</field>
             <field name="view_mode">gantt</field>
             <field name="context">{
@@ -374,7 +374,7 @@
                             <page string="Description">
                                 <field name="description" placeholder="Add a Description..."/>
                                 <!--groups="project.group_tasks_work_on_tasks"-->
-                                <field name="work_ids" attrs="{'readonly':[('kanban_state','in',['audit','close'])]}"
+                                <field name="work_ids" attrs="{'readonly':[('kanban_state','in',['close'])]}"
                                        delete="false">
                                     <tree string="Task Work" editable="top">
                                         <field name="name"/>
@@ -526,7 +526,7 @@
         </record>
 
         <record id="show_new_gantt" model="ir.actions.act_window">
-            <field name="name">Waiting Audit Tasks</field>
+            <field name="name">Show All Projects</field>
             <field name="res_model">project.task</field>
             <field name="view_mode">wangke</field>
             <field name="context">{

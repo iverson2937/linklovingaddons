@@ -700,17 +700,18 @@ gantt._on_dblclick = function (e) {
     var trg = e.target || e.srcElement;
     var id = gantt.locate(e);
     var res = !gantt.checkEvent("onTaskDblClick") || gantt.callEvent("onTaskDblClick", [id, e]);
-    // if (res) {
-    //     var default_action = gantt._find_ev_handler(e, trg, gantt._dbl_click, id);
-    //     if (!default_action)
-    //         return;
-    //
-    //     if (id !== null && gantt.getTask(id)) {
-    //         if (res && gantt.config.details_on_dblclick) {
-    //             gantt.showLightbox(id);
-    //         }
-    //     }
-    // }
+    if (res) {
+        var default_action = gantt._find_ev_handler(e, trg, gantt._dbl_click, id);
+        if (!default_action)
+            return;
+
+        if (id !== null && gantt.getTask(id)) {
+            if (res && gantt.config.details_on_dblclick) {
+                gantt.callEvent("onTaskDisplay", [id, e])
+                // gantt.showLightbox(id);
+            }
+        }
+    }
 };
 
 gantt._on_mousemove = function (e) {
@@ -2361,33 +2362,39 @@ gantt._tasks_dnd = {
     },
     on_mouse_up: function (e) {
         var drag = this.drag;
+        var self = this;
+
         if (drag.mode && drag.id) {
-            //drop
-            var ev = gantt.getTask(drag.id);
+            var title = "Warning";
+            var question = "是否确认修改此任务起始时间(会影响后置任务的起始时间)?";
+            gantt._dhtmlx_confirm(question, title, function () {
+                //drop
+                var ev = gantt.getTask(drag.id);
 
-            if (gantt.config.work_time && gantt.config.correct_work_time) {
-                this._fix_working_times(ev, drag);
-            }
+                if (gantt.config.work_time && gantt.config.correct_work_time) {
+                    self._fix_working_times(ev, drag);
+                }
 
-            this._fix_dnd_scale_time(ev, drag);
-
-            gantt._init_task_timing(ev);
-
-            if (!this._fireEvent("before_finish", drag.mode, [drag.id, drag.mode, gantt.copy(drag.obj), e])) {
-                drag.obj._dhx_changed = false;
-                gantt.mixin(ev, drag.obj, true);
-
-                gantt.updateTask(ev.id);
-            } else {
-                var drag_id = drag.id;
+                self._fix_dnd_scale_time(ev, drag);
 
                 gantt._init_task_timing(ev);
 
-                this.clear_drag_state();
-                gantt.updateTask(ev.id);
-                this._fireEvent("after_finish", drag.mode, [drag_id, drag.mode, e]);
-            }
+                if (!self._fireEvent("before_finish", drag.mode, [drag.id, drag.mode, gantt.copy(drag.obj), e])) {
+                    drag.obj._dhx_changed = false;
+                    gantt.mixin(ev, drag.obj, true);
 
+                    gantt.updateTask(ev.id);
+                } else {
+                    var drag_id = drag.id;
+
+                    gantt._init_task_timing(ev);
+
+                    self.clear_drag_state();
+                    gantt.updateTask(ev.id);
+                    self._fireEvent("after_finish", drag.mode, [drag_id, drag.mode, e]);
+                }
+                gantt.callEvent("onTaskChanged", [ev, ev]);
+            });
         }
         this.clear_drag_state();
     },
