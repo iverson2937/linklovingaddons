@@ -164,7 +164,16 @@ class MrpProductionLine(models.Model):
         lines = self.env["mrp.production.line"].search_read([("process_id", "=", process_id)])
         return lines
 
+    def get_mo_by_productin_line(self, **kwargs):
+        production_line_id = kwargs.get("production_line_id")
+        limit = kwargs.get("limit")
+        offset = kwargs.get("offset")
 
+        mos = self.env["mrp.production"].search_read([("production_line_id", "=", production_line_id)],
+                                                     limit=limit,
+                                                     offset=offset
+                                                     )
+        return mos
 
 class HrEmployeeExtend(models.Model):
     _inherit = 'hr.employee'
@@ -178,3 +187,21 @@ class MrpProcessExtend(models.Model):
 
     work_type_id = fields.Many2one(comodel_name="work.type", string=u"工种", required=False, )
     production_line_ids = fields.One2many(comodel_name='mrp.production.line', inverse_name='process_id', string=u'产线')
+
+
+class MrpProductionExtend(models.Model):
+    _inherit = "mrp.production"
+
+    production_line_id = fields.Many2one("mrp.production.line", string=u"产线")
+
+    def get_unplanned_mo(self, **kwargs):
+        process_id = kwargs.get("process_id")
+        limit = kwargs.get("limit")
+        offset = kwargs.get("offset")
+
+        mos = self.env["mrp.production"].search_read([("process_id", "=", process_id)],
+                                                     limit=limit,
+                                                     offset=offset
+                                                     )
+
+        return mos
