@@ -12,19 +12,19 @@ class ProcurementOrderExtend(models.Model):
     def _prepare_mo_vals(self, bom):
         res = super(ProcurementOrderExtend, self)._prepare_mo_vals(bom)
 
-        produced_spend = res["product_qty"] * bom.produced_spend_per_pcs + bom.prepare_time
-        date_planned_end = fields.Datetime.to_string(self._get_date_planned_from_date_planned())
-        start_time, end_time = self.compute_mo_start_time(self._get_date_planned_from_date_planned(), produced_spend)
-        res.update({'state': 'draft',
-                    # 'process_id': bom.process_id.id,
-                    # 'unit_price': bom.process_id.unit_price,
-                    # 'mo_type': bom.mo_type,
-                    # 'hour_price': bom.hour_price,
-                    # 'in_charge_id': bom.process_id.partner_id.id,
-                    # 'product_qty': self.get_actual_require_qty(),
-                    'date_planned_start': fields.Datetime.to_string(start_time),
-                    'date_planned_finished': fields.Datetime.to_string(end_time)
-                    })
+        # produced_spend = res["product_qty"] * bom.produced_spend_per_pcs + bom.prepare_time
+        # date_planned_end = fields.Datetime.to_string(self._get_date_planned_from_date_planned())
+        # start_time, end_time = self.compute_mo_start_time(self._get_date_planned_from_date_planned(), produced_spend)
+        # res.update({'state': 'draft',
+        #             # 'process_id': bom.process_id.id,
+        #             # 'unit_price': bom.process_id.unit_price,
+        #             # 'mo_type': bom.mo_type,
+        #             # 'hour_price': bom.hour_price,
+        #             # 'in_charge_id': bom.process_id.partner_id.id,
+        #             # 'product_qty': self.get_actual_require_qty(),
+        #             'date_planned_start': fields.Datetime.to_string(start_time),
+        #             'date_planned_finished': fields.Datetime.to_string(end_time)
+        #             })
         return res
 
     def _get_date_planned_from_date_planned(self):
@@ -60,7 +60,7 @@ class ProcurementOrderExtend(models.Model):
                     real_start_time = theoretics_move_start_time
                     left_time = 0
                 else:
-                    left_time = spent_time - (move_corrected_time + new_day_work_start_time)
+                    left_time = spent_time - (move_corrected_time - new_day_work_start_time).seconds
                     # if theoretics_move_start_time <= new_day_off_work_time and theoretics_move_start_time >= new_day_work_start_time:
         if not real_start_time:
             raise UserWarning(u"出错了")

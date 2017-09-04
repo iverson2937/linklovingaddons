@@ -1,0 +1,36 @@
+.arrange_production_container{
+    overflow: hidden;
+    padding-top: 50px;
+}
+#a_p_left{
+    width: 49%;
+    height: 900px;
+    float: left;
+    padding: 10px;
+    border: 1px solid #000;
+    overflow-y: scroll;
+}
+#a_p_right{
+    width: 49%;
+    float: left;
+    padding: 10px;
+    border: 1px solid #000;
+}
+.production_lists_wrap{
+    width: 98%;
+    padding: 20px;
+    background: deepskyblue;
+    margin: 10px auto;
+}
+.ap_item_wrap{
+    width:90%;
+    height: 150px;
+    background: paleturquoise;
+    margin: 10px auto;
+}
+.production_line{
+    width: 98%;
+    height: 30px;
+    background: #388E8E;
+    margin: 10px auto;
+}

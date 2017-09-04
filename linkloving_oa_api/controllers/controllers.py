@@ -669,7 +669,10 @@ class LinklovingOAApi(http.Controller):
             'team': obj.team_id.display_name or '',
             'saler': obj.user_id.display_name or '',
             'tags': self.get_supplier_tags(obj.tag_ids),
-            'description': obj.description or ''
+            'description': obj.description or '',
+            'contact_name': obj.contact_name or '',
+            'email_from': obj.email_from or '',
+            'function': obj.function or ''
         }
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
@@ -817,7 +820,7 @@ class LinklovingOAApi(http.Controller):
                 'salesman': so_order.user_id.display_name,
                 'invoice_status': LinklovingOAApi.selection_get_map("sale.order", "invoice_status", so_order.invoice_status),
                 'state': so_order.state,
-                'amount_total': so_order.amount_total,
+                'amount_total': "%.2f" % so_order.amount_total,
                 'pi_number': so_order.pi_number or '',
                 'team': so_order.team_id.display_name or ''
             })
@@ -871,9 +874,9 @@ class LinklovingOAApi(http.Controller):
             'tax': so_object.tax_id.display_name,
             'pi_number': so_object.pi_number or '',
             'delivery_rule': LinklovingOAApi.selection_get_map("sale.order", "delivery_rule", so_object.delivery_rule),
-            'amount_untaxed': so_object.amount_untaxed,  #未含税金额
-            'amount_tax': so_object.amount_tax,  #税金
-            'amount_total': so_object.amount_total,  #总计
+            'amount_untaxed': "%.2f" % so_object.amount_untaxed,  #未含税金额
+            'amount_tax': "%.2f" % so_object.amount_tax,  #税金
+            'amount_total': "%.2f" % so_object.amount_total,  #总计
             'order_line': self.get_so_detail_order_line(so_object.order_line)
         }
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
@@ -887,8 +890,8 @@ class LinklovingOAApi(http.Controller):
                 'inner_spec': obj.inner_code or '',  #国内型号
                 'uom': obj.product_uom.display_name,
                 'qty': obj.product_uom_qty,   #数量
-                'price_total': obj.price_total,   #小计
-                'price_unit': obj.price_unit,  #单价
+                'price_total': "%.2f" % obj.price_total,   #小计
+                'price_unit': "%.2f" % obj.price_unit,  #单价
                 'qty_delivered': obj.qty_delivered,  #已送货
                 'qty_invoiced': obj.qty_invoiced,   #已开票
             })
@@ -1063,8 +1066,10 @@ class LinklovingOAApi(http.Controller):
             data.append({
                 'name': product.name,
                 'id': product.id,
-                'inner_code': product.inner_code or '',
-                'inner_spec': product.inner_spec or '',
+                'inner_code': product.inner_code or '',   #国内简称
+                'inner_spec': product.inner_spec or '',   #国内型号
+                'categ_id': product.categ_id.display_name,   #内部类别
+                'default_code': product.default_code,   #内部参考
                 'uom': product.uom_id.display_name,
                 'uom_id': product.uom_id.id,
                 'virtual_qty': product.virtual_available,
@@ -1169,10 +1174,33 @@ class LinklovingOAApi(http.Controller):
             'level': obj.level,
             "contracts_count": len(obj.child_ids),  # 联系人&地址个数
             "contracts": self.get_contracts_in_supplier(obj.child_ids),
-            'supplier': obj.supplier_invoice_count,  #对账数量
-            'purchase_count': obj.purchase_order_count,    #订单数量
+            # 'supplier': obj.supplier_invoice_count,  #对账数量
+            'supplier': request.env['account.invoice'].sudo().search_count([('partner_id', '=', request.jsonrequest.get("id"))]),
+            # 'purchase_count': obj.purchase_order_count,    #订单数量
+            'purchase_count': request.env['sale.order'].sudo().search_count([('partner_id', '=', request.jsonrequest.get("id"))]),
             'return_count': request.env['stock.picking'].sudo().search_count([('partner_id', '=', request.jsonrequest.get("id")), ('state', '=', 'waiting_in')]),  #退货入库数量
+            'product_series': self.get_series_products(obj.product_series_ids)
         }
+        return data
+
+    def get_series_products(self, objs):
+        data = []
+        for obj in objs:
+            data.append({
+                'name': obj.display_name,
+                'crm_product_type': LinklovingOAApi.selection_get_map("crm.product.series", "crm_product_type", obj.crm_product_type),
+                'detail': obj.detail or '',
+                'parent': obj.crm_Parent_id.display_name,
+                'ontomany': self.get_on_to_many(obj.crm_Parent_ontomany_ids)
+            })
+        return data
+
+    def get_on_to_many(self, objs):
+        data = []
+        for obj in objs:
+            data.append({
+                'name': obj.display_name
+            })
         return data
 
     # 产品详情页

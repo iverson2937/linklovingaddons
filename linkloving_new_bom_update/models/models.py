@@ -124,7 +124,7 @@ class MrpBom(models.Model):
             'name': self.product_tmpl_id.name_get()[0][1],
             'code': self.product_tmpl_id.default_code,
             'process_id': [self.process_id.id, self.process_id.name],
-            'bom_ids': res,
+            'bom_ids': sorted(res, key=lambda product : product['code']),
             'state': self.state,
             'review_line': self.review_id.get_review_line_list(),
         }
@@ -159,7 +159,7 @@ class MrpBom(models.Model):
             'qty': line.product_qty,
             'process_id': process_id,
             'level': level,
-            'bom_ids': bom_line_ids
+            'bom_ids': sorted(bom_line_ids, key=lambda product : product['code'])
         }
 
         return res
