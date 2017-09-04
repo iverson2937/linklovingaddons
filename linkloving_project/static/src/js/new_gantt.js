@@ -137,7 +137,7 @@ odoo.define('linkloving_project.new_gantt', function (require) {
                 if (task.top_task_id && task.top_task_id[0] != task.id) {
                     t = {
                         "id": task.id,
-                        "text": task.__name + "," + task.id,
+                        "text": task.__name,
                         "start_date": new Date(task.date_start).Format("dd-MM-yyyy"),
                         "duration": (new Date(task.date_end).getTime() - new Date(task.date_start).getTime()) / (1000 * 60 * 60) / 24,
                         "parent": task.parent_ids ? task.parent_ids[0] : task.top_task_id[0],
@@ -147,7 +147,7 @@ odoo.define('linkloving_project.new_gantt', function (require) {
                 } else {
                     t = {
                         "id": task.id,
-                        "text": task.__name + "," + task.id,
+                        "text": task.__name,
                         "start_date": new Date(task.date_start).Format("dd-MM-yyyy"),
                         "duration": (new Date(task.date_end).getTime() - new Date(task.date_start).getTime()) / (1000 * 60 * 60) / 24,
                         "progress": task.task_progress / 100,
@@ -209,7 +209,7 @@ odoo.define('linkloving_project.new_gantt', function (require) {
                         _.each(result, function (task) {
                             var old_t = gantt.getTask(task.id)
                             old_t.start_date = new Date(task.start_date.replace(/-/g, "/"));
-                            old_t.end_date = new Date(task.end_date.replace(/-/g, "/"));
+                            old_t.end_date = task.end_date ? new Date(task.end_date.replace(/-/g, "/")) : new Date(task.start_date.replace(/-/g, "/"));
                             gantt.updateTask(task.id, old_t);
                         });
                         gantt.refreshData();
@@ -230,7 +230,7 @@ odoo.define('linkloving_project.new_gantt', function (require) {
                         _.each(result, function (task) {
                             var old_t = gantt.getTask(task.id)
                             old_t.start_date = new Date(task.start_date.replace(/-/g, "/"));
-                            old_t.end_date = new Date(task.end_date.replace(/-/g, "/"));
+                            old_t.end_date = task.end_date ? new Date(task.end_date.replace(/-/g, "/")) : new Date(task.start_date.replace(/-/g, "/"));
                             gantt.updateTask(task.id, old_t);
                         });
                     }
@@ -261,7 +261,7 @@ odoo.define('linkloving_project.new_gantt', function (require) {
                             if (task_obj && task_id == task_obj.id) {
                                 var old_t = gantt.getTask(task_id)
                                 old_t.start_date = new Date(task_obj.start_date.replace(/-/g, "/"));
-                                old_t.end_date = new Date(task_obj.end_date.replace(/-/g, "/"));
+                                old_t.end_date = task_obj.end_date ? new Date(task_obj.end_date.replace(/-/g, "/")) : new Date(task_obj.start_date.replace(/-/g, "/"));
                                 old_t.progress = task_obj.progress / 100;
                                 old_t.text = task_obj.text;
                                 gantt.updateTask(task_obj.id, old_t);
