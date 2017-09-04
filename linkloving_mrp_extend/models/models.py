@@ -1542,7 +1542,6 @@ class MrpQcFeedBack(models.Model):
 
     # 品捡成功 -> 已入库
     def action_post_inventory(self):
-        self.state = "alredy_post_inventory"
         mrp_product_produce = self.env['mrp.product.produce'].with_context({'active_id': self.production_id.id})
         produce = mrp_product_produce.create({
             'product_qty': self.qty_produced,
@@ -1552,6 +1551,7 @@ class MrpQcFeedBack(models.Model):
         })
 
         produce.do_produce_and_post_inventory()
+        self.state = "alredy_post_inventory"
 
     # 品捡失败 -> 返工
     def action_check_to_rework(self):
