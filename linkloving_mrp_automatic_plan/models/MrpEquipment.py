@@ -199,9 +199,17 @@ class MrpProductionExtend(models.Model):
         limit = kwargs.get("limit")
         offset = kwargs.get("offset")
 
-        mos = self.env["mrp.production"].search_read([("process_id", "=", process_id)],
-                                                     limit=limit,
-                                                     offset=offset
-                                                     )
+        mos = self.env["mrp.production"].search_read(
+                [("process_id", "=", process_id), ("production_line_id", "=", False)],
+                limit=limit,
+                offset=offset,
+                )
 
         return mos
+
+    # 排产或者取消排产
+    def settle_mo(self, **kwargs):
+        production_line_id = kwargs.get("production_line_id")
+        self.production_line_id = production_line_id
+
+        return True
