@@ -557,11 +557,11 @@
                   parent="project.menu_project_management"
                   sequence="12"/>
 
-        <menuitem id="menu_action_view_new_gantt"
-                  name="test_new_gantt"
-                  action="show_new_gantt"
-                  parent="project.menu_project_management"
-                  sequence="13"/>
+        <!--<menuitem id="menu_action_view_new_gantt"-->
+                  <!--name="test_new_gantt"-->
+                  <!--action="show_new_gantt"-->
+                  <!--parent="project.menu_project_management"-->
+                  <!--sequence="13"/>-->
 
 
     </data>

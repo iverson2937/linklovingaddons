@@ -194,7 +194,7 @@ odoo.define('linkloving_project.new_gantt', function (require) {
         },
         on_link_add: function (link) {
             if (link.type != 0){
-                Dialog.alert("关系设定必须又前置任务尾部连至后置任务头部!")
+                Dialog.alert(this, "关系设定必须又前置任务尾部连至后置任务头部!");
                 return false;
             }
             new Model("project.task")
@@ -271,18 +271,7 @@ odoo.define('linkloving_project.new_gantt', function (require) {
             });
         },
         on_task_create: function (id) {
-            alert("on_task_create" + id);
-            var self = this;
-            var pop = new data.SelectCreatePopup(this);
-            pop.on("elements_selected", self, function () {
-                self.reload();
-            });
-            pop.select_element(
-                self.dataset.model,
-                {
-                    initial_view: "form",
-                }
-            );
+           Dialog.alert(this, "该功能正在实现中.");
         },
     });
 
