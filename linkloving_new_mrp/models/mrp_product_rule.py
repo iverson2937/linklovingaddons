@@ -8,6 +8,7 @@ from odoo import models, fields, api, _
 class MrpProductRule(models.Model):
     _name = 'mrp.product.rule'
     name = fields.Char(string='名称')
+    company_id = fields.Many2one('res.company', default=lambda self: self.env.user.company_id)
 
     output_product_ids = fields.One2many('mrp.product.rule.line', 'rule_id', domain=[('type', '=', 'output')],
                                          required=1)
