@@ -31,11 +31,11 @@ class BomUpdateWizard(models.TransientModel):
             line = int(to_update_bom_line_ids[0])
             if line != main_bom_id:
                 line_id = self.env['mrp.bom.line'].browse(int(line))
-                if  line_id.product_id.product_tmpl_id.bom_ids:
-                    bom_id=line_id.product_id.product_tmpl_id.bom_ids
+                if line_id.product_id.product_tmpl_id.bom_ids:
+                    bom_id = line_id.product_id.product_tmpl_id.bom_ids
                 else:
-                    bom_id=self.env['mrp.bom'].create({
-                        'product_tmpl_id':line_id.product_id.product_tmpl_id.id
+                    bom_id = self.env['mrp.bom'].create({
+                        'product_tmpl_id': line_id.product_id.product_tmpl_id.id
                     })
             else:
                 bom_id = bom_obj.browse(line)
@@ -106,7 +106,8 @@ class BomUpdateWizard(models.TransientModel):
             input_changed_value = val.get('input_changed_value')
             name = val.get('name')
             product_specs = val.get('product_specs')
-            last_bom_line_id = int(val.get('pId'))
+            last_bom_line_id = int(val.get('id'))
+            print last_bom_line_id, 'last_bom_line_id'
             qty = val.get('qty')
             to_update_bom_line_ids = parents
             old_line_id = False
@@ -162,7 +163,6 @@ class BomUpdateWizard(models.TransientModel):
                     temp_old_product_id = old_line_id.product_id.id
 
                 if modify_type == 'add':
-                    print 'dddddddddd'
                     if input_changed_value:
                         product_tmpl_id = product_id_obj.browse(product_id).product_tmpl_id
                         new_name = self.get_new_product_name(input_changed_value, postfix)
