@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+        <record model="ir.ui.view" id="approval_project_picking_form">
+            <field name="name">material.request.form</field>
+            <field name="model">material.request</field>
+            <field name="arch" type="xml">
+
+                <form>
+                    <header>
+
+                        <button string="审核" type="object" name="btn_click_state_chenge" class="oe_highlight"
+                                attrs="{'invisible': ['|',('btn_show', '!=', True),('picking_state','not in',('to_submit','Refused','canceled'))]}"
+                                context="{'btn_context': 'to_submit'}"
+                        />
+
+                        <button string="审核" type="object" name="btn_click_state_chenge" class="oe_highlight"
+                                attrs="{'invisible': ['|',('approve_check', '!=', True),('picking_state','!=','review_ing')]}"
+                        />
+
+
+                        <!--<button string="撤销提交" type="object" name="btn_click_state_chenge" class="oe_highlight"/>-->
+
+                        <button string="撤销提交" type="object" name="btn_click_state_chenge_cancel" class="oe_highlight"
+                                attrs="{'invisible': ['|',('btn_show', '!=', True),('picking_state','!=','review_ing')]}"/>
+
+                        <!--<button string="撤销提交" type="object" name="btn_click_state_chenge" class="oe_highlight"/>-->
+
+                        <field name="picking_state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+
+                        <div class="oe_button_box" name="button_box">
+                            <button type="object" name="click_btn_delivery" class="oe_stat_button" icon="fa-truck"
+                                    attrs="{'invisible': [('picking_state', '!=', 'approved_finish')]}">
+                                <field name="delivery_count" widget="statinfo" string="交货"
+                                       modifiers="{'readonly': true}"/>
+                            </button>
+                        </div>
+
+
+                        <group>
+                            <div class="oe_title">
+                                <h1>
+                                    <field name="name"/>
+                                </h1>
+                            </div>
+                        </group>
+                        <group>
+                            <field name="picking_type" widget="radio" required="1"/>
+
+                            <field name="review_i_approvaled_val" invisible="1"/>
+                            <field name="btn_show" invisible="1"/>
+                            <field name="approve_check" invisible="1"/>
+                        </group>
+                        <hr/>
+                        <group>
+                            <group>
+                                <field name="my_create_uid" string="申请人" required="1"/>
+                                <field name="Materials_development_way" invisible="1"/>
+                                <field name="picking_cause" required="1"/>
+                            </group>
+                            <group>
+                                <field name="my_create_date" string="单据日期" required="1"/>
+                                <field name="delivery_date" required="1"/>
+                                <field name="who_review_now"/>
+                                <!--attrs="{'invisible': [('picking_state', 'not in', ('to_approved','approved_finish'))]}"/>-->
+                                <field name="remark"/>
+
+                                <field name="stock_picking_ids" invisible="1"/>
+
+                            </group>
+                        </group>
+                        <group>
+                            <field name="reference_product_template_ids" string="参考产品" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <notebook>
+                                <page string="订单行">
+                                    <field name="line_ids" mode="tree,kanban">
+                                        <form string="Sales Order Lines">
+                                            <group>
+                                                <field name="reference_bom" readonly="1" string="参考BOM" invisible="1"/>
+                                                <field name="product_id" string="产品" readonly="0"/>
+                                                <field name="inner_code" string="国内简码" readonly="1"/>
+                                                <field name="inner_spec" string="国内类型" readonly="1"/>
+                                                <field name="qty_available" string="库存" readonly="1"/>
+                                                <field name="product_qty" readonly="0" string="申请数量"/>
+                                                <field name="uom_id" string="计量单位" readonly="1"/>
+                                            </group>
+                                        </form>
+                                        <tree string="Sales Order Lines" editable="bottom">
+                                            <field name="reference_bom" readonly="1" string="参考BOM" invisible="1"/>
+                                            <field name="product_id" string="产品" readonly="0"/>
+                                            <field name="inner_code" string="国内简码" readonly="1"/>
+                                            <field name="inner_spec" string="国内类型" readonly="1"/>
+                                            <field name="qty_available" string="库存" readonly="1"/>
+                                            <field name="product_qty" readonly="0" string="申请数量"/>
+                                            <field name="uom_id" string="计量单位" readonly="1"/>
+                                        </tree>
+                                        <kanban class="o_kanban_mobile">
+                                            <field name="product_id"/>
+                                            <field name="product_qty"/>
+                                            <field name="uom_id" groups="product.group_uom"/>
+                                            <field name="qty_available"/>
+                                            <templates>
+                                                <t t-name="kanban-box">
+                                                    <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                                                        <div class="row">
+                                                            <div class="col-xs-12">
+                                                                <strong>
+                                                                    <span>
+                                                                        <t t-esc="record.product_id.value"/>
+                                                                    </span>
+                                                                </strong>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-xs-8 text-muted">
+                                                                <span>
+                                                                    <t t-esc="record.product_uom_qty.value"/>
+                                                                    <t t-esc="record.product_uom.value"/>
+                                                                </span>
+                                                            </div>
+                                                            <div class="col-xs-4 text-muted">
+                                                                <span class="pull-right text-right">
+                                                                    <t t-esc="record.price_subtotal.value"/>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </t>
+                                            </templates>
+                                        </kanban>
+                                    </field>
+                                    <div class="oe_clear"/>
+                                </page>
+                                <page string="审核记录">
+                                    <field name="review_process_line_ids">
+                                        <tree>
+                                            <field name="review_order_seq" string="顺序" invisible="1"/>
+                                            <field name="last_review_line_id" string="上一级审核" invisible="1"/>
+
+                                            <field name="partner_id" string="待...审核"/>
+                                            <field name="state"/>
+                                            <field name="remark" string="备注"/>
+                                            <field name="review_time"/>
+                                        </tree>
+                                    </field>
+                                </page>
+                            </notebook>
+                        </group>
+                    </sheet>
+                </form>
+
+            </field>
+        </record>
+
+
+        <record id="approval_project_picking_tree" model="ir.ui.view">
+            <field name="name">material.request.tree</field>
+            <field name="model">material.request</field>
+            <field name="arch" type="xml">
+                <tree string="工程领料">
+                    <field name="name"/>
+                    <field name="picking_type"/>
+                    <field name="picking_cause"/>
+                    <field name="Materials_development_way" invisible="1"/>
+                    <field name="picking_state"/>
+                    <field name="my_create_date" string="单据日期"/>
+                    <field name="delivery_date"/>
+                    <field name="my_create_uid" string="申请人"/>
+                    <field name="who_review_now"/>
+                    <!--<field name="reference_product_ids"/>-->
+                    <!--<field name="approval_bom_ids"/>-->
+                    <field name="remark"/>
+                    <field name="review_i_approvaled_val" invisible="1"/>
+                    <field name="stock_picking_ids" invisible="1"/>
+                </tree>
+
+            </field>
+        </record>
+
+        <record id="action_approval_to_submit" model="ir.actions.act_window">
+            <field name="name">待提交</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">material.request</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+
+            <field name="domain">[('picking_state','=','to_submit'),('create_uid','=',uid)]</field>
+            <field name="context">{'default_my_create_uid': uid}</field>
+            <field name="view_id" eval="False"/>
+
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click add To submit order.
+                </p>
+                <p>
+                    No source Found!
+                </p>
+            </field>
+        </record>
+
+
+        <record id="action_approval_submitted" model="ir.actions.act_window">
+            <field name="name">已提交</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">material.request</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+
+            <field name="domain">[('picking_state','!=','to_submit'),('create_uid','=',uid)]</field>
+            <!--<field name="context">{'default_customer':True,'default_is_company':True}</field>-->
+            <field name="view_id" eval="False"/>
+
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click add To submit order.
+                </p>
+                <p>
+                    No source Found!
+                </p>
+            </field>
+        </record>
+
+
+        <record id="action_approval_check_pending" model="ir.actions.act_window">
+            <field name="name">待审核</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">material.request</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+
+            <!--<field name="domain">[('picking_state','in',('to_approved','submitted')),('who_review_now_id', '=', uid)]</field>-->
+            <field name="domain">[('picking_state','=','review_ing'),('who_review_now_id', '=', uid)]</field>
+            <!--<field name="context">{'default_customer':True,'default_is_company':True}</field>-->
+            <!--<field name="context">{'default_to_approve_id':uid}</field>-->
+
+            <field name="view_id" eval="False"/>
+
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click add To submit order.
+                </p>
+                <p>
+                    No source Found!
+                </p>
+            </field>
+        </record>
+
+        <record id="action_approval_approved_drawing" model="ir.actions.act_window">
+            <field name="name">已审批</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">material.request</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('review_i_approvaled_val','child_of',[uid])]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click add To submit order.
+                </p>
+                <p>
+                    No source Found!
+                </p>
+            </field>
+        </record>
+
+
+        <record id="action_approval_my_project_order" model="ir.actions.act_window">
+            <field name="name">工程订单</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">material.request</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click add project order.
+                </p>
+                <p>
+                    No source Found!
+                </p>
+            </field>
+        </record>
+
+
+        <!--Receipt*-->
+        <menuitem id="menu_material_request"
+                  parent="linkloving_approval.ll_approval_root"
+                  sequence="1" name="工程领料"/>
+
+
+        <menuitem id="approval_pdm_my_bills" name="我的单据" parent="menu_material_request"
+                  action="action_approval_my_project_order"
+                  sequence="0"/>
+
+        <menuitem id="approval_pdm_my_project_order" name="工程订单" parent="menu_material_request"
+                  action="action_approval_my_project_order"
+                  sequence="1"/>
+
+        <menuitem id="approval_pdm_to_submit" name="待提交" parent="approval_pdm_my_bills"
+                  action="action_approval_to_submit"
+                  sequence="0"/>
+
+        <menuitem id="approval_pdm_submitted" name="已提交" parent="approval_pdm_my_bills"
+                  action="action_approval_submitted"
+                  sequence="1"/>
+
+        <menuitem id="approval_pdm_check_pending" name="待审核" parent="approval_pdm_my_bills"
+                  action="action_approval_check_pending"
+                  sequence="2"/>
+
+        <menuitem id="approval_pdm_approved_drawing" name="已审批" parent="approval_pdm_my_bills"
+                  action="action_approval_approved_drawing"
+                  sequence="3"/>
+
+
+        <!--<menuitem id="approval_pdm_view_project" name="显示工程订单" parent="approval_pdm_my_project_order"-->
+        <!--action="action_approval_my_project_order"-->
+        <!--sequence="0"/>-->
+
+
+        <record id="material_request_view_stock_picking_form" model="ir.ui.view">
+            <field name="name">stock.picking.form.material.request</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="Materials_development_way"
+                           attrs="{'invisible': [('Materials_development_way', '=', False)]}"/>
+                </xpath>
+
+                <xpath expr="//field[@name='min_date']" position="after">
+                    <field name="note"/>
+                </xpath>
+
+            </field>
+        </record>
+
+
+    </data>
+</openerp>
