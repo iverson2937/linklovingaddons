@@ -158,14 +158,17 @@ class MrpProductionLine(models.Model):
     line_employee_ids = fields.One2many(comodel_name='hr.employee', inverse_name='production_line_id', string=u'产线人员')
     line_employee_names = fields.Char(string=u'产线人员', compute='_compute_line_employee_names')
 
+    # 根据process_id 获取产线
     def get_production_line_list(self, **kwargs):
         process_id = kwargs.get("process_id")
 
-        lines = self.env["mrp.production.line"].search_read([("process_id", "=", process_id)])
+        lines = self.env["mrp.production.line"].search_read([("process_id", "=", process_id), ])
         return lines
 
+    #根据产线id获取已排产mo
     def get_mo_by_productin_line(self, **kwargs):
         production_line_id = kwargs.get("production_line_id")
+        planned_date = kwargs.get("planned_date")
         limit = kwargs.get("limit")
         offset = kwargs.get("offset")
 
@@ -194,8 +197,10 @@ class MrpProductionExtend(models.Model):
 
     production_line_id = fields.Many2one("mrp.production.line", string=u"产线")
 
+    #根据process_id 获取未排产mo
     def get_unplanned_mo(self, **kwargs):
         process_id = kwargs.get("process_id")
+
         limit = kwargs.get("limit")
         offset = kwargs.get("offset")
 
@@ -210,6 +215,8 @@ class MrpProductionExtend(models.Model):
     # 排产或者取消排产
     def settle_mo(self, **kwargs):
         production_line_id = kwargs.get("production_line_id")
+        settle_date = kwargs.get("settle_date")
+
         self.production_line_id = production_line_id
 
         return True

@@ -1691,7 +1691,7 @@ class StockPackOperationExtend(models.Model):
     @api.multi
     def _compute_receivied_qty(self):
         for pack in self:
-            if pack.picking_id.transfer_way == 'part':
+            if pack.picking_id.transfer_way == 'part':  # and pack.picking_id.state in ["waiting_in", "done"]
                 pack.receivied_qty = pack.qty_done + pack.rejects_qty
             else:
                 pack.receivied_qty = pack.qty_done
