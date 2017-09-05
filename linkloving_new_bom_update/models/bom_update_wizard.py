@@ -106,8 +106,7 @@ class BomUpdateWizard(models.TransientModel):
             input_changed_value = val.get('input_changed_value')
             name = val.get('name')
             product_specs = val.get('product_specs')
-            last_bom_line_id = int(val.get('id'))
-            print last_bom_line_id, 'last_bom_line_id'
+
             qty = val.get('qty')
             to_update_bom_line_ids = parents
             old_line_id = False
@@ -165,7 +164,7 @@ class BomUpdateWizard(models.TransientModel):
                 if modify_type == 'add':
                     if input_changed_value:
                         product_tmpl_id = product_id_obj.browse(product_id).product_tmpl_id
-                        new_name = self.get_new_product_name(input_changed_value, postfix)
+                        new_name = self.get_new_product_name(name, postfix)
                         default_code = self.get_next_default_code(product_tmpl_id.default_code)
                         new_pl_id = product_tmpl_id.copy({'name': new_name, 'default_code': default_code})
                         product_id = new_pl_id.product_variant_ids[0].id
@@ -180,7 +179,7 @@ class BomUpdateWizard(models.TransientModel):
                         input_changed_value = False
                         # 此为修改bom，需要删除一个bom_line
                 elif modify_type == 'edit':
-                    old_product_id = line_obj.browse(last_bom_line_id).product_id
+                    old_product_id = line_obj.browse(int(val.get('id'))).product_id
                     if input_changed_value:
                         product_tmpl_id = product_id_obj.browse(product_id).product_tmpl_id
                         new_name = self.get_new_product_name(name, postfix)
