@@ -5,6 +5,18 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import models, fields, api
 
+class Inheritforarrangeproduction(models.Model):
+    _inherit = 'mrp.process'
+
+    @api.multi
+    def arrange_production(self):
+        return {
+            'name': '排产',
+            'type': 'ir.actions.client',
+            'tag': 'arrange_production',
+            'process_id': self.id
+        }
+
 
 class ProcurementOrderExtend(models.Model):
     _inherit = 'procurement.order'

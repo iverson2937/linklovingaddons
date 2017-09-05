@@ -256,7 +256,6 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
                 return self.get_datas(this, 'mrp.bom', 'waiting_submit');
             }
 
-
         }
     });
 
