@@ -23,6 +23,19 @@
                   parent="hr.menu_human_resources_configuration"
                   action="to_date_page_list_action"/>
 
+        <record id="stock_picking_type_kanban2" model="ir.ui.view">
+            <field name="name">mrp.process.kanban</field>
+            <field name="model">mrp.process</field>
+            <field name="inherit_id" ref="linkloving_process.stock_picking_type_kanban"/>
+            <field name="arch" type="xml">
+                <!-- find field description and add the field
+                     idea_ids after it -->
+                <xpath expr="//button[@name='mo_schedule_query']" position="after">
+                    <button style="margin-left:15px" name="arrange_production" type="object">排产</button>
+                </xpath>
+            </field>
+        </record>
+
         <record id="account_multi_handle_worker_form_view" model="ir.ui.view">
             <field name="name">procurement.order.reset.confirm.form</field>
             <field name="model">procurement.order.reset.confirm</field>

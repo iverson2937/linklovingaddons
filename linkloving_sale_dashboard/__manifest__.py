@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "linkloving_new_mrp",
+    'name': "linkloving_sale_dashboard",
 
     'summary': """
         Short (1 phrase/line) summary of the module's purpose, used as
@@ -20,19 +20,17 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'mrp', 'linkloving_mrp_extend', 'linkloving_process'],
+    'depends': ['base', 'sale', 'crm', 'sales_team', 'linkloving_account'],
 
     # always loaded
     'data': [
-        'security/ir.model.access.csv',
-        'security/rules.xml',
-        'views/views.xml',
-        'views/mrp_production.xml',
-        'views/mrp_product_rule.xml',
-        'views/mrp_process.xml',
+        # 'security/ir.model.access.csv',
+        'views/crm_dashboard.xml',
+        'views/template.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
     ],
+    'qweb': ['static/src/xml/*.xml'],
 }

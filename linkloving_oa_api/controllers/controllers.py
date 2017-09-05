@@ -1167,11 +1167,11 @@ class LinklovingOAApi(http.Controller):
             'phone': obj.phone or '',
             'crm_source': obj.crm_source_id.display_name or '',   #来源
             'source': obj.source_id.display_name or '',   #渠道
-            'team': obj.team_id.display_name,
-            'user_id': obj.user_id.display_name,
+            'team': obj.team_id.display_name or '',
+            'user_id': obj.user_id.display_name or '',
             'tag': self.get_supplier_tags(obj.category_id),
             'priority': obj.priority,
-            'level': obj.level,
+            'level': obj.level or '',
             "contracts_count": len(obj.child_ids),  # 联系人&地址个数
             "contracts": self.get_contracts_in_supplier(obj.child_ids),
             # 'supplier': obj.supplier_invoice_count,  #对账数量

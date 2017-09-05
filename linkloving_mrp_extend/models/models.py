@@ -226,14 +226,14 @@ class StockMoveExtend(models.Model):
             "authorizee_id": authorizee_id,
         })
 
-    # @api.multi
-    # def _qty_available(self):
-    #     for move in self:
-    #         # For consumables, state is available so availability = qty to do
-    #         if move.state == 'assigned':
-    #             move.quantity_available = move.product_uom_qty
-    #         else:
-    #             move.quantity_available = move.reserved_availability
+        # @api.multi
+        # def _qty_available(self):
+        #     for move in self:
+        #         # For consumables, state is available so availability = qty to do
+        #         if move.state == 'assigned':
+        #             move.quantity_available = move.product_uom_qty
+        #         else:
+        #             move.quantity_available = move.reserved_availability
 
 
 class MrpProductionExtend(models.Model):
@@ -529,7 +529,7 @@ class MrpProductionExtend(models.Model):
 
     @api.multi
     def button_action_confirm_draft(self):
-        if self.bom_id.state not in ('draft', 'release'):
+        if self.bom_id.state not in ('draft', 'release') and not self.is_multi_output:
             raise UserError('BOM还没通过审核,请联系相关负责人')
         for production in self:
             production.write({'state': 'confirmed'})
@@ -1317,6 +1317,7 @@ class ReturnMaterialLine(models.Model):
                                                               ('material', '原材料'),
                                                               ('real_semi_finished', '半成品')],
                                     required=False, compute="_compute_product_type")
+
     @api.model
     def create(self, vals):
         return super(ReturnMaterialLine, self).create(vals)
@@ -1542,7 +1543,6 @@ class MrpQcFeedBack(models.Model):
 
     # 品捡成功 -> 已入库
     def action_post_inventory(self):
-        self.state = "alredy_post_inventory"
         mrp_product_produce = self.env['mrp.product.produce'].with_context({'active_id': self.production_id.id})
         produce = mrp_product_produce.create({
             'product_qty': self.qty_produced,
@@ -1552,6 +1552,7 @@ class MrpQcFeedBack(models.Model):
         })
 
         produce.do_produce_and_post_inventory()
+        self.state = "alredy_post_inventory"
 
     # 品捡失败 -> 返工
     def action_check_to_rework(self):
@@ -1690,7 +1691,7 @@ class StockPackOperationExtend(models.Model):
     @api.multi
     def _compute_receivied_qty(self):
         for pack in self:
-            if pack.picking_id.transfer_way == 'part':
+            if pack.picking_id.transfer_way == 'part':  # and pack.picking_id.state in ["waiting_in", "done"]
                 pack.receivied_qty = pack.qty_done + pack.rejects_qty
             else:
                 pack.receivied_qty = pack.qty_done

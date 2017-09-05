@@ -1,0 +1,22 @@
+<odoo>
+    <data>
+        <!--<template id="payment_confirm" inherit_id="sales_team.SalesDashboard">-->
+        <!--<xpath expr="//div[@class='o_sales_dashboard']" position="inside">-->
+        <!--<td>-->
+        <!--<tr>-->
+        <!--sssssssss-->
+        <!--</tr>-->
+        <!--</td>-->
+        <!--</xpath>-->
+        <!--</template>-->
+
+        <template id="sale_team_dashboard" name="linkloving_core_assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+
+                <script type="text/javascript" src="/linkloving_sale_dashboard/static/src/js/dashboard.js"/>
+
+
+            </xpath>
+        </template>
+    </data>
+</odoo>

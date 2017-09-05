@@ -22,6 +22,7 @@ class SaleOrder(models.Model):
     shipped_amount = fields.Float(compute='_compute_invoice_amount')
     pre_payment_amount = fields.Float(compute='_compute_invoice_amount')
 
+
     # 重新计算收货数量由于出入库bug临时使用
     def recompute_receive_amount(self):
         for line in self.order_line:
@@ -99,7 +100,7 @@ class SaleOrder(models.Model):
         ('no', u'待出货'),
         ('part_shipping', u'部分出货'),
         ('done', u'出货完成'),
-    ], compute='_get_shipping_status', default='no')
+    ], compute='_get_shipping_status', default='no', store=True)
 
     @api.one
     @api.depends('order_line.shipping_status')

@@ -279,7 +279,8 @@ class linkloving_project_task(models.Model):
 
     def _update_task_duration(self, res):
         if self.task_progress <= 0:
-            max_date_end = max([datetime.datetime.strptime(pre_task.date_end, '%Y-%m-%d') for pre_task in self.pre_task_ids])
+            max_date_end = max(
+                [datetime.datetime.strptime(pre_task.date_end, '%Y-%m-%d') for pre_task in self.pre_task_ids])
             date_start = datetime.datetime.strptime(self.date_start, '%Y-%m-%d')
             differ = (date_start - max_date_end).days
 
@@ -287,7 +288,8 @@ class linkloving_project_task(models.Model):
 
             vals = {"date_start": max_date_end, "date_end": date_end}
             self.write(vals)
-            res.append({"id": self.id, "start_date": max_date_end.strftime("%Y-%m-%d"), "end_date": date_end.strftime("%Y-%m-%d")},)
+            res.append({"id": self.id, "start_date": max_date_end.strftime("%Y-%m-%d"),
+                        "end_date": date_end.strftime("%Y-%m-%d")}, )
             if self.after_task_id:
                 self.after_task_id._update_task_duration(res)
             return res
@@ -305,3 +307,10 @@ class linkloving_project_task(models.Model):
                 self.after_task_id = False
                 return True
         return False
+
+    def on_refresh_task(self):
+        result = {"id": self.id,
+                  "start_date": datetime.datetime.strptime(self.date_start, '%Y-%m-%d').strftime("%Y-%m-%d"),
+                  "end_date": datetime.datetime.strptime(self.date_end, '%Y-%m-%d').strftime("%Y-%m-%d"),
+                  "progress": self.task_progress, "text": self.name}
+        return result

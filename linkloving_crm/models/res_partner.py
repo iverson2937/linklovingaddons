@@ -399,8 +399,8 @@ class CrmIrAttachment(models.Model):
     @api.returns('self', lambda value: value.id)
     def create(self, vals):
         if not (vals.get('res_model') or vals.get('res_id')):
-            vals['partner_img_id'] = self.env.context.get('active_ids')[0] if len(
-                self.env.context.get('active_ids')) > 0 else ''
+            vals['partner_img_id'] = self.env.context.get('active_ids')[0] if self.env.context.get(
+                'active_ids')  else ''
 
         return super(CrmIrAttachment, self).create(vals)
 

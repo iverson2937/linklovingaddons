@@ -5,6 +5,18 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import models, fields, api
 
+class Inheritforarrangeproduction(models.Model):
+    _inherit = 'mrp.process'
+
+    @api.multi
+    def arrange_production(self):
+        return {
+            'name': '排产',
+            'type': 'ir.actions.client',
+            'tag': 'arrange_production',
+            'process_id': self.id
+        }
+
 
 class ProcurementOrderExtend(models.Model):
     _inherit = 'procurement.order'
@@ -60,7 +72,7 @@ class ProcurementOrderExtend(models.Model):
                     real_start_time = theoretics_move_start_time
                     left_time = 0
                 else:
-                    left_time = spent_time - (move_corrected_time + new_day_work_start_time)
+                    left_time = left_time - (move_corrected_time - new_day_work_start_time).seconds
                     # if theoretics_move_start_time <= new_day_off_work_time and theoretics_move_start_time >= new_day_work_start_time:
         if not real_start_time:
             raise UserWarning(u"出错了")
@@ -158,6 +170,25 @@ class MrpProductionLine(models.Model):
     line_employee_ids = fields.One2many(comodel_name='hr.employee', inverse_name='production_line_id', string=u'产线人员')
     line_employee_names = fields.Char(string=u'产线人员', compute='_compute_line_employee_names')
 
+    # 根据process_id 获取产线
+    def get_production_line_list(self, **kwargs):
+        process_id = kwargs.get("process_id")
+
+        lines = self.env["mrp.production.line"].search_read([("process_id", "=", process_id), ])
+        return lines
+
+    #根据产线id获取已排产mo
+    def get_mo_by_productin_line(self, **kwargs):
+        production_line_id = kwargs.get("production_line_id")
+        planned_date = kwargs.get("planned_date")
+        limit = kwargs.get("limit")
+        offset = kwargs.get("offset")
+
+        mos = self.env["mrp.production"].search_read([("production_line_id", "=", production_line_id)],
+                                                     limit=limit,
+                                                     offset=offset
+                                                     )
+        return mos
 
 class HrEmployeeExtend(models.Model):
     _inherit = 'hr.employee'
@@ -171,3 +202,33 @@ class MrpProcessExtend(models.Model):
 
     work_type_id = fields.Many2one(comodel_name="work.type", string=u"工种", required=False, )
     production_line_ids = fields.One2many(comodel_name='mrp.production.line', inverse_name='process_id', string=u'产线')
+
+
+class MrpProductionExtend(models.Model):
+    _inherit = "mrp.production"
+
+    production_line_id = fields.Many2one("mrp.production.line", string=u"产线")
+
+    #根据process_id 获取未排产mo
+    def get_unplanned_mo(self, **kwargs):
+        process_id = kwargs.get("process_id")
+
+        limit = kwargs.get("limit")
+        offset = kwargs.get("offset")
+
+        mos = self.env["mrp.production"].search_read(
+                [("process_id", "=", process_id), ("production_line_id", "=", False)],
+                limit=limit,
+                offset=offset,
+                )
+
+        return mos
+
+    # 排产或者取消排产
+    def settle_mo(self, **kwargs):
+        production_line_id = kwargs.get("production_line_id")
+        settle_date = kwargs.get("settle_date")
+
+        self.production_line_id = production_line_id
+
+        return True

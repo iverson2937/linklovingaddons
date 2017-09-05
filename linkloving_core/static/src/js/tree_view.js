@@ -47,7 +47,4 @@ odoo.define('web.OLListEditor', function (require) {
             return (($row.length) ? $row : null);
         },
     });
-
-    return Editor;
-
 });

@@ -184,19 +184,37 @@ class SaleOrderLine(models.Model):
 
             if partner_id.level == 1:
                 if not tax_id.amount:
-                    price = product_id.price1
+                    if not product_id.price1:
+                        product_id.price1 = price_unit
+                    else:
+                        price = product_id.price1
                 else:
-                    price = product_id.price1_tax
+                    if not product_id.price1_tax:
+                        product_id.price1_tax = price_unit
+                    else:
+                        price = product_id.price1_tax
             elif partner_id.level == 2:
                 if not tax_id.amount:
-                    price = product_id.price2
+                    if not product_id.price2:
+                        product_id.price2 = price_unit
+                    else:
+                        price = product_id.price2
                 else:
-                    price = product_id.price2_tax
+                    if not product_id.price2_tax:
+                        product_id.price2_tax = price_unit
+                    else:
+                        price = product_id.price2_tax
             elif partner_id.level == 3:
                 if not tax_id.amount:
-                    price = product_id.price3
+                    if not product_id.price3:
+                        product_id.price3 = price_unit
+                    else:
+                        price = product_id.price3
                 else:
-                    price = product_id.price3_tax
+                    if not product_id.price3_tax:
+                        product_id.price3_tax = price_unit
+                    else:
+                        price = product_id.price3_tax
             if price and not tax_id.amount and price_unit <> price:
                 discount = price_unit / price
                 discount_obj.price = discount
