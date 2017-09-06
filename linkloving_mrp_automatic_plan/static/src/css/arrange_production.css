@@ -5,7 +5,7 @@
 }
 #a_p_left{
     width: 50%;
-    /*height: 900px;*/
+    height: 900px;
     float: left;
     padding: 10px 0;
     border-top:1px solid #797979;
@@ -15,7 +15,8 @@
 }
 #a_p_right{
     width: 50%;
-    min-height: 750px;
+    height: 900px;
+    overflow-y: scroll;
     float: left;
     padding: 10px;
     border-top:1px solid #797979;
@@ -92,7 +93,7 @@
 .a_p_product_name{
     margin: 3px;
 }
-.a_p_process_res,.a_p_latest_time,.a_p_arrange_qty,.a_p_spend_time{
+.a_p_process_res,.a_p_latest_time,.a_p_arrange_qty,.a_p_spend_time,.a_p_planned_start,.a_p_planned_end{
     display: block;
     margin-bottom: 8px;
 }
@@ -121,4 +122,7 @@
 }
 .a_p_time_end{
     display: inline-block;
+}
+#a_p_left #a_p_date{
+    left: 60px!important;
 }
