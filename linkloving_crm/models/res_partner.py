@@ -155,17 +155,17 @@ class ResPartner(models.Model):
         #             if select_company(self, {item_type: self[item_type]}, item_type):
         #                 raise UserError(u'此' + item_type + vals.get(item_type) + u'已绑定公司，请更换')
         #
-        # if 'user_id' in vals:
-        #     if vals.get('user_id'):
-        #         vals['public_partners'] = 'private'
-        #         vals['old_user_id'] = vals.get('user_id')
-        #         # if vals.get('user_id') == int(self.old_user_id):
-        #         #     raise UserError(u'此用户不允许被领取')
-        #         # else:
-        #         #     vals['public_partners'] = 'private'
-        #         #     vals['old_user_id'] = vals.get('user_id')
-        #     else:
-        #         vals['public_partners'] = 'public'
+        if 'user_id' in vals:
+            if vals.get('user_id'):
+                vals['public_partners'] = 'private'
+                vals['old_user_id'] = vals.get('user_id')
+                # if vals.get('user_id') == int(self.old_user_id):
+                #     raise UserError(u'此用户不允许被领取')
+                # else:
+                #     vals['public_partners'] = 'private'
+                #     vals['old_user_id'] = vals.get('user_id')
+            else:
+                vals['public_partners'] = 'public'
 
         return super(ResPartner, self).write(vals)
 

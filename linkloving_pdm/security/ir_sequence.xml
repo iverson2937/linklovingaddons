@@ -10,6 +10,11 @@
             <!--<field name="category_id" ref="base.module_category_hidden"/>-->
         </record>
 
+        <record id="group_final_review_picking" model="res.groups">
+            <field name="name">领料终审人</field>
+            <!--<field name="category_id" ref="base.module_category_hidden"/>-->
+        </record>
+
         <record id="sequence_attachment_version" model="ir.sequence">
             <field name="name">Attachment Version Seq</field>
             <field name="code">product.attachment.info</field>
