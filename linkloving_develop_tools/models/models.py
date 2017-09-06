@@ -168,6 +168,14 @@ class CreateOrderPointWizard(models.TransientModel):
                 so.temp_no = False
             except:
                 continue
+
+    def modify_stock_move_company(self):
+        quants = self.env["stock.quant"].search([("company_id", "=", 3)])
+        for quant in quants:
+            if quant.company_id != quant.product_id.company_id:
+                quant.company_id = quant.product_id.company_id
+
+
     def action_confirm_canceled_so(self):
         pass
         # sos = self.env["sale.order"].search([('state', '=', 'cancel')])
