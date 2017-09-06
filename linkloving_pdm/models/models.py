@@ -671,7 +671,7 @@ class ReviewProcessWizard(models.TransientModel):
     def action_pass(self):
 
         review_type = self._context.get("review_type")
-        materials_request_id = self._context.get('material_requests_id')
+        materials_request_id = self._context.get('default_material_requests_id')
         if review_type == 'bom_review':
             if not self.need_sop:
                 raise UserError(u'请选择是否需要SOP文件')
