@@ -126,3 +126,12 @@
 #a_p_left #a_p_date{
     left: 60px!important;
 }
+.production_lists_no_item{
+    padding: 100px 0;
+    border: 1px solid #c7c7c7;
+    text-align: center;
+    font-size: 30px;
+}
+.production_lists_no_item::after{
+    content: "添加内容";
+}

@@ -26,7 +26,20 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             'drop #a_p_left':'move_over_left',
             'dragover #a_p_right':'prevent_default',
             'drop #a_p_right':'move_over_right',
-            'dragstart .ap_item_wrap': 'move_start'
+            'dragstart .ap_item_wrap': 'move_start',
+            'click .to_bom': 'to_bom_func',
+        },
+        to_bom_func:function (e) {
+             var e = e || window.event;
+             var target = e.target || e.srcElement;
+             var action = {
+               'type': 'ir.actions.client',
+                'tag': 'new_bom_update',
+                'bom_id': parseInt($(target).parents('.ap_item_wrap').attr("data-bom-id")),
+                'is_show': false,
+                'target':'new'
+            };
+            this.do_action(action);
         },
         production_lists_wrap_toggle:function (e) {
             var e = e || window.event;
@@ -43,7 +56,11 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         console.log(result);
                         // myself.mydataset = result;
                         $(target).parents('.production_line').next('.production_lists_wrap').html("");
+                        $(target).parents('.production_line').next('.production_lists_wrap').removeClass('production_lists_no_item');
                         $(target).parents('.production_line').next('.production_lists_wrap').append(QWeb.render('a_p_render_right_tmpl',{result: result}));
+                        if($(target).parents('.production_line').next('.production_lists_wrap').children('.ap_item_wrap').length == 0){
+                            $(target).parents('.production_line').next('.production_lists_wrap').addClass('production_lists_no_item');
+                        }
                     })
 
             }else {
@@ -72,11 +89,14 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 var pt_line_index = $(toElem).parents('.production_lists_wrap').prev('.production_line').attr('data-index');
                 myself.no_ap_to_ag(parseInt(mo_id), myself.mydataset.product_line[pt_line_index].id);
             }
-            else if(toElem.className == 'production_lists_wrap'){
+            else if($(toElem).hasClass('production_lists_wrap')){
                 $(toElem).prepend($(elem));
                 var mo_id = $(elem).attr("data-mo-id");
                 var pt_line_index = $(toElem).prev('.production_line').attr('data-index');
                 myself.no_ap_to_ag(parseInt(mo_id), myself.mydataset.product_line[pt_line_index].id);
+                if($(toElem).hasClass('production_lists_no_item')){
+                    $(toElem).removeClass('production_lists_no_item')
+                }
             }
         },
         move_over_right:function (ev) {
@@ -84,6 +104,9 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             var elem = document.getElementById(move_id); //当前拖动的元素
             var toElem = ev.target;
             console.log(toElem.className);
+            if($(elem).parents('#a_p_right').length>=1){
+                return;
+            }
             if(toElem.className == 'ap_item_wrap'){
                 $(elem).insertBefore($(toElem));
                 var mo_id = $(elem).attr("data-mo-id");
