@@ -620,7 +620,7 @@ class ReviewProcessWizard(models.TransientModel):
         to_last_review = self._context.get("to_last_review")  # 是否送往终审
         review_type = self._context.get("review_type")
 
-        materials_request_id = self._context.get('material_requests_id')
+        materials_request_id = self._context.get('default_material_requests_id')
         picking_state = self._context.get('picking_state', False)
 
         if review_type == 'bom_review':
