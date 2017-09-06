@@ -90,25 +90,24 @@ class MaterialRequest(models.Model):
         if vals.get('line_ids'):
             null_lines = True
             for vals_line in vals.get('line_ids'):
-                if len(vals_line) >= 3:
-                    if vals_line[2]:
-                        if vals_line[1]:
-                            product_one1 = self.env['material.request.line'].browse(vals_line[1])
-                            qty_vals = product_one1.product_id.qty_available
+                if vals_line[2]:
+                    if vals_line[1]:
+                        product_one1 = self.env['material.request.line'].browse(vals_line[1])
+                        qty_vals = product_one1.product_id.qty_available
 
-                            if qty_vals < 0 or qty_vals < vals_line[2].get('product_qty'):
-                                raise UserError(u"库存不足： '%s' " % product_one1.product_id.name)
-                            if vals_line[2].get('product_qty') <= 0:
-                                raise UserError(u"产品  '%s'  申请数量不能为0" % product_one1.product_id.name)
-                        else:
-                            product_one2 = self.env['product.product'].browse(vals_line[2].get('product_id'))
-                            qty_vals = vals_line[2].get('qty_available') if vals_line[2].get(
-                                'qty_available') else product_one2.qty_available
-                            if qty_vals < 0 or qty_vals < vals_line[2].get('product_qty'):
-                                raise UserError(u"库存不足： '%s' " % product_one2.name)
-                            if vals_line[2].get('product_qty') <= 0:
-                                raise UserError(u"产品  '%s'  申请数量不能为0" % product_one2.name)
-                        null_lines = False
+                        if qty_vals < 0 or qty_vals < vals_line[2].get('product_qty'):
+                            raise UserError(u"库存不足： '%s' " % product_one1.product_id.name)
+                        if vals_line[2].get('product_qty') <= 0:
+                            raise UserError(u"产品  '%s'  申请数量不能为0" % product_one1.product_id.name)
+                    else:
+                        product_one2 = self.env['product.product'].browse(vals_line[2].get('product_id'))
+                        qty_vals = vals_line[2].get('qty_available') if vals_line[2].get(
+                            'qty_available') else product_one2.qty_available
+                        if qty_vals < 0 or qty_vals < vals_line[2].get('product_qty'):
+                            raise UserError(u"库存不足： '%s' " % product_one2.name)
+                        if vals_line[2].get('product_qty') <= 0:
+                            raise UserError(u"产品  '%s'  申请数量不能为0" % product_one2.name)
+                    null_lines = False
             if null_lines:
                 raise UserError(u"订单行 不能为空！")
         res = super(MaterialRequest, self).write(vals)
@@ -126,14 +125,13 @@ class MaterialRequest(models.Model):
 
         if vals.get('line_ids'):
             for vals_line in vals.get('line_ids'):
-                if len(vals_line) >= 3:
-                    product_one1 = self.env['product.product'].browse(vals_line[2].get('product_id'))
-                    qty_vals = vals_line[2].get('qty_available') if vals_line[2].get(
-                        'qty_available') else product_one1.qty_available
-                    if qty_vals < 0 or qty_vals < vals_line[2].get('product_qty'):
-                        raise UserError(u"库存不足： '%s' " % product_one1.name)
-                    if vals_line[2].get('product_qty') <= 0:
-                        raise UserError(u"产品  '%s'  申请数量不能为0" % product_one1.name)
+                product_one1 = self.env['product.product'].browse(vals_line[2].get('product_id'))
+                qty_vals = vals_line[2].get('qty_available') if vals_line[2].get(
+                    'qty_available') else product_one1.qty_available
+                if qty_vals < 0 or qty_vals < vals_line[2].get('product_qty'):
+                    raise UserError(u"库存不足： '%s' " % product_one1.name)
+                if vals_line[2].get('product_qty') <= 0:
+                    raise UserError(u"产品  '%s'  申请数量不能为0" % product_one1.name)
         else:
             raise UserError(u" 订单行 不能为空！ ")
 
@@ -160,14 +158,20 @@ class MaterialRequest(models.Model):
             for product_one in product_temp_one.bom_ids.bom_line_ids:
                 if not product_one.product_id.id in [my_all_line_temp_one.product_id.id for my_all_line_temp_one in
                                                      my_all_line]:
-                    self.line_ids = self.line_ids + self._create1(product_one.product_id.id)
+                    self.line_ids = self.line_ids + self._create_material_line(product_one.product_id.id,
+                                                                               product_one.product_id.inner_spec,
+                                                                               product_one.product_id.inner_code,
+                                                                               product_one.product_id.uom_id.name)
         for my_all_line_one in my_all_line:
             if not my_all_line_one.product_id.id in all_temp_line:
                 self.line_ids = self.line_ids - my_all_line_one
 
-    def _create1(self, product_id):
+    def _create_material_line(self, product_id, inner_spec, inner_code, uom_id):
         line_ine = self.env['material.request.line'].create({
             'product_id': product_id,
+            'inner_spec': inner_spec,
+            'inner_code': inner_code,
+            'uom_id': uom_id,
         })
         return line_ine
 
@@ -176,11 +180,12 @@ class MaterialRequest(models.Model):
         action = self.env.ref('stock.action_picking_tree_all').read()[0]
 
         pickings = self.mapped('stock_picking_ids')
-        if len(pickings) > 1:
-            action['domain'] = [('id', 'in', pickings.ids)]
-        elif pickings:
-            action['views'] = [(self.env.ref('stock.view_picking_form').id, 'form')]
-            action['res_id'] = pickings.id
+        if pickings:
+            if len(pickings) > 1:
+                action['domain'] = [('id', 'in', pickings.ids)]
+            elif pickings:
+                action['views'] = [(self.env.ref('stock.view_picking_form').id, 'form')]
+                action['res_id'] = pickings.id
         return action
 
     @api.multi
