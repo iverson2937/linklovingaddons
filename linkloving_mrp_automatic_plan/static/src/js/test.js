@@ -82,21 +82,21 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 $(elem).insertBefore($(toElem));
                 var mo_id = $(elem).attr("data-mo-id");
                 var pt_line_index = $(toElem).parents('.production_lists_wrap').prev('.production_line').attr('data-index');
-                myself.no_ap_to_ag(parseInt(mo_id), myself.mydataset.product_line[pt_line_index].id);
+                myself.no_ap_to_ag(parseInt(mo_id), myself.mydataset.product_line[pt_line_index].id,elem);
             }else if($(toElem).parents('.ap_item_wrap').length>=1){
                 $(elem).insertBefore($(toElem).parents('.ap_item_wrap'));
                 var mo_id = $(elem).attr("data-mo-id");
                 var pt_line_index = $(toElem).parents('.production_lists_wrap').prev('.production_line').attr('data-index');
-                myself.no_ap_to_ag(parseInt(mo_id), myself.mydataset.product_line[pt_line_index].id);
+                myself.no_ap_to_ag(parseInt(mo_id), myself.mydataset.product_line[pt_line_index].id,elem);
             }
             else if($(toElem).hasClass('production_lists_wrap')){
                 $(toElem).prepend($(elem));
                 var mo_id = $(elem).attr("data-mo-id");
                 var pt_line_index = $(toElem).prev('.production_line').attr('data-index');
-                myself.no_ap_to_ag(parseInt(mo_id), myself.mydataset.product_line[pt_line_index].id);
                 if($(toElem).hasClass('production_lists_no_item')){
                     $(toElem).removeClass('production_lists_no_item')
                 }
+                myself.no_ap_to_ag(parseInt(mo_id), myself.mydataset.product_line[pt_line_index].id,elem);
             }
         },
         move_over_right:function (ev) {
@@ -110,15 +110,15 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             if(toElem.className == 'ap_item_wrap'){
                 $(elem).insertBefore($(toElem));
                 var mo_id = $(elem).attr("data-mo-id");
-                myself.no_ap_to_ag(parseInt(mo_id),false);
+                myself.no_ap_to_ag(parseInt(mo_id),false,elem);
             }else if($(toElem).parents('.ap_item_wrap').length>=1){
                 $(elem).insertBefore($(toElem).parents('.ap_item_wrap'));
                 var mo_id = $(elem).attr("data-mo-id");
-                myself.no_ap_to_ag(parseInt(mo_id),false);
+                myself.no_ap_to_ag(parseInt(mo_id),false,elem);
             }else if($(toElem).attr('id') == 'a_p_right'){
                 $(toElem).prepend($(elem));
                 var mo_id = $(elem).attr("data-mo-id");
-                myself.no_ap_to_ag(parseInt(mo_id),false);
+                myself.no_ap_to_ag(parseInt(mo_id),false,elem);
             }
         },
         change_drag_true:function (e) {
@@ -126,7 +126,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             var target = e.target || e.srcElement;
             $(target).parents('.ap_item_wrap').attr('draggable','true');
         },
-        change_drag_false:function () {
+        change_drag_false:function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             $(target).parents('.ap_item_wrap').attr('draggable','false');
@@ -136,12 +136,14 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
         },
 
         //拖动的接口
-        no_ap_to_ag: function (mo_id,production_line_id) {
+        no_ap_to_ag: function (mo_id,production_line_id,ele) {
               framework.blockUI();
               new Model("mrp.production")
                     .call("settle_mo", [mo_id], {production_line_id:production_line_id,settle_date:myself.chose_date})
                     .then(function (result) {
                         console.log(result);
+                        var replace_item = QWeb.render('a_p_render_right_tmpl', {result: result})
+                        $(ele).replaceWith(replace_item);
                         framework.unblockUI();
                     })
         },
