@@ -163,7 +163,7 @@
             <field name="name">material.request.tree</field>
             <field name="model">material.request</field>
             <field name="arch" type="xml">
-                <tree string="工程领料">
+                <tree string="工程领料" default_order="write_date desc">
                     <field name="name"/>
                     <field name="picking_type"/>
                     <field name="picking_cause"/>
@@ -190,7 +190,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
 
-            <field name="domain">[('picking_state','=','to_submit'),('create_uid','=',uid)]</field>
+            <field name="domain">[('picking_state','=','to_submit'),('my_create_uid','=',uid)]</field>
             <field name="context">{'default_my_create_uid': uid}</field>
             <field name="view_id" eval="False"/>
 
@@ -212,7 +212,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
 
-            <field name="domain">[('picking_state','!=','to_submit'),('create_uid','=',uid)]</field>
+            <field name="domain">[('picking_state','!=','to_submit'),('my_create_uid','=',uid)]</field>
             <!--<field name="context">{'default_customer':True,'default_is_company':True}</field>-->
             <field name="view_id" eval="False"/>
 

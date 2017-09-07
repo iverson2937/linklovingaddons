@@ -2780,6 +2780,57 @@ class LinklovingAppApi(http.Controller):
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=json_list)
 
+
+    ######### 工程领料 接口  ###############
+
+    # 根据领料类型 抓取全部数据
+    @http.route('/linkloving_app_api/get_picking_material_request/', auth='user', type='json', csrf=False)
+    def get_picking_material_request(self, **kwargs):
+
+        picking_type = request.jsonrequest.get("picking_type")
+        domain = [('picking_type', '=', picking_type)]
+        pickings = request.env["stock.picking"].sudo().search(domain)
+        # if type == 'able_to': #可处理
+        print('length =%d' % len(pickings))
+        json_list = self.get_picking_info_by_picking(pickings)
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    @http.route('/linkloving_app_api/change_stock_picking_state_material', type='json', auth='none', csrf=False, cors='*')
+    def change_stock_picking_state_material(self, **kw):
+
+        state = request.jsonrequest.get('state')  # 状态
+        picking_id = request.jsonrequest.get('picking_id')  # 订单id
+
+        pack_operation_product_ids = request.jsonrequest.get('pack_operation_product_ids')  # 修改
+
+        if not pack_operation_product_ids:
+            return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={'error': _(u"没有订单行")})
+
+        for pick_line_one in pack_operation_product_ids:
+
+            if pick_line_one > pick_line_one:
+                return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={'error': _(u"领取数量不能大于申请数量")})
+
+            line_one=request.env['product.product'].sudo().search([('id', '=', pick_line_one)])
+            line_one.write({'state': 'finish_prepare_material'})
+
+
+
+        picking_obj = request.env['stock.picking'].sudo().search([('id', '=', picking_id)])
+        picking_obj.write({'state': 'done'})
+
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.stock_picking_to_json(picking_obj))
+
+
+
+
+
+
+
+
+
     # 根据客户搜索
     @http.route('/linkloving_app_api/get_stock_picking_by_partner/', auth='user', type='json', csrf=False)
     def get_stock_picking_by_partner(self, **kwargs):
@@ -2827,6 +2878,7 @@ class LinklovingAppApi(http.Controller):
             'state': picking.state,
             'back_order_id': picking.backorder_id.name or '',
             'emergency': picking.is_emergency,
+            'partner_id': picking.partner_id.name,
         }
         return data
 

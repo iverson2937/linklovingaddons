@@ -58,7 +58,7 @@ class MaterialRequest(models.Model):
 
     def _get_btn_show(self):
 
-        if self.env.user.id == self.create_uid.id:
+        if self.env.user.id == self.my_create_uid.id:
             self.btn_show = True
         else:
             self.btn_show = False
@@ -267,3 +267,4 @@ class MaterialStockPicking(models.Model):
     material_request_order_id = fields.Many2one('material.request')
     Materials_development_way = fields.Selection(
         [('U-Line', u'产线直接领用'), ('Engineer_Dept', u'工程部直接领用')], string=u'发料方式')
+    picking_type = fields.Selection([('pick_type', u'产线领用'), ('proofing', u'工程领用')], string=u'领料类型')
