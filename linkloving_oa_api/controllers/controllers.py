@@ -1032,7 +1032,7 @@ class LinklovingOAApi(http.Controller):
     @http.route('/linkloving_oa_api/change_company', type='json', auth="none", csrf=False, cors='*')
     def change_company(self, *kw):
         user_id = request.jsonrequest.get("user_id")
-        user = request.env["res.users"].browse(user_id)
+        user = request.env["res.users"].sudo().browse(user_id)
         if request.jsonrequest.get("id"):
             choose_id = request.jsonrequest.get("id")
             user = request.env["res.users"].sudo().browse(user_id)
@@ -1057,7 +1057,10 @@ class LinklovingOAApi(http.Controller):
             name = request.jsonrequest.get("name")
             products = request.env['product.product'].sudo().search(['|', ('name', 'ilike', name), ('default_code','ilike',name), ('sale_ok','=',True)], limit=10, offset=0, order='id asc')
         else:
-            products = request.env['product.product'].sudo().search([('sale_ok','=',True)],limit=limit,offset=offset,order='id desc')
+            products = request.env['product.product'].sudo().search([('sale_ok', '=', True)],
+                                                                    limit=limit,
+                                                                    offset=offset,
+                                                                    order='id desc')
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.get_product_detail(products))
 
     def get_product_detail(self, objs):
