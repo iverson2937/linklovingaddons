@@ -553,6 +553,8 @@ class linkloving_sale_extend(models.Model):
             if self.env.ref(
                     "mrp.route_warehouse0_manufacture") in line.product_id.route_ids and not line.product_id.bom_ids:
                 raise UserError(u"%s 未找到对应的Bom" % line.product_id.display_name)
+                # if line.product_id.bom_ids[0].state not in ('draft', 'release'):
+                #     raise UserError(u"%s Bom未通过审核" % line.product_id.display_name)
         return super(linkloving_sale_extend, self).action_confirm()
 
     def action_cancel(self):

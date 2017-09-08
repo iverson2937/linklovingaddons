@@ -3,6 +3,7 @@
 
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError, UserError
+from odoo.tools.float_utils import float_compare, float_is_zero
 
 
 class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
@@ -54,12 +55,12 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
                 total_amount -= line_id.amount
         # 报销单金额大于所以暂支单金额
         self.sheet_id.process()
-        if total_amount > 0:
-
-            self.sheet_id.state = 'post'
-
-        else:
+        # 报销单状态
+        if float_is_zero(total_amount, 2):
             self.sheet_id.state = 'done'
+        else:
+            # 不知道是否有这样的情况。。。
+            self.sheet_id.state = 'post'
 
     @api.multi
     def no_deduct_process(self):

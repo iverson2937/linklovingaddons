@@ -365,7 +365,7 @@ class StockMovePicking(models.Model):
         ('procurement_warehousing', u'采购入库'), ('purchase_return', u'采购退货'),
         ('sell_return', u'销售退货'), ('sell_out', u'销售出库'),
         ('manufacturing_orders', u'制造入库'), ('manufacturing_picking', u'制造领料'), ('null', u' '),
-        ('inventory_in', u'盘点入库'), ('inventory_out', u'盘点出库')
+        ('inventory_in', u'盘点入库'), ('inventory_out', u'盘点出库'), ('hand_movement_out', u'手动出库')
     ], string=u'类型')
 
     reason_stock = fields.Text(string="操作原因")
@@ -392,3 +392,12 @@ class StockMovePicking(models.Model):
             sgin = -1
 
         self.data_type = self.product_uom_qty * sgin
+
+    @api.model
+    def create(self, vals):
+        res = super(StockMovePicking, self).create(vals)
+        if res.quantity_adjusted_qty == 0:
+            move_one = self.env['product.product'].browse(vals.get('product_id'))
+            res.write({'quantity_adjusted_qty': move_one.qty_available - vals.get('product_uom_qty'),
+                       'move_order_type': 'hand_movement_out'})
+        return res

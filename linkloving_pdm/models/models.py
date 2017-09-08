@@ -81,7 +81,7 @@ class ReviewProcess(models.Model):
         for line in sorted_line:
             line_list.append({
                 'id': line.id,
-                'name': line.partner_id.name,
+                'name': line.sudo().partner_id.name,
                 'remark': line.remark or '',
                 'state': [line.state, REVIEW_LINE_STATE[line.state]],
                 'create_date': line.create_date,
@@ -97,7 +97,8 @@ class ReviewProcessLine(models.Model):
     state = fields.Selection(string=u"状态", selection=[('waiting_review', u'等待审核'),
                                                       ('review_success', u'审核通过'),
                                                       ('review_fail', u'审核不通过'),
-                                                      ('review_canceled', u'取消审核')], required=False,
+                                                      ('review_canceled', u'取消审核'),
+                                                      ('first_submit', u'提交审核')], required=False,
                              default='waiting_review')
 
     last_review_line_id = fields.Many2one("review.process.line", string=u"上一次审核")
@@ -108,7 +109,8 @@ class ReviewProcessLine(models.Model):
     review_order_seq = fields.Integer(string=u'审核顺序', help=u"从1开始")  # 从1开始
     remark = fields.Text(u"备注")
 
-    def submit_to_next_reviewer(self, review_type, to_last_review=False, partner_id=None, remark=None):
+    def submit_to_next_reviewer(self, review_type, to_last_review=False, partner_id=None, remark=None,
+                                first_submit=None):
 
         if not partner_id:
             raise UserError(u"请选择审核人!")
@@ -126,7 +128,7 @@ class ReviewProcessLine(models.Model):
         # 设置现有的这个审核条目状态等
         self.write({
             'review_time': fields.datetime.now(),
-            'state': 'review_success',
+            'state': 'review_success' if not first_submit else first_submit,
             'remark': remark
         })
 
@@ -172,6 +174,7 @@ class ReviewProcessLine(models.Model):
             'remark': remark
         })
         # 新建一个 审核条目 指向最初的人
+        print self.review_id.id, 'print llsssssssssss'
         self.env["review.process.line"].create({
             'partner_id': self.review_id.create_uid.partner_id.id,
             'review_id': self.review_id.id,
@@ -186,6 +189,8 @@ class ReviewProcessLine(models.Model):
             'remark': remark
         })
         # 新建一个 审核条目 指向最初的人
+
+        print self.review_id.id, 'self.review_id.id'
         self.env["review.process.line"].create({
             'partner_id': self.review_id.create_uid.partner_id.id,
             'review_id': self.review_id.id,
@@ -240,7 +245,7 @@ class ProductAttachmentInfo(models.Model):
             'is_show_cancel': self.is_show_cancel,
             'is_first_review': self.is_first_review,
             'is_show_action_deny': self.is_show_action_deny,
-            'create_uid_name': self.create_uid.name,
+            'create_uid_name': self.sudo().create_uid.name,
             'type': FILE_TYPE_DIC.get(self.type or '') or '',
         }
 
@@ -560,16 +565,18 @@ class ReviewProcessCancelWizard(models.TransientModel):
     bom_id = fields.Many2one("mrp.bom")
     review_process_line = fields.Many2one("review.process.line",
                                           related="product_attachment_info_id.review_id.process_line_review_now")
+    review_process_line_bom = fields.Many2one("review.process.line",
+                                              related="bom_id.review_id.process_line_review_now")
 
     remark = fields.Text(u"备注", required=True)
 
     def action_cancel_review(self):
-        self.review_process_line.action_cancel(self.remark)
-        print self._context, 'dddddddd'
-        if self._context.get('review_type') == 'bom_review':
 
+        if self._context.get('review_type') == 'bom_review':
+            self.review_process_line_bom.action_cancel(self.remark)
             self.bom_id.action_cancel()
         elif self._context.get('review_type') == 'file_review':
+            self.review_process_line.action_cancel(self.remark)
             self.product_attachment_info_id.action_cancel()
 
 
@@ -580,6 +587,8 @@ class ReviewProcessWizard(models.TransientModel):
     partner_id = fields.Many2one("res.partner", string=u'提交给...审核', domain=[('employee', '=', True), ])
     product_attachment_info_id = fields.Many2one("product.attachment.info")
     bom_id = fields.Many2one('mrp.bom')
+
+    # material_request_id = fields.Many2one('material.request')
 
     @api.model
     def _get_default_need_sop(self):
@@ -607,6 +616,10 @@ class ReviewProcessWizard(models.TransientModel):
                                           related="product_attachment_info_id.review_id.process_line_review_now")
     review_bom_line = fields.Many2one("review.process.line",
                                       related="bom_id.review_id.process_line_review_now")
+
+    # material_line = fields.Many2one("review.process.line",
+    #                                 related="material_request_id.review_id.process_line_review_now")
+
     remark = fields.Text(u"备注")
     is_show_action_deny = fields.Boolean(default=True)
 
@@ -614,6 +627,10 @@ class ReviewProcessWizard(models.TransientModel):
     def action_to_next(self):
         to_last_review = self._context.get("to_last_review")  # 是否送往终审
         review_type = self._context.get("review_type")
+
+        materials_request_id = self._context.get('default_material_requests_id')
+        picking_state = self._context.get('picking_state', False)
+
         if review_type == 'bom_review':
             if not self.need_sop:
                 raise UserError(u'请选择是否需要SOP文件')
@@ -638,6 +655,26 @@ class ReviewProcessWizard(models.TransientModel):
                 to_last_review=to_last_review,
                 partner_id=self.partner_id,
                 remark=self.remark)
+        elif review_type == 'picking_review':
+            print self.material_requests_id.review_id
+            if not self.material_requests_id.review_id:  # 如果没审核过
+                self.material_requests_id.action_send_to_review()
+
+            self.material_requests_id.picking_state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
+
+            material_one = self.env['material.request'].browse(materials_request_id)
+            first_submit = ''
+            if self.env.uid != material_one.create_uid.id:
+                self.material_requests_id.write({'review_i_approvaled_val': [(4, self.env.uid)]})
+            else:
+                first_submit = 'first_submit'
+
+            self.material_requests_id.review_id.process_line_review_now.submit_to_next_reviewer(
+                review_type=review_type,
+                to_last_review=to_last_review,
+                partner_id=self.partner_id,
+                remark=self.remark,
+                first_submit=first_submit)
 
         return True
 
@@ -645,6 +682,7 @@ class ReviewProcessWizard(models.TransientModel):
     def action_pass(self):
 
         review_type = self._context.get("review_type")
+        materials_request_id = self._context.get('default_material_requests_id')
         if review_type == 'bom_review':
             if not self.need_sop:
                 raise UserError(u'请选择是否需要SOP文件')
@@ -658,6 +696,35 @@ class ReviewProcessWizard(models.TransientModel):
             # 审核通过
 
             self.review_process_line.action_pass(self.remark)
+        elif review_type == 'picking_review':
+
+            self.material_requests_id.picking_state = 'approved_finish'
+            self.material_requests_id.write({'review_i_approvaled_val': [(4, self.env.uid)]})
+            # 创建出货单
+            material_one = self.env['material.request'].browse(materials_request_id)
+
+            picking_out_material = self.env['stock.picking'].create({
+                'picking_type_id': self.env.ref('stock.picking_type_out').id,
+                'location_id': self.env.ref('stock.stock_location_stock').id,
+                'location_dest_id': self.env.ref('linkloving_eb.stock_location_eb_transfer_2').id,
+                'material_request_order_id': material_one.id,
+                'origin': material_one.name,
+                'note': material_one.remark,
+                'Materials_development_way': material_one.Materials_development_way,
+                'partner_id': material_one.create_uid.partner_id.id,
+                'picking_type': material_one.picking_type,
+            })
+            for one_line in material_one.line_ids:
+                self.env['stock.move'].create({
+                    'name': 'another move',
+                    'product_id': one_line.product_id.id,
+                    'product_uom_qty': one_line.product_qty,
+                    'product_uom': one_line.product_id.uom_id.id,
+                    'picking_id': picking_out_material.id,
+                    'location_id': self.env.ref('stock.stock_location_stock').id,
+                    'location_dest_id': self.env.ref('linkloving_eb.stock_location_eb_transfer').id})
+
+            self.material_line.action_pass(self.remark)
         return True
 
     # 审核不通过
@@ -670,6 +737,16 @@ class ReviewProcessWizard(models.TransientModel):
         elif review_type == 'file_review':
             self.product_attachment_info_id.action_deny()
             self.review_process_line.action_deny(self.remark)
+        elif review_type == 'picking_review':
+            # 改变状态 即可
+            # pick_type = self._context.get('picking_state')
+            # if pick_type == 'submitted':
+            self.material_requests_id.picking_state = 'Refused'
+            # self.material_request_id.write({'review_i_approvaled_val': [(4, self.partner_id.user_ids.id)]})
+            self.material_requests_id.write({'review_i_approvaled_val': [(4, self.env.uid)]})
+
+            self.material_line.action_deny(self.remark)
+
         return True
 
     def action_cancel_review(self):
@@ -679,6 +756,9 @@ class ReviewProcessWizard(models.TransientModel):
             self.review_bom_line.action_cancel(self.remark)
         elif review_type == 'file_review':
             self.product_attachment_info_id.action_cancel()
+            self.review_process_line.action_cancel(self.remark)
+        elif review_type == 'picking_review':
+            self.material_requests_id.picking_state = 'to_submit'
             self.review_process_line.action_cancel(self.remark)
 
     @api.model
@@ -694,7 +774,8 @@ class FinalReviewPartner(models.Model):
     _name = 'final.review.partner'
     review_type = fields.Selection([
         ('bom_review', u'BOM 终审人'),
-        ('file_review', u'文件终审人')
+        ('file_review', u'文件终审人'),
+        ('picking_review', u'领料终审人'),
     ], string=u'审核类型')
 
     final_review_partner_id = fields.Many2one(comodel_name="res.partner", string="终审人", required=False,
@@ -756,6 +837,8 @@ class FinalReviewPartner(models.Model):
             review_type_ref = 'linkloving_pdm.group_final_review_partner'
         elif val == 'bom_review':
             review_type_ref = 'linkloving_pdm.group_final_review_partner_bom'
+        elif val == 'picking_review':
+            review_type_ref = 'linkloving_pdm.group_final_review_picking'
         else:
             raise UserError(u"数据异常,未找到对应的审核人类型")
 

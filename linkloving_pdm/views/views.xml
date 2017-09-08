@@ -158,14 +158,25 @@
                         </group>
                     </sheet>
                     <footer>
+                        <!--<div style="float:left">-->
                         <button name='action_to_next' type='object' string='送审' class='oe_highlight review_reload'/>
+                        <!--</div>-->
+                        <!--<div invisible="context.get('view_material_request')" style="float:left">-->
                         <button string='送往终审' type='object' name='action_to_next' class='oe_link review_reload'
                                 context="{'to_last_review':True}"/>
                         <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
-                                groups="linkloving_pdm.group_final_review_partner"/>
-                        <button name='action_deny' invisible="context.get('is_show_action_deny') == 'false'"
+                                groups="linkloving_pdm.group_final_review_partner"
+                                invisible="context.get('view_material_request')"/>
+
+                        <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
+                                groups="linkloving_pdm.group_final_review_picking"
+                        />
+
+                        <button name='action_deny'
+                                invisible="context.get('is_show_action_deny') == 'false' or context.get('view_show')"
                                 type='object' string='审核不通过' class='oe_highlight review_reload'/>
                         <!--is_show_action_deny-->
+                        <!--</div>-->
                         <button string='取消' class='oe_link review_reload' special='cancel'/>
                     </footer>
                 </form>

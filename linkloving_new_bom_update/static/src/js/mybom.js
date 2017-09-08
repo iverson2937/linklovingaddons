@@ -404,7 +404,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             //存储父级id的数组
             self.parentsid = [];
             self.childrenid = [];
-            $(".o_content").css("background", "white")
+            // $(".o_content").css("background", "white")
         },
 
         //查找父级的递归函数

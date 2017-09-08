@@ -20,7 +20,7 @@
         <menuitem id="approval_pdm_cate" name="文件" parent="ll_approval_root" sequence="0"/>
 
         <!-- This Menu Item must have a parent and an action -->
-        <menuitem id="approval_pdm" name="文件审核" parent="approval_pdm_cate" action="show_pdm_approval_action"
+        <menuitem id="approval_pdm" name="我的审核" parent="approval_pdm_cate" action="show_pdm_approval_action"
                   sequence="0"/>
     </data>
 </openerp>

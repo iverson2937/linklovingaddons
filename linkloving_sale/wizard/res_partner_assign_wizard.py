@@ -23,4 +23,7 @@ class SaleOrderCancel(models.TransientModel):
                 if record.child_ids:
                     for child in record.child_ids:
                         child.user_id = self.user_id.id
+                        child.public_partners = 'private'
+                        child.old_user_id = self.user_id.id
+
         return {'type': 'ir.actions.act_window_close'}

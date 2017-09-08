@@ -4,7 +4,7 @@
             <xpath expr="." position="inside">
                 <script type="text/javascript" src="/linkloving_mrp_automatic_plan/static/src/js/date.js"/>
                 <script type="text/javascript" src="/linkloving_mrp_automatic_plan/static/src/js/almanac.js"/>
-                <script type="text/javascript" src="/linkloving_mrp_automatic_plan/static/src/js/arrange_production.js"/>
+                <!--<script type="text/javascript" src="/linkloving_mrp_automatic_plan/static/src/js/arrange_production.js"/>-->
                 <script type="text/javascript" src="/linkloving_mrp_automatic_plan/static/src/js/test.js"/>
                 <script type="text/javascript" src="/linkloving_mrp_automatic_plan/static/src/js/statuslight.js"/>
                 <link rel="stylesheet" href="/linkloving_mrp_automatic_plan/static/src/css/almanac.css"/>
@@ -22,6 +22,19 @@
                   name="日期"
                   parent="hr.menu_human_resources_configuration"
                   action="to_date_page_list_action"/>
+
+        <record id="stock_picking_type_kanban2" model="ir.ui.view">
+            <field name="name">mrp.process.kanban</field>
+            <field name="model">mrp.process</field>
+            <field name="inherit_id" ref="linkloving_process.stock_picking_type_kanban"/>
+            <field name="arch" type="xml">
+                <!-- find field description and add the field
+                     idea_ids after it -->
+                <xpath expr="//button[@name='mo_schedule_query']" position="after">
+                    <button style="margin-left:15px" name="arrange_production" type="object">排产</button>
+                </xpath>
+            </field>
+        </record>
 
         <record id="account_multi_handle_worker_form_view" model="ir.ui.view">
             <field name="name">procurement.order.reset.confirm.form</field>

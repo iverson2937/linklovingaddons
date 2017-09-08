@@ -941,6 +941,7 @@ class LinklovingOAApi(http.Controller):
         name = request.jsonrequest.get("name")
         model = request.jsonrequest.get("model")
         state = request.jsonrequest.get("state")
+        user_id = request.jsonrequest.get("user_id")
         if model == 'sale.order':
             if state == 'draft':
                 domain = [('state', 'in',('draft', 'sent')), ('name', 'ilike', name)]
@@ -948,6 +949,8 @@ class LinklovingOAApi(http.Controller):
                 domain = [('state', 'not in', ('draft', 'sent')), ('name', 'ilike', name)]
         elif model == 'return.goods':
             domain = [('customer', '=', True), ('name', 'ilike', name)]
+        if user_id != 1:
+            domain.append(('user_id', '=', user_id))
         sale_orders = request.env[model].sudo().search(domain, limit=10, offset=0, order='id desc')
         if model == 'sale.order':
             return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.get_so_orders_lists(sale_orders))
@@ -1032,7 +1035,7 @@ class LinklovingOAApi(http.Controller):
     @http.route('/linkloving_oa_api/change_company', type='json', auth="none", csrf=False, cors='*')
     def change_company(self, *kw):
         user_id = request.jsonrequest.get("user_id")
-        user = request.env["res.users"].browse(user_id)
+        user = request.env["res.users"].sudo().browse(user_id)
         if request.jsonrequest.get("id"):
             choose_id = request.jsonrequest.get("id")
             user = request.env["res.users"].sudo().browse(user_id)
@@ -1057,7 +1060,10 @@ class LinklovingOAApi(http.Controller):
             name = request.jsonrequest.get("name")
             products = request.env['product.product'].sudo().search(['|', ('name', 'ilike', name), ('default_code','ilike',name), ('sale_ok','=',True)], limit=10, offset=0, order='id asc')
         else:
-            products = request.env['product.product'].sudo().search([('sale_ok','=',True)],limit=limit,offset=offset,order='id desc')
+            products = request.env['product.product'].sudo().search([('sale_ok', '=', True)],
+                                                                    limit=limit,
+                                                                    offset=offset,
+                                                                    order='id desc')
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.get_product_detail(products))
 
     def get_product_detail(self, objs):
@@ -1081,7 +1087,7 @@ class LinklovingOAApi(http.Controller):
     @http.route('/linkloving_oa_api/search_products_by_material_no', type='json', auth="none", csrf=False, cors='*')
     def search_products_by_material_no(self, *kw):
         name = request.jsonrequest.get("name")
-        products = request.env['product.template'].sudo().search([('default_code', '=', name)], limit=1, offset=0, order='id asc')
+        products = request.env['product.product'].sudo().search([('default_code', '=', name)], limit=1, offset=0, order='id asc')
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.get_product_detail(products))
 
     # 根据客户选择发票、送货地址

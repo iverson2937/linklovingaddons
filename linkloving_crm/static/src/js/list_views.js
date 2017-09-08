@@ -600,59 +600,59 @@ odoo.define('linkloving_crm.list_views', function (require) {
     });
 
 
-    var FieldPriority = common.AbstractField.extend({
-        events: {
-            'mouseup': function (e) {
-                e.stopPropagation();
-            },
-        },
-        start: function () {
-            this.priority = new Priority(this, {
-                readonly: this.get('readonly'),
-                value: this.get('value'),
-                values: this.field.selection || [],
-            });
+    // var FieldPriority = common.AbstractField.extend({
+    //     events: {
+    //         'mouseup': function (e) {
+    //             e.stopPropagation();
+    //         },
+    //     },
+    //     start: function () {
+    //         this.priority = new Priority(this, {
+    //             readonly: this.get('readonly'),
+    //             value: this.get('value'),
+    //             values: this.field.selection || [],
+    //         });
+    //
+    //         this.priority.on('update', this, function (update) {
+    //             /* setting the value: in view mode, perform an asynchronous call and reload
+    //              the form view; in edit mode, use set_value to save the new value that will
+    //              be written when saving the record. */
+    //             var view = this.view;
+    //             if (view.get('actual_mode') === 'view') {
+    //                 var write_values = {};
+    //                 write_values[this.name] = update.value;
+    //                 view.dataset._model.call('write', [
+    //                     [view.datarecord.id],
+    //                     write_values,
+    //                     view.dataset.get_context()
+    //                 ]).done(function () {
+    //                     view.reload();
+    //                 });
+    //             } else {
+    //                 this.set_value(update.value);
+    //             }
+    //         });
+    //
+    //         this.on('change:readonly', this, function () {
+    //             this.priority.readonly = this.get('readonly');
+    //             var $div = $('<div/>').insertAfter(this.$el);
+    //             this.priority.replace($div);
+    //             this.setElement(this.priority.$el);
+    //         });
+    //
+    //         var self = this;
+    //         return $.when(this._super(), this.priority.appendTo('<div>').then(function () {
+    //             self.priority.$el.addClass(self.$el.attr('class'));
+    //             self.replaceElement(self.priority.$el);
+    //         }));
+    //     },
+    //     render_value: function () {
+    //         this.priority.set_value(this.get('value'));
+    //     },
+    // });
 
-            this.priority.on('update', this, function (update) {
-                /* setting the value: in view mode, perform an asynchronous call and reload
-                 the form view; in edit mode, use set_value to save the new value that will
-                 be written when saving the record. */
-                var view = this.view;
-                if (view.get('actual_mode') === 'view') {
-                    var write_values = {};
-                    write_values[this.name] = update.value;
-                    view.dataset._model.call('write', [
-                        [view.datarecord.id],
-                        write_values,
-                        view.dataset.get_context()
-                    ]).done(function () {
-                        view.reload();
-                    });
-                } else {
-                    this.set_value(update.value);
-                }
-            });
 
-            this.on('change:readonly', this, function () {
-                this.priority.readonly = this.get('readonly');
-                var $div = $('<div/>').insertAfter(this.$el);
-                this.priority.replace($div);
-                this.setElement(this.priority.$el);
-            });
-
-            var self = this;
-            return $.when(this._super(), this.priority.appendTo('<div>').then(function () {
-                self.priority.$el.addClass(self.$el.attr('class'));
-                self.replaceElement(self.priority.$el);
-            }));
-        },
-        render_value: function () {
-            this.priority.set_value(this.get('value'));
-        },
-    });
-
-
-    list_widget_registry.add('field.priorityw', FieldPriority);
+    // list_widget_registry.add('field.priorityw', FieldPriority);
     list_widget_registry.add('field.list_new_view', List_View_New);
 
 })

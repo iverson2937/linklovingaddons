@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_linkloving_material_request_linkloving_material_request,linkloving_material_request.linkloving_material_request,model_linkloving_material_request_linkloving_material_request,,1,0,0,0
+access_material_request_line,linkloving_material_request_material_request_line,model_material_request_line,,1,1,1,1
+access_material_request,linkloving_material_request_material_request,model_material_request,,1,1,1,1
