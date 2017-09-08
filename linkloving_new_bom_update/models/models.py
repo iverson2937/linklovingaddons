@@ -71,7 +71,7 @@ class MrpBom(models.Model):
             #             if line.procurement_ids.filtered(lambda x: x.state not in ('cancel', 'done')):
             #                 raise UserError(_(u'销售单 %s 未发完货,不可以修改BOM,请联系销售取消相关销售单') % (line.order_id.name,))
 
-            if self.state not in ('new', 'updated', 'deny'):
+            if self.state not in ('new', 'updated', 'deny', 'cancel'):
                 if not self.review_id:
                     self.review_id = self.env["review.process"].create_review_process('mrp.bom',
                                                                                       self.id)
@@ -81,6 +81,7 @@ class MrpBom(models.Model):
                         'partner_id': self.env.user.partner_id.id,
                         'review_id': self.review_id.id,
                         'remark': '%s----->%s' % (self.state, u'更新'),
+                        'state': 'review_success',
                         'last_review_line_id': line_ids[-1].get('id') if line_ids else False,
                         'review_order_seq': max([line.review_order_seq for line in self.review_id.review_line_ids]) + 1
                     })
@@ -124,7 +125,7 @@ class MrpBom(models.Model):
             'name': self.product_tmpl_id.name_get()[0][1],
             'code': self.product_tmpl_id.default_code,
             'process_id': [self.process_id.id, self.process_id.name],
-            'bom_ids': sorted(res, key=lambda product : product['code']),
+            'bom_ids': sorted(res, key=lambda product: product['code']),
             'state': self.state,
             'review_line': self.review_id.get_review_line_list(),
         }
@@ -159,7 +160,7 @@ class MrpBom(models.Model):
             'qty': line.product_qty,
             'process_id': process_id,
             'level': level,
-            'bom_ids': sorted(bom_line_ids, key=lambda product : product['code'])
+            'bom_ids': sorted(bom_line_ids, key=lambda product: product['code'])
         }
 
         return res
