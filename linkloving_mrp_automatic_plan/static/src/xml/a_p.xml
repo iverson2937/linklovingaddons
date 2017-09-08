@@ -53,7 +53,7 @@
                     <span class="a_p_spend_time">生产总时间：</span>
                 </div>
                 <div class="ap_item_main_center">
-                    <span class="a_p_latest_time">最晚开始：<t t-esc="item.date_planned_start"/></span>
+                    <span class="a_p_latest_time">最晚开始：<t t-esc="item.planned_start_backup"/></span>
                     <span class="a_p_planned_start">预计开始：<t t-esc="item.date_planned_start"/></span>
                     <span class="a_p_planned_end">预计结束：<t t-esc="item.date_planned_start"/></span>
                 </div>
