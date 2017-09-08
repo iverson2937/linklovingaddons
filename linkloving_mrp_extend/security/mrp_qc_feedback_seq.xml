@@ -9,5 +9,13 @@
             <field eval="1" name="number_increment"/>
             <field name="padding">4</field>
         </record>
+
+        <record model="ir.rule" id="mrp_qc_feedback_rule">
+            <field name="name">品检单multi-company</field>
+            <field name="model_id" search="[('model','=','mrp.qc.feedback')]" model="ir.model"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|',('company_id','child_of',[user.company_id.id]),('company_id','=',False)]
+            </field>
+        </record>
     </data>
 </odoo>
