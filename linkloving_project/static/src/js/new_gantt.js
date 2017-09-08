@@ -147,7 +147,7 @@ odoo.define('linkloving_project.new_gantt', function (require) {
                 } else {
                     t = {
                         "id": task.id,
-                        "text": task.__name,
+                        "text": task.__name + ' - ' + task.stage_id[1],
                         "start_date": new Date(task.date_start).Format("dd-MM-yyyy"),
                         "duration": (new Date(task.date_end).getTime() - new Date(task.date_start).getTime()) / (1000 * 60 * 60) / 24,
                         "progress": task.task_progress / 100,
@@ -194,7 +194,7 @@ odoo.define('linkloving_project.new_gantt', function (require) {
         },
         on_link_add: function (link) {
             if (link.type != 0){
-                Dialog.alert(this, "关系设定必须又前置任务尾部连至后置任务头部!");
+                this.do_notify("Tip", "关系设定必须又前置任务尾部连至后置任务头部.")
                 return false;
             }
             new Model("project.task")
@@ -271,7 +271,7 @@ odoo.define('linkloving_project.new_gantt', function (require) {
             });
         },
         on_task_create: function (id) {
-           Dialog.alert(this, "该功能正在实现中.");
+            this.do_notify("Tip", "该功能正在实现中.")
         },
     });
 
