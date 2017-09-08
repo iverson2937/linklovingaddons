@@ -1491,6 +1491,7 @@ class MrpQcFeedBack(models.Model):
             else:
                 qc.qc_fail_rate = 0
 
+    company_id = fields.Many2one("res.company", default=lambda self: self.env.user.company_id)
     name = fields.Char('Name', index=True, required=True)
     production_id = fields.Many2one('mrp.production')
     qty_produced = fields.Float()
@@ -1518,6 +1519,8 @@ class MrpQcFeedBack(models.Model):
     @api.model
     def create(self, vals):
         vals['name'] = self.env['ir.sequence'].next_by_code('mrp.qc.feedback') or 'New'
+        if not vals.get("production_id"):
+            raise UserError(u"缺少对应的生产单ID")
         return super(MrpQcFeedBack, self).create(vals)
 
     # 等待品捡 -> 品捡中
