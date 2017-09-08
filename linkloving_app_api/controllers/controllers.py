@@ -85,6 +85,7 @@ class LinklovingAppApi(http.Controller):
     #获取数据库列表
     @http.route('/linkloving_app_api/get_db_list', type='http', auth='none', cors='*')
     def get_db_list(self, **kw):
+        print 'sss'
         return JsonResponse.send_response(STATUS_CODE_OK, res_data= http.db_list(), jsonRequest=False)
 
     #换头像

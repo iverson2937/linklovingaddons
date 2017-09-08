@@ -53,9 +53,24 @@
                     <span class="a_p_spend_time">生产总时间：</span>
                 </div>
                 <div class="ap_item_main_center">
-                    <span class="a_p_latest_time">最晚开始：<t t-esc="item.planned_start_backup"/></span>
-                    <span class="a_p_planned_start">预计开始：<t t-esc="item.date_planned_start"/></span>
-                    <span class="a_p_planned_end">预计结束：<t t-esc="item.date_planned_start"/></span>
+                    <span class="a_p_latest_time">最晚开始：<t t-esc="item.planned_start_backup" /></span>
+                    <!--<t t-set="date_planned_start" t-value="item.date_planned_start"/>-->
+                    <t t-js="ctx">
+                        function change_time(date_planned){
+                            var my_date = Date.parse(new Date(date_planned))
+                            var newDate = new Date();
+                            var time_offset = newDate.getTimezoneOffset() * 60000
+                            var c_date = new Date(my_date - time_offset)
+                            return moment(c_date).format('YYYY-MM-DD HH:mm:ss');
+                        }
+                        ctx.item.date_planned_start = change_time(ctx.item.date_planned_start);
+                        ctx.item.date_planned_finished = change_time(ctx.item.date_planned_finished);
+                        ctx.item.planned_start_backup = change_time(ctx.item.planned_start_backup);
+
+                    </t>
+                    <span class="a_p_planned_start">预计开始：<span t-esc="item.date_planned_start" /></span>
+                    <!--<t t-esc="item.date_planned_start"/>-->
+                    <span class="a_p_planned_end">预计结束：<t t-esc="item.date_planned_finished"/></span>
                 </div>
                 <div class="a_p_item_bottom">
                     <span class="to_relevant_struc">查看关联结构</span>
