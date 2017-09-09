@@ -529,7 +529,7 @@ class MrpProductionExtend(models.Model):
 
     @api.multi
     def button_action_confirm_draft(self):
-        if self.bom_id.state not in ('draft', 'release') and not self.is_multi_output:
+        if self.bom_id.state not in ('draft', 'release'):
             raise UserError('BOM还没通过审核,请联系相关负责人')
         for production in self:
             production.write({'state': 'confirmed'})
