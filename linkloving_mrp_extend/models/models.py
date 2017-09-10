@@ -1113,7 +1113,7 @@ class ReturnOfMaterial(models.Model):
     def no_confirm_return(self):
         for r in self.return_ids:
             if r.return_qty == 0:
-                continue
+                raise UserError(u"%s: 系统自动退料遇到问题" % self.production_id.name)
             move = self.env['stock.move'].create(self._prepare_move_values(r))
             r.return_qty = 0
             move.action_done()

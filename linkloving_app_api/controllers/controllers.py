@@ -2976,6 +2976,7 @@ class LinklovingAppApi(http.Controller):
                 for o_move in sim_stock_move.stock_moves:
                     if o_move.state != 'cancel':
                         need_qty += o_move.product_uom_qty
+                print("charlie0910--------%d,%d" % (total_qty, need_qty))
                 # if float_compare(need_qty, sim_stock_move.product_uom_qty, precision_rounding=rounding) < 0:
                 if float_compare(total_qty, sim_stock_move.product_uom_qty, precision_rounding=rounding) > 0:
 
@@ -2996,6 +2997,7 @@ class LinklovingAppApi(http.Controller):
                     qty_split = sim_stock_move.stock_moves[0].product_uom._compute_quantity(
                             split_qty_unuom,
                             sim_stock_move.stock_moves[0].product_id.uom_id)
+                    print("charlie0910-1-------%d,%d" % (split_qty_unuom, qty_split))
                     # _logger.warning(u"charlie_0712_log_2:qty_split:%s,", str(qty_split))
                     split_move = sim_stock_move.stock_moves[0].copy(
                             default={'quantity_done': qty_split, 'product_uom_qty': qty_split,
