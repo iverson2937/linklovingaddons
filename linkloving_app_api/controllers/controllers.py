@@ -2993,7 +2993,10 @@ class LinklovingAppApi(http.Controller):
                         split_qty_unuom = move['quantity_ready']  # 未经过单位换算的数量
                     else:
                         # 如果已完成的数量大于等于需求数量,则是 总数量 - 需求数量
-                        split_qty_unuom = total_qty - sim_stock_move.product_uom_qty
+                        if sim_stock_move.stock_moves.filtered(lambda x: x.state not in ["cancel", "done"]):
+                            split_qty_unuom = total_qty - sim_stock_move.product_uom_qty
+                        else:
+                            split_qty_unuom = total_qty - sim_stock_move.quantity_done
 
                     qty_split = sim_stock_move.stock_moves[0].product_uom._compute_quantity(
                             split_qty_unuom,
