@@ -9,3 +9,4 @@ access_mrp_qc_feedback,access_mrp_qc_feedback,model_mrp_qc_feedback,mrp.group_mr
 access_mrp_qc_feedback1,access_mrp_qc_feedback1,model_mrp_qc_feedback,stock.group_stock_user,1,1,1,1
 access_qc_feedback_img,access_qc_feedback_img,model_qc_feedback_img,,1,1,1,1
 access_production_scrap,access_production_scrap,model_production_scrap,,1,1,1,1
+access_stock_fixed_putaway_strat_extend,stock_fixed_putaway_strat production,stock.model_stock_fixed_putaway_strat,mrp.group_mrp_user,1,0,0,0

@@ -350,9 +350,9 @@ class TimeUtil(models.Model):
                     else:
                         if while_why == 'offwork':
                             left_time = left_time - (new_day_work_off_time - move_corrected_time).seconds
-                if not real_start_time:
-                    raise UserWarning(u"出错了")
-                return corrected_end_time, real_start_time
+            if not real_start_time:
+                raise UserWarning(u"出错了")
+            return corrected_end_time, real_start_time
 
     # @classmethod
     # def get_off_time_zone(cls):
