@@ -2976,7 +2976,8 @@ class LinklovingAppApi(http.Controller):
                 for o_move in sim_stock_move.stock_moves:
                     if o_move.state != 'cancel':
                         need_qty += o_move.product_uom_qty
-                logging.warning("charlie0910--------%d,%d" % (total_qty, need_qty))
+                logging.warning("charlie0910--------%d,%d,%d" % (
+                total_qty, need_qty, sim_stock_move.product_uom_qty, sim_stock_move.quantity_done))
                 # if float_compare(need_qty, sim_stock_move.product_uom_qty, precision_rounding=rounding) < 0:
                 if float_compare(total_qty, sim_stock_move.product_uom_qty, precision_rounding=rounding) > 0:
 
