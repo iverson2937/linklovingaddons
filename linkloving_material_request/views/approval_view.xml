@@ -250,7 +250,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
 
-            <field name="domain">[('picking_state','=','to_submit'),('my_create_uid','=',uid)]</field>
+            <field name="domain">[('picking_state','=','to_submit'),('create_uid','=',uid)]</field>
             <field name="context">{'default_my_create_uid': uid}</field>
             <field name="view_id" eval="False"/>
 
@@ -272,7 +272,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
 
-            <field name="domain">[('picking_state','!=','to_submit'),('my_create_uid','=',uid)]</field>
+            <field name="domain">[('picking_state','!=','to_submit'),('create_uid','=',uid)]</field>
             <!--<field name="context">{'default_customer':True,'default_is_company':True}</field>-->
             <field name="view_id" eval="False"/>
 

@@ -55,7 +55,7 @@ class MaterialRequest(models.Model):
 
     def _get_btn_show(self):
 
-        if self.env.user.id == self.my_create_uid.id:
+        if self.env.user.id == self.create_uid.id:
             self.btn_show = True
         else:
             self.btn_show = False
