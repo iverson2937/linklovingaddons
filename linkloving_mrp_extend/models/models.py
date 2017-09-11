@@ -529,7 +529,7 @@ class MrpProductionExtend(models.Model):
 
     @api.multi
     def button_action_confirm_draft(self):
-        if self.bom_id.state not in ('draft', 'release') and not self.is_multi_output:
+        if self.bom_id and self.bom_id.state not in ('draft', 'release'):
             raise UserError('BOM还没通过审核,请联系相关负责人')
         for production in self:
             production.write({'state': 'confirmed'})
@@ -1113,7 +1113,7 @@ class ReturnOfMaterial(models.Model):
     def no_confirm_return(self):
         for r in self.return_ids:
             if r.return_qty == 0:
-                continue
+                continue  # raise UserError(u"%s: 系统自动退料遇到问题" % self.production_id.name)
             move = self.env['stock.move'].create(self._prepare_move_values(r))
             r.return_qty = 0
             move.action_done()
@@ -1491,6 +1491,7 @@ class MrpQcFeedBack(models.Model):
             else:
                 qc.qc_fail_rate = 0
 
+    company_id = fields.Many2one("res.company", default=lambda self: self.env.user.company_id)
     name = fields.Char('Name', index=True, required=True)
     production_id = fields.Many2one('mrp.production')
     qty_produced = fields.Float()
@@ -1518,6 +1519,8 @@ class MrpQcFeedBack(models.Model):
     @api.model
     def create(self, vals):
         vals['name'] = self.env['ir.sequence'].next_by_code('mrp.qc.feedback') or 'New'
+        if not vals.get("production_id"):
+            raise UserError(u"缺少对应的生产单ID")
         return super(MrpQcFeedBack, self).create(vals)
 
     # 等待品捡 -> 品捡中
@@ -1697,7 +1700,7 @@ class StockPackOperationExtend(models.Model):
                 pack.receivied_qty = pack.qty_done
 
     rejects_qty = fields.Float(string=u"不良品", default=0)
-    receivied_qty = fields.Float(string=u'收到的数量', compute='_compute_receivied_qty')
+    receivied_qty = fields.Float(string=u'收到的数量', compute='_compute_receivied_qty', digits=dp.get_precision('Product Unit of Measure'))
     # accept_qty = fields.Float(string=u'良品', compute='_compute_accept_qty')
 
 

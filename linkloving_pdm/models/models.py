@@ -81,7 +81,7 @@ class ReviewProcess(models.Model):
         for line in sorted_line:
             line_list.append({
                 'id': line.id,
-                'name': line.partner_id.name,
+                'name': line.sudo().partner_id.name,
                 'remark': line.remark or '',
                 'state': [line.state, REVIEW_LINE_STATE[line.state]],
                 'create_date': line.create_date,
@@ -174,6 +174,7 @@ class ReviewProcessLine(models.Model):
             'remark': remark
         })
         # 新建一个 审核条目 指向最初的人
+        print self.review_id.id, 'print llsssssssssss'
         self.env["review.process.line"].create({
             'partner_id': self.review_id.create_uid.partner_id.id,
             'review_id': self.review_id.id,
@@ -188,6 +189,8 @@ class ReviewProcessLine(models.Model):
             'remark': remark
         })
         # 新建一个 审核条目 指向最初的人
+
+        print self.review_id.id, 'self.review_id.id'
         self.env["review.process.line"].create({
             'partner_id': self.review_id.create_uid.partner_id.id,
             'review_id': self.review_id.id,
@@ -562,16 +565,18 @@ class ReviewProcessCancelWizard(models.TransientModel):
     bom_id = fields.Many2one("mrp.bom")
     review_process_line = fields.Many2one("review.process.line",
                                           related="product_attachment_info_id.review_id.process_line_review_now")
+    review_process_line_bom = fields.Many2one("review.process.line",
+                                              related="bom_id.review_id.process_line_review_now")
 
     remark = fields.Text(u"备注", required=True)
 
     def action_cancel_review(self):
-        self.review_process_line.action_cancel(self.remark)
-        print self._context, 'dddddddd'
-        if self._context.get('review_type') == 'bom_review':
 
+        if self._context.get('review_type') == 'bom_review':
+            self.review_process_line_bom.action_cancel(self.remark)
             self.bom_id.action_cancel()
         elif self._context.get('review_type') == 'file_review':
+            self.review_process_line.action_cancel(self.remark)
             self.product_attachment_info_id.action_cancel()
 
 

@@ -420,7 +420,8 @@ if (!gantt.templates) gantt.templates = {};
 
             time_step: 60,
             duration_step: 1,
-            date_scale: "%d %M",
+            date_scale: "%M %d",
+            //date_scale: "%d %M",
             task_date: "%d %F %Y",
             time_picker: "%H:%i",
             task_attribute: "task_id",
@@ -3701,7 +3702,7 @@ gantt._prepare_scale_html = function (config, fromPos, toPos) {
             var cell = "<div class='" + cssclass + "'" + ariaAttr + " style='" + style + "'>" + value + "</div>";
             cells.push(cell);
         } else {
-            //do not render ignored cells
+            //do not render ignored cellswo
         }
 
     }
@@ -10256,8 +10257,8 @@ if (window.jQuery) {
 
 gantt.locale = {
     date: {
-        month_full: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-        month_short: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        month_full: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+        month_short: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
         day_full: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
         day_short: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     },
@@ -10276,9 +10277,9 @@ gantt.locale = {
 
         /* grid columns */
 
-        column_text: "Task name",
-        column_start_date: "Start time",
-        column_duration: "Duration",
+        column_text: "任务名",
+        column_start_date: "起始日期",
+        column_duration: "持续天数",
         column_add: "",
 
         /* link confirmation */
@@ -10570,7 +10571,6 @@ gantt._touch_events = function (names, accessor, ignore) {
         gantt._touch_scroll_active = action_mode = scroll_mode = false;
         current_target = null;
     });
-
 
     //common helper, prevents event
     function block_action(e) {

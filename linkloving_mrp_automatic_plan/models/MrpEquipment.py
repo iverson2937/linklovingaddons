@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-import datetime
+
+from datetime import datetime, timedelta
 import pytz
 from dateutil.relativedelta import relativedelta
 
 from odoo import models, fields, api
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 
 
 class Inheritforarrangeproduction(models.Model):
@@ -13,7 +14,7 @@ class Inheritforarrangeproduction(models.Model):
     @api.multi
     def arrange_production(self):
         return {
-            'name': '排产',
+            'name': self.name + u'排产',
             'type': 'ir.actions.client',
             'tag': 'arrange_production',
             'process_id': self.id
@@ -27,10 +28,24 @@ class ProcurementOrderExtend(models.Model):
         res = super(ProcurementOrderExtend, self)._prepare_mo_vals(bom)
 
         produced_spend = res["product_qty"] * bom.produced_spend_per_pcs + bom.prepare_time
-        date_planned_end = fields.Datetime.to_string(self._get_date_planned_from_date_planned())
-        start_time, end_time = ProcurementOrderExtend.compute_mo_start_time(self._get_date_planned_from_date_planned(),
+        planned_datetime = self._get_date_planned_from_date_planned()
+        # date_planned_end = fields.Datetime.to_string(planned_datetime)
+        new_datetime = datetime(planned_datetime.year,
+                                planned_datetime.month,
+                                planned_datetime.day,
+                                planned_datetime.hour,
+                                planned_datetime.minute,
+                                planned_datetime.second,
+                                microsecond=planned_datetime.microsecond,
+                                tzinfo=pytz.timezone("UTC"))
+
+        planned_time_with_zone = new_datetime.astimezone(pytz.timezone(self.env.user.tz))
+
+        start_time, end_time = self.env["ll.time.util"].compute_mo_start_time(planned_time_with_zone,
                                                                             produced_spend,
                                                                             self.env.user.tz)
+        start_time = pytz.UTC.normalize(start_time)
+        end_time = pytz.UTC.normalize(end_time)
         res.update({'state': 'draft',
                     # 'process_id': bom.process_id.id,
                     # 'unit_price': bom.process_id.unit_price,
@@ -49,115 +64,6 @@ class ProcurementOrderExtend(models.Model):
         date_planned = format_date_planned - relativedelta(days=self.product_id.produce_delay or 0.0)
         date_planned = date_planned - relativedelta(days=self.company_id.manufacturing_lead)
         return date_planned
-
-    @classmethod
-    def compute_mo_start_time(cls, end_time, spent_time, timezone_name, start_or_end="end"):
-        tz_offset = pytz.timezone(timezone_name)._utcoffset
-        end_time_with_zone = (end_time + tz_offset)
-        corrected_end_time = cls.correct_work_time(end_time_with_zone, start_or_end)
-        day_start_time = fields.datetime.strptime(fields.datetime.strftime(corrected_end_time, '%Y-%m-%d'),
-                                                  '%Y-%m-%d')  # 今日的0点
-        work_start_time = day_start_time + relativedelta(seconds=8 * 60 * 60)
-        off_work_time = day_start_time + relativedelta(seconds=16 * 60 * 60)
-
-        if start_or_end == 'end':
-            theoretics_start_time = corrected_end_time - relativedelta(seconds=spent_time)  # 理论的时间- (不计算上下班时间,节假日的)
-            if theoretics_start_time <= off_work_time and theoretics_start_time >= work_start_time:  # 当天能完成 不做操作
-                real_start_time = theoretics_start_time
-
-            else:  # 跨天了
-                arrange_time = corrected_end_time - work_start_time  # 今天的结束时间 - 今天上班时间 = 今天所安排的时间
-                left_time = spent_time - arrange_time.seconds  # 剩余安排时间
-                move_corrected_time = corrected_end_time
-                while left_time > 0:
-                    move_corrected_time = move_corrected_time - relativedelta(days=1)
-                    new_day_0_time = fields.datetime.strptime(fields.datetime.strftime(move_corrected_time, '%Y-%m-%d'),
-                                                              '%Y-%m-%d')  # 这一天的0点
-                    new_day_work_start_time = new_day_0_time + relativedelta(seconds=8 * 60 * 60)  # 这一天的上班时间
-                    # new_day_off_work_time = new_day_0_time + relativedelta(seconds=16 * 60 * 60)#这一天的下班时间
-                    theoretics_move_start_time = move_corrected_time - relativedelta(seconds=left_time)  # 理论的时间
-                    if cls.is_time_in_work_time(theoretics_move_start_time):
-                        real_start_time = theoretics_move_start_time
-                        left_time = 0
-                    else:
-                        left_time = left_time - (move_corrected_time - new_day_work_start_time).seconds
-                        # if theoretics_move_start_time <= new_day_off_work_time and theoretics_move_start_time >= new_day_work_start_time:
-            if not real_start_time:
-                raise UserWarning(u"出错了")
-            return real_start_time, corrected_end_time
-        else:
-            theoretics_start_time = corrected_end_time + relativedelta(seconds=spent_time)  # 理论的时间+ (不计算上下班时间,节假日的)
-            if theoretics_start_time <= off_work_time and theoretics_start_time >= work_start_time:  # 当天能完成 不做操作
-                real_start_time = theoretics_start_time
-            else:  # 跨天了
-                arrange_time = off_work_time - corrected_end_time  # 今天的结束时间 - 今天上班时间 = 今天所安排的时间
-                left_time = spent_time - arrange_time.seconds  # 剩余安排时间
-                move_corrected_time = corrected_end_time
-                while left_time > 0:
-                    move_corrected_time = move_corrected_time + relativedelta(days=1)
-                    new_day_0_time = fields.datetime.strptime(fields.datetime.strftime(move_corrected_time, '%Y-%m-%d'),
-                                                              '%Y-%m-%d')  # 这一天的0点
-                    new_day_work_end_time = new_day_0_time + relativedelta(seconds=16 * 60 * 60)  # 这一天的上班时间
-                    theoretics_move_start_time = move_corrected_time + relativedelta(seconds=left_time)  # 理论的时间
-                    if cls.is_time_in_work_time(theoretics_move_start_time):
-                        real_start_time = theoretics_move_start_time
-                        left_time = 0
-                    else:
-                        left_time = left_time - (new_day_work_end_time - move_corrected_time).seconds
-            if not real_start_time:
-                raise UserWarning(u"出错了")
-            return real_start_time, corrected_end_time
-
-
-
-
-    # 是否是工作时间
-    @classmethod
-    def is_time_in_work_time(cls, planned_time_with_zone):
-        # tz_offset = pytz.timezone(self.env.user.tz)._utcoffset
-        # planned_time_with_zone = (planned_time + tz_offset)
-        dayOfWeek = planned_time_with_zone.weekday()
-        if dayOfWeek == 6:  # 暂定周天为休息日
-            return False
-        else:
-            current_day_start_time = fields.datetime.strptime(
-                fields.datetime.strftime(planned_time_with_zone, '%Y-%m-%d'), '%Y-%m-%d')  # 今日的开始时间
-            work_start_time = current_day_start_time + relativedelta(seconds=8 * 60 * 60)
-            off_work_time = current_day_start_time + relativedelta(seconds=16 * 60 * 60)
-            # current_day_end_time = current_day_start_time + relativedelta(days=1) - relativedelta(microseconds=1)  # 今日的结束时间
-            # print(current_day_end_time)
-            if planned_time_with_zone < work_start_time or planned_time_with_zone > off_work_time:
-                return False
-            else:
-                return True
-
-    # 如果当前时间不是工作时间 则调整到是工作时间以及调整的时间相差了多少,方便计算剩余工时,如果是则不做操作直接返回
-    @classmethod
-    def correct_work_time(cls, planned_time_with_zone, start_or_end):
-        is_work_time = cls.is_time_in_work_time(planned_time_with_zone)
-        if is_work_time:
-            return planned_time_with_zone
-        else:
-            current_day_start_time = fields.datetime.strptime(
-                    fields.datetime.strftime(planned_time_with_zone, '%Y-%m-%d'), '%Y-%m-%d')  # 今日的开始时间
-            if start_or_end == "end":
-                yesterday_off_work_time = current_day_start_time - relativedelta(days=1) + relativedelta(
-                    seconds=16 * 60 * 60)
-                while not cls.is_time_in_work_time(yesterday_off_work_time):
-                    # if self.is_time_in_work_time(yesterday_off_work_time):
-                    #     return yesterday_off_work_time
-                    # else:
-                    yesterday_off_work_time = yesterday_off_work_time - relativedelta(days=1) + relativedelta(
-                            seconds=16 * 60 * 60)
-
-                return yesterday_off_work_time
-            else:
-                next_day_on_work_time = current_day_start_time + relativedelta(days=1) + relativedelta(
-                        seconds=8 * 60 * 60)
-                while not cls.is_time_in_work_time(next_day_on_work_time):
-                    next_day_on_work_time = current_day_start_time + relativedelta(days=1) + relativedelta(
-                            seconds=8 * 60 * 60)
-                return next_day_on_work_time
 
 # 设备
 class MrpProcessEquipment(models.Model):
@@ -237,7 +143,7 @@ class MrpProductionLine(models.Model):
         # return utc_timestamp.astimezone(context_tz)
 
         mos = self.env["mrp.production"].search_read([("production_line_id", "=", production_line_id),
-                                                      ("date_planned_start", "<", end_time_str),
+                                                      ("date_planned_start", "<=", end_time_str),
                                                       ("date_planned_finished", ">=", start_time_str),
                                                       ("state", "not in", ['done', 'cancel', 'waiting_post_inventory'])
                                                       ],
@@ -277,44 +183,282 @@ class MrpProductionExtend(models.Model):
 
         limit = kwargs.get("limit")
         offset = kwargs.get("offset")
+        domain = [("process_id", "=", process_id), ("production_line_id", "=", False), ("state", "in", ['draft', 'confirmed', 'waiting_material']),]
 
         mos = self.env["mrp.production"].search_read(
-                [("process_id", "=", process_id),
-                 ("production_line_id", "=", False),
-                 ("state", "in", ['draft', 'confirmed', 'waiting_material']),
-                 ],
+                domain,
                 limit=limit,
                 offset=offset,
                 # fields=[]
                 )
-
-        return mos
+        length = self.env["mrp.production"].search_count(domain)
+        return {
+            'length': length,
+            'result': mos,
+        }
 
     # 排产或者取消排产
     def settle_mo(self, **kwargs):
         production_line_id = kwargs.get("production_line_id")
         settle_date = kwargs.get("settle_date")
-        current_day_start_time = fields.datetime.strptime(settle_date, '%Y-%m-%d')
-        tz_name = self._context.get("tz") or self.env.user.tz
-        context_tz = pytz.timezone(tz_name)
-        start_time_utc = current_day_start_time - relativedelta(seconds=context_tz._utcoffset.seconds)
-        start_time, end_time = ProcurementOrderExtend.compute_mo_start_time(start_time_utc,
-                                                                            self._compute_produced_spend(),
-                                                                            self.env.user.tz, start_or_end="start")
+
 
         vals = {
             'production_line_id': production_line_id,
         }
         if production_line_id:  # 排
+            current_day_start_time = fields.datetime.strptime(settle_date, '%Y-%m-%d')
+            # start_time_utc = current_day_start_time - relativedelta(seconds=context_tz._utcoffset.seconds)
+            start_time_utc = self.env["ll.time.util"].localize_time(current_day_start_time)
+            start_time, end_time = self.env["ll.time.util"].compute_mo_start_time(start_time_utc,
+                                                                                  self._compute_produced_spend(),
+                                                                                  self.env.user.tz,
+                                                                                  start_or_end="start")
+            start_time = pytz.UTC.normalize(start_time)
+            end_time = pytz.UTC.normalize(end_time)
             vals.update({
                 'state': 'waiting_material',
                 'date_planned_start': start_time,
                 'date_planned_finished': end_time,
             })
         else:  # 取消排产
+            if self.planned_start_backup:
+                planned_start_backup = fields.Datetime.from_string(self.planned_start_backup)
+                new_datetime = datetime(planned_start_backup.year,
+                                        planned_start_backup.month,
+                                        planned_start_backup.day,
+                                        planned_start_backup.hour,
+                                        planned_start_backup.minute,
+                                        planned_start_backup.second,
+                                        microsecond=planned_start_backup.microsecond,
+                                        tzinfo=pytz.timezone("UTC"))
+
+                planned_start_backup_with_zone = new_datetime.astimezone(pytz.timezone(self.env.user.tz))
+                start_time, end_time = self.env["ll.time.util"].compute_mo_start_time(planned_start_backup_with_zone,
+                                                                                      self._compute_produced_spend(),
+                                                                                      self.env.user.tz,
+                                                                                      start_or_end="start")
+                start_time = pytz.UTC.normalize(start_time)
+                end_time = pytz.UTC.normalize(end_time)
+                vals.update({
+                    'date_planned_start': start_time,
+                    'date_planned_finished': end_time,
+                })
             vals.update({
                 'state': 'draft',
             })
 
         self.write(vals)
         return self.read()
+
+
+class SaleOrderLineExtend(models.Model):
+    _inherit = 'sale.order.line'
+
+    @api.multi
+    def _prepare_order_line_procurement(self, group_id=False):
+        vals = super(SaleOrderLineExtend, self)._prepare_order_line_procurement(group_id)
+        date_planned = datetime.strptime(self.order_id.validity_date, DEFAULT_SERVER_DATE_FORMAT) \
+                       + timedelta(days=self.customer_lead or 0.0) - timedelta(
+            days=self.order_id.company_id.security_lead)
+        vals.update({
+            'date_planned': date_planned.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
+        })
+        return vals
+
+class TimeUtil(models.Model):
+    _name = 'll.time.util'
+
+    def compute_mo_start_time(self, end_time, spent_time, timezone_name, start_or_end="end"):
+        # tz_offset = relativedelta(seconds=0)#pytz.timezone(timezone_name)._utcoffset
+        end_time_with_zone = end_time  # + tz_offset)
+        corrected_end_time = self.correct_work_time(end_time_with_zone, start_or_end)
+        work_start_time, off_work_time = self.get_date_begin_end_time(corrected_end_time,
+                                                                      relativedelta(seconds=8 * 60 * 60),
+                                                                      relativedelta(seconds=16 * 60 * 60))
+        # day_start_time = fields.datetime.strptime(fields.datetime.strftime(corrected_end_time, '%Y-%m-%d'),
+        #                                           '%Y-%m-%d')  # 今日的0点
+        # work_start_time = day_start_time + relativedelta(seconds=8 * 60 * 60)
+        # off_work_time = day_start_time + relativedelta(seconds=16 * 60 * 60)
+
+        if start_or_end == 'end':
+            theoretics_start_time = corrected_end_time - relativedelta(seconds=spent_time)  # 理论的时间- (不计算上下班时间,节假日的)
+            why = self.is_time_in_spec_day_and_not_weekend(theoretics_start_time, work_start_time, off_work_time)
+            if why == 'weekday':  # 这天能完成 不做操作
+                real_start_time = theoretics_start_time
+
+            else:  # 跨天了
+                if why == 'offwork':  # 如果是因为休息日导致的调整天数 不能当做是安排的时间扣除
+                    arrange_time = corrected_end_time - work_start_time  # 今天的结束时间 - 今天上班时间 = 今天所安排的时间
+                else:
+                    arrange_time = relativedelta(seconds=0)
+                left_time = spent_time - arrange_time.seconds  # 剩余安排时间
+                move_corrected_time = corrected_end_time
+                while left_time > 0:
+                    new_day_work_start_time, new_day_work_off_time = self.get_date_begin_end_time(
+                        move_corrected_time - relativedelta(days=1),
+                        relativedelta(seconds=8 * 60 * 60),
+                        relativedelta(seconds=16 * 60 * 60))
+                    move_corrected_time = new_day_work_off_time
+                    # new_day_0_time = fields.datetime.strptime(fields.datetime.strftime(move_corrected_time, '%Y-%m-%d'),
+                    #                                           '%Y-%m-%d')  # 这一天的0点
+                    # new_day_work_start_time = new_day_0_time + relativedelta(seconds=8 * 60 * 60)  # 这一天的上班时间
+                    # new_day_off_work_time = new_day_0_time + relativedelta(seconds=16 * 60 * 60)#这一天的下班时间
+                    theoretics_move_start_time = move_corrected_time - relativedelta(seconds=left_time)  # 理论的时间
+                    while_why = self.is_time_in_spec_day_and_not_weekend(theoretics_move_start_time,
+                                                                         new_day_work_start_time,
+                                                                         new_day_work_off_time)  # 此方法返回这时间是工作日还是休息日还是下班时间
+                    if while_why == 'weekday':  # 这天能完成 不做操作
+                        real_start_time = theoretics_move_start_time
+                        left_time = 0
+                    else:
+                        if while_why == 'offwork':
+                            left_time = left_time - (move_corrected_time - new_day_work_start_time).seconds
+                            # if theoretics_move_start_time <= new_day_off_work_time and theoretics_move_start_time >= new_day_work_start_time:
+            if not real_start_time:
+                raise UserWarning(u"出错了")
+            return real_start_time, corrected_end_time
+        else:
+            theoretics_start_time = corrected_end_time + relativedelta(seconds=spent_time)  # 理论的时间+ (不计算上下班时间,节假日的)
+            why = self.is_time_in_spec_day_and_not_weekend(theoretics_start_time, work_start_time, off_work_time)
+            if why == 'weekday':  # 这天能完成 不做操作
+                real_start_time = theoretics_start_time
+            else:  # 跨天了
+                if why == 'offwork':
+                    arrange_time = off_work_time - corrected_end_time  # 今天的结束时间 - 今天上班时间 = 今天所安排的时间
+                else:
+                    arrange_time = relativedelta(seconds=0)
+                left_time = spent_time - arrange_time.seconds  # 剩余安排时间
+
+                move_corrected_time = corrected_end_time
+                while left_time > 0:
+                    move_corrected_time = move_corrected_time + relativedelta(days=1)
+                    new_day_work_start_time, new_day_work_off_time = self.get_date_begin_end_time(move_corrected_time,
+                                                                                                  relativedelta(
+                                                                                                      seconds=8 * 60 * 60),
+                                                                                                  relativedelta(
+                                                                                                      seconds=16 * 60 * 60))
+                    # new_day_0_time = fields.datetime.strptime(fields.datetime.strftime(move_corrected_time, '%Y-%m-%d'),
+                    #                                           '%Y-%m-%d')  # 这一天的0点
+                    # new_day_work_end_time = new_day_0_time + relativedelta(seconds=16 * 60 * 60)  # 这一天的上班时间
+                    theoretics_move_start_time = move_corrected_time + relativedelta(seconds=left_time)  # 理论的时间
+                    while_why = self.is_time_in_spec_day_and_not_weekend(theoretics_move_start_time,
+                                                                         new_day_work_start_time,
+                                                                         new_day_work_off_time)  # 此方法返回这时间是工作日还是休息日还是下班时间
+                    if while_why == 'weekday':  # 这天能完成 不做操作
+                        real_start_time = theoretics_move_start_time
+                        left_time = 0
+                    else:
+                        if while_why == 'offwork':
+                            left_time = left_time - (new_day_work_off_time - move_corrected_time).seconds
+            if not real_start_time:
+                raise UserWarning(u"出错了")
+            return corrected_end_time, real_start_time
+
+    # @classmethod
+    # def get_off_time_zone(cls):
+
+
+    def localize_time(self, planned_time_no_zone):
+        tz_name = self._context.get("tz") or self.env.user.tz
+        context_tz = pytz.timezone(tz_name)
+        return context_tz.localize(planned_time_no_zone)
+
+    def get_date_begin_end_time(self, the_date, delta_start, delta_end):
+        start_time = fields.datetime.strptime(
+                fields.datetime.strftime(the_date, '%Y-%m-%d'), '%Y-%m-%d')  # 今日的开始时间
+        start_time_zone = self.localize_time(start_time)
+        return start_time_zone + delta_start, start_time_zone + delta_end
+
+    # 判断planned_time 是否在所规定的时间内,并且不是休息日
+    def is_time_in_spec_day_and_not_weekend(self, planned_time, time_on_work=None, time_off_work=None):
+        dayOfWeek = time_on_work.weekday()
+        if dayOfWeek == 6:  # 暂定周天为休息日
+            return 'weekend'
+        else:
+            if time_on_work <= planned_time <= time_off_work:
+                return 'weekday'
+            else:
+                return 'offwork'
+
+    # 是否是工作时间
+    def is_time_in_work_time(self, planned_time_with_zone):
+        # tz_offset = pytz.timezone(self.env.user.tz)._utcoffset
+        # planned_time_with_zone = (planned_time + tz_offset)
+        dayOfWeek = planned_time_with_zone.weekday()
+        if dayOfWeek == 6:  # 暂定周天为休息日
+            return False
+        else:
+            current_day_start_time = fields.datetime.strptime(
+                    fields.datetime.strftime(planned_time_with_zone, '%Y-%m-%d'), '%Y-%m-%d')  # 今日的开始时间
+            work_start_time, off_work_time = self.get_date_begin_end_time(current_day_start_time,
+                                                                          relativedelta(seconds=8 * 60 * 60),
+                                                                          relativedelta(seconds=16 * 60 * 60))
+            if work_start_time <= planned_time_with_zone <= off_work_time:
+                return True
+            else:
+                return False
+                # if planned_time_with_zone < work_start_time or planned_time_with_zone > off_work_time:
+                #     return False
+                # else:
+                #     return True
+
+    # 如果当前时间不是工作时间 则调整到是工作时间以及调整的时间相差了多少,方便计算剩余工时,如果是则不做操作直接返回
+    def correct_work_time(self, planned_time_with_zone, start_or_end):
+        is_work_time = self.is_time_in_work_time(planned_time_with_zone)
+        if is_work_time:
+            return planned_time_with_zone
+        else:
+            current_day_start_time = fields.datetime.strptime(
+                    fields.datetime.strftime(planned_time_with_zone, '%Y-%m-%d'), '%Y-%m-%d')  # 今日的开始时间
+            current_day_start_time = self.localize_time(current_day_start_time)
+
+            if start_or_end == "end":
+                current_day_on_work_time, current_day_off_work_time = self.get_date_begin_end_time(
+                    current_day_start_time,
+                    relativedelta(seconds=8 * 60 * 60),
+                    relativedelta(seconds=16 * 60 * 60))
+                # current_day_off_work_time = current_day_start_time + relativedelta(seconds=16 * 60 * 60)
+                if current_day_off_work_time <= planned_time_with_zone < current_day_start_time + relativedelta(days=1):
+                    yesterday_off_work_time = current_day_off_work_time
+                else:
+                    current_day_on_work_time, current_day_off_work_time = self.get_date_begin_end_time(
+                        current_day_start_time - relativedelta(days=1),
+                        relativedelta(seconds=8 * 60 * 60),
+                        relativedelta(seconds=16 * 60 * 60))
+                    yesterday_off_work_time = current_day_off_work_time
+
+                while not self.is_time_in_work_time(yesterday_off_work_time):
+                    # if self.is_time_in_work_time(yesterday_off_work_time):
+                    #     return yesterday_off_work_time
+                    # else:
+                    current_day_on_work_time, current_day_off_work_time = self.get_date_begin_end_time(
+                        yesterday_off_work_time - relativedelta(days=1),
+                        relativedelta(seconds=8 * 60 * 60),
+                        relativedelta(seconds=16 * 60 * 60))
+                    yesterday_off_work_time = current_day_off_work_time
+
+                return yesterday_off_work_time
+            else:
+                current_day_on_work_time, current_day_off_work_time = self.get_date_begin_end_time(
+                    current_day_start_time,
+                    relativedelta(seconds=8 * 60 * 60),
+                    relativedelta(seconds=16 * 60 * 60))
+                # current_day_on_work_time = current_day_start_time + relativedelta(seconds=8 * 60 * 60)
+                if current_day_start_time <= planned_time_with_zone < current_day_on_work_time:
+                    next_day_on_work_time = current_day_on_work_time
+                else:
+                    current_day_on_work_time, current_day_off_work_time = self.get_date_begin_end_time(
+                        current_day_start_time + relativedelta(days=1),
+                        relativedelta(seconds=8 * 60 * 60),
+                        relativedelta(seconds=16 * 60 * 60))
+                    next_day_on_work_time = current_day_on_work_time
+
+                while not self.is_time_in_work_time(next_day_on_work_time):
+                    current_day_on_work_time, current_day_off_work_time = self.get_date_begin_end_time(
+                        current_day_start_time + relativedelta(days=1),
+                        relativedelta(seconds=8 * 60 * 60),
+                        relativedelta(seconds=16 * 60 * 60))
+                    next_day_on_work_time = current_day_on_work_time
+
+                return next_day_on_work_time

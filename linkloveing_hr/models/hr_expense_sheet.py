@@ -138,9 +138,9 @@ class HrExpenseSheet(models.Model):
             state = 'submit'
             department = exp.department_id
             if exp.employee_id == department.manager_id:
-
+                # 报销金额小于部门允许金额直接通过
                 if not department.parent_id or (
-                            department.allow_amount and self.total_amount > department.allow_amount):
+                            department.allow_amount and exp.total_amount < department.allow_amount):
                     state = 'approve'
                     exp.write({'state': 'approve'})
                 else:

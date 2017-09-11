@@ -23,7 +23,7 @@
                     <div class="p_line_employes">
                         员工：<span><t t-esc="item.line_employee_ids.length"/> </span>
                     </div>
-                    <div class="p_line_timw">
+                    <div class="p_line_time">
                         可用时间：0h
                     </div>
                     <span class="fa fa-chevron-down a_p_showorhide"></span>
@@ -39,7 +39,7 @@
     </t>
     <t t-name="a_p_render_right_tmpl">
         <t t-foreach="result" t-as="item">
-            <div class="ap_item_wrap" t-att-id="'id'+item.id" t-att-data-index="item_index" t-att-data-mo-id="item.id" t-att-data-bom-id="item.bom_id[0]">
+            <div class="ap_item_wrap" t-att-id="'id'+item.id" t-att-data-index="item_index" t-att-data-mo-id="item.id" t-att-data-bom-id="item.bom_id[0]" t-att-data-product-id="item.product_tmpl_id[0]">
                 <span class="a_p_move_point"></span>
                 <p class="a_p_mo_name"><t t-esc="item.display_name"/></p>
                 <div class="a_p_status_wrap">
@@ -53,9 +53,31 @@
                     <span class="a_p_spend_time">生产总时间：</span>
                 </div>
                 <div class="ap_item_main_center">
-                    <span class="a_p_latest_time">最晚开始：<t t-esc="item.date_planned_start"/></span>
-                    <span class="a_p_planned_start">预计开始：<t t-esc="item.date_planned_start"/></span>
-                    <span class="a_p_planned_end">预计结束：<t t-esc="item.date_planned_start"/></span>
+                    <t t-js="ctx">
+                        function change_time(date_planned){
+
+                            date_planned = date_planned.replace(/\s/g,'T').replace(/\//g,'-');
+                            var my_date = Date.parse(new Date(date_planned))
+                            var newDate = new Date();
+                            var time_offset = newDate.getTimezoneOffset() * 60000
+                            var c_date = new Date(my_date - time_offset)
+                            return moment(c_date).format('YYYY-MM-DD HH:mm:ss');
+                        }
+                        if (ctx.item.date_planned_start){
+                        ctx.item.date_planned_start = change_time(ctx.item.date_planned_start);
+                        }
+                        if (ctx.item.date_planned_finished){
+                        ctx.item.date_planned_finished = change_time(ctx.item.date_planned_finished);
+                        }
+                        if (ctx.item.planned_start_backup){
+                        ctx.item.planned_start_backup = change_time(ctx.item.planned_start_backup);
+                        }
+                    </t>
+                    <span class="a_p_latest_time">最晚开始：<t t-esc="item.planned_start_backup" /></span>
+                    <!--<t t-set="date_planned_start" t-value="item.date_planned_start"/>-->
+                    <span class="a_p_planned_start">预计开始：<span t-esc="item.date_planned_start" /></span>
+                    <!--<t t-esc="item.date_planned_start"/>-->
+                    <span class="a_p_planned_end">预计结束：<t t-esc="item.date_planned_finished"/></span>
                 </div>
                 <div class="a_p_item_bottom">
                     <span class="to_relevant_struc">查看关联结构</span>

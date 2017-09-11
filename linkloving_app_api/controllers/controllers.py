@@ -85,6 +85,7 @@ class LinklovingAppApi(http.Controller):
     #获取数据库列表
     @http.route('/linkloving_app_api/get_db_list', type='http', auth='none', cors='*')
     def get_db_list(self, **kw):
+        print 'sss'
         return JsonResponse.send_response(STATUS_CODE_OK, res_data= http.db_list(), jsonRequest=False)
 
     #换头像
@@ -2924,6 +2925,8 @@ class LinklovingAppApi(http.Controller):
                 for o_move in sim_stock_move.stock_moves:
                     if o_move.state != 'cancel':
                         need_qty += o_move.product_uom_qty
+                logging.warning("charlie0910--------%d,%d,%d,%d" % (
+                total_qty, need_qty, sim_stock_move.product_uom_qty, sim_stock_move.quantity_done))
                 # if float_compare(need_qty, sim_stock_move.product_uom_qty, precision_rounding=rounding) < 0:
                 if float_compare(total_qty, sim_stock_move.product_uom_qty, precision_rounding=rounding) > 0:
 
@@ -2939,11 +2942,15 @@ class LinklovingAppApi(http.Controller):
                         split_qty_unuom = move['quantity_ready']  # 未经过单位换算的数量
                     else:
                         # 如果已完成的数量大于等于需求数量,则是 总数量 - 需求数量
-                        split_qty_unuom = total_qty - sim_stock_move.product_uom_qty
+                        if sim_stock_move.stock_moves.filtered(lambda x: x.state not in ["cancel", "done"]):
+                            split_qty_unuom = total_qty - sim_stock_move.product_uom_qty
+                        else:
+                            split_qty_unuom = total_qty - sim_stock_move.quantity_done
 
                     qty_split = sim_stock_move.stock_moves[0].product_uom._compute_quantity(
                             split_qty_unuom,
                             sim_stock_move.stock_moves[0].product_id.uom_id)
+                    logging.warning("charlie0910-1-------%d,%d" % (split_qty_unuom, qty_split))
                     # _logger.warning(u"charlie_0712_log_2:qty_split:%s,", str(qty_split))
                     split_move = sim_stock_move.stock_moves[0].copy(
                             default={'quantity_done': qty_split, 'product_uom_qty': qty_split,
@@ -2979,6 +2986,7 @@ class LinklovingAppApi(http.Controller):
                                 true_list.append(False)
                                 #     states = sim_stock_move.stock_moves.mapped("state")
                                 #     if states in ["cancel", "done"]:
+                        logging.warning("charlie0910-2-------%d,%d" % (move['quantity_ready'], all(true_list)))
                         if all(true_list):
                             split_move = sim_stock_move.stock_moves[0].copy(
                                     default={'quantity_done': move['quantity_ready'],
