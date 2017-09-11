@@ -14,7 +14,7 @@ class Inheritforarrangeproduction(models.Model):
     @api.multi
     def arrange_production(self):
         return {
-            'name': '排产',
+            'name': self.name + u'排产',
             'type': 'ir.actions.client',
             'tag': 'arrange_production',
             'process_id': self.id
@@ -183,18 +183,19 @@ class MrpProductionExtend(models.Model):
 
         limit = kwargs.get("limit")
         offset = kwargs.get("offset")
+        domain = [("process_id", "=", process_id), ("production_line_id", "=", False), ("state", "in", ['draft', 'confirmed', 'waiting_material']),]
 
         mos = self.env["mrp.production"].search_read(
-                [("process_id", "=", process_id),
-                 ("production_line_id", "=", False),
-                 ("state", "in", ['draft', 'confirmed', 'waiting_material']),
-                 ],
+                domain,
                 limit=limit,
                 offset=offset,
                 # fields=[]
                 )
-
-        return mos
+        length = self.env["mrp.production"].search_count(domain)
+        return {
+            'length': length,
+            'result': mos,
+        }
 
     # 排产或者取消排产
     def settle_mo(self, **kwargs):
