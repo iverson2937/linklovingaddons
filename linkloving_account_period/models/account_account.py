@@ -18,7 +18,6 @@ class AccountAccount(models.Model):
     @api.multi
     def _get_children_and_consol(self):
         # this function search for all the children and all consolidated children (recursively) of the given account ids
-        print self, 'account'
         ids2 = self.search([('parent_id', 'child_of', self.id)])
         if ids2:
             ids2 = ids2.ids
