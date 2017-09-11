@@ -696,28 +696,28 @@ class ReviewProcessWizard(models.TransientModel):
             self.material_requests_id.picking_state = 'approved_finish'
             self.material_requests_id.write({'review_i_approvaled_val': [(4, self.env.uid)]})
             # 创建出货单
-            material_one = self.env['material.request'].browse(materials_request_id)
-
-            picking_out_material = self.env['stock.picking'].create({
-                'picking_type_id': self.env.ref('stock.picking_type_out').id,
-                'location_id': self.env.ref('stock.stock_location_stock').id,
-                'location_dest_id': self.env.ref('linkloving_eb.stock_location_eb_transfer_2').id,
-                'material_request_order_id': material_one.id,
-                'origin': material_one.name,
-                'note': material_one.remark,
-                'Materials_development_way': material_one.Materials_development_way,
-                'partner_id': material_one.create_uid.partner_id.id,
-                'picking_type': material_one.picking_type,
-            })
-            for one_line in material_one.line_ids:
-                self.env['stock.move'].create({
-                    'name': 'another move',
-                    'product_id': one_line.product_id.id,
-                    'product_uom_qty': one_line.product_qty,
-                    'product_uom': one_line.product_id.uom_id.id,
-                    'picking_id': picking_out_material.id,
-                    'location_id': self.env.ref('stock.stock_location_stock').id,
-                    'location_dest_id': self.env.ref('linkloving_eb.stock_location_eb_transfer').id})
+            # material_one = self.env['material.request'].browse(materials_request_id)
+            #
+            # picking_out_material = self.env['stock.picking'].create({
+            #     'picking_type_id': self.env.ref('stock.picking_type_out').id,
+            #     'location_id': self.env.ref('stock.stock_location_stock').id,
+            #     'location_dest_id': self.env.ref('linkloving_eb.stock_location_eb_transfer_2').id,
+            #     'material_request_order_id': material_one.id,
+            #     'origin': material_one.name,
+            #     'note': material_one.remark,
+            #     'Materials_development_way': material_one.Materials_development_way,
+            #     'partner_id': material_one.create_uid.partner_id.id,
+            #     'picking_type': material_one.picking_type,
+            # })
+            # for one_line in material_one.line_ids:
+            #     self.env['stock.move'].create({
+            #         'name': 'another move',
+            #         'product_id': one_line.product_id.id,
+            #         'product_uom_qty': one_line.product_qty,
+            #         'product_uom': one_line.product_id.uom_id.id,
+            #         'picking_id': picking_out_material.id,
+            #         'location_id': self.env.ref('stock.stock_location_stock').id,
+            #         'location_dest_id': self.env.ref('linkloving_eb.stock_location_eb_transfer').id})
 
             self.material_line.action_pass(self.remark)
         return True

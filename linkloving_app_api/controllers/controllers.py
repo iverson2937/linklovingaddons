@@ -2822,57 +2822,6 @@ class LinklovingAppApi(http.Controller):
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=json_list)
 
-
-    ######### 工程领料 接口  ###############
-
-    # 根据领料类型 抓取全部数据
-    @http.route('/linkloving_app_api/get_picking_material_request/', auth='user', type='json', csrf=False)
-    def get_picking_material_request(self, **kwargs):
-
-        picking_type = request.jsonrequest.get("picking_type")
-        domain = [('picking_type', '=', picking_type)]
-        pickings = request.env["stock.picking"].sudo().search(domain)
-        # if type == 'able_to': #可处理
-        print('length =%d' % len(pickings))
-        json_list = self.get_picking_info_by_picking(pickings)
-
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
-
-    @http.route('/linkloving_app_api/change_stock_picking_state_material', type='json', auth='none', csrf=False, cors='*')
-    def change_stock_picking_state_material(self, **kw):
-
-        state = request.jsonrequest.get('state')  # 状态
-        picking_id = request.jsonrequest.get('picking_id')  # 订单id
-
-        pack_operation_product_ids = request.jsonrequest.get('pack_operation_product_ids')  # 修改
-
-        if not pack_operation_product_ids:
-            return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={'error': _(u"没有订单行")})
-
-        for pick_line_one in pack_operation_product_ids:
-
-            if pick_line_one > pick_line_one:
-                return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={'error': _(u"领取数量不能大于申请数量")})
-
-            line_one=request.env['product.product'].sudo().search([('id', '=', pick_line_one)])
-            line_one.write({'state': 'finish_prepare_material'})
-
-
-
-        picking_obj = request.env['stock.picking'].sudo().search([('id', '=', picking_id)])
-        picking_obj.write({'state': 'done'})
-
-
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.stock_picking_to_json(picking_obj))
-
-
-
-
-
-
-
-
-
     # 根据客户搜索
     @http.route('/linkloving_app_api/get_stock_picking_by_partner/', auth='user', type='json', csrf=False)
     def get_stock_picking_by_partner(self, **kwargs):
@@ -3087,3 +3036,85 @@ class LinklovingAppApi(http.Controller):
         # _logger.warning(u"charlie_0712_log10:finish, mo:%s", LinklovingAppApi.model_convert_to_dict(order_id, request))
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
+
+
+
+
+        ######### 工程领料 接口  ###############
+
+    # 根据领料类型 抓取全部数据
+    @http.route('/linkloving_app_api/get_all_material_request_show/', auth='user', type='json', csrf=False)
+    def get_all_material_request_show(self, **kwargs):
+
+        picking_type = request.jsonrequest.get("picking_type")
+        domain = [('picking_type', '=', picking_type), ('picking_state', 'in', ('approved_finish', 'finish_pick'))]
+        material_request_list = request.env["material.request"].sudo().search(domain)
+
+        json_list = {'waiting_data': [],
+                     'finish_data': [], }
+        for material_one in material_request_list:
+            data = {
+                'id': material_one.id,
+                'name': material_one.name,
+                'create_date': material_one.my_create_date,
+                'delivery_date': material_one.delivery_date,
+                'create_uid': material_one.my_create_uid.name,
+                'picking_state':material_one.picking_state,
+            }
+
+            if material_one.picking_state == 'approved_finish':
+                json_list['waiting_data'].append(data)
+            elif material_one.picking_state == 'finish_pick':
+                json_list['finish_data'].append(data)
+
+        print('length =%d' % len(material_request_list))
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    @http.route('/linkloving_app_api/get_one_material_request_show/', type='json', auth='none', csrf=False, cors='*')
+    def get_one_material_request_show(self, **kw):
+
+        material_id = request.jsonrequest.get('material_id')  # 领料单id
+
+        material = request.env['material.request'].sudo().browse(material_id)
+
+        json_list = {
+            'create_uid': material.my_create_uid.name,
+            'create_date': material.my_create_date,
+            'delivery_date': material.delivery_date,
+            "picking_cause": material.picking_cause,
+            "remark": material.remark,
+            'line_ids':[{
+                            'id':adc.id,
+                            'name':adc.product_id.name,
+                            'location': adc.product_id.property_stock_inventory.name,
+                            'quantity_available': adc.qty_available,
+                            'quantity_done': adc.quantity_done,
+                            'product_qty': adc.product_qty,
+                            'reserve': adc.product_id.stock_quant_ids[-1].qty if adc.product_id.stock_quant_ids[-1] else 0,
+                        } for adc in material.line_ids],
+        }
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    @http.route('/linkloving_app_api/change_material_request_state/', type='json', auth='none', csrf=False, cors='*')
+    def change_material_request_state(self, **kw):
+
+        material_id = request.jsonrequest.get('material_id')  # 领料单id
+
+        pack_operation_product_ids = request.jsonrequest.get('pack_operation_product_ids')  # 修改
+
+        if not pack_operation_product_ids:
+            return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={'error': _(u"没有订单行")})
+
+        for material_line_one in pack_operation_product_ids:
+
+            lin_ids_one = request.env['material.request.line'].sudo().search([('id', '=', material_line_one.get('id'))])
+            lin_ids_one.write({'quantity_done': material_line_one.get('quantity_done')})
+
+        material = request.env['material.request'].sudo().browse(material_id)
+        material.btn_click_product_out()
+
+        json_list = [{"state": 'ok'}]
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)

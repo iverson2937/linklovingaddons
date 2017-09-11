@@ -10,24 +10,23 @@ from odoo import models, fields, api
 class MaterialRequest(models.Model):
     _name = 'material.request'
 
-    name = fields.Char(string='系统流水号', readonly=True, default='新建')
+    name = fields.Char(string=u'系统流水号', readonly=True, default=u'新建')
 
-    my_create_date = fields.Date(string="创建时间", default=fields.datetime.now())
+    my_create_date = fields.Date(string=u"创建时间", default=fields.datetime.now())
 
-    my_create_uid = fields.Many2one('res.users')
+    my_create_uid = fields.Many2one('res.users', string=u"创建人")
 
     picking_cause = fields.Text(string=u'领料原因')
     delivery_date = fields.Date(string=u'交货日期')
     remark = fields.Text(string=u'备注')
     picking_type = fields.Selection([('pick_type', u'产线领用'), ('proofing', u'工程领用')], string=u'领料类型',
-                                    default='pick_type',
-                                    help="The 'Internal Type' is used for features available on different types of accounts: liquidity type is for cash or bank accounts, payable/receivable is for vendor/customer accounts.")
+                                    default='pick_type')
     Materials_development_way = fields.Selection(
         [('U-Line', u'物流发料'), ('Engineer_Dept', u'产线直接领用')], string=u'发料方式')
     picking_state = fields.Selection(
         [('canceled', u'已取消'), ('to_submit', u'待提交'), ('submitted', u'已提交'), ('to_approved', u'待审批'),
-         ('review_ing', u'审核中'),
-         ('approved_finish', u'已批准'), ('Refused', u'已拒绝')], string=u'领料状态', default='to_submit')
+         ('review_ing', u'审核中'), ('approved_finish', u'等待领料'),
+         ('finish_pick', u'完成'), ('Refused', u'已拒绝')], string=u'领料状态', default='to_submit')
     # 参考商品    one2many
     reference_product_template_ids = fields.Many2many('product.template')
     line_ids = fields.One2many('material.request.line', 'request_id', copy=True)
@@ -46,8 +45,6 @@ class MaterialRequest(models.Model):
     who_review_now_id = fields.Integer(string=u'待...审核',
                                        related='review_id.who_review_now.user_ids.id'
                                        )
-
-    # review_i_approvaled = fields.Char(compute="_compute_review_i_approvaled", default="no")
 
     # 审核人列表
     review_i_approvaled_val = fields.Many2many('res.users')
@@ -91,22 +88,28 @@ class MaterialRequest(models.Model):
             null_lines = True
             for vals_line in vals.get('line_ids'):
                 if vals_line[2]:
-                    if vals_line[1]:
-                        product_one1 = self.env['material.request.line'].browse(vals_line[1])
-                        qty_vals = product_one1.product_id.qty_available
-
-                        if qty_vals < 0 or qty_vals < vals_line[2].get('product_qty'):
-                            raise UserError(u"库存不足： '%s' " % product_one1.product_id.name)
-                        if vals_line[2].get('product_qty') <= 0:
-                            raise UserError(u"产品  '%s'  申请数量不能为0" % product_one1.product_id.name)
+                    if not vals_line[2].get('quantity_done'):
+                        if vals_line[1]:
+                            product_one1 = self.env['material.request.line'].browse(vals_line[1])
+                            qty_vals = product_one1.product_id.qty_available
+                            if qty_vals < 0 or qty_vals < vals_line[2].get('product_qty'):
+                                raise UserError(u"库存不足： '%s' " % product_one1.product_id.name)
+                            if vals_line[2].get('product_qty') <= 0:
+                                raise UserError(u"产品  '%s'  申请数量不能为0" % product_one1.product_id.name)
+                        else:
+                            product_one2 = self.env['product.product'].browse(vals_line[2].get('product_id'))
+                            qty_vals = vals_line[2].get('qty_available') if vals_line[2].get(
+                                'qty_available') else product_one2.qty_available
+                            if qty_vals < 0 or qty_vals < vals_line[2].get('product_qty'):
+                                raise UserError(u"库存不足： '%s' " % product_one2.name)
+                            if vals_line[2].get('product_qty') <= 0:
+                                raise UserError(u"产品  '%s'  申请数量不能为0" % product_one2.name)
                     else:
-                        product_one2 = self.env['product.product'].browse(vals_line[2].get('product_id'))
-                        qty_vals = vals_line[2].get('qty_available') if vals_line[2].get(
-                            'qty_available') else product_one2.qty_available
-                        if qty_vals < 0 or qty_vals < vals_line[2].get('product_qty'):
-                            raise UserError(u"库存不足： '%s' " % product_one2.name)
-                        if vals_line[2].get('product_qty') <= 0:
-                            raise UserError(u"产品  '%s'  申请数量不能为0" % product_one2.name)
+                        lin_ids_one = self.env['material.request.line'].browse(vals_line[1])
+                        if lin_ids_one:
+                            if vals_line[2].get('quantity_done') > lin_ids_one.product_qty:
+                                raise UserError(u"产品  '%s'  领料数量不能大于需求数量" % lin_ids_one.product_id.name)
+
                     null_lines = False
             if null_lines:
                 raise UserError(u"订单行 不能为空！")
@@ -237,28 +240,84 @@ class MaterialRequest(models.Model):
                     'review_order_seq': parnter_line_one.review_order_seq + 1,
                 })
 
+    @api.multi
+    def btn_click_show_product_line(self):
+        view = self.env.ref('linkloving_material_request.approval_project_picking_form_lines')
+
+        return {'type': 'ir.actions.act_window',
+                'res_model': 'material.request',
+                'view_mode': 'form',
+                'view_id': view.id,
+                'res_id': self.id,
+                'context': {'picking_mode': 'first_commit'},
+                'target': 'new'}
+
+    def btn_click_picking_material(self):
+
+        self.btn_click_product_out()
+        # self.picking_state = 'wait_verify'
+        return {'type': 'ir.actions.act_window_close'}
+
+    @api.multi
+    def btn_click_product_out(self):
+
+        picking_out_material = self.env['stock.picking'].create({
+            'picking_type_id': self.env.ref('stock.picking_type_out').id,
+            'location_id': self.env.ref('stock.stock_location_stock').id,
+            'location_dest_id': self.env.ref('linkloving_eb.stock_location_eb_transfer_2').id,
+            'material_request_order_id': self.id,
+            'origin': self.name,
+            'note': self.remark,
+            'Materials_development_way': self.Materials_development_way,
+            'partner_id': self.create_uid.partner_id.id,
+            'picking_type': self.picking_type,
+        })
+        for one_line in self.line_ids:
+            move = self.env['stock.move'].create({
+                'name': '工程领料',
+                'product_id': one_line.product_id.id,
+                'product_uom_qty': one_line.quantity_done if one_line.quantity_done else one_line.product_qty,
+                'product_uom': one_line.product_id.uom_id.id,
+                'picking_id': picking_out_material.id,
+                'location_id': self.env.ref('stock.stock_location_stock').id,
+                'location_dest_id': self.env.ref('linkloving_eb.stock_location_eb_transfer').id,
+                'date': self.my_create_date,
+                'raw_material_id': self.id,
+                'origin': self.name,
+                'suggest_qty': one_line.quantity_done,
+                'move_order_type': 'project_picking',
+            })
+            move.action_done()
+
+        self.picking_state = 'finish_pick'
+        # return {'type': 'ir.actions.empty'}
+
 
 class MaterialRequestLine(models.Model):
     _name = 'material.request.line'
 
     request_id = fields.Many2one('material.request')
     product_id = fields.Many2one('product.product')
+
     qty_available = fields.Float(related='product_id.qty_available', string=u'库存')
-    product_qty = fields.Float(string=u'申请数量')
+    quantity_available = fields.Float(string=u'系统可用')
+
+    product_qty = fields.Float(string=u'需求数量')
+
+    quantity_done = fields.Float(string=u'领料数量')
+
     inner_code = fields.Char()
     inner_spec = fields.Char()
-    uom_id = fields.Char()
+    uom_id = fields.Char(related='product_id.uom_id.name')
     reference_bom = fields.Char(string=u'参考BOM')
 
     # inner_code = fields.Char(related='product_id.product_tmpl_id.inner_code')
     # inner_spec = fields.Char(related='product_id.inner_spec')
-    # uom_id = fields.Char(related='product_id.uom_id')
 
-    @api.onchange('product_id', 'qty_available')
+    @api.onchange('product_id')
     def onchange_product_id(self):
         self.inner_code = self.product_id.inner_code
         self.inner_spec = self.product_id.inner_spec
-        self.uom_id = self.product_id.uom_id.name
 
 
 class MaterialStockPicking(models.Model):
@@ -268,3 +327,8 @@ class MaterialStockPicking(models.Model):
     Materials_development_way = fields.Selection(
         [('U-Line', u'产线直接领用'), ('Engineer_Dept', u'工程部直接领用')], string=u'发料方式')
     picking_type = fields.Selection([('pick_type', u'产线领用'), ('proofing', u'工程领用')], string=u'领料类型')
+
+
+class MaterialRequestStockMove(models.Model):
+    _inherit = 'stock.move'
+    raw_material_id = fields.Many2one('material.request')
