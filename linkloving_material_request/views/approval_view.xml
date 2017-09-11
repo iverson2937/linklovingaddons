@@ -25,7 +25,7 @@
                             <field name="product_id" string="产品" readonly="1"/>
 
                             <field name="qty_available" string="库存" readonly="1"/>
-                            <field name="quantity_available" string="系统可用" readonly="1"/>
+                            <field name="quantity_available" string="系统可用" readonly="1" invisible="1"/>
                             <field name="product_qty" string="需求数量" readonly="1"/>
                             <field name="quantity_done" string="领料数量" readonly="0"/>
 
@@ -141,7 +141,7 @@
                                                 <field name="inner_spec" string="国内类型" readonly="1" invisible="1"/>
 
                                                 <field name="qty_available" string="库存" readonly="1"/>
-                                                <field name="quantity_available" string="系统可用" readonly="1"/>
+                                                <field name="quantity_available" string="系统可用" readonly="1" invisible="1"/>
                                                 <field name="product_qty" string="需求数量" readonly="0"/>
                                                 <field name="quantity_done" string="领料数量" readonly="1"/>
 
@@ -155,7 +155,7 @@
                                             <field name="inner_spec" string="国内类型" readonly="1" invisible="1"/>
 
                                             <field name="qty_available" string="库存" readonly="1"/>
-                                            <field name="quantity_available" string="系统可用" readonly="1"/>
+                                            <field name="quantity_available" string="系统可用" readonly="1" invisible="1"/>
                                             <field name="product_qty" string="需求数量" readonly="0"/>
                                             <field name="quantity_done" string="领料数量" readonly="1"/>
 
