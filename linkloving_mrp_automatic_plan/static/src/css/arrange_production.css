@@ -65,7 +65,7 @@
 .production_line>span,.production_line>div{
     display: inline-block;
 }
-.p_line_equipment,.p_line_employes,.p_line_timw{
+.p_line_equipment,.p_line_employes,.p_line_time{
     padding: 2px;
     background: #556c73;
     border-radius: 5px;

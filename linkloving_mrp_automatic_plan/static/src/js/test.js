@@ -9,6 +9,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
     var Widget = require('web.Widget');
     var data = require('web.data');
     var common = require('web.form_common');
+    var Pager = require('web.Pager');
     var framework = require('web.framework');
     var datepicker = require('web.datepicker');
     var QWeb = core.qweb;
@@ -28,6 +29,19 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             'drop #a_p_right':'move_over_right',
             'dragstart .ap_item_wrap': 'move_start',
             'click .to_bom': 'to_bom_func',
+            'click .to_relevant_struc': 'to_relevant_struc_func'
+        },
+        to_relevant_struc_func:function () {
+             var e = e || window.event;
+             var target = e.target || e.srcElement;
+             var action = {
+               'type': 'ir.actions.client',
+                'tag': 'product_detail',
+                'product_id': parseInt($(target).parents('.ap_item_wrap').attr("data-product-id")),
+                'is_show': false,
+                'target':'new'
+            };
+            this.do_action(action);
         },
         to_bom_func:function (e) {
              var e = e || window.event;
@@ -173,23 +187,58 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
         init: function (parent, action) {
             this._super.apply(this, arguments);
             var self = this;
+            self.limit = 10;
+            self.offset=0;
+            self.length = 10;
             if (action.process_id) {
                 this.process_id = action.process_id;
             } else {
                 this.process_id = action.params.active_id;
             }
         },
+        render_pager: function () {
+            if ($(".approval_pagination")) {
+                $(".approval_pagination").remove()
+            }
+            var $node = $('<div/>').addClass('approval_pagination').prependTo($(".a_p_right_head"));
+            this.pager = new Pager(this, this.length, this.offset, this.limit);
+            this.pager.appendTo($node);
+
+            this.pager.on('pager_changed', this, function (new_state) {
+                var self = this;
+                var limit_changed = (this._limit !== new_state.limit);
+                this._limit = new_state.limit;
+                this.current_min = new_state.current_min;
+                self.reload_content(this).then(function () {
+                    self.$el.animate({"scrollTop": "0px"}, 100);
+                });
+            });
+        },
+        reload_content: function (own) {
+            var reloaded = $.Deferred();
+            own.offset = own.current_min;
+            own.un_arrange_production(own.process_id,10,own.offset,own);
+            reloaded.resolve();
+            return reloaded.promise();
+        },
+        set_scrollTop: function (scrollTop) {
+            this.scrollTop = scrollTop;
+        },
+
+
         //右边未排产的接口
-        un_arrange_production:function (process_id,limit,offset) {
+        un_arrange_production:function (process_id,limit,offset,own) {
             framework.blockUI();
             new Model("mrp.production")
                     .call("get_unplanned_mo", [[]], {process_id:process_id,limit:limit,offset:offset})
                     .then(function (result) {
                         console.log(result);
-                        myself.mydataset.mo = result;
-                        $("#a_p_right").html('');
-                        $("#a_p_right").append(QWeb.render('a_p_render_right_tmpl',{result: result}));
+                        myself.mydataset.mo = result.result;
+                        $("#a_p_right .a_p_right_head").nextAll().remove();
+                        $("#a_p_right").append(QWeb.render('a_p_render_right_tmpl',{result: result.result}));
                         framework.unblockUI();
+                        own.length = result.length;
+                        own.render_pager();
                     })
         },
         setupFocus: function ($e) {
@@ -216,7 +265,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         framework.unblockUI();
                     })
             //未排产
-            self.un_arrange_production(this.process_id,10,0);
+            self.un_arrange_production(this.process_id,10,0,this);
         }
 
     })
