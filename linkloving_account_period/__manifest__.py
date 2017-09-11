@@ -20,13 +20,17 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['base', 'account', 'linkloving_account_parent'],
 
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
-        'views/views.xml',
+        # 'views/fiscal_year.xml',
         'views/templates.xml',
+        'views/account_account.xml',
+        # 'views/account_move_line.xml',
+        # 'views/account_move.xml',
+        # 'views/account_final.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
