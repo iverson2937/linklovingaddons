@@ -81,7 +81,7 @@ class MrpBom(models.Model):
                         'partner_id': self.env.user.partner_id.id,
                         'review_id': self.review_id.id,
                         'remark': '%s----->%s' % (self.state, u'更新'),
-                        'state': 'review_success',
+                        'state': 'waiting_review',
                         'last_review_line_id': line_ids[-1].get('id') if line_ids else False,
                         'review_order_seq': max([line.review_order_seq for line in self.review_id.review_line_ids]) + 1
                     })
