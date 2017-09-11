@@ -3,21 +3,23 @@
  */
 odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (require) {
     "use strict";
-
     var core = require('web.core');
     var Model = require('web.Model');
+    var ControlPanelMixin = require('web.ControlPanelMixin');
+    var ControlPanel = require('web.ControlPanel');
     var Widget = require('web.Widget');
     var data = require('web.data');
     var common = require('web.form_common');
     var Pager = require('web.Pager');
-    var framework = require('web.framework');
     var datepicker = require('web.datepicker');
+    var Dialog = require('web.Dialog');
+    var framework = require('web.framework');
     var QWeb = core.qweb;
     var _t = core._t;
     var myself;
     var move_id;
 
-    var Arrange_Production = Widget.extend({
+    var Arrange_Production = Widget.extend(ControlPanelMixin,{
         template: 'arrange_production_tmp',
         events:{
             'click .a_p_showorhide': 'production_lists_wrap_toggle',
@@ -185,16 +187,20 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             });
         },
         init: function (parent, action) {
+            this._super(parent);
             this._super.apply(this, arguments);
-            var self = this;
-            self.limit = 10;
-            self.offset=0;
-            self.length = 10;
+            if (parent && parent.action_stack.length > 0){
+                this.action_manager = parent.action_stack[0].widget.action_manager
+            }
             if (action.process_id) {
                 this.process_id = action.process_id;
             } else {
                 this.process_id = action.params.active_id;
             }
+            var self = this;
+            self.limit = 10;
+            self.offset=0;
+            self.length = 10;
         },
         render_pager: function () {
             if ($(".approval_pagination")) {
@@ -252,7 +258,14 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
         },
         start: function () {
             var self = this;
+            var cp_status = {
+                breadcrumbs: self.action_manager && self.action_manager.get_breadcrumbs(),
+                // cp_content: _.extend({}, self.searchview_elements, {}),
+            };
+            self.update_control_panel(cp_status);
+
             myself = this;
+
             myself.mydataset = {};
             framework.blockUI();
             new Model("mrp.production.line")

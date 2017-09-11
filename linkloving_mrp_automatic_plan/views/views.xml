@@ -31,7 +31,7 @@
                 <!-- find field description and add the field
                      idea_ids after it -->
                 <xpath expr="//button[@name='mo_schedule_query']" position="after">
-                    <button style="margin-left:15px" name="arrange_production" type="object">排产</button>
+                    <button style="margin-left:15px" name="arrange_production" type="object"><field name="name"/>排产</button>
                 </xpath>
             </field>
         </record>

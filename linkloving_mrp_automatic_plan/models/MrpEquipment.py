@@ -14,7 +14,7 @@ class Inheritforarrangeproduction(models.Model):
     @api.multi
     def arrange_production(self):
         return {
-            'name': '排产',
+            'name': self.name + u'排产',
             'type': 'ir.actions.client',
             'tag': 'arrange_production',
             'process_id': self.id
