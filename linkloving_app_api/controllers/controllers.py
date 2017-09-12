@@ -3086,6 +3086,8 @@ class LinklovingAppApi(http.Controller):
 
         material = request.env['material.request'].sudo().browse(material_id)
 
+        # stock_quant = request.env["stock.quant"].sudo()   quantity_available
+
         json_list = {
             'create_uid': material.my_create_uid.name,
             'create_date': material.my_create_date,
@@ -3093,14 +3095,14 @@ class LinklovingAppApi(http.Controller):
             "picking_cause": material.picking_cause,
             "remark": material.remark,
             'line_ids':[{
-                            'id':adc.id,
-                            'name':adc.product_id.name,
-                            'location': adc.product_id.property_stock_inventory.name,
-                            'quantity_available': adc.qty_available,
-                            'quantity_done': adc.quantity_done,
-                            'product_qty': adc.product_qty,
-                            'reserve': adc.product_id.stock_quant_ids[-1].qty if adc.product_id.stock_quant_ids[-1] else 0,
-                        } for adc in material.line_ids],
+                            'id':lines.id,
+                            'name':lines.product_id.name,
+                            'location': lines.product_id.property_stock_inventory.name,
+                            'quantity_available': lines.quantity_available,
+                            'quantity_done': lines.quantity_done,
+                            'product_qty': lines.product_qty,
+                            'reserve': lines.reserve_qty,
+                        } for lines in material.line_ids],
         }
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)

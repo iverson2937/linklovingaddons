@@ -296,11 +296,26 @@ class MaterialRequest(models.Model):
 class MaterialRequestLine(models.Model):
     _name = 'material.request.line'
 
+    def _compute_reserve_qty_material(self):
+        stock_quant = self.env["stock.quant"].sudo()
+        for material_line in self:
+            material_line.reserve_qty = sum(stock_quant.search(
+                [('product_id', '=', material_line.product_id.id), ('reservation_id', '!=', False),
+                 ('location_id', '=',
+                  self.env['stock.location'].sudo().search([('usage', '=', 'internal')], limit=1).id)]).mapped('qty'))
+
+    def _compute_quantity_available_material(self):
+        for mate_one in self:
+            mate_one.quantity_available = mate_one.qty_available - mate_one.reserve_qty
+
+    reserve_qty = fields.Float(compute=_compute_reserve_qty_material, string=u'保留数量')
+
     request_id = fields.Many2one('material.request')
     product_id = fields.Many2one('product.product')
 
     qty_available = fields.Float(related='product_id.qty_available', string=u'库存')
-    quantity_available = fields.Float(string=u'系统可用')
+
+    quantity_available = fields.Float(string=u'系统可用', compute=_compute_quantity_available_material)
 
     product_qty = fields.Float(string=u'需求数量')
 
