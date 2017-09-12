@@ -3097,7 +3097,7 @@ class LinklovingAppApi(http.Controller):
             'line_ids':[{
                             'id':lines.id,
                             'name':lines.product_id.name,
-                            'location': lines.product_id.property_stock_inventory.name,
+                            'location': lines.product_id.area_id.name,
                             'quantity_available': lines.quantity_available,
                             'quantity_done': lines.quantity_done,
                             'product_qty': lines.product_qty,
