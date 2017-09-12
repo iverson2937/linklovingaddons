@@ -85,6 +85,13 @@ odoo.define('linkloving_project.new_gantt', function (require) {
         },
         do_search: function (domains, contexts, group_bys) {
             var self = this;
+            if (domains) {
+                _.each(domains, function (domain, i) {
+                    if (domain && domain[0] == "parent_ids") {
+                        domains.splice(i, 1);
+                    }
+                });
+            }
             self.last_domains = domains;
             self.last_contexts = contexts;
             self.last_group_bys = group_bys;
@@ -193,7 +200,7 @@ odoo.define('linkloving_project.new_gantt', function (require) {
 
         },
         on_link_add: function (link) {
-            if (link.type != 0){
+            if (link.type != 0) {
                 this.do_notify("Tip", "关系设定必须又前置任务尾部连至后置任务头部.")
                 return false;
             }
