@@ -9,7 +9,7 @@
         <field name="arch" type="xml">
         	<field name="code" position="after">
         		<field name="parent_id" domain="[('internal_type','=','view')]" groups="linkloving_account_parent.group_coas_user"
-        			context="{'show_parent_account':True}" />
+                       context="{'show_parent_account':True}" string="父级"/>
         	</field>
         </field>
     </record>

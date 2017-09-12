@@ -10,9 +10,9 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='user_type_id']" position="replace">
 
-                    <field name="debit"/>
-                    <field name="credit"/>
-                    <field name="balance"/>
+                    <field name="debit" string="贷方"/>
+                    <field name="credit" string="借方"/>
+                    <field name="balance" string="余额"/>
                 </xpath>
 
             </field>

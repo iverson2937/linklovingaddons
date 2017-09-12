@@ -79,7 +79,7 @@
             <field name="model">account.payment.register</field>
             <field name="arch" type="xml">
                 <search string="Search">
-                    <field name="invoice_ids" string="对账单号" filter_domain="[('invoice_ids','in',self)]"/>
+                    <field name="invoice_ids" string="对账单号" filter_domain="[('invoice_ids','ilike',self)]"/>
                     <field name="partner_id" filter_domain="[('partner_id', 'ilike', self)]" string="供应商"/>
                     <field name="name" string="单号"/>
                     <field name="state"/>

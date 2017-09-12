@@ -371,6 +371,21 @@
                             </group>
                         </group>
                         <notebook>
+                            <!--groups="group_delegate_task"-->
+                            <page string="Delegation">
+                                <separator string="Delegated tasks"/>
+                                <field name="child_ids" domain="[('project_id','=',project_id),('top_task_id','=',0)]"
+                                       context="{'default_project_id': project_id, 'default_stage_id': stage_id}">
+                                    <tree string="Delegated tasks">
+                                        <field name="name"/>
+                                        <field name="user_id"/>
+                                        <field name="stage_id"/>
+                                        <field name="task_progress" widget="progressbar"/>
+                                        <field name="date_start"/>
+                                        <field name="date_end"/>
+                                    </tree>
+                                </field>
+                            </page>
                             <page string="Description">
                                 <field name="description" placeholder="Add a Description..."/>
                                 <!--groups="project.group_tasks_work_on_tasks"-->
@@ -400,22 +415,7 @@
                                 </group>
                                 <div class="oe_clear"/>
                             </page>
-                            <!--groups="group_delegate_task"-->
-                            <page string="Delegation">
-                                <separator string="Delegated tasks"/>
-                                <field name="child_ids" domain="[('project_id','=',project_id),('top_task_id','=',0)]"
-                                       context="{'default_project_id': project_id, 'default_stage_id': stage_id}">
-                                    <tree string="Delegated tasks">
-                                        <field name="name"/>
-                                        <field name="user_id"/>
-                                        <field name="stage_id"/>
-                                        <!--<field name="effective_hours" widget="float_time"/>-->
-                                        <field name="task_progress" widget="progressbar"/>
-                                        <field name="date_end"/>
-                                        <!--<field name="remaining_hours" widget="float_time"/>-->
-                                    </tree>
-                                </field>
-                            </page>
+
                             <!--<page string="Extra Info">-->
                             <!--<group col="4">-->
                             <!--<field name="priority" groups="base.group_user" widget="priority"/>-->
