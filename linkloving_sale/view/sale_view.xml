@@ -54,6 +54,8 @@
                 <xpath expr="//button[@name='action_cancel']" position="replace">
                     <button name="action_cancel" states="draft,sent,sale" type="object" string="取消订单"
                             confirm="确定取消订单吗？"/>
+                    <button name="recompute_receive_amount" states="" type="object" string="调整数量"
+                            confirm="调整数量吗？" groups="base.group_erp_manager"/>
                 </xpath>
 
                 <xpath expr="//button[@name='action_done']" position="attributes">
