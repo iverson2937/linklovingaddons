@@ -12,8 +12,8 @@ odoo.define('linkloving_crm.crm_tree_list_js', function (require) {
     var TreeList = Widget.extend({
         template: "TreeListView",
         events: {
-            'click .lead_update_submit': 'update_lead',
-            'click .lead_back_click': 'lead_back_fn',
+            'click span.lead_update_submit': 'update_lead',
+            'click span.lead_back_click': 'lead_back_fn',
             'click .show_time_begin': 'show_time_view',
             'click input.brand_check': 'on_click_version',
 
