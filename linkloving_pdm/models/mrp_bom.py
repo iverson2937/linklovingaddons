@@ -22,6 +22,8 @@ class MrpBom(models.Model):
         (2, u'不需要'),
     ], string=u'是否需要SOP文件')
 
+    has_right_to_review = fields.Boolean(compute='_compute_has_right_to_review')
+
     @api.multi
     def _compute_is_show_cancel(self):
         for info in self:
@@ -38,6 +40,12 @@ class MrpBom(models.Model):
             else:
                 info.is_show_action_deny = True
 
+    @api.multi
+    def _compute_has_right_to_review(self):
+        for info in self:
+            if self.env.user.id in info.review_id.who_review_now.user_ids.ids and info.state in ['review_ing']:
+                info.has_right_to_review = True
+
     def convert_bom_info(self):
         return {
             'product_id': {
@@ -52,7 +60,7 @@ class MrpBom(models.Model):
             'product_qty': self.product_qty,
             'review_id': self.sudo().review_id.who_review_now.name or '',
             'state': [self.state, BOM_STATE[self.state]],
-            # 'has_right_to_review': self.has_right_to_review,
+            'has_right_to_review': self.has_right_to_review,
             'review_line': self.review_id.get_review_line_list(),
             # 'is_able_to_use': self.is_able_to_use,
             'is_show_cancel': self.is_show_cancel,
