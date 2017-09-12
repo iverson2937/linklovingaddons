@@ -179,7 +179,8 @@ class CrmLead(models.Model):
         res = self.env['res.partner'].browse(id_one)
         if models_view == 'crm.lead':
             res = self.env['crm.lead'].browse(id_one)
-        res_reuslt = res.write({'product_series_ids': [(6, 0, version_list)]})
+        # res_reuslt = res.write({'product_series_ids': [(6, 0, version_list)]})
+        res_reuslt = res.write({'product_series_ids': [(4, version_one) for version_one in version_list]})
 
         if res_reuslt:
             return 'ok'

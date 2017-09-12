@@ -3,7 +3,7 @@
 <templates xml:space="preserve">
     <t t-name="TreeListView">
 
-        <h2><span  class="show_time_begin">点击查看列表</span></h2>
+        <h2 style="padding-left: 12px;"><span  class="show_time_begin">点击查看列表</span></h2>
         <div class="tree well">
 
             <ul id="rootUL">
@@ -11,8 +11,13 @@
             </ul>
         </div>
 
-        <button class="btn btn-primary"><span  class="lead_update_submit">保存</span></button>
-        <button class="btn btn-primary"><span  class="lead_back_click">返回</span></button>
+
+        <h3 style="display: inline;padding-left: 12px;"><span  class="lead_update_submit">保存</span></h3>
+
+        <h3 style="display: inline;padding-left: 12px;"><span  class="lead_back_click">返回</span></h3>
+
+        <!--<button class="btn btn-primary"><h4><span  class="lead_update_submit">保存</span></h4></button>-->
+        <!--<button class="btn btn-primary"><h4><span  class="lead_back_click">返回</span></h4></button>-->
     </t>
 
 </templates>
