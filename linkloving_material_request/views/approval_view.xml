@@ -2,6 +2,46 @@
 <openerp>
     <data>
 
+        <record model="ir.actions.act_window" id="action_mrp_production_moves_material">
+            <field name="name">Stock Moves</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">stock.move</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('raw_material_id', '=', active_id)]</field>
+        </record>
+
+
+        <record model="ir.ui.view" id="approval_project_picking_form_lines">
+            <field name="name">material.request.form gg</field>
+            <field name="model">material.request</field>
+            <field name="priority" eval="100"/>
+            <field name="arch" type="xml">
+                <form string="Picking material detail">
+                    <field name="line_ids" options="{'reload_on_button': True}">
+                        <tree editable="bottom" delete="0" create="0">
+
+
+                            <field name="product_id" string="产品" readonly="1"/>
+
+                            <field name="qty_available" string="库存" readonly="1"/>
+                            <field name="quantity_available" string="系统可用" readonly="1"/>
+                            <field name="product_qty" string="需求数量" readonly="1"/>
+                            <field name="quantity_done" string="领料数量" readonly="0"/>
+
+                            <field name="uom_id" string="计量单位" readonly="1"/>
+                        </tree>
+                    </field>
+
+                    <footer>
+                        <button name="btn_click_picking_material" string="完成"
+                                colspan="1" type="object" class="btn-primary"/>
+                        <button string="取消" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
 
         <record model="ir.ui.view" id="approval_project_picking_form">
             <field name="name">material.request.form</field>
@@ -20,24 +60,37 @@
                                 attrs="{'invisible': ['|',('approve_check', '!=', True),('picking_state','!=','review_ing')]}"
                         />
 
+                        <!--<button string="领料" type="object" name="btn_click_product_out" class="oe_highlight"-->
+                                <!--attrs="{'invisible': [('picking_state','!=','wait_verify')]}"-->
+                        <!--/>-->
 
-                        <!--<button string="撤销提交" type="object" name="btn_click_state_chenge" class="oe_highlight"/>-->
+
+                        <button string="领料" type="object" name="btn_click_show_product_line" class="oe_highlight"
+                                attrs="{'invisible': [('picking_state','!=','approved_finish')]}"
+                        />
+
 
                         <button string="撤销提交" type="object" name="btn_click_state_chenge_cancel" class="oe_highlight"
                                 attrs="{'invisible': ['|',('btn_show', '!=', True),('picking_state','!=','review_ing')]}"/>
-
-                        <!--<button string="撤销提交" type="object" name="btn_click_state_chenge" class="oe_highlight"/>-->
 
                         <field name="picking_state" widget="statusbar"/>
                     </header>
                     <sheet>
 
                         <div class="oe_button_box" name="button_box">
-                            <button type="object" name="click_btn_delivery" class="oe_stat_button" icon="fa-truck"
-                                    attrs="{'invisible': [('picking_state', '!=', 'approved_finish')]}">
-                                <field name="delivery_count" widget="statinfo" string="交货"
-                                       modifiers="{'readonly': true}"/>
-                            </button>
+                            <!--<button type="object" name="click_btn_delivery" class="oe_stat_button" icon="fa-truck"-->
+                            <!--attrs="{'invisible': [('picking_state', '!=', 'approved_finish')]}">-->
+                            <!--<field name="delivery_count" widget="statinfo" string="交货"-->
+                            <!--modifiers="{'readonly': true}"/>-->
+                            <!--</button>-->
+
+                            <button name="%(action_mrp_production_moves_material)d" type="action"
+                                    string="Inventory Moves"
+                                    class="oe_stat_button" icon="fa-arrows-v"
+
+                            />
+                            <!--attrs="{'invisible': [('picking_state', '!=', 'finish_pick')]}"-->
+
                         </div>
 
 
@@ -84,25 +137,37 @@
                                             <group>
                                                 <field name="reference_bom" readonly="1" string="参考BOM" invisible="1"/>
                                                 <field name="product_id" string="产品" readonly="0"/>
-                                                <field name="inner_code" string="国内简码" readonly="1"/>
-                                                <field name="inner_spec" string="国内类型" readonly="1"/>
+                                                <field name="inner_code" string="国内简码" readonly="1" invisible="1"/>
+                                                <field name="inner_spec" string="国内类型" readonly="1" invisible="1"/>
+                                                <field name="reserve_qty" invisible="1"/>
+
+
+
                                                 <field name="qty_available" string="库存" readonly="1"/>
-                                                <field name="product_qty" readonly="0" string="申请数量"/>
+                                                <field name="quantity_available" string="系统可用" readonly="1"/>
+                                                <field name="product_qty" string="需求数量" readonly="0"/>
+                                                <field name="quantity_done" string="领料数量" readonly="1"/>
+
                                                 <field name="uom_id" string="计量单位" readonly="1"/>
                                             </group>
                                         </form>
                                         <tree string="Sales Order Lines" editable="bottom">
                                             <field name="reference_bom" readonly="1" string="参考BOM" invisible="1"/>
                                             <field name="product_id" string="产品" readonly="0"/>
-                                            <field name="inner_code" string="国内简码" readonly="1"/>
-                                            <field name="inner_spec" string="国内类型" readonly="1"/>
+                                            <field name="inner_code" string="国内简码" readonly="1" invisible="1"/>
+                                            <field name="inner_spec" string="国内类型" readonly="1" invisible="1"/>
+
                                             <field name="qty_available" string="库存" readonly="1"/>
-                                            <field name="product_qty" readonly="0" string="申请数量"/>
+                                            <field name="quantity_available" string="系统可用" readonly="1"/>
+                                            <field name="product_qty" string="需求数量" readonly="0"/>
+                                            <field name="quantity_done" string="领料数量" readonly="1"/>
+
                                             <field name="uom_id" string="计量单位" readonly="1"/>
                                         </tree>
                                         <kanban class="o_kanban_mobile">
                                             <field name="product_id"/>
                                             <field name="product_qty"/>
+                                            <field name="quantity_done"/>
                                             <field name="uom_id" groups="product.group_uom"/>
                                             <field name="qty_available"/>
                                             <templates>
@@ -173,8 +238,6 @@
                     <field name="delivery_date"/>
                     <field name="my_create_uid" string="申请人"/>
                     <field name="who_review_now"/>
-                    <!--<field name="reference_product_ids"/>-->
-                    <!--<field name="approval_bom_ids"/>-->
                     <field name="remark"/>
                     <field name="review_i_approvaled_val" invisible="1"/>
                     <field name="stock_picking_ids" invisible="1"/>
@@ -190,7 +253,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
 
-            <field name="domain">[('picking_state','=','to_submit'),('my_create_uid','=',uid)]</field>
+            <field name="domain">[('picking_state','=','to_submit'),('create_uid','=',uid)]</field>
             <field name="context">{'default_my_create_uid': uid}</field>
             <field name="view_id" eval="False"/>
 
@@ -212,7 +275,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
 
-            <field name="domain">[('picking_state','!=','to_submit'),('my_create_uid','=',uid)]</field>
+            <field name="domain">[('picking_state','!=','to_submit'),('create_uid','=',uid)]</field>
             <!--<field name="context">{'default_customer':True,'default_is_company':True}</field>-->
             <field name="view_id" eval="False"/>
 
