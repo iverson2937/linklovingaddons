@@ -209,7 +209,7 @@
                                             <field name="last_review_line_id" string="上一级审核" invisible="1"/>
 
                                             <field name="partner_id" string="待...审核"/>
-                                            <field name="state"/>
+                                            <field name="state_copy"/>
                                             <field name="remark" string="备注"/>
                                             <field name="review_time"/>
                                         </tree>

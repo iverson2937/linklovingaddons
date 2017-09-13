@@ -97,8 +97,7 @@ class ReviewProcessLine(models.Model):
     state = fields.Selection(string=u"状态", selection=[('waiting_review', u'等待审核'),
                                                       ('review_success', u'审核通过'),
                                                       ('review_fail', u'审核不通过'),
-                                                      ('review_canceled', u'取消审核'),
-                                                      ('first_submit', u'提交审核')], required=False,
+                                                      ('review_canceled', u'取消审核')], required=False,
                              default='waiting_review')
 
     last_review_line_id = fields.Many2one("review.process.line", string=u"上一次审核")
@@ -109,8 +108,20 @@ class ReviewProcessLine(models.Model):
     review_order_seq = fields.Integer(string=u'审核顺序', help=u"从1开始")  # 从1开始
     remark = fields.Text(u"备注")
 
-    def submit_to_next_reviewer(self, review_type, to_last_review=False, partner_id=None, remark=None,
-                                first_submit=None):
+    def _compute_process_line_state_copy(self):
+        selection = self.fields_get(["state"]).get("state").get("selection")
+        for line_one in self:
+            if line_one.review_order_seq == 1:
+                line_one.state_copy = u'提交审核'
+            else:
+                for sele in selection:
+                    if sele[0] == line_one.state:
+                        line_one.state_copy = sele[1]
+                        break
+
+    state_copy = fields.Text(u"状态", compute="_compute_process_line_state_copy")
+
+    def submit_to_next_reviewer(self, review_type, to_last_review=False, partner_id=None, remark=None):
 
         if not partner_id:
             raise UserError(u"请选择审核人!")
@@ -128,7 +139,7 @@ class ReviewProcessLine(models.Model):
         # 设置现有的这个审核条目状态等
         self.write({
             'review_time': fields.datetime.now(),
-            'state': 'review_success' if not first_submit else first_submit,
+            'state': 'review_success',
             'remark': remark
         })
 
@@ -662,19 +673,13 @@ class ReviewProcessWizard(models.TransientModel):
 
             self.material_requests_id.picking_state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
 
-            material_one = self.env['material.request'].browse(materials_request_id)
-            first_submit = ''
-            if self.env.uid != material_one.create_uid.id:
-                self.material_requests_id.write({'review_i_approvaled_val': [(4, self.env.uid)]})
-            else:
-                first_submit = 'first_submit'
+            self.material_requests_id.write({'review_i_approvaled_val': [(4, self.env.uid)]})
 
             self.material_requests_id.review_id.process_line_review_now.submit_to_next_reviewer(
                 review_type=review_type,
                 to_last_review=to_last_review,
                 partner_id=self.partner_id,
-                remark=self.remark,
-                first_submit=first_submit)
+                remark=self.remark)
 
         return True
 
