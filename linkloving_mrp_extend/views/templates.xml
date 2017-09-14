@@ -76,5 +76,16 @@
                     key2="client_action_multi" name="批量取消保留"
                     res_model="multi.force.assign" src_model="stock.picking"
                     view_mode="form" target="new" view_type="form" view_id="multi_unreserve_view"/>
+
+        <report
+                string="打印产成品"
+                id="ssg_action_report_production_order"
+                model="mrp.production"
+                name="linkloving_mrp_extend.report_mrporder_extend"
+                file="linkloving_mrp_extend.report.mrp_production_templates_extend.xml"
+                report_type="qweb-html"
+        />
+
+
     </data>
 </openerp>

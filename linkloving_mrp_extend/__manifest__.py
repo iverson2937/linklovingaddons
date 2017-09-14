@@ -35,6 +35,7 @@
         'report/mrp_bom_structure_report_templates.xml',
         'report/mrp_production_templates.xml',
         'report/stock_picking_operations.xml',
+        'report/mrp_production_templates_extend.xml',
         'wizard/tracking_number_wizard.xml',
         'wizard/change_product_qty_wizard.xml',
         'report/stock_picking_report.xml',

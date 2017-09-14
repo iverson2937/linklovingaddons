@@ -217,3 +217,26 @@ class MrpBomLine(models.Model):
     def unlink(self):
         print self, 'unlink'
         return super(MrpBomLine, self).unlink()
+
+
+class MrpBomTemporary(models.Model):
+    _name = "mrp.bom.temporary"
+
+    bom_type = fields.Selection([('bom_structure', u'Bom 结构'), ('bom_costing', u'Bom 成本')], string=u'导出类型',
+                                default='bom_structure')
+
+    @api.multi
+    def get_product_bom(self):
+
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+
+        file_type = 'bom_structure' if self.bom_type == 'bom_structure' else 'bom_costing'
+
+        print self.id
+        return {
+            'type': 'ir.actions.act_url',
+            'url': '/linkloving_new_bom_update/linkloving_new_bom_update?model=mrp.bom&id_list=%s&file_type=%s' % (
+                active_ids, file_type),
+            'target': 'new',
+        }
