@@ -33,6 +33,23 @@
             </field>
         </record>
 
+
+        <record id="action_account_invoice_salesteams" model="ir.actions.act_window">
+            <field name="name">未结对账单</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.invoice</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+            <field name="domain">[('state', 'not in', ('cancel','paid'))]</field>
+            <field name="context">{
+                'search_default_team_id': [active_id],
+                'default_team_id': active_id,
+                }
+            </field>
+        </record>
+
+
         <!-- Case Teams Action -->
         <record id="sales_team.crm_team_salesteams_act" model="ir.actions.act_window">
             <field name="name">Dashboard</field>
@@ -73,21 +90,16 @@
 
 
                     </xpath>
-                    <!--<xpath expr="//a[@name='%(crm.action_report_crm_opportunity_salesteam)d']" position="attributes">-->
-                    <!--<attribute name="invisible">1</attribute>-->
+                    <xpath expr="//a[@name='%(crm.action_report_crm_opportunity_salesteam)d']" position="attributes">
+                        <attribute name="invisible">1</attribute>
 
 
-                    <!--</xpath>-->
-                    <!--<xpath expr="//a[@name='%(crm.crm_activity_report_action_team)d']" position="attributes">-->
-                    <!--<attribute name="invisible">1</attribute>-->
+                    </xpath>
+                    <xpath expr="//a[@name='%(crm.crm_activity_report_action_team)d']" position="attributes">
+                        <attribute name="invisible">1</attribute>
 
-                    <!--</xpath>-->
-                    <!--<xpath expr="//a[@name='%(sale.action_orders_to_invoice_salesteams)d']" position="replace">-->
+                    </xpath>
 
-                    <!--</xpath>-->
-                    <!--<xpath expr="//field[@name='sales_to_invoice_amount']" position="replace">-->
-
-                    <!--</xpath>-->
 
 
                     <xpath expr="//div[contains(@class, 'o_kanban_primary_right')]" position="inside">
@@ -110,6 +122,17 @@
                             </div>
                             <div class="col-xs-4 text-right">
                                 <field name="orders_to_ship_count"/>
+                            </div>
+                        </div>
+
+                        <div class="row mb4" t-if="record.use_invoices.raw_value">
+                            <div class="col-xs-8">
+                                <a name="%(action_account_invoice_salesteams)d" type="action">
+                                    未结对账单
+                                </a>
+                            </div>
+                            <div class="col-xs-4 text-right">
+                                <field name="invoice_amount"/>
                             </div>
                         </div>
 
