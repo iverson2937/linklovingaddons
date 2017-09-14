@@ -11,6 +11,7 @@ class CrmTeam(models.Model):
     orders_to_ship_count = fields.Integer(compute='_compute_count')
     draft_orders_count = fields.Integer(compute='_compute_count')
     sales_to_invoice_count = fields.Integer(compute="_compute_count")
+    is_show = fields.Boolean(string=u'是否显示')
 
     def _compute_count(self):
         domains = {
