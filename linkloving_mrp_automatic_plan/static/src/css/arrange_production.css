@@ -29,10 +29,10 @@
 }
 .ap_item_wrap{
     width:95%;
-    height: 190px;
     background: white;
     padding-top: 5px;
     padding-left: 10px;
+    padding-bottom: 8px;
     color: #797979;
     margin: 10px auto;
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.349019607843137);
@@ -47,8 +47,6 @@
     font-size:12px;
     margin: 8px auto;
     color: white;
-    display: flex;
-    justify-content: space-around;
 }
 #a_p_all{
     min-width: 1100px;
@@ -60,36 +58,37 @@
     height:30px;
     background: #8B5A00;
     border-radius: 50%;
+    position: absolute;
     cursor: move;
 }
-.production_line>span,.production_line>div{
+.production_line>span,.production_line>div>div{
     display: inline-block;
 }
-.p_line_equipment,.p_line_employes,.p_line_time{
+.p_line_equipment,.p_line_employes{
     padding: 2px;
     background: #556c73;
     border-radius: 5px;
     padding: 0 5px;
+    margin-left: 5px;
+}
+.p_line_right{
+    float: right;
+    margin-right: 5px;
 }
 .production_line .a_p_showorhide{
     margin-top: 6px;
     cursor: pointer;
+    margin-left: 5px;
 }
 .a_p_mo_name{
     display: inline-block;
     font-size: 16px;
     font-weight: bolder;
     color: black;
-    margin-left: 15px;
+    margin-left: 40px;
+    margin-top: 5px;
 }
-.a_p_status_wrap{
-    float: right;
-    margin-top: 15px;
-    margin-right: 30px;
-}
-.a_p_status_wrap>span{
-    margin-left: 15px;
-}
+
 .a_p_product_name{
     margin: 3px;
 }
@@ -103,19 +102,6 @@
 .ap_item_main_center{
     float: left;
     margin-left: 10px;
-}
-.a_p_item_bottom{
-    width: calc(100% + 10px);
-    height:50px;
-    line-height: 36px;
-    float: left;
-    margin-left: -10px;
-    border-top: 1px solid #797979;
-}
-.a_p_item_bottom>span{
-    cursor: pointer;
-    color: #7C7BAD;
-    margin-left: 20px;
 }
 .a_p_time_start{
     display: inline-block;
@@ -134,4 +120,23 @@
 }
 .production_lists_no_item::after{
     content: "添加内容";
+}
+
+.a_p_item_top{
+    position: relative;
+    border-bottom: 1px solid #797979;
+    margin-left: -10px;
+    overflow: hidden;
+}
+.a_p_item_top>div{
+    display: inline-block;
+    float: right;
+    margin-top: 5px;
+    margin-right: 8px;
+}
+.a_p_item_top>div>span{
+    cursor: pointer;
+    color: #7C7BAD;
+    margin-left: 20px;
+    font-weight: bolder;
 }
