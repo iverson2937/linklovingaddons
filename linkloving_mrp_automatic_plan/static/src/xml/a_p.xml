@@ -16,17 +16,15 @@
             <t t-foreach="result" t-as="item">
                 <div class="production_line" t-att-data-index="item_index">
                     <span class="p_line_name">产线 <t t-esc="item.display_name"/></span>
-                    <span class="p_line_manager">负责人：<t t-esc="item.employee_id[1]"/></span>
-                    <div class="p_line_equipment">
-                        设备：<span><t t-esc="item.equipment_ids.length" /></span>
+                    <div class="p_line_right">
+                        <div class="p_line_equipment">
+                            设备：<span><t t-esc="item.equipment_ids.length" /></span>
+                        </div>
+                        <div class="p_line_employes">
+                            员工：<span><t t-esc="item.line_employee_ids.length"/> </span>
+                        </div>
+                        <span class="fa fa-chevron-down a_p_showorhide"></span>
                     </div>
-                    <div class="p_line_employes">
-                        员工：<span><t t-esc="item.line_employee_ids.length"/> </span>
-                    </div>
-                    <div class="p_line_time">
-                        可用时间：0h
-                    </div>
-                    <span class="fa fa-chevron-down a_p_showorhide"></span>
                 </div>
                 <div class="production_lists_wrap"></div>
             </t>
@@ -40,17 +38,24 @@
     <t t-name="a_p_render_right_tmpl">
         <t t-foreach="result" t-as="item">
             <div class="ap_item_wrap" t-att-id="'id'+item.id" t-att-data-index="item_index" t-att-data-mo-id="item.id" t-att-data-bom-id="item.bom_id[0]" t-att-data-product-id="item.product_tmpl_id[0]">
-                <span class="a_p_move_point"></span>
-                <p class="a_p_mo_name"><t t-esc="item.display_name"/></p>
-                <div class="a_p_status_wrap">
-                    <span>生产：<span class="fa fa-circle"></span></span>
-                    <span>排产：<span class="fa fa-circle"></span></span>
+                <div class="a_p_item_top">
+                    <span class="a_p_move_point"></span>
+                    <p class="a_p_mo_name"><t t-esc="item.display_name"/></p>
+                    <div>
+                        <span class="to_relevant_struc">关联MO</span>
+                        <span class="to_so">SO</span>
+                        <span class="to_bom">BOM</span>
+                    </div>
                 </div>
+
                 <p class="a_p_product_name"><t t-esc="item.bom_id[1]"/></p>
                 <div class="ap_item_main_left">
-                    <span class="a_p_process_res">工序负责人: <t t-esc="item.in_charge_id[1]"/></span>
-                    <span class="a_p_arrange_qty">安排的数量: <t t-esc="item.product_qty"/></span>
-                    <span class="a_p_spend_time">生产总时间：</span>
+                    <span class="a_p_process_res">生产数量（实际/需求）: <t t-esc="item.in_charge_id[1]"/></span>
+                    <t t-if="show_more">
+                        <span class="a_p_arrange_qty">工时成本（实际/理论）: <t t-esc="item.product_qty"/></span>
+                        <span class="a_p_spend_time">生产用时：7h</span>
+                    </t>
+
                 </div>
                 <div class="ap_item_main_center">
                     <t t-js="ctx">
@@ -64,26 +69,26 @@
                             return moment(c_date).format('YYYY-MM-DD HH:mm:ss');
                         }
                         if (ctx.item.date_planned_start){
-                        ctx.item.date_planned_start = change_time(ctx.item.date_planned_start);
+                            ctx.item.date_planned_start = change_time(ctx.item.date_planned_start);
                         }
                         if (ctx.item.date_planned_finished){
-                        ctx.item.date_planned_finished = change_time(ctx.item.date_planned_finished);
+                            ctx.item.date_planned_finished = change_time(ctx.item.date_planned_finished);
                         }
                         if (ctx.item.planned_start_backup){
-                        ctx.item.planned_start_backup = change_time(ctx.item.planned_start_backup);
+                            ctx.item.planned_start_backup = change_time(ctx.item.planned_start_backup);
                         }
                     </t>
                     <span class="a_p_latest_time">最晚开始：<t t-esc="item.planned_start_backup" /></span>
-                    <!--<t t-set="date_planned_start" t-value="item.date_planned_start"/>-->
-                    <span class="a_p_planned_start">预计开始：<span t-esc="item.date_planned_start" /></span>
-                    <!--<t t-esc="item.date_planned_start"/>-->
-                    <span class="a_p_planned_end">预计结束：<t t-esc="item.date_planned_finished"/></span>
+                    <t t-if="show_more">
+                        <span class="a_p_latest_time">预计开始：<t t-esc="item.date_planned_start" /></span>
+                        <span class="a_p_latest_time">预计结束：<t t-esc="item.date_planned_finished" /></span>
+                    </t>
                 </div>
-                <div class="a_p_item_bottom">
-                    <span class="to_relevant_struc">查看关联结构</span>
-                    <span class="to_so">查看SO单</span>
-                    <span class="to_bom">查看BOM</span>
-                </div>
+                <!--<div class="a_p_item_bottom">-->
+                    <!--<span class="to_relevant_struc">查看关联结构</span>-->
+                    <!--<span class="to_so">查看SO单</span>-->
+                    <!--<span class="to_bom">查看BOM</span>-->
+                <!--</div>-->
 
             </div>
         </t>
