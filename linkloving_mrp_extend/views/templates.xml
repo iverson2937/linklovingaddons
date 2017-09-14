@@ -83,7 +83,7 @@
                 model="mrp.production"
                 name="linkloving_mrp_extend.report_mrporder_extend"
                 file="linkloving_mrp_extend.report.mrp_production_templates_extend.xml"
-                report_type="qweb-html"
+                report_type="qweb-pdf"
         />
 
 
