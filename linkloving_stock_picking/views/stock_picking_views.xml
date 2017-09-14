@@ -150,7 +150,7 @@
                 </xpath>
 
                 <!--<xpath expr="//field[@name='product_uom']" position="after">-->
-                    <!--<field name="create_uid"/>-->
+                <!--<field name="create_uid"/>-->
                 <!--</xpath>-->
 
 
@@ -400,7 +400,7 @@
             <field name="type">ir.actions.act_window</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,kanban,form,calendar</field>
-            <field name="domain">[('state','not in',['draft','cancel','done'])]</field>
+            <field name="domain">[]</field>
             <field name="context">{
                 'contact_display': 'partner_address',
                 'search_default_picking_state' : 1,
