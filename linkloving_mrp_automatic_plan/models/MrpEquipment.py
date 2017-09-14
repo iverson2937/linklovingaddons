@@ -214,17 +214,18 @@ class MrpProductionExtend(models.Model):
         now_time = fields.datetime.now(pytz.timezone(self.env.user.tz))
         return now_time
 
-    def replanned_mo(self, production_line, ):
-        if not production_line:
+    def replanned_mo(self, production_line_id, ):
+        self.write({
+            'production_line_id': production_line_id
+        })
+        if not production_line_id:
             if self.production_line_id:
-                production_line = self.production_line_id
+                production_line = self.production_line_id.id
             else:  # 从未排产拖到未排产
                 return
-        self.write({
-            'production_line_id': production_line.id
-        })
+
         # 取出这条产线所有的mo
-        all_mos = self.env["mrp.production"].search([("production_line_id", "=", production_line.id)], order=ORDER_BY)
+        all_mos = self.env["mrp.production"].search([("production_line_id", "=", production_line_id)], order=ORDER_BY)
 
         # 如果此条产线暂时无任何mo,
         if not all_mos:
