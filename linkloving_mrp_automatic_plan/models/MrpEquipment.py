@@ -147,8 +147,8 @@ class MrpProductionLine(models.Model):
         # return utc_timestamp.astimezone(context_tz)
 
         mos = self.env["mrp.production"].search_read([("production_line_id", "=", production_line_id),
-                                                      ("date_planned_start", "<=", end_time_str),
-                                                      ("date_planned_finished", ">=", start_time_str),
+                                                      # ("date_planned_start", "<=", end_time_str),
+                                                      # ("date_planned_finished", ">=", start_time_str),
                                                       ("state", "not in", ['done', 'cancel', 'waiting_post_inventory'])
                                                       ],
                                                      # limit=limit,
@@ -216,13 +216,16 @@ class MrpProductionExtend(models.Model):
 
     def replanned_mo(self, production_line, ):
         if not production_line:
-            raise UserError(u"产线异常")
-        # 取出这条产线所有的mo
-        all_mos = self.env["mrp.production"].search([("production_line_id", "=", production_line.id)], order=ORDER_BY)
+            if self.production_line_id:
+                production_line = self.production_line_id
+            else:  # 从未排产拖到未排产
+                return
         self.write({
-            'state': 'waiting_material',
             'production_line_id': production_line.id
         })
+        # 取出这条产线所有的mo
+        all_mos = self.env["mrp.production"].search([("production_line_id", "=", production_line.id)], order=ORDER_BY)
+
         # 如果此条产线暂时无任何mo,
         if not all_mos:
             start_time, end_time = self.env["ll.time.util"].compute_mo_start_time(self.get_today_time(),
@@ -236,19 +239,31 @@ class MrpProductionExtend(models.Model):
                 'date_planned_finished': end_time,
             })
         else:
-            next_mo_start_time = all_mos[0].planned_start_backup or all_mos[0].date_planned_start
+            planned_start_backup = fields.Datetime.from_string(all_mos[0].date_planned_start)
+            new_datetime = datetime(planned_start_backup.year,
+                                    planned_start_backup.month,
+                                    planned_start_backup.day,
+                                    planned_start_backup.hour,
+                                    planned_start_backup.minute,
+                                    planned_start_backup.second,
+                                    microsecond=planned_start_backup.microsecond,
+                                    tzinfo=pytz.timezone("UTC"))
+
+            next_mo_start_time = new_datetime.astimezone(pytz.timezone(self.env.user.tz))
             for mo in all_mos:
                 start_time, end_time = self.env["ll.time.util"].compute_mo_start_time(next_mo_start_time,
                                                                                       mo._compute_produced_spend(),
                                                                                       start_or_end="start",
                                                                                       equipment_no=len(
                                                                                           production_line.equipment_ids))
-                mo.wirte({
+                mo.write({
+                    'state': 'waiting_material',
                     'date_planned_start': start_time,
                     'date_planned_finished': end_time,
                 })
-                next_mo_start_time = end_time
 
+                next_mo_start_time = end_time.astimezone(pytz.timezone(self.env.user.tz))
+        return all_mos
     # 排产或者取消排产
     def settle_mo(self, **kwargs):
         production_line_id = kwargs.get("production_line_id")
@@ -277,9 +292,9 @@ class MrpProductionExtend(models.Model):
                     self.state = 'draft'
                 else:
                     raise UserError(u"该单据已经开始生产,不可从产线上移除")
-        else:
-            production_line = self.env["mrp.production.line"].browse(production_line_id)
-            self.replanned_mo(production_line)
+
+        production_line = self.env["mrp.production.line"].browse(production_line_id)
+        all_mos = self.replanned_mo(production_line)
         # vals = {
         #     'production_line_id': production_line_id,
         # }
@@ -322,7 +337,7 @@ class MrpProductionExtend(models.Model):
         #     })
         #
         # self.write(vals)
-        return self.read()
+        return all_mos.read()
 
 
 class SaleOrderLineExtend(models.Model):
@@ -360,6 +375,8 @@ class TimeUtil(models.Model):
         return (a - b).seconds * equipment_no
 
     def compute_mo_start_time(self, end_time, spent_time, start_or_end="end", equipment_no=1):
+        if equipment_no == 0:
+            equipment_no = 1
         setting = self.g_factory_setting_id()
         # tz_offset = relativedelta(seconds=0)#pytz.timezone(timezone_name)._utcoffset
         end_time_with_zone = end_time  # + tz_offset)
@@ -375,7 +392,8 @@ class TimeUtil(models.Model):
         # off_work_time = day_start_time + relativedelta(seconds=setting.factory_work_end_time)
 
         if start_or_end == 'end':
-            theoretics_start_time = corrected_end_time - relativedelta(seconds=spent_time)  # 理论的时间- (不计算上下班时间,节假日的)
+            theoretics_start_time = corrected_end_time - relativedelta(
+                seconds=spent_time / equipment_no)  # 理论的时间- (不计算上下班时间,节假日的)
             why = self.is_time_in_spec_day_and_not_weekend(theoretics_start_time, work_start_time, off_work_time)
             if why == 'weekday':  # 这天能完成 不做操作
                 real_start_time = theoretics_start_time
@@ -397,7 +415,8 @@ class TimeUtil(models.Model):
                     move_corrected_time = new_day_work_off_time
                     # new_day_work_start_time = new_day_0_time + relativedelta(seconds=setting.factory_work_start_time)  # 这一天的上班时间
                     # new_day_off_work_time = new_day_0_time + relativedelta(seconds=setting.factory_work_end_time)#这一天的下班时间
-                    theoretics_move_start_time = move_corrected_time - relativedelta(seconds=left_time)  # 理论的时间
+                    theoretics_move_start_time = move_corrected_time - relativedelta(
+                        seconds=left_time / equipment_no)  # 理论的时间
                     while_why = self.is_time_in_spec_day_and_not_weekend(theoretics_move_start_time,
                                                                          new_day_work_start_time,
                                                                          new_day_work_off_time)  # 此方法返回这时间是工作日还是休息日还是下班时间
@@ -415,7 +434,8 @@ class TimeUtil(models.Model):
                 raise UserWarning(u"出错了")
             return pytz.UTC.normalize(real_start_time), pytz.UTC.normalize(corrected_end_time)
         else:
-            theoretics_start_time = corrected_end_time + relativedelta(seconds=spent_time)  # 理论的时间+ (不计算上下班时间,节假日的)
+            theoretics_start_time = corrected_end_time + relativedelta(
+                seconds=spent_time / equipment_no)  # 理论的时间+ (不计算上下班时间,节假日的)
             why = self.is_time_in_spec_day_and_not_weekend(theoretics_start_time, work_start_time, off_work_time)
             if why == 'weekday':  # 这天能完成 不做操作
                 real_start_time = theoretics_start_time
@@ -436,7 +456,9 @@ class TimeUtil(models.Model):
                                                                                                           hours=setting.factory_work_start_time),
                                                                                                   relativedelta(
                                                                                                           hours=setting.factory_work_end_time))
-                    theoretics_move_start_time = move_corrected_time + relativedelta(seconds=left_time)  # 理论的时间
+                    move_corrected_time = new_day_work_start_time
+                    theoretics_move_start_time = move_corrected_time + relativedelta(
+                        seconds=left_time / equipment_no)  # 理论的时间
                     while_why = self.is_time_in_spec_day_and_not_weekend(theoretics_move_start_time,
                                                                          new_day_work_start_time,
                                                                          new_day_work_off_time)  # 此方法返回这时间是工作日还是休息日还是下班时间
@@ -448,6 +470,7 @@ class TimeUtil(models.Model):
                             left_time -= self.transfer_spent_time_with_equipment_no(new_day_work_off_time,
                                                                                     move_corrected_time,
                                                                                     equipment_no)
+
             if not real_start_time:
                 raise UserWarning(u"出错了")
             return pytz.UTC.normalize(corrected_end_time), pytz.UTC.normalize(real_start_time)
