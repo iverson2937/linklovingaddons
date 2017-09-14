@@ -170,6 +170,7 @@
 
                         <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
                                 groups="linkloving_pdm.group_final_review_picking"
+                                 invisible="not context.get('view_material_request')"
                         />
 
                         <button name='action_deny'
