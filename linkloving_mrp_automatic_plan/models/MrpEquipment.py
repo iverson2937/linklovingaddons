@@ -217,13 +217,15 @@ class MrpProductionExtend(models.Model):
     def replanned_mo(self, production_line, ):
 
         if not production_line:
-            self.write({
-                'production_line_id': None
-            })
+
             if self.production_line_id:
                 production_line = self.production_line_id
             else:  # 从未排产拖到未排产
                 return
+
+            self.write({
+                'production_line_id': None
+            })
         else:
             self.write({
                 'production_line_id': production_line.id
