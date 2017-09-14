@@ -52,10 +52,13 @@
 
 
                     </xpath>
-                    <xpath expr="//a[@name='%(crm.action_report_crm_opportunity_salesteam)d']" position="replace">
+                    <xpath expr="//a[@name='%(crm.action_report_crm_opportunity_salesteam)d']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+
 
                     </xpath>
-                    <xpath expr="//a[@name='%(crm.crm_activity_report_action_team)d']" position="replace">
+                    <xpath expr="//a[@name='%(crm.crm_activity_report_action_team)d']" position="attributes">
+                        <attribute name="invisible">1</attribute>
 
                     </xpath>
                     <!--<xpath expr="//a[@name='%(sale.action_orders_to_invoice_salesteams)d']" position="replace">-->
