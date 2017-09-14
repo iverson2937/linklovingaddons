@@ -55,7 +55,7 @@
                         <td class="o_main" title="去确认付款">
                             <a href="#" class="o_dashboard_action"
                                name="linkloving_account.action_account_payment_sale_confirm">
-                                收款客户确认
+                                收款确认
                             </a>
                         </td>
                         <td class="o_main" title="To Activities">
