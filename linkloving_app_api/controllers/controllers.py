@@ -1040,7 +1040,7 @@ class LinklovingAppApi(http.Controller):
     def start_produce(self, **kw):
         order_id = request.jsonrequest.get('order_id')  # get paramter
         mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
-        mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).button_start_produce()
+        mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID)._start_produce()
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
@@ -1122,6 +1122,8 @@ class LinklovingAppApi(http.Controller):
                                                   res_data={"error": u"该单据还在返工中,请先产出数量"})
             # 生产完成 结算工时
             mrp_production.state = mrp_production.compute_order_state()
+            if 'produce_finish_replan_mo' in dir(mrp_production):
+                mrp_production.produce_finish_replan_mo()
 
             JPushExtend.send_notification_push(audience=jpush.audience(
                         jpush.tag(LinklovingAppApi.get_jpush_tags("qc"))

@@ -553,8 +553,11 @@ class MrpProductionExtend(models.Model):
         # self.write({'state': 'finish_prepare_material'})
 
     # 开始生产
-    def button_start_produce(self):
+    @api.one
+    def buttonbutton_start_produce(self):
         self.write({'state': 'progress'})
+        if 'produce_start_replan_mo' in dir(self):
+            self.produce_start_replan_mo()
 
     # 给委外供应商发料
     def button_send_material_to_vendor(self):
@@ -582,6 +585,8 @@ class MrpProductionExtend(models.Model):
             # if all(feedback.state in ['qc_success', 'alredy_post_inventory'] for feedback in self.qc_feedback_ids):
             #     self.state = "waiting_inventory_material"#等待清点退料
             # 有其中一个单据还没品捡 或者还没品捡完成, 等待品捡完成
+        if 'produce_finish_replan_mo' in dir(self):
+            self.produce_finish_replan_mo()
 
     def compute_order_state(self):
         if any(feedback.state in ['draft', 'qc_ing'] for feedback in self.qc_feedback_ids):

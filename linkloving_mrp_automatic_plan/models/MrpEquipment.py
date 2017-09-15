@@ -185,10 +185,23 @@ class MrpProductionExtend(models.Model):
 
     planned_start_backup = fields.Datetime(string=u"最晚开始时间")
 
+    def produce_start_replan_mo(self):
+        now_time = self.get_today_time(is_current_time=True)
+        self.planned_one_mo(self, now_time, self.production_line_id)
+        self.replanned_mo(self.production_line_id, base_on_today=True)
+
+    def produce_finish_replan_mo(self):
+        now_time = self.get_today_time(is_current_time=True)
+        self.write({
+            'date_planned_finished': pytz.UTC.normalize(now_time)
+        })
+        self.replanned_mo(self.production_line_id, base_on_today=True)
+
     def _compute_produced_spend(self):
         if self.feedback_on_rework:
             return self.factory_setting_id.rework_spent_time or REWORK_DEFAULT_TIME
         return self.product_qty * self.bom_id.produced_spend_per_pcs + self.bom_id.prepare_time
+
     #根据process_id 获取未排产mo
     def get_unplanned_mo(self, **kwargs):
         process_id = kwargs.get("process_id")
@@ -210,13 +223,24 @@ class MrpProductionExtend(models.Model):
             'result': mos,
         }
 
-    def get_today_time(self):
-        now_time = fields.datetime.now(pytz.timezone(self.env.user.tz)) + relativedelta(days=1)
+    def get_today_time(self, is_current_time=False, day_offset=0):
+        now_time = fields.datetime.now(pytz.timezone(self.env.user.tz)) + relativedelta(days=day_offset)
+        if not is_current_time:
+            now_time = datetime(now_time.year,
+                                now_time.month,
+                                now_time.day,
+                                0,
+                                0,
+                                0,
+                                microsecond=0,
+                                tzinfo=now_time.tzinfo)
         return now_time
 
-    def replanned_mo(self, production_line, ):
+    # base_on_today 第一个mo的排产时间是否基于今天
+    def replanned_mo(self, production_line, base_on_today=False):
 
         if not production_line:
+            no_production_line = True
             if self.production_line_id:
                 production_line = self.production_line_id
             else:  # 从未排产拖到未排产
@@ -234,43 +258,82 @@ class MrpProductionExtend(models.Model):
 
         # 如果此条产线暂时无任何mo,
         if len(all_mos) == 1:
-            start_time, end_time = self.env["ll.time.util"].compute_mo_start_time(self.get_today_time(),
-                                                                                  self._compute_produced_spend(),
-                                                                                  start_or_end="start",
-                                                                                  equipment_no=len(
-                                                                                      production_line.equipment_ids))
-            self.write({
-                'state': 'waiting_material',
-                'date_planned_start': start_time,
-                'date_planned_finished': end_time,
-            })
+            self.planned_one_mo(self, self.get_today_time(day_offset=1), production_line, 'waiting_material')
         else:
             if all_mos:
-                planned_start_backup = fields.Datetime.from_string(all_mos[0].date_planned_start)
-                new_datetime = datetime(planned_start_backup.year,
-                                        planned_start_backup.month,
-                                        planned_start_backup.day,
-                                        planned_start_backup.hour,
-                                        planned_start_backup.minute,
-                                        planned_start_backup.second,
-                                        microsecond=planned_start_backup.microsecond,
-                                        tzinfo=pytz.timezone("UTC"))
+                if not base_on_today:
+                    if all_mos[0] == self:
+                        planned_start_backup = fields.Datetime.from_string(all_mos[1].date_planned_start)
+                    else:
+                        planned_start_backup = fields.Datetime.from_string(all_mos[0].date_planned_start)
+                    new_datetime = datetime(planned_start_backup.year,
+                                            planned_start_backup.month,
+                                            planned_start_backup.day,
+                                            planned_start_backup.hour,
+                                            planned_start_backup.minute,
+                                            planned_start_backup.second,
+                                            microsecond=planned_start_backup.microsecond,
+                                            tzinfo=pytz.timezone("UTC"))
 
-                next_mo_start_time = new_datetime.astimezone(pytz.timezone(self.env.user.tz))
-                for mo in all_mos:
-                    start_time, end_time = self.env["ll.time.util"].compute_mo_start_time(next_mo_start_time,
-                                                                                          mo._compute_produced_spend(),
-                                                                                          start_or_end="start",
-                                                                                          equipment_no=len(
-                                                                                                  production_line.equipment_ids))
-                    mo.write({
-                        'state': 'waiting_material',
-                        'date_planned_start': start_time,
-                        'date_planned_finished': end_time,
-                    })
+                    next_mo_start_time = new_datetime.astimezone(pytz.timezone(self.env.user.tz))
+                    for mo in all_mos:
+                        start_time, end_time = self.planned_one_mo(mo, next_mo_start_time, production_line,
+                                                                   'waiting_material')
+                        next_mo_start_time = end_time.astimezone(pytz.timezone(self.env.user.tz))
+                else:  # 开始生产 重新排程
+                    all_mos = all_mos - self
+                    all_mos = self + all_mos
+                    planned_start_backup = fields.Datetime.from_string(all_mos[0].date_planned_finished)
+                    new_datetime = datetime(planned_start_backup.year,
+                                            planned_start_backup.month,
+                                            planned_start_backup.day,
+                                            planned_start_backup.hour,
+                                            planned_start_backup.minute,
+                                            planned_start_backup.second,
+                                            microsecond=planned_start_backup.microsecond,
+                                            tzinfo=pytz.timezone("UTC"))
 
-                    next_mo_start_time = end_time.astimezone(pytz.timezone(self.env.user.tz))
+                    next_mo_start_time = new_datetime.astimezone(pytz.timezone(self.env.user.tz))
+                    for mo in all_mos[1:]:
+                        start_time, end_time = self.planned_one_mo(mo, next_mo_start_time, production_line,
+                                                                   'waiting_material')
+                        next_mo_start_time = end_time.astimezone(pytz.timezone(self.env.user.tz))
+                        # if self in all_mos:
+                        # planned_start_backup = fields.Datetime.from_string(self.date_planned_start)
+                        # new_datetime = datetime(planned_start_backup.year,
+                        #                     planned_start_backup.month,
+                        #                     planned_start_backup.day,
+                        #                     planned_start_backup.hour,
+                        #                     planned_start_backup.minute,
+                        #                     planned_start_backup.second,
+                        #                     microsecond=planned_start_backup.microsecond,
+                        #                     tzinfo=pytz.timezone("UTC"))
+                        # next_mo_start_time = new_datetime.astimezone(pytz.timezone(self.env.user.tz))
+                        # for mo in all_mos.filtered(lambda x: x != self):
+                        #     start_time, end_time = self.planned_one_mo(mo, next_mo_start_time, production_line, 'waiting_material')
+                        #     next_mo_start_time = end_time.astimezone(pytz.timezone(self.env.user.tz))
+
         return all_mos
+
+    def planned_one_mo(self, mo, next_mo_start_time, production_line, to_state=None):
+        start_time, end_time = self.env["ll.time.util"].compute_mo_start_time(next_mo_start_time,
+                                                                              mo._compute_produced_spend(),
+                                                                              start_or_end="start",
+                                                                              equipment_no=len(
+                                                                                  production_line.equipment_ids))
+
+        vals = {
+            'date_planned_start': start_time,
+            'date_planned_finished': end_time,
+        }
+        if to_state:
+            if mo.state in ["draft", "confirmed", "waiting_material"]:
+                vals.update({
+                    'state': to_state,
+                })
+        mo.write(vals)
+        return start_time, end_time
+
     # 排产或者取消排产
     def settle_mo(self, **kwargs):
         production_line_id = kwargs.get("production_line_id")
@@ -302,50 +365,9 @@ class MrpProductionExtend(models.Model):
 
         production_line = self.env["mrp.production.line"].browse(production_line_id)
         all_mos = self.replanned_mo(production_line)
-        # vals = {
-        #     'production_line_id': production_line_id,
-        # }
-        # if production_line_id:  # 排
-        #     current_day_start_time = fields.datetime.strptime(settle_date, '%Y-%m-%d')
-        #     # start_time_utc = current_day_start_time - relativedelta(seconds=context_tz._utcoffset.seconds)
-        #     line = self.env["mrp.production.line"].browse(production_line_id)
-        #     start_time_utc = self.env["ll.time.util"].localize_time(current_day_start_time)
-        #     start_time, end_time = self.env["ll.time.util"].compute_mo_start_time(start_time_utc,
-        #                                                                           self._compute_produced_spend(),
-        #                                                                           start_or_end="start",
-        #                                                                           equipment_no=len(line.equipment_ids))
-        #     vals.update({
-        #         'state': 'waiting_material',
-        #         'date_planned_start': start_time,
-        #         'date_planned_finished': end_time,
-        #     })
-        # else:  # 取消排产
-        #     if self.planned_start_backup:
-        #         planned_start_backup = fields.Datetime.from_string(self.planned_start_backup)
-        #         new_datetime = datetime(planned_start_backup.year,
-        #                                 planned_start_backup.month,
-        #                                 planned_start_backup.day,
-        #                                 planned_start_backup.hour,
-        #                                 planned_start_backup.minute,
-        #                                 planned_start_backup.second,
-        #                                 microsecond=planned_start_backup.microsecond,
-        #                                 tzinfo=pytz.timezone("UTC"))
-        #
-        #         planned_start_backup_with_zone = new_datetime.astimezone(pytz.timezone(self.env.user.tz))
-        #         start_time, end_time = self.env["ll.time.util"].compute_mo_start_time(planned_start_backup_with_zone,
-        #                                                                               self._compute_produced_spend(),
-        #                                                                               start_or_end="start")
-        #         vals.update({
-        #             'date_planned_start': start_time,
-        #             'date_planned_finished': end_time,
-        #         })
-        #     vals.update({
-        #         'state': 'draft',
-        #     })
-        #
-        # self.write(vals)
         return {'mos': all_mos.read(),
-                'operate_mo': self.read()}
+                'operate_mo': self.read(),
+                'state_mapping': self.fields_get("state")}
 
 
 class SaleOrderLineExtend(models.Model):
