@@ -48,7 +48,10 @@
                     </div>
                 </div>
 
-                <p class="a_p_product_name"><t t-esc="item.bom_id[1]"/></p>
+                <p class="a_p_product_name">
+                    <t t-esc="item.bom_id[1]"/>
+                    <span class="a_p_mo_state"><t t-esc="item.state"/></span>
+                </p>
                 <div class="ap_item_main_left">
                     <span class="a_p_process_res">生产数量（实际/需求）: <t t-esc="item.in_charge_id[1]"/></span>
                     <t t-if="show_more">

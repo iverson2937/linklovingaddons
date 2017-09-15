@@ -295,10 +295,10 @@ class MrpProductionExtend(models.Model):
                     'date_planned_start': start_time,
                     'date_planned_finished': end_time,
                 })
-                if self.state in ["draft", "confirmed", "waiting_material"]:
-                    self.state = 'draft'
-                else:
-                    raise UserError(u"该单据已经开始生产,不可从产线上移除")
+            if self.state in ["draft", "confirmed", "waiting_material"]:
+                self.state = 'draft'
+            else:
+                raise UserError(u"该单据已经开始生产,不可从产线上移除")
 
         production_line = self.env["mrp.production.line"].browse(production_line_id)
         all_mos = self.replanned_mo(production_line)
