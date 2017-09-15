@@ -14,7 +14,7 @@
         </record>
 
         <!-- This Menu Item will appear in the Upper bar, That's why It needs NO parent or action -->
-        <menuitem id="ll_approval_root" name="工程审批" sequence="9"/>
+        <menuitem id="ll_approval_root" name="工程" sequence="9"/>
 
         <!-- This Menu Item Must have a parent -->
         <menuitem id="approval_pdm_cate" name="文件" parent="ll_approval_root" sequence="0"/>

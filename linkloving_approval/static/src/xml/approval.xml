@@ -96,7 +96,25 @@
                     <t t-if="item_files.is_able_to_use == true || approval_type=='waiting_submit' ||approval_type=='waiting_approval'">
                         <button class="btn btn-primary document_download" t-att-data="item_files.type">下载</button>
                     </t>
-                    <button class="btn btn-primary get_version_history">查看历史版本</button>
+
+
+                    <a t-attf-href="/selectfile/file_show?id=#{item_files.id}"
+                                               target="_blank"> <button class="btn btn-primary get_version_history">查看历史版本</button></a>
+
+
+                    <!--&lt;!&ndash; Large modal &ndash;&gt;-->
+<!--<button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-lg">Large modal</button>-->
+
+<!--<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">-->
+  <!--<div class="modal-dialog modal-lg" role="document">-->
+    <!--<div class="modal-content">-->
+      <!--fffff-->
+    <!--</div>-->
+  <!--</div>-->
+<!--</div>-->
+
+
+
                 </div>
             </div>
         </t>

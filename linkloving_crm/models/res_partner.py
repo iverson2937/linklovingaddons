@@ -19,10 +19,12 @@ AVAILABLE_PRIORITIES = [
 
 def select_company(my_self, vals, type):
     strip_str = vals.get(type)
-    if strip_str:
-        result = my_self.env['res.partner'].search(
-            [(type, '=', strip_str.strip()), ('customer', '=', True), ('is_company', '=', True)])
-        return result
+
+    if strip_str != my_self.vals.get(type):
+        if strip_str:
+            result = my_self.env['res.partner'].search(
+                [(type, '=', strip_str.strip()), ('customer', '=', True), ('is_company', '=', True)])
+            return result
 
 
 def action_crm_channel(my_self, body):
@@ -143,18 +145,18 @@ class ResPartner(models.Model):
     def write(self, vals):
         if len(self) > 1:
             return super(ResPartner, self).write(vals)
-        # if not (self['company_type'] == 'company' and vals.get('company_type') == 'person'):
-        #     if self['is_company'] or vals.get('is_company'):
-        #         for item_type in ['name', 'email']:
-        #             if select_company(self, vals, item_type):
-        #                 raise UserError(u'此' + item_type + vals.get(item_type) + u'已绑定公司，请确认')
-        #
-        # if self['company_type'] == 'person' and vals.get('company_type') == 'company':
-        #     for item_type in ['name', 'email']:
-        #         if not vals.get(item_type):
-        #             if select_company(self, {item_type: self[item_type]}, item_type):
-        #                 raise UserError(u'此' + item_type + vals.get(item_type) + u'已绑定公司，请更换')
-        #
+        if not (self['company_type'] == 'company' and vals.get('company_type') == 'person'):
+            if self['is_company'] or vals.get('is_company'):
+                for item_type in ['name', 'email']:
+                    if select_company(self, vals, item_type):
+                        raise UserError(u'此' + item_type + vals.get(item_type) + u'已绑定公司，请确认')
+
+        if self['company_type'] == 'person' and vals.get('company_type') == 'company':
+            for item_type in ['name', 'email']:
+                if not vals.get(item_type):
+                    if select_company(self, {item_type: self[item_type]}, item_type):
+                        raise UserError(u'此' + item_type + vals.get(item_type) + u'已绑定公司，请更换')
+
         if 'user_id' in vals:
             if vals.get('user_id'):
                 vals['public_partners'] = 'private'

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <template id="file_show" name="orderstatus" page="True">
+
+            <html>
+                <head>
+                    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+                    <meta charset="utf-8"/>
+                    <meta http-equiv="pragma" content="no-cache"/>
+                    <meta http-equiv="cache-control" content="no-cache"/>
+                    <meta http-equiv="expires" content="0"/>
+                    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
+
+                    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+
+                    <!--<link rel="stylesheet" href="/linkloving_approval/static/src/js/demo.js"/>-->
+
+                    <link rel="stylesheet" type="text/css" href="/linkloving_approval/static/src/css/approval.css"/>
+
+                    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+                    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"
+                          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+                          crossorigin="anonymous"/>
+
+                    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+                    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"
+                            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+                            crossorigin="anonymous"></script>
+
+
+                    <script>
+                        $(function () {
+                             $('.document_download').click(function (e) {
+
+                                    var e = e || window.event;
+                                    var target = e.target || e.srcElement;
+                                    var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
+                                    console.log(new_file_id);
+                                    //console.log($(target))
+                                    var type = $(target).attr("data").toUpperCase();
+                                    var remote_path = $(target).parents(".tab_pane_display").find(".remote_path").text();
+
+                                    if (remote_path[0] == '/') {
+                                        remote_path[0] = '';
+                                    }
+                                    console.log(remote_path);
+                                    if (type == 'OTHER' || type == 'DESIGN') {
+                                        $.ajax({
+                                            type: "GET",
+                                            url: "http://localhost:8088/downloadfile?remotefile=" + remote_path,
+                                            success: function (data) {
+                                                console.log(data);
+                                                if (data.result == '1') {
+                                                    alert(target, "已下载至指定目录");
+                                                }
+                                                else if (data.result == '2') {
+                                                    alert(target, "下载失败, 未选择存储路径");
+                                                }
+                                                else {
+                                                    alert(target, "下载失败");
+                                                }
+                                            },
+                                            error: function (error) {
+                                                alert(target, "下载失败,请检查是否打开了代理软件");
+                                            }
+                                        })
+                                    } else {
+                                        window.location.href = '/download_file/?download=true &amp;id=' + new_file_id;
+
+                                    }
+                                });
+                        });
+                    </script>
+
+
+                    <title>
+                        审核历史
+                    </title>
+                </head>
+                <body>
+                    <hr/>
+                    <div style="margin: 30px 0;">
+
+                        <div class="panel panel-default" style="margin-left: 32%;margin-right: 32%;">
+                            <t t-foreach="attach_list" t-as="item_files">
+                                <div class="panel-body">
+                                    <div class="tab_pane_display" t-att-data-id="item_files['id']">
+                                        <div class="tab_message_display">
+                                            <div class="approval_tab_pane_type">
+                                                <t t-esc="item_files['type']"/>
+                                            </div>
+                                            <div style="margin: 10px 0;position: relative;">产品名字:
+                                                <span t-att-product-id="item_files['product_id']['id']"
+                                                      t-att-default-code="item_files['product_id']['default_code']"
+                                                      class="approval_product_name">
+                                                    <t t-esc="item_files['product_id']['name']"/>
+                                                </span>
+
+                                                 <button class="btn btn-primary document_download"
+                                                        style="position: absolute;right:0;top:0;"
+                                                        t-att-data="item_files['type']">下载
+                                                </button>
+
+                                            </div>
+                                            <div style="margin: 10px 0;">文件：
+                                                <span>
+                                                    <t t-esc="item_files['file_name']"/>
+                                                </span>
+                                            </div>
+                                            <!--<div>审核人：<span><t t-esc="item_files.review_id"/></span></div>-->
+                                            <t t-if="item_files['remote_path']!=''">
+                                                <div>远程地址：
+                                                    <span class="remote_path">
+                                                        <t t-esc="item_files['remote_path']"/>
+                                                    </span>
+                                                </div>
+                                            </t>
+                                            <div style="margin: 10px 0;">版本：
+                                                <span class="version_span">
+                                                    <t t-esc="item_files['version']"/>
+                                                </span>
+                                            </div>
+                                            <div style="margin: 10px 0;">状态：
+                                                <span>
+                                                    <t t-esc="item_files['state'][1]"/>
+                                                </span>
+                                                <t t-if="item_files['is_show_cancel']">
+                                                    <button class="btn btn-primary review_cancel">取消审核</button>
+                                                </t>
+                                            </div>
+                                            <!--<div>创建人：<span><t t-esc="item_files.create_uid_name"/></span></div>-->
+
+                                        </div>
+                                        <div class="document_review_list" style="margin: 10px 0;">
+                                            <t t-if="item_files['review_line']">
+                                                <t t-foreach="item_files['review_line']" t-as="review_list">
+                                                    <t t-set="foo"
+                                                       t-value="review_list['title']">
+                                                    </t>
+                                                    <t t-esc="review_list['name']"/>
+                                                    <button type="button" class="btn btn-default"
+                                                            data-toggle="tooltip"
+                                                            data-placement="top"
+                                                            t-att-title="foo">
+                                                        <span class="glyphicon glyphicon-arrow-right"
+                                                              aria-hidden="true"></span>
+                                                    </button>
+                                                </t>
+                                            </t>
+                                            <t t-if="item_files['state'][0] == 'released'">
+                                                <t t-esc="item_files['state'][1]"/>
+                                            </t>
+                                        </div>
+
+                                        <div class="document_btns">
+
+                                            <button class="btn btn-primary document_download1"
+                                                    t-att-data="item_files['type']">点击
+                                            </button>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </body>
+            </html>
+
+        </template>
+    </data>
+</openerp>
