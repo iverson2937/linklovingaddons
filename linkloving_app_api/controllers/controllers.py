@@ -1040,7 +1040,7 @@ class LinklovingAppApi(http.Controller):
     def start_produce(self, **kw):
         order_id = request.jsonrequest.get('order_id')  # get paramter
         mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
-        mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'progress'})
+        mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).button_start_produce()
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
