@@ -20,7 +20,7 @@ AVAILABLE_PRIORITIES = [
 def select_company(my_self, vals, type):
     strip_str = vals.get(type)
 
-    if strip_str != my_self.vals.get(type):
+    if strip_str != (my_self[type] if my_self else ''):
         if strip_str:
             result = my_self.env['res.partner'].search(
                 [(type, '=', strip_str.strip()), ('customer', '=', True), ('is_company', '=', True)])
