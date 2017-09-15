@@ -73,7 +73,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         // myself.mydataset = result;
                         $(target).parents('.production_line').next('.production_lists_wrap').html("");
                         $(target).parents('.production_line').next('.production_lists_wrap').removeClass('production_lists_no_item');
-                        $(target).parents('.production_line').next('.production_lists_wrap').append(QWeb.render('a_p_render_right_tmpl',{result: result,show_more:true}));
+                        $(target).parents('.production_line').next('.production_lists_wrap').append(QWeb.render('a_p_render_right_tmpl',{result: result,show_more:true,selection:myself.selection}));
                         if($(target).parents('.production_line').next('.production_lists_wrap').children('.ap_item_wrap').length == 0){
                             $(target).parents('.production_line').next('.production_lists_wrap').addClass('production_lists_no_item');
                         }
@@ -188,10 +188,10 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                             toElem = $(toElem).parents('.production_lists_wrap');
                         }
                         $(toElem).html('');
-                        var new_items = QWeb.render('a_p_render_right_tmpl', {result: result.mos, show_more:show_more})
+                        var new_items = QWeb.render('a_p_render_right_tmpl', {result: result.mos, show_more:show_more,selection:myself.selection})
                         $(toElem).append(new_items);
 
-                        var replace_item = QWeb.render('a_p_render_right_tmpl', {result: result.operate_mo, show_more:show_more})
+                        var replace_item = QWeb.render('a_p_render_right_tmpl', {result: result.operate_mo, show_more:show_more,selection:myself.selection})
                         $(ele).replaceWith(replace_item);
 
                     }).always(function (result) {
@@ -274,13 +274,14 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
         //右边未排产的接口
         un_arrange_production:function (process_id,limit,offset,own) {
             framework.blockUI();
+
             new Model("mrp.production")
                     .call("get_unplanned_mo", [[]], {process_id:process_id,limit:limit,offset:offset-1})
                     .then(function (result) {
-                        console.log(result);
+                        console.log(own.selection);
                         myself.mydataset.mo = result.result;
                         $("#a_p_right .a_p_right_head").nextAll().remove();
-                        $("#a_p_right").append(QWeb.render('a_p_render_right_tmpl',{result: result.result, show_more:false}));
+                        $("#a_p_right").append(QWeb.render('a_p_render_right_tmpl',{result: result.result, show_more:false,selection:own.selection}));
                         framework.unblockUI();
                         own.length = result.length;
                         own.render_pager();
@@ -307,6 +308,15 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
 
             myself.mydataset = {};
             framework.blockUI();
+
+            new Model("mrp.production").call("fields_get",[],{}).then(function (result) {
+                console.log(result.state.selection)
+                myself.selection = result.state.selection;
+                //未排产
+                self.un_arrange_production(this.process_id,10,1,myself);
+            })
+
+
             new Model("mrp.production.line")
                     .call("get_production_line_list", [[]], {process_id:this.process_id})
                     .then(function (result) {
@@ -316,8 +326,6 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         self.init_date_widget($(".a_p_time_start"));
                         framework.unblockUI();
                     })
-            //未排产
-            self.un_arrange_production(this.process_id,10,1,this);
         }
 
     })
