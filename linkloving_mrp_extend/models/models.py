@@ -554,7 +554,7 @@ class MrpProductionExtend(models.Model):
 
     # 开始生产
     @api.one
-    def buttonbutton_start_produce(self):
+    def button_start_produce(self):
         self.write({'state': 'progress'})
         if 'produce_start_replan_mo' in dir(self):
             self.produce_start_replan_mo()
@@ -1705,7 +1705,8 @@ class StockPackOperationExtend(models.Model):
                 pack.receivied_qty = pack.qty_done
 
     rejects_qty = fields.Float(string=u"不良品", default=0)
-    receivied_qty = fields.Float(string=u'收到的数量', compute='_compute_receivied_qty', digits=dp.get_precision('Product Unit of Measure'))
+    receivied_qty = fields.Float(string=u'收到的数量', compute='_compute_receivied_qty',
+                                 digits=dp.get_precision('Product Unit of Measure'))
     # accept_qty = fields.Float(string=u'良品', compute='_compute_accept_qty')
 
 
