@@ -185,6 +185,8 @@ class MrpProductionExtend(models.Model):
 
     planned_start_backup = fields.Datetime(string=u"最晚开始时间")
 
+    alia_name = fields.Char(string=u"别名", size=16)
+
     def produce_start_replan_mo(self):
         now_time = self.get_today_time(is_current_time=True)
         self.planned_one_mo(self, now_time, self.production_line_id)
@@ -199,7 +201,7 @@ class MrpProductionExtend(models.Model):
 
     def _compute_produced_spend(self):
         if self.feedback_on_rework:
-            return self.factory_setting_id.rework_spent_time or REWORK_DEFAULT_TIME
+            return self.factory_setting_id.rework_spent_time * 60 * 60 or REWORK_DEFAULT_TIME
         return self.product_qty * self.bom_id.produced_spend_per_pcs + self.bom_id.prepare_time
 
     #根据process_id 获取未排产mo
@@ -348,9 +350,10 @@ class MrpProductionExtend(models.Model):
             else:
                 raise UserError(u"该单据已经开始生产,不可从产线上移除")
         else:  #
-            self.write({
-                "state": 'waiting_material'
-            })
+            if self.state in ["draft", "confirmed", "waiting_material"]:
+                self.write({
+                    "state": 'waiting_material'
+                })
         production_line = self.env["mrp.production.line"].browse(production_line_id)
 
         all_mos = self.replanned_mo(production_line)
