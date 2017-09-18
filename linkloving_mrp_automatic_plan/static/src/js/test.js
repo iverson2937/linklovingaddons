@@ -109,7 +109,6 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             ev.preventDefault();
             var elem = document.getElementById(move_id); //当前拖动的元素
             var toElem = ev.target;
-            console.log(toElem.className);
             if(toElem.className == 'ap_item_wrap'){
                 // $(elem).insertBefore($(toElem));
                 var mo_id = $(elem).attr("data-mo-id");
@@ -142,12 +141,10 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             ev.preventDefault();
             var elem = document.getElementById(move_id); //当前拖动的元素
             var toElem = ev.target;
-            // console.log(toElem.className);
             if($(elem).parents('#a_p_right').length>=1){
                 return;
             }
             if(toElem.className == 'ap_item_wrap'){
-                // $(elem).insertBefore($(toElem));
                 var mo_id = $(elem).attr("data-mo-id");
                 myself.no_ap_to_ag(parseInt(mo_id),false,toElem,elem, function () {
                     $(elem).insertBefore($(toElem).parents('.ap_item_wrap'));
@@ -158,7 +155,6 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                     $(elem).insertBefore($(toElem).parents('.ap_item_wrap'));
                 });
             }else if($(toElem).attr('id') == 'a_p_right'){
-                // $(elem).insertAfter($('.a_p_right_head'));
                 var mo_id = $(elem).attr("data-mo-id");
                 myself.no_ap_to_ag(parseInt(mo_id),false,toElem,elem, function () {
                     $(elem).insertBefore($(toElem).parents('.ap_item_wrap'));

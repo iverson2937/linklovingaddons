@@ -150,3 +150,9 @@
 .a_p_alia_name{
     margin-left: 15px;
 }
+.a_p_order_type{
+    background-color: darkgrey;
+    color: white;
+    padding: 3px 5px;
+    border-radius: 3px;
+}

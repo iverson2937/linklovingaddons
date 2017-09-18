@@ -53,13 +53,14 @@
                     <t t-esc="item.bom_id[1]"/>
                 </p>
                 <span class="a_p_mo_state">
-                    <div>
-                        <t t-foreach="new_selection" t-as="order_type">
-                            <t t-if="order_type[0] == item.product_order_type">
+                    <t t-foreach="new_selection" t-as="order_type">
+                        <t t-if="order_type[0] == item.product_order_type">
+                            <div class="a_p_order_type">
                                 <t t-esc="order_type[1]"/>
-                            </t>
+                            </div>
                         </t>
-                    </div>
+                    </t>
+
                     <t t-foreach="selection" t-as="sel">
                         <t t-if="sel[0] == item.state">
                             <t t-esc="sel[1]"/>
