@@ -89,6 +89,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             var target = ev.target || ev.srcElement;
             move_id = target.id;
         },
+        //移到左边
         move_over_left:function (ev) {
             ev.preventDefault();
             var elem = document.getElementById(move_id); //当前拖动的元素
@@ -124,11 +125,12 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 });
             }
         },
+        //移到右边
         move_over_right:function (ev) {
             ev.preventDefault();
             var elem = document.getElementById(move_id); //当前拖动的元素
             var toElem = ev.target;
-            console.log(toElem.className);
+            // console.log(toElem.className);
             if($(elem).parents('#a_p_right').length>=1){
                 return;
             }
@@ -136,20 +138,17 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 $(elem).insertBefore($(toElem));
                 var mo_id = $(elem).attr("data-mo-id");
                 myself.no_ap_to_ag(parseInt(mo_id),false,toElem,elem, function () {
-                    console.log('ssssss')
                     $(elem).insertBefore($(toElem).parents('.ap_item_wrap'));
                 });
             }else if($(toElem).parents('.ap_item_wrap').length>=1){
                 var mo_id = $(elem).attr("data-mo-id");
                 myself.no_ap_to_ag(parseInt(mo_id),false,toElem,elem, function () {
-                    console.log('ssssss')
                     $(elem).insertBefore($(toElem).parents('.ap_item_wrap'));
                 });
             }else if($(toElem).attr('id') == 'a_p_right'){
-                $(toElem).prepend($(elem));
+                $(elem).insertAfter($('.a_p_right_head'));
                 var mo_id = $(elem).attr("data-mo-id");
                 myself.no_ap_to_ag(parseInt(mo_id),false,toElem,elem, function () {
-                    console.log('ssssss')
                     $(elem).insertBefore($(toElem).parents('.ap_item_wrap'));
                 });
             }
