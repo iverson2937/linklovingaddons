@@ -48,8 +48,7 @@ class ProcurementOrderExtend(models.Model):
         planned_time_with_zone = new_datetime.astimezone(pytz.timezone(self.env.user.tz))
 
         start_time, end_time = self.env["ll.time.util"].compute_mo_start_time(planned_time_with_zone,
-                                                                            produced_spend,
-                                                                            self.env.user.tz)
+                                                                              produced_spend)
         res.update({'state': 'draft',
                     # 'process_id': bom.process_id.id,
                     # 'unit_price': bom.process_id.unit_price,
@@ -456,8 +455,8 @@ class TimeUtil(models.Model):
                 while left_time > 0:
                     new_day_work_start_time, new_day_work_off_time = self.get_date_begin_end_time(
                         move_corrected_time - relativedelta(days=1),
-                            relativedelta(seconds=setting.factory_work_start_time),
-                            relativedelta(seconds=setting.factory_work_end_time))
+                            relativedelta(hours=setting.factory_work_start_time),
+                            relativedelta(hours=setting.factory_work_end_time))
                     move_corrected_time = new_day_work_off_time
                     # new_day_work_start_time = new_day_0_time + relativedelta(seconds=setting.factory_work_start_time)  # 这一天的上班时间
                     # new_day_off_work_time = new_day_0_time + relativedelta(seconds=setting.factory_work_end_time)#这一天的下班时间

@@ -1,20 +1,12 @@
 # -*- coding: utf-8 -*-
+from linklovingaddons.linkloving_app_api.controllers.controllers import STATUS_CODE_OK, JsonResponse
 from odoo import http
+from odoo.http import request
 
-# class LinklovingMrpAutomaticPlan(http.Controller):
-#     @http.route('/linkloving_mrp_automatic_plan/linkloving_mrp_automatic_plan/', auth='public')
-#     def index(self, **kw):
-#         return "Hello, world"
 
-#     @http.route('/linkloving_mrp_automatic_plan/linkloving_mrp_automatic_plan/objects/', auth='public')
-#     def list(self, **kw):
-#         return http.request.render('linkloving_mrp_automatic_plan.listing', {
-#             'root': '/linkloving_mrp_automatic_plan/linkloving_mrp_automatic_plan',
-#             'objects': http.request.env['linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan'].search([]),
-#         })
-
-#     @http.route('/linkloving_mrp_automatic_plan/linkloving_mrp_automatic_plan/objects/<model("linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"):obj>/', auth='public')
-#     def object(self, obj, **kw):
-#         return http.request.render('linkloving_mrp_automatic_plan.object', {
-#             'object': obj
-#         })
+class LinklovingMrpAutomaticPlan(http.Controller):
+    @http.route('/linkloving_app_api/mrp_equipment/list', type='json', auth='none', csrf=False)
+    def mrp_equipment_list(self):
+        process_id = request.jsonrequest.get("process_id")
+        euip = request.env["mrp.equipment"].sudo().search_read([("process_id", "=", process_id)])
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=euip)
