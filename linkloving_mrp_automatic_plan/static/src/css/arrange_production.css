@@ -1,7 +1,7 @@
 .arrange_production_container{
     overflow: hidden;
     padding-top: 50px;
-    min-width: 1100px;
+    min-width: 1200px;
 }
 #a_p_left{
     width: 50%;
@@ -49,7 +49,7 @@
     color: white;
 }
 #a_p_all{
-    min-width: 1100px;
+    min-width: 1200px;
     overflow: scroll;
 }
 .a_p_move_point{
@@ -87,6 +87,7 @@
     color: black;
     margin-left: 40px;
     margin-top: 5px;
+    cursor: pointer;
 }
 
 .a_p_product_name{
@@ -143,4 +144,9 @@
 .a_p_mo_state{
     float: right;
     margin-right: 5px;
+    margin-top: -22px;
+    text-align: center;
+}
+.a_p_alia_name{
+    margin-left: 15px;
 }
