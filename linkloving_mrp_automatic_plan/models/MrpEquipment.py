@@ -180,6 +180,11 @@ class MrpProductionExtend(models.Model):
             for mo in self:
                 mo.factory_setting_id = setting.id
 
+    @api.multi
+    def _compute_product_order_type(self):
+        for mo in self:
+            mo.product_order_type = mo.product_id.order_ll_type
+
     factory_setting_id = fields.Many2one("hr.config.settings", compute="_compute_factory_setting_id")
     production_line_id = fields.Many2one("mrp.production.line", string=u"产线")
 
@@ -187,9 +192,11 @@ class MrpProductionExtend(models.Model):
 
     alia_name = fields.Char(string=u"别名", size=16)
 
-    product_order_type = fields.Selection(string=u"产品类型", selection=[('ordering', u'订单制'), ('stock', u'备货制'), ],
+    product_order_type = fields.Selection(string=u"产品类型",
+                                          selection=[('ordering', u'订单制'),
+                                                     ('stock', u'备货制'), ],
                                           required=False,
-                                          related='product_id.order_ll_type')
+                                          compute='_compute_product_order_type')
     def produce_start_replan_mo(self):
         now_time = self.get_today_time(is_current_time=True)
         self.planned_one_mo(self, now_time, self.production_line_id)
@@ -328,6 +335,10 @@ class MrpProductionExtend(models.Model):
     def settle_mo(self, **kwargs):
         production_line_id = kwargs.get("production_line_id")
         settle_date = kwargs.get("settle_date")
+        origin_production_line = self.production_line_id
+        if self.state not in ["draft", "confirmed", "waiting_material"]:
+            raise UserError(u"该单据已经开始生产,不可从进行排产")
+
         if not production_line_id:  #如果没有产线传上来, 就说明是从产线移除(取消排产)
             if self.planned_start_backup:
                 planned_start_backup = fields.Datetime.from_string(self.planned_start_backup)
@@ -358,12 +369,20 @@ class MrpProductionExtend(models.Model):
                     "state": 'waiting_material'
                 })
         production_line = self.env["mrp.production.line"].browse(production_line_id)
-
         all_mos = self.replanned_mo(production_line)
+        origin_pl_mos = self.env["mrp.production"]
+        if origin_production_line and production_line_id:  # 两条产线之间切换,
+            origin_pl_mos = self.replanned_mo(origin_production_line)
 
-        return {'mos': all_mos.read(),
+        return {'mos': all_mos.filtered(lambda x: x.state not in ['done',
+                                                                  'cancel',
+                                                                  'waiting_post_inventory']).read(),
+                'origin_pl_mos': origin_pl_mos.filtered(lambda x: x.state not in ['done',
+                                                                                  'cancel',
+                                                                                  'waiting_post_inventory']),
                 'operate_mo': self.read(),
-                'state_mapping': self.fields_get("state")}
+                'state_mapping': self.fields_get(["state"]),
+                }
 
 
 class SaleOrderLineExtend(models.Model):
