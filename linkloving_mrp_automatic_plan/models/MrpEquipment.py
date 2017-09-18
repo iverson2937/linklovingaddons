@@ -248,24 +248,33 @@ class MrpProductionExtend(models.Model):
         return now_time
 
     # base_on_today 第一个mo的排产时间是否基于今天
-    def replanned_mo(self, production_line, base_on_today=False):
+    def replanned_mo(self, origin_production_line, production_line, base_on_today=False):
 
-        if not production_line:
-            no_production_line = True
-            if self.production_line_id:
-                production_line = self.production_line_id
-            else:  # 从未排产拖到未排产
-                return
-
-            self.write({
-                'production_line_id': None
-            })
-        else:
-            self.write({
-                'production_line_id': production_line.id
-            })
+        # if not production_line:
+        #     no_production_line = True
+        #     if self.production_line_id:
+        #         production_line = self.production_line_id
+        #     else:  # 从未排产拖到未排产
+        #         return
+        #
+        #     self.write({
+        #         'production_line_id': None
+        #     })
+        # else:
+        #     self.write({
+        #         'production_line_id': production_line.id
+        #     })
         # 取出这条产线所有的mo
-        all_mos = self.env["mrp.production"].search([("production_line_id", "=", production_line.id)],
+        domain = [("state", "not in", ['done', 'cancel', 'waiting_post_inventory'])]
+        origin_mos = self.env["mrp.production"]
+        all_mos = self.env["mrp.production"]
+        if origin_production_line:
+            domain += [("production_line_id", "=", origin_production_line.id)]
+            origin_mos = self.env["mrp.production"].search(domain,
+                                                           order=ORDER_BY)
+        if production_line:
+            domain += [("production_line_id", "=", production_line.id)]
+            all_mos = self.env["mrp.production"].search(domain,
                                                     order=ORDER_BY)
 
         # 如果此条产线暂时无任何mo,
@@ -308,8 +317,23 @@ class MrpProductionExtend(models.Model):
                     for mo in all_mos[1:]:
                         start_time, end_time = self.planned_one_mo(mo, next_mo_start_time, production_line,)
                         next_mo_start_time = end_time.astimezone(pytz.timezone(self.env.user.tz))
+        if origin_mos:
+            planned_start_backup = fields.Datetime.from_string(origin_mos[0].date_planned_start)
+            new_datetime = datetime(planned_start_backup.year,
+                                    planned_start_backup.month,
+                                    planned_start_backup.day,
+                                    planned_start_backup.hour,
+                                    planned_start_backup.minute,
+                                    planned_start_backup.second,
+                                    microsecond=planned_start_backup.microsecond,
+                                    tzinfo=pytz.timezone("UTC"))
 
-        return all_mos
+            next_mo_start_time = new_datetime.astimezone(pytz.timezone(self.env.user.tz))
+            for mo in origin_mos:
+                start_time, end_time = self.planned_one_mo(mo, next_mo_start_time, production_line)
+                next_mo_start_time = end_time.astimezone(pytz.timezone(self.env.user.tz))
+
+        return origin_mos, all_mos
 
     def planned_one_mo(self, mo, next_mo_start_time, production_line):
         start_time, end_time = self.env["ll.time.util"].compute_mo_start_time(next_mo_start_time,
@@ -338,48 +362,51 @@ class MrpProductionExtend(models.Model):
         if self.state not in ["draft", "confirmed", "waiting_material"]:
             raise UserError(u"该单据已经开始生产,不可从进行排产")
 
+        # 改变产线和状态
         if not production_line_id:  #如果没有产线传上来, 就说明是从产线移除(取消排产)
-            if self.planned_start_backup:
-                planned_start_backup = fields.Datetime.from_string(self.planned_start_backup)
-                new_datetime = datetime(planned_start_backup.year,
-                                        planned_start_backup.month,
-                                        planned_start_backup.day,
-                                        planned_start_backup.hour,
-                                        planned_start_backup.minute,
-                                        planned_start_backup.second,
-                                        microsecond=planned_start_backup.microsecond,
-                                        tzinfo=pytz.timezone("UTC"))
-
-                planned_start_backup_with_zone = new_datetime.astimezone(pytz.timezone(self.env.user.tz))
-                start_time, end_time = self.env["ll.time.util"].compute_mo_start_time(planned_start_backup_with_zone,
-                                                                                      self._compute_produced_spend(),
-                                                                                      start_or_end="start")
-                self.write({
-                    'date_planned_start': start_time,
-                    'date_planned_finished': end_time,
-                })
+            self.write({
+                'production_line_id': None
+            })
+            # if self.planned_start_backup:
+            #     planned_start_backup = fields.Datetime.from_string(self.planned_start_backup)
+            #     new_datetime = datetime(planned_start_backup.year,
+            #                             planned_start_backup.month,
+            #                             planned_start_backup.day,
+            #                             planned_start_backup.hour,
+            #                             planned_start_backup.minute,
+            #                             planned_start_backup.second,
+            #                             microsecond=planned_start_backup.microsecond,
+            #                             tzinfo=pytz.timezone("UTC"))
+            #
+            #     planned_start_backup_with_zone = new_datetime.astimezone(pytz.timezone(self.env.user.tz))
+            #     start_time, end_time = self.env["ll.time.util"].compute_mo_start_time(planned_start_backup_with_zone,
+            #                                                                           self._compute_produced_spend(),
+            #                                                                           start_or_end="start")
+            #     self.write({
+            #         'date_planned_start': start_time,
+            #         'date_planned_finished': end_time,
+            #     })
             if self.state in ["draft", "confirmed", "waiting_material"]:
                 self.state = 'draft'
             else:
                 raise UserError(u"该单据已经开始生产,不可从产线上移除")
-        else:  #
+        else:  # 改变产线和状态
+            self.write({
+                'production_line_id': production_line_id
+            })
             if self.state in ["draft", "confirmed", "waiting_material"]:
                 self.write({
                     "state": 'waiting_material'
                 })
         origin_pl_mos = self.env["mrp.production"]
-        if origin_production_line and production_line_id:  # 两条产线之间切换,
-            origin_pl_mos = self.replanned_mo(origin_production_line) - self
+        # if origin_production_line and production_line_id:  # 两条产线之间切换,
+        #     origin_pl_mos = self.replanned_mo(origin_production_line, production_line_id) - self
 
         production_line = self.env["mrp.production.line"].browse(production_line_id)
-        all_mos = self.replanned_mo(production_line)
+        origin_pl_mos, all_mos = self.replanned_mo(origin_production_line, production_line)
 
-        return {'mos': all_mos.filtered(lambda x: x.state not in ['done',
-                                                                  'cancel',
-                                                                  'waiting_post_inventory']).read(),
-                'origin_pl_mos': origin_pl_mos.filtered(lambda x: x.state not in ['done',
-                                                                                  'cancel',
-                                                                                  'waiting_post_inventory']).read(),
+        return {'mos': all_mos.read(),
+                'origin_pl_mos': origin_pl_mos.read(),
                 'operate_mo': self.read(),
                 'state_mapping': self.fields_get(["state"]),
                 }

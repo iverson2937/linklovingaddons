@@ -182,34 +182,49 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                     .call("settle_mo", [mo_id], {production_line_id:production_line_id,settle_date:myself.chose_date})
                     .then(function (result) {
                         console.log(result);
-                        if(production_line_id!=false){
-                            var show_more = true;
+                        var origin_wrap_bkup = $(ele).parents('.production_lists_wrap');//左边
+                        success_cb();
+                        if (production_line_id != false) {//从右到左
+                            var show_more = true;//显示更多
                             if($(toElem)[0].className != 'production_lists_wrap'){
                                 var elem_wrap = $(toElem).parents('.production_lists_wrap');
                             }else {
                                 var elem_wrap = $(toElem);
-                            }
+                            }//获取目的位置
 
-                            if($(ele).parents('.production_lists_wrap').length >= 1){
-                                var origin_wrap = $(ele).parents('.production_lists_wrap');
+                            if ($(ele).parents('.production_lists_wrap').length >= 1) {//左边到左边
+                                var origin_wrap = $(ele).parents('.production_lists_wrap');//取到from
                                 $(ele).parents('.production_lists_wrap').html('');
                                 var new_items = QWeb.render('a_p_render_right_tmpl', {result: result.origin_pl_mos, show_more:true,selection:myself.states.state.selection,new_selection:myself.states.product_order_type.selection})
                                 $(origin_wrap).append(new_items);
                             }
-                        }else {
+                            //重新渲染拖动的MO所在的产线
+                            $(elem_wrap).html('');
+                            var new_ite = QWeb.render('a_p_render_right_tmpl', {
+                                result: result.mos,
+                                show_more: true,
+                                selection: myself.states.state.selection,
+                                new_selection: myself.states.product_order_type.selection
+                            })
+                            $(elem_wrap).append(new_ite);
+                        } else {//从左到右
                             var show_more = false;
                             //这是从已排产拖到未排产的情况,要重新渲染已排产的数据
-                            var elem_wrap = $(ele).parents('.production_lists_wrap');
+                            var origin_wrap = origin_wrap_bkup;//左边
+                            $(origin_wrap).html('');
+                            var new_items = QWeb.render('a_p_render_right_tmpl', {
+                                result: result.origin_pl_mos,
+                                show_more: true,
+                                selection: myself.states.state.selection,
+                                new_selection: myself.states.product_order_type.selection
+                            })
+                            $(origin_wrap).append(new_items);
                         }
-                        //重新渲染拖动的MO所在的产线
-                        $(elem_wrap).html('');
-                        var new_items = QWeb.render('a_p_render_right_tmpl', {result: result.mos, show_more:true,selection:myself.states.state.selection,new_selection:myself.states.product_order_type.selection})
-                        $(elem_wrap).append(new_items);
 
-                        success_cb();
-                        //从新渲染拖动的那个MO单
+                        //从新渲染拖动的MO单
                         var replace_item = QWeb.render('a_p_render_right_tmpl', {result: result.operate_mo, show_more:show_more,selection:myself.states.state.selection,new_selection:myself.states.product_order_type.selection})
                         $(ele).replaceWith(replace_item);
+
                     }).always(function (result) {
                         console.log(result);
                         framework.unblockUI();

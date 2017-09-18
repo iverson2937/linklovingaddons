@@ -3,3 +3,6 @@ access_linkloving_mrp_automatic_plan_linkloving_mrp_automatic_plan,linkloving_mr
 access_linkloving_mrp_automatic_plan_auto_plan,linkloving_mrp_automatic_plan.auto_plan,model_auto_plan,,1,1,1,1
 access_mrp_production_line,linkloving_mrp_automatic_plan.auto_mrp_production_line,model_mrp_production_line,,1,1,1,1
 access_hr_config_setting,linkloving_mrp_automatic_plan.hr_config_settings,model_hr_config_settings,,1,1,1,1
+access_ll_time_util,linkloving_mrp_automatic_plan.ll_time_util,model_ll_time_util,,1,1,1,1
+access_work_type,linkloving_mrp_automatic_plan.work_type,model_work_type,,1,1,1,1
+access_mrp_process_equipment,linkloving_mrp_automatic_plan.mrp_process_equipment,model_mrp_process_equipment,,1,1,1,1
