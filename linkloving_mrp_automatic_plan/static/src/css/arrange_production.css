@@ -153,6 +153,11 @@
 .a_p_order_type{
     background-color: darkgrey;
     color: white;
+    font-size: 12px;
     padding: 3px 5px;
     border-radius: 3px;
+}
+.a_p_create_alia{
+    display: inline-block;
+    cursor: pointer;
 }
