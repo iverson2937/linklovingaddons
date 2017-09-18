@@ -368,11 +368,12 @@ class MrpProductionExtend(models.Model):
                 self.write({
                     "state": 'waiting_material'
                 })
-        production_line = self.env["mrp.production.line"].browse(production_line_id)
-        all_mos = self.replanned_mo(production_line)
         origin_pl_mos = self.env["mrp.production"]
         if origin_production_line and production_line_id:  # 两条产线之间切换,
-            origin_pl_mos = self.replanned_mo(origin_production_line)
+            origin_pl_mos = self.replanned_mo(origin_production_line) - self
+
+        production_line = self.env["mrp.production.line"].browse(production_line_id)
+        all_mos = self.replanned_mo(production_line)
 
         return {'mos': all_mos.filtered(lambda x: x.state not in ['done',
                                                                   'cancel',
