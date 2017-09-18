@@ -379,7 +379,7 @@ class MrpProductionExtend(models.Model):
                                                                   'waiting_post_inventory']).read(),
                 'origin_pl_mos': origin_pl_mos.filtered(lambda x: x.state not in ['done',
                                                                                   'cancel',
-                                                                                  'waiting_post_inventory']),
+                                                                                  'waiting_post_inventory']).read(),
                 'operate_mo': self.read(),
                 'state_mapping': self.fields_get(["state"]),
                 }
