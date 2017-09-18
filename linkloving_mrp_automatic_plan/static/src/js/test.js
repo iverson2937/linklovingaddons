@@ -100,7 +100,6 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 var mo_id = $(elem).attr("data-mo-id");
                 var pt_line_index = $(toElem).parents('.production_lists_wrap').prev('.production_line').attr('data-index');
                 myself.no_ap_to_ag(parseInt(mo_id), myself.mydataset.product_line[pt_line_index].id,toElem,elem, function () {
-                    console.log('ssssss')
                     $(elem).insertBefore($(toElem).parents('.ap_item_wrap'));
                 });
             }else if($(toElem).parents('.ap_item_wrap').length>=1){
@@ -108,7 +107,6 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 var mo_id = $(elem).attr("data-mo-id");
                 var pt_line_index = $(toElem).parents('.production_lists_wrap').prev('.production_line').attr('data-index');
                 myself.no_ap_to_ag(parseInt(mo_id), myself.mydataset.product_line[pt_line_index].id,toElem,elem, function () {
-                    console.log('ssssss')
                     $(elem).insertBefore($(toElem).parents('.ap_item_wrap'));
                 });
             }
@@ -120,7 +118,6 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                     $(toElem).removeClass('production_lists_no_item')
                 }
                 myself.no_ap_to_ag(parseInt(mo_id), myself.mydataset.product_line[pt_line_index].id,toElem,elem, function () {
-                    console.log('ssssss')
                     $(elem).insertBefore($(toElem).parents('.ap_item_wrap'));
                 });
             }
@@ -173,26 +170,22 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
               new Model("mrp.production")
                     .call("settle_mo", [mo_id], {production_line_id:production_line_id,settle_date:myself.chose_date})
                     .then(function (result) {
-                        success_cb();
                         console.log(result);
                         if(production_line_id!=false){
                             var show_more = true;
                         }else {
                             var show_more = false;
+
+                            var elem_wrap = $(ele).parents('.production_lists_wrap');
+                            //重新渲染拖动的MO所在的产线
+                            $(elem_wrap).html('');
+                            var new_items = QWeb.render('a_p_render_right_tmpl', {result: result.mos, show_more:true,selection:myself.selection})
+                            $(elem_wrap).append(new_items);
                         }
-
-                        if ($(toElem).hasClass('production_lists_wrap')){
-
-                        }else {
-                            toElem = $(toElem).parents('.production_lists_wrap');
-                        }
-                        $(toElem).html('');
-                        var new_items = QWeb.render('a_p_render_right_tmpl', {result: result.mos, show_more:show_more,selection:myself.selection})
-                        $(toElem).append(new_items);
-
+                        success_cb();
+                        //从新渲染拖动的那个MO单
                         var replace_item = QWeb.render('a_p_render_right_tmpl', {result: result.operate_mo, show_more:show_more,selection:myself.selection})
                         $(ele).replaceWith(replace_item);
-
                     }).always(function (result) {
                         console.log(result);
                         framework.unblockUI();
@@ -277,7 +270,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             new Model("mrp.production")
                     .call("get_unplanned_mo", [[]], {process_id:process_id,limit:limit,offset:offset-1})
                     .then(function (result) {
-                        console.log(own.selection);
+                        console.log(result);
                         myself.mydataset.mo = result.result;
                         $("#a_p_right .a_p_right_head").nextAll().remove();
                         $("#a_p_right").append(QWeb.render('a_p_render_right_tmpl',{result: result.result, show_more:false,selection:own.selection}));
@@ -312,7 +305,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 console.log(result.state.selection)
                 myself.selection = result.state.selection;
                 //未排产
-                self.un_arrange_production(this.process_id,10,1,myself);
+                self.un_arrange_production(myself.process_id,10,1,myself);
             })
 
 
