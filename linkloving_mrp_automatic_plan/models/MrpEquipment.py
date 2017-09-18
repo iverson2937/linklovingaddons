@@ -187,6 +187,9 @@ class MrpProductionExtend(models.Model):
 
     alia_name = fields.Char(string=u"别名", size=16)
 
+    product_order_type = fields.Selection(string=u"产品类型", selection=[('ordering', u'订单制'), ('stock', u'备货制'), ],
+                                          required=False,
+                                          related='product_id.order_ll_type')
     def produce_start_replan_mo(self):
         now_time = self.get_today_time(is_current_time=True)
         self.planned_one_mo(self, now_time, self.production_line_id)
