@@ -201,17 +201,25 @@ class MrpProductionExtend(models.Model):
                                                      ('stock', u'备货制'), ],
                                           required=False,
                                           compute='_compute_product_order_type')
+
+    # 开始生产 重新计算排产
     def produce_start_replan_mo(self):
         now_time = self.get_today_time(is_current_time=True)
         self.planned_one_mo(self, now_time, self.production_line_id)
-        self.replanned_mo(self.production_line_id, self.production_line_id, base_on_today=True)
+        self.replanned_mo(self.env["mrp.production.line"], self.production_line_id, base_on_today=True)
 
+    #生产完成 重新计算排产
     def produce_finish_replan_mo(self):
         now_time = self.get_today_time(is_current_time=True)
         self.write({
             'date_planned_finished': pytz.UTC.normalize(now_time)
         })
-        self.replanned_mo(self.production_line_id, self.production_line_id, base_on_today=True)
+        self.replanned_mo(self.env["mrp.production.line"], self.production_line_id, base_on_today=True)
+
+    # 返工 重新计算排产
+    def confirm_rework_replan_mo(self):
+        self.replanned_mo(self.env["mrp.production.line"], self.production_line_id, base_on_today=True)
+        #是否替代已生产中的单子的时间
 
     def _compute_produced_spend(self):
         if self.feedback_on_rework:
@@ -255,8 +263,9 @@ class MrpProductionExtend(models.Model):
 
     def compute_mo_time(self, all_mos, production_line, base_on_today):
         # 如果此条产线暂时无任何mo,
+        self_date_planned_start = fields.Datetime.from_string(self.date_planned_start)
         if len(all_mos) == 1:
-            planned_start_backup = fields.Datetime.from_string(self.date_planned_start)
+            planned_start_backup = self_date_planned_start
             new_datetime = datetime(planned_start_backup.year,
                                     planned_start_backup.month,
                                     planned_start_backup.day,
@@ -273,7 +282,12 @@ class MrpProductionExtend(models.Model):
                     if all_mos[0] == self:  # 如果本次排产的单子本身就再第一个,要取第二个的时间来作为排产时间了
                         planned_start_backup = fields.Datetime.from_string(all_mos[1].date_planned_start)
                     else:
-                        planned_start_backup = fields.Datetime.from_string(all_mos[0].date_planned_start)
+                        datetime_start = fields.Datetime.from_string(all_mos[0].date_planned_start)
+                        if datetime_start > self_date_planned_start:
+                            planned_start_backup = self_date_planned_start
+                        else:
+                            planned_start_backup = datetime_start
+
                     new_datetime = datetime(planned_start_backup.year,
                                             planned_start_backup.month,
                                             planned_start_backup.day,
@@ -333,8 +347,10 @@ class MrpProductionExtend(models.Model):
         if production_line:
             new_domain = domain + [("production_line_id", "=", production_line.id)]
             all_mos = self.env["mrp.production"].search(new_domain,
-                                                    order=ORDER_BY)
+                                                        order=ORDER_BY)
 
+        if production_line.id == origin_production_line.id:
+            return origin_mos, all_mos
         # filtered_all_mos = all_mos.filtered(lambda x: x.state in ["draft", "cancel", "waiting_material"])
         if origin_mos:
             self.compute_mo_time(origin_mos, origin_production_line, base_on_today)
@@ -420,7 +436,6 @@ class MrpProductionExtend(models.Model):
         origin_production_line = self.production_line_id
         if self.state not in ["draft", "confirmed", "waiting_material"]:
             raise UserError(u"该单据已经开始生产,不可从进行排产")
-
         # 改变产线和状态
         if not production_line_id:  #如果没有产线传上来, 就说明是从产线移除(取消排产)
             self.write({
