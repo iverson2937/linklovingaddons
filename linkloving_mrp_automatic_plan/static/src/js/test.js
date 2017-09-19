@@ -362,21 +362,29 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             var res_model = 'mrp.production';
 
             var own = this;
-
-            var model = new Model("mrp.production");
+            pyeval.eval_domains_and_contexts({
+                domains: [[]].concat(domains || []),
+                contexts: [].concat(contexts || []),
+                group_by_seq: groupbys || []
+            }).done(function (results) {
+                console.log(results);
+                var model = new Model("mrp.production");
             // model.call("create", [{res_model: res_model, type: approval_type}])
             //     .then(function (result) {
                     model.call('get_unplanned_mo', [[]], {
                         offset: own.offset - 1,
                         limit: own.limit,
-                        domains: domains,
+                            domains: results.domain,
                         process_id: own.process_id,
-                        contexts: contexts,
-                        groupbys: groupbys
+                            contexts: results.context,
+                            groupbys: results.groupby
                     })
                         .then(function (result) {
                             console.log(result);
                         })
+            })
+
+
                 // })
         },
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from myaddons.linkloving_app_api.controllers.controllers import STATUS_CODE_OK, JsonResponse
+from linklovingaddons.linkloving_app_api.controllers.controllers import STATUS_CODE_OK, JsonResponse
 from odoo import http
 from odoo.http import request
 
