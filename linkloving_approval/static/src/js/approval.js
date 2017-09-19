@@ -329,39 +329,66 @@ odoo.define('linkloving_approval.approval_core', function (require) {
         },
         search: function (domains, contexts, groupbys) {
             var self = this;
-
-            var res_model = 'product.attachment.info';
-
-
-            // var approval_type = 'waiting_submit';
-            var approval_type = $("#approval_tab").attr("data-now-tab");
-            console.log($("#approval_tab").attr("data-now-tab"));
-
             var own = this;
-
-
-            var model = new Model("approval.center");
-            model.call("create", [{res_model: res_model, type: approval_type}])
-                .then(function (result) {
-                    model.call('get_attachment_info_by_types', [result], {
-                        offset: own.begin - 1,
-                        limit: own.limit,
-                        domains: domains,
-                        contexts: contexts,
-                        groupbys: groupbys
-                    })
-                        .then(function (result) {
-                            console.log(result);
-                            own.length = result.length;
-                            self.$("#" + approval_type).html("");
-                            self.$("#" + approval_type).append(QWeb.render('approval_tab_content', {
-                                result: result.records,
-                                approval_type: approval_type
-                            }));
-                            own.render_pager(this);
+            var approval_type = $("#approval_tab").attr("data-now-tab");
+            pyeval.eval_domains_and_contexts({
+                domains: [[]].concat(domains || []),
+                contexts: [].concat(contexts || []),
+                group_by_seq: groupbys || []
+            }).done(function (results) {
+                var model = new Model("approval.center");
+                var res_model = 'product.attachment.info';
+                model.call("create", [{res_model: res_model, type: approval_type}])
+                    .then(function (result) {
+                        model.call('get_attachment_info_by_types', [[result]], {
+                            offset: own.begin - 1,
+                            limit: own.limit,
+                            domains: results.domain,
+                            contexts: results.context,
+                            groupbys: results.groupby
                         })
-                })
+                            .then(function (result) {
+                                console.log(result);
+                                own.length = result.length;
+                                self.$("#" + approval_type).html("");
+                                self.$("#" + approval_type).append(QWeb.render('approval_tab_content', {
+                                    result: result.records,
+                                    approval_type: approval_type
+                                }));
+                                own.render_pager(this);
+                            })
+                    })
+            })
 
+            // var res_model = 'product.attachment.info';
+            // // var approval_type = 'waiting_submit';
+            // var approval_type = $("#approval_tab").attr("data-now-tab");
+            // console.log($("#approval_tab").attr("data-now-tab"));
+            //
+            // var own = this;
+            //
+            //
+            // var model = new Model("approval.center");
+            // model.call("create", [{res_model: res_model, type: approval_type}])
+            //     .then(function (result) {
+            //         model.call('get_attachment_info_by_types', [result], {
+            //             offset: own.begin - 1,
+            //             limit: own.limit,
+            //             domains: domains,
+            //             contexts: contexts,
+            //             groupbys: groupbys
+            //         })
+            //             .then(function (result) {
+            //                 console.log(result);
+            //                 own.length = result.length;
+            //                 self.$("#" + approval_type).html("");
+            //                 self.$("#" + approval_type).append(QWeb.render('approval_tab_content', {
+            //                     result: result.records,
+            //                     approval_type: approval_type
+            //                 }));
+            //                 own.render_pager(this);
+            //             })
+            //     })
 
         },
         render_pager: function () {
