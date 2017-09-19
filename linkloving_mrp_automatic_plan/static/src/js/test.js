@@ -42,15 +42,15 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             'click .alia_confirm': 'confirm_alia_fun'
         },
         confirm_alia_fun:function () {
-            console.log($('.alia_input').val());
-            console.log(this.alia_mo);
             var self = this;
             new Model("mrp.production")
                     .call("write", [[parseInt(this.alia_mo)], {'alia_name':  $('.alia_input').val()}])
                     .then(function (result) {
                         console.log(result);
                         $('.create_alia_container').hide();
-                        $(self.a_p_create_alia).html($('.alia_input').val());
+                        if($('.alia_input').val() != ''){
+                            $(self.a_p_create_alia).html($('.alia_input').val());
+                        }
                     })
         },
         close_create_alia:function () {
@@ -59,7 +59,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
         show_create_alia:function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
-            $('.alia_input').val('')
+            $('.alia_input').val('');
             $('.create_alia_container').show();
             this.alia_mo = $(target).parents('.ap_item_wrap').attr('data-mo-id');
             this.a_p_create_alia = $(target);
@@ -370,6 +370,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         offset: own.offset - 1,
                         limit: own.limit,
                         domains: domains,
+                        process_id: own.process_id,
                         contexts: contexts,
                         groupbys: groupbys
                     })
