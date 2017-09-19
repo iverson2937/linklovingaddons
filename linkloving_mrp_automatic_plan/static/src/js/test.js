@@ -367,25 +367,25 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 contexts: [].concat(contexts || []),
                 group_by_seq: groupbys || []
             }).done(function (results) {
-                console.log(results);
+                own.offset = 1;
                 var model = new Model("mrp.production");
-            // model.call("create", [{res_model: res_model, type: approval_type}])
-            //     .then(function (result) {
-                    model.call('get_unplanned_mo', [[]], {
-                        offset: own.offset - 1,
-                        limit: own.limit,
-                            domains: results.domain,
-                        process_id: own.process_id,
-                            contexts: results.context,
-                            groupbys: results.groupby
-                    })
-                        .then(function (result) {
-                            console.log(result);
-                        })
+                model.call('get_unplanned_mo', [[]], {
+                    offset: own.offset - 1,
+                    limit: own.limit,
+                    domains: results.domain,
+                    process_id: own.process_id,
+                    contexts: results.context,
+                    groupbys: results.groupby
+                }).then(function (result) {
+                        console.log(result)
+                        $("#a_p_right .a_p_right_head").nextAll().remove();
+                        $("#a_p_right").append(QWeb.render('a_p_render_right_tmpl',{result: result.result, show_more:false,selection:own.states.state.selection, new_selection:own.states.product_order_type.selection}));
+                        own.length = result.length;
+                        own.render_pager();
+                        own.setup_search_view();
+                })
             })
 
-
-                // })
         },
 
 
