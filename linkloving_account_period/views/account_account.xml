@@ -44,6 +44,7 @@
             <field name="view_type">tree</field>
             <field name="view_id" ref="view_account_tree"/>
             <field name="domain">[]</field>
+            <field name="context">{'show_parent_account':True}</field>
         </record>
 
         <menuitem id="menu_account_account" name="科目" parent="account.menu_finance_reports"
