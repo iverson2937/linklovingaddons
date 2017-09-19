@@ -382,10 +382,12 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         $("#a_p_right").append(QWeb.render('a_p_render_right_tmpl',{result: result.result, show_more:false,selection:own.states.state.selection, new_selection:own.states.product_order_type.selection}));
                         own.length = result.length;
                         own.render_pager();
-                        own.setup_search_view();
+                    //own.setup_search_view();
                 })
             })
 
+
+            // })
         },
 
 
