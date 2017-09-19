@@ -138,7 +138,19 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
         move_over_left:function (ev) {
             ev.preventDefault();
             var elem = document.getElementById(move_id); //当前拖动的元素
-            var toElem = ev.target;
+            var toElem = ev.target;  //松开鼠标释放节点时光标所在元素
+            //判断是否拖动后还在一个产线  若是 则不做操作
+            if($(elem).parents('.production_lists_wrap').length>=1){
+                var elem_line_index = $(elem).parents('.production_lists_wrap').prev('.production_line').attr('data-index');  //若拖动的节点在左边  取到他所在产线的序号
+                if($(toElem).hasClass('production_lists_wrap')){
+                    if($(toElem).prev('.production_line').attr('data-index') == elem_line_index){
+                        return
+                    }
+                }else if ($(toElem).parents('.production_lists_wrap').prev('.production_line').attr('data-index') == elem_line_index){
+                    return
+                }
+            }
+
             if(toElem.className == 'ap_item_wrap'){
                 // $(elem).insertBefore($(toElem));
                 var mo_id = $(elem).attr("data-mo-id");
@@ -368,28 +380,11 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 group_by_seq: groupbys || []
             }).done(function (results) {
                 own.offset = 1;
-                var model = new Model("mrp.production");
-                model.call('get_unplanned_mo', [[]], {
-                    offset: own.offset - 1,
-                    limit: own.limit,
-                    domains: results.domain,
-                    process_id: own.process_id,
-                    contexts: results.context,
-                    groupbys: results.groupby
-                }).then(function (result) {
-                        console.log(result)
-                        $("#a_p_right .a_p_right_head").nextAll().remove();
-                        $("#a_p_right").append(QWeb.render('a_p_render_right_tmpl',{result: result.result, show_more:false,selection:own.states.state.selection, new_selection:own.states.product_order_type.selection}));
-                        own.length = result.length;
-                        own.render_pager();
-                    //own.setup_search_view();
-                })
+                own.domain = results.domain;
+                own.un_arrange_production(own.process_id,10,own.offset,own)
             })
 
-
-            // })
         },
-
 
         render_pager: function () {
             if ($(".approval_pagination")) {
@@ -424,9 +419,9 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
         //右边未排产的接口
         un_arrange_production:function (process_id,limit,offset,own) {
             framework.blockUI();
-            console.log(own.states.product_order_type.selection)
+            // console.log(own.states.product_order_type.selection)
             new Model("mrp.production")
-                    .call("get_unplanned_mo", [[]], {process_id:process_id,limit:limit,offset:offset-1})
+                    .call("get_unplanned_mo", [[]], {process_id:process_id,limit:limit,offset:offset-1,domains:own.domain})
                     .then(function (result) {
                         console.log(result);
 
