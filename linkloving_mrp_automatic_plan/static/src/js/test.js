@@ -5,15 +5,19 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
     "use strict";
     var core = require('web.core');
     var Model = require('web.Model');
+    var data_manager = require('web.data_manager');
     var ControlPanelMixin = require('web.ControlPanelMixin');
     var ControlPanel = require('web.ControlPanel');
     var Widget = require('web.Widget');
     var data = require('web.data');
+    var ListView = require('web.ListView');
     var common = require('web.form_common');
     var Pager = require('web.Pager');
     var datepicker = require('web.datepicker');
     var Dialog = require('web.Dialog');
     var framework = require('web.framework');
+    var SearchView = require('web.SearchView');
+    var pyeval = require('web.pyeval');
     var QWeb = core.qweb;
     var _t = core._t;
     var myself;
@@ -297,6 +301,85 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             self.offset=1;
             self.length = 10;
         },
+        //搜索部分
+        setup_search_view: function () {
+            var self = this;
+            if (this.searchview) {
+                this.searchview.destroy();
+            }
+            var search_defaults = {};
+            var options = {
+                hidden: true,
+                disable_custom_filters: true,
+                $buttons: $("<div>"),
+                action: this.action,
+                search_defaults: search_defaults,
+            };
+            self.dataset = new data.DataSetSearch(this, "mrp.production", {}, false);
+            $.when(self.load_views()).done(function () {
+                // Instantiate the SearchView, but do not append it nor its buttons to the DOM as this will
+                // be done later, simultaneously to all other ControlPanel elements
+                self.searchview = new SearchView(self, self.dataset, self.search_fields_view, options);
+                var $node1 = $('<div/>').addClass('no_arrange_product_searchview')
+                $(".a_p_right_head").prepend($node1);
+                self.searchview.on('search_data', self, self.search.bind(self));
+                $.when(self.searchview.appendTo($node1)).done(function () {
+                    self.searchview_elements = {};
+                    self.searchview_elements.$searchview = self.searchview.$el;
+                    self.searchview_elements.$searchview_buttons = self.searchview.$buttons.contents();
+                    self.searchview.do_show();
+                });
+            });
+
+        },
+        load_views: function (load_fields) {
+            var self = this;
+            var views = [];
+            _.each(this.views, function (view) {
+                if (!view.fields_view) {
+                    views.push([view.view_id, view.type]);
+                }
+            });
+            var options = {
+                load_fields: load_fields,
+            };
+            if (!this.search_fields_view) {
+                options.load_filters = true;
+                views.push([false, 'search']);
+            }
+            return data_manager.load_views(this.dataset, views, options).then(function (fields_views) {
+                _.each(fields_views, function (fields_view, view_type) {
+                    if (view_type === 'search') {
+                        self.search_fields_view = fields_view;
+                    } else {
+                        self.views[view_type].fields_view = fields_view;
+                    }
+                });
+            });
+        },
+        search: function (domains, contexts, groupbys) {
+            var self = this;
+            var res_model = 'mrp.production';
+
+            var own = this;
+
+            var model = new Model("mrp.production");
+            // model.call("create", [{res_model: res_model, type: approval_type}])
+            //     .then(function (result) {
+                    model.call('get_unplanned_mo', [[]], {
+                        offset: own.offset - 1,
+                        limit: own.limit,
+                        domains: domains,
+                        contexts: contexts,
+                        groupbys: groupbys
+                    })
+                        .then(function (result) {
+                            console.log(result);
+                        })
+                // })
+        },
+
+
         render_pager: function () {
             if ($(".approval_pagination")) {
                 $(".approval_pagination").remove()
@@ -342,6 +425,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         framework.unblockUI();
                         own.length = result.length;
                         own.render_pager();
+                        own.setup_search_view();
                     })
         },
         setupFocus: function ($e) {

@@ -53,7 +53,6 @@
             </field>
         </record>
 
-
         <act_window id="action_multi_reset_confirm"
                     multi="True"
                     key2="client_action_multi" name="批量再确认补货"
