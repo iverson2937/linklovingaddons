@@ -12,7 +12,7 @@ from odoo import api, fields, models, _
 class AccountAccountType(models.Model):
     _inherit = "account.account.type"
 
-    type = fields.Selection(selection_add=[('view', 'View')])
+    type = fields.Selection(selection_add=[('view', u'视图')])
 
 
 class AccountAccount(models.Model):
