@@ -55,6 +55,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
         show_create_alia:function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
+            $('.alia_input').val('')
             $('.create_alia_container').show();
             this.alia_mo = $(target).parents('.ap_item_wrap').attr('data-mo-id');
             this.a_p_create_alia = $(target);
