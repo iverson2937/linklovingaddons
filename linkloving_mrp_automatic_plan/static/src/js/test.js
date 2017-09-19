@@ -41,14 +41,21 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             'click .alia_cancel': 'close_create_alia',
             'click .alia_confirm': 'confirm_alia_fun'
         },
-        confirm_alia_fun:function () {
+        confirm_alia_fun:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
             var self = this;
+            if($('.alia_input').val().length>=16){
+                Dialog.alert(target, "字符数不能超过16个");
+                return;
+            }
             new Model("mrp.production")
                     .call("write", [[parseInt(this.alia_mo)], {'alia_name':  $('.alia_input').val()}])
                     .then(function (result) {
                         console.log(result);
                         $('.create_alia_container').hide();
-                        if($('.alia_input').val() != ''){
+                        var alia_val = $('.alia_input').val().replace(/\s+/g, "");
+                        if(alia_val != ''){
                             $(self.a_p_create_alia).html($('.alia_input').val());
                         }
                     })
