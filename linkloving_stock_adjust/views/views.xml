@@ -28,7 +28,7 @@
                         <button name="confirm" states="draft" string="确认" type="object" state="draft"
                                 class="oe_highlight" groups="stock.group_stock_manager"/>
                         <button name="confirm_transfer" states="confirm" string="库存转换" type="object"
-                                class="oe_highlight" groups="stock.group_stock_manager"/>
+                                class="oe_highlight" groups="stock.group_stock_manager" confirm="确定调整库存吗？"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
                     </header>
                     <sheet>
@@ -57,7 +57,10 @@
                                 </field>
 
                             </page>
-                            <page string="生成物料" attrs="">
+
+                        </notebook>
+                        <notebook>
+                             <page string="生成物料" attrs="">
                                 <field name="output_product_ids" context="{'default_product_type':'output'}">
                                     <tree string="Stock Moves" editable="bottom">
                                         <field name="product_id" options="{'no_create':True}"

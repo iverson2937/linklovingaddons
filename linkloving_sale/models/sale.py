@@ -22,7 +22,6 @@ class SaleOrder(models.Model):
     shipped_amount = fields.Float(compute='_compute_invoice_amount')
     pre_payment_amount = fields.Float(compute='_compute_invoice_amount')
 
-
     # 重新计算收货数量由于出入库bug临时使用
     def recompute_receive_amount(self):
         for line in self.order_line:
@@ -77,6 +76,11 @@ class SaleOrder(models.Model):
                     qty = 0
                 count += qty
             order.product_count = count
+
+    @api.multi
+    def action_done(self):
+        for order in self:
+            order.state = 'done'
 
     @api.multi
     def button_dummy(self):

@@ -6,10 +6,11 @@ from odoo.exceptions import UserError
 
 class StockTransfer(models.Model):
     _name = 'stock.transfer'
-    name = fields.Char('名称')
+    name = fields.Char('名称', default='New')
     picking_type_id = fields.Many2one('stock.picking')
     input_product_ids = fields.One2many('stock.transfer.line', 'transfer_id', domain=[('product_type', '=', 'input')])
     output_product_ids = fields.One2many('stock.transfer.line', 'transfer_id', domain=[('product_type', '=', 'output')])
+
     @api.model
     def _default_location_id(self):
         company_user = self.env.user.company_id
@@ -39,6 +40,13 @@ class StockTransfer(models.Model):
     # picking_type_id = fields.Many2one(
     #     'stock.picking.type', 'Picking Type',
     #     default=_get_default_picking_type, required=True)
+    @api.model
+    def create(self, vals):
+        if vals.get('name', 'New') == 'New':
+            print self.env['ir.sequence'].next_by_code('stock.transfer') or 'New'
+            vals['name'] = self.env['ir.sequence'].next_by_code('stock.transfer') or 'New'
+        print vals['name']
+        return super(StockTransfer, self).create(vals)
 
     @api.multi
     def confirm(self):
@@ -48,7 +56,7 @@ class StockTransfer(models.Model):
     def confirm_transfer(self):
         inv_id = self.env['stock.inventory'].create({
             'filter': 'partial',
-            'name': 'abc'
+            'name': self.name
         })
         inv_id.prepare_inventory()
         print inv_id
@@ -67,6 +75,7 @@ class StockTransfer(models.Model):
                 'location_id': inv_id.location_id.id
             })
         inv_id.action_done()
+        self.state = 'done'
 
 
 class StockTransferLine(models.Model):
