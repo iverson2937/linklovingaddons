@@ -32,12 +32,37 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             'dragstart .ap_item_wrap': 'move_start',
             'click .to_bom': 'to_bom_func',
             'click .to_relevant_struc': 'to_relevant_struc_func',
-            'click .a_p_mo_name':'to_mo_func'
+            'click .a_p_mo_name':'to_mo_func',
+            'click .a_p_create_alia': 'show_create_alia',
+            'click .alia_cancel': 'close_create_alia',
+            'click .alia_confirm': 'confirm_alia_fun'
+        },
+        confirm_alia_fun:function () {
+            console.log($('.alia_input').val());
+            console.log(this.alia_mo);
+            var self = this;
+            new Model("mrp.production")
+                    .call("write", [[parseInt(this.alia_mo)], {'alia_name':  $('.alia_input').val()}])
+                    .then(function (result) {
+                        console.log(result);
+                        $('.create_alia_container').hide();
+                        $(self.a_p_create_alia).html($('.alia_input').val());
+                    })
+        },
+        close_create_alia:function () {
+            $('.create_alia_container').hide();
+        },
+        show_create_alia:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            $('.create_alia_container').show();
+            this.alia_mo = $(target).parents('.ap_item_wrap').attr('data-mo-id');
+            this.a_p_create_alia = $(target);
         },
         to_mo_func:function (e) {
-             var e = e || window.event;
-             var target = e.target || e.srcElement;
-             var action = {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var action = {
                 type: 'ir.actions.act_window',
                 res_model:'mrp.production',
                 view_type: 'form',
@@ -125,14 +150,14 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 });
             }
             else if($(toElem).hasClass('production_lists_wrap')){
-                $(toElem).prepend($(elem));
+                // $(toElem).prepend($(elem));
                 var mo_id = $(elem).attr("data-mo-id");
                 var pt_line_index = $(toElem).prev('.production_line').attr('data-index');
                 if($(toElem).hasClass('production_lists_no_item')){
                     $(toElem).removeClass('production_lists_no_item')
                 }
                 myself.no_ap_to_ag(parseInt(mo_id), myself.mydataset.product_line[pt_line_index].id,toElem,elem, function () {
-                    $(elem).insertBefore($(toElem).parents('.ap_item_wrap'));
+                    $(toElem).prepend($(elem));
                 });
             }
         },

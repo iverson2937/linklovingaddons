@@ -161,3 +161,27 @@
     display: inline-block;
     cursor: pointer;
 }
+.create_alia_wrap{
+    position: absolute;
+    top:30%;
+    left:0;
+    right:0;
+    margin: 0 auto;
+    width: 280px;
+    z-index: 1040;
+    background: white;
+    padding: 30px;
+}
+.create_alia_wrap .modal{
+    display: block;
+}
+.create_alia_wrap .a_p_alia_confirm{
+    width: 50px;
+    margin-left: 580px;
+}
+.create_alia_container .alia_confirm .alia_cancel{
+    margin-top:20px;
+}
+.create_alia_container{
+    display: none;
+}
