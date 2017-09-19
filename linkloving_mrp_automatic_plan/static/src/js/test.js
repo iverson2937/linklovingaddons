@@ -218,11 +218,10 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                                 var elem_wrap = $(toElem);
                             }//获取目的位置
 
-                            if ($(ele).parents('.production_lists_wrap').length >= 1) {//左边到左边
-                                var origin_wrap = $(ele).parents('.production_lists_wrap');//取到from
-                                $(ele).parents('.production_lists_wrap').html('');
+                            if ($(origin_wrap_bkup).length >= 1) {//左边到左边  from位置
+                                $(origin_wrap_bkup).html('');
                                 var new_items = QWeb.render('a_p_render_right_tmpl', {result: result.origin_pl_mos, show_more:true,selection:myself.states.state.selection,new_selection:myself.states.product_order_type.selection})
-                                $(origin_wrap).append(new_items);
+                                $(origin_wrap_bkup).append(new_items);
                             }
                             //重新渲染拖动的MO所在的产线
                             $(elem_wrap).html('');
