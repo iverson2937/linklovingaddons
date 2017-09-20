@@ -998,7 +998,11 @@ class MrpProductionProduceExtend(models.TransientModel):
                 fixed_location_ids = location.putaway_strategy_id.fixed_location_ids
 
                 if self.production_id.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:  # 半成品入库
-                    feedback.action_post_inventory()
+                    try:
+                        feedback.action_post_inventory()
+                    except Exception, e:
+                        feedback.unlink()
+                        raise UserError(e)
 
         return {'type': 'ir.actions.act_window_close'}
 
@@ -1558,8 +1562,8 @@ class MrpQcFeedBack(models.Model):
             'product_uom_id': self.production_id.product_uom_id.id,
             'product_id': self.production_id.product_id.id,
         })
-
         produce.do_produce_and_post_inventory()
+
         self.state = "alredy_post_inventory"
 
     # 品捡失败 -> 返工
