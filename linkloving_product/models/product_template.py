@@ -12,9 +12,16 @@ class ProductTemplate11(models.Model):
                                  string=u'客户')
     is_updated = fields.Boolean()
 
+    @api.model
+    def create(self, vals):
+        if vals.get('default_code'):
+            vals['default_code'] = vals.get('default_code').replace(' ', '')
+        return super(ProductTemplate11, self).create(vals)
 
     @api.multi
     def write(self, vals):
+        if vals.get('default_code'):
+            vals['default_code'] = vals.get('default_code').replace(' ', '')
         if 'default_code' in vals and vals['default_code'] != self.default_code:
             vals.update({'is_updated': True})
         return super(ProductTemplate11, self).write(vals)

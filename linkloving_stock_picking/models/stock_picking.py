@@ -401,3 +401,12 @@ class StockMovePicking(models.Model):
             res.write({'quantity_adjusted_qty': move_one.qty_available - vals.get('product_uom_qty'),
                        'move_order_type': 'hand_movement_out'})
         return res
+
+    @api.multi
+    def write(self, vals):
+        for move in self:
+            if vals.get('state') and move:
+                if vals.get('state') == 'done':
+                    vals['quantity_adjusted_qty'] = move.product_id.qty_available
+            res = super(StockMovePicking, move).write(vals)
+            return res
