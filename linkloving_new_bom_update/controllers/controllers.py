@@ -75,7 +75,7 @@ class LinklovingNewBomUpdate(http.Controller):
                 first_col = sheet1.col(ss)
                 first_col.width = 300 * 70 if ss == 0 else 300 * 40
 
-            row0 = [u'原材料', u'数量', u'单位成本', u'总成本']
+            row0 = [u'原材料', u'数量', u'单位成本(单位/¥)', u'总成本(单位/¥)']
 
             sheet1.write_merge(0, 0, 0, 3, mrp_bom_data.display_name, self.set_style('Arial', 300, True))  # 第一列
 
