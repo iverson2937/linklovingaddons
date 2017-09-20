@@ -2027,6 +2027,10 @@ class LinklovingAppApi(http.Controller):
                 group_ret = request.env['stock.picking.type'].sudo().search([('id','=',group_id)], limit=1)
                 if group_ret:
                     group_obj = group_ret[0]
+                    uid = request.context.get("uid")
+                    user = request.env['res.users'].sudo().browse(uid)
+                    if group_obj.warehouse_id.company_id.id != user.company_id.id:
+                        continue
                 temp_domain = []
                 temp_domain.append(('picking_type_id', '=', group_id))
                 if partner_id:
@@ -2035,6 +2039,7 @@ class LinklovingAppApi(http.Controller):
                 state_group_list = request.env[model].sudo(LinklovingAppApi.CURRENT_USER()).read_group(temp_domain,
                                                                                                        fields=['state'],
                                                                                                        groupby=['state'])
+
                 new_group = {
                     'picking_type_id' : group_id,
                     'picking_type_name' : group.get('picking_type_id')[1],
@@ -2159,7 +2164,10 @@ class LinklovingAppApi(http.Controller):
         partner_id = request.jsonrequest.get('partner_id')
         state = request.jsonrequest.get("state")
         domain = []
-        domain.append(('picking_type_id', '=', picking_type_id))
+        if type(picking_type_id) == list:
+            domain.append(('picking_type_id', 'in', picking_type_id))
+        else:
+            domain.append(('picking_type_id', '=', picking_type_id))
         domain.append(('state', '=', state))
         if partner_id:
             domain.append(('partner_id', 'child_of', partner_id))
@@ -2464,7 +2472,7 @@ class LinklovingAppApi(http.Controller):
 
             'back_order_id': stock_picking_obj.backorder_id.name or '',
             'emergency': stock_picking_obj.is_emergency,
-            'creater': stock_picking_obj.create_uid.name or '',
+            'creater': stock_picking_obj.sudo().create_uid.name or '',
             'location_id': stock_picking_obj.location_id.complete_name or '',
             'tracking_number': stock_picking_obj.tracking_number or '',
 

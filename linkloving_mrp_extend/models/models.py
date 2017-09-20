@@ -1024,8 +1024,8 @@ class MrpProductionProduceExtend(models.TransientModel):
             #     move.quantity_done_store = move.quantity_done_store / (1 + move.bom_line_id.scrap_rate / 100)
         moves = self.production_id.move_finished_ids.filtered(
             lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel'))
-        if not moves and self.production_id.qty_unpost > self.production_id.product_qty:
-            raise UserError(u"产出数量异常")
+        # if not moves:
+        #     raise UserError(u"产出数量异常")
         for move in moves:
             if move.product_id.id == self.production_id.product_id.id:
                 move.quantity_done_store += quantity
