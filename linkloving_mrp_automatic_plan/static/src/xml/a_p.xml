@@ -115,10 +115,17 @@
                             ctx.item.planned_start_backup = change_time(ctx.item.planned_start_backup);
                         }
                     </t>
-                    <span class="a_p_latest_time">最晚开始：<t t-esc="item.planned_start_backup" /></span>
+                    <span class="a_p_latest_time">最晚开始：
+                        <t t-if="item.planned_start_backup == false">
+                            <button class="btn btn-default may_choose_a_time">新建一个时间</button>
+                        </t>
+                        <t t-else="">
+                            <button class="btn btn-default may_choose_a_time"><t t-esc="item.planned_start_backup"/></button>
+                        </t>
+                    </span>
                     <t t-if="show_more">
-                        <span class="a_p_latest_time">预计开始：<t t-esc="item.date_planned_start" /></span>
-                        <span class="a_p_latest_time">预计结束：<t t-esc="item.date_planned_finished" /></span>
+                        <span class="a_p_forecast_start">预计开始：<t t-esc="item.date_planned_start" /></span>
+                        <span class="a_p_forecast_end">预计结束：<t t-esc="item.date_planned_finished" /></span>
                     </t>
                 </div>
                 <!--<div class="a_p_item_bottom">-->

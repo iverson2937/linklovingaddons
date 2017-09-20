@@ -39,7 +39,16 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             'click .a_p_mo_name':'to_mo_func',
             'click .a_p_create_alia': 'show_create_alia',
             'click .alia_cancel': 'close_create_alia',
-            'click .alia_confirm': 'confirm_alia_fun'
+            'click .alia_confirm': 'confirm_alia_fun',
+            'click .may_choose_a_time':'change_late_time'
+        },
+        change_late_time:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var self = this;
+            var select_time_wrap = $(target).parents('.a_p_latest_time');
+            $(target).remove();
+            self.init_date_widget($(select_time_wrap));
         },
         confirm_alia_fun:function (e) {
             var e = e || window.event;
@@ -282,14 +291,23 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                     })
         },
         build_widget: function() {
-            return new datepicker.DateWidget(this);
+            return new datepicker.DateTimeWidget(this);
         },
         init_date_widget:function (node) {
              var self = this;
             this.datewidget = this.build_widget();
             this.datewidget.on('datetime_changed', this, function() {
                 myself.chose_date = self.datewidget.get_value();
-                $(".bootstrap-datetimepicker-widget").attr('id','a_p_date');
+                // $(".bootstrap-datetimepicker-widget").attr('id','a_p_date');
+                if(node[0].className == 'a_p_latest_time'){
+                    new Model("mrp.production")
+                    .call("write", [[parseInt($(node).parents('.ap_item_wrap').attr('data-mo-id'))], {'planned_start_backup':  myself.chose_date}])
+                    .then(function (result) {
+                        console.log(result)
+                    })
+
+                    return
+                }
                 $(".a_p_showorhide").each(function () {
                     if($(this).hasClass('fa-chevron-up')){
                         $(this).parents('.production_line').next('.production_lists_wrap').slideToggle("fast");
@@ -298,7 +316,12 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                     }
                 })
             });
+            console.log(node);
             this.datewidget.appendTo(node).done(function() {
+                console.log(self.datewidget.$el);
+                // self.datewidget.$el.addClass(self.$el.attr('class'));
+                // self.replaceElement(self.datewidget.$el);
+                // self.datewidget.$input.addClass('o_form_input');
                 self.setupFocus(self.datewidget.$input);
                 self.datewidget.set_datetime_default();
                 self.datewidget.commit_value();
@@ -479,6 +502,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         console.log(result);
                         myself.mydataset.product_line = result;
                         self.$el.eq(0).append(QWeb.render('a_p_render_tmpl', {result: result}));
+                        console.log($(".a_p_time_start"));
                         self.init_date_widget($(".a_p_time_start"));
                         framework.unblockUI();
                     })

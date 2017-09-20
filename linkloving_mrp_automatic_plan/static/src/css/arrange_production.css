@@ -93,7 +93,7 @@
 .a_p_product_name{
     margin: 3px;
 }
-.a_p_process_res,.a_p_latest_time,.a_p_arrange_qty,.a_p_spend_time,.a_p_planned_start,.a_p_planned_end{
+.a_p_process_res,.a_p_latest_time,.a_p_arrange_qty,.a_p_spend_time,.a_p_planned_start,.a_p_planned_end,.a_p_forecast_start,.a_p_forecast_end{
     display: block;
     margin-bottom: 8px;
 }
@@ -110,9 +110,12 @@
 .a_p_time_end{
     display: inline-block;
 }
-#a_p_left #a_p_date{
+#a_p_left .production_lists_wrap + .bootstrap-datetimepicker-widget{
     left: 60px!important;
+    top: 90px!important;
 }
+
+
 .production_lists_no_item{
     padding: 100px 0;
     border: 1px solid #c7c7c7;
@@ -184,4 +187,7 @@
 }
 .create_alia_container{
     display: none;
+}
+.a_p_latest_time .btn{
+    padding: 0!important;
 }

@@ -134,16 +134,16 @@ class MrpProductionLine(models.Model):
     #根据产线id获取已排产mo
     def get_mo_by_productin_line(self, **kwargs):
         production_line_id = kwargs.get("production_line_id")
-        planned_date = kwargs.get("planned_date")
+        # planned_date = kwargs.get("planned_date")
         limit = kwargs.get("limit")
         offset = kwargs.get("offset")
-        current_day_start_time = fields.datetime.strptime(planned_date, '%Y-%m-%d')
+        # current_day_start_time = fields.datetime.strptime(planned_date, '%Y-%m-%d')
         tz_name = self._context.get("tz") or self.env.user.tz
         context_tz = pytz.timezone(tz_name)
-        start_time_utc = current_day_start_time - relativedelta(seconds=context_tz._utcoffset.seconds)
-        end_time_utc = start_time_utc + relativedelta(days=1)
-        start_time_str = fields.datetime.strftime(start_time_utc, DEFAULT_SERVER_DATETIME_FORMAT)
-        end_time_str = fields.datetime.strftime(end_time_utc, DEFAULT_SERVER_DATETIME_FORMAT)
+        # start_time_utc = current_day_start_time - relativedelta(seconds=context_tz._utcoffset.seconds)
+        # end_time_utc = start_time_utc + relativedelta(days=1)
+        # start_time_str = fields.datetime.strftime(start_time_utc, DEFAULT_SERVER_DATETIME_FORMAT)
+        # end_time_str = fields.datetime.strftime(end_time_utc, DEFAULT_SERVER_DATETIME_FORMAT)
         # utc_timestamp = pytz.utc.localize(start_time_utc, is_dst=False)  # UTC = no DST
         # if tz_name:
         # try:
