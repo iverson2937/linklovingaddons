@@ -93,7 +93,7 @@ class LinklovingNewBomUpdate(http.Controller):
                 sheet1.write(j, 0, data['display_name'], style)
                 sheet1.write(j, 1, str(data['product_qty']) + data.product_uom_id['name'], style)
                 sheet1.write(j, 2, data.product_id['standard_price'], style)
-                sheet1.write(j, 3, str(data['product_qty'] * data.product_id['standard_price']), style)
+                sheet1.write(j, 3, data['product_qty'] * data.product_id['standard_price'], style)
 
         # f.save('demo1.xlsx')  # 保存文件
 
