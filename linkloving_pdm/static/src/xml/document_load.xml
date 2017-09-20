@@ -28,9 +28,11 @@
                 <t t-set="i" t-value="2"/>
             </t>
         </ul>
-        <div class="create_document">
-            <button class="btn btn-primary create_document_btn">创建</button>
-        </div>
+            <div class="create_document">
+                <button class="btn btn-primary create_document_btn">创建</button>
+
+                <button style="display:none;" class="btn btn-primary delect_hide delect_document_checked">删除选中</button>
+            </div>
 
         <div id="myTabContent" class="tab-content">
             <t t-set="j" t-value="1"/>
@@ -40,6 +42,12 @@
                         <t t-foreach="item.files" t-as="item_files">
                             <div class="tab_pane_display" t-att-data-id="item_files.id">
                                 <div class="tab_message_display">
+                                    <div>
+                                        <input type="checkbox" class="o_chat_header_file" t-att-name="item_files.id">选中</input>
+                                    </div>
+
+                                    <div>产品名字：<span t-att-product-id="item_files.product_id.id" class="approval_product_name"><t t-esc="item_files.product_id.name"/></span></div>
+
                                     <div>文件：<span><t t-esc="item_files.file_name"/></span></div>
                                     <!--<div>审核人：<span><t t-esc="item_files.review_id"/></span></div>-->
                                     <t t-if="item_files.remote_path!=''">
@@ -96,6 +104,11 @@
                                         <button class="btn btn-primary document_download">下载</button>
                                     </t>
                                     <button class="btn btn-primary get_version_history">查看历史版本</button>
+
+                                    <div class="delect_one_document" style="padding-top: 10px;">
+                                        <button class="btn btn-primary delect_document_checked">删除</button>
+                                    </div>
+
                                 </div>
                             </div>
                         </t>
@@ -131,7 +144,7 @@
                         <!--<t t-if=""-->
 
                          <a id="my_load_file__a_1"  href="javascript:void(-1);">选择文件
-                            <!--<input type="file" class="my_load_file" name="my_load_file"/>-->
+                             <!--<input type="file" class="my_load_file" name="my_load_file"/>-->
                         </a>
 
                         <a href="javascript:;" id="my_load_file_a">选择文件
@@ -158,6 +171,13 @@
         <t t-foreach="result.files" t-as="item_files">
             <div class="tab_pane_display" t-att-data-id="item_files.id">
                 <div class="tab_message_display">
+
+                    <div>
+                                        <input type="checkbox" class="o_chat_header_file" t-att-name="item_files.id">
+                                                                        选中
+                                                                    </input>
+                                    </div>
+
                     <div>产品名字：<span t-att-product-id="item_files.product_id.id" class="approval_product_name"><t t-esc="item_files.product_id.name"/></span></div>
                     <div>文件：<span><t t-esc="item_files.file_name"/></span></div>
                     <!--<div>审核人：<span><t t-esc="item_files.review_id"/></span></div>-->
@@ -213,6 +233,11 @@
                             <button class="btn btn-primary document_download" t-att-data="item_files.type">下载</button>
                     </t>
                     <button class="btn btn-primary get_version_history">查看历史版本</button>
+
+                    <div class="delect_one_document" style="padding-top: 10px;">
+                        <button class="btn btn-primary delect_document_checked">删除</button>
+                    </div>
+
                 </div>
             </div>
         </t>

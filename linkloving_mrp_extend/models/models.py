@@ -998,7 +998,11 @@ class MrpProductionProduceExtend(models.TransientModel):
                 fixed_location_ids = location.putaway_strategy_id.fixed_location_ids
 
                 if self.production_id.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:  # 半成品入库
-                    feedback.action_post_inventory()
+                    try:
+                        feedback.action_post_inventory()
+                    except Exception, e:
+                        feedback.unlink()
+                        raise UserError(e)
 
         return {'type': 'ir.actions.act_window_close'}
 
@@ -1020,8 +1024,9 @@ class MrpProductionProduceExtend(models.TransientModel):
             #     move.quantity_done_store = move.quantity_done_store / (1 + move.bom_line_id.scrap_rate / 100)
         moves = self.production_id.move_finished_ids.filtered(
             lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel'))
-        if not moves and self.production_id.qty_unpost > self.production_id.product_qty:
-            raise UserError(u"产出数量异常")
+        # if not moves and self.production_id.qty_unpost > self.production_id.product_qty:
+        # self.production_id.move_finished_ids[0].copy(default={'quantity_done': quantity,
+        #                                                       'product_uom_qty': quantity,})
         for move in moves:
             if move.product_id.id == self.production_id.product_id.id:
                 move.quantity_done_store += quantity
@@ -1230,12 +1235,12 @@ class SimStockMove(models.Model):
                 if move.product_id == sim_move.product_id and move.is_return_material:
                     sim_move.return_qty += move.product_qty
 
-    def _compute_raw_material_production_id(self):
+    def _compute_procurement_id(self):
         for sim_move in self:
             if sim_move.stock_moves:
                 sim_move.procurement_id = sim_move.stock_moves[0].procurement_id
 
-    def _compute_procurement_id(self):
+    def _compute_raw_material_production_id(self):
         for sim_move in self:
             if sim_move.stock_moves:
                 sim_move.raw_material_production_id = sim_move.stock_moves[0].raw_material_production_id
@@ -1558,8 +1563,8 @@ class MrpQcFeedBack(models.Model):
             'product_uom_id': self.production_id.product_uom_id.id,
             'product_id': self.production_id.product_id.id,
         })
-
         produce.do_produce_and_post_inventory()
+
         self.state = "alredy_post_inventory"
 
     # 品捡失败 -> 返工

@@ -30,7 +30,8 @@
                                 groups="hr_expense.group_hr_expense_manager"
                                 type="object"/>
                         <button name="%(linkloveing_hr.account_employee_refuse_wizard_action)d" class="oe_link"
-                                states="confirm,manager1_approve,manager2_approve,manager3_approve" string="Reject"
+                                states="confirm,manager1_approve,manager2_approve,manager3_approve,approve"
+                                string="Reject"
                                 groups="hr_expense.group_hr_expense_user"
                                 type="action"/>
                         <!--<button name="set_account_date" class="oe_link"-->

@@ -13,7 +13,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
     var QWeb = core.qweb;
     var _t = core._t;
 
-    var DocumentManage = Widget.extend(ControlPanelMixin,{
+    var DocumentManage = Widget.extend(ControlPanelMixin, {
         template: 'document_load_page',
         events: {
             'show.bs.tab .tab_toggle_a': 'document_change_tabs',
@@ -29,8 +29,73 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             'click #my_load_file__a_1': 'request_local_server_pdm',
             'click .approval_product_name': 'product_pop',
             'click .document_modify_2': 'document_modify_2_fn',
+            'click input.o_chat_header_file': 'on_click_inputs_file',
+            'click button.delect_document_checked': 'on_click_btn_delect_file',
         },
-         //点击产品名弹出框
+
+        on_click_btn_delect_file: function (e) {
+            var self = this;
+            var attachment_list = [];
+
+            var cur_type = $("#document_tab li.active>a").attr("load_type");
+
+            if (e.target.parentNode.className == 'delect_one_document') {
+                var e = e || window.event;
+                var target = e.target || e.srcElement;
+                var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
+                console.log('删除一个' + new_file_id);
+                attachment_list.splice(0, 0, parseInt(new_file_id));
+            }
+            else {
+                console.log('删除选中' + self.file_checkbox);
+                if (self.file_checkbox) {
+                    for (var i = 0; i < self.file_checkbox.length; i++) {
+                        attachment_list[i] = parseInt(self.file_checkbox[i])
+                    }
+                }
+                $('.delect_hide').hide();
+            }
+
+            new Model("product.attachment.info")
+                .call("unlink_attachment_list", [attachment_list], {attachment_list: attachment_list})
+                .then(function (result_info) {
+                    console.log(result_info);
+                    if (result_info.template_id) {
+
+                        return new Model("product.template")
+                            .call("get_attachemnt_info_list", [result_info.template_id], {type: result_info.type})
+                            .then(function (result) {
+                                console.log(result);
+                                self.$("#" + result_info.type).html("");
+                                self.$("#" + result_info.type).append(QWeb.render('active_document_tab', {result: result}));
+                            });
+                    }
+                });
+        },
+
+
+        on_click_inputs_file: function (event) {
+            var self = this;
+
+            if ($(event.target).prop("checked")) {
+                self.file_checkbox.splice(0, 0, event.target.name);
+            } else {
+                if ($.inArray(event.target.name, self.file_checkbox) >= 0) {
+                    self.file_checkbox.splice($.inArray(event.target.name, self.file_checkbox), 1);
+                }
+            }
+
+            if (self.file_checkbox.length > 1)
+                $('.delect_hide').show();
+            else if (self.file_checkbox.length = 1)
+                $('.delect_hide').hide();
+
+            console.log(self.file_checkbox)
+
+        },
+
+
+        //点击产品名弹出框
         product_pop: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
@@ -371,6 +436,9 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 this.product_id = action.params.active_id;
             }
             var self = this;
+
+            this.file_checkbox = new Array();
+
         },
         start: function () {
             var self = this;

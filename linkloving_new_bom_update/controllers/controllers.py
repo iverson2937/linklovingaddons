@@ -75,7 +75,7 @@ class LinklovingNewBomUpdate(http.Controller):
                 first_col = sheet1.col(ss)
                 first_col.width = 300 * 70 if ss == 0 else 300 * 40
 
-            row0 = [u'原材料', u'数量', u'单位成本', u'总成本']
+            row0 = [u'原材料', u'数量', u'单位成本(单位/¥)', u'总成本(单位/¥)']
 
             sheet1.write_merge(0, 0, 0, 3, mrp_bom_data.display_name, self.set_style('Arial', 300, True))  # 第一列
 
@@ -93,7 +93,7 @@ class LinklovingNewBomUpdate(http.Controller):
                 sheet1.write(j, 0, data['display_name'], style)
                 sheet1.write(j, 1, str(data['product_qty']) + data.product_uom_id['name'], style)
                 sheet1.write(j, 2, data.product_id['standard_price'], style)
-                sheet1.write(j, 3, str(data['product_qty'] * data.product_id['standard_price']), style)
+                sheet1.write(j, 3, data['product_qty'] * data.product_id['standard_price'], style)
 
         # f.save('demo1.xlsx')  # 保存文件
 

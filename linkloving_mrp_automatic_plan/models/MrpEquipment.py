@@ -131,6 +131,15 @@ class MrpProductionLine(models.Model):
         lines = self.env["mrp.production.line"].search_read([("process_id", "=", process_id), ])
         return lines
 
+    def get_recent_available_planned_time(self):
+        domain = [("state", "in", ['draft', 'confirmed', 'waiting_material'])]
+        new_domain = domain + [("production_line_id", "=", self.id)]
+        mos = self.env["mrp.production"].search(new_domain,
+                                                order=ORDER_BY)
+        if mos:
+            return mos[0]
+        else:
+            return mos
     #根据产线id获取已排产mo
     def get_mo_by_productin_line(self, **kwargs):
         production_line_id = kwargs.get("production_line_id")
@@ -218,6 +227,23 @@ class MrpProductionExtend(models.Model):
 
     # 返工 重新计算排产
     def confirm_rework_replan_mo(self):
+
+        mo = self.production_line_id.get_recent_available_planned_time()
+        if not mo:
+            now_time = self.get_today_time(is_current_time=True)
+        else:
+            planned_start_backup = fields.Datetime.from_string(mo.date_planned_start)
+            new_datetime = datetime(planned_start_backup.year,
+                                    planned_start_backup.month,
+                                    planned_start_backup.day,
+                                    planned_start_backup.hour,
+                                    planned_start_backup.minute,
+                                    planned_start_backup.second,
+                                    microsecond=planned_start_backup.microsecond,
+                                    tzinfo=pytz.timezone("UTC"))
+            now_time = new_datetime.astimezone(pytz.timezone(self.env.user.tz))
+        self.planned_one_mo(self, now_time, self.production_line_id)
+
         self.replanned_mo(self.env["mrp.production.line"], self.production_line_id, base_on_today=True)
         #是否替代已生产中的单子的时间
 

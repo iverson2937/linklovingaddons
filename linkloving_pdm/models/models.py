@@ -375,6 +375,21 @@ class ProductAttachmentInfo(models.Model):
             vals['state'] = 'waiting_release'
         return super(ProductAttachmentInfo, self).write(vals)
 
+    def unlink_attachment_list(self, **kwargs):
+        attachment_list = kwargs.get('attachment_list')
+        attachment_to_unlink = self.env["product.attachment.info"].search([('id', 'in', attachment_list)])
+        if attachment_to_unlink:
+            result_product_id = attachment_to_unlink[0].product_tmpl_id.id if attachment_to_unlink else ''
+            result_product_type = attachment_to_unlink[0].type if attachment_to_unlink else ''
+            for att_one in attachment_to_unlink:
+                pro_list = att_one.mapped('review_id')
+                for lines_one in pro_list:
+                    line_list = lines_one.mapped('review_line_ids')
+                    line_list.unlink()
+                pro_list.unlink()
+            attachment_to_unlink.unlink()
+        return {'template_id': result_product_id, 'type': result_product_type}
+
     @api.one
     def update_attachment(self, **kwargs):
         update_dic = {}
