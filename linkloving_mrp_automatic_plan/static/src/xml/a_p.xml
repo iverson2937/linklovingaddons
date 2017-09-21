@@ -94,7 +94,7 @@
                     <span class="a_p_process_res">生产数量（实际/需求）: <t t-esc="item.qty_unpost"/>/<t t-esc="item.product_qty"/></span>
                     <t t-if="show_more">
                         <span class="a_p_arrange_qty">工时成本（实际/理论）: <t t-esc="item.product_qty"/></span>
-                        <span class="a_p_spend_time">生产用时：7h</span>
+                        <span class="a_p_spend_time">生产用时：<t t-esc="item.theo_spent_time"/>h</span>
                     </t>
 
                 </div>
