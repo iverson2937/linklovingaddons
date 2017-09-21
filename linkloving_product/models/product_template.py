@@ -14,13 +14,19 @@ class ProductTemplate11(models.Model):
 
     @api.model
     def create(self, vals):
+        if not self.env.user.has_group('linkloving_warehouse.group_document_control_user'):
+            raise UserError('你没有权限修改物料，请联系文控管理员')
         if vals.get('default_code'):
+            if not vals.get('default_code').replace(' ', ''):
+                raise UserError(u"料号不能为空")
             vals['default_code'] = vals.get('default_code').replace(' ', '')
         return super(ProductTemplate11, self).create(vals)
 
     @api.multi
     def write(self, vals):
         if vals.get('default_code'):
+            if not vals.get('default_code').replace(' ', ''):
+                raise UserError(u"料号不能为空")
             vals['default_code'] = vals.get('default_code').replace(' ', '')
         if 'default_code' in vals and vals['default_code'] != self.default_code:
             vals.update({'is_updated': True})
