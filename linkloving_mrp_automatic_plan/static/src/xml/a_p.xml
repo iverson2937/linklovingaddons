@@ -25,6 +25,9 @@
                 <div class="production_line" t-att-data-index="item_index">
                     <span class="p_line_name">产线 <t t-esc="item.display_name"/></span>
                     <div class="p_line_right">
+                        <div class="production_qty">
+                            生产总数：<span><t t-esc="result.length"/></span>
+                        </div>
                         <div class="p_line_equipment">
                             设备：<span><t t-esc="item.equipment_ids.length" /></span>
                         </div>
@@ -40,6 +43,7 @@
         <div id="a_p_right">
             <div class="a_p_right_head">
                 <span style="font-size:15px;margin-left:15px;font-weight:bold;">未排产</span>
+                <button class="btn btn-default unarrangeed_refresh">刷新</button>
             </div>
         </div>
     </t>
@@ -117,7 +121,7 @@
                     </t>
                     <span class="a_p_latest_time">最晚开始：
                         <t t-if="item.planned_start_backup == false">
-                            <button class="btn btn-default may_choose_a_time">新建一个时间</button>
+                            <button class="btn btn-default may_choose_a_time">暂无时间</button>
                         </t>
                         <t t-else="">
                             <button class="btn btn-default may_choose_a_time"><t t-esc="item.planned_start_backup"/></button>

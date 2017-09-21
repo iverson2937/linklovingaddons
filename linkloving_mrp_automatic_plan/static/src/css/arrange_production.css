@@ -1,6 +1,5 @@
 .arrange_production_container{
     overflow: hidden;
-    padding-top: 50px;
     min-width: 1200px;
 }
 #a_p_left{
@@ -64,7 +63,7 @@
 .production_line>span,.production_line>div>div{
     display: inline-block;
 }
-.p_line_equipment,.p_line_employes{
+.p_line_equipment,.p_line_employes,.production_qty{
     padding: 2px;
     background: #556c73;
     border-radius: 5px;
@@ -190,4 +189,9 @@
 }
 .a_p_latest_time .btn{
     padding: 0!important;
+}
+#a_p_right .unarrangeed_refresh{
+    display: inline-block;
+    margin-left: 15px;
+    padding: 3px 8px;
 }

@@ -40,7 +40,11 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             'click .a_p_create_alia': 'show_create_alia',
             'click .alia_cancel': 'close_create_alia',
             'click .alia_confirm': 'confirm_alia_fun',
-            'click .may_choose_a_time':'change_late_time'
+            'click .may_choose_a_time':'change_late_time',
+            'click .unarrangeed_refresh':'refresh_right'
+        },
+        refresh_right:function () {
+            this.un_arrange_production(this.process_id,10,1,this);
         },
         change_late_time:function (e) {
             var e = e || window.event;
@@ -400,9 +404,6 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             });
         },
         search: function (domains, contexts, groupbys) {
-            var self = this;
-            var res_model = 'mrp.production';
-
             var own = this;
             pyeval.eval_domains_and_contexts({
                 domains: [[]].concat(domains || []),
@@ -413,7 +414,6 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 own.domain = results.domain;
                 own.un_arrange_production(own.process_id,10,own.offset,own)
             })
-
         },
 
         render_pager: function () {
@@ -437,7 +437,8 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
         reload_content: function (own) {
             var reloaded = $.Deferred();
             own.offset = own.current_min;
-            own.un_arrange_production(own.process_id,10,own.offset,own);
+            own.limit = own._limit;
+            own.un_arrange_production(own.process_id,own.limit,own.offset,own);
             reloaded.resolve();
             return reloaded.promise();
         },
