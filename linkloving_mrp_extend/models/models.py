@@ -1057,7 +1057,7 @@ class ReturnOfMaterial(models.Model):
     _name = 'mrp.return.material'
 
     def _get_default_return_location_id(self):
-        return self.env.ref('stock.stock_location_stock', raise_if_not_found=False)
+        return self.env['stock.location'].search([('usage', '=', 'internal')], limit=1)
 
     def _get_default_location_id(self):
         return self.env['stock.location'].search([('usage', '=', 'production')], limit=1)
