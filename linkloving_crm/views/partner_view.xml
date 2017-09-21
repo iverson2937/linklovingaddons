@@ -15,9 +15,9 @@
                 </xpath>
 
 
-                <xpath expr="//form/sheet/div/div/field[@name='company_name']" position="replace">
-                    <field name="company_name" placeholder="公司全称" attrs="{'invisible': [('is_company', '!=', True)]}"/>
-                </xpath>
+                <!--<xpath expr="//form/sheet/div/div/field[@name='company_name']" position="replace">-->
+                    <!--<field name="company_name" placeholder="公司全称" attrs="{'invisible': [('is_company', '!=', True)]}"/>-->
+                <!--</xpath>-->
 
 
                 <!--<xpath expr="//field[@name='category_id']" position="attributes">-->

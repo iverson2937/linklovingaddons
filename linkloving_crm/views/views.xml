@@ -203,8 +203,10 @@
         <menuitem action="action_crm_lead_source"
                   id="menu_crm_lead_source"
                   parent="sales_team.menu_sales"
-                  groups="sales_team.group_sale_manager"
+                  groups="sales_team.group_sale_salesman_all_leads"
                   sequence="2" name="线索来源"/>
+
+        <!--groups="sales_team.group_sale_manager"-->
 
 
         <!--crm.product.series-->
