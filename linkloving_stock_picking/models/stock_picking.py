@@ -404,9 +404,9 @@ class StockMovePicking(models.Model):
 
     @api.multi
     def write(self, vals):
+        res = super(StockMovePicking, self).write(vals)
         for move in self:
-            if vals.get('state') and move:
-                if vals.get('state') == 'done':
-                    vals['quantity_adjusted_qty'] = move.product_id.qty_available
-            res = super(StockMovePicking, move).write(vals)
-            return res
+            if move and move.state:
+                if move.state == 'done':
+                    move.quantity_adjusted_qty = move.product_id.qty_available
+        return res
