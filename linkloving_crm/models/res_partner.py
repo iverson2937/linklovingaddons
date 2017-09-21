@@ -20,6 +20,8 @@ AVAILABLE_PRIORITIES = [
 def select_company(my_self, vals, type):
     strip_str = vals.get(type)
 
+    if my_self._name == 'crm.lead' and type == 'email':
+        type = 'email_from'
     if strip_str != (my_self[type] if my_self else ''):
         if strip_str:
             result = my_self.env['res.partner'].search(
