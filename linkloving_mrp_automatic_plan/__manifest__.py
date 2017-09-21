@@ -27,7 +27,7 @@
     'data': [
         'security/ir.model.access.csv',
         # 'security/auto_plan_data.xml',
-        'views/dashboard.xml',
+        # 'views/dashboard.xml',
         'views/sale_order_view.xml',
         'views/mrp_production_view.xml',
         'views/purchase_view.xml',
