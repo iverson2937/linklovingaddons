@@ -276,6 +276,7 @@ class CreateOrderPointWizard(models.TransientModel):
         }
 
     def mo_to_bz_process(self):
+        return
         mos = self.env["mrp.production"].search([('process_id', '=', False)])
         mos.write({
             'process_id': 26,
@@ -291,10 +292,11 @@ class CreateOrderPointWizard(models.TransientModel):
         }
 
     def bom_to_bz_process(self):
-        mos = self.env["mrp.bom"].search([('process_id', '=', False)])
-        mos.write({
-            'process_id': 26,
-        })
+        mos = self.env["mrp.production"].search([('process_id', '=', 26)])
+        for mo in mos:
+            mo.write({
+                'in_charge_id': mo.process_id.partner_id.id,
+            })
         return {
             "type": "ir.actions.client",
             "tag": "action_notify",
