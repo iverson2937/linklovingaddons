@@ -263,6 +263,7 @@ class MrpProductionExtend(models.Model):
     feedback_on_rework = fields.Many2one("mrp.qc.feedback", u"返工单", track_visibility='onchange')
 
     @api.multi
+    @api.depends('qc_feedback_ids')
     def _compute_qty_unpost(self):
         for production in self:
             feedbacks = production.qc_feedback_ids.filtered(lambda x: x.state not in ["check_to_rework"])
@@ -867,7 +868,6 @@ class MrpProductionExtend(models.Model):
             'origin': self.name,
             'group_id': self.procurement_group_id.id,
             'move_order_type': 'null' if self.move_finished_ids else 'manufacturing_orders',
-            'quantity_adjusted_qty': self.product_id.qty_available + self.product_qty,
             # 'propagate': False,
         })
         move.action_confirm()
@@ -1002,7 +1002,7 @@ class MrpProductionProduceExtend(models.TransientModel):
                         feedback.action_post_inventory()
                     except Exception, e:
                         feedback.unlink()
-                        raise UserError(e)
+                        raise UserError(e.name)
 
         return {'type': 'ir.actions.act_window_close'}
 
@@ -1024,9 +1024,14 @@ class MrpProductionProduceExtend(models.TransientModel):
             #     move.quantity_done_store = move.quantity_done_store / (1 + move.bom_line_id.scrap_rate / 100)
         moves = self.production_id.move_finished_ids.filtered(
             lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel'))
-        # if not moves and self.production_id.qty_unpost > self.production_id.product_qty:
-        # self.production_id.move_finished_ids[0].copy(default={'quantity_done': quantity,
-        #                                                       'product_uom_qty': quantity,})
+        if not moves and self.production_id.qty_unpost > self.production_id.qty_produced:
+            qty = self.production_id.qty_unpost - self.production_id.qty_produced
+            new_move = self.production_id.move_finished_ids[0].copy(default={'quantity_done': qty,
+                                                                             'ordered_qty': qty,
+                                                                             'product_uom_qty': qty,
+                                                                             'production_id': self.production_id.id
+                                                                             })
+            new_move.action_confirm()
         for move in moves:
             if move.product_id.id == self.production_id.product_id.id:
                 move.quantity_done_store += quantity
@@ -1057,7 +1062,7 @@ class ReturnOfMaterial(models.Model):
     _name = 'mrp.return.material'
 
     def _get_default_return_location_id(self):
-        return self.env.ref('stock.stock_location_stock', raise_if_not_found=False)
+        return self.env['stock.location'].search([('usage', '=', 'internal')], limit=1)
 
     def _get_default_location_id(self):
         return self.env['stock.location'].search([('usage', '=', 'production')], limit=1)
@@ -1781,7 +1786,7 @@ class ProcurementOrderExtend(models.Model):
 
     def get_actual_require_qty(self):
         cur = datetime.datetime.now()
-        print "-------------start time: %s" % cur
+        # print "-------------start time: %s" % cur
         if not self.rule_id:
             all_parent_location_ids = self._find_parent_locations()
             self.rule_id = self._search_suitable_rule([('location_id', 'in', all_parent_location_ids.ids)])
@@ -1799,7 +1804,7 @@ class ProcurementOrderExtend(models.Model):
             actual_need_qty = sss
 
         cur = datetime.datetime.now()
-        print "-------------end time: %s" % cur
+        # print "-------------end time: %s" % cur
         return actual_need_qty
 
 

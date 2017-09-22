@@ -38,6 +38,8 @@ class AccountEmployeePayment(models.Model):
         for p in self:
             p.department_id = p.employee_id.department_id.id
 
+    company_id = fields.Many2one('res.company', default=lambda self: self.env.user.company_id)
+
     department_id = fields.Many2one('hr.department', compute='_get_department_id', store=True)
     to_approve_id = fields.Many2one('res.users', track_visibility='onchange')
     approve_ids = fields.Many2many('res.users')
