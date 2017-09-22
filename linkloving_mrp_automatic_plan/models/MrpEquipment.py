@@ -219,6 +219,20 @@ class MrpProductionExtend(models.Model):
 
     theo_spent_time = fields.Float(string=u'生产用时(h)', compute='_compute_theo_spent_time', digits=(16, 2))
 
+    '''
+    操作mo信息接口
+    '''
+
+    def change_prod_qty(self, **kwargs):
+        product_qty = kwargs.get("product_qty")
+
+        qty_wizard = self.env['change.production.qty'].create({
+            'mo_id': self.id,
+            'product_qty': product_qty or self.product_qty,
+        })
+        qty_wizard.change_prod_qty()
+
+        return self.read(FIELDS)
     # 开始生产 重新计算排产
     def produce_start_replan_mo(self):
         now_time = self.get_today_time(is_current_time=True)
