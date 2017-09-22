@@ -27,6 +27,7 @@
         'security/ir.model.access.csv',
         'security/groups.xml',
         'security/hide_menu.xml',
+        'security/rules.xml',
         'wizard/hr_expense_register_payment.xml',
         'wizard/account_employee_register_payment_wizard.xml',
         'wizard/account_employee_payable_wizard.xml',

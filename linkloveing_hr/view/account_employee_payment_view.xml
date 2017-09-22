@@ -79,6 +79,7 @@
                                        string="Apply Date"/>
                                 <field name="accounting_date" string="会计日期"
                                        attrs="{'invisible': [('state', 'not in', ('approve','paid'))]}"/>
+                                <field name="company_id"/>
 
                             </group>
                         </group>
