@@ -550,7 +550,11 @@ class LinklovingAppApi(http.Controller):
                 'process_id': {
                     'process_id': production.process_id.id,
                     'name': production.process_id.name,
-                }
+                },
+            'production_line_id': {
+                'production_line_id': production.production_line_id.id,
+                'name': production.production_line_id.name
+            }
             }
 
     def getYesterday(self):
