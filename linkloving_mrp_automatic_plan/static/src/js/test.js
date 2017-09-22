@@ -41,7 +41,39 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             'click .alia_cancel': 'close_create_alia',
             'click .alia_confirm': 'confirm_alia_fun',
             'click .may_choose_a_time':'change_late_time',
-            'click .unarrangeed_refresh':'refresh_right'
+            'click .unarrangeed_refresh':'refresh_right',
+            'click .a_p_bars': 'show_bars_buttons',
+            'click .show_edit_wrap': 'show_edit_ui',
+            'click .edit_prodiction_confirm': 'confirm_edit_operation'
+        },
+        confirm_edit_operation:function () {
+            var myself = this;
+            var ele = $('.arrange_production_container').find(".ap_item_wrap[data-mo-id="+ myself.alia_mo +"]");
+            var edit_qty = $(".product_qty").val();
+            new Model("mrp.production")
+                    .call("change_prod_qty", [[parseInt(this.alia_mo)], {'product_qty':  edit_qty}])
+                    .then(function (result) {
+                        console.log(result)
+                        var replace_item = QWeb.render('a_p_render_right_tmpl', {result: result,
+                            show_more:false,
+                            selection:myself.states.state.selection,
+                            new_selection: myself.states.product_order_type.selection,
+                            material_selection: myself.states.availability.selection
+                        })
+                        $(ele).replaceWith(replace_item);
+                        $(".item_edit_container").hide();
+                    });
+        },
+        show_edit_ui:function () {
+            $(".item_edit_container").show();
+            $('.a_p_bars_buttons_wrap').hide();
+            $(".product_qty").val('');
+        },
+        show_bars_buttons:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            this.alia_mo = $(target).parents('.ap_item_wrap').attr('data-mo-id');
+            $(target).parents('.ap_item_wrap').find('.a_p_bars_buttons_wrap').toggle();
         },
         refresh_right:function () {
             this.un_arrange_production(this.process_id,10,1,this);
@@ -74,7 +106,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                     })
         },
         close_create_alia:function () {
-            $('.create_alia_container').hide();
+            $('.close_this_container').hide();
         },
         show_create_alia:function (e) {
             var e = e || window.event;
