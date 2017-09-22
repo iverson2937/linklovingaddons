@@ -9,7 +9,7 @@
 
         </div>
     </t>
-    <t t-name="approval_load_detail">
+    <t t-name="approval_load_detail_file">
         <div class="approval_ul_wraper">
             <ul id="approval_tab" class="nav nav-tabs" data-now-tab="waiting_submit">
                <t t-set="i" t-value="1"/>
@@ -22,6 +22,12 @@
                     <t t-set="i" t-value="2"/>
                 </t>
             </ul>
+
+            <!--<div class="create_document">-->
+                <!--<button style="display:none;" class="btn btn-primary delect_hide download_document_checked">下载选中</button>-->
+                <!--<button style="display:none;" class="btn btn-primary delect_hide approval_document_checked">审核选中</button>-->
+            <!--</div>-->
+
         </div>
 
         <div id="myTabContent_Approval" class="tab-content">
@@ -40,11 +46,16 @@
             $(function () { $("[data-toggle='tooltip']").tooltip(); });
         </script>
         <t t-foreach="result" t-as="item_files">
-            <div class="tab_pane_display" t-att-data-id="item_files.id">
+            <div class="tab_pane_display" t-att-data-id="item_files.id" t-att-data="item_files.type">
                 <div class="tab_message_display">
                     <div class="approval_tab_pane_type"><t t-esc="item_files.type"/></div>
+
+                    <!--<div>-->
+                        <!--<input type="checkbox" class="o_chat_header_file" t-att-name="item_files.id">选中</input>-->
+                    <!--</div>-->
+
                     <div>产品名字: <span t-att-product-id="item_files.product_id.id" t-att-default-code="item_files.product_id.default_code" class="approval_product_name"><t t-esc="item_files.product_id.name"/></span></div>
-                    <div>文件：<span><t t-esc="item_files.file_name"/></span></div>
+                    <div>文件：<span class="file_name"><t t-esc="item_files.file_name"/></span></div>
                     <!--<div>审核人：<span><t t-esc="item_files.review_id"/></span></div>-->
                     <t t-if="item_files.remote_path!=''">
                         <div>远程地址：<span class="remote_path"><t t-esc="item_files.remote_path"/></span></div>
@@ -73,6 +84,15 @@
                              <!--<div>审核不通过</div>-->
                         </t>
                     </t>
+
+                    <t t-set="data_check" t-value="item_files.review_id ? false : true"/>
+
+                    <t t-if="data_check">
+                        <div data-toggle="tooltip" data-placement="top" t-att-title="'审核'"><t t-esc="item_files.create_uid_name"/></div>
+                        <span class="fa fa-long-arrow-right" data-toggle="tooltip" data-placement="top" t-att-title="'审核'"></span>
+                    </t>
+
+
                     <t t-if="item_files.state[0] == 'released'">
                          <div><t t-esc="item_files.state[1]" /></div>
                     </t>
@@ -103,15 +123,15 @@
 
 
                     <!--&lt;!&ndash; Large modal &ndash;&gt;-->
-<!--<button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-lg">Large modal</button>-->
+                    <!--<button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-lg">Large modal</button>-->
 
-<!--<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">-->
-  <!--<div class="modal-dialog modal-lg" role="document">-->
-    <!--<div class="modal-content">-->
-      <!--fffff-->
-    <!--</div>-->
-  <!--</div>-->
-<!--</div>-->
+                    <!--<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">-->
+                    <!--<div class="modal-dialog modal-lg" role="document">-->
+                    <!--<div class="modal-content">-->
+                    <!--fffff-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--</div>-->
 
 
 

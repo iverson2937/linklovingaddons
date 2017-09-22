@@ -135,6 +135,17 @@
                                                     </button>
                                                 </t>
                                             </t>
+                                            <t t-if="item_files['review_id'] == ''">
+                                                <t t-esc="item_files['create_uid_name']"/>
+                                                <button type="button" class="btn btn-default"
+                                                        data-toggle="tooltip"
+                                                        data-placement="top"
+                                                        t-att-title="'审核'">
+                                                    <span class="glyphicon glyphicon-arrow-right"
+                                                          aria-hidden="true"></span>
+                                                </button>
+                                            </t>
+
                                             <t t-if="item_files['state'][0] == 'released'">
                                                 <t t-esc="item_files['state'][1]"/>
                                             </t>

@@ -237,8 +237,13 @@ class LinklovingAppApi(http.Controller):
                 'process_id': {
                     'process_id': production.process_id.id,
                     'name': production.process_id.name,
+                },
+                'production_line_id': {
+                    'production_line_id': production.production_line_id.id,
+                    'name': production.production_line_id.name
                 }
             }
+
             data.append(dict)
         # user_data = LinklovingAppApi.odoo10.execute('res.users', 'read', [LinklovingAppApi.odoo10.env.user.id])
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
@@ -553,17 +558,21 @@ class LinklovingAppApi(http.Controller):
 
     def get_simple_production_json(self, production):
         return {
-            'order_id': production.id,
-            'display_name': production.display_name,
-            'product_name': production.product_id.display_name,
-            'date_planned_start': production.date_planned_start,
-            'state': production.state,
-            'product_qty': production.product_qty,
-            'in_charge_name': production.in_charge_id.name,
-            'origin': production.origin,
-            'process_id': {
-                'process_id': production.process_id.id,
-                'name': production.process_id.name,
+                'order_id': production.id,
+                'display_name': production.display_name,
+                'product_name': production.product_id.display_name,
+                'date_planned_start': production.date_planned_start,
+                'state': production.state,
+                'product_qty': production.product_qty,
+                'in_charge_name': production.in_charge_id.name,
+                'origin': production.origin,
+                'process_id': {
+                    'process_id': production.process_id.id,
+                    'name': production.process_id.name,
+                },
+            'production_line_id': {
+                'production_line_id': production.production_line_id.id,
+                'name': production.production_line_id.name
             }
         }
 
@@ -1636,6 +1645,10 @@ class LinklovingAppApi(http.Controller):
             'remark': production.remark or '',
             'is_bom_update': production.is_bom_update,
             'bom_remark': production.bom_id.bom_remark or '',
+            'production_line_id': {
+                'production_line_id': production.production_line_id.id,
+                'name': production.production_line_id.name
+            }
             # 'factory_remark': production.factory_remark,
         }
         return data
