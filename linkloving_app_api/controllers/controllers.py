@@ -228,8 +228,13 @@ class LinklovingAppApi(http.Controller):
                 'process_id': {
                     'process_id': production.process_id.id,
                     'name': production.process_id.name,
+                },
+                'production_line_id': {
+                    'production_line_id': production.production_line_id.id,
+                    'name': production.production_line_id.name
                 }
             }
+
             data.append(dict)
         # user_data = LinklovingAppApi.odoo10.execute('res.users', 'read', [LinklovingAppApi.odoo10.env.user.id])
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
@@ -1581,6 +1586,10 @@ class LinklovingAppApi(http.Controller):
             'remark': production.remark or '',
             'is_bom_update': production.is_bom_update,
             'bom_remark': production.bom_id.bom_remark or '',
+            'production_line_id': {
+                'production_line_id': production.production_line_id.id,
+                'name': production.production_line_id.name
+            }
             # 'factory_remark': production.factory_remark,
         }
         return data

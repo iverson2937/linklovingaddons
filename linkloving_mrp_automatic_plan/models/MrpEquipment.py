@@ -31,7 +31,7 @@ ORDER_BY = "planned_start_backup,id desc"
 FIELDS = ["name", "alia_name", "product_tmpl_id", "state", "product_qty",
           "display_name", "bom_id", "feedback_on_rework", "qty_unpost",
           "planned_start_backup", "date_planned_start", "date_planned_finished",
-          'theo_spent_time']
+          'theo_spent_time', 'availability']
 class ProcurementOrderExtend(models.Model):
     _inherit = 'procurement.order'
 
