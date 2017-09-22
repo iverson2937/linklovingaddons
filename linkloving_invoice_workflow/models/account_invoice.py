@@ -73,7 +73,7 @@ class AccountInvoice(models.Model):
                             line.price_unit = line.price_unit_o * (1 - rate)
                         else:
                             line.price_unit = line.price_unit * (1 - rate)
-            return super(AccountInvoice, invoice).write(vals)
+        return super(AccountInvoice, self).write(vals)
 
     @api.multi
     def action_reject(self):
