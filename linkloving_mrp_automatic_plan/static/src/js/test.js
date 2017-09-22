@@ -138,7 +138,12 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         // myself.mydataset = result;
                         $(target).parents('.production_line').next('.production_lists_wrap').html("");
                         $(target).parents('.production_line').next('.production_lists_wrap').removeClass('production_lists_no_item');
-                        $(target).parents('.production_line').next('.production_lists_wrap').append(QWeb.render('a_p_render_right_tmpl',{result: result,show_more:true,selection:myself.states.state.selection,new_selection:myself.states.product_order_type.selection}));
+                        $(target).parents('.production_line').next('.production_lists_wrap').append(QWeb.render('a_p_render_right_tmpl',{result: result,
+                            show_more:true,
+                            selection:myself.states.state.selection,
+                            new_selection:myself.states.product_order_type.selection,
+                            material_selection: myself.states.availability.selection
+                        }));
                         if($(target).parents('.production_line').next('.production_lists_wrap').children('.ap_item_wrap').length == 0){
                             $(target).parents('.production_line').next('.production_lists_wrap').addClass('production_lists_no_item');
                         }
@@ -256,7 +261,12 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
 
                             if ($(origin_wrap_bkup).length >= 1) {//左边到左边  from位置
                                 $(origin_wrap_bkup).html('');
-                                var new_items = QWeb.render('a_p_render_right_tmpl', {result: result.origin_pl_mos, show_more:true,selection:myself.states.state.selection,new_selection:myself.states.product_order_type.selection})
+                                var new_items = QWeb.render('a_p_render_right_tmpl', {result: result.origin_pl_mos,
+                                    show_more:true,
+                                    selection:myself.states.state.selection,
+                                    new_selection:myself.states.product_order_type.selection,
+                                    material_selection: myself.states.availability.selection
+                                })
                                 $(origin_wrap_bkup).append(new_items);
                             }
                             //重新渲染拖动的MO所在的产线
@@ -265,7 +275,8 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                                 result: result.mos,
                                 show_more: true,
                                 selection: myself.states.state.selection,
-                                new_selection: myself.states.product_order_type.selection
+                                new_selection: myself.states.product_order_type.selection,
+                                material_selection: myself.states.availability.selection
                             })
                             $(elem_wrap).append(new_ite);
                         } else {//从左到右
@@ -277,13 +288,19 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                                 result: result.origin_pl_mos,
                                 show_more: true,
                                 selection: myself.states.state.selection,
-                                new_selection: myself.states.product_order_type.selection
+                                new_selection: myself.states.product_order_type.selection,
+                                material_selection: myself.states.availability.selection
                             })
                             $(origin_wrap).append(new_items);
                         }
 
                         //从新渲染拖动的MO单
-                        var replace_item = QWeb.render('a_p_render_right_tmpl', {result: result.operate_mo, show_more:show_more,selection:myself.states.state.selection,new_selection:myself.states.product_order_type.selection})
+                        var replace_item = QWeb.render('a_p_render_right_tmpl', {result: result.operate_mo,
+                            show_more:show_more,
+                            selection:myself.states.state.selection,
+                            new_selection: myself.states.product_order_type.selection,
+                            material_selection: myself.states.availability.selection
+                        })
                         $(ele).replaceWith(replace_item);
 
                     }).always(function (result) {
@@ -320,7 +337,6 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                     }
                 })
             });
-            console.log(node);
             this.datewidget.appendTo(node).done(function() {
                 console.log(self.datewidget.$el);
                 // self.datewidget.$el.addClass(self.$el.attr('class'));
@@ -454,11 +470,16 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             new Model("mrp.production")
                     .call("get_unplanned_mo", [[]], {process_id:process_id,limit:limit,offset:offset-1,domains:own.domain})
                     .then(function (result) {
-                        console.log(result);
-
+                        console.log(result)
+                        console.log(own.states)
                         myself.mydataset.mo = result.result;
                         $("#a_p_right .a_p_right_head").nextAll().remove();
-                        $("#a_p_right").append(QWeb.render('a_p_render_right_tmpl',{result: result.result, show_more:false,selection:own.states.state.selection, new_selection:own.states.product_order_type.selection}));
+                        $("#a_p_right").append(QWeb.render('a_p_render_right_tmpl',{result: result.result,
+                            show_more:false,
+                            selection:own.states.state.selection,
+                            new_selection:own.states.product_order_type.selection,
+                            material_selection: own.states.availability.selection
+                        }));
                         framework.unblockUI();
                         own.length = result.length;
                         own.render_pager();
@@ -489,7 +510,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             myself.mydataset = {};
             framework.blockUI();
 
-            new Model("mrp.production").call("fields_get",[],{allfields: ['state', 'product_order_type']}).then(function (result) {
+            new Model("mrp.production").call("fields_get",[],{allfields: ['state', 'product_order_type','availability']}).then(function (result) {
                 console.log(result);
                 myself.states = result;
                 //未排产
@@ -503,7 +524,6 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         console.log(result);
                         myself.mydataset.product_line = result;
                         self.$el.eq(0).append(QWeb.render('a_p_render_tmpl', {result: result}));
-                        console.log($(".a_p_time_start"));
                         self.init_date_widget($(".a_p_time_start"));
                         framework.unblockUI();
                     })

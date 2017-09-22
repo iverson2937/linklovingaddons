@@ -88,10 +88,17 @@
                     <t t-if="item.feedback_on_rework!=false">
                         <div class="a_p_rework">【返工】</div>
                     </t>
+                    <t t-foreach="material_selection" t-as="selec">
+                        <t t-if="selec[0] == item.availability">
+                            <div class="a_p_order_type">
+                                <t t-esc="selec[1]"/>
+                            </div>
+                        </t>
+                    </t>
                 </span>
 
                 <div class="ap_item_main_left">
-                    <span class="a_p_process_res">生产数量（实际/需求）: <t t-esc="item.qty_unpost"/>/<t t-esc="item.product_qty"/></span>
+                    <span class="a_p_process_res">生产数量（完成/需求）: <t t-esc="item.qty_unpost"/>/<t t-esc="item.product_qty"/></span>
                     <t t-if="show_more">
                         <span class="a_p_arrange_qty">工时成本（实际/理论）: <t t-esc="item.product_qty"/></span>
                         <span class="a_p_spend_time">生产用时：<t t-esc="item.theo_spent_time"/>h</span>
