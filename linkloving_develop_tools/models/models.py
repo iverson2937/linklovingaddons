@@ -275,6 +275,38 @@ class CreateOrderPointWizard(models.TransientModel):
             }
         }
 
+    def mo_to_bz_process(self):
+        return
+        mos = self.env["mrp.production"].search([('process_id', '=', False)])
+        mos.write({
+            'process_id': 26,
+        })
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": str(len(mos)) + u"完成",
+                "text": u"完成",
+                "sticky": False
+            }
+        }
+
+    def bom_to_bz_process(self):
+        mos = self.env["mrp.production"].search([('process_id', '=', 26)])
+        for mo in mos:
+            mo.write({
+                'in_charge_id': mo.process_id.partner_id.id,
+            })
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": str(len(mos)) + u"完成",
+                "text": u"完成",
+                "sticky": False
+            }
+        }
+
     def get_today_time_and_tz(self):
         if self.env.user.tz:
             timez = fields.datetime.now(pytz.timezone(self.env.user.tz)).tzinfo._utcoffset
