@@ -79,6 +79,14 @@ class NewMrpProduction(models.Model):
                 feedbacks = production.qc_feedback_ids.filtered(lambda x: x.state not in ["check_to_rework"])
                 production.qty_unpost = sum(feedbacks.mapped("qty_produced"))
 
+    def create_multi_output(self, outputs):
+        for line in outputs:
+            for finish_id in self.move_finished_ids:
+                print line['id']
+                if line['id'] == finish_id.product_id.id:
+                    print line['produce_qty']
+                    finish_id.quantity_done += line['produce_qty']
+
     @api.multi
     def confirm_output(self):
 
@@ -170,12 +178,10 @@ class NewMrpProduction(models.Model):
         action = self.env.ref('mrp.act_mrp_product_produce').read()[0]
         return action
 
-
-
     def _generate_finished_moves(self):
         if self.is_multi_output or self.is_random_output:
             if self.is_multi_output:
-                output_product_ids=self.rule_id.output_product_ids
+                output_product_ids = self.rule_id.output_product_ids
             if self.is_random_output:
                 output_product_ids = self.output_product_ids
 
