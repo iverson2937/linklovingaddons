@@ -49,13 +49,18 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
         confirm_edit_operation:function () {
             var myself = this;
             var ele = $('.arrange_production_container').find(".ap_item_wrap[data-mo-id="+ myself.alia_mo +"]");
+            if($(ele).parents('#a_p_left').length>=1){
+                var edit_show_more = true
+            } else {
+                var edit_show_more = false
+            }
             var edit_qty = $(".product_qty").val();
             new Model("mrp.production")
                     .call("change_prod_qty", [[parseInt(this.alia_mo)], {'product_qty':  edit_qty}])
                     .then(function (result) {
                         console.log(result)
                         var replace_item = QWeb.render('a_p_render_right_tmpl', {result: result,
-                            show_more:false,
+                            show_more:edit_show_more,
                             selection:myself.states.state.selection,
                             new_selection: myself.states.product_order_type.selection,
                             material_selection: myself.states.availability.selection
