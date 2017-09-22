@@ -23,7 +23,7 @@
 #
 ##############################################################################
 
-from odoo import  fields, models,_
+from odoo import fields, models, _
 
 
 class StockLocation(models.Model):
@@ -35,7 +35,6 @@ class StockLocation(models.Model):
     name = fields.Char(string="Name")
     description = fields.Text(string='Description')
     _sql_constraints = [
-        ('name_uniq', 'unique (default_code)',   _('Name must unique!')),
+        ('name_uniq', 'unique (default_code)', _('Name must unique!')),
     ]
-
-
+    company_id = fields.Many2one('res.company', default=lambda self: self.env.user.company_id)
