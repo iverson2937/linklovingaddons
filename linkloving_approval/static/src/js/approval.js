@@ -13,6 +13,8 @@ odoo.define('linkloving_approval.approval_core', function (require) {
     var data = require('web.data');
     var pyeval = require('web.pyeval');
 
+    var pdm_mange = require('linkloving_pdm.document_manage');
+
 
     var ViewManager = require('web.ViewManager');
 
@@ -462,7 +464,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                 console.log(result);
                 self.approval_type = result.type.selection;
                 // console.log(self);
-                self.$el.append(QWeb.render('approval_load_detail', {result: result.type.selection}));
+                self.$el.append(QWeb.render('approval_load_detail_file', {result: result.type.selection}));
             });
             return self.get_datas(this, 'product.attachment.info', 'waiting_submit');
 
