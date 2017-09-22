@@ -88,8 +88,8 @@
                     <t t-set="data_check" t-value="item_files.review_id ? false : true"/>
 
                     <t t-if="data_check">
-                        <div data-toggle="tooltip" data-placement="top" t-att-title="'审核人提交'"><t t-esc="item_files.create_uid_name"/></div>
-                        <span class="fa fa-long-arrow-right" data-toggle="tooltip" data-placement="top" t-att-title="'审核人提交'"></span>
+                        <div data-toggle="tooltip" data-placement="top" t-att-title="'审核'"><t t-esc="item_files.create_uid_name"/></div>
+                        <span class="fa fa-long-arrow-right" data-toggle="tooltip" data-placement="top" t-att-title="'审核'"></span>
                     </t>
 
 

@@ -140,7 +140,7 @@
                                                 <button type="button" class="btn btn-default"
                                                         data-toggle="tooltip"
                                                         data-placement="top"
-                                                        t-att-title="'审核人提交'">
+                                                        t-att-title="'审核'">
                                                     <span class="glyphicon glyphicon-arrow-right"
                                                           aria-hidden="true"></span>
                                                 </button>
