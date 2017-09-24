@@ -170,12 +170,16 @@ class AccountPayment(models.Model):
     _name = 'account.payment'
     _inherit = ['account.payment', 'ir.needaction_mixin', 'mail.thread']
     team_id = fields.Many2one('crm.team', related='partner_id.team_id')
+    move_ids = fields.One2many('account.move', compute='_get_move_ids')
     customer = fields.Boolean(related='partner_id.customer')
     partner_id = fields.Many2one('res.partner', track_visibility='onchange')
     state = fields.Selection(selection_add=[('confirm', u'销售确认'), ('cancel', u'取消'), ('done', u'完成')],
                              track_visibility='onchange')
     remark = fields.Text(string='备注')
     product_id = fields.Many2one('product.product')
+
+    def _get_move_ids(self):
+        self.move_ids=self.move_line_ids.mapped('move_id').ids
 
     # origin = fields.Char(string=u'源单据')
     @api.multi
@@ -358,4 +362,17 @@ class AccountPayment(models.Model):
             'journal_id': self.journal_id.id,
             'currency_id': self.currency_id != self.company_id.currency_id and self.currency_id.id or False,
             'payment_id': self.id,
+        }
+
+    @api.multi
+    def button_journal_entries(self):
+
+        return {
+            'name': _('Journal Items'),
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'account.move',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'domain': [('id', 'in', self.move_ids.ids)],
         }
