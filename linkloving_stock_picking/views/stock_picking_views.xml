@@ -145,9 +145,8 @@
                     <field name="state"/>
                 </xpath>
 
-                <xpath expr="//field[@name='date']" position="attributes">
-                    <attribute name="invisible">0</attribute>
-                    <attribute name="string">完成日期</attribute>
+                <xpath expr="//field[@name='date']" position="replace">
+                    <field name="date" string="完成日期"/>
                 </xpath>
 
                 <!--<xpath expr="//field[@name='product_uom']" position="after">-->

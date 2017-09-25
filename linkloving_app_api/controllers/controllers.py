@@ -1124,11 +1124,11 @@ class LinklovingAppApi(http.Controller):
 
         try:
             mrp_product_produce = request.env['mrp.product.produce'].with_context({'active_id': order_id})
-            if mrp_production.is_multi_output or mrp_production.is_random_output:
-                print produce_qty
-                mrp_production.create_multi_output(produce_qty)
-                return JsonResponse.send_response(STATUS_CODE_OK,
-                                                  res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
+            # if mrp_production.is_multi_output or mrp_production.is_random_output:
+            #     print produce_qty
+            #     mrp_production.create_multi_output(produce_qty)
+            #     return JsonResponse.send_response(STATUS_CODE_OK,
+            #                                       res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
             produce = mrp_product_produce.sudo(LinklovingAppApi.CURRENT_USER()).create({
                 'product_qty': produce_qty,
