@@ -49,7 +49,7 @@
                     <span class="p_line_name">产线 <t t-esc="item.display_name"/></span>
                     <div class="p_line_right">
                         <div class="production_qty">
-                            生产总数：<span><t t-esc="result.amount_of_planned_mo"/></span>
+                            生产总数：<span><t t-esc="item.amount_of_planned_mo"/></span>
                         </div>
                         <div class="p_line_equipment">
                             设备：<span><t t-esc="item.equipment_ids.length" /></span>

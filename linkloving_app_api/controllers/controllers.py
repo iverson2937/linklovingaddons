@@ -1124,11 +1124,11 @@ class LinklovingAppApi(http.Controller):
 
         try:
             mrp_product_produce = request.env['mrp.product.produce'].with_context({'active_id': order_id})
-            if mrp_production.is_multi_output or mrp_production.is_random_output:
-                print produce_qty
-                mrp_production.create_multi_output(produce_qty)
-                return JsonResponse.send_response(STATUS_CODE_OK,
-                                                  res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
+            # if mrp_production.is_multi_output or mrp_production.is_random_output:
+            #     print produce_qty
+            #     mrp_production.create_multi_output(produce_qty)
+            #     return JsonResponse.send_response(STATUS_CODE_OK,
+            #                                       res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
             produce = mrp_product_produce.sudo(LinklovingAppApi.CURRENT_USER()).create({
                 'product_qty': produce_qty,
@@ -3073,6 +3073,7 @@ class LinklovingAppApi(http.Controller):
                                          'raw_material_production_id': sim_stock_move.raw_material_production_id.id,
                                          'procurement_id': sim_stock_move.procurement_id.id or False,
                                          'is_over_picking': True})
+                            split_move.action_confirm()
                             sim_stock_move.production_id.move_raw_ids = sim_stock_move.production_id.move_raw_ids + split_move
                             split_move.write({'state': 'assigned', })
                             split_move.action_done()
@@ -3082,6 +3083,8 @@ class LinklovingAppApi(http.Controller):
                                 lambda x: x.state not in ["cancel", "done"])
                             if simss_stock_moves and simss_stock_moves[0]:
                                 # sim_stock_move.stock_moves[0].quantity_done_store = move['quantity_ready']
+                                if simss_stock_moves[0].state == 'draft':
+                                    simss_stock_moves[0].action_confirm()
                                 simss_stock_moves[0].quantity_done = move['quantity_ready']
                                 simss_stock_moves[0].action_done()
                                 simss_stock_moves[0].authorized_stock_move(employee_id, uid)
@@ -3093,6 +3096,7 @@ class LinklovingAppApi(http.Controller):
                                              'raw_material_production_id': sim_stock_move.raw_material_production_id.id,
                                              'procurement_id': sim_stock_move.procurement_id.id or False,
                                              'is_over_picking': True})
+                                split_move.action_confirm()
                                 sim_stock_move.production_id.move_raw_ids = sim_stock_move.production_id.move_raw_ids + split_move
                                 split_move.write({'state': 'assigned', })
                                 split_move.action_done()
