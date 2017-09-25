@@ -97,14 +97,20 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var self = this;
+            var reg = /^[\u4E00-\u9FA5]+$/;  //正则检测中文
             var select_time_wrap = $(target).parents('.a_p_latest_time');
-            self.current_time = $(target).html();
-            self.current_time = self.current_time.replace(/\s/g,'T').replace(/\//g,'-');
-            var my_date = Date.parse(new Date(self.current_time));
-            var newDate = new Date();
-            var time_offset = newDate.getTimezoneOffset() * 60000;
-            var c_date = new Date(my_date + time_offset)
-            self.current_time = moment(c_date).format('YYYY-MM-DD HH:mm:ss');
+            self.current_time = $(target).html()
+
+            if(!reg.test(self.current_time)){
+                self.current_time = self.current_time.replace(/\s/g,'T').replace(/\//g,'-');
+                var my_date = Date.parse(new Date(self.current_time));
+                var newDate = new Date();
+                var time_offset = newDate.getTimezoneOffset() * 60000;
+                var c_date = new Date(my_date + time_offset);
+                self.current_time = moment(c_date).format('YYYY-MM-DD HH:mm:ss');
+            }else {
+                self.current_time = '';
+            }
 
 
             $(target).remove();
@@ -403,7 +409,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 self.setupFocus(self.datewidget.$input);
                 self.datewidget.set_datetime_default();
 
-                if(node[0].className == 'a_p_latest_time'){
+                if(node[0].className == 'a_p_latest_time' && self.current_time){
                     self.datewidget.set_value(self.current_time);
                 }
 
