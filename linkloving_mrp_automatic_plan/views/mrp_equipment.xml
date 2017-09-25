@@ -12,7 +12,7 @@
                     <!-- Add your fields or attributes here -->
                     <notebook>
                         <page string="产线">
-                            <field name="production_line_ids">
+                            <field name="production_line_ids" context="{'default_process_id': active_id}">
                                 <tree>
                                     <field name="name"/>
                                     <field name="employee_id"/>
@@ -107,12 +107,13 @@
                                 <field name="name"/>
                                 <field name="process_id"/>
                                 <field name="employee_id"/>
+                                <field name="sequence"/>
                             </group>
 
                         </group>
                         <notebook>
                             <page string="设备">
-                                <field name="equipment_ids"/>
+                                <field name="equipment_ids" context="{'default_production_line_id': active_id}"/>
                             </page>
                             <page string="人员">
                                 <field name="line_employee_ids" widget="many2many"/>
@@ -163,17 +164,16 @@
                   action="action_mrp_work_type"/>
 
 
+        <!--<record model="ir.actions.client" id="test_pc_action">-->
+        <!--<field name="name">linkloving_mrp_automatic_plan window</field>-->
+        <!--<field name="tag">arrange_production</field>-->
+        <!--</record>-->
 
-        <record model="ir.actions.client" id="test_pc_action">
-            <field name="name">linkloving_mrp_automatic_plan window</field>
-            <field name="tag">arrange_production</field>
-        </record>
-
-         <menuitem id="test_pc"
-            name="生产排产"
-            action="test_pc_action"
-            parent="mrp.menu_mrp_manufacturing"
-            sequence="13"/>
+        <!--<menuitem id="test_pc"-->
+        <!--name="生产排产"-->
+        <!--action="test_pc_action"-->
+        <!--parent="mrp.menu_mrp_manufacturing"-->
+        <!--sequence="13"/>-->
 
     </data>
 </openerp>

@@ -82,7 +82,6 @@ class MrpProcessEquipment(models.Model):
     process_id = fields.Many2one(string=u'工序', comodel_name='mrp.process', related='production_line_id.process_id')
     employee_id = fields.Many2one(comodel_name="hr.employee", string=u"产线负责人", related='production_line_id.employee_id')
 
-
 # 工种
 class WorkType(models.Model):
     _name = 'work.type'
@@ -95,6 +94,23 @@ class WorkType(models.Model):
 # 产线
 class MrpProductionLine(models.Model):
     _name = 'mrp.production.line'
+    _order = 'sequence,name asc'
+
+    @api.onchange('process_id')
+    def onchange_process_id(self):
+        if self.process_id:
+            res = self.env["hr.employee"].search([("address_home_id", "=", self.process_id.partner_id.id)])
+            self.employee_id = res.id
+    @api.multi
+    def _compute_amount_of_planned_mo(self):
+        for line in self:
+            count = self.env["mrp.production"].search_count([("production_line_id", "=", line.id),
+                                                             # ("date_planned_start", "<=", end_time_str),
+                                                             # ("date_planned_finished", ">=", start_time_str),
+                                                             ("state", "not in",
+                                                              ['done', 'cancel', 'waiting_post_inventory'])
+                                                             ], )
+            line.amount_of_planned_mo = count
 
     @api.multi
     def _compute_euiqpment_names(self):
@@ -124,7 +140,8 @@ class MrpProductionLine(models.Model):
     employee_id = fields.Many2one(comodel_name="hr.employee", string=u"产线负责人", required=False, )
     line_employee_ids = fields.One2many(comodel_name='hr.employee', inverse_name='production_line_id', string=u'产线人员')
     line_employee_names = fields.Char(string=u'产线人员', compute='_compute_line_employee_names')
-
+    amount_of_planned_mo = fields.Float(string=u'生产总数', compute="_compute_amount_of_planned_mo")
+    sequence = fields.Integer(string=u'显示顺序序号', default=30, help=u"越小排序越前")
     # 根据process_id 获取产线
     def get_production_line_list(self, **kwargs):
         process_id = kwargs.get("process_id")

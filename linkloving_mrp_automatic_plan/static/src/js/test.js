@@ -44,7 +44,17 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             'click .unarrangeed_refresh':'refresh_right',
             'click .a_p_bars': 'show_bars_buttons',
             'click .show_edit_wrap': 'show_edit_ui',
-            'click .edit_prodiction_confirm': 'confirm_edit_operation'
+            'click .edit_prodiction_confirm': 'confirm_edit_operation',
+            'click .to_schedule_report_btn': 'to_schedule_report',
+        },
+        to_schedule_report: function () {
+            var action = {
+                type: 'ir.actions.client',
+                name: 'Rport',
+                tag: 'schedule_production_report',
+                process_id: myself.process_id,
+            };
+            this.do_action(action);
         },
         confirm_edit_operation:function () {
             var myself = this;

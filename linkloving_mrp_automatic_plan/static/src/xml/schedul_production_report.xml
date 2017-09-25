@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+    <t t-name="schedule_production_tmpl">
+        <div class="schedule_production_container">
+        </div>
+    </t>
+    <t t-name="report_table">
+
+    </t>
+    <t t-name="table_header">
+
+    </t>
+</templates>
