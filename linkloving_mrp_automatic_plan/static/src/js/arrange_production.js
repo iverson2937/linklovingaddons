@@ -66,7 +66,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             }
             var edit_qty = $(".product_qty").val();
             new Model("mrp.production")
-                    .call("change_prod_qty", [[parseInt(this.alia_mo)], {'product_qty':  edit_qty}])
+                .call("change_prod_qty", [parseInt(this.alia_mo)], {'product_qty': edit_qty})
                     .then(function (result) {
                         console.log(result)
                         var replace_item = QWeb.render('a_p_render_right_tmpl', {result: result,
