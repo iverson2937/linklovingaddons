@@ -110,7 +110,7 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//tree" position="attributes">
-                    <attribute name="default_order">state desc,write_date</attribute>
+                    <attribute name="default_order">state desc,date</attribute>
                 </xpath>
 
                 <xpath expr="//field[@name='product_id']" position="after">
@@ -146,12 +146,18 @@
                 </xpath>
 
                 <xpath expr="//field[@name='date']" position="attributes">
-                    <attribute name="invisible">True</attribute>
+                    <attribute name="invisible">0</attribute>
+                    <attribute name="string">完成日期</attribute>
                 </xpath>
 
                 <!--<xpath expr="//field[@name='product_uom']" position="after">-->
                 <!--<field name="create_uid"/>-->
                 <!--</xpath>-->
+
+
+                <xpath expr="//field[@name='date_expected']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
 
 
                 <xpath expr="//field[@name='date_expected']" position="after">
