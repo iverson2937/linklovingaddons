@@ -99,6 +99,14 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             var self = this;
             var select_time_wrap = $(target).parents('.a_p_latest_time');
             self.current_time = $(target).html();
+            self.current_time = self.current_time.replace(/\s/g,'T').replace(/\//g,'-');
+            var my_date = Date.parse(new Date(self.current_time));
+            var newDate = new Date();
+            var time_offset = newDate.getTimezoneOffset() * 60000;
+            var c_date = new Date(my_date + time_offset)
+            self.current_time = moment(c_date).format('YYYY-MM-DD HH:mm:ss');
+
+
             $(target).remove();
             self.init_date_widget($(select_time_wrap));
         },
