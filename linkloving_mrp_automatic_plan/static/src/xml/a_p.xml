@@ -46,7 +46,7 @@
             </div>
             <t t-foreach="result" t-as="item">
                 <div class="production_line" t-att-data-index="item_index">
-                    <span class="p_line_name">产线 <t t-esc="item.display_name"/></span>
+                    <span class="p_line_name">产线： <t t-esc="item.display_name"/></span>
                     <div class="p_line_right">
                         <div class="production_qty">
                             生产总数：<span><t t-esc="item.amount_of_planned_mo"/></span>

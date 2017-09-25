@@ -341,6 +341,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                                 material_selection: myself.states.availability.selection
                             })
                             $(elem_wrap).append(new_ite);
+                            $(elem_wrap).prev('.production_line').find('.production_qty span').html(result.mos.length)
                         } else {//从左到右
                             var show_more = false;
                             //这是从已排产拖到未排产的情况,要重新渲染已排产的数据
