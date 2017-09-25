@@ -276,7 +276,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             if(toElem.className == 'ap_item_wrap'){
                 var mo_id = $(elem).attr("data-mo-id");
                 myself.no_ap_to_ag(parseInt(mo_id),false,toElem,elem, function () {
-                    $(elem).insertBefore($(toElem).parents('.ap_item_wrap'));
+                    $(elem).insertBefore($(toElem));
                 });
             }else if($(toElem).parents('.ap_item_wrap').length>=1){
                 var mo_id = $(elem).attr("data-mo-id");
