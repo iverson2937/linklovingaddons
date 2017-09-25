@@ -38,13 +38,18 @@
                 <span style="font-size:15px;margin-left:15px;font-weight:bold;">已排产</span>
                 <div class="a_p_time_start"></div>
                 <div class="a_p_time_end"></div>
+                <div class="a_p_operation_area">
+                    <button class="fa fa-file-pdf-o to_schedule_report_btn btn btn-default">
+                        <span>报表</span>
+                    </button>
+                </div>
             </div>
             <t t-foreach="result" t-as="item">
                 <div class="production_line" t-att-data-index="item_index">
                     <span class="p_line_name">产线 <t t-esc="item.display_name"/></span>
                     <div class="p_line_right">
                         <div class="production_qty">
-                            生产总数：<span><t t-esc="result.length"/></span>
+                            生产总数：<span><t t-esc="item.amount_of_planned_mo"/></span>
                         </div>
                         <div class="p_line_equipment">
                             设备：<span><t t-esc="item.equipment_ids.length" /></span>

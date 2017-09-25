@@ -44,7 +44,17 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             'click .unarrangeed_refresh':'refresh_right',
             'click .a_p_bars': 'show_bars_buttons',
             'click .show_edit_wrap': 'show_edit_ui',
-            'click .edit_prodiction_confirm': 'confirm_edit_operation'
+            'click .edit_prodiction_confirm': 'confirm_edit_operation',
+            'click .to_schedule_report_btn': 'to_schedule_report',
+        },
+        to_schedule_report: function () {
+            var action = {
+                type: 'ir.actions.client',
+                name: 'Rport',
+                tag: 'schedule_production_report',
+                process_id: myself.process_id,
+            };
+            this.do_action(action);
         },
         confirm_edit_operation:function () {
             var myself = this;
@@ -88,6 +98,15 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             var target = e.target || e.srcElement;
             var self = this;
             var select_time_wrap = $(target).parents('.a_p_latest_time');
+            self.current_time = $(target).html();
+            self.current_time = self.current_time.replace(/\s/g,'T').replace(/\//g,'-');
+            var my_date = Date.parse(new Date(self.current_time));
+            var newDate = new Date();
+            var time_offset = newDate.getTimezoneOffset() * 60000;
+            var c_date = new Date(my_date + time_offset)
+            self.current_time = moment(c_date).format('YYYY-MM-DD HH:mm:ss');
+
+
             $(target).remove();
             self.init_date_widget($(select_time_wrap));
         },
@@ -379,8 +398,15 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 // self.datewidget.$el.addClass(self.$el.attr('class'));
                 // self.replaceElement(self.datewidget.$el);
                 // self.datewidget.$input.addClass('o_form_input');
+
+
                 self.setupFocus(self.datewidget.$input);
                 self.datewidget.set_datetime_default();
+
+                if(node[0].className == 'a_p_latest_time'){
+                    self.datewidget.set_value(self.current_time);
+                }
+
                 self.datewidget.commit_value();
             });
         },

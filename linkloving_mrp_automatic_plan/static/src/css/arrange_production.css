@@ -110,6 +110,17 @@
 .a_p_time_end{
     display: inline-block;
 }
+
+.a_p_operation_area {
+    font-size: 18px;
+    display: inline-block;
+    float: right;
+    margin-right: 8px;
+}
+
+.a_p_operation_area .to_schedule_report_btn {
+    border: none;
+}
 #a_p_left .production_lists_wrap + .bootstrap-datetimepicker-widget{
     left: 60px!important;
     top: 90px!important;
@@ -139,6 +150,13 @@
     margin-right: 8px;
 }
 .a_p_item_top>div>span{
+    cursor: pointer;
+    color: #7C7BAD;
+    margin-left: 20px;
+    font-weight: bolder;
+}
+
+.a_p_left_head > div > span {
     cursor: pointer;
     color: #7C7BAD;
     margin-left: 20px;

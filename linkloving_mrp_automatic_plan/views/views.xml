@@ -6,6 +6,8 @@
                 <script type="text/javascript" src="/linkloving_mrp_automatic_plan/static/src/js/almanac.js"/>
                 <!--<script type="text/javascript" src="/linkloving_mrp_automatic_plan/static/src/js/arrange_production.js"/>-->
                 <script type="text/javascript" src="/linkloving_mrp_automatic_plan/static/src/js/test.js"/>
+                <script type="text/javascript"
+                        src="/linkloving_mrp_automatic_plan/static/src/js/schedule_production_report.js"/>
                 <script type="text/javascript" src="/linkloving_mrp_automatic_plan/static/src/js/statuslight.js"/>
                 <link rel="stylesheet" href="/linkloving_mrp_automatic_plan/static/src/css/almanac.css"/>
                 <link rel="stylesheet" href="/linkloving_mrp_automatic_plan/static/src/css/date.css"/>
