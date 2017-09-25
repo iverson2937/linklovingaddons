@@ -1344,6 +1344,8 @@
                 <form string="品检结果">
                     <sheet>
                         <group>
+                            <field name="state" invisible="1"/>
+                            <field name="picking_type_code" invisible="1"/>
                             <field name="qc_result" readonly="1" style="color:red;"/>
                             <field name="qc_note" readonly="1" string="品检批注"/>
                             <field name="qc_img" readonly="1" widget="image" string="品检图片"/>
@@ -1362,9 +1364,16 @@
                     </sheet>
                     <footer>
                         <button name="confirm_transfer_way" string="确认入库"
-                                groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
+                                groups="purchase.group_purchase_user"
+                                type="object"
+                                class="oe_highlight"
+                                attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
+                        />
                         <button name="reject" string="回退"
-                                groups="purchase.group_purchase_user" type="object" class="oe_highlight"
+                                groups="purchase.group_purchase_user"
+                                type="object"
+                                class="oe_highlight"
+                                attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
                                 confirm="是否确定回退?"/>
                         <button string="取消" class="btn-default" special="cancel"/>
                     </footer>
