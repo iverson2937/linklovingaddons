@@ -243,7 +243,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 var mo_id = $(elem).attr("data-mo-id");
                 var pt_line_index = $(toElem).parents('.production_lists_wrap').prev('.production_line').attr('data-index');
                 myself.no_ap_to_ag(parseInt(mo_id), myself.mydataset.product_line[pt_line_index].id,toElem,elem, function () {
-                    $(elem).insertBefore($(toElem).parents('.ap_item_wrap'));
+                    $(elem).insertBefore($(toElem));
                 });
             }else if($(toElem).parents('.ap_item_wrap').length>=1){
                 // $(elem).insertBefore($(toElem).parents('.ap_item_wrap'));
