@@ -98,6 +98,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             var target = e.target || e.srcElement;
             var self = this;
             var select_time_wrap = $(target).parents('.a_p_latest_time');
+            self.current_time = $(target).html();
             $(target).remove();
             self.init_date_widget($(select_time_wrap));
         },
@@ -389,8 +390,15 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 // self.datewidget.$el.addClass(self.$el.attr('class'));
                 // self.replaceElement(self.datewidget.$el);
                 // self.datewidget.$input.addClass('o_form_input');
+
+
                 self.setupFocus(self.datewidget.$input);
                 self.datewidget.set_datetime_default();
+
+                if(node[0].className == 'a_p_latest_time'){
+                    self.datewidget.set_value(self.current_time);
+                }
+
                 self.datewidget.commit_value();
             });
         },
