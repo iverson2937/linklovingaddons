@@ -37,7 +37,7 @@
                     <!--attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['prepare'])]}"-->
                     <!--groups="stock.group_stock_user" type="object" class="oe_highlight"/>-->
                     <button name="action_view_qc_result" string="查看品检结果"
-                            attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
+                            attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','in',['draft', 'assigned', 'qc_check'])]}"
                             groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
                     <!--<button name="do_new_transfer" string="Confirm Receipts"-->
                     <!--attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"-->

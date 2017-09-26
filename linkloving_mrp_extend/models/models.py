@@ -239,6 +239,9 @@ class StockMoveExtend(models.Model):
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 
+    def back_to_progress(self):
+        self.state = 'progress'
+
     @api.multi
     def action_view_qc_report(self):
         ids = []
