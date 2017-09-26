@@ -88,12 +88,16 @@
                         <span class="to_relevant_struc">关联MO</span>
                         <span class="to_so">SO</span>
                         <span class="to_bom">BOM</span>
-                        <span class="fa fa-bars a_p_bars"></span>
+                        <t t-if="show_more==false">
+                            <span class="fa fa-bars a_p_bars"></span>
+                        </t>
                     </div>
                 </div>
-                <div class="a_p_bars_buttons_wrap">
-                    <div class="show_edit_wrap">编辑生产数量</div>
-                </div>
+                <t t-if="show_more==false">
+                    <div class="a_p_bars_buttons_wrap">
+                        <div class="show_edit_wrap">编辑生产数量</div>
+                    </div>
+                </t>
 
                 <p class="a_p_product_name">
                     <t t-esc="item.bom_id[1]"/>

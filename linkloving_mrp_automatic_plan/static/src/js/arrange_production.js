@@ -120,7 +120,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var self = this;
-            if($('.alia_input').val().length>=16){
+            if($('.alia_input').val().length>16){
                 Dialog.alert(target, "字符数不能超过16个");
                 return;
             }
@@ -410,10 +410,14 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
 
 
                 self.setupFocus(self.datewidget.$input);
-                self.datewidget.set_datetime_default();
+                // self.datewidget.set_datetime_default();
 
                 if(node[0].className == 'a_p_latest_time' && self.current_time){
                     self.datewidget.set_value(self.current_time);
+                }else if(node[0].className == 'a_p_latest_time' && self.current_time==''){
+
+                }else {
+                    self.datewidget.set_datetime_default();
                 }
 
                 self.datewidget.commit_value();
