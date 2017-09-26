@@ -3,7 +3,13 @@
 <templates xml:space="preserve">
     <t t-name="arrange_production_tmp">
         <div class="arrange_production_container">
-
+            <t t-call="container_header"></t>
+        </div>
+    </t>
+    <t t-name="container_header">
+        <div class="container_header">
+            <button class="btn btn-primary">产品报表</button>
+            <button class="btn btn-primary">SO报表</button>
         </div>
     </t>
     <t t-name="a_p_render_tmpl">
@@ -16,7 +22,7 @@
                 </div>
                 <div class="edit_production_qty_body">
                     <label>需求数量</label>
-                    <input type="number" class="product_qty"/>
+                    <input type="number" class="product_qty" placeholder="0"/>
                 </div>
                 <div>
                     <button class="btn btn-primary edit_prodiction_confirm">确定</button>
@@ -38,11 +44,6 @@
                 <span style="font-size:15px;margin-left:15px;font-weight:bold;">已排产</span>
                 <div class="a_p_time_start"></div>
                 <div class="a_p_time_end"></div>
-                <div class="a_p_operation_area">
-                    <button class="fa fa-file-pdf-o to_schedule_report_btn btn btn-default">
-                        <span>报表</span>
-                    </button>
-                </div>
             </div>
             <t t-foreach="result" t-as="item">
                 <div class="production_line" t-att-data-index="item_index">
@@ -84,15 +85,26 @@
                             创建一个别名
                         </t>
                     </span>
-                    <div>
+                    <t t-if="show_more==false">
+                    <div class="a_p_item_operate_zone">
                         <span class="to_relevant_struc">关联MO</span>
                         <span class="to_so">SO</span>
                         <span class="to_bom">BOM</span>
-                        <t t-if="show_more==false">
-                            <span class="fa fa-bars a_p_bars"></span>
-                        </t>
+                        <!--<span class="fa fa-bars a_p_bars"></span>-->
+                        <div class="o_dropdown_kanban dropdown">
+                            <a class="dropdown-toggle btn" data-toggle="dropdown" href="#" >
+                                <span class="fa fa-bars fa-lg"/>
+                            </a>
+                            <ul id="dropdown_x" class="dropdown-menu pull-right" role="menu" aria-labelledby="dLabel">
+                                <li><a class="show_edit_wrap">编辑生产数量</a></li>
+                            </ul>
+                        </div>
                     </div>
+                    </t>
                 </div>
+                <!--<div class="a_p_bars_buttons_wrap">-->
+                <!--<div class="show_edit_wrap">编辑生产数量</div>-->
+                <!--</div>-->
                 <t t-if="show_more==false">
                     <div class="a_p_bars_buttons_wrap">
                         <div class="show_edit_wrap">编辑生产数量</div>
@@ -171,9 +183,9 @@
                     </t>
                 </div>
                 <!--<div class="a_p_item_bottom">-->
-                    <!--<span class="to_relevant_struc">查看关联结构</span>-->
-                    <!--<span class="to_so">查看SO单</span>-->
-                    <!--<span class="to_bom">查看BOM</span>-->
+                <!--<span class="to_relevant_struc">查看关联结构</span>-->
+                <!--<span class="to_so">查看SO单</span>-->
+                <!--<span class="to_bom">查看BOM</span>-->
                 <!--</div>-->
 
             </div>

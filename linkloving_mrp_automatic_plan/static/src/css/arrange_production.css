@@ -1,15 +1,22 @@
+.a_p_item_operate_zone > .o_dropdown_kanban {
+    display: inline-block;
+}
 .arrange_production_container{
     overflow: hidden;
     min-width: 1200px;
+}
+
+.container_header {
+    margin: 5px 8px;
 }
 #a_p_left{
     width: 50%;
     height: 900px;
     float: left;
     padding: 10px 0;
-    border-top:1px solid #797979;
-    border-right:1px solid #797979;
-    border-bottom:1px solid #797979;
+    border-top: 1px solid #a8a8a8;
+    border-right: 1px solid #a8a8a8;
+    border-bottom: 1px solid #a8a8a8;
     overflow-y: scroll;
 }
 #a_p_right{
@@ -18,7 +25,7 @@
     overflow-y: scroll;
     float: left;
     padding: 10px;
-    border-top:1px solid #797979;
+    border-top: 1px solid #a8a8a8;
 }
 .production_lists_wrap{
     width: 100%;
@@ -32,7 +39,7 @@
     padding-top: 5px;
     padding-left: 10px;
     padding-bottom: 8px;
-    color: #797979;
+    color: #a8a8a8;
     margin: 10px auto;
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.349019607843137);
     overflow: hidden;
@@ -111,16 +118,6 @@
     display: inline-block;
 }
 
-.a_p_operation_area {
-    font-size: 18px;
-    display: inline-block;
-    float: right;
-    margin-right: 8px;
-}
-
-.a_p_operation_area .to_schedule_report_btn {
-    border: none;
-}
 #a_p_left .production_lists_wrap + .bootstrap-datetimepicker-widget{
     left: 60px!important;
     top: 90px!important;
@@ -139,9 +136,8 @@
 
 .a_p_item_top{
     position: relative;
-    border-bottom: 1px solid #797979;
+    border-bottom: 1px solid #a8a8a8;
     margin-left: -10px;
-    overflow: hidden;
 }
 .a_p_item_top>div{
     display: inline-block;
