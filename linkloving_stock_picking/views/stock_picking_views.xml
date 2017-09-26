@@ -146,7 +146,7 @@
                 </xpath>
 
                 <xpath expr="//field[@name='date']" position="replace">
-                    <field name="date" string="完成日期"/>
+                    <field name="date" string="完成日期" groups=""/>
                 </xpath>
 
                 <!--<xpath expr="//field[@name='product_uom']" position="after">-->
