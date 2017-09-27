@@ -67,7 +67,7 @@
                     <field name="product_id" options="{'no_create':True}"
                            string="产品"
                            domain="[('can_be_expensed', '=', True)]"
-                           attrs="{'invisible':[('partner_type','!=','other')],'required':[('partner_type','=','other')]}"/>
+                           attrs="{'invisible':[('partner_type','!=','other')]}"/>
                 </xpath>
                 <xpath expr="//field[@name='partner_type']" position="attributes">
                     <attribute name="attrs">{'readonly':[('state','=','done')]}</attribute>
