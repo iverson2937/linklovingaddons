@@ -1,6 +1,7 @@
 /**
  * Created by 123 on 2017/5/10.
  */
+
 odoo.define('linkloving_pdm.document_manage', function (require) {
     "use strict";
     var core = require('web.core');
@@ -10,6 +11,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
     var Widget = require('web.Widget');
     var Dialog = require('web.Dialog');
     var framework = require('web.framework');
+    var common = require('web.form_common');
     var QWeb = core.qweb;
     var _t = core._t;
 

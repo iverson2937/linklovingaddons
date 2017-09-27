@@ -21,7 +21,6 @@ odoo.define('linkloving_mrp_automatic_plan.schedule_production_report', function
     var QWeb = core.qweb;
     var _t = core._t;
     var myself;
-    var move_id;
 
     var Schedule_Production_Report = Widget.extend(ControlPanelMixin, {
         template: 'schedule_production_tmpl',
@@ -33,18 +32,16 @@ odoo.define('linkloving_mrp_automatic_plan.schedule_production_report', function
             if (parent && parent.action_stack.length > 0) {
                 this.action_manager = parent.action_stack[0].widget.action_manager
             }
-            if (action.process_id) {
-                this.process_id = action.process_id;
-            } else {
-                this.process_id = action.params.active_id;
-            }
+
             var self = this;
-            self.limit = 10;
-            self.offset = 1;
-            self.length = 10;
         },
         start: function () {
             var self = this;
+            var cp_status = {
+                breadcrumbs: self.action_manager && self.action_manager.get_breadcrumbs(),
+                // cp_content: _.extend({}, self.searchview_elements, {}),
+            };
+            self.update_control_panel(cp_status);
         }
 
 
