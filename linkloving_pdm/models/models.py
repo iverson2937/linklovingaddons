@@ -151,6 +151,7 @@ class ReviewProcessLine(models.Model):
             'review_order_seq': self.review_order_seq + 1,
             'is_last_review': is_last_review,
         })
+        partner_id.sequence_file += 1
 
     # 审核通过
     def action_pass(self, remark):
@@ -863,3 +864,11 @@ class FinalReviewPartner(models.Model):
             raise UserError(u"数据异常,未找到对应的审核人类型")
 
         return review_type_ref
+
+
+class PdmResPartner(models.Model):
+    """"""
+    _inherit = 'res.partner'
+    _order = 'sequence_file desc'
+
+    sequence_file = fields.Integer(help="Determine the display order", default=0)
