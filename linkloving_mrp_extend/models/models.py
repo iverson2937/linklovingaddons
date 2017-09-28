@@ -870,6 +870,11 @@ class MrpProductionExtend(models.Model):
 
     @api.multi
     def action_cancel(self):
+        for mo in self:
+            if mo.state not in ["draft", "confirmed", "waiting_material",
+                                "prepare_material_ing", "finish_prepare_material",
+                                "already_picking"]:
+                raise UserError(u"不能取消已经开始生产的制造单 或者 相关的生产单已经开始生产无法取消SO")
         res = super(MrpProductionExtend, self).action_cancel()
         for p in self:
             return_m = self.env["mrp.return.material"].create({
