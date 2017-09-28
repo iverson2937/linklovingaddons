@@ -55,7 +55,7 @@ class PurchaseOrder(models.Model):
         for r in self.order_line:
             if r.product_id.seller_ids:
                 id_to_delete = r.id
-                proc_obj = self.env['procurement.order'].search([('purchase_line_id','=',id_to_delete)])
+                proc_obj = self.env['procurement.order'].search([('purchase_line_id', '=', id_to_delete)])
                 r.unlink()
                 if proc_obj:
                     proc_obj.run()
@@ -185,7 +185,11 @@ class LinklovingPurchaseOrderLine(models.Model):
     def unlink(self):
         is_exception_order = self.order_id.partner_id == self.sudo().env.ref('linkloving_mrp_supplier_slover.res_partner_exception_supplier')
         if True:
-            return super(LinklovingPurchaseOrderLine, self).unlink()
+            order = self.order_id
+            res = super(LinklovingPurchaseOrderLine, self).unlink()
+            if not order.order_line:
+                order.unlink()
+            return res
         else:
             if self.product_id.seller_ids:
                 id_to_delete = self.id

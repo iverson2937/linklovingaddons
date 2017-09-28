@@ -901,7 +901,7 @@ class MrpProductionExtend(models.Model):
             'origin': self.name,
             'group_id': self.procurement_group_id.id,
             'move_order_type': 'null' if self.move_finished_ids else 'manufacturing_orders',
-            # 'propagate': False,
+            'propagate': False,
         })
         move.action_confirm()
         return move
