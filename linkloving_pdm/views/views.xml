@@ -74,8 +74,8 @@
             <field name="model">product.attachment.info</field>
             <field name="arch" type="xml">
                 <search string="Search product">
-                    <field name="file_name" string="文件名称"/>
                     <field name="product_tmpl_id" string="产品名称"/>
+                    <field name="file_name" string="文件名称"/>
                     <group expand="0" string="Group By">
                         <filter string="状态" domain="[]" context="{'group_by':'state'}"/>
                         <filter string="类型" domain="[]" context="{'group_by':'type'}"/>
