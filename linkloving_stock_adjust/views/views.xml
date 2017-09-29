@@ -23,8 +23,10 @@
             <field name="model">stock.transfer</field>
             <field name="arch" type="xml">
                 <tree>
-                    <field name="create_date"/>
+                    <field name="name"/>
                     <field name="state"/>
+                    <field name="create_date"/>
+
                 </tree>
             </field>
         </record>
