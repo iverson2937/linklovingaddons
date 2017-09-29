@@ -293,6 +293,13 @@
                             class="oe_highlight"
                             groups="linkloving_mrp_extend.group_charge_produce"/>
 
+                    <button name="action_cancel_and_return_material"
+                            attrs="{'invisible': [('state', 'in', ('draft', 'confirmed', 'waiting_material', 'done', 'cancel'))]}"
+                            type="object"
+                            string="强制取消MO并退料"
+                            confirm="是否强制取消并将已备好的料退回至仓库?"
+                            groups="mrp.group_mrp_manager"/>
+
                     <!--<button name="button_return_material" attrs="{'invisible': ['|',('state', '!=', 'done')]}"-->
                     <!--type="object" string="Return Material"/>-->
                 </xpath>

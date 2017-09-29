@@ -43,12 +43,12 @@ odoo.define('linkloving_mrp_automatic_plan.schedule_production_report', function
             };
             self.update_control_panel(cp_status);
 
-            setTimeout(function () {
+            //setTimeout(function () {
                 self.initTreeTable()
-
-            }, 1000);
+            //}, 1000);
         },
         initTreeTable: function () {
+            var self = this;
             var jsonData = {
                 "nodeID": {
                     "1": [
@@ -178,13 +178,13 @@ odoo.define('linkloving_mrp_automatic_plan.schedule_production_report', function
                 }
             };
             // initialize treeTable
-            $("#example-basic").treetable({
+            self.$("#example-basic").treetable({
                 expandable: true,
                 onNodeExpand: nodeExpand,
                 onNodeCollapse: nodeCollapse
             });
-            $("#example-basic").treetable("reveal", '1');
-            $("#example-basic tbody").on("mousedown", "tr", function () {
+            self.$("#example-basic").treetable("reveal", '1');
+            self.$("#example-basic tbody").on("mousedown", "tr", function () {
                 $(".selected").not(this).removeClass("selected");
                 $(this).toggleClass("selected");
             });
@@ -216,12 +216,12 @@ odoo.define('linkloving_mrp_automatic_plan.schedule_production_report', function
                 var childNodes = data.nodeID[parentNodeID];
 
                 if (childNodes) {
-                    var parentNode = $("#example-basic").treetable("node", parentNodeID);
+                    var parentNode = self.$("#example-basic").treetable("node", parentNodeID);
 
                     for (var i = 0; i < childNodes.length; i++) {
                         var node = childNodes[i];
 
-                        var nodeToAdd = $("#example-basic").treetable("node", node['ID']);
+                        var nodeToAdd = self.$("#example-basic").treetable("node", node['ID']);
 
                         // check if node already exists. If not add row to parent node
                         if (!nodeToAdd) {
@@ -245,7 +245,7 @@ odoo.define('linkloving_mrp_automatic_plan.schedule_production_report', function
                             // End row
                             row += "</tr>";
 
-                            $("#example-basic").treetable("loadBranch", parentNode, row);
+                            self.$("#example-basic").treetable("loadBranch", parentNode, row);
                         }
 
 

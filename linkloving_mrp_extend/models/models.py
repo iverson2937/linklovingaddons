@@ -870,14 +870,39 @@ class MrpProductionExtend(models.Model):
 
     @api.multi
     def action_cancel(self):
+        force_cancel = self._context.get("force_cancel")
+        if force_cancel:
+            state_domain = ["draft", "confirmed", "waiting_material",
+                            "prepare_material_ing", "finish_prepare_material", "already_picking"]
+        else:
+            state_domain = ["draft", "confirmed", "waiting_material"]
         for mo in self:
-            if mo.state not in ["draft", "confirmed", "waiting_material",
-                                "prepare_material_ing", "finish_prepare_material",
-                                "already_picking"]:
+            if mo.state not in state_domain:
                 raise UserError(u"不能取消已经开始生产的制造单 或者 相关的生产单已经开始生产无法取消SO")
+
         res = super(MrpProductionExtend, self).action_cancel()
+        # for p in self:
+        #     return_m = self.env["mrp.return.material"].with_context({
+        #         'active_model': 'mrp.production',
+        #         'active_id': p.id
+        #     }).create({
+        #         'production_id': p.id
+        #     })
+        #     move_raw = p.move_raw_ids.filtered(lambda x: x.state == 'done')
+        #     for line in return_m.return_ids:
+        #         for move in move_raw:
+        #             if line.product_id.id == move.product_id.id:
+        #                 line.return_qty += move.quantity_done
+        #     return_m.no_confirm_return()
+            # return_m.do_retrurn()
+        return res
+
+    def action_cancel_and_return_material(self):
         for p in self:
-            return_m = self.env["mrp.return.material"].create({
+            return_m = self.env["mrp.return.material"].with_context({
+                'active_model': 'mrp.production',
+                'active_id': p.id
+            }).create({
                 'production_id': p.id
             })
             move_raw = p.move_raw_ids.filtered(lambda x: x.state == 'done')
@@ -886,8 +911,19 @@ class MrpProductionExtend(models.Model):
                     if line.product_id.id == move.product_id.id:
                         line.return_qty += move.quantity_done
             return_m.no_confirm_return()
-            # return_m.do_retrurn()
-        return res
+
+            p.with_context({
+                'force_cancel': True
+            }).action_cancel()
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": u"提示",
+                "text": u"退料成功,并取消制造单",
+                "sticky": False
+            }
+        }
 
     def _generate_finished_moves(self):
         move = self.env['stock.move'].create({
@@ -1546,7 +1582,7 @@ class MrpQcFeedBack(models.Model):
 
     company_id = fields.Many2one("res.company", default=lambda self: self.env.user.company_id)
     name = fields.Char('Name', index=True, required=True)
-    production_id = fields.Many2one('mrp.production')
+    production_id = fields.Many2one('mrp.production', ondelete='restrict')
     qty_produced = fields.Float()
     qc_test_qty = fields.Float(string='Sampling Quantity')
     qc_rate = fields.Float(compute='_compute_qc_rate')
