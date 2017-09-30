@@ -8,8 +8,8 @@
     </t>
     <t t-name="container_header">
         <div class="container_header">
-            <button class="btn btn-primary">产品报表</button>
-            <button class="btn btn-primary">SO报表</button>
+            <button class="btn btn-primary product_report_btn">产品报表</button>
+            <button class="btn btn-primary so_report_btn">SO报表</button>
         </div>
     </t>
     <t t-name="a_p_render_tmpl">
@@ -105,11 +105,11 @@
                 <!--<div class="a_p_bars_buttons_wrap">-->
                 <!--<div class="show_edit_wrap">编辑生产数量</div>-->
                 <!--</div>-->
-                <t t-if="show_more==false">
-                    <div class="a_p_bars_buttons_wrap">
-                        <div class="show_edit_wrap">编辑生产数量</div>
-                    </div>
-                </t>
+                <!--<t t-if="show_more==false">-->
+                <!--<div class="a_p_bars_buttons_wrap">-->
+                <!--<div class="show_edit_wrap">编辑生产数量</div>-->
+                <!--</div>-->
+                <!--</t>-->
 
                 <p class="a_p_product_name">
                     <t t-esc="item.bom_id[1]"/>

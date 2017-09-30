@@ -236,10 +236,28 @@ class StockMoveExtend(models.Model):
         #             move.quantity_available = move.reserved_availability
 
 
+class ProductionTimeRecord(models.Model):
+    _name = 'production.time.record'
+
+    record_type = fields.Selection(string="记录类型", selection=[('rework', '返工'), ('secondary', '二次生产'), ],
+                                   default='secondary')
+    end_time = fields.Datetime(string=u'结束时间')
+    production_id = fields.Many2one('mrp.production')
+
+
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 
+    is_secondary_produce = fields.Boolean(default=False)
+    secondary_produce_time_ids = fields.One2many("production.time.record", 'production_id', )
+
     def back_to_progress(self):
+        self.is_secondary_produce = True
+        p_time = self.env["production.time.record"].create({
+            'production_id': self.id,
+            'start_time': fields.Datetime.now(),
+            'record_type': 'secondary'
+        })
         self.state = 'progress'
 
     @api.multi
@@ -585,12 +603,24 @@ class MrpProductionExtend(models.Model):
                 raise UserError(u"该单据还在返工中,请先产出数量")
             # 生产完成 结算工时
             self.worker_line_ids.change_worker_state('outline')
-            self.state = self.compute_order_state()
             # if all(feedback.state in ['qc_success', 'alredy_post_inventory'] for feedback in self.qc_feedback_ids):
             #     self.state = "waiting_inventory_material"#等待清点退料
             # 有其中一个单据还没品捡 或者还没品捡完成, 等待品捡完成
-        if 'produce_finish_replan_mo' in dir(self):
-            self.produce_finish_replan_mo()
+            self.produce_finish_data_handle()
+
+    def produce_finish_data_handle(self):
+        self.state = self.compute_order_state()
+        if not self.is_secondary_produce and not self.feedback_on_rework:  # 不是第二次生产,则重新排产 或者没有返工单
+            if 'produce_finish_replan_mo' in dir(self):
+                self.produce_finish_replan_mo()
+        else:  # 第二次生产,不影响排产,记录时间
+            times = self.secondary_produce_time_ids.filtered(lambda x: not x.end_time)
+            if times:  # 正常来说只有一个是没设置结束时间的
+                times[0].end_time = fields.Datetime.now()
+                times[0].is_secondary_produce = False
+            else:
+                raise UserError(u"未找到对应的数据")
+
 
     def compute_order_state(self):
         if any(feedback.state in ['draft', 'qc_ing'] for feedback in self.qc_feedback_ids):
@@ -840,9 +870,39 @@ class MrpProductionExtend(models.Model):
 
     @api.multi
     def action_cancel(self):
+        force_cancel = self._context.get("force_cancel")
+        if force_cancel:
+            state_domain = ["draft", "confirmed", "waiting_material",
+                            "prepare_material_ing", "finish_prepare_material", "already_picking"]
+        else:
+            state_domain = ["draft", "confirmed", "waiting_material"]
+        for mo in self:
+            if mo.state not in state_domain:
+                raise UserError(u"不能取消已经开始生产的制造单 或者 相关的生产单已经开始生产无法取消SO")
+
         res = super(MrpProductionExtend, self).action_cancel()
+        # for p in self:
+        #     return_m = self.env["mrp.return.material"].with_context({
+        #         'active_model': 'mrp.production',
+        #         'active_id': p.id
+        #     }).create({
+        #         'production_id': p.id
+        #     })
+        #     move_raw = p.move_raw_ids.filtered(lambda x: x.state == 'done')
+        #     for line in return_m.return_ids:
+        #         for move in move_raw:
+        #             if line.product_id.id == move.product_id.id:
+        #                 line.return_qty += move.quantity_done
+        #     return_m.no_confirm_return()
+            # return_m.do_retrurn()
+        return res
+
+    def action_cancel_and_return_material(self):
         for p in self:
-            return_m = self.env["mrp.return.material"].create({
+            return_m = self.env["mrp.return.material"].with_context({
+                'active_model': 'mrp.production',
+                'active_id': p.id
+            }).create({
                 'production_id': p.id
             })
             move_raw = p.move_raw_ids.filtered(lambda x: x.state == 'done')
@@ -851,8 +911,19 @@ class MrpProductionExtend(models.Model):
                     if line.product_id.id == move.product_id.id:
                         line.return_qty += move.quantity_done
             return_m.no_confirm_return()
-            # return_m.do_retrurn()
-        return res
+
+            p.with_context({
+                'force_cancel': True
+            }).action_cancel()
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": u"提示",
+                "text": u"退料成功,并取消制造单",
+                "sticky": False
+            }
+        }
 
     def _generate_finished_moves(self):
         move = self.env['stock.move'].create({
@@ -871,7 +942,7 @@ class MrpProductionExtend(models.Model):
             'origin': self.name,
             'group_id': self.procurement_group_id.id,
             'move_order_type': 'null' if self.move_finished_ids else 'manufacturing_orders',
-            # 'propagate': False,
+            'propagate': False,
         })
         move.action_confirm()
         return move
@@ -1511,7 +1582,7 @@ class MrpQcFeedBack(models.Model):
 
     company_id = fields.Many2one("res.company", default=lambda self: self.env.user.company_id)
     name = fields.Char('Name', index=True, required=True)
-    production_id = fields.Many2one('mrp.production')
+    production_id = fields.Many2one('mrp.production', ondelete='restrict')
     qty_produced = fields.Float()
     qc_test_qty = fields.Float(string='Sampling Quantity')
     qc_rate = fields.Float(compute='_compute_qc_rate')
@@ -1580,6 +1651,11 @@ class MrpQcFeedBack(models.Model):
         if self.production_id.state == "waiting_rework":
 
             self.state = "check_to_rework"
+            p_time = self.env["production.time.record"].create({
+                'production_id': self.production_id.id,
+                'start_time': fields.Datetime.now(),
+                'record_type': 'rework'
+            })
             self.production_id.state = "progress"
             self.production_id.feedback_on_rework = self
             if 'confirm_rework_replan_mo' in dir(self.production_id):

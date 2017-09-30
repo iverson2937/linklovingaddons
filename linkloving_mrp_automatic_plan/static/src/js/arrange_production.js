@@ -46,11 +46,35 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             'click .show_edit_wrap': 'show_edit_ui',
             'click .edit_prodiction_confirm': 'confirm_edit_operation',
             'click .to_schedule_report_btn': 'to_schedule_report',
+            'click .product_report_btn': 'product_report',
+            'click .so_report_btn': 'so_report',
+        },
+        product_report: function (e) {
+            var action = {
+                type: 'ir.actions.act_window',
+                res_model: 'select.report.wizard',
+                view_mode: 'form',
+                view_id: 'select_report_wizard_form',
+                views: [[false, 'form']],
+                target: "new"
+            };
+            this.do_action(action);
+            //    {
+            //    'name': u'填写物流单号',
+            //    'type': 'ir.actions.act_window',
+            //    'view_mode': 'form',
+            //    'res_model': 'tracking.number.wizard',
+            //    'target': 'new',
+            //}
+
+        },
+        so_report: function (e) {
+
         },
         to_schedule_report: function () {
             var action = {
                 type: 'ir.actions.client',
-                name: 'Rport',
+                name: 'Report',
                 tag: 'schedule_production_report',
                 process_id: myself.process_id,
             };
@@ -79,9 +103,12 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         $(".item_edit_container").hide();
                     });
         },
-        show_edit_ui:function () {
+        show_edit_ui: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
             $(".item_edit_container").show();
             $('.a_p_bars_buttons_wrap').hide();
+            this.alia_mo = $(target).parents('.ap_item_wrap').attr('data-mo-id');
             $(".product_qty").val('');
         },
         show_bars_buttons:function (e) {

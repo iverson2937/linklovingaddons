@@ -11,6 +11,18 @@
                 <link rel="stylesheet" href="/linkloving_mrp_automatic_plan/static/src/css/almanac.css"/>
                 <link rel="stylesheet" href="/linkloving_mrp_automatic_plan/static/src/css/date.css"/>
                 <link rel="stylesheet" href="/linkloving_mrp_automatic_plan/static/src/css/arrange_production.css"/>
+
+                <!-- treetable-->
+                <script type="text/javascript"
+                        src="/linkloving_mrp_automatic_plan/static/src/js/treetable/jquery.treetable.js"/>
+
+                <link rel="stylesheet"
+                      href="/linkloving_mrp_automatic_plan/static/src/css/treetable/treetable.css"/>
+                <link rel="stylesheet"
+                      href="/linkloving_mrp_automatic_plan/static/src/css/treetable/jquery.treetable.theme.default.css"/>
+                <link rel="stylesheet"
+                      href="/linkloving_mrp_automatic_plan/static/src/css/treetable/screen.css"/>
+                <!--end-->
             </xpath>
         </template>
 

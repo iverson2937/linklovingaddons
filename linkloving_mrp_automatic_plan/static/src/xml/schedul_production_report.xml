@@ -3,12 +3,37 @@
 <templates xml:space="preserve">
     <t t-name="schedule_production_tmpl">
         <div class="schedule_production_container">
+            <t t-call="table_header">
+            </t>
         </div>
     </t>
-    <t t-name="report_table">
 
-    </t>
     <t t-name="table_header">
+        <table id="example-basic">
+            <caption>
+      <a href="#" onclick="jQuery('#example-basic').treetable('expandAll');  return false;">Expand all</a>
+      <a href="#" onclick="jQuery('#example-basic').treetable('collapseAll'); return false;">Collapse all</a>
+    </caption>
+                <thead>
+                     <th>Tree column</th>
+                    <th>Additional data</th>
+                </thead>
+           <tbody>
+      <tr data-tt-id="1" data-tt-branch='true'>
+        <td>1: column 1</td>
+        <td>1: column 2</td>
+      </tr>
 
+      <tr data-tt-id="2" data-tt-branch='true'>
+        <td>2: column 1</td>
+        <td>2: column 2</td>
+      </tr>
+
+      <tr data-tt-id="3" data-tt-branch='true'>
+        <td>3: column 1</td>
+        <td>3: column 2</td>
+      </tr>
+    </tbody>
+        </table>
     </t>
 </templates>
