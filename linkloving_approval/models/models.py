@@ -63,7 +63,7 @@ class ApprovalCenter(models.TransientModel):
             domain = [('create_uid', '=', self.env.user.id),
                       (
                           'state', 'not in',
-                          ['waiting_release', 'draft', 'cancel'])]
+                          ['waiting_release', 'draft', 'cancel', 'deny'])]
             attatchments = self.env[self.res_model].search(domain,
                                                            limit=limit, offset=offset, order='create_date desc')
         elif self.type == 'waiting_approval':
@@ -92,7 +92,8 @@ class ApprovalCenter(models.TransientModel):
 
         attach_list = []
         for atta in attatchments:
-            attach_list.append(atta.convert_attachment_info())
+            # attach_list.append(atta.convert_attachment_info())
+            attach_list.append(dict(atta.convert_attachment_info(), **{'checkbox_type': self.type}))
 
         length = self.env[self.res_model].search_count(domain)
         return {"records": attach_list,
@@ -162,7 +163,8 @@ class ApprovalCenter(models.TransientModel):
 
         attach_list = []
         for atta in attatchments:
-            attach_list.append(atta.convert_attachment_info())
+            # attach_list.append(atta.convert_attachment_info())
+            attach_list.append(dict(atta.convert_attachment_info(), **{'checkbox_type': self.type}))
 
         length = self.env[self.res_model].search_count(expression.AND([domain, domain_my]))
         return {"records": attach_list,

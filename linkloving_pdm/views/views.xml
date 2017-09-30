@@ -92,19 +92,44 @@
                 <form string="">
                     <sheet>
                         <group>
-                            <group>
-                                <field name="file_name"/>
-                                <field name="remote_path"/>
-                                <field name="file_binary"/>
-                                <field name="state"/>
-                                <field name="version"/>
-                                <field name="product_tmpl_id"/>
-                                <field name="review_id"/>
-                                <field name="type"/>
-
+                            <field name="temp_product_tmpl_ids" widget="many2many_tags"/>
+                            <field name="type" class="this_my_type"/>
+                        </group>
+                        <group>
+                            <field name="file_binary" class="this_my_file_binary"
+                                   attrs="{'invisible': [('type', 'in', ('design','other'))]}"/>
+                        </group>
+                        <group style="margin-left: 18%;">
+                            <!--<group attrs="{'invisible': [('type', 'in', ('design','other'))]}">-->
+                            <!--<a href="javascript:;" id="my_load_file_a">-->
+                            <!--<input type="file" class="o_form_input my_load_file_view" name="file_binary"/>-->
+                            <!--</a>-->
+                            <!--</group>-->
+                            <group attrs="{'invisible': [('type', 'not in', ('design','other'))]}">
+                                <!--<a id="file_click_me_my" class="o_form_input" href="javascript:void(-1);">测试赋值-->
+                                <!--</a>-->
+                                <a id="file_click_me" class="o_form_input" href="javascript:void(-1);">选择文件
+                                </a>
                             </group>
                         </group>
+                        <group>
+                            <!--<field name="file_name" attrs="{'invisible': [('type', 'not in', ('design','other'))]}"/>-->
+                            <field name="file_name" class="this_my_filename" placeholder="输入格式（*.*）"/>
+                            <field name="remote_path" class="this_my_remote_path"
+                                   attrs="{'invisible': [('type', 'not in', ('design','other'))]}"/>
+                            <field name="state" invisible="1"/>
+                            <field name="version" invisible="1"/>
+                            <field name="product_tmpl_id" invisible="1"/>
+                            <field name="review_id" invisible="1"/>
+                        </group>
+                        <script type="text/javascript" src="/linkloving_pdm/static/src/js/file_click_form.js"/>
                     </sheet>
+                    <footer>
+                        <button string="保存" type="object" name="action_create_many_info"
+                                class="btn-primary"/>
+                        <!--<button name='action_create_many_info' type='object' string='' class='oe_highlight review_reload'/>-->
+                        <button string='取消' class='oe_link review_reload' special='cancel'/>
+                    </footer>
                 </form>
             </field>
         </record>
@@ -170,7 +195,7 @@
 
                         <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
                                 groups="linkloving_pdm.group_final_review_picking"
-                                 invisible="not context.get('view_material_request')"
+                                invisible="not context.get('view_material_request')"
                         />
 
                         <button name='action_deny'
@@ -209,6 +234,7 @@
 
                 <script type="text/javascript" src="/linkloving_pdm/static/src/js/document_load.js"/>
                 <link rel="stylesheet" href="/linkloving_pdm/static/src/css/document_load.css"/>
+                <script type="text/javascript" src="/linkloving_pdm/static/src/js/file_form_js.js"/>
             </xpath>
         </template>
 

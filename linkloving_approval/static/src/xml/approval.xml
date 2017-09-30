@@ -23,10 +23,20 @@
                 </t>
             </ul>
 
-            <!--<div class="create_document">-->
-                <!--<button style="display:none;" class="btn btn-primary delect_hide download_document_checked">下载选中</button>-->
-                <!--<button style="display:none;" class="btn btn-primary delect_hide approval_document_checked">审核选中</button>-->
-            <!--</div>-->
+            <div class="create_document">
+
+                 <!--<div id="div_file_all_checkbox">-->
+                <!--<button class="btn btn-primary document_all_checkbox" t-att-data="11">全选</button>-->
+                <!--</div>-->
+
+                <input type="checkbox" id="top_all_checkbox" class="document_all_checkbox">全选</input>
+
+                <button class="btn btn-primary create_file_document_btn">创建</button>
+                <button style="display:none;" id="download_checkbox" class="btn btn-primary delect_hide download_document_checked">批量下载</button>
+                <button style="display:none;" id="document_checkbox" all_hello="nihaoya" class="btn btn-primary delect_hide document_manage_btn">批量审核</button>
+                <button style="display:none;" id="delect_checkbox" class="btn btn-primary delect_hide delect_document_checked">批量删除</button>
+
+            </div>
 
         </div>
 
@@ -50,9 +60,12 @@
                 <div class="tab_message_display">
                     <div class="approval_tab_pane_type"><t t-esc="item_files.type"/></div>
 
-                    <!--<div>-->
-                        <!--<input type="checkbox" class="o_chat_header_file" t-att-name="item_files.id">选中</input>-->
-                    <!--</div>-->
+
+                    <t t-if="item_files.checkbox_type != 'submitted' ">
+                        <div id="div_file_checkbox">
+                            <input id="file_checkbox" type="checkbox" class="o_chat_header_file" t-att-name="item_files.id">选中</input>
+                        </div>
+                    </t>
 
                     <div>产品名字: <span t-att-product-id="item_files.product_id.id" t-att-default-code="item_files.product_id.default_code" class="approval_product_name"><t t-esc="item_files.product_id.name"/></span></div>
                     <div>文件：<span class="file_name"><t t-esc="item_files.file_name"/></span></div>
@@ -103,23 +116,48 @@
                         <button class="btn btn-primary document_manage_btn" t-att-data-suibian="item_files.is_show_action_deny" t-att-data-id="item_files.id">审核操作</button>
                     </t>
                     <t t-if="item_files.state[0] == 'draft' || item_files.state[0] == 'waiting_release'||item_files.state[0] == 'deny'||item_files.state[0]=='cancel' ">
-                        <t t-if="item_files.type == 'Other' || item_files.type == 'Design'">
-                            <a href="javascript:;" class="document_modify_wraper document_modify_2" >文件修改
-                            </a>
-                        </t>
-                        <t t-else="">
-                            <a href="javascript:;" class="document_modify_wraper">文件修改
-                            <input type="file" class="document_modify"/>
-                            </a>
+                        <t t-if="item_files.is_delect_view =='yes' &amp;&amp;  item_files.is_show_outage == true ">
+                            <t t-if="item_files.type == 'Other' || item_files.type == 'Design'">
+                                <a href="javascript:;" class="document_modify_wraper document_modify_2" >文件修改
+                                </a>
+                            </t>
+                            <t t-else="">
+                                <a href="javascript:;" class="document_modify_wraper">文件修改
+                                <input type="file" class="document_modify"/>
+                                </a>
+                            </t>
                         </t>
                     </t>
                     <t t-if="item_files.is_able_to_use == true || approval_type=='waiting_submit' ||approval_type=='waiting_approval'">
-                        <button class="btn btn-primary document_download" t-att-data="item_files.type">下载</button>
+                        <t t-if="item_files.is_show_outage == true ">
+                            <button class="btn btn-primary document_download" t-att-data="item_files.type">下载</button>
+                        </t>
                     </t>
 
 
-                    <a t-attf-href="/selectfile/file_show?id=#{item_files.id}"
+                    <a t-attf-href="/selectfile/file_show?id=#{item_files.id}&amp;type=#{item_files.type}"
                                                target="_blank"> <button class="btn btn-primary get_version_history">查看历史版本</button></a>
+                    <t t-if="item_files.has_right_to_review == true || item_files.is_first_review == true">
+                        <t t-if="item_files.is_delect_view =='yes'">
+                            <div class="delect_one_document" style="padding-top: 6px;">
+                                <button class="btn btn-primary delect_document_checked">删除</button>
+                            </div>
+                        </t>
+                    </t>
+
+                   <t t-if="item_files.state[0] == 'released' ">
+
+                        <div class="stop_one_document" style="padding-top: 6px;">
+                             <t t-if="item_files.is_show_outage == true ">
+                                 <button class="btn btn-primary outage_document_file off" data="off">停用</button>
+                                 <span style="color:red;">使用中</span>
+                             </t>
+                            <t t-if="item_files.is_show_outage == false ">
+                                <button class="btn btn-primary outage_document_file on" data="on">启用</button>
+                                <span style="color:red;">已停用</span>
+                             </t>
+                        </div>
+                    </t>
 
 
                     <!--&lt;!&ndash; Large modal &ndash;&gt;-->

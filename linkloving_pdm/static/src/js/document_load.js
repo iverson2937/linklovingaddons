@@ -20,7 +20,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             'click .document_manage_btn': 'document_form_pop',
             'click .create_document_btn': 'create_document_fn',
             'click .load_container_close': 'close_document_container',
-            'click .submit_file_no':'close_document_container',
+            'click .submit_file_no': 'close_document_container',
             'change .my_load_file': 'get_file_name',
             'click .submit_file_yes': 'load_file',
             'change .document_modify': 'document_modify_fn',
@@ -31,67 +31,129 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             'click .document_modify_2': 'document_modify_2_fn',
             'click input.o_chat_header_file': 'on_click_inputs_file',
             'click button.delect_document_checked': 'on_click_btn_delect_file',
+
+            'click .document_all_checkbox': 'document_all_checkbox_realize',
+            'click .outage_document_file': 'outage_document_file_fn',
         },
+
+
+        // 全选
+        document_all_checkbox_realize: function (e) {
+            var self = this;
+
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var approval_type = $("#document_tab").attr("data-now-tab");
+            $("#" + approval_type + "  input[type='checkbox']").each(function () {
+                $(this).prop('checked', $(target).prop('checked') || false);
+                self.on_click_inputs_file(this, 'all_checkbox');
+            });
+        },
+
+
+        // 停用
+        outage_document_file_fn: function (e) {
+            var tar = this;
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var approval_type = $("#approval_tab").attr("data-now-tab");
+            var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
+            var state_type = $(target).attr("data");
+            new Model("product.attachment.info").call("chenge_outage_state", [new_file_id], {
+                state_type: state_type,
+                new_file_id: new_file_id
+            }).then(function (result_info) {
+                var file_type = self.$("#document_tab").attr("data-now-tab");
+                var product_id = parseInt($("body").attr("data-product-id"));
+                return new Model("product.template")
+                    .call("get_attachemnt_info_list", [product_id], {type: file_type})
+                    .then(function (result) {
+                        console.log(result);
+                        self.$("#" + file_type).html("");
+                        self.$("#" + file_type).append(QWeb.render('active_document_tab', {result: result}));
+                    });
+            });
+        },
+
 
         on_click_btn_delect_file: function (e) {
             var self = this;
             var attachment_list = [];
-
             var cur_type = $("#document_tab li.active>a").attr("load_type");
-
-            if (e.target.parentNode.className == 'delect_one_document') {
-                var e = e || window.event;
-                var target = e.target || e.srcElement;
-                var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
-                console.log('删除一个' + new_file_id);
-                attachment_list.splice(0, 0, parseInt(new_file_id));
-            }
-            else {
-                console.log('删除选中' + self.file_checkbox);
-                if (self.file_checkbox) {
-                    for (var i = 0; i < self.file_checkbox.length; i++) {
-                        attachment_list[i] = parseInt(self.file_checkbox[i])
-                    }
+            var choice = confirm("您确认要删除吗？", function () {
+            }, null);
+            if (choice) {
+                if (e.target.parentNode.className == 'delect_one_document') {
+                    var e = e || window.event;
+                    var target = e.target || e.srcElement;
+                    var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
+                    console.log('删除一个' + new_file_id);
+                    attachment_list.splice(0, 0, parseInt(new_file_id));
                 }
-                $('.delect_hide').hide();
-            }
-
-            new Model("product.attachment.info")
-                .call("unlink_attachment_list", [attachment_list], {attachment_list: attachment_list})
-                .then(function (result_info) {
-                    console.log(result_info);
-                    if (result_info.template_id) {
-
-                        return new Model("product.template")
-                            .call("get_attachemnt_info_list", [result_info.template_id], {type: result_info.type})
-                            .then(function (result) {
-                                console.log(result);
-                                self.$("#" + result_info.type).html("");
-                                self.$("#" + result_info.type).append(QWeb.render('active_document_tab', {result: result}));
-                            });
+                else {
+                    console.log('删除选中' + self.file_checkbox);
+                    if (self.file_checkbox) {
+                        for (var i = 0; i < self.file_checkbox.length; i++) {
+                            attachment_list[i] = parseInt(self.file_checkbox[i])
+                        }
                     }
-                });
+                    $('.delect_hide').hide();
+                }
+                new Model("product.attachment.info")
+                    .call("unlink_attachment_list", [attachment_list], {attachment_list: attachment_list})
+                    .then(function (result_info) {
+                        console.log(result_info);
+                        if (result_info.template_id) {
+
+                            return new Model("product.template")
+                                .call("get_attachemnt_info_list", [result_info.template_id], {type: result_info.type})
+                                .then(function (result) {
+                                    console.log(result);
+
+                                    self.file_checkbox = [];
+                                    $('.delect_hide').hide();
+                                    $('#top_all_checkbox').prop('checked', false);
+
+                                    self.$("#" + result_info.type).html("");
+                                    self.$("#" + result_info.type).append(QWeb.render('active_document_tab', {result: result}));
+                                });
+                        }
+                    });
+            }
         },
 
 
-        on_click_inputs_file: function (event) {
+        on_click_inputs_file: function (event, top_10) {
             var self = this;
+            var is_hava = true;
+            var input_content;
 
-            if ($(event.target).prop("checked")) {
-                self.file_checkbox.splice(0, 0, event.target.name);
+            top_10 ? input_content = event : input_content = event.target;
+
+            var approval_type = $("#approval_tab").attr("data-now-tab");
+
+            if ($(input_content).prop("checked")) {
+                self.file_checkbox.splice(0, 0, input_content.name);
             } else {
-                if ($.inArray(event.target.name, self.file_checkbox) >= 0) {
-                    self.file_checkbox.splice($.inArray(event.target.name, self.file_checkbox), 1);
+                while (is_hava) {
+                    if ($.inArray(input_content.name, self.file_checkbox) >= 0)
+                        self.file_checkbox.splice($.inArray(input_content.name, self.file_checkbox), 1);
+                    else
+                        break;
                 }
             }
-
+            self.file_checkbox = $.grep(self.file_checkbox, function (n) {
+                return $.trim(n).length > 0;
+            });
+            console.log(self.file_checkbox)
             if (self.file_checkbox.length > 1)
-                $('.delect_hide').show();
+                if (approval_type == 'submitted' || approval_type == 'approval')
+                    $('#download_checkbox').show();
+                else
+                    $('.delect_hide').show();
+
             else if (self.file_checkbox.length = 1)
                 $('.delect_hide').hide();
-
-            console.log(self.file_checkbox)
-
         },
 
 
@@ -130,26 +192,26 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                             }
                         }).then(function (ret) {
                             var default_code = self.product_info.default_code.trim()
-                            var remote_file = cur_type.toUpperCase() + '/' + default_code.split('.').join('/') + '/v'+ ret +
+                            var remote_file = cur_type.toUpperCase() + '/' + default_code.split('.').join('/') + '/v' + ret +
                                 '/' + cur_type.toUpperCase() + '_' + default_code.split('.').join('_') + '_v' + ret
                             console.log(ret);
                             $.ajax({
-                            type: "GET",
+                                type: "GET",
                                 url: "http://localhost:8088/uploadfile?id=" + this.product_id + "&remotefile=" + remote_file,
-                            success: function (data) {
-                                framework.unblockUI();
-                                console.log(data);
-                                if (data.result == '1') {
-                                    $(".my_load_file_name").val(data.choose_file_name)
-                                    $(".my_load_file_remote_path").val(data.path)
+                                success: function (data) {
+                                    framework.unblockUI();
+                                    console.log(data);
+                                    if (data.result == '1') {
+                                        $(".my_load_file_name").val(data.choose_file_name)
+                                        $(".my_load_file_remote_path").val(data.path)
+                                    }
+                                },
+                                error: function (error) {
+                                    framework.unblockUI();
+                                    Dialog.alert("上传失败,请打开代理软件");
+                                    console.log(error);
                                 }
-                            },
-                            error: function (error) {
-                                framework.unblockUI();
-                                Dialog.alert("上传失败,请打开代理软件");
-                                console.log(error);
-                            }
-                        });
+                            });
                         })
 
                     }
@@ -233,7 +295,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                     }
                 })
             } else {
-               window.location.href = '/download_file/?download=true&id=' + new_file_id;
+                window.location.href = '/download_file/?download=true&id=' + new_file_id;
 
             }
         },
@@ -279,7 +341,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             var target = e.target || e.srcElement;
             console.log($(target).parents(".tab_pane_display").children(".tab_message_display"));
             $(target).parents(".tab_pane_display").children(".tab_message_display").prepend("<div class='document_modify_name'>新修改的文件：<span>" + target.files[0].name + "</span></div>");
-            if (target.files){
+            if (target.files) {
                 $(".document_modify span").val(target.files[0].name);
             }
             var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
@@ -292,12 +354,15 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             reader.onload = function () {
                 var encoded_file = reader.result;
                 var position = encoded_file.indexOf("base64,");
-                if (position > -1){
+                if (position > -1) {
                     encoded_file = encoded_file.slice(position + "base64,".length);
                 }
                 // var result = btoa(encoded_file);
                 return new Model("product.attachment.info")
-                    .call("update_attachment", [parseInt(new_file_id)], {file_binary: encoded_file, file_name: new_file.name})
+                    .call("update_attachment", [parseInt(new_file_id)], {
+                        file_binary: encoded_file,
+                        file_name: new_file.name
+                    })
                     .then(function (result) {
                     })
             };
@@ -410,6 +475,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             })
         },
         document_change_tabs: function (e) {
+            var tar = this;
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var file_type = $(target).attr("data");
@@ -419,6 +485,11 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 .call("get_attachemnt_info_list", [this.product_id], {type: file_type})
                 .then(function (result) {
                     console.log(result)
+
+                    tar.file_checkbox = [];
+                    $('.delect_hide').hide();
+                    $('#top_all_checkbox').prop('checked', false);
+
                     self.$("#" + file_type).html("");
                     self.$("#" + file_type).append(QWeb.render('active_document_tab', {result: result}));
                 })
@@ -426,7 +497,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
         init: function (parent, action) {
             this._super(parent)
             this._super.apply(this, arguments);
-            if (parent && parent.action_stack.length > 0){
+            if (parent && parent.action_stack.length > 0) {
                 this.action_manager = parent.action_stack[0].widget.action_manager
             }
             console.log(parent);

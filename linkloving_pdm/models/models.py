@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
+import base64
 from odoo import models, fields, api
 
 # class linkloving_pdm(models.Model):
@@ -151,7 +152,8 @@ class ReviewProcessLine(models.Model):
             'review_order_seq': self.review_order_seq + 1,
             'is_last_review': is_last_review,
         })
-        partner_id.sequence_file += 1
+
+        partner_id.sudo().sequence_file += 1
 
     # 审核通过
     def action_pass(self, remark):
@@ -259,6 +261,9 @@ class ProductAttachmentInfo(models.Model):
             'is_show_action_deny': self.is_show_action_deny,
             'create_uid_name': self.sudo().create_uid.name,
             'type': FILE_TYPE_DIC.get(self.type or '') or '',
+            'is_delect_view': 'yes' if self.create_uid.id == self.env.uid else 'no',
+            'is_checkbox_show': 'yes',
+            'is_show_outage': self.is_show_outage,
         }
 
     def get_file_download_url(self, type, host, product_tmpl_id):
@@ -273,6 +278,10 @@ class ProductAttachmentInfo(models.Model):
 
     def get_download_filename(self):
         dc = self.product_tmpl_id.default_code  # .replace(".", "_")
+
+        if self.file_name.find(".") == -1:
+            raise UserError(u"输入文件名有误，请核对")
+
         file_ext = self.file_name.split('.')[-1:][0]
         if file_ext:
             file_ext = '.' + file_ext
@@ -334,7 +343,7 @@ class ProductAttachmentInfo(models.Model):
     is_show_cancel = fields.Boolean(compute='_compute_is_show_cancel')
     file_name = fields.Char(u"文件名")
     remote_path = fields.Char(string=u"远程路径", required=False, )
-    file_binary = fields.Binary()
+    file_binary = fields.Binary(string=u'文件')
     state = fields.Selection(string=u"状态", selection=[('draft', u'等待文件'),
                                                       ('waiting_release', u'等待发布'),
                                                       ('review_ing', u'审核中'),
@@ -342,7 +351,7 @@ class ProductAttachmentInfo(models.Model):
                                                       ('deny', u'被拒'),
                                                       ('cancel', u'已取消')],
                              default='draft', required=False, readonly=True)
-    version = fields.Integer(string=u"版本号", default=_default_version)
+    version = fields.Integer(string=u"版本号")
 
     is_able_to_use = fields.Boolean(string=u"是否可以使用", compute="_compute_is_able_to_use")
     has_right_to_review = fields.Boolean(compute='_compute_has_right_to_review')
@@ -360,8 +369,62 @@ class ProductAttachmentInfo(models.Model):
                                 track_visibility='always',
                                 readonly=True, )
 
-    type = fields.Selection(string="类型", selection=FILE_TYPE, required=True, )
+    type = fields.Selection(string=u"类型", selection=FILE_TYPE, required=True, )
     is_show_action_deny = fields.Boolean(string=u'是否显示审核不通过', default=True, compute='_compute_is_show_action_deny')
+
+    temp_product_tmpl_ids = fields.Many2many('product.template', string=u"产品")
+
+    is_show_outage = fields.Boolean(string=u'文件是否可用', default=True)
+
+    def chenge_outage_state(self, **kwargs):
+        outage_state = kwargs.get('state_type')
+        new_file_id = kwargs.get('new_file_id')
+        attachment_to_outage = self.env["product.attachment.info"].browse(int(new_file_id))
+
+        if outage_state == 'on':
+            attachment_to_outage.write({'is_show_outage': True})
+        if outage_state == 'off':
+            attachment_to_outage.write({'is_show_outage': False})
+
+        return {'state': 'ok'}
+
+    def action_create_many_info(self):
+        print self.temp_product_tmpl_ids
+
+        if not self.temp_product_tmpl_ids:
+            raise UserError(u"请选择产品")
+
+        if self.type in ('design', 'other'):
+            if not (self.file_name and self.remote_path):
+                raise UserError(u"信息不完整，请完善")
+        else:
+            if not (self.file_name and self.file_binary):
+                raise UserError(u"信息不完整，请完善")
+
+        for tmpl_id in self.temp_product_tmpl_ids:
+            print tmpl_id
+            # raise UserError("meishi")
+
+            Model = self.env['product.attachment.info']
+
+            # product_one = self.copy()
+            # product_one['product_tmpl_id'] = tmpl_id.id
+
+            val = {'file_name': self.file_name,
+                   'file_binary': self.file_binary,
+                   'remote_path': self.remote_path,
+                   'state': 'waiting_release',
+                   'product_tmpl_id': int(tmpl_id.id),
+                   'type': self.type,
+                   'version': Model.with_context(
+                       {"product_id": int(tmpl_id.id), "type": self.type})._default_version(),
+                   }
+
+            attach = Model.create(val)
+            filename = attach.get_download_filename()
+            attach.file_name = filename
+        self.unlink()
+        return True
 
     @api.model
     def create(self, vals):
@@ -396,11 +459,11 @@ class ProductAttachmentInfo(models.Model):
         update_dic = {}
         if kwargs.get("file_binary"):
             update_dic["file_binary"] = kwargs.get("file_binary")
-        if kwargs.get("file_name"):
-            update_dic["file_name"] = kwargs.get("file_name")
+        # if kwargs.get("file_name"):
+        #     update_dic["file_name"] = kwargs.get("file_name")
         if kwargs.get("remote_path"):
             update_dic["remote_path"] = kwargs.get("remote_path")
-            update_dic["file_name"] = os.path.basename(kwargs.get("remote_path"))
+            # update_dic["file_name"] = os.path.basename(kwargs.get("remote_path"))
         if self.state not in ['waiting_release', 'draft', 'deny', 'cancel']:
             raise UserError(u'文件正在处于审核中,请先取消审核,再进行操作')
         self.write(update_dic)
@@ -655,6 +718,8 @@ class ReviewProcessWizard(models.TransientModel):
         to_last_review = self._context.get("to_last_review")  # 是否送往终审
         review_type = self._context.get("review_type")
 
+        file_data_list = self._context.get("file_data_list")
+
         materials_request_id = self._context.get('default_material_requests_id')
         picking_state = self._context.get('picking_state', False)
 
@@ -673,6 +738,38 @@ class ReviewProcessWizard(models.TransientModel):
 
             return True
         elif review_type == 'file_review':
+
+            # if file_data_list:
+            #     for info_id_2 in file_data_list:
+            #         self_copy = self.copy()
+            #         self_copy.update({'product_attachment_info_id': int(info_id_2)})
+            #
+            #         if not self_copy.product_attachment_info_id.review_id:  # 如果没审核过
+            #             self_copy.product_attachment_info_id.action_send_to_review()
+            #
+            #         self_copy.product_attachment_info_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
+            #         self_copy.product_attachment_info_id.review_id.process_line_review_now.submit_to_next_reviewer(
+            #             review_type=review_type,
+            #             to_last_review=to_last_review,
+            #             partner_id=self_copy.partner_id,
+            #             remark=self_copy.remark)
+            #     return True
+
+            if file_data_list:
+                for info_one in self.env['product.attachment.info'].browse(
+                        [int(info_list_id) for info_list_id in file_data_list]):
+
+                    if not info_one.review_id:  # 如果没审核过
+                        info_one.action_send_to_review()
+
+                    info_one.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
+                    info_one.review_id.process_line_review_now.submit_to_next_reviewer(
+                        review_type=review_type,
+                        to_last_review=to_last_review,
+                        partner_id=self.partner_id,
+                        remark=self.remark)
+                return True
+
             if not self.product_attachment_info_id.review_id:  # 如果没审核过
                 self.product_attachment_info_id.action_send_to_review()
 
@@ -682,6 +779,7 @@ class ReviewProcessWizard(models.TransientModel):
                 to_last_review=to_last_review,
                 partner_id=self.partner_id,
                 remark=self.remark)
+
         elif review_type == 'picking_review':
             print self.material_requests_id.review_id
             if not self.material_requests_id.review_id:  # 如果没审核过
@@ -703,6 +801,9 @@ class ReviewProcessWizard(models.TransientModel):
     def action_pass(self):
 
         review_type = self._context.get("review_type")
+
+        file_data_list = self._context.get("file_data_list")
+
         materials_request_id = self._context.get('default_material_requests_id')
         if review_type == 'bom_review':
             if not self.need_sop:
@@ -713,6 +814,13 @@ class ReviewProcessWizard(models.TransientModel):
             self.review_bom_line.action_pass(self.remark)
             # self.bom_id.product_tmpl_id.apply_bom_update()
         elif review_type == 'file_review':
+            if file_data_list:
+                for info_one in self.env['product.attachment.info'].browse(
+                        [int(info_list_id) for info_list_id in file_data_list]):
+                    info_one.action_released()
+                    info_one.review_id.process_line_review_now.action_pass(self.remark)
+                return True
+
             self.product_attachment_info_id.action_released()
             # 审核通过
 
@@ -750,12 +858,21 @@ class ReviewProcessWizard(models.TransientModel):
 
     # 审核不通过
     def action_deny(self):
+        file_data_list = self._context.get("file_data_list")
         # 改变文件状态
         review_type = self._context.get('review_type')
         if review_type == 'bom_review':
             self.bom_id.action_deny()
             self.review_bom_line.action_deny(self.remark)
         elif review_type == 'file_review':
+
+            if file_data_list:
+                for info_one in self.env['product.attachment.info'].browse(
+                        [int(info_list_id) for info_list_id in file_data_list]):
+                    info_one.action_deny()
+                    info_one.review_id.process_line_review_now.action_deny(self.remark)
+                return True
+
             self.product_attachment_info_id.action_deny()
             self.review_process_line.action_deny(self.remark)
         elif review_type == 'picking_review':
