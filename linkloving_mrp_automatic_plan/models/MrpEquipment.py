@@ -219,7 +219,8 @@ class MrpProductionExtend(models.Model):
     @api.multi
     def _compute_theo_spent_time(self):
         for mo in self:
-            mo.theo_spent_time = (mo.product_qty * mo.bom_id.produced_spend_per_pcs + mo.bom_id.prepare_time) / 3600
+            mo.theo_spent_time = round(
+                (mo.product_qty * mo.bom_id.produced_spend_per_pcs + mo.bom_id.prepare_time) / 3600, 2)
 
     factory_setting_id = fields.Many2one("hr.config.settings", compute="_compute_factory_setting_id")
     production_line_id = fields.Many2one("mrp.production.line", string=u"产线")
@@ -234,7 +235,7 @@ class MrpProductionExtend(models.Model):
                                           required=False,
                                           compute='_compute_product_order_type')
 
-    theo_spent_time = fields.Float(string=u'生产用时(h)', compute='_compute_theo_spent_time', digits=(16, 2))
+    theo_spent_time = fields.Float(string=u'生产用时(h)', compute='_compute_theo_spent_time')
 
     '''
     操作mo信息接口

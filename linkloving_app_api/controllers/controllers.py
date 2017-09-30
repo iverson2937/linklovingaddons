@@ -225,26 +225,26 @@ class LinklovingAppApi(http.Controller):
 
         data = []
         for production in production_rework:
-            dict = {
-                'order_id': production.id,
-                'display_name': production.display_name,
-                'product_name': production.product_id.display_name,
-                'date_planned_start': production.date_planned_start,
-                'state': production.state,
-                'product_qty': production.product_qty,
-                'in_charge_name': production.in_charge_id.name,
-                'origin': production.origin,
-                'process_id': {
-                    'process_id': production.process_id.id,
-                    'name': production.process_id.name,
-                },
-                'production_line_id': {
-                    'production_line_id': production.production_line_id.id,
-                    'name': production.production_line_id.name
-                }
-            }
+            # dict = {
+            #     'order_id': production.id,
+            #     'display_name': production.display_name,
+            #     'product_name': production.product_id.display_name,
+            #     'date_planned_start': production.date_planned_start,
+            #     'state': production.state,
+            #     'product_qty': production.product_qty,
+            #     'in_charge_name': production.in_charge_id.name,
+            #     'origin': production.origin,
+            #     'process_id': {
+            #         'process_id': production.process_id.id,
+            #         'name': production.process_id.name,
+            #     },
+            #     'production_line_id': {
+            #         'production_line_id': production.production_line_id.id,
+            #         'name': production.production_line_id.name
+            #     }
+            # }
 
-            data.append(dict)
+            data.append(self.get_simple_production_json(production))
         # user_data = LinklovingAppApi.odoo10.execute('res.users', 'read', [LinklovingAppApi.odoo10.env.user.id])
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
@@ -277,22 +277,23 @@ class LinklovingAppApi(http.Controller):
                                                )
         data = []
         for production in production_all:
-            dict = {
-                'order_id': production.id,
-                'display_name': production.display_name,
-                'product_name': production.product_id.display_name,
-                'date_planned_start': production.date_planned_start,
-                'state': production.state,
-                'product_qty': production.product_qty,
-                'qty_produced': production.qty_unpost,
-                'in_charge_name': production.in_charge_id.name,
-                'origin': production.origin,
-                'process_id': {
-                    'process_id': production.process_id.id,
-                    'name': production.process_id.name,
-                }
-            }
-            data.append(dict)
+            # dict = {
+            #     'order_id': production.id,
+            #     'display_name': production.display_name,
+            #     'product_name': production.product_id.display_name,
+            #     'date_planned_start': production.date_planned_start,
+            #     'state': production.state,
+            #     'product_qty': production.product_qty,
+            #     'qty_produced': production.qty_unpost,
+            #     'in_charge_name': production.in_charge_id.name,
+            #     'origin': production.origin,
+            #     'process_id': {
+            #         'process_id': production.process_id.id,
+            #         'name': production.process_id.name,
+            #     },
+            #
+            # }
+            data.append(self.get_simple_production_json(production))
         # user_data = LinklovingAppApi.odoo10.execute('res.users', 'read', [LinklovingAppApi.odoo10.env.user.id])
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
@@ -556,6 +557,7 @@ class LinklovingAppApi(http.Controller):
             data.append(self.get_simple_production_json(production))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
+
     def get_simple_production_json(self, production):
         return {
                 'order_id': production.id,
@@ -563,6 +565,7 @@ class LinklovingAppApi(http.Controller):
                 'product_name': production.product_id.display_name,
                 'date_planned_start': production.date_planned_start,
                 'state': production.state,
+            'qty_produced': production.qty_unpost,
                 'product_qty': production.product_qty,
                 'in_charge_name': production.in_charge_id.name,
                 'origin': production.origin,
@@ -1163,9 +1166,17 @@ class LinklovingAppApi(http.Controller):
                 return JsonResponse.send_response(STATUS_CODE_ERROR,
                                                   res_data={"error": u"该单据还在返工中,请先产出数量"})
             # 生产完成 结算工时
-            mrp_production.state = mrp_production.compute_order_state()
-            if 'produce_finish_replan_mo' in dir(mrp_production):
-                mrp_production.produce_finish_replan_mo()
+            mrp_production.produce_finish_data_handle()
+            # mrp_production.state = mrp_production.compute_order_state()
+            # if not mrp_production.is_secondary_produce:#不是第二次生产,则重新排产
+            #     if 'produce_finish_replan_mo' in dir(mrp_production):
+            #         mrp_production.produce_finish_replan_mo()
+            # else:#第二次生产,不影响排产,记录时间
+            #     times = mrp_production.secondary_produce_time_ids.filtered(lambda x: x.end_time is None)
+            #     if times:#正常来说只有一个是没设置结束时间的
+            #         times[0].end_time = fields.Datetime.now()
+            #     else:
+            #         raise UserError(u"未找到对应的数据")
 
             JPushExtend.send_notification_push(audience=jpush.audience(
                 jpush.tag(LinklovingAppApi.get_jpush_tags("qc"))
@@ -1648,7 +1659,8 @@ class LinklovingAppApi(http.Controller):
             'production_line_id': {
                 'production_line_id': production.production_line_id.id,
                 'name': production.production_line_id.name
-            }
+            },
+            'is_secondary_produce': production.is_secondary_produce,
             # 'factory_remark': production.factory_remark,
         }
         return data
@@ -3122,7 +3134,7 @@ class LinklovingAppApi(http.Controller):
                 #             body=_("Qty:%d,Finish picking！") % (mrp_production.product_qty))
         except Exception, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={"error": e})
+                                              res_data={"error": e.name})
         # _logger.warning(u"charlie_0712_log10:finish, mo:%s", LinklovingAppApi.model_convert_to_dict(order_id, request))
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
