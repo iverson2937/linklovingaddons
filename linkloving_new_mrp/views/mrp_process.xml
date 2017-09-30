@@ -2,7 +2,7 @@
     <data>
 
 
-        <record id="mrp_process_form" model="ir.ui.view">
+        <record id="mrp_process_form_inherit" model="ir.ui.view">
             <field name="name">产出</field>
             <field name="model">mrp.process</field>
             <field name="priority" eval="100"/>

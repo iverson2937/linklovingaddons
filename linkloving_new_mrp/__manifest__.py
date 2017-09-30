@@ -30,6 +30,7 @@
         'views/mrp_production.xml',
         'views/mrp_product_rule.xml',
         'views/mrp_process.xml',
+        'views/mrp_qc_feedback.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

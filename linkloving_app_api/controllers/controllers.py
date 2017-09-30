@@ -269,7 +269,6 @@ class LinklovingAppApi(http.Controller):
 
         if condition and condition[condition.keys()[0]]:
             domain = (condition.keys()[0], 'like', condition[condition.keys()[0]])
-
         production_all = mrp_production.search(domain,
                                                offset=request.jsonrequest['offset'],
                                                limit=request.jsonrequest['limit'],
@@ -557,22 +556,21 @@ class LinklovingAppApi(http.Controller):
             data.append(self.get_simple_production_json(production))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-
     def get_simple_production_json(self, production):
         return {
-                'order_id': production.id,
-                'display_name': production.display_name,
-                'product_name': production.product_id.display_name,
-                'date_planned_start': production.date_planned_start,
-                'state': production.state,
+            'order_id': production.id,
+            'display_name': production.display_name,
+            'product_name': production.product_id.display_name,
+            'date_planned_start': production.date_planned_start,
+            'state': production.state,
             'qty_produced': production.qty_unpost,
-                'product_qty': production.product_qty,
-                'in_charge_name': production.in_charge_id.name,
-                'origin': production.origin,
-                'process_id': {
-                    'process_id': production.process_id.id,
-                    'name': production.process_id.name,
-                },
+            'product_qty': production.product_qty,
+            'in_charge_name': production.in_charge_id.name,
+            'origin': production.origin,
+            'process_id': {
+                'process_id': production.process_id.id,
+                'name': production.process_id.name,
+            },
             'production_line_id': {
                 'production_line_id': production.production_line_id.id,
                 'name': production.production_line_id.name
@@ -1126,12 +1124,15 @@ class LinklovingAppApi(http.Controller):
         produce_qty = request.jsonrequest.get('produce_qty')
 
         try:
+
+            if mrp_production.is_multi_output or mrp_production.is_random_output:
+                for product in produce_qty:
+                    move = mrp_production.stock_move_lines_finished.filtered(lambda x: x.product_id.id == product['id'])
+                    move.produce_qty = product.get('now_num')
+                mrp_production.confirm_output()
+                return JsonResponse.send_response(STATUS_CODE_OK,
+                                                  res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
             mrp_product_produce = request.env['mrp.product.produce'].with_context({'active_id': order_id})
-            # if mrp_production.is_multi_output or mrp_production.is_random_output:
-            #     print produce_qty
-            #     mrp_production.create_multi_output(produce_qty)
-            #     return JsonResponse.send_response(STATUS_CODE_OK,
-            #                                       res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
             produce = mrp_product_produce.sudo(LinklovingAppApi.CURRENT_USER()).create({
                 'product_qty': produce_qty,
@@ -1245,11 +1246,11 @@ class LinklovingAppApi(http.Controller):
 
         feedback_id = request.jsonrequest.get('feedback_id')  # get paramter
         result = request.jsonrequest.get('result')
-
+        line_ids = request.jsonrequest.get('line_ids')
         qc_test_qty = request.jsonrequest.get('qc_test_qty')  # 抽样数量
         qc_fail_qty = request.jsonrequest.get('qc_fail_qty')  # 不良品数量
         qc_note = request.jsonrequest.get('qc_note')  # 批注
-        qc_img = request.jsonrequest.get('qc_img')  # 图片
+        qc_img = request.jsonrequest.get('qc_img', [])  # 图片
         feedback = LinklovingAppApi.get_model_by_id(feedback_id, request, 'mrp.qc.feedback')
         feedback.write({
             'qc_test_qty': qc_test_qty,
@@ -1262,6 +1263,8 @@ class LinklovingAppApi(http.Controller):
                 'qc_img': img,
             })
             feedback.qc_imgs = [(4, qc_img_id.id)]
+        if feedback.is_multi_output or feedback.is_random_output:
+            feedback.update_lines(line_ids)
 
         if not feedback:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
@@ -1469,6 +1472,17 @@ class LinklovingAppApi(http.Controller):
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=self.convert_qc_feedback_to_json(feedback))
 
+    @http.route('/linkloving_app_api/get_mrp_rule_detail', type='json', auth='none', csrf=False)
+    def get_mrp_rule_detail(self, **kw):
+        rule_id = request.jsonrequest.get('rule_id')
+        rule = request.env['mrp.product.rule'].browse(rule_id)
+        if rule:
+            res = rule.get_rule_detail()
+            return JsonResponse.send_response(STATUS_CODE_OK,
+                                              res_data=res)
+        return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                          res_data={'error': u"未找到对应的物料规则"})
+
     @http.route('/linkloving_app_api/get_qc_feedback', type='json', auth='none', csrf=False)
     def get_qc_feedback(self, **kw):
         limit = request.jsonrequest.get("limit")
@@ -1493,9 +1507,31 @@ class LinklovingAppApi(http.Controller):
                                           res_data=json_list)
 
     def convert_qc_feedback_to_json(self, qc_feedback):
+        rule_id = 0
+        line_ids = []
+        is_multi_output = is_random_output = False
+        if (hasattr(qc_feedback, 'is_multi_output') and qc_feedback.is_multi_output) or (
+                    hasattr(qc_feedback, 'is_random_output') and qc_feedback.is_random_output):
+            rule_id = qc_feedback.rule_id.id if qc_feedback.rule_id else 0
+            is_multi_output = qc_feedback.is_multi_output
+            is_random_output = qc_feedback.is_random_output
+            line_ids = [
+                {'line_id': line.id,
+                 'product_id': line.sudo().product_id.id,
+                 'product_name': line.sudo().product_id.name,
+                 'qty_produced': line.qty_produced,
+                 'suggest_qty': line.suggest_qty,
+                 'qc_test_qty': line.qc_test_qty,
+                 'qc_note': line.qc_note,
+                 'qc_fail_qty': line.qc_fail_qty
+                 }
+                for line in qc_feedback.line_ids]
+
         data = {
             'feedback_id': qc_feedback.id,
             'name': qc_feedback.name,
+            'is_multi_output': is_multi_output,
+            'is_random_output': is_random_output,
             'production_id': {
                 "order_id": qc_feedback.sudo().production_id.id,
                 "display_name": qc_feedback.sudo().production_id.display_name,
@@ -1510,8 +1546,10 @@ class LinklovingAppApi(http.Controller):
             'qc_rate': qc_feedback.qc_rate,
             'qc_fail_qty': qc_feedback.qc_fail_qty,
             'qc_fail_rate': qc_feedback.qc_fail_rate,
+            'rule_id': rule_id,
             'qc_note': qc_feedback.qc_note or '',
             'qc_img': LinklovingAppApi.get_qc_img_url(qc_feedback.qc_imgs.ids),
+            'line_ids': line_ids
         }
         return data
 
@@ -1554,15 +1592,19 @@ class LinklovingAppApi(http.Controller):
         production = mrp_production.search([('id', '=', order_id)], limit=1)
         done_stock_moves = []
         is_multi_output = is_random_output = False
+        rule_id = 0
         if (hasattr(production, 'is_multi_output') and production.is_multi_output) or (
                     hasattr(production, 'is_random_output') and production.is_random_output):
             done_stock_moves = request.env['stock.move.finished'].sudo().search_read(
                 [('id', 'in', production.stock_move_lines_finished.ids)],
                 fields=['product_id',
-                        'produce_qty'
+                        'suggest_qty',
+                        'quantity_done_finished',
+                        'product_type'
                         ])
             is_multi_output = production.is_multi_output
             is_random_output = production.is_random_output
+            rule_id = production.rule_id.id if production.rule_id else 0
 
         stock_move = request.env['sim.stock.move'].sudo().search_read(
             [('id', 'in', production.sim_stock_move_lines.ids)],
@@ -1576,6 +1618,7 @@ class LinklovingAppApi(http.Controller):
                     'quantity_ready',
                     'product_uom_qty',
                     'quantity_available',
+                    'demand_qty',
                     'suggest_qty',
                     'area_id',
                     'product_type'
@@ -1583,9 +1626,8 @@ class LinklovingAppApi(http.Controller):
         # semi_finish = []
         # material = []
         for done_move in done_stock_moves:
+            done_move['id'] = done_move['product_id'][0]
             done_move['product_id'] = done_move['product_id'][1]
-            done_move['product_tmpl_id'] = done_move['product_id'][0]
-
 
         for l in stock_move:
             # dic = LinklovingAppApi.search(request,'product.product',[('id','=',l['product_id'][0])], ['display_name'])
@@ -1593,6 +1635,8 @@ class LinklovingAppApi(http.Controller):
                 l['product_tmpl_id'] = l['product_id'][
                     0]  # request.env['product.product'].sudo().search([('id','=',l['product_id'][0])]).id
                 l['product_id'] = l['product_id'][1]
+            if production.is_random_output or production.is_multi_output:
+                l['product_uom_qty'] = l['demand_qty']
             if l.get('area_id'):
                 l['area_id'] = {
                     'area_id': l.get('area_id')[0] or 0,
@@ -1605,7 +1649,7 @@ class LinklovingAppApi(http.Controller):
             #     semi_finish.append(l)
             # else:
             #     material.append(l)
-
+        print stock_move
         data = {
             'order_id': production.id,
             'display_name': production.display_name,
@@ -1633,6 +1677,7 @@ class LinklovingAppApi(http.Controller):
             'cur_location': None,
             'stock_move_lines': stock_move,
             'done_stock_moves': done_stock_moves,
+            'rule_id': rule_id,
 
             'qty_produced': production.qty_unpost,
             'process_id': {
@@ -2832,7 +2877,6 @@ class LinklovingAppApi(http.Controller):
         # request.params["db"] = '0426'#request.jsonrequest["db"]
 
         sources = request.env["crm.lead.source"].sudo(LinklovingAppApi.CURRENT_USER()).search_read([], fields=['name'])
-        print sources
         return sources
 
     ######### 销售出货 新版接口  ###############3
@@ -3027,9 +3071,11 @@ class LinklovingAppApi(http.Controller):
                     #                 sim_stock_move.stock_moves[0].id,
                     #                 str(sim_stock_move.stock_moves[0].product_uom_qty))
                     # 如果已完成的数量大于等于需求数量,则生成的库存移动单的数量就是本次备料的数量
+
                     if float_compare(sim_stock_move.quantity_done, sim_stock_move.product_uom_qty,
                                      precision_rounding=rounding) >= 0:
                         split_qty_unuom = move['quantity_ready']  # 未经过单位换算的数量
+                        print split_qty_unuom
                     else:
                         # 如果已完成的数量大于等于需求数量,则是 总数量 - 需求数量
                         if sim_stock_move.stock_moves.filtered(lambda x: x.state not in ["cancel", "done"]):

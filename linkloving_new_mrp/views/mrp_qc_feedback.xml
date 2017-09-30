@@ -1,0 +1,31 @@
+<odoo>
+    <data>
+
+
+        <record id="mrp_process_form" model="ir.ui.view">
+            <field name="name">产出</field>
+            <field name="model">mrp.qc.feedback</field>
+            <field name="priority" eval="100"/>
+            <field name="inherit_id" ref="linkloving_mrp_extend.mrp_qc_feedback_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook/page[1]" position="before">
+                    <page string="品检明细">
+                        <field name="line_ids">
+                            <tree create="false" delete="false" editable="bottom">
+                                <field name="product_id" options="{'no_create':True}"/>
+                                <field name="qty_produced" string="生产数量"/>
+                                <field name="qc_test_qty" string="检测数量"/>
+                                <field name="qc_fail_qty" string="不良品数量"/>
+                                <field name="qc_rate" string="抽样率"/>
+                                <field name="qc_fail_rate" string="不良品率"/>
+                            </tree>
+                        </field>
+
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

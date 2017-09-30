@@ -26,57 +26,6 @@
             </field>
         </record>
 
-        <!--<record id="add_input_output_material_form" model="ir.ui.view">-->
-        <!--<field name="name">添加材料</field>-->
-        <!--<field name="model">mrp.production</field>-->
-        <!--<field name="priority" eval="100"/>-->
-        <!--<field name="arch" type="xml">-->
-        <!--<form string="Picking material detail">-->
-        <!--<sheet>-->
-        <!--<notebook>-->
-        <!--<page string="投入">-->
-        <!--<field name="input_product_ids" options="{'reload_on_button': True}"-->
-        <!--context="{'default_type':'input'}">-->
-        <!--<tree editable="bottom" delete="1"-->
-        <!--create="1">-->
-
-        <!--<field name="product_id" readonly="0" options="{'no_create': True}"/>-->
-        <!--<field name="type" invisible="0"/>-->
-
-        <!--&lt;!&ndash;<field name="return_qty"  invisible="[('production_state', 'not in', ('waiting_inventory_material','waiting_warehouse_inspection'))]" string="退料数量"/>&ndash;&gt;-->
-        <!--</tree>-->
-        <!--</field>-->
-
-        <!--</page>-->
-
-        <!--</notebook>-->
-        <!--<notebook>-->
-        <!--<page string="产出">-->
-        <!--<field name="output_product_ids" options="{'reload_on_button': True}"-->
-        <!--context="{'default_type':'output'}" string="产出">-->
-        <!--<tree editable="bottom" delete="1" create="1">-->
-
-        <!--<field name="product_id" options="{'no_create': True}"/>-->
-        <!--<field name="type" invisible="1"/>-->
-
-        <!--&lt;!&ndash;<field name="return_qty"  invisible="[('production_state', 'not in', ('waiting_inventory_material','waiting_warehouse_inspection'))]" string="退料数量"/>&ndash;&gt;-->
-        <!--</tree>-->
-        <!--</field>-->
-        <!--</page>-->
-        <!--</notebook>-->
-
-        <!--</sheet>-->
-
-
-        <!--<footer>-->
-        <!--<button name="picking_material" string="Confirm"-->
-        <!--colspan="1" type="object" class="btn-primary"/>-->
-        <!--<button string="Cancel" class="btn-default" special="cancel"/>-->
-        <!--</footer>-->
-        <!--</form>-->
-        <!--</field>-->
-
-        <!--</record>-->
         <record id="picking_material_form" model="ir.ui.view">
             <field name="name">Picking Material Detail</field>
             <field name="model">mrp.production</field>
@@ -92,7 +41,7 @@
                             <field name="virtual_available" string="预测数量" invisible=""/>
                             <field name="suggest_qty" readonly="1" string="建议数量" invisible="1"/>
                             <field name="quantity_available" string="系统可用" invisible="1"/>
-                            <field name="product_uom_qty" string="实际需求物料数量" invisible="1"/>
+                            <field name="product_uom_qty" string="需求数量" invisible="0"/>
                             <field name="quantity_ready" readonly="context.get('quantity_ready_invisible')"
                                    string="备料数量"/>
                             <field name="over_picking_qty" invisible="context.get('overpicking_invisible')"
@@ -122,7 +71,7 @@
                 </xpath>
                 <xpath expr="//field[@name='product_id']" position="attributes">
                     <attribute name="attrs">
-                       {'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)],
+                        {'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)],
                         'readonly':[('state','not in',['draft','confirmed'])]}
                     </attribute>
 
@@ -130,28 +79,36 @@
 
                 <xpath expr="//label[@for='product_qty']" position="attributes">
 
-                    <attribute name="attrs">{'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}</attribute>
+                    <attribute name="attrs">
+                        {'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}
+                    </attribute>
                 </xpath>
 
 
                 <xpath expr="//field[@name='product_qty']" position="attributes">
                     <attribute name="attrs">
                         {'readonly':[('state','not in',['draft','confirmed'])],
-                      'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}
+                        'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}
                     </attribute>
 
 
                 </xpath>
                 <xpath expr="//field[@name='unit_price']" position="attributes">
-                    <attribute name="attrs">{'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}</attribute>
+                    <attribute name="attrs">
+                        {'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}
+                    </attribute>
 
                 </xpath>
                 <xpath expr="//field[@name='mo_type']" position="attributes">
-                    <attribute name="attrs">{'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}</attribute>
+                    <attribute name="attrs">
+                        {'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}
+                    </attribute>
 
                 </xpath>
                 <xpath expr="//field[@name='hour_price']" position="attributes">
-                    <attribute name="attrs">{'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}</attribute>
+                    <attribute name="attrs">
+                        {'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}
+                    </attribute>
                 </xpath>
 
                 <xpath expr="//field[@name='product_id']" position="after">
@@ -162,7 +119,8 @@
 
                 <xpath expr="//field[@name='bom_id']" position="attributes">
                     <attribute name="required">0</attribute>
-                    <attribute name="attrs">{'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)],
+                    <attribute name="attrs">
+                        {'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)],
                         'readonly':[('state','not in',['draft','confirmed'])]}
                     </attribute>
                 </xpath>
@@ -194,7 +152,8 @@
                 </xpath>
 
                 <xpath expr="//notebook/page[3]" position="attributes">
-                    <attribute name="attrs">{'invisible':[('state','in',['waiting_inventory_material','done'])]}
+                    <attribute name="attrs">
+                        {'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}
                     </attribute>
                 </xpath>
 
@@ -219,15 +178,15 @@
 
                     <page string="消耗的物料">
                         <field name="sim_stock_move_lines">
-                            <tree editable="bottom" delete="0" decoration-warning="quantity_done&gt;product_uom_qty"
-                                  decoration-success="quantity_done>=product_uom_qty"
-                                  decoration-danger="qty_available&lt;product_uom_qty" create="0">
+                            <tree editable="bottom" delete="0" decoration-warning="quantity_done&gt;demand_qty"
+                                  decoration-success="quantity_done>=demand_qty"
+                                  decoration-danger="qty_available&lt;demand_qty" create="0">
                                 <field name="product_id" string="产品" options="{'no_create':True}"/>
                                 <field name="qty_available" string="库存"/>
                                 <field name="virtual_available" string="预测数量"/>
-                                <field name="suggest_qty" string="建议数量" invisible="0"/>
+                                <field name="suggest_qty" string="建议数量" invisible="0" readonly="1"/>
                                 <field name="quantity_available" string="系统可用" invisible="0"/>
-                                <field name="product_uom_qty" string="需求数量" invisible="0"/>
+                                <field name="demand_qty" string="需求数量"/>
                                 <field name="quantity_done" string="备料数量"/>
                                 <field name="return_qty" readonly="1" string="退料数量"/>
                             </tree>
@@ -235,11 +194,12 @@
 
                     </page>
 
-                    <page string="产成品" attrs="{'invisible':[('state','not in',['waiting_inventory_material','done'])]}">
-                        <field name="stock_move_lines_finished" readonly="1" context="{'default_type':'output'}"
-                               create="0">
-                            <tree editable="bottom" create="0" delete="0">
+                    <page string="产成品"
+                          attrs="{'invisible':[('is_multi_output','=',False),('is_random_output','=',False)]}">
+                        <field name="stock_move_lines_finished">
+                            <tree editable="bottom">
                                 <field name="product_id" options="{'no_create':True}" string="产品"/>
+                                <field name="suggest_qty" readonly="0"/>
                                 <field name="quantity_done_finished" string="产出数量"/>
                             </tree>
                         </field>

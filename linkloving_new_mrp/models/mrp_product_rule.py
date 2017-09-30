@@ -21,6 +21,20 @@ class MrpProductRule(models.Model):
             vals['name'] = self.env['product.product'].browse(product_id.get('product_id')).name
         return super(MrpProductRule, self).create(vals)
 
+    def get_rule_detail(self):
+        return {
+            'input': [
+                {'product_id': line.sudo().product_id.id,
+                 'product_name': line.sudo().product_id.name,
+                 }
+                for line in self.input_product_ids],
+            'output': [
+                {'product_id': line.sudo().product_id.id,
+                 'product_name': line.sudo().product_id.name,
+                 }
+                for line in self.output_product_ids]
+        }
+
 
 class MrpProductRuleLine(models.Model):
     _name = 'mrp.product.rule.line'

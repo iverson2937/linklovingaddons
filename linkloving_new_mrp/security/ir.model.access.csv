@@ -2,3 +2,4 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_model_mrp_product_rule,linkloving_new_mrp.model_mrp_product_rule,model_mrp_product_rule,,1,1,1,1
 access_model_mrp_product_rule_line,linkloving_new_mrp.model_mrp_product_rule_line,model_mrp_product_rule_line,,1,1,1,1
 access_model_stock_move_finished,linkloving_new_mrp.model_stock_move_finished,model_stock_move_finished,,1,1,1,1
+access_model_mrp_qc_feedback_line_admin,linkloving_new_mrp.model_mrp_qc_feedback_line,model_mrp_qc_feedback_line,,1,1,1,1

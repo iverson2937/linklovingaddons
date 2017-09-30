@@ -79,26 +79,41 @@ class NewMrpProduction(models.Model):
                 feedbacks = production.qc_feedback_ids.filtered(lambda x: x.state not in ["check_to_rework"])
                 production.qty_unpost = sum(feedbacks.mapped("qty_produced"))
 
-    def create_multi_output(self, outputs):
-        for line in outputs:
-            for finish_id in self.move_finished_ids:
-                print line['id']
-                if line['id'] == finish_id.product_id.id:
-                    print line['produce_qty']
-                    finish_id.quantity_done += line['produce_qty']
-
-    @api.multi
+    @api.one
     def confirm_output(self):
 
+        feedback_id = self.env['mrp.qc.feedback'].create({
+            'production_id': self.id,
+        })
+        self.feedback_on_rework = False
         for line in self.stock_move_lines_finished:
-            for finish_id in self.move_finished_ids:
-                if line.product_id.id == finish_id.product_id.id:
-                    finish_id.quantity_done += line.produce_qty
-                    line.produce_qty = 0
+            # 没填数量的不参与计算
+            if not line.produce_qty:
+                continue
+            finished_move_ids = self.move_finished_ids.filtered(
+                lambda x: x.product_id == line.product_id and x.state != 'done'and not x.qc_feedback_lines)
+            if finished_move_ids :
+                finished_move_id = finished_move_ids[0]
+                finished_move_id.quantity_done=line.produce_qty
+            else:
+                finished_move_id = self.move_finished_ids.filtered(
+                    lambda x: x.product_id == line.product_id)[0].copy({
+                    'quantity_done': line.produce_qty
+                })
 
-                    # if sum(move.quantity_done for move in self.move_raw_ids) < sum(
-                    #         move.quantity_done for move in self.move_finished_ids):
-                    #     raise UserError('产出大于投入')
+            self.env['mrp.qc.feedback.line'].create({
+                'product_id': line.product_id.id,
+                'finished_move_id': finished_move_id.id,
+                'feedback_id': feedback_id.id,
+                'suggest_qty': line.suggest_qty,
+                'qty_produced': line.produce_qty
+            })
+            line.produce_qty = 0
+
+
+            # if sum(move.quantity_done for move in self.move_raw_ids) < sum(
+            #         move.quantity_done for move in self.move_finished_ids):
+            #     raise UserError('产出大于投入')
 
     def button_produce_finish(self):
         if self.is_multi_output or self.is_random_output:
@@ -117,34 +132,6 @@ class NewMrpProduction(models.Model):
             return
         else:
             super(NewMrpProduction, self).button_produce_finish()
-
-        @api.multi
-        def do_produce(self):
-            # Nothing to do for lots since values are created using default data (stock.move.lots)
-            moves = self.production_id.move_raw_ids
-            quantity = self.product_qty
-            if float_compare(quantity, 0, precision_rounding=self.product_uom_id.rounding) <= 0:
-                raise UserError(_('You should at least produce some quantity'))
-            for move in moves.filtered(lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel')):
-                if move.unit_factor:
-                    rounding = move.product_uom.rounding
-                    move.quantity_done_store += float_round(quantity * move.unit_factor, precision_rounding=rounding)
-            moves = self.production_id.move_finished_ids.filtered(
-                lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel'))
-            for move in moves:
-                rounding = move.product_uom.rounding
-                if move.product_id.id == self.production_id.product_id.id:
-                    move.quantity_done_store += float_round(quantity, precision_rounding=rounding)
-                elif move.unit_factor:
-                    # byproducts handling
-                    move.quantity_done_store += float_round(quantity * move.unit_factor, precision_rounding=rounding)
-            self.check_finished_move_lots()
-            if self.production_id.state == 'confirmed':
-                self.production_id.write({
-                    'state': 'progress',
-                    'date_start': datetime.now(),
-                })
-            return {'type': 'ir.actions.act_window_close'}
 
     @api.multi
     def add_input_out_products(self):
@@ -170,13 +157,10 @@ class NewMrpProduction(models.Model):
                     'view_mode': 'form',
                     'view_id': view.id,
                     'res_id': self.id,
-                    # 'context': {'picking_mode': picking_mode,
-                    #             'overpicking_invisible': overpicking_invisible,
-                    #             'quantity_ready_invisible': quantity_ready_invisible},
                     'target': 'new'}
 
-        action = self.env.ref('mrp.act_mrp_product_produce').read()[0]
-        return action
+        else:
+            return super(NewMrpProduction, self).open_produce_product()
 
     def _generate_finished_moves(self):
         if self.is_multi_output or self.is_random_output:
@@ -203,25 +187,9 @@ class NewMrpProduction(models.Model):
                     'group_id': self.procurement_group_id.id,
                 })
                 move.action_confirm()
+            return True
         else:
-            move = self.env['stock.move'].create({
-                'name': self.name,
-                'date': self.date_planned_start,
-                'date_expected': self.date_planned_start,
-                'product_id': self.product_id.id,
-                'product_uom': self.product_uom_id.id,
-                'product_uom_qty': self.product_qty,
-                'location_id': self.product_id.property_stock_production.id,
-                'location_dest_id': self.location_dest_id.id,
-                'move_dest_id': self.procurement_ids and self.procurement_ids[0].move_dest_id.id or False,
-                'procurement_id': self.procurement_ids and self.procurement_ids[0].id or False,
-                'company_id': self.company_id.id,
-                'production_id': self.id,
-                'origin': self.name,
-                'group_id': self.procurement_group_id.id,
-            })
-            move.action_confirm()
-            return move
+            return super(NewMrpProduction, self)._generate_finished_moves()
 
     product_uom_id = fields.Many2one(
         'product.uom', 'Product Unit of Measure',
@@ -302,7 +270,3 @@ class NewMrpProduction(models.Model):
             production._adjust_procure_method()
             production.move_raw_ids.action_confirm()
         return True
-
-    @api.model
-    def create(self, vals):
-        return super(NewMrpProduction, self).create(vals)

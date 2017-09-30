@@ -4,6 +4,8 @@ from odoo import models, fields, api, _
 
 import datetime
 import time
+
+from odoo.exceptions import UserError
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, float_compare, float_is_zero
 
 
@@ -13,8 +15,7 @@ class MrpProcess(models.Model):
     name = fields.Char(string=u'Name')
     description = fields.Text(string=u'Description')
     unit_price = fields.Float(string=u'Price Unit')
-    partner_id = fields.Many2one('res.partner', string=u'Responsible By',
-                                 )
+    partner_id = fields.Many2one('res.partner', string=u'Responsible By')
     hour_price = fields.Float(string=u'Price Per Hour')
     color = fields.Integer("Color Index")
     count_mo_waiting = fields.Integer(compute='_compute_process_count')
@@ -30,6 +31,7 @@ class MrpProcess(models.Model):
     is_outside = fields.Boolean(string=u'是否为委外')
     sequence = fields.Integer()
     total_qty = fields.Integer(compute="_get_total_qty")
+    mo_ids = fields.One2many('mrp.production', 'process_id')
 
     company_id = fields.Many2one('res.company', 'Company',
                                  default=lambda self: self.env['res.company']._company_default_get('mrp.process'))
@@ -289,3 +291,9 @@ class MrpProcess(models.Model):
             'res_model': 'mrp.production.query.wizard',
             'target': 'new',
         }
+
+    @api.multi
+    def unlink(self):
+        if any(not process.mo_ids for process in self):
+            raise UserError('不可以删除有关联制造单的工序')
+        return super(MrpProcess, self).unlink()

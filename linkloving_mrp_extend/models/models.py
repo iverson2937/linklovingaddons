@@ -368,7 +368,6 @@ class MrpProductionExtend(models.Model):
                 for fix_location_id in move.product_id.categ_id.fixed_location_ids:
                     for location_id in fix_location_id.putaway_id.location_ids:
                         ids.append(location_id.id)
-            print ids, 'sssssssssssssssss'
             mo.location_ids = [(6, 0, set(ids))]
 
     # 备料信息
@@ -1650,12 +1649,18 @@ class MrpQcFeedBack(models.Model):
     def action_check_to_rework(self):
         if self.production_id.state == "waiting_rework":
 
-            self.state = "check_to_rework"
             p_time = self.env["production.time.record"].create({
                 'production_id': self.production_id.id,
                 'start_time': fields.Datetime.now(),
                 'record_type': 'rework'
             })
+            back_ids=self.production_id.qc_feedback_ids.filtered(lambda x: x.state == 'qc_fail')
+            for r in back_ids:
+                r.state = 'check_to_rework'
+            #开始返工move_id 关联取消
+            if self.line_ids:
+                for line in self.line_ids:
+                    line.finished_move_id = False
             self.production_id.state = "progress"
             self.production_id.feedback_on_rework = self
             if 'confirm_rework_replan_mo' in dir(self.production_id):
