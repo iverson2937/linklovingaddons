@@ -76,9 +76,9 @@ class ProductTemplate(models.Model):
              "resized as a 64x64px image, with aspect ratio preserved. "
              "Use this field anywhere a small image is required.")
 
-    last1_month_qty = fields.Float(string=u'销量一')
-    last2_month_qty = fields.Float(string=u'销量二')
-    last3_month_qty = fields.Float(string=u'销量三')
+    last1_month_qty = fields.Float(string=u'最近1个月销量')
+    last2_month_qty = fields.Float(string=u'最近3个月销量')
+    last3_month_qty = fields.Float(string=u'最近6个月销量')
 
     # pack_rate = fields.Float(string=u'装箱率')
 

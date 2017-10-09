@@ -25,10 +25,12 @@ class ResPartnerExtend(models.Model):
         #     pa.simliar_companys -= self
         self.unlink()
 
+
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
     is_move_in_recent = fields.Boolean(string=u"近期是否移动过")
+
     @api.multi
     def create_reorder_rule(self, min_qty=0.0, max_qty=0.0, qty_multiple=1.0, overwrite=False):
         swo_obj = self.env['stock.warehouse.orderpoint']
@@ -67,7 +69,7 @@ class CreateOrderPointWizard(models.TransientModel):
         #         ['|', ("default_code", "=ilike", "99.%"), ("default_code", "=ilike", "98.%")])
 
         products = self.env["product.product"].search(
-                [("default_code", "=ilike", "98.%")])
+            [("default_code", "=ilike", "98.%")])
 
         products.create_reorder_rule()
 
@@ -175,7 +177,6 @@ class CreateOrderPointWizard(models.TransientModel):
             if quant.company_id != quant.product_id.company_id:
                 quant.company_id = quant.product_id.company_id
 
-
     def action_confirm_canceled_so(self):
         pass
         # sos = self.env["sale.order"].search([('state', '=', 'cancel')])
@@ -190,10 +191,10 @@ class CreateOrderPointWizard(models.TransientModel):
             for similar_company in company2.filtered(lambda x: x.id != company.id):
                 if ((similar_company.name and company.name and similar_company.name.upper() in company.name.upper()) or \
                             (
-                                    similar_company.name and company.name and company.name.upper() in similar_company.name.upper()) or \
+                                            similar_company.name and company.name and company.name.upper() in similar_company.name.upper()) or \
                             (company.phone == similar_company.phone and company.phone and similar_company.phone) or \
                             (
-                                    company.email and similar_company.email and company.email.upper() == similar_company.email.upper())):
+                                            company.email and similar_company.email and company.email.upper() == similar_company.email.upper())):
                     company_obj += similar_company
 
             print(company_obj)
@@ -219,10 +220,8 @@ class CreateOrderPointWizard(models.TransientModel):
         this_month = datetime.datetime.now().month
         last1_month = this_month - 1
         date1_start, date1_end = getMonthFirstDayAndLastDay(month=last1_month)
-        last2_month = this_month - 2
-        date2_start, date2_end = getMonthFirstDayAndLastDay(month=last2_month)
-        last3_month = this_month - 3
-        date3_start, date3_end = getMonthFirstDayAndLastDay(month=last3_month)
+        date2_start, date2_end = getMonthFirstDayAndLastDay(month=last1_month, period=2)
+        date3_start, date3_end = getMonthFirstDayAndLastDay(month=last1_month, period=5)
         products = self.env['product.template'].search([('sale_ok', '=', True)])
         for product in products:
             if product.product_variant_ids:
@@ -315,7 +314,9 @@ class CreateOrderPointWizard(models.TransientModel):
             return date_to_show, timez
         else:
             raise UserError("未找到对应的时区, 请点击 右上角 -> 个人资料 -> 时区 -> Asia/Shanghai")
-def getMonthFirstDayAndLastDay(year=None, month=None):
+
+
+def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
     """
     :param year: 年份，默认是本年，可传int或str类型
     :param month: 月份，默认是本月，可传int或str类型
@@ -326,19 +327,23 @@ def getMonthFirstDayAndLastDay(year=None, month=None):
         year = int(year)
     else:
         year = datetime.date.today().year
+    if not period:
+        period = 0
     if month <= 0:
-        print month,'dddddddd'
         year = -1
         month = 12 + month
         # 获取当月第一天的星期和当月的总天数
     firstDayWeekDay, monthRange = calendar.monthrange(year, month)
 
     # 获取当月的第一天
-    firstDay = datetime.date(year=year, month=month, day=1).strftime('%Y-%m-%d')
+    firstDay = datetime.date(year=year, month=month - period, day=1).strftime('%Y-%m-%d')
+
     lastDay = datetime.date(year=year, month=month, day=monthRange).strftime('%Y-%m-%d')
-    print type(firstDay)
+    print firstDay, lastDay
 
     return firstDay, lastDay
+
+
 class SaleOrderExtend(models.Model):
     _inherit = "sale.order"
 
