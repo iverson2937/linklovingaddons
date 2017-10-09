@@ -21,7 +21,7 @@
 
 
                 <xpath expr="//field[@name='standard_price']" position="attributes">
-                    <attribute name="readonly">1</attribute>
+                    <attribute name="invisible">1</attribute>
                 </xpath>
 
 
