@@ -18,11 +18,11 @@
 
 
         <record id="total_receivable_action" model="ir.actions.act_window">
-            <field name="name">Orders Make By MRP</field>
+            <field name="name">应收总计</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">res.partner</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[('customer','=',True),('is_company','=',True),('credit','!=',0.00)]</field>
+            <field name="domain">[('customer','=',True),('is_company','=',True)]</field>
             <field name="view_ids" eval="[(5,0,0),
             (0,0,{'view_mode':'tree', 'view_id': ref('linkloving_account_report.customer_receivable_account_tree')}),
             (0,0,{'view_mode':'form', 'view_id': ref('base.view_partner_form')})]"/>
