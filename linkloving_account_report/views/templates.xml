@@ -9,6 +9,7 @@
                     <field name="name" string="客户名称"/>
                     <field name="credit" string="应收总计" sum="总计"/>
                     <field name="receivable_amount" sum="总计"/>
+                    <field name="receivable_amount_real" sum="总计"/>
                     <field name="team_id"/>
 
                 </tree>
