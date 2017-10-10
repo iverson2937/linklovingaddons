@@ -21,14 +21,21 @@ class ll_auto_plan_kb(models.Model):
     count_confirm = fields.Integer(compute='_compute_count_confirm')
     count_inventory = fields.Integer(compute='_compute_count_inventory')
     count_waiting_file = fields.Integer(compute='_compute_count_waiting_file')
+    count_to_invoice = fields.Integer(compute='_compute_to_invoice_po')
+
+    def _compute_to_invoice_po(self):
+        for plan in self:
+            plan.count_to_invoice = len(
+                self.env['purchase.order'].search(
+                    [('invoice_status', '=', 'to invoice')]))
 
     @api.multi
     def _compute_count_waiting_file(self):
         for plan in self:
             if plan.type == 'waiting_file':
                 plan.count_waiting_file = len(
-                        self.env['purchase.order'].search(
-                                [("waiting_file", '=', True), ('state', 'in', ['purchase', 'done'])]))
+                    self.env['purchase.order'].search(
+                        [("waiting_file", '=', True), ('state', 'in', ['purchase', 'done'])]))
 
     @api.multi
     def _compute_count_red(self):
@@ -65,6 +72,17 @@ class ll_auto_plan_kb(models.Model):
         for plan in self:
             plan.count_inventory = len(self.env["stock.picking"].search([("state", '=', 'waiting_in')]))
 
+    @api.multi
+    def get_purchase_order_to_invoice(self):
+        return {
+            'name': u'采购单',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'purchase.order',
+            'target': 'current',
+            'domain': [('invoice_status', '=', 'to invoice')]
+        }
 
     @api.multi
     def get_waiting_file_po(self):
@@ -160,20 +178,23 @@ class ll_auto_plan_kb(models.Model):
                 "sticky": False
             }
         }
+
+
 class linkloving_mrp_automatic_plan(models.Model):
     _name = 'linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan'
 
-#     value = fields.Integer()
-#     value2 = fields.Float(compute="_value_pc", store=True)
-#     description = fields.Text()
-#
-#     @api.depends('value')
-#     def _value_pc(self):
-#         self.value2 = float(self.value) / 100
+    #     value = fields.Integer()
+    #     value2 = fields.Float(compute="_value_pc", store=True)
+    #     description = fields.Text()
+    #
+    #     @api.depends('value')
+    #     def _value_pc(self):
+    #         self.value2 = float(self.value) / 100
 
     @api.multi
     def get_holiday(self):
-        page = urllib.urlopen("https://sp0.baidu.com/8aQDcjqpAAV3otqbppnN2DJv/api.php?query=2017%E5%B9%B48%E6%9C%88&co=&resource_id=6018&t=1496889566304&ie=utf8&oe=gbk&format=json&tn=baidu&_=1496889558209")
+        page = urllib.urlopen(
+            "https://sp0.baidu.com/8aQDcjqpAAV3otqbppnN2DJv/api.php?query=2017%E5%B9%B48%E6%9C%88&co=&resource_id=6018&t=1496889566304&ie=utf8&oe=gbk&format=json&tn=baidu&_=1496889558209")
         html = page.read()
         # print html.decode("gbk")
         return {
@@ -319,15 +340,15 @@ class linkloving_mrp_automatic_plan(models.Model):
             if so.order_line.mapped("status_light"):
                 so.status_light = max(so.order_line.mapped("status_light"))
                 so.material_light = max(so.order_line.mapped("material_light"))
-            # for mo in lv1_mo:
-            #     lv = 0
-            #     mo_relate_mo = []
-            #     rescuise(mos, mo, lv)
-            #     all_mo_mo.append(mo_relate_mo)
+                # for mo in lv1_mo:
+                #     lv = 0
+                #     mo_relate_mo = []
+                #     rescuise(mos, mo, lv)
+                #     all_mo_mo.append(mo_relate_mo)
 
-        # so.action_cancel()
-        # procurements = so.order_line.mapped('procurement_ids')
-        # get_propagate_order(procurements)
+                # so.action_cancel()
+                # procurements = so.order_line.mapped('procurement_ids')
+                # get_propagate_order(procurements)
 
     def cal_mo_light_status(self, mos, origin_mos, line):
         today_start, today_end = self.get_today_start_end()
@@ -499,6 +520,7 @@ class PuchaseOrderEx(models.Model):
     #     print("do compute status_light")
     #     self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].cal_po_light_status(self)
 
+
 class SaleOrderEx(models.Model):
     _inherit = "sale.order"
     status_light = fields.Selection(string="状态灯", selection=[(3, '红'),
@@ -524,6 +546,7 @@ class SaleOrderLineEx(models.Model):
     material_light = fields.Selection(string="物料状态", selection=[(3, '红'),
                                                                 (2, '黄'),
                                                                 (1, '绿')], )
+
 
 class MrpProductionEx(models.Model):
     _inherit = "mrp.production"

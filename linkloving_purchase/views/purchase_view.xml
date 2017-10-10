@@ -32,8 +32,8 @@
                         <field name="amount_total" string="汇总金额"/>
                         <field name="product_id" string="产品"/>
                         <field name="shipping_rate" widget="progressbar"/>
-
                         <field name="state"/>
+                        <field name="invoice_status" string="对账单状态"/>
                     </tree>
 
                 </xpath>

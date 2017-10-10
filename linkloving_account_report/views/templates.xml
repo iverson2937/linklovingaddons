@@ -1,0 +1,96 @@
+<odoo>
+    <data>
+
+        <record id="supplier_payable_account_tree" model="ir.ui.view">
+            <field name="name">purchase.order.tree</field>
+            <field name="model">res.partner</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" string="供应商"/>
+                    <field name="debit" string="应付总计" sum="总计"/>
+                    <field name="payable_amount" sum="总计"/>
+                    <field name="payable_amount_real" sum="总计"/>
+
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="customer_receivable_account_tree" model="ir.ui.view">
+            <field name="name">purchase.order.tree</field>
+            <field name="model">res.partner</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" string="客户名称"/>
+                    <field name="credit" string="应收总计" sum="总计"/>
+                    <field name="receivable_amount" sum="总计"/>
+                    <field name="receivable_amount_real" sum="总计"/>
+                    <field name="team_id"/>
+
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="total_receivable_action" model="ir.actions.act_window">
+            <field name="name">应收总计</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('customer','=',True),('is_company','=',True)]</field>
+            <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'tree', 'view_id': ref('linkloving_account_report.customer_receivable_account_tree')}),
+            (0,0,{'view_mode':'form', 'view_id': ref('base.view_partner_form')})]"/>
+
+            <field name="search_view_id" ref="base.view_res_partner_filter"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a quotation that will be converted into a purchase order.
+                </p>
+                <p>
+                    Use this menu to search within your purchase orders by
+                    references, vendor, products, etc. For each purchase order,
+                    you can track the related discussion with the vendor, control
+                    the products received and control the vendor bills.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_supplier_total_payable" model="ir.actions.act_window">
+            <field name="name">应付总计</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('supplier','=',True),('is_company','=',True)]</field>
+            <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'tree', 'view_id': ref('linkloving_account_report.supplier_payable_account_tree')}),
+            (0,0,{'view_mode':'form', 'view_id': ref('base.view_partner_form')})]"/>
+
+            <field name="search_view_id" ref="base.view_res_partner_filter"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a quotation that will be converted into a purchase order.
+                </p>
+                <p>
+                    Use this menu to search within your purchase orders by
+                    references, vendor, products, etc. For each purchase order,
+                    you can track the related discussion with the vendor, control
+                    the products received and control the vendor bills.
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem id="menu_total_receivable_action"
+                  action="total_receivable_action"
+                  name="应收总计"
+                  parent="sale.menu_sale_invoicing" sequence="7"/>
+
+        <menuitem id="menu_total_payable"
+                  action="action_supplier_total_payable"
+                  name="应付总计"
+                  parent="linkloving_purchase.menu_purchase_account_invoice" sequence="3"/>
+
+
+    </data>
+</odoo>

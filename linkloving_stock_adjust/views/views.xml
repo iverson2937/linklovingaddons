@@ -18,6 +18,19 @@
             </field>
         </record>
 
+        <record id="stock_transfer_tree" model="ir.ui.view">
+            <field name="name">物料调整</field>
+            <field name="model">stock.transfer</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="state"/>
+                    <field name="create_date"/>
+
+                </tree>
+            </field>
+        </record>
+
         <record id="stock_transfer_form" model="ir.ui.view">
             <field name="name">物料调整</field>
             <field name="model">stock.transfer</field>
@@ -60,7 +73,7 @@
 
                         </notebook>
                         <notebook>
-                             <page string="生成物料" attrs="">
+                            <page string="生成物料" attrs="">
                                 <field name="output_product_ids" context="{'default_product_type':'output'}">
                                     <tree string="Stock Moves" editable="bottom">
                                         <field name="product_id" options="{'no_create':True}"

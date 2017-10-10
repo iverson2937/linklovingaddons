@@ -92,6 +92,7 @@ class NameCardController(http.Controller):
             raise UserError(u"请确认导入的信息")
         for partner in partners:
             NameCardController.add_one_partner(partner)
+        print 'sssssssss'
         return True
 
     # 解析
@@ -104,6 +105,7 @@ class NameCardController(http.Controller):
         saleman_id = dic.get("saleman_id")
         saleteam_id = dic.get("saleteam_id")
         tag_list = dic.get("tag_list") or None
+        comment = dic.get("comment") or ''
         star_cnt = dic.get("star_cnt")
         partner_lv = dic.get("partner_lv")
         website = dic.get("website")
@@ -129,7 +131,7 @@ class NameCardController(http.Controller):
             #     company_name = company_name.replace(u"责任有限公司", "")
             # elif u'公司' in company_name:
             #     company_name = company_name.replace(u"公司", "")
-            company = request.env["res.partner"].sudo().search([("name", "ilike", company_name)], limit=1)
+            company = request.env["res.partner"].sudo().search([("name", "=", company_name)], limit=1)
             if not company:
                 company = request.env["res.partner"].sudo(request.context.get("uid")).create({
                     "name": company_real_name,
@@ -145,6 +147,7 @@ class NameCardController(http.Controller):
                     'source_id': src_id,
                     'country_id': country_id,
                     'website': website,
+                    "comment": comment,
                     # 'product_series_ids': (6, 0, product_series) or [],
                 })
                 company.category_id = [tag_list] if tag_list else []
@@ -164,6 +167,7 @@ class NameCardController(http.Controller):
                     'source_id': src_id,
                     'country_id': country_id,
                     'website': website,
+                    "comment": comment,
                     # 'product_series_ids': (6, 0, product_series) or [],
                 })
                 company.category_id = [tag_list] if tag_list else []
