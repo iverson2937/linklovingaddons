@@ -61,7 +61,7 @@
                         />
 
                         <!--<button string="领料" type="object" name="btn_click_product_out" class="oe_highlight"-->
-                                <!--attrs="{'invisible': [('picking_state','!=','wait_verify')]}"-->
+                        <!--attrs="{'invisible': [('picking_state','!=','wait_verify')]}"-->
                         <!--/>-->
 
 
@@ -127,7 +127,8 @@
                             </group>
                         </group>
                         <group>
-                            <field name="reference_product_template_ids" string="参考产品" widget="many2many_tags"/>
+                            <field name="reference_product_template_ids" string="参考产品"
+                                   domain="[('bom_ids', '!=', False)]" widget="many2many_tags"/>
                         </group>
                         <group>
                             <notebook>
@@ -140,7 +141,6 @@
                                                 <field name="inner_code" string="国内简码" readonly="1" invisible="1"/>
                                                 <field name="inner_spec" string="国内类型" readonly="1" invisible="1"/>
                                                 <field name="reserve_qty" invisible="1"/>
-
 
 
                                                 <field name="qty_available" string="库存" readonly="1"/>
@@ -350,8 +350,8 @@
 
 
         <!--<menuitem id="approval_pdm_my_project_Price" name="工程核价" parent="menu_material_request"-->
-                  <!--action="action_approval_my_project_order"-->
-                  <!--sequence="2"/>-->
+        <!--action="action_approval_my_project_order"-->
+        <!--sequence="2"/>-->
 
         <menuitem id="approval_pdm_to_submit" name="待提交" parent="approval_pdm_my_bills"
                   action="action_approval_to_submit"

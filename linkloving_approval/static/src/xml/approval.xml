@@ -33,7 +33,7 @@
 
                 <button class="btn btn-primary create_file_document_btn">创建</button>
                 <button style="display:none;" id="download_checkbox" class="btn btn-primary delect_hide download_document_checked">批量下载</button>
-                <button style="display:none;" id="document_checkbox" all_hello="nihaoya" class="btn btn-primary delect_hide document_manage_btn">批量审核</button>
+                <button style="display:none;" id="document_checkbox" all_hello="nihaoya" class="btn btn-primary delect_hide document_manage_btn">批量送审</button>
                 <button style="display:none;" id="delect_checkbox" class="btn btn-primary delect_hide delect_document_checked">批量删除</button>
 
             </div>

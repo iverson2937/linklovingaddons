@@ -191,7 +191,7 @@
                                 context="{'to_last_review':True}"/>
                         <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
                                 groups="linkloving_pdm.group_final_review_partner"
-                                invisible="context.get('view_material_request')"/>
+                        />
 
                         <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
                                 groups="linkloving_pdm.group_final_review_picking"

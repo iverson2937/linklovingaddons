@@ -2,7 +2,7 @@
 import os
 
 import base64
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 
 # class linkloving_pdm(models.Model):
 #     _name = 'linkloving_pdm.linkloving_pdm'
@@ -15,7 +15,7 @@ from odoo import models, fields, api
 #     @api.depends('value')
 #     def _value_pc(self):
 #         self.value2 = float(self.value) / 100
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 REVIEW_LINE_STATE = {'waiting_review': u'等待审核',
                      'review_success': u'审核通过',
@@ -388,18 +388,23 @@ class ProductAttachmentInfo(models.Model):
 
         return {'state': 'ok'}
 
-    def action_create_many_info(self):
-        print self.temp_product_tmpl_ids
-
+    @api.one
+    @api.constrains('temp_product_tmpl_ids')
+    def _check_temp_product_tmpl_ids(self):
         if not self.temp_product_tmpl_ids:
-            raise UserError(u"请选择产品")
+            raise ValidationError(u"请选择产品")
 
         if self.type in ('design', 'other'):
             if not (self.file_name and self.remote_path):
-                raise UserError(u"信息不完整，请完善")
+                raise ValidationError(u"信息不完整，请完善")
         else:
             if not (self.file_name and self.file_binary):
-                raise UserError(u"信息不完整，请完善")
+                raise ValidationError(u"信息不完整，请完善")
+            elif self.file_name.find(".") == -1:
+                raise ValidationError(u"输入文件名有误，请核对")
+
+    def action_create_many_info(self):
+        print self.temp_product_tmpl_ids
 
         for tmpl_id in self.temp_product_tmpl_ids:
             print tmpl_id
@@ -445,13 +450,14 @@ class ProductAttachmentInfo(models.Model):
         if attachment_to_unlink:
             result_product_id = attachment_to_unlink[0].product_tmpl_id.id if attachment_to_unlink else ''
             result_product_type = attachment_to_unlink[0].type if attachment_to_unlink else ''
-            for att_one in attachment_to_unlink:
-                pro_list = att_one.mapped('review_id')
-                for lines_one in pro_list:
-                    line_list = lines_one.mapped('review_line_ids')
-                    line_list.unlink()
-                pro_list.unlink()
-            attachment_to_unlink.unlink()
+            for attachment_to_unlink_one in attachment_to_unlink:
+                if attachment_to_unlink_one.create_uid.id == self.env.uid:
+                    pro_list = attachment_to_unlink_one.mapped('review_id')
+                    for lines_one in pro_list:
+                        line_list = lines_one.mapped('review_line_ids')
+                        line_list.unlink()
+                    pro_list.unlink()
+                    attachment_to_unlink_one.unlink()
         return {'template_id': result_product_id, 'type': result_product_type}
 
     @api.one

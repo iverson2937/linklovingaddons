@@ -235,8 +235,12 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             if (self.file_checkbox.length > 1)
                 if (approval_type == 'submitted' || approval_type == 'approval')
                     $('#download_checkbox').show();
-                else
+                else {
                     $('.delect_hide').show();
+                    if (approval_type == 'waiting_approval')
+                        $('#delect_checkbox').hide();
+                }
+
 
             else if (self.file_checkbox.length = 1)
                 $('.delect_hide').hide();
