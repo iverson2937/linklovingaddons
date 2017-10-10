@@ -146,8 +146,34 @@
                                                     </span>
                                                 </button>
                                             </div>
+                                            <div class="col-md-6 col-xs-6 o_kanban_primary_right"
+                                                 style="min-height:150px">
+                                                <div class="row">
+                                                    <div class="col-xs-9">
+                                                        <a name="get_purchase_order_to_invoice"
+                                                           type="object">
+                                                            待对账采购单
+                                                        </a>
+                                                    </div>
+                                                    <div class="col-xs-3">
+                                                        <field name="count_to_invoice"/>
+                                                    </div>
+                                                </div>
+                                                <!--<div class="row">-->
+                                                <!--<div class="col-xs-9">-->
+                                                <!--<a name="get_stock_picking_inventory"-->
+                                                <!--type="object">-->
+                                                <!--待 入 库-->
+                                                <!--</a>-->
+                                                <!--</div>-->
+                                                <!--<div class="col-xs-3">-->
+                                                <!--<field name="count_inventory"/>-->
+                                                <!--</div>-->
+                                                <!--</div>-->
+                                            </div>
+
                                         </t>
-                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </t>
