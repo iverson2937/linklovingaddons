@@ -34,3 +34,10 @@ class SelectReportWizard(models.TransientModel):
             'tag': 'schedule_production_report',
             'target': 'reload'
         }
+
+
+class ScheduleReport(models.TransientModel):
+    _name = 'schedule.report'
+
+    def do_report(self):
+        pass

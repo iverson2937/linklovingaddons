@@ -297,8 +297,11 @@ class MrpProductionExtend(models.Model):
         process_id = kwargs.get("process_id")
         limit = kwargs.get("limit")
         offset = kwargs.get("offset")
-        domain = [("process_id", "=", process_id), ("production_line_id", "=", False),
+
+        domain = [("process_id", "=", process_id),
+                  ("production_line_id", "=", False),
                   ("state", "in", ['draft', 'confirmed', 'waiting_material'])]
+
         domains = kwargs.get("domains", [])
         new_domains = expression.AND([domains, domain])
         mos = self.env["mrp.production"].search_read(

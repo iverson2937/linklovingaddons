@@ -59,6 +59,8 @@ class ProductTemplate(models.Model):
     reordering_max_qty = fields.Float(compute='_compute_nbr_reordering_rules', store=True,
                                       inverse='_set_nbr_reordering_rules')
 
+    order_point_active = fields.Boolean(compute='_compute_order_point_active', store=True,
+                                        inverse='_set_nbr_reordering_rules')
     image = fields.Binary(
         "Image", attachment=True,
         copy=False,
@@ -96,6 +98,16 @@ class ProductTemplate(models.Model):
             }
 
     @api.multi
+    def _set_order_point_active(self):
+        OrderPoint = self.env['stock.warehouse.orderpoint']
+        orderPoints = OrderPoint.search([('product_id.product_tmpl_id', 'in', self.ids),
+                                         ('active', '!=', -1)])
+
+        orderPoints.write({
+            'active': True
+        })
+
+    @api.multi
     def _set_nbr_reordering_rules(self):
         OrderPoint = self.env['stock.warehouse.orderpoint']
         for product_tmplate in self:
@@ -104,7 +116,7 @@ class ProductTemplate(models.Model):
             if product_tmplate.product_variant_ids:
                 product_id = product_tmplate.product_variant_ids[0].id
 
-                orderpoint = OrderPoint.search([('product_id', '=', product_id)])
+                orderpoint = OrderPoint.search([('product_id', '=', product_id), ('active', '!=', None)])
                 if not orderpoint:
                     orderpoint.create({
                         'product_id': product_tmplate.product_variant_ids[0].id,
@@ -116,11 +128,26 @@ class ProductTemplate(models.Model):
                 elif len(orderpoint) == 1:
                     orderpoint.product_max_qty = product_tmplate.reordering_max_qty
                     orderpoint.product_min_qty = product_tmplate.reordering_min_qty
+                    orderpoint.active = product_tmplate.order_point_active
+
+    @api.multi
+    @api.depends("product_variant_ids.orderpoint_ids.active")
+    def _compute_order_point_active(self):
+        OrderPoint = self.env['stock.warehouse.orderpoint']
+        for tmpl in self:
+            if tmpl.product_variant_ids:
+                product_id = tmpl.product_variant_ids[0].id
+                orderpoint = OrderPoint.search([('product_id', '=', product_id), ('active', '!=', None)], limit=1)
+                tmpl.order_point_active = orderpoint.active
 
     def _compute_nbr_reordering_rules(self):
         res = {k: {'nbr_reordering_rules': 0, 'reordering_min_qty': 0, 'reordering_max_qty': 0} for k in self.ids}
         product_data = self.env['stock.warehouse.orderpoint'].read_group(
-            [('product_id.product_tmpl_id', 'in', self.ids)], ['product_id', 'product_min_qty', 'product_max_qty'],
+                [
+                    ('product_id.product_tmpl_id', 'in', self.ids),
+                    ('active', '!=', None)
+                ],
+                ['product_id', 'product_min_qty', 'product_max_qty'],
             ['product_id'])
         for data in product_data:
             product = self.env['product.product'].browse([data['product_id'][0]])
