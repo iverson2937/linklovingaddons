@@ -92,6 +92,7 @@ class NameCardController(http.Controller):
             raise UserError(u"请确认导入的信息")
         for partner in partners:
             NameCardController.add_one_partner(partner)
+        print 'sssssssss'
         return True
 
     # 解析
@@ -104,6 +105,7 @@ class NameCardController(http.Controller):
         saleman_id = dic.get("saleman_id")
         saleteam_id = dic.get("saleteam_id")
         tag_list = dic.get("tag_list") or None
+        comment = dic.get("comment") or ''
         star_cnt = dic.get("star_cnt")
         partner_lv = dic.get("partner_lv")
         website = dic.get("website")
@@ -145,6 +147,7 @@ class NameCardController(http.Controller):
                     'source_id': src_id,
                     'country_id': country_id,
                     'website': website,
+                    "comment": comment,
                     # 'product_series_ids': (6, 0, product_series) or [],
                 })
                 company.category_id = [tag_list] if tag_list else []
@@ -164,6 +167,7 @@ class NameCardController(http.Controller):
                     'source_id': src_id,
                     'country_id': country_id,
                     'website': website,
+                    "comment": comment,
                     # 'product_series_ids': (6, 0, product_series) or [],
                 })
                 company.category_id = [tag_list] if tag_list else []
