@@ -131,7 +131,7 @@ class NameCardController(http.Controller):
             #     company_name = company_name.replace(u"责任有限公司", "")
             # elif u'公司' in company_name:
             #     company_name = company_name.replace(u"公司", "")
-            company = request.env["res.partner"].sudo().search([("name", "ilike", company_name)], limit=1)
+            company = request.env["res.partner"].sudo().search([("name", "=", company_name)], limit=1)
             if not company:
                 company = request.env["res.partner"].sudo(request.context.get("uid")).create({
                     "name": company_real_name,
