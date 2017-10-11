@@ -221,7 +221,13 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 var index = $(target).parents('.production_line').attr("data-index");
 
                 new Model("mrp.production.line")
-                    .call("get_mo_by_productin_line", [[]], {production_line_id: myself.mydataset.product_line[index].id,limit:10,offset:0, planned_date:myself.chose_date})
+                    .call("get_mo_by_productin_line", [[]], {
+                        production_line_id: myself.mydataset.product_line[index].id,
+                        limit: 10,
+                        offset: 0,
+                        planned_date: myself.chose_date,
+                        domains: myself.left_domain,
+                    })
                     .then(function (result) {
                         console.log(result);
                         // myself.mydataset = result;
@@ -241,6 +247,26 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             }else {
                 $(target).removeClass('fa-chevron-up');
                 $(target).addClass('fa-chevron-down');
+            }
+        },
+        render_one_production_line: function (target, result) {
+            if ($(target).parents('.production_line').next('.production_lists_wrap').is(':hidden')) {
+                $(target).parents('.production_line').next('.production_lists_wrap').slideToggle("fast");
+            }
+            $(target).removeClass('fa-chevron-down');
+            $(target).addClass('fa-chevron-up');
+            $(target).parents('.production_line').next('.production_lists_wrap').html("");
+            $(target).parents('.production_line').next('.production_lists_wrap').removeClass('production_lists_no_item');
+            $(target).parents('.production_line').next('.production_lists_wrap').append(QWeb.render('a_p_render_right_tmpl', {
+                result: result,
+                show_more: true,
+                selection: myself.states.state.selection,
+                new_selection: myself.states.product_order_type.selection,
+                material_selection: myself.states.availability.selection
+            }));
+            if ($(target).parents('.production_line').next('.production_lists_wrap').children('.ap_item_wrap').length == 0) {
+                $(target).parents('.production_line').next('.production_lists_wrap').slideToggle("fast");
+                $(target).parents('.production_line').next('.production_lists_wrap').addClass('production_lists_no_item');
             }
         },
         move_start:function (ev) {
@@ -466,7 +492,6 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             self.offset=1;
             self.length = 10;
         },
-        //搜索部分
         setup_search_view: function () {
             var self = this;
             if (this.searchview) {
@@ -493,6 +518,37 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                     self.searchview_elements.$searchview = self.searchview.$el;
                     self.searchview_elements.$searchview_buttons = self.searchview.$buttons.contents();
                     self.searchview.do_show();
+                });
+            });
+
+        },
+        //搜索部分
+        setup_left_search_view: function () {
+            var self = this;
+            if (this.left_searchview) {
+                this.left_searchview.destroy();
+            }
+            var search_defaults = {};
+            var options = {
+                hidden: true,
+                disable_custom_filters: true,
+                $buttons: $("<div>"),
+                action: this.action,
+                search_defaults: search_defaults,
+            };
+            self.left_dataset = new data.DataSetSearch(this, "mrp.production", {}, false);
+            $.when(self.load_views()).done(function () {
+                // Instantiate the SearchView, but do not append it nor its buttons to the DOM as this will
+                // be done later, simultaneously to all other ControlPanel elements
+                self.left_searchview = new SearchView(self, self.dataset, self.search_fields_view, options);
+                var $node1 = $('<div/>').addClass('arranged_product_searchview')
+                $(".a_p_time_end").prepend($node1);
+                self.left_searchview.on('search_data', self, self.left_search.bind(self));
+                $.when(self.left_searchview.appendTo($node1)).done(function () {
+                    self.left_searchview_elements = {};
+                    self.left_searchview_elements.$searchview = self.left_searchview.$el;
+                    self.left_searchview_elements.$searchview_buttons = self.left_searchview.$buttons.contents();
+                    self.left_searchview.do_show();
                 });
             });
 
@@ -534,7 +590,20 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 own.un_arrange_production(own.process_id,10,own.offset,own)
             })
         },
-
+        left_search: function (domains, contexts, groupbys) {
+            var own = this;
+            console.log("1111111");
+            pyeval.eval_domains_and_contexts({
+                domains: [[]].concat(domains || []),
+                contexts: [].concat(contexts || []),
+                group_by_seq: groupbys || []
+            }).done(function (results) {
+                own.offset = 1;
+                own.left_domain = results.domain;
+                own.group_by = ["production_line_id"]
+                own.arrangeed_searched()
+            })
+        },
         render_pager: function () {
             if ($(".approval_pagination")) {
                 $(".approval_pagination").remove()
@@ -588,7 +657,54 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         own.render_pager();
                         if(!own.domain){
                             own.setup_search_view();
+                            own.setup_left_search_view();
+
                         }
+                    })
+        },
+        arrangeed_searched: function () {
+            var self = this;
+            framework.blockUI();
+
+            // console.log(own.states.product_order_type.selection)
+            new Model("mrp.production")
+                .call("get_planned_mo_by_search", [[]], {
+                        process_id: self.process_id,
+                        domains: self.left_domain,
+                        group_by: self.group_by
+                    }
+                )
+                .then(function (result) {
+                    framework.unblockUI();
+                    console.log(result)
+                    console.log(self.states)
+                    var showorhides = $(".a_p_showorhide")
+                    showorhides.each(function (i) {
+                        var index = parseInt($(this).parents('.production_line').attr("data-index"));
+                        var line_id = myself.mydataset.product_line[index].id;
+                        if (result[line_id]) {
+                            var mos = result[line_id].mos;
+                            myself.render_one_production_line(this, mos)
+                        }
+                        else {
+                            myself.render_one_production_line(this, {})
+                        }
+
+
+                    })
+                    //myself.mydataset.mo = result.result;
+                    //$("#a_p_right .a_p_right_head").nextAll().remove();
+                    //$("#a_p_right").append(QWeb.render('a_p_render_right_tmpl',{result: result.result,
+                    //    show_more:false,
+                    //    selection:own.states.state.selection,
+                    //    new_selection:own.states.product_order_type.selection,
+                    //    material_selection: own.states.availability.selection
+                    //}));
+                    //own.length = result.length;
+                    //own.render_pager();
+                    //if(!own.left_domain){
+                    //    own.setup_left_search_view();
+                    //}
                     })
         },
         setupFocus: function ($e) {
