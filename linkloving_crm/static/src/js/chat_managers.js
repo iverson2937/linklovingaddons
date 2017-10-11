@@ -53,7 +53,7 @@ odoo.define('mail.chat_managers', function (require) {
     function notify_incoming_message(msg, options) {
         if (bus.is_odoo_focused() && options.is_displayed) {
             // no need to notify
-            return;
+            // return;
         }
         var title = _t('New message');
         if (msg.author_id[1]) {
@@ -315,7 +315,7 @@ odoo.define('mail.chat_managers', function (require) {
         if (data.last_message_date) {
             channel.last_message_date = moment(time.str_to_datetime(data.last_message_date));
         }
-        channel.is_chat = !channel.type.match(/^(public|private|static)$/);
+        channel.is_chat = !channel.type.match(/^(static)$/);
         if (data.message_unread_counter) {
             update_channel_unread_counter(channel, data.message_unread_counter);
         }

@@ -149,12 +149,13 @@
 
                         <div class="stop_one_document" style="padding-top: 6px;">
                              <t t-if="item_files.is_show_outage == true ">
-                                 <button class="btn btn-primary outage_document_file off" data="off">停用</button>
-                                 <span style="color:red;">使用中</span>
+                                 <button class="btn btn-primary outage_document_file off" data="off" data-toggle="tooltip" data-placement="left" title="点击暂停使用">停用</button>
+                                 <!--<span style="color:red;">使用中</span>-->
+
                              </t>
                             <t t-if="item_files.is_show_outage == false ">
-                                <button class="btn btn-primary outage_document_file on" data="on">启用</button>
-                                <span style="color:red;">已停用</span>
+                                <button class="btn btn-primary outage_document_file on" data="on" data-toggle="tooltip" data-placement="left" title="点击使用">启用</button>
+                                <!--<span style="color:red;">已停用</span>-->
                              </t>
                         </div>
                     </t>
