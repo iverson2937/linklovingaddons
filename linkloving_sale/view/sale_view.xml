@@ -247,10 +247,11 @@
             </xpath>
         </template>
 
+
         <menuitem
                 id="menu_order_point"
-                parent="sales_team.menu_sales"
-                sequence="10" name="订货规则"/>
+                parent="sales_team.menu_base_partner"
+                sequence="1" name="产品看板"/>
 
 
     </data>

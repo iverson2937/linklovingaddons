@@ -205,7 +205,7 @@ class linkloving_procurement_order_extend(models.Model):
                                     self._procurement_from_orderpoint_post_process([orderpoint.id])
                                 if use_new_cursor:
                                     cr.commit()
-
+                            orderpoint.active = False  # 运算完补货规则之后,将补货规则设置成无效
                         except OperationalError:
                             if use_new_cursor:
                                 orderpoints_noprefetch += orderpoint.id

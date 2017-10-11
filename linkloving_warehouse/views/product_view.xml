@@ -60,6 +60,8 @@
 
                     <field name="reordering_min_qty"/>
                     <field name="reordering_max_qty"/>
+                    <field name="order_point_active" string="订货规则开启"/>
+
                     <field name="last1_month_qty" readonly="1"/>
                     <field name="last2_month_qty" readonly="1"/>
                     <field name="last3_month_qty" readonly="1"/>

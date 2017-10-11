@@ -3,6 +3,7 @@
  */
 odoo.define('linkloving_mrp_automatic_plan.schedule_production_report', function (require) {
     "use strict";
+
     var core = require('web.core');
     var Model = require('web.Model');
     var data_manager = require('web.data_manager');
@@ -28,11 +29,9 @@ odoo.define('linkloving_mrp_automatic_plan.schedule_production_report', function
         init: function (parent, action) {
             this._super(parent);
             this._super.apply(this, arguments);
-            console.log("13123")
             if (parent && parent.action_stack.length > 0) {
                 this.action_manager = parent.action_stack[0].widget.action_manager
             }
-
             var self = this;
         },
         start: function () {
@@ -42,9 +41,17 @@ odoo.define('linkloving_mrp_automatic_plan.schedule_production_report', function
                 // cp_content: _.extend({}, self.searchview_elements, {}),
             };
             self.update_control_panel(cp_status);
-
+            self.initTreeTable();//
             //setTimeout(function () {
-                self.initTreeTable()
+            //console.log("HELLO");
+            //var app = new Vue({
+            //      el: '.schedule_production_container',
+            //      template: '<App/>',
+            //    components:{
+            //        App:App
+            //    }
+            //    })
+            //    console.log("HELLO1")
             //}, 1000);
         },
         initTreeTable: function () {
@@ -178,15 +185,16 @@ odoo.define('linkloving_mrp_automatic_plan.schedule_production_report', function
                 }
             };
             // initialize treeTable
-            self.$("#example-basic").treetable({
+            self.$("#example-basic").treetable1({
                 expandable: true,
                 onNodeExpand: nodeExpand,
                 onNodeCollapse: nodeCollapse
             });
-            self.$("#example-basic").treetable("reveal", '1');
+            self.$("#example-basic").treetable1("reveal", '1');
             self.$("#example-basic tbody").on("mousedown", "tr", function () {
                 $(".selected").not(this).removeClass("selected");
                 $(this).toggleClass("selected");
+
             });
             function nodeExpand() {
                 // alert("Expanded: " + this.id);
@@ -216,12 +224,12 @@ odoo.define('linkloving_mrp_automatic_plan.schedule_production_report', function
                 var childNodes = data.nodeID[parentNodeID];
 
                 if (childNodes) {
-                    var parentNode = self.$("#example-basic").treetable("node", parentNodeID);
+                    var parentNode = self.$("#example-basic").treetable1("node", parentNodeID);
 
                     for (var i = 0; i < childNodes.length; i++) {
                         var node = childNodes[i];
 
-                        var nodeToAdd = self.$("#example-basic").treetable("node", node['ID']);
+                        var nodeToAdd = self.$("#example-basic").treetable1("node", node['ID']);
 
                         // check if node already exists. If not add row to parent node
                         if (!nodeToAdd) {
@@ -245,7 +253,7 @@ odoo.define('linkloving_mrp_automatic_plan.schedule_production_report', function
                             // End row
                             row += "</tr>";
 
-                            self.$("#example-basic").treetable("loadBranch", parentNode, row);
+                            self.$("#example-basic").treetable1("loadBranch", parentNode, row);
                         }
 
 

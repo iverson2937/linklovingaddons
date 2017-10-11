@@ -43,7 +43,7 @@
             <div class="a_p_left_head">
                 <span style="font-size:15px;margin-left:15px;font-weight:bold;">已排产</span>
                 <div class="a_p_time_start"></div>
-                <div class="a_p_time_end"></div>
+                <div class="a_p_time_end search_view"></div>
             </div>
             <t t-foreach="result" t-as="item">
                 <div class="production_line" t-att-data-index="item_index">

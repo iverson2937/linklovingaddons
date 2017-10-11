@@ -26,12 +26,16 @@ class Inheritforarrangeproduction(models.Model):
             'process_id': self.id
         }
 
+    produce_speed_factor = fields.Selection([('human', u'人数'), ('equipment', u'设备数'), ],
+                                            default='human', string=u'生产速度因子', )
+
+    theory_factor = fields.Integer(string=u'理论 人数/设备数', require=True)
 
 ORDER_BY = "planned_start_backup,id desc"
 FIELDS = ["name", "alia_name", "product_tmpl_id", "state", "product_qty",
           "display_name", "bom_id", "feedback_on_rework", "qty_unpost",
           "planned_start_backup", "date_planned_start", "date_planned_finished",
-          'theo_spent_time', 'availability', 'product_order_type']
+          'theo_spent_time', 'availability', 'product_order_type', 'production_line_id']
 class ProcurementOrderExtend(models.Model):
     _inherit = 'procurement.order'
 
@@ -161,6 +165,8 @@ class MrpProductionLine(models.Model):
     #根据产线id获取已排产mo
     def get_mo_by_productin_line(self, **kwargs):
         production_line_id = kwargs.get("production_line_id")
+        domains = kwargs.get("domains", [])
+
         # planned_date = kwargs.get("planned_date")
         limit = kwargs.get("limit")
         offset = kwargs.get("offset")
@@ -176,16 +182,17 @@ class MrpProductionLine(models.Model):
         # try:
         # return utc_timestamp.astimezone(context_tz)
 
-        mos = self.env["mrp.production"].search_read([("production_line_id", "=", production_line_id),
-                                                      # ("date_planned_start", "<=", end_time_str),
+        mos = self.env["mrp.production"].search_read(
+            domain=expression.AND([[("production_line_id", "=", production_line_id),
+                                    # ("date_planned_start", "<=", end_time_str),
                                                       # ("date_planned_finished", ">=", start_time_str),
                                                       ("state", "not in", ['done', 'cancel', 'waiting_post_inventory'])
-                                                      ],
-                                                     # limit=limit,
+                                    ], domains]),
+            # limit=limit,
                                                      # offset=offset,
                                                      order=ORDER_BY,
-                                                     fields=FIELDS
-                                                     )
+            fields=FIELDS
+            )
         return mos
 
 class HrEmployeeExtend(models.Model):
@@ -297,8 +304,11 @@ class MrpProductionExtend(models.Model):
         process_id = kwargs.get("process_id")
         limit = kwargs.get("limit")
         offset = kwargs.get("offset")
-        domain = [("process_id", "=", process_id), ("production_line_id", "=", False),
+
+        domain = [("process_id", "=", process_id),
+                  ("production_line_id", "=", False),
                   ("state", "in", ['draft', 'confirmed', 'waiting_material'])]
+
         domains = kwargs.get("domains", [])
         new_domains = expression.AND([domains, domain])
         mos = self.env["mrp.production"].search_read(
@@ -313,6 +323,27 @@ class MrpProductionExtend(models.Model):
             'length': length,
             'result': mos,
         }
+
+    def get_planned_mo_by_search(self, **kwargs):
+        process_id = kwargs.get("process_id")
+        domains = kwargs.get("domains", [])
+
+        group_by = kwargs.get("group_by")
+        new_domain = expression.AND([domains, [("process_id", "=", process_id),
+                                               ("production_line_id", "!=", False),
+                                               ("state", "not in", ['done', 'cancel', 'waiting_post_inventory'])]])
+
+        groups = self.read_group(domain=new_domain,
+                                 fields=FIELDS,
+                                 groupby=group_by)
+        MrpProducion = self.env["mrp.production"]
+        groups_dic = {}
+        for group in groups:
+            domain = group.get("__domain", [])
+            group["mos"] = MrpProducion.search_read(domain, fields=FIELDS, order=ORDER_BY)
+            groups_dic[group.get("production_line_id")[0]] = group
+        return groups_dic
+
 
     def get_today_time(self, is_current_time=False, day_offset=0):
         now_time = fields.datetime.now(pytz.timezone(self.env.user.tz)) + relativedelta(days=day_offset)
