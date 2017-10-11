@@ -250,9 +250,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             }
         },
         render_one_production_line: function (target, result) {
-            if ($(target).parents('.production_line').next('.production_lists_wrap').is(':hidden')) {
-                $(target).parents('.production_line').next('.production_lists_wrap').slideToggle("fast");
-            }
+
             $(target).removeClass('fa-chevron-down');
             $(target).addClass('fa-chevron-up');
             $(target).parents('.production_line').next('.production_lists_wrap').html("");
@@ -265,8 +263,13 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 material_selection: myself.states.availability.selection
             }));
             if ($(target).parents('.production_line').next('.production_lists_wrap').children('.ap_item_wrap').length == 0) {
-                $(target).parents('.production_line').next('.production_lists_wrap').slideToggle("fast");
+                $(target).parents('.production_line').next('.production_lists_wrap').slideUp(0);
                 $(target).parents('.production_line').next('.production_lists_wrap').addClass('production_lists_no_item');
+            }
+            else {
+                if ($(target).parents('.production_line').next('.production_lists_wrap').is(':hidden')) {
+                    $(target).parents('.production_line').next('.production_lists_wrap').slideToggle("fast");
+                }
             }
         },
         move_start:function (ev) {
