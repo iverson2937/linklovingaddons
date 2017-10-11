@@ -61,7 +61,7 @@ class ProductCategory(models.Model):
             'res_model': model,
             'view_type': 'form',
             'view_mode': 'tree,form,kanban',
-            'domain': '[["categ_id", "=", %d]]' % int(category.id),
+            'domain': '[["categ_id", "child_of", %d]]' % int(category.id),
             'view_id': view_id,
         }
         return self.env['ir.actions.act_window'].create(val)
