@@ -277,7 +277,9 @@ class CreateOrderPointWizard(models.TransientModel):
     def update_product_categ_menu(self):
         categ_ids = self.env['product.category'].search([])
         for c in categ_ids:
-            c.menu_id.action.domain = '[["categ_id", "child_of", %d]]' % int(c.id)
+            if c.menu_id.action:
+                _logger.warning("update menu action list, %d/%d" % (c.id, c.menu_id.id))
+                c.menu_id.action.domain = '[["categ_id", "child_of", %d]]' % int(c.id)
 
     def mo_to_bz_process(self):
         return
