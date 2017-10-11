@@ -18,7 +18,8 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
 
         purchase_ids = purchase_obj.sudo().search([
             ('state', 'in', ['sent', 'to approve', 'purchase']),
-            ('date_order', '>=', date1), ('date_order', '<=', date2)], order='name desc')
+            ('date_order', '>=', date1), ('date_order', '<=', date2), ('company_id', '=', self.env.user.company_id.id)],
+            order='name desc')
 
         purchase_sequence = 1
         for purchase in purchase_ids:
