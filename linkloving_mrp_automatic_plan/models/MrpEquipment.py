@@ -26,6 +26,10 @@ class Inheritforarrangeproduction(models.Model):
             'process_id': self.id
         }
 
+    produce_speed_factor = fields.Selection([('human', u'人数'), ('equipment', u'设备数'), ],
+                                            default='human', string=u'生产速度因子', )
+
+    theory_factor = fields.Integer(string=u'理论 人数/设备数', require=True)
 
 ORDER_BY = "planned_start_backup,id desc"
 FIELDS = ["name", "alia_name", "product_tmpl_id", "state", "product_qty",
