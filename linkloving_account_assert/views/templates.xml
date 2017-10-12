@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="view_account_asset_asset_form_inherit" model="ir.ui.view">
+            <field name="name">account.asset.asset.form</field>
+            <field name="model">account.asset.asset</field>
+            <field name="inherit_id" ref="account_asset.view_account_asset_asset_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='date']" position="after">
+                    <field name="employee_id" string="保管人"/>
+                    <field name="asset_no" string="资产编号"/>
+
+                </xpath>
+
+            </field>
+        </record>
+    </data>
+</openerp>
