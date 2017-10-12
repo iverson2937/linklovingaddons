@@ -1,23 +1,60 @@
 # -*- coding:utf-8 -*-
 
+from pyvirtualdisplay import Display
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
 import time
 import sys
 import json
+import redis
 import re
 import datetime
+import uuid
 
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+
+
+'''
+    注意:此方法可以在并发的模型中运行!!!
+'''
+dcap = dict(DesiredCapabilities.PHANTOMJS)
+dcap["phantomjs.page.settings.userAgent"] = (
+    "Mozilla/5.0 (Linux; Android 5.1.1; Nexus 6 Build/LYZ28E) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.23 Mobile Safari/537.36"
+)
+
+
+display = Display(visible=0, size=(1366, 768))
+display.start()
+
+
+# driver = webdriver.PhantomJS(desired_capabilities=dcap)
 driver = webdriver.Chrome()
-# driver = webdriver.PhantomJS()
+# driver = webdriver.PhantomJS('phantomjs')
 
 loginurl = 'https://login.taobao.com/member/login.jhtml'
 
 # 让浏览器窗口最大化
-driver.maximize_window()
+#driver.maximize_window()
+# driver.set_window_size(2000, 20000)
+driver.set_window_size(1366, 768)
 
 # 天猫界面中页面做了防爬虫的手段，所以需要使用虚拟浏览器来模拟js定位到制定的位置界面和翻页功能
 common_url = 'https://gongxiao.tmall.com/supplier/order/order_list.htm'
 
+def eliminate_alert_to_target(url):
+    # 可能在打开新窗口的时候有一些flahs更新的弹框出来，我们需要谜面这种情况的出现!!!
+    driver.get(url)
+    time.sleep(15)
+    try:
+        driver.switch_to.alert.accept()
+    except:
+        pass
+    driver.switch_to.window(driver.window_handles[-1])
+    
 
 # 限定抓取数据的天数
 def limit_scrapy_data_in_days():
@@ -53,63 +90,89 @@ def limit_scrapy_data_in_days():
     # 输入结束分钟
     driver.find_element_by_xpath('//select[@name="endMinutes"]').send_keys('0')
 
-    time.sleep(3)
+    ActionChains(driver).move_by_offset(200, 200).click().perform()
+
     # 过滤出30天的数据
     # driver.find_element_by_xpath('//*[@id="J_searchb"]/tbody/tr[3]/td[4]/span/button').click()
-    driver.find_element_by_xpath('//button[@class="sui-btn btn-primary btn-large"]').click()
+    driver.find_element_by_xpath('//*[@id="J_searchb"]/tbody/tr[4]/td[2]/span/button').click()
+    time.sleep(3)
     print u'点击搜索之后,获得需要的结果'
 
 
 # login in tianmao
 
-def login(loginurl):
+def login(loginurl, username=None, password=None):
     # open the login in page
-    driver.get(loginurl)
-    time.sleep(3)
+    eliminate_alert_to_target(loginurl)
+    #time.sleep(3)
     # sign in the username
-    try:
-        driver.find_element_by_xpath('//*[@id="J_QRCodeLogin"]/div[5]/a[1]').click()
-        time.sleep(3)
-        driver.find_element_by_xpath('//*[@id="TPL_username_1"]').send_keys(u'若态旗舰店')
-        print 'user success!'
-    except:
-        print 'user error!'
-    time.sleep(3)
 
-    # sign in the pasword
-    try:
-        driver.find_element_by_xpath('//*[@id="TPL_password_1"]').send_keys('szrtkjqjd@123!!')
-        print 'pw success!'
-    except:
-        print 'pw error!'
-    time.sleep(3)
-    # click to login
-    try:
-        driver.find_element_by_xpath('//*[@id="J_SubmitStatic"]').click()
-        print 'click success!'
-    except:
-        print 'click error!'
-    time.sleep(3)
 
-    curpage_url = driver.current_url
-    print 'currpage_url ' + curpage_url
-    while (curpage_url == loginurl):
-        # print 'please input the verify code:'
-        print 'please input the verify code:'
-        verifycode = sys.stdin.readline()  # 关于验证码中的需求,在目前的的爬虫中没有,但是可能在以后的场景出现,所以还是放在其中
-        driver.find_element_by_xpath("//div[@id='pl_login_form']/div/div[2]/div[3]/div[1]/input").send_keys(verifycode)
+    def login_name():
         try:
-            driver.find_element_by_xpath("//div[@id='pl_login_form']/div/div[2]/div[6]/a").click()
+            driver.find_element_by_xpath('//*[@id="J_QRCodeLogin"]/div[5]/a[1]').click()
+            time.sleep(3)
+            driver.find_element_by_xpath('//*[@id="TPL_username_1"]').clear()
+            # driver.find_element_by_xpath('//*[@id="TPL_username_1"]').send_keys(u'若态旗舰店')
+            driver.find_element_by_xpath('//*[@id="TPL_username_1"]').send_keys(username)
+            print 'user success!'
+        except:
+            print 'user error!'
+        time.sleep(3)
+
+    def login_password():
+        # sign in the pasword
+        try:
+            driver.find_element_by_xpath('//*[@id="TPL_password_1"]').clear()
+            # driver.find_element_by_xpath('//*[@id="TPL_password_1"]').send_keys('szrtkjqjd@123!!')
+            driver.find_element_by_xpath('//*[@id="TPL_password_1"]').send_keys(password)
+            print 'pw success!'
+        except:
+            print 'pw error!'
+        time.sleep(3)
+
+    def click_and_login():
+        # click to login
+        try:
+            driver.find_element_by_xpath('//*[@id="J_SubmitStatic"]').click()
             print 'click success!'
         except:
             print 'click error!'
         time.sleep(3)
+
+    login_name()
+    login_password()
+    click_and_login()
+
+
+    curpage_url = driver.current_url
+    print 'currpage_url ' + curpage_url
+
+    while (curpage_url == loginurl):
+        # print 'please input the verify code:'
+        print '天猫登录中的滑块验证已经出现需要去做验证:'
+
+        def verify_span_slider():
+            try:
+                span_slider = driver.find_element_by_xpath('//*[@id="nc_1_n1z"]')
+                ActionChains(driver).drag_and_drop_by_offset(span_slider, 258, 0).perform()
+                time.sleep(3)
+                print u'滑块运行成功!'
+            except:
+                print u'滑块运行失败!'
+            time.sleep(3)
+
+        login_name()
+        login_password()
+        click_and_login()
+        verify_span_slider()
+
         curpage_url = driver.current_url
 
 
 def get_all_infomations_from_tiaomao(tianmao_url):
-    driver.get(tianmao_url)
-    time.sleep(5)
+    eliminate_alert_to_target(tianmao_url)
+    #time.sleep(5)
 
     # redis_entity 实体,我们需要通过链表的模式来做传递,因为python本身的设计模式就是基于引用(指针)之间的传递
     redis_list = []
@@ -126,8 +189,10 @@ def get_all_infomations_from_tiaomao(tianmao_url):
             except:
                 print u'可能在某些时候天猫会去除这些演示教程,所以需要进行异常处理机制'
 
-            # 也是在第一次的时候，处理搜索的范围 接下来的操作在于是通过获取所需求的30天之内数据来
+
+            # 也是在第一次的时候，处理搜索的范围 接下来的操作在于是通过获取所需求的30天之内数据
             limit_scrapy_data_in_days()
+
 
         time.sleep(5)
 
@@ -135,6 +200,7 @@ def get_all_infomations_from_tiaomao(tianmao_url):
         for order_list in order_lists:
             # 数据结构 用来存储获得到的每个订单的详细的信息
             order_detail_info = {}
+
 
             # print order_list.text
             # 获取其中的分销流水号
@@ -183,6 +249,36 @@ def get_all_infomations_from_tiaomao(tianmao_url):
             # print '*' * 20 + '\n' + order_info + '\n' + '*' * 20
             # 获取消费者买的所有商家的商品列表
             items = order_info.find_elements_by_xpath('./td[1]/ul')
+
+            # 随着业务需求的增长,需要更加详细的去获取每个订单的详细信息，但这种情况需要另一个网页窗口来做此类业务
+            def get_extra_order_detail_info():
+                # 这次的点击事件会触发另一个窗口,并且浏览器当前的的操作也是在这个窗口中
+                order_info.find_element_by_xpath('./td[4]/p[last()]/a').click()
+                time.sleep(2)
+                print driver.current_url
+                # driver.switch_to_window(driver.window_handles[-1])
+                driver.switch_to.window(driver.window_handles[-1])
+                print driver.current_url
+                order_detail_info[u'收货地址'] = driver.find_element_by_xpath('//table[1]/tbody/tr[1]/td[2]').text
+                order_detail_info[u'付款时间'] = driver.find_element_by_xpath('//table[3]/tbody/tr[last()-2]/td').text
+                order_detail_info[u'发货时间'] = driver.find_element_by_xpath('//table[3]/tbody/tr[last()-1]/td').text
+                order_detail_info[u'确认时间'] = driver.find_element_by_xpath('//table[3]/tbody/tr[last()]/td').text
+
+                print u'收货地址: %s' % order_detail_info[u'收货地址']
+                print u'付款时间: %s' % order_detail_info[u'付款时间']
+                print u'发货时间: %s' % order_detail_info[u'发货时间']
+                print u'确认时间: %s' % order_detail_info[u'确认时间']
+                # time.sleep(3)
+                driver.close()
+
+                # driver.switch_to_window(driver.window_handles[0])
+                driver.switch_to.window(driver.window_handles[0])
+
+
+
+            print u'从另一个标签页中'
+            get_extra_order_detail_info()
+
 
             order_total_deal = 0.0
             # 初始化小订单的数据结构
@@ -239,21 +335,18 @@ def get_all_infomations_from_tiaomao(tianmao_url):
                 print u' ' * 10 + u'商家编码:%s 单价:%s 优惠价:%s 调价:%s 采购价:%s 购买数量:%s' \
                                   % (seller_name, price, concessional_rate, adjust_price, purchase, num)
                 single_item = {}
-                # single_item[u'商家编码'] = seller_name
-                # single_item[u'单价'] = price
-                # single_item[u'优惠价'] = concessional_rate
-                # single_item[u'调价'] = adjust_price
-                # single_item[u'采购价'] = purchase
-                # single_item[u'购买数量'] = num
-                single_item.update({
-                    'code': seller_name,
-                    'price_unit': purchase,
-                    'product_qty': num,
 
-                })
+                single_item[u'商家编码'] = seller_name
+                single_item[u'单价'] = price
+                single_item[u'优惠价'] = concessional_rate
+                single_item[u'调价'] = adjust_price
+                single_item[u'采购价'] = purchase
+                single_item[u'购买数量'] = num
 
                 # 把每个小的item的dict都放入到列表中
                 order_detail_info['items'].append(single_item)
+
+
 
             # 获得关于这次大订单最后交易的状态
             purchage_result = order_info.find_element_by_xpath('./td[4]/p').text
@@ -273,34 +366,37 @@ def get_all_infomations_from_tiaomao(tianmao_url):
 
             # print u'最后交易的状态' + purchage_result
             # print u'最后交易的状态:%s 大订单的价格:%.2f' %(purchage_result, total_price_and_delivery - delivery_price)
-            print u'收货人: %s 最后交易的状态:%s 大订单的价格:%.2f' % (buyer_person, purchage_result, total_price_and_delivery)
-            order_detail_info['state'] = purchage_result
-            order_detail_info['total_amount'] = total_price_and_delivery
-            order_detail_info['customer_info'] = buyer_person
+            print u'收货人: %s 最后交易的状态:%s 需要付费的价格:%.2f(含快递价:%.2f)' % (buyer_person, purchage_result, total_price_and_delivery, delivery_price)
+            order_detail_info[u'最后交易的状态'] = purchage_result
+            order_detail_info[u'大订单的价格'] = total_price_and_delivery - delivery_price
+            order_detail_info[u'收货人'] = buyer_person
+            order_detail_info[u'快递价'] = delivery_price
 
             # 这是一步真正的存储的过程
-            # save_to_redis(order_detail_info[u'订单编号'], order_detail_info)
+            save_to_redis(order_detail_info[u'订单编号'], order_detail_info)
         print '*' * 50
 
     def click_next_page():
         driver.find_element_by_xpath('//a[@class="page-next"]').click()
 
-    # def init_redis():
-    #     print '初始化redis客户端!!!'
-    #     r = redis.Redis(host='localhost', port=6379)
-    #     try:
-    #         r.client_list()
-    #     except redis.ConnectionError:
-    #         print u'redis 客户端没有连接成功!!!'
-    #         print u'redis 客户端没有连接成功!!!'
-    #         print u'redis 客户端没有连接成功!!!'
-    #         print u'关闭浏览器!!!'
-    #         driver.quit()
-    #
-    #         sys.exit(-1)
-    #
-    #     # 把连接池对象放入到redis_list列表中
-    #     redis_list.append(r)
+    def init_redis():
+        print '初始化redis客户端!!!'
+        r = redis.Redis(host='localhost', port=6379)
+        try:
+            r.client_list()
+        except redis.ConnectionError:
+            print u'redis 客户端没有连接成功!!!'
+            print u'redis 客户端没有连接成功!!!'
+            print u'redis 客户端没有连接成功!!!'
+            print u'关闭浏览器!!!'
+            driver.quit()
+
+            sys.exit(-1)
+
+        # 把连接池对象放入到redis_list列表中
+        redis_list.append(r)
+
+
 
     # 在process_items函数中,把获得的数据保存下来,放入到redis中,使用redis的键值对技术
     # 注意这里面存储的key是字符串
@@ -316,20 +412,23 @@ def get_all_infomations_from_tiaomao(tianmao_url):
 
     # ******************  processing ****************** #
     # 初始化redis
-    # init_redis()
+    init_redis()
 
     # 对于第一次打开网页,我们特殊做一次处理,网页中有一些关于初学者的指南的学习步骤,会影响爬虫的爬去工作
+
+    print '当前的页码是%s' % '1'
     process_items(True)
 
-    page = 0
+    page = 1
     while True:
         page += 1
         print '当前的页码是%s' % page
         try:
             click_next_page()
-            time.sleep(3)
+            time.sleep(10)
             process_items(False)
         except Exception:
+	    print u'我们已经到了最后的一页!!!'
             # 如果到了最后一页,我们就完成这次的处理需求
             break
 
@@ -337,10 +436,77 @@ def get_all_infomations_from_tiaomao(tianmao_url):
     close_redis(redis_list)
 
 
-def setup():
-    login(loginurl)
-    get_all_infomations_from_tiaomao(common_url)
+# 获取出售中的宝贝的详细信息
+seller_baby_url = 'https://sell.tmall.com/auction/item/item_list.htm#' \
+                  'sortField=starts&status=item_on_sale&order=desc&currentPage=%s'
 
+def process_seller_baby_info():
+    babys_info = {}
+    url = seller_baby_url.replace('%s', '1')
+    eliminate_alert_to_target(url)
+    #time.sleep(10)
+    total_pages_str = driver.find_element_by_xpath('//*[@id="rtCtn"]/div/div[5]/div/div[2]/div[1]/' +
+                                                'div/div[3]/span[2]/div/div/div/span/span[2]').text.strip()
+    print u'总共的页数为:%s' % total_pages_str
+
+    def process(page):
+        url = seller_baby_url.replace('%s', page)
+        eliminate_alert_to_target(url)
+        #########time.sleep(3)
+        baby_infos_detail = driver.find_elements_by_xpath('//*[@id="rtCtn"]/div/div[5]/div/div[2]/div[1]/div/div[5]' +
+                                                          '/div/div/div/div/table/tbody/tr/td[10]/span/div/div[1]/a')
+        for info in baby_infos_detail:
+            id = str(uuid.uuid1()).replace('-', '')
+            babys_info[id] = {}
+            href = info.get_attribute('href').strip()
+
+            JS_Script = 'window.open("http://www.baidu.com");'
+            driver.execute_script(JS_Script)
+            driver.switch_to.window(driver.window_handles[-1])
+	    time.sleep(3)
+
+            # 跳转到另一个界面中做操作!!!
+            # info.click()
+            # time.sleep(30)
+            # driver句柄切换到目标句柄中
+            # driver.switch_to.window(driver.window_handles[-1])
+
+            print u'href is %s' % href
+            # 开始获取每个宝贝的详细的信息
+            eliminate_alert_to_target(href)
+            # driver.refresh()
+            # print u'所获得的内容为:%s' % driver.find_element_by_xpath('//body').text
+            # time.sleep(60)
+            rows_info = driver.find_elements_by_xpath('//*[@id="J_SKUTable"]/table/tbody/tr')
+            print u'每页中列表的数量为:%s' % len(rows_info)
+            if rows_info:
+                for row in rows_info:
+                    price = row.find_element_by_xpath('./td[4]/div/input').get_attribute('value')
+                    linkloving_code = row.find_element_by_xpath('./td[6]/div/input').get_attribute('value')
+                    babys_info[id]['itemprice'] = price
+                    babys_info[id]['code'] = linkloving_code
+                    print u'出售中的宝贝商品的价格为:%s\t商品编码为:%s' % (price, linkloving_code)
+            else:
+                price = driver.find_element_by_xpath('//*[@id="buynow"]').get_attribute('value')
+                linkloving_code = driver.find_element_by_xpath('//*[@id="outerIdId"]').get_attribute('value')
+                babys_info[id]['itemprice'] = price
+                babys_info[id]['code'] = linkloving_code
+                print u'出售中的宝贝商品的价格为:%s\t商品编码为:%s' % (price, linkloving_code)
+
+            driver.close()
+            driver.switch_to.window(driver.window_handles[-1])
+
+    page = 1
+    total_pages = int(total_pages_str)
+    while page <= total_pages:
+        print u'当前页为:%s' % page
+        process(str(page))
+        page += 1
+
+def setup(username, password):
+    login(loginurl, username, password)
+    get_all_infomations_from_tiaomao(common_url)
+    process_seller_baby_info()
     time.sleep(10)
     driver.quit()
     print u'爬虫工作完成!!!'
@@ -350,4 +516,14 @@ if __name__ == '__main__':
     print u'main....'
     print '__name__ is %s' % __name__
     print '__file__ is %s' % __file__
-    setup()
+    try:
+
+        # username = sys.argv[1]
+        username = u'若态旗舰店'
+        # password = sys.argv[2]
+        password = u'szrtkjqjd@123!!'
+        setup(username, password)
+    except IndexError:
+        print u'缺少必要的参数!!!'
+
+
