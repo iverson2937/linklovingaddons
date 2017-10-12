@@ -381,24 +381,28 @@ class CrmProductSeries(models.Model):
     crm_Parent_ontomany_ids = fields.One2many('crm.product.series', 'crm_Parent_id', string=u'下级列表')
 
 
-# class ChannelCrm(models.Model):
-#     _inherit = 'mail.channel'
-#
-#     @api.model
-#     def create(self, vals):
-#         print vals
-#         return super(ChannelCrm, self).create(vals)
+class ChannelCrm(models.Model):
+    _inherit = 'mail.channel'
 
-        # @api.multi
-        # @api.returns('self', lambda value: value.id)
-        # def message_post(self, body='', subject=None, message_type='notification', subtype=None, parent_id=False,
-        #                  attachments=None, content_subtype='html', **kwargs):
-        #     print kwargs.get('author_id')
-        #     # if len(self) <= 0:
-        #     #     # self = self.env['mail.channel'].browse(7)
-        #     #     self = self.env['mail.channel'].search([('name', '=', '公海通知')])
-        #     return super(ChannelCrm, self).message_post(body, subject, message_type, subtype, parent_id, attachments,
-        #                                                 content_subtype, **kwargs)
+    # @api.model
+    # def create(self, vals):
+    #     print vals
+    #     return super(ChannelCrm, self).create(vals)
+
+    @api.multi
+    @api.returns('self', lambda value: value.id)
+    def message_post(self, body='', subject=None, message_type='notification', subtype=None, parent_id=False,
+                     attachments=None, content_subtype='html', **kwargs):
+        print kwargs.get('author_id')
+        # if len(self) <= 0:
+        #     # self = self.env['mail.channel'].browse(7)
+        #     self = self.env['mail.channel'].search([('name', '=', '公海通知')])
+
+        if not kwargs.get('project'):
+            body = '【 聊天 】' + body
+
+        return super(ChannelCrm, self).message_post(body, subject, message_type, subtype, parent_id, attachments,
+                                                    content_subtype, **kwargs)
 
 
 class CrmIrAttachment(models.Model):
