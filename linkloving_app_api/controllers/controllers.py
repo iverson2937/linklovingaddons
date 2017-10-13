@@ -2936,7 +2936,7 @@ class LinklovingAppApi(http.Controller):
     def get_picking_info_by_partner(self, partner_id):
         domain = [('partner_id', 'child_of', partner_id), ('picking_type_code', '=', 'outgoing'),
                   ("state", 'not in', ['cancel', 'done'])]
-        pickings = request.env["stock.picking"].sudo(LinklovingAppApi.CURRENT_USER()).search(domain)
+        pickings = request.env["stock.picking"].sudo().search(domain)
         # if type == 'able_to': #可处理
         print('length =%d' % len(pickings))
         return self.get_picking_info_by_picking(pickings)

@@ -486,7 +486,7 @@ odoo.define('linkloving_crm.list_views', function (require) {
                 return;
             }
 
-            // ondrop, move relevant record & fix sequences
+            // ondrop, move relevant record & fix sequences.xml
             list.$current.sortable({
                 axis: 'y',
                 items: '> tr[data-id]',
