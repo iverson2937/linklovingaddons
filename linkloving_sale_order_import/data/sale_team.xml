@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data noupdate="0">
 
 
-        <record id="sale_team_for_grab" model="sale.team">
-            <field name="name">淘宝京东散单</field>
-            <!--<field name="supplier">1</field>-->
 
-        </record>
 
         <record id="product_product_delivery_cost" model="product.product">
             <field name="name">运费-Buyer</field>
