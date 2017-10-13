@@ -84,15 +84,15 @@ class LinklovingAppApi(http.Controller):
     # 获取数据库列表
     @http.route('/linkloving_app_api/is_inner_ip', type='http', auth='none', cors='*')
     def is_inner_ip(self, **kw):
-        env = request.httprequest.headers.environ
-        remote_addr = env.get("X-Real-IP")
+        remote_addr = request.httprequest.environ['HTTP_X_REAL_IP']
+        remote_addr2 = request.httprequest.environ['X-real-IP']
         if remote_addr == '112.80.45.130':
             return JsonResponse.send_response(STATUS_CODE_OK, res_data={'origin_ip': remote_addr,
-                                                                        'header': request.httprequest.headers.environ},
+                                                                        'header': remote_addr2},
                                               jsonRequest=False)
         else:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={'origin_ip': remote_addr,
-                                                                           'header': request.httprequest.headers.environ},
+                                                                           'header': remote_addr2},
                                               jsonRequest=False)
 
     @classmethod
