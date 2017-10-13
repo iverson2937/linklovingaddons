@@ -56,7 +56,7 @@
                             设备：<span><t t-esc="item.equipment_ids.length" /></span>
                         </div>
                         <div class="p_line_employes">
-                            员工：<span><t t-esc="item.line_employee_ids.length"/> </span>
+                            员工：<span><t t-esc="item.amount_of_members"/> </span>
                         </div>
                         <span class="fa fa-chevron-down a_p_showorhide"></span>
                     </div>

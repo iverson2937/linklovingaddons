@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+
+        <record id="sale_team_for_grab" model="sale.team">
+            <field name="name">淘宝京东散单</field>
+            <!--<field name="supplier">1</field>-->
+
+        </record>
+
+        <record id="product_product_delivery_cost" model="product.product">
+            <field name="name">运费-Buyer</field>
+            <field name="type">service</field>
+            <field name="default_code">003</field>
+            <field name="categ_id" ref="hr_expense.cat_expense"/>
+            <field name="can_be_expensed" eval="True"/>
+        </record>
+
+
+    </data>
+</odoo>

@@ -1,18 +1,30 @@
 jpush ==3.2.4.1
-<xpath expr="//tree" position="attributes"> <attribute name="create">false</attribute> </xpath>
-
-           <!--<div class="col-xs-6">-->
-                                            <!--<a name="%(create_mrp_production)d" type="action">-->
-                                                <!--创建-->
-                                            <!--</a>-->
-                                        <!--</div>-->
 
 
-                    <button name="button_start_produce" class="oe_highlight"
-                            attrs="{'invisible': ['|',('state', '!=', 'already_picking'),('is_outside', '=', True)]}"
-                            type="object" string="开始生产"
-                            groups="linkloving_mrp_extend.group_charge_produce"/>
-                    <button name="button_send_material_to_vendor" class="oe_highlight"
-                            attrs="{'invisible': ['|',('state', '!=', 'already_picking'),('is_outside', '=', False)]}"
-                            type="object" string="发料至供应商"
-                            groups="linkloving_mrp_extend.group_charge_produce"/>
+爬虫软件环境搭建    [顺序安装]
+
+1   [Ubuntu安装需求]
+
+        1   sudo apt-get install chromium-browser
+            sudo apt-get install xvfb
+
+        2   chromedriver_linux64.zip    http://chromedriver.storage.googleapis.com/2.32/chromedriver_linux64.zip
+            放入到PATH环境中  (注意解压)
+
+
+    [windows安装需求]
+
+        1   chromedriver_win32.zip      http://chromedriver.storage.googleapis.com/2.32/chromedriver_win32.zip
+            放入到PATH环境中  (注意解压)
+
+        2   由于在windows中做测试使用,需要将 ./linklovingaddons/linkloving_sale_order_import/models 中fetch_*.py中
+            两行内容隐藏
+
+                #display = Display(visible=0, size=(1366, 768))
+                #display.start()
+
+
+2   [python 安装环境]
+
+    1   selenuim==3.6
+    2   pyvirtualdisplay

@@ -81,6 +81,17 @@ class JsonResponse(object):
 
 
 class LinklovingAppApi(http.Controller):
+    # 获取数据库列表
+    @http.route('/linkloving_app_api/is_inner_ip', type='http', auth='none', cors='*')
+    def is_inner_ip(self, **kw):
+        remote_addr = request.httprequest.environ.get('HTTP_X_REAL_IP')
+        if remote_addr == '112.80.45.130':
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data={'origin_ip': remote_addr},
+                                              jsonRequest=False)
+        else:
+            return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={'origin_ip': remote_addr},
+                                              jsonRequest=False)
+
     @classmethod
     def CURRENT_USER(cls, force_admin=False):
         if not force_admin:
@@ -2925,7 +2936,7 @@ class LinklovingAppApi(http.Controller):
     def get_picking_info_by_partner(self, partner_id):
         domain = [('partner_id', 'child_of', partner_id), ('picking_type_code', '=', 'outgoing'),
                   ("state", 'not in', ['cancel', 'done'])]
-        pickings = request.env["stock.picking"].sudo(LinklovingAppApi.CURRENT_USER()).search(domain)
+        pickings = request.env["stock.picking"].sudo().search(domain)
         # if type == 'able_to': #可处理
         print('length =%d' % len(pickings))
         return self.get_picking_info_by_picking(pickings)
