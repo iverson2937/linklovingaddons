@@ -1,18 +1,1 @@
 jpush ==3.2.4.1
-<xpath expr="//tree" position="attributes"> <attribute name="create">false</attribute> </xpath>
-
-           <!--<div class="col-xs-6">-->
-                                            <!--<a name="%(create_mrp_production)d" type="action">-->
-                                                <!--创建-->
-                                            <!--</a>-->
-                                        <!--</div>-->
-
-
-                    <button name="button_start_produce" class="oe_highlight"
-                            attrs="{'invisible': ['|',('state', '!=', 'already_picking'),('is_outside', '=', True)]}"
-                            type="object" string="开始生产"
-                            groups="linkloving_mrp_extend.group_charge_produce"/>
-                    <button name="button_send_material_to_vendor" class="oe_highlight"
-                            attrs="{'invisible': ['|',('state', '!=', 'already_picking'),('is_outside', '=', False)]}"
-                            type="object" string="发料至供应商"
-                            groups="linkloving_mrp_extend.group_charge_produce"/>
