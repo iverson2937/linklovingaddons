@@ -81,6 +81,16 @@ class JsonResponse(object):
 
 
 class LinklovingAppApi(http.Controller):
+    # 获取数据库列表
+    @http.route('/linkloving_app_api/is_inner_ip', type='http', auth='none', cors='*')
+    def is_inner_ip(self, **kw):
+        print request.httprequest.remote_addr
+        remote_addr = request.httprequest.remote_addr
+        if remote_addr == '112.80.45.130':
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data={'origin_ip': remote_addr}, jsonRequest=False)
+        else:
+            return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={'origin_ip': remote_addr}, jsonRequest=False)
+
     @classmethod
     def CURRENT_USER(cls, force_admin=False):
         if not force_admin:
