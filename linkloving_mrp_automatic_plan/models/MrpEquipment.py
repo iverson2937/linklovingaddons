@@ -186,7 +186,7 @@ class MrpProductionLine(models.Model):
     def get_mo_by_productin_line(self, **kwargs):
         production_line_id = kwargs.get("production_line_id")
         domains = kwargs.get("domains", [])
-
+        order_by_material = kwargs.get("order_by_material", False)
         # planned_date = kwargs.get("planned_date")
         limit = kwargs.get("limit")
         offset = kwargs.get("offset")
@@ -213,7 +213,7 @@ class MrpProductionLine(models.Model):
                                                      order=ORDER_BY,
             fields=FIELDS
             )
-        return mos
+        return self.env["mrp.production"].sorted_mos_by_material(mos, order_by_material)
 
 class HrEmployeeExtend(models.Model):
     _inherit = 'hr.employee'
@@ -358,7 +358,7 @@ class MrpProductionExtend(models.Model):
     def get_planned_mo_by_search(self, **kwargs):
         process_id = kwargs.get("process_id")
         domains = kwargs.get("domains", [])
-
+        order_by_material = kwargs.get("order_by_material", False)
         group_by = kwargs.get("group_by")
         new_domain = expression.AND([domains, [("process_id", "=", process_id),
                                                ("production_line_id", "!=", False),
@@ -367,14 +367,46 @@ class MrpProductionExtend(models.Model):
         groups = self.read_group(domain=new_domain,
                                  fields=FIELDS,
                                  groupby=group_by)
+
         MrpProducion = self.env["mrp.production"]
         groups_dic = {}
         for group in groups:
             domain = group.get("__domain", [])
-            group["mos"] = MrpProducion.search_read(domain, fields=FIELDS, order=ORDER_BY)
+            mos = MrpProducion.search_read(domain, fields=FIELDS, order=ORDER_BY)
+            group["mos"] = self.sorted_mos_by_material(mos, order_by_material)
+
             groups_dic[group.get("production_line_id")[0]] = group
         return groups_dic
 
+    def sorted_mos_by_material(self, mos, order_by_material):
+        if order_by_material:  # 按照物料状态排序
+            def cmp_func(a, b):
+                if a.get("availability") == 'assigned':
+                    a_val = 4
+                elif a.get("availability") == 'partially_available':
+                    a_val = 3
+                elif a.get("availability") == 'waiting':
+                    a_val = 2
+                else:
+                    a_val = 1
+                if b.get("availability") == 'assigned':
+                    b_val = 4
+                elif b.get("availability") == 'partially_available':
+                    b_val = 3
+                elif b.get("availability") == 'waiting':
+                    b_val = 2
+                else:
+                    b_val = 1
+                return b_val - a_val
+                # 'assigned', 'Available'),
+                # ('partially_available', 'Partially Available'),
+                # ('waiting', 'Waiting'),
+
+            mos.sort(cmp_func)
+            new_mos = mos
+        else:
+            new_mos = mos
+        return new_mos
 
     def get_today_time(self, is_current_time=False, day_offset=0):
         now_time = fields.datetime.now(pytz.timezone(self.env.user.tz)) + relativedelta(days=day_offset)
