@@ -443,9 +443,10 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 // $(".bootstrap-datetimepicker-widget").attr('id','a_p_date');
                 if(node[0].className == 'a_p_latest_time'){
                     new Model("mrp.production")
-                    .call("write", [[parseInt($(node).parents('.ap_item_wrap').attr('data-mo-id'))], {'planned_start_backup':  myself.chose_date}])
+                        .call("change_backup_time", [[parseInt($(node).parents('.ap_item_wrap').attr('data-mo-id'))]], {'planned_start_backup': myself.chose_date})
                     .then(function (result) {
-                        console.log(result)
+
+                        self.render_one_production_line($(node).parents('.production_lists_wrap').prev(".production_line").find(".a_p_showorhide"), result.mos)
                     })
 
                     return
@@ -476,7 +477,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                     self.datewidget.set_datetime_default();
                 }
 
-                self.datewidget.commit_value();
+                //self.datewidget.commit_value();
             });
         },
         init: function (parent, action) {
