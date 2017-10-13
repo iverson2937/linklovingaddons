@@ -182,12 +182,9 @@ class ReviewProcessLine(models.Model):
             prompt_type = '待您审核-'
 
         if review_type == 'picking_review':
-            # body_data = body_data + prompt_type + str('流水号') + '，领料原因:' + str(
-            #     '领料原因') + '，申请人:' + '还没人' + ' , 备注：' + (
-            #                 remark if remark else '') + '<hr />'
             body_data = '【 工程领料 】' + prompt_type + str(material_requests_id.name) + '，领料原因:' + str(
                 material_requests_id.picking_cause) + '，申请人:' + str(
-                material_requests_id.my_create_uid.nema) + ' , 备注：' + (
+                material_requests_id.my_create_uid.display_name) + ' , 备注：' + (
                             remark if remark else '')
         elif review_type == 'bom_review':
             body_data = '【 BOM 】' + prompt_type + '产品:' + str(
@@ -207,7 +204,7 @@ class ReviewProcessLine(models.Model):
 
         body_data = self.make_body_data(remark, submit_type, material_requests_id)
 
-        chat_category = self.env['ir.module.category'].sudo().search([('name', '=', '采购')])  # 根据部门名称 查出类别
+        chat_category = self.env.ref('base.module_category_purchase_management')  # 根据部门名称 查出类别
 
         chat_group = self.env['res.groups'].search([('category_id', '=', chat_category.id)])  # 根据类别 查出所在的群组
 
@@ -244,7 +241,8 @@ class ReviewProcessLine(models.Model):
                                    message_type='comment',
                                    subtype='mail.mt_comment',
                                    parent_id=False, attachments=None,
-                                   content_subtype='html', **{'author_id': self.env.user.partner_id.id, 'project': True})
+                                   content_subtype='html',
+                                   **{'author_id': self.env.user.partner_id.id, 'project': True})
 
     def send_chat_msg(self, partner_id, remark, submit_type, material_requests_id):
         chat_channel = self.env['mail.channel'].sudo()
@@ -260,7 +258,8 @@ class ReviewProcessLine(models.Model):
                                               message_type='comment',
                                               subtype='mail.mt_comment',
                                               parent_id=False, attachments=None,
-                                              content_subtype='html', **{'author_id': self.env.user.partner_id.id, 'project': True})
+                                              content_subtype='html',
+                                              **{'author_id': self.env.user.partner_id.id, 'project': True})
 
         else:
             chat_vals = {"channel_type": "chat", "name": self.env.user.name + u"," + partner_id.name,
@@ -274,7 +273,8 @@ class ReviewProcessLine(models.Model):
                                    message_type='comment',
                                    subtype='mail.mt_comment',
                                    parent_id=False, attachments=None,
-                                   content_subtype='html', **{'author_id': self.env.user.partner_id.id, 'project': True})
+                                   content_subtype='html',
+                                   **{'author_id': self.env.user.partner_id.id, 'project': True})
 
     # 审核通过
     def action_pass(self, remark, material_requests_id):

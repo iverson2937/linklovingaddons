@@ -393,12 +393,8 @@ class ChannelCrm(models.Model):
     @api.returns('self', lambda value: value.id)
     def message_post(self, body='', subject=None, message_type='notification', subtype=None, parent_id=False,
                      attachments=None, content_subtype='html', **kwargs):
-        print kwargs.get('author_id')
-        # if len(self) <= 0:
-        #     # self = self.env['mail.channel'].browse(7)
-        #     self = self.env['mail.channel'].search([('name', '=', '公海通知')])
-
-        if not kwargs.get('project'):
+        # print kwargs.get('author_id')
+        if (not kwargs.get('project')) and self.channel_type == 'chat':
             body = '【 聊天 】' + body
 
         return super(ChannelCrm, self).message_post(body, subject, message_type, subtype, parent_id, attachments,
