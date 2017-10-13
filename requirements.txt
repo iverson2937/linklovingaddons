@@ -5,10 +5,12 @@ jpush ==3.2.4.1
 
 1   [Ubuntu安装需求]
 
-        1   sudo apt-get install chromium-browser
-            sudo apt-get install xvfb
+        1   sudo dpkg -i chrome64_59.0.3071.86.deb       (网址下载的文件名自己修改)
+                            https://www.slimjet.com/chrome/download-chrome.php?file=lnx%2Fchrome64_59.0.3071.86.deb
 
-        2   chromedriver_linux64.zip    http://chromedriver.storage.googleapis.com/2.32/chromedriver_linux64.zip
+        2    sudo apt-get install xvfb
+
+        3   chromedriver_linux64.zip    http://chromedriver.storage.googleapis.com/2.32/chromedriver_linux64.zip
             放入到PATH环境中  (注意解压)
 
 
