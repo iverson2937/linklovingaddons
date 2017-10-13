@@ -88,11 +88,11 @@ class LinklovingAppApi(http.Controller):
         remote_addr = env.get("X-Real-IP")
         if remote_addr == '112.80.45.130':
             return JsonResponse.send_response(STATUS_CODE_OK, res_data={'origin_ip': remote_addr,
-                                                                        'header': request.httprequest.headers},
+                                                                        'header': request.httprequest.headers.environ},
                                               jsonRequest=False)
         else:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={'origin_ip': remote_addr,
-                                                                           'header': request.httprequest.headers},
+                                                                           'header': request.httprequest.headers.environ},
                                               jsonRequest=False)
 
     @classmethod
