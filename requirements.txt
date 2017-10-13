@@ -17,8 +17,8 @@ jpush ==3.2.4.1
         1   chromedriver_win32.zip      http://chromedriver.storage.googleapis.com/2.32/chromedriver_win32.zip
             放入到PATH环境中  (注意解压)
 
-        2   由于在windows中做测试使用,需要将 ./linklovingaddons/linkloving_sale_order_import/models 中fetch_*.py中
-            两行内容隐藏
+        2   由于在windows中做测试使用,需要将 ./linklovingaddons/linkloving_sale_order_import/models 文件中fetch_*.py
+            源码两行内容隐藏
 
                 #display = Display(visible=0, size=(1366, 768))
                 #display.start()
