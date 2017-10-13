@@ -48,6 +48,23 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             'click .to_schedule_report_btn': 'to_schedule_report',
             'click .product_report_btn': 'product_report',
             'click .so_report_btn': 'so_report',
+            'click .order_by_material': 'order_by_material',
+            'click .order_by_default': 'order_by_material',
+        },
+        order_by_material: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            console.log(target);
+            if ($(target).hasClass("order_by_material")) {
+                myself.order_by_material = true;
+                $(target).hide();
+                $(".order_by_default").show();
+            }
+            else {
+                myself.order_by_material = false;
+                $(".order_by_default").hide();
+                $(target).show();
+            }
         },
         product_report: function (e) {
             var action = {
@@ -227,6 +244,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         offset: 0,
                         planned_date: myself.chose_date,
                         domains: myself.left_domain,
+                        order_by_material: myself.order_by_material,
                     })
                     .then(function (result) {
                         console.log(result);
@@ -675,7 +693,8 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 .call("get_planned_mo_by_search", [[]], {
                         process_id: self.process_id,
                         domains: self.left_domain,
-                        group_by: self.group_by
+                    group_by: self.group_by,
+                    order_by_material: myself.order_by_material,
                     }
                 )
                 .then(function (result) {
@@ -693,8 +712,6 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         else {
                             myself.render_one_production_line(this, {})
                         }
-
-
                     })
                     //myself.mydataset.mo = result.result;
                     //$("#a_p_right .a_p_right_head").nextAll().remove();
