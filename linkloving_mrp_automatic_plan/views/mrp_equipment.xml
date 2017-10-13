@@ -108,20 +108,25 @@
                     <sheet>
                         <group>
                             <group>
+                                <field name="produce_speed_factor"
+                                       invisible="1"/>
                                 <field name="name"/>
                                 <field name="process_id"/>
                                 <field name="employee_id"/>
                                 <field name="sequence"/>
+                                <field name="amount_of_members"
+                                       attrs="{'invisible': [('produce_speed_factor','!=','human')]}"/>
                             </group>
 
                         </group>
                         <notebook>
                             <page string="设备">
-                                <field name="equipment_ids" context="{'default_production_line_id': active_id}"/>
+                                <field name="equipment_ids"
+                                       context="{'default_production_line_id': active_id}"/>
                             </page>
-                            <page string="人员">
-                                <field name="line_employee_ids" widget="many2many"/>
-                            </page>
+                            <!--<page string="人员">-->
+                                <!--<field name="line_employee_ids" widget="many2many"/>-->
+                            <!--</page>-->
                         </notebook>
                     </sheet>
                 </form>
