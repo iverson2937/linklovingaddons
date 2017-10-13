@@ -85,11 +85,15 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/is_inner_ip', type='http', auth='none', cors='*')
     def is_inner_ip(self, **kw):
         env = request.httprequest.headers.environ
-        remote_addr = env.get("X-Forwarded-For")
+        remote_addr = env.get("X-Real-IP")
         if remote_addr == '112.80.45.130':
-            return JsonResponse.send_response(STATUS_CODE_OK, res_data={'origin_ip': remote_addr}, jsonRequest=False)
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data={'origin_ip': remote_addr,
+                                                                        'header': request.httprequest.headers},
+                                              jsonRequest=False)
         else:
-            return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={'origin_ip': remote_addr}, jsonRequest=False)
+            return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={'origin_ip': remote_addr,
+                                                                           'header': request.httprequest.headers},
+                                              jsonRequest=False)
 
     @classmethod
     def CURRENT_USER(cls, force_admin=False):
