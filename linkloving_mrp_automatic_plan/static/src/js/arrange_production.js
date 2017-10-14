@@ -48,23 +48,25 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             'click .to_schedule_report_btn': 'to_schedule_report',
             'click .product_report_btn': 'product_report',
             'click .so_report_btn': 'so_report',
-            'click .order_by_material': 'order_by_material',
-            'click .order_by_default': 'order_by_material',
+            'click .order_by_material': 'order_by_material_1',
+            'click .order_by_default': 'order_by_material_1',
         },
-        order_by_material: function (e) {
+        order_by_material_1: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             console.log(target);
-            if ($(target).hasClass("order_by_material")) {
+            if ($(target).hasClass("order_by_material")) {//物料排序
                 myself.order_by_material = true;
                 $(target).hide();
                 $(".order_by_default").show();
             }
-            else {
+            else {//时间排序
                 myself.order_by_material = false;
-                $(".order_by_default").hide();
-                $(target).show();
+                $(target).hide();
+                $(".order_by_material").show();
             }
+            myself.arrangeed_searched();
+
         },
         product_report: function (e) {
             var action = {
@@ -622,7 +624,6 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             }).done(function (results) {
                 own.offset = 1;
                 own.left_domain = results.domain;
-                own.group_by = ["production_line_id"]
                 own.arrangeed_searched()
             })
         },
@@ -746,7 +747,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             self.update_control_panel(cp_status);
 
             myself = this;
-
+            myself.group_by = ["production_line_id"]
             myself.mydataset = {};
             framework.blockUI();
 
