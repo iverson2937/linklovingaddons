@@ -93,7 +93,7 @@
                   action="action_see_mrp_report"
                   name="MRP运算报告"
                   parent="stock.menu_warehouse_report"
-                  sequence="0"
-                  groups="base.group_no_one"/>
+                  sequence="1"
+                  groups="base.group_user"/>
     </data>
 </openerp>
