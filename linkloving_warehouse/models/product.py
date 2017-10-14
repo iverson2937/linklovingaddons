@@ -82,21 +82,20 @@ class ProductTemplate(models.Model):
     last2_month_qty = fields.Float(string=u'最近3个月销量')
     last3_month_qty = fields.Float(string=u'最近6个月销量')
     status = fields.Selection([
-        ('eol','已停产'),
+        ('eol', '已停产'),
         ('normal', '正常')
-    ],track_visibility='onchange')
+    ], track_visibility='onchange')
 
     # pack_rate = fields.Float(string=u'装箱率')
     @api.multi
     def set_to_eol(self):
         for r in self:
-            print 'ddddddddddddd'
-            r.status='eol'
-            r.active=False
+            r.status = 'eol'
+
     @api.multi
     def cancel_eol(self):
         for r in self:
-            r.status='normal'
+            r.status = 'normal'
             r.active = True
 
     @api.multi
