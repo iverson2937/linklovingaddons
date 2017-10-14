@@ -148,6 +148,13 @@ class linkloving_procurement_order_extend(models.Model):
         orderpoints_noprefetch = OrderPoint.with_context(prefetch_fields=False).search(
             company_id and [('company_id', '=', company_id)] or [],
             order=self._procurement_from_orderpoint_get_order())
+        new_mrp_report = self.env["mrp.report"]
+        exception_happend = False
+        if len(orderpoints_noprefetch) != 0:
+            new_mrp_report = new_mrp_report.create({
+                'total_orderpoint_count': len(orderpoints_noprefetch),
+            })
+            report_line_obj = self.env["mrp.report.product.line"]
         while orderpoints_noprefetch:
             orderpoints = OrderPoint.browse(orderpoints_noprefetch[:1000].ids)
             orderpoints_noprefetch = orderpoints_noprefetch[1000:]
@@ -206,7 +213,14 @@ class linkloving_procurement_order_extend(models.Model):
                                 if use_new_cursor:
                                     cr.commit()
                             orderpoint.active = False  # 运算完补货规则之后,将补货规则设置成无效
+                            if new_mrp_report:
+                                report_line_obj.create(new_mrp_report.prepare_report_line_val(new_procurement,
+                                                                                              report_id=new_mrp_report,
+                                                                                              orderpoint_id=orderpoint,
+                                                                                              order_qty=qty_rounded))
+                                new_mrp_report.report_end_time = fields.Datetime.now()  # 刷新最后记录时间
                         except OperationalError:
+                            exception_happend = True
                             if use_new_cursor:
                                 orderpoints_noprefetch += orderpoint.id
                                 cr.rollback()
@@ -224,6 +238,7 @@ class linkloving_procurement_order_extend(models.Model):
                 if use_new_cursor:
                     cr.commit()
             except OperationalError:
+                exception_happend = True
                 if use_new_cursor:
                     cr.rollback()
                     continue
@@ -232,7 +247,8 @@ class linkloving_procurement_order_extend(models.Model):
 
             if use_new_cursor:
                 cr.commit()
-
+        if new_mrp_report and not exception_happend:
+            new_mrp_report.state = 'done'
         if use_new_cursor:
             cr.commit()
             cr.close()
