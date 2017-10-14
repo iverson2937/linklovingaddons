@@ -81,8 +81,23 @@ class ProductTemplate(models.Model):
     last1_month_qty = fields.Float(string=u'最近1个月销量')
     last2_month_qty = fields.Float(string=u'最近3个月销量')
     last3_month_qty = fields.Float(string=u'最近6个月销量')
+    status = fields.Selection([
+        ('eol','已停产'),
+        ('normal', '正常')
+    ],track_visibility='onchange')
 
     # pack_rate = fields.Float(string=u'装箱率')
+    @api.multi
+    def set_to_eol(self):
+        for r in self:
+            print 'ddddddddddddd'
+            r.status='eol'
+            r.active=False
+    @api.multi
+    def cancel_eol(self):
+        for r in self:
+            r.status='normal'
+            r.active = True
 
     @api.multi
     def view_product_id(self):
@@ -143,11 +158,11 @@ class ProductTemplate(models.Model):
     def _compute_nbr_reordering_rules(self):
         res = {k: {'nbr_reordering_rules': 0, 'reordering_min_qty': 0, 'reordering_max_qty': 0} for k in self.ids}
         product_data = self.env['stock.warehouse.orderpoint'].read_group(
-                [
-                    ('product_id.product_tmpl_id', 'in', self.ids),
-                    ('active', '!=', None)
-                ],
-                ['product_id', 'product_min_qty', 'product_max_qty'],
+            [
+                ('product_id.product_tmpl_id', 'in', self.ids),
+                ('active', '!=', None)
+            ],
+            ['product_id', 'product_min_qty', 'product_max_qty'],
             ['product_id'])
         for data in product_data:
             product = self.env['product.product'].browse([data['product_id'][0]])

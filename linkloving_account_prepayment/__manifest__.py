@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "linkloving_sale_order_import",
+    'name': "linkloving_account_prepayment",
 
     'summary': """
         Short (1 phrase/line) summary of the module's purpose, used as
@@ -14,17 +14,16 @@
     'website': "http://www.yourcompany.com",
 
     # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml
+    # Check https://github.com/odoo/odoo/blob/master/odoo/addons/base/module/module_data.xml
     # for the full list
     'category': 'Uncategorized',
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'sale', 'linkloving_eb', 'hr_expense'],
+    'depends': ['base', 'linkloving_account'],
 
     # always loaded
     'data': [
-        # 'data/sale_team.xml',
         # 'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',

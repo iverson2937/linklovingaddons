@@ -8,6 +8,11 @@ import datetime
 from odoo import models, fields, api
 from selenium import webdriver
 import time
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
 
 driver = webdriver.Chrome()
 driver.maximize_window()
@@ -17,6 +22,159 @@ class ImportSaleOrderSetting(models.Model):
     _name = 'import.sale.order.setting'
     login_url = fields.Char(string=u'登录地址')
     common_url = fields.Char(string=u'访问地址')
+    partner_id = fields.Many2one('res.partner', string=u'客户名称')
+    username = fields.Char(string=u'用户名')
+    password = fields.Char(string=u'密码')
+    retail_type = fields.Selection([
+        ('tb', u'淘宝'),
+        ('jd', u'京东'),
+    ])
+
+    def _login_name(self):
+        try:
+            # driver.find_element_by_xpath('//*[@id="loginname"]').click()
+            time.sleep(3)
+            driver.find_element_by_xpath('//*[@id="loginname"]').clear()
+            # driver.find_element_by_xpath('//*[@id="TPL_username_1"]').send_keys(u'若态旗舰店')
+            driver.find_element_by_xpath('//*[@id="loginname"]').send_keys(self.username)
+            print 'user success!'
+        except:
+            print 'user error!'
+        time.sleep(3)
+
+    def _login_password(self):
+        # sign in the pasword
+        try:
+            driver.find_element_by_xpath('//*[@id="nloginpwd"]').clear()
+            # driver.find_element_by_xpath('//*[@id="TPL_password_1"]').send_keys('szrtkjqjd@123!!')
+            driver.find_element_by_xpath('//*[@id="nloginpwd"]').send_keys(self.password)
+            print 'pw success!'
+        except:
+            print 'pw error!'
+        time.sleep(3)
+
+    def _click_and_login(self):
+        # click to login
+        try:
+            driver.find_element_by_xpath('//*[@id="paipaiLoginSubmit"]').click()
+            print 'click success!'
+        except:
+            print 'click error!'
+        time.sleep(3)
+
+    @staticmethod
+    def _verify_span_slider():
+        try:
+            span_slider = driver.find_element_by_xpath('//*[@id="nc_1_n1z"]')
+            ActionChains(driver).drag_and_drop_by_offset(span_slider, 258, 0).perform()
+            time.sleep(3)
+            print u'滑块运行成功!'
+        except:
+            print u'滑块运行失败!'
+        time.sleep(3)
+
+    # 京东登录
+
+    def jdlogin(self):
+        # open the login in page
+        driver.get(self.loginurl)
+        try:
+            driver.find_element_by_xpath('//*[@id="account-login"]').click()
+        except:
+            print u'京东登录界面出现改版,需要把用户登陆界面切换出来'
+        time.sleep(3)
+        # sign in the username
+
+        # 由于京东中使用frame来再次加载一个网页，所以，在选择元素的时候会出现选择不到的结果，所以，我们需要把视图窗口切换到frame中
+        driver.switch_to.frame(u'loginFrame')
+
+        self._login_name()
+        self._login_password()
+        self._click_and_login()
+
+        curpage_url = driver.current_url
+        print 'currpage_url ' + curpage_url
+
+        while (curpage_url == self.loginurl):
+            # print 'please input the verify code:'
+            print '京东登录中的滑块验证已经出现需要去做验证:'
+            self._login_name()
+            self._login_password()
+            self._click_and_login()
+            self._verify_span_slider()
+
+            curpage_url = driver.current_url
+
+    def get_all_infomations_from_jd(self):
+        driver.get(jingdong_url)
+        time.sleep(5)
+
+        total_pages_list = []
+
+        def process_items(is_first, total_pages_list=None):
+            if is_first:
+                # 对于第一次打开网页的时候,会出现操作教程,这个界面我们只需要第一次去处理即可
+                try:
+                    driver.find_element_by_xpath('/html/body/div[7]/div/div[4]/a').click()
+                    time.sleep(3)
+                    driver.find_element_by_xpath('/html/body/div[3]/div[2]/div[3]/ul/li[1]/a').click()
+                    time.sleep(3)
+
+                except:
+                    print u'可能在某些时候京东会去除这些演示教程,所以需要进行异常处理机制'
+
+                # 也是在第一次的时候，处理搜索的范围 接下来的操作在于是通过获取所需求的30天之内数据
+                limit_scrapy_data_in_days()
+
+                # 在页面的底层，京东有完整的页码，方便我们对总的页数进行处理分析的过程!!!
+                tmp = driver.find_element_by_xpath('//div[@class="pagin fr"]/span[2]').text.strip()
+                # res_str = ur'共(\d+)页'
+                res_str = r'%s(\d+)%s' % (u'共', u'页')
+                total_pages = re.match(res_str, tmp).groups()[0]
+                print u'总共的页码数是 %s' % total_pages
+
+                # 千万要记得,要把内容转换为整形数值.
+                total_pages_list.append(int(total_pages))
+
+            # time.sleep(3)
+
+
+            # 注意,最后一个并没有我们要求的数据，所以，我们把该数据去除掉
+            order_lists = driver.find_elements_by_xpath('//tr[@class="head"]')[:-1]
+
+            for order_list in order_lists:
+                print order_list.text
+                # 获得隐藏属性值中的订单号来对数据进行操作
+                order_number = order_list.find_element_by_xpath('./td/input').get_attribute('value').strip()
+                print u'order_number is %s' % order_number
+
+                # 这个地方先把各个的订单号拿到手，最后再去做各个的汇总操作
+                order_detail[order_number] = ''
+                # processOrderDetail(order_number)
+
+        def click_next_page(page_num):
+            # 由于京东在做下一页的这种设计的时候，基于自定义操作的步骤，所以对于在下一页的的这个按钮在其他表中是看不到的，所以使用
+            # 这种方法在解决问题
+            print u'正在处理当前的页码是%s' % page
+            driver.find_element_by_xpath('//input[@name="toPage"]').send_keys(page_num)
+            driver.find_element_by_xpath(
+                '/html/body/div[2]/div/div[3]/div[1]/div/div/div[2]/div[3]/div/em/input[2]').click()
+
+        # 对于第一次打开网页,我们特殊做一次处理,网页中有一些关于初学者的指南的学习步骤,会影响爬虫的爬去工作
+        process_items(True, total_pages_list)
+
+        page = 2
+        total_pages = total_pages_list[0]
+        while page <= total_pages:
+            try:
+                click_next_page(page)
+                # time.sleep(3)
+                process_items(False)
+            except Exception:
+                # 如果到了最后一页,我们就完成这次的处理需求
+                break
+
+            page += 1
 
     @api.multi
     def login(self):

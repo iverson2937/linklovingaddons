@@ -44,6 +44,10 @@
                 <span style="font-size:15px;margin-left:15px;font-weight:bold;">已排产</span>
                 <div class="a_p_time_start"></div>
                 <div class="a_p_time_end search_view"></div>
+                <div class="order_by">
+                    <button class="btn btn-primary order_by_material">根据物料排序</button>
+                    <button class="btn btn-primary order_by_default" style="display:none;">根据时间排序</button>
+                </div>
             </div>
             <t t-foreach="result" t-as="item">
                 <div class="production_line" t-att-data-index="item_index">

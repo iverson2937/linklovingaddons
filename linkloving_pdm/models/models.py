@@ -348,12 +348,8 @@ class ReviewProcessLine(models.Model):
                                            material_requests_id, bom_id)
                 else:
                     self.send_all_msg(remark, 'pass', material_requests_id, bom_id)
-
-            elif review_type == 'bom_review':
-                self.send_chat_msg(bom_id.create_uid.partner_id, remark, 'pass',
-                                   material_requests_id, bom_id)
-            elif review_type == 'picking_review':
-                self.send_chat_msg(material_requests_id.my_create_uid.partner_id, remark, 'pass',
+            else:
+                self.send_chat_msg(self.review_id.product_line_ids.create_uid.partner_id, remark, 'pass',
                                    material_requests_id, bom_id)
 
 
