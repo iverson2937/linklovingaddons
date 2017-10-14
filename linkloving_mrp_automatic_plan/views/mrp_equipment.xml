@@ -7,10 +7,6 @@
             <field name="model">mrp.process</field>
             <field name="inherit_id" ref="linkloving_process.mrp_process_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='hour_price']" position="after">
-                    <field name="produce_speed_factor"/>
-                    <field name="theory_factor"/>
-                </xpath>
 
                 <xpath expr="//group" position="after">
                     <!-- Add your fields or attributes here -->
@@ -108,14 +104,10 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name="produce_speed_factor"
-                                       invisible="1"/>
                                 <field name="name"/>
                                 <field name="process_id"/>
                                 <field name="employee_id"/>
                                 <field name="sequence"/>
-                                <field name="amount_of_members"
-                                       attrs="{'invisible': [('produce_speed_factor','!=','human')]}"/>
                             </group>
 
                         </group>
@@ -183,6 +175,19 @@
         <!--action="test_pc_action"-->
         <!--parent="mrp.menu_mrp_manufacturing"-->
         <!--sequence="13"/>-->
+        <!-- Inherit Form View to Modify it -->
+        <record id="mrp_bom_from_view_inherit" model="ir.ui.view">
+            <field name="name">mrp.bom.form.inherit</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+            <field name="arch" type="xml">
 
+                <xpath expr="//field[@name='prepare_time']" position="after">
+                    <field name="produce_speed_factor"/>
+                    <field name="theory_factor"/>
+                </xpath>
+
+            </field>
+        </record>
     </data>
 </openerp>

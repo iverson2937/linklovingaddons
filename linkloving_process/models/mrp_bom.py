@@ -17,7 +17,7 @@ class MrpBom(models.Model):
     ], default='unit')
     cycle_time = fields.Integer(string=u'Cycle Time')
     cycle_time_time_unit = fields.Many2one('product.uom')
-    produced_spend_per_pcs = fields.Integer(string=u'生产速度 (1个/秒)', default=0, required=True)
+    produced_spend_per_pcs = fields.Integer(string=u'生产速度 (秒/个)', default=0, required=True)
     prepare_time = fields.Integer(string=u"准备时间(秒)", default=0, required=True)
 
     @api.depends('cost', 'hour_price')

@@ -26,10 +26,10 @@ class Inheritforarrangeproduction(models.Model):
             'process_id': self.id
         }
 
-    produce_speed_factor = fields.Selection([('human', u'人数'), ('equipment', u'设备数'), ],
-                                            default='equipment', string=u'生产速度因子', )
-
-    theory_factor = fields.Integer(string=u'理论 人数/设备数', require=True)
+        # produce_speed_factor = fields.Selection([('human', u'人数'), ('equipment', u'设备数'), ],
+        #                                         default='equipment', string=u'生产速度因子', )
+        #
+        # theory_factor = fields.Integer(string=u'理论 人数/设备数', require=True)
 
 ORDER_BY = "planned_start_backup,id desc"
 FIELDS = ["name", "alia_name", "product_tmpl_id", "state", "product_qty",
@@ -58,7 +58,9 @@ class ProcurementOrderExtend(models.Model):
 
         start_time, end_time = self.env["ll.time.util"].compute_mo_start_time(planned_time_with_zone,
                                                                               produced_spend,
-                                                                              equipment_no=self.env["mrp.production.line"].compute_speed_factor(bom.process_id))
+                                                                              equipment_no=self.env[
+                                                                                  "mrp.production.line"].compute_speed_factor(
+                                                                                  bom))
         res.update({'state': 'draft',
                     # 'process_id': bom.process_id.id,
                     # 'unit_price': bom.process_id.unit_price,
@@ -101,16 +103,16 @@ class MrpProductionLine(models.Model):
     _name = 'mrp.production.line'
     _order = 'sequence,name asc'
 
-    def compute_speed_factor(self, process):
+    def compute_speed_factor(self, bom):
         if len(self) == 0:
-            #无产线 去获取工序理论数量
-            if process:
-                return process.theory_factor or 1
+            # 无产线 去获取理论数量
+            if bom:
+                return bom.theory_factor or 1
             else:
                 return 1
         else:
-            if process.produce_speed_factor == 'human':#人为因素
-                return self.amount_of_members
+            if bom.produce_speed_factor == 'human':  # 人为因素
+                return bom.theory_factor
             else:
                 return len(self.equipment_ids)
 
@@ -156,11 +158,6 @@ class MrpProductionLine(models.Model):
                                     inverse_name='production_line_id')
     euiqpment_names = fields.Char(string=u'设备', compute='_compute_euiqpment_names')
     employee_id = fields.Many2one(comodel_name="hr.employee", string=u"产线负责人", required=False, )
-    amount_of_members = fields.Integer(string=u'产线人员数量', default=1, help=u'仅在产线生产速度因子为 人数时 生效')
-    produce_speed_factor = fields.Selection([('human', u'人数'),
-                                             ('equipment', u'设备数'),
-                                             ],
-                                            related='process_id.produce_speed_factor', string=u'生产速度因子', )
 
     line_employee_ids = fields.One2many(comodel_name='hr.employee', inverse_name='production_line_id', string=u'产线人员')
     line_employee_names = fields.Char(string=u'产线人员', compute='_compute_line_employee_names')
@@ -227,6 +224,15 @@ class MrpProcessExtend(models.Model):
 
     work_type_id = fields.Many2one(comodel_name="work.type", string=u"工种", required=False, )
     production_line_ids = fields.One2many(comodel_name='mrp.production.line', inverse_name='process_id', string=u'产线')
+
+
+class MrpBomExtend(models.Model):
+    _inherit = 'mrp.bom'
+
+    produce_speed_factor = fields.Selection([('human', u'人数'), ('equipment', u'设备数'), ],
+                                            default='equipment', string=u'生产速度因子', )
+
+    theory_factor = fields.Integer(string=u'理论 人数/设备数', require=True)
 
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
@@ -574,7 +580,8 @@ class MrpProductionExtend(models.Model):
         start_time, end_time = self.env["ll.time.util"].compute_mo_start_time(next_mo_start_time,
                                                                               mo._compute_produced_spend(),
                                                                               start_or_end="start",
-                                                                              equipment_no=production_line.compute_speed_factor(production_line.process_id))
+                                                                              equipment_no=production_line.compute_speed_factor(
+                                                                                  mo.bom_id))
 
         vals = {
             'date_planned_start': start_time,
