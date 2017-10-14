@@ -301,8 +301,9 @@ class ReviewProcessLine(models.Model):
         body_data = self.make_body_data(remark, submit_type, material_requests_id, bom_id)
 
         channel_list_chat = self.env['mail.channel'].sudo().search(
-            [('channel_partner_ids', '=', [partner_id.id]), ('channel_type', '=', 'chat'),
-             ('channel_partner_ids', '=', [self.env.user.partner_id.id])])
+                [('channel_type', '=', 'chat'),
+                 ('channel_partner_ids', 'in', [partner_id.id, self.env.user.partner_id.id]),
+                 ])
 
         if channel_list_chat:
             channel_list_chat[0].message_post(body=body_data, subject=None,
@@ -349,7 +350,7 @@ class ReviewProcessLine(models.Model):
                 else:
                     self.send_all_msg(remark, 'pass', material_requests_id, bom_id)
             else:
-                self.send_chat_msg(self.review_id.product_line_ids.create_uid.partner_id, remark, 'pass',
+                self.send_chat_msg(self.review_id.create_uid.partner_id, remark, 'pass',
                                    material_requests_id, bom_id)
 
 
