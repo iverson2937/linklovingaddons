@@ -158,7 +158,8 @@
             <field name="arch" type="xml">
                 <field name="pricelist_id" position="after">
 
-                    <filter name="eol" string="已停产" domain="[('status','=','eol'),('active','=',False)]"/>
+                    <filter name="eol1" string="已停产"
+                            domain="['|',('active','=',False),('active','=',True),('status','=','eol')]"/>
                 </field>
             </field>
         </record>

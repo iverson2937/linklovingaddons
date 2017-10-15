@@ -89,8 +89,15 @@ class ProductTemplate(models.Model):
     # pack_rate = fields.Float(string=u'装箱率')
     @api.multi
     def set_to_eol(self):
+        OrderPoint = self.env['stock.warehouse.orderpoint']
         for r in self:
             r.status = 'eol'
+            orderPoints = OrderPoint.search([('product_id.product_tmpl_id', 'in', r.ids)])
+            if orderPoints:
+                orderPoints.write({
+                    'active': False
+                })
+
 
     @api.multi
     def cancel_eol(self):
@@ -125,6 +132,8 @@ class ProductTemplate(models.Model):
     def _set_nbr_reordering_rules(self):
         OrderPoint = self.env['stock.warehouse.orderpoint']
         for product_tmplate in self:
+            if  product_tmplate.status=='eol':
+                raise UserError('已经停产,不能设置订货规则')
             if product_tmplate.reordering_max_qty < product_tmplate.reordering_min_qty:
                 raise UserError(u'最小数量不能大于最大数量')
             if product_tmplate.product_variant_ids:
