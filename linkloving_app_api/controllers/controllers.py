@@ -398,8 +398,11 @@ class LinklovingAppApi(http.Controller):
                             ('process_id', '=', process_id),
                             # ('location_ids', 'in', location_domain)
                             ]
+        domain_all = [('state', 'in', ['waiting_material', 'prepare_material_ing']),
+                      ('process_id', '=', process_id), ]
 
-        order_today = request.env["mrp.production"].sudo(LinklovingAppApi.CURRENT_USER()).read_group(domain, fields=[
+        order_today = request.env["mrp.production"].sudo(LinklovingAppApi.CURRENT_USER()).read_group(domain,
+                                                                                                     fields=[
             "date_planned_start"],
                                                                                                      groupby=[
                                                                                                          "date_planned_start"])
@@ -413,6 +416,11 @@ class LinklovingAppApi(http.Controller):
                                                                                                      groupby=[
                                                                                                          "date_planned_start"])
 
+        order_all = request.env["mrp.production"].sudo(LinklovingAppApi.CURRENT_USER()).read_group(domain_all,
+                                                                                                   fields=[
+                                                                                                       "date_planned_start"],
+                                                                                                   groupby=[
+                                                                                                       "date_planned_start"])
         list = []
 
         def get_count_iter(orders):
@@ -433,6 +441,10 @@ class LinklovingAppApi(http.Controller):
         if order_after:
             list.append({"state": "after",
                          "count": get_count_iter(order_after)})
+        if order_all:
+            list.append({"state": "all",
+                         "count": get_count_iter(order_all)})
+
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=list)
 
     # 多个工序 的订单数量
@@ -534,7 +546,7 @@ class LinklovingAppApi(http.Controller):
                                               '%Y-%m-%d')
         # locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
 
-        if date_to_show != "delay":
+        if date_to_show not in ["delay", "all"]:
             today_time = fields.datetime.strptime(date_to_show, '%Y-%m-%d')
 
         one_millisec_before = datetime.timedelta(milliseconds=1)  #
@@ -548,6 +560,11 @@ class LinklovingAppApi(http.Controller):
         if date_to_show == "delay":
             domain = [('date_planned_start', '<', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
                       ('state', 'in', ['waiting_material', 'prepare_material_ing']),
+                      ('process_id', '=', process_id),
+                      # ('location_ids', 'in', location_domain)
+                      ]
+        elif date_to_show == 'all':
+            domain = [('state', 'in', ['waiting_material', 'prepare_material_ing']),
                       ('process_id', '=', process_id),
                       # ('location_ids', 'in', location_domain)
                       ]
