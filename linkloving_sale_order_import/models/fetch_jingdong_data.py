@@ -14,12 +14,14 @@ import re
 import datetime
 from termcolor import colored
 
+
 '''
     注意:此模块没有做多线程并发问题,所以，强烈建议多进程模式启动!!!
 '''
 
-# display = Display(visible=0, size=(1366, 768))
-# display.start()
+
+#display = Display(visible=0, size=(1366, 768))
+#display.start()
 
 driver = webdriver.Chrome()
 # driver = webdriver.PhantomJS()
@@ -27,7 +29,7 @@ driver = webdriver.Chrome()
 loginurl = 'https://passport.shop.jd.com/login/index.action'
 
 # 让浏览器窗口最大化
-# driver.maximize_window()
+#driver.maximize_window()
 driver.set_window_size(1366, 768)
 
 # 天猫界面中页面做了防爬虫的手段，所以需要使用虚拟浏览器来模拟js定位到制定的位置界面和翻页功能
@@ -38,8 +40,7 @@ buyer_alerady_accetped_url = 'https://order.shop.jd.com/order/sSopUp_yiReceiving
 lock_order_during_url = 'https://order.shop.jd.com/order/sSopUp_lockOrderList.action'
 refund_order_during_url = 'https://order.shop.jd.com/order/sSopUp_refundingList.action'
 
-urls = [waitting_export_url, alerady_export_url, buyer_alerady_accetped_url, lock_order_during_url,
-        refund_order_during_url]
+urls = [waitting_export_url, alerady_export_url, buyer_alerady_accetped_url, lock_order_during_url, refund_order_during_url]
 
 order_detail = {}
 
@@ -67,6 +68,9 @@ def limit_scrapy_data_in_days():
 
     # 输入开始日期
     driver.find_element_by_xpath('//*[@id="createStartDate"]').send_keys(u'%s %s' % (str(prev30_today), '00:00:00'))
+
+
+
 
     # 输入结束时间
     driver.find_element_by_xpath('//*[@id="createEndDate"]').send_keys(u'%s %s' % (str(today), '00:00:00'))
@@ -129,6 +133,7 @@ def login(loginurl, username=None, password=None):
     login_password()
     click_and_login()
 
+
     curpage_url = driver.current_url
     print 'currpage_url ' + curpage_url
 
@@ -158,6 +163,7 @@ def get_all_infomations_from_tiaomao(jingdong_url):
     driver.get(jingdong_url)
     time.sleep(5)
 
+
     total_pages_list = []
 
     def process_items(is_first, total_pages_list=None):
@@ -172,6 +178,7 @@ def get_all_infomations_from_tiaomao(jingdong_url):
             except:
                 print u'可能在某些时候京东会去除这些演示教程,所以需要进行异常处理机制'
 
+
             # 也是在第一次的时候，处理搜索的范围 接下来的操作在于是通过获取所需求的30天之内数据
             limit_scrapy_data_in_days()
 
@@ -184,6 +191,7 @@ def get_all_infomations_from_tiaomao(jingdong_url):
 
             # 千万要记得,要把内容转换为整形数值.
             total_pages_list.append(int(total_pages))
+
 
         # time.sleep(3)
 
@@ -201,13 +209,17 @@ def get_all_infomations_from_tiaomao(jingdong_url):
             order_detail[order_number] = ''
             # processOrderDetail(order_number)
 
+
     def click_next_page(page_num):
         # 由于京东在做下一页的这种设计的时候，基于自定义操作的步骤，所以对于在下一页的的这个按钮在其他表中是看不到的，所以使用
         # 这种方法在解决问题
         print u'正在处理当前的页码是%s' % page
         driver.find_element_by_xpath('//input[@name="toPage"]').send_keys(page_num)
-        driver.find_element_by_xpath(
-            '/html/body/div[2]/div/div[3]/div[1]/div/div/div[2]/div[3]/div/em/input[2]').click()
+        driver.find_element_by_xpath('/html/body/div[2]/div/div[3]/div[1]/div/div/div[2]/div[3]/div/em/input[2]').click()
+
+
+
+
 
     # 对于第一次打开网页,我们特殊做一次处理,网页中有一些关于初学者的指南的学习步骤,会影响爬虫的爬去工作
     process_items(True, total_pages_list)
@@ -226,6 +238,7 @@ def get_all_infomations_from_tiaomao(jingdong_url):
         page += 1
 
 
+
 # 在process_items函数中,把获得的数据保存下来,放入到redis中,使用redis的键值对技术
 # 注意这里面存储的key是字符串
 def save_to_redis(order_key, order_value):
@@ -236,13 +249,14 @@ def save_to_redis(order_key, order_value):
     print '把数据存储到redis中' + '*' * 30
 
 
+
 # 处理订单详情界面信息
 def processOrderDetail(orderId):
     # 该url所要做的事情在于是获取详细的订单的详情
     order_url = 'https://neworder.shop.jd.com/order/orderDetail?orderId=%s' % orderId
     driver.get(order_url)
 
-    sku_numbers_info = driver.find_elements_by_xpath('/html/body/div[1]/div[5]/table/tbody')
+    sku_numbers_info = driver.find_elements_by_xpath('/html/body/div[1]/div[5]/table/tbody/tr')
     print colored('*', 'red') * 50 + u'订单的结构' + colored('*', 'red') * 50
     order_detail[orderId] = {}
 
@@ -270,32 +284,36 @@ def processOrderDetail(orderId):
     order_detail[orderId][u'coupon_price'] = coupon_price
 
     order_detail[orderId][u'actual_payment'] = actual_payment
-
-    print u'下单时间:%s\t付款时间:%s\t完成时间:%s\t订单状态:%s\t商品总额:%s\t运费总额:%s\t促销优惠:%s\t优惠券:%s\t应支付金额:%s' % (
-        order_time, payment_time, finish_time, order_status, amount_price, total_freight, total_sales_promotion,
-        coupon_price,
+    order_detail[orderId][u'smalloder'] = []
+    print u'订单编号为: %s' % orderId
+    print u'下单时间:%s\t付款时间:%s\t完成时间:%s\t订单状态:%s\t商品总额:%s\t运费总额:%s\t促销优惠:%s\t优惠券:%s\t应支付金额:%s' %(
+        order_time, payment_time, finish_time, order_status, amount_price, total_freight, total_sales_promotion, coupon_price,
         actual_payment
-    )
+        )
+
+    print u'小订单的个数为%s' % len(sku_numbers_info)
 
     for sku_number_info in sku_numbers_info:
-        jingdong_sku_number = sku_number_info.find_element_by_xpath('./tr/td[1]').text.strip()
+        jingdong_sku_number = sku_number_info.find_element_by_xpath('./td[1]').text.strip()
         # 京东的sku商品编号
         # order_detail[orderId][u'商品编号'] = sku_number
         # order_detail[orderId][jingdong_sku_number] = {}
-        entity_item_price = sku_number_info.find_element_by_xpath('./tr/td[3]').text.strip()
-        entity_discount_amount = sku_number_info.find_element_by_xpath('./tr/td[4]').text.strip()
-        entity_item_count = sku_number_info.find_element_by_xpath('./tr/td[7]').text.strip()
-        entity_item_code_temp = sku_number_info.find_element_by_xpath('./tr/td[2]/a').text.strip()
+        entity_item_price = sku_number_info.find_element_by_xpath('./td[3]').text.replace(u'￥', '').strip()
+        entity_discount_amount = sku_number_info.find_element_by_xpath('./td[4]').text.strip()
+        entity_item_count = sku_number_info.find_element_by_xpath('./td[7]').text.strip()
+        entity_item_code_temp = sku_number_info.find_element_by_xpath('./td[2]/a').text.strip()
         print u'商品总称为:%s' % entity_item_code_temp
         # entity_item_code = ' '.join(entity_item_code_temp.strip().split(' ')[2:])
         entity_item_code = processJingDongSkuToJiongDongItemCode(orderId, jingdong_sku_number, entity_item_code_temp)
-        order_detail[orderId][u'entity_item_code'] = entity_item_code
-        order_detail[orderId][u'entity_item_price'] = entity_item_price
-        order_detail[orderId][u'entity_discount_amount'] = entity_discount_amount
-        order_detail[orderId][u'entity_item_count'] = entity_item_count
-        print colored('*', 'green') * 40 + u'小订单的结构' + colored('*', 'green') * 40
-        print u'商家编码:%s\t商品价格:%s\t优惠金额:%s\t商品数量:%s' % (
-        entity_item_code, entity_item_price, entity_discount_amount, entity_item_count)
+        smallorder = {}
+        smallorder[u'entity_item_code'] = entity_item_code
+        smallorder[u'entity_item_price'] = entity_item_price
+        smallorder[u'entity_discount_amount'] = entity_discount_amount
+        smallorder[u'entity_item_count'] = entity_item_count
+        order_detail[orderId][u'smalloder'].append(smallorder)
+
+        print colored('*', 'blue') * 40 + u'小订单的结构' + colored('*', 'green') * 40
+        print u'商家编码:%s\t商品价格:%s\t优惠金额:%s\t商品数量:%s' %(entity_item_code, entity_item_price, entity_discount_amount, entity_item_count)
         # processJingDongSkuToJiongDongItemCode(orderId,jingdong_sku_number)
 
 
@@ -303,10 +321,11 @@ def processOrderDetail(orderId):
 # 就该去下架的产品中寻找数据
 def processJingDongSkuToJiongDongItemCode(orderId, sku_number, total_title,
                                           onSale_url='https://ware.shop.jd.com/onSaleWare/onSaleWare_newDoSearch.action',
-                                          recurison_depth=1
+                                          recurison_depth = 1
                                           ):
     if recurison_depth > 2:
         return
+
 
     # 搜索要找的商品编码
     JS_Script = 'window.open("http://www.baidu.com");'
@@ -317,8 +336,8 @@ def processJingDongSkuToJiongDongItemCode(orderId, sku_number, total_title,
 
     try:
         element = WebDriverWait(driver, 30).until(
-            EC.presence_of_element_located(
-                (By.ID, 'skuId'))
+                EC.presence_of_element_located(
+                        (By.ID, 'skuId'))
         )
         # prefix = driver.find_element_by_xpath('//*[@id="addWareVO.title"]').get_attribute('value').strip()
         element.send_keys(sku_number)
@@ -336,6 +355,7 @@ def processJingDongSkuToJiongDongItemCode(orderId, sku_number, total_title,
 
     time.sleep(5)
 
+
     try:
         tmp = driver.find_element_by_xpath('//*[@id="tbl_type2"]/tbody/tr/td[2]/div[1]/div').text.strip()
     except:
@@ -348,12 +368,12 @@ def processJingDongSkuToJiongDongItemCode(orderId, sku_number, total_title,
         driver.switch_to.window(driver.window_handles[-1])
         # 在这种情况下,我们更换一下要访问的url列表,这个列表的作用就是在已下架的模块中寻找所需的产品是否存在!!!
 
-        return processJingDongSkuToJiongDongItemCode(orderId, sku_number, total_title,
-                                                     'https://ware.shop.jd.com/forSaleWare/forSaleWare_newDoSearch.action',
-                                                     recurison_depth + 1
-                                                     )
+        return processJingDongSkuToJiongDongItemCode(orderId, sku_number, total_title, 'https://ware.shop.jd.com/forSaleWare/forSaleWare_newDoSearch.action',
+                                              recurison_depth + 1
+                                              )
 
     regular_str = ur'商品编码:(\d+)'
+
 
     JingDongItemCode = re.match(regular_str, tmp).groups()[0]
 
@@ -374,14 +394,15 @@ def processJingDongSkuToJiongDongItemCode(orderId, sku_number, total_title,
         driver.get(JingDongItem_url)
         try:
             element = WebDriverWait(driver, 30).until(
-                EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="nav-0"]/div/ul/li[2]/div[2]/div/div/div/div[1]/div/input'))
+                    EC.presence_of_element_located((By.XPATH, '//*[@id="nav-0"]/div/ul/li[2]/div[2]/div/div/div/div[1]/div/input'))
             )
             # prefix = driver.find_element_by_xpath('//*[@id="addWareVO.title"]').get_attribute('value').strip()
             prefix = element.get_attribute('value').strip()
         except:
-            print u'京东在sku列表在异步加载的过程中可能时间上达不到所期望的要求!!!'
+	    print u'京东在sku列表在异步加载的过程中可能时间上达不到所期望的要求!!!'
             prefix = ''
+
+
 
         print u'prefix: %s' % prefix
 
@@ -404,6 +425,7 @@ def processJingDongSkuToJiongDongItemCode(orderId, sku_number, total_title,
         return code
 
     code = process_JingDongItemCode(JingDongItemCode)
+
 
     # driver.switch_to.window(driver.window_handles[-1])
     driver.close()
@@ -457,6 +479,8 @@ def setup(username, password):
         time.sleep(1)
         save_to_redis(order_number, order_detail[order_number])
 
+
+
     time.sleep(10)
     # driver.quit()
     close_redis(redis_list)
@@ -469,7 +493,7 @@ if __name__ == '__main__':
     print '__name__ is %s' % __name__
     print '__file__ is %s' % __file__
     try:
-
+        
         # username = sys.argv[1]
         username = u'jd_rtkj'
         # password = sys.argv[2]
@@ -477,4 +501,5 @@ if __name__ == '__main__':
         setup(username, password)
     except IndexError:
         print u'缺少必要的参数!!!'
+
 
