@@ -61,7 +61,7 @@ class ProductTemplate(models.Model):
         print("_compute_has_mo_procure")
 
         for product in self:
-            zaichan_mos = product.all_mo_ids.filtered(lambda x: x.state not in ['done'])
+            zaichan_mos = product.all_mo_ids.filtered(lambda x: x.state not in ['done', 'cancel'])
             if zaichan_mos:  # 是否有在产
                 product.has_mo_procure = True
             else:
