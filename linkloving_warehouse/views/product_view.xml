@@ -163,7 +163,27 @@
                 </field>
             </field>
         </record>
+        <record id="product_template_search_inherit" model="ir.ui.view">
+            <field name="name">product.template.search.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_search_view"/>
+            <field name="arch" type="xml">
+                <field name="pricelist_id" position="after">
+                    <filter name="filter_produce" string="有MO在产的" domain="[('has_mo_procure', '=', True)]"/>
+                    <separator/>
+                    <filter name="filter_in_plan" string="有MO已排产的" domain="[('has_mo_in_plan', '=', True)]"/>
+                    <separator/>
+                    <filter name="filter_unplan" string="有MO未排产的" domain="[('has_mo_unplan', '=', True)]"/>
+                    <separator/>
+                    <filter name="filter_is_virtual_lt_reordering" string="预测 &lt;最小存货"
+                            domain="[('is_virtual_lt_reordering', '=', True)]"/>
+                    <separator/>
+                    <filter name="filter_is_available_lt_required" string="库存 &lt;订单量"
+                            domain="[('is_available_lt_required', '=', True)]"/>
+                </field>
 
+            </field>
+        </record>
     </data>
 </openerp>
 

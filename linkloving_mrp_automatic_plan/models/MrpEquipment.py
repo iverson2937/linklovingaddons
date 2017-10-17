@@ -35,7 +35,8 @@ ORDER_BY = "planned_start_backup,id desc"
 FIELDS = ["name", "alia_name", "product_tmpl_id", "state", "product_qty",
           "display_name", "bom_id", "feedback_on_rework", "qty_unpost",
           "planned_start_backup", "date_planned_start", "date_planned_finished",
-          'theo_spent_time', 'availability', 'product_order_type', 'production_line_id']
+          'theo_spent_time', 'availability', 'product_order_type', 'production_line_id',
+          'produce_speed_factor', 'theory_factor', 'real_theo_spent_time', 'ava_spent_time']
 class ProcurementOrderExtend(models.Model):
     _inherit = 'procurement.order'
 
@@ -106,15 +107,12 @@ class MrpProductionLine(models.Model):
     def compute_speed_factor(self, bom):
         if len(self) == 0:
             # 无产线 去获取理论数量
-            if bom:
-                return bom.theory_factor or 1
-            else:
-                return 1
+            return bom.theory_factor or 1
         else:
             if bom.produce_speed_factor == 'human':  # 人为因素
-                return bom.theory_factor
+                return bom.theory_factor or 1
             else:
-                return len(self.equipment_ids)
+                return len(self.equipment_ids) or 1
 
     @api.onchange('process_id')
     def onchange_process_id(self):
@@ -253,7 +251,26 @@ class MrpProductionExtend(models.Model):
     def _compute_theo_spent_time(self):
         for mo in self:
             mo.theo_spent_time = round(
+                    (
+                    mo.product_qty * mo.bom_id.produced_spend_per_pcs + mo.bom_id.prepare_time * mo.production_line_id.compute_speed_factor(
+                        mo.bom_id)) / 3600, 2)
+
+    @api.multi
+    def _compute_real_theo_spent_time(self):
+        for mo in self:
+            mo.real_theo_spent_time = round(
                 (mo.product_qty * mo.bom_id.produced_spend_per_pcs + mo.bom_id.prepare_time) / 3600, 2)
+
+    @api.multi
+    def _compute_ava_spent_time(self):
+        for mo in self:
+            mo.ava_spent_time = round(mo.theo_spent_time / mo.production_line_id.compute_speed_factor(mo.bom_id), 2)
+
+    ava_spent_time = fields.Float(string=u'平均生产用时(h)', compute='_compute_ava_spent_time')
+    real_theo_spent_time = fields.Float(string=u'生产用时(h)', compute='_compute_real_theo_spent_time')
+    produce_speed_factor = fields.Selection(related="bom_id.produce_speed_factor", )
+
+    theory_factor = fields.Integer(related="bom_id.theory_factor")
 
     factory_setting_id = fields.Many2one("hr.config.settings", compute="_compute_factory_setting_id")
     production_line_id = fields.Many2one("mrp.production.line", string=u"产线")
@@ -334,7 +351,7 @@ class MrpProductionExtend(models.Model):
     def _compute_produced_spend(self):
         if self.feedback_on_rework:
             return self.factory_setting_id.rework_spent_time * 60 * 60 or REWORK_DEFAULT_TIME
-        return self.product_qty * self.bom_id.produced_spend_per_pcs + self.bom_id.prepare_time
+        return self.theo_spent_time * 3600
 
     #根据process_id 获取未排产mo
     def get_unplanned_mo(self, **kwargs):
@@ -601,7 +618,7 @@ class MrpProductionExtend(models.Model):
         settle_date = kwargs.get("settle_date")
         origin_production_line = self.production_line_id
         if self.state not in ["draft", "confirmed", "waiting_material"]:
-            raise UserError(u"该单据已经开始生产,不可从进行排产")
+            raise UserError(u"该单据已经开始生产,不可重新进行排产")
         # 改变产线和状态
         if not production_line_id:  #如果没有产线传上来, 就说明是从产线移除(取消排产)
             self.write({

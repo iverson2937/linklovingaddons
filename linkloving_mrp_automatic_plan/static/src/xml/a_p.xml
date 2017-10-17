@@ -59,9 +59,9 @@
                         <div class="p_line_equipment">
                             设备：<span><t t-esc="item.equipment_ids.length" /></span>
                         </div>
-                        <div class="p_line_employes">
-                            员工：<span><t t-esc="item.amount_of_members"/> </span>
-                        </div>
+                        <!--<div class="p_line_employes">-->
+                        <!--员工：<span><t t-esc="item.amount_of_members"/> </span>-->
+                        <!--</div>-->
                         <span class="fa fa-chevron-down a_p_showorhide"></span>
                     </div>
                 </div>
@@ -147,8 +147,16 @@
                 <div class="ap_item_main_left">
                     <span class="a_p_process_res">生产数量（完成/需求）: <t t-esc="item.qty_unpost"/>/<t t-esc="item.product_qty"/></span>
                     <t t-if="show_more">
-                        <span class="a_p_arrange_qty">工时成本（实际/理论）: </span>
-                        <span class="a_p_spend_time">生产用时：<t t-esc="item.theo_spent_time"/>h</span>
+                        <!--<span class="a_p_arrange_qty">工时成本（实际/理论）: </span>-->
+                        <t t-if="item.produce_speed_factor == 'human'">
+                            <!--<t t-set="spent_time_even" t-value="spent_time_even / (item.theory_factor == 0 ? 1 : item.theory_factor )"/>-->
+                            <span class="a_p_spend_time">理论人数: <t t-esc="item.theory_factor"/>人</span>
+                        </t>
+                        <!--<t t-else="">-->
+                        <!--<t t-set="spent_time_even" t-value="spent_time_even / (item.theory_factor == 0 ? 1 : item.theory_factor )"/>-->
+                        <!--</t>-->
+                        <span class="a_p_spend_time">生产用时 (平均 / 总计)：<t t-esc="item.ava_spent_time"/>h / <t t-esc="item.real_theo_spent_time"/>h</span>
+
                     </t>
 
                 </div>
