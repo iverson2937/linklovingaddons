@@ -35,6 +35,7 @@ class ProductProduct(models.Model):
     area_id = fields.Many2one('stock.location.area', string='Area', copy=False)
     location_x = fields.Char()
     location_y = fields.Char()
+    orderpoint_ids = fields.One2many("stock.warehouse.orderpoint", "product_id")
     product_specs = fields.Text(string=u'Product Specification', related='product_tmpl_id.product_specs')
     _sql_constraints = [
         ('default_code_uniq', 'unique (default_code)', _('Default Code already exist!')),
@@ -54,6 +55,78 @@ class ProductProduct(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    @api.model
+    @api.depends("all_mo_ids", "all_mo_ids.state")
+    def _compute_has_mo_procure(self):
+        print("_compute_has_mo_procure")
+
+        for product in self:
+            zaichan_mos = product.all_mo_ids.filtered(lambda x: x.state not in ['done', 'cancel'])
+            if zaichan_mos:  # 是否有在产
+                product.has_mo_procure = True
+            else:
+                product.has_mo_procure = False
+
+    @api.model
+    @api.depends("all_mo_ids", "all_mo_ids.state")
+    def _compute_has_mo_in_plan(self):
+        print("_compute_has_mo_in_plan")
+        for product in self:
+            zaichan_mos = product.all_mo_ids.filtered(lambda x: x.state not in ['cancel', 'draft', 'confirmed', 'done'])
+            if zaichan_mos:  # 是否有在产
+                product.has_mo_in_plan = True
+            else:
+                product.has_mo_in_plan = False
+
+    @api.model
+    @api.depends("all_mo_ids", "all_mo_ids.state")
+    def _compute_has_mo_unplan(self):
+        print("_compute_has_mo_unplan")
+        for product in self:
+            zaichan_mos = product.all_mo_ids.filtered(lambda x: x.state in ['draft', 'confirmed'])
+            if zaichan_mos:  # 已排产
+                product.has_mo_unplan = True
+            else:
+                product.has_mo_unplan = False
+
+    @api.depends('stock_move_ids', 'stock_move_ids.state')
+    def _compute_is_available_lt_required(self):
+        res = self._compute_quantities_dict()
+        for product in self:
+            product_data = res[product.id]
+            print(product_data["qty_available"], product_data["outgoing_qty"])
+            if product_data["qty_available"] < product_data["outgoing_qty"]:  # 库存小于需求
+                product.is_available_lt_required = True
+            else:
+                product.is_available_lt_required = False
+
+    @api.depends('stock_move_ids', 'stock_move_ids.state', 'product_variant_ids.orderpoint_ids.product_min_qty')
+    def _compute_is_virtual_lt_reordering(self):
+        res = self._compute_quantities_dict()
+        ress = {k: {'nbr_reordering_rules': 0, 'reordering_min_qty': 0, 'reordering_max_qty': 0} for k in self.ids}
+        product_data = self.env['stock.warehouse.orderpoint'].read_group(
+                [('product_id.product_tmpl_id', 'in', self.ids)], ['product_id', 'product_min_qty', 'product_max_qty'],
+                ['product_id'])
+        for data in product_data:
+            product = self.env['product.product'].browse([data['product_id'][0]])
+            product_tmpl_id = product.product_tmpl_id.id
+            ress[product_tmpl_id]['reordering_min_qty'] = data['product_min_qty']
+
+        for product in self:
+            product_data = res[product.id]
+            if product_data["virtual_available"] < ress[product.id]['reordering_min_qty']:  # 库存小于最小存货规则
+                product.is_virtual_lt_reordering = True
+            else:
+                product.is_virtual_lt_reordering = False
+
+    stock_move_ids = fields.One2many(comodel_name="stock.move", inverse_name="product_tmpl_id")
+    is_virtual_lt_reordering = fields.Boolean(compute="_compute_is_virtual_lt_reordering", store=True)
+    is_available_lt_required = fields.Boolean(compute='_compute_is_available_lt_required', store=True)
+    all_mo_ids = fields.One2many('mrp.production', 'product_tmpl_id')
+    has_mo_in_plan = fields.Boolean(compute='_compute_has_mo_in_plan', store=True)
+    has_mo_unplan = fields.Boolean(compute='_compute_has_mo_unplan', store=True)
+    has_mo_procure = fields.Boolean(compute='_compute_has_mo_procure', store=True)
+
     reordering_min_qty = fields.Float(compute='_compute_nbr_reordering_rules', store=True,
                                       inverse='_set_nbr_reordering_rules')
     reordering_max_qty = fields.Float(compute='_compute_nbr_reordering_rules', store=True,
@@ -61,6 +134,7 @@ class ProductTemplate(models.Model):
 
     order_point_active = fields.Boolean(compute='_compute_order_point_active', store=True,
                                         inverse='_set_nbr_reordering_rules')
+
     image = fields.Binary(
         "Image", attachment=True,
         copy=False,

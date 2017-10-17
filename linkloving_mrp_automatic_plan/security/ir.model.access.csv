@@ -6,3 +6,6 @@ access_hr_config_setting,linkloving_mrp_automatic_plan.hr_config_settings,model_
 access_ll_time_util,linkloving_mrp_automatic_plan.ll_time_util,model_ll_time_util,,1,1,1,1
 access_work_type,linkloving_mrp_automatic_plan.work_type,model_work_type,,1,1,1,1
 access_mrp_process_equipment,linkloving_mrp_automatic_plan.mrp_process_equipment,model_mrp_process_equipment,,1,1,1,1
+access_mrp_report,linkloving_mrp_automatic_plan.mrp_report,model_mrp_report,,1,1,1,1
+access_mrp_report_product_line,linkloving_mrp_automatic_plan.mrp_report_product_line,model_mrp_report_product_line,,1,1,1,1
+
