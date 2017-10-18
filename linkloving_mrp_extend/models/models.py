@@ -621,7 +621,6 @@ class MrpProductionExtend(models.Model):
             else:
                 raise UserError(u"未找到对应的数据")
 
-
     def compute_order_state(self):
         if any(feedback.state in ['draft', 'qc_ing'] for feedback in self.qc_feedback_ids):
             state = "waiting_inspection_finish"  # 等待品捡完成,
@@ -894,7 +893,7 @@ class MrpProductionExtend(models.Model):
         #             if line.product_id.id == move.product_id.id:
         #                 line.return_qty += move.quantity_done
         #     return_m.no_confirm_return()
-            # return_m.do_retrurn()
+        # return_m.do_retrurn()
         return res
 
     def action_cancel_and_return_material(self):
@@ -1272,6 +1271,7 @@ class SimStockMove(models.Model):
         boms, lines = self[0].production_id.bom_id.explode(self[0].production_id.product_id,
                                                            self[0].production_id.product_qty)
         for sim_move in self:
+
             if sim_move.stock_moves:
                 for bom_line, datas in lines:
                     if bom_line.product_id.id == sim_move.product_id.id:
@@ -1281,6 +1281,13 @@ class SimStockMove(models.Model):
                         #         continue
                         #     if l.state != "cancel":
                         #         sim_move.product_uom_qty += l.product_uom_qty
+                    # FIXME:应该在rework model allen
+                    if sim_move.production_id.is_rework:
+                        production_id = sim_move.production_id
+
+                        sim_move.product_uom_qty = production_id.product_qty * (
+                            production_id.rework_material_line_ids.filtered(
+                                lambda x: x.product_id.id == sim_move.product_id.id).product_qty)
 
     def _default_qty_available(self):
         for sim_move in self:
