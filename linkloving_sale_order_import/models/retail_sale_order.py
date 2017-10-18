@@ -26,27 +26,29 @@ class RetailSaleOrder(models.Model):
 
     @api.model
     def create(self, vals):
+        print vals, 'ddddddd'
         eb_order = super(RetailSaleOrder, self).create(vals)
-        tax_id = self.env["account.tax"].search([('type_tax_use', '<>', "purchase")], limit=1)[0].id
-        order_id = self.env["sale.order"].create({
-            'partner_id': eb_order.partner_id.id,
-            'partner_invoice_id': eb_order.partner_id.id,
-            'partner_shipping_id': eb_order.partner_id.id,
-            'tax_id': tax_id,
-            'order_line': [(0, 0, {'name': p.product_id.name,
-                                   'product_id': p.product_id.id,
-                                   'product_uom_qty': p.qty,
-                                   'product_uom': p.product_id.uom_id.id,
-                                   'price_unit': p.price_unit,
-                                   'tax_id': [(6, 0, [tax_id])]}) for p in eb_order.eb_order_line_ids],
-        })
-        eb_order.order_id = order_id.id
+        # tax_id = self.env["account.tax"].search([('type_tax_use', '<>', "purchase")], limit=1)[0].id
+        # order_id = self.env["sale.order"].create({
+        #     'partner_id': eb_order.partner_id.id,
+        #     'partner_invoice_id': eb_order.partner_id.id,
+        #     'partner_shipping_id': eb_order.partner_id.id,
+        #     'tax_id': tax_id,
+        #     'order_line': [(0, 0, {'name': p.product_id.name,
+        #                            'product_id': p.product_id.id,
+        #                            'product_uom_qty': p.qty,
+        #                            'product_uom': p.product_id.uom_id.id,
+        #                            'price_unit': p.price_unit,
+        #                            'tax_id': [(6, 0, [tax_id])]}) for p in eb_order.order_line_ids],
+        # })
+        # eb_order.order_id = order_id.id
         return eb_order
 
     def create_retail_sale_order(self, values, partner_id=False):
         print values
         name, vals = values.items()[0]
         items = vals.get('items')
+        print items, 'items'
 
         order_id = self.search([('name', '=', vals.get('name'))], limit=1)
         delivery_fee = vals.get('delivery_fee')
@@ -85,8 +87,11 @@ class RetailSaleOrder(models.Model):
                     'eb_order_id': order_id,
                 })
             if items:
+                print items
                 for item in items:
-                    product_id = self.env['product.product'].search(['default_code', '=', item.get('default_code')])
+                    product_id = False
+                    if item.get('default_code'):
+                        product_id = self.env['product.product'].search(['default_code', '=', item.get('default_code')])
                     if not product_id:
                         order_id.state = 'error'
                     self.env['retail.order.line'].create({
@@ -150,3 +155,4 @@ class RetailSaleOrder(models.Model):
         qty = fields.Float(string=u'数量')
         price_unit = fields.Float(string=u'单价')
         description = fields.Char(string=u'描述')
+        product_name = fields.Char(string=u'描述')

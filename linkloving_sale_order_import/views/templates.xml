@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <record id="retail_order_import_form" model="ir.ui.view">
+        <record id="retail_order_import_tree" model="ir.ui.view">
             <field name="name">电商散单</field>
             <field name="model">retail.order</field>
             <field name="arch" type="xml">
@@ -46,7 +46,7 @@
                                         <field name="product_id" options="{'no_create':True}"/>
                                         <field name="qty"/>
                                         <field name="price_unit"/>
-                                        <field name="description"/>
+                                        <field name="product_name"/>
                                     </tree>
                                 </field>
                             </page>
@@ -58,36 +58,25 @@
             </field>
         </record>
 
-        <record id="action_retail_order" model="ir.actions.act_window">
+        <record id="action_retail_order1" model="ir.actions.act_window">
             <field name="name">零售订单</field>
-            <field name="res_model">retail.order</field>
             <field name="type">ir.actions.act_window</field>
+            <field name="res_model">retail.order</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <!--<field name="domain">[('picking_type_code','=', 'incoming')]</field>-->
-            <!--<field name="context">{-->
-            <!--'contact_display': 'partner_address',-->
-            <!--}-->
-            <!--</field>-->
-            <!--<field name="search_view_id" ref="stock.view_picking_internal_search"/>-->
             <field name="help" type="html">
-                <!--<field name="search_view_id" ref="sale.sale_order_view_search_inherit_sale"/>-->
                 <p class="oe_view_nocontent_create">
-                    Click here to create a new transfer.
-                </p>
-                <p>
-                    You can either do it immediately or mark it as Todo for future processing. Use your scanner to
-                    validate the transferred quantity quicker.
+                    Click to define a new kind of landed cost.
                 </p>
             </field>
         </record>
 
 
-        <menuitem action="action_retail_order"
-                  id="menu_retail_order"
+        <menuitem action="action_retail_order1"
+                  id="menu_retail_order1"
                   name="零售订单"
                   parent="linkloving_sale.menu_sales_orders"
-                  sequence="4"/>
+                  sequence="5"/>
 
     </data>
 </openerp>

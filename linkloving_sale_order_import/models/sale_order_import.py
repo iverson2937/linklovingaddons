@@ -4,6 +4,7 @@ import re
 import sys
 
 import datetime
+import traceback
 
 from odoo import models, fields, api
 from selenium import webdriver
@@ -638,11 +639,11 @@ def process_order_detail(order_id):
     payment_time = pay_info.find_element_by_xpath('./tr[2]/td[2]').text.strip()
     finish_time = pay_info.find_element_by_xpath('/html/body/div[1]/div[1]/ul/li[5]/p[2]').text.strip()
     order_status = pay_info.find_element_by_xpath('/html/body/div[1]/div[2]/p[1]/span[4]').text.strip()
-    amount_price = pay_info.find_element_by_xpath('./tr[3]/td[2]').text.strip()
-    total_freight = pay_info.find_element_by_xpath('./tr[4]/td[2]').text.strip()
-    total_sales_promotion = pay_info.find_element_by_xpath('./tr[5]/td[2]').text.strip()
-    coupon_price = pay_info.find_element_by_xpath('./tr[6]/td[2]').text.strip()
-    actual_payment = pay_info.find_element_by_xpath('./tr[9]/td[2]').text.strip()
+    amount_price = pay_info.find_element_by_xpath('./tr[3]/td[2]').text.replace(u'￥', '').strip()
+    total_freight = pay_info.find_element_by_xpath('./tr[4]/td[2]').text.replace(u'￥', '').strip()
+    total_sales_promotion = pay_info.find_element_by_xpath('./tr[5]/td[2]').text.replace(u'￥', '').strip()
+    coupon_price = pay_info.find_element_by_xpath('./tr[6]/td[2]').text.replace(u'￥', '').strip()
+    actual_payment = pay_info.find_element_by_xpath('./tr[9]/td[2]').text.replace(u'￥', '').strip()
 
     for sku_number_info in sku_numbers_info:
         item = {}
@@ -650,9 +651,9 @@ def process_order_detail(order_id):
         # 京东的sku商品编号
         # order_detail[orderId][u'商品编号'] = sku_number
         # order_detail[orderId][jingdong_sku_number] = {}
-        entity_item_price = sku_number_info.find_element_by_xpath('./tr/td[3]').text.strip()
-        entity_discount_amount = sku_number_info.find_element_by_xpath('./tr/td[4]').text.strip()
-        entity_item_count = sku_number_info.find_element_by_xpath('./tr/td[7]').text.strip()
+        entity_item_price = sku_number_info.find_element_by_xpath('./tr/td[3]').text.replace(u'￥', '').strip()
+        entity_discount_amount = sku_number_info.find_element_by_xpath('./tr/td[4]').text.replace(u'￥', '').strip()
+        entity_item_count = sku_number_info.find_element_by_xpath('./tr/td[7]').text.replace(u'￥', '').strip()
         entity_item_code_temp = sku_number_info.find_element_by_xpath('./tr/td[2]/a').text.strip()
         print u'商品总称为:%s' % entity_item_code_temp
         # entity_item_code = ' '.join(entity_item_code_temp.strip().split(' ')[2:])
@@ -667,10 +668,11 @@ def process_order_detail(order_id):
         items.append(item)
         print u'商家编码:%s\t商品价格:%s\t优惠金额:%s\t商品数量:%s' % (
             entity_item_code, entity_item_price, entity_discount_amount, entity_item_count)
+    print order_time, '44444444444'
     res.update({
-        'order_date': order_time,
-        'payment_date': payment_time,
-        'finish_date': finish_time,
+        'order_date': datetime.datetime.strptime(order_time, "%Y-%m-%d %H:%M:%S") if order_time else False,
+        'payment_date': datetime.datetime.strptime(payment_time, "%Y-%m-%d %H:%M:%S") if payment_time else False,
+        'finish_date': datetime.datetime.strptime(finish_time, "%Y-%m-%d %H:%M:%S") if finish_time else False,
         'order_status': order_status,
         'total_amount': amount_price,
         'delivery_fee': total_freight,
@@ -731,6 +733,6 @@ def get_all():
         print u'*' * 100 + u'   %s' % url
         try:
             get_all_infomations_from_jd(url, orders)
-        except:
-            print u'某些url中或许没有需求的数据,所以忽略'
+        except Exception, e:
+            print e
     return orders
