@@ -7,7 +7,7 @@
             <field name="arch" type="xml">
                 <tree>
                     <field name="name"/>
-                    <field name="partner_id"/>
+                    <field name="partner_id" string="店名"/>
                     <field name="total_amount"/>
                     <field name="shipping_date"/>
                     <field name="create_date"/>
