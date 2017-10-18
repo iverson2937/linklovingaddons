@@ -1285,9 +1285,8 @@ class SimStockMove(models.Model):
                     if sim_move.production_id.is_rework:
                         production_id = sim_move.production_id
 
-                        sim_move.product_uom_qty = production_id.product_qty * (
-                            production_id.rework_material_line_ids.filtered(
-                                lambda x: x.product_id.id == sim_move.product_id.id).product_qty)
+                        sim_move.product_uom_qty = production_id.rework_material_line_ids.filtered(
+                            lambda x: x.product_id.id == sim_move.product_id.id).product_qty
 
     def _default_qty_available(self):
         for sim_move in self:
