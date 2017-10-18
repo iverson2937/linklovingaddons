@@ -92,7 +92,8 @@ class MrpProduction(models.Model):
 
     @api.onchange('bom_id')
     def on_change_bom_id(self):
-        self.process_id = self.bom_id.process_id
+        if self.bom_id.process_id and not self.is_rework:
+            self.process_id = self.bom_id.process_id
         self.unit_price = self.bom_id.unit_price
         self.mo_type = self.bom_id.mo_type
         self.hour_price = self.bom_id.hour_price
