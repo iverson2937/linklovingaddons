@@ -201,6 +201,18 @@ class MaterialRequest(models.Model):
         if btn_context in ('to_submit', 'canceled', 'Refused'):
             view_show = True
 
+        new_picking_type = ''
+        project_line_pass_show = False
+
+        if self.picking_type == 'pick_type':
+            new_picking_type = 'picking_review_line'
+        elif self.picking_type == 'proofing':
+            new_picking_type = 'picking_review_project'
+
+        if self.env['final.review.partner'].search([('final_review_partner_id', '=', self.env.user.partner_id.id),
+                                                    ('review_type', '=', new_picking_type)]):
+            project_line_pass_show = True
+
         return {
             'name': '新建',
             'view_type': 'form',
@@ -208,7 +220,8 @@ class MaterialRequest(models.Model):
             # 'view_id': False,
             'res_model': 'review.process.wizard',
             'domain': [],
-            'context': {'view_material_request': True, 'view_show': view_show,
+            'context': {'view_show': view_show, 'review_type_two': self.picking_type,
+                        'project_line_pass_show': project_line_pass_show,
                         'default_material_requests_id': self.id, 'review_type': 'picking_review'},
             'type': 'ir.actions.act_window',
             'target': 'new',

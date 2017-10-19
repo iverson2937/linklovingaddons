@@ -331,7 +331,14 @@ class ReviewProcessLine(models.Model):
     def action_pass(self, remark, material_requests_id, bom_id):
         review_type = self._context.get('review_type')
 
-        if self.env["final.review.partner"].get_final_review_partner_id(review_type).id == self.env.user.partner_id.id:
+        review_type_two = self._context.get('review_type_two')
+
+        if review_type_two == 'pick_type':
+            review_type_two = 'picking_review_line'
+        elif review_type_two == 'proofing':
+            review_type_two = 'picking_review_project'
+
+        if self.env["final.review.partner"].get_final_review_partner_id(review_type_two).id == self.env.user.partner_id.id:
             self.write({
                 'review_time': fields.datetime.now(),
                 'state': 'review_success',
@@ -917,6 +924,8 @@ class ReviewProcessWizard(models.TransientModel):
         to_last_review = self._context.get("to_last_review")  # 是否送往终审
         review_type = self._context.get("review_type")
 
+        review_type_two = self._context.get("review_type_two")
+
         file_data_list = self._context.get("file_data_list")
 
         materials_request_id = self._context.get('default_material_requests_id')
@@ -988,8 +997,13 @@ class ReviewProcessWizard(models.TransientModel):
 
             self.material_requests_id.write({'review_i_approvaled_val': [(4, self.env.uid)]})
 
+            if review_type_two == 'pick_type':
+                review_type_two = 'picking_review_line'
+            elif review_type_two == 'proofing':
+                review_type_two = 'picking_review_project'
+
             self.material_requests_id.review_id.process_line_review_now.submit_to_next_reviewer(
-                review_type=review_type,
+                review_type=review_type_two,
                 to_last_review=to_last_review,
                 partner_id=self.partner_id,
                 remark=self.remark, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
@@ -1029,29 +1043,6 @@ class ReviewProcessWizard(models.TransientModel):
 
             self.material_requests_id.picking_state = 'approved_finish'
             self.material_requests_id.write({'review_i_approvaled_val': [(4, self.env.uid)]})
-            # 创建出货单
-            # material_one = self.env['material.request'].browse(materials_request_id)
-            #
-            # picking_out_material = self.env['stock.picking'].create({
-            #     'picking_type_id': self.env.ref('stock.picking_type_out').id,
-            #     'location_id': self.env.ref('stock.stock_location_stock').id,
-            #     'location_dest_id': self.env.ref('linkloving_eb.stock_location_eb_transfer_2').id,
-            #     'material_request_order_id': material_one.id,
-            #     'origin': material_one.name,
-            #     'note': material_one.remark,
-            #     'Materials_development_way': material_one.Materials_development_way,
-            #     'partner_id': material_one.create_uid.partner_id.id,
-            #     'picking_type': material_one.picking_type,
-            # })
-            # for one_line in material_one.line_ids:
-            #     self.env['stock.move'].create({
-            #         'name': 'another move',
-            #         'product_id': one_line.product_id.id,
-            #         'product_uom_qty': one_line.product_qty,
-            #         'product_uom': one_line.product_id.uom_id.id,
-            #         'picking_id': picking_out_material.id,
-            #         'location_id': self.env.ref('stock.stock_location_stock').id,
-            #         'location_dest_id': self.env.ref('linkloving_eb.stock_location_eb_transfer').id})
 
             self.material_line.action_pass(self.remark, self.material_requests_id, self.bom_id)
         return True
@@ -1115,6 +1106,8 @@ class FinalReviewPartner(models.Model):
         ('bom_review', u'BOM 终审人'),
         ('file_review', u'文件终审人'),
         ('picking_review', u'领料终审人'),
+        ('picking_review_project', u'工程领料终审人'),
+        ('picking_review_line', u'产线领料终审人'),
     ], string=u'审核类型')
 
     final_review_partner_id = fields.Many2one(comodel_name="res.partner", string="终审人", required=False,
@@ -1178,6 +1171,10 @@ class FinalReviewPartner(models.Model):
             review_type_ref = 'linkloving_pdm.group_final_review_partner_bom'
         elif val == 'picking_review':
             review_type_ref = 'linkloving_pdm.group_final_review_picking'
+        elif val == 'picking_review_project':
+            review_type_ref = 'linkloving_pdm.group_final_review_picking_project'
+        elif val == 'picking_review_line':
+            review_type_ref = 'linkloving_pdm.group_final_review_picking_line'
         else:
             raise UserError(u"数据异常,未找到对应的审核人类型")
 
