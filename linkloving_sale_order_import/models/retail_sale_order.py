@@ -148,11 +148,14 @@ class RetailSaleOrder(models.Model):
                         'eb_order_id': order_id,
                     })
 
-    class RetailSaleOrderLine(models.Model):
-        _name = 'retail.order.line'
-        order_id = fields.Many2one('retail.order')
-        product_id = fields.Many2one('product.product')
-        qty = fields.Float(string=u'数量')
-        price_unit = fields.Float(string=u'单价')
-        description = fields.Char(string=u'描述')
-        product_name = fields.Char(string=u'描述')
+
+class RetailSaleOrderLine(models.Model):
+    _name = 'retail.order.line'
+    order_id = fields.Many2one('retail.order')
+    product_id = fields.Many2one('product.product')
+    discount = fields.Float(string=u'折扣')
+    qty = fields.Float(string=u'数量')
+    price_unit = fields.Float(string=u'单价')
+    description = fields.Char(string=u'描述')
+    product_name = fields.Char(string=u'描述')
+    purchase_price = fields.Float(string=u'采购价')
