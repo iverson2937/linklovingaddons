@@ -538,11 +538,12 @@ class MrpProductionExtend(models.Model):
         self.write({'state': 'waiting_material'})
         # else:
         #     self.write({'state': 'finish_prepare_material'})
-        qty_wizard = self.env['change.production.qty'].create({
-            'mo_id': self.id,
-            'product_qty': self.product_qty,
-        })
-        qty_wizard.change_prod_qty()
+        if not self.is_rework:
+            qty_wizard = self.env['change.production.qty'].create({
+                'mo_id': self.id,
+                'product_qty': self.product_qty,
+            })
+            qty_wizard.change_prod_qty()
         return {'type': 'ir.actions.empty'}
         # from linkloving_app_api.models.models import JPushExtend
         # JPushExtend.send_push(audience=jpush.audience(
