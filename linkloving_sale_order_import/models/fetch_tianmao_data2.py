@@ -27,8 +27,8 @@ dcap["phantomjs.page.settings.userAgent"] = (
 )
 
 
-display = Display(visible=0, size=(1366, 768))
-display.start()
+# display = Display(visible=0, size=(1366, 768))
+# display.start()
 
 
 # driver = webdriver.PhantomJS(desired_capabilities=dcap)
@@ -148,26 +148,30 @@ def login(loginurl, username=None, password=None):
     curpage_url = driver.current_url
     print 'currpage_url ' + curpage_url
 
-    while (curpage_url == loginurl):
-        # print 'please input the verify code:'
-        print '天猫登录中的滑块验证已经出现需要去做验证:'
-
-        def verify_span_slider():
-            try:
-                span_slider = driver.find_element_by_xpath('//*[@id="nc_1_n1z"]')
-                ActionChains(driver).drag_and_drop_by_offset(span_slider, 258, 0).perform()
-                time.sleep(3)
-                print u'滑块运行成功!'
-            except:
-                print u'滑块运行失败!'
-            time.sleep(3)
-
-        login_name()
-        login_password()
-        click_and_login()
-        verify_span_slider()
-
-        curpage_url = driver.current_url
+    if curpage_url == loginurl:
+        print u'登陆失败'
+        raise u'爬虫登陆失败!!'
+    # while (curpage_url == loginurl):
+    #     # print 'please input the verify code:'
+    #     print '天猫登录中的滑块验证已经出现需要去做验证:'
+    #
+    #     def verify_span_slider():
+    #         try:
+    #             span_slider = driver.find_element_by_xpath('//*[@id="nc_1_n1z"]')
+    #             ActionChains(driver).drag_and_drop_by_offset(span_slider, 258, 0).perform()
+    #             time.sleep(3)
+    #             print u'滑块运行成功!'
+    #         except:
+    #             print u'滑块运行失败!'
+    #             raise u'用户登录失败'
+    #         time.sleep(3)
+    #
+    #     login_name()
+    #     login_password()
+    #     click_and_login()
+    #     verify_span_slider()
+    #
+    #     curpage_url = driver.current_url
 
 
 def get_all_infomations_from_tiaomao(tianmao_url):
