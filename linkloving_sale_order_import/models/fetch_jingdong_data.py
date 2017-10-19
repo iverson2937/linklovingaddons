@@ -137,26 +137,30 @@ def login(loginurl, username=None, password=None):
     curpage_url = driver.current_url
     print 'currpage_url ' + curpage_url
 
-    while (curpage_url == loginurl):
-        # print 'please input the verify code:'
-        print '京东登录中的滑块验证已经出现需要去做验证:'
+    if curpage_url == loginurl:
+        print u'用户登陆失败'
+        raise u'用户登陆失败'
 
-        def verify_span_slider():
-            try:
-                span_slider = driver.find_element_by_xpath('//*[@id="nc_1_n1z"]')
-                ActionChains(driver).drag_and_drop_by_offset(span_slider, 258, 0).perform()
-                time.sleep(3)
-                print u'滑块运行成功!'
-            except:
-                print u'滑块运行失败!'
-            time.sleep(3)
-
-        login_name()
-        login_password()
-        click_and_login()
-        verify_span_slider()
-
-        curpage_url = driver.current_url
+    # while (curpage_url == loginurl):
+    #     # print 'please input the verify code:'
+    #     print '京东登录中的滑块验证已经出现需要去做验证:'
+    #
+    #     def verify_span_slider():
+    #         try:
+    #             span_slider = driver.find_element_by_xpath('//*[@id="nc_1_n1z"]')
+    #             ActionChains(driver).drag_and_drop_by_offset(span_slider, 258, 0).perform()
+    #             time.sleep(3)
+    #             print u'滑块运行成功!'
+    #         except:
+    #             print u'滑块运行失败!'
+    #         time.sleep(3)
+    #
+    #     login_name()
+    #     login_password()
+    #     click_and_login()
+    #     verify_span_slider()
+    #
+    #     curpage_url = driver.current_url
 
 
 def get_all_infomations_from_tiaomao(jingdong_url):

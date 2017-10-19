@@ -398,8 +398,7 @@ class StockMovePicking(models.Model):
         res = super(StockMovePicking, self).create(vals)
         if res.quantity_adjusted_qty == 0:
             move_one = self.env['product.product'].browse(vals.get('product_id'))
-            res.write({'quantity_adjusted_qty': move_one.qty_available - vals.get('product_uom_qty'),
-                       'move_order_type': 'hand_movement_out'})
+            res.write({'quantity_adjusted_qty': move_one.qty_available})
         return res
 
     @api.multi
