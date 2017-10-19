@@ -48,9 +48,11 @@ class RetailSaleOrder(models.Model):
         print values
         name, vals = values.items()[0]
         items = vals.get('items')
-        print items, 'items'
-
-        order_id = self.search([('name', '=', vals.get('name'))], limit=1)
+        print  'items', items,
+        print name
+        order_id = self.search([('name', '=', name)], limit=1)
+        print 'order_id', order_id
+        print order_id, 'dddddddddddddddddddd'
         delivery_fee = vals.get('delivery_fee')
 
         delivery_fee_id = self.env.ref('linkloving_sale_order_import.product_product_delivery_cost')

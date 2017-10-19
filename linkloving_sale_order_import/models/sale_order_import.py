@@ -6,9 +6,10 @@ import sys
 import datetime
 import traceback
 import uuid
+import logging
 
+_logger = logging.getLogger(__name__)
 from odoo import models, fields, api
-from selenium import webdriver
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -403,16 +404,20 @@ class ImportSaleOrderSetting(models.Model):
 
     @api.multi
     def start(self):
+        driver = webdriver.Chrome()
+        driver.maximize_window()
         for rec in self:
             if rec.retail_type == 'jd':
                 rec.jdlogin()
                 orders = get_all()
                 # 根据获得的订单编号,来获取每个订单编号中关于京东的商品编号
                 for order_number in set(orders):
+
                     self.env['retail.order'].create_retail_sale_order(process_order_detail(order_number),
-                                                                      partner_id=rec.partner_id)
+                                                                      partner_id=rec.partner_id.id)
 
                     time.sleep(1)
+                    break
             if rec.retail_type == 'tb':
                 rec.tb_login()
                 rec.get_all_infomations_from_tiaomao()
@@ -646,9 +651,8 @@ def process_order_detail(order_id):
             'product_qty': entity_item_count,
         })
         items.append(item)
-        print u'商家编码:%s\t商品价格:%s\t优惠金额:%s\t商品数量:%s' % (
-            entity_item_code, entity_item_price, entity_discount_amount, entity_item_count)
-    print order_time, '44444444444'
+        # print u'商家编码:%s\t商品价格:%s\t优惠金额:%s\t商品数量:%s' % (
+        #     entity_item_code, entity_item_price, entity_discount_amount, entity_item_count)
     res.update({
         'order_date': datetime.datetime.strptime(order_time, "%Y-%m-%d %H:%M:%S") if order_time else False,
         'payment_date': datetime.datetime.strptime(payment_time, "%Y-%m-%d %H:%M:%S") if payment_time else False,
@@ -661,11 +665,11 @@ def process_order_detail(order_id):
         'actual_payment': actual_payment,
         'items': items,
     })
-    print u'下单时间:%s\t付款时间:%s\t完成时间:%s\t订单状态:%s\t商品总额:%s\t运费总额:%s\t促销优惠:%s\t优惠券:%s\t应支付金额:%s' % (
-        order_time, payment_time, finish_time, order_status, amount_price, total_freight, total_sales_promotion,
-        coupon_price,
-        actual_payment
-    )
+    # print u'下单时间:%s\t付款时间:%s\t完成时间:%s\t订单状态:%s\t商品总额:%s\t运费总额:%s\t促销优惠:%s\t优惠券:%s\t应支付金额:%s' % (
+    #     order_time, payment_time, finish_time, order_status, amount_price, total_freight, total_sales_promotion,
+    #     coupon_price,
+    #     actual_payment
+    # )
     return {order_id: res}
 
 
@@ -710,7 +714,6 @@ def get_all():
     urls = [waitting_export_url, alerady_export_url, buyer_alerady_accetped_url, lock_order_during_url,
             refund_order_during_url]
     for url in urls:
-        print u'*' * 100 + u'   %s' % url
         try:
             get_all_infomations_from_jd(url, orders)
         except Exception, e:
@@ -721,7 +724,6 @@ def get_all():
 # 淘宝相关
 def eliminate_alert_to_target(url):
     # 可能在打开新窗口的时候有一些flahs更新的弹框出来，我们需要谜面这种情况的出现!!!
-    print url, 'sssssssssssssssss'
     driver.get(url)
     time.sleep(15)
     try:
@@ -815,20 +817,20 @@ def process_seller_baby_info():
             # print u'所获得的内容为:%s' % driver.find_element_by_xpath('//body').text
             # time.sleep(60)
             rows_info = driver.find_elements_by_xpath('//*[@id="J_SKUTable"]/table/tbody/tr')
-            print u'每页中列表的数量为:%s' % len(rows_info)
+            # print u'每页中列表的数量为:%s' % len(rows_info)
             if rows_info:
                 for row in rows_info:
                     price = row.find_element_by_xpath('./td[4]/div/input').get_attribute('value')
                     linkloving_code = row.find_element_by_xpath('./td[6]/div/input').get_attribute('value')
                     babys_info[id]['itemprice'] = price
                     babys_info[id]['code'] = linkloving_code
-                    print u'出售中的宝贝商品的价格为:%s\t商品编码为:%s' % (price, linkloving_code)
+                    # print u'出售中的宝贝商品的价格为:%s\t商品编码为:%s' % (price, linkloving_code)
             else:
                 price = driver.find_element_by_xpath('//*[@id="buynow"]').get_attribute('value')
                 linkloving_code = driver.find_element_by_xpath('//*[@id="outerIdId"]').get_attribute('value')
                 babys_info[id]['itemprice'] = price
                 babys_info[id]['code'] = linkloving_code
-                print u'出售中的宝贝商品的价格为:%s\t商品编码为:%s' % (price, linkloving_code)
+                # print u'出售中的宝贝商品的价格为:%s\t商品编码为:%s' % (price, linkloving_code)
 
             driver.close()
             driver.switch_to.window(driver.window_handles[-1])
