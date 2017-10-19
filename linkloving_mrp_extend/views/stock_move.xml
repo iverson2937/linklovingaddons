@@ -3,16 +3,32 @@
     <data>
 
 
-        <record id="view_move_tree_inherit" model="ir.ui.view">
-            <field name="name">stock.move.tree.inherit</field>
-            <field name="model">stock.move</field>
-            <field name="inherit_id" ref="stock.view_move_tree"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='date_expected']" position="after">
-                    <field name="create_uid" invisible="1"/>
-                    <field name="reason" invisible="1"/>
+        <!--<record id="view_move_tree_inherit" model="ir.ui.view">-->
+        <!--<field name="name">stock.move.tree.inherit</field>-->
+        <!--<field name="model">stock.move</field>-->
+        <!--<field name="inherit_id" ref="stock.view_move_tree"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<xpath expr="//field[@name='date_expected']" position="after">-->
+        <!--<field name="create_uid" invisible="1"/>-->
+        <!--<field name="reason" invisible="1"/>-->
 
+        <!--</xpath>-->
+        <!--</field>-->
+        <!--</record>-->
+        <!-- Inherit Form View to Modify it -->
+        <record id="view_move_form_inherit" model="ir.ui.view">
+            <field name="name">stock.move.form</field>
+            <field name="model">stock.move</field>
+            <field name="inherit_id" ref="stock.view_move_form"/>
+            <field name="arch" type="xml">
+                <!--<field name="state" widget="statusbar" statusbar_visible="draft,confirmed,assigned,done"/>-->
+
+                <xpath expr="//header" position="inside">
+                    <!-- Add your fields or attributes here -->
+                    <button name="action_change_state_done" string="设置成完成" class="oe_highlight" type="object"
+                            groups="base.group_no_one"/>
                 </xpath>
+
             </field>
         </record>
 
