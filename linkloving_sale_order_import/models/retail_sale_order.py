@@ -27,21 +27,22 @@ class RetailSaleOrder(models.Model):
     @api.model
     def create(self, vals):
         eb_order = super(RetailSaleOrder, self).create(vals)
-        # tax_id = self.env["account.tax"].search([('type_tax_use', '<>', "purchase")], limit=1)[0].id
-        # order_id = self.env["sale.order"].create({
-        #     'partner_id': eb_order.partner_id.id,
-        #     'partner_invoice_id': eb_order.partner_id.id,
-        #     'partner_shipping_id': eb_order.partner_id.id,
-        #     'tax_id': tax_id,
-        #     'order_line': [(0, 0, {'name': p.product_id.name,
-        #                            'product_id': p.product_id.id,
-        #                            'product_uom_qty': p.qty,
-        #                            'product_uom': p.product_id.uom_id.id,
-        #                            'price_unit': p.price_unit,
-        #                            'tax_id': [(6, 0, [tax_id])]}) for p in eb_order.order_line_ids],
-        # })
-        # eb_order.order_id = order_id.id
-        return eb_order
+        if eb_order.order_status != 'error':
+            tax_id = self.env["account.tax"].search([('type_tax_use', '<>', "purchase")], limit=1)[0].id
+            order_id = self.env["sale.order"].create({
+                'partner_id': eb_order.partner_id.id,
+                'partner_invoice_id': eb_order.partner_id.id,
+                'partner_shipping_id': eb_order.partner_id.id,
+                'tax_id': tax_id,
+                'order_line': [(0, 0, {'name': p.product_id.name,
+                                       'product_id': p.product_id.id,
+                                       'product_uom_qty': p.qty,
+                                       'product_uom': p.product_id.uom_id.id,
+                                       'price_unit': p.price_unit,
+                                       'tax_id': [(6, 0, [tax_id])]}) for p in eb_order.order_line_ids],
+            })
+            eb_order.order_id = order_id.id
+            return eb_order
 
     def create_retail_sale_order(self, values, partner_id=False):
         print values
