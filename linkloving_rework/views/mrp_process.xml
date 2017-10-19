@@ -14,6 +14,29 @@
 
         </record>
 
+        <record id="stock_picking_type_kanban3" model="ir.ui.view">
+            <field name="name">mrp.process.kanban</field>
+            <field name="model">mrp.process</field>
+            <field name="inherit_id" ref="linkloving_process.stock_picking_type_kanban"/>
+            <field name="arch" type="xml">
+                <!-- find field description and add the field
+                     idea_ids after it -->
+
+                <xpath expr="//field[@name='count_mo_others']" position="after">
+                    <field name="is_rework"/>
+                </xpath>
+                <xpath expr="//button[@name='get_action_mrp_production_tree_to_combine']" position="after">
+                    <t t-if="record.is_rework.raw_value === true">
+                        <a name="%(linkloving_process.action_create_mrp_production_form)d" type="action">
+                            <span>
+                                创建
+                            </span>
+                        </a>
+                    </t>
+                </xpath>
+            </field>
+        </record>
+
 
     </data>
 </odoo>

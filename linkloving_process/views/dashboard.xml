@@ -78,7 +78,9 @@
                                                     Schedule
                                                 </span>
                                             </button>
+
                                         </div>
+
                                         <div class="col-xs-3 o_kanban_primary_left">
                                             <button class="btn btn-primary"
                                                     name="get_stock_detail"
@@ -87,7 +89,9 @@
                                                     查看库存
                                                 </span>
                                             </button>
+
                                         </div>
+
                                         <div class="col-xs-6 o_kanban_primary_right" style="min-height:150px">
                                             <div class="row">
                                                 <div class="col-xs-9">

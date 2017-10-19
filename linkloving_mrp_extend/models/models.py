@@ -418,20 +418,20 @@ class MrpProductionExtend(models.Model):
     state = fields.Selection([
         ('draft', _('Draft')),
         ('confirmed', u'已排产'),
-        ('waiting_material', _('Waiting Prepare Material')),
-        ('prepare_material_ing', _('Material Preparing')),
-        ('finish_prepare_material', _('Material Ready')),
-        ('already_picking', _('Already Picking Material')),
+        ('waiting_material', u'等待备料'),
+        ('prepare_material_ing', u'备料中...'),
+        ('finish_prepare_material', u'备料完成'),
+        ('already_picking', u'已领料'),
         ('planned', 'Planned'),
         ('progress', '生产中'),
         ('waiting_inspection_finish', u'等待品检完成'),
-        ('waiting_quality_inspection', _('Waiting Quality Inspection')),
-        ('quality_inspection_ing', _('Under Quality Inspection')),
-        ('waiting_rework', _('Waiting Rework')),
-        ('rework_ing', _('Under Rework')),
-        ('waiting_inventory_material', _('Waiting Inventory Material')),
-        ('waiting_warehouse_inspection', _('Waiting Check Return Material')),
-        ('waiting_post_inventory', _('Waiting Stock Transfers')),
+        ('waiting_quality_inspection', u'等待品检'),
+        ('quality_inspection_ing', u'品检中'),
+        ('waiting_rework', u'等待返工'),
+        ('rework_ing', u'返工中'),
+        ('waiting_inventory_material', u'等待清单退料'),
+        ('waiting_warehouse_inspection', u'等待检验退料'),
+        ('waiting_post_inventory', u'等待入库'),
         ('done', 'Done'),
         ('cancel', 'Cancelled')], string='status',
         copy=False, default='confirmed', track_visibility='onchange')
@@ -538,11 +538,12 @@ class MrpProductionExtend(models.Model):
         self.write({'state': 'waiting_material'})
         # else:
         #     self.write({'state': 'finish_prepare_material'})
-        qty_wizard = self.env['change.production.qty'].create({
-            'mo_id': self.id,
-            'product_qty': self.product_qty,
-        })
-        qty_wizard.change_prod_qty()
+        if not self.is_rework:
+            qty_wizard = self.env['change.production.qty'].create({
+                'mo_id': self.id,
+                'product_qty': self.product_qty,
+            })
+            qty_wizard.change_prod_qty()
         return {'type': 'ir.actions.empty'}
         # from linkloving_app_api.models.models import JPushExtend
         # JPushExtend.send_push(audience=jpush.audience(
@@ -620,7 +621,6 @@ class MrpProductionExtend(models.Model):
                 times[0].is_secondary_produce = False
             else:
                 raise UserError(u"未找到对应的数据")
-
 
     def compute_order_state(self):
         if any(feedback.state in ['draft', 'qc_ing'] for feedback in self.qc_feedback_ids):
@@ -894,7 +894,7 @@ class MrpProductionExtend(models.Model):
         #             if line.product_id.id == move.product_id.id:
         #                 line.return_qty += move.quantity_done
         #     return_m.no_confirm_return()
-            # return_m.do_retrurn()
+        # return_m.do_retrurn()
         return res
 
     def action_cancel_and_return_material(self):
@@ -1272,6 +1272,7 @@ class SimStockMove(models.Model):
         boms, lines = self[0].production_id.bom_id.explode(self[0].production_id.product_id,
                                                            self[0].production_id.product_qty)
         for sim_move in self:
+
             if sim_move.stock_moves:
                 for bom_line, datas in lines:
                     if bom_line.product_id.id == sim_move.product_id.id:
@@ -1281,6 +1282,12 @@ class SimStockMove(models.Model):
                         #         continue
                         #     if l.state != "cancel":
                         #         sim_move.product_uom_qty += l.product_uom_qty
+                    # FIXME:应该在rework model allen
+                    if sim_move.production_id.is_rework:
+                        production_id = sim_move.production_id
+
+                        sim_move.product_uom_qty = production_id.rework_material_line_ids.filtered(
+                            lambda x: x.product_id.id == sim_move.product_id.id).product_qty
 
     def _default_qty_available(self):
         for sim_move in self:
