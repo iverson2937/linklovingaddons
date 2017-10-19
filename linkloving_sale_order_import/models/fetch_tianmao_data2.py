@@ -27,8 +27,8 @@ dcap["phantomjs.page.settings.userAgent"] = (
 )
 
 
-# display = Display(visible=0, size=(1366, 768))
-# display.start()
+display = Display(visible=0, size=(1366, 768))
+display.start()
 
 
 # driver = webdriver.PhantomJS(desired_capabilities=dcap)
