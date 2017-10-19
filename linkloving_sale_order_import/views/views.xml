@@ -15,13 +15,14 @@
                     <sheet>
                         <group>
                             <group>
+                                <field name="retail_type" string="门店分类"/>
                                 <field name="username"/>
                                 <field name="password"/>
 
                             </group>
 
                             <group>
-                                <field name="partner_id" required="1"/>
+                                <field name="partner_id" required="1" string="店名"/>
                                 <field name="login_url"/>
                                 <field name="common_url"/>
                             </group>
