@@ -18,7 +18,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 
 driver = webdriver.Chrome()
-driver.maximize_window()
 
 
 class ImportSaleOrderSetting(models.Model):
@@ -405,7 +404,6 @@ class ImportSaleOrderSetting(models.Model):
     @api.multi
     def start(self):
         driver = webdriver.Chrome()
-        driver.maximize_window()
         for rec in self:
             if rec.retail_type == 'jd':
                 rec.jdlogin()
