@@ -218,6 +218,8 @@ class StockMoveExtend(models.Model):
     authorizer_id = fields.Many2one("hr.employee", string=u'授权人', )
     authorizee_id = fields.Many2one("res.users", string=u"被授权人")
 
+    def action_change_state_done(self):
+        self.state = 'done'
     @api.multi
     # 授权人 和被授权人
     def authorized_stock_move(self, authorizer_id=None, authorizee_id=None):
@@ -245,20 +247,51 @@ class ProductionTimeRecord(models.Model):
     production_id = fields.Many2one('mrp.production')
 
 
+class BackToProgressWizard(models.TransientModel):
+    _name = 'secondary.produce.wizard'
+
+    produce_line_ids = fields.Many2many("mrp.production", string=u'相关制造单')
+
+    def action_confirm(self):
+        self.produce_line_ids.back_to_progress()
+        return '1234'
+
+
+class BackToProgressMoLine(models.TransientModel):
+    _name = 'secondary.produce.line'
+
+    production_id = fields.Many2one("mrp.production", string=u"制造单")
+    process_id = fields.Many2one("mrp.process", related="production_id.process_id")
+    product_id = fields.Many2one("product.template", related="production_id.product_tmpl_id")
+    state = fields.Selection(related="production_id.state")
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 
     is_secondary_produce = fields.Boolean(default=False)
     secondary_produce_time_ids = fields.One2many("production.time.record", 'production_id', )
 
+    def action_view_secondary_mos(self):
+        mos = self.env["mrp.production"].search([("origin", "ilike", self.name),
+                                                 ("state", "=", "done")])
+        mos += self
+        return {'type': 'ir.actions.act_window',
+                'res_model': 'secondary.produce.wizard',
+                'view_mode': 'form',
+                'context': '{"default_production_id":%s, "default_produce_line_ids":%s}' % (self.id, mos.ids),
+                # , "default_produce_line_ids": %s}' % (self.id, self),
+                # 'res_id': self.product_tmpl_id.id,
+                'target': 'new'
+                }
+    @api.multi
     def back_to_progress(self):
-        self.is_secondary_produce = True
-        p_time = self.env["production.time.record"].create({
-            'production_id': self.id,
-            'start_time': fields.Datetime.now(),
-            'record_type': 'secondary'
-        })
-        self.state = 'progress'
+        for mo in self:
+            mo.is_secondary_produce = True
+            p_time = self.env["production.time.record"].create({
+                'production_id': mo.id,
+                'start_time': fields.Datetime.now(),
+                'record_type': 'secondary'
+            })
+            mo.state = 'progress'
 
     @api.multi
     def action_view_qc_report(self):
@@ -538,12 +571,11 @@ class MrpProductionExtend(models.Model):
         self.write({'state': 'waiting_material'})
         # else:
         #     self.write({'state': 'finish_prepare_material'})
-        if not self.is_rework:
-            qty_wizard = self.env['change.production.qty'].create({
-                'mo_id': self.id,
-                'product_qty': self.product_qty,
-            })
-            qty_wizard.change_prod_qty()
+        qty_wizard = self.env['change.production.qty'].create({
+            'mo_id': self.id,
+            'product_qty': self.product_qty,
+        })
+        qty_wizard.change_prod_qty()
         return {'type': 'ir.actions.empty'}
         # from linkloving_app_api.models.models import JPushExtend
         # JPushExtend.send_push(audience=jpush.audience(
@@ -1652,6 +1684,10 @@ class MrpQcFeedBack(models.Model):
         produce.do_produce_and_post_inventory()
 
         self.state = "alredy_post_inventory"
+
+    def action_back_state(self):
+        if self.state == 'alredy_post_inventory':
+            self.state = 'qc_success'
 
     # 品捡失败 -> 返工
     def action_check_to_rework(self):
