@@ -2824,6 +2824,7 @@ class LinklovingAppApi(http.Controller):
                         dom = safe_eval(menu.action.params_store or '{}', {'uid': uid}).get('domain')
                     res[xml_name]['needaction_enabled'] = model._needaction
                     res[xml_name]['needaction_counter'] = model._needaction_count(dom)
+        print(res)
         return res
 
 
