@@ -3098,7 +3098,7 @@ class LinklovingAppApi(http.Controller):
                         move_todo.action_done()
                         move_todo.authorized_stock_move(employee_id, uid)
                 sim_stock_move.quantity_ready = 0  # 清0
-                sim_stock_move.quantity_done = sim_stock_move.quantity_done + move['quantity_ready']
+                # sim_stock_move.quantity_done = sim_stock_move.quantity_done + move['quantity_ready']
         except Exception, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error": e.name})
