@@ -3071,7 +3071,7 @@ class LinklovingAppApi(http.Controller):
                 if not sim_stock_move.stock_moves:
                     continue
                 else:
-                    move_todo = sim_stock_move.stock_moves.filtered(lambda x: x.state not in ["cancel", "done"])
+                    move_todo = sim_stock_move.sudo().stock_moves.filtered(lambda x: x.state not in ["cancel", "done"])
                     if not move_todo:
                         split_move = sim_stock_move.stock_moves[0].copy(
                                 default={'quantity_done': move['quantity_ready'],
@@ -3348,8 +3348,8 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/get_secondary_mos', type='json', auth='none', csrf=False, cors='*')
     def get_secondary_mos(self, **kw):
         # order_id = request.jsonrequest.get('material_id')
-        domain = [("is_secondary_produce", '=', True), ('state', 'not in ', ['cancel', 'done'])]
-        mos = request.env["mrp.production"].sudo().search(domain)
+        domain = [("is_secondary_produce", '=', True)]
+        mos = request.env["mrp.production"].sudo().search(domain).filtered(lambda x: x.state not in ['cancel', 'done'])
 
         data = []
         for production in mos:
