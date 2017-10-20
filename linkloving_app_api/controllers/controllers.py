@@ -3340,3 +3340,15 @@ class LinklovingAppApi(http.Controller):
         json_list = [{"state": 'ok'}]
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    @http.route('/linkloving_app_api/get_secondary_mos', type='json', auth='none', csrf=False, cors='*')
+    def get_secondary_mos(self, **kw):
+        # order_id = request.jsonrequest.get('material_id')
+        domain = [("is_secondary_produce", '=', True), ('state', 'not in ', ['cancel', 'done'])]
+        mos = request.env["mrp.production"].sudo().search(domain)
+
+        data = []
+        for production in mos:
+            data.append(self.get_simple_production_json(production))
+        # user_data = LinklovingAppApi.odoo10.execute('res.users', 'read', [LinklovingAppApi.odoo10.env.user.id])
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
