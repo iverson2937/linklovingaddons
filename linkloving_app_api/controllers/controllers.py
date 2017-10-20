@@ -2595,7 +2595,7 @@ class LinklovingAppApi(http.Controller):
                     'name': move.product_id.display_name,
                     'default_code': move.product_id.default_code,
                     'qty_available': move.product_id.qty_available,
-                    'weight': pack.product_id.weight or 0,
+                    'weight': move.product_id.weight or 0,
                     'area_id': {
                         'area_id': move.product_id.area_id.id or None,
                         'area_name': move.product_id.area_id.name or None,
