@@ -3064,14 +3064,15 @@ class LinklovingAppApi(http.Controller):
         stock_move_lines = request.env["sim.stock.move"].sudo()
         try:
             for move in stock_moves:
-                sim_stock_move = LinklovingAppApi.get_model_by_id(move['stock_move_lines_id'],
-                                                                  request,
-                                                                  'sim.stock.move')
+                sim_stock_move = request.env["sim.stock.move"].sudo().browse(move['stock_move_lines_id'])
+                # LinklovingAppApi.get_model_by_id(,
+                #                                                   request,
+                #                                                   'sim.stock.move')
                 stock_move_lines += sim_stock_move
                 if not sim_stock_move.stock_moves:
                     continue
                 else:
-                    move_todo = sim_stock_move.sudo().stock_moves.filtered(lambda x: x.state not in ["cancel", "done"])
+                    move_todo = sim_stock_move.stock_moves.filtered(lambda x: x.state not in ["cancel", "done"])
                     if not move_todo:
                         split_move = sim_stock_move.stock_moves[0].copy(
                                 default={'quantity_done': move['quantity_ready'],
