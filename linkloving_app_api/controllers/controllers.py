@@ -304,9 +304,9 @@ class LinklovingAppApi(http.Controller):
 
         if condition and condition[condition.keys()[0]]:
             domain = (condition.keys()[0], 'like', condition[condition.keys()[0]])
-
-        production_line_id = request.jsonrequest.get("production_line_id")
-        domain.append(('production_line_id', '=', production_line_id))
+        if 'production_line_id' in request.jsonrequest.keys():
+            production_line_id = request.jsonrequest.get("production_line_id")
+            domain.append(('production_line_id', '=', production_line_id))
 
         production_all = mrp_production.search(domain,
                                                offset=request.jsonrequest['offset'],
@@ -2595,7 +2595,7 @@ class LinklovingAppApi(http.Controller):
                     'name': move.product_id.display_name,
                     'default_code': move.product_id.default_code,
                     'qty_available': move.product_id.qty_available,
-                    'weight': pack.product_id.weight or 0,
+                    'weight': move.product_id.weight or 0,
                     'area_id': {
                         'area_id': move.product_id.area_id.id or None,
                         'area_name': move.product_id.area_id.name or None,
@@ -2824,6 +2824,7 @@ class LinklovingAppApi(http.Controller):
                         dom = safe_eval(menu.action.params_store or '{}', {'uid': uid}).get('domain')
                     res[xml_name]['needaction_enabled'] = model._needaction
                     res[xml_name]['needaction_counter'] = model._needaction_count(dom)
+        print(res)
         return res
 
 
@@ -3064,9 +3065,10 @@ class LinklovingAppApi(http.Controller):
         stock_move_lines = request.env["sim.stock.move"].sudo()
         try:
             for move in stock_moves:
-                sim_stock_move = LinklovingAppApi.get_model_by_id(move['stock_move_lines_id'],
-                                                                  request,
-                                                                  'sim.stock.move')
+                sim_stock_move = request.env["sim.stock.move"].sudo().browse(move['stock_move_lines_id'])
+                # LinklovingAppApi.get_model_by_id(,
+                #                                                   request,
+                #                                                   'sim.stock.move')
                 stock_move_lines += sim_stock_move
                 if not sim_stock_move.stock_moves:
                     continue
@@ -3097,7 +3099,7 @@ class LinklovingAppApi(http.Controller):
                         move_todo.action_done()
                         move_todo.authorized_stock_move(employee_id, uid)
                 sim_stock_move.quantity_ready = 0  # 清0
-                sim_stock_move.quantity_done = sim_stock_move.quantity_done + move['quantity_ready']
+                # sim_stock_move.quantity_done = sim_stock_move.quantity_done + move['quantity_ready']
         except Exception, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error": e.name})
@@ -3348,8 +3350,8 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/get_secondary_mos', type='json', auth='none', csrf=False, cors='*')
     def get_secondary_mos(self, **kw):
         # order_id = request.jsonrequest.get('material_id')
-        domain = [("is_secondary_produce", '=', True), ('state', 'not in ', ['cancel', 'done'])]
-        mos = request.env["mrp.production"].sudo().search(domain)
+        domain = [("is_secondary_produce", '=', True)]
+        mos = request.env["mrp.production"].sudo().search(domain).filtered(lambda x: x.state not in ['cancel', 'done'])
 
         data = []
         for production in mos:
