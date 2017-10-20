@@ -304,9 +304,9 @@ class LinklovingAppApi(http.Controller):
 
         if condition and condition[condition.keys()[0]]:
             domain = (condition.keys()[0], 'like', condition[condition.keys()[0]])
-
-        production_line_id = request.jsonrequest.get("production_line_id")
-        domain.append(('production_line_id', '=', production_line_id))
+        if 'production_line_id' in request.jsonrequest.keys():
+            production_line_id = request.jsonrequest.get("production_line_id")
+            domain.append(('production_line_id', '=', production_line_id))
 
         production_all = mrp_production.search(domain,
                                                offset=request.jsonrequest['offset'],
