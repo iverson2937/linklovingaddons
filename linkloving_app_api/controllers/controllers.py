@@ -3085,7 +3085,11 @@ class LinklovingAppApi(http.Controller):
                         split_move.action_done()
                         split_move.authorized_stock_move(employee_id, uid)
                     elif len(move_todo) > 1:
-                        raise UserError(u"库存移动异常")
+                        if move_todo[0].state == 'draft':
+                            move_todo[0].action_confirm()
+                        move_todo[0].quantity_done = move['quantity_ready']
+                        move_todo[0].action_done()
+                        move_todo[0].authorized_stock_move(employee_id, uid)
                     else:
                         if move_todo.state == 'draft':
                             move_todo.action_confirm()
