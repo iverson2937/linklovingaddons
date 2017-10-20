@@ -19,6 +19,11 @@
                 </xpath>
 
 
+                <xpath expr="//button[@name='%(stock.act_stock_return_picking)d']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+
                 <xpath expr="//button[@name='do_new_transfer']" position="replace">
 
                     <button name="to_stock" string="出库" type="object" class="oe_highlight"
