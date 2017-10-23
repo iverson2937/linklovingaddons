@@ -18,6 +18,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 
 driver = webdriver.Chrome()
+driver.maximize_window()
 
 
 class ImportSaleOrderSetting(models.Model):
@@ -177,10 +178,6 @@ class ImportSaleOrderSetting(models.Model):
 
     def get_all_infomations_from_tiaomao(self):
         eliminate_alert_to_target(self.common_url)
-        # time.sleep(5)
-
-        # redis_entity 实体,我们需要通过链表的模式来做传递,因为python本身的设计模式就是基于引用(指针)之间的传递
-        redis_list = []
 
         def process_items_tb(is_first, partner_id=False):
             if is_first:
@@ -190,7 +187,6 @@ class ImportSaleOrderSetting(models.Model):
                     time.sleep(3)
                     driver.find_element_by_xpath('/html/body/div[3]/div[2]/div[3]/ul/li[1]/a').click()
                     time.sleep(3)
-
                 except:
                     print u'可能在某些时候天猫会去除这些演示教程,所以需要进行异常处理机制'
 
@@ -408,14 +404,14 @@ class ImportSaleOrderSetting(models.Model):
             if rec.retail_type == 'jd':
                 rec.jdlogin()
                 orders = get_all()
+                orders = orders[1:10]
                 # 根据获得的订单编号,来获取每个订单编号中关于京东的商品编号
+                print 'orders', orders
                 for order_number in set(orders):
-
                     self.env['retail.order'].create_retail_sale_order(process_order_detail(order_number),
                                                                       partner_id=rec.partner_id.id)
 
                     time.sleep(1)
-                    break
             if rec.retail_type == 'tb':
                 rec.tb_login()
                 rec.get_all_infomations_from_tiaomao()
@@ -615,7 +611,7 @@ def process_order_detail(order_id):
     driver.get(order_url)
     res = {}
     items = []
-    sku_numbers_info = driver.find_elements_by_xpath('/html/body/div[1]/div[5]/table/tbody')
+    sku_numbers_info = driver.find_elements_by_xpath('/html/body/div[1]/div[5]/table/tbody/tr')
     pay_info = driver.find_element_by_xpath('/html/body/div[1]/div[4]/table/tbody/tr/td[3]/table/tbody')
     # 付款时间 商品总额 运费总额 促销优惠 优惠券 应支付金额
     order_time = driver.find_element_by_xpath('/html/body/div[1]/div[1]/ul/li[1]/p[2]').text.strip()
@@ -630,22 +626,22 @@ def process_order_detail(order_id):
 
     for sku_number_info in sku_numbers_info:
         item = {}
-        jingdong_sku_number = sku_number_info.find_element_by_xpath('./tr/td[1]').text.strip()
+        jingdong_sku_number = sku_number_info.find_element_by_xpath('./td[1]').text.strip()
         # 京东的sku商品编号
         # order_detail[orderId][u'商品编号'] = sku_number
         # order_detail[orderId][jingdong_sku_number] = {}
-        entity_item_price = sku_number_info.find_element_by_xpath('./tr/td[3]').text.replace(u'￥', '').strip()
-        entity_discount_amount = sku_number_info.find_element_by_xpath('./tr/td[4]').text.replace(u'￥', '').strip()
-        entity_item_count = sku_number_info.find_element_by_xpath('./tr/td[7]').text.replace(u'￥', '').strip()
-        entity_item_code_temp = sku_number_info.find_element_by_xpath('./tr/td[2]/a').text.strip()
+        entity_item_price = sku_number_info.find_element_by_xpath('./td[3]').text.replace(u'￥', '').strip()
+        entity_discount_amount = sku_number_info.find_element_by_xpath('./td[4]').text.replace(u'￥', '').strip()
+        entity_item_count = sku_number_info.find_element_by_xpath('./td[7]').text.strip()
+        entity_item_code_temp = sku_number_info.find_element_by_xpath('./td[2]/a').text.strip()
         print u'商品总称为:%s' % entity_item_code_temp
         # entity_item_code = ' '.join(entity_item_code_temp.strip().split(' ')[2:])
         entity_item_code = processJingDongSkuToJiongDongItemCode(order_id, jingdong_sku_number, entity_item_code_temp)
         item.update({
             'default_code': entity_item_code,
             'product_name': entity_item_code_temp,
-            'price_unit': entity_item_price,
-            'discount': entity_discount_amount,
+            'price_unit': float(entity_item_price),
+            'discount': float(entity_discount_amount),
             'product_qty': entity_item_count,
         })
         items.append(item)
@@ -656,11 +652,11 @@ def process_order_detail(order_id):
         'payment_date': datetime.datetime.strptime(payment_time, "%Y-%m-%d %H:%M:%S") if payment_time else False,
         'finish_date': datetime.datetime.strptime(finish_time, "%Y-%m-%d %H:%M:%S") if finish_time else False,
         'order_status': order_status,
-        'total_amount': amount_price,
-        'delivery_fee': total_freight,
-        'sales_promotion': total_sales_promotion,
-        'coupon_price': coupon_price,
-        'actual_payment': actual_payment,
+        'total_amount': float(amount_price),
+        'delivery_fee': float(total_freight),
+        'sales_promotion': float(total_sales_promotion),
+        'coupon_price': float(coupon_price),
+        'actual_payment': float(actual_payment),
         'items': items,
     })
     # print u'下单时间:%s\t付款时间:%s\t完成时间:%s\t订单状态:%s\t商品总额:%s\t运费总额:%s\t促销优惠:%s\t优惠券:%s\t应支付金额:%s' % (
