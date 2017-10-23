@@ -337,8 +337,11 @@ class ReviewProcessLine(models.Model):
             review_type_two = 'picking_review_line'
         elif review_type_two == 'proofing':
             review_type_two = 'picking_review_project'
+        else:
+            review_type_two = review_type
 
-        if self.env["final.review.partner"].get_final_review_partner_id(review_type_two).id == self.env.user.partner_id.id:
+        if self.env["final.review.partner"].get_final_review_partner_id(
+                review_type_two).id == self.env.user.partner_id.id:
             self.write({
                 'review_time': fields.datetime.now(),
                 'state': 'review_success',
