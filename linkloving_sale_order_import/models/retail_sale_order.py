@@ -8,6 +8,7 @@ class RetailSaleOrder(models.Model):
     _name = 'retail.order'
     name = fields.Char(string=u'名称')
     partner_id = fields.Many2one('res.partner')
+    sale_order_id = fields.Many2one('sale_order')
     total_amount = fields.Float(string=u'订单金额', track_visibility='onchange')
     order_date = fields.Datetime(string=u'成交日期/下单时间', track_visibility='onchange')
     payment_date = fields.Datetime(string=u'付款日期')
@@ -25,16 +26,14 @@ class RetailSaleOrder(models.Model):
     order_status = fields.Char(string=u'订单状态')
     order_line_ids = fields.One2many('retail.order.line', 'order_id')
 
-    @api.model
-    def create(self, vals):
-        print vals, 'ddddddd'
-        eb_order = super(RetailSaleOrder, self).create(vals)
-        if vals.get('state') != 'error':
+    @api.multi
+    def write(self, vals):
+        if vals.get('state') == 'done':
             tax_id = self.env["account.tax"].search([('type_tax_use', '<>', "purchase")], limit=1)[0].id
-            order_id = self.env["sale.order"].create({
-                'partner_id': eb_order.partner_id.id,
-                'partner_invoice_id': eb_order.partner_id.id,
-                'partner_shipping_id': eb_order.partner_id.id,
+            sale_order_id = self.env["sale.order"].create({
+                'partner_id': self.partner_id.id,
+                'partner_invoice_id': self.partner_id.id,
+                'partner_shipping_id': self.partner_id.id,
                 'tax_id': tax_id,
                 'is_scrapy': True,
                 'order_line': [(0, 0, {'name': p.product_id.name,
@@ -42,10 +41,10 @@ class RetailSaleOrder(models.Model):
                                        'product_uom_qty': p.qty,
                                        'product_uom': p.product_id.uom_id.id,
                                        'price_unit': p.price_unit,
-                                       'tax_id': [(6, 0, [tax_id])]}) for p in eb_order.order_line_ids],
+                                       'tax_id': [(6, 0, [tax_id])]}) for p in self.order_line_ids],
             })
-            eb_order.order_id = order_id.id
-        return eb_order
+            self.sale_order_id = sale_order_id.id
+        return super(RetailSaleOrder, self).write(vals)
 
     def create_retail_sale_order(self, values, partner_id=False):
         name, vals = values.items()[0]
@@ -70,6 +69,23 @@ class RetailSaleOrder(models.Model):
                 'coupon_price': vals.get('coupon_price'),
                 'actual_payment': vals.get('actual_payment')
             })
+            if items:
+                for item in items:
+                    product_id = False
+                    if item.get('default_code'):
+                        product_id = self.env['product.product'].search(['default_code', '=', item.get('default_code')])
+                    if not product_id:
+                        order_id.state = 'error'
+                    else:
+                        self.env['retail.order.line'].create({
+                            'product_id': product_id.id if product_id else False,
+                            'description': item.get('description'),
+                            'product': item.get('product'),
+                            'price_unit': item.get('price_unit'),
+                            'product_qty': item.get('product_qty'),
+                            'order_id': order_id.id,
+                        })
+
             # 添加运费
             if delivery_fee:
                 self.env['retail.order.line'].create({
@@ -104,21 +120,6 @@ class RetailSaleOrder(models.Model):
                     'order_id': order_id.id,
                 })
 
-            if items:
-                for item in items:
-                    product_id = False
-                    if item.get('default_code'):
-                        product_id = self.env['product.product'].search(['default_code', '=', item.get('default_code')])
-                    if not product_id:
-                        order_id.state = 'error'
-                    self.env['retail.order.line'].create({
-                        'product_id': product_id.id if product_id else False,
-                        'description': item.get('description'),
-                        'product': item.get('product'),
-                        'price_unit': item.get('price_unit'),
-                        'product_qty': item.get('product_qty'),
-                        'order_id': order_id.id,
-                    })
         else:
             order_id.write({
                 'total_amount': vals.get('total_amount'),
@@ -140,6 +141,7 @@ class RetailSaleOrder(models.Model):
                             'price_unit': item.get('price_unit'),
                             'product_qty': item.get('product_qty'),
                             'description': item.get('description'),
+                            'default_code': item.get('default_code')
                         })
                     else:
                         self.env['retail.order.line'].create({
@@ -150,6 +152,7 @@ class RetailSaleOrder(models.Model):
                             'product_qty': item.get('product_qty'),
                             'order_id': order_id.id,
                         })
+
                         # if delivery_fee:
                         #     fee_id = self.order_line_ids.filtered(lambda x: x.product_id == delivery_fee_id.id)
                         #     if fee_id:
@@ -168,8 +171,16 @@ class RetailSaleOrder(models.Model):
 
 class RetailSaleOrderLine(models.Model):
     _name = 'retail.order.line'
+
+    @api.depends('default_code')
+    def compute_compute_id(self):
+        if self.product_code:
+            self.product_id = self.env['product.product'].search([('product_code', '=', self.product_id)])
+
     order_id = fields.Many2one('retail.order')
-    product_id = fields.Many2one('product.product')
+
+    product_id = fields.Many2one('product.product', compute='compute_compute_id')
+    default_code = fields.Char()
     discount = fields.Float(string=u'折扣')
     product_qty = fields.Float(string=u'数量')
     price_unit = fields.Float(string=u'单价')

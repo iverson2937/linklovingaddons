@@ -16,9 +16,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
-
-driver = webdriver.Chrome()
-driver.maximize_window()
+from pyvirtualdisplay import Display
 
 
 class ImportSaleOrderSetting(models.Model):
@@ -33,7 +31,7 @@ class ImportSaleOrderSetting(models.Model):
         ('jd', u'京东'),
     ])
 
-    def _login_name(self):
+    def _login_name(self, driver):
         try:
             # driver.find_element_by_xpath('//*[@id="loginname"]').click()
             time.sleep(3)
@@ -45,7 +43,7 @@ class ImportSaleOrderSetting(models.Model):
             print 'user error!'
         time.sleep(3)
 
-    def _login_password(self):
+    def _login_password(self, driver):
         # sign in the pasword
         try:
             driver.find_element_by_xpath('//*[@id="nloginpwd"]').clear()
@@ -56,7 +54,7 @@ class ImportSaleOrderSetting(models.Model):
             print 'pw error!'
         time.sleep(3)
 
-    def _click_and_login(self):
+    def _click_and_login(self, driver):
         # click to login
         try:
             driver.find_element_by_xpath('//*[@id="paipaiLoginSubmit"]').click()
@@ -66,7 +64,7 @@ class ImportSaleOrderSetting(models.Model):
         time.sleep(3)
 
     @staticmethod
-    def _verify_span_slider():
+    def _verify_span_slider(driver):
         try:
             span_slider = driver.find_element_by_xpath('//*[@id="nc_1_n1z"]')
             ActionChains(driver).drag_and_drop_by_offset(span_slider, 258, 0).perform()
@@ -78,7 +76,7 @@ class ImportSaleOrderSetting(models.Model):
 
     # 京东登录
 
-    def jdlogin(self):
+    def jdlogin(self, driver):
         # open the login in page
         driver.get(self.login_url)
         try:
@@ -91,9 +89,9 @@ class ImportSaleOrderSetting(models.Model):
         # 由于京东中使用frame来再次加载一个网页，所以，在选择元素的时候会出现选择不到的结果，所以，我们需要把视图窗口切换到frame中
         driver.switch_to.frame(u'loginFrame')
 
-        self._login_name()
-        self._login_password()
-        self._click_and_login()
+        self._login_name(driver)
+        self._login_password(driver)
+        self._click_and_login(driver)
 
         curpage_url = driver.current_url
         print 'currpage_url ' + curpage_url
@@ -101,14 +99,14 @@ class ImportSaleOrderSetting(models.Model):
         while (curpage_url == self.login_url):
             # print 'please input the verify code:'
             print '京东登录中的滑块验证已经出现需要去做验证:'
-            self._login_name()
-            self._login_password()
-            self._click_and_login()
-            self._verify_span_slider()
+            self._login_name(driver)
+            self._login_password(driver)
+            self._click_and_login(driver)
+            self._verify_span_slider(driver)
 
             curpage_url = driver.current_url
 
-    def tb_login(self):
+    def tb_login(self, driver):
         # open the login in page
         eliminate_alert_to_target(self.login_url)
 
@@ -116,7 +114,7 @@ class ImportSaleOrderSetting(models.Model):
         # sign in the username
 
 
-        def login_name(username):
+        def login_name(driver, username, ):
             try:
                 driver.find_element_by_xpath('//*[@id="J_QRCodeLogin"]/div[5]/a[1]').click()
                 time.sleep(3)
@@ -128,7 +126,7 @@ class ImportSaleOrderSetting(models.Model):
                 print 'user error!'
             time.sleep(3)
 
-        def login_password(password):
+        def login_password(driver, password):
             # sign in the pasword
             try:
                 driver.find_element_by_xpath('//*[@id="TPL_password_1"]').clear()
@@ -139,7 +137,7 @@ class ImportSaleOrderSetting(models.Model):
                 print 'pw error!'
             time.sleep(3)
 
-        def click_and_login():
+        def click_and_login(driver):
             # click to login
             try:
                 driver.find_element_by_xpath('//*[@id="J_SubmitStatic"]').click()
@@ -148,9 +146,9 @@ class ImportSaleOrderSetting(models.Model):
                 print 'click error!'
             time.sleep(3)
 
-        login_name(self.username)
-        login_password(self.password)
-        click_and_login()
+        login_name(driver, self.username)
+        login_password(driver, self.password)
+        click_and_login(driver)
 
         curpage_url = driver.current_url
         print 'currpage_url ' + curpage_url
@@ -169,14 +167,14 @@ class ImportSaleOrderSetting(models.Model):
                     print u'滑块运行失败!'
                 time.sleep(3)
 
-            login_name(self.username)
-            login_password(self.password)
-            click_and_login()
-            verify_span_slider()
+            login_name(driver, self.username)
+            login_password(driver, self.password)
+            click_and_login(driver)
+            verify_span_slider(driver)
 
             curpage_url = driver.current_url
 
-    def get_all_infomations_from_tiaomao(self):
+    def get_all_infomations_from_tiaomao(self, driver):
         eliminate_alert_to_target(self.common_url)
 
         def process_items_tb(is_first, partner_id=False):
@@ -191,7 +189,7 @@ class ImportSaleOrderSetting(models.Model):
                     print u'可能在某些时候天猫会去除这些演示教程,所以需要进行异常处理机制'
 
                 # 也是在第一次的时候，处理搜索的范围 接下来的操作在于是通过获取所需求的30天之内数据
-                limit_scrapy_data_in_days_tb()
+                limit_scrapy_data_in_days_tb(driver)
 
             time.sleep(5)
 
@@ -400,10 +398,12 @@ class ImportSaleOrderSetting(models.Model):
     @api.multi
     def start(self):
         driver = webdriver.Chrome()
+        display = Display(visible=0, size=(1366, 768))
+        display.start()
         for rec in self:
             if rec.retail_type == 'jd':
-                rec.jdlogin()
-                orders = get_all()
+                rec.jdlogin(driver)
+                orders = get_all(driver)
                 orders = orders[1:10]
                 # 根据获得的订单编号,来获取每个订单编号中关于京东的商品编号
                 print 'orders', orders
@@ -419,7 +419,7 @@ class ImportSaleOrderSetting(models.Model):
         driver.quit()
 
 
-def process_items(is_first, orders, total_pages_list=None):
+def process_items(driver, is_first, orders, total_pages_list=None):
     if is_first:
         # 对于第一次打开网页的时候,会出现操作教程,这个界面我们只需要第一次去处理即可
         try:
@@ -433,7 +433,7 @@ def process_items(is_first, orders, total_pages_list=None):
             print u'error'
 
         # 也是在第一次的时候，处理搜索的范围 接下来的操作在于是通过获取所需求的30天之内数据
-        limit_scrapy_data_in_days_jd()
+        limit_scrapy_data_in_days_jd(driver)
         print ''
         # 在页面的底层，京东有完整的页码，方便我们对总的页数进行处理分析的过程!!!
         tmp = driver.find_element_by_xpath('//div[@class="pagin fr"]/span[2]').text.strip()
@@ -463,13 +463,13 @@ def process_items(is_first, orders, total_pages_list=None):
         # processOrderDetail(order_number)
 
 
-def get_all_infomations_from_jd(jingdong_url, orders):
+def get_all_infomations_from_jd(driver, jingdong_url, orders):
     driver.get(jingdong_url)
     time.sleep(5)
 
     total_pages_list = []
 
-    def click_next_page(page_num):
+    def click_next_page(driver, page_num):
         # 由于京东在做下一页的这种设计的时候，基于自定义操作的步骤，所以对于在下一页的的这个按钮在其他表中是看不到的，所以使用
         # 这种方法在解决问题
         print u'正在处理当前的页码是%s' % page
@@ -478,14 +478,14 @@ def get_all_infomations_from_jd(jingdong_url, orders):
             '/html/body/div[2]/div/div[3]/div[1]/div/div/div[2]/div[3]/div/em/input[2]').click()
 
     # 对于第一次打开网页,我们特殊做一次处理,网页中有一些关于初学者的指南的学习步骤,会影响爬虫的爬去工作
-    process_items(True, orders, total_pages_list)
+    process_items(driver, True, orders, total_pages_list)
     page = 2
     total_pages = total_pages_list[0]
     while page <= total_pages:
         try:
-            click_next_page(page)
+            click_next_page(driver, page)
             # time.sleep(3)
-            process_items(False, orders)
+            process_items(driver, False, orders)
         except Exception:
             # 如果到了最后一页,我们就完成这次的处理需求
             break
@@ -495,7 +495,7 @@ def get_all_infomations_from_jd(jingdong_url, orders):
 
 # 此方法有递归,目的在与在订单中所要查找的小定单可能不在当前销售的数据之中(数据先去在售的管理界面中寻找),可能在下架的产品之中,如果有recursion == 2 那么,
 # 就该去下架的产品中寻找数据
-def processJingDongSkuToJiongDongItemCode(orderId, sku_number, total_title,
+def processJingDongSkuToJiongDongItemCode(driver, orderId, sku_number, total_title,
                                           onSale_url='https://ware.shop.jd.com/onSaleWare/onSaleWare_newDoSearch.action',
                                           recurison_depth=1
                                           ):
@@ -542,7 +542,7 @@ def processJingDongSkuToJiongDongItemCode(orderId, sku_number, total_title,
         driver.switch_to.window(driver.window_handles[-1])
         # 在这种情况下,我们更换一下要访问的url列表,这个列表的作用就是在已下架的模块中寻找所需的产品是否存在!!!
 
-        return processJingDongSkuToJiongDongItemCode(orderId, sku_number, total_title,
+        return processJingDongSkuToJiongDongItemCode(driver, orderId, sku_number, total_title,
                                                      'https://ware.shop.jd.com/forSaleWare/forSaleWare_newDoSearch.action',
                                                      recurison_depth + 1
                                                      )
@@ -605,7 +605,7 @@ def processJingDongSkuToJiongDongItemCode(orderId, sku_number, total_title,
     return code
 
 
-def process_order_detail(order_id):
+def process_order_detail(order_id, driver):
     # 该url所要做的事情在于是获取详细的订单的详情
     order_url = 'https://neworder.shop.jd.com/order/orderDetail?orderId=%s' % order_id
     driver.get(order_url)
@@ -667,7 +667,7 @@ def process_order_detail(order_id):
     return {order_id: res}
 
 
-def limit_scrapy_data_in_days_jd():
+def limit_scrapy_data_in_days_jd(driver):
     # 获取当前的日期时间 如: xxxx-xx-xx
     today = datetime.date.today()
 
@@ -697,7 +697,7 @@ def limit_scrapy_data_in_days_jd():
     print u'点击搜索之后,获得需要的结果'
 
 
-def get_all():
+def get_all(driver):
     orders = []
     waitting_export_url = 'https://order.shop.jd.com/order/sopUp_waitOutList.action'
     alerady_export_url = 'https://order.shop.jd.com/order/sSopUp_newYiShipList.action'
@@ -709,14 +709,14 @@ def get_all():
             refund_order_during_url]
     for url in urls:
         try:
-            get_all_infomations_from_jd(url, orders)
+            get_all_infomations_from_jd(driver,url, orders)
         except Exception, e:
             print e
     return orders
 
 
 # 淘宝相关
-def eliminate_alert_to_target(url):
+def eliminate_alert_to_target(driver, url):
     # 可能在打开新窗口的时候有一些flahs更新的弹框出来，我们需要谜面这种情况的出现!!!
     driver.get(url)
     time.sleep(15)
@@ -728,7 +728,7 @@ def eliminate_alert_to_target(url):
 
 
 # 限定抓取数据的天数
-def limit_scrapy_data_in_days_tb():
+def limit_scrapy_data_in_days_tb(driver):
     # 获取当前的日期时间 如: xxxx-xx-xx
     today = datetime.date.today()
 
@@ -770,7 +770,7 @@ def limit_scrapy_data_in_days_tb():
     print u'点击搜索之后,获得需要的结果'
 
 
-def process_seller_baby_info():
+def process_seller_baby_info(driver):
     # 获取出售中的宝贝的详细信息
     seller_baby_url = 'https://sell.tmall.com/auction/item/item_list.htm#' \
                       'sortField=starts&status=item_on_sale&order=desc&currentPage=%s'
@@ -784,7 +784,7 @@ def process_seller_baby_info():
 
     def process(page):
         url = seller_baby_url.replace('%s', page)
-        eliminate_alert_to_target(url)
+        eliminate_alert_to_target(driver,url)
         #########time.sleep(3)
         baby_infos_detail = driver.find_elements_by_xpath('//*[@id="rtCtn"]/div/div[5]/div/div[2]/div[1]/div/div[5]' +
                                                           '/div/div/div/div/table/tbody/tr/td[10]/span/div/div[1]/a')
