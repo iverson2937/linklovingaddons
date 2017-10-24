@@ -398,8 +398,8 @@ class ImportSaleOrderSetting(models.Model):
     @api.multi
     def start(self):
         driver = webdriver.Chrome()
-        display = Display(visible=0, size=(1366, 768))
-        display.start()
+        # display = Display(visible=0, size=(1366, 768))
+        # display.start()
         for rec in self:
             if rec.retail_type == 'jd':
                 rec.jdlogin(driver)
