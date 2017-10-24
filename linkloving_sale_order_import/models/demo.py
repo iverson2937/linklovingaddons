@@ -2,15 +2,8 @@
 
 from pyvirtualdisplay import Display
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
-import time
 
-import re
-import datetime
-from termcolor import colored
+import time
 
 '''
     注意:此模块没有做多线程并发问题,所以，强烈建议多进程模式启动!!!
