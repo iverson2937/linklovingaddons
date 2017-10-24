@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="hr_purchase_apply_form" model="ir.ui.view">
+            <field name="model">hr.purchase.apply</field>
+            <field name="arch" type="xml">
+                <form string="" class="o_expense_sheet">
+                    <header>
+
+                        <!---->
+
+                        <!--<button name="hr_expense_sheet_post" states="draft" string="提交审核"-->
+                        <!--type="object" groups="base.group_user"-->
+                        <!--class="oe_highlight o_expense_sheet_post"/>-->
+
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,submit,manager1_approve,manager2_approve,approve,post,done"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box">
+                            <!--<button name="action_get_attachment_view"-->
+                            <!--class="oe_stat_button"-->
+                            <!--icon="fa-book"-->
+                            <!--type="object">-->
+                            <!--<field name="attachment_number" widget="statinfo" string="Documents"/>-->
+                            <!--</button>-->
+                            <!--<button name="action_open_journal_entries"-->
+                            <!--class="oe_stat_button"-->
+                            <!--icon="fa-book"-->
+                            <!--string="Accounting Entries"-->
+                            <!--attrs="{'invisible': [('account_move_id', '=', False)]}"-->
+                            <!--type="object">-->
+                            <!--</button>-->
+                        </div>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" placeholder="e.g. Trip to NY" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+
+                                <field name="department_id" required="1" options="{'no_create':True}"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="employee_id" invisible="0" readonly="1"/>
+                                <field name="is_show" invisible="1"/>
+                                <field name="total_amount" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="to_approve_id"/>
+
+                                <field name="apply_date"/>
+                            </group>
+                        </group>
+                        <field name="line_ids"
+                               attrs="{'readonly':[('state','not in',('done','draft','cancel'))]}">
+                            <tree editable="bottom">
+                                <field name="product_id" options="{'no_create':True}"/>
+                                <field name="price_unit" string="金额"
+                                       readonly="0"/>
+                                <field name="product_qty"/>
+                                <field name="description"/>
+                            </tree>
+                        </field>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+
+
+                <!--<xpath expr="//button[@name='%(hr_expense.hr_expense_refuse_wizard_action)d']" position="replace">-->
+                <!--<button name="%(hr_expense.hr_expense_refuse_wizard_action)d"-->
+                <!--states="submit,manager1_approve,manager2_approve,manager3_approve" string="Refuse"-->
+                <!--type="action" groups="hr_expense.group_hr_expense_user"/>-->
+                <!--</xpath>-->
+
+                <!--<xpath expr="//button[@name='action_sheet_move_create']" position="replace">-->
+                <!---->
+                <!--</xpath>-->
+
+
+            </field>
+        </record>
+        <record id="hr_purchase_apply_tree" model="ir.ui.view">
+            <field name="model">hr.purchase.apply</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="employee_id"/>
+                    <field name="department_id"/>
+                    <field name="description"/>
+
+                </tree>
+
+
+            </field>
+        </record>
+
+        <record id="action_draft_hr_purchase_apply1" model="ir.actions.act_window">
+            <field name="name">待提交的申购</field>
+            <field name="res_model">hr.purchase.apply</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record id="action_reject_hr_purchase_apply" model="ir.actions.act_window">
+            <field name="name">否决的申购</field>
+            <field name="res_model">hr.purchase.apply</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record id="action_all_hr_purchase_apply" model="ir.actions.act_window">
+            <field name="name">申购报告</field>
+            <field name="res_model">hr.purchase.apply</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <menuitem id="menu_hr_purchase_apply_root" name="申购" sequence="7"
+                  parent="hr_expense.menu_hr_expense_root"/>
+        <menuitem id="menu_draft_hr_purchase_apply" name="待提交的申购"
+                  action="action_draft_hr_purchase_apply1"
+                  parent="menu_hr_purchase_apply_root"/>
+        <menuitem id="menu_reject_hr_purchase_apply" name="否决的申购"
+                  action="action_reject_hr_purchase_apply"
+                  parent="menu_hr_purchase_apply_root"/>
+        <menuitem id="menu_reject_hr_purchase_apply" name="申购报告"
+                  action="action_all_hr_purchase_apply"
+                  parent="menu_hr_purchase_apply_root"/>
+
+
+    </data>
+</openerp>
