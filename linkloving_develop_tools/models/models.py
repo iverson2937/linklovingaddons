@@ -8,8 +8,6 @@ import pytz
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
-from pyvirtualdisplay import Display
-from selenium import webdriver
 _logger = logging.getLogger(__name__)
 import time
 
@@ -267,30 +265,22 @@ class CreateOrderPointWizard(models.TransientModel):
         click_and_login()
 
     def compute_sale_qty(self):
-        username = u'jd_rtkj'
-        # password = sys.argv[2]
-        password = u'dzswrobotime2016!!'
-        loginurl = 'https://passport.shop.jd.com/login/index.action'
-        display = Display(visible=0, size=(1366, 768))
-        display.start()
 
-        driver = webdriver.Chrome()
-        self.login(driver, loginurl, username, password)
-        # this_month = datetime.datetime.now().month
-        # last1_month = this_month - 1
-        # date1_start, date1_end = getMonthFirstDayAndLastDay(month=last1_month)
-        # date2_start, date2_end = getMonthFirstDayAndLastDay(month=last1_month, period=2)
-        # date3_start, date3_end = getMonthFirstDayAndLastDay(month=last1_month, period=5)
-        # products = self.env['product.template'].search([('sale_ok', '=', True)])
-        # for product in products:
-        #     if product.product_variant_ids:
-        #         product_id = product.product_variant_ids[0]
-        #         last1_month_qty = product_id.count_amount(date1_start, date1_end)
-        #         last2_month_qty = product_id.count_amount(date2_start, date2_end)
-        #         last3_month_qty = product_id.count_amount(date3_start, date3_end)
-        #         product.last1_month_qty = last1_month_qty
-        #         product.last2_month_qty = last2_month_qty
-        #         product.last3_month_qty = last3_month_qty
+        this_month = datetime.datetime.now().month
+        last1_month = this_month - 1
+        date1_start, date1_end = getMonthFirstDayAndLastDay(month=last1_month)
+        date2_start, date2_end = getMonthFirstDayAndLastDay(month=last1_month, period=2)
+        date3_start, date3_end = getMonthFirstDayAndLastDay(month=last1_month, period=5)
+        products = self.env['product.template'].search([('sale_ok', '=', True)])
+        for product in products:
+            if product.product_variant_ids:
+                product_id = product.product_variant_ids[0]
+                last1_month_qty = product_id.count_amount(date1_start, date1_end)
+                last2_month_qty = product_id.count_amount(date2_start, date2_end)
+                last3_month_qty = product_id.count_amount(date3_start, date3_end)
+                product.last1_month_qty = last1_month_qty
+                product.last2_month_qty = last2_month_qty
+                product.last3_month_qty = last3_month_qty
 
     def recompute_po_chager(self):
         pos = self.env["purchase.order"].search([])
