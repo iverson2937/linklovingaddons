@@ -24,11 +24,13 @@
 
     # always loaded
     'data': [
+        'wizard/hr_purchase_apply_refuse_wizard.xml',
         'data/hr_purchase_apply_seq.xml',
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
         'views/purchase_apply.xml',
+
     ],
     # only loaded in demonstration mode
     'demo': [

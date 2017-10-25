@@ -7,14 +7,30 @@
                 <form string="" class="o_expense_sheet">
                     <header>
 
-                        <!---->
-
-                        <!--<button name="hr_expense_sheet_post" states="draft" string="提交审核"-->
-                        <!--type="object" groups="base.group_user"-->
+                        <!--<button name="set_account_date" states="done" string="设置日期"-->
+                        <!--type="object" groups="base.group_erp_manager"-->
                         <!--class="oe_highlight o_expense_sheet_post"/>-->
 
+
+                        <button name="hr_purchase_apply_post" states="draft" string="提交审核" type="object"
+                                groups="base.group_user" class="oe_highlight o_expense_sheet_post"/>
+                        <button name="reset_hr_purchase_apply" states="cancel" string="重新提交" type="object"/>
+                        <button name="manager1_approve" string="审核通过" type="object"
+                                groups="hr_expense.group_hr_expense_user" class="oe_highlight o_expense_sheet_approve"
+                                attrs="{'invisible':['|',('is_show','=',False),('state','!=','submit')]}"/>
+                        <button name="manager2_approve" states="manager1_approve" string="审核通过" type="object"
+                                groups="hr_expense.group_hr_expense_user"
+                                attrs="{'invisible':['|',('is_show','=',False),('state','!=','manager1_approve')]}"
+                                class="oe_highlight o_expense_sheet_approve"/>
+                        <button name="manager3_approve" states="manager2_approve" string="审核通过" type="object"
+                                groups="linkloveing_hr.group_hr_expense_user"
+                                attrs="{'invisible':['|',('is_show','=',False),('state','!=','manager2_approve')]}"
+                                class="oe_highlight"/>
+                        <button name="%(hr_purchase_apply_refuse_wizard_action)d"
+                                states="draft,submit,manager1_approve,manager2_approve,manager3_approve,approve"
+                                string="拒绝" type="action" groups="base.group_user"/>
                         <field name="state" widget="statusbar"
-                               statusbar_visible="draft,submit,manager1_approve,manager2_approve,approve,post,done"/>
+                               statusbar_visible="draft,done"/>
                     </header>
                     <sheet>
                         <div class="oe_button_box">
@@ -33,22 +49,22 @@
                             <!--</button>-->
                         </div>
                         <div class="oe_title">
-                            <label for="name" class="oe_edit_only"/>
                             <h1>
-                                <field name="name" placeholder="e.g. Trip to NY" readonly="1"/>
+                                <field name="name" readonly="1"/>
                             </h1>
                         </div>
                         <group>
                             <group>
 
-                                <field name="department_id" required="1" options="{'no_create':True}"/>
-                                <field name="company_id" groups="base.group_multi_company"/>
-                                <field name="employee_id" invisible="0" readonly="1"/>
+                                <field name="department_id" required="1" options="{'no_create':True}" string="部门"/>
+                                <field name="company_id" groups="base.group_multi_company" string="公司"/>
+                                <field name="employee_id" invisible="0" readonly="1" string="员工"/>
                                 <field name="is_show" invisible="1"/>
-                                <field name="total_amount" invisible="1"/>
+                                <field name="total_amount" invisible="0" string="总计"/>
                             </group>
                             <group>
-                                <field name="to_approve_id"/>
+                                <field name="to_approve_id" string="待审核人"
+                                       attrs="{'invisible': [('to_approve_id', '=', False)]}"/>
 
                                 <field name="apply_date"/>
                             </group>
@@ -56,11 +72,13 @@
                         <field name="line_ids"
                                attrs="{'readonly':[('state','not in',('done','draft','cancel'))]}">
                             <tree editable="bottom">
-                                <field name="product_id" options="{'no_create':True}"/>
+                                <field name="product_id" options="{'no_create':True}" string='申购产品'/>
+                                <field name="product_qty"/>
                                 <field name="price_unit" string="金额"
                                        readonly="0"/>
-                                <field name="product_qty"/>
-                                <field name="description"/>
+                                <field name="tax_id"/>
+                                <field name="sub_total"/>
+                                <field name="description" required="1"/>
                             </tree>
                         </field>
                     </sheet>
@@ -88,10 +106,11 @@
             <field name="model">hr.purchase.apply</field>
             <field name="arch" type="xml">
                 <tree>
-                    <field name="name"/>
+                    <field name="name" string="单号"/>
                     <field name="employee_id"/>
                     <field name="department_id"/>
                     <field name="description"/>
+                    <field name="state"/>
 
                 </tree>
 
@@ -99,20 +118,58 @@
             </field>
         </record>
 
-        <record id="action_draft_hr_purchase_apply1" model="ir.actions.act_window">
+        <record id="action_my_draft_hr_purchase_apply" model="ir.actions.act_window">
             <field name="name">待提交的申购</field>
             <field name="res_model">hr.purchase.apply</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
+            <field name="context">{'state':'draft'}</field>
+            <field name="domain">[('employee_id.user_id', '=', uid),('state', '=', 'draft')]</field>
         </record>
         <record id="action_reject_hr_purchase_apply" model="ir.actions.act_window">
             <field name="name">否决的申购</field>
             <field name="res_model">hr.purchase.apply</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
+            <field name="context">{'state':'cancel'}</field>
+            <field name="domain">[('employee_id.user_id', '=', uid),('state','=','cancel')]</field>
+
         </record>
+
+        <record id="action_all_my_hr_purchase_apply" model="ir.actions.act_window">
+            <field name="name">我的申购</field>
+            <field name="res_model">hr.purchase.apply</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        </record>
+
+        <record id="action_my_waiting_hr_purchase_apply" model="ir.actions.act_window">
+            <field name="name">待批准申购</field>
+            <field name="res_model">hr.purchase.apply</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'to_approve_id':True}</field>
+            <field name="domain">[('to_approve_id','=',uid)]</field>
+        </record>
+        <record id="action_my_approved_hr_purchase_apply" model="ir.actions.act_window">
+            <field name="name">已批准申购</field>
+            <field name="res_model">hr.purchase.apply</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('approve_ids','child_of',[uid])]</field>
+        </record>
+
+
+        <record id="action_my_approved_hr_purchase_apply" model="ir.actions.act_window">
+            <field name="name">已审核申购</field>
+            <field name="res_model">hr.purchase.apply</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
         <record id="action_all_hr_purchase_apply" model="ir.actions.act_window">
-            <field name="name">申购报告</field>
+            <field name="name">所有申购单</field>
             <field name="res_model">hr.purchase.apply</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
@@ -121,13 +178,31 @@
 
         <menuitem id="menu_hr_purchase_apply_root" name="申购" sequence="7"
                   parent="hr_expense.menu_hr_expense_root"/>
-        <menuitem id="menu_draft_hr_purchase_apply" name="待提交的申购"
-                  action="action_draft_hr_purchase_apply1"
+        <menuitem id="menu_my_hr_purchase_apply_root" name="我的申购"
+                  action="action_all_my_hr_purchase_apply"
+                  sequence="1"
                   parent="menu_hr_purchase_apply_root"/>
+
+        <menuitem id="menu_draft_hr_purchase_apply" name="待提交的申购"
+                  action="action_my_draft_hr_purchase_apply"
+                  sequence="1"
+                  parent="menu_my_hr_purchase_apply_root"/>
         <menuitem id="menu_reject_hr_purchase_apply" name="否决的申购"
                   action="action_reject_hr_purchase_apply"
+                  sequence="2"
+                  parent="menu_my_hr_purchase_apply_root"/>
+
+        <menuitem id="menu_waiting_hr_purchase_apply_root" name="待批准" sequence="2"
                   parent="menu_hr_purchase_apply_root"/>
-        <menuitem id="menu_reject_hr_purchase_apply" name="申购报告"
+        <menuitem id="menu_my_waiting_hr_purchase_apply" name="待批准申购" sequence="7"
+                  action="action_my_waiting_hr_purchase_apply"
+                  parent="menu_waiting_hr_purchase_apply_root"/>
+
+        <menuitem id="menu_my_approved_hr_purchase_apply" name="已审核申购" sequence="7"
+                  action="action_my_approved_hr_purchase_apply"
+                  parent="menu_waiting_hr_purchase_apply_root"/>
+
+        <menuitem id="menu_all_hr_purchase_apply" name="所有申购单" sequence="3"
                   action="action_all_hr_purchase_apply"
                   parent="menu_hr_purchase_apply_root"/>
 
