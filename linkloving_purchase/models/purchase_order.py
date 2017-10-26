@@ -58,6 +58,13 @@ class PurchaseOrder(models.Model):
 
     shipping_rate = fields.Float(string=u"收货率", compute='_compute_shipping_rate', store=True)
 
+    @api.depends('picking_ids', 'picking_ids.state')
+    def _compute_is_shipped(self):
+        for order in self:
+            if order.picking_ids and all([x.state in ('done', 'cancel', 'waiting_in') for x in order.picking_ids]):
+                order.is_shipped = True
+
+
     @api.multi
     def _compute_shipping_status(self):
         for order in self:
@@ -65,6 +72,9 @@ class PurchaseOrder(models.Model):
             if order.state == 'purchase' and all(
                             picking.state in ["cancel", "done", "waiting_in"] for picking in order.picking_ids):
                 order.shipping_status = 'done'
+            elif order.state == 'purchase ' and any(
+                            picking.state in ["cancel", "done", "waiting_in"] for picking in order.picking_ids):
+                order.shipping_status = 'part_shipping'
             else:
                 order.shipping_status = 'no'
 
@@ -137,6 +147,14 @@ class PurchaseOrder(models.Model):
             'location_id': self.partner_id.property_stock_supplier.id,
             'company_id': self.company_id.id,
         }
+
+    @api.multi
+    def button_done(self):
+
+        for pick in self.picking_ids.filtered(lambda r: r.state not in ('cancel', 'done')):
+            pick.action_cancel()
+
+        self.write({'state': 'done', 'shipping_status': 'done'})
 
 
 class PurchaseOrderLine(models.Model):
