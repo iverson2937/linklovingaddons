@@ -44,14 +44,13 @@ odoo.define('linkloving_mrp_automatic_plan.schedule_production_report', function
             self.initTreeTable();//
             //setTimeout(function () {
             //console.log("HELLO");
-            //var app = new Vue({
-            //      el: '.schedule_production_container',
-            //      template: '<App/>',
-            //    components:{
-            //        App:App
-            //    }
+            //    var app = new Vue({
+            //      el: '.o_main',
+            //      data:{
+            //          msg:'zcxxzcxz',
+            //      }
             //    })
-            //    console.log("HELLO1")
+
             //}, 1000);
         },
         initTreeTable: function () {

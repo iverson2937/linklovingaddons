@@ -1386,6 +1386,14 @@
                                 class="oe_highlight"
                                 attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
                         />
+
+                        <button name="to_picking" string="去分拣"
+                                groups="purchase.group_purchase_user"
+                                type="object"
+                                class="oe_highlight"
+                                attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
+                        />
+
                         <button name="reject" string="回退"
                                 groups="purchase.group_purchase_user"
                                 type="object"
@@ -1413,6 +1421,12 @@
                     <!-- Add your fields or attributes here -->
                     <field name="rejects_qty"
                            attrs="{'invisible': [('state', 'not in', ['qc_check', 'validate', 'waiting_in', 'done'])]}"/>
+                </xpath>
+
+                <xpath expr="//button[@name='action_cancel']" position="after">
+                    <button name="action_picking_done" string="分拣完成"
+                            attrs="{'invisible': [('state', '!=', 'picking')]}"
+                            groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
                 </xpath>
 
             </field>
