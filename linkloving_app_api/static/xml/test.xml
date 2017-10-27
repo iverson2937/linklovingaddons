@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="test_pager" name="Partner Page">
+        <!--<t t-call="website.layout">-->
+        <div id="wrap">
+            TEST PAGE
+        </div>
+        <!--</t>-->
+    </template>
+
+</odoo>

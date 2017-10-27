@@ -46,6 +46,10 @@
                     <strong>订购日期:</strong>
                     <p t-field="o.date_order"/>
                 </div>
+                <div t-if="o.user_id" class="col-xs-3">
+                    <strong>联系人:</strong>
+                    <p t-field="o.user_id.name"/>
+                </div>
                   <div t-if="o.remark" class="col-xs-3">
                       <strong>备注:</strong>
                     <p t-field="o.remark"/>

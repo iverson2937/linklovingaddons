@@ -1,5 +1,4 @@
 <openerp>
-    https://unpkg.com/vue
     <data>
          <template id="mrp_automatic_plan" name="linkloving_mrp_automatic_plan" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">

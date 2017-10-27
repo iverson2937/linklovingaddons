@@ -35,7 +35,8 @@ class report_purchase(http.Controller):
             header_list = [
                 _('Order No'), _('Supplier'), _('Create By'), _('Order Date'), _('Product'),
                 _('Inner Code'), _('Specification'), _('Unit Price'), _('Order qty'), _('Receive qty'),
-                _('Invoiced qty'), _('Sub Total'), _('Total Amount'), u'收货金额', u'开单金额', u'预付金额', u'截止金额'
+                _('Invoiced qty'), _('Sub Total'), _('Total Amount'), u'收货金额', u'开单金额', u'预付金额', u'截止金额', u'收货状态',
+                u'对账状态'
 
             ]
 
@@ -58,6 +59,10 @@ class report_purchase(http.Controller):
                                  vals.get('pre_payment_amount') and vals.get('pre_payment_amount') or 0.0,
                                  style)
                 data_sheet.write(current_row, 16, vals.get('remaining_amount') and vals.get('remaining_amount') or 0.0,
+                                 style)
+                data_sheet.write(current_row, 17, vals.get('shipping_status') and vals.get('shipping_status') or 0.0,
+                                 style)
+                data_sheet.write(current_row, 18, vals.get('invoice_status') and vals.get('invoice_status') or 0.0,
                                  style)
 
                 if not record.get('line'):

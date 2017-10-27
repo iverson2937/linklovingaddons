@@ -1199,8 +1199,7 @@ class LinklovingAppApi(http.Controller):
             })
             produce.do_produce()
         except Exception, e:
-            return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error': e.name})
+            raise UserError(e)
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
@@ -1436,7 +1435,7 @@ class LinklovingAppApi(http.Controller):
                                               res_data={'error': _("MO not found")})
         return_lines = []
         if all(stock_move.get("return_qty") == 0 for stock_move in stock_move_ids):
-            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'done'})
+            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).button_mark_done()
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
         if not is_check:
@@ -1481,7 +1480,7 @@ class LinklovingAppApi(http.Controller):
                     returun_material_obj._prepare_move_values(r))
                 move.action_done()
             returun_material_obj.return_ids.create_scraps()
-            mrp_production.write({'state': 'done'})
+            mrp_production.button_mark_done()
             #
             # location = request.env["stock.location"].sudo().search([("is_circulate_location", "=", True)], limit=1)
             # if location and location.putaway_strategy_id and location.putaway_strategy_id.fixed_location_ids:
@@ -1743,7 +1742,7 @@ class LinklovingAppApi(http.Controller):
         domain = []
         for key in condition_dic.keys():
             if key == 'default_code':
-                domain.append((key, 'ilike', condition_dic[key]))
+                domain.append((key, '=', condition_dic[key]))
             else:
                 domain.append((key, 'in', [condition_dic[key]]))
         sudo_model = request.env['product.product'].sudo(LinklovingAppApi.CURRENT_USER())
@@ -2373,7 +2372,7 @@ class LinklovingAppApi(http.Controller):
         picking_type_code = request.jsonrequest.get('picking_type_code')
         state = request.jsonrequest.get("state")
         domain = []
-        domain.append(('state', '=', state))
+        domain.append(('state', '=', state))  # picking
         if picking_type_code:
             domain.append(('picking_type_code', '=', picking_type_code))
 
@@ -2493,6 +2492,8 @@ class LinklovingAppApi(http.Controller):
                 wiz = request.env['stock.backorder.confirmation'].sudo(LinklovingAppApi.CURRENT_USER()).create(
                     {'pick_id': picking_id})
                 wiz.process()
+        elif state == 'picking_done':
+            picking_obj.action_picking_done()
         elif state == 'cancel_backorder':  # 取消欠单\
             wiz = request.env['stock.backorder.confirmation'].sudo(LinklovingAppApi.CURRENT_USER()).create(
                 {'pick_id': picking_id})
@@ -3083,7 +3084,7 @@ class LinklovingAppApi(http.Controller):
                                          'procurement_id': sim_stock_move.procurement_id.id or False,
                                          'is_over_picking': True})
                         split_move.write({'state': 'assigned'})
-                        sim_stock_move.production_id.move_raw_ids = sim_stock_move.production_id.move_raw_ids + split_move
+                        # sim_stock_move.production_id.move_raw_ids = sim_stock_move.production_id.move_raw_ids + split_move
                         split_move.action_done()
                         split_move.authorized_stock_move(employee_id, uid)
                     elif len(move_todo) > 1:
@@ -3358,3 +3359,21 @@ class LinklovingAppApi(http.Controller):
             data.append(self.get_simple_production_json(production))
         # user_data = LinklovingAppApi.odoo10.execute('res.users', 'read', [LinklovingAppApi.odoo10.env.user.id])
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    @http.route('/auto_mrp/partners', type='http', auth="public")
+    def partners(self, **kw):
+        partner_id = 3
+        if partner_id:
+            partner_sudo = request.env['res.partner'].sudo().browse(partner_id)
+            is_website_publisher = request.env['res.users'].has_group('website.group_website_publisher')
+            if partner_sudo.exists():
+                values = {
+                    'main_object': partner_sudo,
+                    'partner': partner_sudo,
+                    'edit_page': False
+                }
+        # return request.render("website_partner.partner_page", values)
+        print("12312312312")
+        return request.render("linkloving_app_api.listing", {
+            'objects': partner_sudo,
+        })

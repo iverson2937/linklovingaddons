@@ -8,9 +8,8 @@ import pytz
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
-
 _logger = logging.getLogger(__name__)
-
+import time
 
 class ResPartnerExtend(models.Model):
     _inherit = 'res.partner'
@@ -216,7 +215,57 @@ class CreateOrderPointWizard(models.TransientModel):
             'company_id': 3,
         })
 
+    def login(self, driver, loginurl, username=None, password=None):
+        # open the login in page
+        driver.get(loginurl)
+        try:
+            driver.find_element_by_xpath('//*[@id="account-login"]').click()
+        except:
+            print u'京东登录界面出现改版,需要把用户登陆界面切换出来'
+        time.sleep(3)
+        # sign in the username
+
+        # 由于京东中使用frame来再次加载一个网页，所以，在选择元素的时候会出现选择不到的结果，所以，我们需要把视图窗口切换到frame中
+        driver.switch_to.frame(u'loginFrame')
+
+        def login_name():
+            try:
+                # driver.find_element_by_xpath('//*[@id="loginname"]').click()
+                time.sleep(3)
+                driver.find_element_by_xpath('//*[@id="loginname"]').clear()
+                # driver.find_element_by_xpath('//*[@id="TPL_username_1"]').send_keys(u'若态旗舰店')
+                driver.find_element_by_xpath('//*[@id="loginname"]').send_keys(username)
+                print 'user success!'
+            except:
+                print 'user error!'
+            time.sleep(3)
+
+        def login_password():
+            # sign in the pasword
+            try:
+                driver.find_element_by_xpath('//*[@id="nloginpwd"]').clear()
+                # driver.find_element_by_xpath('//*[@id="TPL_password_1"]').send_keys('szrtkjqjd@123!!')
+                driver.find_element_by_xpath('//*[@id="nloginpwd"]').send_keys(password)
+                print 'pw success!'
+            except:
+                print 'pw error!'
+            time.sleep(3)
+
+        def click_and_login():
+            # click to login
+            try:
+                driver.find_element_by_xpath('//*[@id="paipaiLoginSubmit"]').click()
+                print 'click success!'
+            except:
+                print 'click error!'
+            time.sleep(3)
+
+        login_name()
+        login_password()
+        click_and_login()
+
     def compute_sale_qty(self):
+
         this_month = datetime.datetime.now().month
         last1_month = this_month - 1
         date1_start, date1_end = getMonthFirstDayAndLastDay(month=last1_month)
