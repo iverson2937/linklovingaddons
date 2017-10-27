@@ -1233,7 +1233,7 @@ class ReturnOfMaterial(models.Model):
                 r.return_qty = 0
                 move.action_done()
             self.return_ids.create_scraps()
-            self.production_id.write({'state': 'done'})
+            self.production_id.button_mark_done()
         else:
             self.production_id.write({'state': 'waiting_warehouse_inspection'})
         return True

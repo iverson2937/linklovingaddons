@@ -1435,7 +1435,7 @@ class LinklovingAppApi(http.Controller):
                                               res_data={'error': _("MO not found")})
         return_lines = []
         if all(stock_move.get("return_qty") == 0 for stock_move in stock_move_ids):
-            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'done'})
+            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).button_mark_done()
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
         if not is_check:
@@ -1480,7 +1480,7 @@ class LinklovingAppApi(http.Controller):
                     returun_material_obj._prepare_move_values(r))
                 move.action_done()
             returun_material_obj.return_ids.create_scraps()
-            mrp_production.write({'state': 'done'})
+            mrp_production.button_mark_done()
             #
             # location = request.env["stock.location"].sudo().search([("is_circulate_location", "=", True)], limit=1)
             # if location and location.putaway_strategy_id and location.putaway_strategy_id.fixed_location_ids:
