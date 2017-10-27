@@ -1859,9 +1859,10 @@ class LinklovingAppApi(http.Controller):
                 product_obj.weight = line['product'].get('weight')
                 product_obj.area_id = line['product']['area']['area_id']
                 if line['product'].get('image_medium'):
-                    image_str = line['product'].get('image_medium')
-                    print 'image_str:%s' % image_str[0:16]
                     try:
+                        image_str = line['product'].get('image_medium')
+                        print 'image_str:%s' % image_str[0:16]
+
                         product_obj.product_tmpl_id.image_medium = image_str
                     except Exception, e:
                         print "exception catch %s" % image_str[0:16]
