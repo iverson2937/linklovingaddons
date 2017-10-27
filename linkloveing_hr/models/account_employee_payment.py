@@ -6,6 +6,9 @@ from .hr_expense_sheet import create_remark_comment
 
 
 class AccountEmployeePayment(models.Model):
+    '''
+    暂支model
+    '''
     _name = 'account.employee.payment'
     _inherit = ['mail.thread', 'ir.needaction_mixin']
     _order = 'create_date desc'
