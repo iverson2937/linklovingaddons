@@ -21,6 +21,9 @@ class MrpProduction(models.Model):
     @api.multi
     def _prepare_invoice(self):
         inv_obj = self.env['account.invoice']
+        cost_account_id = self.env['account.account'].search([('name', 'ilike', u'生产成本')], limit=1)
+        if not cost_account_id:
+            raise UserError('请设置成本科目')
 
         account_id = self.supplier_id.property_account_payable_id.id
         if not account_id:
@@ -40,7 +43,7 @@ class MrpProduction(models.Model):
                 'name': self.name,
                 'origin': self.name,
                 'price_unit': self.unit_price,
-                'account_id': 47,
+                'account_id': self.cost_account_id.id,
                 'quantity': self.qty_produced,
                 'uom_id': self.product_id.uom_id.id,
                 'product_id': self.product_id.id,
