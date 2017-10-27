@@ -1420,7 +1420,7 @@
                 <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='qty_done']" position="after">
                     <!-- Add your fields or attributes here -->
                     <field name="rejects_qty"
-                           attrs="{'invisible': [('state', 'not in', ['qc_check', 'validate', 'waiting_in', 'done'])]}"/>
+                           attrs="{'invisible': [('state', 'not in', ['qc_check', 'validate', 'waiting_in', 'done', 'picking'])]}"/>
                 </xpath>
 
                 <xpath expr="//button[@name='action_cancel']" position="after">

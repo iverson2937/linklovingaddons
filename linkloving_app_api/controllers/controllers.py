@@ -1742,7 +1742,7 @@ class LinklovingAppApi(http.Controller):
         domain = []
         for key in condition_dic.keys():
             if key == 'default_code':
-                domain.append((key, 'ilike', condition_dic[key]))
+                domain.append((key, '=', condition_dic[key]))
             else:
                 domain.append((key, 'in', [condition_dic[key]]))
         sudo_model = request.env['product.product'].sudo(LinklovingAppApi.CURRENT_USER())
