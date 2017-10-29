@@ -312,7 +312,7 @@ class MrpProductionExtend(models.Model):
         action['domain'] = [('production_id', '=', self.id), ('is_scrap', '=', True)]
         return action
 
-    qc_feedback_ids = fields.One2many('mrp.qc.feedback', 'production_id')
+    qc_feedback_ids = fields.One2many('mrp.qc.feedback', 'production_id', track_visibility='onchange')
     qty_unpost = fields.Float(string=u"已生产的数量", compute="_compute_qty_unpost")
     feedback_on_rework = fields.Many2one("mrp.qc.feedback", u"返工单", track_visibility='onchange')
 
@@ -1688,6 +1688,8 @@ class MrpQcFeedBack(models.Model):
 
     # 品捡成功 -> 已入库
     def action_post_inventory(self):
+        if self.state == 'alredy_post_inventory':
+            raise UserError(u"该单据已入库,无需再重复入库")
         mrp_product_produce = self.env['mrp.product.produce'].with_context({'active_id': self.production_id.id})
         produce = mrp_product_produce.create({
             'product_qty': self.qty_produced,
