@@ -30,6 +30,7 @@
         'views/views.xml',
         'views/templates.xml',
         'views/purchase_apply.xml',
+        'views/hr_expense_sheet.xml',
 
     ],
     # only loaded in demonstration mode
