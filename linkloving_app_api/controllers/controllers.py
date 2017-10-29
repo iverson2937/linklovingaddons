@@ -1846,20 +1846,23 @@ class LinklovingAppApi(http.Controller):
     # 创建盘点单
     @http.route('/linkloving_app_api/create_stock_inventory', type='json', auth='none', csrf=False)
     def create_stock_inventory(self, **kw):
+        print 'create_stock_inventory1'
         stock_inventory_lines = request.jsonrequest.get('line_ids')
         name = request.jsonrequest.get('name')
         new_lines = []
         try:
             for line in stock_inventory_lines:
+                print 'line11111111111111'
                 product_obj = LinklovingAppApi.get_model_by_id(line['product']['product_id'], request,
                                                                'product.product')
                 line['product_uom_id'] = product_obj.uom_id.id
                 product_obj.weight = line['product'].get('weight')
                 product_obj.area_id = line['product']['area']['area_id']
                 if line['product'].get('image_medium'):
-                    image_str = line['product'].get('image_medium')
-                    print 'image_str:%s' % image_str[0:16]
                     try:
+                        image_str = line['product'].get('image_medium')
+                        print 'image_str:%s' % image_str[0:16]
+
                         product_obj.product_tmpl_id.image_medium = image_str
                     except Exception, e:
                         print "exception catch %s" % image_str[0:16]

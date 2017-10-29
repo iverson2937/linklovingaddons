@@ -21,6 +21,9 @@ class MrpProduction(models.Model):
     @api.multi
     def _prepare_invoice(self):
         inv_obj = self.env['account.invoice']
+        cost_account_id = self.env['account.account'].search([('name', 'ilike', u'生产成本')], limit=1)
+        if not cost_account_id:
+            raise UserError('请设置成本科目')
 
         account_id = self.supplier_id.property_account_payable_id.id
         if not account_id:
@@ -28,6 +31,7 @@ class MrpProduction(models.Model):
                 _(
                     'There is no income account defined for this product: "%s". You may have to install a chart of account from Accounting app, settings menu.') %
                 (self.supplier_id.name,))
+
 
         invoice = inv_obj.create({
             'origin': self.name,
@@ -40,7 +44,7 @@ class MrpProduction(models.Model):
                 'name': self.name,
                 'origin': self.name,
                 'price_unit': self.unit_price,
-                'account_id': 47,
+                'account_id': cost_account_id.id,
                 'quantity': self.qty_produced,
                 'uom_id': self.product_id.uom_id.id,
                 'product_id': self.product_id.id,
@@ -140,6 +144,6 @@ class MrpProduction(models.Model):
     @api.multi
     def button_mark_done(self):
         print 'is_outside', self.is_outside
-        if self.is_outside:
+        if self.is_outside and not self.mo_invoice_count:
             self._prepare_invoice()
         return super(MrpProduction, self).button_mark_done()
