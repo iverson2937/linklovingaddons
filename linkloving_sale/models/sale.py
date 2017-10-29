@@ -80,7 +80,9 @@ class SaleOrder(models.Model):
     @api.multi
     def action_done(self):
         for order in self:
-            order.state = 'done'
+            for pick in order.picking_ids.filtered(lambda r: r.state not in ('cancel', 'done')):
+                pick.action_cancel()
+            order.write({'state': 'done', 'shipping_status': 'done'})
 
     @api.multi
     def button_dummy(self):
