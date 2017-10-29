@@ -2340,12 +2340,12 @@ class LinklovingAppApi(http.Controller):
             pickings = request.env["stock.picking"].sudo(LinklovingAppApi.CURRENT_USER()).search(
                 [("state", "in", ["partially_available", "assigned", "confirmed"]),
                  ("picking_type_code", "=", "outgoing")])
-            pickings.action_assign()
+            pickings.force_assign()
             return JsonResponse.send_response(STATUS_CODE_OK, res_data={})
 
         picking = request.env["stock.picking"].sudo(LinklovingAppApi.CURRENT_USER()).search([("id", "=", picking_id)])
         try:
-            picking.action_assign()
+            picking.force_assign()
         except UserError:
             return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.stock_picking_to_json(picking))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.stock_picking_to_json(picking))
