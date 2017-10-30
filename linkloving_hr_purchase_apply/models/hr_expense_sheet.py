@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError
-from odoo.addons import decimal_precision as dp
 
 
 class HrExpenseSheet(models.Model):
     _inherit = 'hr.expense.sheet'
-    apply_line_ids = fields.Many2one('hr.purchase.apply.line', 'sheet_id')
+    apply_line_ids = fields.One2many('hr.purchase.apply.line', 'sheet_id')
 
     @api.onchange('apply_line_ids')
     def on_change_apply_line_ids(self):
