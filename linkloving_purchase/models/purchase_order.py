@@ -64,7 +64,6 @@ class PurchaseOrder(models.Model):
             if order.picking_ids and all([x.state in ('done', 'cancel', 'waiting_in') for x in order.picking_ids]):
                 order.is_shipped = True
 
-
     @api.multi
     def _compute_shipping_status(self):
         for order in self:
@@ -154,7 +153,7 @@ class PurchaseOrder(models.Model):
         for pick in self.picking_ids.filtered(lambda r: r.state not in ('cancel', 'done')):
             pick.action_cancel()
 
-        self.write({'state': 'done', 'shipping_status': 'done'})
+        self.write({'state': 'done', 'shipping_status': 'done', 'shipping_rate': 100.0})
 
 
 class PurchaseOrderLine(models.Model):
