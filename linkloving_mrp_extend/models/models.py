@@ -1854,6 +1854,8 @@ class StcokPickingExtend(models.Model):
             elif any(move.state in ["done"] for move in pick.move_lines) and any(
                             move.state == "assigned" for move in pick.move_lines):
                 raise UserError(u"库存异动单异常,请联系管理员解决")
+            if all(not pack.qty_done for pack in pick.pack_operation_product_ids):
+                raise UserError(u"出货数量不能全部为0")
         return super(StcokPickingExtend, self).to_stock()
 
     # 分拣完成
