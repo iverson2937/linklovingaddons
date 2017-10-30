@@ -22,6 +22,7 @@ class StockMove(models.Model):
                 _logger.warning("Could not find view object with view_id '%s'", move.id)
                 print move.id, 'ddddddddddddddddddddddddddddddddddddddddddddd'
         if any(move.state == 'done' for move in self):
+            _logger.warning("Cddddddddddddddddddddd '%s'", move.id)
             raise UserError(_('You cannot cancel a stock move that has been set to \'Done\'.'))
 
         procurements = self.env['procurement.order']
