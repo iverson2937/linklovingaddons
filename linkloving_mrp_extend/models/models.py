@@ -1665,6 +1665,7 @@ class MrpQcFeedBack(models.Model):
         for qc in self:
             if qc.state in ['check_to_rework', 'alredy_post_inventory']:
                 raise UserError(u"无法删除已完成的品检单据")
+        return super(MrpQcFeedBack, self).unlink()
     # 等待品捡 -> 品捡中
     def action_start_qc(self):
         self.state = "qc_ing"
