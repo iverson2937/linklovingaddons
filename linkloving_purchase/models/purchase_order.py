@@ -55,6 +55,8 @@ class PurchaseOrder(models.Model):
             if r.product_count:
                 qtys = sum(line.qty_received for line in r.order_line)
                 r.shipping_rate = (qtys / r.product_count) * 100.0
+            if r.is_shipped:
+                r.shipping_rate = 100.0
 
     shipping_rate = fields.Float(string=u"收货率", compute='_compute_shipping_rate', store=True)
 
@@ -149,11 +151,9 @@ class PurchaseOrder(models.Model):
 
     @api.multi
     def button_done(self):
-
         for pick in self.picking_ids.filtered(lambda r: r.state not in ('cancel', 'done')):
             pick.action_cancel()
-
-        self.write({'state': 'done', 'shipping_status': 'done', 'shipping_rate': 100.0})
+        self.write({'state': 'done', 'is_shipped': True})
 
 
 class PurchaseOrderLine(models.Model):
@@ -166,7 +166,7 @@ class PurchaseOrderLine(models.Model):
         ('done', u'出货完成'),
     ], default='no', compute='_compute_shipping_status', store=True, readonly=True)
 
-    @api.depends('state', 'product_qty', 'qty_received', 'qty_to_invoice', 'qty_invoiced')
+    @api.depends('product_qty', 'qty_received', 'qty_to_invoice', 'qty_invoiced')
     def _compute_shipping_status(self):
         """
         Compute the invoice status of a SO line. Possible statuses:
