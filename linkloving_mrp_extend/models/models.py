@@ -1774,15 +1774,18 @@ class StcokPickingExtend(models.Model):
     qc_result = fields.Selection(string=u"品检结果", selection=[('no_result', u'为以前的品检单,无品检结果记录'),
                                                             ('fail', u'品检失败'),
                                                             ('success', u'品检通过'), ], default='no_result', )
-    transfer_way = fields.Selection(string=u'入库方式', selection=[('draft', u'未选择'),
-                                                               ('all', u'全部入库'),
-                                                               ('part', u'仅良品入库,不良品退回')], default='draft')
+    transfer_way = fields.Selection(string=u'入库方式',
+                                    selection=[('draft', u'未选择'),
+                                               ('all', u'全部入库'),
+                                               ('part', u'仅良品入库,不良品退回')],
+                                    default='draft',
+                                    copy=False)
 
     state = fields.Selection(selection_add=[
         ('picking', u'分拣中')])
 
-    is_picking_process = fields.Boolean(string=u'是否进入分拣流程', default=False)
-    is_cancel_backorder = fields.Boolean(string=u'是否创建欠单')
+    is_picking_process = fields.Boolean(string=u'是否进入分拣流程', default=False, copy=False)
+    is_cancel_backorder = fields.Boolean(string=u'是否创建欠单', copy=False)
 
     # @api.multi
     # def do_new_transfer(self):
@@ -1855,6 +1858,8 @@ class StcokPickingExtend(models.Model):
             elif any(move.state in ["done"] for move in pick.move_lines) and any(
                             move.state == "assigned" for move in pick.move_lines):
                 raise UserError(u"库存异动单异常,请联系管理员解决")
+            if all(not pack.qty_done for pack in pick.pack_operation_product_ids):
+                raise UserError(u"出货数量不能全部为0")
         return super(StcokPickingExtend, self).to_stock()
 
     # 分拣完成

@@ -371,6 +371,30 @@ class CreateOrderPointWizard(models.TransientModel):
         else:
             raise UserError("未找到对应的时区, 请点击 右上角 -> 个人资料 -> 时区 -> Asia/Shanghai")
 
+    # 设置已完成的mo的库存移动没有完成或者取消的问题
+    def set_done_mo_to_done(self):
+        MrpProduction = self.env["mrp.production"]
+        mos = MrpProduction.search([("state", "=", "done")])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
     """

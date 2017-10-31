@@ -603,6 +603,7 @@ class MrpProductionExtend(models.Model):
         vals = {
             'date_planned_start': start_time,
             'date_planned_finished': end_time,
+            'in_charge_id': production_line.employee_id.address_home_id.id or production_line.process_id.partner_id.id,
         }
         # if to_state:
         #     if mo.state in ["draft", "confirmed", "waiting_material"]:
