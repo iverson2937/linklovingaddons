@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+
+        <record id="hr_purchase_apply_line_search" model="ir.ui.view">
+            <field name="model">hr.purchase.apply.line</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name" string="单号"/>
+                    <field name="product_id" string="产品"/>
+                </search>
+
+            </field>
+        </record>
         <record id="hr_purchase_apply_form" model="ir.ui.view">
             <field name="model">hr.purchase.apply</field>
             <field name="arch" type="xml">
@@ -107,13 +118,12 @@
             <field name="arch" type="xml">
                 <tree>
                     <field name="name" string="单号"/>
-                    <field name="employee_id"/>
-                    <field name="department_id"/>
-                    <field name="description"/>
+                    <field name="employee_id" string="员工"/>
+                    <field name="department_id" string="部门"/>
+                    <field name="description" string="描述"/>
                     <field name="state"/>
 
                 </tree>
-
 
             </field>
         </record>

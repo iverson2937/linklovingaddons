@@ -9,11 +9,13 @@ class HrExpenseSheet(models.Model):
 
     @api.onchange('apply_line_ids')
     def on_change_apply_line_ids(self):
-        if self.apply_line_ids:
-            for line_id in self.apply_line_ids:
-                self.env['hr.expense'].crate({
-                    'product_id': line_id.product_id.id,
-                    'quantity': line_id.product_qty,
-                    'price_unit': line_id.price_unit,
-                    'name': line_id.decription,
-                })
+        expense_line_ids = self.expense_line_ids
+
+        for line_id in self.apply_line_ids:
+            result = self.env['hr.expense'].create({
+                'product_id': line_id.product_id.id,
+                'quantity': line_id.product_qty,
+                'unit_amount': line_id.price_unit,
+                'name': line_id.description
+            })
+            self.expense_line_ids = expense_line_ids + result

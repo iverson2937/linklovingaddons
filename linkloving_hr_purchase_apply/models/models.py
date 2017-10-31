@@ -51,7 +51,7 @@ class PurchaseApply(models.Model):
         ('cancel', u'取消'),
         ('approve', u'批准'),
         ('done', u'完成')
-    ], default='draft')
+    ], default='draft', track_visibility='onchange')
     company_id = fields.Many2one('res.company')
 
     def _get_is_show(self):
@@ -63,11 +63,12 @@ class PurchaseApply(models.Model):
     is_show = fields.Boolean(compute=_get_is_show)
     description = fields.Text()
 
-    @api.multi
-    def unlink(self):
-        if self.state not in ['draft', 'cancel']:
-            raise UserError('只可以删除草稿状态的采购申请.')
-        return super(PurchaseApply, self).unlink()
+    # @api.multi
+    # def unlink(self):
+    #     for r in self:
+    #         if r.state not in ['draft', 'cancel']:
+    #             raise UserError('只可以删除草稿状态的采购申请.')
+    #     return super(PurchaseApply, self).unlink()
 
     @api.model
     def create(self, vals):
@@ -164,7 +165,9 @@ class PurchaseApply(models.Model):
 class PurchaseApplyLine(models.Model):
     _name = 'hr.purchase.apply.line'
 
-    apply_id = fields.Many2one('purchase.apply')
+    apply_id = fields.Many2one('hr.purchase.apply')
+    name = fields.Char(related='apply_id.name')
+    employee_id = fields.Many2one('hr.employee', related='apply_id.employee_id')
     sheet_id = fields.Many2one('hr.expense.sheet')
     product_id = fields.Many2one('product.product', string='产品',
                                  domain=[('can_be_expensed', '=', True)], required=True)
@@ -173,6 +176,15 @@ class PurchaseApplyLine(models.Model):
     description = fields.Char(string=u'说明')
     sub_total = fields.Float(compute='_compute_amount', string='小计')
     tax_id = fields.Many2one('account.tax', string=u'税率')
+    state = fields.Selection([
+        ('draft', u'草稿'),
+        ('submit', u'提交'),
+        ('manager1_approve', u'一级审核'),
+        ('manager2_approve', u'二级审核'),
+        ('cancel', u'取消'),
+        ('approve', u'批准'),
+        ('done', u'完成')
+    ], related='apply_id.state')
 
     @api.depends('price_unit', 'product_qty')
     def _compute_amount(self):
