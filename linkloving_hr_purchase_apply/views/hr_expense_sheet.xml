@@ -6,11 +6,11 @@
             <field name="model">hr.expense.sheet</field>
             <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_form"/>
             <field name="arch" type="xml">
-
                 <xpath expr='//group[1]' position="after">
                     <group>
-                        <field name="employee_id"/>
+                        <field name="balance" string="申购余额" readonly="1"/>
                         <field name="apply_line_ids" widget="many2many_tags" string="申购单"
+                               options="{'no_create':True}"
                                domain="[('employee_id','=',employee_id),('state','=','approve')]">
                             <tree>
                                 <field name="name" string="单号"/>
@@ -20,8 +20,6 @@
                             </tree>
                         </field>
                     </group>
-
-
                 </xpath>
             </field>
         </record>

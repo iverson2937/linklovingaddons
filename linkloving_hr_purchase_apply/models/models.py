@@ -63,6 +63,18 @@ class PurchaseApply(models.Model):
     is_show = fields.Boolean(compute=_get_is_show)
     description = fields.Text()
 
+    @api.multi
+    def refuse_payment(self, reason):
+        self.write({'state': 'cancel'})
+        for sheet in self:
+            body = (_(
+                "申购单 %s 已经取消.<br/><ul class=o_timeline_tracking_value_list><li>原因<span> : </span><span class=o_timeline_tracking_value>%s</span></li></ul>") % (
+                        sheet.name, reason))
+            sheet.message_post(body=body)
+            sheet.to_approve_id = False
+
+
+
     # @api.multi
     # def unlink(self):
     #     for r in self:
@@ -111,6 +123,7 @@ class PurchaseApply(models.Model):
         state, to_approve_id = department.get_to_approve_id(self.env.user.employee_ids[0], self.total_amount)
         if not state:
             state = 'manager1_approve'
+        print 'd', to_approve_id
         self.write({
             'state': state,
             'to_approve_id': to_approve_id,
