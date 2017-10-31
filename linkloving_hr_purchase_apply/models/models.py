@@ -165,6 +165,7 @@ class PurchaseApplyLine(models.Model):
     _name = 'hr.purchase.apply.line'
 
     apply_id = fields.Many2one('purchase.apply')
+    sheet_id = fields.Many2one('hr.expense.sheet')
     product_id = fields.Many2one('product.product', string='产品',
                                  domain=[('can_be_expensed', '=', True)], required=True)
     product_qty = fields.Float(string=u'申购数量', default=1.00)

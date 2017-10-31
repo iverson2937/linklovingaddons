@@ -51,16 +51,12 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
 
             }
             for line in purchase.order_line:
-                quantity = line.product_qty
-                if line.order_id.state == 'done':
-                    quantity = line.qty_received
-
                 returnDict[purchase.id]['line'].update({line.id: {
                     'name': line.product_id.name,
                     'default_code': line.product_id.default_code,
                     'price_unit': line.price_unit,
                     'product_specs': line.product_specs,
-                    'quantity': quantity,
+                    'quantity': line.product_qty,
                     'qty_received': line.qty_received,
                     'qty_invoiced': line.qty_invoiced,
                     'price_subtotal': line.price_subtotal,

@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'hr'],
+    'depends': ['base', 'linkloveing_hr'],
 
     # always loaded
     'data': [
@@ -30,6 +30,7 @@
         'views/views.xml',
         'views/templates.xml',
         'views/purchase_apply.xml',
+        'views/hr_expense_sheet.xml',
 
     ],
     # only loaded in demonstration mode
