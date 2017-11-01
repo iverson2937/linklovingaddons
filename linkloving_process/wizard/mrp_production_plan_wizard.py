@@ -12,7 +12,7 @@ class MrpProductionWizard(models.TransientModel):
         u'开始时间', default=fields.Datetime.now)
     date_planned_finished = fields.Datetime(
         u'结束时间', default=fields.Datetime.now)
-    partner_id = fields.Many2one('res.partner', string='工序负责人')
+    partner_id = fields.Many2one('res.partner', string='负责人')
     is_set_start = fields.Boolean(default=True)
 
     @api.multi

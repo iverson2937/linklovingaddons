@@ -11,7 +11,7 @@ class HrPurchaseRefuseWizard(models.TransientModel):
     description = fields.Char(string='Reason', required=True)
 
     @api.multi
-    def refuse_reason(self):
+    def prepayment_refuse_reason(self):
         self.ensure_one()
 
         context = dict(self._context or {})

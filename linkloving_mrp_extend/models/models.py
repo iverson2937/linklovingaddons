@@ -330,9 +330,9 @@ class MrpProductionExtend(models.Model):
 
     qc_feedback_count = fields.Integer(compute='_get_qc_feedback_count')
     availability = fields.Selection([
-        ('assigned', _('Can send the material')),
-        ('partially_available', _('Partially Available')),
-        ('waiting', _('Waiting')),
+        ('assigned', u'可发料'),
+        ('partially_available', u'缺料中'),
+        ('waiting', u'等待材料'),
         ('none', 'None')], string=_('Material Status'),
         compute='_compute_availability', store=True)
 
@@ -449,7 +449,7 @@ class MrpProductionExtend(models.Model):
     total_spent_time = fields.Float(default=0, compute='_compute_total_spent_time', string='Time taken', )
     total_spent_money = fields.Float(default=0, compute='_compute_total_spent_money', string='Total Cost', )
     state = fields.Selection([
-        ('draft', _('Draft')),
+        ('draft', u'草稿'),
         ('confirmed', u'已排产'),
         ('waiting_material', u'等待备料'),
         ('prepare_material_ing', u'备料中...'),
@@ -462,7 +462,7 @@ class MrpProductionExtend(models.Model):
         ('quality_inspection_ing', u'品检中'),
         ('waiting_rework', u'等待返工'),
         ('rework_ing', u'返工中'),
-        ('waiting_inventory_material', u'等待清单退料'),
+        ('waiting_inventory_material', u'等待清点退料'),
         ('waiting_warehouse_inspection', u'等待检验退料'),
         ('waiting_post_inventory', u'等待入库'),
         ('done', 'Done'),
@@ -1665,6 +1665,7 @@ class MrpQcFeedBack(models.Model):
         for qc in self:
             if qc.state in ['check_to_rework', 'alredy_post_inventory']:
                 raise UserError(u"无法删除已完成的品检单据")
+        return super(MrpQcFeedBack, self).unlink()
     # 等待品捡 -> 品捡中
     def action_start_qc(self):
         self.state = "qc_ing"
@@ -1773,15 +1774,18 @@ class StcokPickingExtend(models.Model):
     qc_result = fields.Selection(string=u"品检结果", selection=[('no_result', u'为以前的品检单,无品检结果记录'),
                                                             ('fail', u'品检失败'),
                                                             ('success', u'品检通过'), ], default='no_result', )
-    transfer_way = fields.Selection(string=u'入库方式', selection=[('draft', u'未选择'),
-                                                               ('all', u'全部入库'),
-                                                               ('part', u'仅良品入库,不良品退回')], default='draft')
+    transfer_way = fields.Selection(string=u'入库方式',
+                                    selection=[('draft', u'未选择'),
+                                               ('all', u'全部入库'),
+                                               ('part', u'仅良品入库,不良品退回')],
+                                    default='draft',
+                                    copy=False)
 
     state = fields.Selection(selection_add=[
         ('picking', u'分拣中')])
 
-    is_picking_process = fields.Boolean(string=u'是否进入分拣流程', default=False)
-    is_cancel_backorder = fields.Boolean(string=u'是否创建欠单')
+    is_picking_process = fields.Boolean(string=u'是否进入分拣流程', default=False, copy=False)
+    is_cancel_backorder = fields.Boolean(string=u'是否创建欠单', copy=False)
 
     # @api.multi
     # def do_new_transfer(self):
@@ -1854,6 +1858,8 @@ class StcokPickingExtend(models.Model):
             elif any(move.state in ["done"] for move in pick.move_lines) and any(
                             move.state == "assigned" for move in pick.move_lines):
                 raise UserError(u"库存异动单异常,请联系管理员解决")
+            if all(not pack.qty_done for pack in pick.pack_operation_product_ids):
+                raise UserError(u"出货数量不能全部为0")
         return super(StcokPickingExtend, self).to_stock()
 
     # 分拣完成

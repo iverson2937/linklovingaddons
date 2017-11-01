@@ -2144,6 +2144,7 @@ class LinklovingAppApi(http.Controller):
     def get_stock_picking_by_origin(self, **kw):
         order_name = request.jsonrequest.get("order_name")
         type = request.jsonrequest.get("type")
+
         if order_name:
             pickings = request.env["stock.picking"].sudo(LinklovingAppApi.CURRENT_USER()).search(
                 [('origin', 'like', order_name),

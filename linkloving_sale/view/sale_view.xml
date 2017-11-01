@@ -57,12 +57,13 @@
 
 
                     <!--<button name="recompute_receive_amount" states="" type="object" string="调整数量"-->
-                            <!--confirm="调整数量吗？" groups="base.group_erp_manager"/>-->
+                    <!--confirm="调整数量吗？" groups="base.group_erp_manager"/>-->
                 </xpath>
 
                 <xpath expr="//button[@name='action_done']" position="replace">
-                        <button name="action_done" states="sale" type="object" string="标记完成"
+                    <button name="action_done" states="sale" type="object" string="标记完成"
                             confirm="确定标记为完成吗？"/>
+                    <button name="button_cancel_sale_order" states="done" type="object" string="取消标记完成"/>
                 </xpath>
 
 
@@ -175,7 +176,7 @@
             <field name="inherit_id" ref="base.view_partner_tree"/>
             <field name="arch" type="xml">
 
-                 <xpath expr="//field[@name='phone']" position="attributes">
+                <xpath expr="//field[@name='phone']" position="attributes">
                     <attribute name='invisible'>1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='email']" position="attributes">

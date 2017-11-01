@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "linkloving_stock_adjust",
+    'name': "linkloving_product_query",
 
     'summary': """
         Short (1 phrase/line) summary of the module's purpose, used as
@@ -20,12 +20,11 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'stock', 'linkloving_approval'],
+    'depends': ['base'],
 
     # always loaded
     'data': [
-        'security/ir.model.access.csv',
-        'data/ir_sequence_data.xml',
+        # 'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
     ],

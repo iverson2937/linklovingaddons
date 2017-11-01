@@ -82,7 +82,13 @@ class SaleOrder(models.Model):
         for order in self:
             for pick in order.picking_ids.filtered(lambda r: r.state not in ('cancel', 'done')):
                 pick.action_cancel()
-            order.write({'state': 'done', 'shipping_status': 'done'})
+            order.write({'state': 'done', 'shipping_status': 'done', 'shipping_rate': 100.0})
+
+    @api.multi
+    def button_cancel_sale_order(self):
+        for order in self:
+            order.state = 'sale'
+            order._compute_shipping_rate()
 
     @api.multi
     def button_dummy(self):
