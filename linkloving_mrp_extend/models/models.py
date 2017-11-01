@@ -462,7 +462,7 @@ class MrpProductionExtend(models.Model):
         ('quality_inspection_ing', u'品检中'),
         ('waiting_rework', u'等待返工'),
         ('rework_ing', u'返工中'),
-        ('waiting_inventory_material', u'等待清单退料'),
+        ('waiting_inventory_material', u'等待清点退料'),
         ('waiting_warehouse_inspection', u'等待检验退料'),
         ('waiting_post_inventory', u'等待入库'),
         ('done', 'Done'),
