@@ -65,7 +65,7 @@ class PurchaseApply(models.Model):
 
     @api.multi
     def refuse_payment(self, reason):
-        self.write({'state': 'cancel'})
+        self.write({'state': 'cancel', 'approve_ids': [(4, self.env.user.id)]})
         for sheet in self:
             body = (_(
                 "申购单 %s 已经取消.<br/><ul class=o_timeline_tracking_value_list><li>原因<span> : </span><span class=o_timeline_tracking_value>%s</span></li></ul>") % (
@@ -73,12 +73,12 @@ class PurchaseApply(models.Model):
             sheet.message_post(body=body)
             sheet.to_approve_id = False
 
-    # @api.multi
-    # def unlink(self):
-    #     for r in self:
-    #         if r.state not in ['draft', 'cancel']:
-    #             raise UserError('只可以删除草稿状态的采购申请.')
-    #     return super(PurchaseApply, self).unlink()
+    @api.multi
+    def unlink(self):
+        for r in self:
+            if r.state not in ['draft', 'cancel']:
+                raise UserError('只可以删除草稿状态的采购申请.')
+        return super(PurchaseApply, self).unlink()
 
     @api.model
     def create(self, vals):
