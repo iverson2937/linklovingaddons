@@ -375,7 +375,26 @@ class CreateOrderPointWizard(models.TransientModel):
     def set_done_mo_to_done(self):
         MrpProduction = self.env["mrp.production"]
         mos = MrpProduction.search([("state", "=", "done")])
-
+        mos_to_do = self.env["mrp.production"]
+        for mo in mos:
+            if mo.move_raw_ids.filtered(lambda x: x.state not in ["done", "cancel"]):
+                mos_to_do += mo
+            if mo.move_finished_ids.filtered(
+                    lambda x: x.state not in ["done", "cancel"]) and mo.qc_feedback_ids.filtered(
+                    lambda x: x.state in ["alredy_post_inventory", "check_to_rework"]):
+                mos_to_do += mo
+        mos_to_do.write({
+            'state': 'cancel'
+        })
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": str(len(mos_to_do)) + u"完成",
+                "text": u"完成",
+                "sticky": False
+            }
+        }
 
 
 
