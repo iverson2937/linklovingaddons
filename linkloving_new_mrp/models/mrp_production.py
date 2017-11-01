@@ -262,26 +262,27 @@ class NewMrpProduction(models.Model):
                 moves.create(data)
         return super(NewMrpProduction, self)._generate_raw_moves(exploded_lines)
 
-    state = fields.Selection([
-        ('draft', _('Draft')),
-        ('confirmed', u'已排产'),
-        ('waiting_material', _('Waiting Prepare Material')),
-        ('prepare_material_ing', _('Material Preparing')),
-        ('finish_prepare_material', _('Material Ready')),
-        ('already_picking', _('Already Picking Material')),
-        ('planned', 'Planned'),
-        ('progress', '生产中'),
-        ('waiting_inspection_finish', u'等待品检完成'),
-        ('waiting_quality_inspection', _('Waiting Quality Inspection')),
-        ('quality_inspection_ing', _('Under Quality Inspection')),
-        ('waiting_rework', _('Waiting Rework')),
-        ('rework_ing', _('Under Rework')),
-        ('waiting_inventory_material', _('Waiting Inventory Material')),
-        ('waiting_warehouse_inspection', _('Waiting Check Return Material')),
-        ('waiting_post_inventory', _('Waiting Stock Transfers')),
-        ('done', 'Done'),
-        ('cancel', 'Cancelled')], string='status',
-        copy=False, default='draft', track_visibility='onchange')
+    #
+    # state = fields.Selection([
+    #     ('draft', _('Draft')),
+    #     ('confirmed', u'已排产'),
+    #     ('waiting_material', _('Waiting Prepare Material')),
+    #     ('prepare_material_ing', _('Material Preparing')),
+    #     ('finish_prepare_material', _('Material Ready')),
+    #     ('already_picking', _('Already Picking Material')),
+    #     ('planned', 'Planned'),
+    #     ('progress', '生产中'),
+    #     ('waiting_inspection_finish', u'等待品检完成'),
+    #     ('waiting_quality_inspection', _('Waiting Quality Inspection')),
+    #     ('quality_inspection_ing', _('Under Quality Inspection')),
+    #     ('waiting_rework', _('Waiting Rework')),
+    #     ('rework_ing', _('Under Rework')),
+    #     ('waiting_inventory_material', _('Waiting Inventory Material')),
+    #     ('waiting_warehouse_inspection', _('Waiting Check Return Material')),
+    #     ('waiting_post_inventory', _('Waiting Stock Transfers')),
+    #     ('done', 'Done'),
+    #     ('cancel', 'Cancelled')], string='status',
+    #     copy=False, default='draft', track_visibility='onchange')
 
     @api.multi
     def _generate_moves(self):

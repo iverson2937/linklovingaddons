@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_linkloving_stock_adjust_linkloving_stock_adjust,linkloving_stock_adjust.linkloving_stock_adjust,model_linkloving_stock_adjust_linkloving_stock_adjust,,1,0,0,0
+access_linkloving_stock_transfer_admin,linkloving_stock_adjust.linkloving_stock_transfer,model_stock_transfer,,1,1,1,1
+access_linkloving_stock_transfer_line_access,linkloving_stock_adjust.linkloving_stock_transfer_line,model_stock_transfer_line,,1,1,1,1

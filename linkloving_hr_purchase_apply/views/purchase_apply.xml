@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+
+        <record id="hr_purchase_apply_line_search" model="ir.ui.view">
+            <field name="model">hr.purchase.apply.line</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name" string="单号"/>
+                    <field name="product_id" string="产品"/>
+                </search>
+
+            </field>
+        </record>
         <record id="hr_purchase_apply_form" model="ir.ui.view">
             <field name="model">hr.purchase.apply</field>
             <field name="arch" type="xml">
@@ -23,7 +34,7 @@
                                 attrs="{'invisible':['|',('is_show','=',False),('state','!=','manager1_approve')]}"
                                 class="oe_highlight o_expense_sheet_approve"/>
                         <button name="manager3_approve" states="manager2_approve" string="审核通过" type="object"
-                                groups="linkloveing_hr.group_hr_expense_user"
+                                groups="hr_expense.group_hr_expense_user"
                                 attrs="{'invisible':['|',('is_show','=',False),('state','!=','manager2_approve')]}"
                                 class="oe_highlight"/>
                         <button name="%(hr_purchase_apply_refuse_wizard_action)d"
@@ -59,7 +70,7 @@
                                 <field name="department_id" required="1" options="{'no_create':True}" string="部门"/>
                                 <field name="company_id" groups="base.group_multi_company" string="公司"/>
                                 <field name="employee_id" invisible="0" readonly="1" string="员工"/>
-                                <field name="is_show" invisible="1"/>
+                                <field name="is_show" invisible=""/>
                                 <field name="total_amount" invisible="0" string="总计"/>
                             </group>
                             <group>
@@ -107,13 +118,13 @@
             <field name="arch" type="xml">
                 <tree>
                     <field name="name" string="单号"/>
-                    <field name="employee_id"/>
-                    <field name="department_id"/>
-                    <field name="description"/>
-                    <field name="state"/>
+                    <field name="employee_id" string="员工"/>
+                    <field name="department_id" string="部门"/>
+                    <field name="to_approve_id" string="待审核人"/>
+                    <field name="state" string="状态"/>
+                    <field name="apply_date"/>
 
                 </tree>
-
 
             </field>
         </record>

@@ -330,9 +330,9 @@ class MrpProductionExtend(models.Model):
 
     qc_feedback_count = fields.Integer(compute='_get_qc_feedback_count')
     availability = fields.Selection([
-        ('assigned', _('Can send the material')),
-        ('partially_available', _('Partially Available')),
-        ('waiting', _('Waiting')),
+        ('assigned', u'可发料'),
+        ('partially_available', u'缺料中'),
+        ('waiting', u'等待材料'),
         ('none', 'None')], string=_('Material Status'),
         compute='_compute_availability', store=True)
 
@@ -449,7 +449,7 @@ class MrpProductionExtend(models.Model):
     total_spent_time = fields.Float(default=0, compute='_compute_total_spent_time', string='Time taken', )
     total_spent_money = fields.Float(default=0, compute='_compute_total_spent_money', string='Total Cost', )
     state = fields.Selection([
-        ('draft', _('Draft')),
+        ('draft', u'草稿'),
         ('confirmed', u'已排产'),
         ('waiting_material', u'等待备料'),
         ('prepare_material_ing', u'备料中...'),
@@ -462,7 +462,7 @@ class MrpProductionExtend(models.Model):
         ('quality_inspection_ing', u'品检中'),
         ('waiting_rework', u'等待返工'),
         ('rework_ing', u'返工中'),
-        ('waiting_inventory_material', u'等待清单退料'),
+        ('waiting_inventory_material', u'等待清点退料'),
         ('waiting_warehouse_inspection', u'等待检验退料'),
         ('waiting_post_inventory', u'等待入库'),
         ('done', 'Done'),
