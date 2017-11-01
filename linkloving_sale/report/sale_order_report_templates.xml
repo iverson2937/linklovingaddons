@@ -114,7 +114,7 @@
                                             <span t-esc="i"/>
                                         </td>
                                         <t t-set="i" t-value="i+1"/>
-                                        <td >
+                                        <td>
                                             <span t-field="l.name"/>
                                         </td>
                                         <td t-if="l.inner_code">
