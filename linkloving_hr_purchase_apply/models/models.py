@@ -73,8 +73,6 @@ class PurchaseApply(models.Model):
             sheet.message_post(body=body)
             sheet.to_approve_id = False
 
-
-
     # @api.multi
     # def unlink(self):
     #     for r in self:
@@ -203,3 +201,7 @@ class PurchaseApplyLine(models.Model):
     def _compute_amount(self):
         for line in self:
             line.sub_total = line.price_unit * line.product_qty
+
+    @api.multi
+    def name_get(self):
+        return [(order.name, '%s %s' % (order.name, '#%s' % order.product_id.name)) for order in self]
