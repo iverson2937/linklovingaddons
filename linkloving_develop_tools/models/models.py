@@ -374,7 +374,7 @@ class CreateOrderPointWizard(models.TransientModel):
     # 设置已完成的mo的库存移动没有完成或者取消的问题
     def set_done_mo_to_done(self):
         MrpProduction = self.env["mrp.production"]
-        mos = MrpProduction.search([("state", "=", "done")])
+        mos = MrpProduction.search([("state", "in", ["done",'cancel'])])
         mos_to_do = self.env["mrp.production"]
         for mo in mos:
             if mo.move_raw_ids.filtered(lambda x: x.state not in ["done", "cancel"]):
