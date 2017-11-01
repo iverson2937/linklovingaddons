@@ -166,6 +166,15 @@ class HrExpenseSheet(models.Model):
     def return_to_approve(self):
         self.state = 'approve'
 
+    @api.multi
+    def refuse_expenses(self, reason):
+        self.write({'state': 'cancel', 'approve_ids': [(4, self.env.user.id)]})
+        for sheet in self:
+            body = (_(
+                "Your Expense %s has been refused.<br/><ul class=o_timeline_tracking_value_list><li>Reason<span> : </span><span class=o_timeline_tracking_value>%s</span></li></ul>") % (
+                        sheet.name, reason))
+            sheet.message_post(body=body)
+
     @api.model
     def create(self, vals):
         if vals.get('expense_no', 'New') == 'New':
