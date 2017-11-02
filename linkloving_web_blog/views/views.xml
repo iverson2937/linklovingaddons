@@ -2,31 +2,31 @@
     <data>
 
 
-        <!--&lt;!&ndash;crm.lead.source&ndash;&gt;-->
-        <!--<record model="ir.ui.view" id="view_blog_post_broad_heading_form">-->
-            <!--<field name="name">blog.post.broad.heading.form</field>-->
-            <!--<field name="model">blog.post.broad.heading</field>-->
-            <!--<field name="arch" type="xml">-->
-                <!--<form>-->
-                    <!--<sheet>-->
-                        <!--<group>-->
-                            <!--<group>-->
-                                <!--<field name="blog_product_type"/>-->
-                                <!--<field name="name"/>-->
-                            <!--</group>-->
-                            <!--<group>-->
-                                <!--<field name="blog_Parent_id" domain="[('blog_product_type','=','one_type')]"-->
-                                       <!--attrs="{'invisible': [('blog_product_type','=','one_type')]}"/>-->
-                            <!--</group>-->
-                            <!--<field name="detail"/>-->
+        <!--crm.lead.source-->
+        <record model="ir.ui.view" id="view_blog_post_broad_heading_form">
+            <field name="name">blog.post.broad.heading.form</field>
+            <field name="model">blog.post.broad.heading</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="blog_product_type"/>
+                                <field name="name"/>
+                            </group>
+                            <group>
+                                <field name="blog_Parent_id" domain="[('blog_product_type','=','one_type')]"
+                                       attrs="{'invisible': [('blog_product_type','=','one_type')]}"/>
+                            </group>
+                            <field name="detail"/>
 
-                            <!--<field name="blog_junior_ids"-->
-                                   <!--attrs="{'invisible': [('blog_product_type','=','two_type')]}"/>-->
-                        <!--</group>-->
-                    <!--</sheet>-->
-                <!--</form>-->
-            <!--</field>-->
-        <!--</record>-->
+                            <field name="blog_junior_ids"
+                                   attrs="{'invisible': [('blog_product_type','=','two_type')]}"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
         <!--<record id="view_blog_post_broad_heading_tree" model="ir.ui.view">-->
             <!--<field name="name">blog.post.broad.heading.tree</field>-->
@@ -78,18 +78,18 @@
         </record>
 
 
-        <!--<record id="web_bolog_view_blog_blog_form" model="ir.ui.view">-->
-            <!--<field name="name">web.blog.blog.form</field>-->
-            <!--<field name="model">blog.blog</field>-->
-            <!--<field name="inherit_id" ref="website_blog.view_blog_blog_form"/>-->
-            <!--<field name="arch" type="xml">-->
+        <record id="web_bolog_view_blog_blog_form" model="ir.ui.view">
+            <field name="name">web.blog.blog.form</field>
+            <field name="model">blog.blog</field>
+            <field name="inherit_id" ref="website_blog.view_blog_blog_form"/>
+            <field name="arch" type="xml">
 
-                <!--<xpath expr="//field[@name='subtitle']" position="after">-->
-                    <!--<field name="blog_tag_ids"/>-->
-                <!--</xpath>-->
+                <xpath expr="//field[@name='subtitle']" position="after">
+                    <field name="blog_tag_ids"/>
+                </xpath>
 
-            <!--</field>-->
-        <!--</record>-->
+            </field>
+        </record>
 
         <!-- page list view  -->
         <record id="website_blog.view_blog_post_list" model="ir.ui.view">
