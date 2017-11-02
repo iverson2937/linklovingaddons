@@ -1,0 +1,196 @@
+<openerp>
+    <data>
+
+
+        <!--crm.lead.source-->
+        <record model="ir.ui.view" id="view_blog_post_broad_heading_form">
+            <field name="name">blog.post.broad.heading.form</field>
+            <field name="model">blog.post.broad.heading</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="blog_product_type"/>
+                                <field name="name"/>
+                            </group>
+                            <group>
+                                <field name="blog_Parent_id" domain="[('blog_product_type','=','one_type')]"
+                                       attrs="{'invisible': [('blog_product_type','=','one_type')]}"/>
+                            </group>
+                            <field name="detail"/>
+
+                            <field name="blog_junior_ids"
+                                   attrs="{'invisible': [('blog_product_type','=','two_type')]}"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_blog_post_broad_heading_tree" model="ir.ui.view">
+            <field name="name">blog.post.broad.heading.tree</field>
+            <field name="model">blog.post.broad.heading</field>
+            <field name="arch" type="xml">
+                <tree string="博客类型" default_order="blog_product_type">
+                    <field name="blog_product_type"/>
+                    <field name="name"/>
+                    <field name="detail"/>
+                    <field name="blog_Parent_id"/>
+                    <field name="blog_junior_ids"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_blog_post_broad_heading" model="ir.actions.act_window">
+            <field name="name">大类</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">blog.post.broad.heading</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    点击添加 大类.
+                </p>
+            </field>
+        </record>
+
+
+        <!--<menuitem id="menu_blog_broad_heading" parent="website_blog.menu_website_blog_root" name="博客一级类别"-->
+                  <!--action="action_blog_post_broad_heading" sequence="39"/>-->
+
+        <!--<menuitem id="website_blog.menu_blog" parent="website_blog.menu_website_blog_root" name="分类"-->
+                  <!--action="website_blog.action_blog_blog" sequence="20"/>-->
+        <!--<menuitem id="website_blog.menu_blog_tag" parent="website_blog.menu_website_blog_root" name="详细类别"-->
+                  <!--action="website_blog.action_tags" sequence="40"/>-->
+
+        <record id="web_bolog_view_blog_blog_list" model="ir.ui.view">
+            <field name="name">web.blog.blog.list</field>
+            <field name="model">blog.blog</field>
+            <field name="inherit_id" ref="website_blog.view_blog_blog_list"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="blog_tag_ids"/>
+                </xpath>
+
+            </field>
+        </record>
+
+
+        <record id="web_bolog_view_blog_blog_form" model="ir.ui.view">
+            <field name="name">web.blog.blog.form</field>
+            <field name="model">blog.blog</field>
+            <field name="inherit_id" ref="website_blog.view_blog_blog_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='subtitle']" position="after">
+                    <field name="blog_tag_ids"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!-- page list view  -->
+        <record id="website_blog.view_blog_post_list" model="ir.ui.view">
+            <field name="name">blog.post.list</field>
+            <field name="model">blog.post</field>
+            <field name="arch" type="xml">
+                <tree string="Blog Posts">
+                    <field name="name"/>
+                    <field name="active" invisible="1"/>
+                    <field name="blog_id"/>
+                    <field name="visits"/>
+                    <field name="create_uid" invisible="1"/>
+                    <field name="write_uid"/>
+                    <field name="write_date"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- page form view  -->
+        <record id="website_blog.view_blog_post_form" model="ir.ui.view">
+            <field name="name">blog.post.form</field>
+            <field name="model">blog.post</field>
+            <field name="arch" type="xml">
+                <form string="Blog Post">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                                <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                            </button>
+                            <button class="oe_stat_button" name="website_publish_button"
+                                    type="object" icon="fa-globe">
+                                <field name="website_published" widget="website_button"/>
+                            </button>
+                        </div>
+                        <group>
+                            <field name="blog_id"/>
+                            <field name="tag_ids"/>
+
+                            <field name="name" placeholder="Blog Post Title" string="主题"/>
+                            <field name="subtitle" placeholder="Blog Subtitle"/>
+                        </group>
+                        <group invisible="1">
+                            <field name="blog_post_type_ids" placeholder="文章分类"/>
+                        </group>
+
+
+                        <field name="content" options="{'style-inline': true}"/>
+
+                        <group string="Publishing Options" invisible="1">
+                            <field name="author_id" invisible="1"/>
+                            <field name="create_date" invisible="1"/>
+                            <field name="post_date" invisible="1"/>
+                            <field name="write_uid" invisible="1"/>
+                            <field name="write_date" invisible="1"/>
+                        </group>
+                        <group string="Technical" groups="base.group_no_one" invisible="1">
+                            <field name="ranking" invisible="1"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread" options='{"thread_level": 1}'/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        <!-- page search view  -->
+        <record id="website_blog.view_blog_post_search" model="ir.ui.view">
+            <field name="name">blog.post.search</field>
+            <field name="model">blog.post</field>
+            <field name="arch" type="xml">
+                <search string="Blog Post">
+                    <filter string="Archived" name="inactive" domain="[('active','=',False)]"/>
+                    <field name="name" string="Content"
+                           filter_domain="['|', ('name','ilike',self), ('content','ilike',self)]"/>
+                    <field name="write_uid"/>
+                    <field name="blog_id"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Blog" domain="[]" context="{'group_by': 'blog_id'}"/>
+                        <filter string="Author" domain="[]" context="{'group_by': 'create_uid'}"/>
+                        <filter string="Last Contributor" domain="[]" context="{'group_by': 'write_uid'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!--&lt;!&ndash; page action &ndash;&gt;-->
+        <!--<record id="action_blog_post" model="ir.actions.act_window">-->
+        <!--<field name="name">Blog Posts</field>-->
+        <!--<field name="res_model">blog.post</field>-->
+        <!--<field name="view_type">form</field>-->
+        <!--<field name="view_mode">tree,form</field>-->
+        <!--<field name="view_id" ref="view_blog_post_list"/>-->
+        <!--<field name="search_view_id" ref="view_blog_post_search"/>-->
+        <!--<field name="help" type="html">-->
+        <!--<p class="oe_view_nocontent_create">-->
+        <!--Click to create a new blog post.-->
+        <!--</p>-->
+        <!--</field>-->
+        <!--</record>-->
+
+
+    </data>
+</openerp>
