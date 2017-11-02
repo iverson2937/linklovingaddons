@@ -146,7 +146,7 @@ class linkloving_procurement_order_extend(models.Model):
         procurement_list = []
 
         orderpoints_noprefetch = OrderPoint.with_context(prefetch_fields=False).search(
-            company_id and [('company_id', '=', company_id)] or [],
+                company_id and [('company_id', '=', company_id), ('active', '=', True)] or [('active', '=', True)],
             order=self._procurement_from_orderpoint_get_order())
         new_mrp_report = self.env["mrp.report"]
         exception_happend = False
