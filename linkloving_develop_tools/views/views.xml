@@ -63,6 +63,9 @@
                         <button string="更新菜单" name="update_product_categ_menu" type="object"
                                 default_focus="1"
                                 class="btn-primary"/>
+                        <button string="将已完成的mo的库存移动设置完成" name="set_done_mo_to_done" type="object"
+                                default_focus="1"
+                                class="btn-primary"/>
                     </footer>
                 </form>
             </field>

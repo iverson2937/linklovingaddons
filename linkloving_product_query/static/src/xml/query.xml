@@ -2,7 +2,7 @@
 <!--t-if='widget.options.import_enabled'-->
 <templates xml:space="preserve">
        <t t-name="QueryView.query_button">
-        <button  type="button" class="btn btn-sm btn-default o_button_query">
+        <button  type="button" class="btn btn-sm btn-primary o_button_query">
             选择查询条件
         </button>
     </t>

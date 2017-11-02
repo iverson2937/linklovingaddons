@@ -74,9 +74,8 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <t t-if="not page[0]['is_domestic']">
+                                <!--<t t-if="not page[0]['is_domestic']">-->
                                     <th>产品</th>
-                                </t>
                                 <t t-if="page[0]['is_domestic']">
                                     <th>国内简称</th>
                                 </t>
@@ -115,7 +114,7 @@
                                             <span t-esc="i"/>
                                         </td>
                                         <t t-set="i" t-value="i+1"/>
-                                        <td t-if="not l.order_id.team_id.is_domestic">
+                                        <td>
                                             <span t-field="l.name"/>
                                         </td>
                                         <td t-if="l.inner_code">
