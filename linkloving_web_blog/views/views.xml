@@ -2,45 +2,45 @@
     <data>
 
 
-        <!--crm.lead.source-->
-        <record model="ir.ui.view" id="view_blog_post_broad_heading_form">
-            <field name="name">blog.post.broad.heading.form</field>
-            <field name="model">blog.post.broad.heading</field>
-            <field name="arch" type="xml">
-                <form>
-                    <sheet>
-                        <group>
-                            <group>
-                                <field name="blog_product_type"/>
-                                <field name="name"/>
-                            </group>
-                            <group>
-                                <field name="blog_Parent_id" domain="[('blog_product_type','=','one_type')]"
-                                       attrs="{'invisible': [('blog_product_type','=','one_type')]}"/>
-                            </group>
-                            <field name="detail"/>
+        <!--&lt;!&ndash;crm.lead.source&ndash;&gt;-->
+        <!--<record model="ir.ui.view" id="view_blog_post_broad_heading_form">-->
+            <!--<field name="name">blog.post.broad.heading.form</field>-->
+            <!--<field name="model">blog.post.broad.heading</field>-->
+            <!--<field name="arch" type="xml">-->
+                <!--<form>-->
+                    <!--<sheet>-->
+                        <!--<group>-->
+                            <!--<group>-->
+                                <!--<field name="blog_product_type"/>-->
+                                <!--<field name="name"/>-->
+                            <!--</group>-->
+                            <!--<group>-->
+                                <!--<field name="blog_Parent_id" domain="[('blog_product_type','=','one_type')]"-->
+                                       <!--attrs="{'invisible': [('blog_product_type','=','one_type')]}"/>-->
+                            <!--</group>-->
+                            <!--<field name="detail"/>-->
 
-                            <field name="blog_junior_ids"
-                                   attrs="{'invisible': [('blog_product_type','=','two_type')]}"/>
-                        </group>
-                    </sheet>
-                </form>
-            </field>
-        </record>
+                            <!--<field name="blog_junior_ids"-->
+                                   <!--attrs="{'invisible': [('blog_product_type','=','two_type')]}"/>-->
+                        <!--</group>-->
+                    <!--</sheet>-->
+                <!--</form>-->
+            <!--</field>-->
+        <!--</record>-->
 
-        <record id="view_blog_post_broad_heading_tree" model="ir.ui.view">
-            <field name="name">blog.post.broad.heading.tree</field>
-            <field name="model">blog.post.broad.heading</field>
-            <field name="arch" type="xml">
-                <tree string="博客类型" default_order="blog_product_type">
-                    <field name="blog_product_type"/>
-                    <field name="name"/>
-                    <field name="detail"/>
-                    <field name="blog_Parent_id"/>
-                    <field name="blog_junior_ids"/>
-                </tree>
-            </field>
-        </record>
+        <!--<record id="view_blog_post_broad_heading_tree" model="ir.ui.view">-->
+            <!--<field name="name">blog.post.broad.heading.tree</field>-->
+            <!--<field name="model">blog.post.broad.heading</field>-->
+            <!--<field name="arch" type="xml">-->
+                <!--<tree string="博客类型" default_order="blog_product_type">-->
+                    <!--<field name="blog_product_type"/>-->
+                    <!--<field name="name"/>-->
+                    <!--<field name="detail"/>-->
+                    <!--<field name="blog_Parent_id"/>-->
+                    <!--<field name="blog_junior_ids"/>-->
+                <!--</tree>-->
+            <!--</field>-->
+        <!--</record>-->
 
         <!--<record id="action_blog_post_broad_heading" model="ir.actions.act_window">-->
             <!--<field name="name"> blog type</field>-->

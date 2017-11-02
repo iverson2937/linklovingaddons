@@ -6,7 +6,7 @@ from odoo import models, fields, api
 class LinkLovingBlogPost(models.Model):
     _inherit = "blog.post"
 
-    blog_post_type_ids = fields.Many2one('blog.post.broad.heading', string=u'文章分类')
+    # blog_post_type_ids = fields.Many2one('blog.post.broad.heading', string=u'文章分类')
     tag_ids = fields.Many2one('blog.tag', string='Tags')
 
     # @api.model
@@ -42,6 +42,6 @@ class LinkLovingTypeOne(models.Model):
     name = fields.Char(u'名称')
     detail = fields.Text(string=u'描述')
 
-    blog_Parent_id = fields.Many2one('blog.post.broad.heading', string=u'上级')
+    # blog_Parent_id = fields.Many2one('blog.post.broad.heading', string=u'上级')
     blog_product_type = fields.Selection([('one_type', u'一级类别'), ('two_type', u'二级类别')], string=u'类型')
-    blog_junior_ids = fields.One2many('blog.post.broad.heading', 'blog_Parent_id', string=u'下级列表')
+    # blog_junior_ids = fields.One2many('blog.post.broad.heading', 'blog_Parent_id', string=u'下级列表')
