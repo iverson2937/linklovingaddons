@@ -42,18 +42,18 @@
             </field>
         </record>
 
-        <record id="action_blog_post_broad_heading" model="ir.actions.act_window">
-            <field name="name"> blog type</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">blog.post.broad.heading</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-            <field name="help" type="html">
-                <p class="oe_view_nocontent_create">
-                    点击添加 大类.
-                </p>
-            </field>
-        </record>
+        <!--<record id="action_blog_post_broad_heading" model="ir.actions.act_window">-->
+            <!--<field name="name"> blog type</field>-->
+            <!--<field name="type">ir.actions.act_window</field>-->
+            <!--<field name="res_model">blog.post.broad.heading</field>-->
+            <!--<field name="view_type">form</field>-->
+            <!--<field name="view_mode">tree,form</field>-->
+            <!--<field name="help" type="html">-->
+                <!--<p class="oe_view_nocontent_create">-->
+                    <!--点击添加 大类.-->
+                <!--</p>-->
+            <!--</field>-->
+        <!--</record>-->
 
 
         <!--<menuitem id="menu_blog_broad_heading" parent="website_blog.menu_website_blog_root" name="博客一级类别"-->
