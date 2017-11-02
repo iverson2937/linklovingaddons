@@ -24,7 +24,7 @@ class LinkLovingWebsiteMenu(models.Model):
 class LinkLovingBlogBlog(models.Model):
     _inherit = 'blog.blog'
 
-    blog_tag_ids = fields.One2many('blog.tag', 'tag_parent_id', string=u'详细分类')
+    blog_tag_ids = fields.Many2many('blog.tag', 'tag_parent_id', string=u'详细分类')
 
 
 class LinkLovingBlogTag(models.Model):

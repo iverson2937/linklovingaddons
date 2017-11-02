@@ -85,7 +85,7 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//field[@name='name']" position="after">
-                    <field name="blog_tag_ids" widget="one2many"/>
+                    <field name="blog_tag_ids" widget="many2many_tags"/>
                 </xpath>
 
             </field>
