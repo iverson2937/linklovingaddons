@@ -128,20 +128,20 @@
 
                 </xpath>
 
-                <xpath expr="//label[@for='product_qty']" position="attributes">
+                <!--<xpath expr="//label[@for='product_qty']" position="attributes">-->
 
-                    <attribute name="attrs">{'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}</attribute>
-                </xpath>
-
-
-                <xpath expr="//field[@name='product_qty']" position="attributes">
-                    <attribute name="attrs">
-                        {'readonly':[('state','not in',['draft','confirmed'])],
-                      'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}
-                    </attribute>
+                <!--<attribute name="attrs">{'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}</attribute>-->
+                <!--</xpath>-->
 
 
-                </xpath>
+                <!--<xpath expr="//field[@name='product_qty']" position="attributes">-->
+                <!--<attribute name="attrs">-->
+                <!--{'readonly':[('state','not in',['draft','confirmed'])],-->
+                <!--'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}-->
+                <!--</attribute>-->
+
+
+                <!--</xpath>-->
                 <xpath expr="//field[@name='unit_price']" position="attributes">
                     <attribute name="attrs">{'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}</attribute>
 
