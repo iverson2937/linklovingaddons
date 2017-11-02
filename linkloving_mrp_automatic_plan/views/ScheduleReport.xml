@@ -41,6 +41,7 @@
                         <group>
                             <field name="report_type"/>
                             <field name="total_orderpoint_count"/>
+                            <field name="note"/>
                         </group>
                         <notebook>
                             <page string="报告条目">

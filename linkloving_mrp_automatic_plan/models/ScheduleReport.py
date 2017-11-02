@@ -59,6 +59,7 @@ class MrpReportProductLine(models.Model):
 class MrpReport(models.Model):
     _name = 'mrp.report'
 
+    note = fields.Text(string=u'备注', readonly=True)
     total_orderpoint_count = fields.Integer(string=u"此次运算订货规则个数", readonly=True)
     state = fields.Selection(string=u"完成状态",
                              selection=[('part', u'部分完成,出现异常'), ('done', u'已完成'), ],
