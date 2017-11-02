@@ -16,12 +16,12 @@
                             </group>
                             <group>
                                 <!--<field name="blog_Parent_id" domain="[('blog_product_type','=','one_type')]"-->
-                                       <!--attrs="{'invisible': [('blog_product_type','=','one_type')]}"/>-->
+                                <!--attrs="{'invisible': [('blog_product_type','=','one_type')]}"/>-->
                             </group>
                             <field name="detail"/>
 
                             <!--<field name="blog_junior_ids"-->
-                                   <!--attrs="{'invisible': [('blog_product_type','=','two_type')]}"/>-->
+                            <!--attrs="{'invisible': [('blog_product_type','=','two_type')]}"/>-->
                         </group>
                     </sheet>
                 </form>
@@ -29,40 +29,40 @@
         </record>
 
         <!--<record id="view_blog_post_broad_heading_tree" model="ir.ui.view">-->
-            <!--<field name="name">blog.post.broad.heading.tree</field>-->
-            <!--<field name="model">blog.post.broad.heading</field>-->
-            <!--<field name="arch" type="xml">-->
-                <!--<tree string="博客类型" default_order="blog_product_type">-->
-                    <!--<field name="blog_product_type"/>-->
-                    <!--<field name="name"/>-->
-                    <!--<field name="detail"/>-->
-                    <!--<field name="blog_Parent_id"/>-->
-                    <!--<field name="blog_junior_ids"/>-->
-                <!--</tree>-->
-            <!--</field>-->
+        <!--<field name="name">blog.post.broad.heading.tree</field>-->
+        <!--<field name="model">blog.post.broad.heading</field>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<tree string="博客类型" default_order="blog_product_type">-->
+        <!--<field name="blog_product_type"/>-->
+        <!--<field name="name"/>-->
+        <!--<field name="detail"/>-->
+        <!--<field name="blog_Parent_id"/>-->
+        <!--<field name="blog_junior_ids"/>-->
+        <!--</tree>-->
+        <!--</field>-->
         <!--</record>-->
 
         <!--<record id="action_blog_post_broad_heading" model="ir.actions.act_window">-->
-            <!--<field name="name"> blog type</field>-->
-            <!--<field name="type">ir.actions.act_window</field>-->
-            <!--<field name="res_model">blog.post.broad.heading</field>-->
-            <!--<field name="view_type">form</field>-->
-            <!--<field name="view_mode">tree,form</field>-->
-            <!--<field name="help" type="html">-->
-                <!--<p class="oe_view_nocontent_create">-->
-                    <!--点击添加 大类.-->
-                <!--</p>-->
-            <!--</field>-->
+        <!--<field name="name"> blog type</field>-->
+        <!--<field name="type">ir.actions.act_window</field>-->
+        <!--<field name="res_model">blog.post.broad.heading</field>-->
+        <!--<field name="view_type">form</field>-->
+        <!--<field name="view_mode">tree,form</field>-->
+        <!--<field name="help" type="html">-->
+        <!--<p class="oe_view_nocontent_create">-->
+        <!--点击添加 大类.-->
+        <!--</p>-->
+        <!--</field>-->
         <!--</record>-->
 
 
         <!--<menuitem id="menu_blog_broad_heading" parent="website_blog.menu_website_blog_root" name="博客一级类别"-->
-                  <!--action="action_blog_post_broad_heading" sequence="39"/>-->
+        <!--action="action_blog_post_broad_heading" sequence="39"/>-->
 
         <!--<menuitem id="website_blog.menu_blog" parent="website_blog.menu_website_blog_root" name="分类"-->
-                  <!--action="website_blog.action_blog_blog" sequence="20"/>-->
+        <!--action="website_blog.action_blog_blog" sequence="20"/>-->
         <!--<menuitem id="website_blog.menu_blog_tag" parent="website_blog.menu_website_blog_root" name="详细类别"-->
-                  <!--action="website_blog.action_tags" sequence="40"/>-->
+        <!--action="website_blog.action_tags" sequence="40"/>-->
 
         <record id="web_bolog_view_blog_blog_list" model="ir.ui.view">
             <field name="name">web.blog.blog.list</field>
@@ -84,7 +84,7 @@
             <field name="inherit_id" ref="website_blog.view_blog_blog_form"/>
             <field name="arch" type="xml">
 
-                <xpath expr="//field[@name='subtitle']" position="after">
+                <xpath expr="//field[@name='name']" position="after">
                     <field name="blog_tag_ids"/>
                 </xpath>
 
