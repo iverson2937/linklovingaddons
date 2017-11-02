@@ -15,13 +15,13 @@
                                 <field name="name"/>
                             </group>
                             <group>
-                                <field name="blog_Parent_id" domain="[('blog_product_type','=','one_type')]"
-                                       attrs="{'invisible': [('blog_product_type','=','one_type')]}"/>
+                                <!--<field name="blog_Parent_id" domain="[('blog_product_type','=','one_type')]"-->
+                                       <!--attrs="{'invisible': [('blog_product_type','=','one_type')]}"/>-->
                             </group>
                             <field name="detail"/>
 
-                            <field name="blog_junior_ids"
-                                   attrs="{'invisible': [('blog_product_type','=','two_type')]}"/>
+                            <!--<field name="blog_junior_ids"-->
+                                   <!--attrs="{'invisible': [('blog_product_type','=','two_type')]}"/>-->
                         </group>
                     </sheet>
                 </form>
@@ -132,7 +132,7 @@
                             <field name="subtitle" placeholder="Blog Subtitle"/>
                         </group>
                         <group invisible="1">
-                            <field name="blog_post_type_ids" placeholder="文章分类"/>
+                            <!--<field name="blog_post_type_ids" placeholder="文章分类"/>-->
                         </group>
 
 
