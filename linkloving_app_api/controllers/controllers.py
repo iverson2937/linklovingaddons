@@ -1514,6 +1514,7 @@ class LinklovingAppApi(http.Controller):
                 'product_id': return_line.product_id.display_name,
                 'return_qty': return_line.return_qty,
                 'product_type': return_line.product_type,
+                'weight': return_line.product_id.weight or 0,
             }
             data.append(dic)
         return JsonResponse.send_response(STATUS_CODE_OK,
