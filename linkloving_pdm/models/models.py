@@ -966,6 +966,9 @@ class ReviewProcessWizard(models.TransientModel):
             #             remark=self_copy.remark)
             #     return True
 
+            if not self.product_attachment_info_id.review_id:  # 如果没审核过
+                self.product_attachment_info_id.action_send_to_review()
+
             if file_data_list:
                 for info_one in self.env['product.attachment.info'].browse(
                         [int(info_list_id) for info_list_id in file_data_list]):
@@ -973,26 +976,24 @@ class ReviewProcessWizard(models.TransientModel):
                     if not info_one.review_id:  # 如果没审核过
                         info_one.action_send_to_review()
 
-                    info_one.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
-                    info_one.review_id.process_line_review_now.submit_to_next_reviewer(
-                        review_type=review_type,
-                        to_last_review=to_last_review,
-                        partner_id=self.partner_id,
-                        remark=self.remark, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
+                    if info_one.review_id.who_review_now.id == self.env.user.partner_id.id:
+                        info_one.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
+                        info_one.review_id.process_line_review_now.submit_to_next_reviewer(
+                            review_type=review_type,
+                            to_last_review=to_last_review,
+                            partner_id=self.partner_id,
+                            remark=self.remark, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
                 return True
 
-            if not self.product_attachment_info_id.review_id:  # 如果没审核过
-                self.product_attachment_info_id.action_send_to_review()
-
-            self.product_attachment_info_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
-            self.product_attachment_info_id.review_id.process_line_review_now.submit_to_next_reviewer(
-                review_type=review_type,
-                to_last_review=to_last_review,
-                partner_id=self.partner_id,
-                remark=self.remark, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
+            if self.product_attachment_info_id.review_id.who_review_now.id == self.env.user.partner_id.id:
+                self.product_attachment_info_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
+                self.product_attachment_info_id.review_id.process_line_review_now.submit_to_next_reviewer(
+                    review_type=review_type,
+                    to_last_review=to_last_review,
+                    partner_id=self.partner_id,
+                    remark=self.remark, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
 
         elif review_type == 'picking_review':
-            print self.material_requests_id.review_id
             if not self.material_requests_id.review_id:  # 如果没审核过
                 self.material_requests_id.action_send_to_review()
 
