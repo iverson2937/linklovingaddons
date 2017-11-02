@@ -65,7 +65,7 @@
         <!--action="website_blog.action_tags" sequence="40"/>-->
 
         <record id="web_bolog_view_blog_blog_list" model="ir.ui.view">
-            <field name="name">web.blog.blog.list</field>
+            <field name="name">blog.blog.list</field>
             <field name="model">blog.blog</field>
             <field name="inherit_id" ref="website_blog.view_blog_blog_list"/>
             <field name="arch" type="xml">
@@ -79,7 +79,7 @@
 
 
         <record id="web_bolog_view_blog_blog_form" model="ir.ui.view">
-            <field name="name">web.blog.blog.form</field>
+            <field name="name">blog.blog.form</field>
             <field name="model">blog.blog</field>
             <field name="inherit_id" ref="website_blog.view_blog_blog_form"/>
             <field name="arch" type="xml">
