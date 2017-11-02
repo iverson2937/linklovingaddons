@@ -1,0 +1,40 @@
+#main_column > div > a {
+    display: inline-block;
+    position: absolute;
+    left: 75px;
+    top: -22px;
+}
+
+#div_blog_checkbox {
+    display: inline-block;
+    position: absolute;
+    left: 0;
+}
+
+.kf_mod_searchBox {
+    margin-top: -10px !important;
+}
+
+#main_column > div > #div_blog_checkbox + .text-muted {
+    padding-top: 30px;
+}
+
+/*#com-quick-reply-bbs {*/
+/*position: fixed;*/
+/*right: 40px;*/
+/*color: #fff;*/
+/*background: forestgreen;*/
+/*z-index: 9999999;*/
+/*}*/
+
+.iframe_view_post {
+    margin-top: -30px;
+}
+
+.div_show_go_back {
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.a_show_go_back {
+    padding-left: 94%;
+}

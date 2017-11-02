@@ -263,7 +263,7 @@
                             type="object" string="开始生产"
                             groups="linkloving_mrp_extend.group_charge_produce"/>
                     <button name="button_produce_finish" class="oe_highlight"
-                            attrs="{'invisible': [ '|', ('availability', 'not in', ['partially_available', 'assigned']),('state', '!=', 'progress')]}"
+                            attrs="{'invisible': [('state', '!=', 'progress')]}"
                             type="object" string="Production Complete,Send to Inspection"
                             groups="linkloving_mrp_extend.group_charge_produce"/>
                     <button name="button_start_quality_inspection" class="oe_highlight"
