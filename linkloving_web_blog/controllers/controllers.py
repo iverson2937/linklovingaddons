@@ -382,7 +382,9 @@ class WebsiteBlogLinkLoving(WebsiteBlog, http.Controller):
         # Find next Post
         all_post = BlogPost.search([('blog_id', '=', blog.id)])
 
-        if blog.id == 1:
+        index_blog = self.env.ref('website_menu.menu_news')
+
+        if blog.id == index_blog.id:
             blogs = BlogPost.search([], order="post_date desc")
             all_post = BlogPost.search([('blog_id', 'in', [blog_one.id for blog_one in blogs])])
 
