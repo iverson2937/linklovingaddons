@@ -384,7 +384,7 @@ class WebsiteBlogLinkLoving(WebsiteBlog, http.Controller):
 
         index_blog = self.env.ref('website_blog.menu_news')
 
-        if blog.id == index_blog.id:
+        if blog.id == 2:
             blogs = BlogPost.search([], order="post_date desc")
             all_post = BlogPost.search([('blog_id', 'in', [blog_one.id for blog_one in blogs])])
 
