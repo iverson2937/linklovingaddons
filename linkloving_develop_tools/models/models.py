@@ -8,8 +8,10 @@ import pytz
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+
 _logger = logging.getLogger(__name__)
 import time
+
 
 class ResPartnerExtend(models.Model):
     _inherit = 'res.partner'
@@ -374,45 +376,34 @@ class CreateOrderPointWizard(models.TransientModel):
     # 设置已完成的mo的库存移动没有完成或者取消的问题
     def set_done_mo_to_done(self):
         MrpProduction = self.env["mrp.production"]
-        mos = MrpProduction.search([("state", "=", "done")])
-        mos_to_do = self.env["mrp.production"]
+        mos = MrpProduction.search([("state", "in", ("done", "cancel"))])
+        stock_moves_to_do = self.env["stock.move"]
         for mo in mos:
-            if mo.move_raw_ids.filtered(lambda x: x.state not in ["done", "cancel"]):
-                mos_to_do += mo
-            if mo.move_finished_ids.filtered(
-                    lambda x: x.state not in ["done", "cancel"]) and mo.qc_feedback_ids.filtered(
+            raw_stock_moves = mo.move_raw_ids.filtered(lambda x: x.state not in ["done", "cancel"])
+            print raw_stock_moves
+            if mo.qc_feedback_ids.filtered(
                     lambda x: x.state in ["alredy_post_inventory", "check_to_rework"]):
-                mos_to_do += mo
-        mos_to_do.write({
+                finish_stock_moves = mo.move_finished_ids.filtered(
+                    lambda x: x.state not in ["done", "cancel"])
+            if raw_stock_moves:
+                stock_moves_to_do += raw_stock_moves
+            if finish_stock_moves:
+                stock_moves_to_do += finish_stock_moves
+        stock_moves_to_do.write({
             'state': 'cancel'
         })
+        for stock in stock_moves_to_do:
+            print stock.id
+            print stock.production_id.name
         return {
             "type": "ir.actions.client",
             "tag": "action_notify",
             "params": {
-                "title": str(len(mos_to_do)) + u"完成",
+                "title": str(len(stock_moves_to_do)) + u"完成",
                 "text": u"完成",
                 "sticky": False
             }
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
