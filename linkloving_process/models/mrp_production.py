@@ -12,7 +12,7 @@ class MrpProduction(models.Model):
     is_outside = fields.Boolean(related='process_id.is_outside', store=True)
     supplier_id = fields.Many2one('res.partner', domain=[('supplier', '=', True)], string=u'加工商')
     tracking_number = fields.Char(string=u'物流单号')
-    unit_price = fields.Float()
+    unit_price = fields.Float(digits=dp.get_precision('Produce Price'))
 
     @api.multi
     def mo_create(self):
