@@ -33,6 +33,8 @@
                                 <t t-esc="result.process"/>
                             </t>
                          ]
+                        <!--2017/11/6修改，需求库存等移到此处-->
+                        <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                         <!--<t t-if="result.state_bom">-->
                             <!--<t t-if="result.state_bom=='draft'">-->
                                 <!--<span class="fa fa-circle" style="padding-left:10px;color:red;"></span>-->
@@ -57,7 +59,7 @@
                                         </t>
                                     </a>
                                     MO[<t t-esc="mo_length"/>]
-                                    <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
+                                    <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                                     <button class="btn btn-primary send-mo-btn" t-att-check-name="'chk_mo'+result.product_id">合并</button>
                                 </h4>
                             </div>
@@ -98,6 +100,7 @@
                                                         <span style="margin-left:15px;color:green;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
                                                         </t>
 
+                                                        <span style="margin-left:15px;"><t t-esc="item.remark"/> </span>
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'mo_detail'+item.uuid">
@@ -149,6 +152,12 @@
                                                     <!--<span class="fa fa-circle" style="padding-left:10px;color:green;"></span>-->
                                                 <!--</t>-->
                                             <!--</t>-->
+
+                                        <!--2017/11/6修改，需求库存等移到此处-->
+                                        <span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>
+
+                                        <!--2017/11/6添加部分刷新功能-->
+                                        <span style="margin-left:20px;" class="fa fa-refresh part_refresh"></span>
                                     </span>
                                 </h4>
                             </div>
@@ -173,7 +182,7 @@
                                         </t>
                                     </a>
                                     PO[<t t-esc="po_length"/>]
-                                    <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
+                                    <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                                     <!--<button class="btn btn-primary send-po-btn">合并</button>-->
                                 </h4>
                             </div>
@@ -204,6 +213,8 @@
                                                         <t t-if="item.status_light == 1">
                                                         <span style="margin-left:15px;color:green;" class="fa fa-circle"></span>
                                                         </t>
+
+                                                        <span style="margin-left:15px;"><t t-esc="item.remark"/> </span>
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'po_detail'+item.line_id">
@@ -242,7 +253,7 @@
                                         </t>
                                     </a>
                                     MO[<t t-esc="mo_length"/>]
-                                        <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
+                                        <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                                     <button class="btn btn-primary send-mo-btn" t-att-check-name="'chk_mo'+result.product_id">合并</button>
                                 </h4>
                             </div>
@@ -283,6 +294,8 @@
                                                         <t t-if="item.material_light == 1">
                                                         <span style="margin-left:15px;color:green;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
                                                         </t>
+
+                                                        <span style="margin-left:15px;"><t t-esc="item.remark"/> </span>
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'mo_detail'+item.uuid">
@@ -337,6 +350,12 @@
                                                 <!--<span class="fa fa-circle" style="padding-left:10px;color:green;"></span>-->
                                             <!--</t>-->
                                          <!--</t>-->
+
+                                        <!--2017/11/6修改，需求库存等移到此处-->
+                                        <span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>
+
+                                        <!--2017/11/6添加部分刷新功能-->
+                                        <span style="margin-left:20px;" class="fa fa-refresh part_refresh"></span>
                                     </span>
                                 </h4>
                             </div>
@@ -361,7 +380,7 @@
                                         </t>
                                     </a>
                                     PO[<t t-esc="po_length"/>]
-                                        <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
+                                        <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                                     <!--<button class="btn btn-primary send-po-btn" t-att-check-name="'chk'+result.product_id">合并</button>-->
                                 </h4>
                             </div>
@@ -391,6 +410,8 @@
                                                         <t t-if="item.status_light == 1">
                                                         <span style="margin-left:15px;color:green;" class="fa fa-circle"></span>
                                                         </t>
+
+                                                        <span style="margin-left:15px;"><t t-esc="item.remark"/> </span>
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'po_detail'+item.line_id">

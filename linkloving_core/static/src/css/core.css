@@ -144,3 +144,7 @@
     text-overflow: inherit;
     white-space:inherit;
 }
+
+.show_bom_line_one .part_refresh{
+    cursor: pointer;
+}
