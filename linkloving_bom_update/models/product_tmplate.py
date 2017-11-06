@@ -41,13 +41,16 @@ class ProductTemplate(models.Model):
                 bom_id = product_t.bom_ids[0]
             else:
                 raise UserError(u"%s 没有Bom" % (product_t.name))
+
             mos = self.env["mrp.production"].search(
                     [('bom_id', '=', bom_id.id), ('state', 'not in', ['cancel', 'done'])])
+
             for mo in mos:
                 if mo.state in ['draft', 'confirmed', 'waiting_material']:
                     mo.action_cancel()
                     if mo.procurement_ids.move_dest_id.procurement_id:  # 订单制
                         mo.procurement_ids.cancel()
+                        mo.procurement_ids.move_dest_id.procurement_id.cancel()
                         mo.procurement_ids.move_dest_id.procurement_id.reset_to_confirmed()
                         mo.procurement_ids.move_dest_id.procurement_id.run()
                     elif mo.procurement_ids:
