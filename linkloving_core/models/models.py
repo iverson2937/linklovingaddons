@@ -119,6 +119,7 @@ class ProductTemplate(models.Model):
                     'date_planned': line.date_planned,
                     'state': PURCHASE_TYPE[line.order_id.state],
                     'status_light': line.order_id.status_light,
+                    'remark': line.order_id.remark
                 })
 
         mo_ids = self.env['mrp.production'].search(
@@ -138,6 +139,7 @@ class ProductTemplate(models.Model):
                     'date': mo.date_planned_start,
                     'status_light': mo.status_light,
                     'material_light': mo.material_light,
+                    'remark': mo.remark
                     # 'origin': mo.origin if mo.origin else '',
                 })
 
