@@ -116,6 +116,7 @@ class ProductProduct(models.Model):
                     mo.action_cancel()
                     if mo.procurement_ids.move_dest_id.procurement_id:  # 订单制
                         mo.procurement_ids.cancel()
+                        mo.procurement_ids.move_dest_id.procurement_id.cancel()
                         mo.procurement_ids.move_dest_id.procurement_id.reset_to_confirmed()
                         mo.procurement_ids.move_dest_id.procurement_id.run()
                     elif mo.procurement_ids:
