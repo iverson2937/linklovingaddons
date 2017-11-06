@@ -155,6 +155,9 @@
 
                                         <!--2017/11/6修改，需求库存等移到此处-->
                                         <span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>
+
+                                        <!--2017/11/6添加部分刷新功能-->
+                                        <span style="margin-left:20px;" class="fa fa-refresh part_refresh"></span>
                                     </span>
                                 </h4>
                             </div>
@@ -350,6 +353,9 @@
 
                                         <!--2017/11/6修改，需求库存等移到此处-->
                                         <span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>
+
+                                        <!--2017/11/6添加部分刷新功能-->
+                                        <span style="margin-left:20px;" class="fa fa-refresh part_refresh"></span>
                                     </span>
                                 </h4>
                             </div>
