@@ -600,11 +600,17 @@ class MrpProductionExtend(models.Model):
                                                                               equipment_no=production_line.compute_speed_factor(
                                                                                   mo.bom_id))
 
+
         vals = {
             'date_planned_start': start_time,
             'date_planned_finished': end_time,
-            'in_charge_id': production_line.employee_id.address_home_id.id or production_line.process_id.partner_id.id,
         }
+        if production_line:
+            charge_id = production_line.employee_id.address_home_id.id or production_line.process_id.partner_id.id
+            vals.update({
+                'in_charge_id': charge_id
+            })
+
         # if to_state:
         #     if mo.state in ["draft", "confirmed", "waiting_material"]:
         #         vals.update({

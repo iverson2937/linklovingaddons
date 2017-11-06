@@ -267,7 +267,6 @@ class CreateOrderPointWizard(models.TransientModel):
         click_and_login()
 
     def compute_sale_qty(self):
-
         this_month = datetime.datetime.now().month
         last1_month = this_month - 1
         date1_start, date1_end = getMonthFirstDayAndLastDay(month=last1_month)
@@ -404,6 +403,13 @@ class CreateOrderPointWizard(models.TransientModel):
                 "sticky": False
             }
         }
+
+    def quantity_done_0(self):
+        StockPicking = self.env["stock.picking"]
+        pickings = StockPicking.search([("state", "=", "done")])
+        for pick in pickings:
+            all(pick.pack_operation_product_ids)
+
 
 
 def getMonthFirstDayAndLastDay(year=None, month=None, period=None):

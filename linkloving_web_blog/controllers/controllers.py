@@ -270,7 +270,7 @@ class WebsiteBlogLinkLoving(WebsiteBlog, http.Controller):
         active_tag_ids = tag and map(int, [unslug(t)[1] for t in tag.split(',')]) or []
         if active_tag_ids:
             domain += [('tag_ids', 'in', active_tag_ids)]
-        if blog.id == 1:
+        if blog.is_all_blog:
             domain += [('blog_id', 'in', [blog_one.id for blog_one in blogs])]
         else:
             domain += [('blog_id', '=', blog.id)]
@@ -382,9 +382,9 @@ class WebsiteBlogLinkLoving(WebsiteBlog, http.Controller):
         # Find next Post
         all_post = BlogPost.search([('blog_id', '=', blog.id)])
 
-        index_blog = self.env.ref('website_blog.menu_news')
+        # index_blog = request.env.ref('website_blog.menu_news')
 
-        if blog.id == 2:
+        if blog.is_all_blog:
             blogs = BlogPost.search([], order="post_date desc")
             all_post = BlogPost.search([('blog_id', 'in', [blog_one.id for blog_one in blogs])])
 

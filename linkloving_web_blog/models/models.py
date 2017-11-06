@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 
 class LinkLovingBlogPost(models.Model):
@@ -25,6 +26,49 @@ class LinkLovingBlogBlog(models.Model):
     _inherit = 'blog.blog'
 
     blog_tag_ids = fields.Many2many('blog.tag', 'tag_parent_id', string=u'详细分类')
+    is_all_blog = fields.Boolean(string=u'是否是总博文标签', default=False)
+
+    @api.model
+    def create(self, vals):
+
+        if vals.get('is_all_blog'):
+            blog_list = self.env['blog.blog'].search([('is_all_blog', '=', True)])
+            if blog_list:
+                raise UserError(u'已经存在主目录类别')
+
+        res = super(LinkLovingBlogBlog, self).create(vals)
+        self.write_website_nenu(res)
+        return res
+
+    @api.multi
+    def write(self, vals):
+
+        if vals.get('is_all_blog'):
+            blog_list = self.env['blog.blog'].search([('is_all_blog', '=', True)])
+            if blog_list:
+                raise UserError(u'已经存在主目录类别')
+
+        res = super(LinkLovingBlogBlog, self).write(vals)
+        self.write_website_nenu(self)
+        return res
+
+    @api.multi
+    def unlink(self):
+
+        if self.is_all_blog:
+            res_list = self.env['blog.blog'].search([]) - self
+            if res_list:
+                index_blog = self.env.ref('website_blog.menu_news')
+                index_blog.write({'url': '/blog/' + str(res_list[0].id)})
+
+        res = super(LinkLovingBlogBlog, self).unlink()
+
+        return res
+
+    def write_website_nenu(self, res):
+        if res.is_all_blog:
+            index_blog = self.env.ref('website_blog.menu_news')
+            index_blog.write({'url': '/blog/' + str(res.id)})
 
 
 class LinkLovingBlogTag(models.Model):
