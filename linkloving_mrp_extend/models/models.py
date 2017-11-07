@@ -218,8 +218,8 @@ class StockMoveExtend(models.Model):
     authorizer_id = fields.Many2one("hr.employee", string=u'授权人', )
     authorizee_id = fields.Many2one("res.users", string=u"被授权人")
 
-    def action_change_state_done(self):
-        self.state = 'done'
+    def action_change_state_cancel(self):
+        self.state = 'cancel'
     @api.multi
     # 授权人 和被授权人
     def authorized_stock_move(self, authorizer_id=None, authorizee_id=None):
