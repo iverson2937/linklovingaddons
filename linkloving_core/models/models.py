@@ -235,7 +235,7 @@ class ProductTemplate(models.Model):
     def get_onproduct_mo(self, product_id):
         mo_ids = self.env['mrp.production'].search(
             [('product_tmpl_id', '=', product_id), ('state', 'not in', ['draft', 'cancel', 'done'])])
-        return sum(mo.product_qty for mo in mo_ids)
+        return sum(mo.on_produce_qty for mo in mo_ids)
 
     @api.multi
     def show_detail(self):

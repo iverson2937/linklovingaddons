@@ -180,8 +180,8 @@ odoo.define('linkloving_core.product_detail', function (require) {
                     for(var i=0;i<result.length;i++){
                         result[i].date = result[i].date.substr(0,10);
                     }
-                    self.$("#po_detail"+po_id+">.panel-body").html(" ")
-                    self.$("#po_detail"+po_id+">.panel-body").append(QWeb.render('show_po_detail_add', {result:result}));
+                    // self.$("#po_detail"+po_id+">.panel-body").html(" ")
+                    // self.$("#po_detail"+po_id+">.panel-body").append(QWeb.render('show_po_detail_add', {result:result}));
                 })
         },
         show_po_detail_line_add:function (e) {
