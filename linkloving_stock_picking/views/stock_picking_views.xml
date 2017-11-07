@@ -115,7 +115,7 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//tree" position="attributes">
-                    <attribute name="default_order">traces_sort,date desc</attribute>
+                    <attribute name="default_order">traces_sort_state,date desc</attribute>
                 </xpath>
 
                 <xpath expr="//field[@name='product_id']" position="after">
