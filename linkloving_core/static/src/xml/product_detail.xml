@@ -194,11 +194,11 @@
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title">
                                                        <!--<input type="checkbox" t-att-name="'chk'+result.product_id" t-att-po-id="item.id" />-->
-                                                        <a data-toggle="collapse" data-parent="#name" t-att-href="'#po_detail'+item.line_id" class="click_po_detail_a" t-att-data-po-id="item.line_id">
-                                                            <t t-if="item.origin!=false">
-                                                                <span class="fa fa-caret-right open-sign po_details"></span>
-                                                            </t>
-                                                        </a>
+                                                        <!--<a data-toggle="collapse" data-parent="#name" t-att-href="'#po_detail'+item.line_id" class="click_po_detail_a" t-att-data-po-id="item.line_id">-->
+                                                            <!--<t t-if="item.origin!=false">-->
+                                                                <!--<span class="fa fa-caret-right open-sign po_details"></span>-->
+                                                            <!--</t>-->
+                                                        <!--</a>-->
                                                         <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.state"/> </span>
@@ -265,11 +265,11 @@
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title">
                                                         <input type="checkbox" t-att-name="'chk_mo'+result.product_id" t-att-mo-id="item.id"/>
-                                                        <a data-toggle="collapse" data-parent="#name" t-att-data-more-mo="item.uuid" t-att-href="'#mo_detail'+item.uuid" t-att-data-origin="item.origin" class="click_mo_detail_a" t-att-data-mo-id="item.product_id">
-                                                            <t t-if="item.origin!=false">
-                                                                <span class="fa fa-caret-right open-sign po_details"></span>
-                                                            </t>
-                                                        </a>
+                                                        <!--<a data-toggle="collapse" data-parent="#name" t-att-data-more-mo="item.uuid" t-att-href="'#mo_detail'+item.uuid" t-att-data-origin="item.origin" class="click_mo_detail_a" t-att-data-mo-id="item.product_id">-->
+                                                            <!--<t t-if="item.origin!=false">-->
+                                                                <!--<span class="fa fa-caret-right open-sign po_details"></span>-->
+                                                            <!--</t>-->
+                                                        <!--</a>-->
                                                         <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.date"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.state"/> </span>
@@ -392,11 +392,11 @@
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title">
                                                         <!--<input type="checkbox" t-att-name="'chk'+result.product_id" t-att-po-id="item.id"/>-->
-                                                        <a data-toggle="collapse" data-parent="#name" t-att-href="'#po_detail'+item.line_id" class="click_po_detail_a" t-att-data-po-id="item.line_id">
-                                                            <t t-if="item.origin!=false">
-                                                                <span class="fa fa-caret-right open-sign po_details"></span>
-                                                            </t>
-                                                        </a>
+                                                        <!--<a data-toggle="collapse" data-parent="#name" t-att-href="'#po_detail'+item.line_id" class="click_po_detail_a" t-att-data-po-id="item.line_id">-->
+                                                            <!--<t t-if="item.origin!=false">-->
+                                                                <!--<span class="fa fa-caret-right open-sign po_details"></span>-->
+                                                            <!--</t>-->
+                                                        <!--</a>-->
                                                         <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.state"/> </span>
