@@ -372,6 +372,8 @@ class StockMovePicking(models.Model):
 
     quantity_adjusted_qty = fields.Float(string=u'调整后数量')
 
+    traces_sort = fields.Integer(string=u'追溯界面排序')
+
     @api.one
     @api.depends('company_id')
     def _compute_qty(self):
@@ -399,6 +401,7 @@ class StockMovePicking(models.Model):
         if res.quantity_adjusted_qty == 0:
             move_one = self.env['product.product'].browse(vals.get('product_id'))
             res.write({'quantity_adjusted_qty': move_one.qty_available})
+        self.init_traces_sort(vals)
         return res
 
     @api.multi
@@ -409,4 +412,20 @@ class StockMovePicking(models.Model):
                 if move and move.state:
                     if move.state == 'done':
                         move.quantity_adjusted_qty = move.product_id.qty_available
+        self.init_traces_sort(vals)
         return res
+
+    def init_traces_sort(self, vals):
+        for move_self in self:
+            if vals.get("state") == 'done':
+                move_self.write({'traces_sort': 1})
+            elif vals.get("state") == 'assigned':
+                move_self.write({'traces_sort': 2})
+            elif vals.get("state") == 'confirmed':
+                move_self.write({'traces_sort': 3})
+            elif vals.get("state") == 'waiting':
+                move_self.write({'traces_sort': 4})
+            elif vals.get("state") == 'draft':
+                move_self.write({'traces_sort': 5})
+            elif vals.get("state") == 'cancel':
+                move_self.write({'traces_sort': 10})

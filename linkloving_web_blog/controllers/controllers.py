@@ -70,6 +70,28 @@ class LinklovingWebBlog(http.Controller):
 
         return request.render("linkloving_web_blog.web_blog_create_show", values)
 
+    @http.route('/stock_move/init_state', type='http', auth='public', csrf=False)
+    def update_blog_show(self, **kw):
+
+        val = request.env['stock.move'].search([])
+
+        # 完成 可用  等待可用 等待另一个移动 新建  取消
+
+        for vals in val:
+            if vals.state == 'done':
+                vals.write({'traces_sort': 1})
+            elif vals.state == 'assigned':
+                vals.write({'traces_sort': 2})
+            elif vals.state == 'confirmed':
+                vals.write({'traces_sort': 3})
+            elif vals.state == 'waiting':
+                vals.write({'traces_sort': 4})
+            elif vals.state == 'draft':
+                vals.write({'traces_sort': 5})
+            elif vals.state == 'cancel':
+                vals.write({'traces_sort': 10})
+        return 'init'
+
     @http.route('/blog/create_blog_post_index', type='http', auth='public', website=True, csrf=False)
     def create_blog_post_index_show(self, **kw):
         # request.env.user.partner_id.id
