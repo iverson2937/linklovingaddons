@@ -33,7 +33,7 @@ class LinklovingWebBlog(http.Controller):
 
     @http.route('/blog/new_blog_create_index', type='http', auth='public', website=True, csrf=False)
     def new_blog_create_index_show(self, **kw):
-        fields_one = http.request.env['blog.blog'].search([])
+        fields_one = http.request.env['blog.blog'].search([('is_all_blog', '=', False)])
         fields_two = http.request.env['blog.tag'].search([])
         # field = fields.search([('model', '=', '')])
         values = {
@@ -90,7 +90,7 @@ class LinklovingWebBlog(http.Controller):
                 vals.write({'traces_sort': 5})
             elif vals.state == 'cancel':
                 vals.write({'traces_sort': 10})
-        return 'init'
+        return http.local_redirect('/')
 
     @http.route('/blog/create_blog_post_index', type='http', auth='public', website=True, csrf=False)
     def create_blog_post_index_show(self, **kw):
