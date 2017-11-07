@@ -641,9 +641,6 @@ class MrpProductionExtend(models.Model):
             #     self.state = "waiting_inventory_material"#等待清点退料
             # 有其中一个单据还没品捡 或者还没品捡完成, 等待品捡完成
             self.produce_finish_data_handle()
-            moves_to_cancel = (self.move_raw_ids | self.move_finished_ids).filtered(
-                lambda x: x.state not in ('done', 'cancel'))
-            moves_to_cancel.action_cancel()
             self.env["procurement.order"].search([('production_id', 'in', self.ids)]).check()
 
     def produce_finish_data_handle(self):
