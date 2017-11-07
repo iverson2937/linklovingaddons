@@ -25,7 +25,7 @@
 
                 <xpath expr="//header" position="inside">
                     <!-- Add your fields or attributes here -->
-                    <button name="action_change_state_done" string="设置成完成" class="oe_highlight" type="object"
+                    <button name="action_change_state_cancel" string="设置成取消" class="oe_highlight" type="object"
                             groups="base.group_no_one"/>
                 </xpath>
 

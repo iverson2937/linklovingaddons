@@ -11,9 +11,11 @@ from odoo.exceptions import UserError
 class MrpProduction(models.Model):
     _inherit = 'mrp.production'
 
+    @api.multi
     def _compute_on_produce_qty(self):
-        finished_product = sum(
-            move.product_uom_qty for move in self.move_finished_ids.filtered(lambda x: x.state == 'done'))
-        self.on_produce_qty = self.product_qty - finished_product
+        for stock_move in self:
+            finished_product = sum(
+                move.product_uom_qty for move in stock_move.move_finished_ids.filtered(lambda x: x.state == 'done'))
+            stock_move.on_produce_qty = stock_move.product_qty - finished_product
 
     on_produce_qty = fields.Float(compute=_compute_on_produce_qty)
