@@ -406,9 +406,24 @@ class CreateOrderPointWizard(models.TransientModel):
 
     def quantity_done_0(self):
         StockPicking = self.env["stock.picking"]
-        pickings = StockPicking.search([("state", "=", "done")])
+        pickings = StockPicking.search([("state", "=", "done"), ("picking_type_code", "=", "outgoing")])
         for pick in pickings:
-            all(pick.pack_operation_product_ids)
+            if pick.pack_operation_product_ids:
+                sum_qty_done = sum(pick.pack_operation_product_ids.mapped("qty_done"))
+                if sum_qty_done == 0:
+                    StockPicking += pick
+                    for pack in pick.pack_operation_product_ids:
+                        pack.qty_done = pack.product_qty
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": str(len(StockPicking)) + u"完成",
+                "text": u"完成",
+                "sticky": False
+            }
+        }
+
 
 
 
