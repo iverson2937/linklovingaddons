@@ -61,8 +61,8 @@
                                     MO[<t t-esc="mo_length"/>]
                                     <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                                     <button class="btn btn-primary send-mo-btn" t-att-check-name="'chk_mo'+result.product_id">合并</button>
-                                    <button class="btn btn-primary create_mo">创建</button>
-                                    <button class="btn btn-default delete_mo">删除</button>
+                                    <button class="btn btn-primary create_mo_btn">创建</button>
+                                    <button class="btn btn-default delete_mo_btn">删除</button>
                                 </h4>
                             </div>
                             <t t-if="mo_length!=0">
