@@ -131,6 +131,8 @@ class ProductTemplate(models.Model):
                 ids.append({
                     'id': mo.id,
                     'name': mo.name,
+                    'prepare_material_state': mo.prepare_material_state,
+                    'material_state': mo.material_state,
                     'product_id': mo.product_tmpl_id.product_variant_ids[0].id,
                     'qty': mo.product_qty,
                     'uuid': str(uuid.uuid1()),
@@ -219,8 +221,6 @@ class ProductTemplate(models.Model):
             'purchase_ok': self.purchase_ok,
             'stock': self.qty_available,
             'require': self.outgoing_qty,
-            'prepare_material_state': self.prepare_material_state,
-            'material_state': self.material_state,
             'state_bom': state_bom
         }
 
