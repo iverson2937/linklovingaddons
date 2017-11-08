@@ -4,6 +4,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
     var core = require('web.core');
     var Model = require('web.Model');
     var Widget = require('web.Widget');
+    var Dialog = require('web.Dialog');
 
     var QWeb = core.qweb;
     var _t = core._t;
@@ -28,20 +29,92 @@ odoo.define('linkloving_core.product_detail', function (require) {
             'click .po_mo_target': 'to_po_or_mo_page',
             'click .part_refresh': 'refresh_part_func',
             'click .create_mo_btn': 'click_create_mo',
+            'click .delete_mo_btn': 'click_delete_mo',
+            'click .create_po_btn': 'click_create_po',
+            'click .delete_po_btn': 'click_delete_po'
+        },
+
+        click_create_po: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+
+            if ($(target).data('product-tmpl')) {
+                var create_po_view = {
+                    type: 'ir.actions.act_window',
+                    res_model: 'purchase.order',
+                    view_mode: 'form',
+                    views: [[false, 'form']],
+                    context: {'default_product_id': parseInt($(target).data('product-tmpl'))},
+                    target: 'new'
+                };
+                var self = this;
+                self.do_action(create_po_view, {
+                    on_close: function () {
+                        console.log('just to close it ')
+                    },
+                }).then(function () {
+                    console.log('this is just')
+                });
+            }
+
+        },
+
+        click_delete_mo: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+
+
+            var check_name = target.getAttribute("check-name");
+            var selected_mos = [];
+            var mo_merge_inputs = $("input[name=" + check_name + "]");
+            mo_merge_inputs.each(function () {
+                if ($(this).prop("checked")) {
+                    selected_mos.push(parseInt($(this).attr("mo-id")))
+                }
+            });
+
+
+            if (selected_mos.length > 0) {
+                var def = $.Deferred();
+                var message = '确定要删除选中的mo?';
+                var options = {
+                    title: _t("Warning"),
+                    //确认删除的操作
+                    confirm_callback: function () {
+
+                        new Model("mrp.production")
+                            .call("delete_mos", [selected_mos])
+                            .then(function (result) {
+
+                            })
+                    },
+                    cancel_callback: function () {
+                        def.reject();
+                    },
+                };
+                var dialog = Dialog.confirm(this, message, options);
+                dialog.$modal.on('hidden.bs.modal', function () {
+                    def.reject();
+                });
+                return def;
+
+            } else {
+                alert("请选择要删除的MO")
+            }
+
         },
 
 
         click_create_mo: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
-            target = $(target).parents('.show_bom_line_one').prevAll('.click_tag_a');
-            if (target.data('product-id')) {
+            if ($(target).data('product-tmpl')) {
                 var create_mo_view = {
                     type: 'ir.actions.act_window',
                     res_model: 'mrp.production',
                     view_mode: 'form',
                     views: [[false, 'form']],
-                    context: {'default_product_tmpl_id': target.data('product-id')},
+                    context: {'default_product_id': parseInt($(target).data('product-tmpl'))},
                     target: 'new'
                 };
                 var self = this;
@@ -365,6 +438,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var check_name = target.getAttribute("check-name");
+            alert(check_name);
             var mo_merge_inputs_ids = [];
             var mo_merge_inputs = $("input[name=" + check_name + "]");
             // console.log(mo_merge_inputs)

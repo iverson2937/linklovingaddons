@@ -16,7 +16,7 @@
                     <a data-toggle="collapse" data-parent="#accordion" class="click_tag_a" data-level="true"
                        href="#name">
                        <span class="fa fa-caret-down open-sign"></span>
-                       <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
+                        <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                     </a>
                     [<t t-esc="result.part_no"/> ]
                     <span class="product_name" t-att-data-id="result.product_id" style="cursor:pointer"><t t-esc="result.name"/></span>
@@ -36,12 +36,12 @@
                         <!--2017/11/6修改，需求库存等移到此处-->
                         <span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>
                         <!--<t t-if="result.state_bom">-->
-                            <!--<t t-if="result.state_bom=='draft'">-->
-                                <!--<span class="fa fa-circle" style="padding-left:10px;color:red;"></span>-->
-                            <!--</t>-->
-                            <!--<t t-if="result.state_bom=='release'">-->
-                                <!--<span class="fa fa-circle" style="padding-left:10px;color:green;"></span>-->
-                            <!--</t>-->
+                        <!--<t t-if="result.state_bom=='draft'">-->
+                        <!--<span class="fa fa-circle" style="padding-left:10px;color:red;"></span>-->
+                        <!--</t>-->
+                        <!--<t t-if="result.state_bom=='release'">-->
+                        <!--<span class="fa fa-circle" style="padding-left:10px;color:green;"></span>-->
+                        <!--</t>-->
                         <!--</t>-->
                     </span>
                 </h4>
@@ -61,8 +61,8 @@
                                     MO[<t t-esc="mo_length"/>]
                                     <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                                     <button class="btn btn-primary send-mo-btn" t-att-check-name="'chk_mo'+result.product_id">合并</button>
-                                    <button class="btn btn-primary create_mo_btn">创建</button>
-                                    <button class="btn btn-default delete_mo_btn">删除</button>
+                                    <button class="btn btn-primary create_mo_btn" t-att-data-product-tmpl="result.product_p_id" >创建</button>
+                                    <button class="btn btn-default delete_mo_btn" t-att-check-name="'chk_mo'+result.product_id">删除</button>
                                 </h4>
                             </div>
                             <t t-if="mo_length!=0">
@@ -73,11 +73,11 @@
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title">
                                                         <input type="checkbox" t-att-name="'chk_mo'+result.product_id" t-att-mo-id="item.id" />
-                                                        <a data-toggle="collapse" t-att-data-more-mo="item.uuid" data-parent="#name" t-att-data-origin="item.origin" t-att-href="'#mo_detail'+item.uuid" class="click_mo_detail_a" t-att-data-mo-id="item.product_id">
-                                                            <t t-if="item.origin!=false">
-                                                                <span class="fa fa-caret-right open-sign po_details"></span>
-                                                            </t>
-                                                        </a>
+                                                        <!--<a data-toggle="collapse" t-att-data-more-mo="item.uuid" data-parent="#name" t-att-data-origin="item.origin" t-att-href="'#mo_detail'+item.uuid" class="click_mo_detail_a" t-att-data-mo-id="item.product_id">-->
+                                                        <!--<t t-if="item.origin!=false">-->
+                                                        <!--<span class="fa fa-caret-right open-sign po_details"></span>-->
+                                                        <!--</t>-->
+                                                        <!--</a>-->
                                                         <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.date"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.state"/> </span>
@@ -126,7 +126,7 @@
                                         <t t-if="item.level">
                                             <span class="fa fa-caret-right open-sign"></span>
                                         </t>
-                                       <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
+                                        <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
                                     </a>
                                     [<t t-esc="item.part_no"/> ]
                                     <span class="product_name" t-att-data-id="item.product_id" style="cursor:pointer"><t t-esc="item.name"/></span>
@@ -146,14 +146,14 @@
                                                   <t t-esc="item.process"/>
                                             </t>
                                              ]
-                                            <!--<t t-if="item.state_bom">-->
-                                                <!--<t t-if="item.state_bom=='draft'">-->
-                                                    <!--<span class="fa fa-circle" style="padding-left:10px;color:red;"></span>-->
-                                                <!--</t>-->
-                                                <!--<t t-if="item.state_bom=='release'">-->
-                                                    <!--<span class="fa fa-circle" style="padding-left:10px;color:green;"></span>-->
-                                                <!--</t>-->
-                                            <!--</t>-->
+                                        <!--<t t-if="item.state_bom">-->
+                                        <!--<t t-if="item.state_bom=='draft'">-->
+                                        <!--<span class="fa fa-circle" style="padding-left:10px;color:red;"></span>-->
+                                        <!--</t>-->
+                                        <!--<t t-if="item.state_bom=='release'">-->
+                                        <!--<span class="fa fa-circle" style="padding-left:10px;color:green;"></span>-->
+                                        <!--</t>-->
+                                        <!--</t>-->
 
                                         <!--2017/11/6修改，需求库存等移到此处-->
                                         <span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>
@@ -186,8 +186,8 @@
                                     PO[<t t-esc="po_length"/>]
                                     <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                                     <!--<button class="btn btn-primary send-po-btn">合并</button>-->
-                                    <button class="btn btn-primary create_po">创建</button>
-                                    <button class="btn btn-default delete_po">删除</button>
+                                    <button class="btn btn-primary create_po_btn" t-att-data-product-tmpl="result.product_p_id">创建</button>
+                                    <button class="btn btn-default delete_po_btn">删除</button>
                                 </h4>
                             </div>
                             <t t-if="po_length!=0">
@@ -199,9 +199,9 @@
                                                     <h4 class="panel-title">
                                                        <!--<input type="checkbox" t-att-name="'chk'+result.product_id" t-att-po-id="item.id" />-->
                                                         <!--<a data-toggle="collapse" data-parent="#name" t-att-href="'#po_detail'+item.line_id" class="click_po_detail_a" t-att-data-po-id="item.line_id">-->
-                                                            <!--<t t-if="item.origin!=false">-->
-                                                                <!--<span class="fa fa-caret-right open-sign po_details"></span>-->
-                                                            <!--</t>-->
+                                                        <!--<t t-if="item.origin!=false">-->
+                                                        <!--<span class="fa fa-caret-right open-sign po_details"></span>-->
+                                                        <!--</t>-->
                                                         <!--</a>-->
                                                         <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
@@ -257,10 +257,10 @@
                                         </t>
                                     </a>
                                     MO[<t t-esc="mo_length"/>]
-                                        <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
+                                    <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                                     <button class="btn btn-primary send-mo-btn" t-att-check-name="'chk_mo'+result.product_id">合并</button>
-                                    <button class="btn btn-primary create_mo">创建</button>
-                                    <button class="btn btn-default delete_mo">删除</button>
+                                    <button class="btn btn-primary create_mo_btn" t-att-data-product-tmpl="result.product_p_id">创建</button>
+                                    <button class="btn btn-default delete_mo_btn" t-att-check-name="'chk_mo'+result.product_id">删除</button>
                                 </h4>
                             </div>
                             <t t-if="mo_length!=0">
@@ -272,9 +272,9 @@
                                                     <h4 class="panel-title">
                                                         <input type="checkbox" t-att-name="'chk_mo'+result.product_id" t-att-mo-id="item.id"/>
                                                         <!--<a data-toggle="collapse" data-parent="#name" t-att-data-more-mo="item.uuid" t-att-href="'#mo_detail'+item.uuid" t-att-data-origin="item.origin" class="click_mo_detail_a" t-att-data-mo-id="item.product_id">-->
-                                                            <!--<t t-if="item.origin!=false">-->
-                                                                <!--<span class="fa fa-caret-right open-sign po_details"></span>-->
-                                                            <!--</t>-->
+                                                        <!--<t t-if="item.origin!=false">-->
+                                                        <!--<span class="fa fa-caret-right open-sign po_details"></span>-->
+                                                        <!--</t>-->
                                                         <!--</a>-->
                                                         <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.date"/> </span>
@@ -327,7 +327,7 @@
                                             <span class="fa fa-caret-right open-sign"></span>
                                         </t>
 
-                                       <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
+                                        <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
                                     </a>
                                     [<t t-esc="item.part_no"/> ]
 
@@ -342,20 +342,20 @@
                                         </t>/
                                         <t t-if="item.service">
                                             <t t-esc="item.service"/>
-                                             <!--<t t-esc="service[item.service]"/>-->
+                                            <!--<t t-esc="service[item.service]"/>-->
                                         </t>/
                                         <t t-if="item.process">
                                               <t t-esc="item.process"/>
                                         </t>
                                          ]
-                                         <!--<t t-if="item.state_bom">-->
-                                            <!--<t t-if="item.state_bom=='draft'">-->
-                                                <!--<span class="fa fa-circle" style="padding-left:10px;color:red;"></span>-->
-                                            <!--</t>-->
-                                            <!--<t t-if="item.state_bom=='release'">-->
-                                                <!--<span class="fa fa-circle" style="padding-left:10px;color:green;"></span>-->
-                                            <!--</t>-->
-                                         <!--</t>-->
+                                        <!--<t t-if="item.state_bom">-->
+                                        <!--<t t-if="item.state_bom=='draft'">-->
+                                        <!--<span class="fa fa-circle" style="padding-left:10px;color:red;"></span>-->
+                                        <!--</t>-->
+                                        <!--<t t-if="item.state_bom=='release'">-->
+                                        <!--<span class="fa fa-circle" style="padding-left:10px;color:green;"></span>-->
+                                        <!--</t>-->
+                                        <!--</t>-->
 
                                         <!--2017/11/6修改，需求库存等移到此处-->
                                         <span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>
@@ -386,10 +386,10 @@
                                         </t>
                                     </a>
                                     PO[<t t-esc="po_length"/>]
-                                        <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
+                                    <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                                     <!--<button class="btn btn-primary send-po-btn" t-att-check-name="'chk'+result.product_id">合并</button>-->
-                                    <button class="btn btn-primary create_po">创建</button>
-                                    <button class="btn btn-default delete_po">删除</button>
+                                    <button class="btn btn-primary create_po_btn" t-att-data-product-tmpl="result.product_p_id">创建</button>
+                                    <button class="btn btn-default delete_po_btn">删除</button>
                                 </h4>
                             </div>
                             <t t-if="po_length!=0">
@@ -401,9 +401,9 @@
                                                     <h4 class="panel-title">
                                                         <!--<input type="checkbox" t-att-name="'chk'+result.product_id" t-att-po-id="item.id"/>-->
                                                         <!--<a data-toggle="collapse" data-parent="#name" t-att-href="'#po_detail'+item.line_id" class="click_po_detail_a" t-att-data-po-id="item.line_id">-->
-                                                            <!--<t t-if="item.origin!=false">-->
-                                                                <!--<span class="fa fa-caret-right open-sign po_details"></span>-->
-                                                            <!--</t>-->
+                                                        <!--<t t-if="item.origin!=false">-->
+                                                        <!--<span class="fa fa-caret-right open-sign po_details"></span>-->
+                                                        <!--</t>-->
                                                         <!--</a>-->
                                                         <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>

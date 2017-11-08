@@ -207,6 +207,7 @@ class ProductTemplate(models.Model):
             'name': self.name,
             'bom_lines': bom_lines,
             'product_id': self.id,
+            'product_p_id': self.product_variant_ids[0].id,
             'process': process,
             'type': PRODUCT_TYPE.get(self.product_ll_type),
             'part_no': self.default_code,
