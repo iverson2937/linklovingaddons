@@ -79,9 +79,11 @@
                                                         <!--</t>-->
                                                         <!--</a>-->
                                                         <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.date"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.in_charge_id"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
+                                                        <span style="margin-left:15px" data-toggle="tooltip" title="预计开始"><t t-esc="item.date_planned_start"/> </span>
+                                                        <span style="margin-left:15px" data-toggle="tooltip" title="预计结束"><t t-esc="item.date_planned_finished"/> </span>
+                                                        <span style="margin-left:15px" data-toggle="tooltip" title="截止时间"><t t-esc="item.planned_start_backup"/> </span>
                                                         <t t-if="item.status_light == 3">
                                                         <span style="margin-left:15px;color:red;" class="fa fa-circle" data-toggle="tooltip" data-placement="top" title="状态灯"></span>
                                                         </t>
@@ -243,6 +245,9 @@
 
 
     <t t-name="show_bom_line_tr_add">
+        <script>
+            $(function () { $("[data-toggle='tooltip']").tooltip(); });
+        </script>
         <div class="panel panel-default">
             <div id="name" class="panel-collapse collapse in">
                 <div class="panel-body">
@@ -277,9 +282,12 @@
                                                         <!--</t>-->
                                                         <!--</a>-->
                                                         <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.date"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.in_charge_id"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
+                                                        <span style="margin-left:15px" data-toggle="tooltip" title="预计开始"><t t-esc="item.date_planned_start"/> </span>
+                                                        <span style="margin-left:15px" data-toggle="tooltip" title="预计结束"><t t-esc="item.date_planned_finished"/> </span>
+                                                        <span style="margin-left:15px" data-toggle="tooltip" title="截止时间"><t t-esc="item.planned_start_backup"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
                                                         <!--<span style="margin-left:15px"><t t-esc="item.origin"/> </span>-->
                                                         <t t-if="item.status_light == 3">
                                                         <span style="margin-left:15px;color:red;" class="fa fa-circle" data-toggle="tooltip" data-placement="top" title="状态灯"></span>
