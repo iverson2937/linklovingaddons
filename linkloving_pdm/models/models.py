@@ -1109,7 +1109,7 @@ class FinalReviewPartner(models.Model):
     review_type = fields.Selection([
         ('bom_review', u'BOM 终审人'),
         ('file_review', u'文件终审人'),
-        # ('picking_review', u'领料终审人'),
+        ('picking_review', u'领料终审人'),
         ('picking_review_project', u'工程领料终审人'),
         ('picking_review_line', u'产线领料终审人'),
     ], string=u'审核类型')

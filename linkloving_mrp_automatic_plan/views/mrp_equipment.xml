@@ -189,5 +189,178 @@
 
             </field>
         </record>
+
+        <record id="mrp_production_paichan_form_view" model="ir.ui.view">
+            <field name="name">mrp.production.form</field>
+            <field name="model">mrp.production</field>
+            <field name="arch" type="xml">
+                <form string="Manufacturing Orders">
+                    <header>
+                        <button name="button_plan"
+                                attrs="{'invisible': ['|', ('state', '!=', 'confirmed'), ('routing_id', '=', False)]}"
+                                type="object" string="Create Workorders" class="oe_highlight"/>
+                        <button name="button_action_confirm_draft" class="oe_highlight"
+                                attrs="{'invisible': [('state', 'not in', 'draft')]}" type="object"
+                                groups="linkloving_mrp_extend.group_charge_produce" string="确认需求"/>
+                        <button name="action_cancel" type="object" string="Cancel"
+                                attrs="{'invisible': ['|', ('state', 'in', ('done','cancel')), ('check_to_done', '=', True)]}"/>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,confirmed,waiting_material,prepare_material_ing,finish_prepare_material,already_picking,progress,waiting_quality_inspection,quality_inspection_ing,waiting_post_inventory,done"/>
+
+                    </header>
+                    <sheet>
+                        <field name="post_visible" invisible="1"/>
+                        <!--<div class="oe_button_box" name="button_box">-->
+                        <!--<button name="372" type="action" attrs="{'invisible': [('workorder_count', '=', 0)]}" class="oe_stat_button" icon="fa-play-circle-o">-->
+                        <!--<div class="o_form_field o_stat_info">-->
+                        <!--<span class="o_stat_value"><field name="workorder_done_count" widget="statinfo" nolabel="1"/> / <field name="workorder_count" widget="statinfo" nolabel="1"/></span>-->
+                        <!--<span class="o_stat_text">Work Orders</span>-->
+                        <!--</div>-->
+                        <!--</button>-->
+                        <!--<button name="368" type="action" string="Inventory Moves" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('state', 'not in', ('progress', 'cancel', 'done'))]}"/>-->
+                        <!--<button class="oe_stat_button" name="action_see_move_scrap" type="object" icon="fa-arrows-v" attrs="{'invisible': [('scrap_count', '=', 0)]}">-->
+                        <!--<div class="o_form_field o_stat_info">-->
+                        <!--<span class="o_stat_value"><field name="scrap_count"/></span>-->
+                        <!--<span class="o_stat_text">Scraps</span>-->
+                        <!--</div>-->
+                        <!--</button>-->
+                        <!--</div>-->
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Manufacturing Reference" nolabel="1"/>
+                            </h1>
+                            <field name="is_bom_update" invisible="1"/>
+                            <label style="color:red;" string="BOM已发生变化"
+                                   attrs="{'invisible': [('is_bom_update', '=', False)]}"/>
+
+                        </div>
+                        <group>
+                            <group>
+                                <field name="has_moves" invisible="1"/>
+                                <field name="check_to_done" invisible="1"/>
+                                <field name="product_id" attrs="{'readonly': [('has_moves', '=', True)]}"
+                                       domain="[('bom_ids', '!=', False)]"/>
+                                <field name="product_tmpl_id" invisible="1"/>
+                                <label for="product_qty"/>
+                                <div class="o_row">
+                                    <field name="product_qty" attrs="{'readonly': [('has_moves', '=', True)]}"/>
+                                    <field name="product_uom_id" options="{'no_open':True,'no_create':True}"
+                                           groups="product.group_uom" attrs="{'readonly': [('has_moves', '=', True)]}"/>
+                                    <button type="action"
+                                            name="%(mrp.action_change_production_qty)d"
+                                            string="编辑数量"
+                                            states="confirmed,planned,progress"
+                                            class="oe_highlight"
+                                            attrs="{'invisible': [('state','=','done')]}"/>
+                                </div>
+                                <field name="process_id" options="{'no_create':True}" string="Process" required="1"/>
+                                <field name="production_line_id" domain="[('process_id', '=', process_id)]"
+                                       attrs="{'required': [('state', '=', 'confirmed')]}"/>
+                                <field name="in_charge_id" options="{'no_create':True}"/>
+                                <field name="supplier_id"/>
+                                <field name="planned_start_backup" required="1"/>
+
+                                <field name="routing_id" groups="mrp.group_mrp_routings"/>
+                                <field name="date_planned_start" readonly="1"/>
+                                <field name="date_planned_finished" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="bom_id"
+                                       domain="['&amp;', '|',('product_id','=',product_id),'&amp;',
+                                   ('product_tmpl_id.product_variant_ids','=',product_id),
+                                   ('product_id','=',False),
+                                   ('type', '=', 'normal')]"
+                                       context="{'default_product_tmpl_id': product_tmpl_id}"
+                                       required="1"
+                                       attrs="{'readonly': [('has_moves', '=', True)]}"/>
+
+                                <field name="origin"/>
+                                <field name="production_order_type"/>
+                                <field name="mo_type" widget="radio" string="Type"/>
+                                <field name="unit_price" string="单价/委外加工单价"
+                                       attrs="{'invisible':[('mo_type', '==', 'time')],'readonly':[('state', '!=', 'confirmed')]}"/>
+                                <field name="hour_price"
+                                       attrs="{'invisible':[('mo_type', '==', 'unit')],'readonly':[('state', '!=', 'confirmed')]}"/>
+                                <field name="sale_remark" readonly="1"/>
+                                <field name="remark"/>
+                                <field name="factory_remark"/>
+                                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"
+                                       attrs="{'readonly': [('has_moves', '=', True)]}"/>
+                            </group>
+                            <field name="output_rate"/>
+                        </group>
+
+                        <notebook>
+                            <page string="消耗的物料">
+                                <field name="sim_stock_move_lines" string="消耗的物料">
+                                    <tree editable="bottom" delete="0"
+                                          decoration-warning="quantity_done&gt;product_uom_qty"
+                                          decoration-success="quantity_done&gt;=product_uom_qty"
+                                          decoration-danger="qty_available&lt;product_uom_qty" create="0">
+                                        <field name="product_id" string="产品" options="{'no_create':True}"/>
+                                        <field name="product_uom_qty" string="需求数量"/>
+                                        <field name="suggest_qty" string="建议数量"/>
+                                        <field name="quantity_available" string="系统可用"/>
+                                        <field name="qty_available" string="库存"/>
+                                        <field name="virtual_available" string="预测数量"/>
+                                        <field name="quantity_done" string="备料数量"/>
+                                        <field name="return_qty" readonly="1" string="退料数量"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="产成品">
+                                <field name="move_finished_ids" options="{'reload_on_button': True}"
+                                       context="{'default_location_id': location_src_id, 'default_location_dest_id': location_dest_id}">
+                                    <tree editable="bottom" delete="0" default_order="is_done desc,sequence"
+                                          decoration-muted="is_done"
+                                          decoration-warning="quantity_done&gt;product_uom_qty"
+                                          decoration-success="quantity_done==product_uom_qty" create="0">
+                                        <field name="product_id" required="1"/>
+                                        <field name="product_uom" groups="product.group_uom"/>
+                                        <field name="is_done" invisible="1"/>
+                                        <field name="sequence" invisible="1"/>
+                                        <field name="has_tracking" invisible="1"/>
+                                        <field name="location_id" domain="[('id', 'child_of', parent.location_id)]"
+                                               invisible="1"/>
+                                        <field name="location_dest_id"
+                                               domain="[('id', 'child_of', parent.location_dest_id)]" invisible="1"/>
+                                        <field name="state" invisible="1"/>
+                                        <field name="product_uom_qty" readonly="1"
+                                               attrs="{'required': [('product_id', '!=', False)]}" string="To Produce"/>
+                                        <field name="quantity_done"
+                                               attrs="{'readonly': ['|', ('is_done', '=', True), ('has_tracking', 'in', ['lot','serial'])]}"
+                                               string="Produced"/>
+                                        <button name="split_move_lot" string="Register lots" type="object"
+                                                icon="fa-list"
+                                                attrs="{'invisible': [('has_tracking', 'not in', ['lot','serial'])]}"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Miscellaneous">
+                                <group>
+                                    <group groups="stock.group_stock_multi_locations">
+                                        <field name="picking_type_id" attrs="{'readonly': [('has_moves', '=', True)]}"/>
+                                        <field name="location_src_id" domain="[('usage','=','internal')]"
+                                               attrs="{'readonly': [('has_moves', '=', True)]}"/>
+                                        <field name="location_dest_id" domain="[('usage','=','internal')]"
+                                               attrs="{'readonly': [('has_moves', '=', True)]}"/>
+                                    </group>
+                                    <group>
+                                        <field name="availability"/>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+
+            </field>
+        </record>
+
+
     </data>
 </openerp>

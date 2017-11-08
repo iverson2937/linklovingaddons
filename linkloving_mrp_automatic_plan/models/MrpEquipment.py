@@ -36,7 +36,8 @@ FIELDS = ["name", "alia_name", "product_tmpl_id", "state", "product_qty",
           "display_name", "bom_id", "feedback_on_rework", "qty_unpost",
           "planned_start_backup", "date_planned_start", "date_planned_finished",
           'theo_spent_time', 'availability', 'product_order_type', 'production_line_id',
-          'produce_speed_factor', 'theory_factor', 'real_theo_spent_time', 'ava_spent_time']
+          'produce_speed_factor', 'theory_factor', 'real_theo_spent_time', 'ava_spent_time',
+          'prepare_material_state', 'material_state']
 class ProcurementOrderExtend(models.Model):
     _inherit = 'procurement.order'
 
@@ -235,6 +236,22 @@ class MrpBomExtend(models.Model):
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 
+    def show_paichan_form_view(self):
+        print(123123123123)
+        view_id = self.env.ref('linkloving_mrp_automatic_plan.mrp_production_paichan_form_view').id
+        return view_id
+        # return {
+        #         'name': u"排产",
+        #         'view_type': 'form',
+        #         'view_mode': 'form',
+        #         'res_model': 'mrp.production',
+        #         'view_id': view_id,
+        #         'views': [(view_id, 'form')],
+        #         'type': 'ir.actions.act_window',
+        #         'res_id': self.id,
+        #         'target': 'new'
+        #     }
+
     @api.multi
     def _compute_factory_setting_id(self):
         setting = self.env["hr.config.settings"].search([("is_available", "=", True)], limit=1)
@@ -266,6 +283,40 @@ class MrpProductionExtend(models.Model):
         for mo in self:
             mo.ava_spent_time = round(mo.theo_spent_time / mo.production_line_id.compute_speed_factor(mo.bom_id), 2)
 
+    @api.multi
+    def _compute_prepare_material_state(self):
+        for mo in self:
+            rate_list = []
+            for move in mo.sim_stock_move_lines:
+                if move.product_uom_qty == 0:
+                    rate_list.append(0)
+                    continue
+                rate = move.quantity_done * 1.0 / move.product_uom_qty
+                rate_list.append(rate)
+            if any(rate < 0.5 for rate in rate_list):
+                mo.prepare_material_state = 'red'
+            elif all(rate >= 1.0 for rate in rate_list):
+                mo.prepare_material_state = 'green'
+            else:
+                mo.prepare_material_state = 'yellow'
+
+    @api.multi
+    def _compute_material_state(self):
+        for mo in self:
+            rate_list = []
+            for move in mo.sim_stock_move_lines:
+                if move.product_uom_qty == 0:
+                    rate_list.append(0)
+                    continue
+                rate = move.product_id.qty_available * 1.0 / move.product_uom_qty
+                rate_list.append(rate)
+            if any(rate < 0.5 for rate in rate_list):
+                mo.material_state = 'red'
+            elif all(rate >= 1.0 for rate in rate_list):
+                mo.material_state = 'green'
+            else:
+                mo.material_state = 'yellow'
+
     ava_spent_time = fields.Float(string=u'平均生产用时(h)', compute='_compute_ava_spent_time')
     real_theo_spent_time = fields.Float(string=u'生产用时(h)', compute='_compute_real_theo_spent_time')
     produce_speed_factor = fields.Selection(related="bom_id.produce_speed_factor", )
@@ -287,6 +338,17 @@ class MrpProductionExtend(models.Model):
 
     theo_spent_time = fields.Float(string=u'生产用时(h)', compute='_compute_theo_spent_time')
 
+    prepare_material_state = fields.Selection(string=u"备料状态", selection=[('red', u'红'),
+                                                                         ('yellow', u'黄'),
+                                                                         ('green', u'绿'), ],
+                                              required=False,
+                                              compute='_compute_prepare_material_state')
+
+    material_state = fields.Selection(string=u"物料状态", selection=[('red', u'红'),
+                                                                 ('yellow', u'黄'),
+                                                                 ('green', u'绿'), ],
+                                      required=False,
+                                      compute='_compute_material_state')
     '''
     操作mo信息接口
     '''
