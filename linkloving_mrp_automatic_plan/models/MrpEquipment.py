@@ -291,7 +291,7 @@ class MrpProductionExtend(models.Model):
                 if move.product_qty == 0:
                     rate_list.append(0)
                     continue
-                rate = move.qty_done * 1.0 / move.product_qty
+                rate = move.qty_done * 1.0 / move.product_uom_qty
                 rate_list.append(rate)
             if any(rate < 0.5 for rate in rate_list):
                 mo.prepare_material_state = 'red'
@@ -305,10 +305,10 @@ class MrpProductionExtend(models.Model):
         for mo in self:
             rate_list = []
             for move in mo.sim_stock_move_lines:
-                if move.product_qty == 0:
+                if move.product_uom_qty == 0:
                     rate_list.append(0)
                     continue
-                rate = move.product_id.qty_available * 1.0 / move.product_qty
+                rate = move.product_id.qty_available * 1.0 / move.product_uom_qty
                 rate_list.append(rate)
             if any(rate < 0.5 for rate in rate_list):
                 mo.material_state = 'red'
