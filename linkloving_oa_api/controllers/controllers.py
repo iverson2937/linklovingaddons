@@ -17,6 +17,7 @@ from pip import download
 
 import odoo
 import odoo.modules.registry
+from myaddons.linkloving_app_api.controllers.controllers import LinklovingAppApi
 
 from odoo import fields
 from odoo.osv import expression
@@ -24,7 +25,7 @@ from odoo.tools import float_compare, SUPERUSER_ID, werkzeug, os, safe_eval
 from odoo.tools.translate import _
 from odoo import http
 from odoo.http import content_disposition, dispatch_rpc, request, \
-                      serialize_exception as _serialize_exception
+    serialize_exception as _serialize_exception
 from odoo.exceptions import AccessError, UserError
 
 
@@ -97,7 +98,7 @@ class LinklovingOAApi(http.Controller):
             "invoice": supplier_detail_object.supplier_invoice_count,  #对账
             "payment_count": supplier_detail_object.payment_count,   #付款申请
             "put_in_storage": request.env['stock.picking'].sudo().search_count(
-                    [('partner_id', '=', request.jsonrequest.get("id")), ('state', '=', 'waiting_in')]),
+                [('partner_id', '=', request.jsonrequest.get("id")), ('state', '=', 'waiting_in')]),
             # 入库
         }
         return supplier_details
@@ -639,9 +640,9 @@ class LinklovingOAApi(http.Controller):
         offset = request.jsonrequest.get("offset")
         user_id = request.jsonrequest.get("user_id")
         clues = request.env['crm.lead'].sudo().search([('type', '=', 'lead' or False),('user_id','=',user_id)],
-                                                        limit=limit,
-                                                        offset=offset,
-                                                        order='id desc')
+                                                      limit=limit,
+                                                      offset=offset,
+                                                      order='id desc')
         data = []
         for clue in clues:
             data.append({
@@ -721,6 +722,7 @@ class LinklovingOAApi(http.Controller):
         json_list = []
         for feedback in search_supplier_results:
             json_list.append({
+                'id':feedback.id,
                 'name': feedback.display_name,
                 'team': feedback.team_id.display_name,
                 'user': feedback.user_id.display_name or '',
@@ -765,7 +767,8 @@ class LinklovingOAApi(http.Controller):
                 'category': self.get_supplier_tags(customer.category_id),
                 'priority': customer.priority,
                 'level': customer.level,
-                'id': customer.id
+                'id': customer.id,
+                'message_ids':self.message_to_json(customer.message_ids)
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
@@ -1167,6 +1170,7 @@ class LinklovingOAApi(http.Controller):
 
     def get_customer_details(self, obj):
         data = {
+            'id':obj.id,
             'country': obj.country_id.display_name or '',
             'name': obj.display_name,
             'address': (obj.country_id.display_name or '') + (obj.state_id.name or '') + (obj.city or '') + (obj.street2 or '') + (obj.street or ''),
@@ -1185,7 +1189,8 @@ class LinklovingOAApi(http.Controller):
             # 'purchase_count': obj.purchase_order_count,    #订单数量
             'purchase_count': request.env['sale.order'].sudo().search_count([('partner_id', '=', request.jsonrequest.get("id"))]),
             'return_count': request.env['stock.picking'].sudo().search_count([('partner_id', '=', request.jsonrequest.get("id")), ('state', '=', 'waiting_in')]),  #退货入库数量
-            'product_series': self.get_series_products(obj.product_series_ids)
+            'product_series': self.get_series_products(obj.product_series_ids),
+            'message_ids':self.message_to_json(obj.message_ids),
         }
         return data
 
@@ -1259,3 +1264,593 @@ class LinklovingOAApi(http.Controller):
             return product.bom_ids.get_bom()
         else:
             return ''
+
+    def res_user_to_json(self, objs):
+        data = []
+        for obj in objs:
+            data.append({
+                'user_id': obj.id,
+                'name': obj.name,
+            })
+        return data
+
+    def message_to_json(self, objs):
+        data = []
+        for obj in objs:
+            body_str = obj.body.replace('<p>', '')
+            body_str = body_str.replace('</p>', '')
+            data.append({
+                'model': obj.model,
+                'body': body_str,
+                'email_from': obj.email_from,
+                'date': obj.date,
+                'create_uid': self.res_user_to_json(obj.create_uid)
+            })
+        return data
+
+    @http.route('/linkloving_oa_api/create_info', type='json', auth="none", csrf=False, cors='*')
+    def create_info(self, *kw):
+        body = request.jsonrequest.get("body")
+        author_id = request.jsonrequest.get("author_id")
+        message_label_ids = request.jsonrequest.get("message_label_ids")
+        res_id = request.jsonrequest.get("res_id")
+        create_uid = request.jsonrequest.get("create_uid")
+        # data = {
+        #     'body':body,
+        #     'message_type':'comment',
+        #     'model':'res.partner',
+        #     'res_id':res_id,
+        #     'subtype_id':1,
+        #     'messages_label_ids':message_label_ids,
+        #     'author_id':author_id,
+        # }
+        # domain = [("id", '=', res_id)]
+        new_partner_info = request.env["mail.message"].sudo(create_uid).create({
+            'body': body,
+            'message_type': 'comment',
+            'model': 'res.partner',
+            'res_id': res_id,
+            'subtype_id': 1,
+            'messages_label_ids': message_label_ids,
+            'author_id': author_id,
+            'create_uid': create_uid,
+        })
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
+
+    @http.route('/linkloving_oa_api/get_all_message_label', type='json', auth="none", csrf=False, cors='*')
+    def get_all_message_label(self, *kw):
+        get_all_messages = request.env["message.label"].sudo().search([])
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.message_label_to_json(get_all_messages))
+
+    def message_label_to_json(self, objs):
+        data = []
+        for obj in objs:
+            data.append({
+                'id': obj.id,
+                'name': obj.name,
+            })
+        return data
+
+    # 报销-等待审核
+    @http.route('/linkloving_oa_api/wait_approval', type='json', auth="none", csrf=False, cors='*')
+    def product_details(self, *kw):
+        limit = request.jsonrequest.get("limit")
+        offset = request.jsonrequest.get("offset")
+        user_id = request.jsonrequest.get("user_id")
+        domain = [("to_approve_id", '=', user_id),
+                  ('state', 'in', ('submit', 'manager1_approve', 'manager2_approve'))]
+        approval_lists = request.env["hr.expense.sheet"].sudo().search(domain,
+                                                                       limit = limit,
+                                                                       offset = offset,
+                                                                       order='id desc')
+        json_list = []
+        for approval_list in approval_lists:
+            json_list.append(self.approval_list_to_json(approval_list))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    def approval_list_to_json(self, obj):
+        return {
+            'sheet_id': obj.id,
+            'expense_name': obj.expense_no or '',
+            'employee_name': obj.employee_id.name or '',
+            'amount': obj.total_amount or '',
+            'create_date': obj.create_date or '',
+            'department': obj.department_id.name or '',
+            'remark': obj.name or '',
+            'state': obj.state or '',
+            'pre_payment_reminding': obj.pre_payment_reminding or '',
+            'line_ids': self.get_waiting_approval_detail_lists(obj.expense_line_ids),
+            'message_ids':self.get_apply_record(obj.message_ids),
+        }
+
+    def get_waiting_approval_detail_lists(self, objs):
+        data = []
+        for obj in objs:
+            data.append({
+                'analytic_account_id': obj.analytic_account_id.name or '',
+                'product_id': obj.product_id.name or '',
+                'account_id': obj.account_id.name or '',
+                'unit_amount': obj.unit_amount or '',
+                # 'sale_id':obj.sale_id,
+                'quantity': obj.quantity or '',
+                # 'tax_ids':obj.tax_ids,
+                'name': obj.name or '',
+                'description': obj.description or '',
+            })
+        return data
+
+    # 报销-已审核
+    @http.route('/linkloving_oa_api/already_approved', type='json', auth="none", csrf=False, cors='*')
+    def already_approved(self, *kw):
+        limit = request.jsonrequest.get("limit")
+        offset = request.jsonrequest.get("offset")
+        user_id = request.jsonrequest.get("user_id")
+        domain = [("approve_ids", "child_of", user_id)]
+        already_approved = request.env["hr.expense.sheet"].sudo().search(domain,
+                                                                         limit = limit,
+                                                                         offset = offset,
+                                                                         order='id desc')
+        json_list = []
+        for approval_list in already_approved:
+            json_list.append(self.approval_list_to_json(approval_list))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list[0:10])
+
+    # 批准 发送状态的
+    @http.route('/linkloving_oa_api/confirm_approve1', type='json', auth="none", csrf=False, cors='*')
+    def confirm_approve1(self, *kw):
+        user_id = request.jsonrequest.get("user_id")
+        sheet_id = request.jsonrequest.get("sheet_id")
+        domain = [("id", '=', sheet_id)]
+        confirm_approve = request.env["hr.expense.sheet"].sudo(user_id).search(domain)
+        confirm_approve.manager1_approve()
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
+
+    # 批准 1级审核的
+    @http.route('/linkloving_oa_api/confirm_approve2', type='json', auth="none", csrf=False, cors='*')
+    def confirm_approve(self, *kw):
+        user_id = request.jsonrequest.get("user_id")
+        sheet_id = request.jsonrequest.get("sheet_id")
+        domain = [("id", '=', sheet_id)]
+        confirm_approve = request.env["hr.expense.sheet"].sudo(user_id).search(domain)
+        confirm_approve.manager2_approve()
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
+
+    # 拒绝
+    @http.route('/linkloving_oa_api/refuse_approve', type='json', auth="none", csrf=False, cors='*')
+    def refuse_approve(self, *kw):
+        user_id = request.jsonrequest.get("user_id")
+        sheet_id = request.jsonrequest.get("sheet_id")
+        refuse_reason = request.jsonrequest.get("reason")
+        domain = [("id", '=', sheet_id)]
+        refuse_approve = request.env["hr.expense.sheet"].sudo(user_id).search(domain)
+        refuse_approve.refuse_expenses(refuse_reason)
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
+
+    # 搜索报销单
+    @http.route('/linkloving_oa_api/search_approve', type='json', auth="none", csrf=False, cors='*')
+    def search_approve(self, *kw):
+        type = request.jsonrequest.get("type")
+        search_text = request.jsonrequest.get("search_text")
+        user_id = request.jsonrequest.get("user_id")
+        if (type == 'expense_no'):
+            domain = [("to_approve_id", '=', user_id),
+                      ('state', 'in', ('submit', 'manager1_approve', 'manager2_approve')),
+                      (type, 'ilike', search_text)]
+            search_approve = request.env["hr.expense.sheet"].sudo().search(domain,
+                                                                           order='id desc')
+            json_list = []
+            for search_approval_list in search_approve:
+                json_list.append(self.approval_list_to_json(search_approval_list))
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+        elif (type == 'name'):
+            domain = [("to_approve_id", '=', user_id),
+                      ('state', 'in', ('submit', 'manager1_approve', 'manager2_approve')),
+                      ]
+            search_approve = request.env["hr.expense.sheet"].sudo().search(domain,
+                                                                           order='id desc')
+            json_list = []
+            for search_approval_list in search_approve:
+                if (search_approval_list.employee_id.name.find(search_text) != -1):
+                    json_list.append(self.approval_list_to_json(search_approval_list))
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    #搜索已审的
+    @http.route('/linkloving_oa_api/search_already_approve', type='json', auth="none", csrf=False, cors='*')
+    def search_already_approve(self, *kw):
+        type = request.jsonrequest.get("type")
+        search_text = request.jsonrequest.get("search_text")
+        user_id = request.jsonrequest.get("user_id")
+        if (type == 'expense_no'):
+            domain = [("approve_ids", "child_of", user_id),(type, 'ilike', search_text)]
+            search_already_approved = request.env["hr.expense.sheet"].sudo().search(domain,
+                                                                                    order='id desc')
+            json_list = []
+            for approval_list in search_already_approved:
+                json_list.append(self.approval_list_to_json(approval_list))
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+        elif (type == 'name'):
+            domain = [("approve_ids", "child_of", user_id),("employee_id", "ilike", search_text)]
+            search_already_approved = request.env["hr.expense.sheet"].sudo().search(domain,
+                                                                                    order='id desc')
+            json_list = []
+            for approval_list_name in search_already_approved:
+                    json_list.append(self.approval_list_to_json(approval_list_name))
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    # 我的申购
+    @http.route('/linkloving_oa_api/get_shengoulist', type='json', auth="none", csrf=False, cors='*')
+    def get_shengoulist(self, *kw):
+        limit = request.jsonrequest.get("limit")
+        offset = request.jsonrequest.get("offset")
+        user_id = request.jsonrequest.get('user_id')
+        domain = [('create_uid', '=', user_id)]
+        shengoulist = request.env['hr.purchase.apply'].sudo().search(domain,
+                                                          limit=limit,
+                                                          offset=offset,
+                                                          order='id desc')
+        data = []
+        for shengou in shengoulist:
+            data.append(self.shengou_list_to_json(shengou))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+     #拒绝
+    @http.route('/linkloving_oa_api/refuse_shengou', type='json', auth="none", csrf=False, cors='*')
+    def refuse_shengou(self, *kw):
+        sheet_id = request.jsonrequest.get('sheet_id')
+        user_id = request.jsonrequest.get('user_id')
+        refuse_reason = request.jsonrequest.get('reason')
+        domain = [('id','=',sheet_id)]
+        shengou = request.env['hr.purchase.apply'].sudo(user_id).search(domain,
+                                                          order='id desc')
+        shengou.refuse_payment(refuse_reason);
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
+
+    #重新申请
+    @http.route('/linkloving_oa_api/reset_shengou', type='json', auth="none", csrf=False, cors='*')
+    def reset_shengou(self, *kw):
+        sheet_id = request.jsonrequest.get('sheet_id')
+        user_id = request.jsonrequest.get('user_id')
+        domain = [('id', '=', sheet_id)]
+        reset_shengou = request.env['hr.purchase.apply'].sudo(user_id).search(domain,
+                                                                        order='id desc')
+        reset_shengou.reset_hr_purchase_apply();
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
+
+    #获取所有部门
+    @http.route('/linkloving_oa_api/get_all_departments', type='json', auth="none", csrf=False, cors='*')
+    def get_all_departments(self, *kw):
+        partner_id = request.jsonrequest.get('partner_id')
+        get_all_departments = request.env['hr.department'].sudo().search([])
+        domain = [('address_home_id', '=', partner_id)]
+        person_department = request.env['hr.employee'].sudo().search(domain,
+                                                                        order='id desc')
+        data = {
+           "all_departments":self.get_department_to_json(get_all_departments),
+           "default_department":self.get_name_and_id(person_department.department_id),
+           "employee_id":person_department.id,
+        }
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    #获取所有产品
+    @http.route('/linkloving_oa_api/get_all_products', type='json', auth="none", csrf=False, cors='*')
+    def get_all_products(self, *kw):
+        get_all_products = request.env['product.product'].sudo().search(
+        [('can_be_expensed', '=', True)])
+        data = self.get_name_and_id(get_all_products)
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    #创建申购单
+    @http.route('/linkloving_oa_api/create_shengou', type='json', auth="none", csrf=False, cors='*')
+    def create_shengou(self,*kw):
+        data = request.jsonrequest.get("data")
+        create_uid = data.get('create_uid')
+        request.env['hr.purchase.apply'].sudo(create_uid).create({
+            'department_id': data.get('department_id'),  # 部门
+            'employee_id': data.get('employee_id'),  # 申请人
+            'total_amount': float(data.get('total_amount')),
+            'create_uid': data.get('create_uid'),
+            'line_ids': [(0, 0, {
+                'product_id': p.get('product_id'),  # 产品
+                'price_unit': float(p.get('price_unit')),  # 金额
+                'product_qty': float(p.get('quantity')),  # 费用说明
+                'description': p.get('description'),
+            }) for p in data.get('line_ids')]
+        })
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
+
+    #搜索申购单
+    @http.route('/linkloving_oa_api/search_shengou', type='json', auth="none", csrf=False, cors='*')
+    def search_shengou(self,*kw):
+        search_text = request.jsonrequest.get('search_text')
+        user_id = request.jsonrequest.get('user_id')
+        domain = [('create_uid', '=', user_id), ('name', 'ilike', search_text)]
+        shengoulist = request.env['hr.purchase.apply'].sudo().search(domain,
+                                                                     order='id desc')
+        data = []
+        for shengou in shengoulist:
+            data.append(self.shengou_list_to_json(shengou))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    def get_department_to_json(self, obj):
+        data = []
+        for objs in obj:
+            data.append({
+                'name': objs.display_name,
+                'id': objs.id
+            })
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    def shengou_list_to_json(self, obj):
+        return {
+            'sheet_id': obj.id,
+            'name': obj.name or '',
+            'employee_name': obj.employee_id.name or '',
+            'total_amount': obj.total_amount or '',
+            'create_date': obj.create_date or '',
+            'department': obj.department_id.name or '',
+            'state': obj.state or '',
+            'line_ids': self.get_shengou_detail_lists(obj.line_ids),
+            'message_ids':self.get_apply_record(obj.message_ids),
+        }
+
+    def get_shengou_detail_lists(self, obj):
+        data = []
+        for obj_d in obj:
+            data.append({
+                # 'analytic_account_id': obj_d.analytic_account_id.name or '',
+                'product_id': obj_d.product_id.name or '',
+                'quantity': obj_d.product_qty,
+                'description': obj_d.description or '',
+                'price_unit':obj_d.price_unit or 0.0,
+            })
+        return data
+
+    def get_department(self,objs):
+        return {
+            'name':objs.name,
+            'id':objs.id,
+        }
+
+
+
+        #  XD 我的请假
+
+    @http.route('/linkloving_oa_api/get_leavelist', type='json', auth="none", csrf=False, cors='*')
+    def get_leavelist(self, *kw):
+        limit = request.jsonrequest.get("limit")
+        offset = request.jsonrequest.get("offset")
+        user_id = request.jsonrequest.get('user_id')
+        domain = [('user_id', '=', user_id), ('holiday_type', '=', 'employee'),
+                  ('holiday_status_id.active', '=', True)]
+        orders = request.env['hr.holidays'].sudo().search(domain,
+                                                          limit=limit,
+                                                          offset=offset,
+                                                          order='id desc')
+        data = []
+        for orderDetail in orders:
+            data.append({
+                "description": orderDetail.name,
+                "date_from": orderDetail.date_from,
+                "date_to": orderDetail.date_to,
+                "create_date": orderDetail.create_date,
+                "holiday_status_id": orderDetail.holiday_status_id.name,
+                "state": orderDetail.state,
+                "id": orderDetail.id
+            })
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+        # 请假详细页
+
+    @http.route('/linkloving_oa_api/get_leavelist_detail', type='json', auth="none", csrf=False, cors='*')
+    def get_leavelist_detail(self, *kw):
+        id = request.jsonrequest.get('id')
+        orderDetail = request.env['hr.holidays'].sudo().browse(id)
+        data = {
+            "description": orderDetail.name,
+            "date_from": orderDetail.date_from,
+            "date_to": orderDetail.date_to,
+            "create_date": orderDetail.create_date,
+            "holiday_status_id": orderDetail.holiday_status_id.name,
+            "state": orderDetail.state,
+            'message_ids': self.get_leave_record(orderDetail.message_ids),  # 审批请假记录
+        }
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+        # 请假审批记录
+
+    def get_leave_record(self, objs):
+        data = []
+        for obj in objs:
+            data.append({
+                "create_time": obj.create_date,
+                "create_person_ava": LinklovingAppApi.get_img_url(obj.create_uid.self.user_ids.id,
+                                                                  "res.users", "image_medium"),
+                "create_person": obj.create_uid.display_name,
+                "description": obj.description,
+                "old_state": obj.tracking_value_ids.old_value_char or '',
+                "new_state": obj.tracking_value_ids.new_value_char or '',
+            })
+        return data
+
+    # 获取休假类型
+    @http.route('/linkloving_oa_api/get_leaveType', type='json', auth="none", csrf=False, cors='*')
+    def get_leaveType(self, *kw):
+        limit = request.jsonrequest.get("limit")
+        data = {
+            "typeList": self.get_name_id(request.env['hr.holidays.status'].sudo().search([]))
+        }
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    # 我的申请
+    @http.route('/linkloving_oa_api/get_applylist', type='json', auth="none", csrf=False, cors='*')
+    def get_applylist(self, *kw):
+        limit = request.jsonrequest.get("limit")
+        offset = request.jsonrequest.get("offset")
+        user_id = request.jsonrequest.get('user_id')
+        type = request.jsonrequest.get('type')
+        data = request.jsonrequest.get('data')
+        domain = []
+        domain.append(('employee_id.user_id', '=', user_id))
+        if type == 'number':
+            domain.append(('expense_no', 'ilike', data))
+        elif type == 'department':
+            domain.append(('department_id', 'ilike', data))
+        elif type == 'employee':
+            domain.append(('employee_id', 'ilike', data))
+        orders = request.env['hr.expense.sheet'].sudo().search(domain,
+                                                               limit=limit,
+                                                               offset=offset,
+                                                               order='id desc')
+        data = []
+        for orderDetail in orders:
+            data.append({
+                'name': orderDetail.expense_no,
+                'department': orderDetail.department_id.display_name,
+                "payment": orderDetail.total_amount,
+                "create_time": orderDetail.create_date,
+                "state": orderDetail.state,
+                'id': orderDetail.id
+            })
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    # 申请详细页
+    @http.route('/linkloving_oa_api/get_applylist_detail', type='json', auth="none", csrf=False, cors='*')
+    def get_applylist_detail(self, *kw):
+        id = request.jsonrequest.get('id')
+        orderDetail = request.env['hr.expense.sheet'].sudo().browse(id)
+        data = {
+            'state': orderDetail.state,
+            'id': orderDetail.id,
+            'name': orderDetail.expense_no,
+            'employee': orderDetail.employee_id.display_name,  # 员工
+            "pre_payment_reminding": orderDetail.pre_payment_reminding,  # 暂支余额
+            "payment": orderDetail.total_amount,  # 总金额
+            'expense_line_ids': self.get_expense_line_ids(orderDetail.expense_line_ids, orderDetail),  # 报销明细
+            'message_ids': self.get_apply_record(orderDetail.message_ids),  # 审批申请记录
+            'department': orderDetail.department_id.display_name,  # 部门
+            'department_id': orderDetail.department_id.id,
+            'employee_id': orderDetail.employee_id.id,
+        }
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    # 申请记录
+    def get_apply_record(self, objs):
+        data = []
+        for obj in objs:
+            data.append({
+                "create_time": obj.create_date,
+                "create_person_ava": LinklovingAppApi.get_img_url(obj.create_uid.self.user_ids.id,
+                                                                  "res.users", "image_medium"),
+                "create_person": obj.create_uid.display_name,
+                "description": obj.description,
+                "old_state": obj.tracking_value_ids.old_value_char or '',
+                "new_state": obj.tracking_value_ids.new_value_char or '',
+            })
+        return data
+
+    # 申请详细条目
+    def get_expense_line_ids(self, objs, orderDetail):
+        data = []
+        for obj in objs:
+            data.append({
+                'name': obj.product_id.name,
+                "description": obj.name,
+                "amount": obj.unit_amount,
+                "department": orderDetail.department_id.id,
+                "employee_id": orderDetail.employee_id.id,
+                "productId": obj.product_id.id,
+                "id": obj.id
+            })
+        return data
+
+    # 获取暂支金额,部门,产品名
+    @http.route('/linkloving_oa_api/get_payment_reminding', type='json', auth="none", csrf=False, cors='*')
+    def get_payment_reminding(self, *kw):
+        id = request.jsonrequest.get('id')
+        orderDetail = request.env['hr.expense.sheet'].sudo().browse(id)
+        employee_id = request.env['hr.employee'].sudo().search(
+            [('user_id', '=', id)]).id
+        name = request.env['hr.employee'].sudo().search(
+            [('user_id', '=', id)]).name
+        products = request.env['product.product'].sudo().search(
+            [('can_be_expensed', '=', True)])
+        data = {
+            'pre_payment_reminding': orderDetail.pre_payment_reminding,  # 暂支金额
+            'department': self.get_name_and_id(request.env['hr.department'].sudo().search([])),  # 部门
+            'product': self.get_name_and_id(products),  # 产品
+            'employee_id': employee_id,  # 员工id
+            'name': name,  # 姓名
+            'department_id': orderDetail.department_id.id  # 部门id
+        }
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    # 创建审批单
+    @http.route('/linkloving_oa_api/create_apply_order', type='json', auth="none", csrf=False, cors='*')
+    def create_apply_order(self, *kw):
+        data = request.jsonrequest.get("data")
+        userId = data.get('user_id')
+        is_reset = data.get('is_reset')
+        id = data.get('id')
+        if is_reset:
+            record = request.env['hr.expense.sheet'].sudo().browse(id)
+            expense_lines = record.expense_line_ids
+            record.write({
+                'department_id': data.get('department_id'),  # 部门
+                'employee_id': data.get('employee_id'),  # 申请人
+                'expense_line_ids': [(0, 0, {
+                    'product_id': p.get('product_id'),  # 产品
+                    'unit_amount': float(p.get('unit_amount')),  # 金额
+                    'name': p.get('name'),  # 费用说明
+                    'employee_id': p.get('employee_id'),
+                    'department_id': p.get('department_id')
+                }) for p in data.get('expense_line_ids')]
+            })
+            for expense_line in expense_lines:
+                request.env['hr.expense'].sudo().browse(expense_line.id).unlink()
+            # for p in data.get("expense_line_ids"):
+            #     request.env['hr.expense'].sudo().create(
+            #         {
+            #             'product_id': p.get('product_id'),  # 产品
+            #             'unit_amount': float(p.get('unit_amount')),  # 金额
+            #             'name': p.get('name'),  # 费用说明
+            #             'employee_id': p.get('employee_id'),
+            #             'department_id': p.get('department_id'),
+            #         }
+            #     )
+            record.reset_expense_sheets()
+        else:
+            new_order_draft = request.env['hr.expense.sheet'].sudo(userId).create({
+                'department_id': data.get('department_id'),  # 部门
+                'employee_id': data.get('employee_id'),  # 申请人
+                'expense_line_ids': [(0, 0, {
+                    'product_id': p.get('product_id'),  # 产品
+                    'unit_amount': float(p.get('unit_amount')),  # 金额
+                    'name': p.get('name'),  # 费用说明
+                    'employee_id': p.get('employee_id'),
+                    'department_id': p.get('department_id')
+                }) for p in data.get('expense_line_ids')]
+            })
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
+
+    # 撤回
+    @http.route('/linkloving_oa_api/get_retract', type='json', auth="none", csrf=False, cors='*')
+    def get_retract(self, *kw):
+        active_id = request.jsonrequest.get("active_id")
+        description = request.jsonrequest.get("description")
+        user_id = request.jsonrequest.get("user_id")
+        new_order_draft = request.env["hr.expense.refuse.wizard"].sudo(user_id).with_context({
+            'active_ids': active_id,
+        }).create({
+            'description': description,  # 理由
+        })
+        new_order_draft.expense_refuse_reason()
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
+
+    # 提交审核
+    @http.route('/linkloving_oa_api/submit_apply', type='json', auth="none", csrf=False, cors='*')
+    def submit_apply(self, *kw):
+        id = request.jsonrequest.get("id")
+        user_id = request.jsonrequest.get("user_id")
+        new_order_draft = request.env["hr.expense.sheet"].sudo(user_id).browse(id)
+        new_order_draft.hr_expense_sheet_post()
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
