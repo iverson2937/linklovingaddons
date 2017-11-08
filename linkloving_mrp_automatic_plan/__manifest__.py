@@ -21,7 +21,7 @@
 
     # any module necessary for this one to work correctly
     'depends': ['base', 'mrp', 'purchase', 'sale', 'linkloving_purchase', 'linkloving_process', 'hr',
-                'linkloving_app_api'],
+                'linkloving_app_api', 'linkloving_mrp_extend'],
 
     # always loaded
     'data': [

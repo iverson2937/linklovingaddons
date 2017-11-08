@@ -195,16 +195,22 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
         to_mo_func:function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
-            var action = {
+            var self = this;
+            new Model("mrp.production").call("show_paichan_form_view", [parseInt($(target).parents('.ap_item_wrap').attr("data-mo-id"))]).then(function (res) {
+                var action = {
                 type: 'ir.actions.act_window',
                 res_model:'mrp.production',
+                    view_mode: 'form',
+                    views: [[res, 'form']],
                 view_type: 'form',
-                view_mode: 'tree,form',
-                views: [[false, 'form']],
+                    view_id: res,
                 res_id: parseInt($(target).parents('.ap_item_wrap').attr("data-mo-id")),
                 target:"new"
-            };
-            this.do_action(action);
+                };
+                console.log("332")
+                self.do_action(action);
+            })
+
         },
         to_relevant_struc_func:function (e) {
              var e = e || window.event;
