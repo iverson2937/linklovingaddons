@@ -450,7 +450,7 @@ class MrpProductionExtend(models.Model):
     total_spent_money = fields.Float(default=0, compute='_compute_total_spent_money', string='Total Cost', )
     state = fields.Selection([
         ('draft', u'草稿'),
-        ('confirmed', u'已排产'),
+        ('confirmed', u'需求确认'),
         ('waiting_material', u'等待备料'),
         ('prepare_material_ing', u'备料中...'),
         ('finish_prepare_material', u'备料完成'),
@@ -1856,7 +1856,7 @@ class StcokPickingExtend(models.Model):
             elif any(move.state in ["done"] for move in pick.move_lines) and any(
                             move.state == "assigned" for move in pick.move_lines):
                 raise UserError(u"库存异动单异常,请联系管理员解决")
-            if all(not pack.qty_done for pack in pick.pack_operation_product_ids):
+            if sum(pick.pack_operation_product_ids.mapped("qty_done")) == 0:
                 raise UserError(u"出货数量不能全部为0")
         return super(StcokPickingExtend, self).to_stock()
 

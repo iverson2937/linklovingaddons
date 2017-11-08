@@ -18,7 +18,7 @@ PURCHASE_TYPE = {
 }
 MO_STATE = {
     'draft': u'草稿',
-    'confirmed': u'已排产',
+    'confirmed': u'需求确认',
     'waiting_material': u'等待备料',
     'prepare_material_ing': u'备料中',
     'finish_prepare_material': u'备料完成',

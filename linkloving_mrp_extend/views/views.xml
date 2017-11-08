@@ -244,10 +244,12 @@
                     <button name="button_action_cancel_confirm" class="oe_link"
                             attrs="{'invisible': [('state', 'not in', 'confirmed')]}" type="object"
                             groups="linkloving_mrp_extend.group_charge_produce" string="取消加入排程"/>
+
                     <button name="button_waiting_material" class="oe_highlight"
                             attrs="{'invisible': [('state', 'not in', 'confirmed')]}" type="object"
                             groups="linkloving_mrp_extend.group_charge_produce"
                             string="Confirm Order,Prepare Material"/>
+
                     <button name="button_start_prepare_material" class="oe_highlight"
                             attrs="{'invisible': [('state', 'not in', 'waiting_material')]}" type="object"
                             string="Start Prepare Material" groups="linkloving_mrp_extend.group_charge_warehouse"/>
@@ -417,7 +419,7 @@
                 </xpath>
                 <xpath expr="//field[@name='state']" position="replace">
                     <field name="state" widget="statusbar"
-                           statusbar_visible="confirmed,waiting_material,prepare_material_ing,finish_prepare_material,already_picking,progress,waiting_quality_inspection,quality_inspection_ing,waiting_post_inventory,done"/>
+                           statusbar_visible="draft,confirmed,waiting_material,prepare_material_ing,finish_prepare_material,already_picking,progress,waiting_quality_inspection,quality_inspection_ing,waiting_post_inventory,done"/>
                 </xpath>
 
                 <xpath expr="//button[@name='post_inventory']" position="replace">
