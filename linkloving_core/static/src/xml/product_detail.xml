@@ -105,6 +105,7 @@
                                                         </t>
 
                                                         <span style="margin-left:15px;"><t t-esc="item.remark"/> </span>
+                                                        <span class="trace_back">追溯</span>
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'mo_detail'+item.uuid">
@@ -221,6 +222,7 @@
                                                         </t>
 
                                                         <span style="margin-left:15px;"><t t-esc="item.remark"/> </span>
+                                                        <span class="trace_back">追溯</span>
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'po_detail'+item.line_id">
@@ -310,6 +312,7 @@
                                                         </t>
 
                                                         <span style="margin-left:15px;"><t t-esc="item.remark"/> </span>
+                                                        <span class="trace_back">追溯</span>
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'mo_detail'+item.uuid">
@@ -428,6 +431,7 @@
                                                         </t>
 
                                                         <span style="margin-left:15px;"><t t-esc="item.remark"/> </span>
+                                                        <span class="trace_back">追溯</span>
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'po_detail'+item.line_id">
@@ -484,6 +488,7 @@
                         <t t-if="item.material_light == 1">
                         <span style="margin-left:15px;color:green;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>
                         </t>
+                        <span class="trace_back">追溯</span>
                     </h4>
                 </div>
                 <div class="panel-collapse collapse" t-att-id="'mo_source'+item.id">
