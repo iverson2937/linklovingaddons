@@ -151,3 +151,14 @@
 .panel-title .trace_back{
     cursor: pointer;
 }
+
+.panel-title .mat{
+    margin-left: 15px;
+}
+.panel-title .mat,.panel-title .pre{
+    display: inline-block;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    color: white;
+}
