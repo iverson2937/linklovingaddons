@@ -31,7 +31,12 @@ odoo.define('linkloving_core.product_detail', function (require) {
             'click .create_mo_btn': 'click_create_mo',
             'click .delete_mo_btn': 'click_delete_mo',
             'click .create_po_btn': 'click_create_po',
-            'click .delete_po_btn': 'click_delete_po'
+            'click .delete_po_btn': 'click_delete_po',
+            'mouseenter .trace_back':'mouseenter_ev'
+        },
+
+        mouseenter_ev:function () {
+            console.log('sssssss')
         },
 
         click_create_po: function (e) {
