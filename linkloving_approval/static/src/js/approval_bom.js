@@ -104,6 +104,13 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
                 is_show_action_deny = 'false'
             }
             ;
+            var is_final_one = false;
+
+            if (parseInt(bom_id))
+                is_final_one = true;
+            else
+                is_final_one = false;
+
             var action = {
                 name: "详细",
                 type: 'ir.actions.act_window',
@@ -114,7 +121,8 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
                 context: {
                     'default_bom_id': parseInt(bom_id),
                     'is_show_action_deny': is_show_action_deny,
-                    'review_type': 'bom_review'
+                    'review_type': 'bom_review',
+                    'is_final_one': is_final_one
                 },
                 'target': "new",
             };
