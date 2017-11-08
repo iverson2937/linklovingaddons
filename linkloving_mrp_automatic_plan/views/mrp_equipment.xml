@@ -251,7 +251,14 @@
                                             string="编辑数量"
                                             states="confirmed,planned,progress"
                                             class="oe_highlight"
-                                            attrs="{'invisible': [('state','=','done')]}"/>
+                                            attrs="{'invisible': [('state','=','done')]}"
+                                    />
+                                    <button type="formview_dialog"
+                                            name="get_formview"
+                                            class="oe_highlight"
+                                            string="开始排产"
+                                    >
+                                    </button>
                                 </div>
                                 <field name="process_id" options="{'no_create':True}" string="Process" required="1"/>
                                 <field name="production_line_id" domain="[('process_id', '=', process_id)]"
@@ -361,6 +368,19 @@
             </field>
         </record>
 
+        <record id="form_plan_mo_wizard" model="ir.ui.view">
+            <field name="name">plan.mo.wizard.form</field>
+            <field name="model">plan.mo.wizard</field>
+            <field name="arch" type="xml">
+                <form string="排产">
+                    <sheet>
+                        <group>
+                            <field name="production_id"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
     </data>
 </openerp>

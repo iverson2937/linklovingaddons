@@ -14,6 +14,11 @@ OFF_WORK_TIME = 16 * 60 * 60
 WEEKEND_LIST = [6]  # 从0 - 6 周一到周天
 REWORK_DEFAULT_TIME = 8 * 60 * 60
 
+
+class PlanMoWizard(models.TransientModel):
+    _name = 'plan.mo.wizard'
+
+    production_id = fields.Many2one(comodel_name="mrp.production", string=u"生产单", required=False, )
 class Inheritforarrangeproduction(models.Model):
     _inherit = 'mrp.process'
 
@@ -236,6 +241,14 @@ class MrpBomExtend(models.Model):
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 
+    def get_formview(self):
+        view_id = self.env.ref('linkloving_mrp_automatic_plan.mrp_production_paichan_form_view').id
+        return {
+            'title': u'打开',
+            'res_model': 'mrp.production',
+            'view_id': view_id,
+            'res_id': self.id,
+        }
     def show_paichan_form_view(self):
         print(123123123123)
         view_id = self.env.ref('linkloving_mrp_automatic_plan.mrp_production_paichan_form_view').id
