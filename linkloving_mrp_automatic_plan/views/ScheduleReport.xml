@@ -25,5 +25,76 @@
                 </form>
             </field>
         </record>
+
+
+        <record id="mrp_report_form" model="ir.ui.view">
+            <field name="name">mrp.report.form</field>
+            <field name="model">mrp.report</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+                            <field name="report_start_time"/>
+                            <field name="report_end_time"/>
+                            <field name="state"/>
+                        </group>
+                        <group>
+                            <field name="report_type"/>
+                            <field name="total_orderpoint_count"/>
+                            <field name="note"/>
+                        </group>
+                        <notebook>
+                            <page string="报告条目">
+                                <group>
+                                    <field name="report_line_ids">
+                                        <tree>
+                                            <field name="product_id"/>
+                                            <field name="production_id"/>
+                                            <field name="order_qty"/>
+                                            <field name="orderpoint_id"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="mrp_report_tree" model="ir.ui.view">
+            <field name="name">Report</field>
+            <field name="model">mrp.report</field>
+            <field name="arch" type="xml">
+                <tree string="Report">
+                    <field name="report_type"/>
+                    <field name="report_start_time"/>
+                    <field name="report_end_time"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_see_mrp_report" model="ir.actions.act_window">
+            <field name="name">MRP运算报告</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">mrp.report</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p>
+                <p>
+                    <!-- More details about what a user can do with this object will be OK -->
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menuitem_mrp_report"
+                  action="action_see_mrp_report"
+                  name="MRP运算报告"
+                  parent="stock.menu_warehouse_report"
+                  sequence="1"
+                  groups="base.group_user"/>
     </data>
 </openerp>

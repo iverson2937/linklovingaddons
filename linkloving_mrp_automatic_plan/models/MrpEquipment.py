@@ -26,12 +26,17 @@ class Inheritforarrangeproduction(models.Model):
             'process_id': self.id
         }
 
+        # produce_speed_factor = fields.Selection([('human', u'人数'), ('equipment', u'设备数'), ],
+        #                                         default='equipment', string=u'生产速度因子', )
+        #
+        # theory_factor = fields.Integer(string=u'理论 人数/设备数', require=True)
 
 ORDER_BY = "planned_start_backup,id desc"
 FIELDS = ["name", "alia_name", "product_tmpl_id", "state", "product_qty",
           "display_name", "bom_id", "feedback_on_rework", "qty_unpost",
           "planned_start_backup", "date_planned_start", "date_planned_finished",
-          'theo_spent_time', 'availability', 'product_order_type']
+          'theo_spent_time', 'availability', 'product_order_type', 'production_line_id',
+          'produce_speed_factor', 'theory_factor', 'real_theo_spent_time', 'ava_spent_time']
 class ProcurementOrderExtend(models.Model):
     _inherit = 'procurement.order'
 
@@ -53,7 +58,10 @@ class ProcurementOrderExtend(models.Model):
         planned_time_with_zone = new_datetime.astimezone(pytz.timezone(self.env.user.tz))
 
         start_time, end_time = self.env["ll.time.util"].compute_mo_start_time(planned_time_with_zone,
-                                                                              produced_spend)
+                                                                              produced_spend,
+                                                                              equipment_no=self.env[
+                                                                                  "mrp.production.line"].compute_speed_factor(
+                                                                                  bom))
         res.update({'state': 'draft',
                     # 'process_id': bom.process_id.id,
                     # 'unit_price': bom.process_id.unit_price,
@@ -95,6 +103,16 @@ class WorkType(models.Model):
 class MrpProductionLine(models.Model):
     _name = 'mrp.production.line'
     _order = 'sequence,name asc'
+
+    def compute_speed_factor(self, bom):
+        if len(self) == 0:
+            # 无产线 去获取理论数量
+            return bom.theory_factor or 1
+        else:
+            if bom.produce_speed_factor == 'human':  # 人为因素
+                return bom.theory_factor or 1
+            else:
+                return len(self.equipment_ids) or 1
 
     @api.onchange('process_id')
     def onchange_process_id(self):
@@ -138,6 +156,7 @@ class MrpProductionLine(models.Model):
                                     inverse_name='production_line_id')
     euiqpment_names = fields.Char(string=u'设备', compute='_compute_euiqpment_names')
     employee_id = fields.Many2one(comodel_name="hr.employee", string=u"产线负责人", required=False, )
+
     line_employee_ids = fields.One2many(comodel_name='hr.employee', inverse_name='production_line_id', string=u'产线人员')
     line_employee_names = fields.Char(string=u'产线人员', compute='_compute_line_employee_names')
     amount_of_planned_mo = fields.Float(string=u'生产总数', compute="_compute_amount_of_planned_mo")
@@ -161,6 +180,8 @@ class MrpProductionLine(models.Model):
     #根据产线id获取已排产mo
     def get_mo_by_productin_line(self, **kwargs):
         production_line_id = kwargs.get("production_line_id")
+        domains = kwargs.get("domains", [])
+        order_by_material = kwargs.get("order_by_material", False)
         # planned_date = kwargs.get("planned_date")
         limit = kwargs.get("limit")
         offset = kwargs.get("offset")
@@ -176,17 +197,18 @@ class MrpProductionLine(models.Model):
         # try:
         # return utc_timestamp.astimezone(context_tz)
 
-        mos = self.env["mrp.production"].search_read([("production_line_id", "=", production_line_id),
-                                                      # ("date_planned_start", "<=", end_time_str),
+        mos = self.env["mrp.production"].search_read(
+            domain=expression.AND([[("production_line_id", "=", production_line_id),
+                                    # ("date_planned_start", "<=", end_time_str),
                                                       # ("date_planned_finished", ">=", start_time_str),
                                                       ("state", "not in", ['done', 'cancel', 'waiting_post_inventory'])
-                                                      ],
-                                                     # limit=limit,
+                                    ], domains]),
+            # limit=limit,
                                                      # offset=offset,
                                                      order=ORDER_BY,
-                                                     fields=FIELDS
-                                                     )
-        return mos
+            fields=FIELDS
+            )
+        return self.env["mrp.production"].sorted_mos_by_material(mos, order_by_material)
 
 class HrEmployeeExtend(models.Model):
     _inherit = 'hr.employee'
@@ -200,6 +222,15 @@ class MrpProcessExtend(models.Model):
 
     work_type_id = fields.Many2one(comodel_name="work.type", string=u"工种", required=False, )
     production_line_ids = fields.One2many(comodel_name='mrp.production.line', inverse_name='process_id', string=u'产线')
+
+
+class MrpBomExtend(models.Model):
+    _inherit = 'mrp.bom'
+
+    produce_speed_factor = fields.Selection([('human', u'人数'), ('equipment', u'设备数'), ],
+                                            default='equipment', string=u'生产速度因子', )
+
+    theory_factor = fields.Integer(string=u'理论 人数/设备数', require=True)
 
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
@@ -220,7 +251,26 @@ class MrpProductionExtend(models.Model):
     def _compute_theo_spent_time(self):
         for mo in self:
             mo.theo_spent_time = round(
+                    (
+                    mo.product_qty * mo.bom_id.produced_spend_per_pcs + mo.bom_id.prepare_time * mo.production_line_id.compute_speed_factor(
+                        mo.bom_id)) / 3600, 2)
+
+    @api.multi
+    def _compute_real_theo_spent_time(self):
+        for mo in self:
+            mo.real_theo_spent_time = round(
                 (mo.product_qty * mo.bom_id.produced_spend_per_pcs + mo.bom_id.prepare_time) / 3600, 2)
+
+    @api.multi
+    def _compute_ava_spent_time(self):
+        for mo in self:
+            mo.ava_spent_time = round(mo.theo_spent_time / mo.production_line_id.compute_speed_factor(mo.bom_id), 2)
+
+    ava_spent_time = fields.Float(string=u'平均生产用时(h)', compute='_compute_ava_spent_time')
+    real_theo_spent_time = fields.Float(string=u'生产用时(h)', compute='_compute_real_theo_spent_time')
+    produce_speed_factor = fields.Selection(related="bom_id.produce_speed_factor", )
+
+    theory_factor = fields.Integer(related="bom_id.theory_factor")
 
     factory_setting_id = fields.Many2one("hr.config.settings", compute="_compute_factory_setting_id")
     production_line_id = fields.Many2one("mrp.production.line", string=u"产线")
@@ -257,6 +307,17 @@ class MrpProductionExtend(models.Model):
         self.planned_one_mo(self, now_time, self.production_line_id)
         self.replanned_mo(self.env["mrp.production.line"], self.production_line_id, base_on_today=True)
 
+    def change_backup_time(self, **kwargs):
+        self.write({
+            'planned_start_backup': kwargs.get("planned_start_backup")
+        })
+        origin_pl_mos, all_mos = self.replanned_mo(self.env["mrp.production.line"], self.production_line_id)
+        return {'mos': all_mos.read(fields=FIELDS),
+                'origin_pl_mos': origin_pl_mos.read(fields=FIELDS),
+                'operate_mo': self.read(fields=FIELDS),
+                'state_mapping': self.fields_get(["state"]),
+                }
+
     #生产完成 重新计算排产
     def produce_finish_replan_mo(self):
         now_time = self.get_today_time(is_current_time=True)
@@ -290,15 +351,18 @@ class MrpProductionExtend(models.Model):
     def _compute_produced_spend(self):
         if self.feedback_on_rework:
             return self.factory_setting_id.rework_spent_time * 60 * 60 or REWORK_DEFAULT_TIME
-        return self.product_qty * self.bom_id.produced_spend_per_pcs + self.bom_id.prepare_time
+        return self.theo_spent_time * 3600
 
     #根据process_id 获取未排产mo
     def get_unplanned_mo(self, **kwargs):
         process_id = kwargs.get("process_id")
         limit = kwargs.get("limit")
         offset = kwargs.get("offset")
-        domain = [("process_id", "=", process_id), ("production_line_id", "=", False),
+
+        domain = [("process_id", "=", process_id),
+                  ("production_line_id", "=", False),
                   ("state", "in", ['draft', 'confirmed', 'waiting_material'])]
+
         domains = kwargs.get("domains", [])
         new_domains = expression.AND([domains, domain])
         mos = self.env["mrp.production"].search_read(
@@ -313,6 +377,59 @@ class MrpProductionExtend(models.Model):
             'length': length,
             'result': mos,
         }
+
+    def get_planned_mo_by_search(self, **kwargs):
+        process_id = kwargs.get("process_id")
+        domains = kwargs.get("domains", [])
+        order_by_material = kwargs.get("order_by_material", False)
+        group_by = kwargs.get("group_by")
+        new_domain = expression.AND([domains, [("process_id", "=", process_id),
+                                               ("production_line_id", "!=", False),
+                                               ("state", "not in", ['done', 'cancel', 'waiting_post_inventory'])]])
+
+        groups = self.read_group(domain=new_domain,
+                                 fields=FIELDS,
+                                 groupby=group_by)
+
+        MrpProducion = self.env["mrp.production"]
+        groups_dic = {}
+        for group in groups:
+            domain = group.get("__domain", [])
+            mos = MrpProducion.search_read(domain, fields=FIELDS, order=ORDER_BY)
+            group["mos"] = self.sorted_mos_by_material(mos, order_by_material)
+
+            groups_dic[group.get("production_line_id")[0]] = group
+        return groups_dic
+
+    def sorted_mos_by_material(self, mos, order_by_material):
+        if order_by_material:  # 按照物料状态排序
+            def cmp_func(a, b):
+                if a.get("availability") == 'assigned':
+                    a_val = 4
+                elif a.get("availability") == 'partially_available':
+                    a_val = 3
+                elif a.get("availability") == 'waiting':
+                    a_val = 2
+                else:
+                    a_val = 1
+                if b.get("availability") == 'assigned':
+                    b_val = 4
+                elif b.get("availability") == 'partially_available':
+                    b_val = 3
+                elif b.get("availability") == 'waiting':
+                    b_val = 2
+                else:
+                    b_val = 1
+                return b_val - a_val
+                # 'assigned', 'Available'),
+                # ('partially_available', 'Partially Available'),
+                # ('waiting', 'Waiting'),
+
+            mos.sort(cmp_func)
+            new_mos = mos
+        else:
+            new_mos = mos
+        return new_mos
 
     def get_today_time(self, is_current_time=False, day_offset=0):
         now_time = fields.datetime.now(pytz.timezone(self.env.user.tz)) + relativedelta(days=day_offset)
@@ -480,13 +597,20 @@ class MrpProductionExtend(models.Model):
         start_time, end_time = self.env["ll.time.util"].compute_mo_start_time(next_mo_start_time,
                                                                               mo._compute_produced_spend(),
                                                                               start_or_end="start",
-                                                                              equipment_no=len(
-                                                                                  production_line.equipment_ids))
+                                                                              equipment_no=production_line.compute_speed_factor(
+                                                                                  mo.bom_id))
+
 
         vals = {
             'date_planned_start': start_time,
             'date_planned_finished': end_time,
         }
+        if production_line:
+            charge_id = production_line.employee_id.address_home_id.id or production_line.process_id.partner_id.id
+            vals.update({
+                'in_charge_id': charge_id
+            })
+
         # if to_state:
         #     if mo.state in ["draft", "confirmed", "waiting_material"]:
         #         vals.update({
@@ -501,7 +625,7 @@ class MrpProductionExtend(models.Model):
         settle_date = kwargs.get("settle_date")
         origin_production_line = self.production_line_id
         if self.state not in ["draft", "confirmed", "waiting_material"]:
-            raise UserError(u"该单据已经开始生产,不可从进行排产")
+            raise UserError(u"该单据已经开始生产,不可重新进行排产")
         # 改变产线和状态
         if not production_line_id:  #如果没有产线传上来, 就说明是从产线移除(取消排产)
             self.write({

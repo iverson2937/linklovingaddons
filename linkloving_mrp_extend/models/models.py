@@ -218,6 +218,8 @@ class StockMoveExtend(models.Model):
     authorizer_id = fields.Many2one("hr.employee", string=u'授权人', )
     authorizee_id = fields.Many2one("res.users", string=u"被授权人")
 
+    def action_change_state_cancel(self):
+        self.state = 'cancel'
     @api.multi
     # 授权人 和被授权人
     def authorized_stock_move(self, authorizer_id=None, authorizee_id=None):
@@ -245,20 +247,51 @@ class ProductionTimeRecord(models.Model):
     production_id = fields.Many2one('mrp.production')
 
 
+class BackToProgressWizard(models.TransientModel):
+    _name = 'secondary.produce.wizard'
+
+    produce_line_ids = fields.Many2many("mrp.production", string=u'相关制造单')
+
+    def action_confirm(self):
+        self.produce_line_ids.back_to_progress()
+        return '1234'
+
+
+class BackToProgressMoLine(models.TransientModel):
+    _name = 'secondary.produce.line'
+
+    production_id = fields.Many2one("mrp.production", string=u"制造单")
+    process_id = fields.Many2one("mrp.process", related="production_id.process_id")
+    product_id = fields.Many2one("product.template", related="production_id.product_tmpl_id")
+    state = fields.Selection(related="production_id.state")
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 
     is_secondary_produce = fields.Boolean(default=False)
     secondary_produce_time_ids = fields.One2many("production.time.record", 'production_id', )
 
+    def action_view_secondary_mos(self):
+        mos = self.env["mrp.production"].search([("origin", "ilike", self.name),
+                                                 ("state", "=", "done")])
+        mos += self
+        return {'type': 'ir.actions.act_window',
+                'res_model': 'secondary.produce.wizard',
+                'view_mode': 'form',
+                'context': '{"default_production_id":%s, "default_produce_line_ids":%s}' % (self.id, mos.ids),
+                # , "default_produce_line_ids": %s}' % (self.id, self),
+                # 'res_id': self.product_tmpl_id.id,
+                'target': 'new'
+                }
+    @api.multi
     def back_to_progress(self):
-        self.is_secondary_produce = True
-        p_time = self.env["production.time.record"].create({
-            'production_id': self.id,
-            'start_time': fields.Datetime.now(),
-            'record_type': 'secondary'
-        })
-        self.state = 'progress'
+        for mo in self:
+            mo.is_secondary_produce = True
+            p_time = self.env["production.time.record"].create({
+                'production_id': mo.id,
+                'start_time': fields.Datetime.now(),
+                'record_type': 'secondary'
+            })
+            mo.state = 'progress'
 
     @api.multi
     def action_view_qc_report(self):
@@ -279,7 +312,7 @@ class MrpProductionExtend(models.Model):
         action['domain'] = [('production_id', '=', self.id), ('is_scrap', '=', True)]
         return action
 
-    qc_feedback_ids = fields.One2many('mrp.qc.feedback', 'production_id')
+    qc_feedback_ids = fields.One2many('mrp.qc.feedback', 'production_id', track_visibility='onchange')
     qty_unpost = fields.Float(string=u"已生产的数量", compute="_compute_qty_unpost")
     feedback_on_rework = fields.Many2one("mrp.qc.feedback", u"返工单", track_visibility='onchange')
 
@@ -297,9 +330,9 @@ class MrpProductionExtend(models.Model):
 
     qc_feedback_count = fields.Integer(compute='_get_qc_feedback_count')
     availability = fields.Selection([
-        ('assigned', _('Can send the material')),
-        ('partially_available', _('Partially Available')),
-        ('waiting', _('Waiting')),
+        ('assigned', u'可发料'),
+        ('partially_available', u'缺料中'),
+        ('waiting', u'等待材料'),
         ('none', 'None')], string=_('Material Status'),
         compute='_compute_availability', store=True)
 
@@ -416,22 +449,22 @@ class MrpProductionExtend(models.Model):
     total_spent_time = fields.Float(default=0, compute='_compute_total_spent_time', string='Time taken', )
     total_spent_money = fields.Float(default=0, compute='_compute_total_spent_money', string='Total Cost', )
     state = fields.Selection([
-        ('draft', _('Draft')),
+        ('draft', u'草稿'),
         ('confirmed', u'已排产'),
-        ('waiting_material', _('Waiting Prepare Material')),
-        ('prepare_material_ing', _('Material Preparing')),
-        ('finish_prepare_material', _('Material Ready')),
-        ('already_picking', _('Already Picking Material')),
+        ('waiting_material', u'等待备料'),
+        ('prepare_material_ing', u'备料中...'),
+        ('finish_prepare_material', u'备料完成'),
+        ('already_picking', u'已领料'),
         ('planned', 'Planned'),
         ('progress', '生产中'),
         ('waiting_inspection_finish', u'等待品检完成'),
-        ('waiting_quality_inspection', _('Waiting Quality Inspection')),
-        ('quality_inspection_ing', _('Under Quality Inspection')),
-        ('waiting_rework', _('Waiting Rework')),
-        ('rework_ing', _('Under Rework')),
-        ('waiting_inventory_material', _('Waiting Inventory Material')),
-        ('waiting_warehouse_inspection', _('Waiting Check Return Material')),
-        ('waiting_post_inventory', _('Waiting Stock Transfers')),
+        ('waiting_quality_inspection', u'等待品检'),
+        ('quality_inspection_ing', u'品检中'),
+        ('waiting_rework', u'等待返工'),
+        ('rework_ing', u'返工中'),
+        ('waiting_inventory_material', u'等待清点退料'),
+        ('waiting_warehouse_inspection', u'等待检验退料'),
+        ('waiting_post_inventory', u'等待入库'),
         ('done', 'Done'),
         ('cancel', 'Cancelled')], string='status',
         copy=False, default='confirmed', track_visibility='onchange')
@@ -538,11 +571,12 @@ class MrpProductionExtend(models.Model):
         self.write({'state': 'waiting_material'})
         # else:
         #     self.write({'state': 'finish_prepare_material'})
-        qty_wizard = self.env['change.production.qty'].create({
-            'mo_id': self.id,
-            'product_qty': self.product_qty,
-        })
-        qty_wizard.change_prod_qty()
+        if not self.is_rework:
+            qty_wizard = self.env['change.production.qty'].create({
+                'mo_id': self.id,
+                'product_qty': self.product_qty,
+            })
+            qty_wizard.change_prod_qty()
         return {'type': 'ir.actions.empty'}
         # from linkloving_app_api.models.models import JPushExtend
         # JPushExtend.send_push(audience=jpush.audience(
@@ -607,6 +641,7 @@ class MrpProductionExtend(models.Model):
             #     self.state = "waiting_inventory_material"#等待清点退料
             # 有其中一个单据还没品捡 或者还没品捡完成, 等待品捡完成
             self.produce_finish_data_handle()
+            self.env["procurement.order"].search([('production_id', 'in', self.ids)]).check()
 
     def produce_finish_data_handle(self):
         self.state = self.compute_order_state()
@@ -620,7 +655,6 @@ class MrpProductionExtend(models.Model):
                 times[0].is_secondary_produce = False
             else:
                 raise UserError(u"未找到对应的数据")
-
 
     def compute_order_state(self):
         if any(feedback.state in ['draft', 'qc_ing'] for feedback in self.qc_feedback_ids):
@@ -854,28 +888,31 @@ class MrpProductionExtend(models.Model):
                 return [('state', '=', 'progress'),
                         ('in_charge_id', '=', self.env.user.partner_id.id),
                         ('feedback_on_rework', '=', None),
-                        ('date_planned_start', '<', after_day.strftime('%Y-%m-%d %H:%M:%S'))]
+                        # ('date_planned_start', '<', after_day.strftime('%Y-%m-%d %H:%M:%S'))
+                        ]
             else:
                 return [('state', '=', "progress"),
                         ('in_charge_id', '=', self.env.user.partner_id.id),
                         ('feedback_on_rework', '!=', None),
-                        ('date_planned_start', '<', after_day.strftime('%Y-%m-%d %H:%M:%S'))]
+                        # ('date_planned_start', '<', after_day.strftime('%Y-%m-%d %H:%M:%S'))
+                        ]
         else:
             # locations = self.env["stock.location"].sudo().get_semi_finished_location_by_user(self._context.get("uid"))
             # location_cir = self.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
             # location_domain = locations.ids + location_cir
             return [('state', '=', state),
                     # ('location_ids', 'in', location_domain),
-                    ('date_planned_start', '<', after_day.strftime('%Y-%m-%d %H:%M:%S'))]
+                    # ('date_planned_start', '<', after_day.strftime('%Y-%m-%d %H:%M:%S'))
+                    ]
 
     @api.multi
     def action_cancel(self):
         force_cancel = self._context.get("force_cancel")
         if force_cancel:
             state_domain = ["draft", "confirmed", "waiting_material",
-                            "prepare_material_ing", "finish_prepare_material", "already_picking"]
+                            "prepare_material_ing", "finish_prepare_material", "already_picking", "cancel"]
         else:
-            state_domain = ["draft", "confirmed", "waiting_material"]
+            state_domain = ["draft", "confirmed", "waiting_material", "cancel"]
         for mo in self:
             if mo.state not in state_domain:
                 raise UserError(u"不能取消已经开始生产的制造单 或者 相关的生产单已经开始生产无法取消SO")
@@ -894,7 +931,7 @@ class MrpProductionExtend(models.Model):
         #             if line.product_id.id == move.product_id.id:
         #                 line.return_qty += move.quantity_done
         #     return_m.no_confirm_return()
-            # return_m.do_retrurn()
+        # return_m.do_retrurn()
         return res
 
     def action_cancel_and_return_material(self):
@@ -1074,9 +1111,9 @@ class MrpProductionProduceExtend(models.TransientModel):
                 if self.production_id.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:  # 半成品入库
                     try:
                         feedback.action_post_inventory()
-                    except Exception, e:
+                    except ValueError, e:
                         feedback.unlink()
-                        raise UserError(e.name)
+                        raise UserError(e)
 
         return {'type': 'ir.actions.act_window_close'}
 
@@ -1098,13 +1135,15 @@ class MrpProductionProduceExtend(models.TransientModel):
             #     move.quantity_done_store = move.quantity_done_store / (1 + move.bom_line_id.scrap_rate / 100)
         moves = self.production_id.move_finished_ids.filtered(
             lambda x: x.product_id.tracking == 'none' and x.state not in ('done', 'cancel'))
-        if not moves and self.production_id.qty_unpost > self.production_id.qty_produced:
-            qty = self.production_id.qty_unpost - self.production_id.qty_produced
-            new_move = self.production_id.move_finished_ids[0].copy(default={'quantity_done': qty,
-                                                                             'ordered_qty': qty,
-                                                                             'product_uom_qty': qty,
-                                                                             'production_id': self.production_id.id
-                                                                             })
+        if not moves:  # and self.production_id.qty_unpost > self.production_id.qty_produced:
+            qty = quantity
+            copy_moves = self.production_id.move_finished_ids.filtered(
+                lambda x: x.product_id.id == self.production_id.product_id.id)
+            new_move = copy_moves[0].copy(default={'quantity_done': qty,
+                                                   'ordered_qty': qty,
+                                                   'product_uom_qty': qty,
+                                                   'production_id': self.production_id.id
+                                                   })
             new_move.action_confirm()
         for move in moves:
             if move.product_id.id == self.production_id.product_id.id:
@@ -1192,7 +1231,7 @@ class ReturnOfMaterial(models.Model):
                 r.return_qty = 0
                 move.action_done()
             self.return_ids.create_scraps()
-            self.production_id.write({'state': 'done'})
+            self.production_id.button_mark_done()
         else:
             self.production_id.write({'state': 'waiting_warehouse_inspection'})
         return True
@@ -1272,6 +1311,7 @@ class SimStockMove(models.Model):
         boms, lines = self[0].production_id.bom_id.explode(self[0].production_id.product_id,
                                                            self[0].production_id.product_qty)
         for sim_move in self:
+
             if sim_move.stock_moves:
                 for bom_line, datas in lines:
                     if bom_line.product_id.id == sim_move.product_id.id:
@@ -1281,6 +1321,12 @@ class SimStockMove(models.Model):
                         #         continue
                         #     if l.state != "cancel":
                         #         sim_move.product_uom_qty += l.product_uom_qty
+                    # FIXME:应该在rework model allen
+                    if sim_move.production_id.is_rework:
+                        production_id = sim_move.production_id
+
+                        sim_move.product_uom_qty = production_id.rework_material_line_ids.filtered(
+                            lambda x: x.product_id.id == sim_move.product_id.id).product_qty
 
     def _default_qty_available(self):
         for sim_move in self:
@@ -1612,6 +1658,12 @@ class MrpQcFeedBack(models.Model):
             raise UserError(u"缺少对应的生产单ID")
         return super(MrpQcFeedBack, self).create(vals)
 
+    @api.multi
+    def unlink(self):
+        for qc in self:
+            if qc.state in ['check_to_rework', 'alredy_post_inventory']:
+                raise UserError(u"无法删除已完成的品检单据")
+        return super(MrpQcFeedBack, self).unlink()
     # 等待品捡 -> 品捡中
     def action_start_qc(self):
         self.state = "qc_ing"
@@ -1635,6 +1687,8 @@ class MrpQcFeedBack(models.Model):
 
     # 品捡成功 -> 已入库
     def action_post_inventory(self):
+        if self.state == 'alredy_post_inventory':
+            raise UserError(u"该单据已入库,无需再重复入库")
         mrp_product_produce = self.env['mrp.product.produce'].with_context({'active_id': self.production_id.id})
         produce = mrp_product_produce.create({
             'product_qty': self.qty_produced,
@@ -1645,6 +1699,10 @@ class MrpQcFeedBack(models.Model):
         produce.do_produce_and_post_inventory()
 
         self.state = "alredy_post_inventory"
+
+    def action_back_state(self):
+        if self.state == 'alredy_post_inventory':
+            self.state = 'qc_success'
 
     # 品捡失败 -> 返工
     def action_check_to_rework(self):
@@ -1693,6 +1751,16 @@ class MultiHandleWorker(models.TransientModel):
             em.is_worker = True
 
 
+class StockComfirmationExtend(models.TransientModel):
+    _inherit = 'stock.backorder.confirmation'
+
+    @api.one
+    def _process(self, cancel_backorder=False):
+        if self.pick_id.state in ["picking"] and self.pick_id.picking_type_code == 'incoming':  # 如果是处于分拣流程则只记录一下选择
+            self.pick_id.is_cancel_backorder = cancel_backorder
+            return {'type': 'ir.actions.act_window_close'}
+        else:
+            return super(StockComfirmationExtend, self)._process(cancel_backorder)
 class StcokPickingExtend(models.Model):
     _inherit = 'stock.picking'
 
@@ -1704,9 +1772,99 @@ class StcokPickingExtend(models.Model):
     qc_result = fields.Selection(string=u"品检结果", selection=[('no_result', u'为以前的品检单,无品检结果记录'),
                                                             ('fail', u'品检失败'),
                                                             ('success', u'品检通过'), ], default='no_result', )
-    transfer_way = fields.Selection(string=u'入库方式', selection=[('draft', u'未选择'),
-                                                               ('all', u'全部入库'),
-                                                               ('part', u'仅良品入库,不良品退回')], default='draft')
+    transfer_way = fields.Selection(string=u'入库方式',
+                                    selection=[('draft', u'未选择'),
+                                               ('all', u'全部入库'),
+                                               ('part', u'仅良品入库,不良品退回')],
+                                    default='draft',
+                                    copy=False)
+
+    state = fields.Selection(selection_add=[
+        ('picking', u'分拣中')])
+
+    is_picking_process = fields.Boolean(string=u'是否进入分拣流程', default=False, copy=False)
+    is_cancel_backorder = fields.Boolean(string=u'是否创建欠单', copy=False)
+
+    # @api.multi
+    # def do_new_transfer(self):
+    #     for pick in self:
+    #         if pick.is_picking_process:#如果是分拣流程,则不做处理先记录下来
+    #             pick.is_create_backorder
+
+    @api.multi
+    def do_new_transfer(self):
+        for pick in self:
+            pack_operations_delete = self.env['stock.pack.operation']
+            if not pick.move_lines and not pick.pack_operation_ids:
+                raise UserError(_('Please create some Initial Demand or Mark as Todo and create some Operations. '))
+            # In draft or with no pack operations edited yet, ask if we can just do everything
+            if pick.state == 'draft' or all([x.qty_done == 0.0 for x in pick.pack_operation_ids]):
+                # If no lots when needed, raise error
+                picking_type = pick.picking_type_id
+                if (picking_type.use_create_lots or picking_type.use_existing_lots):
+                    for pack in pick.pack_operation_ids:
+                        if pack.product_id and pack.product_id.tracking != 'none':
+                            raise UserError(
+                                _('Some products require lots/serial numbers, so you need to specify those first!'))
+                view = self.env.ref('stock.view_immediate_transfer')
+                wiz = self.env['stock.immediate.transfer'].create({'pick_id': pick.id})
+                # TDE FIXME: a return in a loop, what a good idea. Really.
+                return {
+                    'name': _('Immediate Transfer?'),
+                    'type': 'ir.actions.act_window',
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'res_model': 'stock.immediate.transfer',
+                    'views': [(view.id, 'form')],
+                    'view_id': view.id,
+                    'target': 'new',
+                    'res_id': wiz.id,
+                    'context': self.env.context,
+                }
+
+            # Check backorder should check for other barcodes
+            if pick.check_backorder():
+                view = self.env.ref('stock.view_backorder_confirmation')
+                wiz = self.env['stock.backorder.confirmation'].create({'pick_id': pick.id})
+                # TDE FIXME: same reamrk as above actually
+                return {
+                    'name': _('Create Backorder?'),
+                    'type': 'ir.actions.act_window',
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'res_model': 'stock.backorder.confirmation',
+                    'views': [(view.id, 'form')],
+                    'view_id': view.id,
+                    'target': 'new',
+                    'res_id': wiz.id,
+                    'context': self.env.context,
+                }
+            pick.is_cancel_backorder = True
+            pick.state = 'waiting_in'
+        return
+
+    @api.multi
+    def to_stock(self):
+        for pick in self:
+            if all(move.state not in ["done", "cancel"] for move in pick.move_lines):
+                # if pick.move_lines.filtered(lambda x: x.state not in ["done", "cancel"]):
+                confirmation = self.env["stock.backorder.confirmation"].create({
+                    'pick_id': pick.id
+                })
+                confirmation._process(cancel_backorder=pick.is_cancel_backorder)
+            # 既有完成又有可用的单子, 肯定有问题的!!!
+            elif any(move.state in ["done"] for move in pick.move_lines) and any(
+                            move.state == "assigned" for move in pick.move_lines):
+                raise UserError(u"库存异动单异常,请联系管理员解决")
+            if all(not pack.qty_done for pack in pick.pack_operation_product_ids):
+                raise UserError(u"出货数量不能全部为0")
+        return super(StcokPickingExtend, self).to_stock()
+
+    # 分拣完成
+    @api.multi
+    def action_picking_done(self):
+        # self.is_picking_process = False
+        self.state = 'waiting_in'
 
     @api.multi
     def action_check_pass(self):
@@ -1724,20 +1882,51 @@ class StcokPickingExtend(models.Model):
 
     def confirm_transfer_way(self):
         if any([x.rejects_qty > 0.0 for x in self.pack_operation_ids]):  # 若有一个不良品大于0
-            view = self.env.ref('linkloving_mrp_extend.view_choose_transfer_way')
-            return {
-                'name': u'选择入库方式',
-                'type': 'ir.actions.act_window',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'stock.transfer.way',
-                'views': [(view.id, 'form')],
-                'view_id': view.id,
-                'target': 'new',
-                'context': {'default_picking_id': self.id},
-            }
+            return self.action_view_choose_transfer_way()
         else:
             return self.do_new_transfer()
+
+    # 分拣
+    def to_picking(self):
+        if any([x.rejects_qty > 0.0 for x in self.pack_operation_ids]):  # 若有一个不良品大于0
+            # self.is_picking_process = True
+            context = dict(self._context)
+            context.update({'is_all_transfer_in': False})
+            self.with_context(context).choose_transfer_way()
+            self.state = 'picking'
+            return self.do_new_transfer()
+        else:
+            raise UserError(u"没有不良品无法进入分拣流程.")
+
+    def action_view_choose_transfer_way(self):
+        view = self.env.ref('linkloving_mrp_extend.view_choose_transfer_way')
+        return {
+            'name': u'选择入库方式',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'stock.transfer.way',
+            'views': [(view.id, 'form')],
+            'view_id': view.id,
+            'target': 'new',
+            'context': {'default_picking_id': self.id,},
+        }
+
+    def choose_transfer_way(self):
+        is_all = self._context.get("is_all_transfer_in")
+        last_transfer_way = self.transfer_way
+        if last_transfer_way == 'part':
+            for pack in self.pack_operation_product_ids:
+                pack.qty_done = pack.qty_done + pack.rejects_qty
+
+        if is_all:  # 全部入库
+            self.transfer_way = 'all'
+        else:
+            self.transfer_way = 'part'
+        # if not self.picking_id.check_backorder():  # 此条件是货全都收全了, 所以要提前修改数量
+        if self.transfer_way == 'part':
+            for pack in self.pack_operation_product_ids:
+                pack.qty_done = pack.qty_done - pack.rejects_qty
 
 
 class stock_transfer_way(models.TransientModel):
@@ -1746,20 +1935,21 @@ class stock_transfer_way(models.TransientModel):
     picking_id = fields.Many2one("stock.picking")
 
     def choose_transfer_way(self):
-        is_all = self._context.get("is_all_transfer_in")
-        last_transfer_way = self.picking_id.transfer_way
-        if last_transfer_way == 'part':
-            for pack in self.picking_id.pack_operation_product_ids:
-                pack.qty_done = pack.qty_done + pack.rejects_qty
-
-        if is_all:  # 全部入库
-            self.picking_id.transfer_way = 'all'
-        else:
-            self.picking_id.transfer_way = 'part'
-        # if not self.picking_id.check_backorder():  # 此条件是货全都收全了, 所以要提前修改数量
-        if self.picking_id.transfer_way == 'part':
-            for pack in self.picking_id.pack_operation_product_ids:
-                pack.qty_done = pack.qty_done - pack.rejects_qty
+        self.picking_id.choose_transfer_way()
+        # is_all = self._context.get("is_all_transfer_in")
+        # last_transfer_way = self.picking_id.transfer_way
+        # if last_transfer_way == 'part':
+        #     for pack in self.picking_id.pack_operation_product_ids:
+        #         pack.qty_done = pack.qty_done + pack.rejects_qty
+        #
+        # if is_all:  # 全部入库
+        #     self.picking_id.transfer_way = 'all'
+        # else:
+        #     self.picking_id.transfer_way = 'part'
+        # # if not self.picking_id.check_backorder():  # 此条件是货全都收全了, 所以要提前修改数量
+        # if self.picking_id.transfer_way == 'part':
+        #     for pack in self.picking_id.pack_operation_product_ids:
+        #         pack.qty_done = pack.qty_done - pack.rejects_qty
 
         return self.picking_id.do_new_transfer()
 

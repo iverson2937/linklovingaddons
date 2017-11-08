@@ -128,20 +128,20 @@
 
                 </xpath>
 
-                <xpath expr="//label[@for='product_qty']" position="attributes">
+                <!--<xpath expr="//label[@for='product_qty']" position="attributes">-->
 
-                    <attribute name="attrs">{'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}</attribute>
-                </xpath>
-
-
-                <xpath expr="//field[@name='product_qty']" position="attributes">
-                    <attribute name="attrs">
-                        {'readonly':[('state','not in',['draft','confirmed'])],
-                      'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}
-                    </attribute>
+                <!--<attribute name="attrs">{'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}</attribute>-->
+                <!--</xpath>-->
 
 
-                </xpath>
+                <!--<xpath expr="//field[@name='product_qty']" position="attributes">-->
+                <!--<attribute name="attrs">-->
+                <!--{'readonly':[('state','not in',['draft','confirmed'])],-->
+                <!--'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}-->
+                <!--</attribute>-->
+
+
+                <!--</xpath>-->
                 <xpath expr="//field[@name='unit_price']" position="attributes">
                     <attribute name="attrs">{'invisible':['|',('is_multi_output','=',True),('is_random_output','=',True)]}</attribute>
 
@@ -192,11 +192,11 @@
                     <field name="is_force_output"
                            attrs="{'readonly':[('state','not in',['draft','confirmed'])],'invisible':[('is_multi_output','!=',True)]}"/>
                 </xpath>
-
-                <xpath expr="//notebook/page[3]" position="attributes">
-                    <attribute name="attrs">{'invisible':[('state','in',['waiting_inventory_material','done'])]}
-                    </attribute>
-                </xpath>
+                <!--产成品 tab-->
+                <!--<xpath expr="//notebook/page[3]" position="attributes">-->
+                <!--<attribute name="attrs">{'invisible':[('state','in',['waiting_inventory_material','done'])]}-->
+                <!--</attribute>-->
+                <!--</xpath>-->
 
                 <xpath expr="//notebook/page[2]" position="replace">
                     <page string="投入" attrs="{'invisible':[('is_random_output','!=',True)]}">
@@ -235,15 +235,15 @@
 
                     </page>
 
-                    <page string="产成品" attrs="{'invisible':[('state','not in',['waiting_inventory_material','done'])]}">
-                        <field name="stock_move_lines_finished" readonly="1" context="{'default_type':'output'}"
-                               create="0">
-                            <tree editable="bottom" create="0" delete="0">
-                                <field name="product_id" options="{'no_create':True}" string="产品"/>
-                                <field name="quantity_done_finished" string="产出数量"/>
-                            </tree>
-                        </field>
-                    </page>
+                    <!--<page string="产成品" attrs="{'invisible':[('state','not in',['waiting_inventory_material','done'])]}">-->
+                    <!--<field name="stock_move_lines_finished" readonly="1" context="{'default_type':'output'}"-->
+                    <!--create="0">-->
+                    <!--<tree editable="bottom" create="0" delete="0">-->
+                    <!--<field name="product_id" options="{'no_create':True}" string="产品"/>-->
+                    <!--<field name="quantity_done_finished" string="产出数量"/>-->
+                    <!--</tree>-->
+                    <!--</field>-->
+                    <!--</page>-->
                 </xpath>
             </field>
         </record>

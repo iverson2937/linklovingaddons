@@ -92,7 +92,7 @@
                 <form string="">
                     <sheet>
                         <group>
-                            <field name="temp_product_tmpl_ids" widget="many2many_tags"/>
+                            <field name="temp_product_tmpl_ids" widget="many2many_tags" options="{'no_create': True}"/>
                             <field name="type" class="this_my_type"/>
                         </group>
                         <group>
@@ -191,12 +191,15 @@
                                 context="{'to_last_review':True}"/>
                         <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
                                 groups="linkloving_pdm.group_final_review_partner"
-                                invisible="context.get('view_material_request')"/>
+                                invisible="context.get('project_line_pass_show')"
+                        />
+
 
                         <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
-                                groups="linkloving_pdm.group_final_review_picking"
-                                invisible="not context.get('view_material_request')"
+                                groups="linkloving_pdm.group_final_review_picking_project,linkloving_pdm.group_final_review_picking_line"
+                                invisible="not context.get('project_line_pass_show')"
                         />
+
 
                         <button name='action_deny'
                                 invisible="context.get('is_show_action_deny') == 'false' or context.get('view_show')"

@@ -225,7 +225,9 @@
                 <xpath expr="//field[@name='bom_id']" position="attributes">
                     <attribute name="options">{'no_create':True}</attribute>
                 </xpath>
-
+                <xpath expr="//field[@name='date_planned_finished']" position="attributes">
+                    <attribute name="invisible">False</attribute>
+                </xpath>
                 <div name="button_box" position="inside">
                     <button class="oe_stat_button" name="action_view_qc_report"
                             type="object" icon="fa-list-alt"
@@ -261,7 +263,7 @@
                             type="object" string="开始生产"
                             groups="linkloving_mrp_extend.group_charge_produce"/>
                     <button name="button_produce_finish" class="oe_highlight"
-                            attrs="{'invisible': [ '|', ('availability', 'not in', ['partially_available', 'assigned']),('state', '!=', 'progress')]}"
+                            attrs="{'invisible': [('state', '!=', 'progress')]}"
                             type="object" string="Production Complete,Send to Inspection"
                             groups="linkloving_mrp_extend.group_charge_produce"/>
                     <button name="button_start_quality_inspection" class="oe_highlight"
@@ -1384,6 +1386,14 @@
                                 class="oe_highlight"
                                 attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
                         />
+
+                        <button name="to_picking" string="去分拣"
+                                groups="purchase.group_purchase_user"
+                                type="object"
+                                class="oe_highlight"
+                                attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"
+                        />
+
                         <button name="reject" string="回退"
                                 groups="purchase.group_purchase_user"
                                 type="object"
@@ -1410,7 +1420,13 @@
                 <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='qty_done']" position="after">
                     <!-- Add your fields or attributes here -->
                     <field name="rejects_qty"
-                           attrs="{'invisible': [('state', 'not in', ['qc_check', 'validate', 'waiting_in', 'done'])]}"/>
+                           attrs="{'invisible': [('state', 'not in', ['qc_check', 'validate', 'waiting_in', 'done', 'picking'])]}"/>
+                </xpath>
+
+                <xpath expr="//button[@name='action_cancel']" position="after">
+                    <button name="action_picking_done" string="分拣完成"
+                            attrs="{'invisible': [('state', '!=', 'picking')]}"
+                            groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
                 </xpath>
 
             </field>

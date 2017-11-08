@@ -1,19 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <record id="eb_order_import_form" model="ir.ui.view">
-            <field name="name">EB Transfer Out</field>
-            <field name="model">eb.order</field>
-            <field name="inherit_id" ref="linkloving_eb.eb_order_form"/>
+        <record id="retail_order_import_tree" model="ir.ui.view">
+            <field name="name">电商散单</field>
+            <field name="model">retail.order</field>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='create_date']" position="replace">
-                    <field name="deal_date"/>
-                </xpath>
+                <tree>
+                    <field name="name" string="原始料号"/>
+                    <field name="partner_id" string="店名"/>
+                    <field name="total_amount"/>
+                    <field name="shipping_date"/>
+                    <field name="order_status"/>
+                    <field name="create_date" string="创建日期"/>
+                </tree>
+            </field>
 
-                <xpath expr="//field[@name='eb_order_line_ids']/tree/field[@name='product_id']" position="after">
-                    <field name="product"/>
-                    <field name="price_unit"/>
-                </xpath>
+        </record>
+
+
+        <record id="retail_order_import_form" model="ir.ui.view">
+            <field name="name">电商散单</field>
+            <field name="model">retail.order</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <field name="state" widget="statusbar"/>
+
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name" require="1" string="原始单号"/>
+                                <field name="partner_id" string="店名" options="{'no_create':True}"/>
+                                <field name="order_date"/>
+                                <field name="payment_date"/>
+                                <field name="order_status"/>
+                            </group>
+                            <group>
+                                <field name="shipping_date"/>
+                                <field name="total_amount"/>
+                                <field name="sales_promotion"/>
+                                <field name="coupon_price"/>
+                                <field name="actual_payment"/>
+                                <field name="create_date" string="创建日期"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string="明细">
+                                <field name="order_line_ids">
+                                    <tree editable="bottom">
+                                        <field name="product_id" options="{'no_create':True}" string="产品"/>
+                                        <field name="product_qty"/>
+                                        <field name="price_unit"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+
+                </form>
+
             </field>
         </record>
+
+        <record id="action_retail_order1" model="ir.actions.act_window">
+            <field name="name">零售订单</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">retail.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new kind of landed cost.
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem action="action_retail_order1"
+                  id="menu_retail_order1"
+                  name="零售订单"
+                  parent="linkloving_sale.menu_sales_orders"
+                  sequence="5"/>
+
     </data>
 </openerp>

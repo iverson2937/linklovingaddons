@@ -52,7 +52,7 @@
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='qty_available']" position="after">
-                    <field name="outgoing_qty" string="在产数量"/>
+                    <field name="incoming_qty" string="在产数量"/>
                 </xpath>
 
 
@@ -60,6 +60,8 @@
 
                     <field name="reordering_min_qty"/>
                     <field name="reordering_max_qty"/>
+                    <field name="order_point_active" string="订货规则开启"/>
+
                     <field name="last1_month_qty" readonly="1"/>
                     <field name="last2_month_qty" readonly="1"/>
                     <field name="last3_month_qty" readonly="1"/>
@@ -95,6 +97,32 @@
 
             </field>
         </record>
+        <record id="product_template_form_view_procurement_button_inherit" model="ir.ui.view">
+            <field name="name">product.template.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="stock.product_template_form_view_procurement_button"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//button[@name='%(stock.action_view_change_product_quantity)d']" position="after">
+                    <button string="标记为停产"
+                            type="object"
+                            class=" btn-primary"
+                            groups="stock.group_stock_manager"
+                            name="set_to_eol"
+                            confirm="确定标记为停产？"
+                            attrs="{'invisible': [('status', '=', 'eol')]}"/>
+                    <button string="取消标记为停产"
+                            type="object"
+                            name="cancel_eol"
+                            groups="stock.group_stock_manager"
+                            attrs="{'invisible': [('status', '!=', 'eol')]}"/>
+                    <field name="status" widget="statusbar" statusbar_visible="eol" readonly="1"/>
+
+                </xpath>
+
+
+            </field>
+        </record>
 
 
         <record id="view_product_template_form_linkloving" model="ir.ui.view">
@@ -120,6 +148,39 @@
                 <xpath expr="//field[@name='categ_id']" position="attributes">
                     <attribute name="options">{'no_create':True}</attribute>
                 </xpath>
+
+            </field>
+        </record>
+        <record id="product_template_search_form_view_stock_inherit" model="ir.ui.view">
+            <field name="name">product.template.search.stock.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_search_view"/>
+            <field name="arch" type="xml">
+                <field name="pricelist_id" position="after">
+
+                    <filter name="eol1" string="已停产"
+                            domain="['|',('active','=',False),('active','=',True),('status','=','eol')]"/>
+                </field>
+            </field>
+        </record>
+        <record id="product_template_search_inherit" model="ir.ui.view">
+            <field name="name">product.template.search.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_search_view"/>
+            <field name="arch" type="xml">
+                <field name="pricelist_id" position="after">
+                    <filter name="filter_produce" string="有MO在产的" domain="[('has_mo_procure', '=', True)]"/>
+                    <separator/>
+                    <filter name="filter_in_plan" string="有MO已排产的" domain="[('has_mo_in_plan', '=', True)]"/>
+                    <separator/>
+                    <filter name="filter_unplan" string="有MO未排产的" domain="[('has_mo_unplan', '=', True)]"/>
+                    <separator/>
+                    <filter name="filter_is_virtual_lt_reordering" string="预测 &lt;最小存货"
+                            domain="[('is_virtual_lt_reordering', '=', True)]"/>
+                    <separator/>
+                    <filter name="filter_is_available_lt_required" string="库存 &lt;订单量"
+                            domain="[('is_available_lt_required', '=', True)]"/>
+                </field>
 
             </field>
         </record>

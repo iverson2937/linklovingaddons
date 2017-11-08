@@ -36,10 +36,10 @@
                                         <strong>Date:</strong>
                                         <p t-field="o.accounting_date"/>
                                     </div>
-                                    <div class="col-xs-5">
-                                        <strong>Description:</strong>
-                                        <p t-field="o.name"/>
-                                    </div>
+                                    <!--<div class="col-xs-5">-->
+                                    <!--<strong>Description:</strong>-->
+                                    <!--<p t-field="o.name"/>-->
+                                    <!--</div>-->
                                     <!--<div class="col-xs-2">-->
                                     <!--<strong>Validated By:</strong>-->
                                     <!--<p t-field="o.responsible_id"/>-->

@@ -2,7 +2,7 @@
 import os
 
 import base64
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 
 # class linkloving_pdm(models.Model):
 #     _name = 'linkloving_pdm.linkloving_pdm'
@@ -15,7 +15,7 @@ from odoo import models, fields, api
 #     @api.depends('value')
 #     def _value_pc(self):
 #         self.value2 = float(self.value) / 100
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 REVIEW_LINE_STATE = {'waiting_review': u'等待审核',
                      'review_success': u'审核通过',
@@ -51,6 +51,8 @@ class ReviewProcess(models.Model):
 
     who_review_now = fields.Many2one("res.partner", string=u'待...审核', compute="_compute_who_review_now", store=True)
     process_line_review_now = fields.Many2one("review.process.line", compute="_compute_process_line_review_now")
+
+    product_line_ids = fields.One2many("product.attachment.info", "review_id", string=u"产品")
 
     @api.multi
     def name_get(self):
@@ -122,7 +124,9 @@ class ReviewProcessLine(models.Model):
 
     state_copy = fields.Text(u"状态", compute="_compute_process_line_state_copy")
 
-    def submit_to_next_reviewer(self, review_type, to_last_review=False, partner_id=None, remark=None):
+    # 送审
+    def submit_to_next_reviewer(self, review_type, to_last_review=False, partner_id=None, remark=None,
+                                material_requests_id=None, bom_id=None):
 
         if not partner_id:
             raise UserError(u"请选择审核人!")
@@ -155,16 +159,213 @@ class ReviewProcessLine(models.Model):
 
         partner_id.sudo().sequence_file += 1
 
+        self.send_chat_msg(partner_id, remark, 'waiting', material_requests_id, bom_id)
+
+        # self.env['mail.channel'].search([('name', '=', 'file_check')]).message_post(body=remark, subject=None,
+        #                                                                             message_type='comment',
+        #                                                                             subtype='mail.mt_comment',
+        #                                                                             parent_id=False, attachments=None,
+        #                                                                             content_subtype='html')
+
+    def make_body_data(self, remark, prompt_type, material_requests_id, bom_id):
+
+        # body_data = '<h5>【' + action_type + '】</h5>.'
+        body_data = ''
+
+        review_type = self._context.get("review_type")
+
+        if prompt_type == 'pass':
+            prompt_type = '审核通过-'
+        elif prompt_type == 'reject':
+            prompt_type = '审核被拒-'
+        elif prompt_type == 'waiting':
+            prompt_type = '待您审核-'
+
+        if review_type == 'picking_review':
+            body_data = '【 工程领料 】' + prompt_type + str(material_requests_id.name) + '，领料原因:' + str(
+                material_requests_id.picking_cause) + '，申请人:' + str(
+                material_requests_id.my_create_uid.display_name) + ' , 备注：' + (
+                            remark if remark else '')
+        elif review_type == 'bom_review':
+            body_data = '【 BOM 】' + prompt_type + '产品:' + str(
+                bom_id.display_name if bom_id.display_name else ' ') + ',  备注：' + (
+                            remark if remark else '')
+        elif review_type == 'file_review':
+            body_data = '【 文件 】' + prompt_type + str(self.review_id.product_line_ids.type) + ' 产品:' + str(
+                self.review_id.product_line_ids.product_tmpl_id.name) + '，版本:' + str(
+                self.review_id.product_line_ids.version) + '，文件:' + str(
+                self.review_id.product_line_ids.file_name) + ' ; 备注：' + (remark if remark else '')
+
+        return body_data
+
+    def send_all_msg(self, remark, submit_type, material_requests_id, bom_id):
+
+        chat_channel = self.env['mail.channel'].sudo()
+
+        body_data = self.make_body_data(remark, submit_type, material_requests_id, bom_id)
+
+        chat_category = self.env.ref('base.module_category_purchase_management')  # 根据部门名称 查出类别
+
+        chat_group = self.env['res.groups'].search([('category_id', '=', chat_category.id)])  # 根据类别 查出所在的群组
+
+        # channel_list_chat = self.env['mail.channel'].search([('group_ids', 'in', chat_group.ids)])  # 查出哪些通道含有 群组
+        channel_list_chat = self.env['mail.channel'].search(
+            [('group_ids', '=', [group_id]) for group_id in chat_group.ids])  # 查出哪些通道含有 群组
+
+        chat_data_num = []
+        channel_data_num = True
+        for chat_data_one in chat_group:
+            chat_data_num += chat_data_one.users.ids
+
+        chat_data_num = list(set(chat_data_num))
+
+        if channel_list_chat:
+            for channel_one_1 in channel_list_chat:
+                if len(chat_data_num) != 0 and len(chat_data_num) <= channel_one_1.channel_partner_ids.ids.__len__():
+                    # TODO 当 review_id 为空时这里判断 采购所有人数量=某一个组人数 像这个组发送消息 存在巧合
+                    if self.review_id:
+                        if self.review_id.product_line_ids.create_uid.partner_id.id in channel_one_1.channel_partner_ids.ids:
+                            print '发送跳出循环'
+                            channel_data_num = False
+                            channel_one_1.message_post(body=body_data, subject=None,
+                                                       message_type='comment',
+                                                       subtype='mail.mt_comment',
+                                                       parent_id=False, attachments=None,
+                                                       content_subtype='html',
+                                                       **{'author_id': self.env.user.partner_id.id, 'project': True})
+                            break
+
+        if channel_data_num:
+            chat_vals = {
+                "alias_contact": "everyone",
+                "alias_id": False,
+                "alias_name": False,
+                "description": False,
+                "email_send": False,
+                "group_ids": [(6, 0, [chat_group.ids])],
+                "channel_partner_ids": [
+                    (4, [self.review_id.product_line_ids.create_uid.partner_id.id])] if self.review_id else [],
+                # "group_public_id": chat_group.ids,
+                "message_follower_ids": False,
+                "name": (
+                            self.review_id.product_line_ids.create_uid.partner_id.name if self.review_id else '') + ", 采购组",
+                "public": "groups"
+            }
+
+            chat_data = chat_channel.create(chat_vals)
+            print chat_data.id
+            chat_data.message_post(body=body_data, subject=None,
+                                   message_type='comment',
+                                   subtype='mail.mt_comment',
+                                   parent_id=False, attachments=None,
+                                   content_subtype='html',
+                                   **{'author_id': self.env.user.partner_id.id, 'project': True})
+
+            # if channel_list_chat:
+            #     for channel_one in channel_list_chat:
+            #         channel_one.write({"channel_partner_ids": [(4, [self.review_id.product_line_ids.create_uid.id])]})
+            #
+            #         channel_one.message_post(body=body_data, subject=None,
+            #                                  message_type='comment',
+            #                                  subtype='mail.mt_comment',
+            #                                  parent_id=False, attachments=None,
+            #                                  content_subtype='html',
+            #                                  **{'author_id': self.env.user.partner_id.id, 'project': True})
+            # else:
+            #     chat_vals = {
+            #         "alias_contact": "everyone",
+            #         "alias_id": False,
+            #         "alias_name": False,
+            #         "description": False,
+            #         "email_send": False,
+            #         "group_ids": [(6, 0, [chat_group.ids])],
+            #         "channel_partner_ids": [(4, [self.review_id.product_line_ids.create_uid.id])],
+            #         # "group_public_id": chat_group.ids,
+            #         "message_follower_ids": False,
+            #         "name": "new groups",
+            #         "public": "groups"
+            #     }
+            #
+            #     chat_data = chat_channel.create(chat_vals)
+            #     print chat_data.id
+            #     chat_data.message_post(body=body_data, subject=None,
+            #                            message_type='comment',
+            #                            subtype='mail.mt_comment',
+            #                            parent_id=False, attachments=None,
+            #                            content_subtype='html',
+            #                            **{'author_id': self.env.user.partner_id.id, 'project': True})
+
+    def send_chat_msg(self, partner_id, remark, submit_type, material_requests_id, bom_id):
+        chat_channel = self.env['mail.channel'].sudo()
+
+        body_data = self.make_body_data(remark, submit_type, material_requests_id, bom_id)
+
+        channel_list_chat = self.env['mail.channel'].sudo().search(
+            [('channel_partner_ids', 'in', [partner_id.id]), ('channel_type', '=', 'chat'),
+             ('channel_partner_ids', 'in', [self.env.user.partner_id.id])])
+
+        if channel_list_chat:
+            channel_list_chat[0].message_post(body=body_data, subject=None,
+                                              message_type='comment',
+                                              subtype='mail.mt_comment',
+                                              parent_id=False, attachments=None,
+                                              content_subtype='html',
+                                              **{'author_id': self.env.user.partner_id.id, 'project': True})
+
+        else:
+            chat_vals = {"channel_type": "chat", "name": self.env.user.name + u"," + partner_id.name,
+                         "public": "private",
+                         "channel_partner_ids": [(6, 0, [self.env.user.partner_id.id, partner_id.id])],
+                         "email_send": False}
+
+            chat_data = chat_channel.create(chat_vals)
+
+            chat_data.message_post(body=body_data, subject=None,
+                                   message_type='comment',
+                                   subtype='mail.mt_comment',
+                                   parent_id=False, attachments=None,
+                                   content_subtype='html',
+                                   **{'author_id': self.env.user.partner_id.id, 'project': True})
+
     # 审核通过
-    def action_pass(self, remark):
+    def action_pass(self, remark, material_requests_id, bom_id):
         review_type = self._context.get('review_type')
 
-        if self.env["final.review.partner"].get_final_review_partner_id(review_type).id == self.env.user.partner_id.id:
+        review_type_two = self._context.get('review_type_two')
+
+        if review_type_two == 'pick_type':
+            review_type_two = 'picking_review_line'
+        elif review_type_two == 'proofing':
+            review_type_two = 'picking_review_project'
+        else:
+            review_type_two = review_type
+
+        if self.env["final.review.partner"].get_final_review_partner_id(
+                review_type_two).id == self.env.user.partner_id.id:
             self.write({
                 'review_time': fields.datetime.now(),
                 'state': 'review_success',
                 'remark': remark
             })
+
+            if review_type == 'file_review':
+                # if self.review_id.product_line_ids.type == 'design':
+                if self.review_id:
+                    if self.review_id.product_line_ids.type == 'design':
+                        self.send_all_msg(remark, 'pass', material_requests_id, bom_id)
+                    else:
+                        self.send_chat_msg(self.review_id.product_line_ids.create_uid.partner_id, remark, 'pass',
+                                           material_requests_id, bom_id)
+                else:
+                    self.send_all_msg(remark, 'pass', material_requests_id, bom_id)
+            elif review_type == 'bom_review':
+                self.send_chat_msg(bom_id.create_uid.partner_id, remark, 'pass',
+                                   material_requests_id, bom_id)
+            elif review_type == 'picking_review':
+                self.send_chat_msg(material_requests_id.my_create_uid.partner_id, remark, 'pass',
+                                   material_requests_id, bom_id)
+
+
 
         else:
             raise UserError(u"终审人才能进行审核")
@@ -181,7 +382,7 @@ class ReviewProcessLine(models.Model):
             raise UserError(u"您不是审核人")
 
     # 拒绝审核
-    def action_deny(self, remark):
+    def action_deny(self, remark, material_requests_id, bom_id):
         self.write({
             'review_time': fields.datetime.now(),
             'state': 'review_fail',
@@ -195,6 +396,8 @@ class ReviewProcessLine(models.Model):
             'last_review_line_id': self.id,
             'review_order_seq': self.review_order_seq + 1,
         })
+
+        self.send_chat_msg(self.review_id.create_uid.partner_id, remark, 'reject', material_requests_id, bom_id)
 
     def action_cancel(self, remark):
         self.write({
@@ -388,18 +591,23 @@ class ProductAttachmentInfo(models.Model):
 
         return {'state': 'ok'}
 
-    def action_create_many_info(self):
-        print self.temp_product_tmpl_ids
-
+    @api.one
+    @api.constrains('temp_product_tmpl_ids')
+    def _check_temp_product_tmpl_ids(self):
         if not self.temp_product_tmpl_ids:
-            raise UserError(u"请选择产品")
+            raise ValidationError(u"请选择产品")
 
         if self.type in ('design', 'other'):
             if not (self.file_name and self.remote_path):
-                raise UserError(u"信息不完整，请完善")
+                raise ValidationError(u"信息不完整，请完善")
         else:
             if not (self.file_name and self.file_binary):
-                raise UserError(u"信息不完整，请完善")
+                raise ValidationError(u"信息不完整，请完善")
+            elif self.file_name.find(".") == -1:
+                raise ValidationError(u"输入文件名有误，请核对")
+
+    def action_create_many_info(self):
+        print self.temp_product_tmpl_ids
 
         for tmpl_id in self.temp_product_tmpl_ids:
             print tmpl_id
@@ -445,13 +653,14 @@ class ProductAttachmentInfo(models.Model):
         if attachment_to_unlink:
             result_product_id = attachment_to_unlink[0].product_tmpl_id.id if attachment_to_unlink else ''
             result_product_type = attachment_to_unlink[0].type if attachment_to_unlink else ''
-            for att_one in attachment_to_unlink:
-                pro_list = att_one.mapped('review_id')
-                for lines_one in pro_list:
-                    line_list = lines_one.mapped('review_line_ids')
-                    line_list.unlink()
-                pro_list.unlink()
-            attachment_to_unlink.unlink()
+            for attachment_to_unlink_one in attachment_to_unlink:
+                if attachment_to_unlink_one.create_uid.id == self.env.uid:
+                    pro_list = attachment_to_unlink_one.mapped('review_id')
+                    for lines_one in pro_list:
+                        line_list = lines_one.mapped('review_line_ids')
+                        line_list.unlink()
+                    pro_list.unlink()
+                    attachment_to_unlink_one.unlink()
         return {'template_id': result_product_id, 'type': result_product_type}
 
     @api.one
@@ -718,6 +927,8 @@ class ReviewProcessWizard(models.TransientModel):
         to_last_review = self._context.get("to_last_review")  # 是否送往终审
         review_type = self._context.get("review_type")
 
+        review_type_two = self._context.get("review_type_two")
+
         file_data_list = self._context.get("file_data_list")
 
         materials_request_id = self._context.get('default_material_requests_id')
@@ -734,7 +945,7 @@ class ReviewProcessWizard(models.TransientModel):
                 review_type=review_type,
                 to_last_review=to_last_review,
                 partner_id=self.partner_id,
-                remark=self.remark)
+                remark=self.remark, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
 
             return True
         elif review_type == 'file_review':
@@ -755,6 +966,9 @@ class ReviewProcessWizard(models.TransientModel):
             #             remark=self_copy.remark)
             #     return True
 
+            if not self.product_attachment_info_id.review_id:  # 如果没审核过
+                self.product_attachment_info_id.action_send_to_review()
+
             if file_data_list:
                 for info_one in self.env['product.attachment.info'].browse(
                         [int(info_list_id) for info_list_id in file_data_list]):
@@ -762,26 +976,24 @@ class ReviewProcessWizard(models.TransientModel):
                     if not info_one.review_id:  # 如果没审核过
                         info_one.action_send_to_review()
 
-                    info_one.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
-                    info_one.review_id.process_line_review_now.submit_to_next_reviewer(
-                        review_type=review_type,
-                        to_last_review=to_last_review,
-                        partner_id=self.partner_id,
-                        remark=self.remark)
+                    if info_one.review_id.who_review_now.id == self.env.user.partner_id.id:
+                        info_one.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
+                        info_one.review_id.process_line_review_now.submit_to_next_reviewer(
+                            review_type=review_type,
+                            to_last_review=to_last_review,
+                            partner_id=self.partner_id,
+                            remark=self.remark, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
                 return True
 
-            if not self.product_attachment_info_id.review_id:  # 如果没审核过
-                self.product_attachment_info_id.action_send_to_review()
-
-            self.product_attachment_info_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
-            self.product_attachment_info_id.review_id.process_line_review_now.submit_to_next_reviewer(
-                review_type=review_type,
-                to_last_review=to_last_review,
-                partner_id=self.partner_id,
-                remark=self.remark)
+            if self.product_attachment_info_id.review_id.who_review_now.id == self.env.user.partner_id.id:
+                self.product_attachment_info_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
+                self.product_attachment_info_id.review_id.process_line_review_now.submit_to_next_reviewer(
+                    review_type=review_type,
+                    to_last_review=to_last_review,
+                    partner_id=self.partner_id,
+                    remark=self.remark, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
 
         elif review_type == 'picking_review':
-            print self.material_requests_id.review_id
             if not self.material_requests_id.review_id:  # 如果没审核过
                 self.material_requests_id.action_send_to_review()
 
@@ -789,11 +1001,16 @@ class ReviewProcessWizard(models.TransientModel):
 
             self.material_requests_id.write({'review_i_approvaled_val': [(4, self.env.uid)]})
 
+            if review_type_two == 'pick_type':
+                review_type_two = 'picking_review_line'
+            elif review_type_two == 'proofing':
+                review_type_two = 'picking_review_project'
+
             self.material_requests_id.review_id.process_line_review_now.submit_to_next_reviewer(
-                review_type=review_type,
+                review_type=review_type_two,
                 to_last_review=to_last_review,
                 partner_id=self.partner_id,
-                remark=self.remark)
+                remark=self.remark, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
 
         return True
 
@@ -811,49 +1028,27 @@ class ReviewProcessWizard(models.TransientModel):
             self.bom_id.need_sop = self.need_sop
             self.bom_id.action_released()
 
-            self.review_bom_line.action_pass(self.remark)
+            self.review_bom_line.action_pass(self.remark, self.material_requests_id, self.bom_id)
             # self.bom_id.product_tmpl_id.apply_bom_update()
         elif review_type == 'file_review':
             if file_data_list:
                 for info_one in self.env['product.attachment.info'].browse(
                         [int(info_list_id) for info_list_id in file_data_list]):
                     info_one.action_released()
-                    info_one.review_id.process_line_review_now.action_pass(self.remark)
+                    info_one.review_id.process_line_review_now.action_pass(self.remark, self.material_requests_id,
+                                                                           self.bom_id)
                 return True
 
             self.product_attachment_info_id.action_released()
             # 审核通过
 
-            self.review_process_line.action_pass(self.remark)
+            self.review_process_line.action_pass(self.remark, self.material_requests_id, self.bom_id)
         elif review_type == 'picking_review':
 
             self.material_requests_id.picking_state = 'approved_finish'
             self.material_requests_id.write({'review_i_approvaled_val': [(4, self.env.uid)]})
-            # 创建出货单
-            # material_one = self.env['material.request'].browse(materials_request_id)
-            #
-            # picking_out_material = self.env['stock.picking'].create({
-            #     'picking_type_id': self.env.ref('stock.picking_type_out').id,
-            #     'location_id': self.env.ref('stock.stock_location_stock').id,
-            #     'location_dest_id': self.env.ref('linkloving_eb.stock_location_eb_transfer_2').id,
-            #     'material_request_order_id': material_one.id,
-            #     'origin': material_one.name,
-            #     'note': material_one.remark,
-            #     'Materials_development_way': material_one.Materials_development_way,
-            #     'partner_id': material_one.create_uid.partner_id.id,
-            #     'picking_type': material_one.picking_type,
-            # })
-            # for one_line in material_one.line_ids:
-            #     self.env['stock.move'].create({
-            #         'name': 'another move',
-            #         'product_id': one_line.product_id.id,
-            #         'product_uom_qty': one_line.product_qty,
-            #         'product_uom': one_line.product_id.uom_id.id,
-            #         'picking_id': picking_out_material.id,
-            #         'location_id': self.env.ref('stock.stock_location_stock').id,
-            #         'location_dest_id': self.env.ref('linkloving_eb.stock_location_eb_transfer').id})
 
-            self.material_line.action_pass(self.remark)
+            self.material_line.action_pass(self.remark, self.material_requests_id, self.bom_id)
         return True
 
     # 审核不通过
@@ -863,18 +1058,19 @@ class ReviewProcessWizard(models.TransientModel):
         review_type = self._context.get('review_type')
         if review_type == 'bom_review':
             self.bom_id.action_deny()
-            self.review_bom_line.action_deny(self.remark)
+            self.review_bom_line.action_deny(self.remark, self.material_requests_id, self.bom_id)
         elif review_type == 'file_review':
 
             if file_data_list:
                 for info_one in self.env['product.attachment.info'].browse(
                         [int(info_list_id) for info_list_id in file_data_list]):
                     info_one.action_deny()
-                    info_one.review_id.process_line_review_now.action_deny(self.remark)
+                    info_one.review_id.process_line_review_now.action_deny(self.remark, self.material_requests_id,
+                                                                           self.bom_id)
                 return True
 
             self.product_attachment_info_id.action_deny()
-            self.review_process_line.action_deny(self.remark)
+            self.review_process_line.action_deny(self.remark, self.material_requests_id, self.bom_id)
         elif review_type == 'picking_review':
             # 改变状态 即可
             # pick_type = self._context.get('picking_state')
@@ -883,7 +1079,7 @@ class ReviewProcessWizard(models.TransientModel):
             # self.material_request_id.write({'review_i_approvaled_val': [(4, self.partner_id.user_ids.id)]})
             self.material_requests_id.write({'review_i_approvaled_val': [(4, self.env.uid)]})
 
-            self.material_line.action_deny(self.remark)
+            self.material_line.action_deny(self.remark, self.material_requests_id, self.bom_id)
 
         return True
 
@@ -913,7 +1109,9 @@ class FinalReviewPartner(models.Model):
     review_type = fields.Selection([
         ('bom_review', u'BOM 终审人'),
         ('file_review', u'文件终审人'),
-        ('picking_review', u'领料终审人'),
+        # ('picking_review', u'领料终审人'),
+        ('picking_review_project', u'工程领料终审人'),
+        ('picking_review_line', u'产线领料终审人'),
     ], string=u'审核类型')
 
     final_review_partner_id = fields.Many2one(comodel_name="res.partner", string="终审人", required=False,
@@ -977,6 +1175,10 @@ class FinalReviewPartner(models.Model):
             review_type_ref = 'linkloving_pdm.group_final_review_partner_bom'
         elif val == 'picking_review':
             review_type_ref = 'linkloving_pdm.group_final_review_picking'
+        elif val == 'picking_review_project':
+            review_type_ref = 'linkloving_pdm.group_final_review_picking_project'
+        elif val == 'picking_review_line':
+            review_type_ref = 'linkloving_pdm.group_final_review_picking_line'
         else:
             raise UserError(u"数据异常,未找到对应的审核人类型")
 

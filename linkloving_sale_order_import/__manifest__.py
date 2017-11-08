@@ -20,10 +20,11 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'sale', 'linkloving_eb'],
+    'depends': ['base', 'sale', 'linkloving_eb', 'hr_expense', 'linkloving_sale'],
 
     # always loaded
     'data': [
+        'data/sale_team.xml',
         # 'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',

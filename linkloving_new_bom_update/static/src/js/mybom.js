@@ -13,6 +13,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
     var SearchView = require('web.SearchView');
     var data = require('web.data');
     var _t = core._t;
+    var del_ids = [];
 
 
     var NewBomUpdate = Widget.extend({
@@ -72,10 +73,18 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             self.changes_back = [];
             self.xNodes.forEach(function (v, i) {
                 if (self.xNodes[i].modify_type) {
-                    self.changes_back.push(self.xNodes[i]);
+                    if(self.xNodes[i].modify_type == 'delete'){
+                        if($.inArray(self.xNodes[i].id,del_ids)!=-1){
+                            self.changes_back.push(self.xNodes[i]);
+                        }
+                    }else {
+                        self.changes_back.push(self.xNodes[i]);
+                    }
+
                 }
             })
             console.log(self.changes_back);
+            del_ids=[];
             if (self.changes_back.length == 0) {
                 var message = ("您没有做任何操作");
                 var def = $.Deferred();
@@ -147,6 +156,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var del_id = $(target).parents("tr").attr("data-tt-id");
+            del_ids.push(parseInt(del_id))
             var self = this;
 
             self.parentsid = [];
@@ -427,8 +437,6 @@ on_search:function () {
             if (this.is_show === false) {
                 this.$el.find('.new_bom_modify_submit').hide();
                 this.$el.find('.new_bom_modify_direct').hide();
-
-
             }
             var options = {
                 $buttons: $("<div>"),
@@ -443,8 +451,8 @@ on_search:function () {
                 return new Model("mrp.bom")
                     .call("get_bom", [this.bom_id])
                     .then(function (result) {
+                        console.log(result)
                         var tNodes = [];
-
                         //获取数据存入数组
 
                         function get_datas(obj) {
@@ -455,7 +463,6 @@ on_search:function () {
                                 } else {
                                     var td1 = [obj[i].product_specs, obj[i].qty, obj[i].process_id[1], obj[i].product_type == 'raw material' ? "" : "<span class='fa fa-plus-square-o add_bom_data'></span>",
                                         "<span class='fa fa-edit new_product_edit'></span>", "<span class='fa fa-trash-o new_product_delete'></span>"];
-
                                 }
                                 var s = {
                                     id: obj[i].id,
@@ -467,7 +474,8 @@ on_search:function () {
                                     name: obj[i].name,
                                     product_type: obj[i].product_type,
                                     process_id: obj[i].process_id[0],
-                                    td: td1
+                                    td: td1,
+                                    index:i+1
                                 };
                                 tNodes.push(s);
                                 if (obj[i].bom_ids.length > 0) {
@@ -495,6 +503,7 @@ on_search:function () {
                             product_type: result.product_type,
                             process_id: result.process_id[0],
                             td: td2,
+                            index: ''
                         });
                         self.xNodes = tNodes;
                         var heads = ["名字", "规格", "数量", "工序", "添加", "编辑", "删除"];

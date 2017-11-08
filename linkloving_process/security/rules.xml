@@ -12,6 +12,11 @@
             </field>
         </record>
 
+        <record id="decimal_produce_price" model="decimal.precision">
+            <field name="name">Produce Price</field>
+            <field name="digits" eval="3"/>
+        </record>
+
 
     </data>
 </odoo>

@@ -3,6 +3,17 @@ import datetime
 
 from odoo import models, fields, api, _
 
+SHIPPING_STATUS = {
+    'no': u'未收货',
+    'part_shipping': u'部分收货',
+    'done': u'收货完成'
+}
+INVOICE_STATUS = {
+    'no': u'没有要对账的',
+    'to invoice': u'待对账',
+    'invoiced': u'对账完成'
+}
+
 
 class PurchaseOrderListPrintWizard(models.TransientModel):
     _name = 'purchase.order.list.wizard'
@@ -18,7 +29,8 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
 
         purchase_ids = purchase_obj.sudo().search([
             ('state', 'in', ['sent', 'to approve', 'purchase']),
-            ('date_order', '>=', date1), ('date_order', '<=', date2)], order='name desc')
+            ('date_order', '>=', date1), ('date_order', '<=', date2), ('company_id', '=', self.env.user.company_id.id)],
+            order='name desc')
 
         purchase_sequence = 1
         for purchase in purchase_ids:
@@ -33,7 +45,9 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
                 'remaining_amount': purchase.remaining_amount,
                 'invoiced_amount': purchase.invoiced_amount,
                 'shipped_amount': purchase.shipped_amount,
-                'pre_payment_amount': purchase.pre_payment_amount
+                'pre_payment_amount': purchase.pre_payment_amount,
+                'shipping_status': SHIPPING_STATUS.get(purchase.shipping_status),
+                'invoice_status': INVOICE_STATUS.get(purchase.invoice_status)
 
             }
             for line in purchase.order_line:

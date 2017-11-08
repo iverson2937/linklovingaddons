@@ -120,7 +120,7 @@
 
         <menuitem id="menu_hr_expense_sheet_all" name="All Expense Sheet" sequence="1"
                   parent="hr_expense.menu_hr_expense_to_approve"
-                  groups="base.group_erp_manager"
+                  groups="hr_expense.group_hr_expense_manager"
                   action="action_hr_expense_sheet_all"/>
 
 

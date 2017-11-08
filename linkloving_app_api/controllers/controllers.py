@@ -81,6 +81,17 @@ class JsonResponse(object):
 
 
 class LinklovingAppApi(http.Controller):
+    # 获取数据库列表
+    @http.route('/linkloving_app_api/is_inner_ip', type='http', auth='none', cors='*')
+    def is_inner_ip(self, **kw):
+        remote_addr = request.httprequest.environ.get('HTTP_X_REAL_IP')
+        if remote_addr == '112.80.45.130':
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data={'origin_ip': remote_addr},
+                                              jsonRequest=False)
+        else:
+            return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={'origin_ip': remote_addr},
+                                              jsonRequest=False)
+
     @classmethod
     def CURRENT_USER(cls, force_admin=False):
         if not force_admin:
@@ -248,6 +259,30 @@ class LinklovingAppApi(http.Controller):
         # user_data = LinklovingAppApi.odoo10.execute('res.users', 'read', [LinklovingAppApi.odoo10.env.user.id])
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
+    @http.route('/linkloving_app_api/get_production_lines', type='json', auth='none', csrf=False)
+    def get_production_lines(self, **kw):
+        # request.session.db = request.jsonrequest["db"]
+        # request.params["db"] = request.jsonrequest["db"]
+
+        mrp_production = request.env['mrp.production'].sudo()
+        partner_id = request.jsonrequest.get('partner_id')
+        domain = []
+        if partner_id:
+            domain.append('|')
+            domain.append(('in_charge_id', '=', partner_id))
+            domain.append(('create_uid', '=', partner_id))
+
+        if request.jsonrequest.get('state'):
+            domain.append(('state', '=', request.jsonrequest['state']))
+            if request.jsonrequest.get('state') == 'progress':
+                domain.append(('feedback_on_rework', '=', None))
+
+        if request.jsonrequest.get('process_id'):
+            domain.append(('process_id', '=', request.jsonrequest['process_id']))
+        g = mrp_production.read_group(domain, fields=['production_line_id'], groupby="production_line_id")
+        print(g)
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=g)
+
     # 获取生产单列表
     @http.route('/linkloving_app_api/get_mrp_production', type='json', auth='none', csrf=False)
     def get_mrp_production(self, **kw):
@@ -269,6 +304,9 @@ class LinklovingAppApi(http.Controller):
 
         if condition and condition[condition.keys()[0]]:
             domain = (condition.keys()[0], 'like', condition[condition.keys()[0]])
+        if 'production_line_id' in request.jsonrequest.keys():
+            production_line_id = request.jsonrequest.get("production_line_id")
+            domain.append(('production_line_id', '=', production_line_id))
 
         production_all = mrp_production.search(domain,
                                                offset=request.jsonrequest['offset'],
@@ -317,7 +355,10 @@ class LinklovingAppApi(http.Controller):
         partner_id = request.jsonrequest.get("partner_id")
 
         domain_uid = ['|', ('in_charge_id', '=', partner_id), ('create_uid', '=', partner_id)]
-        domain = expression.AND([[('state', '=', 'progress')], domain_uid])
+        domain = expression.AND([[('state', '=', 'progress')],
+                                 domain_uid,
+                                 [('feedback_on_rework', '=', None)], ])
+
         orders_group_by_process = request.env["mrp.production"].sudo(LinklovingAppApi.CURRENT_USER()).read_group(domain
                                                                                                                  ,
                                                                                                                  fields=[
@@ -387,8 +428,11 @@ class LinklovingAppApi(http.Controller):
                             ('process_id', '=', process_id),
                             # ('location_ids', 'in', location_domain)
                             ]
+        domain_all = [('state', 'in', ['waiting_material', 'prepare_material_ing']),
+                      ('process_id', '=', process_id), ]
 
-        order_today = request.env["mrp.production"].sudo(LinklovingAppApi.CURRENT_USER()).read_group(domain, fields=[
+        order_today = request.env["mrp.production"].sudo(LinklovingAppApi.CURRENT_USER()).read_group(domain,
+                                                                                                     fields=[
             "date_planned_start"],
                                                                                                      groupby=[
                                                                                                          "date_planned_start"])
@@ -402,6 +446,11 @@ class LinklovingAppApi(http.Controller):
                                                                                                      groupby=[
                                                                                                          "date_planned_start"])
 
+        order_all = request.env["mrp.production"].sudo(LinklovingAppApi.CURRENT_USER()).read_group(domain_all,
+                                                                                                   fields=[
+                                                                                                       "date_planned_start"],
+                                                                                                   groupby=[
+                                                                                                       "date_planned_start"])
         list = []
 
         def get_count_iter(orders):
@@ -422,6 +471,10 @@ class LinklovingAppApi(http.Controller):
         if order_after:
             list.append({"state": "after",
                          "count": get_count_iter(order_after)})
+        if order_all:
+            list.append({"state": "all",
+                         "count": get_count_iter(order_all)})
+
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=list)
 
     # 多个工序 的订单数量
@@ -523,7 +576,7 @@ class LinklovingAppApi(http.Controller):
                                               '%Y-%m-%d')
         # locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
 
-        if date_to_show != "delay":
+        if date_to_show not in ["delay", "all"]:
             today_time = fields.datetime.strptime(date_to_show, '%Y-%m-%d')
 
         one_millisec_before = datetime.timedelta(milliseconds=1)  #
@@ -537,6 +590,11 @@ class LinklovingAppApi(http.Controller):
         if date_to_show == "delay":
             domain = [('date_planned_start', '<', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
                       ('state', 'in', ['waiting_material', 'prepare_material_ing']),
+                      ('process_id', '=', process_id),
+                      # ('location_ids', 'in', location_domain)
+                      ]
+        elif date_to_show == 'all':
+            domain = [('state', 'in', ['waiting_material', 'prepare_material_ing']),
                       ('process_id', '=', process_id),
                       # ('location_ids', 'in', location_domain)
                       ]
@@ -1141,8 +1199,7 @@ class LinklovingAppApi(http.Controller):
             })
             produce.do_produce()
         except Exception, e:
-            return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error': e.name})
+            raise UserError(e)
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
@@ -1378,7 +1435,7 @@ class LinklovingAppApi(http.Controller):
                                               res_data={'error': _("MO not found")})
         return_lines = []
         if all(stock_move.get("return_qty") == 0 for stock_move in stock_move_ids):
-            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'done'})
+            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).button_mark_done()
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
         if not is_check:
@@ -1423,7 +1480,7 @@ class LinklovingAppApi(http.Controller):
                     returun_material_obj._prepare_move_values(r))
                 move.action_done()
             returun_material_obj.return_ids.create_scraps()
-            mrp_production.write({'state': 'done'})
+            mrp_production.button_mark_done()
             #
             # location = request.env["stock.location"].sudo().search([("is_circulate_location", "=", True)], limit=1)
             # if location and location.putaway_strategy_id and location.putaway_strategy_id.fixed_location_ids:
@@ -1457,6 +1514,7 @@ class LinklovingAppApi(http.Controller):
                 'product_id': return_line.product_id.display_name,
                 'return_qty': return_line.return_qty,
                 'product_type': return_line.product_type,
+                'weight': return_line.product_id.weight or 0,
             }
             data.append(dic)
         return JsonResponse.send_response(STATUS_CODE_OK,
@@ -1591,7 +1649,9 @@ class LinklovingAppApi(http.Controller):
             # dic = LinklovingAppApi.search(request,'product.product',[('id','=',l['product_id'][0])], ['display_name'])
             if l.get("product_id"):
                 l['product_tmpl_id'] = l['product_id'][
-                    0]  # request.env['product.product'].sudo().search([('id','=',l['product_id'][0])]).id
+                    0]
+                product = request.env['product.product'].sudo().search([('id', '=', l['product_id'][0])])
+                l['weight'] = product.weight
                 l['product_id'] = l['product_id'][1]
             if l.get('area_id'):
                 l['area_id'] = {
@@ -1618,6 +1678,7 @@ class LinklovingAppApi(http.Controller):
                 'product_name': production.product_id.display_name,
                 'product_ll_type': production.product_id.product_ll_type or '',
                 'product_specs': production.product_id.product_specs,
+                'weight': production.product_id.weight,
                 'area_id': {
                     'area_id': production.product_id.area_id.id,
                     'area_name': production.product_id.area_id.name,
@@ -1681,7 +1742,10 @@ class LinklovingAppApi(http.Controller):
         condition_dic = request.jsonrequest.get('condition')
         domain = []
         for key in condition_dic.keys():
-            domain.append((key, 'in', [condition_dic[key]]))
+            if key == 'default_code':
+                domain.append((key, '=', condition_dic[key]))
+            else:
+                domain.append((key, 'in', [condition_dic[key]]))
         sudo_model = request.env['product.product'].sudo(LinklovingAppApi.CURRENT_USER())
         product_s = sudo_model.search(domain)
         if product_s:
@@ -1692,6 +1756,7 @@ class LinklovingAppApi(http.Controller):
                     'product_id': product_s.id,
                     'product_name': product_s.display_name,
                     'image_medium': LinklovingAppApi.get_product_image_url(product_s, model='product.product'),
+                    'weight': product_s.weight,
                     'product_spec': product_s.product_specs,
                     'area': {
                         'area_id': product_s.area_id.id,
@@ -1782,19 +1847,23 @@ class LinklovingAppApi(http.Controller):
     # 创建盘点单
     @http.route('/linkloving_app_api/create_stock_inventory', type='json', auth='none', csrf=False)
     def create_stock_inventory(self, **kw):
+        print 'create_stock_inventory1'
         stock_inventory_lines = request.jsonrequest.get('line_ids')
         name = request.jsonrequest.get('name')
         new_lines = []
         try:
             for line in stock_inventory_lines:
+                print 'line11111111111111'
                 product_obj = LinklovingAppApi.get_model_by_id(line['product']['product_id'], request,
                                                                'product.product')
                 line['product_uom_id'] = product_obj.uom_id.id
+                product_obj.weight = line['product'].get('weight')
                 product_obj.area_id = line['product']['area']['area_id']
                 if line['product'].get('image_medium'):
-                    image_str = line['product'].get('image_medium')
-                    print 'image_str:%s' % image_str[0:16]
                     try:
+                        image_str = line['product'].get('image_medium')
+                        print 'image_str:%s' % image_str[0:16]
+
                         product_obj.product_tmpl_id.image_medium = image_str
                     except Exception, e:
                         print "exception catch %s" % image_str[0:16]
@@ -1804,7 +1873,7 @@ class LinklovingAppApi(http.Controller):
                     'product_id': product_obj.id,
                     'product_uom_id': product_obj.uom_id.id,
                     'location_id': location_id,
-                    'product_qty': line['product_qty']
+                    'product_qty': line['product_qty'],
                 }
                 new_lines.append((0, 0, new_line))
         except:
@@ -1841,6 +1910,7 @@ class LinklovingAppApi(http.Controller):
                     'id': line['product_id'][0],
                     'product_name': line['product_id'][1],
                     'product_spec': product_n.product_specs,
+                    'weight': product_n.weight,
                     'image_medium': LinklovingAppApi.get_product_image_url(
                         request.env['product.product'].sudo(LinklovingAppApi.CURRENT_USER()).browse(
                             line['product_id'][0])[0],
@@ -2058,6 +2128,7 @@ class LinklovingAppApi(http.Controller):
             'type': product_tmpl.type,
             'inner_code': product_tmpl.inner_code,
             'inner_spec': product_tmpl.inner_spec,
+            'weight': product_tmpl.weight,
             'area_id': {
                 'area_name': product_tmpl.area_id.name,
                 'area_id': product_tmpl.area_id.id
@@ -2074,6 +2145,7 @@ class LinklovingAppApi(http.Controller):
     def get_stock_picking_by_origin(self, **kw):
         order_name = request.jsonrequest.get("order_name")
         type = request.jsonrequest.get("type")
+
         if order_name:
             pickings = request.env["stock.picking"].sudo(LinklovingAppApi.CURRENT_USER()).search(
                 [('origin', 'like', order_name),
@@ -2270,12 +2342,12 @@ class LinklovingAppApi(http.Controller):
             pickings = request.env["stock.picking"].sudo(LinklovingAppApi.CURRENT_USER()).search(
                 [("state", "in", ["partially_available", "assigned", "confirmed"]),
                  ("picking_type_code", "=", "outgoing")])
-            pickings.action_assign()
+            pickings.force_assign()
             return JsonResponse.send_response(STATUS_CODE_OK, res_data={})
 
         picking = request.env["stock.picking"].sudo(LinklovingAppApi.CURRENT_USER()).search([("id", "=", picking_id)])
         try:
-            picking.action_assign()
+            picking.force_assign()
         except UserError:
             return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.stock_picking_to_json(picking))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=LinklovingAppApi.stock_picking_to_json(picking))
@@ -2305,7 +2377,7 @@ class LinklovingAppApi(http.Controller):
         picking_type_code = request.jsonrequest.get('picking_type_code')
         state = request.jsonrequest.get("state")
         domain = []
-        domain.append(('state', '=', state))
+        domain.append(('state', '=', state))  # picking
         if picking_type_code:
             domain.append(('picking_type_code', '=', picking_type_code))
 
@@ -2425,6 +2497,8 @@ class LinklovingAppApi(http.Controller):
                 wiz = request.env['stock.backorder.confirmation'].sudo(LinklovingAppApi.CURRENT_USER()).create(
                     {'pick_id': picking_id})
                 wiz.process()
+        elif state == 'picking_done':
+            picking_obj.action_picking_done()
         elif state == 'cancel_backorder':  # 取消欠单\
             wiz = request.env['stock.backorder.confirmation'].sudo(LinklovingAppApi.CURRENT_USER()).create(
                 {'pick_id': picking_id})
@@ -2494,6 +2568,7 @@ class LinklovingAppApi(http.Controller):
                     'default_code': pack.product_id.default_code,
                     'qty_available': pack.product_id.qty_available,
                     'product_specs': pack.product_id.product_specs or '',
+                    'weight': pack.product_id.weight or 0,
                     'area_id': {
                         'area_id': pack.product_id.area_id.id or None,
                         'area_name': pack.product_id.area_id.name or None,
@@ -2526,6 +2601,7 @@ class LinklovingAppApi(http.Controller):
                     'name': move.product_id.display_name,
                     'default_code': move.product_id.default_code,
                     'qty_available': move.product_id.qty_available,
+                    'weight': move.product_id.weight or 0,
                     'area_id': {
                         'area_id': move.product_id.area_id.id or None,
                         'area_name': move.product_id.area_id.name or None,
@@ -2754,6 +2830,7 @@ class LinklovingAppApi(http.Controller):
                         dom = safe_eval(menu.action.params_store or '{}', {'uid': uid}).get('domain')
                     res[xml_name]['needaction_enabled'] = model._needaction
                     res[xml_name]['needaction_counter'] = model._needaction_count(dom)
+        print(res)
         return res
 
 
@@ -2925,7 +3002,7 @@ class LinklovingAppApi(http.Controller):
     def get_picking_info_by_partner(self, partner_id):
         domain = [('partner_id', 'child_of', partner_id), ('picking_type_code', '=', 'outgoing'),
                   ("state", 'not in', ['cancel', 'done'])]
-        pickings = request.env["stock.picking"].sudo(LinklovingAppApi.CURRENT_USER()).search(domain)
+        pickings = request.env["stock.picking"].sudo().search(domain)
         # if type == 'able_to': #可处理
         print('length =%d' % len(pickings))
         return self.get_picking_info_by_picking(pickings)
@@ -2984,6 +3061,60 @@ class LinklovingAppApi(http.Controller):
 
     # 备料
     @http.route('/linkloving_app_api/new_prepare_material', type='json', auth='none', csrf=False)
+    def new_prepare_material1(self, **kw):
+        order_id = request.jsonrequest.get('order_id')  # get paramter
+        employee_id = request.jsonrequest.get("employee_id")
+        uid = request.context.get("uid")
+        stock_moves = [request.jsonrequest.get('stock_move')]  # get paramter
+        # _logger.warning(u"charlie_0712_log:finish_prepare_material, mo:%s,moves:%s", mrp_production.name, stock_moves)
+        # print(u"charlie_0712_log:finish_prepare_material, mo:%s,moves:%s" % (mrp_production.name, stock_moves))
+        stock_move_lines = request.env["sim.stock.move"].sudo()
+        try:
+            for move in stock_moves:
+                sim_stock_move = request.env["sim.stock.move"].sudo().browse(move['stock_move_lines_id'])
+                # LinklovingAppApi.get_model_by_id(,
+                #                                                   request,
+                #                                                   'sim.stock.move')
+                stock_move_lines += sim_stock_move
+                if not sim_stock_move.stock_moves:
+                    continue
+                else:
+                    move_todo = sim_stock_move.stock_moves.filtered(lambda x: x.state not in ["cancel", "done"])
+                    if not move_todo:
+                        split_move = sim_stock_move.stock_moves[0].copy(
+                                default={'quantity_done': move['quantity_ready'],
+                                         'product_uom_qty': move['quantity_ready'],
+                                         'production_id': sim_stock_move.production_id.id,
+                                         'raw_material_production_id': sim_stock_move.raw_material_production_id.id,
+                                         'procurement_id': sim_stock_move.procurement_id.id or False,
+                                         'is_over_picking': True})
+                        split_move.write({'state': 'assigned'})
+                        # sim_stock_move.production_id.move_raw_ids = sim_stock_move.production_id.move_raw_ids + split_move
+                        split_move.action_done()
+                        split_move.authorized_stock_move(employee_id, uid)
+                    elif len(move_todo) > 1:
+                        if move_todo[0].state == 'draft':
+                            move_todo[0].action_confirm()
+                        move_todo[0].quantity_done = move['quantity_ready']
+                        move_todo[0].action_done()
+                        move_todo[0].authorized_stock_move(employee_id, uid)
+                    else:
+                        if move_todo.state == 'draft':
+                            move_todo.action_confirm()
+                        move_todo.quantity_done = move['quantity_ready']
+                        move_todo.action_done()
+                        move_todo.authorized_stock_move(employee_id, uid)
+                sim_stock_move.quantity_ready = 0  # 清0
+                # sim_stock_move.quantity_done = sim_stock_move.quantity_done + move['quantity_ready']
+        except Exception, e:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={"error": e.name})
+        # _logger.warning(u"charlie_0712_log10:finish, mo:%s", LinklovingAppApi.model_convert_to_dict(order_id, request))
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
+
+    # 备料
+    @http.route('/linkloving_app_api/new_prepare_material1', type='json', auth='none', csrf=False)
     def new_prepare_material(self, **kw):
         order_id = request.jsonrequest.get('order_id')  # get paramter
         employee_id = request.jsonrequest.get("employee_id")
@@ -3221,3 +3352,33 @@ class LinklovingAppApi(http.Controller):
         json_list = [{"state": 'ok'}]
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    @http.route('/linkloving_app_api/get_secondary_mos', type='json', auth='none', csrf=False, cors='*')
+    def get_secondary_mos(self, **kw):
+        # order_id = request.jsonrequest.get('material_id')
+        domain = [("is_secondary_produce", '=', True)]
+        mos = request.env["mrp.production"].sudo().search(domain).filtered(lambda x: x.state not in ['cancel', 'done'])
+
+        data = []
+        for production in mos:
+            data.append(self.get_simple_production_json(production))
+        # user_data = LinklovingAppApi.odoo10.execute('res.users', 'read', [LinklovingAppApi.odoo10.env.user.id])
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    @http.route('/auto_mrp/partners', type='http', auth="public")
+    def partners(self, **kw):
+        partner_id = 3
+        if partner_id:
+            partner_sudo = request.env['res.partner'].sudo().browse(partner_id)
+            is_website_publisher = request.env['res.users'].has_group('website.group_website_publisher')
+            if partner_sudo.exists():
+                values = {
+                    'main_object': partner_sudo,
+                    'partner': partner_sudo,
+                    'edit_page': False
+                }
+        # return request.render("website_partner.partner_page", values)
+        print("12312312312")
+        return request.render("linkloving_app_api.listing", {
+            'objects': partner_sudo,
+        })

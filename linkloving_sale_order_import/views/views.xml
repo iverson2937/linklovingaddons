@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
 
@@ -8,13 +9,28 @@
             <field name="arch" type="xml">
                 <form string="Backups">
                     <header>
-                        <button name="import_tb_sale_order" string="测试按钮" type="object" class="btn-primary"/>
+                        <button name="start" string="测试按钮" type="object" class="btn-primary"/>
                     </header>
 
-                    <group>
-                        <field name="login_url"/>
-                        <field name="common_url"/>
-                    </group>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="retail_type" string="门店分类"/>
+                                <field name="username"/>
+                                <field name="password"/>
+
+                            </group>
+
+                            <group>
+                                <field name="partner_id" required="1" string="店名"/>
+                                <field name="login_url"/>
+                                <field name="common_url"/>
+                            </group>
+
+                        </group>
+
+
+                    </sheet>
 
 
                 </form>
@@ -27,7 +43,7 @@
             <field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree string="Backups">
-
+                    <field name="username"/>
                     <field name="login_url"/>
                     <field name="common_url"/>
 

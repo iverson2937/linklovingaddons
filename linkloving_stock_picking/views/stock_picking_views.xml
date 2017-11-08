@@ -19,6 +19,11 @@
                 </xpath>
 
 
+                <xpath expr="//button[@name='%(stock.act_stock_return_picking)d']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+
                 <xpath expr="//button[@name='do_new_transfer']" position="replace">
 
                     <button name="to_stock" string="出库" type="object" class="oe_highlight"
@@ -110,7 +115,7 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//tree" position="attributes">
-                    <attribute name="default_order">state desc,date</attribute>
+                    <attribute name="default_order">traces_sort_state,date desc</attribute>
                 </xpath>
 
                 <xpath expr="//field[@name='product_id']" position="after">
@@ -388,7 +393,7 @@
                 </xpath>
                 <xpath expr="//filter[@name='picking_type']" position="after">
                     <filter name="picking_state" string="Status"
-                            domain="[('state','in',('draft','waiting','confirmed','partially_available','assigned','qc_check','validate','waiting_in','done' ))]"
+                            domain="[('state','in',('draft','waiting','confirmed','partially_available','assigned','qc_check','validate','waiting_in', 'picking', 'done' ))]"
                             context="{'group_by':'state'}"/>
                 </xpath>
                 <xpath expr="//field[@name='partner_id']" position="after">

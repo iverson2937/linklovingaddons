@@ -113,11 +113,12 @@
                         </group>
                         <notebook>
                             <page string="设备">
-                                <field name="equipment_ids" context="{'default_production_line_id': active_id}"/>
+                                <field name="equipment_ids"
+                                       context="{'default_production_line_id': active_id}"/>
                             </page>
-                            <page string="人员">
-                                <field name="line_employee_ids" widget="many2many"/>
-                            </page>
+                            <!--<page string="人员">-->
+                                <!--<field name="line_employee_ids" widget="many2many"/>-->
+                            <!--</page>-->
                         </notebook>
                     </sheet>
                 </form>
@@ -174,6 +175,19 @@
         <!--action="test_pc_action"-->
         <!--parent="mrp.menu_mrp_manufacturing"-->
         <!--sequence="13"/>-->
+        <!-- Inherit Form View to Modify it -->
+        <record id="mrp_bom_from_view_inherit" model="ir.ui.view">
+            <field name="name">mrp.bom.form.inherit</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+            <field name="arch" type="xml">
 
+                <xpath expr="//field[@name='prepare_time']" position="after">
+                    <field name="produce_speed_factor"/>
+                    <field name="theory_factor"/>
+                </xpath>
+
+            </field>
+        </record>
     </data>
 </openerp>

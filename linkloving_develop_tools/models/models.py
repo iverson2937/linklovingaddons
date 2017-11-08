@@ -10,6 +10,7 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
+import time
 
 
 class ResPartnerExtend(models.Model):
@@ -216,6 +217,55 @@ class CreateOrderPointWizard(models.TransientModel):
             'company_id': 3,
         })
 
+    def login(self, driver, loginurl, username=None, password=None):
+        # open the login in page
+        driver.get(loginurl)
+        try:
+            driver.find_element_by_xpath('//*[@id="account-login"]').click()
+        except:
+            print u'京东登录界面出现改版,需要把用户登陆界面切换出来'
+        time.sleep(3)
+        # sign in the username
+
+        # 由于京东中使用frame来再次加载一个网页，所以，在选择元素的时候会出现选择不到的结果，所以，我们需要把视图窗口切换到frame中
+        driver.switch_to.frame(u'loginFrame')
+
+        def login_name():
+            try:
+                # driver.find_element_by_xpath('//*[@id="loginname"]').click()
+                time.sleep(3)
+                driver.find_element_by_xpath('//*[@id="loginname"]').clear()
+                # driver.find_element_by_xpath('//*[@id="TPL_username_1"]').send_keys(u'若态旗舰店')
+                driver.find_element_by_xpath('//*[@id="loginname"]').send_keys(username)
+                print 'user success!'
+            except:
+                print 'user error!'
+            time.sleep(3)
+
+        def login_password():
+            # sign in the pasword
+            try:
+                driver.find_element_by_xpath('//*[@id="nloginpwd"]').clear()
+                # driver.find_element_by_xpath('//*[@id="TPL_password_1"]').send_keys('szrtkjqjd@123!!')
+                driver.find_element_by_xpath('//*[@id="nloginpwd"]').send_keys(password)
+                print 'pw success!'
+            except:
+                print 'pw error!'
+            time.sleep(3)
+
+        def click_and_login():
+            # click to login
+            try:
+                driver.find_element_by_xpath('//*[@id="paipaiLoginSubmit"]').click()
+                print 'click success!'
+            except:
+                print 'click error!'
+            time.sleep(3)
+
+        login_name()
+        login_password()
+        click_and_login()
+
     def compute_sale_qty(self):
         this_month = datetime.datetime.now().month
         last1_month = this_month - 1
@@ -274,6 +324,13 @@ class CreateOrderPointWizard(models.TransientModel):
             }
         }
 
+    def update_product_categ_menu(self):
+        categ_ids = self.env['product.category'].search([])
+        for c in categ_ids:
+            if c.menu_id.action:
+                _logger.warning("update menu action list, %d/%d" % (c.id, c.menu_id.id))
+                c.menu_id.action.domain = '[["categ_id", "child_of", %d]]' % int(c.id)
+
     def mo_to_bz_process(self):
         return
         mos = self.env["mrp.production"].search([('process_id', '=', False)])
@@ -314,6 +371,60 @@ class CreateOrderPointWizard(models.TransientModel):
             return date_to_show, timez
         else:
             raise UserError("未找到对应的时区, 请点击 右上角 -> 个人资料 -> 时区 -> Asia/Shanghai")
+
+    # 设置已完成的mo的库存移动没有完成或者取消的问题
+    def set_done_mo_to_done(self):
+        MrpProduction = self.env["mrp.production"]
+        mos = MrpProduction.search([("state", "in", ("done", "cancel"))])
+        stock_moves_to_do = self.env["stock.move"]
+        for mo in mos:
+            raw_stock_moves = mo.move_raw_ids.filtered(lambda x: x.state not in ["done", "cancel"])
+            print raw_stock_moves
+            if mo.qc_feedback_ids.filtered(
+                    lambda x: x.state in ["alredy_post_inventory", "check_to_rework"]):
+                finish_stock_moves = mo.move_finished_ids.filtered(
+                    lambda x: x.state not in ["done", "cancel"])
+            if raw_stock_moves:
+                stock_moves_to_do += raw_stock_moves
+            if finish_stock_moves:
+                stock_moves_to_do += finish_stock_moves
+        stock_moves_to_do.write({
+            'state': 'cancel'
+        })
+        for stock in stock_moves_to_do:
+            print stock.id
+            print stock.production_id.name
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": str(len(stock_moves_to_do)) + u"完成",
+                "text": u"完成",
+                "sticky": False
+            }
+        }
+
+    def quantity_done_0(self):
+        StockPicking = self.env["stock.picking"]
+        pickings = StockPicking.search([("state", "=", "done"), ("picking_type_code", "=", "outgoing")])
+        for pick in pickings:
+            if pick.pack_operation_product_ids:
+                sum_qty_done = sum(pick.pack_operation_product_ids.mapped("qty_done"))
+                if sum_qty_done == 0:
+                    StockPicking += pick
+                    for pack in pick.pack_operation_product_ids:
+                        pack.qty_done = pack.product_qty
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": str(len(StockPicking)) + u"完成",
+                "text": u"完成",
+                "sticky": False
+            }
+        }
+
+
 
 
 def getMonthFirstDayAndLastDay(year=None, month=None, period=None):

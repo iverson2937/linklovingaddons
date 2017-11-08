@@ -177,7 +177,7 @@ msgstr "ID"
 #. module: linkloving_process
 #: model:ir.model.fields,field_description:linkloving_process.field_mrp_production_in_charge_id
 msgid "In charge id"
-msgstr "工序负责人"
+msgstr "负责人"
 
 #. module: linkloving_process
 #: model:ir.model.fields,field_description:linkloving_process.field_hr_employee_is_in_charge

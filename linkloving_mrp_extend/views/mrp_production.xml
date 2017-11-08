@@ -16,5 +16,29 @@
             </field>
         </record>
 
+        <record id="secondary_produce_wizard_form" model="ir.ui.view">
+            <field name="name">secondary.produce.wizard.form</field>
+            <field name="model">secondary.produce.wizard</field>
+            <field name="arch" type="xml">
+                <form string="选择重新回到生产中的单据">
+                    <sheet>
+                        <group>
+                            <field name="produce_line_ids">
+                                <tree>
+                                    <field name="product_id"/>
+                                    <field name="process_id"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                            <strong>以上制造单将重新回到生产中</strong>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_confirm" string="确认回到生产中" class="oe_highlight" type="object"/>
+                        <button string="取消" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
     </data>
 </odoo>

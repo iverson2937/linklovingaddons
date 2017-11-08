@@ -6,6 +6,9 @@ from .hr_expense_sheet import create_remark_comment
 
 
 class AccountEmployeePayment(models.Model):
+    '''
+    暂支model
+    '''
     _name = 'account.employee.payment'
     _inherit = ['mail.thread', 'ir.needaction_mixin']
     _order = 'create_date desc'
@@ -24,7 +27,7 @@ class AccountEmployeePayment(models.Model):
 
     @api.multi
     def refuse_payment(self, reason):
-        self.write({'state': 'cancel'})
+        self.write({'state': 'cancel', 'approve_ids': [(4, self.env.user.id)]})
         for sheet in self:
             body = (_(
                 "Your Expense %s has been refused.<br/><ul class=o_timeline_tracking_value_list><li>Reason<span> : </span><span class=o_timeline_tracking_value>%s</span></li></ul>") % (

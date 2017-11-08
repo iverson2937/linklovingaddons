@@ -30,7 +30,7 @@ class BatchApprovalWizard(models.TransientModel):
                 review_type='bom_review',
                 to_last_review=False,
                 partner_id=self.partner_id,
-                remark=self.remark)
+                remark=self.remark, material_requests_id=None, bom_id=record)
 
     @api.multi
     def action_pass(self):
@@ -44,4 +44,5 @@ class BatchApprovalWizard(models.TransientModel):
             #             lambda x: x.state == 'waiting_review').partner_id != self.env.user.partner_id):
             #     raise UserError(u'%s不属于你提交' % record.product_tmpl_id.name)
             record.action_released()
-            record.review_id.review_line_ids.filtered(lambda x: x.state == 'waiting_review').action_pass(self.remark)
+            record.review_id.review_line_ids.filtered(lambda x: x.state == 'waiting_review').action_pass(self.remark,
+                                                                                                         None, record)

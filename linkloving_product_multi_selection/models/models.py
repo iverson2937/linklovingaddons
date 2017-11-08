@@ -114,7 +114,7 @@ class linkloving_product_multi_selection(models.Model):
                 pur_lines.append(po_line.id)
         return pur_lines
 
-    product_ids = fields.Many2many('product.template', string='Products to make Order',                                 )
+    product_ids = fields.Many2many('product.template', string='Products to make Order', )
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user.id)
     sale_ok = fields.Boolean()
     purchase_ok = fields.Boolean()

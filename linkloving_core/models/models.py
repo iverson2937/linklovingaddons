@@ -119,6 +119,7 @@ class ProductTemplate(models.Model):
                     'date_planned': line.date_planned,
                     'state': PURCHASE_TYPE[line.order_id.state],
                     'status_light': line.order_id.status_light,
+                    'remark': line.order_id.remark if line.order_id.remark else ''
                 })
 
         mo_ids = self.env['mrp.production'].search(
@@ -138,6 +139,7 @@ class ProductTemplate(models.Model):
                     'date': mo.date_planned_start,
                     'status_light': mo.status_light,
                     'material_light': mo.material_light,
+                    'remark': mo.remark if mo.remark else ''
                     # 'origin': mo.origin if mo.origin else '',
                 })
 
@@ -196,6 +198,7 @@ class ProductTemplate(models.Model):
                     'require': line.product_id.outgoing_qty,
                 })
                 bom_lines.append(res)
+        bom_lines.sort(key=lambda k: (k.get('type', 0)))
         return {
             'name': self.name,
             'bom_lines': bom_lines,
@@ -232,7 +235,7 @@ class ProductTemplate(models.Model):
     def get_onproduct_mo(self, product_id):
         mo_ids = self.env['mrp.production'].search(
             [('product_tmpl_id', '=', product_id), ('state', 'not in', ['draft', 'cancel', 'done'])])
-        return sum(mo.product_qty for mo in mo_ids)
+        return sum(mo.on_produce_qty for mo in mo_ids)
 
     @api.multi
     def show_detail(self):

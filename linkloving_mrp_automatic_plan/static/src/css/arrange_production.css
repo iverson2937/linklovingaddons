@@ -1,3 +1,10 @@
+.order_by .active {
+    background: #4d4d88;
+}
+
+.order_by {
+    display: inline-block;
+}
 .a_p_item_operate_zone > .o_dropdown_kanban {
     display: inline-block;
 }
@@ -115,6 +122,7 @@
     display: inline-block;
 }
 .a_p_time_end{
+    width: 40%;
     display: inline-block;
 }
 
@@ -122,7 +130,6 @@
     left: 60px!important;
     top: 90px!important;
 }
-
 
 .production_lists_no_item{
     padding: 100px 0;

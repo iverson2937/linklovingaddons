@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+
+        <record id="product_product_delivery_cost" model="product.product">
+            <field name="name">运费-Buyer111</field>
+            <field name="type">service</field>
+            <field name="default_code">0005</field>
+            <!--<field name="categ_id" ref="hr_expense.cat_expense"/>-->
+            <field name="can_be_expensed" eval="True"/>
+        </record>
+        <record id="product_product_delivery_cost" model="product.product">
+            <field name="name">运费-Buyer111</field>
+            <field name="type">service</field>
+            <field name="default_code">0005</field>
+            <!--<field name="categ_id" ref="hr_expense.cat_expense"/>-->
+            <field name="can_be_expensed" eval="True"/>
+        </record>
+        <record id="product_product_discount" model="product.product">
+            <field name="name">折扣</field>
+            <field name="type">service</field>
+            <field name="default_code">11111111</field>
+            <!--<field name="categ_id" ref="hr_expense.cat_expense"/>-->
+            <field name="can_be_expensed" eval="True"/>
+        </record>
+        <record id="product_product_sales_promotion" model="product.product">
+            <field name="name">促销</field>
+            <field name="type">service</field>
+            <field name="default_code">888888</field>
+            <!--<field name="categ_id" ref="hr_expense.cat_expense"/>-->
+            <field name="can_be_expensed" eval="True"/>
+        </record>
+        <record id="product_product_coupon_price" model="product.product">
+            <field name="name">优惠卷</field>
+            <field name="type">service</field>
+            <field name="default_code">999999</field>
+            <!--<field name="categ_id" ref="hr_expense.cat_expense"/>-->
+            <field name="can_be_expensed" eval="True"/>
+        </record>
+
+        <record id="product_product_coupon_price" model="product.product">
+            <field name="name">优惠卷</field>
+            <field name="type">service</field>
+            <field name="default_code">999999</field>
+            <!--<field name="categ_id" ref="hr_expense.cat_expense"/>-->
+            <field name="can_be_expensed" eval="True"/>
+        </record>
+
+        <record id="seq_picking_type_retail" model="ir.sequence">
+            <field name="name">电商零售出货</field>
+            <field name="prefix">DS</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="picking_type_retail" model="stock.picking.type">
+            <field name="name">电商出货</field>
+            <field name="sequence_id" ref="seq_picking_type_retail"/>
+            <field name="default_location_src_id" ref="linkloving_eb.stock_location_eb_transfer"/>
+            <field name="default_location_dest_id" ref="stock.stock_location_customers"/>
+            <field name="warehouse_id" eval="False"/>
+            <field name="code">retail</field>
+        </record>
+
+        <record id="procurement_rule_retail_shipping" model="procurement.rule">
+            <field name="name">电商出库</field>
+            <field name="action">move</field>
+            <field name="location_id" ref="stock.stock_location_customers"/>
+            <field name="location_src_id" ref="linkloving_eb.stock_location_eb_transfer"/>
+            <field name="procure_method">make_to_stock</field>
+            <field name="picking_type_id" ref="picking_type_retail"/>
+        </record>
+
+
+    </data>
+</odoo>

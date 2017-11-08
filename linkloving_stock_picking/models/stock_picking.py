@@ -372,6 +372,26 @@ class StockMovePicking(models.Model):
 
     quantity_adjusted_qty = fields.Float(string=u'调整后数量')
 
+    # traces_sort = fields.Integer(string=u'追溯界面排序')
+
+    traces_sort_state = fields.Integer(string=u'追溯界面排序', compute='_compute_traces_sort', store=True)
+
+    @api.depends('state')
+    def _compute_traces_sort(self):
+        for record in self:
+            if record.state == 'done':
+                record.traces_sort_state = 1
+            elif record.state == 'assigned':
+                record.traces_sort_state = 2
+            elif record.state == 'confirmed':
+                record.traces_sort_state = 3
+            elif record.state == 'waiting':
+                record.traces_sort_state = 4
+            elif record.state == 'draft':
+                record.traces_sort_state = 5
+            elif record.state == 'cancel':
+                record.traces_sort_state = 10
+
     @api.one
     @api.depends('company_id')
     def _compute_qty(self):
@@ -398,8 +418,7 @@ class StockMovePicking(models.Model):
         res = super(StockMovePicking, self).create(vals)
         if res.quantity_adjusted_qty == 0:
             move_one = self.env['product.product'].browse(vals.get('product_id'))
-            res.write({'quantity_adjusted_qty': move_one.qty_available - vals.get('product_uom_qty'),
-                       'move_order_type': 'hand_movement_out'})
+            res.write({'quantity_adjusted_qty': move_one.qty_available})
         return res
 
     @api.multi

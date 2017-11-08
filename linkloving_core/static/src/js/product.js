@@ -25,7 +25,62 @@ odoo.define('linkloving_core.product_detail', function (require) {
             'click .click_po_detail_a':'show_po_detail_line',
             'click .click_po_detail_a_add':'show_po_detail_line_add',
             'click .click_mo_detail_a':'show_mo_detail_line',
-            'click .po_mo_target':'to_po_or_mo_page'
+            'click .po_mo_target':'to_po_or_mo_page',
+            'click .part_refresh':'refresh_part_func'
+        },
+        refresh_part_func:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            target = $(target).parents('.show_bom_line_one').prevAll('.click_tag_a');
+            if(target.attr('data-product-id')){
+                 var product_id = target.attr('data-product-id');
+                 var transform_service="";
+                    product_id = parseInt(product_id);
+                    // console.log(product_id);
+                    new Model("product.template")
+                        .call("get_detail", [product_id])
+                        .then(function (result) {
+                            console.log(result);
+                            var po_length = result.po_lines.length;
+                            var bom_length = result.bom_lines.length;
+                            var mo_length = result.mo_ids.length;
+                            self.$("#"+product_id+">.panel-body").html(" ");
+                             if(result.po_lines.length>0){
+                                for(var i=0;i<result.po_lines.length;i++){
+                                    result.po_lines[i].date_planned = result.po_lines[i].date_planned.substr(0,10);
+                                }
+                            }
+                            if(result.mo_ids.length>0){
+                                for(var i=0;i<result.mo_ids.length;i++){
+                                    result.mo_ids[i].date = result.mo_ids[i].date.substr(0,10);
+                                }
+                            }
+                            var service={
+                                'ordering':'订单制',
+                                'stock':'备货制'
+                            }
+                            if(result.service=='ordering'){
+                                result.service='订单制'
+                            }else if(result.service=='stock'){
+                                result.service='备货制'
+                            }
+                            if(result.type == '半成品'){
+                                result.service='备货制';
+                            }
+                            for(var i=0;i<result.bom_lines.length;i++){
+                                if(result.bom_lines[i].type=='半成品'){
+                                    result.bom_lines[i].service='备货制';
+                                }
+                                if(result.bom_lines[i].service=='ordering'){
+                                    result.service='订单制'
+                                }else if(result.service=='stock'){
+                                    result.bom_lines[i].service='备货制'
+                                }
+                            }
+
+                            self.$("#"+product_id+">.panel-body").append(QWeb.render('show_bom_line_tr_add', {bom_lines: result.bom_lines,result:result,po_length:po_length,bom_length:bom_length,mo_length: mo_length,service:service}));
+                        });
+            }
         },
         to_po_or_mo_page:function (e) {
             var e = e || window.event;
@@ -125,8 +180,8 @@ odoo.define('linkloving_core.product_detail', function (require) {
                     for(var i=0;i<result.length;i++){
                         result[i].date = result[i].date.substr(0,10);
                     }
-                    self.$("#po_detail"+po_id+">.panel-body").html(" ")
-                    self.$("#po_detail"+po_id+">.panel-body").append(QWeb.render('show_po_detail_add', {result:result}));
+                    // self.$("#po_detail"+po_id+">.panel-body").html(" ")
+                    // self.$("#po_detail"+po_id+">.panel-body").append(QWeb.render('show_po_detail_add', {result:result}));
                 })
         },
         show_po_detail_line_add:function (e) {

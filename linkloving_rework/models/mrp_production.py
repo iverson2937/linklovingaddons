@@ -24,11 +24,12 @@ class MrpProduction(models.Model):
             if not self.rework_material_line_ids:
                 raise UserError(u'请添加重工物料')
             for line_id in self.rework_material_line_ids:
+                print line_id.product_qty, 'line_id.product_qty'
                 data = {
                     'name': self.name,
                     'date': self.date_planned_start,
                     'product_id': line_id.product_id.id,
-                    'product_uom_qty': line_id.product_qty * self.product_qty,
+                    'product_uom_qty': line_id.product_qty,
                     'product_uom': line_id.product_id.uom_id.id,
                     'location_id': source_location.id,
                     'location_dest_id': line_id.product_id.property_stock_production.id,
@@ -40,7 +41,7 @@ class MrpProduction(models.Model):
                     'warehouse_id': source_location.get_warehouse().id,
                     'group_id': self.procurement_group_id.id,
                     'propagate': self.propagate,
-                    'suggest_qty': line_id.product_qty * self.product_qty,
+                    'suggest_qty': line_id.product_qty,
                 }
                 moves.create(data)
 

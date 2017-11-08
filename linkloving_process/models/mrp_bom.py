@@ -3,6 +3,7 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 import odoo.addons.decimal_precision as dp
+from odoo.exceptions import UserError, ValidationError
 
 
 class MrpBom(models.Model):
@@ -16,8 +17,8 @@ class MrpBom(models.Model):
     ], default='unit')
     cycle_time = fields.Integer(string=u'Cycle Time')
     cycle_time_time_unit = fields.Many2one('product.uom')
-    produced_spend_per_pcs = fields.Integer(string=u'生产速度 (1个/秒)', default=0)
-    prepare_time = fields.Integer(string=u"准备时间(秒)", default=0, )
+    produced_spend_per_pcs = fields.Integer(string=u'生产速度 (秒/个)', default=0, required=True)
+    prepare_time = fields.Integer(string=u"准备时间(秒)", default=0, required=True)
 
     @api.depends('cost', 'hour_price')
     def _get_product_cost(self):
@@ -27,7 +28,14 @@ class MrpBom(models.Model):
     cost = fields.Monetary(string=u'Cost', compute=_get_product_cost, currency_field='currency_id')
     currency_id = fields.Many2one('res.currency', string='Currency', required=True,
                                   default=lambda self: self.env.user.company_id.currency_id)
-    hour_price = fields.Float(string=u'时薪')
+    hour_price = fields.Float(string=u'时薪', default=30)
+
+    @api.constrains('produced_spend_per_pcs', 'prepare_time')
+    def _check_cycle_spend_prepare(self):
+        if self.produced_spend_per_pcs <= 0:
+            raise ValidationError(u"生产速度 无效")
+        elif self.prepare_time <= 0:
+            raise ValidationError(u"准备时间 无效")
 
     @api.onchange('process_id')
     def on_change_price(self):

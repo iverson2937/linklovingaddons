@@ -26,3 +26,7 @@ table.treetable span.indenter a {
     text-decoration: none;
     width: 19px;
 }
+
+/*table.treetable tbody tr{*/
+/*display:  !important;*/
+/*}*/

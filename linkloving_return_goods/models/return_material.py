@@ -328,6 +328,7 @@ class ReturnMaterial(models.Model):
                 'product_uom_qty': line.product_uom_qty,
                 'product_uom': line.product_id.uom_id.id,
                 'rma_line_id': line.id,
+                'origin': origin,
                 'move_order_type': order_type,
                 'quantity_adjusted_qty': line.product_id.qty_available + line.product_uom_qty if order_type == 'sell_return' else line.product_id.qty_available - line.product_uom_qty,
                 'picking_id': picking_id.id,
