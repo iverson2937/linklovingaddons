@@ -219,6 +219,8 @@ class ProductTemplate(models.Model):
             'purchase_ok': self.purchase_ok,
             'stock': self.qty_available,
             'require': self.outgoing_qty,
+            'prepare_material_state': self.prepare_material_state,
+            'material_state': self.material_state,
             'state_bom': state_bom
         }
 

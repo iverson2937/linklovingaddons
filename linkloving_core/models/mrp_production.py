@@ -32,12 +32,3 @@ class MrpProduction(models.Model):
         return True
 
 
-class StockPicking(models.Model):
-    _inherit = 'stock.picking'
-
-    @api.multi
-    def write(self, vals):
-        print 'dddddddddd'
-        if vals.get('note'):
-            print vals.get('note')
-        return super(StockPicking, self).write(vals)
