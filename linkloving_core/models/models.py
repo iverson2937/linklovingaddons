@@ -142,9 +142,8 @@ class ProductTemplate(models.Model):
                     'planned_start_backup': mo.planned_start_backup if mo.planned_start_backup else '',
                     'in_charge_id': mo.in_charge_id.name,
                     'state': MO_STATE[mo.state],
-                    'date': mo.date_planned_start,
-                    'status_light': mo.status_light,
-                    'material_light': mo.material_light,
+                    # 'status_light': mo.status_light,
+                    # 'material_light': mo.material_light,
                     'remark': mo.remark if mo.remark else ''
                     # 'origin': mo.origin if mo.origin else '',
                 })
