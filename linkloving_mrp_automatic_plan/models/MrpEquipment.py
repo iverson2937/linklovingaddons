@@ -19,6 +19,31 @@ class PlanMoWizard(models.TransientModel):
     _name = 'plan.mo.wizard'
 
     production_id = fields.Many2one(comodel_name="mrp.production", string=u"生产单", required=False, )
+    process_id = fields.Many2one(comodel_name="mrp.process", string=u"工序", required=False, )
+    production_line_id = fields.Many2one(comodel_name="mrp.production.line", string=u'产线', required=True)
+    in_charge_id = fields.Many2one(comodel_name="res.partner", string=u'工序负责人')
+    supplier_id = fields.Many2one(comodel_name="res.partner", string=u'外协加工商')
+    product_qty = fields.Float(string=u"生产数量")
+
+    @api.model
+    def create(self, vals):
+        mo = self.env["mrp.production"].browse(self._context.get("production_id"))
+        mo_vals = vals.copy()
+        mo_vals.update({
+            'state': 'waiting_material'
+        })
+        if mo.state in ["draft", "confirmed"]:
+            mo.write(mo_vals)
+            mo.replanned_mo(self.env["mrp.production.line"], mo.production_line_id)
+
+        else:
+            raise UserError(u"该状态无法排产")
+
+        return super(PlanMoWizard, self).create(vals)
+
+    def print_report(self):
+        return True
+
 class Inheritforarrangeproduction(models.Model):
     _inherit = 'mrp.process'
 
@@ -241,13 +266,19 @@ class MrpBomExtend(models.Model):
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 
+    # @api.multi
+    # def write(self, vals):
+    #     for mo in self:
+    #         if vals.get("")
     def get_formview(self):
-        view_id = self.env.ref('linkloving_mrp_automatic_plan.mrp_production_paichan_form_view').id
+        view_id = self.env.ref('linkloving_mrp_automatic_plan.form_plan_mo_wizard').id
         return {
             'title': u'打开',
-            'res_model': 'mrp.production',
+            'res_model': 'plan.mo.wizard',
             'view_id': view_id,
-            'res_id': self.id,
+            'disable_multiple_selection': True,
+            'readonly': True,
+            # 'res_id': self.id,
         }
     def show_paichan_form_view(self):
         print(123123123123)
