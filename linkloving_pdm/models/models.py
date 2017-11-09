@@ -935,17 +935,23 @@ class ReviewProcessWizard(models.TransientModel):
         picking_state = self._context.get('picking_state', False)
 
         if review_type == 'bom_review':
-            if not self.need_sop:
-                raise UserError(u'请选择是否需要SOP文件')
+
             if not self.bom_id.review_id:  # 如果没审核过
                 self.bom_id.action_send_to_review()
-            self.bom_id.need_sop = self.need_sop
-            self.bom_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
-            self.bom_id.review_id.process_line_review_now.submit_to_next_reviewer(
-                review_type=review_type,
-                to_last_review=to_last_review,
-                partner_id=self.partner_id,
-                remark=self.remark, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
+
+            if self.bom_id.review_id.who_review_now.id == self.env.user.partner_id.id:
+
+                if not self.need_sop:
+                    raise UserError(u'请选择是否需要SOP文件')
+                if not self.bom_id.review_id:  # 如果没审核过
+                    self.bom_id.action_send_to_review()
+                self.bom_id.need_sop = self.need_sop
+                self.bom_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
+                self.bom_id.review_id.process_line_review_now.submit_to_next_reviewer(
+                    review_type=review_type,
+                    to_last_review=to_last_review,
+                    partner_id=self.partner_id,
+                    remark=self.remark, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
 
             return True
         elif review_type == 'file_review':
@@ -997,20 +1003,22 @@ class ReviewProcessWizard(models.TransientModel):
             if not self.material_requests_id.review_id:  # 如果没审核过
                 self.material_requests_id.action_send_to_review()
 
-            self.material_requests_id.picking_state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
+            if self.material_requests_id.review_id.who_review_now.id == self.env.user.partner_id.id:
 
-            self.material_requests_id.write({'review_i_approvaled_val': [(4, self.env.uid)]})
+                self.material_requests_id.picking_state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
 
-            if review_type_two == 'pick_type':
-                review_type_two = 'picking_review_line'
-            elif review_type_two == 'proofing':
-                review_type_two = 'picking_review_project'
+                self.material_requests_id.write({'review_i_approvaled_val': [(4, self.env.uid)]})
 
-            self.material_requests_id.review_id.process_line_review_now.submit_to_next_reviewer(
-                review_type=review_type_two,
-                to_last_review=to_last_review,
-                partner_id=self.partner_id,
-                remark=self.remark, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
+                if review_type_two == 'pick_type':
+                    review_type_two = 'picking_review_line'
+                elif review_type_two == 'proofing':
+                    review_type_two = 'picking_review_project'
+
+                self.material_requests_id.review_id.process_line_review_now.submit_to_next_reviewer(
+                    review_type=review_type_two,
+                    to_last_review=to_last_review,
+                    partner_id=self.partner_id,
+                    remark=self.remark, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
 
         return True
 
