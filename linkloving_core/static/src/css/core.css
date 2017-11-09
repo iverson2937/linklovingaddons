@@ -161,5 +161,12 @@
     width: 12px;
     height: 12px;
     color: white;
-
+}
+.panel-title .rem{
+    width: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
 }
