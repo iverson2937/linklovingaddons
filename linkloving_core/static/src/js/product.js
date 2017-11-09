@@ -373,7 +373,9 @@ odoo.define('linkloving_core.product_detail', function (require) {
                         //时间截取
                         if (result.mo_ids.length > 0) {
                             for (var i = 0; i < result.mo_ids.length; i++) {
-                                result.mo_ids[i].date = result.mo_ids[i].date.substr(0, 10);
+                                result.mo_ids[i].date_planned_finished = result.mo_ids[i].date_planned_finished.substr(0, 10);
+                                result.mo_ids[i].date_planned_start = result.mo_ids[i].date_planned_start.substr(0, 10);
+                                result.mo_ids[i].planned_start_backup = result.mo_ids[i].planned_start_backup.substr(0, 10);
                             }
                         }
                         if (result.po_lines.length > 0) {
@@ -640,7 +642,9 @@ odoo.define('linkloving_core.product_detail', function (require) {
                         //时间截取
                         if (result.mo_ids.length > 0) {
                             for (var i = 0; i < result.mo_ids.length; i++) {
-                                result.mo_ids[i].date = result.mo_ids[i].date.substr(0, 10);
+                                result.mo_ids[i].date_planned_finished = result.mo_ids[i].date_planned_finished.substr(0, 10);
+                                result.mo_ids[i].date_planned_start = result.mo_ids[i].date_planned_start.substr(0, 10);
+                                result.mo_ids[i].planned_start_backup = result.mo_ids[i].planned_start_backup.substr(0, 10);
                             }
                         }
                         if (result.po_lines.length > 0) {
