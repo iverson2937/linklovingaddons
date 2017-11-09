@@ -1,6 +1,12 @@
 <openerp>
     <data>
-
+        <record id="action_form_plan_mo_wizard" model="ir.actions.act_window">
+            <field name="name">排产</field>
+            <field name="res_model">plan.mo.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
         <!-- Inherit Form View to Modify it -->
         <record id="mrp_process_form_inherit" model="ir.ui.view">
             <field name="name">mrp.process.form.inherit</field>
@@ -415,12 +421,6 @@
 
             </field>
         </record>
-        <record id="action_form_plan_mo_wizard" model="ir.actions.act_window">
-            <field name="name">排产</field>
-            <field name="res_model">plan.mo.wizard</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">form</field>
-            <field name="target">new</field>
-        </record>
+
     </data>
 </openerp>
