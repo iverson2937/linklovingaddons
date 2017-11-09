@@ -152,6 +152,9 @@
                 <xpath expr="//field[@name='categ_id']" position="attributes">
                     <attribute name="options">{'no_create':True}</attribute>
                 </xpath>
+                <!--<xpath expr="//button[@name='%(stock.action_view_change_product_quantity)d']" position="attributes">-->
+                <!--<attribute name="groups">linkloving_warehouse.group_stock_control_manager</attribute>-->
+                <!--</xpath>-->
 
 
             </field>
