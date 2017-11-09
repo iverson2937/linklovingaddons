@@ -277,7 +277,7 @@
 
 
                 <xpath expr="//field[@name='order_id']" position="before">
-                    <filter string="未发货完成" domain="[('shipping_status','!=', 'done')]"/>
+                    <filter string="未发货完成" domain="[('shipping_status','!=', 'done'),('state','=', 'sale')]"/>
                 </xpath>
             </field>
         </record>
