@@ -84,6 +84,7 @@
                                                         <span style="margin-left:15px" data-toggle="tooltip" title="预计开始"><t t-esc="item.date_planned_start"/> </span>
                                                         <span style="margin-left:15px" data-toggle="tooltip" title="预计结束"><t t-esc="item.date_planned_finished"/> </span>
                                                         <span style="margin-left:15px" data-toggle="tooltip" title="截止时间"><t t-esc="item.planned_start_backup"/> </span>
+                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
                                                         <!--<t t-if="item.status_light == 3">-->
                                                         <!--<span style="margin-left:15px;color:red;" class="fa fa-circle" data-toggle="tooltip" data-placement="top" title="状态灯"></span>-->
                                                         <!--</t>-->
@@ -108,7 +109,7 @@
                                                         <span class="pre" t-att-style='"background:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
                                                         <span class="rem" style="margin-left:15px;" data-toggle="tooltip" t-att-title="item.remark"><t t-esc="item.remark"/> </span>
-                                                        <span class="trace_back">追溯</span>
+                                                        <!--<span class="trace_back">追溯</span>-->
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'mo_detail'+item.uuid">
@@ -228,7 +229,7 @@
                                                         <span class="pre" t-att-style='"background:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
                                                         <span class="rem" style="margin-left:15px;" data-toggle="tooltip" t-att-title="item.remark"><t t-esc="item.remark"/> </span>
-                                                        <span class="trace_back">追溯</span>
+                                                        <!--<span class="trace_back">追溯</span>-->
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'po_detail'+item.line_id">
@@ -321,7 +322,7 @@
                                                         <span class="pre" t-att-style='"background:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
                                                         <span class="rem" style="margin-left:15px;" data-toggle="tooltip" t-att-title="item.remark"><t t-esc="item.remark"/> </span>
-                                                        <span class="trace_back">追溯</span>
+                                                        <!--<span class="trace_back">追溯</span>-->
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'mo_detail'+item.uuid">
@@ -443,7 +444,7 @@
                                                         <span class="pre" t-att-style='"background:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
                                                         <span class="rem" style="margin-left:15px;" data-toggle="tooltip" t-att-title="item.remark"><t t-esc="item.remark"/> </span>
-                                                        <span class="trace_back">追溯</span>
+                                                        <!--<span class="trace_back">追溯</span>-->
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'po_detail'+item.line_id">
@@ -504,7 +505,7 @@
                         <span class="mat" t-att-style='"background:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
                         <span class="pre" t-att-style='"background:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
-                        <span class="trace_back">追溯</span>
+                        <!--<span class="trace_back">追溯</span>-->
                     </h4>
                 </div>
                 <div class="panel-collapse collapse" t-att-id="'mo_source'+item.id">
