@@ -27,13 +27,29 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
         template: 'arrange_production_tmp',
         events:{
             'click .a_p_showorhide': 'production_lists_wrap_toggle',
+            'mouseenter .a_p_move_point':'change_drag_true',
+            'mouseleave .a_p_move_point':'change_drag_false',
+            'dragover #a_p_left':'prevent_default',
+            'drop #a_p_left':'move_over_left',
+            'dragover #a_p_right':'prevent_default',
+            'drop #a_p_right':'move_over_right',
+            'dragstart .ap_item_wrap': 'move_start',
             'click .to_bom': 'to_bom_func',
             'click .to_relevant_struc': 'to_relevant_struc_func',
             'click .a_p_mo_name':'to_mo_func',
+            'click .a_p_create_alia': 'show_create_alia',
+            'click .alia_cancel': 'close_create_alia',
+            'click .alia_confirm': 'confirm_alia_fun',
+            'click .may_choose_a_time':'change_late_time',
+            'click .unarrangeed_refresh':'refresh_right',
+            'click .a_p_bars': 'show_bars_buttons',
+            'click .show_edit_wrap': 'show_edit_ui',
+            'click .edit_prodiction_confirm': 'confirm_edit_operation',
+            'click .to_schedule_report_btn': 'to_schedule_report',
+            'click .product_report_btn': 'product_report',
             'click .so_report_btn': 'so_report',
             'click .order_by_material': 'order_by_material_1',
             'click .order_by_default': 'order_by_material_1',
-            'click .un_a_p_showorhide':'un_a_p_showorhide_toggle',   //未排产的
         },
         order_by_material_1: function (e) {
             var e = e || window.event;
@@ -52,27 +68,143 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             myself.arrangeed_searched();
 
         },
+        product_report: function (e) {
+            var action = {
+                type: 'ir.actions.act_window',
+                res_model: 'select.report.wizard',
+                view_mode: 'form',
+                view_id: 'select_report_wizard_form',
+                views: [[false, 'form']],
+                target: "new"
+            };
+            this.do_action(action);
+            //    {
+            //    'name': u'填写物流单号',
+            //    'type': 'ir.actions.act_window',
+            //    'view_mode': 'form',
+            //    'res_model': 'tracking.number.wizard',
+            //    'target': 'new',
+            //}
 
+        },
+        so_report: function (e) {
 
-        to_mo_func:function (e) {
+        },
+        to_schedule_report: function () {
+            var action = {
+                type: 'ir.actions.client',
+                name: 'Report',
+                tag: 'schedule_production_report',
+                process_id: myself.process_id,
+            };
+            this.do_action(action);
+        },
+        confirm_edit_operation:function () {
+            var myself = this;
+            var ele = $('.arrange_production_container').find(".ap_item_wrap[data-mo-id="+ myself.alia_mo +"]");
+            if($(ele).parents('#a_p_left').length>=1){
+                var edit_show_more = true
+            } else {
+                var edit_show_more = false
+            }
+            var edit_qty = $(".product_qty").val();
+            new Model("mrp.production")
+                .call("change_prod_qty", [parseInt(this.alia_mo)], {'product_qty': edit_qty})
+                    .then(function (result) {
+                        console.log(result)
+                        var replace_item = QWeb.render('a_p_render_right_tmpl', {result: result,
+                            show_more:edit_show_more,
+                            selection:myself.states.state.selection,
+                            new_selection: myself.states.product_order_type.selection,
+                            material_selection: myself.states.availability.selection
+                        })
+                        $(ele).replaceWith(replace_item);
+                        $(".item_edit_container").hide();
+                    });
+        },
+        show_edit_ui: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            $(".item_edit_container").show();
+            $('.a_p_bars_buttons_wrap').hide();
+            this.alia_mo = $(target).parents('.ap_item_wrap').attr('data-mo-id');
+            $(".product_qty").val('');
+        },
+        show_bars_buttons:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            this.alia_mo = $(target).parents('.ap_item_wrap').attr('data-mo-id');
+            $(target).parents('.ap_item_wrap').find('.a_p_bars_buttons_wrap').toggle();
+        },
+        refresh_right:function () {
+            this.un_arrange_production(this.process_id,10,1,this);
+        },
+        change_late_time:function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var self = this;
-            new Model("mrp.production").call("show_paichan_form_view", [parseInt($(target).parents('.ap_item_wrap').attr("data-mo-id"))]).then(function (res) {
-                var action = {
+            var reg = /^[\u4E00-\u9FA5]+$/;  //正则检测中文
+            var select_time_wrap = $(target).parents('.a_p_latest_time');
+            self.current_time = $(target).html()
+
+            if(!reg.test(self.current_time)){
+                self.current_time = self.current_time.replace(/\s/g,'T').replace(/\//g,'-');
+                var my_date = Date.parse(new Date(self.current_time));
+                var newDate = new Date();
+                var time_offset = newDate.getTimezoneOffset() * 60000;
+                var c_date = new Date(my_date + time_offset);
+                self.current_time = moment(c_date).format('YYYY-MM-DD HH:mm:ss');
+            }else {
+                self.current_time = '';
+            }
+
+
+            $(target).remove();
+            self.init_date_widget($(select_time_wrap));
+        },
+        confirm_alia_fun:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var self = this;
+            if($('.alia_input').val().length>16){
+                Dialog.alert(target, "字符数不能超过16个");
+                return;
+            }
+            new Model("mrp.production")
+                    .call("write", [[parseInt(this.alia_mo)], {'alia_name':  $('.alia_input').val()}])
+                    .then(function (result) {
+                        console.log(result);
+                        $('.create_alia_container').hide();
+                        var alia_val = $('.alia_input').val().replace(/\s+/g, "");
+                        if(alia_val != ''){
+                            $(self.a_p_create_alia).html($('.alia_input').val());
+                        }
+                    })
+        },
+        close_create_alia:function () {
+            $('.close_this_container').hide();
+        },
+        show_create_alia:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            $('.alia_input').val('');
+            $('.create_alia_container').show();
+            this.alia_mo = $(target).parents('.ap_item_wrap').attr('data-mo-id');
+            this.a_p_create_alia = $(target);
+        },
+        to_mo_func:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var action = {
                 type: 'ir.actions.act_window',
                 res_model:'mrp.production',
-                    view_mode: 'form',
-                    views: [[res, 'form']],
                 view_type: 'form',
-                    view_id: res,
+                view_mode: 'tree,form',
+                views: [[false, 'form']],
                 res_id: parseInt($(target).parents('.ap_item_wrap').attr("data-mo-id")),
                 target:"new"
-                };
-                console.log("332")
-                self.do_action(action);
-            })
-
+            };
+            this.do_action(action);
         },
         to_relevant_struc_func:function (e) {
              var e = e || window.event;
@@ -98,22 +230,6 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             };
             this.do_action(action);
         },
-        //未排产的toggle
-        un_a_p_showorhide_toggle:function (e) {
-            var e = e || window.event;
-            var target = e.target || e.srcElement;
-            $(target).parents('.production_line').next('.production_lists_wrap').slideToggle("fast");
-            var self = this;
-            // self.un_arrange_production(myself.process_id,10,1,myself);
-            if($(target).hasClass('fa-chevron-down')){
-                $(target).removeClass('fa-chevron-down');
-                $(target).addClass('fa-chevron-up');
-            }else {
-                $(target).removeClass('fa-chevron-up');
-                $(target).addClass('fa-chevron-down');
-            }
-        },
-        //已经排产的产线的toggle
         production_lists_wrap_toggle:function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
@@ -176,7 +292,166 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 }
             }
         },
+        move_start:function (ev) {
+            var ev = ev || window.event;
+            var target = ev.target || ev.srcElement;
+            move_id = target.id;
+        },
+        //移到左边
+        move_over_left:function (ev) {
+            ev.preventDefault();
+            var elem = document.getElementById(move_id); //当前拖动的元素
+            var toElem = ev.target;  //松开鼠标释放节点时光标所在元素
+            //判断是否拖动后还在一个产线  若是 则不做操作
+            if($(elem).parents('.production_lists_wrap').length>=1){
+                var elem_line_index = $(elem).parents('.production_lists_wrap').prev('.production_line').attr('data-index');  //若拖动的节点在左边  取到他所在产线的序号
+                if($(toElem).hasClass('production_lists_wrap')){
+                    if($(toElem).prev('.production_line').attr('data-index') == elem_line_index){
+                        return
+                    }
+                }else if ($(toElem).parents('.production_lists_wrap').prev('.production_line').attr('data-index') == elem_line_index){
+                    return
+                }
+            }
 
+            if(toElem.className == 'ap_item_wrap'){
+                // $(elem).insertBefore($(toElem));
+                var mo_id = $(elem).attr("data-mo-id");
+                var pt_line_index = $(toElem).parents('.production_lists_wrap').prev('.production_line').attr('data-index');
+                myself.no_ap_to_ag(parseInt(mo_id), myself.mydataset.product_line[pt_line_index].id,toElem,elem, function () {
+                    $(elem).insertBefore($(toElem));
+                });
+            }else if($(toElem).parents('.ap_item_wrap').length>=1){
+                // $(elem).insertBefore($(toElem).parents('.ap_item_wrap'));
+                var mo_id = $(elem).attr("data-mo-id");
+                var pt_line_index = $(toElem).parents('.production_lists_wrap').prev('.production_line').attr('data-index');
+                myself.no_ap_to_ag(parseInt(mo_id), myself.mydataset.product_line[pt_line_index].id,toElem,elem, function () {
+                    $(elem).insertBefore($(toElem).parents('.ap_item_wrap'));
+                });
+            }
+            else if($(toElem).hasClass('production_lists_wrap')){
+                // $(toElem).prepend($(elem));
+                var mo_id = $(elem).attr("data-mo-id");
+                var pt_line_index = $(toElem).prev('.production_line').attr('data-index');
+                if($(toElem).hasClass('production_lists_no_item')){
+                    $(toElem).removeClass('production_lists_no_item')
+                }
+                myself.no_ap_to_ag(parseInt(mo_id), myself.mydataset.product_line[pt_line_index].id,toElem,elem, function () {
+                    $(toElem).prepend($(elem));
+                });
+            }
+        },
+        //移到右边
+        move_over_right:function (ev) {
+            ev.preventDefault();
+            var elem = document.getElementById(move_id); //当前拖动的元素
+            var toElem = ev.target;
+            if($(elem).parents('#a_p_right').length>=1){
+                return;
+            }
+            if(toElem.className == 'ap_item_wrap'){
+                var mo_id = $(elem).attr("data-mo-id");
+                myself.no_ap_to_ag(parseInt(mo_id),false,toElem,elem, function () {
+                    $(elem).insertBefore($(toElem));
+                });
+            }else if($(toElem).parents('.ap_item_wrap').length>=1){
+                var mo_id = $(elem).attr("data-mo-id");
+                myself.no_ap_to_ag(parseInt(mo_id),false,toElem,elem, function () {
+                    $(elem).insertBefore($(toElem).parents('.ap_item_wrap'));
+                });
+            }else if($(toElem).attr('id') == 'a_p_right'){
+                var mo_id = $(elem).attr("data-mo-id");
+                myself.no_ap_to_ag(parseInt(mo_id),false,toElem,elem, function () {
+                    $(elem).insertAfter($('.a_p_right_head'));
+                });
+            }
+        },
+        change_drag_true:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            $(target).parents('.ap_item_wrap').attr('draggable','true');
+        },
+        change_drag_false:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            $(target).parents('.ap_item_wrap').attr('draggable','false');
+        },
+        prevent_default:function (ev) {
+            ev.preventDefault(); //阻止向上冒泡
+        },
+
+        //拖动的接口
+        no_ap_to_ag: function (mo_id,production_line_id,toElem,ele, success_cb) {
+              framework.blockUI();
+              new Model("mrp.production")
+                    .call("settle_mo", [mo_id], {production_line_id:production_line_id,settle_date:myself.chose_date})
+                    .then(function (result) {
+                        console.log(result);
+                        var origin_wrap_bkup = $(ele).parents('.production_lists_wrap');//左边
+                        success_cb();
+                        if (production_line_id != false) {//从右到左
+                            var show_more = true;//显示更多
+                            if($(toElem)[0].className != 'production_lists_wrap'){
+                                var elem_wrap = $(toElem).parents('.production_lists_wrap');
+                            }else {
+                                var elem_wrap = $(toElem);
+                            }//获取目的位置
+
+                            if ($(origin_wrap_bkup).length >= 1) {//左边到左边  from位置
+                                $(origin_wrap_bkup).html('');
+                                var new_items = QWeb.render('a_p_render_right_tmpl', {result: result.origin_pl_mos,
+                                    show_more:true,
+                                    selection:myself.states.state.selection,
+                                    new_selection:myself.states.product_order_type.selection,
+                                    material_selection: myself.states.availability.selection
+                                })
+                                $(origin_wrap_bkup).append(new_items);
+                            }
+                            //重新渲染拖动的MO所在的产线
+                            $(elem_wrap).html('');
+                            var new_ite = QWeb.render('a_p_render_right_tmpl', {
+                                result: result.mos,
+                                show_more: true,
+                                selection: myself.states.state.selection,
+                                new_selection: myself.states.product_order_type.selection,
+                                material_selection: myself.states.availability.selection
+                            })
+                            $(elem_wrap).append(new_ite);
+                            $(origin_wrap_bkup).prev('.production_line').find('.production_qty span').html(result.origin_pl_mos.length)
+                            $(elem_wrap).prev('.production_line').find('.production_qty span').html(result.mos.length);
+                        } else {//从左到右
+                            var show_more = false;
+                            //这是从已排产拖到未排产的情况,要重新渲染已排产的数据
+                            var origin_wrap = origin_wrap_bkup;//左边
+                            $(origin_wrap).html('');
+                            var new_items = QWeb.render('a_p_render_right_tmpl', {
+                                result: result.origin_pl_mos,
+                                show_more: true,
+                                selection: myself.states.state.selection,
+                                new_selection: myself.states.product_order_type.selection,
+                                material_selection: myself.states.availability.selection
+                            })
+                            $(origin_wrap).append(new_items);
+                            $(origin_wrap_bkup).prev('.production_line').find('.production_qty span').html(result.origin_pl_mos.length)
+                        }
+
+                        //从新渲染拖动的MO单
+                        var replace_item = QWeb.render('a_p_render_right_tmpl', {result: result.operate_mo,
+                            show_more:show_more,
+                            selection:myself.states.state.selection,
+                            new_selection: myself.states.product_order_type.selection,
+                            material_selection: myself.states.availability.selection
+                        })
+                        $(ele).replaceWith(replace_item);
+
+                    }).always(function (result) {
+                        console.log(result);
+                        framework.unblockUI();
+                        if(result && result.code == '200'){
+                            return 'error';
+                        }
+                    })
+        },
         build_widget: function() {
             return new datepicker.DateTimeWidget(this);
         },
@@ -382,6 +657,34 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             this.scrollTop = scrollTop;
         },
 
+
+        //右边未排产的接口
+        un_arrange_production:function (process_id,limit,offset,own) {
+            framework.blockUI();
+            // console.log(own.states.product_order_type.selection)
+            new Model("mrp.production")
+                    .call("get_unplanned_mo", [[]], {process_id:process_id,limit:limit,offset:offset-1,domains:own.domain})
+                    .then(function (result) {
+                        console.log(result)
+                        console.log(own.states)
+                        myself.mydataset.mo = result.result;
+                        $("#a_p_right .a_p_right_head").nextAll().remove();
+                        $("#a_p_right").append(QWeb.render('a_p_render_right_tmpl',{result: result.result,
+                            show_more:false,
+                            selection:own.states.state.selection,
+                            new_selection:own.states.product_order_type.selection,
+                            material_selection: own.states.availability.selection
+                        }));
+                        framework.unblockUI();
+                        own.length = result.length;
+                        own.render_pager();
+                        if(!own.domain){
+                            own.setup_search_view();
+                            own.setup_left_search_view();
+
+                        }
+                    })
+        },
         arrangeed_searched: function () {
             var self = this;
             framework.blockUI();
@@ -411,6 +714,19 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                             myself.render_one_production_line(this, {})
                         }
                     })
+                    //myself.mydataset.mo = result.result;
+                    //$("#a_p_right .a_p_right_head").nextAll().remove();
+                    //$("#a_p_right").append(QWeb.render('a_p_render_right_tmpl',{result: result.result,
+                    //    show_more:false,
+                    //    selection:own.states.state.selection,
+                    //    new_selection:own.states.product_order_type.selection,
+                    //    material_selection: own.states.availability.selection
+                    //}));
+                    //own.length = result.length;
+                    //own.render_pager();
+                    //if(!own.left_domain){
+                    //    own.setup_left_search_view();
+                    //}
                     })
         },
         setupFocus: function ($e) {
@@ -421,33 +737,6 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 },
                 blur: function () { self.trigger('blurred'); }
             });
-        },
-
-        //未排产
-        un_arrange_production:function (process_id,limit,offset,own) {
-            framework.blockUI();
-            new Model("mrp.production")
-                    .call("get_unplanned_mo", [[]], {process_id:process_id,limit:limit,offset:offset-1,domains:own.domain})
-                    .then(function (result) {
-                        console.log(result);
-                        if($('.un_production_line').length>0){
-                            $('.un_production_line').remove();
-                        }
-                        myself.mydataset.mo = result.result;
-                        $("#a_p_left").append(QWeb.render('un_a_p_tmpl',{result: result.result,
-                            show_more:false,
-                            selection:own.states.state.selection,
-                            new_selection:own.states.product_order_type.selection,
-                            material_selection: own.states.availability.selection
-                        }));
-                        framework.unblockUI();
-                        own.length = result.length;
-                        own.render_pager();
-                        if(!own.domain){
-                            own.setup_search_view();
-                            own.setup_left_search_view();
-                        }
-                    })
         },
         start: function () {
             var self = this;
@@ -465,7 +754,9 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             new Model("mrp.production").call("fields_get",[],{allfields: ['state', 'product_order_type','availability']}).then(function (result) {
                 console.log(result);
                 myself.states = result;
-            });
+                //未排产
+                self.un_arrange_production(myself.process_id,10,1,myself);
+            })
 
 
             new Model("mrp.production.line")
@@ -477,7 +768,6 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         self.init_date_widget($(".a_p_time_start"));
                         framework.unblockUI();
                     })
-            self.un_arrange_production(myself.process_id,10,1,myself);
         }
 
     })
