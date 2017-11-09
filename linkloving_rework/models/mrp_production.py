@@ -42,6 +42,7 @@ class MrpProduction(models.Model):
                     'group_id': self.procurement_group_id.id,
                     'propagate': self.propagate,
                     'suggest_qty': line_id.product_qty,
+                    'move_order_type': 'manufacturing_picking',
                 }
                 moves.create(data)
 
