@@ -255,5 +255,33 @@
                 sequence="1" name="产品看板"/>
 
 
+        <record id="view_sales_order_line_tree_inherit" model="ir.ui.view">
+            <field name="name">sale.order.line.select</field>
+            <field name="model">sale.order.line</field>
+            <field name="inherit_id" ref="sale.view_order_line_tree"/>
+            <field name="arch" type="xml">
+
+
+                <xpath expr="//field[@name='name']" position="before">
+                    <field name="validity_date"/>
+                </xpath>
+            </field>
+        </record>
+
+
+        <record id="view_sales_order_line_filter_inherit" model="ir.ui.view">
+            <field name="name">sale.order.line.select</field>
+            <field name="model">sale.order.line</field>
+            <field name="inherit_id" ref="sale.view_sales_order_line_filter"/>
+            <field name="arch" type="xml">
+
+
+                <xpath expr="//field[@name='order_id']" position="before">
+                    <filter string="未发货完成" domain="[('shipping_status','!=', 'done')]"/>
+                </xpath>
+            </field>
+        </record>
+
+
     </data>
 </openerp>
