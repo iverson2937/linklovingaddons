@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'sale', 'linkloving_sale', 'sales_team', 'website'],
+    'depends': ['base', 'sale', 'linkloving_sale', 'sales_team', 'website', 'mrp'],
 
     # always loaded
     'data': [
@@ -29,7 +29,7 @@
         'report/sale_order_report.xml',
         # 'security/ir.model.access.csv',
 
-        # 'views/templates.xml',
+        'views/views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
