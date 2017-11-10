@@ -1104,6 +1104,10 @@ class MrpProductionProduceExtend(models.TransientModel):
 
     @api.multi
     def do_produce(self):
+        self._do_produce()
+        return {'type': 'ir.actions.act_window_close'}
+
+    def _do_produce(self):
         quantity = self.product_qty
         if float_compare(quantity, 0, precision_rounding=self.product_uom_id.rounding) > 0:
             feedback = self.feedback_create(self.product_qty)  # 产出  生成品检单
@@ -1118,8 +1122,6 @@ class MrpProductionProduceExtend(models.TransientModel):
                     except ValueError, e:
                         feedback.unlink()
                         raise UserError(e)
-
-        return {'type': 'ir.actions.act_window_close'}
 
     def do_produce_and_post_inventory(self):
         quantity = self.product_qty
@@ -1269,7 +1271,8 @@ class ReturnOfMaterial(models.Model):
             move_type = 'manufacturing_mo_in'
         elif product.product_type == 'material':
             move_type = 'manufacturing_rejected_out'
-
+        else:
+            move_type = ''
         return {
             'name': self.name,
             'product_id': product.product_id.id,

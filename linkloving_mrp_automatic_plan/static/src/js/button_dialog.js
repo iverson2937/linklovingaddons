@@ -58,7 +58,7 @@ odoo.define('linkloving_mrp_automatic_plan.button_dialog', function (require) {
                 options = options || {};
                 options.buttons = [
                     {
-                        text: (readonly ? _t("Close") : _t("Discard")),
+                        text: (readonly ? "取消" : "取消"),
                         classes: "btn-default o_form_button_cancel",
                         close: true,
                         click: function () {
@@ -69,7 +69,7 @@ odoo.define('linkloving_mrp_automatic_plan.button_dialog', function (require) {
 
                 if (true) {
                     options.buttons.splice(0, 0, {
-                        text: _t("Save") + ((multi_select) ? " " + _t(" & Close") : ""),
+                        text: "确定" + ((multi_select) ? " " + _t(" & Close") : ""),
                         classes: "btn-primary",
                         click: function () {
                             self.view_form.onchanges_mutex.def.then(function () {

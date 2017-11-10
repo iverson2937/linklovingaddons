@@ -22,14 +22,14 @@ class PlanMoWizard(models.TransientModel):
     process_id = fields.Many2one(comodel_name="mrp.process", string=u"工序", required=False, )
     production_line_id = fields.Many2one(comodel_name="mrp.production.line", string=u'产线', required=True)
     in_charge_id = fields.Many2one(comodel_name="res.partner", string=u'工序负责人')
-    supplier_id = fields.Many2one(comodel_name="res.partner", string=u'外协加工商')
     product_qty = fields.Float(string=u"生产数量")
 
     is_priority = fields.Boolean(string=u'是否优先', default=False)
 
     @api.onchange('process_id')
     def onchange_process_id(self):
-        self.production_line_id = False
+        if self.production_line_id not in self.process_id.production_line_ids:
+            self.production_line_id = False
 
     @api.model
     def create(self, vals):
@@ -59,6 +59,7 @@ class PlanMoWizard(models.TransientModel):
 class Inheritforarrangeproduction(models.Model):
     _inherit = 'mrp.process'
 
+    production_line_ids = fields.One2many(comodel_name="mrp.production.line", inverse_name="process_id", string=u'产线')
     @api.multi
     def arrange_production(self):
         return {
