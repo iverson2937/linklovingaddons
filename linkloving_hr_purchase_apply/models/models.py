@@ -22,6 +22,7 @@ class PurchaseApply(models.Model):
                                   digits=dp.get_precision('Account'))
     total_amount = fields.Float(string='Total', store=True, compute='_compute_amount',
                                 digits=dp.get_precision('Account'))
+    reject_reason = fields.Char(string=u'拒绝原因')
 
     @api.depends('line_ids.sub_total')
     def _compute_amount(self):
@@ -72,6 +73,7 @@ class PurchaseApply(models.Model):
                         sheet.name, reason))
             sheet.message_post(body=body)
             sheet.to_approve_id = False
+            sheet.reject_reason = reason
 
     @api.multi
     def unlink(self):
