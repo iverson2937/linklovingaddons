@@ -13,6 +13,10 @@ from odoo.addons.website_blog.controllers.main import WebsiteBlog
 import base64
 
 
+# ------------------------------------------------------
+#         bolog_name = ['公告栏', '发布文章','my文章审核','原生审核']
+#         bolog_url = ['/blog/new_blog_index', '/blog/new_blog_create_index','/blog/ 主页id','/blog/ago/check']
+# ------------------------------------------------------
 class LinklovingWebBlog(http.Controller):
     @http.route('/blog/new_blog_index', type='http', auth='public', website=True, methods=['GET'], csrf=False)
     def new_blog_index_show(self, **kw):
@@ -70,28 +74,6 @@ class LinklovingWebBlog(http.Controller):
 
         return request.render("linkloving_web_blog.web_blog_create_show", values)
 
-    @http.route('/stock_move/init_state', type='http', auth='public', csrf=False)
-    def update_blog_show(self, **kw):
-
-        val = request.env['stock.move'].search([])
-
-        # 完成 可用  等待可用 等待另一个移动 新建  取消
-
-        for vals in val:
-            if vals.state == 'done':
-                vals.write({'traces_sort': 1})
-            elif vals.state == 'assigned':
-                vals.write({'traces_sort': 2})
-            elif vals.state == 'confirmed':
-                vals.write({'traces_sort': 3})
-            elif vals.state == 'waiting':
-                vals.write({'traces_sort': 4})
-            elif vals.state == 'draft':
-                vals.write({'traces_sort': 5})
-            elif vals.state == 'cancel':
-                vals.write({'traces_sort': 10})
-        return http.local_redirect('/')
-
     @http.route('/blog/create_blog_post_index', type='http', auth='public', website=True, csrf=False)
     def create_blog_post_index_show(self, **kw):
         # request.env.user.partner_id.id
@@ -107,10 +89,13 @@ class LinklovingWebBlog(http.Controller):
         for a_html in content('img'):
             # attachment_one = Model_Attachment.search([('datas', '=', pq(a_html).attr('src').split('base64,')[1])])
             # if not attachment_one:
+
+            print pq(a_html).attr('src')
+
             attachment_one = Model_Attachment.create({
                 'res_model': u'blog.post',
                 'name': pq(a_html).attr('data-filename') if pq(a_html).attr('data-filename') else u"截图",
-                'datas': pq(a_html).attr('src').split('base64,')[1] if pq(a_html).attr('src').split('base64,') else  pq(
+                'datas': pq(a_html).attr('src').split('base64,')[1] if ('base64,' in pq(a_html).attr('src')) else  pq(
                     a_html).attr('src'),
                 'datas_fname': pq(a_html).attr('data-filename') if pq(a_html).attr('data-filename') else u"截图",
                 'public': True,
@@ -140,6 +125,7 @@ class LinklovingWebBlog(http.Controller):
         is_hot = kw.get('is_hot')
 
         blog_model = request.env['blog.post']
+
         domain = [('website_published', '=', True)]
         result_hot = False
         if is_search:
@@ -158,7 +144,9 @@ class LinklovingWebBlog(http.Controller):
             if is_parent:
                 domain.append(('tag_ids', '=', int(blog_type_id)))
             else:
-                domain.append(('blog_id', '=', int(blog_type_id)))
+                is_index = False if request.env['blog.blog'].browse(int(blog_type_id)).is_all_blog else True
+                if is_index:
+                    domain.append(('blog_id', '=', int(blog_type_id)))
 
         result = result_hot if result_hot else blog_model.search(domain)
         # result = blog_model.search(domain)
@@ -219,6 +207,45 @@ class LinklovingWebBlog(http.Controller):
             'public': True,
         })
         return str(attachment_one.id)
+
+    @http.route('/blog/ago/check', type='http', auth='public', website=True, csrf=False)
+    def create_attachment_index(self, **kw):
+
+        menu_id = request.env.ref('linkloving_web_blog.menu_blog_my_blog')
+        action = request.env.ref('linkloving_web_blog.blog_post_action')
+
+        return http.local_redirect(
+            '/web#min=1&limit=80&view_type=list&model=blog.post&menu_id=' + str(menu_id.id) + '&action=' + str(
+                action.id))
+
+        # return {'name': u'我的文章',
+        #         'type': 'ir.actions.act_window',
+        #         'view_mode': 'tree',
+        #         'view_type': 'tree',
+        #         # 'view_id': self.env.ref('mrp.mrp_bom_line_tree_view').id,
+        #         # 'res_id': self.id,
+        #         'domain': [('create_uid', '=', request.env.user.partner_id.id)],
+        #         'res_model': 'blog,post',
+        #         'target': 'new',
+        #         }
+
+        # @http.route('/blog/uploadMultipleFile', type='http', auth='public', website=True, csrf=False)
+        # def create_uploadMultipleFile_index(self, **kw):
+        #
+        #     Model_Attachment = request.env['ir.attachment']
+        #
+        #     file_name = kw.get('file')
+        #
+        #     base64.b64encode(kw.get('file').getvalue())
+        #
+        #     # attachment_one = Model_Attachment.create({
+        #     #     'res_model': u'blog.post',
+        #     #     'name': file_name,
+        #     #     'datas': base64.b64encode(kw.get('file').getvalue()),
+        #     #     'datas_fname': file_name,
+        #     #     'public': True,
+        #     # })
+        #     return base64.b64encode(kw.get('file').getvalue())
 
     @http.route('/blog/blog_all_publish', type='json', auth='public', website=True, csrf=False)
     def blog_all_publish(self, **kw):

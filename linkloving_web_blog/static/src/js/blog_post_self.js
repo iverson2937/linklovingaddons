@@ -138,6 +138,7 @@ $(function () {
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({
                 "params": {
+                    'blog_blog_id': target.id,
                     'blog_type_id': target.id,
                     'is_Parent': is_Parent,
                     'is_search': is_search,

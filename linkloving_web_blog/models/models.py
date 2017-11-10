@@ -7,13 +7,17 @@ from odoo.exceptions import UserError
 class LinkLovingBlogPost(models.Model):
     _inherit = "blog.post"
 
-    # blog_post_type_ids = fields.Many2one('blog.post.broad.heading', string=u'文章分类')
     tag_ids = fields.Many2one('blog.tag', string='Tags')
 
     # @api.model
     # def create(self, vals):
     #     post_id = super(LinkLovingBlogPost, self).create(vals)
     #     return post_id
+    @api.multi
+    def website_publish_button_new(self):
+        # if self.env.user.has_group('website.group_website_publisher') and self.website_url != '#':
+        #     return self.open_website_url()
+        return self.write({'website_published': not self.website_published})
 
 
 class LinkLovingWebsiteMenu(models.Model):
@@ -74,18 +78,26 @@ class LinkLovingBlogBlog(models.Model):
 class LinkLovingBlogTag(models.Model):
     _inherit = 'blog.tag'
 
-    # name = fields.Char('Name', required=True, translate=True)
-    # post_ids = fields.Many2many('blog.post', string='Posts')
-
     tag_parent_id = fields.Many2one('blog.blog', string=u'父级')
 
 
-class LinkLovingTypeOne(models.Model):
-    _name = 'blog.post.broad.heading'
+class WebBlogTemporary(models.Model):
+    _name = "web.blog.temporary"
 
-    name = fields.Char(u'名称')
-    detail = fields.Text(string=u'描述')
+    post_type = fields.Selection([('published', u'发布'), ('unpublished', u'取消发布')], string=u'操作类型', default='published')
 
-    # blog_Parent_id = fields.Many2one('blog.post.broad.heading', string=u'上级')
-    blog_product_type = fields.Selection([('one_type', u'一级类别'), ('two_type', u'二级类别')], string=u'类型')
-    # blog_junior_ids = fields.One2many('blog.post.broad.heading', 'blog_Parent_id', string=u'下级列表')
+    @api.multi
+    def set_web_blog_published(self):
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+        Model = self.env['blog.post']
+        post_type = True if self.post_type == 'published' else False
+        for post_id in active_ids:
+            print int(post_id)
+            record = Model.browse(int(post_id))
+            values = {}
+            if 'website_published' in Model._fields:
+                values['website_published'] = post_type
+            record.write(values)
+
+        return {'type': 'ir.actions.act_window_close'}
