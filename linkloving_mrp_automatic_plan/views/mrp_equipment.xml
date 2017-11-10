@@ -209,8 +209,7 @@
                         <button name="button_action_confirm_draft" class="oe_highlight"
                                 attrs="{'invisible': [('state', 'not in', 'draft')]}" type="object"
                                 groups="linkloving_mrp_extend.group_charge_produce" string="确认需求"/>
-                        <button name="action_cancel" type="object" string="Cancel"
-                                attrs="{'invisible': ['|', ('state', 'in', ('done','cancel')), ('check_to_done', '=', True)]}"/>
+
                         <!--<button type="action"-->
                         <!--name="%(action_form_plan_mo_wizard)d"-->
                         <!--class="oe_highlight"-->
@@ -234,6 +233,10 @@
                                 'default_supplier_id': supplier_id,
                                 'default_product_qty': product_qty}"
                                 string="开始排产"/>
+                        <button name="action_cancel" type="object" string="取消订单"
+                                attrs="{'invisible': [('state', 'not in', ('confirmed', 'draft'))]}"
+                        />
+
                         <field name="state" widget="statusbar"
                                statusbar_visible="draft,confirmed,waiting_material,prepare_material_ing,finish_prepare_material,already_picking,progress,waiting_quality_inspection,quality_inspection_ing,waiting_post_inventory,done"/>
 
@@ -276,13 +279,13 @@
                                     <field name="product_qty" attrs="{'readonly': [('has_moves', '=', True)]}"/>
                                     <field name="product_uom_id" options="{'no_open':True,'no_create':True}"
                                            groups="product.group_uom" attrs="{'readonly': [('has_moves', '=', True)]}"/>
-                                    <button type="action"
-                                            name="%(mrp.action_change_production_qty)d"
-                                            string="编辑数量"
-                                            states="confirmed,planned,progress"
-                                            class="oe_highlight"
-                                            attrs="{'invisible': [('state','=','done')]}"
-                                    />
+                                    <!--<button type="action"-->
+                                    <!--name="%(mrp.action_change_production_qty)d"-->
+                                    <!--string="编辑数量"-->
+                                    <!--states="confirmed,planned,progress"-->
+                                    <!--class="oe_highlight"-->
+                                    <!--attrs="{'invisible': [('state','=','done')]}"-->
+                                    <!--/>-->
                                 </div>
                                 <field name="process_id" options="{'no_create':True}" string="Process" required="1"/>
                                 <field name="production_line_id" domain="[('process_id', '=', process_id)]"
@@ -400,23 +403,24 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name="production_id"/>
-                                <field name="process_id"/>
+                                <field name="production_id" required="1"/>
+                                <field name="process_id" required="1"/>
                                 <field name="production_line_id" domain="[('process_id', '=', process_id)]"
                                        required="1"/>
+                                <field name="is_priority"/>
                             </group>
                             <group>
-                                <field name="product_qty"/>
-                                <field name="in_charge_id"/>
+                                <field name="product_qty" required="1"/>
+                                <field name="in_charge_id" required="1"/>
                                 <field name="supplier_id"/>
                             </group>
                         </group>
 
                     </sheet>
-                    <footer>
-                        <button name="arrange" string="排产" type="object" class="btn-primary"/>
-                        <button string="取消" class="btn-default" special="cancel"/>
-                    </footer>
+                    <!--<footer>-->
+                    <!--<button name="arrange" string="排产" type="object" class="btn-primary"/>-->
+                    <!--<button string="取消" class="btn-default" special="cancel"/>-->
+                    <!--</footer>-->
                 </form>
 
             </field>
