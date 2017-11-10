@@ -1271,8 +1271,7 @@ class ReturnOfMaterial(models.Model):
             move_type = 'manufacturing_mo_in'
         elif product.product_type == 'material':
             move_type = 'manufacturing_rejected_out'
-        else:
-            move_type = ''
+
         return {
             'name': self.name,
             'product_id': product.product_id.id,

@@ -1,2 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_linkloving_web_blog_linkloving_web_blog,linkloving_web_blog.linkloving_web_blog,model_linkloving_web_blog_linkloving_web_blog,,1,0,0,0
+access_linkloving_web_blog_web_blog_temporary,linkloving_web_blog_web_blog_temporary,model_web_blog_temporary,,1,1,1,1
