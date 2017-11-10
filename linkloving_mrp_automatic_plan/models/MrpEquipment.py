@@ -25,16 +25,28 @@ class PlanMoWizard(models.TransientModel):
     supplier_id = fields.Many2one(comodel_name="res.partner", string=u'外协加工商')
     product_qty = fields.Float(string=u"生产数量")
 
+    is_priority = fields.Boolean(string=u'是否优先', default=False)
+
+    @api.onchange('process_id')
+    def onchange_process_id(self):
+        self.production_line_id = False
+
     @api.model
     def create(self, vals):
         mo = self.env["mrp.production"].browse(self._context.get("production_id"))
+        is_priority = vals.get("is_priority")
         mo_vals = vals.copy()
         mo_vals.update({
             'state': 'waiting_material'
         })
         if mo.state in ["draft", "confirmed"]:
             mo.write(mo_vals)
-            mo.replanned_mo(self.env["mrp.production.line"], mo.production_line_id)
+            qty_wizard = self.env['change.production.qty'].create({
+                'mo_id': mo.id,
+                'product_qty': vals.get("product_qty")
+            })
+            qty_wizard.change_prod_qty()
+            mo.replanned_mo(self.env["mrp.production.line"], mo.production_line_id, is_priority=is_priority)
 
         else:
             raise UserError(u"该状态无法排产")
@@ -609,7 +621,7 @@ class MrpProductionExtend(models.Model):
                         next_mo_start_time = end_time.astimezone(pytz.timezone(self.env.user.tz))
 
     # base_on_today 第一个mo的排产时间是否基于今天
-    def replanned_mo(self, origin_production_line, production_line, base_on_today=False):
+    def replanned_mo(self, origin_production_line, production_line, base_on_today=False, is_priority=False):
 
         # if not production_line:
         #     no_production_line = True
@@ -637,6 +649,22 @@ class MrpProductionExtend(models.Model):
             new_domain = domain + [("production_line_id", "=", production_line.id)]
             all_mos = self.env["mrp.production"].search(new_domain,
                                                         order=ORDER_BY)
+            if is_priority:  # 如果是优先排产
+                all_mos -= self
+                first_start_time = fields.Datetime.from_string(all_mos[0].planned_start_backup)
+                new_datetime = datetime(first_start_time.year,
+                                        first_start_time.month,
+                                        first_start_time.day,
+                                        first_start_time.hour,
+                                        first_start_time.minute,
+                                        first_start_time.second,
+                                        microsecond=first_start_time.microsecond,
+                                        tzinfo=pytz.timezone("UTC"))
+
+                next_mo_start_time = new_datetime.astimezone(pytz.timezone(self.env.user.tz)) - relativedelta(days=1)
+
+                self.planned_start_backup = next_mo_start_time
+                all_mos = self + all_mos
 
         if production_line.id == origin_production_line.id:
             return origin_mos, all_mos
@@ -653,6 +681,7 @@ class MrpProductionExtend(models.Model):
                         planned_start_backup = fields.Datetime.from_string(all_mos[1].date_planned_start)
                     else:
                         planned_start_backup = fields.Datetime.from_string(all_mos[0].date_planned_start)
+
                     new_datetime = datetime(planned_start_backup.year,
                                             planned_start_backup.month,
                                             planned_start_backup.day,
