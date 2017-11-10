@@ -170,3 +170,10 @@
     display: inline-block;
     vertical-align: middle;
 }
+.o_content .panel-body{
+    padding: 0;
+}
+
+.o_form_view .o_form_sheet_bg .o_form_sheet{
+    min-width: 1050px;
+}
