@@ -137,3 +137,14 @@ class PurchaseOrderLine(models.Model):
                             })
 
             return res
+
+
+class PurchaseOrder(models.Model):
+    _inherit = "purchase.order"
+
+    @api.multi
+    def get_mail_message(self):
+        for mo in self:
+            return [
+                {'name': 'allen', 'time': '2017-10-19', 'description': 'abc'}
+            ]
