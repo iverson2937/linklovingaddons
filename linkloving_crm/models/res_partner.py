@@ -170,6 +170,11 @@ class ResPartner(models.Model):
                 # else:
                 #     vals['public_partners'] = 'private'
                 #     vals['old_user_id'] = vals.get('user_id')
+
+                if self.child_ids:
+                    for child in self.child_ids:
+                        child.user_id = vals.get('user_id')
+
             else:
                 vals['public_partners'] = 'public'
 
