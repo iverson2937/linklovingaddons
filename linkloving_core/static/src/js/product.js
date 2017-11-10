@@ -46,7 +46,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
             if ($(target).data('product-tmpl')) {
                 var create_po_view = {
                     type: 'ir.actions.act_window',
-                    res_model: 'purchase.order',
+                    res_model: 'purchase.order.line.wizard',
                     view_mode: 'form',
                     views: [[false, 'form']],
                     context: {'default_product_id': parseInt($(target).data('product-tmpl'))},
@@ -447,7 +447,6 @@ odoo.define('linkloving_core.product_detail', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var check_name = target.getAttribute("check-name");
-            alert(check_name);
             var mo_merge_inputs_ids = [];
             var mo_merge_inputs = $("input[name=" + check_name + "]");
             // console.log(mo_merge_inputs)

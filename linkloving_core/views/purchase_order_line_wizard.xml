@@ -11,12 +11,14 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name="partner_id"/>
-                                <field name="product_id"/>
+                                <field name="partner_id" option="{'no_create':True}"
+                                       domain="[('is_company','=',True),('supplier','=',True)]"/>
+                                <field name="product_id" option="{'no_create':True}"/>
                             </group>
                             <group>
                                 <field name="product_uom_qty"/>
                                 <field name="price_unit"/>
+                                <field name="product_uom"/>
                             </group>
                         </group>
                     </sheet>
