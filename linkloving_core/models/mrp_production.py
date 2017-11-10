@@ -31,4 +31,9 @@ class MrpProduction(models.Model):
                 raise UserError('只有未生产的MO才可以删除')
         return True
 
-
+    @api.multi
+    def get_mail_message(self):
+        for mo in self:
+            return [
+                {'name': 'allen', 'time': '2017-10-19', 'description': 'abc'}
+            ]
