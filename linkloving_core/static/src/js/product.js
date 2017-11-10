@@ -35,8 +35,29 @@ odoo.define('linkloving_core.product_detail', function (require) {
             'mouseenter .trace_back':'mouseenter_ev'
         },
 
-        mouseenter_ev:function () {
-            console.log('sssssss')
+        mouseenter_ev:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            console.log(target)
+            if($(target).hasClass('mo_trace')){
+                var trace_id = $(target).parents('h4').children('.show_mo_number').attr('data-id');
+                console.log(parseInt(trace_id));
+                new Model("mrp.production")
+                    .call("get_mail_message", [parseInt(trace_id)])
+                    .then(function (result) {
+                        console.log(result);
+                        $(target).attr('title',result[0].name + ',' + result[0].time + ',' + result[0].description)
+                    })
+            }else if($(target).hasClass('po_trace')){
+                var trace_id = $(target).parents('h4').children('.show_po_number').attr('data-id');
+                console.log(parseInt(trace_id));
+                new Model("purchase.order")
+                    .call("get_mail_message", [parseInt(trace_id)])
+                    .then(function (result) {
+                        console.log(result);
+                        $(target).attr('title',result[0].name + ',' + result[0].time + ',' + result[0].description)
+                    })
+            }
         },
 
         click_create_po: function (e) {
