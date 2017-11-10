@@ -30,6 +30,8 @@ class HrExpenseSheet(models.Model):
     department_id = fields.Many2one('hr.department', string='Department',
                                     states={'post': [('readonly', True)], 'done': [('readonly', False)]})
 
+    reject_reason = fields.Char(string=u'拒绝原因')
+
     @api.onchange('department_id')
     def _onchange_department_id(self):
         for line in self.expense_line_ids:
@@ -174,6 +176,7 @@ class HrExpenseSheet(models.Model):
                 "Your Expense %s has been refused.<br/><ul class=o_timeline_tracking_value_list><li>Reason<span> : </span><span class=o_timeline_tracking_value>%s</span></li></ul>") % (
                         sheet.name, reason))
             sheet.message_post(body=body)
+            sheet.reject_reason = reason
 
     @api.model
     def create(self, vals):
