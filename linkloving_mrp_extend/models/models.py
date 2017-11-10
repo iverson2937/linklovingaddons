@@ -220,6 +220,7 @@ class StockMoveExtend(models.Model):
 
     def action_change_state_cancel(self):
         self.state = 'cancel'
+
     @api.multi
     # 授权人 和被授权人
     def authorized_stock_move(self, authorizer_id=None, authorizee_id=None):
@@ -264,6 +265,8 @@ class BackToProgressMoLine(models.TransientModel):
     process_id = fields.Many2one("mrp.process", related="production_id.process_id")
     product_id = fields.Many2one("product.template", related="production_id.product_tmpl_id")
     state = fields.Selection(related="production_id.state")
+
+
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 
@@ -282,6 +285,7 @@ class MrpProductionExtend(models.Model):
                 # 'res_id': self.product_tmpl_id.id,
                 'target': 'new'
                 }
+
     @api.multi
     def back_to_progress(self):
         for mo in self:
@@ -450,7 +454,7 @@ class MrpProductionExtend(models.Model):
     total_spent_money = fields.Float(default=0, compute='_compute_total_spent_money', string='Total Cost', )
     state = fields.Selection([
         ('draft', u'草稿'),
-        ('confirmed', u'已排产'),
+        ('confirmed', u'需求确认'),
         ('waiting_material', u'等待备料'),
         ('prepare_material_ing', u'备料中...'),
         ('finish_prepare_material', u'备料完成'),
@@ -1260,6 +1264,12 @@ class ReturnOfMaterial(models.Model):
 
     def _prepare_move_values(self, product):
         self.ensure_one()
+
+        if product.product_type == 'semi-finished':
+            move_type = 'manufacturing_mo_in'
+        elif product.product_type == 'material':
+            move_type = 'manufacturing_rejected_out'
+
         return {
             'name': self.name,
             'product_id': product.product_id.id,
@@ -1272,6 +1282,7 @@ class ReturnOfMaterial(models.Model):
             'state': 'confirmed',
             'origin': 'Return %s' % self.production_id.name,
             'is_return_material': True,
+            'move_order_type': move_type,
             # 'restrict_partner_id': self.owner_id.id,
             # 'picking_id': self.picking_id.id
         }
@@ -1664,6 +1675,7 @@ class MrpQcFeedBack(models.Model):
             if qc.state in ['check_to_rework', 'alredy_post_inventory']:
                 raise UserError(u"无法删除已完成的品检单据")
         return super(MrpQcFeedBack, self).unlink()
+
     # 等待品捡 -> 品捡中
     def action_start_qc(self):
         self.state = "qc_ing"
@@ -1761,6 +1773,8 @@ class StockComfirmationExtend(models.TransientModel):
             return {'type': 'ir.actions.act_window_close'}
         else:
             return super(StockComfirmationExtend, self)._process(cancel_backorder)
+
+
 class StcokPickingExtend(models.Model):
     _inherit = 'stock.picking'
 
@@ -1856,8 +1870,8 @@ class StcokPickingExtend(models.Model):
             elif any(move.state in ["done"] for move in pick.move_lines) and any(
                             move.state == "assigned" for move in pick.move_lines):
                 raise UserError(u"库存异动单异常,请联系管理员解决")
-            if all(not pack.qty_done for pack in pick.pack_operation_product_ids):
-                raise UserError(u"出货数量不能全部为0")
+                # if sum(pick.pack_operation_product_ids.mapped("qty_done")) == 0:
+                #     raise UserError(u"出货数量不能全部为0")
         return super(StcokPickingExtend, self).to_stock()
 
     # 分拣完成
@@ -1909,7 +1923,7 @@ class StcokPickingExtend(models.Model):
             'views': [(view.id, 'form')],
             'view_id': view.id,
             'target': 'new',
-            'context': {'default_picking_id': self.id,},
+            'context': {'default_picking_id': self.id, },
         }
 
     def choose_transfer_way(self):

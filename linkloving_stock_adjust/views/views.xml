@@ -97,6 +97,7 @@
         <menuitem id="menu_material_request"
                   action="action_stock_transfer"
                   parent="linkloving_approval.ll_approval_root"
+                  groups="linkloving_warehouse.group_stock_control_manager"
                   sequence="1" name="物料转换"/>
 
     </data>

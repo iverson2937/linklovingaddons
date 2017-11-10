@@ -8,3 +8,4 @@ class AccountAssetAsset(models.Model):
 
     employee_id = fields.Many2one('hr.employee', string=u'保管人')
     asset_no = fields.Char(string=u'资产编号')
+    remark = fields.Char(string=u'备注')

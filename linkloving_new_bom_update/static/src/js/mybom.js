@@ -47,6 +47,14 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             var target = e.target || e.srcElement;
             var bom_id = $("#treeMenu").data("bom-id");
             var is_show_action_deny = $(target).data("action-deny");
+
+            var is_final_one = false;
+
+            if (parseInt(bom_id))
+                is_final_one = true;
+            else
+                is_final_one = false;
+
             var action = {
                 name: "详细",
                 type: 'ir.actions.act_window',
@@ -57,7 +65,8 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 context: {
                     'default_bom_id': parseInt(bom_id),
                     'is_show_action_deny': 'false',
-                    'review_type': 'bom_review'
+                    'review_type': 'bom_review',
+                    'is_final_one': is_final_one
                 },
                 'target': "new",
             };
@@ -73,18 +82,18 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
             self.changes_back = [];
             self.xNodes.forEach(function (v, i) {
                 if (self.xNodes[i].modify_type) {
-                    if(self.xNodes[i].modify_type == 'delete'){
-                        if($.inArray(self.xNodes[i].id,del_ids)!=-1){
+                    if (self.xNodes[i].modify_type == 'delete') {
+                        if ($.inArray(self.xNodes[i].id, del_ids) != -1) {
                             self.changes_back.push(self.xNodes[i]);
                         }
-                    }else {
+                    } else {
                         self.changes_back.push(self.xNodes[i]);
                     }
 
                 }
             })
             console.log(self.changes_back);
-            del_ids=[];
+            del_ids = [];
             if (self.changes_back.length == 0) {
                 var message = ("您没有做任何操作");
                 var def = $.Deferred();
@@ -429,9 +438,9 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 return;
             }
         },
-on_search:function () {
+        on_search: function () {
 
-},
+        },
         start: function () {
             var self = this;
             if (this.is_show === false) {
@@ -475,7 +484,7 @@ on_search:function () {
                                     product_type: obj[i].product_type,
                                     process_id: obj[i].process_id[0],
                                     td: td1,
-                                    index:i+1
+                                    index: i + 1
                                 };
                                 tNodes.push(s);
                                 if (obj[i].bom_ids.length > 0) {

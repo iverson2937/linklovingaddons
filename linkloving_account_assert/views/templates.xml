@@ -9,8 +9,9 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//field[@name='date']" position="after">
-                    <field name="employee_id" string="保管人"/>
+                    <field name="employee_id" string="保管人" options="{'no_create':True}"/>
                     <field name="asset_no" string="资产编号"/>
+                    <field name="remark"/>
 
                 </xpath>
 

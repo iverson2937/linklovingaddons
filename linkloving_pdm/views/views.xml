@@ -189,12 +189,19 @@
                         <!--<div invisible="context.get('view_material_request')" style="float:left">-->
                         <button string='送往终审' type='object' name='action_to_next' class='oe_link review_reload'
                                 context="{'to_last_review':True}"/>
+
+                        <!--BOM审核-->
+                        <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
+                                groups="linkloving_pdm.group_final_review_partner_bom"
+                                invisible="not context.get('is_final_one')"
+                        />
+                        <!--文件审核-->
                         <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
                                 groups="linkloving_pdm.group_final_review_partner"
-                                invisible="context.get('project_line_pass_show')"
+                                invisible="context.get('project_line_pass_show') or context.get('is_final_one')"
                         />
 
-
+                        <!--工程审核-->
                         <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
                                 groups="linkloving_pdm.group_final_review_picking_project,linkloving_pdm.group_final_review_picking_line"
                                 invisible="not context.get('project_line_pass_show')"

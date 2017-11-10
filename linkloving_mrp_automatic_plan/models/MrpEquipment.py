@@ -14,6 +14,48 @@ OFF_WORK_TIME = 16 * 60 * 60
 WEEKEND_LIST = [6]  # 从0 - 6 周一到周天
 REWORK_DEFAULT_TIME = 8 * 60 * 60
 
+
+class PlanMoWizard(models.TransientModel):
+    _name = 'plan.mo.wizard'
+
+    production_id = fields.Many2one(comodel_name="mrp.production", string=u"生产单", required=False, )
+    process_id = fields.Many2one(comodel_name="mrp.process", string=u"工序", required=False, )
+    production_line_id = fields.Many2one(comodel_name="mrp.production.line", string=u'产线', required=True)
+    in_charge_id = fields.Many2one(comodel_name="res.partner", string=u'工序负责人')
+    supplier_id = fields.Many2one(comodel_name="res.partner", string=u'外协加工商')
+    product_qty = fields.Float(string=u"生产数量")
+
+    is_priority = fields.Boolean(string=u'是否优先', default=False)
+
+    @api.onchange('process_id')
+    def onchange_process_id(self):
+        self.production_line_id = False
+
+    @api.model
+    def create(self, vals):
+        mo = self.env["mrp.production"].browse(self._context.get("production_id"))
+        is_priority = vals.get("is_priority")
+        mo_vals = vals.copy()
+        mo_vals.update({
+            'state': 'waiting_material'
+        })
+        if mo.state in ["draft", "confirmed"]:
+            mo.write(mo_vals)
+            qty_wizard = self.env['change.production.qty'].create({
+                'mo_id': mo.id,
+                'product_qty': vals.get("product_qty")
+            })
+            qty_wizard.change_prod_qty()
+            mo.replanned_mo(self.env["mrp.production.line"], mo.production_line_id, is_priority=is_priority)
+
+        else:
+            raise UserError(u"该状态无法排产")
+
+        return super(PlanMoWizard, self).create(vals)
+
+    def print_report(self):
+        return True
+
 class Inheritforarrangeproduction(models.Model):
     _inherit = 'mrp.process'
 
@@ -36,7 +78,8 @@ FIELDS = ["name", "alia_name", "product_tmpl_id", "state", "product_qty",
           "display_name", "bom_id", "feedback_on_rework", "qty_unpost",
           "planned_start_backup", "date_planned_start", "date_planned_finished",
           'theo_spent_time', 'availability', 'product_order_type', 'production_line_id',
-          'produce_speed_factor', 'theory_factor', 'real_theo_spent_time', 'ava_spent_time']
+          'produce_speed_factor', 'theory_factor', 'real_theo_spent_time', 'ava_spent_time',
+          'prepare_material_state', 'material_state']
 class ProcurementOrderExtend(models.Model):
     _inherit = 'procurement.order'
 
@@ -235,6 +278,36 @@ class MrpBomExtend(models.Model):
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 
+    # @api.multi
+    # def write(self, vals):
+    #     for mo in self:
+    #         if vals.get("")
+    def get_formview(self):
+        view_id = self.env.ref('linkloving_mrp_automatic_plan.form_plan_mo_wizard').id
+        return {
+            'title': u'打开',
+            'res_model': 'plan.mo.wizard',
+            'view_id': view_id,
+            'disable_multiple_selection': True,
+            'readonly': True,
+            # 'res_id': self.id,
+        }
+    def show_paichan_form_view(self):
+        print(123123123123)
+        view_id = self.env.ref('linkloving_mrp_automatic_plan.mrp_production_paichan_form_view').id
+        return view_id
+        # return {
+        #         'name': u"排产",
+        #         'view_type': 'form',
+        #         'view_mode': 'form',
+        #         'res_model': 'mrp.production',
+        #         'view_id': view_id,
+        #         'views': [(view_id, 'form')],
+        #         'type': 'ir.actions.act_window',
+        #         'res_id': self.id,
+        #         'target': 'new'
+        #     }
+
     @api.multi
     def _compute_factory_setting_id(self):
         setting = self.env["hr.config.settings"].search([("is_available", "=", True)], limit=1)
@@ -266,6 +339,40 @@ class MrpProductionExtend(models.Model):
         for mo in self:
             mo.ava_spent_time = round(mo.theo_spent_time / mo.production_line_id.compute_speed_factor(mo.bom_id), 2)
 
+    @api.multi
+    def _compute_prepare_material_state(self):
+        for mo in self:
+            rate_list = []
+            for move in mo.sim_stock_move_lines:
+                if move.product_uom_qty == 0:
+                    rate_list.append(0)
+                    continue
+                rate = move.quantity_done * 1.0 / move.product_uom_qty
+                rate_list.append(rate)
+            if any(rate < 0.5 for rate in rate_list):
+                mo.prepare_material_state = 'red'
+            elif all(rate >= 1.0 for rate in rate_list):
+                mo.prepare_material_state = 'green'
+            else:
+                mo.prepare_material_state = 'yellow'
+
+    @api.multi
+    def _compute_material_state(self):
+        for mo in self:
+            rate_list = []
+            for move in mo.sim_stock_move_lines:
+                if move.product_uom_qty == 0:
+                    rate_list.append(0)
+                    continue
+                rate = move.product_id.qty_available * 1.0 / move.product_uom_qty
+                rate_list.append(rate)
+            if any(rate < 0.5 for rate in rate_list):
+                mo.material_state = 'red'
+            elif all(rate >= 1.0 for rate in rate_list):
+                mo.material_state = 'green'
+            else:
+                mo.material_state = 'yellow'
+
     ava_spent_time = fields.Float(string=u'平均生产用时(h)', compute='_compute_ava_spent_time')
     real_theo_spent_time = fields.Float(string=u'生产用时(h)', compute='_compute_real_theo_spent_time')
     produce_speed_factor = fields.Selection(related="bom_id.produce_speed_factor", )
@@ -287,6 +394,17 @@ class MrpProductionExtend(models.Model):
 
     theo_spent_time = fields.Float(string=u'生产用时(h)', compute='_compute_theo_spent_time')
 
+    prepare_material_state = fields.Selection(string=u"备料状态", selection=[('red', u'红'),
+                                                                         ('yellow', u'黄'),
+                                                                         ('green', u'绿'), ],
+                                              required=False,
+                                              compute='_compute_prepare_material_state')
+
+    material_state = fields.Selection(string=u"物料状态", selection=[('red', u'红'),
+                                                                 ('yellow', u'黄'),
+                                                                 ('green', u'绿'), ],
+                                      required=False,
+                                      compute='_compute_material_state')
     '''
     操作mo信息接口
     '''
@@ -503,7 +621,7 @@ class MrpProductionExtend(models.Model):
                         next_mo_start_time = end_time.astimezone(pytz.timezone(self.env.user.tz))
 
     # base_on_today 第一个mo的排产时间是否基于今天
-    def replanned_mo(self, origin_production_line, production_line, base_on_today=False):
+    def replanned_mo(self, origin_production_line, production_line, base_on_today=False, is_priority=False):
 
         # if not production_line:
         #     no_production_line = True
@@ -531,6 +649,22 @@ class MrpProductionExtend(models.Model):
             new_domain = domain + [("production_line_id", "=", production_line.id)]
             all_mos = self.env["mrp.production"].search(new_domain,
                                                         order=ORDER_BY)
+            if is_priority:  # 如果是优先排产
+                all_mos -= self
+                first_start_time = fields.Datetime.from_string(all_mos[0].planned_start_backup)
+                new_datetime = datetime(first_start_time.year,
+                                        first_start_time.month,
+                                        first_start_time.day,
+                                        first_start_time.hour,
+                                        first_start_time.minute,
+                                        first_start_time.second,
+                                        microsecond=first_start_time.microsecond,
+                                        tzinfo=pytz.timezone("UTC"))
+
+                next_mo_start_time = new_datetime.astimezone(pytz.timezone(self.env.user.tz)) - relativedelta(days=1)
+
+                self.planned_start_backup = next_mo_start_time
+                all_mos = self + all_mos
 
         if production_line.id == origin_production_line.id:
             return origin_mos, all_mos
@@ -547,6 +681,7 @@ class MrpProductionExtend(models.Model):
                         planned_start_backup = fields.Datetime.from_string(all_mos[1].date_planned_start)
                     else:
                         planned_start_backup = fields.Datetime.from_string(all_mos[0].date_planned_start)
+
                     new_datetime = datetime(planned_start_backup.year,
                                             planned_start_backup.month,
                                             planned_start_backup.day,

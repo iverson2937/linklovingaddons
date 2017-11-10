@@ -18,7 +18,7 @@ PURCHASE_TYPE = {
 }
 MO_STATE = {
     'draft': u'草稿',
-    'confirmed': u'已排产',
+    'confirmed': u'需求确认',
     'waiting_material': u'等待备料',
     'prepare_material_ing': u'备料中',
     'finish_prepare_material': u'备料完成',
@@ -131,14 +131,19 @@ class ProductTemplate(models.Model):
                 ids.append({
                     'id': mo.id,
                     'name': mo.name,
+                    'prepare_material_state': mo.prepare_material_state,
+                    'material_state': mo.material_state,
                     'product_id': mo.product_tmpl_id.product_variant_ids[0].id,
                     'qty': mo.product_qty,
                     'uuid': str(uuid.uuid1()),
-                    'origin': mo.origin,
+                    'origin': mo.origin if mo.origin else '',
+                    'date_planned_finished': mo.date_planned_finished if mo.date_planned_finished else '',
+                    'date_planned_start': mo.date_planned_start if mo.date_planned_start else '',
+                    'planned_start_backup': mo.planned_start_backup if mo.planned_start_backup else '',
+                    'in_charge_id': mo.in_charge_id.name,
                     'state': MO_STATE[mo.state],
-                    'date': mo.date_planned_start,
-                    'status_light': mo.status_light,
-                    'material_light': mo.material_light,
+                    # 'status_light': mo.status_light,
+                    # 'material_light': mo.material_light,
                     'remark': mo.remark if mo.remark else ''
                     # 'origin': mo.origin if mo.origin else '',
                 })
@@ -203,6 +208,7 @@ class ProductTemplate(models.Model):
             'name': self.name,
             'bom_lines': bom_lines,
             'product_id': self.id,
+            'product_p_id': self.product_variant_ids[0].id,
             'process': process,
             'type': PRODUCT_TYPE.get(self.product_ll_type),
             'part_no': self.default_code,
