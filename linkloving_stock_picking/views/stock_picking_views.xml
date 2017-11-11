@@ -53,6 +53,10 @@
                 </xpath>
                 <xpath expr="//field[@name='location_id']" position="after">
                     <field name="tracking_number" string="Tracking Number"/>
+                    <field name="remark" string="原单据备注"/>
+                </xpath>
+                <xpath expr="//field[@name='origin']" position="after">
+                    <field name="remark" string="原单据备注"/>
                 </xpath>
 
 

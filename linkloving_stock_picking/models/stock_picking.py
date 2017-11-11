@@ -9,6 +9,15 @@ class StockPicking(models.Model):
     _name = 'stock.picking'
     _inherit = ['stock.picking', 'ir.needaction_mixin']
     tracking_number = fields.Char(string=u'Tracking Number')
+    remark = fields.Text(string=u'备注', compute='_get_stock_picking_remark')
+
+    def _get_stock_picking_remark(self):
+        if self.po_id:
+            self.remark = self.po_id.remark
+        elif self.so_id:
+            self.remark = self.po_id.remark
+        else:
+            self.remark = ''
 
     @api.multi
     def action_view_qc_result(self):

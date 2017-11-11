@@ -230,7 +230,6 @@
                                 'default_process_id': process_id,
                                 'default_production_line_id': production_line_id,
                                 'default_in_charge_id': in_charge_id,
-                                'default_supplier_id': supplier_id,
                                 'default_product_qty': product_qty}"
                                 string="开始排产"/>
                         <button name="action_cancel" type="object" string="取消订单"
@@ -287,16 +286,17 @@
                                     <!--attrs="{'invisible': [('state','=','done')]}"-->
                                     <!--/>-->
                                 </div>
-                                <field name="process_id" options="{'no_create':True}" string="Process" required="1"/>
+                                <field name="process_id" options="{'no_create':True}" string="工序" required="1"
+                                       readonly="1"/>
                                 <field name="production_line_id" domain="[('process_id', '=', process_id)]"
-                                       attrs="{'required': [('state', '=', 'confirmed')]}"/>
-                                <field name="in_charge_id" options="{'no_create':True}"/>
-                                <field name="supplier_id"/>
-                                <field name="planned_start_backup" required="1"/>
+                                       readonly="1"/>
+                                <field name="in_charge_id" options="{'no_create':True}" readonly="1"/>
+                                <field name="supplier_id" readonly="1"/>
+                                <field name="planned_start_backup" required="1" readonly="1"/>
 
                                 <field name="routing_id" groups="mrp.group_mrp_routings"/>
-                                <field name="date_planned_start" readonly="1"/>
-                                <field name="date_planned_finished" readonly="1"/>
+                                <field name="date_planned_start" readonly="1" string="开始"/>
+                                <field name="date_planned_finished" readonly="1" string="结束"/>
                             </group>
                             <group>
                                 <field name="bom_id"
@@ -412,7 +412,6 @@
                             <group>
                                 <field name="product_qty" required="1"/>
                                 <field name="in_charge_id" required="1"/>
-                                <field name="supplier_id"/>
                             </group>
                         </group>
 

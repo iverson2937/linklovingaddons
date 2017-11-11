@@ -5,11 +5,12 @@ odoo.define('linkloving_core.product_detail', function (require) {
     var Model = require('web.Model');
     var Widget = require('web.Widget');
     var Dialog = require('web.Dialog');
-
+    var ControlPanelMixin = require('web.ControlPanelMixin');
+    var ControlPanel = require('web.ControlPanel');
     var QWeb = core.qweb;
     var _t = core._t;
 
-    var KioskConfirm = Widget.extend({
+    var KioskConfirm = Widget.extend(ControlPanelMixin, {
         template: "HomePage",
         events: {
             'click .click_tag_a': 'show_bom_line',
@@ -32,30 +33,30 @@ odoo.define('linkloving_core.product_detail', function (require) {
             'click .delete_mo_btn': 'click_delete_mo',
             'click .create_po_btn': 'click_create_po',
             'click .delete_po_btn': 'click_delete_po',
-            'mouseenter .trace_back':'mouseenter_ev'
+            'mouseenter .trace_back': 'mouseenter_ev'
         },
 
-        mouseenter_ev:function (e) {
+        mouseenter_ev: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             console.log(target)
-            if($(target).hasClass('mo_trace')){
+            if ($(target).hasClass('mo_trace')) {
                 var trace_id = $(target).parents('h4').children('.show_mo_number').attr('data-id');
                 console.log(parseInt(trace_id));
                 new Model("mrp.production")
                     .call("get_mail_message", [parseInt(trace_id)])
                     .then(function (result) {
                         console.log(result);
-                        $(target).attr('title',result[0].name + ',' + result[0].time + ',' + result[0].description)
+                        $(target).attr('title', result[0].name + ',' + result[0].time + ',' + result[0].description)
                     })
-            }else if($(target).hasClass('po_trace')){
+            } else if ($(target).hasClass('po_trace')) {
                 var trace_id = $(target).parents('h4').children('.show_po_number').attr('data-id');
                 console.log(parseInt(trace_id));
                 new Model("purchase.order")
                     .call("get_mail_message", [parseInt(trace_id)])
                     .then(function (result) {
                         console.log(result);
-                        $(target).attr('title',result[0].name + ',' + result[0].time + ',' + result[0].description)
+                        $(target).attr('title', result[0].name + ',' + result[0].time + ',' + result[0].description)
                     })
             }
         },
@@ -558,7 +559,11 @@ odoo.define('linkloving_core.product_detail', function (require) {
         },
 
         init: function (parent, action) {
+            this._super(parent);
             this._super.apply(this, arguments);
+            if (parent && parent.action_stack.length > 0) {
+                this.action_manager = parent.action_stack[0].widget.action_manager
+            }
             this.product_id = action.product_id;
             var self = this;
         },
@@ -652,6 +657,12 @@ odoo.define('linkloving_core.product_detail', function (require) {
         },
         start: function () {
             var self = this;
+            var cp_status = {
+                breadcrumbs: self.action_manager && self.action_manager.get_breadcrumbs(),
+                // cp_content: _.extend({}, self.searchview_elements, {}),
+            };
+            console.log(cp_status);
+            self.update_control_panel(cp_status);
             if (this.product_id) {
                 return new Model("product.template")
                     .call("get_detail", [this.product_id])

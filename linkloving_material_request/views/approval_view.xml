@@ -385,9 +385,6 @@
                            attrs="{'invisible': [('Materials_development_way', '=', False)]}"/>
                 </xpath>
 
-                <xpath expr="//field[@name='min_date']" position="after">
-                    <field name="note"/>
-                </xpath>
 
             </field>
         </record>
