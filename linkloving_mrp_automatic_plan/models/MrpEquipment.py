@@ -80,7 +80,7 @@ FIELDS = ["name", "alia_name", "product_tmpl_id", "state", "product_qty",
           "planned_start_backup", "date_planned_start", "date_planned_finished",
           'theo_spent_time', 'availability', 'product_order_type', 'production_line_id',
           'produce_speed_factor', 'theory_factor', 'real_theo_spent_time', 'ava_spent_time',
-          'prepare_material_state', 'material_state']
+          'prepare_material_state', 'material_state', 'last_mo_time', 'total_time', 'total_ava_time']
 class ProcurementOrderExtend(models.Model):
     _inherit = 'procurement.order'
 
@@ -194,6 +194,32 @@ class MrpProductionLine(models.Model):
                 eq_names = eq_names + em.name
             line.line_employee_names = eq_names
 
+    @api.multi
+    def _compute_last_mo_time(self):
+        domain = [("state", "in", ['draft', 'confirmed', 'waiting_material'])]
+        for line in self:
+            new_domain = domain + [("production_line_id", "=", line.id)]
+            last_mo = self.env["mrp.production"].search(new_domain,
+                                                        order="date_planned_start,id desc",
+                                                        limit=1)
+            line.last_mo_time = last_mo.date_planned_finished
+
+    @api.multi
+    def _compute_total_time(self):
+        domain = [("state", "in", ['draft', 'confirmed', 'waiting_material'])]
+        for line in self:
+            new_domain = domain + [("production_line_id", "=", line.id)]
+            mos = self.env["mrp.production"].search(new_domain)
+            line.total_time = sum(mos.mapped("real_theo_spent_time"))
+
+    @api.multi
+    def _compute_total_ava_time(self):
+        domain = [("state", "in", ['draft', 'confirmed', 'waiting_material'])]
+        for line in self:
+            new_domain = domain + [("production_line_id", "=", line.id)]
+            mos = self.env["mrp.production"].search(new_domain)
+            line.total_ava_time = sum(mos.mapped("ava_spent_time"))
+
     name = fields.Char(string=u"名称", required=True, )
     process_id = fields.Many2one(string=u'工序', comodel_name='mrp.process')
     equipment_ids = fields.One2many(string=u'设备', comodel_name='mrp.process.equipment',
@@ -205,6 +231,9 @@ class MrpProductionLine(models.Model):
     line_employee_names = fields.Char(string=u'产线人员', compute='_compute_line_employee_names')
     amount_of_planned_mo = fields.Float(string=u'生产总数', compute="_compute_amount_of_planned_mo")
     sequence = fields.Integer(string=u'显示顺序序号', default=30, help=u"越小排序越前")
+    last_mo_time = fields.Datetime(compute="_compute_last_mo_time")
+    total_time = fields.Float(compute='_compute_total_time')
+    total_ava_time = fields.Float(compute='_compute_total_ava_time')
     # 根据process_id 获取产线
     def get_production_line_list(self, **kwargs):
         process_id = kwargs.get("process_id")

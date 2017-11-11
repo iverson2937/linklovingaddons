@@ -321,7 +321,6 @@ class MrpProductionExtend(models.Model):
     feedback_on_rework = fields.Many2one("mrp.qc.feedback", u"返工单", track_visibility='onchange')
 
     @api.multi
-    @api.depends('qc_feedback_ids')
     def _compute_qty_unpost(self):
         for production in self:
             feedbacks = production.qc_feedback_ids.filtered(lambda x: x.state not in ["check_to_rework"])

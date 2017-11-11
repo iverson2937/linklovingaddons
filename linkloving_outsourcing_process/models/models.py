@@ -18,6 +18,12 @@ class MrpProductionExtend(models.Model):
     outsourcing_order_ids = fields.One2many(comodel_name="outsourcing.process.order", inverse_name="production_id",
                                             string=u'外协单')
 
+    @api.multi
+    def _compute_qty_unpost(self):
+        res = super(MrpProductionExtend, self)._compute_qty_unpost()
+        for production in self:
+            outsourcing_orders = production.outsourcing_order_ids.filtered(lambda x: x.state not in ["done"])
+            production.qty_unpost += sum(outsourcing_orders.mapped("qty_produced"))
 
 class MrpProductionProduceExtend(models.TransientModel):
     _inherit = 'mrp.product.produce'

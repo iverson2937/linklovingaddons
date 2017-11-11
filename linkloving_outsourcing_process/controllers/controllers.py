@@ -7,9 +7,9 @@ from odoo.http import request
 class LinklovingOutsourceAppApi(http.Controller):
     @http.route('/linkloving_app_api/get_outsourcing_order_by_state', type='json', auth="none", csrf=False, )
     def get_outsourcing_order_by_state(self, **kw):
-        state = request.context.get("state")
-        limit = request.context.get("limit")
-        offset = request.context.get("offset")
+        state = request.jsonrequest.get("state")
+        limit = request.jsonrequest.get("limit")
+        offset = request.jsonrequest.get("offset")
 
         orders = request.env["outsourcing.process.order"].sudo().search_read([("state", "=", state)],
                                                                              limit=limit,
@@ -18,9 +18,9 @@ class LinklovingOutsourceAppApi(http.Controller):
 
     @http.route('/linkloving_app_api/change_outsourcing_order_state', type='json', auth="none", csrf=False, )
     def change_outsourcing_order_state(self, **kw):
-        order_id = request.context.get("order_id")
-        qty_produced = request.context.get("qty_produced")
-        state = request.context.get("state")
+        order_id = request.jsonrequest.get("order_id")
+        qty_produced = request.jsonrequest.get("qty_produced")
+        state = request.jsonrequest.get("state")
         # offset = request.context.get("offset")
 
         order = request.env["outsourcing.process.order"].sudo(LinklovingAppApi.CURRENT_USER).browse(order_id)
