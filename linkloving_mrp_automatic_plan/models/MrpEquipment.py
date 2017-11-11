@@ -240,7 +240,9 @@ class MrpProductionLine(models.Model):
 
         lines = self.env["mrp.production.line"].search_read([("process_id", "=", process_id), ])
         count = self.env["mrp.production"].search_count([("process_id", "=", process_id),
-                                                         ("production_line_id", "=", False)])
+                                                         ("production_line_id", "=", False),
+                                                         ("state", "not in",
+                                                          ['done', 'cancel', 'waiting_post_inventory'])])
         lines.append({
             'id': -1,
             'name': u'未分组',
@@ -286,8 +288,8 @@ class MrpProductionLine(models.Model):
                                     ("state", "not in", ['done', 'cancel', 'waiting_post_inventory']),
                                     ("process_id", "=", process_id)
                                     ], domains]),
-            # limit=limit,
-                                                     # offset=offset,
+                limit=limit,
+                offset=offset,
                                                      order=ORDER_BY,
             fields=FIELDS
             )

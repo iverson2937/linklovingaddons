@@ -59,6 +59,7 @@ class MrpProductionProduceExtend(models.TransientModel):
             'qty_produced': draft_sum_qty,
             'production_id': self.production_id.id,
             'product_id': self.production_id.product_id.id,
+            'employee_id': self.production_id.employee_id.id,
         })
         order_draft.unlink()
         return feedback
@@ -68,6 +69,13 @@ class OutsouringPorcessOrder(models.Model):
     _name = 'outsourcing.process.order'
 
     company_id = fields.Many2one("res.company", default=lambda self: self.env.user.company_id, string=u'公司')
+
+    employee_id = fields.Many2one(comodel_name="hr.employee", string=u"产线负责人", required=False, )
+
+    outsourcing_supplier_id = fields.Many2one(comodel_name="res.partner",
+                                              related='production_id.outsourcing_supplier_id', string=u'外协加工商')
+    po_user_id = fields.Many2one(comodel_name="res.users", related='outsourcing_supplier_id.po_user_id',
+                                 string=u'采购负责人')
     name = fields.Char('Name', index=True, required=True, )
     production_id = fields.Many2one('mrp.production', ondelete='restrict', string=u'生产单')
     qty_produced = fields.Float(string=u'数量')
