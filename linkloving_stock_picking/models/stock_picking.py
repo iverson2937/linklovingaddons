@@ -111,23 +111,23 @@ class StockPicking(models.Model):
         self.mapped('pack_operation_product_ids').unlink()  # Checks if moves are not done
         return super(StockPicking, self).unlink()
 
-
-
+    @api.multi
     def _get_origin_number(self):
-        if self.origin:
+        for picking in self:
+            if picking.origin:
 
-            if self.env['sale.order'].search([('name', '=', self.origin)]):
-                so = self.env['sale.order'].search([('name', '=', self.origin)])
-                self.so_id = so.id
-                self.remark = so.remark if so.remark else ''
-            elif self.env['purchase.order'].search([('name', '=', self.origin)]):
-                po = self.env['purchase.order'].search([('name', '=', self.origin)])
-                self.po_id = po.id
-                self.remark = po.remark if po.remark else ''
-            else:
-                self.po_id = False
-                self.so_id = False
-                self.remark = ''
+                if self.env['sale.order'].search([('name', '=', picking.origin)]):
+                    so = self.env['sale.order'].search([('name', '=', picking.origin)])
+                    picking.so_id = so.id
+                    picking.remark = so.remark if so.remark else ''
+                elif self.env['purchase.order'].search([('name', '=', picking.origin)]):
+                    po = self.env['purchase.order'].search([('name', '=', picking.origin)])
+                    picking.po_id = po.id
+                    picking.remark = po.remark if po.remark else ''
+                else:
+                    picking.po_id = False
+                    picking.so_id = False
+                    picking.remark = ''
 
     @api.multi
     def _compute_delivery_rule(self):
