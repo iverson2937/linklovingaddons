@@ -41,7 +41,7 @@ class LinkLovingBlogBlog(models.Model):
                 raise UserError(u'已经存在主目录类别')
 
         res = super(LinkLovingBlogBlog, self).create(vals)
-        self.write_website_nenu(res)
+        # self.write_website_nenu(res)
         return res
 
     @api.multi
@@ -53,17 +53,17 @@ class LinkLovingBlogBlog(models.Model):
                 raise UserError(u'已经存在主目录类别')
 
         res = super(LinkLovingBlogBlog, self).write(vals)
-        self.write_website_nenu(self)
+        # self.write_website_nenu(self)
         return res
 
     @api.multi
     def unlink(self):
 
-        if self.is_all_blog:
-            res_list = self.env['blog.blog'].search([]) - self
-            if res_list:
-                index_blog = self.env.ref('website_blog.menu_news')
-                index_blog.write({'url': '/blog/' + str(res_list[0].id)})
+        # if self.is_all_blog:
+        #     res_list = self.env['blog.blog'].search([]) - self
+        #     if res_list:
+        #         index_blog = self.env.ref('website_blog.menu_news')
+        #         index_blog.write({'url': '/blog/' + str(res_list[0].id)})
 
         res = super(LinkLovingBlogBlog, self).unlink()
 
