@@ -581,8 +581,11 @@ class MrpProductionExtend(models.Model):
             domain = group.get("__domain", [])
             mos = MrpProducion.search_read(domain, fields=FIELDS, order=ORDER_BY)
             group["mos"] = self.sorted_mos_by_material(mos, order_by_material)
+            if group.get("production_line_id"):
+                groups_dic[group.get("production_line_id")[0]] = group
+            else:
+                groups_dic['-1'] = group
 
-            groups_dic[group.get("production_line_id")[0]] = group
         return groups_dic
 
     def sorted_mos_by_material(self, mos, order_by_material):
