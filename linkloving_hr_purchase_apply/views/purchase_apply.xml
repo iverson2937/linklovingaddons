@@ -83,7 +83,7 @@
                         <field name="line_ids"
                                attrs="{'readonly':[('state','not in',('done','draft','cancel'))]}">
                             <tree editable="bottom">
-                                <field name="product_id" options="{'no_create':True}" string='申购产品'/>
+                                <field name="product_id" options="{'no_create':True}" string='费用类型'/>
                                 <field name="product_qty"/>
                                 <field name="price_unit" string="金额"
                                        readonly="0"/>

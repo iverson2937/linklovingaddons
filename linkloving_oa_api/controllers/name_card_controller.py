@@ -120,6 +120,7 @@ class NameCardController(http.Controller):
         country_id = dic.get("country_id")
         product_series = dic.get("series_ids") or []
         # job_title = dic.get("job_title")
+        cur_user_id = dic.get('user_id') or 1
         if company_id:
             new_company_id = company_id
         else:
@@ -133,7 +134,7 @@ class NameCardController(http.Controller):
             #     company_name = company_name.replace(u"公司", "")
             company = request.env["res.partner"].sudo().search([("name", "=", company_name)], limit=1)
             if not company:
-                company = request.env["res.partner"].sudo(request.context.get("uid")).create({
+                company = request.env["res.partner"].sudo(request.context.get("uid") or cur_user_id).create({
                     "name": company_real_name,
                     "street": street,
                     "level": int(partner_lv or 0),
@@ -180,7 +181,7 @@ class NameCardController(http.Controller):
                     [("name", "=", me.get("name")), ("parent_id", '=', new_company_id)], )
             if partners:
                 continue
-            s = request.env["res.partner"].sudo(request.context.get("uid")).create({
+            s = request.env["res.partner"].sudo(request.context.get("uid") or cur_user_id).create({
                 "name": me.get("name"),
                 "parent_id": new_company_id,
                 "mobile": me.get("phone"),
