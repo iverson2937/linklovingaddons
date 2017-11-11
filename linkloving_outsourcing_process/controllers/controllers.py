@@ -23,7 +23,7 @@ class LinklovingOutsourceAppApi(http.Controller):
         state = request.jsonrequest.get("state")
         # offset = request.context.get("offset")
 
-        order = request.env["outsourcing.process.order"].sudo(LinklovingAppApi.CURRENT_USER).browse(order_id)
+        order = request.env["outsourcing.process.order"].sudo(LinklovingAppApi.CURRENT_USER()).browse(order_id)
         order.qty_produced = qty_produced
         if state == 'draft_to_out_ing':
             order.action_draft_to_out()

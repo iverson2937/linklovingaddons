@@ -239,6 +239,10 @@ class MrpProductionLine(models.Model):
         process_id = kwargs.get("process_id")
 
         lines = self.env["mrp.production.line"].search_read([("process_id", "=", process_id), ])
+        lines.append({
+            'id': -1,
+            'name': u'未分组',
+        })
         return lines
 
     def get_recent_available_planned_time(self):
@@ -253,6 +257,7 @@ class MrpProductionLine(models.Model):
     #根据产线id获取已排产mo
     def get_mo_by_productin_line(self, **kwargs):
         production_line_id = kwargs.get("production_line_id")
+        process_id = kwargs.get("process_id")
         domains = kwargs.get("domains", [])
         order_by_material = kwargs.get("order_by_material", False)
         # planned_date = kwargs.get("planned_date")
@@ -269,12 +274,14 @@ class MrpProductionLine(models.Model):
         # if tz_name:
         # try:
         # return utc_timestamp.astimezone(context_tz)
-
+        if production_line_id == -1:
+            production_line_id = False
         mos = self.env["mrp.production"].search_read(
             domain=expression.AND([[("production_line_id", "=", production_line_id),
                                     # ("date_planned_start", "<=", end_time_str),
                                                       # ("date_planned_finished", ">=", start_time_str),
-                                                      ("state", "not in", ['done', 'cancel', 'waiting_post_inventory'])
+                                    ("state", "not in", ['done', 'cancel', 'waiting_post_inventory']),
+                                    ("process_id", "=", process_id)
                                     ], domains]),
             # limit=limit,
                                                      # offset=offset,
