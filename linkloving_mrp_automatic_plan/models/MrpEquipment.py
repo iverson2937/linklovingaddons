@@ -286,8 +286,8 @@ class MrpProductionLine(models.Model):
                                     ("state", "not in", ['done', 'cancel', 'waiting_post_inventory']),
                                     ("process_id", "=", process_id)
                                     ], domains]),
-            # limit=limit,
-                                                     # offset=offset,
+                limit=limit,
+                offset=offset,
                                                      order=ORDER_BY,
             fields=FIELDS
             )
