@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+from datetime import datetime
 
 from odoo import models, fields, api
 from models import MO_STATE
@@ -28,16 +29,18 @@ class PurchaseOrderLineWizard(models.TransientModel):
 
     @api.model
     def create(self, vals):
-        product_id = self.env['product.product'].browse(vals.get('product_id'))
+        wizard = super(PurchaseOrderLineWizard, self).create(vals)
         self.env['purchase.order'].create({
             'name': 'New',
-            'partner_id': vals.get('partner_id'),
+            'partner_id': wizard.partner_id.id,
+            'handle_date': wizard.date_planned,
             'order_line': [(0, 0, {
-                'product_id': vals.get('product_id'),
-                'product_qty': float(vals.get('product_uom_qty')),
-                'price_unit': float(vals.get('price_unit')),
-                'product_uom': vals.get('product_uom'),
-                'name': product_id.display_name
+                'product_id': wizard.product_id.id,
+                'product_qty': wizard.product_uom_qty,
+                'price_unit': wizard.price_unit,
+                'product_uom': wizard.product_uom.id,
+                'name': wizard.product_id.display_name,
+                'date_planned': wizard.date_planned
             })]
 
         })
