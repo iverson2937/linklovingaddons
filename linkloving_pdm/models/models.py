@@ -972,9 +972,6 @@ class ReviewProcessWizard(models.TransientModel):
             #             remark=self_copy.remark)
             #     return True
 
-            if not self.product_attachment_info_id.review_id:  # 如果没审核过
-                self.product_attachment_info_id.action_send_to_review()
-
             if file_data_list:
                 for info_one in self.env['product.attachment.info'].browse(
                         [int(info_list_id) for info_list_id in file_data_list]):
@@ -990,6 +987,9 @@ class ReviewProcessWizard(models.TransientModel):
                             partner_id=self.partner_id,
                             remark=self.remark, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
                 return True
+
+            if not self.product_attachment_info_id.review_id:  # 如果没审核过
+                self.product_attachment_info_id.action_send_to_review()
 
             if self.product_attachment_info_id.review_id.who_review_now.id == self.env.user.partner_id.id:
                 self.product_attachment_info_id.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中

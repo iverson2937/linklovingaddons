@@ -28,7 +28,7 @@
                         <button name='action_to_next' type='object' string='送审' class='oe_highlight review_reload'/>
 
                         <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
-                                groups="linkloving_pdm.group_final_review_partner"/>
+                                groups="linkloving_pdm.group_final_review_partner_bom"/>
 
                         <button string='取消' class='oe_link review_reload' special='cancel'/>
                     </footer>
