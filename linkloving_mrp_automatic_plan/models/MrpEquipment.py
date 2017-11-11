@@ -239,9 +239,12 @@ class MrpProductionLine(models.Model):
         process_id = kwargs.get("process_id")
 
         lines = self.env["mrp.production.line"].search_read([("process_id", "=", process_id), ])
+        count = self.env["mrp.production.line"].search_count([("process_id", "=", process_id),
+                                                              ("production_line_id", "=", False)])
         lines.append({
             'id': -1,
             'name': u'未分组',
+            'amount_of_planned_mo': count,
         })
         return lines
 
