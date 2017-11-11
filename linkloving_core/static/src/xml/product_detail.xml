@@ -105,8 +105,8 @@
                                                         <!--<span style="margin-left:15px;color:green;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>-->
                                                         <!--</t>-->
 
-                                                        <span class="mat" t-att-style='"background:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
-                                                        <span class="pre" t-att-style='"background:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
+                                                        <span class="mat fa fa-home" t-att-style='"color:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
+                                                        <span class="mat fa fa-road" t-att-style='"color:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
                                                         <span class="rem" style="margin-left:15px;" data-toggle="tooltip" t-att-title="item.remark"><t t-esc="item.remark"/> </span>
                                                         <span data-toggle="tooltip" class="mo_trace trace_back">追溯</span>
@@ -225,8 +225,8 @@
                                                         <!--<span style="margin-left:15px;color:green;" class="fa fa-circle"></span>-->
                                                         <!--</t>-->
 
-                                                        <span class="mat" t-att-style='"background:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
-                                                        <span class="pre" t-att-style='"background:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
+                                                        <span class="mat fa fa-home" t-att-style='"color:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
+                                                        <span class="pre fa fa-road" t-att-style='"color:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
                                                         <span class="rem" style="margin-left:15px;" data-toggle="tooltip" t-att-title="item.remark"><t t-esc="item.remark"/> </span>
                                                         <span data-toggle="tooltip" class="po_trace trace_back">追溯</span>
@@ -318,8 +318,8 @@
                                                         <!--<span style="margin-left:15px;color:green;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>-->
                                                         <!--</t>-->
 
-                                                        <span class="mat" t-att-style='"background:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
-                                                        <span class="pre" t-att-style='"background:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
+                                                        <span class="mat fa fa-home" t-att-style='"color:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
+                                                        <span class="mat fa fa-road" t-att-style='"color:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
                                                         <span class="rem" style="margin-left:15px;" data-toggle="tooltip" t-att-title="item.remark"><t t-esc="item.remark"/> </span>
                                                         <span data-toggle="tooltip" class="mo_trace trace_back">追溯</span>
@@ -440,8 +440,8 @@
                                                         <!--<span style="margin-left:15px;color:green;" class="fa fa-circle"></span>-->
                                                         <!--</t>-->
 
-                                                        <span class="mat" t-att-style='"background:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
-                                                        <span class="pre" t-att-style='"background:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
+                                                        <span class="mat fa fa-home" t-att-style='"color:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
+                                                        <span class="mat fa fa-road" t-att-style='"color:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
                                                         <span class="rem" style="margin-left:15px;" data-toggle="tooltip" t-att-title="item.remark"><t t-esc="item.remark"/> </span>
                                                         <span data-toggle="tooltip" class="po_trace trace_back">追溯</span>
@@ -502,8 +502,8 @@
                         <!--<span style="margin-left:15px;color:green;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>-->
                         <!--</t>-->
 
-                        <span class="mat" t-att-style='"background:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
-                        <span class="pre" t-att-style='"background:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
+                        <span class="mat fa fa-home" t-att-style='"color:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
+                        <span class="mat fa fa-road" t-att-style='"color:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
                         <span data-toggle="tooltip" class="po_trace trace_back">追溯</span>
                     </h4>
@@ -554,8 +554,8 @@
                         <!--<span style="margin-left:15px;color:green;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>-->
                         <!--</t>-->
 
-                        <span class="mat" t-att-style='"background:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
-                        <span class="pre" t-att-style='"background:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
+                        <span class="mat fa fa-home" t-att-style='"color:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
+                        <span class="mat fa fa-road" t-att-style='"color:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
                     </h4>
                 </div>
                 <div class="panel-collapse collapse" t-att-id="'mo_detail'+item.uuid">

@@ -321,7 +321,6 @@ class MrpProductionExtend(models.Model):
     feedback_on_rework = fields.Many2one("mrp.qc.feedback", u"返工单", track_visibility='onchange')
 
     @api.multi
-    @api.depends('qc_feedback_ids')
     def _compute_qty_unpost(self):
         for production in self:
             feedbacks = production.qc_feedback_ids.filtered(lambda x: x.state not in ["check_to_rework"])
@@ -1104,6 +1103,10 @@ class MrpProductionProduceExtend(models.TransientModel):
 
     @api.multi
     def do_produce(self):
+        self._do_produce()
+        return {'type': 'ir.actions.act_window_close'}
+
+    def _do_produce(self):
         quantity = self.product_qty
         if float_compare(quantity, 0, precision_rounding=self.product_uom_id.rounding) > 0:
             feedback = self.feedback_create(self.product_qty)  # 产出  生成品检单
@@ -1118,8 +1121,6 @@ class MrpProductionProduceExtend(models.TransientModel):
                     except ValueError, e:
                         feedback.unlink()
                         raise UserError(e)
-
-        return {'type': 'ir.actions.act_window_close'}
 
     def do_produce_and_post_inventory(self):
         quantity = self.product_qty
@@ -1265,10 +1266,10 @@ class ReturnOfMaterial(models.Model):
     def _prepare_move_values(self, product):
         self.ensure_one()
 
-        # if product.product_type == 'semi-finished':
-        #     move_type = 'manufacturing_mo_in'
-        # elif product.product_type == 'material':
-        #     move_type = 'manufacturing_rejected_out'
+        if product.product_type == 'semi-finished':
+            move_type = 'manufacturing_mo_in'
+        elif product.product_type == 'material':
+            move_type = 'manufacturing_rejected_out'
 
         return {
             'name': self.name,
@@ -1282,7 +1283,7 @@ class ReturnOfMaterial(models.Model):
             'state': 'confirmed',
             'origin': 'Return %s' % self.production_id.name,
             'is_return_material': True,
-            # 'move_order_type': move_type,
+            'move_order_type': move_type,
             # 'restrict_partner_id': self.owner_id.id,
             # 'picking_id': self.picking_id.id
         }

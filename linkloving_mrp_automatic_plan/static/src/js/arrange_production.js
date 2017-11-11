@@ -198,14 +198,15 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             var self = this;
             new Model("mrp.production").call("show_paichan_form_view", [parseInt($(target).parents('.ap_item_wrap').attr("data-mo-id"))]).then(function (res) {
                 var action = {
-                type: 'ir.actions.act_window',
-                res_model:'mrp.production',
+                    type: 'ir.actions.act_window',
+                    res_model: 'mrp.production',
                     view_mode: 'form',
                     views: [[res, 'form']],
-                view_type: 'form',
+                    view_type: 'form',
                     view_id: res,
-                res_id: parseInt($(target).parents('.ap_item_wrap').attr("data-mo-id")),
-                target:"new"
+                    res_id: parseInt($(target).parents('.ap_item_wrap').attr("data-mo-id")),
+                    readonly: true,
+                    target: "new"
                 };
                 console.log("332")
                 self.do_action(action);

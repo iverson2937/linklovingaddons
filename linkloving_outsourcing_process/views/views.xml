@@ -1,0 +1,175 @@
+<openerp>
+    <data>
+        <!-- Inherit Form View to Modify it -->
+        <record id="form_plan_mo_wizard_inherit" model="ir.ui.view">
+            <field name="name">plan.mo.wizard.form</field>
+            <field name="model">plan.mo.wizard</field>
+            <field name="inherit_id" ref="linkloving_mrp_automatic_plan.form_plan_mo_wizard"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='in_charge_id']" position="after">
+                    <!-- Add your fields or attributes here -->
+                    <field name="outsourcing_supplier_id"/>
+                </xpath>
+
+            </field>
+        </record>
+
+
+        <!-- Inherit Form View to Modify it -->
+        <record id="mrp_production_paichan_form_view_inherit" model="ir.ui.view">
+            <field name="name">mrp.production.form</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="linkloving_mrp_automatic_plan.mrp_production_paichan_form_view"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='in_charge_id']" position="after">
+                    <!-- Add your fields or attributes here -->
+                    <field name="outsourcing_supplier_id"/>
+                </xpath>
+
+                <xpath expr="//button[@name='get_formview']" position="replace">
+                    <button type="formview_dialog"
+                            name="get_formview"
+                            class="oe_highlight"
+                            attrs="{'invisible': [('state', 'not in', ('confirmed', 'draft'))]}"
+                            context="{'default_production_id': active_id,
+                                'production_id': active_id,
+                                'default_process_id': process_id,
+                                'default_production_line_id': production_line_id,
+                                'default_in_charge_id': in_charge_id,
+                                'default_outsourcing_supplier_id': outsourcing_supplier_id,
+                                'default_product_qty': product_qty}"
+                            string="开始排产"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="outsourcing_process_order_tree" model="ir.ui.view">
+            <field name="name">outsourcing.process.order.tree</field>
+            <field name="model">outsourcing.process.order</field>
+            <field name="arch" type="xml">
+                <tree string="外协单">
+                    <field name="production_id"/>
+                    <field name="product_id"/>
+                    <field name="qty_produced"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="outsourcing_process_order_form" model="ir.ui.view">
+            <field name="name">outsourcing.process.order.form</field>
+            <field name="model">outsourcing.process.order</field>
+            <field name="arch" type="xml">
+                <form string="外协单">
+                    <header>
+                        <button name="action_draft_to_out" string="开始外协" class="oe_highlight" states="draft"
+                                type="object"/>
+                        <button name="action_out_to_done" string="完成外协" class="oe_highlight" states="out_ing"
+                                type="object"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,out_ing,done"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="New" nolabel="1" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="production_id" readonly="1"/>
+                                <field name="product_id"/>
+                            </group>
+                            <group>
+                                <field name="qty_produced" attrs="{'readonly': [('state', 'in', ['done'])]}"/>
+                                <field name="company_id" readonly="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <menuitem
+                id="mrp_production_outsource"
+                parent="mrp.menu_mrp_manufacturing"
+                sequence="3" name="外协单"/>
+
+        <record id="action_outsource_draft" model="ir.actions.act_window">
+            <field name="name">等待的外协</field>
+            <field name="res_model">outsourcing.process.order</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state','=', 'draft')]</field>
+            <field name="context">{'state': 'draft'}</field>
+            <!--<field name="search_view_id" ref="view_mrp_qc_feedback_search"/>-->
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    没有等待中的单据.
+                </p>
+                <p>
+
+                </p>
+            </field>
+        </record>
+
+        <menuitem
+                id="mrp_production_wait_outsource"
+                parent="mrp_production_outsource"
+                action="action_outsource_draft"
+                sequence="2" name="等待的外协"/>
+
+        <record id="action_outsource_out_ing" model="ir.actions.act_window">
+            <field name="name">进行中外协</field>
+            <field name="res_model">outsourcing.process.order</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state','=', 'out_ing')]</field>
+            <field name="context">{'state': 'out_ing'}</field>
+            <!--<field name="search_view_id" ref="view_mrp_qc_feedback_search"/>-->
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    没有外协中的单据.
+                </p>
+                <p>
+
+                </p>
+            </field>
+        </record>
+
+        <menuitem
+                id="mrp_production_outsource_out_ing"
+                parent="mrp_production_outsource"
+                action="action_outsource_out_ing"
+                sequence="3" name="进行中外协"/>
+
+        <record id="action_outsource_done" model="ir.actions.act_window">
+            <field name="name">已完成的外协</field>
+            <field name="res_model">outsourcing.process.order</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state','=', 'done')]</field>
+            <field name="context">{'state': 'done'}</field>
+            <!--<field name="search_view_id" ref="view_mrp_qc_feedback_search"/>-->
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    没有已完成的外协.
+                </p>
+                <p>
+
+                </p>
+            </field>
+        </record>
+
+        <menuitem
+                id="mrp_production_outsource_done"
+                parent="mrp_production_outsource"
+                action="action_outsource_done"
+                sequence="4" name="已完成的外协"/>
+    </data>
+</openerp>
