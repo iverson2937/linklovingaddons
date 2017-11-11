@@ -290,7 +290,7 @@ class MrpProductionLine(models.Model):
                                     ], domains]),
                 limit=limit,
                 offset=offset,
-                                                     order=ORDER_BY,
+                order=ORDER_BY,
             fields=FIELDS
             )
         return self.env["mrp.production"].sorted_mos_by_material(mos, order_by_material)
@@ -538,13 +538,37 @@ class MrpProductionExtend(models.Model):
             'result': mos,
         }
 
+    def get_unplanned_mo_by_search(self, **kwargs):
+        process_id = kwargs.get("process_id")
+        search_domain = kwargs.get("domains", [])
+        limit = kwargs.get("limit")
+        offset = kwargs.get("offset")
+
+        domain = [("process_id", "=", process_id),
+                  ("production_line_id", "=", False),
+                  ("state", "in", ['draft', 'confirmed', 'waiting_material'])]
+
+        domains = kwargs.get("domains", [])
+        new_domains = expression.AND([domains, domain, search_domain])
+        mos = self.env["mrp.production"].search_read(
+                new_domains,
+                limit=limit,
+                offset=offset,
+                order=ORDER_BY,
+                fields=FIELDS
+        )
+        length = self.env["mrp.production"].search_count(new_domains)
+        return {
+            'length': length,
+            'result': mos,
+        }
+
     def get_planned_mo_by_search(self, **kwargs):
         process_id = kwargs.get("process_id")
         domains = kwargs.get("domains", [])
         order_by_material = kwargs.get("order_by_material", False)
         group_by = kwargs.get("group_by")
         new_domain = expression.AND([domains, [("process_id", "=", process_id),
-                                               ("production_line_id", "!=", False),
                                                ("state", "not in", ['done', 'cancel', 'waiting_post_inventory'])]])
 
         groups = self.read_group(domain=new_domain,
