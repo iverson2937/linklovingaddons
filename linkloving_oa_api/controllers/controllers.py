@@ -17,7 +17,7 @@ from pip import download
 
 import odoo
 import odoo.modules.registry
-from myaddons.linkloving_app_api.controllers.controllers import LinklovingAppApi
+from linklovingaddons.linkloving_app_api.controllers.controllers import LinklovingAppApi
 
 from odoo import fields
 from odoo.osv import expression
