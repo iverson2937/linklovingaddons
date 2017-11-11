@@ -9,13 +9,15 @@ class StockPicking(models.Model):
     _name = 'stock.picking'
     _inherit = ['stock.picking', 'ir.needaction_mixin']
     tracking_number = fields.Char(string=u'Tracking Number')
-    remark = fields.Text(string=u'备注', compute='_get_stock_picking_remark')
+    remark = fields.Text(string=u'备注', compute='_get_po_number')
 
     def _get_stock_picking_remark(self):
+        print 'dddddddddddddd'
         if self.po_id:
+            print self.po_id.remark, 'dddddddddddddddddddddddddddddd'
             self.remark = self.po_id.remark
         elif self.so_id:
-            self.remark = self.po_id.remark
+            self.remark = self.so_id.remark
         else:
             self.remark = ''
 
@@ -121,13 +123,25 @@ class StockPicking(models.Model):
         if self.origin:
             po = self.env['purchase.order'].search([('name', '=', self.origin)])
             self.po_id = po.id if po else None
+            self.remark = self.po_id.remark if po else ''
 
     po_id = fields.Many2one('purchase.order', compute=_get_po_number)
 
-    def _get_so_number(self):
+    def _get_origin_number(self):
         if self.origin:
-            so = self.env['sale.order'].search([('name', '=', self.origin)])
-            self.so_id = so.id if so else None
+
+            if self.env['sale.order'].search([('name', '=', self.origin)]):
+                so = self.env['sale.order'].search([('name', '=', self.origin)])
+                self.so_id = so
+                self.remark = self.so.remark if so.remark else ''
+            elif self.env['purchase.order'].search([('name', '=', self.origin)]):
+                po = self.env['purchase.order'].search([('name', '=', self.origin)])
+                self.po_id = po
+                self.remark = self.po.remark if po.remark else ''
+            else:
+                self.po_id = False
+                self.so_id = False
+                self.remark = ''
 
     @api.multi
     def _compute_delivery_rule(self):
@@ -148,8 +162,8 @@ class StockPicking(models.Model):
     # actual_state = fields.Selection(string="", selection=[('', ''), ('', ''), ], required=False, )
     complete_rate = fields.Integer(u"可用产品比率", compute="_compute_complete_rate", store=True)
     available_rate = fields.Integer(u"可用率", compute="_compute_available_rate")
-    po_id = fields.Many2one('purchase.order', compute=_get_so_number)
-    so_id = fields.Many2one('sale.order', compute=_get_so_number)
+    po_id = fields.Many2one('purchase.order', compute=_get_origin_number)
+    so_id = fields.Many2one('sale.order', compute=_get_origin_number)
     state = fields.Selection([
         ('draft', 'Draft'), ('cancel', 'Cancelled'),
         ('waiting', 'Waiting Another Operation'),
