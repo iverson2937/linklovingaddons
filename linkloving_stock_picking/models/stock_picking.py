@@ -9,17 +9,9 @@ class StockPicking(models.Model):
     _name = 'stock.picking'
     _inherit = ['stock.picking', 'ir.needaction_mixin']
     tracking_number = fields.Char(string=u'Tracking Number')
-    remark = fields.Text(string=u'备注', compute='_get_po_number')
+    remark = fields.Text(string=u'备注', compute='_get_origin_number')
 
-    def _get_stock_picking_remark(self):
-        print 'dddddddddddddd'
-        if self.po_id:
-            print self.po_id.remark, 'dddddddddddddddddddddddddddddd'
-            self.remark = self.po_id.remark
-        elif self.so_id:
-            self.remark = self.so_id.remark
-        else:
-            self.remark = ''
+
 
     @api.multi
     def action_view_qc_result(self):
@@ -119,25 +111,19 @@ class StockPicking(models.Model):
         self.mapped('pack_operation_product_ids').unlink()  # Checks if moves are not done
         return super(StockPicking, self).unlink()
 
-    def _get_po_number(self):
-        if self.origin:
-            po = self.env['purchase.order'].search([('name', '=', self.origin)])
-            self.po_id = po.id if po else None
-            self.remark = self.po_id.remark if po else ''
 
-    po_id = fields.Many2one('purchase.order', compute=_get_po_number)
 
     def _get_origin_number(self):
         if self.origin:
 
             if self.env['sale.order'].search([('name', '=', self.origin)]):
                 so = self.env['sale.order'].search([('name', '=', self.origin)])
-                self.so_id = so
-                self.remark = self.so.remark if so.remark else ''
+                self.so_id = so.id
+                self.remark = so.remark if so.remark else ''
             elif self.env['purchase.order'].search([('name', '=', self.origin)]):
                 po = self.env['purchase.order'].search([('name', '=', self.origin)])
-                self.po_id = po
-                self.remark = self.po.remark if po.remark else ''
+                self.po_id = po.id
+                self.remark = po.remark if po.remark else ''
             else:
                 self.po_id = False
                 self.so_id = False
