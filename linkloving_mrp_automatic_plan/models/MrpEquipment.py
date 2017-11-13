@@ -60,6 +60,7 @@ class Inheritforarrangeproduction(models.Model):
     _inherit = 'mrp.process'
 
     production_line_ids = fields.One2many(comodel_name="mrp.production.line", inverse_name="process_id", string=u'产线')
+
     @api.multi
     def arrange_production(self):
         return {
@@ -73,6 +74,22 @@ class Inheritforarrangeproduction(models.Model):
         #                                         default='equipment', string=u'生产速度因子', )
         #
         # theory_factor = fields.Integer(string=u'理论 人数/设备数', require=True)
+
+    def get_process_info(self):
+        info = self.read(fields=["name", 'partner_id', ''])
+        total_equipment = 0
+        total_time = 0
+        total_ava_time = 0
+        for line in self.production_line_ids:
+            total_equipment += len(line.equipment_ids)
+            total_time += line.total_time
+            total_ava_time += line.total_ava_time
+        info.update({
+            'total_equipment': total_equipment,
+            'total_time': total_time,
+            'total_ava_time': total_ava_time,
+        })
+        return info
 
 ORDER_BY = "planned_start_backup,id desc"
 FIELDS = ["name", "alia_name", "product_tmpl_id", "state", "product_qty",
@@ -234,6 +251,7 @@ class MrpProductionLine(models.Model):
     last_mo_time = fields.Datetime(compute="_compute_last_mo_time")
     total_time = fields.Float(compute='_compute_total_time')
     total_ava_time = fields.Float(compute='_compute_total_ava_time')
+
     # 根据process_id 获取产线
     def get_production_line_list(self, **kwargs):
         process_id = kwargs.get("process_id")
@@ -247,11 +265,17 @@ class MrpProductionLine(models.Model):
             'id': -1,
             'name': u'未分组',
             'amount_of_planned_mo': count,
-            'equipment_ids': [],
+            'equipment_ids`': [],
             'line_employee_ids': [],
             'employee_id': [],
         })
         return lines
+
+    def get_process_info(self, **kwargs):
+        process_id = kwargs.get("process_id")
+        process = self.env["mrp.process"].browse(process_id)
+        info = process.get_process_info()
+        return info
 
     def get_recent_available_planned_time(self):
         domain = [("state", "in", ['draft', 'confirmed', 'waiting_material'])]

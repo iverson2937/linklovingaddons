@@ -234,7 +234,6 @@
                                 string="开始排产"/>
                         <button name="action_cancel_plan" type="object" string="取消排产"
                                 attrs="{'invisible': [('state', 'not in', ('waiting_material'))]}"
-                                confirm="是否从产线中移除,可重新进行排产"
                         />
 
                         <button name="action_cancel" type="object" string="取消订单"

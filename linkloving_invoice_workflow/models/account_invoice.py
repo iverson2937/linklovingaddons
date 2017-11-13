@@ -10,6 +10,8 @@ class AccountInvoice(models.Model):
 
     amount_total_o = fields.Monetary(string=u'Invoice Amount',
                                      store=True, readonly=True, track_visibility='always')
+    commission = fields.Float(string=u'折算提成金额', track_visibility='onchange')
+
 
     @api.one
     def _get_po_number(self):
