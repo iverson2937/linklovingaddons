@@ -25,7 +25,7 @@ class PlanMoWizard(models.TransientModel):
     product_qty = fields.Float(string=u"生产数量")
 
     is_priority = fields.Boolean(string=u'是否优先', default=False)
-
+    planned_start_backup = fields.Datetime(string=u'最晚开始时间', )
     @api.onchange('process_id')
     def onchange_process_id(self):
         if self.production_line_id not in self.process_id.production_line_ids:

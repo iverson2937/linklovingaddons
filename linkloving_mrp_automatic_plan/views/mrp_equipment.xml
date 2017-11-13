@@ -297,7 +297,7 @@
                                        readonly="1"/>
                                 <field name="in_charge_id" options="{'no_create':True}" readonly="1"/>
                                 <field name="supplier_id" readonly="1"/>
-                                <field name="planned_start_backup" required="1" readonly="1"/>
+                                <field name="planned_start_backup"/>
 
                                 <field name="routing_id" groups="mrp.group_mrp_routings"/>
                                 <field name="date_planned_start" readonly="1" string="开始"/>
@@ -375,20 +375,6 @@
                                     </tree>
                                 </field>
                             </page>
-                            <page string="Miscellaneous">
-                                <group>
-                                    <group groups="stock.group_stock_multi_locations">
-                                        <field name="picking_type_id" attrs="{'readonly': [('has_moves', '=', True)]}"/>
-                                        <field name="location_src_id" domain="[('usage','=','internal')]"
-                                               attrs="{'readonly': [('has_moves', '=', True)]}"/>
-                                        <field name="location_dest_id" domain="[('usage','=','internal')]"
-                                               attrs="{'readonly': [('has_moves', '=', True)]}"/>
-                                    </group>
-                                    <group>
-                                        <field name="availability"/>
-                                    </group>
-                                </group>
-                            </page>
                         </notebook>
                     </sheet>
                     <div class="oe_chatter">
@@ -416,6 +402,7 @@
                             </group>
                             <group>
                                 <field name="product_qty" required="1"/>
+                                <field name="planned_start_backup"/>
                                 <field name="in_charge_id" required="1"/>
                             </group>
                         </group>
