@@ -232,8 +232,14 @@
                                 'default_in_charge_id': in_charge_id,
                                 'default_product_qty': product_qty}"
                                 string="开始排产"/>
+                        <button name="action_cancel_plan" type="object" string="取消排产"
+                                attrs="{'invisible': [('state', 'not in', ('waiting_material'))]}"
+                                confirm="是否从产线中移除,可重新进行排产"
+                        />
+
                         <button name="action_cancel" type="object" string="取消订单"
                                 attrs="{'invisible': [('state', 'not in', ('confirmed', 'draft'))]}"
+                                confirm="确定取消订单?"
                         />
 
                         <field name="state" widget="statusbar"
