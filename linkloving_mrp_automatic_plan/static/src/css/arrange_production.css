@@ -81,14 +81,14 @@
 .production_line>span,.production_line>div>div{
     display: inline-block;
 }
-.p_line_equipment,.p_line_employes,.production_qty,.responsible{
+.production_line .p_line_right>div{
     padding: 2px;
     background: #556c73;
     border-radius: 5px;
     padding: 0 5px;
     margin-left: 5px;
 }
-.un_production_line .production_qty,.un_production_line .p_line_equipment{
+.un_production_line .p_line_right>div{
     background-color: white;
     color: #7f7f7f;
 }
@@ -148,7 +148,7 @@
 
 #a_p_left .production_lists_wrap + .bootstrap-datetimepicker-widget{
     left: 109px!important;
-    top: 45px!important;
+    top: 108px!important;
 }
 
 .production_lists_no_item{
@@ -296,4 +296,9 @@
     width: 70%;
     margin: 10px auto;
     overflow: hidden;
+}
+.a_p_message_summation{
+    padding: 15px;
+    color:#2c5660;
+    font-size: 22px;
 }

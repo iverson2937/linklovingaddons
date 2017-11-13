@@ -6,9 +6,21 @@
             <!--<t t-call="container_header"></t>-->
         </div>
     </t>
+    <t t-name="process_info_tmp">
+        <div class="a_p_message_summation">
+            <span>【车间名称：<t t-esc="process_info.name"/></span>
+            <span>负责人: <t t-esc="process_info.partner_id[1]"/></span>
+            <span>设备数：<t t-esc="process_info.total_equipment"/></span>
+            <span>产线时间：<t t-esc="process_info.total_ava_time"/>h</span>
+            <span>总工时: <t t-esc="process_info.total_time"/>h】</span>
+        </div>
+    </t>
 
     <t t-name="a_p_render_tmpl">
         <div id="a_p_left">
+            <t t-call="process_info_tmp">
+                <t t-set="process_info" t-value="process_info"></t>
+            </t>
             <div class="a_p_left_head">
                 <span style="font-size:15px;margin-left:15px;font-weight:bold;">时间（包含）</span>
                 <div class="a_p_time_start"></div>
@@ -18,30 +30,38 @@
                     <button class="btn btn-primary order_by_default" style="display:none;">根据时间排序</button>
                 </div>
             </div>
+
             <t t-foreach="result" t-as="item">
                 <div class="production_line" t-att-data-index="item_index">
                     <span class="p_line_name">产线： <t t-esc="item.name"/></span>
+                    <span style="margin-left: 20px;">产线负责人: <t t-esc="item.employee_id[1]"/></span>
                     <div class="p_line_right">
-                        <t t-if="item.employee_id &amp;&amp; item.employee_id.length>0">
-                            <div class="responsible">
-                                产线负责人：<span><t t-esc="item.employee_id[1]"/></span>
-                            </div>
-                        </t>
+                        <!--<div class="responsible">-->
+                            <!--产线负责人：<span><t t-esc="item.employee_id[1]"/></span>-->
+                        <!--</div>-->
+                        <div class="p_line_last_mo">
+                            最后MO完成时间: <span><t t-esc="item.last_mo_time"/></span>
+                        </div>
                         <div class="production_qty">
                             MO数量：<span><t t-esc="item.amount_of_planned_mo"/></span>
                         </div>
-                        <t t-if="item.equipment_ids &amp;&amp; item.equipment_ids.length">
-                            <div class="p_line_equipment">
-                                设备：<span><t t-esc="item.equipment_ids.length" /></span>
-                            </div>
-                        </t>
+                        <div class="p_line_equipment">
+                            设备：<span><t t-esc="item.equipment_ids.length" /></span>
+                        </div>
+                        <div class="p_line_employee">
+                            员工数：<span><t t-esc="item.line_employee_ids.length" /></span>
+                        </div>
+                        <div class="p_line_equipment">
+                            产线时间/总人工时间：<span><t t-esc="item.total_ava_time"/>h/<t t-esc="item.total_time"/>h</span>
+                        </div>
+
 
                         <span class="fa fa-chevron-down a_p_showorhide"></span>
                     </div>
                 </div>
-                <div class="production_lists_wrap">
+                <div t-att-class="item.id==-1 ? 'production_lists_wrap un_group_list_wrap' : 'production_lists_wrap'">
                     <t t-if="item.id==-1">
-                        <div class="un_group"></div>
+                        <!--<div class="un_group"></div>-->
                     </t>
                 </div>
             </t>
@@ -54,10 +74,7 @@
             <span class="p_line_name">未排产</span>
             <div class="p_line_right">
                 <div class="production_qty">
-                    MO数量：<span><t t-esc="result.length"/></span>
-                </div>
-                <div class="p_line_equipment">
-                    产线时间/总人工时间：<span></span>
+                    MO数量：<span><t t-esc="length"/></span>
                 </div>
                 <span class="fa fa-chevron-down un_a_p_showorhide"></span>
             </div>

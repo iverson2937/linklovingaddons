@@ -76,7 +76,7 @@ class Inheritforarrangeproduction(models.Model):
         # theory_factor = fields.Integer(string=u'理论 人数/设备数', require=True)
 
     def get_process_info(self):
-        info = self.read(fields=["name", 'partner_id', ''])
+        info = self.read(fields=["name", 'partner_id'])[0]
         total_equipment = 0
         total_time = 0
         total_ava_time = 0

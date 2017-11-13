@@ -119,6 +119,16 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var own = this;
+
+            //开一个产线  关掉其他展开的产线
+            $('.fa-chevron-up').each(function () {
+                if($(target).hasClass('fa-chevron-up')){
+                    return
+                }
+                $(this).addClass('fa-chevron-down').removeClass('fa-chevron-up');
+                $(this).parents('.production_line').next('.production_lists_wrap').slideToggle("fast");
+            });
+
             $(target).parents('.production_line').next('.production_lists_wrap').slideToggle("fast");
             if($(target).hasClass('fa-chevron-down')){
                 $(target).removeClass('fa-chevron-down');
@@ -141,7 +151,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         console.log(result);
                         // myself.mydataset = result;
                         $(target).parents('.production_line').next('.production_lists_wrap').html("");
-                        $(target).parents('.production_line').next('.production_lists_wrap').append("<div class='un_group'></div>")
+                        $(target).parents('.production_line').next('.un_group_list_wrap').append("<div class='un_group'></div>")
                         $(target).parents('.production_line').next('.production_lists_wrap').removeClass('production_lists_no_item');
                         $(target).parents('.production_line').next('.production_lists_wrap').append(QWeb.render('a_p_render_right_tmpl',{result: result,
                             show_more:true,
@@ -426,7 +436,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
         },
         render_pager2: function () {
             if ($(".approval_pagination")) {
-                // $(".approval_pagination").remove()
+                $(".approval_pagination").remove()
             }
             var $node = $('<div/>').addClass('approval_pagination').prependTo($(".un_group"));
             this.pager = new Pager(this, this.length_un_group, this.offset_un_group, this.limit_un_group);
@@ -550,7 +560,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                             return
                         }
                         myself.mydataset.mo = result.result;
-                        $("#a_p_left").append(QWeb.render('un_a_p_tmpl',{result: result.result,
+                        $("#a_p_left").append(QWeb.render('un_a_p_tmpl',{result: result.result,length:result.length,
                             show_more:false,
                             selection:own.states.state.selection,
                             new_selection:own.states.product_order_type.selection,
@@ -583,17 +593,21 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 myself.states = result;
             });
 
+            var model_ = new Model("mrp.production.line")
 
-            new Model("mrp.production.line")
-                    .call("get_production_line_list", [[]], {process_id:this.process_id})
-                    .then(function (result) {
-                        console.log(result);
-                        myself.length_un_group = result[result.length-1].amount_of_planned_mo;
-                        myself.mydataset.product_line = result;
-                        self.$el.eq(0).append(QWeb.render('a_p_render_tmpl', {result: result}));
-                        self.init_date_widget($(".a_p_time_start"));
-                        framework.unblockUI();
-                    })
+            model_.call("get_production_line_list", [[]], {process_id:this.process_id})
+            .then(function (result) {
+                console.log(result);
+                model_.call('get_process_info',[[]], {process_id:myself.process_id}).then(function (process_info) {
+                    console.log(process_info)
+                    myself.length_un_group = result[result.length-1].amount_of_planned_mo;
+                    myself.mydataset.product_line = result;
+                    self.$el.eq(0).append(QWeb.render('a_p_render_tmpl', {result: result,process_info:process_info}));
+                    self.init_date_widget($(".a_p_time_start"));
+                    framework.unblockUI();
+                });
+            });
+
             self.un_arrange_production(myself.process_id,10,1,myself);
         }
 
