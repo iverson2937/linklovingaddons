@@ -59,7 +59,8 @@ class MrpProductionProduceExtend(models.TransientModel):
             'qty_produced': draft_sum_qty,
             'production_id': self.production_id.id,
             'product_id': self.production_id.product_id.id,
-            'employee_id': self.production_id.employee_id.id,
+            'employee_id': self.production_id.in_charge_id.employee_ids and
+                           self.production_id.in_charge_id.employee_ids[0].id,
         })
         order_draft.unlink()
         return feedback

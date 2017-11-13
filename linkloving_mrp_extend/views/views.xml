@@ -315,6 +315,7 @@
                 <xpath expr="//header/button[@name='action_cancel']" position="replace">
                     <button name="action_cancel" type="object" string="取消订单"
                             attrs="{'invisible': [('state', 'not in', ('draft','confirmed','waiting_material', 'prepare_material_ing'))]}"
+                            confirm="是否取消订单?"
                             groups="linkloving_mrp_extend.group_charge_produce"/>
                 </xpath>
 
