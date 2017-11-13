@@ -86,8 +86,8 @@ class Inheritforarrangeproduction(models.Model):
             total_ava_time += line.total_ava_time
         info.update({
             'total_equipment': total_equipment,
-            'total_time': total_time,
-            'total_ava_time': total_ava_time,
+            'total_time': round(total_time, 2),
+            'total_ava_time': round(total_ava_time, 2),
         })
         return info
 
@@ -227,7 +227,7 @@ class MrpProductionLine(models.Model):
         for line in self:
             new_domain = domain + [("production_line_id", "=", line.id)]
             mos = self.env["mrp.production"].search(new_domain)
-            line.total_time = sum(mos.mapped("real_theo_spent_time"))
+            line.total_time = round(sum(mos.mapped("real_theo_spent_time")))
 
     @api.multi
     def _compute_total_ava_time(self):
@@ -235,7 +235,7 @@ class MrpProductionLine(models.Model):
         for line in self:
             new_domain = domain + [("production_line_id", "=", line.id)]
             mos = self.env["mrp.production"].search(new_domain)
-            line.total_ava_time = sum(mos.mapped("ava_spent_time"))
+            line.total_ava_time = round(sum(mos.mapped("ava_spent_time")), 2)
 
     name = fields.Char(string=u"名称", required=True, )
     process_id = fields.Many2one(string=u'工序', comodel_name='mrp.process')
