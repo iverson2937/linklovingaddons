@@ -69,6 +69,8 @@ class MrpProductionProduceExtend(models.TransientModel):
 class OutsouringPorcessOrder(models.Model):
     _name = 'outsourcing.process.order'
 
+    process_id = fields.Many2one("mrp.process", related="production_id.process_id", string=u'工序')
+
     company_id = fields.Many2one("res.company", default=lambda self: self.env.user.company_id, string=u'公司')
 
     employee_id = fields.Many2one(comodel_name="hr.employee", string=u"产线负责人", required=False, )
