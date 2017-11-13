@@ -60,6 +60,7 @@ class Inheritforarrangeproduction(models.Model):
     _inherit = 'mrp.process'
 
     production_line_ids = fields.One2many(comodel_name="mrp.production.line", inverse_name="process_id", string=u'产线')
+
     @api.multi
     def arrange_production(self):
         return {
@@ -73,6 +74,22 @@ class Inheritforarrangeproduction(models.Model):
         #                                         default='equipment', string=u'生产速度因子', )
         #
         # theory_factor = fields.Integer(string=u'理论 人数/设备数', require=True)
+
+    def get_process_info(self):
+        info = self.read(fields=["name", 'partner_id'])[0]
+        total_equipment = 0
+        total_time = 0
+        total_ava_time = 0
+        for line in self.production_line_ids:
+            total_equipment += len(line.equipment_ids)
+            total_time += line.total_time
+            total_ava_time += line.total_ava_time
+        info.update({
+            'total_equipment': total_equipment,
+            'total_time': total_time,
+            'total_ava_time': total_ava_time,
+        })
+        return info
 
 ORDER_BY = "planned_start_backup,id desc"
 FIELDS = ["name", "alia_name", "product_tmpl_id", "state", "product_qty",
@@ -234,6 +251,7 @@ class MrpProductionLine(models.Model):
     last_mo_time = fields.Datetime(compute="_compute_last_mo_time")
     total_time = fields.Float(compute='_compute_total_time')
     total_ava_time = fields.Float(compute='_compute_total_ava_time')
+
     # 根据process_id 获取产线
     def get_production_line_list(self, **kwargs):
         process_id = kwargs.get("process_id")
@@ -250,8 +268,16 @@ class MrpProductionLine(models.Model):
             'equipment_ids': [],
             'line_employee_ids': [],
             'employee_id': [],
+            'total_ava_time': 0,
+            'total_time': 0,
         })
         return lines
+
+    def get_process_info(self, **kwargs):
+        process_id = kwargs.get("process_id")
+        process = self.env["mrp.process"].browse(process_id)
+        info = process.get_process_info()
+        return info
 
     def get_recent_available_planned_time(self):
         domain = [("state", "in", ['draft', 'confirmed', 'waiting_material'])]
@@ -418,7 +444,16 @@ class MrpProductionExtend(models.Model):
                 if move.product_uom_qty == 0:
                     rate_list.append(0)
                     continue
-                rate = move.product_id.qty_available * 1.0 / move.product_uom_qty
+
+                remaining_qty = move.product_uom_qty - move.quantity_done
+                if remaining_qty < 0:
+                    remaining_qty = 0
+
+                rate = remaining_qty * 1.0 / move.product_uom_qty
+                if rate > 0.5:
+                    rate = (move.quantity_done + move.product_id.qty_available) / move.product_uom_qty
+
+                # rate = move.product_id.qty_available * 1.0 / move.product_uom_qty
                 rate_list.append(rate)
             if any(rate < 0.5 for rate in rate_list):
                 mo.material_state = 'red'
@@ -593,8 +628,11 @@ class MrpProductionExtend(models.Model):
             domain = group.get("__domain", [])
             mos = MrpProducion.search_read(domain, fields=FIELDS, order=ORDER_BY)
             group["mos"] = self.sorted_mos_by_material(mos, order_by_material)
+            if group.get("production_line_id"):
+                groups_dic[group.get("production_line_id")[0]] = group
+            else:
+                groups_dic['-1'] = group
 
-            groups_dic[group.get("production_line_id")[0]] = group
         return groups_dic
 
     def sorted_mos_by_material(self, mos, order_by_material):

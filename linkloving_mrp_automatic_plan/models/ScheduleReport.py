@@ -55,6 +55,16 @@ class MrpReportProductLine(models.Model):
     order_qty = fields.Float(string=u'数量')
     product_id = fields.Many2one(comodel_name="product.product", string=u"产品", related="orderpoint_id.product_id")
 
+    qty_available = fields.Float(string=u'库存', related='product_id.qty_available')
+    virtual_available = fields.Float(string=u'预测数量', related='product_id.qty_available')
+
+    def show_product_detail(self):
+        return {
+            'name': self.product_id.name,
+            'type': 'ir.actions.client',
+            'tag': 'product_detail',
+            'product_id': self.product_id.product_tmpl_id.id
+        }
 
 class MrpReport(models.Model):
     _name = 'mrp.report'

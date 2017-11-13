@@ -20,15 +20,6 @@ odoo.define('linkloving_mrp_automatic_plan.button_dialog', function (require) {
     var ButtonDialog = View.include({
         do_execute_action: function (action_data, dataset, record_id, on_closed) {
             var self = this;
-            console.log(action_data)
-            var result_handler = function () {
-                if (on_closed) {
-                    on_closed.apply(null, arguments);
-                }
-                if (self.getParent() && self.getParent().on_action_executed) {
-                    return self.getParent().on_action_executed.apply(null, arguments);
-                }
-            };
             if (action_data.type == 'formview_dialog') {
                 var model_obj = new Model(dataset.model);
                 model_obj.call(action_data.name, [record_id]).then(function (view) {
@@ -141,11 +132,32 @@ odoo.define('linkloving_mrp_automatic_plan.button_dialog', function (require) {
             return this;
         },
     });
+    var MyDialog = Dialog.include({
 
+        set_buttons: function (buttons) {
+            var self = this;
+            var res = this._super(buttons);
+
+            console.log("eereqrqqwrqww");
+            _.each(self.$footer.children(), function (b) {
+                $(b).on('click', function (e) {
+                    $(b).prop('disabled', true);
+                });
+                self.$footer.append($(b));
+            });
+            return res;
+        },
+    });
+    //disable_button: function () {
+    //    console.log("eeeeeeee")
+    //    this.$('.oe_form_buttons').add(this.$buttons).find('button').addClass('o_disabled').prop('disabled', true);
+    //    this.is_disabled = true;
+    //},
 
     return {
         ButtonDialog: ButtonDialog,
         NewFormViewDialog: NewFormViewDialog,
+        MyDialog: MyDialog,
     };
 
 });
