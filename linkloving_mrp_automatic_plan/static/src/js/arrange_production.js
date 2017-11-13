@@ -141,8 +141,6 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                     .call("get_mo_by_productin_line", [[]], {
                         process_id: myself.process_id,
                         production_line_id: myself.mydataset.product_line[index].id,
-                        limit: 10,
-                        offset: 0,
                         planned_date: myself.chose_date,
                         domains: myself.left_domain,
                         order_by_material: myself.order_by_material,
