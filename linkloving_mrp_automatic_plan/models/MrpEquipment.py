@@ -295,8 +295,7 @@ class MrpProductionLine(models.Model):
         domains = kwargs.get("domains", [])
         order_by_material = kwargs.get("order_by_material", False)
         # planned_date = kwargs.get("planned_date")
-        limit = kwargs.get("limit")
-        offset = kwargs.get("offset")
+
         # current_day_start_time = fields.datetime.strptime(planned_date, '%Y-%m-%d')
         tz_name = self._context.get("tz") or self.env.user.tz
         context_tz = pytz.timezone(tz_name)
@@ -310,17 +309,30 @@ class MrpProductionLine(models.Model):
         # return utc_timestamp.astimezone(context_tz)
         if production_line_id == -1:
             production_line_id = False
-        mos = self.env["mrp.production"].search_read(
-            domain=expression.AND([[("production_line_id", "=", production_line_id),
-                                    # ("date_planned_start", "<=", end_time_str),
-                                                      # ("date_planned_finished", ">=", start_time_str),
-                                    ("state", "not in", ['done', 'cancel', 'waiting_post_inventory']),
-                                    ("process_id", "=", process_id)
-                                    ], domains]),
-                limit=limit,
-                offset=offset,
+            limit = kwargs.get("limit")
+            offset = kwargs.get("offset")
+            mos = self.env["mrp.production"].search_read(
+                    domain=expression.AND([[("production_line_id", "=", production_line_id),
+                                            # ("date_planned_start", "<=", end_time_str),
+                                            # ("date_planned_finished", ">=", start_time_str),
+                                            ("state", "not in", ['done', 'cancel', 'waiting_post_inventory']),
+                                            ("process_id", "=", process_id)
+                                            ], domains]),
+                    limit=limit,
+                    offset=offset,
+                    order=ORDER_BY,
+                    fields=FIELDS
+            )
+        else:
+            mos = self.env["mrp.production"].search_read(
+                    domain=expression.AND([[("production_line_id", "=", production_line_id),
+                                            # ("date_planned_start", "<=", end_time_str),
+                                            # ("date_planned_finished", ">=", start_time_str),
+                                            ("state", "not in", ['done', 'cancel', 'waiting_post_inventory']),
+                                            ("process_id", "=", process_id)
+                                            ], domains]),
                 order=ORDER_BY,
-            fields=FIELDS
+                    fields=FIELDS
             )
         return self.env["mrp.production"].sorted_mos_by_material(mos, order_by_material)
 
