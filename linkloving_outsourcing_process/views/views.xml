@@ -83,6 +83,7 @@
                                 <field name="production_id" readonly="1"/>
                                 <field name="product_id"/>
                                 <field name="qty_produced" attrs="{'readonly': [('state', 'in', ['done'])]}"/>
+                                <field name="process_id"/>
                             </group>
                             <group>
                                 <field name="employee_id" readonly="1"/>
