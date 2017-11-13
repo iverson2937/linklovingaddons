@@ -463,7 +463,9 @@ class MrpProductionExtend(models.Model):
 
                 rate = remaining_qty * 1.0 / move.product_uom_qty
                 if rate > 0.5:
-                    rate = (move.quantity_done + move.product_id.qty_available) / move.product_uom_qty
+                    rate = (
+                           move.quantity_done + move.product_id.qty_available if move.product_id.qty_available > 0 else 0) \
+                           / move.product_uom_qty
 
                 # rate = move.product_id.qty_available * 1.0 / move.product_uom_qty
                 rate_list.append(rate)
