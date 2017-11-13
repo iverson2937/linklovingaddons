@@ -49,8 +49,11 @@
                                     <field name="report_line_ids">
                                         <tree>
                                             <field name="product_id"/>
+                                            <button name="show_product_detail" type="object" string="详细"/>
                                             <field name="production_id"/>
                                             <field name="order_qty"/>
+                                            <field name="qty_available"/>
+                                            <field name="virtual_available"/>
                                             <field name="orderpoint_id"/>
                                         </tree>
                                     </field>

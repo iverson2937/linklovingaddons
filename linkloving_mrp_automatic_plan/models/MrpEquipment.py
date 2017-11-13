@@ -265,9 +265,11 @@ class MrpProductionLine(models.Model):
             'id': -1,
             'name': u'未分组',
             'amount_of_planned_mo': count,
-            'equipment_ids`': [],
+            'equipment_ids': [],
             'line_employee_ids': [],
             'employee_id': [],
+            'total_ava_time': 0,
+            'total_time': 0,
         })
         return lines
 
@@ -442,7 +444,16 @@ class MrpProductionExtend(models.Model):
                 if move.product_uom_qty == 0:
                     rate_list.append(0)
                     continue
-                rate = move.product_id.qty_available * 1.0 / move.product_uom_qty
+
+                remaining_qty = move.product_uom_qty - move.quantity_done
+                if remaining_qty < 0:
+                    remaining_qty = 0
+
+                rate = remaining_qty * 1.0 / move.product_uom_qty
+                if rate < 0.5:
+                    rate = (move.quantity_done + move.product_id.qty_available) / move.product_uom_qty
+
+                # rate = move.product_id.qty_available * 1.0 / move.product_uom_qty
                 rate_list.append(rate)
             if any(rate < 0.5 for rate in rate_list):
                 mo.material_state = 'red'
