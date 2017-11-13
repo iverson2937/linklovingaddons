@@ -3393,3 +3393,15 @@ class LinklovingAppApi(http.Controller):
         result_json = LinklovingAppApi.product_template_obj_to_json(product_json)
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=result_json)
+
+    @http.route('/linkloving_app_api/get_stock_picking_by_remark', type='json', auth='none', csrf=False)
+    def get_stock_picking_by_remark(self, **kw):
+        remark = request.jsonrequest.get("remark")
+        purchase_orders = request.env["purchase.order"].sudo(LinklovingAppApi.CURRENT_USER()).search(
+            [('remark', 'ilike', remark)])
+        json_list = []
+        for purchase_order in purchase_orders:
+            for ids in purchase_order.picking_ids:
+                # print purchase_order
+                json_list.append(LinklovingAppApi.stock_picking_to_json(ids))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
