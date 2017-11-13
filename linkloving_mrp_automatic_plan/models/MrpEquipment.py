@@ -76,7 +76,7 @@ class Inheritforarrangeproduction(models.Model):
         # theory_factor = fields.Integer(string=u'理论 人数/设备数', require=True)
 
     def get_process_info(self):
-        info = self.read(fields=["name", 'partner_id', ''])
+        info = self.read(fields=["name", 'partner_id'])[0]
         total_equipment = 0
         total_time = 0
         total_ava_time = 0
@@ -628,8 +628,11 @@ class MrpProductionExtend(models.Model):
             domain = group.get("__domain", [])
             mos = MrpProducion.search_read(domain, fields=FIELDS, order=ORDER_BY)
             group["mos"] = self.sorted_mos_by_material(mos, order_by_material)
+            if group.get("production_line_id"):
+                groups_dic[group.get("production_line_id")[0]] = group
+            else:
+                groups_dic['-1'] = group
 
-            groups_dic[group.get("production_line_id")[0]] = group
         return groups_dic
 
     def sorted_mos_by_material(self, mos, order_by_material):
