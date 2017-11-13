@@ -939,6 +939,8 @@ class MrpProductionExtend(models.Model):
 
     def action_cancel_and_return_material(self):
         for p in self:
+            if p.state == 'cancel':
+                raise UserError(u"此单据已处于取消状态,无法退料")
             return_m = self.env["mrp.return.material"].with_context({
                 'active_model': 'mrp.production',
                 'active_id': p.id
@@ -1272,7 +1274,7 @@ class ReturnOfMaterial(models.Model):
         #     move_type = 'manufacturing_rejected_out'
 
         return {
-            'name': self.name,
+            'name': '退料 %s' % self.production_id.name,
             'product_id': product.product_id.id,
             'product_uom': product.product_id.uom_id.id,
             'product_uom_qty': product.return_qty,
@@ -1281,7 +1283,7 @@ class ReturnOfMaterial(models.Model):
             'location_dest_id': self.return_location_id.id,
             'production_id': self.production_id.id,
             'state': 'confirmed',
-            'origin': 'Return %s' % self.production_id.name,
+            'origin': '退料 %s' % self.production_id.name,
             'is_return_material': True,
             # 'move_order_type': move_type,
             # 'restrict_partner_id': self.owner_id.id,
