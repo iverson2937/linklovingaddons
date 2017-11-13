@@ -194,7 +194,7 @@
                                     <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                                     <!--<button class="btn btn-primary send-po-btn">合并</button>-->
                                     <button class="btn btn-primary create_po_btn" t-att-data-product-tmpl="result.product_p_id">创建</button>
-                                    <button class="btn btn-default delete_po_btn">删除</button>
+                                    <!--<button class="btn btn-default delete_po_btn">删除</button>-->
                                 </h4>
                             </div>
                             <t t-if="po_length!=0">
@@ -410,7 +410,7 @@
                                     <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                                     <!--<button class="btn btn-primary send-po-btn" t-att-check-name="'chk'+result.product_id">合并</button>-->
                                     <button class="btn btn-primary create_po_btn" t-att-data-product-tmpl="result.product_p_id">创建</button>
-                                    <button class="btn btn-default delete_po_btn">删除</button>
+                                    <!--<button class="btn btn-default delete_po_btn">删除</button>-->
                                 </h4>
                             </div>
                             <t t-if="po_length!=0">
