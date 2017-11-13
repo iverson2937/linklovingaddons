@@ -247,6 +247,9 @@ class MrpProductionLine(models.Model):
             'id': -1,
             'name': u'未分组',
             'amount_of_planned_mo': count,
+            'equipment_ids': [],
+            'line_employee_ids': [],
+            'employee_id': [],
         })
         return lines
 
@@ -350,6 +353,15 @@ class MrpProductionExtend(models.Model):
         #         'target': 'new'
         #     }
 
+    @api.multi
+    def action_cancel_plan(self):
+        if all(mo.state == 'waiting_material' for mo in self):
+            self.write({
+                'production_line_id': False,
+                'state': 'confirmed',
+            })
+        else:
+            raise UserError(u"该状态无法取消排产")
     @api.multi
     def _compute_factory_setting_id(self):
         setting = self.env["hr.config.settings"].search([("is_available", "=", True)], limit=1)
