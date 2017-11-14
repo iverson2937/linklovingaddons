@@ -213,7 +213,7 @@ class MrpProductionLine(models.Model):
 
     @api.multi
     def _compute_last_mo_time(self):
-        domain = [("state", "in", ['draft', 'confirmed', 'waiting_material'])]
+        domain = [("state", "not in", DONE_CANCEL_DOMAIN)]
         for line in self:
             new_domain = domain + [("production_line_id", "=", line.id)]
             last_mo = self.env["mrp.production"].search(new_domain,
@@ -315,7 +315,7 @@ class MrpProductionLine(models.Model):
                     domain=expression.AND([[("production_line_id", "=", production_line_id),
                                             # ("date_planned_start", "<=", end_time_str),
                                             # ("date_planned_finished", ">=", start_time_str),
-                                            ("state", "not in", ['draft', 'confirmed', 'cancel', 'done']),
+                                            ("state", "not in", DONE_CANCEL_DOMAIN),
                                             ("process_id", "=", process_id)
                                             ], domains]),
                     limit=limit,
@@ -456,9 +456,7 @@ class MrpProductionExtend(models.Model):
                 if move.product_uom_qty == 0:
                     rate_list.append(0)
                     continue
-
-                rate = (
-                           move.quantity_done + move.product_id.qty_available if move.product_id.qty_available > 0 else 0) \
+                rate = (move.quantity_done + move.product_id.qty_available if move.product_id.qty_available > 0 else 0) \
                        / move.product_uom_qty
 
                 # rate = move.product_id.qty_available * 1.0 / move.product_uom_qty
