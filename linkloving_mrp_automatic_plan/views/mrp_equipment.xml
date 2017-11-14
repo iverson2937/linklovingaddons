@@ -316,7 +316,7 @@
 
                                 <field name="origin"/>
                                 <field name="production_order_type"/>
-                                <field name="mo_type" widget="radio" string="Type"/>
+                                <field name="mo_type" widget="radio" string="类型"/>
                                 <field name="unit_price" string="单价/委外加工单价"
                                        attrs="{'invisible':[('mo_type', '==', 'time')],'readonly':[('state', '!=', 'confirmed')]}"/>
                                 <field name="hour_price"

@@ -70,6 +70,10 @@ odoo.define('linkloving_mrp_automatic_plan.button_dialog', function (require) {
                                             self.trigger('record_saved');
                                             self.close();
                                         });
+                                    }).fail(function () {
+                                        setTimeout(function () {
+                                            self.$footer.children().prop("disabled", false);
+                                        }, 1000);
                                     });
                                 }
                             });
@@ -138,7 +142,6 @@ odoo.define('linkloving_mrp_automatic_plan.button_dialog', function (require) {
             var self = this;
             var res = this._super(buttons);
 
-            console.log("eereqrqqwrqww");
             _.each(self.$footer.children(), function (b) {
                 $(b).on('click', function (e) {
                     $(b).prop('disabled', true);
