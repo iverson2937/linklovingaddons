@@ -150,6 +150,7 @@
 }
 .panel-title .trace_back{
     cursor: pointer;
+    text-decoration: underline;
 }
 
 .panel-title .mat{

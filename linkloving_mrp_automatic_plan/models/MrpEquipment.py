@@ -597,7 +597,10 @@ class MrpProductionExtend(models.Model):
         state = kwargs.get("state")
         search_domain = kwargs.get("domains", [])
         if not search_domain:
-            return []
+            return {
+                'length': 0,
+                'result': []
+                }
         limit = kwargs.get("limit")
         offset = kwargs.get("offset")
 
