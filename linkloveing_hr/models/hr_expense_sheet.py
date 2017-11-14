@@ -2,7 +2,8 @@
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-
+from linklovingaddons.linkloving_app_api.models.models import JPushExtend
+import jpush
 
 class HrExpenseSheet(models.Model):
     _inherit = 'hr.expense.sheet'
@@ -103,6 +104,28 @@ class HrExpenseSheet(models.Model):
 
         create_remark_comment(self, u'1级审核')
 
+    # @api.multi
+    # def manager1_approve_withText(self, text):
+    #     # if self.employee_id == self.employee_id.department_id.manager_id:
+    #     #     self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
+    #     # else:
+    #     department = self.to_approve_id.employee_ids.department_id
+    #     if not department:
+    #         UserError(u'请设置该员工部门')
+    #     if not department.manager_id:
+    #         UserError(u'该员工所在部门未设置经理(审核人)')
+    #     # 如果没有上级部门，或者报销金额小于该部门的允许最大金额
+    #     if not department.parent_id or (department.allow_amount and self.total_amount < department.allow_amount):
+    #         self.to_approve_id = False
+    #         self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
+    #     else:
+    #         if not department.parent_id.manager_id:
+    #             raise UserError(u'上级部门没有设置经理,请联系管理员')
+    #         self.to_approve_id = department.sudo().parent_id.manager_id.user_id.id
+    #         self.write({'state': 'manager1_approve', 'approve_ids': [(4, self.env.user.id)]})
+    #
+    #     create_remark_comment(self, (u'1级审核：%s' % text))
+
     @api.multi
     def manager2_approve(self):
 
@@ -158,6 +181,11 @@ class HrExpenseSheet(models.Model):
             exp.write({'state': state})
             create_remark_comment(exp, u'送审')
 
+            JPushExtend.send_notification_push(audience=jpush.audience(
+                jpush.alias(exp.to_approve_id.id)
+            ), notification=exp.expense_no,
+                body=_("报销单：%s 等待审核") % (self.expense_no))
+
     @api.multi
     def manager3_approve(self):
         self.to_approve_id = False
@@ -177,6 +205,17 @@ class HrExpenseSheet(models.Model):
                         sheet.name, reason))
             sheet.message_post(body=body)
             sheet.reject_reason = reason
+
+        JPushExtend.send_notification_push(audience=jpush.audience(
+            jpush.alias(sheet.create_uid.id)
+        ), notification=_("报销单：%s被拒绝") % (sheet.expense_no),
+            body=_("原因：%s") % (reason))
+
+    @api.multi
+    def create_message_post(self, body_str):
+        for sheet in self:
+            body = body_str
+            sheet.message_post(body=body)
 
     @api.model
     def create(self, vals):

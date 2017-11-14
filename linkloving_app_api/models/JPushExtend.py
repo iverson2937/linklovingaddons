@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import jpush
 from odoo import models, fields, api
-app_key = "6e6ce8723531335ce45edd34"
-master_secret = "64ec88028aac4dda6286400e"
+app_key = "f2ae889d6e4c3400fef49696"
+master_secret = "e1d3af4d5ab66d45f6255c18"
 _jpush = jpush.JPush(app_key, master_secret)
 push = _jpush.create_push()
 _jpush.set_logging("DEBUG")
