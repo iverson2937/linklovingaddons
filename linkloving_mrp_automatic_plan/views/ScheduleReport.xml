@@ -96,7 +96,7 @@
         <menuitem id="menuitem_mrp_report"
                   action="action_see_mrp_report"
                   name="MRP运算报告"
-                  parent="stock.menu_warehouse_report"
+                  parent="mrp.menu_mrp_reporting"
                   sequence="1"
                   groups="base.group_user"/>
     </data>
