@@ -38,6 +38,7 @@
                                 'default_process_id': process_id,
                                 'default_production_line_id': production_line_id,
                                 'default_in_charge_id': in_charge_id,
+                                'default_planned_start_backup': planned_start_backup,
                                 'default_outsourcing_supplier_id': outsourcing_supplier_id,
                                 'default_product_qty': product_qty}"
                             string="开始排产"/>
