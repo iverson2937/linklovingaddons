@@ -293,7 +293,7 @@ class MaterialRequest(models.Model):
                 'product_uom': one_line.product_id.uom_id.id,
                 'picking_id': picking_out_material.id,
                 'location_id': self.env.ref('stock.stock_location_stock').id,
-                'location_dest_id': self.env.ref('linkloving_eb.stock_location_eb_transfer').id,
+                'location_dest_id': self.env.ref('linkloving_eb.stock_location_eb_transfer_2').id,
                 'date': self.my_create_date,
                 'raw_material_id': self.id,
                 'origin': self.name,
