@@ -9,10 +9,10 @@
     <t t-name="process_info_tmp">
         <div class="a_p_message_summation">
             <span>【车间名称：<t t-esc="process_info.name"/></span>
-            <span>负责人: <t t-esc="process_info.partner_id[1]"/></span>
-            <span>设备数：<t t-esc="process_info.total_equipment"/></span>
-            <span>产线时间：<t t-esc="process_info.total_ava_time"/>h</span>
-            <span>总工时: <t t-esc="process_info.total_time"/>h】</span>
+            <span style="margin-left:15px;padding-left:15px;border-left:2px solid;">负责人: <t t-esc="process_info.partner_id[1]"/></span>
+            <span style="margin-left:15px;padding-left:15px;border-left:2px solid;">设备数：<t t-esc="process_info.total_equipment"/></span>
+            <span style="margin-left:15px;padding-left:15px;border-left:2px solid;">产线时间：<t t-esc="process_info.total_ava_time"/>h</span>
+            <span style="margin-left:15px;padding-left:15px;border-left:2px solid;">总工时: <t t-esc="process_info.total_time"/>h】</span>
         </div>
     </t>
 
@@ -124,15 +124,12 @@
                         </t>
                     </span>
                     <t t-if="show_more">
-                        <t t-if="item.produce_speed_factor == 'human'">
-                            <span class="a_p_spend_time">理论人数: <t t-esc="item.theory_factor"/>人</span>
-                        </t>
-                        <span class="a_p_spend_time">数量（完成/需求）：<t t-esc="item.ava_spent_time"/>h / <t t-esc="item.real_theo_spent_time"/>h</span>
+                        <span class="a_p_spend_time">数量（完成/需求）：<t t-esc="item.qty_unpost"/> / <t t-esc="item.product_qty"/></span>
                     </t>
 
                 </div>
                 <div class="ap_item_new_add">
-                    <span>理论工时（产线/总工时）：<t t-esc="item.ava_spent_time"/>/<t t-esc="item.real_theo_spent_time"/> </span>
+                    <span>理论工时（产线/总工时）：<t t-esc="item.ava_spent_time"/>h/<t t-esc="item.real_theo_spent_time"/>h </span>
                 </div>
                 <div class="ap_item_main_center">
                     <t t-js="ctx">
