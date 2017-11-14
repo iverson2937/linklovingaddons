@@ -10,6 +10,7 @@ class SaleOrderLine(models.Model):
     @api.multi
     def show_product_detail(self):
         return {
+            'name': self.name,
             'type': 'ir.actions.client',
             'tag': 'product_detail',
             'product_id': self.product_id.product_tmpl_id.id

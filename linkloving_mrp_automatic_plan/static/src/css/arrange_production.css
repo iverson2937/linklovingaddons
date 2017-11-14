@@ -17,7 +17,7 @@
     margin: 5px 8px;
 }
 #a_p_left{
-    width: 50%;
+    width: 100%;
     height: 900px;
     float: left;
     padding: 10px 0;
@@ -41,7 +41,7 @@
     display: none;
 }
 .ap_item_wrap{
-    width:95%;
+    width:70%;
     background: white;
     padding-top: 5px;
     padding-left: 10px;
@@ -62,6 +62,9 @@
     margin: 8px auto;
     color: white;
 }
+#a_p_left .un_production_line{
+    background: #aeaeae;
+}
 #a_p_all{
     min-width: 1200px;
     overflow: scroll;
@@ -78,18 +81,24 @@
 .production_line>span,.production_line>div>div{
     display: inline-block;
 }
-.p_line_equipment,.p_line_employes,.production_qty{
+.production_line .p_line_right>div{
     padding: 2px;
     background: #556c73;
     border-radius: 5px;
     padding: 0 5px;
     margin-left: 5px;
 }
+.un_production_line .p_line_right>div{
+    background-color: white;
+    color: #7f7f7f;
+}
+
+
 .p_line_right{
     float: right;
     margin-right: 5px;
 }
-.production_line .a_p_showorhide{
+.production_line .a_p_showorhide,.production_line .un_a_p_showorhide{
     margin-top: 6px;
     cursor: pointer;
     margin-left: 5px;
@@ -115,8 +124,19 @@
     float: left;
 }
 .ap_item_main_center{
+    /*float: left;*/
+    /*margin-left: 10px;*/
+    position: absolute;
+    left: 545px;
+    top: 45px;
+}
+.ap_item_new_add{
     float: left;
-    margin-left: 10px;
+    margin-left: 40px;
+}
+.ap_item_new_add span{
+    display: block;
+    margin-bottom: 8px;
 }
 .a_p_time_start{
     display: inline-block;
@@ -127,8 +147,8 @@
 }
 
 #a_p_left .production_lists_wrap + .bootstrap-datetimepicker-widget{
-    left: 60px!important;
-    top: 90px!important;
+    left: 109px!important;
+    top: 108px!important;
 }
 
 .production_lists_no_item{
@@ -174,12 +194,17 @@
 .a_p_alia_name{
     margin-left: 15px;
 }
-.a_p_order_type{
-    background-color: darkgrey;
+.a_p_mo_state .mat,.a_p_mo_state .pre{
+    display: inline-block;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
     color: white;
-    font-size: 12px;
-    padding: 3px 5px;
-    border-radius: 3px;
+}
+.a_p_mo_state .sta{
+    background-color: #ededed;
+    padding: 5px;
+    border-radius: 10px;
 }
 .a_p_create_alia{
     display: inline-block;
@@ -256,4 +281,24 @@
     cursor: pointer;
     box-shadow: 4px 6px 5px #888888;
     display: none;
+}
+
+.un_a_p_lists_wrap .ap_item_main_center{
+    top: 70px;
+}
+.un_a_p_lists_wrap .a_p_right_head{
+    width: 70%;
+    margin: 0 auto;
+    margin-bottom: 45px;
+}
+
+.production_lists_wrap .un_group{
+    width: 70%;
+    margin: 10px auto;
+    overflow: hidden;
+}
+.a_p_message_summation{
+    padding: 15px;
+    color:#2c5660;
+    font-size: 22px;
 }

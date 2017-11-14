@@ -9,15 +9,9 @@ class StockPicking(models.Model):
     _name = 'stock.picking'
     _inherit = ['stock.picking', 'ir.needaction_mixin']
     tracking_number = fields.Char(string=u'Tracking Number')
-    remark = fields.Text(string=u'备注', compute='_get_stock_picking_remark')
+    remark = fields.Text(string=u'备注', compute='_get_origin_number')
 
-    def _get_stock_picking_remark(self):
-        if self.po_id:
-            self.remark = self.po_id.remark
-        elif self.so_id:
-            self.remark = self.po_id.remark
-        else:
-            self.remark = ''
+
 
     @api.multi
     def action_view_qc_result(self):
@@ -117,17 +111,23 @@ class StockPicking(models.Model):
         self.mapped('pack_operation_product_ids').unlink()  # Checks if moves are not done
         return super(StockPicking, self).unlink()
 
-    def _get_po_number(self):
-        if self.origin:
-            po = self.env['purchase.order'].search([('name', '=', self.origin)])
-            self.po_id = po.id if po else None
+    @api.multi
+    def _get_origin_number(self):
+        for picking in self:
+            if picking.origin:
 
-    po_id = fields.Many2one('purchase.order', compute=_get_po_number)
-
-    def _get_so_number(self):
-        if self.origin:
-            so = self.env['sale.order'].search([('name', '=', self.origin)])
-            self.so_id = so.id if so else None
+                if self.env['sale.order'].search([('name', '=', picking.origin)]):
+                    so = self.env['sale.order'].search([('name', '=', picking.origin)])
+                    picking.so_id = so.id
+                    picking.remark = so.remark if so.remark else ''
+                elif self.env['purchase.order'].search([('name', '=', picking.origin)]):
+                    po = self.env['purchase.order'].search([('name', '=', picking.origin)])
+                    picking.po_id = po.id
+                    picking.remark = po.remark if po.remark else ''
+                else:
+                    picking.po_id = False
+                    picking.so_id = False
+                    picking.remark = ''
 
     @api.multi
     def _compute_delivery_rule(self):
@@ -148,8 +148,8 @@ class StockPicking(models.Model):
     # actual_state = fields.Selection(string="", selection=[('', ''), ('', ''), ], required=False, )
     complete_rate = fields.Integer(u"可用产品比率", compute="_compute_complete_rate", store=True)
     available_rate = fields.Integer(u"可用率", compute="_compute_available_rate")
-    po_id = fields.Many2one('purchase.order', compute=_get_so_number)
-    so_id = fields.Many2one('sale.order', compute=_get_so_number)
+    po_id = fields.Many2one('purchase.order', compute=_get_origin_number)
+    so_id = fields.Many2one('sale.order', compute=_get_origin_number)
     state = fields.Selection([
         ('draft', 'Draft'), ('cancel', 'Cancelled'),
         ('waiting', 'Waiting Another Operation'),

@@ -53,6 +53,8 @@
                     <field name="production_id"/>
                     <field name="product_id"/>
                     <field name="qty_produced"/>
+                    <field name="outsourcing_supplier_id"/>
+                    <field name="po_user_id"/>
                     <field name="state"/>
                 </tree>
             </field>
@@ -80,9 +82,13 @@
                             <group>
                                 <field name="production_id" readonly="1"/>
                                 <field name="product_id"/>
+                                <field name="qty_produced" attrs="{'readonly': [('state', 'in', ['done'])]}"/>
+                                <field name="process_id"/>
                             </group>
                             <group>
-                                <field name="qty_produced" attrs="{'readonly': [('state', 'in', ['done'])]}"/>
+                                <field name="employee_id" readonly="1"/>
+                                <field name="outsourcing_supplier_id"/>
+                                <field name="po_user_id"/>
                                 <field name="company_id" readonly="1"/>
                             </group>
                         </group>

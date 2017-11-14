@@ -525,20 +525,25 @@ odoo.define('linkloving_core.product_detail', function (require) {
         },
         to_mo_page: function (e) {
             var e = e || window.event;
+            var self = this;
             var target = e.target || e.srcElement;
             var act_id = target.getAttribute("data-id");
+
             act_id = parseInt(act_id);
-            var action = {
-                name: "制造单",
-                type: 'ir.actions.act_window',
-                res_model: 'mrp.production',
-                view_type: 'form',
-                view_mode: 'tree,form',
-                views: [[false, 'form']],
-                res_id: act_id,
-                target: "new"
-            };
-            this.do_action(action);
+            new Model('mrp.production').call('get_formview_id', [[act_id], {'show_custom_form': true}]).then(function (view_id) {
+                var action = {
+                    name: "详细",
+                    type: 'ir.actions.act_window',
+                    res_model: 'mrp.production',
+                    view_type: 'form',
+                    view_mode: 'tree,form',
+                    views: [[view_id, 'form']],
+                    res_id: act_id,
+                    target: "new"
+                };
+
+                self.do_action(action);
+            });
         },
         to_product_name: function (e) {
             var e = e || window.event;

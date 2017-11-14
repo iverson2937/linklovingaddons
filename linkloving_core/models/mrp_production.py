@@ -37,3 +37,10 @@ class MrpProduction(models.Model):
             return [
                 {'name': 'allen', 'time': '2017-10-19', 'description': 'abc'}
             ]
+
+    @api.multi
+    def get_formview_id(self):
+        """ Update form view id of action to open the invoice """
+        if self._context.get('show_custom_form'):
+            return self.env.ref('linkloving_mrp_automatic_plan.mrp_production_paichan_form_view').id
+        return super(MrpProduction, self).get_formview_id()

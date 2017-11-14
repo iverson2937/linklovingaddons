@@ -3382,3 +3382,26 @@ class LinklovingAppApi(http.Controller):
         return request.render("linkloving_app_api.listing", {
             'objects': partner_sudo,
         })
+
+    ##修改产品重量
+    @http.route('/linkloving_app_api/change_product_weight', type='json', auth='none', csrf=False)
+    def change_product_weight(self, **kw):
+        product_id = request.jsonrequest.get('product_id')
+        weight = request.jsonrequest.get('weight')
+        product_json = request.env['product.template'].sudo(LinklovingAppApi.CURRENT_USER()).browse(product_id)
+        product_json.write({'weight': weight})
+        result_json = LinklovingAppApi.product_template_obj_to_json(product_json)
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=result_json)
+
+    @http.route('/linkloving_app_api/get_stock_picking_by_remark', type='json', auth='none', csrf=False)
+    def get_stock_picking_by_remark(self, **kw):
+        remark = request.jsonrequest.get("remark")
+        purchase_orders = request.env["purchase.order"].sudo(LinklovingAppApi.CURRENT_USER()).search(
+            [('remark', 'ilike', remark)])
+        json_list = []
+        for purchase_order in purchase_orders:
+            for ids in purchase_order.picking_ids:
+                # print purchase_order
+                json_list.append(LinklovingAppApi.stock_picking_to_json(ids))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)

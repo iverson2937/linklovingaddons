@@ -179,7 +179,7 @@ class AccountPayment(models.Model):
     product_id = fields.Many2one('product.product')
 
     def _get_move_ids(self):
-        self.move_ids=self.move_line_ids.mapped('move_id').ids
+        self.move_ids = self.move_line_ids.mapped('move_id').ids
 
     # origin = fields.Char(string=u'源单据')
     @api.multi

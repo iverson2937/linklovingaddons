@@ -109,7 +109,7 @@
                                                         <span class="mat fa fa-road" t-att-style='"color:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
                                                         <span class="rem" style="margin-left:15px;" data-toggle="tooltip" t-att-title="item.remark"><t t-esc="item.remark"/> </span>
-                                                        <span data-toggle="tooltip" class="mo_trace trace_back">追溯</span>
+                                                        <!--<span data-toggle="tooltip" class="mo_trace trace_back">追溯</span>-->
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'mo_detail'+item.uuid">
@@ -194,7 +194,7 @@
                                     <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                                     <!--<button class="btn btn-primary send-po-btn">合并</button>-->
                                     <button class="btn btn-primary create_po_btn" t-att-data-product-tmpl="result.product_p_id">创建</button>
-                                    <button class="btn btn-default delete_po_btn">删除</button>
+                                    <!--<button class="btn btn-default delete_po_btn">删除</button>-->
                                 </h4>
                             </div>
                             <t t-if="po_length!=0">
@@ -229,7 +229,7 @@
                                                         <span class="pre fa fa-road" t-att-style='"color:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
                                                         <span class="rem" style="margin-left:15px;" data-toggle="tooltip" t-att-title="item.remark"><t t-esc="item.remark"/> </span>
-                                                        <span data-toggle="tooltip" class="po_trace trace_back">追溯</span>
+                                                        <!--<span data-toggle="tooltip" class="po_trace trace_back">追溯</span>-->
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'po_detail'+item.line_id">
@@ -322,7 +322,7 @@
                                                         <span class="mat fa fa-road" t-att-style='"color:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
                                                         <span class="rem" style="margin-left:15px;" data-toggle="tooltip" t-att-title="item.remark"><t t-esc="item.remark"/> </span>
-                                                        <span data-toggle="tooltip" class="mo_trace trace_back">追溯</span>
+                                                        <!--<span data-toggle="tooltip" class="mo_trace trace_back">追溯</span>-->
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'mo_detail'+item.uuid">
@@ -410,7 +410,7 @@
                                     <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                                     <!--<button class="btn btn-primary send-po-btn" t-att-check-name="'chk'+result.product_id">合并</button>-->
                                     <button class="btn btn-primary create_po_btn" t-att-data-product-tmpl="result.product_p_id">创建</button>
-                                    <button class="btn btn-default delete_po_btn">删除</button>
+                                    <!--<button class="btn btn-default delete_po_btn">删除</button>-->
                                 </h4>
                             </div>
                             <t t-if="po_length!=0">
@@ -444,7 +444,7 @@
                                                         <span class="mat fa fa-road" t-att-style='"color:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
                                                         <span class="rem" style="margin-left:15px;" data-toggle="tooltip" t-att-title="item.remark"><t t-esc="item.remark"/> </span>
-                                                        <span data-toggle="tooltip" class="po_trace trace_back">追溯</span>
+                                                        <!--<span data-toggle="tooltip" class="po_trace trace_back">追溯</span>-->
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'po_detail'+item.line_id">
@@ -505,7 +505,7 @@
                         <span class="mat fa fa-home" t-att-style='"color:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
                         <span class="mat fa fa-road" t-att-style='"color:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
-                        <span data-toggle="tooltip" class="po_trace trace_back">追溯</span>
+                        <!--<span data-toggle="tooltip" class="po_trace trace_back">追溯</span>-->
                     </h4>
                 </div>
                 <div class="panel-collapse collapse" t-att-id="'mo_source'+item.id">

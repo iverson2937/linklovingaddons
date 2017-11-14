@@ -258,6 +258,7 @@ class ProductTemplate(models.Model):
         @api.multi
         def show_detail(self):
             return {
+                'name': '产品详细',
                 'type': 'ir.actions.client',
                 'tag': 'product_detail',
                 'product_id': self.product_tmpl_id.id
