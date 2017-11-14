@@ -183,14 +183,20 @@ class ProductTemplate(models.Model):
     def view_product_id(self):
         for product in self:
             return {
-                'type': 'ir.actions.act_window',
-                'res_model': 'product.template',
-                'view_mode': 'form',
-                'view_type': 'form',
-                'views': [[False, 'form']],
-                'target': 'current',
-                'res_id': product.id
+                'name': product.name,
+                'type': 'ir.actions.client',
+                'tag': 'product_detail',
+                'product_id': product.id
             }
+            # return {
+            #     'type': 'ir.actions.act_window',
+            #     'res_model': 'product.template',
+            #     'view_mode': 'form',
+            #     'view_type': 'form',
+            #     'views': [[False, 'form']],
+            #     'target': 'current',
+            #     'res_id': product.id
+            # }
 
     @api.multi
     def _set_order_point_active(self):
