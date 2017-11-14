@@ -70,8 +70,15 @@
 
     <!--未排产-->
     <t t-name="un_a_p_tmpl">
-        <div class="production_line un_production_line">
-            <span class="p_line_name">未排产</span>
+        <div t-att-class="state=='draft' ? 'production_line un_production_line un_draft' : 'production_line un_production_line un_confirm'">
+            <span class="p_line_name">
+                <t t-if="state=='draft'">
+                    未排产-草稿
+                </t>
+                <t t-else="">
+                    未排产-需求确认
+                </t>
+            </span>
             <div class="p_line_right">
                 <div class="production_qty">
                     MO数量：<span><t t-esc="length"/></span>
@@ -79,7 +86,7 @@
                 <span class="fa fa-chevron-down un_a_p_showorhide"></span>
             </div>
         </div>
-        <div class="production_lists_wrap un_a_p_lists_wrap">
+        <div t-att-class="state=='draft' ? 'production_lists_wrap un_a_p_lists_wrap un_draft_wrap' : 'production_lists_wrap un_a_p_lists_wrap un_confirm_wrap'">
             <t t-call="un_a_p_render_right_tmpl"></t>
         </div>
     </t>
