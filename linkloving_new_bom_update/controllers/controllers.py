@@ -103,6 +103,17 @@ class LinklovingNewBomUpdate(http.Controller):
         content = xls.read()
         return content
 
+    def set_product_style(self, color):
+        style = xlwt.easyxf(
+            # 'align: wrap on;'
+            'font:height 240;'
+
+            'borders: left thin, right thin, top thin, bottom thin;'
+
+            'pattern: pattern solid, fore_colour ' + color + '; font: bold on;'
+        )
+        return style
+
     # 写excel  结构
     def write_structure_excel(self, model, bom_list):
 
@@ -111,9 +122,10 @@ class LinklovingNewBomUpdate(http.Controller):
         xls = StringIO.StringIO()
 
         style = xlwt.easyxf(
-            'font: height 250;'
-            'align: wrap on;'
-            'alignment: vert center, horizontal center;'
+
+            # 'align: wrap on;'
+            'font:height 240;'
+
             'borders: left thin, right thin, top thin, bottom thin;'
         )
 
@@ -132,11 +144,16 @@ class LinklovingNewBomUpdate(http.Controller):
 
             for bom_data_int in range(0, len(mrp_bom_data.bom_line_ids)):
                 first_col = sheet1.col(bom_data_int)
-                first_col.width = 250 * 40
+                if bom_data_int == 1:
+                    first_col.width = 700 * 40
+                elif bom_data_int == 2:
+                    first_col.width = 500 * 80
+                else:
+                    first_col.width = 4000
 
             for bom_data_int in range(0, len(mrp_bom_data.bom_line_ids) + 1):
                 first_row = sheet1.row(bom_data_int)
-                first_row.set_style(tall_style)
+                # first_row.set_style(tall_style)
 
             row0 = [u'序号', u'Bom 名称', u'Bom 规格', u'数量', u'Bom 参考']
 
@@ -147,23 +164,43 @@ class LinklovingNewBomUpdate(http.Controller):
                 sheet1.write(1, i, row0[i], style)
 
             jj = 1
+
+            asdd = 0
             for mrp_bom_one in mrp_bom_data:
                 jj += 1
                 sheet1.write(jj, 0, jj - 1, style)
-                sheet1.write(jj, 1, mrp_bom_one.display_name, style)
-                sheet1.write(jj, 2, mrp_bom_one.product_specs, style)
-                sheet1.write(jj, 3, str(mrp_bom_one['product_qty']) + mrp_bom_one.product_uom_id['name'], style)
-                sheet1.write(jj, 4, mrp_bom_one['code'], style)
+                sheet1.write(jj, 1, mrp_bom_one.display_name, self.set_product_style('Green'))
+                sheet1.write(jj, 2, mrp_bom_one.product_specs, self.set_product_style('Green'))
+                sheet1.write(jj, 3, str(mrp_bom_one['product_qty']) + mrp_bom_one.product_uom_id['name'],
+                             self.set_product_style('Green'))
+                sheet1.write(jj, 4, mrp_bom_one['code'], self.set_product_style('Green'))
             j = 2
-            for data in mrp_bom_data.bom_line_ids:
-                j += 1
-                sheet1.write(j, 0, j - 2, style)
-                sheet1.write(j, 1, data.display_name, style)
-                sheet1.write(j, 2, data.product_id['product_specs'], style)
-                sheet1.write(j, 3, str(data['product_qty'] * data.product_id['standard_price']), style)
-                sheet1.write(j, 4, [adc.display_name for adc in data.child_line_ids], style)
+
+            self.create_my_style(mrp_bom_one, sheet1, j, 0)
 
         f.save(xls)
         xls.seek(0)
         content = xls.read()
         return content
+
+    ssg = 0
+
+    def create_my_style(self, data, sheet1, j, xu):
+
+        self.ssg += 1
+
+        for data_s in data.bom_line_ids:
+            j += 1
+            xu += 1
+            # sheet1.write(j, 0, j - 2, style)
+            sheet1.write(j, 1, ('      ' * self.ssg) + str(xu) + ' ' + data_s.display_name,
+                         self.set_product_style('Yellow'))
+            sheet1.write(j, 2, data_s.product_id['product_specs'], self.set_product_style('Yellow'))
+            sheet1.write(j, 3, str(data_s['product_qty'] * data_s.product_id['standard_price']),
+                         self.set_product_style('Yellow'))
+            sheet1.write(j, 4, [adc.display_name for adc in data_s.child_line_ids], self.set_product_style('Yellow'))
+
+            for line_bom_one in data_s.product_id.product_tmpl_id.bom_ids:
+                j = self.create_my_style(line_bom_one, sheet1, j, 0)
+        self.ssg -= 1
+        return j

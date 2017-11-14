@@ -153,7 +153,12 @@ class ResPartner(models.Model):
             if self['is_company'] or vals.get('is_company'):
                 for item_type in ['name', 'email']:
                     if select_company(self, vals, item_type):
-                        raise UserError(u'此' + item_type + vals.get(item_type) + u'已绑定公司，请确认')
+                        item_type_name = item_type
+                        if item_type == 'name':
+                            item_type_name = '名称 '
+                        elif item_type == 'email':
+                            item_type_name = '邮件 '
+                        raise UserError(u'此' + item_type_name + vals.get(item_type) + u'已绑定公司，请确认')
 
         if self['company_type'] == 'person' and vals.get('company_type') == 'company':
             for item_type in ['name', 'email']:
