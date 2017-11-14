@@ -21,7 +21,7 @@
                     </group>
 
                     <footer>
-                        <button name='action_mo_plan' type='object' string='确认' class='oe_highlight'/>
+                        <!--<button name='action_mo_plan' type='object' string='确认' class='oe_highlight'/>-->
                         or
                         <button string='取消' class='oe_link' special='cancel'/>
                     </footer>

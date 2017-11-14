@@ -34,18 +34,20 @@
                 <form string="">
                     <sheet>
                         <group>
-                            <field name="report_start_time"/>
-                            <field name="report_end_time"/>
-                            <field name="state"/>
+                            <group>
+                                <field name="report_start_time"/>
+                                <field name="report_end_time"/>
+                                <field name="state"/>
+                            </group>
+                            <group>
+                                <field name="report_type"/>
+                                <field name="total_orderpoint_count"/>
+                                <field name="note"/>
+                            </group>
                         </group>
-                        <group>
-                            <field name="report_type"/>
-                            <field name="total_orderpoint_count"/>
-                            <field name="note"/>
-                        </group>
+
                         <notebook>
                             <page string="报告条目">
-                                <group>
                                     <field name="report_line_ids">
                                         <tree>
                                             <field name="product_id"/>
@@ -57,7 +59,6 @@
                                             <field name="orderpoint_id"/>
                                         </tree>
                                     </field>
-                                </group>
                             </page>
                         </notebook>
                     </sheet>

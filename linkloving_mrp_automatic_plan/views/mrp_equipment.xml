@@ -401,6 +401,41 @@
             </field>
         </record>
 
+        <!-- Inherit Form View to Modify it -->
+        <record id="linkloving_mrp_production_form_view_inherit" model="ir.ui.view">
+            <field name="name">mrp.production.form</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="linkloving_mrp_extend.linkloving_mrp_production_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='button_waiting_material']" position="replace">
+                    <field name="production_line_id" invisible="1"/>
+                    <field name="planned_start_backup" invisible="1"/>
+                    <button type="formview_dialog"
+                            name="get_formview"
+                            class="oe_highlight"
+                            attrs="{'invisible': [('state', 'not in', ('confirmed', 'draft'))]}"
+                            context="{'default_production_id': active_id,
+                                'production_id': active_id,
+                                'default_process_id': process_id,
+                                'default_production_line_id': production_line_id,
+                                'default_in_charge_id': in_charge_id,
+                                'default_planned_start_backup': planned_start_backup,
+                                'default_product_qty': product_qty}"
+                            string="开始排产"/>
+                </xpath>
+
+                <xpath expr="//button[@name='button_action_cancel_confirm']" position="replace">
+                    <!-- Add your fields or attributes here -->
+                    <button name="action_cancel_plan" type="object" string="取消排产"
+                            attrs="{'invisible': [('state', 'not in', ('waiting_material'))]}"
+                            confirm="是否取消排产,移出当前产线?"
+                    />
+                </xpath>
+
+
+            </field>
+        </record>
+
         <record id="form_plan_mo_wizard" model="ir.ui.view">
             <field name="name">plan.mo.wizard.form</field>
             <field name="model">plan.mo.wizard</field>

@@ -178,5 +178,33 @@
                 parent="mrp_production_outsource"
                 action="action_outsource_done"
                 sequence="4" name="已完成的外协"/>
+
+
+        <record id="linkloving_mrp_production_form_view_inherit" model="ir.ui.view">
+            <field name="name">mrp.production.form</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="linkloving_mrp_automatic_plan.linkloving_mrp_production_form_view_inherit"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='get_formview']" position="replace">
+                    <field name="outsourcing_supplier_id" invisible="1"/>
+                    <button type="formview_dialog"
+                            name="get_formview"
+                            class="oe_highlight"
+                            attrs="{'invisible': [('state', 'not in', ('confirmed', 'draft'))]}"
+                            context="{'default_production_id': active_id,
+                                'production_id': active_id,
+                                'default_process_id': process_id,
+                                'default_production_line_id': production_line_id,
+                                'default_in_charge_id': in_charge_id,
+                                'default_planned_start_backup': planned_start_backup,
+                                'default_outsourcing_supplier_id': outsourcing_supplier_id,
+                                'default_product_qty': product_qty}"
+                            string="开始排产"/>
+                </xpath>
+
+
+            </field>
+        </record>
+
     </data>
 </openerp>

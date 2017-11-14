@@ -248,7 +248,7 @@
                     <button name="button_waiting_material" class="oe_highlight"
                             attrs="{'invisible': [('state', 'not in', 'confirmed')]}" type="object"
                             groups="linkloving_mrp_extend.group_charge_produce"
-                            string="Confirm Order,Prepare Material"/>
+                            string="Confirm Order"/>
 
                     <button name="button_start_prepare_material" class="oe_highlight"
                             attrs="{'invisible': [('state', 'not in', 'waiting_material')]}" type="object"
