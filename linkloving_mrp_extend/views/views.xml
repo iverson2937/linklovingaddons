@@ -408,13 +408,13 @@
                               decoration-success="quantity_done>=product_uom_qty"
                               decoration-danger="qty_available&lt;product_uom_qty" create="0">
                             <field name="product_id" string="产品" options="{'no_create':True}"/>
-                            <field name="qty_available" string="库存"/>
-                            <field name="virtual_available" string="Forecast Quantity"/>
-                            <field name="suggest_qty" string="Suggest Quantity"/>
-                            <field name="quantity_available" string="系统可用"/>
                             <field name="product_uom_qty" string="Demand Quantity"/>
+                            <field name="suggest_qty" string="Suggest Quantity"/>
+                            <field name="qty_available" string="库存"/>
+                            <field name="remaining_qty"/>
                             <field name="quantity_done" string="备料数量"/>
                             <field name="return_qty" readonly="1" string="Return Quantity"/>
+                            <field name="virtual_available" string="Forecast Quantity"/>
                         </tree>
                     </field>
                 </xpath>
@@ -528,7 +528,6 @@
                             <field name="qty_available" string="库存"/>
                             <field name="virtual_available" string="预测数量"/>
                             <field name="suggest_qty" readonly="1" string="建议数量"/>
-                            <field name="quantity_available" string="系统可用"/>
                             <field name="product_uom_qty" string="实际需求物料数量"/>
                             <field name="quantity_ready" readonly="context.get('quantity_ready_invisible')"
                                    string="备料数量"/>

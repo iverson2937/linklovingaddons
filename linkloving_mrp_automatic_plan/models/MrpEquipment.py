@@ -14,7 +14,7 @@ OFF_WORK_TIME = 16 * 60 * 60
 WEEKEND_LIST = [6]  # 从0 - 6 周一到周天
 REWORK_DEFAULT_TIME = 8 * 60 * 60
 
-
+DONE_CANCEL_DOMAIN = ["done", "cancel"]
 class PlanMoWizard(models.TransientModel):
     _name = 'plan.mo.wizard'
 
@@ -187,7 +187,7 @@ class MrpProductionLine(models.Model):
                                                              # ("date_planned_start", "<=", end_time_str),
                                                              # ("date_planned_finished", ">=", start_time_str),
                                                              ("state", "not in",
-                                                              ['done', 'cancel', 'waiting_post_inventory'])
+                                                              DONE_CANCEL_DOMAIN)
                                                              ], )
             line.amount_of_planned_mo = count
 
@@ -223,7 +223,7 @@ class MrpProductionLine(models.Model):
 
     @api.multi
     def _compute_total_time(self):
-        domain = [("state", "in", ['draft', 'confirmed', 'waiting_material'])]
+        domain = [("state", "not in", DONE_CANCEL_DOMAIN)]
         for line in self:
             new_domain = domain + [("production_line_id", "=", line.id)]
             mos = self.env["mrp.production"].search(new_domain)
@@ -231,7 +231,7 @@ class MrpProductionLine(models.Model):
 
     @api.multi
     def _compute_total_ava_time(self):
-        domain = [("state", "in", ['draft', 'confirmed', 'waiting_material'])]
+        domain = [("state", "not in", DONE_CANCEL_DOMAIN)]
         for line in self:
             new_domain = domain + [("production_line_id", "=", line.id)]
             mos = self.env["mrp.production"].search(new_domain)
@@ -260,7 +260,7 @@ class MrpProductionLine(models.Model):
         count = self.env["mrp.production"].search_count([("process_id", "=", process_id),
                                                          ("production_line_id", "=", False),
                                                          ("state", "not in",
-                                                          ['done', 'cancel', 'waiting_post_inventory'])])
+                                                          DONE_CANCEL_DOMAIN)])
         lines.append({
             'id': -1,
             'name': u'未分组',
@@ -315,7 +315,7 @@ class MrpProductionLine(models.Model):
                     domain=expression.AND([[("production_line_id", "=", production_line_id),
                                             # ("date_planned_start", "<=", end_time_str),
                                             # ("date_planned_finished", ">=", start_time_str),
-                                            ("state", "not in", ['done', 'cancel', 'waiting_post_inventory']),
+                                            ("state", "not in", ['draft', 'confirmed', 'cancel', 'done']),
                                             ("process_id", "=", process_id)
                                             ], domains]),
                     limit=limit,
@@ -328,7 +328,7 @@ class MrpProductionLine(models.Model):
                     domain=expression.AND([[("production_line_id", "=", production_line_id),
                                             # ("date_planned_start", "<=", end_time_str),
                                             # ("date_planned_finished", ">=", start_time_str),
-                                            ("state", "not in", ['done', 'cancel', 'waiting_post_inventory']),
+                                            ("state", "not in", DONE_CANCEL_DOMAIN),
                                             ("process_id", "=", process_id)
                                             ], domains]),
                 order=ORDER_BY,
@@ -457,11 +457,9 @@ class MrpProductionExtend(models.Model):
                     rate_list.append(0)
                     continue
 
-                rate = move.quantity_done * 1.0 / move.product_uom_qty
-                if rate < 0.5:
-                    rate = (
+                rate = (
                            move.quantity_done + move.product_id.qty_available if move.product_id.qty_available > 0 else 0) \
-                           / move.product_uom_qty
+                       / move.product_uom_qty
 
                 # rate = move.product_id.qty_available * 1.0 / move.product_uom_qty
                 rate_list.append(rate)
@@ -578,7 +576,7 @@ class MrpProductionExtend(models.Model):
 
         domain = [("process_id", "=", process_id),
                   ("production_line_id", "=", False),
-                  ("state", "in", ['draft', 'confirmed', 'waiting_material'])]
+                  ("state", "in", ['draft', 'confirmed'])]
 
         domains = kwargs.get("domains", [])
         new_domains = expression.AND([domains, domain])
@@ -598,12 +596,14 @@ class MrpProductionExtend(models.Model):
     def get_unplanned_mo_by_search(self, **kwargs):
         process_id = kwargs.get("process_id")
         search_domain = kwargs.get("domains", [])
+        if not search_domain:
+            return []
         limit = kwargs.get("limit")
         offset = kwargs.get("offset")
 
         domain = [("process_id", "=", process_id),
                   ("production_line_id", "=", False),
-                  ("state", "in", ['draft', 'confirmed', 'waiting_material'])]
+                  ("state", "in", ['draft', 'confirmed'])]
 
         domains = kwargs.get("domains", [])
         new_domains = expression.AND([domains, domain, search_domain])
@@ -623,10 +623,16 @@ class MrpProductionExtend(models.Model):
     def get_planned_mo_by_search(self, **kwargs):
         process_id = kwargs.get("process_id")
         domains = kwargs.get("domains", [])
+        if not domains:
+            return []
         order_by_material = kwargs.get("order_by_material", False)
         group_by = kwargs.get("group_by")
+        state_domain = ("state", "not in", DONE_CANCEL_DOMAIN)
         new_domain = expression.AND([domains, [("process_id", "=", process_id),
-                                               ("state", "not in", ['done', 'cancel', 'waiting_post_inventory'])]])
+                                               state_domain]])
+
+        ungroup_domain = expression.AND([domains, [("process_id", "=", process_id),
+                                                   ("state", "not in", ['done', 'cancel', 'draft', 'confirmed'])]])
 
         groups = self.read_group(domain=new_domain,
                                  fields=FIELDS,
@@ -636,11 +642,14 @@ class MrpProductionExtend(models.Model):
         groups_dic = {}
         for group in groups:
             domain = group.get("__domain", [])
-            mos = MrpProducion.search_read(domain, fields=FIELDS, order=ORDER_BY)
-            group["mos"] = self.sorted_mos_by_material(mos, order_by_material)
-            if group.get("production_line_id"):
+            line_id = group.get("production_line_id")
+            if line_id:
+                mos = MrpProducion.search_read(domain, fields=FIELDS, order=ORDER_BY)
+                group["mos"] = self.sorted_mos_by_material(mos, order_by_material)
                 groups_dic[group.get("production_line_id")[0]] = group
             else:
+                mos = MrpProducion.search_read(ungroup_domain, fields=FIELDS, order=ORDER_BY)
+                group["mos"] = self.sorted_mos_by_material(mos, order_by_material)
                 groups_dic['-1'] = group
 
         return groups_dic
@@ -764,7 +773,7 @@ class MrpProductionExtend(models.Model):
         #         'production_line_id': production_line.id
         #     })
         # 取出这条产线所有的mo
-        domain = [("state", "not in", ['done', 'cancel', 'waiting_post_inventory'])]
+        domain = [("state", "not in", DONE_CANCEL_DOMAIN)]
         origin_mos = self.env["mrp.production"]
         all_mos = self.env["mrp.production"]
         if origin_production_line:
@@ -777,20 +786,23 @@ class MrpProductionExtend(models.Model):
                                                         order=ORDER_BY)
             if is_priority:  # 如果是优先排产
                 all_mos -= self
-                first_start_time = fields.Datetime.from_string(all_mos[0].planned_start_backup)
-                new_datetime = datetime(first_start_time.year,
-                                        first_start_time.month,
-                                        first_start_time.day,
-                                        first_start_time.hour,
-                                        first_start_time.minute,
-                                        first_start_time.second,
-                                        microsecond=first_start_time.microsecond,
-                                        tzinfo=pytz.timezone("UTC"))
+                if not all_mos:  # 如果产线上只有本mo,则直接开始从今天排
+                    self.planned_one_mo(self, self.get_today_time(day_offset=1), production_line)
+                else:
+                    first_start_time = fields.Datetime.from_string(all_mos[0].planned_start_backup)
+                    new_datetime = datetime(first_start_time.year,
+                                            first_start_time.month,
+                                            first_start_time.day,
+                                            first_start_time.hour,
+                                            first_start_time.minute,
+                                            first_start_time.second,
+                                            microsecond=first_start_time.microsecond,
+                                            tzinfo=pytz.timezone("UTC"))
 
-                next_mo_start_time = new_datetime.astimezone(pytz.timezone(self.env.user.tz)) - relativedelta(days=1)
+                    next_mo_start_time = new_datetime.astimezone(pytz.timezone(self.env.user.tz)) - relativedelta(days=1)
 
-                self.planned_start_backup = next_mo_start_time
-                all_mos = self + all_mos
+                    self.planned_start_backup = next_mo_start_time
+                    all_mos = self + all_mos
 
         if production_line.id == origin_production_line.id:
             return origin_mos, all_mos

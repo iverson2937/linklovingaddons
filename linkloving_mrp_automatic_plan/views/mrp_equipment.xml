@@ -230,6 +230,7 @@
                                 'default_process_id': process_id,
                                 'default_production_line_id': production_line_id,
                                 'default_in_charge_id': in_charge_id,
+                                'default_planned_start_backup': planned_start_backup,
                                 'default_product_qty': product_qty}"
                                 string="开始排产"/>
                         <button name="action_cancel_plan" type="object" string="取消排产"
@@ -295,7 +296,7 @@
                                        readonly="1"/>
                                 <field name="production_line_id" domain="[('process_id', '=', process_id)]"
                                        readonly="1"/>
-                                <field name="in_charge_id" options="{'no_create':True}" readonly="1"/>
+                                <field name="in_charge_id" options="{'no_create':True}" readonly="1" string="负责人"/>
                                 <field name="supplier_id" readonly="1"/>
                                 <field name="planned_start_backup"/>
 
@@ -339,11 +340,11 @@
                                         <field name="product_id" string="产品" options="{'no_create':True}"/>
                                         <field name="product_uom_qty" string="需求数量"/>
                                         <field name="suggest_qty" string="建议数量"/>
-                                        <field name="quantity_available" string="系统可用"/>
                                         <field name="qty_available" string="库存"/>
-                                        <field name="virtual_available" string="预测数量"/>
+                                        <field name="remaining_qty"/>
                                         <field name="quantity_done" string="备料数量"/>
                                         <field name="return_qty" readonly="1" string="退料数量"/>
+                                        <field name="virtual_available" string="预测数量"/>
                                     </tree>
                                 </field>
                             </page>

@@ -1412,6 +1412,12 @@ class SimStockMove(models.Model):
                     if bom_line.product_id.id == sim_move.product_id.id:
                         sim_move.bom_line_id = bom_line.id
 
+    @api.multi
+    def _compute_remaining_qty(self):
+        for sim_move in self:
+            remaining_qty = sim_move.suggest_qty - sim_move.quantity_done
+            sim_move.remaining_qty = remaining_qty if remaining_qty else 0
+
     product_id = fields.Many2one('product.product', )
     production_id = fields.Many2one('mrp.production')
     stock_moves = fields.One2many('stock.move', compute=_compute_stock_moves)
@@ -1437,6 +1443,7 @@ class SimStockMove(models.Model):
 
     bom_line_id = fields.Many2one(comodel_name='mrp.bom.line', compute='_compute_bom_line_id')
 
+    remaining_qty = fields.Float(string=u"待领数量", compute='_compute_remaining_qty')
 
 class ReturnMaterialLine(models.Model):
     _name = 'return.material.line'

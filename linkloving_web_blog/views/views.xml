@@ -23,8 +23,12 @@
             <field name="inherit_id" ref="website_blog.view_blog_blog_form"/>
             <field name="arch" type="xml">
 
+                <xpath expr="//field[@name='name']" position="attributes">
+                    <attribute name="string">一级分类</attribute>
+                </xpath>
+
                 <xpath expr="//field[@name='name']" position="after">
-                    <field name="blog_tag_ids" widget="many2many_tags"/>
+                    <field name="blog_tag_ids" widget="many2many_tags" string="二级分类"/>
 
                     <field name="is_all_blog"/>
                 </xpath>

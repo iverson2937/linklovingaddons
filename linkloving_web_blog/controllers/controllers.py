@@ -47,20 +47,20 @@ class LinklovingWebBlog(http.Controller):
 
         return request.render("linkloving_web_blog.web_blog_create_show", values)
 
-    @http.route('/blog/init', type='http', auth='public', csrf=False)
+    @http.route('/blog/init', type='http', auth="user", website=True)
     def init_blog_show(self, **kw):
 
-        chat_category = self.env.ref('website_menu.menu_news')
+        # chat_category = request.env.ref('website_menu.menu_news')
 
-        bolog_name = ['公告栏', '发布文章']
-        bolog_url = ['/blog/new_blog_index', '/blog/new_blog_create_index']
+        bolog_name = ['知识分享', '发布文章', '我的文章']
+        bolog_url = ['/blog/new_blog_index', '/blog/new_blog_create_index', '/blog/ago/check']
 
         for a in range(0, len(bolog_name)):
             request.env['website.menu'].create({
                 'name': bolog_name[a],
                 'url': bolog_url[a],
-                'parent_id': request.website.menu_id.id,
-                'website_id': request.website.id,
+                'parent_id': 4,
+                'website_id': 1,
             })
 
         return http.local_redirect('/blog/new_blog_index')
