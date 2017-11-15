@@ -66,6 +66,9 @@
                             <strong>规格</strong>
                         </th>
                         <th>
+                            <strong>供应商码</strong>
+                        </th>
+                        <th>
                             <strong>交期</strong>
                         </th>
                         <!--<th class="text-center"><strong>Date Req.</strong></th>-->
@@ -83,6 +86,9 @@
                         </td>
                         <td>
                             <span t-field="line.product_id.product_specs"/>
+                        </td>
+                        <td>
+                            <span t-field="line.supplier_product_code"/>
                         </td>
                         <td class="text-center">
                             <span t-field="line.date_planned"/>
