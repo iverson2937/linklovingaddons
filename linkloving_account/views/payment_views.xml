@@ -87,7 +87,7 @@
                     <separator/>
                     <filter string="Waiting Confirm" name="confirm" domain="[('state', '=', 'posted')]"/>
                     <filter string="Waiting Payment" name="register" domain="[('state', '=', 'confirm')]"/>
-                    <filter string="Done" name="register" domain="[('state', '=', 'done')]"/>
+                    <filter string="Done" name="done" domain="[('state', '=', 'done')]"/>
                     <separator/>
                     <group expand='0' string='Group by...'>
                         <filter string='合作伙伴' domain="[]" context="{'group_by': 'partner_id'}"/>
@@ -208,7 +208,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="domain">[('payment_type','=',1),('state','in',['confirm','done'])]</field>
-            <field name="context">{'default_payment_type':1,'wait_pay':True}</field>
+            <field name="context">{'default_payment_type':1,'wait_pay':True,'search_default_register':True}</field>
             <field name="view_ids" eval="[(5,0,0),
             (0,0,{'view_mode':'tree', 'view_id': ref('account_payment_register_tree')}),
             (0,0,{'view_mode':'form', 'view_id': ref('purchase_account_payment_register_form')})]"/>

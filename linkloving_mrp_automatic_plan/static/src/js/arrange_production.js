@@ -22,6 +22,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
     var _t = core._t;
     var myself;
     var move_id;
+    var a_flag = true;
 
     var Arrange_Production = Widget.extend(ControlPanelMixin,{
         template: 'arrange_production_tmp',
@@ -30,6 +31,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             'click .to_bom': 'to_bom_func',
             'click .to_relevant_struc': 'to_relevant_struc_func',
             'click .a_p_mo_name':'to_mo_func',
+            'dbclick .a_p_mo_name':'to_mo_func',
             'click .so_report_btn': 'so_report',
             'click .order_by_material': 'order_by_material_1',
             'click .order_by_default': 'order_by_material_1',
@@ -70,10 +72,14 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                     readonly: true,
                     target: "new"
                 };
-                console.log("332")
-                self.do_action(action);
+                if(a_flag == true){
+                    a_flag = false;
+                    self.do_action(action).then(function () {
+                        a_flag = true;
+                    });
+                }
             })
-
+            // a_flag = true;
         },
         to_relevant_struc_func:function (e) {
              var e = e || window.event;
@@ -193,23 +199,36 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             }
             $(target).parents('.production_line').next('.production_lists_wrap').html("");
             $(target).parents('.production_line').next('.production_lists_wrap').removeClass('production_lists_no_item');
-            if($(target).hasClass('un_a_p_showorhide')){
-                $(target).parents('.production_line').next('.production_lists_wrap').append(QWeb.render('un_a_p_render_right_tmpl', {
-                result: result,
-                show_more: true,
-                selection: myself.states.state.selection,
-                new_selection: myself.states.product_order_type.selection,
-                material_selection: myself.states.availability.selection
-            }));
+
+            //需求确认
+            if($(target).parents('.un_confirm').length>0){
+                $(target).parents('.un_confirm').next('.un_confirm_wrap').append(QWeb.render('un_a_p_render_right_tmpl', {
+                    result: result,
+                    show_more: true,
+                    state:"confirm",
+                    selection: myself.states.state.selection,
+                    new_selection: myself.states.product_order_type.selection,
+                    material_selection: myself.states.availability.selection
+                }));
             }
-            else {
+            // 草稿
+            else if($(target).parents('.un_draft').length>0){
+                $(target).parents('.un_draft').next('.un_draft_wrap').append(QWeb.render('un_a_p_render_right_tmpl', {
+                    result: result,
+                    show_more: true,
+                    state:"draft",
+                    selection: myself.states.state.selection,
+                    new_selection: myself.states.product_order_type.selection,
+                    material_selection: myself.states.availability.selection
+                }));
+            } else {
                 $(target).parents('.production_line').next('.production_lists_wrap').append(QWeb.render('a_p_render_right_tmpl', {
-                result: result,
-                show_more: true,
-                selection: myself.states.state.selection,
-                new_selection: myself.states.product_order_type.selection,
-                material_selection: myself.states.availability.selection
-            }));
+                    result: result,
+                    show_more: true,
+                    selection: myself.states.state.selection,
+                    new_selection: myself.states.product_order_type.selection,
+                    material_selection: myself.states.availability.selection
+                }));
             }
             if ($(target).parents('.production_line').next('.production_lists_wrap').children('.ap_item_wrap').length == 0) {
                 $(target).parents('.production_line').next('.production_lists_wrap').slideUp(0);
@@ -349,8 +368,8 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 // be done later, simultaneously to all other ControlPanel elements
                 self.left_searchview = new SearchView(self, self.dataset, self.search_fields_view, options);
                 var $node1 = $('<div/>').addClass('arranged_product_searchview');
-                $(".a_p_time_end").html("");
-                $(".a_p_time_end").prepend($node1);
+                $(".o_cp_searchview").html("");
+                $(".o_cp_searchview").prepend($node1);
                 self.left_searchview.on('search_data', self, self.left_search.bind(self));
                 $.when(self.left_searchview.appendTo($node1)).done(function () {
                     self.left_searchview_elements = {};
@@ -395,7 +414,8 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             }).done(function (results) {
                 own.offset = 1;
                 own.domain = results.domain;
-                own.un_arrange_production(own.process_id,10,own.offset,own)
+                own.un_arrange_production(own.process_id,10,own.offset,"draft",own)
+                own.un_arrange_production(own.process_id,10,own.offset,"confirmed",own)
             })
         },
         left_search: function (domains, contexts, groupbys) {
@@ -409,26 +429,30 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 own.offset = 1;
                 own.left_domain = results.domain;
                 own.arrangeed_searched();
-                own.un_arrange_searched();
+                own.un_arrange_searched("draft");
+                own.un_arrange_searched("confirmed");
             })
         },
-        un_arrange_searched:function () {
+        un_arrange_searched:function (state) {
             var self = this;
             framework.blockUI();
             new Model("mrp.production")
                     .call("get_unplanned_mo_by_search", [[]], {
                         process_id: self.process_id,
                         domains: self.left_domain,
-                    group_by: self.group_by,
-                    order_by_material: myself.order_by_material,
+                        state:state,
+                        order_by_material: myself.order_by_material,
                     })
                     .then(function (result) {
                         framework.unblockUI();
                         console.log(result)
-                        console.log(self.states)
                         var showorhides = $(".un_a_p_showorhide");
                         var mos = result["result"];
-                        myself.render_one_production_line($('.un_a_p_showorhide'), mos)
+                        if(state == 'draft'){
+                            myself.render_one_production_line($('.un_a_p_draft'), mos)
+                        }else {
+                            myself.render_one_production_line($('.un_a_p_confirm'), mos)
+                        }
                         framework.unblockUI();
                     })
         },
@@ -439,6 +463,8 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             var $node = $('<div/>').addClass('approval_pagination').prependTo($(".un_draft_wrap .a_p_right_head"));
             this.pager = new Pager(this, this.length, this.offset, this.limit);
             this.pager.appendTo($node);
+
+            framework.unblockUI();
 
             this.pager.on('pager_changed', this, function (new_state) {
                 var self = this;
@@ -476,10 +502,12 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             this.pager = new Pager(this, this.length_un_confirm, this.offset_un_confirm, this.limit_un_confirm);
             this.pager.appendTo($node);
 
+            framework.unblockUI();
+
             this.pager.on('pager_changed', this, function (new_state) {
                 var self = this;
                 var limit_changed = (this._limit !== new_state.limit);
-                this._limit = new_state.limit_un_confirm;
+                this._limit = new_state.limit;
                 this.current_min = new_state.current_min;
                 self.reload_content3(this).then(function () {
                     self.$el.animate({"scrollTop": "0px"}, 100);
@@ -627,7 +655,10 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                             new_selection:own.states.product_order_type.selection,
                             material_selection: own.states.availability.selection
                         }));
-                        framework.unblockUI();
+                        // if(state == 'draft'){
+                        //     framework.unblockUI();
+                        // }
+
                         own.length = result.length;
 
                         //分页的情况

@@ -6,6 +6,7 @@ import os, zipfile
 
 import qrcode
 
+from linklovingaddons.linkloving_pdm.models.models import ATTACHINFO_FIELD
 from odoo import http
 from odoo.http import request
 
@@ -28,11 +29,12 @@ class LinklovingApproval(http.Controller):
             file_type = file_type.lower()
 
         attachment_info = request.env['product.attachment.info'].browse(int(file_id))
-        version_data_list = request.env['product.attachment.info'].search(
-            [('product_tmpl_id', '=', attachment_info.product_tmpl_id.id), ('type', '=', file_type)])
+        version_data_list = request.env['product.attachment.info'].search_read(
+                [('product_tmpl_id', '=', attachment_info.product_tmpl_id.id), ('type', '=', file_type)],
+                fields=ATTACHINFO_FIELD)
         attach_list = []
         for atta in version_data_list:
-            attach_list.append(atta.convert_attachment_info())
+            attach_list.append(request.env['product.attachment.info'].sudo().convert_attachment_info(atta))
         for attach_one in attach_list:
             for review_line_one in attach_one.get('review_line'):
                 review_line_one['title'] = '备注:' + str(review_line_one.get('remark')) + ',审核结果：' + str(

@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 import json
+import odoo
 
 from odoo import http, _
 from odoo.http import request
-from odoo.exceptions import UserError, ValidationError
 from pyquery import PyQuery as pq
 from odoo.addons.website.models.website import slug, unslug
 from odoo import http, fields, _
 from odoo.addons.website.controllers.main import QueryURL
 from odoo.addons.website_blog.controllers.main import WebsiteBlog
 
-import base64
-
-
 # ------------------------------------------------------
 #         bolog_name = ['公告栏', '发布文章','my文章审核','原生审核']
 #         bolog_url = ['/blog/new_blog_index', '/blog/new_blog_create_index','/blog/ 主页id','/blog/ago/check']
 # ------------------------------------------------------
+from odoo.addons.web.controllers.main import ensure_db, Home
+
+
 class LinklovingWebBlog(http.Controller):
     @http.route('/blog/new_blog_index', type='http', auth='public', website=True, methods=['GET'], csrf=False)
     def new_blog_index_show(self, **kw):
@@ -37,6 +37,10 @@ class LinklovingWebBlog(http.Controller):
 
     @http.route('/blog/new_blog_create_index', type='http', auth='public', website=True, csrf=False)
     def new_blog_create_index_show(self, **kw):
+
+        if not request.env.user.active:
+            return http.local_redirect('/web/login?redirect=blog.post')
+
         fields_one = http.request.env['blog.blog'].search([('is_all_blog', '=', False)])
         fields_two = http.request.env['blog.tag'].search([])
         # field = fields.search([('model', '=', '')])

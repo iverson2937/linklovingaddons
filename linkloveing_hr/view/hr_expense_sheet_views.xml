@@ -28,11 +28,11 @@
                                 groups="hr_expense.group_hr_expense_user" class="oe_highlight o_expense_sheet_approve"
                                 attrs="{'invisible':['|',('is_show','=',False),('state','!=','submit')]}"
                         />
-                        <button name="manager2_approve" states="manager1_approve" string="Approve" type="object"
+                        <button name="manager2_approve" string="Approve" type="object"
                                 groups="hr_expense.group_hr_expense_user"
                                 attrs="{'invisible':['|',('is_show','=',False),('state','!=','manager1_approve')]}"
                                 class="oe_highlight o_expense_sheet_approve"/>
-                        <button name="manager3_approve" states="manager2_approve" string="Approve" type="object"
+                        <button name="manager3_approve" string="Approve" type="object"
                                 groups="hr_expense.group_hr_expense_manager"
                                 attrs="{'invisible':['|',('is_show','=',False),('state','!=','manager2_approve')]}"
                                 class="oe_highlight"/>

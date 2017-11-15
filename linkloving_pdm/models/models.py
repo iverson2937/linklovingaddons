@@ -21,6 +21,10 @@ REVIEW_LINE_STATE = {'waiting_review': u'等待审核',
                      'review_success': u'审核通过',
                      'review_fail': u'审核不通过',
                      'review_canceled': u'取消审核'}
+ATTACHINFO_FIELD = ['product_tmpl_id', 'file_name', 'review_id', 'remote_path',
+                    'version', 'state', 'has_right_to_review', 'is_show_outage',
+                    'is_able_to_use', 'is_show_cancel', 'is_first_review',
+                    'create_uid', 'type', 'is_delect_view', 'is_show_action_deny']
 
 
 class ReviewProcess(models.Model):
@@ -194,7 +198,7 @@ class ReviewProcessLine(models.Model):
             body_data = '【 文件 】' + prompt_type + str(self.review_id.product_line_ids.type) + ' 产品:' + str(
                 self.review_id.product_line_ids.product_tmpl_id.name) + '，版本:' + str(
                 self.review_id.product_line_ids.version) + '，文件:' + str(
-                self.review_id.product_line_ids.file_name) + ' ; 备注：' + (remark if remark else '')
+                self.review_id.product_line_ids.file_name) + ' ; 备注：' + str(remark if remark else '')
 
         return body_data
 
@@ -443,7 +447,36 @@ class ProductAttachmentInfo(models.Model):
     #         else:
     #             return res_id
 
-    def convert_attachment_info(self):
+    def convert_attachment_info(self, info_dic):
+        p_id = info_dic.get("product_tmpl_id")[0]
+        product = self.env["product.template"].browse(p_id)
+        info_dic["product_id"] = {
+            'id': p_id,
+            'name': product.display_name,
+            'default_code': product.default_code,
+        }
+        state = info_dic.get("state")
+        info_dic["state"] = [state, ATTACHMENT_STATE[state]]
+
+        review_id = info_dic.get("review_id")
+        if not review_id:
+            review_id = False
+        else:
+            review_id = review_id[0]
+        review = self.env["review.process"].search([("id", "=", review_id)])
+        info_dic['review_line'] = review.get_review_line_list()
+        info_dic['review_id'] = review.who_review_now.name or ''
+
+        type1 = info_dic.get("type")
+        info_dic["type"] = FILE_TYPE_DIC.get(type1 or '') or ''
+
+        c_uid = info_dic.get("create_uid")[0]
+        create_uid = self.env["res.users"].browse(c_uid)
+        info_dic["create_uid_name"] = create_uid.name
+
+        info_dic['is_delect_view'] = 'yes' if create_uid.id == self.env.uid else 'no',
+        info_dic["is_checkbox_show"] = 'yes'
+        return info_dic
         return {
             'product_id': {
                 'id': self.product_tmpl_id.id,
@@ -801,11 +834,11 @@ class ProductTemplateExtend(models.Model):
         }
 
     def convert_attendment_info_list(self, type):
-        files = self.env["product.attachment.info"].search(
-            [("type", "=", type), ("product_tmpl_id", '=', self.id)], order='version desc')
+        files = self.env["product.attachment.info"].search_read(
+            [("type", "=", type), ("product_tmpl_id", '=', self.id)], order='version desc', fields=ATTACHINFO_FIELD)
         json_list = []
         for a_file in files:
-            json_list.append(a_file.convert_attachment_info())
+            json_list.append(self.env['product.attachment.info'].convert_attachment_info(a_file))
         return json_list
 
     # def convert_attachment_info(self, info):

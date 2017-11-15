@@ -217,7 +217,7 @@ class MrpProductionLine(models.Model):
         for line in self:
             new_domain = domain + [("production_line_id", "=", line.id)]
             last_mo = self.env["mrp.production"].search(new_domain,
-                                                        order="date_planned_start,id desc",
+                                                        order="date_planned_finished,id desc",
                                                         limit=1)
             line.last_mo_time = last_mo.date_planned_finished
 
@@ -227,7 +227,7 @@ class MrpProductionLine(models.Model):
         for line in self:
             new_domain = domain + [("production_line_id", "=", line.id)]
             mos = self.env["mrp.production"].search(new_domain)
-            line.total_time = round(sum(mos.mapped("real_theo_spent_time")))
+            line.total_time = round(sum(mos.mapped("real_theo_spent_time")), 2)
 
     @api.multi
     def _compute_total_ava_time(self):
@@ -315,7 +315,7 @@ class MrpProductionLine(models.Model):
                     domain=expression.AND([[("production_line_id", "=", production_line_id),
                                             # ("date_planned_start", "<=", end_time_str),
                                             # ("date_planned_finished", ">=", start_time_str),
-                                            ("state", "not in", DONE_CANCEL_DOMAIN),
+                                            ("state", "not in", DONE_CANCEL_DOMAIN + ['draft', 'confirmed']),
                                             ("process_id", "=", process_id)
                                             ], domains]),
                     limit=limit,
@@ -452,6 +452,7 @@ class MrpProductionExtend(models.Model):
     def _compute_material_state(self):
         for mo in self:
             rate_list = []
+            mo.sim_stock_move_lines._default_product_uom_qty()
             for move in mo.sim_stock_move_lines:
                 if move.product_uom_qty == 0:
                     rate_list.append(0)

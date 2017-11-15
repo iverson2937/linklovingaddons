@@ -119,6 +119,26 @@ class ProductTemplate(models.Model):
             else:
                 product.is_virtual_lt_reordering = False
 
+    @api.multi
+    @api.depends("all_mo_ids", "all_mo_ids.state")
+    def _compute_has_confirmed_mo(self):
+        for product in self:
+            unplan_mos = product.all_mo_ids.filtered(lambda x: x.state in ['confirmed'])
+            if unplan_mos:
+                product.has_confirmed_mo = True
+            else:
+                product.has_confirmed_mo = False
+
+    @api.multi
+    @api.depends("all_mo_ids", "all_mo_ids.state")
+    def _compute_has_draft_mo(self):
+        for product in self:
+            unplan_mos = product.all_mo_ids.filtered(lambda x: x.state in ['draft'])
+            if unplan_mos:
+                product.has_draft_mo = True
+            else:
+                product.has_draft_mo = False
+
     stock_move_ids = fields.One2many(comodel_name="stock.move", inverse_name="product_tmpl_id")
     is_virtual_lt_reordering = fields.Boolean(compute="_compute_is_virtual_lt_reordering", store=True)
     is_available_lt_required = fields.Boolean(compute='_compute_is_available_lt_required', store=True)
@@ -126,6 +146,8 @@ class ProductTemplate(models.Model):
     has_mo_in_plan = fields.Boolean(compute='_compute_has_mo_in_plan', store=True)
     has_mo_unplan = fields.Boolean(compute='_compute_has_mo_unplan', store=True)
     has_mo_procure = fields.Boolean(compute='_compute_has_mo_procure', store=True)
+    has_confirmed_mo = fields.Boolean(compute='_compute_has_confirmed_mo', store=True)
+    has_draft_mo = fields.Boolean(compute='_compute_has_draft_mo', store=True)
 
     reordering_min_qty = fields.Float(compute='_compute_nbr_reordering_rules', store=True,
                                       inverse='_set_nbr_reordering_rules')

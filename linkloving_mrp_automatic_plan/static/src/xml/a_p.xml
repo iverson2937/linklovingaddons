@@ -36,11 +36,24 @@
                     <span class="p_line_name">产线： <t t-esc="item.name"/></span>
                     <span style="margin-left: 20px;">产线负责人: <t t-esc="item.employee_id[1]"/></span>
                     <div class="p_line_right">
-                        <!--<div class="responsible">-->
-                            <!--产线负责人：<span><t t-esc="item.employee_id[1]"/></span>-->
-                        <!--</div>-->
+                        <t t-js="ctx">
+                            function change_time(date_planned){
+                                date_planned = date_planned.replace(/\s/g,'T').replace(/\//g,'-');
+                                var my_date = Date.parse(new Date(date_planned))
+                                var newDate = new Date();
+                                var time_offset = newDate.getTimezoneOffset() * 60000
+                                var c_date = new Date(my_date - time_offset)
+                                return moment(c_date).format('YYYY-MM-DD HH:mm:ss');
+                            }
+                            if (ctx.item.last_mo_time){
+                                ctx.item.last_mo_time = change_time(ctx.item.last_mo_time);
+                            }
+                        </t>
                         <div class="p_line_last_mo">
-                            最后MO完成时间: <span><t t-esc="item.last_mo_time"/></span>
+                            最后MO完成时间:
+                            <span>
+                                <t t-esc="item.last_mo_time ? item.last_mo_time : ''"/>
+                            </span>
                         </div>
                         <div class="production_qty">
                             MO数量：<span><t t-esc="item.amount_of_planned_mo"/></span>
@@ -83,7 +96,7 @@
                 <div class="production_qty">
                     MO数量：<span><t t-esc="length"/></span>
                 </div>
-                <span class="fa fa-chevron-down un_a_p_showorhide"></span>
+                <span t-att-class="state=='draft' ? 'fa fa-chevron-down un_a_p_showorhide un_a_p_draft' : 'fa fa-chevron-down un_a_p_showorhide un_a_p_confirm'"></span>
             </div>
         </div>
         <div t-att-class="state=='draft' ? 'production_lists_wrap un_a_p_lists_wrap un_draft_wrap' : 'production_lists_wrap un_a_p_lists_wrap un_confirm_wrap'">
