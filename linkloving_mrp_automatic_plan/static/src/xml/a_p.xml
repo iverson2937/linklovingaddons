@@ -83,7 +83,7 @@
                 <div class="production_qty">
                     MO数量：<span><t t-esc="length"/></span>
                 </div>
-                <span class="fa fa-chevron-down un_a_p_showorhide"></span>
+                <span t-att-class="state=='draft' ? 'fa fa-chevron-down un_a_p_showorhide un_a_p_draft' : 'fa fa-chevron-down un_a_p_showorhide un_a_p_confirm'"></span>
             </div>
         </div>
         <div t-att-class="state=='draft' ? 'production_lists_wrap un_a_p_lists_wrap un_draft_wrap' : 'production_lists_wrap un_a_p_lists_wrap un_confirm_wrap'">
