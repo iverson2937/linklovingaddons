@@ -1416,7 +1416,7 @@ class SimStockMove(models.Model):
     def _compute_remaining_qty(self):
         for sim_move in self:
             remaining_qty = sim_move.suggest_qty - sim_move.quantity_done
-            sim_move.remaining_qty = remaining_qty if remaining_qty else 0
+            sim_move.remaining_qty = remaining_qty if remaining_qty > 0 else 0
 
     product_id = fields.Many2one('product.product', )
     production_id = fields.Many2one('mrp.production')
