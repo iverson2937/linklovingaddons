@@ -14,10 +14,6 @@ from odoo.http import request, content_disposition
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
-ATTACHINFO_FIELD = ['product_tmpl_id', 'file_name', 'review_id', 'remote_path',
-                    'version', 'state', 'has_right_to_review', 'is_show_outage',
-                    'is_able_to_use', 'is_show_cancel', 'is_first_review',
-                    'create_uid', 'type', 'is_delect_view', 'is_show_action_deny']
 
 class LinklovingApproval(http.Controller):
     @http.route('/selectfile/file_show', type='http', auth='public', website=True, methods=['GET'], csrf=False)
@@ -29,6 +25,10 @@ class LinklovingApproval(http.Controller):
             file_type = 'project'
         else:
             file_type = file_type.lower()
+        ATTACHINFO_FIELD = ['product_tmpl_id', 'file_name', 'review_id', 'remote_path',
+                            'version', 'state', 'has_right_to_review', 'is_show_outage',
+                            'is_able_to_use', 'is_show_cancel', 'is_first_review',
+                            'create_uid', 'type', 'is_delect_view', 'is_show_action_deny']
 
         attachment_info = request.env['product.attachment.info'].browse(int(file_id))
         version_data_list = request.env['product.attachment.info'].search_read(

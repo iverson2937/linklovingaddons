@@ -21,6 +21,7 @@ REVIEW_LINE_STATE = {'waiting_review': u'等待审核',
                      'review_success': u'审核通过',
                      'review_fail': u'审核不通过',
                      'review_canceled': u'取消审核'}
+
 ATTACHINFO_FIELD = ['product_tmpl_id', 'file_name', 'review_id', 'remote_path',
                     'version', 'state', 'has_right_to_review', 'is_show_outage',
                     'is_able_to_use', 'is_show_cancel', 'is_first_review',
