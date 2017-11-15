@@ -193,23 +193,36 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             }
             $(target).parents('.production_line').next('.production_lists_wrap').html("");
             $(target).parents('.production_line').next('.production_lists_wrap').removeClass('production_lists_no_item');
-            if($(target).hasClass('un_a_p_showorhide')){
-                $(target).parents('.production_line').next('.production_lists_wrap').append(QWeb.render('un_a_p_render_right_tmpl', {
-                result: result,
-                show_more: true,
-                selection: myself.states.state.selection,
-                new_selection: myself.states.product_order_type.selection,
-                material_selection: myself.states.availability.selection
-            }));
+
+            //需求确认
+            if($(target).parents('.un_confirm').length>0){
+                $(target).parents('.un_confirm').next('.un_confirm_wrap').append(QWeb.render('un_a_p_render_right_tmpl', {
+                    result: result,
+                    show_more: true,
+                    state:"confirm",
+                    selection: myself.states.state.selection,
+                    new_selection: myself.states.product_order_type.selection,
+                    material_selection: myself.states.availability.selection
+                }));
             }
-            else {
+            // 草稿
+            else if($(target).parents('.un_draft').length>0){
+                $(target).parents('.un_draft').next('.un_draft_wrap').append(QWeb.render('un_a_p_render_right_tmpl', {
+                    result: result,
+                    show_more: true,
+                    state:"draft",
+                    selection: myself.states.state.selection,
+                    new_selection: myself.states.product_order_type.selection,
+                    material_selection: myself.states.availability.selection
+                }));
+            } else {
                 $(target).parents('.production_line').next('.production_lists_wrap').append(QWeb.render('a_p_render_right_tmpl', {
-                result: result,
-                show_more: true,
-                selection: myself.states.state.selection,
-                new_selection: myself.states.product_order_type.selection,
-                material_selection: myself.states.availability.selection
-            }));
+                    result: result,
+                    show_more: true,
+                    selection: myself.states.state.selection,
+                    new_selection: myself.states.product_order_type.selection,
+                    material_selection: myself.states.availability.selection
+                }));
             }
             if ($(target).parents('.production_line').next('.production_lists_wrap').children('.ap_item_wrap').length == 0) {
                 $(target).parents('.production_line').next('.production_lists_wrap').slideUp(0);
@@ -395,7 +408,8 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             }).done(function (results) {
                 own.offset = 1;
                 own.domain = results.domain;
-                own.un_arrange_production(own.process_id,10,own.offset,own)
+                own.un_arrange_production(own.process_id,10,own.offset,"draft",own)
+                own.un_arrange_production(own.process_id,10,own.offset,"confirmed",own)
             })
         },
         left_search: function (domains, contexts, groupbys) {
@@ -409,26 +423,30 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 own.offset = 1;
                 own.left_domain = results.domain;
                 own.arrangeed_searched();
-                own.un_arrange_searched();
+                own.un_arrange_searched("draft");
+                own.un_arrange_searched("confirmed");
             })
         },
-        un_arrange_searched:function () {
+        un_arrange_searched:function (state) {
             var self = this;
             framework.blockUI();
             new Model("mrp.production")
                     .call("get_unplanned_mo_by_search", [[]], {
                         process_id: self.process_id,
                         domains: self.left_domain,
-                    group_by: self.group_by,
-                    order_by_material: myself.order_by_material,
+                        state:state,
+                        order_by_material: myself.order_by_material,
                     })
                     .then(function (result) {
                         framework.unblockUI();
                         console.log(result)
-                        console.log(self.states)
                         var showorhides = $(".un_a_p_showorhide");
                         var mos = result["result"];
-                        myself.render_one_production_line($('.un_a_p_showorhide'), mos)
+                        if(state == 'draft'){
+                            myself.render_one_production_line($('.un_a_p_draft'), mos)
+                        }else {
+                            myself.render_one_production_line($('.un_a_p_confirm'), mos)
+                        }
                         framework.unblockUI();
                     })
         },
