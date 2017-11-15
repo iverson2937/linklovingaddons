@@ -110,7 +110,7 @@ class LinklovingOAApi(http.Controller):
         data = []
         data.append({
             'continent': (obj.continent.display_name or '') + (obj.country_id.display_name or '') + (
-            obj.state_id.name or '') + (obj.city or '') + (obj.street2 or '') + (obj.street or ''),
+                obj.state_id.name or '') + (obj.city or '') + (obj.street2 or '') + (obj.street or ''),
         })
         return data
 
@@ -1197,7 +1197,7 @@ class LinklovingOAApi(http.Controller):
             'country': obj.country_id.display_name or '',
             'name': obj.display_name,
             'address': (obj.country_id.display_name or '') + (obj.state_id.name or '') + (obj.city or '') + (
-            obj.street2 or '') + (obj.street or ''),
+                obj.street2 or '') + (obj.street or ''),
             'phone': obj.phone or '',
             'crm_source': obj.crm_source_id.display_name or '',  # 来源
             'source': obj.source_id.display_name or '',  # 渠道
@@ -1248,7 +1248,8 @@ class LinklovingOAApi(http.Controller):
     def product_details(self, *kw):
         if request.jsonrequest.get("code"):
             product = \
-            request.env["product.template"].sudo().search([('default_code', '=', request.jsonrequest.get("code"))])[0]
+                request.env["product.template"].sudo().search([('default_code', '=', request.jsonrequest.get("code"))])[
+                    0]
         else:
             id = request.jsonrequest.get("id")
             product = request.env["product.product"].sudo().browse(id).product_tmpl_id
@@ -1962,7 +1963,7 @@ class LinklovingOAApi(http.Controller):
                     'name': p.get('name'),  # 费用说明
                     'employee_id': p.get('employee_id'),
                     'department_id': p.get('department_id'),
-                    'tax_ids': ([(6, 0, [p.get('taxid')])] if type(p.get('taxid'))== int else [(6, 0, [4])]),
+                    'tax_ids': ([(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [4])]),
                     'description': p.get('remarks'),
                 }) for p in data.get('expense_line_ids')]
             })
@@ -1979,7 +1980,7 @@ class LinklovingOAApi(http.Controller):
                     'name': p.get('name'),  # 费用说明
                     'employee_id': p.get('employee_id'),
                     'department_id': p.get('department_id'),
-                    'tax_ids': ([(6, 0, [p.get('taxid')])] if type(p.get('taxid'))== int else [(6, 0, [4])]),
+                    'tax_ids': ([(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [4])]),
                     'description': p.get('remarks'),
                 }) for p in data.get('expense_line_ids')]
             })
@@ -2127,3 +2128,15 @@ class LinklovingOAApi(http.Controller):
 
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    @http.route('/linkloving_oa_api/confirm_approve3', type='json', auth="none", csrf=False, cors='*')
+    def confirm_approve3(self, *kw):
+        user_id = request.jsonrequest.get("user_id")
+        sheet_id = request.jsonrequest.get("sheet_id")
+        domain = [("id", '=', sheet_id)]
+        reason = request.jsonrequest.get("reason")
+        confirm_approve = request.env["hr.expense.sheet"].sudo(user_id).search(domain)
+        confirm_approve.manager3_approve()
+        if reason:
+            confirm_approve.create_message_post(reason)
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
