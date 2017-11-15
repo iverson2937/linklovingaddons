@@ -5,7 +5,7 @@ from odoo import models, fields, api
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
-    supplier_product_code = fields.Char(string=u'商家编码', compute='_get_supplier_product_code',
+    supplier_product_code = fields.Char(string=u'供应商码', compute='_get_supplier_product_code',
                                         inverse='_set_supplier_product_code')
 
     @api.multi
