@@ -22,6 +22,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
     var _t = core._t;
     var myself;
     var move_id;
+    var a_flag = true;
 
     var Arrange_Production = Widget.extend(ControlPanelMixin,{
         template: 'arrange_production_tmp',
@@ -30,6 +31,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             'click .to_bom': 'to_bom_func',
             'click .to_relevant_struc': 'to_relevant_struc_func',
             'click .a_p_mo_name':'to_mo_func',
+            'dbclick .a_p_mo_name':'to_mo_func',
             'click .so_report_btn': 'so_report',
             'click .order_by_material': 'order_by_material_1',
             'click .order_by_default': 'order_by_material_1',
@@ -70,10 +72,15 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                     readonly: true,
                     target: "new"
                 };
-                console.log("332")
-                self.do_action(action);
+                if(a_flag == true){
+                    console.log('ss');
+                    a_flag = false;
+                    self.do_action(action).then(function () {
+                        a_flag = true;
+                    });
+                }
             })
-
+            // a_flag = true;
         },
         to_relevant_struc_func:function (e) {
              var e = e || window.event;
@@ -362,8 +369,8 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 // be done later, simultaneously to all other ControlPanel elements
                 self.left_searchview = new SearchView(self, self.dataset, self.search_fields_view, options);
                 var $node1 = $('<div/>').addClass('arranged_product_searchview');
-                $(".a_p_time_end").html("");
-                $(".a_p_time_end").prepend($node1);
+                $(".o_cp_searchview").html("");
+                $(".o_cp_searchview").prepend($node1);
                 self.left_searchview.on('search_data', self, self.left_search.bind(self));
                 $.when(self.left_searchview.appendTo($node1)).done(function () {
                     self.left_searchview_elements = {};
