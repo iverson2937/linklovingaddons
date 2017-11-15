@@ -1389,10 +1389,10 @@ class LinklovingOAApi(http.Controller):
             'department': obj.department_id.name or '',
             'remark': obj.name or '',
             'state': obj.state or '',
-            'pre_payment_reminding': obj.pre_payment_reminding or '',
+            'pre_payment_reminding': obj.pre_payment_reminding or '0.00',
             'line_ids': self.get_waiting_approval_detail_lists(obj.expense_line_ids),
             'message_ids': self.get_apply_record(obj.message_ids),
-
+            'to_approve_id':obj.to_approve_id.id,
         }
 
     def get_waiting_approval_detail_lists(self, objs):
@@ -1442,7 +1442,22 @@ class LinklovingOAApi(http.Controller):
         sheet_id = request.jsonrequest.get("sheet_id")
         domain = [("id", '=', sheet_id)]
         reason = request.jsonrequest.get("reason")
+        expense_line_ids = request.jsonrequest.get("expense_line_ids")
         confirm_approve = request.env["hr.expense.sheet"].sudo(user_id).search(domain)
+
+        approve_lines = confirm_approve.expense_line_ids
+        confirm_approve.write({
+            'expense_line_ids': [(0, 0, {
+                'product_id': p.get('product_id'),  # 产品
+                'unit_amount': float(p.get('unit_amount')),  # 金额
+                'name': p.get('name'),  # 费用说明
+                'tax_ids': ([(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [4])]),
+                'description': p.get('remarks'),
+            }) for p in expense_line_ids.get('data').get('expense_line_ids')]
+        })
+        for approve_line in approve_lines:
+            request.env['hr.expense'].sudo().browse(approve_line.id).unlink()
+
         confirm_approve.manager1_approve()
         if reason:
             confirm_approve.create_message_post(reason)
@@ -1456,7 +1471,22 @@ class LinklovingOAApi(http.Controller):
         sheet_id = request.jsonrequest.get("sheet_id")
         domain = [("id", '=', sheet_id)]
         reason = request.jsonrequest.get("reason")
+        expense_line_ids = request.jsonrequest.get("expense_line_ids")
         confirm_approve = request.env["hr.expense.sheet"].sudo(user_id).search(domain)
+
+        approve_lines = confirm_approve.expense_line_ids
+        confirm_approve.write({
+            'expense_line_ids': [(0, 0, {
+                'product_id': p.get('product_id'),  # 产品
+                'unit_amount': float(p.get('unit_amount')),  # 金额
+                'name': p.get('name'),  # 费用说明
+                'tax_ids': ([(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [4])]),
+                'description': p.get('remarks'),
+            }) for p in expense_line_ids.get('data').get('expense_line_ids')]
+        })
+        for approve_line in approve_lines:
+            request.env['hr.expense'].sudo().browse(approve_line.id).unlink()
+
         confirm_approve.manager2_approve()
         if reason:
             confirm_approve.create_message_post(reason)
@@ -1917,7 +1947,7 @@ class LinklovingOAApi(http.Controller):
                 "productId": obj.product_id.id,
                 "id": obj.id,
                 "tax": obj.tax_ids.name or '',
-                "remarks": obj.description
+                "remarks": obj.description or ""
             })
         return data
 
@@ -1964,7 +1994,7 @@ class LinklovingOAApi(http.Controller):
                     'employee_id': p.get('employee_id'),
                     'department_id': p.get('department_id'),
                     'tax_ids': ([(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [4])]),
-                    'description': p.get('remarks'),
+                    'description': p.get('remarks') or '',
                 }) for p in data.get('expense_line_ids')]
             })
             for expense_line in expense_lines:
@@ -1981,7 +2011,7 @@ class LinklovingOAApi(http.Controller):
                     'employee_id': p.get('employee_id'),
                     'department_id': p.get('department_id'),
                     'tax_ids': ([(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [4])]),
-                    'description': p.get('remarks'),
+                    'description': p.get('remarks') or '',
                 }) for p in data.get('expense_line_ids')]
             })
         data = {
@@ -2041,15 +2071,23 @@ class LinklovingOAApi(http.Controller):
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-        # 批准 发送状态的
-
+    # 批准 发送状态的 申购
     @http.route('/linkloving_oa_api/confirm_purchase', type='json', auth="none", csrf=False, cors='*')
     def confirm_purchase(self, *kw):
         user_id = request.jsonrequest.get("user_id")
         sheet_id = request.jsonrequest.get("sheet_id")
+        reason = request.jsonrequest.get("reason")
+        type = request.jsonrequest.get("type")
         domain = [("id", '=', sheet_id)]
         confirm_approve = request.env["hr.purchase.apply"].sudo(user_id).search(domain)
-        confirm_approve.manager1_approve()
+        if type == "submit":
+            confirm_approve.manager1_approve()
+        elif type == "manager1_approve":
+            confirm_approve.manager2_approve()
+        elif type == "manager2_approve":
+            confirm_approve.manager3_approve()
+        if reason:
+            confirm_approve.create_message_post(reason)
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
 
     # 申购拒绝
@@ -2128,16 +2166,3 @@ class LinklovingOAApi(http.Controller):
 
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
-
-    # 2级审核 tb test
-    @http.route('/linkloving_oa_api/confirm_approve3', type='json', auth="none", csrf=False, cors='*')
-    def confirm_approve3(self, *kw):
-        user_id = request.jsonrequest.get("user_id")
-        sheet_id = request.jsonrequest.get("sheet_id")
-        domain = [("id", '=', sheet_id)]
-        reason = request.jsonrequest.get("reason")
-        confirm_approve = request.env["hr.expense.sheet"].sudo(user_id).search(domain)
-        confirm_approve.manager3_approve()
-        if reason:
-            confirm_approve.create_message_post(reason)
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
