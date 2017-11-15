@@ -40,7 +40,10 @@
                             <!--产线负责人：<span><t t-esc="item.employee_id[1]"/></span>-->
                         <!--</div>-->
                         <div class="p_line_last_mo">
-                            最后MO完成时间: <span><t t-esc="item.last_mo_time"/></span>
+                            最后MO完成时间:
+                            <span>
+                                <t t-esc="item.last_mo_time ? item.last_mo_time : ''"/>
+                            </span>
                         </div>
                         <div class="production_qty">
                             MO数量：<span><t t-esc="item.amount_of_planned_mo"/></span>
