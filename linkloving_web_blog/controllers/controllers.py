@@ -4,7 +4,6 @@ import odoo
 
 from odoo import http, _
 from odoo.http import request
-from odoo.exceptions import UserError, ValidationError
 from pyquery import PyQuery as pq
 from odoo.addons.website.models.website import slug, unslug
 from odoo import http, fields, _
@@ -290,38 +289,6 @@ class LinklovingWebBlog(http.Controller):
                 # return bool(record.website_published)
 
         return {'data': 'ok'}
-
-
-class HomeLinkLoving(Home, http.Controller):
-    @http.route('/web/login', type='http', auth="none")
-    def web_login(self, redirect=None, **kw):
-        ensure_db()
-        request.params['login_success'] = False
-        if request.httprequest.method == 'GET' and redirect and request.session.uid:
-            return http.redirect_with_hash(redirect)
-
-        if not request.uid:
-            request.uid = odoo.SUPERUSER_ID
-
-        values = request.params.copy()
-        try:
-            values['databases'] = http.db_list()
-        except odoo.exceptions.AccessDenied:
-            values['databases'] = None
-
-        if request.httprequest.method == 'POST':
-            old_uid = request.uid
-            uid = request.session.authenticate(request.session.db, request.params['login'], request.params['password'])
-            if uid is not False:
-                request.params['login_success'] = True
-                if not redirect:
-                    redirect = '/web'
-                if redirect == 'blog.post':
-                    return http.local_redirect('/blog/new_blog_create_index')
-                return http.redirect_with_hash(redirect)
-            request.uid = old_uid
-            values['error'] = _("Wrong login/password")
-        return request.render('web.login', values)
 
 
 class WebsiteBlogLinkLoving(WebsiteBlog, http.Controller):
