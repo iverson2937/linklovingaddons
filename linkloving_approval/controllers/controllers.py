@@ -15,7 +15,6 @@ from odoo.http import request, content_disposition
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-
 class LinklovingApproval(http.Controller):
     @http.route('/selectfile/file_show', type='http', auth='public', website=True, methods=['GET'], csrf=False)
     def order_status_show(self, **kw):
@@ -26,13 +25,18 @@ class LinklovingApproval(http.Controller):
             file_type = 'project'
         else:
             file_type = file_type.lower()
+        ATTACHINFO_FIELD = ['product_tmpl_id', 'file_name', 'review_id', 'remote_path',
+                            'version', 'state', 'has_right_to_review', 'is_show_outage',
+                            'is_able_to_use', 'is_show_cancel', 'is_first_review',
+                            'create_uid', 'type', 'is_delect_view', 'is_show_action_deny']
 
         attachment_info = request.env['product.attachment.info'].browse(int(file_id))
-        version_data_list = request.env['product.attachment.info'].search(
-            [('product_tmpl_id', '=', attachment_info.product_tmpl_id.id), ('type', '=', file_type)])
+        version_data_list = request.env['product.attachment.info'].search_read(
+                [('product_tmpl_id', '=', attachment_info.product_tmpl_id.id), ('type', '=', file_type)],
+                fields=ATTACHINFO_FIELD)
         attach_list = []
         for atta in version_data_list:
-            attach_list.append(atta.convert_attachment_info())
+            attach_list.append(request.env['product.attachment.info'].sudo().convert_attachment_info(atta))
         for attach_one in attach_list:
             for review_line_one in attach_one.get('review_line'):
                 review_line_one['title'] = '备注:' + str(review_line_one.get('remark')) + ',审核结果：' + str(
