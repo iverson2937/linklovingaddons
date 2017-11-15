@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from linklovingaddons.linkloving_pdm.models.models import ATTACHINFO_FIELD
 from odoo import models, fields, api
 from odoo.osv import expression
 
@@ -57,19 +57,21 @@ class ApprovalCenter(models.TransientModel):
         if self.type == 'waiting_submit':
             domain = [('create_uid', '=', self.env.user.id),
                       ('state', 'in', ['waiting_release', 'cancel', 'deny'])]
-            attatchments = self.env[self.res_model].search(domain,
-                                                           limit=limit,
-                                                           offset=offset,
-                                                           order='create_date desc')
+            attatchments = self.env[self.res_model].search_read(domain,
+                                                                limit=limit,
+                                                                offset=offset,
+                                                                order='create_date desc',
+                                                                fields=ATTACHINFO_FIELD)
         elif self.type == 'submitted':
             domain = [('create_uid', '=', self.env.user.id),
                       (
                           'state', 'not in',
                           ['waiting_release', 'draft', 'cancel', 'deny'])]
-            attatchments = self.env[self.res_model].search(domain,
-                                                           limit=limit,
-                                                           offset=offset,
-                                                           order='create_date desc')
+            attatchments = self.env[self.res_model].search_read(domain,
+                                                                limit=limit,
+                                                                offset=offset,
+                                                                order='create_date desc',
+                                                                fields=ATTACHINFO_FIELD)
         elif self.type == 'waiting_approval':
 
             lines = self.env["review.process.line"].search([("state", '=', 'waiting_review'),
@@ -78,9 +80,10 @@ class ApprovalCenter(models.TransientModel):
             review_ids = lines.mapped("review_id")
             domain = [("review_id", "in", review_ids.ids),
                       ('state', 'in', ['review_ing'])]
-            attatchments = self.env[self.res_model].search(domain,
-                                                           limit=limit,
-                                                           offset=offset, )
+            attatchments = self.env[self.res_model].search_read(domain,
+                                                                limit=limit,
+                                                                offset=offset,
+                                                                fields=ATTACHINFO_FIELD)
         elif self.type == 'approval':
 
             lines = self.env["review.process.line"].search([("state", 'not in', ['waiting_review', 'review_canceled']),
@@ -89,15 +92,17 @@ class ApprovalCenter(models.TransientModel):
                                                            order='create_date desc')
             review_ids = lines.mapped("review_id")
             domain = [("review_id", "in", review_ids.ids)]
-            attatchments = self.env[self.res_model].search(domain,
-                                                           order='create_date desc',
-                                                           limit=limit,
-                                                           offset=offset, )
+            attatchments = self.env[self.res_model].search_read(domain,
+                                                                order='create_date desc',
+                                                                limit=limit,
+                                                                offset=offset,
+                                                                fields=ATTACHINFO_FIELD)
 
         attach_list = []
         for atta in attatchments:
             # attach_list.append(atta.convert_attachment_info())
-            attach_list.append(dict(atta.convert_attachment_info(), **{'checkbox_type': self.type}))
+            attach_list.append(
+                dict(self.env['product.attachment.info'].convert_attachment_info(atta), **{'checkbox_type': self.type}))
 
         length = self.env[self.res_model].search_count(domain)
         return {"records": attach_list,
@@ -132,15 +137,17 @@ class ApprovalCenter(models.TransientModel):
         if self.type == 'waiting_submit':
             domain = [('create_uid', '=', self.env.user.id),
                       ('state', 'in', ['waiting_release', 'cancel', 'deny'])]
-            attatchments = self.env[self.res_model].search(expression.AND([domain, domain_my]),
-                                                           limit=limit, offset=offset, order='create_date desc')
+            attatchments = self.env[self.res_model].search_read(expression.AND([domain, domain_my]),
+                                                                limit=limit, offset=offset, order='create_date desc',
+                                                                fields=ATTACHINFO_FIELD)
         elif self.type == 'submitted':
             domain = [('create_uid', '=', self.env.user.id),
                       (
                           'state', 'not in',
                           ['waiting_release', 'draft', 'cancel'])]
-            attatchments = self.env[self.res_model].search(expression.AND([domain, domain_my]),
-                                                           limit=limit, offset=offset, order='create_date desc')
+            attatchments = self.env[self.res_model].search_read(expression.AND([domain, domain_my]),
+                                                                limit=limit, offset=offset, order='create_date desc',
+                                                                fields=ATTACHINFO_FIELD)
         elif self.type == 'waiting_approval':
 
             lines = self.env["review.process.line"].search([("state", '=', 'waiting_review'),
@@ -149,9 +156,10 @@ class ApprovalCenter(models.TransientModel):
             review_ids = lines.mapped("review_id")
             domain = [("review_id", "in", review_ids.ids),
                       ('state', 'in', ['review_ing'])]
-            attatchments = self.env[self.res_model].search(expression.AND([domain, domain_my]),
-                                                           limit=limit,
-                                                           offset=offset, )
+            attatchments = self.env[self.res_model].search_read(expression.AND([domain, domain_my]),
+                                                                limit=limit,
+                                                                offset=offset,
+                                                                fields=ATTACHINFO_FIELD)
         elif self.type == 'approval':
 
             lines = self.env["review.process.line"].search([("state", 'not in', ['waiting_review', 'review_canceled']),
@@ -160,14 +168,15 @@ class ApprovalCenter(models.TransientModel):
                                                            order='create_date desc')
             review_ids = lines.mapped("review_id")
             domain = [("review_id", "in", review_ids.ids)]
-            attatchments = self.env[self.res_model].search(expression.AND([domain, domain_my]),
-                                                           order='create_date desc',
-                                                           limit=limit,
-                                                           offset=offset, )
+            attatchments = self.env[self.res_model].search_read(expression.AND([domain, domain_my]),
+                                                                order='create_date desc',
+                                                                limit=limit,
+                                                                offset=offset,
+                                                                fields=ATTACHINFO_FIELD)
 
         attach_list = []
         for atta in attatchments:
-            res = atta.convert_attachment_info()
+            res = self.env['product.attachment.info'].convert_attachment_info(atta)
             res.update({
                 'checkbox_type': self.type
             })
