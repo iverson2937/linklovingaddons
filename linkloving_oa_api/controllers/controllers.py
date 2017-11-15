@@ -1790,6 +1790,7 @@ class LinklovingOAApi(http.Controller):
             })
         return data
 
+    #头像json
     def get_img_url(cls, id, model, field, time):
         url = '%sweb/image?model=%s&id=%s&field=%s&unique=%s' % (
             request.httprequest.host_url, model, str(id), field, time)
