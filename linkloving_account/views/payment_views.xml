@@ -87,7 +87,7 @@
                     <separator/>
                     <filter string="Waiting Confirm" name="confirm" domain="[('state', '=', 'posted')]"/>
                     <filter string="Waiting Payment" name="register" domain="[('state', '=', 'confirm')]"/>
-                    <filter string="Done" name="register" domain="[('state', '=', 'done')]"/>
+                    <filter string="Done" name="done" domain="[('state', '=', 'done')]"/>
                     <separator/>
                     <group expand='0' string='Group by...'>
                         <filter string='合作伙伴' domain="[]" context="{'group_by': 'partner_id'}"/>
