@@ -1924,14 +1924,20 @@ class LinklovingOAApi(http.Controller):
     def get_apply_record(self, objs):
         data = []
         for obj in objs:
+            if (type(obj.tracking_value_ids) == list):
+                old_state = obj.tracking_value_ids[0].old_value_char or ''
+                new_state = obj.tracking_value_ids[0].new_value_char or ''
+            else:
+                old_state = obj.tracking_value_ids.old_value_char or ''
+                new_state = obj.tracking_value_ids.new_value_char or ''
             data.append({
                 "create_time": obj.create_date,
                 "create_person_ava": LinklovingAppApi.get_img_url(obj.create_uid.self.user_ids.id,
                                                                   "res.users", "image_medium"),
                 "create_person": obj.create_uid.display_name,
                 "description": obj.compyter_body,
-                "old_state": obj.tracking_value_ids.old_value_char or '',
-                "new_state": obj.tracking_value_ids.new_value_char or '',
+                "old_state": old_state,
+                "new_state": new_state,
             })
         return data
 
