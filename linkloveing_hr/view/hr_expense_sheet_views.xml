@@ -99,7 +99,8 @@
                                attrs="{'readonly':[('state','not in',('done','draft','cancel','approve'))]}"
                                context="{'default_employee_id':employee_id,'default_department_id':department_id,'default_state':'draft'}">
                             <tree editable="bottom">
-                                <field name="product_id" options="{'no_create':True}"/>
+                                <field name="name" string="消费用途"/>
+                                <field name="product_id" options="{'no_create':True}" string="费用类别"/>
                                 <field name="state" invisible="1"/>
                                 <field name="account_id" groups="account.group_account_user"
                                        attrs="{'no_create':True}"/>
@@ -116,7 +117,6 @@
                                 <field name="sale_id" string="订单" options="{'no_create':True}"/>
                                 <field name="quantity" groups="account.group_account_user"/>
                                 <field name="tax_ids" widget="many2many_tags"/>
-                                <field name="name"/>
                                 <field name="employee_id" required="1" invisible="1"/>
                                 <field name="department_id" required="1" invisible="1"/>
                                 <field name="state" invisible="1"/>
