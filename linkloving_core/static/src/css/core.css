@@ -150,6 +150,7 @@
 }
 .panel-title .trace_back{
     cursor: pointer;
+    text-decoration: underline;
 }
 
 .panel-title .mat{
@@ -161,7 +162,7 @@
     height: 12px;
 }
 .panel-title .rem{
-    width: 70px;
+    width: 49%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

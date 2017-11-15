@@ -52,6 +52,10 @@ class MrpReportProductLine(models.Model):
                                     related="procurement_id.production_id")
 
     orderpoint_id = fields.Many2one(comodel_name="stock.warehouse.orderpoint", string=u"补货规则")
+    reordering_max_qty = fields.Float(related='orderpoint_id.product_max_qty', string=u'订货最大数量')
+    reordering_min_qty = fields.Float(related='orderpoint_id.product_min_qty', string=u'订货最小数量')
+
+    incoming_qty = fields.Float(related='product_id.incoming_qty', string=u'在产数量')
     order_qty = fields.Float(string=u'数量')
     product_id = fields.Many2one(comodel_name="product.product", string=u"产品", related="orderpoint_id.product_id")
 
@@ -69,6 +73,7 @@ class MrpReportProductLine(models.Model):
 class MrpReport(models.Model):
     _name = 'mrp.report'
 
+    name = fields.Text(string=u'名称')
     note = fields.Text(string=u'备注', readonly=True)
     total_orderpoint_count = fields.Integer(string=u"此次运算订货规则个数", readonly=True)
     state = fields.Selection(string=u"完成状态",
@@ -90,6 +95,11 @@ class MrpReport(models.Model):
                                         readonly=True)
 
     report_end_time = fields.Datetime(string=u"报告结束时间", readonly=True)
+
+    @api.model
+    def create(self, vals):
+        vals['name'] = self.env['ir.sequence'].next_by_code('mrp.report') or 'New'
+        return super(MrpReport, self).create(vals)
 
     def prepare_report_line_val(self, procurement_id, report_id, orderpoint_id=None, order_qty=0):
         return {

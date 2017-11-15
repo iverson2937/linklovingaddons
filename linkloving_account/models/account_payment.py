@@ -188,7 +188,7 @@ class AccountPayment(models.Model):
 
     @api.multi
     def set_to_cancel(self):
-        pass
+        self.state = 'cancel'
         # account_invoices = self.env['account.invoice'].search([('type', '=', 'out_invoice'), ('state', '=', 'open')],
         #                                                       limit=300)
         # for invoice in account_invoices:

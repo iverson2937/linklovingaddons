@@ -13,5 +13,15 @@
             <field name="name">采购订单</field>
             <field name="type">waiting_file</field>
         </record>
+
+
+        <record id="sequence_mrp_report" model="ir.sequence">
+            <field name="name">mrp.report</field>
+            <field name="code">mrp.report</field>
+            <field name="prefix">MR/%(year)s%(month)s%(day)s</field>
+            <field eval="1" name="number_next"/>
+            <field eval="1" name="number_increment"/>
+            <field name="padding">4</field>
+        </record>
     </data>
 </odoo>

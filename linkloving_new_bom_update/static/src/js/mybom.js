@@ -438,11 +438,9 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                 return;
             }
         },
-
         on_search: function () {
 
         },
-
         start: function () {
             var self = this;
             if (this.is_show === false) {

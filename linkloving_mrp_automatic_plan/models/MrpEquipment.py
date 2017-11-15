@@ -569,12 +569,13 @@ class MrpProductionExtend(models.Model):
     #根据process_id 获取未排产mo
     def get_unplanned_mo(self, **kwargs):
         process_id = kwargs.get("process_id")
+        state = kwargs.get("state")
         limit = kwargs.get("limit")
         offset = kwargs.get("offset")
 
         domain = [("process_id", "=", process_id),
                   ("production_line_id", "=", False),
-                  ("state", "in", ['draft', 'confirmed'])]
+                  ("state", "in", [state])]
 
         domains = kwargs.get("domains", [])
         new_domains = expression.AND([domains, domain])
@@ -593,15 +594,19 @@ class MrpProductionExtend(models.Model):
 
     def get_unplanned_mo_by_search(self, **kwargs):
         process_id = kwargs.get("process_id")
+        state = kwargs.get("state")
         search_domain = kwargs.get("domains", [])
         if not search_domain:
-            return []
+            return {
+                'length': 0,
+                'result': []
+                }
         limit = kwargs.get("limit")
         offset = kwargs.get("offset")
 
         domain = [("process_id", "=", process_id),
                   ("production_line_id", "=", False),
-                  ("state", "in", ['draft', 'confirmed'])]
+                  ("state", "in", [state])]
 
         domains = kwargs.get("domains", [])
         new_domains = expression.AND([domains, domain, search_domain])
