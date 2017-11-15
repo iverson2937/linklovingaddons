@@ -217,7 +217,7 @@ class MrpProductionLine(models.Model):
         for line in self:
             new_domain = domain + [("production_line_id", "=", line.id)]
             last_mo = self.env["mrp.production"].search(new_domain,
-                                                        order="date_planned_start,id desc",
+                                                        order="date_planned_finished,id desc",
                                                         limit=1)
             line.last_mo_time = last_mo.date_planned_finished
 
@@ -227,7 +227,7 @@ class MrpProductionLine(models.Model):
         for line in self:
             new_domain = domain + [("production_line_id", "=", line.id)]
             mos = self.env["mrp.production"].search(new_domain)
-            line.total_time = round(sum(mos.mapped("real_theo_spent_time")))
+            line.total_time = round(sum(mos.mapped("real_theo_spent_time")), 2)
 
     @api.multi
     def _compute_total_ava_time(self):

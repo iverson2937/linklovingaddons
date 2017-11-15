@@ -37,6 +37,10 @@ class LinklovingWebBlog(http.Controller):
 
     @http.route('/blog/new_blog_create_index', type='http', auth='public', website=True, csrf=False)
     def new_blog_create_index_show(self, **kw):
+
+        if not request.env.user.active:
+            return http.local_redirect('/web/login')
+
         fields_one = http.request.env['blog.blog'].search([('is_all_blog', '=', False)])
         fields_two = http.request.env['blog.tag'].search([])
         # field = fields.search([('model', '=', '')])
