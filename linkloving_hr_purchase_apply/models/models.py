@@ -77,6 +77,7 @@ class PurchaseApply(models.Model):
             sheet.to_approve_id = False
             sheet.reject_reason = reason
 
+        #推送
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.alias(sheet.create_uid.id)
         ), notification=_("申购单：%s被拒绝") % (sheet.name),
