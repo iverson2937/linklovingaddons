@@ -9,6 +9,9 @@ class LinkLovingBlogPost(models.Model):
 
     tag_ids = fields.Many2one('blog.tag', string='Tags')
 
+    keyword = fields.Char(string=u'关键字')
+    visits = fields.Integer('No of Views', default=0)
+
     # @api.model
     # def create(self, vals):
     #     post_id = super(LinkLovingBlogPost, self).create(vals)

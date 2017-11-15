@@ -109,6 +109,7 @@ class LinklovingWebBlog(http.Controller):
             'tag_ids': http.request.env['blog.tag'].search(
                 [('name', '=', kw.get('blog_tag_type_id'))]).id,
             'content': content,
+            'keyword': kw.get('keyword'),
         })
         print attach
 
@@ -129,24 +130,27 @@ class LinklovingWebBlog(http.Controller):
         domain = [('website_published', '=', True)]
         result_hot = False
         if is_search:
-
-            author_list = [author.id for author in request.env['res.partner'].search([('name', 'ilike', search_body)])]
-
-            if author_list:
+            if search_body:
+                author_list = [author.id for author in
+                               request.env['res.partner'].search([('name', 'ilike', search_body)])]
+                if author_list:
+                    domain.append('|')
                 domain.append('|')
-                domain.append(('author_id', 'in', author_list))
-
-            domain.append(('name', 'ilike', search_body))
-
+                domain.append(('name', 'ilike', search_body))
+                domain.append(('keyword', 'ilike', search_body))
+                if author_list:
+                    domain.append(('author_id', 'in', author_list))
         elif is_hot:
             result_hot = blog_model.search(domain, limit=10, order='visits desc')
-        else:
+        elif blog_type_id:
             if is_parent:
                 domain.append(('tag_ids', '=', int(blog_type_id)))
             else:
                 is_index = False if request.env['blog.blog'].browse(int(blog_type_id)).is_all_blog else True
                 if is_index:
                     domain.append(('blog_id', '=', int(blog_type_id)))
+                else:
+                    result_hot = blog_model.search(domain, limit=15, order='create_date desc')
 
         result = result_hot if result_hot else blog_model.search(domain)
         # result = blog_model.search(domain)
@@ -160,6 +164,7 @@ class LinklovingWebBlog(http.Controller):
                 'name': res.name,
                 'blog_type_one': res.blog_id.id,
                 'blog_type_two': res.tag_ids.id,
+                'keyword_name': res.keyword if res.keyword else '',
             }
 
             data.append(res_one)
