@@ -26,6 +26,7 @@ ATTACHINFO_FIELD = ['product_tmpl_id', 'file_name', 'review_id', 'remote_path',
                     'is_able_to_use', 'is_show_cancel', 'is_first_review',
                     'create_uid', 'type', 'is_delect_view', 'is_show_action_deny']
 
+
 class ReviewProcess(models.Model):
     _name = 'review.process'
 
@@ -197,7 +198,7 @@ class ReviewProcessLine(models.Model):
             body_data = '【 文件 】' + prompt_type + str(self.review_id.product_line_ids.type) + ' 产品:' + str(
                 self.review_id.product_line_ids.product_tmpl_id.name) + '，版本:' + str(
                 self.review_id.product_line_ids.version) + '，文件:' + str(
-                self.review_id.product_line_ids.file_name) + ' ; 备注：' + (remark if remark else '')
+                self.review_id.product_line_ids.file_name) + ' ; 备注：' + str(remark if remark else '')
 
         return body_data
 
@@ -834,7 +835,7 @@ class ProductTemplateExtend(models.Model):
 
     def convert_attendment_info_list(self, type):
         files = self.env["product.attachment.info"].search_read(
-                [("type", "=", type), ("product_tmpl_id", '=', self.id)], order='version desc', fields=ATTACHINFO_FIELD)
+            [("type", "=", type), ("product_tmpl_id", '=', self.id)], order='version desc', fields=ATTACHINFO_FIELD)
         json_list = []
         for a_file in files:
             json_list.append(self.env['product.attachment.info'].convert_attachment_info(a_file))

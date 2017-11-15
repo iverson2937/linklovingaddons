@@ -144,7 +144,7 @@
                                                 <div class="searchBar">
                                                     <input type="text" class="search" id="kf_search_index_key"
                                                            searchsuggest="true" accesskey="/" autocomplete="off"
-                                                           placeholder="请输入产品或问题"/>
+                                                           placeholder="输入标题或关键词搜索"/>
                                                     <input id="kf_search_index_key_hidden" type="hidden"/>
                                                     <button type="button" class="btn btn-info search-type blog-type"
                                                             style="width:76px;">

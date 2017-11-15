@@ -158,7 +158,7 @@ $(function () {
 
 
                 for (var data_one in data_list) {
-                    html_val += "<dd> <div class='row'> <div class='col-md-7'> <a target='main_my' class='view_post_js' href='/blog/" + data_list[data_one].blog_id + "/post1/" + data_list[data_one].blog_post_id + "'>" + data_list[data_one].name + "</a></div> <div class='col-md-3'>" + data_list[data_one].keyword_name + "</div> <div class='col-md-2'>" + data_list[data_one].blog_post_name + "</div> </div></dd>";
+                    html_val += "<dd> <div class='row'> <div class='col-md-10'> <a target='main_my' class='view_post_js' href='/blog/" + data_list[data_one].blog_id + "/post1/" + data_list[data_one].blog_post_id + "'>" + data_list[data_one].name + "</a></div> <div class='col-md-2'>" + data_list[data_one].blog_post_name + "</div> </div></dd>";
 
                     // html_val += "<dd><a class='view_post' href='/blog/" + data_list[data_one].blog_id + "/post/" + data_list[data_one].blog_post_id + ">" + data_list[data_one].name + "</a></dd>"
                 }

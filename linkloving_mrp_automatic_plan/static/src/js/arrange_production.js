@@ -73,7 +73,6 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                     target: "new"
                 };
                 if(a_flag == true){
-                    console.log('ss');
                     a_flag = false;
                     self.do_action(action).then(function () {
                         a_flag = true;
@@ -465,6 +464,8 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             this.pager = new Pager(this, this.length, this.offset, this.limit);
             this.pager.appendTo($node);
 
+            framework.unblockUI();
+
             this.pager.on('pager_changed', this, function (new_state) {
                 var self = this;
                 var limit_changed = (this._limit !== new_state.limit);
@@ -501,10 +502,12 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             this.pager = new Pager(this, this.length_un_confirm, this.offset_un_confirm, this.limit_un_confirm);
             this.pager.appendTo($node);
 
+            framework.unblockUI();
+
             this.pager.on('pager_changed', this, function (new_state) {
                 var self = this;
                 var limit_changed = (this._limit !== new_state.limit);
-                this._limit = new_state.limit_un_confirm;
+                this._limit = new_state.limit;
                 this.current_min = new_state.current_min;
                 self.reload_content3(this).then(function () {
                     self.$el.animate({"scrollTop": "0px"}, 100);
@@ -652,7 +655,10 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                             new_selection:own.states.product_order_type.selection,
                             material_selection: own.states.availability.selection
                         }));
-                        framework.unblockUI();
+                        // if(state == 'draft'){
+                        //     framework.unblockUI();
+                        // }
+
                         own.length = result.length;
 
                         //分页的情况
