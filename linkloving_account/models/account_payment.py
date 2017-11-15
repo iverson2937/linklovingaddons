@@ -177,6 +177,8 @@ class AccountPayment(models.Model):
                              track_visibility='onchange')
     remark = fields.Text(string='备注')
     product_id = fields.Many2one('product.product')
+    res_model = fields.Char()
+    res_id = fields.Integer()
 
     def _get_move_ids(self):
         self.move_ids = self.move_line_ids.mapped('move_id').ids
