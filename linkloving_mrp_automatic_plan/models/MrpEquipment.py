@@ -315,7 +315,7 @@ class MrpProductionLine(models.Model):
                     domain=expression.AND([[("production_line_id", "=", production_line_id),
                                             # ("date_planned_start", "<=", end_time_str),
                                             # ("date_planned_finished", ">=", start_time_str),
-                                            ("state", "not in", DONE_CANCEL_DOMAIN),
+                                            ("state", "not in", DONE_CANCEL_DOMAIN + ['draft', 'confirmed']),
                                             ("process_id", "=", process_id)
                                             ], domains]),
                     limit=limit,
