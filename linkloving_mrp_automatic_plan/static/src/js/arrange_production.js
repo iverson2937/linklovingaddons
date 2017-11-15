@@ -671,11 +671,11 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                     self.$el.eq(0).append(QWeb.render('a_p_render_tmpl', {result: result,process_info:process_info}));
                     self.init_date_widget($(".a_p_time_start"));
                     framework.unblockUI();
-                });
+                }).then(function () {
+                    self.un_arrange_production(myself.process_id,10,1,"confirmed",myself);
+                    self.un_arrange_production(myself.process_id,10,1,"draft",myself);
+                })
             });
-
-            self.un_arrange_production(myself.process_id,10,1,"draft",myself);
-            self.un_arrange_production(myself.process_id,10,1,"confirmed",myself);
         }
 
     })
