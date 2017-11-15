@@ -637,7 +637,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         }
 
                         if(!own.domain){
-                            own.setup_search_view();
+                            // own.setup_search_view();
                             own.setup_left_search_view();
                         }
                     })
