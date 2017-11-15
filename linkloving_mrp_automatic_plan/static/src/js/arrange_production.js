@@ -348,7 +348,8 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                 // Instantiate the SearchView, but do not append it nor its buttons to the DOM as this will
                 // be done later, simultaneously to all other ControlPanel elements
                 self.left_searchview = new SearchView(self, self.dataset, self.search_fields_view, options);
-                var $node1 = $('<div/>').addClass('arranged_product_searchview')
+                var $node1 = $('<div/>').addClass('arranged_product_searchview');
+                $(".a_p_time_end").html("");
                 $(".a_p_time_end").prepend($node1);
                 self.left_searchview.on('search_data', self, self.left_search.bind(self));
                 $.when(self.left_searchview.appendTo($node1)).done(function () {
@@ -637,7 +638,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         }
 
                         if(!own.domain){
-                            // own.setup_search_view();
+                            own.setup_search_view();
                             own.setup_left_search_view();
                         }
                     })
