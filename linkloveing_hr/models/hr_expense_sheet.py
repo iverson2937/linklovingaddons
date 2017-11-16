@@ -297,7 +297,7 @@ class HrExpenseSheet(models.Model):
     @api.multi
     def register_payment_action(self):
 
-        amount = self.total_amount - sum(line.amount for line in self.payment_line_ids)
+        amount = self.total_amount - sum(line.amount for line in self.account_payment_line_ids)
 
         context = {'default_payment_type': 'outbound', 'default_amount': amount}
 
