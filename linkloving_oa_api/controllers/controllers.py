@@ -2177,7 +2177,7 @@ class LinklovingOAApi(http.Controller):
 
 
 
-        # 报销时选择的申购item
+        # 报销时选择的申购Item
 
     @http.route('/linkloving_oa_api/get_shengou_item', type='json', auth="none", csrf=False, cors='*')
     def get_shengou_item(self, *kw):
