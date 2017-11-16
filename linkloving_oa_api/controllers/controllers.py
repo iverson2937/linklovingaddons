@@ -1645,14 +1645,16 @@ class LinklovingOAApi(http.Controller):
     @http.route('/linkloving_oa_api/get_all_departments', type='json', auth="none", csrf=False, cors='*')
     def get_all_departments(self, *kw):
         partner_id = request.jsonrequest.get('partner_id')
+        employee = request.env['hr.employee'].sudo().search(
+            [('user_id', '=', partner_id)])
         get_all_departments = request.env['hr.department'].sudo().search([])
-        domain = [('address_home_id', '=', partner_id)]
-        person_department = request.env['hr.employee'].sudo().search(domain,
-                                                                     order='id desc')
+        #domain = [('address_home_id', '=', partner_id)]
+        #person_department = request.env['hr.employee'].sudo().search(domain,
+                                                                     #order='id desc')
         data = {
             "all_departments": self.get_department_to_json(get_all_departments),
-            "default_department": self.get_name_and_id(person_department.department_id),
-            "employee_id": person_department.id,
+            "default_department": self.get_name_and_id(employee.department_id),
+            "employee_id": employee.id,
         }
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
