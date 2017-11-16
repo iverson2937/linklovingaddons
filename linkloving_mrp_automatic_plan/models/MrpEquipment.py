@@ -217,7 +217,7 @@ class MrpProductionLine(models.Model):
         for line in self:
             new_domain = domain + [("production_line_id", "=", line.id)]
             last_mo = self.env["mrp.production"].search(new_domain,
-                                                        order="date_planned_finished asc",
+                                                        order="date_planned_finished desc",
                                                         limit=1)
             line.last_mo_time = last_mo.date_planned_finished
 
