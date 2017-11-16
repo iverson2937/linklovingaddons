@@ -12,12 +12,12 @@ class AccountInvoice(models.Model):
                                      store=True, readonly=True, track_visibility='always')
     commission = fields.Float(string=u'折算提成金额', track_visibility='onchange')
 
-
-    @api.one
+    @api.multi
     def _get_po_number(self):
-        if self.origin:
-            po = self.env['purchase.order'].search([('name', '=', self.origin)])
-            self.po_id = po.id if po else None
+        for invoice in self:
+            if invoice.origin:
+                po = invoice.env['purchase.order'].search([('name', '=', invoice.origin)])
+                invoice.po_id = po.id if po else None
 
     po_id = fields.Many2one('purchase.order', compute=_get_po_number)
     order_line = fields.One2many('purchase.order.line', related='po_id.order_line')
@@ -55,27 +55,27 @@ class AccountInvoice(models.Model):
     def action_post(self):
         self.state = 'validate'
 
-    @api.multi
-    def write(self, vals):
-        for invoice in self:
-            if not invoice.amount_total_o:
-                amount_total_o = 0
-                for line in invoice.invoice_line_ids:
-                    line.price_unit_o = line.price_unit
-                    amount_total_o += line.price_unit_o * line.quantity
-                vals.update({'amount_total_o': amount_total_o})
-            if 'deduct_amount' in vals:
-                deduct_amount = vals['deduct_amount']
-                if deduct_amount > (invoice.amount_total_o or vals.get('amount_total_o')):
-                    raise UserError(_('Deduct Amount can not larger than Invoice Amount'))
-                if invoice.amount_total_o or vals.get('amount_total_o'):
-                    rate = deduct_amount / (invoice.amount_total_o or vals.get('amount_total_o'))
-                    for line in invoice.invoice_line_ids:
-                        if line.price_unit_o:
-                            line.price_unit = line.price_unit_o * (1 - rate)
-                        else:
-                            line.price_unit = line.price_unit * (1 - rate)
-        return super(AccountInvoice, self).write(vals)
+    # @api.multi
+    # def write(self, vals):
+    #     for invoice in self:
+    #         if not invoice.amount_total_o:
+    #             amount_total_o = 0
+    #             for line in invoice.invoice_line_ids:
+    #                 line.price_unit_o = line.price_unit
+    #                 amount_total_o += line.price_unit_o * line.quantity
+    #             vals.update({'amount_total_o': amount_total_o})
+    #         if 'deduct_amount' in vals:
+    #             deduct_amount = vals['deduct_amount']
+    #             if deduct_amount > (invoice.amount_total_o or vals.get('amount_total_o')):
+    #                 raise UserError(_('Deduct Amount can not larger than Invoice Amount'))
+    #             if invoice.amount_total_o or vals.get('amount_total_o'):
+    #                 rate = deduct_amount / (invoice.amount_total_o or vals.get('amount_total_o'))
+    #                 for line in invoice.invoice_line_ids:
+    #                     if line.price_unit_o:
+    #                         line.price_unit = line.price_unit_o * (1 - rate)
+    #                     else:
+    #                         line.price_unit = line.price_unit * (1 - rate)
+    #     return super(AccountInvoice, self).write(vals)
 
     @api.multi
     def action_reject(self):
@@ -103,36 +103,37 @@ class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
     price_unit_o = fields.Float(digits=dp.get_precision('Product Price'), string=u'原始单价')
-    price_subtotal_o = fields.Monetary(string='Amount',
-                                       store=True, readonly=True, compute='_compute_price')
-    price_unit = fields.Float(digits=dp.get_precision('Price Deduct'), string=u'单价')
-
-    # 添加原始总价在invoice_line
-    @api.one
-    @api.depends('price_unit', 'discount', 'invoice_line_tax_ids', 'quantity',
-                 'product_id', 'invoice_id.partner_id', 'invoice_id.currency_id', 'invoice_id.company_id')
-    def _compute_price(self):
-        currency = self.invoice_id and self.invoice_id.currency_id or None
-        price = self.price_unit * (1 - (self.discount or 0.0) / 100.0)
-        taxes = False
-        if self.invoice_line_tax_ids:
-            taxes = self.invoice_line_tax_ids.compute_all(price, currency, self.quantity, product=self.product_id,
-                                                          partner=self.invoice_id.partner_id)
-        self.price_subtotal = price_subtotal_signed = taxes['total_excluded'] if taxes else self.quantity * price
-        self.price_subtotal_o = self.quantity * self.price_unit_o
-        if self.invoice_id.currency_id and self.invoice_id.company_id and self.invoice_id.currency_id != self.invoice_id.company_id.currency_id:
-            price_subtotal_signed = self.invoice_id.currency_id.compute(price_subtotal_signed,
-                                                                        self.invoice_id.company_id.currency_id)
-        sign = self.invoice_id.type in ['in_refund', 'out_refund'] and -1 or 1
-        self.price_subtotal_signed = price_subtotal_signed * sign
-
-    @api.model
-    def create(self, vals):
-        """
-        原始单价存起来
-        :param vals:
-        :return:
-        """
-        res = super(AccountInvoiceLine, self).create(vals)
-        res.price_unit_o = res.price_unit
-        return res
+    price_subtotal_o = fields.Monetary()
+    # price_subtotal_o = fields.Monetary(string='Amount',
+    #                                    store=True, readonly=True, compute='_compute_price')
+    # price_unit = fields.Float(digits=dp.get_precision('Price Deduct'), string=u'单价')
+    #
+    # # 添加原始总价在invoice_line
+    # @api.one
+    # @api.depends('price_unit', 'discount', 'invoice_line_tax_ids', 'quantity',
+    #              'product_id', 'invoice_id.partner_id', 'invoice_id.currency_id', 'invoice_id.company_id')
+    # def _compute_price(self):
+    #     currency = self.invoice_id and self.invoice_id.currency_id or None
+    #     price = self.price_unit * (1 - (self.discount or 0.0) / 100.0)
+    #     taxes = False
+    #     if self.invoice_line_tax_ids:
+    #         taxes = self.invoice_line_tax_ids.compute_all(price, currency, self.quantity, product=self.product_id,
+    #                                                       partner=self.invoice_id.partner_id)
+    #     self.price_subtotal = price_subtotal_signed = taxes['total_excluded'] if taxes else self.quantity * price
+    #     self.price_subtotal_o = self.quantity * self.price_unit_o
+    #     if self.invoice_id.currency_id and self.invoice_id.company_id and self.invoice_id.currency_id != self.invoice_id.company_id.currency_id:
+    #         price_subtotal_signed = self.invoice_id.currency_id.compute(price_subtotal_signed,
+    #                                                                     self.invoice_id.company_id.currency_id)
+    #     sign = self.invoice_id.type in ['in_refund', 'out_refund'] and -1 or 1
+    #     self.price_subtotal_signed = price_subtotal_signed * sign
+    #
+    # @api.model
+    # def create(self, vals):
+    #     """
+    #     原始单价存起来
+    #     :param vals:
+    #     :return:
+    #     """
+    #     res = super(AccountInvoiceLine, self).create(vals)
+    #     res.price_unit_o = res.price_unit
+    #     return res

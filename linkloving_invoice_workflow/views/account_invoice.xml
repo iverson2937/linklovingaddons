@@ -123,7 +123,7 @@
                                         </div>
                                         <field name="amount_tax" nolabel="1"/>
                                         <field name="amount_total" class="oe_subtotal_footer_separator"/>
-                                        <field name="amount_total_o" invisible="1"/>
+                                        <!--<field name="amount_total_o" invisible="1"/>-->
                                         <field name="payments_widget" colspan="2" nolabel="1" widget="payment"/>
                                         <field name="residual" class="oe_subtotal_footer_separator"
                                                attrs="{'invisible': [('state', '=', 'draft')]}"/>
@@ -289,19 +289,19 @@
                 </xpath>
                 <xpath expr="//field[@name='purchase_id']" position="replace">
 
-                    <field name="deduct_amount" attrs="{'readonly': [('state', 'in', ['open','paid'])]}"/>
+                    <!--<field name="deduct_amount" attrs="{'readonly': [('state', 'in', ['open','paid'])]}"/>-->
                     <field name="po_id" string="采购单"/>
 
                 </xpath>
-                <xpath expr="//tree/field[@name='price_unit']" position="before">
-                    <field name="price_unit_o" string="原始单价" readonly="1"/>
-                </xpath>
-                <xpath expr="//tree/field[@name='price_unit']" position="attributes">
-                    <attrbute name="readonly">1</attrbute>
-                </xpath>
-                <xpath expr="//field[@name='amount_total']" position="after">
-                    <field name="amount_total_o" string="Total Amount" invisible="1"/>
-                </xpath>
+                <!--<xpath expr="//tree/field[@name='price_unit']" position="before">-->
+                <!--<field name="price_unit_o" string="原始单价" readonly="1"/>-->
+                <!--</xpath>-->
+                <!--<xpath expr="//tree/field[@name='price_unit']" position="attributes">-->
+                <!--<attrbute name="readonly">1</attrbute>-->
+                <!--</xpath>-->
+                <!--<xpath expr="//field[@name='amount_total']" position="after">-->
+                <!--<field name="amount_total_o" string="Total Amount" invisible="1"/>-->
+                <!--</xpath>-->
                 <xpath expr="//field[@name='amount_tax']" position="replace">
                     <div>
                         <label for="amount_tax"/>

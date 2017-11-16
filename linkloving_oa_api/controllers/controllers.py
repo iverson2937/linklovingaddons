@@ -1492,6 +1492,34 @@ class LinklovingOAApi(http.Controller):
             confirm_approve.create_message_post(reason)
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
 
+    # 审批 2级审核
+    @http.route('/linkloving_oa_api/confirm_approve3', type='json', auth="none", csrf=False, cors='*')
+    def confirm_approve3(self, *kw):
+        user_id = request.jsonrequest.get("user_id")
+        sheet_id = request.jsonrequest.get("sheet_id")
+        domain = [("id", '=', sheet_id)]
+        reason = request.jsonrequest.get("reason")
+        confirm_approve = request.env["hr.expense.sheet"].sudo(user_id).search(domain)
+        expense_line_ids = request.jsonrequest.get("expense_line_ids")
+
+        approve_lines = confirm_approve.expense_line_ids
+        confirm_approve.write({
+            'expense_line_ids': [(0, 0, {
+                'product_id': p.get('product_id'),  # 产品
+                'unit_amount': float(p.get('unit_amount')),  # 金额
+                'name': p.get('name'),  # 费用说明
+                'tax_ids': ([(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [4])]),
+                'description': p.get('remarks'),
+            }) for p in expense_line_ids.get('data').get('expense_line_ids')]
+        })
+        for approve_line in approve_lines:
+            request.env['hr.expense'].sudo().browse(approve_line.id).unlink()
+
+        confirm_approve.manager3_approve()
+        if reason:
+            confirm_approve.create_message_post(reason)
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
+
     # 拒绝
     @http.route('/linkloving_oa_api/refuse_approve', type='json', auth="none", csrf=False, cors='*')
     def refuse_approve(self, *kw):
@@ -1924,12 +1952,9 @@ class LinklovingOAApi(http.Controller):
     def get_apply_record(self, objs):
         data = []
         for obj in objs:
-            if (type(obj.tracking_value_ids) == list):
-                old_state = obj.tracking_value_ids[0].old_value_char or ''
-                new_state = obj.tracking_value_ids[0].new_value_char or ''
-            else:
-                old_state = obj.tracking_value_ids.old_value_char or ''
-                new_state = obj.tracking_value_ids.new_value_char or ''
+            old_state = obj.tracking_value_ids and obj.tracking_value_ids[0].old_value_char or ''
+            new_state = obj.tracking_value_ids and obj.tracking_value_ids[0].new_value_char or ''
+
             data.append({
                 "create_time": obj.create_date,
                 "create_person_ava": LinklovingAppApi.get_img_url(obj.create_uid.self.user_ids.id,
@@ -2173,3 +2198,6 @@ class LinklovingOAApi(http.Controller):
 
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+
+
