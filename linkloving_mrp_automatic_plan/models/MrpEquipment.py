@@ -45,7 +45,9 @@ class PlanMoWizard(models.TransientModel):
                 'mo_id': mo.id,
                 'product_qty': vals.get("product_qty")
             })
-            qty_wizard.change_prod_qty()
+            # context = dict(self._context)
+            # context.pop("default_product_qty")
+            qty_wizard.with_context({}).change_prod_qty()
             mo.replanned_mo(self.env["mrp.production.line"], mo.production_line_id, is_priority=is_priority)
 
         else:
