@@ -5,6 +5,7 @@ from odoo.exceptions import UserError
 from linklovingaddons.linkloving_app_api.models.models import JPushExtend
 import jpush
 
+
 class HrExpenseSheet(models.Model):
     _inherit = 'hr.expense.sheet'
     _rec_name = 'expense_no'
@@ -26,12 +27,21 @@ class HrExpenseSheet(models.Model):
     payment_id = fields.Many2one('account.employee.payment')
     income = fields.Boolean(default=False)
     partner_id = fields.Many2one('res.partner')
-    payment_line_ids = fields.One2many('account.employee.payment.line', 'sheet_id')
+    account_payment_line_ids = fields.One2many('account.employee.payment.line', 'sheet_id')
     remark_comments_ids = fields.One2many('hr.remark.comment', 'expense_sheet_id', string=u'审核记录')
     department_id = fields.Many2one('hr.department', string='Department',
                                     states={'post': [('readonly', True)], 'done': [('readonly', False)]})
 
     reject_reason = fields.Char(string=u'拒绝原因')
+    has_payment_line_ids = fields.Boolean(compute='_compute_has_payment_line_ids')
+
+    @api.multi
+    def _compute_has_payment_line_ids(self):
+        for sheet in self:
+            if sheet.account_payment_line_ids:
+                sheet.has_payment_line_ids = True
+            else:
+                sheet.has_payment_line_ids = False
 
     @api.onchange('department_id')
     def _onchange_department_id(self):
