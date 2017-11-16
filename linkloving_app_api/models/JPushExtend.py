@@ -16,9 +16,7 @@ class JPushExtend:
         ios = jpush.ios(alert={"title":notification,
                                        "body":body,
                                        }, sound=need_sound)
-        android = jpush.android(alert={"title":notification,
-                                       "body":body,
-                                       }, priority=1, style=1)
+        android = jpush.android(alert=body, title=notification)
         push.notification = jpush.notification(ios=ios, android=android)
         push.options = {"apns_production":apns_production,}
         push.platform = platform
