@@ -1492,7 +1492,7 @@ class LinklovingOAApi(http.Controller):
             confirm_approve.create_message_post(reason)
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
 
-    # 审批 2级审核
+    # 修改 2级审核
     @http.route('/linkloving_oa_api/confirm_approve3', type='json', auth="none", csrf=False, cors='*')
     def confirm_approve3(self, *kw):
         user_id = request.jsonrequest.get("user_id")
