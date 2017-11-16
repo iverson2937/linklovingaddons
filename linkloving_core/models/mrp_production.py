@@ -12,6 +12,11 @@ class MrpProduction(models.Model):
     _inherit = 'mrp.production'
 
     @api.multi
+    def set_to_confirm(self):
+        for m in self:
+            m.state = 'confirmed'
+
+    @api.multi
     def _compute_on_produce_qty(self):
         for stock_move in self:
             finished_product = sum(

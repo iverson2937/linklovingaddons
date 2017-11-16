@@ -33,13 +33,29 @@ odoo.define('linkloving_core.product_detail', function (require) {
             'click .delete_mo_btn': 'click_delete_mo',
             'click .create_po_btn': 'click_create_po',
             'click .delete_po_btn': 'click_delete_po',
-            'mouseenter .trace_back': 'mouseenter_ev'
+            'mouseenter .trace_back': 'mouseenter_ev',
+            'click .demand_confirm': 'action_demand_confirm',
+
         },
 
+        action_demand_confirm: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var self = this;
+
+            if ($(target).data('id')) {
+
+                new Model("mrp.production")
+                    .call("set_to_confirm", [$(target).data('id')])
+                    .then(function (result) {
+                        $(target).hide();
+                        $(target).parents('h4').children(".state").text('需求确认');
+                    })
+            }
+        },
         mouseenter_ev: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
-            console.log(target)
             if ($(target).hasClass('mo_trace')) {
                 var trace_id = $(target).parents('h4').children('.show_mo_number').attr('data-id');
                 console.log(parseInt(trace_id));

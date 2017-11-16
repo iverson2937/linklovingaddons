@@ -13,3 +13,4 @@ class AccountEmployeePaymentLine(models.Model):
 
     amount = fields.Float()
     payment_id = fields.Many2one('account.employee.payment')
+    payment_name = fields.Char(related='payment_id.name')

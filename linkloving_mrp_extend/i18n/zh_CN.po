@@ -174,7 +174,7 @@ msgstr "确认生产"
 #. module: linkloving_mrp_extend
 #: model:ir.ui.view,arch_db:linkloving_mrp_extend.linkloving_mrp_production_form_view
 msgid "Confirm the Schedule"
-msgstr "确认加入排程"
+msgstr "需求确认"
 
 #. module: linkloving_mrp_extend
 #: model:ir.actions.act_window,name:linkloving_mrp_extend.mrp_confirmed
