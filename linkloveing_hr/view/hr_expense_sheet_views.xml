@@ -205,7 +205,7 @@
                                         <field name="display_name"/>
                                         <field name="payment_date"/>
                                         <field name="journal_id"/>
-                                        <field name="amount"/>
+                                        <field name="amount" sum="总计"/>
                                         <!--<field name="account_id"/>-->
                                     </tree>
 
