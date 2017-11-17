@@ -9,6 +9,7 @@ class HrExpense(models.Model):
     department_id = fields.Many2one('hr.department', string=u'部门')
     doc = fields.Binary(attachment=True, string=u'附件')
     sale_id = fields.Many2one('sale.order')
+    expense_no = fields.Char(related='sheet_id.expense_no')
     product_id = fields.Many2one('product.product', string='Product', readonly=True,
                                  states={'draft': [('readonly', False)], 'refused': [('readonly', False)],
                                          'done': [('readonly', False)]},
