@@ -91,7 +91,7 @@
                                         <field name="expense_no"/>
                                         <field name="name"/>
                                         <field name="accounting_date"/>
-                                        <field name="amount"/>
+                                        <field name="amount" sum="总计"/>
                                     </tree>
                                 </field>
                             </page>
@@ -100,7 +100,7 @@
                                     <tree create="0">
                                         <field name="create_uid" string="Created By"/>
                                         <field name="create_date" string="Return Date"/>
-                                        <field name="amount"/>
+                                        <field name="amount" sum="总计"/>
                                     </tree>
                                 </field>
 
