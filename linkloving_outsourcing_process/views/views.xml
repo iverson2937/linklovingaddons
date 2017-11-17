@@ -9,7 +9,11 @@
 
                 <xpath expr="//field[@name='in_charge_id']" position="after">
                     <!-- Add your fields or attributes here -->
-                    <field name="outsourcing_supplier_id"/>
+                    <field name="outside_type" invisible="1"/>
+                    <field name="outsourcing_supplier_id" attrs="{'invisible': [('outside_type', '!=', 'outsourcing')],
+                    'required': [('outside_type', '=', 'outsourcing')]}"/>
+                    <field name="supplier_id" attrs="{'invisible': [('outside_type', '!=', 'all_outside')],
+                    'required': [('outside_type', '=', 'all_outside')]}"/>
                 </xpath>
 
             </field>
@@ -25,7 +29,17 @@
 
                 <xpath expr="//field[@name='in_charge_id']" position="after">
                     <!-- Add your fields or attributes here -->
-                    <field name="outsourcing_supplier_id"/>
+                    <field name="outside_type" invisible="1"/>
+                    <field name="outsourcing_supplier_id"
+                           attrs="{'invisible': [('outside_type', '!=', 'outsourcing')]}"
+                           string="外协加工商"/>
+
+                </xpath>
+                <xpath expr="//field[@name='supplier_id']" position="replace">
+                    <field name="supplier_id"
+                           attrs="{'invisible': [('outside_type', '!=', 'all_outside')]}"
+                           string="委外供应商"/>
+
                 </xpath>
 
                 <xpath expr="//button[@name='get_formview']" position="replace">
@@ -202,6 +216,21 @@
                             string="开始排产"/>
                 </xpath>
 
+
+            </field>
+        </record>
+
+        <!-- Inherit Form View to Modify it -->
+        <record id="mrp_process_form_inherit" model="ir.ui.view">
+            <field name="name">mrp.process.form.inherit</field>
+            <field name="model">mrp.process</field>
+            <field name="inherit_id" ref="linkloving_process.mrp_process_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='description']" position="after">
+                    <field name="outside_type"/>
+                    <!-- Add your fields or attributes here -->
+                </xpath>
 
             </field>
         </record>
