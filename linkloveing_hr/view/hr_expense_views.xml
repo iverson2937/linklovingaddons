@@ -144,6 +144,13 @@
             <field name="model">hr.expense</field>
             <field name="inherit_id" ref="hr_expense.view_expenses_tree"/>
             <field name="arch" type="xml">
+
+
+                <xpath expr="//field[@name='date']" position="after">
+                    <field name="expense_no"/>
+
+                </xpath>
+
                 <xpath expr="//field[@name='date']" position="after">
                     <field name="department_id"/>
                     <field name="product_id"/>
