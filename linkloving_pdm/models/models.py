@@ -921,7 +921,21 @@ class ReviewProcessWizard(models.TransientModel):
     product_attachment_info_id = fields.Many2one("product.attachment.info")
     bom_id = fields.Many2one('mrp.bom')
 
-    # material_request_id = fields.Many2one('material.request')
+    @api.model
+    def _get_down_man(self):
+        review_type = self._context.get("review_type")
+        if review_type == 'picking_review':
+            review_type = self._context.get("review_type_two")
+        if review_type == 'pick_type':
+            review_type = 'picking_review_line'
+        elif review_type == 'proofing':
+            review_type = 'picking_review_project'
+        if review_type:
+            final = self.env["final.review.partner"].search([('review_type', '=', review_type)], limit=1)
+            return final.final_review_partner_id.name
+        return ''
+
+    down_man = fields.Char(string=u'终审人', default=_get_down_man)
 
     @api.model
     def _get_default_need_sop(self):
