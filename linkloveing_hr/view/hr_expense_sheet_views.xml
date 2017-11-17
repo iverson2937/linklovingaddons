@@ -198,17 +198,17 @@
 
                             </page>
 
-                            <page string="付款信息" attrs="{'invisible':[('has_payment_ids','=',False)]}">
-                                <field name="account_payment_ids" readonly="1">
-                                    <tree>
-                                        <field name="display_name"/>
-                                        <field name="payment_date"/>
-                                        <field name="journal_id"/>
-                                        <field name="amount"/>
-                                        <!--<field name="account_id"/>-->
-                                    </tree>
+                            <!--<page string="付款信息" attrs="{'invisible':[('has_payment_ids','=',False)]}">-->
+                            <!--<field name="account_payment_ids" readonly="1">-->
+                            <!--<tree>-->
+                            <!--<field name="display_name"/>-->
+                            <!--<field name="payment_date"/>-->
+                            <!--<field name="journal_id"/>-->
+                            <!--<field name="amount"/>-->
+                            <!--&lt;!&ndash;<field name="account_id"/>&ndash;&gt;-->
+                            <!--</tree>-->
 
-                                </field>
+                            <!--</field>-->
 
                             <!--</page>-->
 
