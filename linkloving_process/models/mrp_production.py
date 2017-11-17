@@ -141,9 +141,3 @@ class MrpProduction(models.Model):
             'res_id': self.env['account.invoice'].search([('origin', '=', self.name)]).ids[0],
         }
 
-    @api.multi
-    def button_mark_done(self):
-        print 'is_outside', self.is_outside
-        if self.is_outside and not self.mo_invoice_count:
-            self._prepare_invoice()
-        return super(MrpProduction, self).button_mark_done()
