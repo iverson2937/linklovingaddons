@@ -1777,7 +1777,13 @@ class StockComfirmationExtend(models.TransientModel):
 
     @api.one
     def _process(self, cancel_backorder=False):
-        if self.pick_id.state in ["picking"] and self.pick_id.picking_type_code == 'incoming':  # 如果是处于分拣流程则只记录一下选择
+        # 分拣 和 正常过程都只记录选择
+        if self.pick_id.state in ["picking",
+                                  "validate"] and self.pick_id.picking_type_code == 'incoming':  # 如果是处于分拣流程则只记录一下选择
+            if self.pick_id.state == 'validate':
+                self.pick_id.write({
+                    'state': 'waiting_in'
+                })
             self.pick_id.is_cancel_backorder = cancel_backorder
             return {'type': 'ir.actions.act_window_close'}
         else:
