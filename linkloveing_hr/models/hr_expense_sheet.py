@@ -18,6 +18,7 @@ class HrExpenseSheet(models.Model):
         self.name = name
 
     name = fields.Char(compute='_get_full_name', store=True, required=False)
+    account_payment_ids = fields.One2many('account.payment', 'res_id', domain=[('res_model', '=', 'hr.expense.sheet')])
     expense_no = fields.Char(default=lambda self: _('New'))
     approve_ids = fields.Many2many('res.users')
     is_deduct_payment = fields.Boolean(default=False)
@@ -27,6 +28,7 @@ class HrExpenseSheet(models.Model):
     payment_id = fields.Many2one('account.employee.payment')
     income = fields.Boolean(default=False)
     partner_id = fields.Many2one('res.partner')
+    # 抵扣明细行
     account_payment_line_ids = fields.One2many('account.employee.payment.line', 'sheet_id')
     remark_comments_ids = fields.One2many('hr.remark.comment', 'expense_sheet_id', string=u'审核记录')
     department_id = fields.Many2one('hr.department', string='Department',
@@ -34,6 +36,16 @@ class HrExpenseSheet(models.Model):
 
     reject_reason = fields.Char(string=u'拒绝原因')
     has_payment_line_ids = fields.Boolean(compute='_compute_has_payment_line_ids')
+    has_payment_ids = fields.Boolean(compute='_compute_has_payment_ids')
+
+    @api.multi
+    def _compute_has_payment_ids(self):
+        for sheet in self:
+
+            if sheet.account_payment_ids:
+                sheet.has_payment_ids = True
+            else:
+                sheet.has_payment_ids = False
 
     @api.multi
     def _compute_has_payment_line_ids(self):

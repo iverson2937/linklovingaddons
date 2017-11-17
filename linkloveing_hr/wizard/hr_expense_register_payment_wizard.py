@@ -25,7 +25,7 @@ class HrExpenseRegisterPaymentWizard(models.TransientModel):
             'journal_id': self.journal_id.id,
             'company_id': self.company_id.id,
             'res_model': 'hr.expense.sheet',
-            'res_id': context.get('active_ids', []),
+            'res_id': expense_sheet.id,
             'payment_method_id': self.payment_method_id.id,
             'amount': self.amount,
             'currency_id': self.currency_id.id,
