@@ -138,7 +138,7 @@
                     <field name="department_id" string="Department" invisible="1"/>
                     <field name="to_approve_id" string="Waiting Approve By" readonly="1"
                            attrs="{'invisible': [('to_approve_id', '=', False)]}"/>
-                    <field name="amount"/>
+                    <field name="amount" sum="总计"/>
                     <field name="remark"/>
                     <field name="apply_date" string="Apply Date"/>
                     <field name="state"/>
