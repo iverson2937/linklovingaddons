@@ -301,6 +301,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
             } else {
                 this.process_id = action.params.active_id;
             }
+            console.log(action)
             var self = this;
             //未排产-草稿
             self.limit = 10;
@@ -532,7 +533,7 @@ odoo.define('linkloving_mrp_automatic_plan.arrange_production', function (requir
                         process_id: myself.process_id,
                         production_line_id: -1,
                         limit: 10,
-                        offset: myself.offset_un_group,
+                        offset: myself.offset_un_group - 1,
                         planned_date: myself.chose_date,
                         domains: myself.left_domain,
                         order_by_material: myself.order_by_material,
