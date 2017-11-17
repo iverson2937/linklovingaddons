@@ -128,6 +128,7 @@
             <field name="name">报销明细</field>
             <field name="res_model">hr.expense</field>
             <field name="view_mode">tree,form</field>
+            <field name="domain">[('state','=','done')]</field>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
                     Click here to create a new expense report.
