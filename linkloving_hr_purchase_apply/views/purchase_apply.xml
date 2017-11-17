@@ -70,7 +70,7 @@
                                 <field name="department_id" required="1" options="{'no_create':True}" string="部门"/>
                                 <field name="company_id" groups="base.group_multi_company" string="公司"/>
                                 <field name="employee_id" invisible="0" readonly="1" string="员工"/>
-                                <field name="is_show" invisible=""/>
+                                <field name="is_show" invisible="1"/>
                                 <field name="total_amount" invisible="0" string="总计"/>
                             </group>
                             <group>

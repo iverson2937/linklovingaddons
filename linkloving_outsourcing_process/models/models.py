@@ -10,6 +10,9 @@ class PlanMoWizard(models.TransientModel):
 
     outsourcing_supplier_id = fields.Many2one(comodel_name="res.partner", string=u'外协加工商')
 
+    outside_type = fields.Selection(related="process_id.outside_type")
+
+    supplier_id = fields.Many2one(comodel_name="res.partner", string=u'委外供应商')
 
 class MrpProductionExtend(models.Model):
     _inherit = 'mrp.production'
@@ -17,6 +20,7 @@ class MrpProductionExtend(models.Model):
     outsourcing_supplier_id = fields.Many2one(comodel_name="res.partner", string=u'外协加工商')
     outsourcing_order_ids = fields.One2many(comodel_name="outsourcing.process.order", inverse_name="production_id",
                                             string=u'外协单')
+    outside_type = fields.Selection(related="process_id.outside_type")
 
     @api.multi
     def _compute_qty_unpost(self):
@@ -24,6 +28,24 @@ class MrpProductionExtend(models.Model):
         for production in self:
             outsourcing_orders = production.outsourcing_order_ids.filtered(lambda x: x.state not in ["done"])
             production.qty_unpost += sum(outsourcing_orders.mapped("qty_produced"))
+
+    @api.multi
+    def button_mark_done(self):
+        if self.outside_type in ['outsourcing', 'all_outside'] and not self.mo_invoice_count:
+            self._prepare_invoice()
+        return super(MrpProductionExtend, self).button_mark_done()
+
+
+class MrpProcessExtend(models.Model):
+    _inherit = 'mrp.process'
+
+    outside_type = fields.Selection(string=u"外协类型", selection=[('normal', u'正常'),
+                                                               ('all_outside', u'委外'),
+                                                               ('outsourcing', u'外协'), ],
+                                    required=False, default='normal',
+                                    )
+
+
 
 class MrpProductionProduceExtend(models.TransientModel):
     _inherit = 'mrp.product.produce'
@@ -33,8 +55,10 @@ class MrpProductionProduceExtend(models.TransientModel):
         qc_direct = self._context.get("qc_direct")  # 是否直接去QC, 外协完成之后的动作
         if not qc_direct:
             for mo in self:
-                if mo.production_id.outsourcing_supplier_id:  # 外协
+                if mo.production_id.outside_type == 'outsourcing' and mo.production_id.outsourcing_supplier_id:  # 外协
                     return self.outsourcing_process_produce()
+                elif mo.production_id.outside_type == 'outsourcing' and not mo.production_id.outsourcing_supplier_id:
+                    raise UserError(u"此单据未设置外协供应商")
                 else:
                     return super(MrpProductionProduceExtend, mo).do_produce()
         else:
