@@ -198,7 +198,6 @@
 
                             </page>
 
-                            <field name="has_payment_ids" invisible="1"/>
                             <page string="付款信息" attrs="{'invisible':[('has_payment_ids','=',False)]}">
                                 <field name="account_payment_ids" readonly="1">
                                     <tree>
