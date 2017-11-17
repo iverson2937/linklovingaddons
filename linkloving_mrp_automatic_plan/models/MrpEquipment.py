@@ -637,7 +637,8 @@ class MrpProductionExtend(models.Model):
         new_domain = expression.AND([domains, [("process_id", "=", process_id),
                                                state_domain]])
 
-        ungroup_domain = expression.AND([domains, [("process_id", "=", process_id),
+        ungroup_domain = expression.AND([domains, [('production_line_id', '=', False),
+                                                   ("process_id", "=", process_id),
                                                    ("state", "not in", ['done', 'cancel', 'draft', 'confirmed'])]])
 
         groups = self.read_group(domain=new_domain,
