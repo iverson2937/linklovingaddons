@@ -146,8 +146,8 @@
             <field name="arch" type="xml">
 
 
-                <xpath expr="//field[@name='date']" position="after">
-                    <field name="expense_no"/>
+                <xpath expr="//field[@name='date']" position="before">
+                    <field name="expense_no" string="报销单号"/>
 
                 </xpath>
 
