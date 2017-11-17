@@ -124,5 +124,47 @@
                   action="action_hr_expense_sheet_all"/>
 
 
+        <record id="action_hr_expense_all" model="ir.actions.act_window">
+            <field name="name">报销明细</field>
+            <field name="res_model">hr.expense</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click here to create a new expense report.
+                </p>
+                <p>
+                    Once you have created your expense, submit it to your manager who will validate it.
+                </p>
+            </field>
+        </record>
+
+
+        <record id="hr_expense_tree_inherit" model="ir.ui.view">
+            <field name="name">hr.expense</field>
+            <field name="model">hr.expense</field>
+            <field name="inherit_id" ref="hr_expense.view_expenses_tree"/>
+            <field name="arch" type="xml">
+
+
+                <xpath expr="//field[@name='date']" position="after">
+                    <field name="expense_no"/>
+
+                </xpath>
+
+                <xpath expr="//field[@name='date']" position="after">
+                    <field name="department_id"/>
+                    <field name="product_id"/>
+
+                </xpath>
+
+            </field>
+        </record>
+
+
+        <menuitem id="menu_hr_expense_all" name="报销明细"
+                  action="action_hr_expense_all"
+                  sequence="3" parent="hr_expense.menu_hr_expense_reports"/>
+
+
     </data>
 </openerp>
