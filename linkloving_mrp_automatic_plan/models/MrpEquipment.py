@@ -262,7 +262,7 @@ class MrpProductionLine(models.Model):
         count = self.env["mrp.production"].search_count([("process_id", "=", process_id),
                                                          ("production_line_id", "=", False),
                                                          ("state", "not in",
-                                                          DONE_CANCEL_DOMAIN)])
+                                                          DONE_CANCEL_DOMAIN + ["draft", "confirmed"])])
         lines.append({
             'id': -1,
             'name': u'未分组',
