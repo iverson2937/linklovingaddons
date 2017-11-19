@@ -66,12 +66,15 @@
                     <field name="express_sample_record"/>
                 </xpath>
 
-                <!--you-->
-                <xpath expr="//field[@name='lang']" position="after">
-                    <field name="qq" invisible="1"/>
+                <!--供应商显示的字段-->
+                   <xpath expr="//field[@name='email']" position="after">
+                    <field name="qq" attrs="{'invisible':[('customer','=',True)]}" string="QQ/旺旺/微信"/>
                 </xpath>
 
-                <xpath expr="//field[@name='qq']" position="after">
+
+
+
+                <xpath expr="//field[@name='lang']" position="after">
                     <field name="skype" invisible="1"/>
                 </xpath>
 
