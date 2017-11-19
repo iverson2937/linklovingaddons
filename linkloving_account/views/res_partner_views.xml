@@ -3,6 +3,7 @@
     <data>
         <!--让采购有权限添加银行账户-->
     <!--attrs="{'invisible':[('account_payment_count', '=',0)]}"-->
+                 <!--<field string="收付款明细" name="account_payment_count" widget="statinfo"/>-->
         <record model="ir.ui.view" id="account.partner_view_buttons">
             <field name="name">partner.view.buttons</field>
             <field name="model">res.partner</field>
@@ -17,7 +18,7 @@
 
                             context="{'search_default_partner_id': active_id, 'default_partner_id': active_id}"
                             icon="fa-tasks">
-                        <!--<field string="收付款明细" name="account_payment_count" widget="statinfo"/>-->
+
                     </button>
 
 
