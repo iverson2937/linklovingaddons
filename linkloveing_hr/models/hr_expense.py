@@ -5,6 +5,7 @@ from odoo import models, fields, api, _
 
 class HrExpense(models.Model):
     _inherit = 'hr.expense'
+    _order = 'date asc'
 
     department_id = fields.Many2one('hr.department', string=u'部门')
     doc = fields.Binary(attachment=True, string=u'附件')

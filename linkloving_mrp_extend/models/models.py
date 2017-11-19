@@ -817,8 +817,8 @@ class MrpProductionExtend(models.Model):
             lambda x: x.product_id.id == line.product_id.id and x.state not in ('done', 'cancel'))
         if move:
             if quantity > 0:
-                move[0].write({'product_uom_qty': quantity * qty,
-                               'suggest_qty': round(quantity * qty)})
+                move[0].write({'product_uom_qty': quantity,
+                               'suggest_qty': round(quantity)})
             else:
                 if move[0].quantity_done > 0:
                     raise UserError(_(

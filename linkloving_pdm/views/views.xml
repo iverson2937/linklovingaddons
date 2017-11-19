@@ -181,6 +181,11 @@
                             <field name="need_sop" widget="radio" invisible="context.get('review_type')!='bom_review'"/>
                             <field name="sop_name" readonly="1" invisible="context.get('review_type')!='bom_review'"/>
                         </group>
+                        <p style="color:red;">提示：如需终审，请提交给以下终审人</p>
+                        <group>
+                            <field name="down_man" readonly="1"/>
+                        </group>
+
                     </sheet>
                     <footer>
                         <!--<div style="float:left">-->
