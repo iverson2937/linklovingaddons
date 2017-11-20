@@ -107,7 +107,7 @@ class LinklovingAppApi(http.Controller):
         print 'sss'
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=http.db_list(), jsonRequest=False)
 
-    # 换头像
+    # 换头像。
     @http.route('/linkloving_app_api/change_img', type='json', auth="none", csrf=False, cors='*')
     def change_img(self, **kw):
         uid = request.context.get("uid")
@@ -117,6 +117,18 @@ class LinklovingAppApi(http.Controller):
         cur_user = request.env['res.users'].browse(uid)
         values = {}
         values['user_ava'] = LinklovingAppApi.get_img_url(cur_user.id, "res.users", "image_medium")
+        employee = request.env['hr.employee'].sudo().search(
+            [('user_id', '=', uid)])
+        user.write({
+            "image": request.jsonrequest['img'],
+            "image_medium": request.jsonrequest['img'],
+            "image_small": request.jsonrequest['img']
+        })
+        employee.write({
+            "image": request.jsonrequest['img'],
+            "image_medium": request.jsonrequest['img'],
+            "image_small": request.jsonrequest['img']
+        })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=values)
 
     # 登录
