@@ -1305,7 +1305,7 @@ class LinklovingOAApi(http.Controller):
             })
         return data
 
-    #去掉html标签
+    #去掉<p>标签
     def message_to_json(self, objs):
         data = []
         for obj in objs:
