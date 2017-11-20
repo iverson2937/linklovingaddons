@@ -27,6 +27,13 @@ class PurchaseOrder(models.Model):
     pre_payment_amount = fields.Float(compute='_compute_invoice_amount')
 
     @api.multi
+    def button_cancel(self):
+        for order in self:
+            for pick in order.picking_ids:
+                if pick.state in ['qc_check', 'validate', 'picking', 'waiting_in', 'done']:
+                    raise UserError(u'不能取消已经收到货的订单: %s.' % (order.name))
+        return super(PurchaseOrder, self).button_cancel()
+    @api.multi
     @api.depends('invoice_ids')
     def _compute_invoice_amount(self):
         for order in self:

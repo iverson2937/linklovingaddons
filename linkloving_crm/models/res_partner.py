@@ -143,7 +143,20 @@ class ResPartner(models.Model):
                     #     # mutual_rule_id
                     #     vals['mutual_rule_id'] = vals.get('mutual_customer_id')
 
-        return super(ResPartner, self).create(vals)
+        res = super(ResPartner, self).create(vals)
+
+        lead_vals = {
+
+            'name': "默认商机-" + str(res.name),
+            'partner_id': res.id,
+            'planned_revenue': 0.0,
+            'priority': res.priority,
+            'type': 'opportunity',
+        }
+
+        self.env['crm.lead'].create(lead_vals)
+
+        return res
 
     @api.multi
     def write(self, vals):

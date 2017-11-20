@@ -17,9 +17,15 @@ class PlanMoWizard(models.TransientModel):
 class MrpProductionExtend(models.Model):
     _inherit = 'mrp.production'
 
+    @api.multi
+    def _compute_count_of_outsourcing_order(self):
+        for order in self:
+            order.count_of_outsourcing_order = len(order.outsourcing_order_ids)
+
     outsourcing_supplier_id = fields.Many2one(comodel_name="res.partner", string=u'外协加工商')
     outsourcing_order_ids = fields.One2many(comodel_name="outsourcing.process.order", inverse_name="production_id",
                                             string=u'外协单')
+    count_of_outsourcing_order = fields.Integer(compute='_compute_count_of_outsourcing_order')
     outside_type = fields.Selection(related="process_id.outside_type")
 
     @api.multi
@@ -30,9 +36,24 @@ class MrpProductionExtend(models.Model):
             production.qty_unpost += sum(outsourcing_orders.mapped("qty_produced"))
 
     @api.multi
+    def action_view_outsourcing_orders(self):
+        return {
+            'name': u'外协单',
+            'type': 'ir.actions.act_window',
+            'res_model': 'outsourcing.process.order',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', self.outsourcing_order_ids.ids)],
+            'target': 'current',
+        }
+
+    @api.multi
     def button_mark_done(self):
         if self.outside_type in ['outsourcing', 'all_outside'] and not self.mo_invoice_count:
-            self._prepare_invoice()
+            if self.outside_type == 'outsourcing':
+                self._prepare_invoice(self.outsourcing_supplier_id)
+            else:
+                self._prepare_invoice(self.supplier_id)
+
         return super(MrpProductionExtend, self).button_mark_done()
 
 
