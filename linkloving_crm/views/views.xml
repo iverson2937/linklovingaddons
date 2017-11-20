@@ -500,5 +500,33 @@
             </field>
         </record>
 
+
+        <record id="crm.crm_stage_form" model="ir.ui.view">
+            <field name="name">crm.stage.form</field>
+            <field name="model">crm.stage</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <form string="Stage">
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="team_id"/>
+                            <field name="fold"/>
+                        </group>
+                        <group>
+                            <field name="on_change"/>
+                            <field name="probability" attrs="{'invisible': [('on_change', '=', False)]}"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="full_name_ids" widget="many2many_tags" options="{'no_create': True}"
+                               groups="sales_team.group_sale_manager"/>
+                    </group>
+                    <separator string="Requirements"/>
+                    <field name="requirements" nolabel="1"/>
+                </form>
+            </field>
+        </record>
+
     </data>
 </openerp>

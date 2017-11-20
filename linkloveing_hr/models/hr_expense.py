@@ -7,7 +7,7 @@ class HrExpense(models.Model):
     _inherit = 'hr.expense'
     _order = 'date asc'
 
-    department_id = fields.Many2one('hr.department', string=u'部门')
+    department_id = fields.Many2one('hr.department', string=u'部门', related='sheet_id.department_id')
     doc = fields.Binary(attachment=True, string=u'附件')
     sale_id = fields.Many2one('sale.order')
     expense_no = fields.Char(related='sheet_id.expense_no')

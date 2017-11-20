@@ -45,6 +45,14 @@ class CrmMailMessage(models.Model):
 
     @api.multi
     def message_format(self):
+        if self:
+            if self[0].model == 'res.partner':
+                partner_my = self.env['res.partner'].search([('id', '=', self[0].res_id)])
+                res_ids = partner_my.ids + partner_my.opportunity_ids.ids
+
+                self = self.env['mail.message'].search(
+                    [('model', 'in', ('crm.lead', 'res.partner')), ('res_id', 'in', res_ids)])
+
         message_values = self.read([
             'id', 'body', 'date', 'author_id', 'email_from',  # base message fields
             'message_type', 'subtype_id', 'subject',  # message specific
@@ -192,7 +200,7 @@ class CrmMailMessage(models.Model):
                     sale_order_data.write({'inspection_report_count': (sale_order_data.inspection_report_count + 1)})
                 values['sale_order_type'] = values['messages_label_ids'][0]
 
-        if values.get('model') == "res.partner":
+        if values.get('model') == "res.partner" or values.get('model') == "crm.lead":
             if values.get('messages_label_ids'):  # needed to compute reply_to
                 if str(values.get('messages_label_ids')) in ["[u'inspection']", "[u'question']"]:
                     if values.get('question_subject'):
@@ -210,6 +218,13 @@ class CrmMailMessage(models.Model):
             values['subject'] = values['question_subject']
 
         message = super(CrmMailMessage, self).create(values)
+        # 处理商机状态
+        if message.model == 'crm.lead':
+            crm_lead_val = self.env['crm.lead'].search([('id', '=', message.res_id)])
+            if crm_lead_val.type == 'opportunity':
+                for one_type in message.messages_label_ids:
+                    stage_val = self.env['crm.stage'].search([('full_name_ids', 'in', one_type.id)])
+                    crm_lead_val.write({'stage_id': stage_val.id})
         return message
 
     @api.multi
@@ -229,6 +244,12 @@ class CrmMailMessage(models.Model):
 
     def update_message_action(self):
         pass
+
+
+class Stage(models.Model):
+    _inherit = "crm.stage"
+
+    full_name_ids = fields.Many2many('message.label', string=u'名称')
 
 
 class CrmMessageLabelStatus(models.Model):

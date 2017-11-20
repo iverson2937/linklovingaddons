@@ -107,7 +107,7 @@ class LinklovingAppApi(http.Controller):
         print 'sss'
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=http.db_list(), jsonRequest=False)
 
-    # 换头像
+    # 换头像。
     @http.route('/linkloving_app_api/change_img', type='json', auth="none", csrf=False, cors='*')
     def change_img(self, **kw):
         uid = request.context.get("uid")
@@ -117,6 +117,18 @@ class LinklovingAppApi(http.Controller):
         cur_user = request.env['res.users'].browse(uid)
         values = {}
         values['user_ava'] = LinklovingAppApi.get_img_url(cur_user.id, "res.users", "image_medium")
+        employee = request.env['hr.employee'].sudo().search(
+            [('user_id', '=', uid)])
+        user.write({
+            "image": request.jsonrequest['img'],
+            "image_medium": request.jsonrequest['img'],
+            "image_small": request.jsonrequest['img']
+        })
+        employee.write({
+            "image": request.jsonrequest['img'],
+            "image_medium": request.jsonrequest['img'],
+            "image_small": request.jsonrequest['img']
+        })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=values)
 
     # 登录
@@ -1372,7 +1384,8 @@ class LinklovingAppApi(http.Controller):
                                               res_data={'error': _("MO not found")})
         return_lines = []
         if all(stock_move.get("return_qty") == 0 for stock_move in stock_move_ids):
-            mrp_production.write({'state': 'done'})
+            mrp_production.sudo(
+                request.context.get("uid") or SUPERUSER_ID).button_mark_done()  # write({'state': 'done'})
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
         if not is_check:
@@ -2186,9 +2199,9 @@ class LinklovingAppApi(http.Controller):
                 if partner_id:
                     temp_domain.append(('partner_id', 'child_of', partner_id))
 
-                state_group_list = request.env[model].sudo(LinklovingAppApi.CURRENT_USER()).read_group(temp_domain,
-                                                                                                       fields=['state'],
-                                                                                                       groupby=[
+                state_group_list = request.env[model].sudo().read_group(temp_domain,
+                                                                        fields=['state'],
+                                                                        groupby=[
                                                                                                            'state'])
 
                 new_group = {
@@ -2433,6 +2446,8 @@ class LinklovingAppApi(http.Controller):
 
         picking_obj = request.env['stock.picking'].sudo(LinklovingAppApi.CURRENT_USER()).search(
             [('id', '=', picking_id)])
+        if picking_obj.state == 'cancel':
+            raise UserError(u'该单据已取消,无法操作')
         if state == 'confirm':  # 确认 标记为代办
             picking_obj.action_confirm()
         elif state == 'post':  # 提交
@@ -2967,7 +2982,7 @@ class LinklovingAppApi(http.Controller):
         order_name = request.jsonrequest.get("order_name")
         domain = [("origin", 'ilike', order_name), ('picking_type_code', '=', 'outgoing'), ]
         # domain = expression.OR([domain, [('name', 'ilike', order_name)]])
-        pickings = request.env["stock.picking"].sudo(LinklovingAppApi.CURRENT_USER()).search(domain)
+        pickings = request.env["stock.picking"].sudo().search(domain)
 
         json_list = self.get_picking_info_by_picking(pickings)
         return JsonResponse.send_response(STATUS_CODE_OK,

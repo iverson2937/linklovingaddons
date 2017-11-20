@@ -3,7 +3,7 @@ import base64
 import json
 import logging
 from urllib2 import URLError
-
+import re
 import time
 import datetime
 
@@ -1305,11 +1305,13 @@ class LinklovingOAApi(http.Controller):
             })
         return data
 
+    #去掉<p>标签
     def message_to_json(self, objs):
         data = []
         for obj in objs:
-            body_str = obj.body.replace('<p>', '')
-            body_str = body_str.replace('</p>', '')
+            dr = re.compile(r'<[^>]+>', re.S)
+            body_str = dr.sub('',obj.body)
+            # body_str = body_str.replace('</p>', '')
             data.append({
                 'model': obj.model,
                 'body': body_str,
@@ -1399,6 +1401,7 @@ class LinklovingOAApi(http.Controller):
         data = []
         for obj in objs:
             data.append({
+                'line_id':obj.id,
                 'analytic_account_id': obj.analytic_account_id.name or '',
                 'product_id': obj.product_id.name or '',
                 'account_id': obj.account_id.name or '',
@@ -1444,19 +1447,16 @@ class LinklovingOAApi(http.Controller):
         reason = request.jsonrequest.get("reason")
         expense_line_ids = request.jsonrequest.get("expense_line_ids")
         confirm_approve = request.env["hr.expense.sheet"].sudo(user_id).search(domain)
-
-        approve_lines = confirm_approve.expense_line_ids
-        confirm_approve.write({
-            'expense_line_ids': [(0, 0, {
-                'product_id': p.get('product_id'),  # 产品
-                'unit_amount': float(p.get('unit_amount')),  # 金额
-                'name': p.get('name'),  # 费用说明
-                'tax_ids': ([(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [4])]),
-                'description': p.get('remarks'),
-            }) for p in expense_line_ids.get('data').get('expense_line_ids')]
-        })
-        for approve_line in approve_lines:
-            request.env['hr.expense'].sudo().browse(approve_line.id).unlink()
+        for line_ids in confirm_approve.expense_line_ids:
+            for request_line in expense_line_ids.get('data').get('expense_line_ids'):
+                if (line_ids.id == request_line.get('line_id')):
+                    line_ids.write({
+                            'product_id': request_line.get('product_id'),  # 产品
+                            'unit_amount': float(request_line.get('unit_amount')),  # 金额
+                            'name': request_line.get('name'),  # 费用说明
+                            'tax_ids': ([(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [(6, 0, [4])]),
+                            'description': request_line.get('remarks'),
+                     })
 
         confirm_approve.manager1_approve()
         if reason:
@@ -1474,18 +1474,16 @@ class LinklovingOAApi(http.Controller):
         expense_line_ids = request.jsonrequest.get("expense_line_ids")
         confirm_approve = request.env["hr.expense.sheet"].sudo(user_id).search(domain)
 
-        approve_lines = confirm_approve.expense_line_ids
-        confirm_approve.write({
-            'expense_line_ids': [(0, 0, {
-                'product_id': p.get('product_id'),  # 产品
-                'unit_amount': float(p.get('unit_amount')),  # 金额
-                'name': p.get('name'),  # 费用说明
-                'tax_ids': ([(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [4])]),
-                'description': p.get('remarks'),
-            }) for p in expense_line_ids.get('data').get('expense_line_ids')]
-        })
-        for approve_line in approve_lines:
-            request.env['hr.expense'].sudo().browse(approve_line.id).unlink()
+        for line_ids in confirm_approve.expense_line_ids:
+            for request_line in expense_line_ids.get('data').get('expense_line_ids'):
+                if (line_ids.id == request_line.get('line_id')):
+                    line_ids.write({
+                            'product_id': request_line.get('product_id'),  # 产品
+                            'unit_amount': float(request_line.get('unit_amount')),  # 金额
+                            'name': request_line.get('name'),  # 费用说明
+                            'tax_ids': ([(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [(6, 0, [4])]),
+                            'description': request_line.get('remarks'),
+                     })
 
         confirm_approve.manager2_approve()
         if reason:
@@ -1502,18 +1500,16 @@ class LinklovingOAApi(http.Controller):
         confirm_approve = request.env["hr.expense.sheet"].sudo(user_id).search(domain)
         expense_line_ids = request.jsonrequest.get("expense_line_ids")
 
-        approve_lines = confirm_approve.expense_line_ids
-        confirm_approve.write({
-            'expense_line_ids': [(0, 0, {
-                'product_id': p.get('product_id'),  # 产品
-                'unit_amount': float(p.get('unit_amount')),  # 金额
-                'name': p.get('name'),  # 费用说明
-                'tax_ids': ([(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [4])]),
-                'description': p.get('remarks'),
-            }) for p in expense_line_ids.get('data').get('expense_line_ids')]
-        })
-        for approve_line in approve_lines:
-            request.env['hr.expense'].sudo().browse(approve_line.id).unlink()
+        for line_ids in confirm_approve.expense_line_ids:
+            for request_line in expense_line_ids.get('data').get('expense_line_ids'):
+                if (line_ids.id == request_line.get('line_id')):
+                    line_ids.write({
+                            'product_id': request_line.get('product_id'),  # 产品
+                            'unit_amount': float(request_line.get('unit_amount')),  # 金额
+                            'name': request_line.get('name'),  # 费用说明
+                            'tax_ids': ([(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [(6, 0, [4])]),
+                            'description': request_line.get('remarks'),
+                     })
 
         confirm_approve.manager3_approve()
         if reason:
