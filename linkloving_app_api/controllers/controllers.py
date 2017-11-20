@@ -2199,9 +2199,9 @@ class LinklovingAppApi(http.Controller):
                 if partner_id:
                     temp_domain.append(('partner_id', 'child_of', partner_id))
 
-                state_group_list = request.env[model].sudo(LinklovingAppApi.CURRENT_USER()).read_group(temp_domain,
-                                                                                                       fields=['state'],
-                                                                                                       groupby=[
+                state_group_list = request.env[model].sudo().read_group(temp_domain,
+                                                                        fields=['state'],
+                                                                        groupby=[
                                                                                                            'state'])
 
                 new_group = {
@@ -2446,6 +2446,8 @@ class LinklovingAppApi(http.Controller):
 
         picking_obj = request.env['stock.picking'].sudo(LinklovingAppApi.CURRENT_USER()).search(
             [('id', '=', picking_id)])
+        if picking_obj.state == 'cancel':
+            raise UserError(u'该单据已取消,无法操作')
         if state == 'confirm':  # 确认 标记为代办
             picking_obj.action_confirm()
         elif state == 'post':  # 提交
@@ -2980,7 +2982,7 @@ class LinklovingAppApi(http.Controller):
         order_name = request.jsonrequest.get("order_name")
         domain = [("origin", 'ilike', order_name), ('picking_type_code', '=', 'outgoing'), ]
         # domain = expression.OR([domain, [('name', 'ilike', order_name)]])
-        pickings = request.env["stock.picking"].sudo(LinklovingAppApi.CURRENT_USER()).search(domain)
+        pickings = request.env["stock.picking"].sudo().search(domain)
 
         json_list = self.get_picking_info_by_picking(pickings)
         return JsonResponse.send_response(STATUS_CODE_OK,
