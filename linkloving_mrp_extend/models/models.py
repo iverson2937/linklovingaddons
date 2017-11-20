@@ -1682,7 +1682,8 @@ class MrpQcFeedBack(models.Model):
     @api.multi
     def unlink(self):
         for qc in self:
-            raise UserError(u"无法删除品检单据")
+            if qc.state not in ["draft"]:
+                raise UserError(u"无法删除品检单据")
         return super(MrpQcFeedBack, self).unlink()
 
     # 等待品捡 -> 品捡中
