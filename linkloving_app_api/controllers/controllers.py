@@ -1372,7 +1372,8 @@ class LinklovingAppApi(http.Controller):
                                               res_data={'error': _("MO not found")})
         return_lines = []
         if all(stock_move.get("return_qty") == 0 for stock_move in stock_move_ids):
-            mrp_production.write({'state': 'done'})
+            mrp_production.sudo(
+                request.context.get("uid") or SUPERUSER_ID).button_mark_done()  # write({'state': 'done'})
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
         if not is_check:
