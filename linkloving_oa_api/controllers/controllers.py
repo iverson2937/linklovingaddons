@@ -3,7 +3,7 @@ import base64
 import json
 import logging
 from urllib2 import URLError
-
+import re
 import time
 import datetime
 
@@ -1308,8 +1308,9 @@ class LinklovingOAApi(http.Controller):
     def message_to_json(self, objs):
         data = []
         for obj in objs:
-            body_str = obj.body.replace('<p>', '')
-            body_str = body_str.replace('</p>', '')
+            dr = re.compile(r'<[^>]+>', re.S)
+            body_str = dr.sub('',obj.body)
+            # body_str = body_str.replace('</p>', '')
             data.append({
                 'model': obj.model,
                 'body': body_str,
