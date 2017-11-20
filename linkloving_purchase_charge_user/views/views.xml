@@ -41,7 +41,19 @@
                     <!-- Add new fields here -->
                     <field name="user_id"/>
                 </xpath>
+            </field>
+        </record>
 
+        <record id="res_partner_supplier_tree" model="ir.ui.view">
+            <field name="name">res.partner</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="linkloving_purchase.res_partner_supplier_tree"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='category_id']" position="after">
+                    <!-- Add new fields here -->
+                    <field name="po_user_id"/>
+                </xpath>
             </field>
         </record>
     </data>

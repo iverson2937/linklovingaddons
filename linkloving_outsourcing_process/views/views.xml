@@ -199,6 +199,21 @@
             <field name="model">mrp.production</field>
             <field name="inherit_id" ref="linkloving_mrp_automatic_plan.linkloving_mrp_production_form_view_inherit"/>
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='process_id']" position="after">
+                    <!-- Add your fields or attributes here -->
+                    <field name="outside_type" invisible="1"/>
+                    <field name="outsourcing_supplier_id"
+                           attrs="{'invisible': [('outside_type', '!=', 'outsourcing')]}"
+                           string="外协加工商"/>
+
+                </xpath>
+                <xpath expr="//field[@name='supplier_id']" position="replace">
+                    <field name="supplier_id"
+                           attrs="{'invisible': [('outside_type', '!=', 'all_outside')]}"
+                           string="委外供应商"/>
+
+                </xpath>
+
                 <xpath expr="//button[@name='get_formview']" position="replace">
                     <field name="outsourcing_supplier_id" invisible="1"/>
                     <button type="formview_dialog"
