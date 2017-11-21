@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_linkloving_custom_rule_linkloving_custom_rule,linkloving_custom_rule.linkloving_custom_rule,model_linkloving_custom_rule_linkloving_custom_rule,,1,0,0,0
