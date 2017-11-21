@@ -36,6 +36,7 @@ class HrExpenseSheet(models.Model):
 
     reject_reason = fields.Char(string=u'拒绝原因')
     has_payment_line_ids = fields.Boolean(compute='_compute_has_payment_line_ids')
+    payment_line_amount = fields.Float(string=u'暂支抵扣金额', compute='_compute_has_payment_line_ids')
     has_payment_ids = fields.Boolean(compute='_compute_has_payment_ids')
 
     @api.multi
@@ -71,6 +72,7 @@ class HrExpenseSheet(models.Model):
         for sheet in self:
             if sheet.account_payment_line_ids:
                 sheet.has_payment_line_ids = True
+                sheet.payment_line_amount = sum(line.amount for line in sheet.account_payment_line_ids)
             else:
                 sheet.has_payment_line_ids = False
 
