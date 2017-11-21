@@ -34,6 +34,10 @@ class AccountEmployeePayment(models.Model):
                         sheet.name, reason))
             sheet.message_post(body=body)
             sheet.to_approve_id = False
+            # 拒絕取消暂支抵扣
+            if sheet.payment_line_ids:
+                for line in sheet.payment_line_ids:
+                    line.unlink()
 
             create_remark_comment(sheet, u'拒绝')
 
@@ -240,7 +244,6 @@ class AccountEmployeePayment(models.Model):
     def create(self, vals):
         if not vals.get('name'):
             vals['name'] = self.env['ir.sequence'].next_by_code('account.employee.payment') or '/'
-            print vals['name']
         return super(AccountEmployeePayment, self).create(vals)
 
     @api.model

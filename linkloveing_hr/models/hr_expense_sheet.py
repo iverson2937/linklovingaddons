@@ -39,6 +39,16 @@ class HrExpenseSheet(models.Model):
     has_payment_ids = fields.Boolean(compute='_compute_has_payment_ids')
 
     @api.multi
+    def action_cancel(self):
+        for sheet in self:
+            if sheet.account_move_id:
+                sheet.account_move_id.unlink()
+            if sheet.payment_line_ids:
+                for line in sheet.payment_line_ids:
+                    line.unlink()
+            sheet.state = 'approve'
+
+    @api.multi
     def _compute_has_payment_ids(self):
         for sheet in self:
 
