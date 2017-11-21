@@ -41,11 +41,20 @@ class HrExpenseSheet(models.Model):
     @api.multi
     def action_cancel(self):
         for sheet in self:
+            # 取消过账分录
             if sheet.account_move_id:
+                sheet.account_move_id.button_cancel()
                 sheet.account_move_id.unlink()
-            if sheet.payment_line_ids:
-                for line in sheet.payment_line_ids:
+            # 取消暂支抵扣
+            if sheet.account_payment_line_ids:
+                for line in sheet.account_payment_line_ids:
                     line.unlink()
+            # 取消付款分录
+            if sheet.account_payment_ids:
+                for payment in sheet.account_payment_ids:
+                    payment.cancel()
+                    payment.unlink()
+
             sheet.state = 'approve'
 
     @api.multi
