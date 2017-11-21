@@ -6,7 +6,7 @@
         <field name="name">我跟单的供应商</field>
         <field ref="base.model_res_partner" name="model_id"/>
         <field name="domain_force">
-            ['|','|',('po_user_id','=',user.id),('po_user_id','=',False),('customer','=',True)]
+            ['|',('po_user_id','=',user.id),('po_user_id','=',False)]
         </field>
         <field name="groups" eval="[(4, ref('purchase.group_purchase_user'))]"/>
     </record>
@@ -21,8 +21,7 @@
     <record id="my_orders" model="ir.rule">
         <field name="name">我的订单</field>
         <field ref="purchase.model_purchase_order" name="model_id"/>
-        <field name="domain_force">['|',('user_id', '=', user.id),('create_uid', '=',
-            user.id),('partner_id.po_user_id','=',user.id)]
+        <field name="domain_force">['|',('user_id', '=', user.id),('partner_id.po_user_id','=',user.id)]
         </field>
         <field name="groups" eval="[(4, ref('purchase.group_purchase_user'))]"/>
     </record>
