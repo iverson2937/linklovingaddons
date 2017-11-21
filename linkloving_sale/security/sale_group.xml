@@ -50,7 +50,7 @@
         <field name="name">我的客户</field>
         <field ref="base.model_res_partner" name="model_id"/>
         <field name="domain_force">['|','|',('team_id','=',False),('user_ids','child_of',user.id),'|',('user_id', '=',
-            user.id),'&amp;',('user_id','=',False),('team_id','=',user.sale_team_id.id)]
+            user.id),'&amp;',('user_id','=',False),('team_id','=',user.sale_team_id.id),('customer','=',True)]
         </field>
         <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
     </record>
@@ -88,7 +88,7 @@
         <field name="domain_force">[(1,'=',1)]
         </field>
         <field name="groups"
-               eval="[(4, ref('sales_team.group_sale_manager')),(4, ref('linkloving_mrp_extend.group_charge_warehouse'))]"/>
+               eval="[(4, ref('sales_team.group_sale_manager')),(4, ref('linkloving_mrp_extend.group_charge_warehouse')),(4, ref('linkloving_mrp_extend.group_charge_produce'))]"/>
     </record>
 
     <record id="my_orders" model="ir.rule">
