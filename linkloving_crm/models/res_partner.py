@@ -144,17 +144,17 @@ class ResPartner(models.Model):
                     #     vals['mutual_rule_id'] = vals.get('mutual_customer_id')
 
         res = super(ResPartner, self).create(vals)
+        if res.customer:
+            lead_vals = {
 
-        lead_vals = {
+                'name': "默认商机-" + str(res.name),
+                'partner_id': res.id,
+                'planned_revenue': 0.0,
+                'priority': res.priority,
+                'type': 'opportunity',
+            }
 
-            'name': "默认商机-" + str(res.name),
-            'partner_id': res.id,
-            'planned_revenue': 0.0,
-            'priority': res.priority,
-            'type': 'opportunity',
-        }
-
-        self.env['crm.lead'].create(lead_vals)
+            self.env['crm.lead'].create(lead_vals)
 
         return res
 
