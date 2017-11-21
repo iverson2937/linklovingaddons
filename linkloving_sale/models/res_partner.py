@@ -19,6 +19,12 @@ class Partner(models.Model):
                               help="Check this box if this contact is a customer.")
 
     team_id = fields.Many2one('crm.team')
+
+    def _get_default_user_id(self):
+        if self._context.get('default_customer'):
+            return self.env.user.id
+
+    user_id = fields.Many2one('res.users', default=_get_default_user_id)
     source_id = fields.Many2one('res.partner.source')
 
     level = fields.Selection([
