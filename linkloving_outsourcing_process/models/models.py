@@ -49,7 +49,11 @@ class MrpProductionExtend(models.Model):
     @api.multi
     def button_mark_done(self):
         if self.outside_type in ['outsourcing', 'all_outside'] and not self.mo_invoice_count:
-            self._prepare_invoice()
+            if self.outside_type == 'outsourcing':
+                self._prepare_invoice(self.outsourcing_supplier_id)
+            else:
+                self._prepare_invoice(self.supplier_id)
+
         return super(MrpProductionExtend, self).button_mark_done()
 
 
