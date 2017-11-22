@@ -67,12 +67,15 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
         # expense_sheet = self.env['hr.expense.sheet'].browse(active_ids)
 
         # Create payment and post it
+        # 付款申请
         payment = self.env['account.payment'].create({
             'partner_type': 'supplier',
             'payment_type': 'outbound',
             'partner_id': self.partner_id.id,
             'journal_id': self.journal_id.id,
             'company_id': self.company_id.id,
+            'res_model': 'account.payment.register',
+            'res_id': self.register_id.id,
             'payment_method_id': self.payment_method_id.id,
             'amount': self.amount,
             'currency_id': self.currency_id.id,
@@ -95,7 +98,7 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
         #         account_move_lines_to_reconcile |= line
         # account_move_lines_to_reconcile.reconcile()
 
-        self.register_id.state='done'
+        self.register_id.state = 'done'
         for invoice in self.register_id.invoice_ids:
             invoice.auto_set_to_done()
 

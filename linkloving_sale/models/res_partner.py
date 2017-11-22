@@ -20,6 +20,12 @@ class Partner(models.Model):
 
     team_id = fields.Many2one('crm.team')
 
+    def _get_default_user_id(self):
+        if self._context.get('default_customer'):
+            return self.env.user.id
+
+    user_id = fields.Many2one('res.users', default=_get_default_user_id)
+
     level = fields.Selection([
         (1, u'lst'),
         (2, u'2nd'),

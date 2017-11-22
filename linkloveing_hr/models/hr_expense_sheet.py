@@ -36,16 +36,26 @@ class HrExpenseSheet(models.Model):
 
     reject_reason = fields.Char(string=u'拒绝原因')
     has_payment_line_ids = fields.Boolean(compute='_compute_has_payment_line_ids')
+    payment_line_amount = fields.Float(string=u'暂支抵扣金额', compute='_compute_has_payment_line_ids')
     has_payment_ids = fields.Boolean(compute='_compute_has_payment_ids')
 
     @api.multi
     def action_cancel(self):
         for sheet in self:
+            # 取消过账分录
             if sheet.account_move_id:
+                sheet.account_move_id.button_cancel()
                 sheet.account_move_id.unlink()
-            if sheet.payment_line_ids:
-                for line in sheet.payment_line_ids:
+            # 取消暂支抵扣
+            if sheet.account_payment_line_ids:
+                for line in sheet.account_payment_line_ids:
                     line.unlink()
+            # 取消付款分录
+            if sheet.account_payment_ids:
+                for payment in sheet.account_payment_ids:
+                    payment.cancel()
+                    payment.unlink()
+
             sheet.state = 'approve'
 
     @api.multi
@@ -62,6 +72,7 @@ class HrExpenseSheet(models.Model):
         for sheet in self:
             if sheet.account_payment_line_ids:
                 sheet.has_payment_line_ids = True
+                sheet.payment_line_amount = sum(line.amount for line in sheet.account_payment_line_ids)
             else:
                 sheet.has_payment_line_ids = False
 

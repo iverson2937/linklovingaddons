@@ -11,9 +11,10 @@
                         <!--type="object" groups="base.group_erp_manager"-->
                         <!--class="oe_highlight o_expense_sheet_post"/>-->
 
-                        <button name="action_cancel" states="draft" string="取消过账"
+                        <button name="action_cancel" string="取消过账"
+                                confirm="确定取消过账吗？"
                                 type="object" groups="account.group_account_manager"
-                                state="post"
+                                states="post,done"
                                 class="oe_highlight o_expense_sheet_post"/>
                         <button name="hr_expense_sheet_post" states="draft" string="提交审核"
                                 type="object" groups="base.group_user"
