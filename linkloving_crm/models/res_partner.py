@@ -127,12 +127,7 @@ class ResPartner(models.Model):
 
     customer_sex = fields.Char(string=u'性别')
 
-    @api.model
-    def _default_image(self):
-        image_path = get_module_resource('hr', 'static/src/img', 'default_image.png')
-        return tools.image_resize_image_big(open(image_path, 'rb').read().encode('base64'))
-
-    customer_image = fields.Binary("Photo", attachment=True,
+    customer_image = fields.Binary("Photo",
                                    help="This field holds the image used as photo for the employee, limited to 1024x1024px.")
 
     def _compute_order_partner_question(self):
