@@ -7,24 +7,12 @@
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
 
+
                 <xpath expr="//field[@name='category_id']" position="after">
-                    <field name="crm_source_id" string="来源" attrs="{'invisible': [('customer','!=', True)]}"
-                           options="{'no_create':True}"/>
                     <field name="public_partners" invisible="1"/>
                     <field name="old_user_id" invisible="1"/>
-                </xpath>
-
-
-                <!--<xpath expr="//form/sheet/div/div/field[@name='company_name']" position="replace">-->
-                <!--<field name="company_name" placeholder="公司全称" attrs="{'invisible': [('is_company', '!=', True)]}"/>-->
-                <!--</xpath>-->
-
-
-                <!--<xpath expr="//field[@name='category_id']" position="attributes">-->
-                <!--<attribute name="required">True</attribute>-->
-                <!--</xpath>-->
-
-                <xpath expr="//field[@name='crm_source_id']" position="after">
+                    <field name="crm_source_id" string="来源" attrs="{'invisible': [('customer','!=', True)]}"
+                           options="{'no_create':True}"/>
                     <field name="customer_status" options="{'no_create':True}"
                            attrs="{'invisible':[('customer','=', False)]}"/>
                 </xpath>
@@ -39,25 +27,19 @@
                     <field name="detailed_address"/>
                 </xpath>
 
+
                 <!--创建联系人 di第一栏-->
-                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='comment']"
+                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='mobile']"
                        position="after">
-                    <field name="whatsapp"/>
-                </xpath>
-                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='whatsapp']"
-                       position="after">
-                    <field name="wechat"/>
-                </xpath>
-                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='wechat']"
-                       position="after">
-                    <field name="skype"/>
-                </xpath>
-                <xpath expr="//form/sheet/notebook/page/field[@name='child_ids']/form/sheet/group/group/field[@name='skype']"
-                       position="after">
-                    <field name="qq"/>
+                    <field name="im_tool"/>
+
+                    <field name="customer_social_platform"/>
+                    <field name="customer_birthday"/>
+                    <field name="customer_sex"/>
+                    <field name="customer_image" widget='image'/>
                 </xpath>
 
-                <!--zuo-->
+
                 <xpath expr="//field[@name='country_id']" position="after">
                     <field name="continent" placeholder="大洲"/>
                 </xpath>
@@ -67,11 +49,9 @@
                 </xpath>
 
                 <!--供应商显示的字段-->
-                   <xpath expr="//field[@name='email']" position="after">
+                <xpath expr="//field[@name='email']" position="after">
                     <field name="qq" attrs="{'invisible':[('customer','=',True)]}" string="QQ/旺旺/微信"/>
                 </xpath>
-
-
 
 
                 <xpath expr="//field[@name='lang']" position="after">
@@ -90,7 +70,6 @@
                     <field name="communication_identifier" invisible="1"/>
                 </xpath>
                 <xpath expr="//field[@name='lang']" position="after">
-                    <field name="priority" widget="priority" attrs="{'invisible':[('customer','=', False)]}"/>
                     <field name="customer_code" attrs="{'invisible':[('customer','!=',True)]}"/>
                     <field name="customer_alias" attrs="{'invisible':[('customer','!=',True)]}"/>
                     <field name="mutual_rule_id"/>
@@ -105,6 +84,25 @@
                     <page string="产品" attrs="{'invisible': True}">
                         <field name="interested_in_product" domain="[('sale_ok','=',True)]"
                                context="{'search_default_rteng':1,'search_default_filter_categ_id':1}"/>
+                    </page>
+                </xpath>
+
+
+                <xpath expr="//page[@name='internal_notes']" position="replace">
+
+                    <page name='internal_notes' string="客户信息">
+                        <group>
+                            <group string="信息">
+                                <field name="customer_bazaar"/>
+                                <field name="customer_scale"/>
+                                <field name="source_id" string="渠道"
+                                       attrs="{'invisible': [('customer','!=', True)]}"/>
+                                <field name="customer_store_number"/>
+                                <field name="customer_store_product_type"/>
+                                <field name="customer_user_group"/>
+                            </group>
+                            <field name="comment" placeholder="内部备注..."/>
+                        </group>
                     </page>
 
                     <page string="产品">
@@ -124,11 +122,6 @@
                 </xpath>
 
 
-                <!--<xpath expr="//page[@name='sales_purchases']/group/group/field[@name='user_id']" position="attributes">-->
-                <!--<attribute name="string">负责人</attribute>-->
-                <!--</xpath>-->
-
-
                 <xpath expr="//div[@name='button_box']" position="inside">
                     <button type="object"
                             name="action_view_question_order"
@@ -142,11 +135,29 @@
                             name="action_view_partner_img"
                             class="oe_stat_button"
                             icon="fa-photo fa-image fa-picture-o">
-                        <field name="partner_img_count" widget="statinfo" string="客户照片"/>
+                        <field name="partner_img_count" widget="statinfo" string="公司照片"/>
                     </button>
 
                 </xpath>
 
+
+                <!--you-->
+
+                <xpath expr="//field[@name='phone']" position="replace">
+                    <field name="priority" widget="priority" attrs="{'invisible':[('customer','=', False)]}"/>
+                </xpath>
+
+                <xpath expr="//field[@name='fax']" position="attributes">
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='email']" position="attributes">
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='lang']" position="attributes">
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
 
             </field>
         </record>
@@ -267,6 +278,61 @@
                 <xpath expr="//group/field[@name='team_id']" position="after">
                     <field name="mutual_customer_id" options="{'no_create':True}"/>
                 </xpath>
+            </field>
+        </record>
+
+
+        <record id="linkloving_view_partners_form_website" model="ir.ui.view">
+            <field name="name">res.partner.tree.sale</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="website_partner.view_partners_form_website"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//button[@name='website_publish_button']" position="attributes">
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="linkloving_res_partner_issues_button_view" model="ir.ui.view">
+            <field name="name">res.partner.issues.button.view.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="project_issue.res_partner_issues_button_view"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//button[@name='%(project_issue.action_view_issues)d']" position="attributes">
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+
+        <!--  Partners inherited form -->
+        <record id="linkloving_view_task_partner_info_form" model="ir.ui.view">
+            <field name="name">res.partner.task.buttons</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="project.view_task_partner_info_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//button[@name='%(project.action_view_task)d']" position="attributes">
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="linkloving_view_partners_form_crm1" model="ir.ui.view">
+            <field name="name">view.res.partner.form.crm.inherited1</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="crm.view_partners_form_crm1"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='meeting_count']" position="attributes">
+                    <attribute name='string'>日程</attribute>
+                </xpath>
+
             </field>
         </record>
 

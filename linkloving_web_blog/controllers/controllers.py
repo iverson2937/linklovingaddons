@@ -90,21 +90,25 @@ class LinklovingWebBlog(http.Controller):
         #     return request.render('linkloving_web_blog.web_blog_create_show', values)
 
         content = pq(kw.get('content'))
-        for a_html in content('img'):
-            # attachment_one = Model_Attachment.search([('datas', '=', pq(a_html).attr('src').split('base64,')[1])])
-            # if not attachment_one:
 
-            print pq(a_html).attr('src')
+        if content('img'):
+            for a_html in content('img'):
+                # attachment_one = Model_Attachment.search([('datas', '=', pq(a_html).attr('src').split('base64,')[1])])
+                # if not attachment_one:
+                # print pq(a_html).attr('src')
 
-            attachment_one = Model_Attachment.create({
-                'res_model': u'blog.post',
-                'name': pq(a_html).attr('data-filename') if pq(a_html).attr('data-filename') else u"截图",
-                'datas': pq(a_html).attr('src').split('base64,')[1] if ('base64,' in pq(a_html).attr('src')) else  pq(
-                    a_html).attr('src'),
-                'datas_fname': pq(a_html).attr('data-filename') if pq(a_html).attr('data-filename') else u"截图",
-                'public': True,
-            })
-            pq(a_html).attr('src', '/web/image/' + str(attachment_one.id))
+                attachment_one = Model_Attachment.create({
+                    'res_model': u'blog.post',
+                    'name': pq(a_html).attr('data-filename') if pq(a_html).attr('data-filename') else u"截图",
+                    'datas': pq(a_html).attr('src').split('base64,')[1] if (
+                        'base64,' in pq(a_html).attr('src')) else  pq(
+                        a_html).attr('src'),
+                    'datas_fname': pq(a_html).attr('data-filename') if pq(a_html).attr('data-filename') else u"截图",
+                    'public': True,
+                })
+                pq(a_html).attr('src', '/web/image/' + str(attachment_one.id))
+        else:
+            content = kw.get('content')
 
         attach = Model.create({
             'blog_id': http.request.env['blog.blog'].search([('name', '=', kw.get('blog_id'))]).id,
