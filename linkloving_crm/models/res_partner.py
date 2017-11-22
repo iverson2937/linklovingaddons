@@ -177,7 +177,7 @@ class ResPartner(models.Model):
                     #     vals['mutual_rule_id'] = vals.get('mutual_customer_id')
 
         res = super(ResPartner, self).create(vals)
-        if (not (vals.get('company_type') == 'person')) and res.customer:
+        if (not (res.company_type == 'person')) and res.customer:
             lead_vals = {
 
                 'name': "默认商机-" + str(res.name),
