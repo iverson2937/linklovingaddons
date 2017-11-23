@@ -98,12 +98,12 @@ class AccountPaymentRegister(models.Model):
     ], 'State', readonly=True, default='draft', track_visibility='onchange')
 
     account_payment_ids = fields.One2many('account.payment', 'res_id',
-                                          domain=[('model', '=', 'account.payment.register')])
+                                          domain=[('res_model', '=', 'account.payment.register')])
 
     @api.multi
     def _compute_has_payment_ids(self):
         for register in self:
-            if register.payment_ids:
+            if register.account_payment_ids:
                 register.has_payment_ids = True
             else:
                 register.has_payment_ids = False
