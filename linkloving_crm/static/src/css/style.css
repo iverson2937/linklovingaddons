@@ -59,3 +59,11 @@
     border:1px solid #94a0b4;
     color:#000
 }
+
+.test_img{
+    overflow: inherit!important;
+}
+.test_img>img{
+    width: 100%!important;
+    height:100% !important;
+}

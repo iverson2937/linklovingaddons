@@ -6,7 +6,13 @@ from odoo import models, fields, api
 class ResPartnerExtend(models.Model):
     _inherit = 'res.partner'
 
-    po_user_id = fields.Many2one(comodel_name="res.users", string=u"采购负责人", required=False)
+    def _get_default_po_user_id(self):
+        if self._context.get('default_supplier'):
+            return self.env.user.id
+
+
+    po_user_id = fields.Many2one(comodel_name="res.users", string=u"采购负责人", required=False,
+                                 default=_get_default_po_user_id)
 
 
 class PurchaseOrderExtend(models.Model):

@@ -34,6 +34,8 @@ class PlanMoWizard(models.TransientModel):
     @api.model
     def create(self, vals):
         mo = self.env["mrp.production"].browse(self._context.get("production_id"))
+        if mo.bom_id and mo.bom_id.state not in ('draft', 'release'):
+            raise UserError('BOM还没通过审核,请联系相关负责人')
         is_priority = vals.get("is_priority")
         mo_vals = vals.copy()
         mo_vals.update({
