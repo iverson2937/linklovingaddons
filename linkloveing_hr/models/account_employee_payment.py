@@ -135,6 +135,8 @@ class AccountEmployeePayment(models.Model):
     @api.multi
     def submit(self):
         self.state = 'confirm'
+        if not self.employee_id.department_id:
+            raise UserError('请设置员工所在部门')
 
         if self.employee_id == self.employee_id.department_id.manager_id:
             department = self.employee_id.department_id
