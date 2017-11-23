@@ -206,7 +206,7 @@ class AccountEmployeePayment(models.Model):
     @api.multi
     def manager3_approve(self):
 
-        self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
+        self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)], 'to_approve_id': False})
 
     @api.multi
     def post(self):
