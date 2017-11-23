@@ -219,7 +219,7 @@
 
                         </notebook>
 
-                        <field name="has_payment_ids"/>
+                        <field name="has_payment_ids" invisible="1"/>
 
                         <field name="has_payment_line_ids" invisible="1"/>
 
