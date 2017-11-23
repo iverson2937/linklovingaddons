@@ -97,6 +97,19 @@ class AccountPaymentRegister(models.Model):
         ('cancel', u'Cancel')
     ], 'State', readonly=True, default='draft', track_visibility='onchange')
 
+    account_payment_ids = fields.One2many('account.payment', 'res_id',
+                                          domain=[('model', '=', 'account.payment.register')])
+
+    @api.multi
+    def _compute_has_payment_ids(self):
+        for register in self:
+            if register.payment_ids:
+                register.has_payment_ids = True
+            else:
+                register.has_payment_ids = False
+
+    has_payment_ids = fields.Boolean(compute=_compute_has_payment_ids)
+
     _sql_constraints = {
         ('name_uniq', 'unique(name)',
          'Name must be unique!')
