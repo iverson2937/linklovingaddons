@@ -154,16 +154,24 @@
                 <xpath expr="//page[@name='internal_notes']" position="replace">
 
                     <page name='internal_notes' string="客户信息">
+
+                        <group>
+                            <label for="customer_country_id" string="市场"/>
+                            <div class="o_customer_country_id_format">
+                                <div>
+                                    <span>全世界 &#160;&#160;&#160;&#160;</span>
+                                    <field name="customer_is_world"/>
+                                </div>
+                                <field name="customer_continent" widget="many2many_tags" placeholder="大洲"
+                                       attrs="{'invisible': [('customer_is_world', '=', True)]}"/>
+                                <field name="customer_country_id" placeholder="国家" class="o_address_country"
+                                       widget="many2many_tags"
+                                       options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"
+                                       attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)],'invisible': [('customer_is_world', '=', True)]}"/>
+                            </div>
+                        </group>
                         <group>
                             <group>
-                                <label for="customer_country_id" string="市场"/>
-                                <div class="o_customer_country_id_format">
-                                    <field name="customer_country_id" placeholder="国家" class="o_address_country"
-                                           widget="many2many_tags"
-                                           options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"
-                                           attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
-                                    <field name="customer_continent" widget="many2many_tags" placeholder="大洲"/>
-                                </div>
                                 <!--<field name="customer_bazaar"/>-->
                                 <field name="customer_scale"/>
                                 <field name="source_id" string="渠道"

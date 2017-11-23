@@ -129,7 +129,8 @@ class ResPartner(models.Model):
                                    help="This field holds the image used as photo for the employee, limited to 1024x1024px.")
 
     customer_country_id = fields.Many2many('res.country', string=u'国家')  # 市场
-    customer_continent = fields.Many2many('crm.continent', string=u'所属大洲')  # 市场
+    customer_continent = fields.Many2many('crm.continent', string=u'大洲')  # 市场
+    customer_is_world = fields.Boolean(string=u'世界')  # 市场
 
     def _compute_order_partner_question(self):
         for partner in self:
