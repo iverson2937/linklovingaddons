@@ -34,25 +34,19 @@ odoo.define('linkloving_product_query.product_query', function (require) {
 
     function execute_query_action() {
         console.log("execute_query_action");
-
+        this.select_ids;
         var self = this;
-        this.do_action({
-            'name': '',
-            type: 'ir.actions.client',
-            tag: 'query',
-            params: {
-                model: this.dataset.model,
-                // this.dataset.get_context() could be a compound?
-                // not sure. action's context should be evaluated
-                // so safer bet. Odd that timezone & al in it
-                // though
-                context: this.getParent().action.context,
+        var action = {
+            type: 'ir.actions.act_window',
+            res_model: 'manual.procurement.order',
+            view_mode: 'form',
+            view_type: 'form,kanban,tree',
+            views: [[false, 'form']],
+            context: {
+                'selected_product_ids': this.select_ids
             }
-        }, {
-            on_reverse_breadcrumb: function () {
-                return self.reload();
-            },
-        });
+        };
+        this.do_action(action);
         return false;
     }
 
@@ -72,6 +66,7 @@ odoo.define('linkloving_product_query.product_query', function (require) {
                 add_button = true;
             }
             this._super.apply(this, arguments); // Sets this.$buttons
+            //var is_show_procuremnt_create_btn = this.options.action && this.options.action.context.is_show_procuremnt_create_btn
             if (add_button) {
                 this.$buttons.on('click', '.o_button_query', execute_query_action.bind(this));
                 //default is false, nothing selected
@@ -82,15 +77,13 @@ odoo.define('linkloving_product_query.product_query', function (require) {
             // uncheck header hook if at least one row has been deselected
             // console.log("do_select");
 
-            if (deselected) {
-                this.$('thead .o_list_record_selector input').prop('checked', false);
-        }
-
             if (!ids.length) {
                 $('.o_button_query').prop('disabled', true);
             } else {
+
                 $('.o_button_query').prop('disabled', false);
             }
+            this.select_ids = ids;
             return this._super(ids, records, deselected);
         },
     });

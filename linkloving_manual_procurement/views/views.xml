@@ -1,0 +1,122 @@
+<openerp>
+    <data>
+
+        <template id="base_query" name="linkloving_base_query" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+
+                <script type="text/javascript" src="/linkloving_manual_procurement/static/src/js/query.js"/>
+            </xpath>
+        </template>
+
+        <record id="manual_procurement_order_tree_view" model="ir.ui.view">
+            <field name="name">manual.procurement.order.tree</field>
+            <field name="model">manual.procurement.order</field>
+            <field name="arch" type="xml">
+                <tree string="需求单">
+                    <field name="name"/>
+                    <field name="alia_name"/>
+                    <field name="date_excepted"/>
+                    <field name="state"/>
+                    <field name="create_date"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="manual_procurement_order_form_view" model="ir.ui.view">
+            <field name="name">manual.procurement.order.form</field>
+            <field name="model">manual.procurement.order</field>
+            <field name="arch" type="xml">
+                <form string="需求单" options="{'asd':'12312'}">
+                    <header>
+                        <button string="确认需求"
+                                name="action_confirm_procurement"
+                                type="object"
+                                class="btn-primary"
+                                states="draft"
+                                confirm="点击确认会生成对应的制造单以及采购单"/>
+                        <!---->
+                        <button string="取消需求"
+                                name="action_cancel_procurement"
+                                type="object"
+                                class="btn-primary"
+                                states="confirmed"
+                                confirm="点击确认会取消对应的制造单以及采购单"/>
+
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
+                    </header>
+                    <sheet>
+
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="New" nolabel="1" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="alia_name"/>
+                                <field name="date_excepted" required="1"
+                                       attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            </group>
+                            <group>
+                                <field name="create_date" readonly="1" string="创建时间"/>
+                                <field name="remark"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="产品明细">
+                                <field name="procurement_line_ids" attrs="{'readonly': [('state', '!=', 'draft')]}">
+                                    <tree editable="bottom" decoration-success="qty_done==qty_ordered">
+                                        <field name="product_id"/>
+                                        <button name="show_product_detail" type="object" string="详细"/>
+                                        <field name="inner_code" readonly="1"/>
+                                        <field name="inner_spec" readonly="1"/>
+                                        <field name="qty_available" readonly="1" string="库存"/>
+                                        <field name="qty_ordered"/>
+                                        <field name="qty_done"/>
+                                        <field name="state"/>
+                                    </tree>
+                                    <form>
+                                        <group>
+                                            <group>
+                                                <field name="product_id"/>
+                                                <field name="inner_code" readonly="1"/>
+                                                <field name="inner_spec" readonly="1"/>
+                                            </group>
+                                            <group>
+                                                <field name="qty_available" readonly="1" string="库存"/>
+                                                <field name="qty_ordered"/>
+                                            </group>
+                                        </group>
+                                    </form>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+
+                </form>
+            </field>
+        </record>
+        <record id="action_manual_procurement_order" model="ir.actions.act_window">
+            <field name="name">manual.procurement.order</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">manual.procurement.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p>
+                <p>
+                    <!-- More details about what a user can do with this object will be OK -->
+                </p>
+            </field>
+        </record>
+
+        <menuitem
+                id="menu_manual_procurement_order"
+                parent="sales_team.menu_base_partner"
+                sequence="3"
+                name="生产需求单"
+                action="action_manual_procurement_order"/>
+
+    </data>
+</openerp>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sequence_manual_procurement_order" model="ir.sequence">
+            <field name="name">manual.procurement.order</field>
+            <field name="code">manual.procurement.order</field>
+            <field name="prefix">PR%(year)s%(month)s%(day)s</field>
+            <field eval="1" name="number_next"/>
+            <field eval="1" name="number_increment"/>
+            <field name="padding">4</field>
+        </record>
+
+        <record model="ir.rule" id="manual_procurement_order_rule">
+            <field name="name">需求单multi-company</field>
+            <field name="model_id" search="[('model','=','manual.procurement.order')]" model="ir.model"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|',('company_id','child_of',[user.company_id.id]),('company_id','=',False)]
+            </field>
+        </record>
+    </data>
+</odoo>
