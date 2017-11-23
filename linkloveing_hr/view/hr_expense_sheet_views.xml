@@ -12,6 +12,7 @@
                         <!--class="oe_highlight o_expense_sheet_post"/>-->
 
                         <button name="action_cancel" string="取消过账"
+                                confirm="确定取消过账吗？"
                                 type="object" groups="account.group_account_manager"
                                 states="post,done"
                                 class="oe_highlight o_expense_sheet_post"/>
