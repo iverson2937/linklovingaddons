@@ -116,7 +116,7 @@ class LinklovingWebBlog(http.Controller):
             'subtitle': kw.get('subtitle'),
             'tag_ids': http.request.env['blog.tag'].search(
                 [('name', '=', kw.get('blog_tag_type_id'))]).id,
-            'content': content,
+            'content': (str(content)).decode("unicode-escape"),
             'keyword': kw.get('keyword'),
         })
         print attach
