@@ -152,7 +152,21 @@
                                        domain="[('partner_id','=', partner_id),('remain_apply_balance','!=',0 ),('payment_ids','=',False)]"/>
 
                             </page>
+                            <page string="付款信息" attrs="{'invisible':[('has_payment_ids','=',False)]}">
+                                <field name="account_payment_ids" readonly="1">
+                                    <tree>
+                                        <field name="display_name"/>
+                                        <field name="payment_date"/>
+                                        <field name="journal_id"/>
+                                        <field name="amount" sum="总计"/>
+                                    </tree>
+                                </field>
+
+
+                            </page>
+
                         </notebook>
+                        <field name="has_payment_ids" invisible="1"/>
                     </sheet>
                     <div class="oe_chatter">
                         <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
