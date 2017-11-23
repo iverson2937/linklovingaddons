@@ -117,18 +117,19 @@ class ResPartner(models.Model):
 
     customer_user_group = fields.Char(string=u'用户群体')
 
-    customer_bazaar = fields.Selection([('country', u'国家'), ('continent', u'大洲'), ('global', u'全球')], string=u'市场')
+    # customer_bazaar = fields.Selection([('country', u'国家'), ('continent', u'大洲'), ('global', u'全球')], string=u'市场')
 
     customer_social_platform = fields.Char(string=u'社交平台')
 
-    customer_birthday = fields.Char(string=u'生日')
+    customer_birthday = fields.Date(string=u'生日')
 
-    customer_sex = fields.Char(string=u'性别')
+    customer_sex = fields.Selection([('man', '男'), ('woman', '女')], string=u'性别')
 
-    customer_sex = fields.Char(string=u'性别')
-
-    customer_image = fields.Binary("Photo",
+    customer_image = fields.Binary(u"照片",
                                    help="This field holds the image used as photo for the employee, limited to 1024x1024px.")
+
+    customer_country_id = fields.Many2many('res.country', string=u'国家')  # 市场
+    customer_continent = fields.Many2many('crm.continent', string=u'所属大洲')  # 市场
 
     def _compute_order_partner_question(self):
         for partner in self:
