@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <report
+                string="打印申购"
+                id="action_report_hr_purchase_report"
+                model="hr.purchase.apply"
+                report_type="qweb-pdf"
+                name="linkloving_hr_purchase_apply.hr_purchase_apply_sheet"
+                file="linkloving_hr_purchase_apply.hr_purchase_apply_sheet"
+        />
+    </data>
+</openerp>
