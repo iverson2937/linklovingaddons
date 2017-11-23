@@ -1268,10 +1268,11 @@ class ReturnOfMaterial(models.Model):
     def _prepare_move_values(self, product):
         self.ensure_one()
 
-        # if product.product_type == 'semi-finished':
-        #     move_type = 'manufacturing_mo_in'
-        # elif product.product_type == 'material':
-        #     move_type = 'manufacturing_rejected_out'
+        move_type = 'null'
+        if product.product_type == 'semi-finished':
+            move_type = 'manufacturing_mo_in'
+        elif product.product_type == 'material':
+            move_type = 'manufacturing_rejected_out'
 
         return {
             'name': '退料 %s' % self.production_id.name,
@@ -1285,7 +1286,7 @@ class ReturnOfMaterial(models.Model):
             'state': 'confirmed',
             'origin': '退料 %s' % self.production_id.name,
             'is_return_material': True,
-            # 'move_order_type': move_type,
+            'move_order_type': move_type,
             # 'restrict_partner_id': self.owner_id.id,
             # 'picking_id': self.picking_id.id
         }
@@ -1444,6 +1445,7 @@ class SimStockMove(models.Model):
     bom_line_id = fields.Many2one(comodel_name='mrp.bom.line', compute='_compute_bom_line_id')
 
     remaining_qty = fields.Float(string=u"待领数量", compute='_compute_remaining_qty')
+
 
 class ReturnMaterialLine(models.Model):
     _name = 'return.material.line'

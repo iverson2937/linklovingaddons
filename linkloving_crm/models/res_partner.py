@@ -6,6 +6,8 @@
 from datetime import date, time, datetime, timedelta
 from odoo import fields, api, models
 from odoo.exceptions import UserError
+from odoo import tools, _
+from odoo.modules.module import get_module_resource
 
 AVAILABLE_PRIORITIES = [
     ('0', 'badly'),
@@ -75,7 +77,11 @@ class ResPartner(models.Model):
     whatsapp = fields.Char(string=u'WhatsApp')
     wechat = fields.Char(string=u'微信')
 
+    im_tool = fields.Char(string=u'即时通讯工具')
+
     crm_source_id = fields.Many2one('crm.lead.source', string=u'来源')
+
+    source_id = fields.Many2one('res.partner.source')
 
     customer_status = fields.Many2one('message.order.status', string=u'客户状态')
     is_order = fields.Boolean(string=u'订单记录', readonly=True, compute='_compute_is_order', store=True)
@@ -90,7 +96,7 @@ class ResPartner(models.Model):
 
     partner_img_count = fields.Integer(compute='_compute_order_partner_question', string=u'客户照片')
 
-    public_partners = fields.Selection([('public', '公海'), ('buffer', '缓冲区'), ('private', '私有')], string=u'公海')
+    public_partners = fields.Selection([('public', u'公海'), ('buffer', u'缓冲区'), ('private', u'私有')], string=u'公海')
 
     old_user_id = fields.Char(string=u'前销售员')
 
@@ -101,6 +107,30 @@ class ResPartner(models.Model):
         ('customer_code', 'unique (customer_code)', u'客户简码不能重复.'),
         ('customer_alias', 'unique (customer_code)', u'客户简称不能重复.'),
     ]
+
+    customer_scale = fields.Selection(
+        [('1', u'1-10人'), ('2', u'10-49人'), ('3', u'50-100人'), ('4', u'100-500人'), ('5', u'500人以上')], string=u'规模')
+
+    customer_store_number = fields.Integer(string=u'门店数量')
+
+    customer_store_product_type = fields.Char(string=u'门店主营产品类型')
+
+    customer_user_group = fields.Char(string=u'用户群体')
+
+    # customer_bazaar = fields.Selection([('country', u'国家'), ('continent', u'大洲'), ('global', u'全球')], string=u'市场')
+
+    customer_social_platform = fields.Char(string=u'社交平台')
+
+    customer_birthday = fields.Date(string=u'生日')
+
+    customer_sex = fields.Selection([('man', '男'), ('woman', '女')], string=u'性别')
+
+    customer_image = fields.Binary(u"照片",
+                                   help="This field holds the image used as photo for the employee, limited to 1024x1024px.")
+
+    customer_country_id = fields.Many2many('res.country', string=u'国家')  # 市场
+    customer_continent = fields.Many2many('crm.continent', string=u'大洲')  # 市场
+    customer_is_world = fields.Boolean(string=u'世界')  # 市场
 
     def _compute_order_partner_question(self):
         for partner in self:
@@ -144,7 +174,7 @@ class ResPartner(models.Model):
                     #     vals['mutual_rule_id'] = vals.get('mutual_customer_id')
 
         res = super(ResPartner, self).create(vals)
-        if res.customer:
+        if (not (res.company_type == 'person')) and res.customer:
             lead_vals = {
 
                 'name': "默认商机-" + str(res.name),
