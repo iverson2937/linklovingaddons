@@ -376,7 +376,7 @@ class StockMovePicking(models.Model):
         ('manufacturing_orders', u'制造入库'), ('manufacturing_picking', u'制造领料'), ('null', u' '),
         ('inventory_in', u'盘点入库'), ('inventory_out', u'盘点出库'), ('hand_movement_out', u'手动出库')
         , ('project_picking', u'工程领料'), ('manufacturing_rejected_out', u'清点退料'),
-        ('manufacturing_mo_in', u'MO取消入库')], string=u'类型')
+        ('manufacturing_mo_in', u'制造退料')], string=u'类型')
 
     reason_stock = fields.Text(string="操作原因")
 

@@ -25,6 +25,8 @@ class AccountEmployeePayment(models.Model):
                                   default=lambda self: self.env['hr.employee'].search([('user_id', '=', self.env.uid)],
                                                                                       limit=1))
 
+
+
     @api.multi
     def refuse_payment(self, reason):
         self.write({'state': 'cancel', 'approve_ids': [(4, self.env.user.id)]})
@@ -135,6 +137,8 @@ class AccountEmployeePayment(models.Model):
     @api.multi
     def submit(self):
         self.state = 'confirm'
+        if not self.employee_id.department_id:
+            raise UserError('请设置员工所在部门')
 
         if self.employee_id == self.employee_id.department_id.manager_id:
             department = self.employee_id.department_id
@@ -177,6 +181,12 @@ class AccountEmployeePayment(models.Model):
         create_remark_comment(self, u'1级审核')
 
     @api.multi
+    def create_message_post(self, body_str):
+        for sheet in self:
+            body = body_str
+            sheet.message_post(body=body)
+
+    @api.multi
     def cancel(self):
 
         self.state = 'cancel'
@@ -204,7 +214,7 @@ class AccountEmployeePayment(models.Model):
     @api.multi
     def manager3_approve(self):
 
-        self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
+        self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)], 'to_approve_id': False})
 
     @api.multi
     def post(self):

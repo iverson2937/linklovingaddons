@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo.addons import decimal_precision as dp
 import jpush
 from linklovingaddons.linkloving_app_api.models.models import JPushExtend
@@ -222,6 +222,12 @@ class PurchaseApplyLine(models.Model):
     def _compute_amount(self):
         for line in self:
             line.sub_total = line.price_unit * line.product_qty
+
+    @api.one
+    @api.constrains('amount')
+    def _check_amount(self):
+        if not self.amount > 0.0:
+            raise ValidationError('金额必须大于0.')
 
     @api.multi
     def name_get(self):

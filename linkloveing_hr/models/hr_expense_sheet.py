@@ -10,6 +10,11 @@ class HrExpenseSheet(models.Model):
     _inherit = 'hr.expense.sheet'
     _rec_name = 'expense_no'
 
+    sheet_type = fields.Selection([
+        ('normal', '普通报销'),
+        ('purchase', '申购报销'),
+    ], default='normal')
+
     @api.depends('expense_line_ids')
     def _get_full_name(self):
         name = ''
@@ -21,7 +26,10 @@ class HrExpenseSheet(models.Model):
     account_payment_ids = fields.One2many('account.payment', 'res_id', domain=[('res_model', '=', 'hr.expense.sheet')])
     expense_no = fields.Char(default=lambda self: _('New'))
     approve_ids = fields.Many2many('res.users')
-    is_deduct_payment = fields.Boolean(default=False)
+    is_deduct_payment = fields.Selection([
+        (1, '是'),
+        (0, '否')
+    ])
     pre_payment_reminding = fields.Float(related='employee_id.pre_payment_reminding')
     product_id = fields.Many2one(related='expense_line_ids.product_id')
     account_id = fields.Many2one(related='expense_line_ids.account_id')

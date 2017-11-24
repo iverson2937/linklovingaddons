@@ -25,7 +25,6 @@ class Partner(models.Model):
             return self.env.user.id
 
     user_id = fields.Many2one('res.users', default=_get_default_user_id)
-    source_id = fields.Many2one('res.partner.source')
 
     level = fields.Selection([
         (1, u'lst'),

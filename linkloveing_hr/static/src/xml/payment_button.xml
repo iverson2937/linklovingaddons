@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+
+    <t t-name="ShowPrePayment">
+        <div>
+            <t>
+                <div>
+                    <button>去抵扣</button>
+                </div>
+            </t>
+
+        </div>
+    </t>
+
+
+</templates>
