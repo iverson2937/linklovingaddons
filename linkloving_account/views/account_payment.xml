@@ -23,18 +23,7 @@
             </field>
         </record>
 
-        <record id="view_account_payment_invoice_form" model="ir.ui.view">
-            <field name="name">account.payment.invoice.form</field>
-            <field name="model">account.payment</field>
-            <field name="inherit_id" ref="account.view_account_payment_invoice_form"/>
-            <field name="arch" type="xml">
 
-
-                <xpath expr="//field[@name='amount']" position="replace">
-                    <field name="amount" readonly="1"/>
-                </xpath>
-            </field>
-        </record>
         <record id="view_account_payment_form_inherit" model="ir.ui.view">
             <field name="name">account.payment.form.inherit</field>
             <field name="model">account.payment</field>
@@ -42,15 +31,11 @@
             <field name="arch" type="xml">
 
 
-                <xpath expr="//field[@name='amount']" position="replace">
-                    <field name="amount"/>
-                </xpath>
-
-                <xpath expr="//button[@name='post']" position="after">
-                <button name="set_to_cancel" class="oe_highlight" string="取消" states="posted,sent,confirm"
-                groups="account.group_account_user"
-                type="object" confirm="确定取消这张收款单吗？"/>
-                </xpath>
+                <!--<xpath expr="//button[@name='post']" position="after">-->
+                <!--<button name="set_to_cancel" class="oe_highlight" string="取消" states="posted,sent,confirm"-->
+                <!--groups="account.group_account_user"-->
+                <!--type="object" confirm="确定取消这张收款单吗？"/>-->
+                <!--</xpath>-->
                 <!--<xpath expr="//button[@name='post']" position="after">-->
                     <!--<button name="set_to_post" class="oe_highlight" string="设置"-->
                             <!--groups="base.group_erp_manager"-->

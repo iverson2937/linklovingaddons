@@ -33,28 +33,41 @@
             <field name="arch" type="xml">
                 <form string="">
                     <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="New" nolabel="1" readonly="1"/>
+                            </h1>
+                        </div>
+
                         <group>
-                            <field name="report_start_time"/>
-                            <field name="report_end_time"/>
-                            <field name="state"/>
+                            <group>
+                                <field name="report_start_time"/>
+                                <field name="report_end_time"/>
+                                <field name="state"/>
+                            </group>
+                            <group>
+                                <field name="report_type"/>
+                                <field name="total_orderpoint_count"/>
+                                <field name="note"/>
+                            </group>
                         </group>
-                        <group>
-                            <field name="report_type"/>
-                            <field name="total_orderpoint_count"/>
-                            <field name="note"/>
-                        </group>
+
                         <notebook>
                             <page string="报告条目">
-                                <group>
                                     <field name="report_line_ids">
                                         <tree>
                                             <field name="product_id"/>
+                                            <button name="show_product_detail" type="object" string="详细"/>
                                             <field name="production_id"/>
                                             <field name="order_qty"/>
+                                            <field name="qty_available"/>
+                                            <field name="reordering_min_qty"/>
+                                            <field name="reordering_max_qty"/>
+                                            <field name="virtual_available"/>
+                                            <field name="incoming_qty"/>
                                             <field name="orderpoint_id"/>
                                         </tree>
                                     </field>
-                                </group>
                             </page>
                         </notebook>
                     </sheet>
@@ -93,7 +106,7 @@
         <menuitem id="menuitem_mrp_report"
                   action="action_see_mrp_report"
                   name="MRP运算报告"
-                  parent="stock.menu_warehouse_report"
+                  parent="mrp.menu_mrp_reporting"
                   sequence="1"
                   groups="base.group_user"/>
     </data>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <template id="linkloving_hr_purchase_apply.hr_purchase_apply_sheet">
+            <t t-call="report.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-if="o.state in ['approve']">
+                        <t t-call="report.external_layout">
+                            <div class="page">
+                                <div class="row">
+                                    <div class="col-xs-4">
+                                        <h2>申购单</h2>
+                                    </div>
+                                    <div class="col-xs-offset-4 ">
+                                        <!--<strong>报销单号:</strong>-->
+                                        <h2>
+                                            <span t-field="o.name"></span>
+                                        </h2>
+                                    </div>
+
+                                </div>
+                                <div class="row mt32 mb32">
+                                    <!--<div class="col-xs-2">-->
+                                    <!--<strong>报销单号:</strong>-->
+                                    <!--<p t-field="o.expense_no"/>-->
+                                    <!--</div>-->
+                                    <div class="col-xs-2">
+                                        <strong>员工:</strong>
+                                        <p t-field="o.employee_id.name"/>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <strong>部门:</strong>
+                                        <p t-field="o.department_id"/>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <strong>申请日期:</strong>
+                                        <p t-field="o.apply_date"/>
+                                    </div>
+                                    <!--<div class="col-xs-5">-->
+                                    <!--<strong>Description:</strong>-->
+                                    <!--<p t-field="o.name"/>-->
+                                    <!--</div>-->
+                                    <!--<div class="col-xs-2">-->
+                                    <!--<strong>Validated By:</strong>-->
+                                    <!--<p t-field="o.responsible_id"/>-->
+                                    <!--</div>-->
+                                    <!--<div class="col-xs-2">-->
+                                    <!--<strong>Payment By:</strong>-->
+                                    <!--<p t-field="o.payment_mode"/>-->
+                                    <!--</div>-->
+                                </div>
+
+                                <table class="table table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th>名称</th>
+                                            <th>单价</th>
+                                            <th>税费</th>
+                                            <th class="text-center">数量</th>
+                                            <th class="text-right">小计</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="o.line_ids" t-as="line">
+
+                                            <td>
+                                                <span t-field="line.product_id.name"/>
+                                                <span t-field="line.description"/>
+                                                <br/>
+                                            </td>
+                                            <td style="text-center">
+                                            </td>
+                                            <td>
+                                                <span t-field="line.price_unit"/>
+                                            </td>
+                                            <td>
+                                                <t t-foreach="line.tax_id" t-as="tax">
+                                                    <t t-if="tax.description">
+                                                        <span t-field="tax.description"/>
+                                                    </t>
+                                                    <t t-if="not tax.description">
+                                                        <span t-field="tax.name"/>
+                                                    </t>
+                                                </t>
+                                            </td>
+                                            <td class="text-center">
+                                                <span t-field="line.product_qty"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-field="line.sub_total"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="row">
+                                    <div class="col-xs-4 pull-right">
+                                        <table class="table table-condensed">
+                                            <tr class="border-black">
+                                                <td>
+                                                    <strong>总计</strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-field="o.total_amount"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!--<p>Certified honest and conform,<br/>(Date and signature).-->
+                                <!--<br/>-->
+                                <!--<br/>-->
+                                <!--</p>-->
+                                <div class="row">
+                                    <div class="col-xs-offset-9">
+                                        <strong>制单人:</strong>
+                                        <span t-field="o.create_uid.name"></span>
+                                    </div>
+                                </div>
+                                <br/>
+                                <div class="row">
+                                    <!--<div class="col-xs-3">-->
+                                    <!--<strong>总经理:</strong>-->
+                                    <!--</div>-->
+                                    <!--<div class="col-xs-3">-->
+                                    <!--<strong>财务:</strong>-->
+                                    <!--</div>-->
+                                    <div class="col-xs-3">
+                                        <strong>部门主管:</strong>
+                                    </div>
+
+                                </div>
+                                <!--<div class="row">-->
+                                <!--<div class="col-xs-6">-->
+                                <!--<strong>经理Email:</strong>-->
+                                <!--<span t-field="o.employee_id.parent_id.work_email"></span>-->
+                                <!--</div>-->
+                                <!--<div class="col-xs-6">-->
+                                <!--<strong>总经理Email:</strong>-->
+                                <!--<span t-field="o.employee_id.parent_id.parent_id.work_email"></span>-->
+                                <!--</div>-->
+                                <!--</div>-->
+                                <br/>
+                                <br/>
+                            </div>
+                        </t>
+                    </t>
+                    <t t-if="o.state not in ['approve']">
+                        <div>ddddddddddd</div>
+                    </t>
+
+
+                </t>
+
+            </t>
+        </template>
+    </data>
+</openerp>

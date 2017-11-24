@@ -11,7 +11,11 @@
                         <!--type="object" groups="base.group_erp_manager"-->
                         <!--class="oe_highlight o_expense_sheet_post"/>-->
 
-
+                        <button name="action_cancel" string="取消过账"
+                                confirm="确定取消过账吗？"
+                                type="object" groups="account.group_account_manager"
+                                states="post,done"
+                                class="oe_highlight o_expense_sheet_post"/>
                         <button name="hr_expense_sheet_post" states="draft" string="提交审核"
                                 type="object" groups="base.group_user"
                                 class="oe_highlight o_expense_sheet_post"/>
@@ -28,12 +32,12 @@
                                 groups="hr_expense.group_hr_expense_user" class="oe_highlight o_expense_sheet_approve"
                                 attrs="{'invisible':['|',('is_show','=',False),('state','!=','submit')]}"
                         />
-                        <button name="manager2_approve" states="manager1_approve" string="Approve" type="object"
+                        <button name="manager2_approve" string="Approve" type="object"
                                 groups="hr_expense.group_hr_expense_user"
                                 attrs="{'invisible':['|',('is_show','=',False),('state','!=','manager1_approve')]}"
                                 class="oe_highlight o_expense_sheet_approve"/>
-                        <button name="manager3_approve" states="manager2_approve" string="Approve" type="object"
-                                groups="linkloveing_hr.group_hr_expense_user"
+                        <button name="manager3_approve" string="Approve" type="object"
+                                groups="hr_expense.group_hr_expense_manager"
                                 attrs="{'invisible':['|',('is_show','=',False),('state','!=','manager2_approve')]}"
                                 class="oe_highlight"/>
                         <button name="%(hr_expense.hr_expense_refuse_wizard_action)d"
@@ -95,89 +99,132 @@
                                 <field name="account_move_id" invisible="1"/>
                             </group>
                         </group>
-                        <field name="expense_line_ids"
-                               attrs="{'readonly':[('state','not in',('done','draft','cancel','approve'))]}"
-                               context="{'default_employee_id':employee_id,'default_department_id':department_id,'default_state':'draft'}">
-                            <tree editable="bottom">
-                                <field name="product_id" options="{'no_create':True}"/>
-                                <field name="state" invisible="1"/>
-                                <field name="account_id" groups="account.group_account_user"
-                                       attrs="{'no_create':True}"/>
-                                <field name="unit_amount" sum="Total Amount" widget="monetary" string="金额"
-                                       readonly="0"/>
-                                <field name="analytic_account_id" groups="analytic.group_analytic_accounting"
-                                       invisible="1"/>
-                                <field name="message_unread" invisible="1"/>
-                                <field name="attachment_number" invisible="1"/>
-                                <field name="attachment_number" string=" "/>
-                                <button name="action_get_attachment_view" string="View Attachments" type="object"
-                                        icon="fa-paperclip"/>
-                                <field name="analytic_account_id" string="项目" options="{'no_create':True}"/>
-                                <field name="sale_id" string="订单" options="{'no_create':True}"/>
-                                <field name="quantity" groups="account.group_account_user"/>
-                                <field name="tax_ids" widget="many2many_tags"/>
-                                <field name="name"/>
-                                <field name="employee_id" required="1" invisible="1"/>
-                                <field name="department_id" required="1" invisible="1"/>
-                                <field name="state" invisible="1"/>
-                                <field name="description" groups="account.group_account_user"/>
-                            </tree>
-                            <form>
-                                <sheet>
-                                    <div class="oe_button_box">
-                                        <button name="action_get_attachment_view"
-                                                class="oe_stat_button"
-                                                icon="fa-book"
-                                                type="object">
-                                            <field name="attachment_number" widget="statinfo" string="Documents"/>
-                                        </button>
-                                    </div>
-                                    <div class="oe_title">
-                                        <label for="name"/>
-                                        <h1>
-                                            <field name="name" placeholder="e.g. Lunch with Customer"/>
-                                        </h1>
-                                    </div>
-                                    <group>
-                                        <group>
-                                            <field name="product_id" context="{'default_can_be_expensed': 1}"
-                                                   options="{'no_create':True}"/>
-                                            <field name="unit_amount" required="1" widget="monetary"
-                                                   options="{'currency_field': 'currency_id'}" string="金额"/>
-                                            <field name="quantity" class="oe_inline" invisible="1"/>
-                                            <field name="product_uom_id" widget="selection" class="oe_inline"
-                                                   groups="product.group_uom" invisible="1"/>
-                                            <field name="tax_ids" domain="[('type_tax_use', '=', 'purchase')]"
-                                                   widget="many2many_tags" options="{'no_create':True}"/>
-                                        </group>
-                                        <group>
-                                            <field name="reference"/>
-                                            <field name="doc" widget="binary"/>
-                                            <field name="date"/>
-                                            <field name="state" invisible="1"/>
-                                            <field name="account_id"/>
-                                            <field name="employee_id" readonly="1" required="1"/>
-                                            <field name="department_id" readonly="1" required="1"/>
-                                            <field name="sheet_id" invisible="1"/>
-                                            <field name="currency_id" groups="base.group_multi_currency" invisible="1"/>
-                                            <field name="analytic_account_id"
-                                                   groups="analytic.group_analytic_accounting" string="项目"
-                                                   options="{'no_create':True}"/>
-                                            <field name="company_id" groups="base.group_multi_company"/>
-                                        </group>
-                                        <group>
-                                            <field name="total_amount" widget='monetary'
-                                                   options="{'currency_field': 'currency_id'}" invisible="1"/>
-                                            <div>
-                                                <field name="payment_mode" widget="radio" invisible="1"/>
+
+                        <notebook colspan="1">
+                            <page string='报销明细'>
+                                <field name="expense_line_ids"
+                                       attrs="{'readonly':[('state','not in',('done','draft','cancel','approve'))]}"
+                                       context="{'default_employee_id':employee_id,'default_department_id':department_id,'default_state':'draft'}">
+                                    <tree editable="bottom">
+                                        <field name="name" string="消费用途"/>
+                                        <field name="product_id" options="{'no_create':True}" string="费用类别"/>
+                                        <field name="state" invisible="1"/>
+                                        <field name="account_id" groups="account.group_account_user"
+                                               attrs="{'no_create':True}"/>
+                                        <field name="unit_amount" sum="Total Amount" widget="monetary" string="金额"
+                                               readonly="0"/>
+                                        <field name="analytic_account_id" groups="analytic.group_analytic_accounting"
+                                               invisible="1"/>
+                                        <field name="message_unread" invisible="1"/>
+                                        <field name="attachment_number" invisible="1"/>
+                                        <field name="attachment_number" string=" "/>
+                                        <button name="action_get_attachment_view" string="View Attachments"
+                                                type="object"
+                                                icon="fa-paperclip"/>
+                                        <field name="analytic_account_id" string="项目" options="{'no_create':True}"/>
+                                        <field name="sale_id" string="订单" options="{'no_create':True}"/>
+                                        <field name="quantity" groups="account.group_account_user"/>
+                                        <field name="tax_ids" widget="many2many_tags"/>
+                                        <field name="employee_id" required="1" invisible="1"/>
+                                        <field name="department_id" required="1" invisible="1"/>
+                                        <field name="state" invisible="1"/>
+                                        <field name="description" groups="account.group_account_user"/>
+                                    </tree>
+                                    <form>
+                                        <sheet>
+                                            <div class="oe_button_box">
+                                                <button name="action_get_attachment_view"
+                                                        class="oe_stat_button"
+                                                        icon="fa-book"
+                                                        type="object">
+                                                    <field name="attachment_number" widget="statinfo"
+                                                           string="Documents"/>
+                                                </button>
                                             </div>
-                                        </group>
+                                            <div class="oe_title">
+                                                <label for="name"/>
+                                                <h1>
+                                                    <field name="name" placeholder="e.g. Lunch with Customer"/>
+                                                </h1>
+                                            </div>
+                                            <group>
+                                                <group>
+                                                    <field name="product_id" context="{'default_can_be_expensed': 1}"
+                                                           options="{'no_create':True}"/>
+                                                    <field name="unit_amount" required="1" widget="monetary"
+                                                           options="{'currency_field': 'currency_id'}" string="金额"/>
+                                                    <field name="quantity" class="oe_inline" invisible="1"/>
+                                                    <field name="product_uom_id" widget="selection" class="oe_inline"
+                                                           groups="product.group_uom" invisible="1"/>
+                                                    <field name="tax_ids" domain="[('type_tax_use', '=', 'purchase')]"
+                                                           widget="many2many_tags" options="{'no_create':True}"/>
+                                                </group>
+                                                <group>
+                                                    <field name="reference"/>
+                                                    <field name="doc" widget="binary"/>
+                                                    <field name="date"/>
+                                                    <field name="state" invisible="1"/>
+                                                    <field name="account_id"/>
+                                                    <field name="employee_id" readonly="1" required="1"/>
+                                                    <field name="department_id" readonly="1" required="1"/>
+                                                    <field name="sheet_id" invisible="1"/>
+                                                    <field name="currency_id" groups="base.group_multi_currency"
+                                                           invisible="1"/>
+                                                    <field name="analytic_account_id"
+                                                           groups="analytic.group_analytic_accounting" string="项目"
+                                                           options="{'no_create':True}"/>
+                                                    <field name="company_id" groups="base.group_multi_company"/>
+                                                </group>
+                                                <group>
+                                                    <field name="total_amount" widget='monetary'
+                                                           options="{'currency_field': 'currency_id'}" invisible="1"/>
+                                                    <div>
+                                                        <field name="payment_mode" widget="radio" invisible="1"/>
+                                                    </div>
+                                                </group>
 
-                                    </group>
+                                            </group>
 
-                                </sheet>
-                            </form>
-                        </field>
+                                        </sheet>
+                                    </form>
+                                </field>
+                            </page>
+
+                            <page string="暂支抵扣明细" attrs="{'invisible':[('has_payment_line_ids','=',False)]}">
+                                <field name="account_payment_line_ids" readonly="1">
+                                    <tree>
+                                        <field name="payment_name"/>
+                                        <field name="accounting_date"/>
+                                        <field name="amount"/>
+                                    </tree>
+
+                                </field>
+
+                            </page>
+
+
+                            <page string="付款信息" attrs="{'invisible':[('has_payment_ids','=',False)]}">
+                                <field name="account_payment_ids" readonly="1">
+                                    <tree>
+                                        <field name="display_name"/>
+                                        <field name="payment_date"/>
+                                        <field name="journal_id"/>
+                                        <field name="amount" sum="总计"/>
+                                        <!--<field name="account_id"/>-->
+                                    </tree>
+
+                                </field>
+
+                            </page>
+
+
+                        </notebook>
+
+                        <field name="has_payment_ids" invisible="1"/>
+
+                        <field name="has_payment_line_ids" invisible="1"/>
+
+
                     </sheet>
                     <div class="oe_chatter">
                         <field name="message_follower_ids" widget="mail_followers"/>

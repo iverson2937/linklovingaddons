@@ -105,7 +105,7 @@ class ProductTemplate(models.Model):
             draft_qty = self.get_draft_mo(self.id)
             on_produce = self.get_onproduct_mo(self.id)
 
-        po_lines = self.env['purchase.order.line'].search(
+        po_lines = self.env['purchase.order.line'].sudo().search(
             [('product_id', '=', self.product_variant_ids[0].id), ('state', 'not in', ['cancel', 'done'])])
         line_ids = []
         for line in po_lines:
@@ -224,7 +224,7 @@ class ProductTemplate(models.Model):
         }
 
     def get_draft_po_qty(self, product_id):
-        pos = self.env["purchase.order"].search([("state", "in", ("make_by_mrp", "draft", "to approve"))])
+        pos = self.env["purchase.order"].sudo().search([("state", "in", ("make_by_mrp", "draft", "to approve"))])
         chose_po_lines = self.env["purchase.order.line"]
         total_draft_order_qty = 0
         for po in pos:
@@ -246,6 +246,7 @@ class ProductTemplate(models.Model):
     @api.multi
     def show_detail(self):
         return {
+            'name': '产品详细',
             'type': 'ir.actions.client',
             'tag': 'product_detail',
             'product_id': self.id
@@ -257,6 +258,7 @@ class ProductTemplate(models.Model):
         @api.multi
         def show_detail(self):
             return {
+                'name': '产品详细',
                 'type': 'ir.actions.client',
                 'tag': 'product_detail',
                 'product_id': self.product_tmpl_id.id

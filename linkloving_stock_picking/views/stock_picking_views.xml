@@ -54,6 +54,9 @@
                 <xpath expr="//field[@name='location_id']" position="after">
                     <field name="tracking_number" string="Tracking Number"/>
                 </xpath>
+                <xpath expr="//field[@name='origin']" position="after">
+                    <field name="remark" string="原单据备注"/>
+                </xpath>
 
 
                 <xpath expr="//field[@name='pack_operation_product_ids']//tree//field[@name='product_id']"
@@ -465,17 +468,7 @@
             </field>
         </record>
 
-        <record id="linkloving_stock_view_inventory_form" model="ir.ui.view">
-            <field name="name">partner.vendor.form</field>
-            <field name="model">stock.inventory</field>
-            <field name="inherit_id" ref="stock.view_inventory_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='filter']" position="after">
-                    <field name="create_uid"/>
-                </xpath>
 
-            </field>
-        </record>
 
 
         <!-- Inherit Form View to Modify it -->

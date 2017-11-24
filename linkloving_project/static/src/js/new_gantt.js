@@ -35,6 +35,14 @@ odoo.define('linkloving_project.new_gantt', function (require) {
     var New_Gantt = View.extend({
         template: 'new_gantt',
         view_type: "wangke",
+        events: {
+            'mouseenter .gantt_tree_content':'func',
+            'mouseenter .gantt_task_content':'func'
+        },
+        func:function () {
+            $("[data-toggle='tooltip']").tooltip();
+        },
+
         init: function (parent, options) {
             var self = this;
             this._super.apply(this, arguments);

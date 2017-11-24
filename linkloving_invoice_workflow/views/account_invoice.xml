@@ -52,7 +52,7 @@
                         <group>
                             <group>
                                 <field string="Customer" name="partner_id"/>
-                                <field name="deduct_amount" string="Deduction"/>
+                                <!--<field name="deduct_amount" string="Deduction"/>-->
                             </group>
                             <group>
                                 <field name="origin" attrs="{'invisible': [('origin', '=', False)]}"/>
@@ -61,6 +61,7 @@
                                 <field name="move_name" invisible="1"/>
                                 <field name="currency_id" options="{'no_create': True, 'no_open': True}"
                                        groups="base.group_multi_currency"/>
+                                <field name="commission" string="折算提成金额"/>
                                 <field name="company_currency_id" invisible="1"/>
                             </group>
                         </group>
@@ -81,7 +82,7 @@
                                                widget="many2many_tags"/>
                                         <field name="quantity"/>
                                         <field name="uom_id" groups="product.group_uom"/>
-                                        <field name="price_unit_o" string="原始单价" readonly="1"/>
+                                        <!--<field name="price_unit_o" string="原始单价" readonly="1"/>-->
                                         <field name="price_unit" readonly="1"/>
                                         <field name="discount" groups="sale.group_discount_per_so_line"/>
                                         <field name="invoice_line_tax_ids" widget="many2many_tags"
@@ -122,7 +123,7 @@
                                         </div>
                                         <field name="amount_tax" nolabel="1"/>
                                         <field name="amount_total" class="oe_subtotal_footer_separator"/>
-                                        <field name="amount_total_o" invisible="1"/>
+                                        <!--<field name="amount_total_o" invisible="1"/>-->
                                         <field name="payments_widget" colspan="2" nolabel="1" widget="payment"/>
                                         <field name="residual" class="oe_subtotal_footer_separator"
                                                attrs="{'invisible': [('state', '=', 'draft')]}"/>
@@ -180,7 +181,9 @@
             <field name="inherit_id" ref="account.invoice_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='partner_shipping_id']" position="after">
-                    <field name="deduct_amount" attrs="{'readonly': [('state', 'in', ['open','paid'])]}" string="扣减"/>
+                    <!--<field name="deduct_amount" attrs="{'readonly': [('state', 'in', ['open','paid'])]}" string="扣减"/>-->
+
+                    <field name="commission"/>
                     <field name="remark"/>
                 </xpath>
                 <xpath expr="//button[@name='action_invoice_open']" position="replace">
@@ -216,15 +219,16 @@
             <field name="model">account.invoice</field>
             <field name="arch" type="xml">
                 <tree>
+                    <field name="origin"/>
                     <field name="partner_id" groups="base.group_user" string="Customer"/>
                     <field name="date_invoice"/>
                     <field name="number"/>
                     <field name="commercial_partner_id" invisible="1"/>
                     <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                     <field name="date_due"/>
-                    <field name="origin"/>
                     <field name="amount_total_signed" string="Total" sum="Total"/>
                     <field name="residual_signed" string="To Pay" sum="To pay" groups="account.group_account_invoice"/>
+                    <field name="amount_total_signed" string="Total" sum="Total"/>
                     <field name="currency_id" invisible="1"/>
                     <field name="company_currency_id" invisible="1"/>
                     <field name="state"/>
@@ -285,19 +289,19 @@
                 </xpath>
                 <xpath expr="//field[@name='purchase_id']" position="replace">
 
-                    <field name="deduct_amount" attrs="{'readonly': [('state', 'in', ['open','paid'])]}"/>
+                    <!--<field name="deduct_amount" attrs="{'readonly': [('state', 'in', ['open','paid'])]}"/>-->
                     <field name="po_id" string="采购单"/>
 
                 </xpath>
-                <xpath expr="//tree/field[@name='price_unit']" position="before">
-                    <field name="price_unit_o" string="原始单价" readonly="1"/>
-                </xpath>
-                <xpath expr="//tree/field[@name='price_unit']" position="attributes">
-                    <attrbute name="readonly">1</attrbute>
-                </xpath>
-                <xpath expr="//field[@name='amount_total']" position="after">
-                    <field name="amount_total_o" string="Total Amount" invisible="1"/>
-                </xpath>
+                <!--<xpath expr="//tree/field[@name='price_unit']" position="before">-->
+                <!--<field name="price_unit_o" string="原始单价" readonly="1"/>-->
+                <!--</xpath>-->
+                <!--<xpath expr="//tree/field[@name='price_unit']" position="attributes">-->
+                <!--<attrbute name="readonly">1</attrbute>-->
+                <!--</xpath>-->
+                <!--<xpath expr="//field[@name='amount_total']" position="after">-->
+                <!--<field name="amount_total_o" string="Total Amount" invisible="1"/>-->
+                <!--</xpath>-->
                 <xpath expr="//field[@name='amount_tax']" position="replace">
                     <div>
                         <label for="amount_tax"/>

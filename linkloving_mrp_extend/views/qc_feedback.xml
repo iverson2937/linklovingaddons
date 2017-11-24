@@ -90,7 +90,6 @@
             <field name="arch" type="xml">
                 <search string="品检单" create="false">
                     <field name="production_id" readonly="1" string="制造单号"/>
-
                 </search>
             </field>
         </record>

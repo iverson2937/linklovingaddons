@@ -78,13 +78,20 @@
                                                         <!--<span class="fa fa-caret-right open-sign po_details"></span>-->
                                                         <!--</t>-->
                                                         <!--</a>-->
+
                                                         <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
+                                             <t t-if="item.state=='草稿'">
+                                                           <span>
+                                                            <button t-att-data-id="item.id" class="btn btn-default demand_confirm" t-att-check-name="'chk_mo'+result.product_id" confirm="sss">需求确认</button>
+                                                        </span>
+                                                        </t>
+
                                                         <span style="margin-left:15px"><t t-esc="item.in_charge_id"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
                                                         <span style="margin-left:15px" data-toggle="tooltip" title="预计开始"><t t-esc="item.date_planned_start"/> </span>
                                                         <span style="margin-left:15px" data-toggle="tooltip" title="预计结束"><t t-esc="item.date_planned_finished"/> </span>
                                                         <span style="margin-left:15px" data-toggle="tooltip" title="截止时间"><t t-esc="item.planned_start_backup"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+                                                        <span style="margin-left:15px" class="state"><t t-esc="item.state"/> </span>
                                                         <!--<t t-if="item.status_light == 3">-->
                                                         <!--<span style="margin-left:15px;color:red;" class="fa fa-circle" data-toggle="tooltip" data-placement="top" title="状态灯"></span>-->
                                                         <!--</t>-->
@@ -95,7 +102,7 @@
                                                         <!--<span style="margin-left:15px;color:green;" class="fa fa-circle" data-toggle="tooltip" data-placement="top" title="状态灯"></span>-->
                                                         <!--</t>-->
 
-                                                         <!--<t t-if="item.material_light == 3">-->
+                                                        <!--<t t-if="item.material_light == 3">-->
                                                         <!--<span style="margin-left:15px;color:red;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>-->
                                                         <!--</t>-->
                                                         <!--<t t-if="item.material_light == 2">-->
@@ -105,11 +112,11 @@
                                                         <!--<span style="margin-left:15px;color:green;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>-->
                                                         <!--</t>-->
 
-                                                        <span class="mat" t-att-style='"background:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
-                                                        <span class="pre" t-att-style='"background:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
+                                                        <span class="mat fa fa-home" t-att-style='"color:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
+                                                        <span class="mat fa fa-road" t-att-style='"color:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
                                                         <span class="rem" style="margin-left:15px;" data-toggle="tooltip" t-att-title="item.remark"><t t-esc="item.remark"/> </span>
-                                                        <!--<span class="trace_back">追溯</span>-->
+                                                        <!--<span data-toggle="tooltip" class="mo_trace trace_back">追溯</span>-->
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'mo_detail'+item.uuid">
@@ -193,7 +200,7 @@
                                     PO[<t t-esc="po_length"/>]
                                     <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                                     <!--<button class="btn btn-primary send-po-btn">合并</button>-->
-                                    <!--<button class="btn btn-primary create_po_btn" t-att-data-product-tmpl="result.product_p_id">创建</button>-->
+                                    <button class="btn btn-primary create_po_btn" t-att-data-product-tmpl="result.product_p_id">创建</button>
                                     <!--<button class="btn btn-default delete_po_btn">删除</button>-->
                                 </h4>
                             </div>
@@ -213,6 +220,7 @@
                                                         <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+
                                                         <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
 
                                                         <!--<t t-if="item.status_light == 3">-->
@@ -225,11 +233,11 @@
                                                         <!--<span style="margin-left:15px;color:green;" class="fa fa-circle"></span>-->
                                                         <!--</t>-->
 
-                                                        <span class="mat" t-att-style='"background:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
-                                                        <span class="pre" t-att-style='"background:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
+                                                        <span class="mat fa fa-home" t-att-style='"color:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
+                                                        <span class="pre fa fa-road" t-att-style='"color:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
                                                         <span class="rem" style="margin-left:15px;" data-toggle="tooltip" t-att-title="item.remark"><t t-esc="item.remark"/> </span>
-                                                        <!--<span class="trace_back">追溯</span>-->
+                                                        <!--<span data-toggle="tooltip" class="po_trace trace_back">追溯</span>-->
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'po_detail'+item.line_id">
@@ -290,13 +298,20 @@
                                                         <!--<span class="fa fa-caret-right open-sign po_details"></span>-->
                                                         <!--</t>-->
                                                         <!--</a>-->
-                                                        <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
+                                                         <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
+
+                                                         <t t-if="item.state=='草稿'">
+                                                        <span>
+                                                            <button class="btn btn-default demand_confirm" t-att-data-id="item.id" t-att-check-name="'chk_mo'+result.product_id">需求确认</button>
+                                                        </span>
+                                                    </t>
                                                         <span style="margin-left:15px"><t t-esc="item.in_charge_id"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
                                                         <span style="margin-left:15px" data-toggle="tooltip" title="预计开始"><t t-esc="item.date_planned_start"/> </span>
                                                         <span style="margin-left:15px" data-toggle="tooltip" title="预计结束"><t t-esc="item.date_planned_finished"/> </span>
                                                         <span style="margin-left:15px" data-toggle="tooltip" title="截止时间"><t t-esc="item.planned_start_backup"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+                                                        <span style="margin-left:15px" class="state"><t t-esc="item.state"/> </span>
+
                                                         <!--<span style="margin-left:15px"><t t-esc="item.origin"/> </span>-->
                                                         <!--<t t-if="item.status_light == 3">-->
                                                         <!--<span style="margin-left:15px;color:red;" class="fa fa-circle" data-toggle="tooltip" data-placement="top" title="状态灯"></span>-->
@@ -318,11 +333,11 @@
                                                         <!--<span style="margin-left:15px;color:green;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>-->
                                                         <!--</t>-->
 
-                                                        <span class="mat" t-att-style='"background:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
-                                                        <span class="pre" t-att-style='"background:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
+                                                        <span class="mat fa fa-home" t-att-style='"color:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
+                                                        <span class="mat fa fa-road" t-att-style='"color:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
                                                         <span class="rem" style="margin-left:15px;" data-toggle="tooltip" t-att-title="item.remark"><t t-esc="item.remark"/> </span>
-                                                        <!--<span class="trace_back">追溯</span>-->
+                                                        <!--<span data-toggle="tooltip" class="mo_trace trace_back">追溯</span>-->
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'mo_detail'+item.uuid">
@@ -409,7 +424,7 @@
                                     PO[<t t-esc="po_length"/>]
                                     <!--<span class="show_bom_line_two">[需求:<t t-esc="result.require"/>,库存:<t t-esc="result.stock"/>,在产:<t t-esc="result.on_produce"/>,草稿:<t t-esc="result.draft"/>]</span>-->
                                     <!--<button class="btn btn-primary send-po-btn" t-att-check-name="'chk'+result.product_id">合并</button>-->
-                                    <!--<button class="btn btn-primary create_po_btn" t-att-data-product-tmpl="result.product_p_id">创建</button>-->
+                                    <button class="btn btn-primary create_po_btn" t-att-data-product-tmpl="result.product_p_id">创建</button>
                                     <!--<button class="btn btn-default delete_po_btn">删除</button>-->
                                 </h4>
                             </div>
@@ -440,11 +455,11 @@
                                                         <!--<span style="margin-left:15px;color:green;" class="fa fa-circle"></span>-->
                                                         <!--</t>-->
 
-                                                        <span class="mat" t-att-style='"background:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
-                                                        <span class="pre" t-att-style='"background:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
+                                                        <span class="mat fa fa-home" t-att-style='"color:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
+                                                        <span class="mat fa fa-road" t-att-style='"color:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
                                                         <span class="rem" style="margin-left:15px;" data-toggle="tooltip" t-att-title="item.remark"><t t-esc="item.remark"/> </span>
-                                                        <!--<span class="trace_back">追溯</span>-->
+                                                        <!--<span data-toggle="tooltip" class="po_trace trace_back">追溯</span>-->
                                                     </h4>
                                                 </div>
                                                 <div class="panel-collapse collapse" t-att-id="'po_detail'+item.line_id">
@@ -502,10 +517,10 @@
                         <!--<span style="margin-left:15px;color:green;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>-->
                         <!--</t>-->
 
-                        <span class="mat" t-att-style='"background:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
-                        <span class="pre" t-att-style='"background:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
+                        <span class="mat fa fa-home" t-att-style='"color:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
+                        <span class="mat fa fa-road" t-att-style='"color:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
 
-                        <!--<span class="trace_back">追溯</span>-->
+                        <!--<span data-toggle="tooltip" class="po_trace trace_back">追溯</span>-->
                     </h4>
                 </div>
                 <div class="panel-collapse collapse" t-att-id="'mo_source'+item.id">
@@ -554,8 +569,8 @@
                         <!--<span style="margin-left:15px;color:green;" class="fa fa-star" data-toggle="tooltip" data-placement="top" title="物料状态灯"></span>-->
                         <!--</t>-->
 
-                        <span class="mat" t-att-style='"background:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
-                        <span class="pre" t-att-style='"background:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
+                        <span class="mat fa fa-home" t-att-style='"color:" + item.material_state' data-toggle="tooltip" title="库存状态"></span>
+                        <span class="mat fa fa-road" t-att-style='"color:" + item.prepare_material_state' data-toggle="tooltip" title="备料状态"></span>
                     </h4>
                 </div>
                 <div class="panel-collapse collapse" t-att-id="'mo_detail'+item.uuid">

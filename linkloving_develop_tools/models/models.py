@@ -330,6 +330,7 @@ class CreateOrderPointWizard(models.TransientModel):
             if c.menu_id.action:
                 _logger.warning("update menu action list, %d/%d" % (c.id, c.menu_id.id))
                 c.menu_id.action.domain = '[["categ_id", "child_of", %d]]' % int(c.id)
+                c.menu_id.action.context = "{'is_show_procuremnt_create_btn': True}"
 
     def mo_to_bz_process(self):
         return
@@ -377,6 +378,7 @@ class CreateOrderPointWizard(models.TransientModel):
         MrpProduction = self.env["mrp.production"]
         mos = MrpProduction.search([("state", "in", ("done", "cancel"))])
         stock_moves_to_do = self.env["stock.move"]
+        finish_stock_moves = self.env["stock.move"]
         for mo in mos:
             raw_stock_moves = mo.move_raw_ids.filtered(lambda x: x.state not in ["done", "cancel"])
             print raw_stock_moves

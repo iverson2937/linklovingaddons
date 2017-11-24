@@ -7,7 +7,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='action_cancel']" position="replace">
                     <button name="action_cancel" states="draft,confirmed,waiting_material" type="object" string="取消订单"
-                            confirm="确定制造订单吗？"/>
+                            confirm="确定取消制造订单吗？"/>
                 </xpath>
                 <div name="button_box" position="inside">
                     <button class="oe_stat_button" name="action_view_mrp_productions"

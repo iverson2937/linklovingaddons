@@ -24,6 +24,8 @@
 
     # always loaded
     'data': [
+        'report/hr_purchase_apply.xml',
+        'report/report.xml',
         'wizard/hr_purchase_apply_refuse_wizard.xml',
         'data/hr_purchase_apply_seq.xml',
         'security/ir.model.access.csv',

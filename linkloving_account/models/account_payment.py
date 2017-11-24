@@ -31,7 +31,7 @@ class AccountPaymentRegister(models.Model):
     _inherit = ['mail.thread', 'ir.needaction_mixin']
     name = fields.Char()
     balance_ids = fields.One2many('account.payment.register.balance', 'payment_id')
-    amount = fields.Float(string=u'Amount', compute='get_amount', store=True)
+    amount = fields.Float(string=u'Amount', compute='get_amount', store=True, track_visibility='onchange')
     company_id = fields.Many2one('res.company', 'Company',
                                  default=lambda self: self.env['res.company']._company_default_get(
                                      'account.payment.register'))
@@ -95,7 +95,20 @@ class AccountPaymentRegister(models.Model):
         ('register', u'Register'),
         ('done', u'Done'),
         ('cancel', u'Cancel')
-    ], 'State', readonly=True, default='draft')
+    ], 'State', readonly=True, default='draft', track_visibility='onchange')
+
+    account_payment_ids = fields.One2many('account.payment', 'res_id',
+                                          domain=[('res_model', '=', 'account.payment.register')])
+
+    @api.multi
+    def _compute_has_payment_ids(self):
+        for register in self:
+            if register.account_payment_ids:
+                register.has_payment_ids = True
+            else:
+                register.has_payment_ids = False
+
+    has_payment_ids = fields.Boolean(compute=_compute_has_payment_ids)
 
     _sql_constraints = {
         ('name_uniq', 'unique(name)',
@@ -177,9 +190,11 @@ class AccountPayment(models.Model):
                              track_visibility='onchange')
     remark = fields.Text(string='备注')
     product_id = fields.Many2one('product.product')
+    res_model = fields.Char()
+    res_id = fields.Integer()
 
     def _get_move_ids(self):
-        self.move_ids=self.move_line_ids.mapped('move_id').ids
+        self.move_ids = self.move_line_ids.mapped('move_id').ids
 
     # origin = fields.Char(string=u'源单据')
     @api.multi
@@ -188,35 +203,36 @@ class AccountPayment(models.Model):
 
     @api.multi
     def set_to_cancel(self):
-        account_invoices = self.env['account.invoice'].search([('type', '=', 'out_invoice'), ('state', '=', 'open')],
-                                                              limit=300)
-        for invoice in account_invoices:
-            invoice.auto_set_to_done()
+        self.state = 'cancel'
+        # account_invoices = self.env['account.invoice'].search([('type', '=', 'out_invoice'), ('state', '=', 'open')],
+        #                                                       limit=300)
+        # for invoice in account_invoices:
+        #     invoice.auto_set_to_done()
 
-            # account_invoices = self.env['account.invoice'].search([('type', '=', 'in_invoice')], limit=400, offset=2500)
-            # print len(account_invoices)
-            # for invoice in account_invoices:
-            #     if invoice.partner_id.supplier:
-            #         print invoice.name
-            #         invoice.journal_id = 2
-            # payment_ids = self.env['account.payment'].search([('payment_type', '=', 'inbound')])
-            # ids = []
-            # for payment in payment_ids:
-            #     if payment.partner_id:
-            #         for move in payment.move_line_ids:
-            #             if not move.partner_id:
-            #                 ids.append(payment.id)
-            #                 move.partner_id = payment.partner_id.id
-            #
+        # account_invoices = self.env['account.invoice'].search([('type', '=', 'in_invoice')], limit=400, offset=2500)
+        # print len(account_invoices)
+        # for invoice in account_invoices:
+        #     if invoice.partner_id.supplier:
+        #         print invoice.name
+        #         invoice.journal_id = 2
+        # payment_ids = self.env['account.payment'].search([('payment_type', '=', 'inbound')])
+        # ids = []
+        # for payment in payment_ids:
+        #     if payment.partner_id:
+        #         for move in payment.move_line_ids:
+        #             if not move.partner_id:
+        #                 ids.append(payment.id)
+        #                 move.partner_id = payment.partner_id.id
+        #
 
 
 
 
-            # # FIXME: 怎么样的可以取消
-            # if self.move_line_ids and len(self.move_line_ids) == 2 and self.payment_type != 'transfer':
-            #     raise UserError('不可以取消,请联系系统管理员')
-            # else:
-            #     self.state = 'cancel'
+        # # FIXME: 怎么样的可以取消
+        # if self.move_line_ids and len(self.move_line_ids) == 2 and self.payment_type != 'transfer':
+        #     raise UserError('不可以取消,请联系系统管理员')
+        # else:
+        #     self.state = 'cancel'
 
     @api.onchange('product_id')
     def _onchange_product_id(self):

@@ -150,6 +150,7 @@
 }
 .panel-title .trace_back{
     cursor: pointer;
+    text-decoration: underline;
 }
 
 .panel-title .mat{
@@ -157,16 +158,28 @@
 }
 .panel-title .mat,.panel-title .pre{
     display: inline-block;
-    border-radius: 50%;
     width: 12px;
     height: 12px;
-    color: white;
 }
 .panel-title .rem{
-    width: 70px;
+    width: 49%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     display: inline-block;
     vertical-align: middle;
+}
+.o_content .panel-body{
+    padding: 0;
+}
+
+.o_form_view .o_form_sheet_bg .o_form_sheet{
+    min-width: 1050px;
+}
+
+
+@media (min-width: 992px){
+    .modal-lg{
+        width: 1200px;
+    }
 }

@@ -1149,7 +1149,7 @@ gantt._render_grid_item = function (item) {
             if (value instanceof Date)
                 value = this.templates.date_grid(value, item);
             textValue = value;
-            value = "<div class='gantt_tree_content'>" + value + "</div>";
+            value = "<div class='gantt_tree_content' data-toggle='tooltip' title="+ value +">" + value + "</div>";
         }
         var css = "gantt_cell" + (last ? " gantt_last_cell" : "");
 
@@ -4192,6 +4192,9 @@ gantt._render_task_content = function (task, width) {
     if (this._get_safe_type(task.type) != this.config.types.milestone)
         content.innerHTML = this.templates.task_text(task.start_date, task.end_date, task);
     content.className = "gantt_task_content";
+    content.setAttribute('data-toggle','tooltip');
+    content.setAttribute('data-html','true');
+    content.setAttribute('title',this.templates.task_text(task.start_date, task.end_date, task));
     //content.style.width = width + 'px';
     return content;
 };

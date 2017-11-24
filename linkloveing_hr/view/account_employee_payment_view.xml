@@ -91,7 +91,7 @@
                                         <field name="expense_no"/>
                                         <field name="name"/>
                                         <field name="accounting_date"/>
-                                        <field name="amount"/>
+                                        <field name="amount" sum="总计"/>
                                     </tree>
                                 </field>
                             </page>
@@ -100,7 +100,7 @@
                                     <tree create="0">
                                         <field name="create_uid" string="Created By"/>
                                         <field name="create_date" string="Return Date"/>
-                                        <field name="amount"/>
+                                        <field name="amount" sum="总计"/>
                                     </tree>
                                 </field>
 
@@ -138,7 +138,7 @@
                     <field name="department_id" string="Department" invisible="1"/>
                     <field name="to_approve_id" string="Waiting Approve By" readonly="1"
                            attrs="{'invisible': [('to_approve_id', '=', False)]}"/>
-                    <field name="amount"/>
+                    <field name="amount" sum="总计"/>
                     <field name="remark"/>
                     <field name="apply_date" string="Apply Date"/>
                     <field name="state"/>
@@ -154,7 +154,8 @@
             <field name="arch" type="xml">
                 <search string="Employee">
                     <field name="employee_id" string="Employee"/>
-                    <field name="name" string="SN"/>
+                    <field name="name" string="单号"/>
+                    <field name="amount" filter_domain="[('amount','ilike',self)]" string="Amount"/>
                 </search>
             </field>
         </record>

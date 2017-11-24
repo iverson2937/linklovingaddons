@@ -5,52 +5,52 @@
 
         <!-- Layout -->
         <!--<template id="website.submenu" name="Submenu">-->
-            <!--<li t-if="not submenu.child_id" t-att-class="-->
+        <!--<li t-if="not submenu.child_id" t-att-class="-->
         <!--'active' if submenu.url and submenu.url != '/' and request.httprequest.path == submenu.url.replace('/page/website.', '/page/') else None-->
         <!--">-->
 
-                <!--&lt;!&ndash;<a t-attf-href="/blog/new_blog_index" t-ignore="true"&ndash;&gt;-->
-                <!--&lt;!&ndash;t-att-target="'_blank' if submenu.new_window else None">&ndash;&gt;-->
-                <!--&lt;!&ndash;<span t-field="submenu.name"/>&ndash;&gt;-->
-                <!--&lt;!&ndash;</a>&ndash;&gt;-->
-                <!--&lt;!&ndash;<a t-attf-href="/blog/new_blog_create_index" t-ignore="true"&ndash;&gt;-->
-                <!--&lt;!&ndash;t-att-target="'_blank' if submenu.new_window else None">&ndash;&gt;-->
-                <!--&lt;!&ndash;<span t-field="submenu.name"/>&ndash;&gt;-->
-                <!--&lt;!&ndash;</a>&ndash;&gt;-->
+        <!--&lt;!&ndash;<a t-attf-href="/blog/new_blog_index" t-ignore="true"&ndash;&gt;-->
+        <!--&lt;!&ndash;t-att-target="'_blank' if submenu.new_window else None">&ndash;&gt;-->
+        <!--&lt;!&ndash;<span t-field="submenu.name"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;</a>&ndash;&gt;-->
+        <!--&lt;!&ndash;<a t-attf-href="/blog/new_blog_create_index" t-ignore="true"&ndash;&gt;-->
+        <!--&lt;!&ndash;t-att-target="'_blank' if submenu.new_window else None">&ndash;&gt;-->
+        <!--&lt;!&ndash;<span t-field="submenu.name"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;</a>&ndash;&gt;-->
 
-                <!--if 是否 是博客-->
-                    <!--if 是否是管理员-->
-                        <!--显示-->
-                <!--else-->
-                    <!--显示-->
-
-
-                <!--<t t-esc="json.dumps(request.env.user._is_superuser())"/>-->
-
-                <!--&lt;!&ndash;<t t-if="json.dumps(request.env.user._is_superuser())">&ndash;&gt;-->
-
-                    <!--<a t-att-href="(website.menu_id.child_id[0] == submenu) and '/' or submenu.url" t-ignore="true"-->
-                       <!--t-att-target="'_blank' if submenu.new_window else None">-->
-                        <!--<span t-field="submenu.name"/>-->
-                    <!--</a>-->
-                <!--&lt;!&ndash;</t>&ndash;&gt;-->
+        <!--if 是否 是博客-->
+        <!--if 是否是管理员-->
+        <!--显示-->
+        <!--else-->
+        <!--显示-->
 
 
-            <!--</li>-->
-            <!--<li t-if="submenu.child_id" t-attf-class="dropdown #{-->
+        <!--<t t-esc="json.dumps(request.env.user._is_superuser())"/>-->
+
+        <!--&lt;!&ndash;<t t-if="json.dumps(request.env.user._is_superuser())">&ndash;&gt;-->
+
+        <!--<a t-att-href="(website.menu_id.child_id[0] == submenu) and '/' or submenu.url" t-ignore="true"-->
+        <!--t-att-target="'_blank' if submenu.new_window else None">-->
+        <!--<span t-field="submenu.name"/>-->
+        <!--</a>-->
+        <!--&lt;!&ndash;</t>&ndash;&gt;-->
+
+
+        <!--</li>-->
+        <!--<li t-if="submenu.child_id" t-attf-class="dropdown #{-->
         <!--(submenu.url and submenu.url != '/' and any([request.httprequest.path == child.url.replace('/page/website.', '/page/') for child in submenu.child_id if child.url]) or-->
         <!--(submenu.url and request.httprequest.path == submenu.url.replace('/page/website.', '/page/'))) and 'active'-->
         <!--}">-->
-                <!--<a class="dropdown-toggle" data-toggle="dropdown" href="#">-->
-                    <!--<span t-field="submenu.name"/>-->
-                    <!--<span class="caret" t-ignore="true"></span>-->
-                <!--</a>-->
-                <!--<ul class="dropdown-menu" role="menu">-->
-                    <!--<t t-foreach="submenu.child_id" t-as="submenu">-->
-                        <!--<t t-call="website.submenu"/>-->
-                    <!--</t>-->
-                <!--</ul>-->
-            <!--</li>-->
+        <!--<a class="dropdown-toggle" data-toggle="dropdown" href="#">-->
+        <!--<span t-field="submenu.name"/>-->
+        <!--<span class="caret" t-ignore="true"></span>-->
+        <!--</a>-->
+        <!--<ul class="dropdown-menu" role="menu">-->
+        <!--<t t-foreach="submenu.child_id" t-as="submenu">-->
+        <!--<t t-call="website.submenu"/>-->
+        <!--</t>-->
+        <!--</ul>-->
+        <!--</li>-->
         <!--</template>-->
 
 
@@ -144,7 +144,7 @@
                                                 <div class="searchBar">
                                                     <input type="text" class="search" id="kf_search_index_key"
                                                            searchsuggest="true" accesskey="/" autocomplete="off"
-                                                           placeholder="请输入产品或问题"/>
+                                                           placeholder="输入标题或关键词搜索"/>
                                                     <input id="kf_search_index_key_hidden" type="hidden"/>
                                                     <button type="button" class="btn btn-info search-type blog-type"
                                                             style="width:76px;">
@@ -321,6 +321,15 @@
 
                                             </select>
                                         </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label for="keyword" class="col-sm-2 control-label">关键词</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="keyword" name="keyword"
+                                               placeholder="关键词,关键词...."/>
                                     </div>
                                 </div>
 

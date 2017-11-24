@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+    <t t-name="AccountDashboard">
+        <div class="panel-group" id="account_dashboard">
+           <table class="table table-bordered">
+  <caption>条纹表格布局</caption>
+  <thead>
+    <tr>
+      <th>资产</th>
+      <th>年初数</th>
+      <th>期末数</th>
+       <th>负债及所有者权益</th>
+      <th>年初数</th>
+      <th>期末数</th>
+
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>货币</td>
+        <!--年初数-->
+      <td>NA</td>
+      <td>
+        <a style="cursor: pointer">
+           560001
+        </a>
+
+      </td>
+         <td>短期借款</td>
+      <td>Bangalore</td>
+      <td>560001</td>
+    </tr>
+    <tr>
+      <td>应收账款</td>
+      <td>Mumbai</td>
+      <td>400003</td>
+       <td>应付账款</td>
+      <td>Mumbai</td>
+      <td>400003</td>
+    </tr>
+    <tr>
+      <td>其他应收款</td>
+      <td>Pune</td>
+      <td>411027</td>
+    </tr>
+    <tr>
+      <td>固定资产</td>
+      <td>Pune</td>
+      <td>411027</td>
+    </tr>
+  </tbody>
+</table>
+        </div>
+    </t>
+</templates>

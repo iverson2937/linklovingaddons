@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        action_account_dashboard
+
+        <record id="action_account_dashboard" model="ir.actions.client">
+            <field name="name">仪表盘</field>
+            <field name="tag">account_dashboard</field>
+        </record>
+
+
+        <menuitem id="menu_account_dashboard_root" name="仪表盘" sequence="0"
+                  groups=""/>
+        <menuitem id="menu_account_dashboard" name="仪表盘" sequence="0"
+                  action="action_account_dashboard"
+                  parent="menu_account_dashboard_root"
+                  groups=""/>
+
+
+    </data>
+</openerp>

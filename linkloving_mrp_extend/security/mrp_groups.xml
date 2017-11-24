@@ -1,37 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-<data>
+    <data>
+
+
         <record id="group_charge_produce" model="res.groups">
             <field name="name">生产组</field>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+            <field name="implied_ids" eval="[(4, ref('mrp.group_mrp_user'))]"/>
+            <field name="category_id" ref="base.module_category_manufacturing"/>
+        </record>
+
+        <record id="mrp.group_mrp_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="category_id" ref="base.module_category_manufacturing"/>
+            <field name="implied_ids" eval="[(4, ref('linkloving_mrp_extend.group_charge_produce'))]"/>
             <field name="users" eval="[(4, ref('base.user_root'))]"/>
         </record>
 
         <record id="group_charge_warehouse" model="res.groups">
             <field name="name">仓库组</field>
+            <field name="implied_ids" eval="[(4, ref('stock.group_stock_user'))]"/>
+            <field name="category_id" ref="base.module_category_warehouse_management"/>
             <field name="users" eval="[(4, ref('base.user_root'))]"/>
         </record>
+
+        <record id="stock.group_stock_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="category_id" ref="base.module_category_warehouse_management"/>
+            <field name="implied_ids" eval="[(4, ref('group_charge_warehouse'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        </record>
+
 
         <record id="group_charge_inspection" model="res.groups">
             <field name="name">品检组</field>
             <field name="users" eval="[(4, ref('base.user_root'))]"/>
         </record>
 
-    <!--<record model="ir.rule" id="mrp_production_rule_user">-->
-    <!--<field name="name">mrp.production process user</field>-->
-    <!--<field name="model_id" search="[('model','=','mrp.production')]" model="ir.model"/>-->
-    <!--<field name="groups" eval="[(4, ref('mrp.group_mrp_user'))]"/>-->
-    <!--<field name="domain_force">-->
-    <!--["|","|",('in_charge_id','=',user.partner_id.id),('create_uid','=',user.id),('state', 'in',-->
-    <!--['waiting_material','already_picking',-->
-    <!--'prepare_material_ing','waiting_quality_inspection','quality_inspection_ing','waiting_warehouse_inspection','waiting_post_inventory'])]-->
-    <!--</field>-->
+        <!--<record model="ir.rule" id="mrp_production_rule_user">-->
+        <!--<field name="name">mrp.production process user</field>-->
+        <!--<field name="model_id" search="[('model','=','mrp.production')]" model="ir.model"/>-->
+        <!--<field name="groups" eval="[(4, ref('mrp.group_mrp_user'))]"/>-->
+        <!--<field name="domain_force">-->
+        <!--["|","|",('in_charge_id','=',user.partner_id.id),('create_uid','=',user.id),('state', 'in',-->
+        <!--['waiting_material','already_picking',-->
+        <!--'prepare_material_ing','waiting_quality_inspection','quality_inspection_ing','waiting_warehouse_inspection','waiting_post_inventory'])]-->
+        <!--</field>-->
 
-    <!--</record>-->
-            <record model="ir.rule" id="mrp_production_rule_manager">
+        <!--</record>-->
+        <record model="ir.rule" id="mrp_production_rule_manager">
             <field name="name">mrp.production process manager</field>
             <field name="model_id" search="[('model','=','mrp.production')]" model="ir.model"/>
             <field name="groups" eval="[(4, ref('mrp.group_mrp_manager'))]"/>
             <field name="domain_force">[(1, '=', 1)]</field>
         </record>
-</data>
+    </data>
 </odoo>

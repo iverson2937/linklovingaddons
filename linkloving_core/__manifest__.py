@@ -30,7 +30,7 @@
         'views/product_product.xml',
         'views/sale_order.xml',
         'views/purchase_order_line.xml',
-        # 'views/purchase_order_line_wizard.xml'
+        'views/purchase_order_line_wizard.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

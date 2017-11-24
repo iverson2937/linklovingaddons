@@ -240,15 +240,15 @@
                 <xpath expr="//button[@name='button_plan']" position="after">
                     <button name="button_action_confirm_draft" class="oe_highlight"
                             attrs="{'invisible': [('state', 'not in', 'draft')]}" type="object"
-                            groups="linkloving_mrp_extend.group_charge_produce" string="Confirm the Schedule"/>
+                            groups="linkloving_mrp_extend.group_charge_produce" string="需求确认"/>
                     <button name="button_action_cancel_confirm" class="oe_link"
                             attrs="{'invisible': [('state', 'not in', 'confirmed')]}" type="object"
-                            groups="linkloving_mrp_extend.group_charge_produce" string="取消加入排程"/>
+                            groups="linkloving_mrp_extend.group_charge_produce" string="取消排产"/>
 
                     <button name="button_waiting_material" class="oe_highlight"
                             attrs="{'invisible': [('state', 'not in', 'confirmed')]}" type="object"
                             groups="linkloving_mrp_extend.group_charge_produce"
-                            string="Confirm Order,Prepare Material"/>
+                            string="Confirm Order"/>
 
                     <button name="button_start_prepare_material" class="oe_highlight"
                             attrs="{'invisible': [('state', 'not in', 'waiting_material')]}" type="object"
@@ -315,6 +315,7 @@
                 <xpath expr="//header/button[@name='action_cancel']" position="replace">
                     <button name="action_cancel" type="object" string="取消订单"
                             attrs="{'invisible': [('state', 'not in', ('draft','confirmed','waiting_material', 'prepare_material_ing'))]}"
+                            confirm="是否取消订单?"
                             groups="linkloving_mrp_extend.group_charge_produce"/>
                 </xpath>
 
@@ -407,13 +408,13 @@
                               decoration-success="quantity_done>=product_uom_qty"
                               decoration-danger="qty_available&lt;product_uom_qty" create="0">
                             <field name="product_id" string="产品" options="{'no_create':True}"/>
-                            <field name="qty_available" string="库存"/>
-                            <field name="virtual_available" string="Forecast Quantity"/>
-                            <field name="suggest_qty" string="Suggest Quantity"/>
-                            <field name="quantity_available" string="系统可用"/>
                             <field name="product_uom_qty" string="Demand Quantity"/>
+                            <field name="suggest_qty" string="Suggest Quantity"/>
+                            <field name="qty_available" string="库存"/>
+                            <field name="remaining_qty"/>
                             <field name="quantity_done" string="备料数量"/>
                             <field name="return_qty" readonly="1" string="Return Quantity"/>
+                            <field name="virtual_available" string="Forecast Quantity"/>
                         </tree>
                     </field>
                 </xpath>
@@ -527,7 +528,6 @@
                             <field name="qty_available" string="库存"/>
                             <field name="virtual_available" string="预测数量"/>
                             <field name="suggest_qty" readonly="1" string="建议数量"/>
-                            <field name="quantity_available" string="系统可用"/>
                             <field name="product_uom_qty" string="实际需求物料数量"/>
                             <field name="quantity_ready" readonly="context.get('quantity_ready_invisible')"
                                    string="备料数量"/>

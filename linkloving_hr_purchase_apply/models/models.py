@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo.addons import decimal_precision as dp
+import jpush
+from linklovingaddons.linkloving_app_api.models.models import JPushExtend
 
 
 class PurchaseApply(models.Model):
@@ -75,6 +77,18 @@ class PurchaseApply(models.Model):
             sheet.to_approve_id = False
             sheet.reject_reason = reason
 
+        #推送
+        JPushExtend.send_notification_push(audience=jpush.audience(
+            jpush.alias(sheet.create_uid.id)
+        ), notification=_("申购单：%s被拒绝") % (sheet.name),
+            body=_("原因：%s") % (reason))
+
+    @api.multi
+    def create_message_post(self,body_str):
+        for sheet in self:
+            body = body_str
+            sheet.message_post(body=body)
+
     @api.multi
     def unlink(self):
         for r in self:
@@ -109,6 +123,11 @@ class PurchaseApply(models.Model):
                 'state': state,
                 'to_approve_id': to_approve_id
             })
+
+        JPushExtend.send_notification_push(audience=jpush.audience(
+            jpush.alias(exp.to_approve_id.id)
+        ), notification=exp.name,
+            body=_("申购单：%s 等待审核！") % (exp.name))
 
     def reset_hr_purchase_apply(self):
         self.hr_purchase_apply_post()
@@ -203,6 +222,12 @@ class PurchaseApplyLine(models.Model):
     def _compute_amount(self):
         for line in self:
             line.sub_total = line.price_unit * line.product_qty
+
+    @api.one
+    @api.constrains('amount')
+    def _check_amount(self):
+        if not self.amount > 0.0:
+            raise ValidationError('金额必须大于0.')
 
     @api.multi
     def name_get(self):

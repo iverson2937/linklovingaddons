@@ -2,6 +2,8 @@
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+from linklovingaddons.linkloving_app_api.models.models import JPushExtend
+import jpush
 
 
 class HrExpenseSheet(models.Model):
@@ -16,6 +18,7 @@ class HrExpenseSheet(models.Model):
         self.name = name
 
     name = fields.Char(compute='_get_full_name', store=True, required=False)
+    account_payment_ids = fields.One2many('account.payment', 'res_id', domain=[('res_model', '=', 'hr.expense.sheet')])
     expense_no = fields.Char(default=lambda self: _('New'))
     approve_ids = fields.Many2many('res.users')
     is_deduct_payment = fields.Boolean(default=False)
@@ -25,12 +28,53 @@ class HrExpenseSheet(models.Model):
     payment_id = fields.Many2one('account.employee.payment')
     income = fields.Boolean(default=False)
     partner_id = fields.Many2one('res.partner')
-    payment_line_ids = fields.One2many('account.employee.payment.line', 'sheet_id')
+    # 抵扣明细行
+    account_payment_line_ids = fields.One2many('account.employee.payment.line', 'sheet_id')
     remark_comments_ids = fields.One2many('hr.remark.comment', 'expense_sheet_id', string=u'审核记录')
     department_id = fields.Many2one('hr.department', string='Department',
                                     states={'post': [('readonly', True)], 'done': [('readonly', False)]})
 
     reject_reason = fields.Char(string=u'拒绝原因')
+    has_payment_line_ids = fields.Boolean(compute='_compute_has_payment_line_ids')
+    payment_line_amount = fields.Float(string=u'暂支抵扣金额', compute='_compute_has_payment_line_ids')
+    has_payment_ids = fields.Boolean(compute='_compute_has_payment_ids')
+
+    @api.multi
+    def action_cancel(self):
+        for sheet in self:
+            # 取消过账分录
+            if sheet.account_move_id:
+                sheet.account_move_id.button_cancel()
+                sheet.account_move_id.unlink()
+            # 取消暂支抵扣
+            if sheet.account_payment_line_ids:
+                for line in sheet.account_payment_line_ids:
+                    line.unlink()
+            # 取消付款分录
+            if sheet.account_payment_ids:
+                for payment in sheet.account_payment_ids:
+                    payment.cancel()
+                    payment.unlink()
+
+            sheet.state = 'approve'
+
+    @api.multi
+    def _compute_has_payment_ids(self):
+        for sheet in self:
+
+            if sheet.account_payment_ids:
+                sheet.has_payment_ids = True
+            else:
+                sheet.has_payment_ids = False
+
+    @api.multi
+    def _compute_has_payment_line_ids(self):
+        for sheet in self:
+            if sheet.account_payment_line_ids:
+                sheet.has_payment_line_ids = True
+                sheet.payment_line_amount = sum(line.amount for line in sheet.account_payment_line_ids)
+            else:
+                sheet.has_payment_line_ids = False
 
     @api.onchange('department_id')
     def _onchange_department_id(self):
@@ -103,6 +147,28 @@ class HrExpenseSheet(models.Model):
 
         create_remark_comment(self, u'1级审核')
 
+    # @api.multi
+    # def manager1_approve_withText(self, text):
+    #     # if self.employee_id == self.employee_id.department_id.manager_id:
+    #     #     self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
+    #     # else:
+    #     department = self.to_approve_id.employee_ids.department_id
+    #     if not department:
+    #         UserError(u'请设置该员工部门')
+    #     if not department.manager_id:
+    #         UserError(u'该员工所在部门未设置经理(审核人)')
+    #     # 如果没有上级部门，或者报销金额小于该部门的允许最大金额
+    #     if not department.parent_id or (department.allow_amount and self.total_amount < department.allow_amount):
+    #         self.to_approve_id = False
+    #         self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
+    #     else:
+    #         if not department.parent_id.manager_id:
+    #             raise UserError(u'上级部门没有设置经理,请联系管理员')
+    #         self.to_approve_id = department.sudo().parent_id.manager_id.user_id.id
+    #         self.write({'state': 'manager1_approve', 'approve_ids': [(4, self.env.user.id)]})
+    #
+    #     create_remark_comment(self, (u'1级审核：%s' % text))
+
     @api.multi
     def manager2_approve(self):
 
@@ -158,6 +224,11 @@ class HrExpenseSheet(models.Model):
             exp.write({'state': state})
             create_remark_comment(exp, u'送审')
 
+            JPushExtend.send_notification_push(audience=jpush.audience(
+                jpush.alias(exp.to_approve_id.id)
+            ), notification=exp.expense_no,
+                body=_("报销单：%s 等待审核") % (self.expense_no))
+
     @api.multi
     def manager3_approve(self):
         self.to_approve_id = False
@@ -177,6 +248,17 @@ class HrExpenseSheet(models.Model):
                         sheet.name, reason))
             sheet.message_post(body=body)
             sheet.reject_reason = reason
+
+        JPushExtend.send_notification_push(audience=jpush.audience(
+            jpush.alias(sheet.create_uid.id)
+        ), notification=_("报销单：%s被拒绝") % (sheet.expense_no),
+            body=_("原因：%s") % (reason))
+
+    @api.multi
+    def create_message_post(self, body_str):
+        for sheet in self:
+            body = body_str
+            sheet.message_post(body=body)
 
     @api.model
     def create(self, vals):
@@ -248,7 +330,7 @@ class HrExpenseSheet(models.Model):
     @api.multi
     def register_payment_action(self):
 
-        amount = self.total_amount - sum(line.amount for line in self.payment_line_ids)
+        amount = self.total_amount - sum(line.amount for line in self.account_payment_line_ids)
 
         context = {'default_payment_type': 'outbound', 'default_amount': amount}
 

@@ -34,6 +34,10 @@ class AccountEmployeePayment(models.Model):
                         sheet.name, reason))
             sheet.message_post(body=body)
             sheet.to_approve_id = False
+            # 拒絕取消暂支抵扣
+            if sheet.payment_line_ids:
+                for line in sheet.payment_line_ids:
+                    line.unlink()
 
             create_remark_comment(sheet, u'拒绝')
 
@@ -131,6 +135,8 @@ class AccountEmployeePayment(models.Model):
     @api.multi
     def submit(self):
         self.state = 'confirm'
+        if not self.employee_id.department_id:
+            raise UserError('请设置员工所在部门')
 
         if self.employee_id == self.employee_id.department_id.manager_id:
             department = self.employee_id.department_id
@@ -200,7 +206,7 @@ class AccountEmployeePayment(models.Model):
     @api.multi
     def manager3_approve(self):
 
-        self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
+        self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)], 'to_approve_id': False})
 
     @api.multi
     def post(self):
@@ -240,7 +246,6 @@ class AccountEmployeePayment(models.Model):
     def create(self, vals):
         if not vals.get('name'):
             vals['name'] = self.env['ir.sequence'].next_by_code('account.employee.payment') or '/'
-            print vals['name']
         return super(AccountEmployeePayment, self).create(vals)
 
     @api.model

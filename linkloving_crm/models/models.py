@@ -36,6 +36,8 @@ class CrmLead(models.Model):
 
     mutual_rule_id = fields.Integer()
 
+    lead_price_sheet = fields.Boolean(string=u'产品报价单')
+
     @api.multi
     def _lead_create_contact(self, name, is_company, parent_id=False, customer=False):
         """ extract data from lead to create a partner

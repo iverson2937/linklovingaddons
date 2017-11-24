@@ -230,11 +230,16 @@
                                 'default_process_id': process_id,
                                 'default_production_line_id': production_line_id,
                                 'default_in_charge_id': in_charge_id,
-                                'default_supplier_id': supplier_id,
+                                'default_planned_start_backup': planned_start_backup,
                                 'default_product_qty': product_qty}"
                                 string="开始排产"/>
+                        <button name="action_cancel_plan" type="object" string="取消排产"
+                                attrs="{'invisible': [('state', 'not in', ('waiting_material'))]}"
+                        />
+
                         <button name="action_cancel" type="object" string="取消订单"
                                 attrs="{'invisible': [('state', 'not in', ('confirmed', 'draft'))]}"
+                                confirm="确定取消订单?"
                         />
 
                         <field name="state" widget="statusbar"
@@ -271,6 +276,7 @@
                             <group>
                                 <field name="has_moves" invisible="1"/>
                                 <field name="check_to_done" invisible="1"/>
+                                <field name="alia_name"/>
                                 <field name="product_id" attrs="{'readonly': [('has_moves', '=', True)]}"
                                        domain="[('bom_ids', '!=', False)]"/>
                                 <field name="product_tmpl_id" invisible="1"/>
@@ -287,16 +293,17 @@
                                     <!--attrs="{'invisible': [('state','=','done')]}"-->
                                     <!--/>-->
                                 </div>
-                                <field name="process_id" options="{'no_create':True}" string="Process" required="1"/>
+                                <field name="process_id" options="{'no_create':True}" string="工序" required="1"
+                                       readonly="1"/>
                                 <field name="production_line_id" domain="[('process_id', '=', process_id)]"
-                                       attrs="{'required': [('state', '=', 'confirmed')]}"/>
-                                <field name="in_charge_id" options="{'no_create':True}"/>
-                                <field name="supplier_id"/>
-                                <field name="planned_start_backup" required="1"/>
+                                       readonly="1"/>
+                                <field name="in_charge_id" options="{'no_create':True}" readonly="1" string="负责人"/>
+                                <field name="supplier_id" readonly="1"/>
+                                <field name="planned_start_backup"/>
 
                                 <field name="routing_id" groups="mrp.group_mrp_routings"/>
-                                <field name="date_planned_start" readonly="1"/>
-                                <field name="date_planned_finished" readonly="1"/>
+                                <field name="date_planned_start" readonly="1" string="开始"/>
+                                <field name="date_planned_finished" readonly="1" string="结束"/>
                             </group>
                             <group>
                                 <field name="bom_id"
@@ -310,7 +317,7 @@
 
                                 <field name="origin"/>
                                 <field name="production_order_type"/>
-                                <field name="mo_type" widget="radio" string="Type"/>
+                                <field name="mo_type" widget="radio" string="类型"/>
                                 <field name="unit_price" string="单价/委外加工单价"
                                        attrs="{'invisible':[('mo_type', '==', 'time')],'readonly':[('state', '!=', 'confirmed')]}"/>
                                 <field name="hour_price"
@@ -334,11 +341,11 @@
                                         <field name="product_id" string="产品" options="{'no_create':True}"/>
                                         <field name="product_uom_qty" string="需求数量"/>
                                         <field name="suggest_qty" string="建议数量"/>
-                                        <field name="quantity_available" string="系统可用"/>
                                         <field name="qty_available" string="库存"/>
-                                        <field name="virtual_available" string="预测数量"/>
+                                        <field name="remaining_qty"/>
                                         <field name="quantity_done" string="备料数量"/>
                                         <field name="return_qty" readonly="1" string="退料数量"/>
+                                        <field name="virtual_available" string="预测数量"/>
                                     </tree>
                                 </field>
                             </page>
@@ -395,6 +402,41 @@
             </field>
         </record>
 
+        <!-- Inherit Form View to Modify it -->
+        <record id="linkloving_mrp_production_form_view_inherit" model="ir.ui.view">
+            <field name="name">mrp.production.form</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="linkloving_mrp_extend.linkloving_mrp_production_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='button_waiting_material']" position="replace">
+                    <field name="production_line_id" invisible="1"/>
+                    <field name="planned_start_backup" invisible="1"/>
+                    <button type="formview_dialog"
+                            name="get_formview"
+                            class="oe_highlight"
+                            attrs="{'invisible': [('state', 'not in', ('confirmed', 'draft'))]}"
+                            context="{'default_production_id': active_id,
+                                'production_id': active_id,
+                                'default_process_id': process_id,
+                                'default_production_line_id': production_line_id,
+                                'default_in_charge_id': in_charge_id,
+                                'default_planned_start_backup': planned_start_backup,
+                                'default_product_qty': product_qty}"
+                            string="开始排产"/>
+                </xpath>
+
+                <xpath expr="//button[@name='button_action_cancel_confirm']" position="replace">
+                    <!-- Add your fields or attributes here -->
+                    <button name="action_cancel_plan" type="object" string="取消排产"
+                            attrs="{'invisible': [('state', 'not in', ('waiting_material'))]}"
+                            confirm="是否取消排产,移出当前产线?"
+                    />
+                </xpath>
+
+
+            </field>
+        </record>
+
         <record id="form_plan_mo_wizard" model="ir.ui.view">
             <field name="name">plan.mo.wizard.form</field>
             <field name="model">plan.mo.wizard</field>
@@ -411,8 +453,8 @@
                             </group>
                             <group>
                                 <field name="product_qty" required="1"/>
+                                <field name="planned_start_backup"/>
                                 <field name="in_charge_id" required="1"/>
-                                <field name="supplier_id"/>
                             </group>
                         </group>
 

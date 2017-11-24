@@ -27,6 +27,7 @@
         'report/purchase_order_report_template.xml',
         'report/purchase_order_report.xml',
         'security/ir.model.access.csv',
+        'security/supplier_rule.xml',
         'views/supplier_view.xml',
         'views/purchase_view.xml',
         'views/purchase_config_view.xml',

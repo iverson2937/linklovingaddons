@@ -321,7 +321,6 @@ class MrpProductionExtend(models.Model):
     feedback_on_rework = fields.Many2one("mrp.qc.feedback", u"返工单", track_visibility='onchange')
 
     @api.multi
-    @api.depends('qc_feedback_ids')
     def _compute_qty_unpost(self):
         for production in self:
             feedbacks = production.qc_feedback_ids.filtered(lambda x: x.state not in ["check_to_rework"])
@@ -818,8 +817,8 @@ class MrpProductionExtend(models.Model):
             lambda x: x.product_id.id == line.product_id.id and x.state not in ('done', 'cancel'))
         if move:
             if quantity > 0:
-                move[0].write({'product_uom_qty': quantity * qty,
-                               'suggest_qty': round(quantity * qty)})
+                move[0].write({'product_uom_qty': quantity,
+                               'suggest_qty': round(quantity)})
             else:
                 if move[0].quantity_done > 0:
                     raise UserError(_(
@@ -940,6 +939,8 @@ class MrpProductionExtend(models.Model):
 
     def action_cancel_and_return_material(self):
         for p in self:
+            if p.state == 'cancel':
+                raise UserError(u"此单据已处于取消状态,无法退料")
             return_m = self.env["mrp.return.material"].with_context({
                 'active_model': 'mrp.production',
                 'active_id': p.id
@@ -1104,6 +1105,10 @@ class MrpProductionProduceExtend(models.TransientModel):
 
     @api.multi
     def do_produce(self):
+        self._do_produce()
+        return {'type': 'ir.actions.act_window_close'}
+
+    def _do_produce(self):
         quantity = self.product_qty
         if float_compare(quantity, 0, precision_rounding=self.product_uom_id.rounding) > 0:
             feedback = self.feedback_create(self.product_qty)  # 产出  生成品检单
@@ -1118,8 +1123,6 @@ class MrpProductionProduceExtend(models.TransientModel):
                     except ValueError, e:
                         feedback.unlink()
                         raise UserError(e)
-
-        return {'type': 'ir.actions.act_window_close'}
 
     def do_produce_and_post_inventory(self):
         quantity = self.product_qty
@@ -1265,13 +1268,14 @@ class ReturnOfMaterial(models.Model):
     def _prepare_move_values(self, product):
         self.ensure_one()
 
+        move_type = 'null'
         if product.product_type == 'semi-finished':
             move_type = 'manufacturing_mo_in'
         elif product.product_type == 'material':
             move_type = 'manufacturing_rejected_out'
 
         return {
-            'name': self.name,
+            'name': '退料 %s' % self.production_id.name,
             'product_id': product.product_id.id,
             'product_uom': product.product_id.uom_id.id,
             'product_uom_qty': product.return_qty,
@@ -1280,7 +1284,7 @@ class ReturnOfMaterial(models.Model):
             'location_dest_id': self.return_location_id.id,
             'production_id': self.production_id.id,
             'state': 'confirmed',
-            'origin': 'Return %s' % self.production_id.name,
+            'origin': '退料 %s' % self.production_id.name,
             'is_return_material': True,
             'move_order_type': move_type,
             # 'restrict_partner_id': self.owner_id.id,
@@ -1409,6 +1413,12 @@ class SimStockMove(models.Model):
                     if bom_line.product_id.id == sim_move.product_id.id:
                         sim_move.bom_line_id = bom_line.id
 
+    @api.multi
+    def _compute_remaining_qty(self):
+        for sim_move in self:
+            remaining_qty = sim_move.suggest_qty - sim_move.quantity_done
+            sim_move.remaining_qty = remaining_qty if remaining_qty > 0 else 0
+
     product_id = fields.Many2one('product.product', )
     production_id = fields.Many2one('mrp.production')
     stock_moves = fields.One2many('stock.move', compute=_compute_stock_moves)
@@ -1433,6 +1443,8 @@ class SimStockMove(models.Model):
     is_prepare_finished = fields.Boolean(u"是否备货完成")
 
     bom_line_id = fields.Many2one(comodel_name='mrp.bom.line', compute='_compute_bom_line_id')
+
+    remaining_qty = fields.Float(string=u"待领数量", compute='_compute_remaining_qty')
 
 
 class ReturnMaterialLine(models.Model):
@@ -1672,8 +1684,8 @@ class MrpQcFeedBack(models.Model):
     @api.multi
     def unlink(self):
         for qc in self:
-            if qc.state in ['check_to_rework', 'alredy_post_inventory']:
-                raise UserError(u"无法删除已完成的品检单据")
+            if qc.state not in ["draft"]:
+                raise UserError(u"无法删除品检单据")
         return super(MrpQcFeedBack, self).unlink()
 
     # 等待品捡 -> 品捡中
@@ -1768,7 +1780,13 @@ class StockComfirmationExtend(models.TransientModel):
 
     @api.one
     def _process(self, cancel_backorder=False):
-        if self.pick_id.state in ["picking"] and self.pick_id.picking_type_code == 'incoming':  # 如果是处于分拣流程则只记录一下选择
+        # 分拣 和 正常过程都只记录选择
+        if self.pick_id.state in ["picking",
+                                  "validate"] and self.pick_id.picking_type_code == 'incoming':  # 如果是处于分拣流程则只记录一下选择
+            if self.pick_id.state == 'validate':
+                self.pick_id.write({
+                    'state': 'waiting_in'
+                })
             self.pick_id.is_cancel_backorder = cancel_backorder
             return {'type': 'ir.actions.act_window_close'}
         else:

@@ -88,6 +88,7 @@ $(function () {
         var target = e.target || e.srcElement;
         console.log(target.id);
 
+
         $('a.blog-type').removeClass('current');
         $(target).addClass("current");
 
@@ -109,6 +110,7 @@ $(function () {
         ajax_search_body(target);
 
         $(".div_show_go_back").hide();
+
     });
 
 
@@ -120,7 +122,7 @@ $(function () {
         else if ($(target).hasClass("detailed-type")) is_Parent = true;
 
         var is_search;
-        if ($(target).hasClass("search-type")) {
+        if ($(target).hasClass("search-type") || $(target).hasClass("glyphicon-search")) {
             is_search = true;
         }
 
@@ -138,6 +140,7 @@ $(function () {
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({
                 "params": {
+                    'blog_blog_id': target.id,
                     'blog_type_id': target.id,
                     'is_Parent': is_Parent,
                     'is_search': is_search,
@@ -155,7 +158,7 @@ $(function () {
 
 
                 for (var data_one in data_list) {
-                    html_val += "<dd> <div class='row'> <div class='col-md-10'> <a target='main_my' class='view_post_js' href='/blog/" + data_list[data_one].blog_id + "/post1/" + data_list[data_one].blog_post_id + "'>" + data_list[data_one].name + "</a></div> <div class='col-md-2'>" + data_list[data_one].blog_post_name + "</div> </div></dd>"
+                    html_val += "<dd> <div class='row'> <div class='col-md-10'> <a target='main_my' class='view_post_js' href='/blog/" + data_list[data_one].blog_id + "/post1/" + data_list[data_one].blog_post_id + "'>" + data_list[data_one].name + "</a></div> <div class='col-md-2'>" + data_list[data_one].blog_post_name + "</div> </div></dd>";
 
                     // html_val += "<dd><a class='view_post' href='/blog/" + data_list[data_one].blog_id + "/post/" + data_list[data_one].blog_post_id + ">" + data_list[data_one].name + "</a></dd>"
                 }

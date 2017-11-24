@@ -5,11 +5,12 @@ odoo.define('linkloving_core.product_detail', function (require) {
     var Model = require('web.Model');
     var Widget = require('web.Widget');
     var Dialog = require('web.Dialog');
-
+    var ControlPanelMixin = require('web.ControlPanelMixin');
+    var ControlPanel = require('web.ControlPanel');
     var QWeb = core.qweb;
     var _t = core._t;
 
-    var KioskConfirm = Widget.extend({
+    var KioskConfirm = Widget.extend(ControlPanelMixin, {
         template: "HomePage",
         events: {
             'click .click_tag_a': 'show_bom_line',
@@ -32,11 +33,48 @@ odoo.define('linkloving_core.product_detail', function (require) {
             'click .delete_mo_btn': 'click_delete_mo',
             'click .create_po_btn': 'click_create_po',
             'click .delete_po_btn': 'click_delete_po',
-            'mouseenter .trace_back':'mouseenter_ev'
+            'mouseenter .trace_back': 'mouseenter_ev',
+            'click .demand_confirm': 'action_demand_confirm',
+
         },
 
-        mouseenter_ev:function () {
-            console.log('sssssss')
+        action_demand_confirm: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var self = this;
+
+            if ($(target).data('id')) {
+
+                new Model("mrp.production")
+                    .call("set_to_confirm", [$(target).data('id')])
+                    .then(function (result) {
+                        $(target).hide();
+                        $(target).parents('h4').children(".state").text('需求确认');
+                    })
+            }
+        },
+        mouseenter_ev: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            if ($(target).hasClass('mo_trace')) {
+                var trace_id = $(target).parents('h4').children('.show_mo_number').attr('data-id');
+                console.log(parseInt(trace_id));
+                new Model("mrp.production")
+                    .call("get_mail_message", [parseInt(trace_id)])
+                    .then(function (result) {
+                        console.log(result);
+                        $(target).attr('title', result[0].name + ',' + result[0].time + ',' + result[0].description)
+                    })
+            } else if ($(target).hasClass('po_trace')) {
+                var trace_id = $(target).parents('h4').children('.show_po_number').attr('data-id');
+                console.log(parseInt(trace_id));
+                new Model("purchase.order")
+                    .call("get_mail_message", [parseInt(trace_id)])
+                    .then(function (result) {
+                        console.log(result);
+                        $(target).attr('title', result[0].name + ',' + result[0].time + ',' + result[0].description)
+                    })
+            }
         },
 
         click_create_po: function (e) {
@@ -46,7 +84,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
             if ($(target).data('product-tmpl')) {
                 var create_po_view = {
                     type: 'ir.actions.act_window',
-                    res_model: 'purchase.order',
+                    res_model: 'purchase.order.line.wizard',
                     view_mode: 'form',
                     views: [[false, 'form']],
                     context: {'default_product_id': parseInt($(target).data('product-tmpl'))},
@@ -447,7 +485,6 @@ odoo.define('linkloving_core.product_detail', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var check_name = target.getAttribute("check-name");
-            alert(check_name);
             var mo_merge_inputs_ids = [];
             var mo_merge_inputs = $("input[name=" + check_name + "]");
             // console.log(mo_merge_inputs)
@@ -504,20 +541,25 @@ odoo.define('linkloving_core.product_detail', function (require) {
         },
         to_mo_page: function (e) {
             var e = e || window.event;
+            var self = this;
             var target = e.target || e.srcElement;
             var act_id = target.getAttribute("data-id");
+
             act_id = parseInt(act_id);
-            var action = {
-                name: "制造单",
-                type: 'ir.actions.act_window',
-                res_model: 'mrp.production',
-                view_type: 'form',
-                view_mode: 'tree,form',
-                views: [[false, 'form']],
-                res_id: act_id,
-                target: "new"
-            };
-            this.do_action(action);
+            new Model('mrp.production').call('get_formview_id', [[act_id], {'show_custom_form': true}]).then(function (view_id) {
+                var action = {
+                    name: "详细",
+                    type: 'ir.actions.act_window',
+                    res_model: 'mrp.production',
+                    view_type: 'form',
+                    view_mode: 'tree,form',
+                    views: [[view_id, 'form']],
+                    res_id: act_id,
+                    target: "new"
+                };
+
+                self.do_action(action);
+            });
         },
         to_product_name: function (e) {
             var e = e || window.event;
@@ -538,7 +580,11 @@ odoo.define('linkloving_core.product_detail', function (require) {
         },
 
         init: function (parent, action) {
+            this._super(parent);
             this._super.apply(this, arguments);
+            if (parent && parent.action_stack.length > 0) {
+                this.action_manager = parent.action_stack[0].widget.action_manager
+            }
             this.product_id = action.product_id;
             var self = this;
         },
@@ -632,6 +678,12 @@ odoo.define('linkloving_core.product_detail', function (require) {
         },
         start: function () {
             var self = this;
+            var cp_status = {
+                breadcrumbs: self.action_manager && self.action_manager.get_breadcrumbs(),
+                // cp_content: _.extend({}, self.searchview_elements, {}),
+            };
+            console.log(cp_status);
+            self.update_control_panel(cp_status);
             if (this.product_id) {
                 return new Model("product.template")
                     .call("get_detail", [this.product_id])
