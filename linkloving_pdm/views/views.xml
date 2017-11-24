@@ -1,5 +1,45 @@
 <openerp>
     <data>
+
+        <record id="view_stock_config_settings" model="ir.ui.view">
+            <field name="name">文件服务器设置</field>
+            <field name="model">pdm.config.settings</field>
+            <field name="arch" type="xml">
+                <form string="Configure Warehouse" class="oe_form_configuration">
+                    <header>
+                        <button string="Apply" type="object" name="execute" class="oe_highlight"/>
+                        <button string="Cancel" type="object" name="cancel" class="oe_link"/>
+                    </header>
+                    <group>
+                        <group string="文件服务器设置">
+                            <field name="pdm_intranet_ip"/>
+                            <field name="pdm_external_ip"/>
+                            <field name="pdm_port"/>
+                            <field name="op_path"/>
+                            <field name="pdm_account"/>
+                            <field name="pdm_pwd"/>
+                        </group>
+
+                    </group>
+
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="pdm_config_setting_action">
+            <field name="name">设置</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">pdm.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+        </record>
+
+        <menuitem id="pdm_config_setting_menu"
+                  parent="linkloving_approval.approval_setting"
+                  action="pdm_config_setting_action"
+                  sequence="50"/>
+
+
         <record id="action_review_process_wizard" model="ir.actions.act_window">
             <field name="name">选择下一个审核人</field>
             <field name="type">ir.actions.act_window</field>
