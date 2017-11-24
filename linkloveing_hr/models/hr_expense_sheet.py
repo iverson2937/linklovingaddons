@@ -10,6 +10,13 @@ class HrExpenseSheet(models.Model):
     _inherit = 'hr.expense.sheet'
     _rec_name = 'expense_no'
 
+    @api.multi
+    def _get_payment_info_JSON(self):
+        for sheet in self:
+            sheet.to_deduct_payment = 'ssss'
+
+    to_deduct_payment = fields.Char(compute=_get_payment_info_JSON)
+
     sheet_type = fields.Selection([
         ('normal', '普通报销'),
         ('purchase', '申购报销'),

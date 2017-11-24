@@ -5,9 +5,16 @@
     <t t-name="ShowPrePayment">
         <div>
             <t>
-                <div>
-                    <button>去抵扣</button>
+                <div  style="opacity:0.5">
+                    <span>暂支余额:</span>
                 </div>
+                <div  style="opacity:0.5">
+                      <span>已选择:</span>
+                </div>
+                <div>
+                    <button class="oe_highlight to_deduct_payment">去抵扣</button>
+                </div>
+
             </t>
 
         </div>

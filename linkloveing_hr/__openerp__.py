@@ -34,6 +34,7 @@
         'wizard/hr_expense_receive_wizard.xml',
         'wizard/account_employee_refuse_wizard.xml',
         # 'security/hr_expense_sheet_rule.xml',
+        'view/assets.xml',
         'view/account_employee_payment_view.xml',
         'view/hr_expense_views.xml',
         'view/hr_department_view.xml',
@@ -49,4 +50,5 @@
     'demo': [
         'demo.xml',
     ],
+    'qweb': ['static/src/xml/*.xml'],
 }

@@ -11,8 +11,10 @@ odoo.define('prepayment_button', function (require) {
     var ShowPrePaymentWidget = form_common.AbstractField.extend({
         render_value: function () {
             var self = this;
-            var info = JSON.parse(this.get('value'));
+            // var info = JSON.parse(this.get('value'));
+            var info = this.get('value');
             var invoice_id = info.invoice_id;
+            this.$el.html(QWeb.render('ShowPrePayment'));
             // if (info !== false) {
             //     _.each(info.content, function(k,v){
             //         k.index = v;
@@ -26,14 +28,19 @@ odoo.define('prepayment_button', function (require) {
             //         'outstanding': info.outstanding,
             //         'title': info.title
             //     }));
-            //     this.$('.outstanding_credit_assign').click(function(){
-            //         var id = $(this).data('id') || false;
-            //         new Model("account.invoice")
-            //             .call("assign_outstanding_credit", [invoice_id, id])
-            //             .then(function (result) {
-            //                 self.view.reload();
-            //             });
-            //     });
+            this.$('.to_deduct_payment').click(function () {
+                self.do_action(
+                    {
+                        name: 'Expense Sheet',
+                        type: 'ir.actions.act_window',
+                        res_model: "account.employee.payable.wizard",
+                        view_mode: 'form',
+                        view_type: 'form',
+                        context: {'default_employee_id': 1},
+                        target: 'new'
+                    }
+                )
+            });
             //     _.each(this.$('.js_payment_info'), function(k, v){
             //         var options = {
             //             'content': QWeb.render('PaymentPopOver', {
