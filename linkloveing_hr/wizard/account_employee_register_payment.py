@@ -3,6 +3,7 @@
 
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
+from odoo.tools import float_compare
 
 
 class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
@@ -100,7 +101,6 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
                 'payment_id': employee_payment.id,
                 'amount': self.amount
             })
-
-        else:
+        if float_compare(employee_payment.paid_amount, employee_payment.amount, precision_digits=2) == 0:
             employee_payment.state = 'paid'
         return {'type': 'ir.actions.act_window_close'}
