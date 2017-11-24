@@ -14,7 +14,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
     var common = require('web.form_common');
     var QWeb = core.qweb;
     var _t = core._t;
-
+    var PROXY_URL = "http://localhost:8088/";
     var DocumentManage = Widget.extend(ControlPanelMixin, {
         template: 'document_load_page',
         events: {
@@ -38,7 +38,14 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             'click .outage_document_file': 'outage_document_file_fn',
         },
 
-
+        get_default_pdm_intranet_ip: function (then_cb) {
+            var m_fields = ['pdm_intranet_ip', 'pdm_external_ip', 'pdm_port', 'op_path', 'pdm_account', 'pdm_pwd']
+            return new Model("pdm.config.settings")
+                .call("get_default_pdm_intranet_ip", [m_fields])
+                .then(function (res) {
+                    then_cb(res);
+                });
+        },
         // 全选
         document_all_checkbox_realize: function (e) {
             var self = this;
@@ -182,7 +189,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             console.log(self.product_info);
             $.ajax({
                 type: "GET",
-                url: "http://localhost:8088",
+                url: PROXY_URL,
                 // dataType: 'json/html',
                 success: function (data) {
                     if (data.result == '1') {
@@ -199,7 +206,8 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                             console.log(ret);
                             $.ajax({
                                 type: "GET",
-                                url: "http://localhost:8088/uploadfile?id=" + this.product_id + "&remotefile=" + remote_file,
+                                url: PROXY_URL + "uploadfile",//http://localhost:8088/uploadfile?id=" + this.product_id + "&remotefile=" + remote_file,
+                                data: $.extend(self.pdm_info, {id: this.product_id, remotefile: remote_file}),// "http://localhost:8088/downloadfile?remotefile=" + remote_path,
                                 success: function (data) {
                                     framework.unblockUI();
                                     console.log(data);
@@ -210,7 +218,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                                 },
                                 error: function (error) {
                                     framework.unblockUI();
-                                    Dialog.alert("上传失败,请打开代理软件");
+                                    Dialog.alert(e.target, "上传失败,请打开代理软件");
                                     console.log(error);
                                 }
                             });
@@ -219,7 +227,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                     }
                     else {
                         framework.unblockUI();
-                        Dialog.alert("请打开代理软件!");
+                        Dialog.alert(e.target, "请打开代理软件!");
                     }
                 },
                 error: function (error) {
@@ -265,6 +273,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             })
         },
         document_download_fn: function (e) {
+            var self = this;
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
@@ -279,7 +288,8 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             if (type == 'OTHER' || type == 'DESIGN') {
                 $.ajax({
                     type: "GET",
-                    url: "http://localhost:8088/downloadfile?remotefile=" + remote_path,
+                    url: PROXY_URL + "downloadfile",// "http://localhost:8088/downloadfile?remotefile=" + remote_path,
+                    data: $.extend(self.pdm_info, {remotefile: remote_path}),
                     success: function (data) {
                         console.log(data);
                         if (data.result == '1') {
@@ -313,7 +323,8 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             console.log(ret);
             $.ajax({
                 type: "GET",
-                url: "http://localhost:8088/uploadfile?id=" + this.product_id + "&remotefile=" + remote_file,
+                url: PROXY_URL + "uploadfile",//http://localhost:8088/uploadfile?id=" + this.product_id + "&remotefile=" + remote_file,
+                data: $.extend(self.pdm_info, {id: this.product_id, remotefile: remote_file}),
                 success: function (data) {
                     framework.unblockUI();
                     console.log(data);
@@ -381,7 +392,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
         close_document_container: function () {
             $(".load_container").hide()
         },
-        create_document_fn: function () {
+        create_document_fn: function (e) {
             //   var action = {
             //     name:"详细",
             //     type: 'ir.actions.act_window',
@@ -420,7 +431,7 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             $(".file_func").val(callback);
             window[callback] = function (result) {
                 if (result.error) {
-                    Dialog.alert(result.error)
+                    Dialog.alert(e.target, result.error)
                 }
                 console.log(result)
                 // window.location.reload()
@@ -529,6 +540,10 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 .then(function (result) {
                     console.log(result)
                     self.$el.append(QWeb.render('document_load_detail', {result: result.list}));
+                    self.get_default_pdm_intranet_ip(function (res) {
+                        self.pdm_info = res;
+                        console.log(res);
+                    })
                     self.product_info = result.info;
                 });
         }

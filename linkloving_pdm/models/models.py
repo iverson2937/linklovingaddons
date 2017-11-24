@@ -26,38 +26,6 @@ ATTACHINFO_FIELD = ['product_tmpl_id', 'file_name', 'review_id', 'remote_path',
                     'version', 'state', 'has_right_to_review', 'is_show_outage',
                     'is_able_to_use', 'is_show_cancel', 'is_first_review',
                     'create_uid', 'type', 'is_delect_view', 'is_show_action_deny']
-
-
-class PdmConfigSetting(models.TransientModel):
-    _name = 'pdm.config.settings'
-    _inherit = 'res.config.settings'
-
-    pdm_intranet_ip = fields.Char(string=u'内网地址')
-    pdm_external_ip = fields.Char(string=u'外网地址')
-    pdm_port = fields.Char(string=u'端口')
-    op_path = fields.Char(string=u'操作路径', default='/home/pdm/')
-    pdm_account = fields.Char(string=u'账号')
-    pdm_pwd = fields.Char(string=u'密码')
-
-    @api.model
-    def get_default_pdm_intranet_ip(self, fields):
-        dica = {}
-        for fi in fields:
-            fi_val = self.env["ir.config_parameter"].get_param("pdm.config.settings.%s" % fi, default=None)
-            dica.update({
-                fi: fi_val
-            })
-
-        return dica
-
-    @api.multi
-    def set_pdm_intranet_ip(self):
-        fileds = ['pdm_intranet_ip', 'pdm_external_ip', 'pdm_port', 'op_path', 'pdm_account', 'pdm_pwd']
-        for record in self:
-            for fi in fileds:
-                self.env['ir.config_parameter'].set_param("pdm.config.settings.%s" % fi, getattr(record, fi, ''))
-
-
 class ReviewProcess(models.Model):
     _name = 'review.process'
 
