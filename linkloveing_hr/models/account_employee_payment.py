@@ -25,6 +25,7 @@ class AccountEmployeePayment(models.Model):
                                   default=lambda self: self.env['hr.employee'].search([('user_id', '=', self.env.uid)],
                                                                                       limit=1))
     payment_ids = fields.One2many('account.payment', 'res_id', domain=[('res_model', '=', 'account.employee.payment')])
+    pre_payment_reminding = fields.Float(related='employee_id.pre_payment_reminding')
 
     def _get_paid_amount(self):
         for record in self:
@@ -42,7 +43,6 @@ class AccountEmployeePayment(models.Model):
                 sheet.has_payment_ids = False
 
     has_payment_ids = fields.Boolean(compute=_compute_has_payment_ids)
-
 
     @api.multi
     def refuse_payment(self, reason):

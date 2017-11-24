@@ -70,9 +70,9 @@
                             </h1>
                         </div>
 
-                        <!--<group>-->
-                        <!--<field name="sheet_type" widget="radio" string="报销类型"/>-->
-                        <!--</group>-->
+                        <group>
+                            <field name="sheet_type" widget="radio" string="报销类型" invisible="1"/>
+                        </group>
                         <separator/>
 
                         <group>
