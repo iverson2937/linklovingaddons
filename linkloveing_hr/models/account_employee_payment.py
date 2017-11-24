@@ -25,6 +25,8 @@ class AccountEmployeePayment(models.Model):
                                   default=lambda self: self.env['hr.employee'].search([('user_id', '=', self.env.uid)],
                                                                                       limit=1))
 
+
+
     @api.multi
     def refuse_payment(self, reason):
         self.write({'state': 'cancel', 'approve_ids': [(4, self.env.user.id)]})
@@ -177,6 +179,12 @@ class AccountEmployeePayment(models.Model):
             self.write({'state': 'manager1_approve', 'approve_ids': [(4, self.env.user.id)]})
 
         create_remark_comment(self, u'1级审核')
+
+    @api.multi
+    def create_message_post(self, body_str):
+        for sheet in self:
+            body = body_str
+            sheet.message_post(body=body)
 
     @api.multi
     def cancel(self):
