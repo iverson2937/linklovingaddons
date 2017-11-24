@@ -82,7 +82,7 @@
                                 <field name="accounting_date" string="会计日期"
                                        attrs="{'invisible': [('state', 'not in', ('approve','paid'))]}"/>
                                 <field name="company_id" invisible="1"/>
-                                <field name="pre_payment_reminding" string="暂支余额"/>
+                                <field name="payment_reminding" string="暂支余额"/>
 
                             </group>
                         </group>
