@@ -252,7 +252,8 @@
         <menuitem
                 id="menu_order_point"
                 parent="sales_team.menu_base_partner"
-                sequence="1" name="产品看板"/>
+                sequence="1" name="产品看板"
+        />
 
 
         <record id="view_sales_order_line_tree_inherit" model="ir.ui.view">

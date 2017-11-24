@@ -62,7 +62,9 @@
                         <group>
                             <group>
                                 <!--<field name="is_show" invisible="1"/>-->
+                                <field name="paid_amount" invisible="1"/>
                                 <field name="employee_id" string="Employee"/>
+
                                 <field name="is_show" invisible="1"/>
                                 <field name="can_return" invisible="1"/>
                                 <field name="bank_account_id" string="Bank Account"
@@ -79,7 +81,8 @@
                                        string="Apply Date"/>
                                 <field name="accounting_date" string="会计日期"
                                        attrs="{'invisible': [('state', 'not in', ('approve','paid'))]}"/>
-                                <field name="company_id"/>
+                                <field name="company_id" invisible="1"/>
+                                <field name="payment_reminding" string="暂支余额"/>
 
                             </group>
                         </group>
@@ -105,6 +108,18 @@
                                 </field>
 
                             </page>
+
+                            <page string="付款信息" attrs="{'invisible':[('has_payment_ids','=',False)]}">
+                                <field name="payment_ids" readonly="1">
+                                    <tree>
+                                        <field name="display_name"/>
+                                        <field name="payment_date"/>
+                                        <field name="journal_id"/>
+                                        <field name="amount" sum="总计"/>
+                                    </tree>
+                                </field>
+
+                            </page>
                             <page string='Other Info' attrs="{}">
                                 <group>
                                     <field name="return_count" invisible="1"/>
@@ -117,6 +132,7 @@
 
                             </page>
                         </notebook>
+                        <field name="has_payment_ids" invisible="1"/>
 
                     </sheet>
                     <div class="oe_chatter">

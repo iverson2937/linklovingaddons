@@ -69,23 +69,33 @@
                                 <field name="expense_no" placeholder="e.g. Trip to NY" readonly="1"/>
                             </h1>
                         </div>
+
+                        <group>
+                            <field name="sheet_type" widget="radio" string="报销类型" invisible="1"/>
+                        </group>
+                        <separator/>
+
                         <group>
                             <group>
 
                                 <field name="department_id" required="1" options="{'no_create':True}"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
-                                <field name="pre_payment_reminding"
-                                       attrs="{'invisible': [('pre_payment_reminding', '=', False)]}"
-                                       readonly="1"/>
                                 <field name="employee_id" invisible="0" readonly="1"/>
+                                <field name="to_approve_id"/>
                                 <field name="is_show" invisible="1"/>
                                 <field name="responsible_id" invisible="1"/>
                                 <field name="total_amount" invisible="1"/>
                                 <field name="currency_id" invisible="1"/>
                                 <field name="address_id" invisible="1"/>
+                                <!--<div>-->
+                                <!--申购明细-->
+                                <!--</div>-->
                             </group>
                             <group>
-                                <field name="to_approve_id"/>
+                                <field name="pre_payment_reminding"/>
+                                <!--<field name="is_deduct_payment" required="1" widget="radio"/>-->
+
+
                                 <field name="journal_id" domain="[('type', '=', 'purchase')]"
                                        groups="account.group_account_user"
                                        options="{'no_open': True, 'no_create': True}"

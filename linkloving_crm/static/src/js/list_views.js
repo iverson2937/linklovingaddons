@@ -90,7 +90,6 @@ odoo.define('linkloving_crm.list_views', function (require) {
             if (!this.options.$pager || !this.options.$pager.length) {
                 this.options.$pager = false;
             }
-
             this.options.deletable = this.options.deletable && this.is_action_enabled('delete');
             this.name = "" + this.fields_view.arch.attrs.string;
 

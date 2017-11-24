@@ -24,6 +24,25 @@ class AccountEmployeePayment(models.Model):
     employee_id = fields.Many2one('hr.employee',
                                   default=lambda self: self.env['hr.employee'].search([('user_id', '=', self.env.uid)],
                                                                                       limit=1))
+    payment_ids = fields.One2many('account.payment', 'res_id', domain=[('res_model', '=', 'account.employee.payment')])
+    payment_reminding = fields.Float(related='employee_id.pre_payment_reminding')
+
+    def _get_paid_amount(self):
+        for record in self:
+            record.paid_amount = sum(payment.amount for payment in record.payment_ids)
+
+    paid_amount = fields.Float(compute=_get_paid_amount)
+
+    @api.multi
+    def _compute_has_payment_ids(self):
+        for sheet in self:
+
+            if sheet.payment_ids:
+                sheet.has_payment_ids = True
+            else:
+                sheet.has_payment_ids = False
+
+    has_payment_ids = fields.Boolean(compute=_compute_has_payment_ids)
 
     @api.multi
     def refuse_payment(self, reason):
@@ -74,6 +93,7 @@ class AccountEmployeePayment(models.Model):
     payment_return = fields.Float(string='Return amount', compute=_get_return_balance)
     return_count = fields.Integer(compute='_get_count')
     payment_count = fields.Integer(compute='_get_count')
+    # 暂支抵扣明细
     payment_line_ids = fields.One2many('account.employee.payment.line', 'payment_id')
 
     @api.one
@@ -179,6 +199,12 @@ class AccountEmployeePayment(models.Model):
         create_remark_comment(self, u'1级审核')
 
     @api.multi
+    def create_message_post(self, body_str):
+        for sheet in self:
+            body = body_str
+            sheet.message_post(body=body)
+
+    @api.multi
     def cancel(self):
 
         self.state = 'cancel'
@@ -211,7 +237,7 @@ class AccountEmployeePayment(models.Model):
     @api.multi
     def post(self):
 
-        context = {'default_payment_type': 'outbound', 'default_amount': self.amount}
+        context = {'default_payment_type': 'outbound', 'default_amount': self.amount - self.paid_amount}
 
         return {
             'name': _('payment'),
