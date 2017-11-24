@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--t-if='widget.options.import_enabled'-->
+<templates xml:space="preserve">
+       <t t-name="QueryView.query_button">
+    <t t-if="widget.options.action.context.is_show_procuremnt_create_btn">
+        <button  type="button" class="btn btn-sm btn-primary o_button_query">
+            创建生产需求单
+        </button>
+        </t>
+    </t>
+
+        <t t-extend="ListView.buttons">
+        <t t-jquery="button.o_list_button_add" t-operation="after">
+           <t t-call="QueryView.query_button"/>
+        </t>
+    </t>
+</templates>
