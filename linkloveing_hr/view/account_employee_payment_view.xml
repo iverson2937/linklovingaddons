@@ -64,7 +64,7 @@
                                 <!--<field name="is_show" invisible="1"/>-->
                                 <field name="paid_amount" invisible="1"/>
                                 <field name="employee_id" string="Employee"/>
-                                <field name="pre_payment_reminding" string="暂支余额"/>
+
                                 <field name="is_show" invisible="1"/>
                                 <field name="can_return" invisible="1"/>
                                 <field name="bank_account_id" string="Bank Account"
@@ -81,7 +81,8 @@
                                        string="Apply Date"/>
                                 <field name="accounting_date" string="会计日期"
                                        attrs="{'invisible': [('state', 'not in', ('approve','paid'))]}"/>
-                                <field name="company_id"/>
+                                <field name="company_id" invisible="1"/>
+                                <field name="pre_payment_reminding" string="暂支余额"/>
 
                             </group>
                         </group>
