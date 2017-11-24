@@ -329,7 +329,7 @@ class CreateOrderPointWizard(models.TransientModel):
         for c in categ_ids:
             if c.menu_id.action:
                 _logger.warning("update menu action list, %d/%d" % (c.id, c.menu_id.id))
-                c.menu_id.action.domain = '[["categ_id", "child_of", %d]]' % int(c.id)
+                c.menu_id.action.domain = '[["categ_id", "child_of", %d],["active", "=", True]]' % int(c.id)
                 c.menu_id.action.context = "{'is_show_procuremnt_create_btn': True}"
 
     def mo_to_bz_process(self):
