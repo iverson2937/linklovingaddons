@@ -9,13 +9,14 @@
         </template>
 
         <record id="manual_procurement_order_tree_view" model="ir.ui.view">
-            <field name="name">manual.procurement.order.tree</field>
+            <field name="name">生产需求单</field>
             <field name="model">manual.procurement.order</field>
             <field name="arch" type="xml">
                 <tree string="需求单">
                     <field name="name"/>
                     <field name="alia_name"/>
                     <field name="date_excepted"/>
+                    <field name="qty_done_rate" widget="progressbar"/>
                     <field name="state"/>
                     <field name="create_date"/>
                 </tree>
@@ -23,24 +24,24 @@
         </record>
 
         <record id="manual_procurement_order_form_view" model="ir.ui.view">
-            <field name="name">manual.procurement.order.form</field>
+            <field name="name">生产需求单</field>
             <field name="model">manual.procurement.order</field>
             <field name="arch" type="xml">
-                <form string="需求单" options="{'asd':'12312'}">
+                <form string="需求单">
                     <header>
                         <button string="确认需求"
                                 name="action_confirm_procurement"
                                 type="object"
                                 class="btn-primary"
                                 states="draft"
-                                confirm="点击确认会生成对应的制造单以及采购单"/>
+                                confirm="点击'确定' 会生成对应的制造单以及采购单"/>
                         <!---->
                         <button string="取消需求"
                                 name="action_cancel_procurement"
                                 type="object"
                                 class="btn-primary"
                                 states="confirmed"
-                                confirm="点击确认会取消对应的制造单以及采购单"/>
+                                confirm="点击'确定' 会取消对应的制造单以及采购单"/>
 
                         <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
                     </header>
@@ -73,7 +74,7 @@
                                         <field name="qty_available" readonly="1" string="库存"/>
                                         <field name="qty_ordered"/>
                                         <field name="qty_done"/>
-                                        <field name="state"/>
+                                        <field name="state" readonly="1"/>
                                     </tree>
                                     <form>
                                         <group>
@@ -92,12 +93,15 @@
                             </page>
                         </notebook>
                     </sheet>
-
+                    <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
                 </form>
             </field>
         </record>
         <record id="action_manual_procurement_order" model="ir.actions.act_window">
-            <field name="name">manual.procurement.order</field>
+            <field name="name">生产需求单</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">manual.procurement.order</field>
             <field name="view_mode">tree,form</field>
@@ -117,6 +121,18 @@
                 sequence="3"
                 name="生产需求单"
                 action="action_manual_procurement_order"/>
+
+        <record id="view_procurement_filter" model="ir.ui.view">
+            <field name="name">manual.procurement.order.select</field>
+            <field name="model">manual.procurement.order</field>
+            <field name="arch" type="xml">
+                <search string="Search Procurement">
+                    <field name="name"/>
+                    <field name="alia_name"/>
+                    <field name="procurement_line_ids" string="产品" filter_domain="[('procurement_line_ids.product_id','ilike',self)]"/>
+                </search>
+            </field>
+        </record>
 
     </data>
 </openerp>

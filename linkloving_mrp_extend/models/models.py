@@ -2064,7 +2064,8 @@ class ProcurementOrderExtend(models.Model):
 
     @api.multi
     def _prepare_purchase_order_line(self, po, supplier):
-        product_new_qty = self.get_actual_require_qty()  #
+        self.ensure_one()
+        product_new_qty = self.product_qty if self.not_base_on_available else self.get_actual_require_qty()
         procurement_uom_po_qty = self.product_uom._compute_quantity(product_new_qty, self.product_id.uom_po_id)
         res = super(ProcurementOrderExtend, self)._prepare_purchase_order_line(po, supplier)
 

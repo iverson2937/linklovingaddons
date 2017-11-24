@@ -73,8 +73,8 @@ class linkloving_procurement_order(models.Model):
         res = []
 
         for procurement in self:
-            product_new_qty = self.get_actual_require_qty()
-            procurement_uom_po_qty = self.product_uom._compute_quantity(product_new_qty, self.product_id.uom_po_id)
+            product_new_qty = procurement.product_qty if self.not_base_on_available else procurement.get_actual_require_qty()
+            procurement_uom_po_qty = procurement.product_uom._compute_quantity(product_new_qty, procurement.product_id.uom_po_id)
             if procurement_uom_po_qty <= 0:
                 res += [procurement.id]
                 continue
