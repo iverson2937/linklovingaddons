@@ -293,7 +293,14 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                     success: function (data) {
                         console.log(data);
                         if (data.result == '1') {
-                            Dialog.alert(target, "已下载至指定目录");
+                            Dialog.OpenDialog(target, "已下载至指定目录", {
+                                open_confirm_callback: function () {
+                                    self.open_file_browser(data.chose_path, data.file_name, false);
+                                },
+                                open_file_callback: function () {
+                                    self.open_file_browser(data.chose_path, data.file_name, true);
+                                }
+                            });
                         }
                         else if (data.result == '2') {
                             Dialog.alert(target, "下载失败, 未选择存储路径");
@@ -548,7 +555,43 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                 });
         }
 
-    })
+    });
+// static method to open simple confirm dialog
+    Dialog.OpenDialog = function (owner, message, options) {
+        var buttons = [
+            {
+                text: _t("Ok"),
+                classes: 'btn-primary',
+                close: true,
+                click: options && options.confirm_callback
+            },
+            {
+                text: "打开所在文件夹",
+                classes: 'btn-primary',
+                close: true,
+                click: options && options.open_confirm_callback
+            },
+            {
+                text: "直接打开文件",
+                classes: 'btn-primary',
+                close: true,
+                click: options && options.open_file_callback
+            },
+            {
+                text: _t("Cancel"),
+                close: true,
+                click: options && options.cancel_callback
+            }
+        ];
+        return new Dialog(owner, _.extend({
+            size: 'medium',
+            buttons: buttons,
+            $content: $('<div>', {
+                text: message,
+            }),
+            title: _t("Confirmation"),
+        }, options)).open();
+    };
 
     core.action_registry.add('document_manage', DocumentManage);
 

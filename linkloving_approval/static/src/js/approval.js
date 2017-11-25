@@ -44,6 +44,16 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             'click .document_all_checkbox': 'document_all_checkbox_realize',
             'click .outage_document_file': 'outage_document_file_fn',
         },
+        open_file_browser: function (file_path, file_name, direct_open) {
+            $.ajax({
+                type: "GET",
+                url: PROXY_URL + "open_file_browser",
+                data: {file_path: file_path, file_name: file_name, direct_open: direct_open},// "http://localhost:8088/downloadfile?remotefile=" + remote_path,
+                success: function (data) {
+
+                }
+            });
+        },
         get_default_pdm_intranet_ip: function (then_cb) {
             var m_fields = ['pdm_intranet_ip', 'pdm_external_ip', 'pdm_port', 'op_path', 'pdm_account', 'pdm_pwd']
             return new Model("pdm.config.settings")
@@ -205,7 +215,14 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                 success: function (data) {
                     console.log(data);
                     if (data.result == '1') {
-                        Dialog.alert(target, "已下载至指定目录");
+                        Dialog.OpenDialog(target, "已下载至指定目录", {
+                            open_confirm_callback: function () {
+                                self.open_file_browser(data.chose_path, data.file_name, false);
+                            },
+                            open_file_callback: function () {
+                                self.open_file_browser(data.chose_path, data.file_name, true);
+                            }
+                        });
                     }
                     else if (data.result == '2') {
                         Dialog.alert(target, "下载失败, 未选择存储路径");
@@ -318,7 +335,14 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                     success: function (data) {
                         console.log(data);
                         if (data.result == '1') {
-                            Dialog.alert(target, "已下载至指定目录");
+                            Dialog.OpenDialog(target, "已下载至指定目录", {
+                                open_confirm_callback: function () {
+                                    self.open_file_browser(data.chose_path, data.file_name, false);
+                                },
+                                open_file_callback: function () {
+                                    self.open_file_browser(data.chose_path, data.file_name, true);
+                                }
+                            });
                         }
                         else if (data.result == '2') {
                             Dialog.alert(target, "下载失败, 未选择存储路径");
@@ -720,8 +744,6 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             //     });
             // }
         },
-
-
         start: function () {
             var self = this;
             var model = new Model("approval.center");
