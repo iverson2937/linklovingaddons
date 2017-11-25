@@ -2,16 +2,25 @@
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+from odoo.tools import float_is_zero
 
 
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
     payment_ids = fields.One2many('account.employee.payment', 'employee_id')
 
-    @api.one
-    @api.depends('payment_ids')
+    @api.multi
     def _get_pre_payment_reminding(self):
-        self.pre_payment_reminding = sum(
-            [payment_id.pre_payment_reminding if payment_id.state == 'paid' else 0 for payment_id in self.payment_ids])
+        for employee in self:
+            employee.pre_payment_reminding = sum(
+                [payment_id.pre_payment_reminding if payment_id.state == 'paid' else 0 for payment_id in
+                 employee.payment_ids])
+            if not float_is_zero(employee.pre_payment_reminding, precision_rounding=2):
+                employee.has_prepayment_ids = True
+            else:
+                employee.has_prepayment_ids = False
+
+    # 该员工是否有暂支
+    has_prepayment_ids = fields.Boolean(compute=_get_pre_payment_reminding)
 
     pre_payment_reminding = fields.Float(compute=_get_pre_payment_reminding)

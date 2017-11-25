@@ -11,28 +11,23 @@ odoo.define('prepayment_button', function (require) {
     var ShowPrePaymentWidget = form_common.AbstractField.extend({
         render_value: function () {
             var self = this;
-            // var info = JSON.parse(this.get('value'));
-            var info = this.get('value');
-            var invoice_id = info.invoice_id;
-            this.$el.html(QWeb.render('ShowPrePayment'));
-            // if (info !== false) {
-            //     _.each(info.content, function(k,v){
-            //         k.index = v;
-            //         k.amount = formats.format_value(k.amount, {type: "float", digits: k.digits});
-            //         if (k.date){
-            //             k.date = formats.format_value(k.date, {type: "date"});
-            //         }
-            //     });
-            //     this.$el.html(QWeb.render('ShowPaymentInfo', {
-            //         'lines': info.content,
-            //         'outstanding': info.outstanding,
-            //         'title': info.title
-            //     }));
+
+            var info = JSON.parse(this.get('value'));
+            console.log(this);
+            this.$el.html(QWeb.render('ShowPrePayment', {
+                'pre_payment_amount': info.pre_payment_amount,
+                'payment_line_amount': info.payment_line_amount,
+            }));
+
             var action = {
                 type: 'ir.actions.act_window',
                 res_model: 'account.employee.payable.wizard',
                 views: [[false, 'form']],
-                context:{'default_employee_id':info.get('employee_id')},
+                context: {
+                    'default_employee_id': info.employee_id,
+                    'default_payment_ids': info.payment_ids,
+                    'active_ids': info.sheet_id
+                },
                 target: 'new'
             };
             this.$('.to_deduct_payment').click(function () {
