@@ -28,18 +28,15 @@ odoo.define('prepayment_button', function (require) {
             //         'outstanding': info.outstanding,
             //         'title': info.title
             //     }));
+            var action = {
+                type: 'ir.actions.act_window',
+                res_model: 'account.employee.payable.wizard',
+                views: [[false, 'form']],
+                context:{'default_employee_id':info.get('employee_id')},
+                target: 'new'
+            };
             this.$('.to_deduct_payment').click(function () {
-                self.do_action(
-                    {
-                        name: 'Expense Sheet',
-                        type: 'ir.actions.act_window',
-                        res_model: "account.employee.payable.wizard",
-                        view_mode: 'form',
-                        view_type: 'form',
-                        context: {'default_employee_id': 1},
-                        target: 'new'
-                    }
-                )
+                self.do_action(action)
             });
             //     _.each(this.$('.js_payment_info'), function(k, v){
             //         var options = {
