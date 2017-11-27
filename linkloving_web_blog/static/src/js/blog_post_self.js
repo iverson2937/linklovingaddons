@@ -390,21 +390,26 @@ function UploadFiles(files, content, func) {
     var name_list = files.split("\\");
     files = name_list[name_list.length - 1];
 
-    formData.append("file", files);
-    formData.append("content", content);
-
-    console.log(formData);
+    // formData.append("file", files);
+    // formData.append("content", content);
+    //
+    // console.log(formData);
 
     $.ajax({
-        data: formData,
         type: "POST",
-        url: "/blog/create_attachment",
-        // url: "#",
-        cache: false,
-        contentType: false,
-        processData: false,
+        dataType: 'json',
+        url: '/linkloving_crm/create_attachment',
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify({
+            'jsonrpc': "2.0",
+            'method': "call",
+            "params": {
+                "file": files,
+                "content": content,
+            }
+        }),
         success: function (imageUrl) {
-            func("/web/content?id=" + imageUrl + "&download=true");
+            func("/web/content?id=" + imageUrl.result + "&download=true");
         },
         error: function () {
             console.log("uploadError");
