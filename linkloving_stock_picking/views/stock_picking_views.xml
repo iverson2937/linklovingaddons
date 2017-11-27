@@ -84,27 +84,27 @@
                 <!--</xpath>-->
 
 
-                <xpath expr="//button[@name='open_website_url']" position="before">
+                <!--<xpath expr="//button[@name='open_website_url']" position="before">-->
 
 
-                    <button type="object"
-                            name="stock_img_count"
-                            class="oe_stat_button"
-                            icon="fa-photo fa-image fa-picture-o"
-                            context="{'type_btn':'Inspection'}"
-                            attrs="" groups="">
-                        <field name="qc_img_count" widget="statinfo" string="品检信息"/>
-                    </button>
+                <!--<button type="object"-->
+                <!--name="stock_img_count"-->
+                <!--class="oe_stat_button"-->
+                <!--icon="fa-photo fa-image fa-picture-o"-->
+                <!--context="{'type_btn':'Inspection'}"-->
+                <!--attrs="" groups="">-->
+                <!--<field name="qc_img_count" widget="statinfo" string="品检信息"/>-->
+                <!--</button>-->
 
-                    <button type="object"
-                            name="stock_img_count"
-                            class="oe_stat_button"
-                            icon="fa-photo fa-image fa-picture-o"
-                            context="{'type_btn':'Logistical'}"
-                            attrs="" groups="">
-                        <field name="attachment_img_count" widget="statinfo" string="物流信息"/>
-                    </button>
-                </xpath>
+                <!--<button type="object"-->
+                <!--name="stock_img_count"-->
+                <!--class="oe_stat_button"-->
+                <!--icon="fa-photo fa-image fa-picture-o"-->
+                <!--context="{'type_btn':'Logistical'}"-->
+                <!--attrs="" groups="">-->
+                <!--<field name="attachment_img_count" widget="statinfo" string="物流信息"/>-->
+                <!--</button>-->
+                <!--</xpath>-->
 
 
             </field>
