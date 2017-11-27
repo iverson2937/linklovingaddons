@@ -77,8 +77,6 @@ class ResPartner(models.Model):
     whatsapp = fields.Char(string=u'WhatsApp')
     wechat = fields.Char(string=u'微信')
 
-    im_tool = fields.Char(string=u'即时通讯工具')
-
     crm_source_id = fields.Many2one('crm.lead.source', string=u'来源')
 
     source_id = fields.Many2one('res.partner.source')
@@ -108,29 +106,36 @@ class ResPartner(models.Model):
         ('customer_alias', 'unique (customer_code)', u'客户简称不能重复.'),
     ]
 
+    crm_partner_id = fields.Many2one('crm.res.partner', string='related partner')
+
+    crm_is_partner = fields.Boolean(related='crm_partner_id.crm_is_partner', string=u'是否线索客户')
+
+    im_tool = fields.Char(related='crm_partner_id.im_tool', string=u'即时通讯工具')
+
     customer_scale = fields.Selection(
-        [('1', u'1-10人'), ('2', u'10-49人'), ('3', u'50-100人'), ('4', u'100-500人'), ('5', u'500人以上')], string=u'规模')
+        [('1', u'1-10人'), ('2', u'10-49人'), ('3', u'50-100人'), ('4', u'100-500人'), ('5', u'500人以上')],
+        related='crm_partner_id.customer_scale', string=u'规模')
 
-    customer_store_number = fields.Integer(string=u'门店数量')
+    customer_store_number = fields.Integer(related='crm_partner_id.customer_store_number', string=u'门店数量')
 
-    customer_store_product_type = fields.Char(string=u'门店主营产品类型')
+    customer_store_product_type = fields.Char(related='crm_partner_id.customer_store_product_type', string=u'门店主营产品类型')
 
-    customer_user_group = fields.Char(string=u'用户群体')
+    customer_user_group = fields.Char(related='crm_partner_id.customer_user_group', string=u'用户群体')
 
-    # customer_bazaar = fields.Selection([('country', u'国家'), ('continent', u'大洲'), ('global', u'全球')], string=u'市场')
+    customer_social_platform = fields.Char(related='crm_partner_id.customer_social_platform', string=u'社交平台')
 
-    customer_social_platform = fields.Char(string=u'社交平台')
+    customer_birthday = fields.Date(related='crm_partner_id.customer_birthday', string=u'生日')
 
-    customer_birthday = fields.Date(string=u'生日')
-
-    customer_sex = fields.Selection([('man', '男'), ('woman', '女')], string=u'性别')
+    customer_sex = fields.Selection([('man', u'男'), ('woman', u'女')], related='crm_partner_id.customer_sex',
+                                    string=u'性别')
 
     customer_image = fields.Binary(u"照片",
                                    help="This field holds the image used as photo for the employee, limited to 1024x1024px.")
 
     customer_country_id = fields.Many2many('res.country', string=u'国家')  # 市场
     customer_continent = fields.Many2many('crm.continent', string=u'大洲')  # 市场
-    customer_is_world = fields.Boolean(string=u'世界')  # 市场
+    customer_is_world = fields.Boolean(related='crm_partner_id.customer_is_world', string=u'世界')  # 市场
+
 
     def _compute_order_partner_question(self):
         for partner in self:
@@ -173,18 +178,23 @@ class ResPartner(models.Model):
                     #     # mutual_rule_id
                     #     vals['mutual_rule_id'] = vals.get('mutual_customer_id')
 
+                # 是客户 创建外部表
+                crm_res_one = self.env['crm.res.partner'].create({})
+
+                vals['crm_partner_id'] = crm_res_one.id
+
         res = super(ResPartner, self).create(vals)
-        if (not (res.company_type == 'person')) and res.customer:
-            lead_vals = {
-
-                'name': "默认商机-" + str(res.name),
-                'partner_id': res.id,
-                'planned_revenue': 0.0,
-                'priority': res.priority,
-                'type': 'opportunity',
-            }
-
-            self.env['crm.lead'].create(lead_vals)
+        # if (not (res.company_type == 'person')) and res.customer:
+        #     lead_vals = {
+        #
+        #         'name': "默认商机-" + str(res.name),
+        #         'partner_id': res.id,
+        #         'planned_revenue': 0.0,
+        #         'priority': res.priority,
+        #         'type': 'opportunity',
+        #     }
+        #
+        #     self.env['crm.lead'].create(lead_vals)
 
         return res
 
@@ -505,3 +515,28 @@ class CrmModelLead2OpportunityPartner(models.TransientModel):
                     self.env['res.partner'].browse(lead.partner_id.id).write({'user_id': lead.user_id.id})
 
         return leads[0].redirect_opportunity_view()
+
+
+class CrmResPartner(models.Model):
+    _name = 'crm.res.partner'
+
+    crm_is_partner = fields.Boolean(u'线索客户', default=False)
+
+    im_tool = fields.Char(string=u'即时通讯工具')
+
+    customer_scale = fields.Selection(
+        [('1', u'1-10人'), ('2', u'10-49人'), ('3', u'50-100人'), ('4', u'100-500人'), ('5', u'500人以上')], string=u'规模')
+
+    customer_store_number = fields.Integer(string=u'门店数量')
+
+    customer_store_product_type = fields.Char(string=u'门店主营产品类型')
+
+    customer_user_group = fields.Char(string=u'用户群体')
+
+    customer_social_platform = fields.Char(string=u'社交平台')
+
+    customer_birthday = fields.Date(string=u'生日')
+
+    customer_sex = fields.Selection([('man', u'男'), ('woman', u'女')], string=u'性别')
+
+    customer_is_world = fields.Boolean(string=u'世界')  # 市场

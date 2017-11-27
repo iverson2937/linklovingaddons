@@ -11,6 +11,16 @@ class LinklovingCrm(http.Controller):
 
         return "init partner succeed"
 
+    # 建立外键关系表  初始化之前的数据
+    @http.route('/linkloving_crm/init_ago_partner/', auth='public')
+    def init_partner(self, **kw):
+        par_list = http.request.env['res.partner'].search([])
+        for par_list_one in par_list:
+            ssr = http.request.env['crm.res.partner'].create({})
+            par_list_one.write({'crm_partner_id': ssr.id})
+
+        return "init partner succeed"
+
     @http.route('/linkloving_crm/create_attachment', type='json', auth='public', website=True, csrf=False)
     def create_attachment_index(self, **kw):
         Model_Attachment = request.env['ir.attachment']
