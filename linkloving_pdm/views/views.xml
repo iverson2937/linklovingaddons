@@ -1,5 +1,6 @@
 <openerp>
     <data>
+
         <record id="action_review_process_wizard" model="ir.actions.act_window">
             <field name="name">选择下一个审核人</field>
             <field name="type">ir.actions.act_window</field>
@@ -105,12 +106,12 @@
                             <!--<input type="file" class="o_form_input my_load_file_view" name="file_binary"/>-->
                             <!--</a>-->
                             <!--</group>-->
-                            <group attrs="{'invisible': [('type', 'not in', ('design','other'))]}">
-                                <!--<a id="file_click_me_my" class="o_form_input" href="javascript:void(-1);">测试赋值-->
+                            <!--<group attrs="{'invisible': [('type', 'not in', ('design','other'))]}">-->
+                            <!--&lt;!&ndash;<a id="file_click_me_my" class="o_form_input" href="javascript:void(-1);">测试赋值&ndash;&gt;-->
+                            <!--&lt;!&ndash;</a>&ndash;&gt;-->
+                            <!--<a id="file_click_me" class="o_form_input" href="javascript:void(-1);">选择文件-->
                                 <!--</a>-->
-                                <a id="file_click_me" class="o_form_input" href="javascript:void(-1);">选择文件
-                                </a>
-                            </group>
+                            <!--</group>-->
                         </group>
                         <group>
                             <!--<field name="file_name" attrs="{'invisible': [('type', 'not in', ('design','other'))]}"/>-->

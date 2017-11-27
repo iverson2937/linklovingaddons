@@ -13,6 +13,8 @@ class HrExpenseSheet(models.Model):
 
     default_payment_ids = fields.One2many('account.employee.payment', compute="_get_default_payment_ids")
 
+    # related_payment_ids = fields.Many2many('account.employee.payment', 'payment_sheet_rel', 'sheet_id', 'payment_id')
+
     @api.multi
     def _get_default_payment_ids(self):
         for sheet in self:

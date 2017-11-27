@@ -1,7 +1,5 @@
 <openerp>
     <data>
-
-
         <record id="qc_feedback_img_tree" model="ir.ui.view">
             <field name="name">品检单</field>
             <field name="model">qc.feedback.img</field>
@@ -90,6 +88,14 @@
             <field name="arch" type="xml">
                 <search string="品检单" create="false">
                     <field name="production_id" readonly="1" string="制造单号"/>
+                    <field name="name" string="单号"/>
+                    <field name="product_id"/>
+                    <field name="production_id" string="工序"
+                           filter_domain="[('production_id.process_id','ilike',self)]"/>
+                    <field name="production_id" string="原材料"
+                           filter_domain="[('production_id.bom_id.bom_line_ids.product_id','ilike',self)]"/>
+                    <field name="production_id" string="源订单" filter_domain="[('production_id.origin','ilike',self)]"/>
+
                 </search>
             </field>
         </record>

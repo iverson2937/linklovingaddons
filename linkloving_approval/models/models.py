@@ -3,6 +3,37 @@ from linklovingaddons.linkloving_pdm.models.models import ATTACHINFO_FIELD
 from odoo import models, fields, api
 from odoo.osv import expression
 
+
+class PdmConfigSetting(models.TransientModel):
+    _name = 'pdm.config.settings'
+    _inherit = 'res.config.settings'
+
+    pdm_intranet_ip = fields.Char(string=u'内网地址', default='192.168.2.6')
+    pdm_external_ip = fields.Char(string=u'外网地址', default='221.224.85.74')
+    pdm_port = fields.Char(string=u'端口', default='21')
+    op_path = fields.Char(string=u'操作路径', default='/home/pdm/')
+    pdm_account = fields.Char(string=u'账号', default='pdm')
+    pdm_pwd = fields.Char(string=u'密码', default='robotime')
+
+    @api.model
+    def get_default_pdm_intranet_ip(self, m_fields):
+        dica = {}
+        for fi in m_fields:
+            fi_val = self.env["ir.config_parameter"].get_param("pdm.config.settings.%s" % fi, default=None)
+            dica.update({
+                fi: fi_val
+            })
+
+        return dica
+
+    @api.multi
+    def set_pdm_intranet_ip(self):
+        m_fields = ['pdm_intranet_ip', 'pdm_external_ip', 'pdm_port', 'op_path', 'pdm_account', 'pdm_pwd']
+        for record in self:
+            for fi in m_fields:
+                self.env['ir.config_parameter'].set_param("pdm.config.settings.%s" % fi, getattr(record, fi, ''))
+
+
 APPROVAL_TYPE = [('waiting_submit', '待提交'),
                  ('submitted', '已提交'),
                  ('waiting_approval', '待我审批'),
