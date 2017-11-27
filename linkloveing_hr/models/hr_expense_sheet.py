@@ -13,7 +13,14 @@ class HrExpenseSheet(models.Model):
 
     default_payment_ids = fields.One2many('account.employee.payment', compute="_get_default_payment_ids")
 
-    # related_payment_ids = fields.Many2many('account.employee.payment', 'payment_sheet_rel', 'sheet_id', 'payment_id')
+    related_payment_ids = fields.Many2many('account.employee.payment', 'payment_sheet_rel', 'sheet_id', 'payment_id')
+
+    @api.multi
+    def get_formview_id(self):
+        """ Update form view id of action to open the invoice """
+        if self._context.get('show_custom_form'):
+            return self.env.ref('linkloveing_hr.hr_expense_sheet_payment').id
+        return super(HrExpenseSheet, self).get_formview_id()
 
     @api.multi
     def _get_default_payment_ids(self):
