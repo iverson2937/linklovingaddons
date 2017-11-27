@@ -87,13 +87,13 @@
                                 <field name="total_amount" invisible="1"/>
                                 <field name="currency_id" invisible="1"/>
                                 <field name="address_id" invisible="1"/>
-                                <field name="has_prepayment_ids" string="是否有暂支"/>
+                                <!--<field name="has_prepayment_ids" string="是否有暂支"/>-->
 
                             </group>
                             <group>
                                 <!--<field name="pre_payment_reminding"/>-->
-                                <field name="is_deduct_payment" string="是否抵扣" widget="radio" attrs="{}"/>
-                                <field name="to_deduct_payment" widget="prepayment_button" string="暂支抵扣"/>
+                                <!--<field name="is_deduct_payment" string="是否抵扣" widget="radio" attrs="{}"/>-->
+                                <!--<field name="to_deduct_payment" widget="prepayment_button" string="暂支抵扣"/>-->
                                 <!--<field name="is_deduct_payment" required="1" widget="radio"/>-->
 
 

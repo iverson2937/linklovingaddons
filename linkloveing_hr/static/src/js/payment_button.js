@@ -19,19 +19,32 @@ odoo.define('prepayment_button', function (require) {
                 'payment_line_amount': info.payment_line_amount,
             }));
 
-            var action = {
-                type: 'ir.actions.act_window',
-                res_model: 'account.employee.payable.wizard',
-                views: [[false, 'form']],
-                context: {
-                    'default_employee_id': info.employee_id,
-                    'default_payment_ids': info.payment_ids,
-                    'active_ids': info.sheet_id
-                },
-                target: 'new'
-            };
+            // var action = {
+            //     type: 'ir.actions.act_window',
+            //     res_model: 'hr.expense.sheet',
+            //     views: [[false, 'form']],
+            //     res_id: info.sheet_id,
+            //     context: {
+            //         'default_payment_ids': info.payment_ids,
+            //     },
+            //     target: 'new'
+            // };
             this.$('.to_deduct_payment').click(function () {
-                self.do_action(action)
+
+                new Model('hr.expense.sheet').call('get_formview_id', [[info.sheet_id], {'show_custom_form': true}]).then(function (view_id) {
+                    var action = {
+                        name: "详细",
+                        type: 'ir.actions.act_window',
+                        res_model: 'hr.expense.sheet',
+                        view_type: 'form',
+                        view_mode: 'tree,form',
+                        views: [[view_id, 'form']],
+                        res_id: info.sheet_id,
+                        target: "new"
+                    };
+
+                    self.do_action(action);
+                });
             });
             //     _.each(this.$('.js_payment_info'), function(k, v){
             //         var options = {

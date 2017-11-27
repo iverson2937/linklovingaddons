@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="hr_expense_sheet_payment" model="ir.ui.view">
+        <field name="name">hr.expense.sheet</field>
+        <field name="model">hr.expense.sheet</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <form string="Backorder creation">
+                <sheet>
+                    <field name="related_payment_ids" string='请选择暂支单'/>
+
+                </sheet>
+
+            </form>
+        </field>
+    </record>
+</odoo>
