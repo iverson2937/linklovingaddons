@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'crm', 'web', 'sales_team'],
+    'depends': ['base', 'crm', 'web', 'sales_team', 'website_partner'],
 
     # always loaded
     'data': [
@@ -31,6 +31,7 @@
         'security/crm_rule.xml',
         'views/message_label_views.xml',
         'views/mutual_customer_views.xml',
+        'views/sales_team_dashboard_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

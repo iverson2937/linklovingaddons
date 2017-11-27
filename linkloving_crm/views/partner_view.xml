@@ -18,7 +18,8 @@
                 </xpath>
 
                 <xpath expr="//field[@name='customer_status']" position="after">
-                    <field name="is_order" attrs="{'invisible':[('customer','=', False)]}"/>
+                    <field name="is_order" invisible="1" attrs="{'invisible':[('customer','=', False)]}"/>
+                    <field name="crm_is_partner" string="线索客户"/>
                 </xpath>
 
 
@@ -391,31 +392,18 @@
         </record>
 
 
-        <!--<record id="linkloving_view_partners_form_website" model="ir.ui.view">-->
-        <!--<field name="name">res.partner.tree.sale</field>-->
-        <!--<field name="model">res.partner</field>-->
-        <!--<field name="inherit_id" ref="website_partner.view_partners_form_website"/>-->
-        <!--<field name="arch" type="xml">-->
+        <record id="linkloving_view_partners_form_website" model="ir.ui.view">
+            <field name="name">res.partner.tree.sale</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="website_partner.view_partners_form_website"/>
+            <field name="arch" type="xml">
 
-        <!--<xpath expr="//button[@name='website_publish_button']" position="attributes">-->
-        <!--<attribute name='invisible'>1</attribute>-->
-        <!--</xpath>-->
+                <xpath expr="//button[@name='website_publish_button']" position="attributes">
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
 
-        <!--</field>-->
-        <!--</record>-->
-
-        <!--<record id="linkloving_res_partner_issues_button_view" model="ir.ui.view">-->
-        <!--<field name="name">res.partner.issues.button.view.inherit</field>-->
-        <!--<field name="model">res.partner</field>-->
-        <!--<field name="inherit_id" ref="project_issue.res_partner_issues_button_view"/>-->
-        <!--<field name="arch" type="xml">-->
-
-        <!--<xpath expr="//button[@name='%(project_issue.action_view_issues)d']" position="attributes">-->
-        <!--<attribute name='invisible'>1</attribute>-->
-        <!--</xpath>-->
-
-        <!--</field>-->
-        <!--</record>-->
+            </field>
+        </record>
 
 
         <!--  Partners inherited form -->
