@@ -27,7 +27,7 @@
         </record>
 
         <record model="ir.actions.act_window" id="pdm_config_setting_action">
-            <field name="name">设置</field>
+            <field name="name">文件服务器设置</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">pdm.config.settings</field>
             <field name="view_mode">form</field>

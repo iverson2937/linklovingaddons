@@ -8,12 +8,12 @@ class PdmConfigSetting(models.TransientModel):
     _name = 'pdm.config.settings'
     _inherit = 'res.config.settings'
 
-    pdm_intranet_ip = fields.Char(string=u'内网地址')
-    pdm_external_ip = fields.Char(string=u'外网地址')
-    pdm_port = fields.Char(string=u'端口')
+    pdm_intranet_ip = fields.Char(string=u'内网地址', default='192.168.2.6')
+    pdm_external_ip = fields.Char(string=u'外网地址', default='221.224.85.74')
+    pdm_port = fields.Char(string=u'端口', default='21')
     op_path = fields.Char(string=u'操作路径', default='/home/pdm/')
-    pdm_account = fields.Char(string=u'账号')
-    pdm_pwd = fields.Char(string=u'密码')
+    pdm_account = fields.Char(string=u'账号', default='pdm')
+    pdm_pwd = fields.Char(string=u'密码', default='robotime')
 
     @api.model
     def get_default_pdm_intranet_ip(self, m_fields):
