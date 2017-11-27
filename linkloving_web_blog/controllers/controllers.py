@@ -204,22 +204,21 @@ class LinklovingWebBlog(http.Controller):
             })
         return response
 
-    @http.route('/blog/create_attachment', type='http', auth='public', website=True, csrf=False)
-    def create_attachment_index(self, **kw):
-
-        Model_Attachment = request.env['ir.attachment']
-
-        content = kw.get('content')
-        file_name = kw.get('file')
-
-        attachment_one = Model_Attachment.create({
-            'res_model': u'blog.post',
-            'name': file_name,
-            'datas': content.split('base64,')[1] if content.split('base64,') else content,
-            'datas_fname': file_name,
-            'public': True,
-        })
-        return str(attachment_one.id)
+    # @http.route('/linkloving_blog/create_attachment', type='json', auth='public', website=True, csrf=False)
+    # def create_attachment_index(self, **kw):
+    #     Model_Attachment = request.env['ir.attachment']
+    #
+    #     content = kw.get('content')
+    #     file_name = kw.get('file')
+    #
+    #     attachment_one = Model_Attachment.create({
+    #         'res_model': u'blog.post',
+    #         'name': file_name,
+    #         'datas': content.split('base64,')[1] if content.split('base64,') else content,
+    #         'datas_fname': file_name,
+    #         'public': True,
+    #     })
+    #     return str(attachment_one.id)
 
     @http.route('/blog/ago/check', type='http', auth='public', website=True, csrf=False)
     def create_attachment_index(self, **kw):

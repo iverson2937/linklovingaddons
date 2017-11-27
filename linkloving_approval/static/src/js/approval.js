@@ -23,6 +23,8 @@ odoo.define('linkloving_approval.approval_core', function (require) {
     var QWeb = core.qweb;
     var _t = core._t;
     var framework = require('web.framework');
+    var PROXY_URL = "http://localhost:8088/";
+
     var Approval = Widget.extend({
         template: 'approval_load_page',
         events: {
@@ -42,7 +44,24 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             'click .document_all_checkbox': 'document_all_checkbox_realize',
             'click .outage_document_file': 'outage_document_file_fn',
         },
+        open_file_browser: function (file_path, file_name, direct_open) {
+            $.ajax({
+                type: "GET",
+                url: PROXY_URL + "open_file_browser",
+                data: {file_path: file_path, file_name: file_name, direct_open: direct_open},// "http://localhost:8088/downloadfile?remotefile=" + remote_path,
+                success: function (data) {
 
+                }
+            });
+        },
+        get_default_pdm_intranet_ip: function (then_cb) {
+            var m_fields = ['pdm_intranet_ip', 'pdm_external_ip', 'pdm_port', 'op_path', 'pdm_account', 'pdm_pwd']
+            return new Model("pdm.config.settings")
+                .call("get_default_pdm_intranet_ip", [m_fields])
+                .then(function (res) {
+                    then_cb(res);
+                });
+        },
         // 停用
         outage_document_file_fn: function (e) {
             var tar = this;
@@ -183,6 +202,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
         },
 
         batch_download_file: function (new_file_id, dom, target) {
+            var self = this;
             var remote_path = dom.find(".remote_path").text();
             if (remote_path[0] == '/') {
                 remote_path[0] = '';
@@ -190,11 +210,19 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             console.log(remote_path);
             $.ajax({
                 type: "GET",
-                url: "http://localhost:8088/downloadfile?remotefile=" + remote_path,
+                url: PROXY_URL + "downloadfile",
+                data: $.extend(self.pdm_info, {remotefile: remote_path}),// "http://localhost:8088/downloadfile?remotefile=" + remote_path,
                 success: function (data) {
                     console.log(data);
                     if (data.result == '1') {
-                        Dialog.alert(target, "已下载至指定目录");
+                        Dialog.OpenDialog(target, "已下载至指定目录", {
+                            open_confirm_callback: function () {
+                                self.open_file_browser(data.chose_path, data.file_name, false);
+                            },
+                            open_file_callback: function () {
+                                self.open_file_browser(data.chose_path, data.file_name, true);
+                            }
+                        });
                     }
                     else if (data.result == '2') {
                         Dialog.alert(target, "下载失败, 未选择存储路径");
@@ -258,7 +286,8 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             console.log(ret);
             $.ajax({
                 type: "GET",
-                url: "http://localhost:8088/uploadfile?id=" + this.product_id + "&remotefile=" + remote_file,
+                url: PROXY_URL + "uploadfile",//http://localhost:8088/uploadfile?id=" + this.product_id + "&remotefile=" + remote_file,
+                data: $.extend(self.pdm_info, {id: this.product_id, remotefile: remote_file}),// "http://localhost:8088/downloadfile?remotefile=" + remote_path,
                 success: function (data) {
                     framework.unblockUI();
                     console.log(data);
@@ -285,6 +314,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
         },
         //下载
         document_download_fn: function (e) {
+            var self = this;
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var new_file_id = $(target).parents(".tab_pane_display").attr("data-id");
@@ -300,11 +330,19 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             if (type == 'OTHER' || type == 'DESIGN') {
                 $.ajax({
                     type: "GET",
-                    url: "http://localhost:8088/downloadfile?remotefile=" + remote_path,
+                    url: PROXY_URL + "downloadfile",// "http://localhost:8088/downloadfile?remotefile=" + remote_path,
+                    data: $.extend(self.pdm_info, {remotefile: remote_path}),// "http://localhost:8088/downloadfile?remotefile=" + remote_path,
                     success: function (data) {
                         console.log(data);
                         if (data.result == '1') {
-                            Dialog.alert(target, "已下载至指定目录");
+                            Dialog.OpenDialog(target, "已下载至指定目录", {
+                                open_confirm_callback: function () {
+                                    self.open_file_browser(data.chose_path, data.file_name, false);
+                                },
+                                open_file_callback: function () {
+                                    self.open_file_browser(data.chose_path, data.file_name, true);
+                                }
+                            });
                         }
                         else if (data.result == '2') {
                             Dialog.alert(target, "下载失败, 未选择存储路径");
@@ -706,8 +744,6 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             //     });
             // }
         },
-
-
         start: function () {
             var self = this;
             var model = new Model("approval.center");
@@ -717,6 +753,10 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                 self.approval_type = result.type.selection;
                 // console.log(self);
                 self.$el.append(QWeb.render('approval_load_detail_file', {result: result.type.selection}));
+                self.get_default_pdm_intranet_ip(function (res) {
+                    self.pdm_info = res;
+                    console.log(res);
+                })
             });
             return self.get_datas(this, 'product.attachment.info', 'waiting_submit');
 
