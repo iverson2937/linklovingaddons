@@ -42,7 +42,9 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
     def process(self):
         if not self.payment_ids:
             raise UserError('你还未选择暂支单')
-        total_amount = self.sheet_id.total_amount - self.sheet_id.payment_line_amount
+        total_amount = self.sheet_id.total_amount
+        print self.sheet_id.total_amount,
+        print self.sheet_id.payment_line_amount
         if not self.sheet_id:
             raise UserError(u'未找到报销单')
         for payment_id in sorted(self.payment_ids, key=lambda x: x.pre_payment_reminding):
@@ -54,13 +56,13 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
                 })
                 total_amount -= line_id.amount
                 # 报销单金额大于所以暂支单金额
-                self.sheet_id.process()
-                # 报销单状态
-                if float_is_zero(total_amount, 2):
-                    self.sheet_id.state = 'done'
-                else:
-                    # 不知道是否有这样的情况。。。
-                    self.sheet_id.state = 'post'
+        self.sheet_id.process()
+        # 如果抵扣直接等于报销金额直接pass
+        if float_is_zero(self.sheet_id.total_amount - self.sheet_id.payment_line_amount, 2):
+            self.sheet_id.state = 'done'
+        else:
+            # 不知道是否有这样的情况。。。
+            self.sheet_id.state = 'post'
 
     @api.multi
     def no_deduct_process(self):
