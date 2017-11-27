@@ -1,5 +1,21 @@
 <openerp>
     <data>
+        <record id="view_outsourcing_process_order" model="ir.ui.view">
+            <field name="name">outsourcing.process.order.select</field>
+            <field name="model">outsourcing.process.order</field>
+            <field name="arch" type="xml">
+                <search string="Search">
+                    <field name="name" string="单号"/>
+                    <field name="production_id"/>
+                    <field name="product_id"/>
+                    <field name="process_id"/>
+                    <field name="production_id" string="原材料"
+                           filter_domain="[('production_id.bom_id.bom_line_ids.product_id','ilike',self)]"/>
+                    <field name="production_id" string="源订单" filter_domain="[('production_id.origin','ilike',self)]"/>
+                </search>
+            </field>
+        </record>
+
         <!-- Inherit Form View to Modify it -->
         <record id="form_plan_mo_wizard_inherit" model="ir.ui.view">
             <field name="name">plan.mo.wizard.form</field>

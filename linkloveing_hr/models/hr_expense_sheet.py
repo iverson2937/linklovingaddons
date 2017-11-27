@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
@@ -9,6 +10,39 @@ import jpush
 class HrExpenseSheet(models.Model):
     _inherit = 'hr.expense.sheet'
     _rec_name = 'expense_no'
+
+    default_payment_ids = fields.One2many('account.employee.payment', compute="_get_default_payment_ids")
+
+    # related_payment_ids = fields.Many2many('account.employee.payment', 'payment_sheet_rel', 'sheet_id', 'payment_id')
+
+    @api.multi
+    def _get_default_payment_ids(self):
+        for sheet in self:
+            payment_ids = self.env['account.employee.payment'].search(
+                [('can_return', '=', True), ('employee_id', '=', sheet.employee_id.id)])
+            ids = []
+            amount = sheet.total_amount
+            for payment in payment_ids:
+                if payment.pre_payment_reminding >= amount:
+                    amount = payment.pre_payment_reminding - amount
+                    ids.append(payment.id)
+                    break
+            print ids, 'ids'
+            sheet.default_payment_ids = ids
+
+    @api.multi
+    def _get_payment_info_JSON(self):
+        for sheet in self:
+            value = {
+                'pre_payment_amount': sheet.pre_payment_reminding,
+                'payment_line_amount': sheet.payment_line_amount,
+                'employee_id': sheet.employee_id.id,
+                'payment_ids': sheet.default_payment_ids.ids,
+                'sheet_id': sheet.id,
+            }
+            sheet.to_deduct_payment = json.dumps(value)
+
+    to_deduct_payment = fields.Char(compute=_get_payment_info_JSON)
 
     sheet_type = fields.Selection([
         ('normal', '普通报销'),
@@ -55,9 +89,7 @@ class HrExpenseSheet(models.Model):
                 sheet.account_move_id.button_cancel()
                 sheet.account_move_id.unlink()
             # 取消暂支抵扣
-            if sheet.account_payment_line_ids:
-                for line in sheet.account_payment_line_ids:
-                    line.unlink()
+            sheet.cancel_deduct_payment()
             # 取消付款分录
             if sheet.account_payment_ids:
                 for payment in sheet.account_payment_ids:
@@ -118,6 +150,13 @@ class HrExpenseSheet(models.Model):
 
     is_show = fields.Boolean(compute=_get_is_show)
 
+    @api.multi
+    def cancel_deduct_payment(self):
+        for sheet in self:
+            if sheet.account_payment_line_ids:
+                for line in sheet.account_payment_line_ids:
+                    line.unlink()
+
     to_approve_id = fields.Many2one('res.users', readonly=True, track_visibility='onchange')
 
     state = fields.Selection([('draft', u'草稿'),
@@ -155,28 +194,6 @@ class HrExpenseSheet(models.Model):
 
         create_remark_comment(self, u'1级审核')
 
-    # @api.multi
-    # def manager1_approve_withText(self, text):
-    #     # if self.employee_id == self.employee_id.department_id.manager_id:
-    #     #     self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
-    #     # else:
-    #     department = self.to_approve_id.employee_ids.department_id
-    #     if not department:
-    #         UserError(u'请设置该员工部门')
-    #     if not department.manager_id:
-    #         UserError(u'该员工所在部门未设置经理(审核人)')
-    #     # 如果没有上级部门，或者报销金额小于该部门的允许最大金额
-    #     if not department.parent_id or (department.allow_amount and self.total_amount < department.allow_amount):
-    #         self.to_approve_id = False
-    #         self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
-    #     else:
-    #         if not department.parent_id.manager_id:
-    #             raise UserError(u'上级部门没有设置经理,请联系管理员')
-    #         self.to_approve_id = department.sudo().parent_id.manager_id.user_id.id
-    #         self.write({'state': 'manager1_approve', 'approve_ids': [(4, self.env.user.id)]})
-    #
-    #     create_remark_comment(self, (u'1级审核：%s' % text))
-
     @api.multi
     def manager2_approve(self):
 
@@ -193,18 +210,6 @@ class HrExpenseSheet(models.Model):
             self.write({'state': 'manager2_approve', 'approve_ids': [(4, self.env.user.id)]})
 
         create_remark_comment(self, u'2级审核')
-
-    @api.multi
-    def set_account_date(self):
-        pass
-        # sheet_ids = self.env['hr.expense.sheet'].search([])
-        # for sheet in sheet_ids:
-        #     for line in sheet.expense_line_ids:
-        #         if not line.department_id:
-        #             line.department_id = sheet.department_id.id
-        # sheet_ids = self.env['hr.expense.sheet'].search([('state', '=', 'done'), ('accounting_date', '=', False)])
-        # for sheet in sheet_ids:
-        #     sheet.accounting_date = sheet.write_date
 
     @api.multi
     def hr_expense_sheet_post(self):
@@ -224,8 +229,6 @@ class HrExpenseSheet(models.Model):
                         raise UserError(u'上级部门未设置审核人')
                     exp.to_approve_id = department.parent_id.manager_id.user_id.id
             else:
-                # if not department.parent_id.manager_id:
-                #     raise UserError(u'上级部门没有设置经理,请联系管理员')
                 if not department.manager_id:
                     raise UserError(u'请设置部门审核人')
                 exp.to_approve_id = department.manager_id.user_id.id
@@ -239,9 +242,8 @@ class HrExpenseSheet(models.Model):
 
     @api.multi
     def manager3_approve(self):
-        self.to_approve_id = False
 
-        self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
+        self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)], 'to_approve_id': False})
 
     @api.multi
     def return_to_approve(self):
@@ -271,15 +273,9 @@ class HrExpenseSheet(models.Model):
     @api.model
     def create(self, vals):
         if vals.get('expense_no', 'New') == 'New':
-            if self._context.get('default_income'):
-                vals['expense_no'] = self.env['ir.sequence'].next_by_code('account.income') or '/'
-            else:
-                vals['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense.sheet') or '/'
+            vals['expense_no'] = self.env['ir.sequence'].next_by_code('hr.expense.sheet') or '/'
 
-        exp = super(HrExpenseSheet, self).create(vals)
-        #
-
-        return exp
+        return super(HrExpenseSheet, self).create(vals)
 
     @api.multi
     def write(self, vals):
