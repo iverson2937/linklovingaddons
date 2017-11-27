@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-from linklovingaddons.linkloving_pdm.models.models import ATTACHINFO_FIELD
+
+
+try:
+    from linklovingaddons.linkloving_pdm.models.models import ATTACHINFO_FIELD
+except Exception:
+    pass
+
 from odoo import models, fields, api
 from odoo.osv import expression
 
