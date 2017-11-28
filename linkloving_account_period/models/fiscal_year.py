@@ -160,7 +160,7 @@ class AccountPeriod(models.Model):
 
     @api.multi
     def close_period(self):
-        pass
+        self.state = 'done'
 
         # accounts = self.env['account.account'].search([])
         # account_res = self._get_account_period_accounts(accounts, self.id)
