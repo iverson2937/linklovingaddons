@@ -66,7 +66,7 @@ class CreateOrderPointWizard(models.TransientModel):
 
     def compute_period_for_account_move(self):
         periods = self.env['account.period'].search([])
-        for move in self.env["account.move"].search([], limit=10):
+        for move in self.env["account.move"].search([]):
             print move.id
 
             for p in periods:
