@@ -127,6 +127,39 @@ class ReviewProcessLine(models.Model):
 
     state_copy = fields.Text(u"状态", compute="_compute_process_line_state_copy")
 
+    def oa_submit_to_next_reviewer(self, review_type, to_last_review=False, partner_id=None, remark=None,
+                                material_requests_id=None, bom_id=None):
+        if not partner_id:
+            raise UserError(u"请选择审核人!")
+
+        if to_last_review:
+            if not self.env['final.review.partner'].search([('final_review_partner_id', '=', partner_id.id),
+                                                            ('review_type', '=', review_type)]):
+                raise UserError('请选择终正确的终审人')
+
+        is_last_review = False
+        if to_last_review \
+                or partner_id.id == self.env["final.review.partner"].get_final_review_partner_id(review_type).id:
+            is_last_review = True
+
+        # 设置现有的这个审核条目状态等
+        self.write({
+            'review_time': fields.datetime.now(),
+            'state': 'review_success',
+            'remark': remark
+        })
+
+        # 新建一个 审核条目 指向下一个审核人员
+        self.env["review.process.line"].create({
+            'partner_id': partner_id.id,
+            'review_id': self.review_id.id,
+            'last_review_line_id': self.id,
+            'review_order_seq': self.review_order_seq + 1,
+            'is_last_review': is_last_review,
+        })
+
+        partner_id.sudo().sequence_file += 1
+
     # 送审
     def submit_to_next_reviewer(self, review_type, to_last_review=False, partner_id=None, remark=None,
                                 material_requests_id=None, bom_id=None):
@@ -329,6 +362,18 @@ class ReviewProcessLine(models.Model):
                                    parent_id=False, attachments=None,
                                    content_subtype='html',
                                    **{'author_id': self.env.user.partner_id.id, 'project': True})
+
+    def action_oa_pass(self, remark, material_requests_id, bom_id):
+        review_type_two = 'picking_review_project'
+        #if self.env["final.review.partner"].get_final_review_partner_id(
+                #review_type_two).id == self.env.user.partner_id.id:
+        self.write({
+            'review_time': fields.datetime.now(),
+            'state': 'review_success',
+            'remark': remark
+        })
+        # self.send_chat_msg(material_requests_id.my_create_uid.partner_id, remark, 'pass',
+        #                    material_requests_id, bom_id)
 
     # 审核通过
     def action_pass(self, remark, material_requests_id, bom_id):
@@ -968,6 +1013,28 @@ class ReviewProcessWizard(models.TransientModel):
     remark = fields.Text(u"备注")
     is_show_action_deny = fields.Boolean(default=True)
 
+    #oa送审
+    def oa_action_to_next(self,type,to_last_review):
+        if not self.material_requests_id.review_id:  # 如果没审核过
+            self.material_requests_id.action_send_to_review()
+
+        if self.material_requests_id.review_id.who_review_now.id == self.env.user.partner_id.id:
+
+            self.material_requests_id.picking_state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
+
+            self.material_requests_id.write({'review_i_approvaled_val': [(4, self.env.uid)]})
+
+            if type == 'pick_type':
+                review_type_two = 'picking_review_line'
+            elif type == 'proofing':
+                review_type_two = 'picking_review_project'
+
+            self.material_requests_id.review_id.process_line_review_now.oa_submit_to_next_reviewer(
+                review_type=review_type_two,
+                to_last_review=to_last_review,
+                partner_id=self.partner_id,
+                remark=self.remark, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
+
     # 送审
     def action_to_next(self):
         to_last_review = self._context.get("to_last_review")  # 是否送往终审
@@ -1068,6 +1135,13 @@ class ReviewProcessWizard(models.TransientModel):
 
         return True
 
+    # oa手机端终审通过
+    def action_oa_pass(self):
+        self.material_requests_id.picking_state = 'approved_finish'
+        self.material_requests_id.write({'review_i_approvaled_val': [(4, self.env.uid)]})
+        self.material_line.action_oa_pass(self.remark, self.material_requests_id, self.bom_id)
+        return True
+
     # 终审 审核通过
     def action_pass(self):
 
@@ -1104,6 +1178,14 @@ class ReviewProcessWizard(models.TransientModel):
 
             self.material_line.action_pass(self.remark, self.material_requests_id, self.bom_id)
         return True
+
+    # oa手机端审核不通过
+    def action_oa_deny(self):
+        self.material_requests_id.picking_state = 'Refused'
+        self.material_requests_id.write({'review_i_approvaled_val': [(4, self.env.uid)]})
+        self.material_line.action_deny(self.remark, self.material_requests_id, self.bom_id)
+
+
 
     # 审核不通过
     def action_deny(self):
