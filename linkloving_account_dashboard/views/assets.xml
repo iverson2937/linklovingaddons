@@ -4,6 +4,7 @@
 
         <template id="assets_backend" name="statistic" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
+                <link rel="stylesheet" href="/linkloving_account_dashboard/static/src/css/core.css"/>
                 <script type="text/javascript" src="/linkloving_account_dashboard/static/src/js/account_dashboard.js"/>
             </xpath>
         </template>

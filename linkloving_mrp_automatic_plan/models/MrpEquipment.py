@@ -34,8 +34,6 @@ class PlanMoWizard(models.TransientModel):
     @api.model
     def create(self, vals):
         mo = self.env["mrp.production"].browse(self._context.get("production_id"))
-        if mo.bom_id and mo.bom_id.state not in ('draft', 'release'):
-            raise UserError('BOM还没通过审核,请联系相关负责人')
         is_priority = vals.get("is_priority")
         mo_vals = vals.copy()
         mo_vals.update({
@@ -905,9 +903,13 @@ class MrpProductionExtend(models.Model):
     def settle_mo(self, **kwargs):
         production_line_id = kwargs.get("production_line_id")
         settle_date = kwargs.get("settle_date")
+        state = kwargs.get("state")
         origin_production_line = self.production_line_id
         if self.state not in ["draft", "confirmed", "waiting_material"]:
             raise UserError(u"该单据已经开始生产,不可重新进行排产")
+
+        if production_line_id == -1:
+            raise UserError(u'无法排产到未分组中...')
         # 改变产线和状态
         if not production_line_id:  #如果没有产线传上来, 就说明是从产线移除(取消排产)
             self.write({
@@ -933,7 +935,7 @@ class MrpProductionExtend(models.Model):
             #         'date_planned_finished': end_time,
             #     })
             if self.state in ["draft", "confirmed", "waiting_material"]:
-                self.state = 'draft'
+                self.state = state
             else:
                 raise UserError(u"该单据已经开始生产,不可从产线上移除")
         else:  # 改变产线和状态

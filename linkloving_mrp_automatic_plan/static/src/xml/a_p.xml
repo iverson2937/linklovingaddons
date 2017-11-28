@@ -6,23 +6,53 @@
             <!--<t t-call="container_header"></t>-->
         </div>
     </t>
-    <t t-name="process_info_tmp">
-        <div class="a_p_message_summation">
-            <span>【车间名称：<t t-esc="process_info.name"/></span>
-            <span style="margin-left:15px;padding-left:15px;border-left:2px solid;">负责人: <t t-esc="process_info.partner_id[1]"/></span>
-            <span style="margin-left:15px;padding-left:15px;border-left:2px solid;">设备数：<t t-esc="process_info.total_equipment"/></span>
-            <span style="margin-left:15px;padding-left:15px;border-left:2px solid;">产线时间：<t t-esc="process_info.total_ava_time"/>h</span>
-            <span style="margin-left:15px;padding-left:15px;border-left:2px solid;">总工时: <t t-esc="process_info.total_time"/>h】</span>
-        </div>
-    </t>
-
+    <!--<t t-name="container_header">-->
+        <!--<div class="container_header">-->
+            <!--&lt;!&ndash;<button class="btn btn-primary product_report_btn">产品报表</button>&ndash;&gt;-->
+            <!--&lt;!&ndash;<button class="btn btn-primary so_report_btn">SO报表</button>&ndash;&gt;-->
+        <!--</div>-->
+    <!--</t>-->
     <t t-name="a_p_render_tmpl">
+
+        <div class="container_header">
+            <div class="a_p_message_summation">
+                <span>【车间名称：<t t-esc="process_info.name"/></span>
+                <span style="margin-left:15px;padding-left:15px;border-left:2px solid;">负责人: <t t-esc="process_info.partner_id[1]"/></span>
+                <span style="margin-left:15px;padding-left:15px;border-left:2px solid;">设备数：<t t-esc="process_info.total_equipment"/></span>
+                <span style="margin-left:15px;padding-left:15px;border-left:2px solid;">产线时间：<t t-esc="process_info.total_ava_time"/>h</span>
+                <span style="margin-left:15px;padding-left:15px;border-left:2px solid;">总工时: <t t-esc="process_info.total_time"/>h】</span>
+            </div>
+        </div>
+
+        <!--编辑的弹出框-->
+        <div class="item_edit_container close_this_container">
+            <div class="modal-backdrop  in"></div>
+            <div class="edit_production_qty_wrap">
+                <div class="edit_production_qty_head">
+                    <span>编辑生产数量</span>
+                </div>
+                <div class="edit_production_qty_body">
+                    <label>需求数量</label>
+                    <input type="number" class="product_qty" placeholder="0"/>
+                </div>
+                <div>
+                    <button class="btn btn-primary edit_prodiction_confirm">确定</button>
+                    <button class="btn btn-default alia_cancel">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="create_alia_container close_this_container">
+            <div class="modal-backdrop  in"></div>
+            <div class="create_alia_wrap">
+                <input class="alia_input" type="text"/>
+                <button class=" btn btn-primary alia_confirm" style="margin-left:112px">确定</button>
+                <button class="btn btn-default alia_cancel">取消</button>
+            </div>
+        </div>
         <div id="a_p_left">
-            <t t-call="process_info_tmp">
-                <t t-set="process_info" t-value="process_info"></t>
-            </t>
             <div class="a_p_left_head">
-                <span style="font-size:15px;margin-left:15px;font-weight:bold;">时间（包含）</span>
+                <span style="font-size:15px;margin-left:15px;font-weight:bold;">已排产</span>
                 <div class="a_p_time_start"></div>
                 <div class="a_p_time_end search_view"></div>
                 <div class="order_by">
@@ -30,12 +60,25 @@
                     <button class="btn btn-primary order_by_default" style="display:none;">根据时间排序</button>
                 </div>
             </div>
-
             <t t-foreach="result" t-as="item">
                 <div class="production_line" t-att-data-index="item_index">
-                    <span class="p_line_name">产线： <t t-esc="item.name"/></span>
-                    <span style="margin-left: 20px;">产线负责人: <t t-esc="item.employee_id[1]"/></span>
+                    <div class="p_line_left">
+                        <span class="p_line_name">产线： <t t-esc="item.name"/></span>
+                        <span>产线负责人: <t t-esc="item.employee_id[1]"/></span>
+                    </div>
                     <div class="p_line_right">
+                        <div style="display:inline-block;">
+                            <div class="p_line_equipment">
+                                设备：<span><t t-esc="item.equipment_ids.length" /></span>
+                            </div>
+                            <div class="p_line_employes">
+                                员工：<span><t t-esc="item.line_employee_ids.length" /></span>
+                            </div>
+                            <div class="production_qty">
+                                MO数量：<span><t t-esc="item.amount_of_planned_mo"/></span>
+                            </div>
+                        </div>
+
                         <t t-js="ctx">
                             function change_time(date_planned){
                                 date_planned = date_planned.replace(/\s/g,'T').replace(/\//g,'-');
@@ -49,25 +92,15 @@
                                 ctx.item.last_mo_time = change_time(ctx.item.last_mo_time);
                             }
                         </t>
-                        <div class="p_line_last_mo">
-                            最后MO完成时间:
-                            <span>
-                                <t t-esc="item.last_mo_time ? item.last_mo_time : ''"/>
-                            </span>
-                        </div>
-                        <div class="production_qty">
-                            MO数量：<span><t t-esc="item.amount_of_planned_mo"/></span>
-                        </div>
-                        <div class="p_line_equipment">
-                            设备：<span><t t-esc="item.equipment_ids.length" /></span>
-                        </div>
-                        <div class="p_line_employee">
-                            员工数：<span><t t-esc="item.line_employee_ids.length" /></span>
-                        </div>
-                        <div class="p_line_equipment">
-                            产线时间/总人工时间：<span><t t-esc="item.total_ava_time"/>h/<t t-esc="item.total_time"/>h</span>
-                        </div>
 
+                        <div style="display:inline-block;vertical-align:top">
+                            <div class="p_line_last_mo">
+                                最后MO完成时间:<t t-esc="item.last_mo_time ? item.last_mo_time : ''"/>
+                            </div>
+                            <div class="p_line_times">
+                                产线时间/总人工时间：<span><t t-esc="item.total_ava_time"/>h/<t t-esc="item.total_time"/>h</span>
+                            </div>
+                        </div>
 
                         <span class="fa fa-chevron-down a_p_showorhide"></span>
                     </div>
@@ -79,9 +112,16 @@
                 </div>
             </t>
         </div>
+        <div id="a_p_right">
+            <div class="a_p_right_head">
+                <span style="font-size:15px;margin-left:15px;font-weight:bold;">未排产</span>
+                <button class="btn btn-default unarrangeed_refresh">刷新</button>
+            </div>
+        </div>
     </t>
 
-    <!--未排产-->
+
+    <!--未排产界面的产线模板-->
     <t t-name="un_a_p_tmpl">
         <div t-att-class="state=='draft' ? 'production_line un_production_line un_draft' : 'production_line un_production_line un_confirm'">
             <span class="p_line_name">
@@ -100,7 +140,7 @@
             </div>
         </div>
         <div t-att-class="state=='draft' ? 'production_lists_wrap un_a_p_lists_wrap un_draft_wrap' : 'production_lists_wrap un_a_p_lists_wrap un_confirm_wrap'">
-            <t t-call="un_a_p_render_right_tmpl"></t>
+            <!--<t t-call="un_a_p_render_right_tmpl"></t>-->
         </div>
     </t>
 
@@ -108,10 +148,21 @@
         <t t-foreach="result" t-as="item">
             <div class="ap_item_wrap" t-att-id="'id'+item.id" t-att-data-index="item_index" t-att-data-mo-id="item.id" t-att-data-bom-id="item.bom_id[0]" t-att-data-product-id="item.product_tmpl_id[0]">
                 <div class="a_p_item_top">
+                    <span class="a_p_move_point"></span>
                     <p class="a_p_mo_name"><t t-esc="item.display_name"/></p>
                     <span class="a_p_create_alia">
                         <t t-if="item.alia_name!=false">
                             <t t-esc="item.alia_name"/>
+                        </t>
+                    </span>
+
+                    <span class="a_p_mo_state">
+                        <span class="mat" t-att-style='"background:" + item.material_state'>物</span>
+                        <span class="pre" t-att-style='"background:" + item.prepare_material_state'>备</span>
+                        <t t-foreach="selection" t-as="sel">
+                            <t t-if="sel[0] == item.state">
+                                <span class="sta"><t t-esc="sel[1]"/></span>
+                            </t>
                         </t>
                     </span>
                     <div class="a_p_item_operate_zone">
@@ -124,15 +175,6 @@
                 <p class="a_p_product_name">
                     <t t-esc="item.bom_id[1]"/>
                 </p>
-                <span class="a_p_mo_state">
-                    <span class="mat" t-att-style='"background:" + item.material_state'>物</span>
-                    <span class="pre" t-att-style='"background:" + item.prepare_material_state'>备</span>
-                    <t t-foreach="selection" t-as="sel">
-                        <t t-if="sel[0] == item.state">
-                            <span class="sta"><t t-esc="sel[1]"/></span>
-                        </t>
-                    </t>
-                </span>
 
                 <div class="ap_item_main_left">
                     <span class="a_p_process_res">
@@ -144,12 +186,20 @@
                         </t>
                     </span>
                     <t t-if="show_more">
-                        <span class="a_p_spend_time">数量（完成/需求）：<t t-esc="item.qty_unpost"/> / <t t-esc="item.product_qty"/></span>
+                        <span class="a_p_spend_time">数量(完成/需求):<t t-esc="item.qty_unpost"/> / <t t-esc="item.product_qty"/></span>
                     </t>
 
                 </div>
                 <div class="ap_item_new_add">
-                    <span>理论工时（产线/总工时）：<t t-esc="item.ava_spent_time"/>h/<t t-esc="item.real_theo_spent_time"/>h </span>
+                    <span class="a_p_latest_time">最晚开始：
+                        <t t-if="item.planned_start_backup == false">
+                            暂无时间
+                        </t>
+                        <t t-else="">
+                            <t t-esc="item.planned_start_backup"/>
+                        </t>
+                    </span>
+                    <span>理论工时(产线/总工时):<t t-esc="item.ava_spent_time"/>h/<t t-esc="item.real_theo_spent_time"/>h </span>
                 </div>
                 <div class="ap_item_main_center">
                     <t t-js="ctx">
@@ -172,17 +222,10 @@
                             ctx.item.planned_start_backup = change_time(ctx.item.planned_start_backup);
                         }
                     </t>
-                    <span class="a_p_latest_time">最晚开始：
-                        <t t-if="item.planned_start_backup == false">
-                            暂无时间
-                        </t>
-                        <t t-else="">
-                            <t t-esc="item.planned_start_backup"/>
-                        </t>
-                    </span>
+
                     <t t-if="show_more">
-                        <span class="a_p_forecast_start">预计开始：<t t-esc="item.date_planned_start" /></span>
-                        <span class="a_p_forecast_end">预计结束：<t t-esc="item.date_planned_finished" /></span>
+                        <span class="a_p_forecast_start">预计开始:<t t-esc="item.date_planned_start" /></span>
+                        <span class="a_p_forecast_end">预计结束:<t t-esc="item.date_planned_finished" /></span>
                     </t>
                 </div>
 
@@ -190,17 +233,36 @@
         </t>
     </t>
 
-    <t t-name="un_a_p_render_right_tmpl">
-        <div class="a_p_right_head">
 
-        </div>
+
+    <!--11/23-->
+    <t t-name="un_a_p_render_right_tmpl">
+        <t t-if="signle and signle==true">
+
+        </t>
+        <t t-else="">
+            <div class="a_p_right_head">
+
+            </div>
+        </t>
         <t t-foreach="result" t-as="item">
             <div class="ap_item_wrap" t-att-id="'id'+item.id" t-att-data-index="item_index" t-att-data-mo-id="item.id" t-att-data-bom-id="item.bom_id[0]" t-att-data-product-id="item.product_tmpl_id[0]">
                 <div class="a_p_item_top">
+                    <span class="a_p_move_point"></span>
                     <p class="a_p_mo_name"><t t-esc="item.display_name"/></p>
                     <span class="a_p_create_alia">
                         <t t-if="item.alia_name!=false">
                             <t t-esc="item.alia_name"/>
+                        </t>
+                    </span>
+
+                    <span class="a_p_mo_state">
+                        <span class="mat" t-att-style='"background:" + item.material_state'>物</span>
+                        <span class="pre" t-att-style='"background:" + item.prepare_material_state'>备</span>
+                        <t t-foreach="selection" t-as="sel">
+                            <t t-if="sel[0] == item.state">
+                                <span class="sta"><t t-esc="sel[1]"/></span>
+                            </t>
                         </t>
                     </span>
                     <div class="a_p_item_operate_zone">
@@ -211,15 +273,7 @@
                 <p class="a_p_product_name">
                     <t t-esc="item.bom_id[1]"/>
                 </p>
-                <span class="a_p_mo_state">
-                    <span class="mat" t-att-style='"background:" + item.material_state'>物</span>
-                    <span class="pre" t-att-style='"background:" + item.prepare_material_state'>备</span>
-                    <t t-foreach="selection" t-as="sel">
-                        <t t-if="sel[0] == item.state">
-                            <span class="sta"><t t-esc="sel[1]"/></span>
-                        </t>
-                    </t>
-                </span>
+
 
                 <div class="ap_item_main_left">
                     <span class="a_p_process_res">
@@ -255,6 +309,7 @@
                             ctx.item.planned_start_backup = change_time(ctx.item.planned_start_backup);
                         }
                     </t>
+
                     <span class="a_p_latest_time">最晚开始：
                         <t t-if="item.planned_start_backup == false">
                             暂无时间
@@ -263,6 +318,11 @@
                             <t t-esc="item.planned_start_backup"/>
                         </t>
                     </span>
+
+                    <t t-if="show_more">
+                        <span class="a_p_forecast_start">预计开始：<t t-esc="item.date_planned_start" /></span>
+                        <span class="a_p_forecast_end">预计结束：<t t-esc="item.date_planned_finished" /></span>
+                    </t>
                 </div>
 
             </div>
