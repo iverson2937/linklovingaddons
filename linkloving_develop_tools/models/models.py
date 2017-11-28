@@ -64,6 +64,15 @@ class ProductProduct(models.Model):
 class CreateOrderPointWizard(models.TransientModel):
     _name = "create.order.point"
 
+    def compute_period_for_account_move(self):
+        periods = self.env['account.period'].search([])
+        for move in self.env["account.move"].search([], limit=10):
+            print move.id
+
+            for p in periods:
+                if p.date_start <= move.date < p.date_stop:
+                    move.period_id = p.id
+
     def action_create_in_aboard_rule(self):
         # products = self.env["product.product"].search([("inner_spec", "!=", False)])
         # products = self.env["product.product"].search(
@@ -425,8 +434,6 @@ class CreateOrderPointWizard(models.TransientModel):
                 "sticky": False
             }
         }
-
-
 
 
 def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
