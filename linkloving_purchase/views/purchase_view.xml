@@ -204,7 +204,7 @@
                     <!--<field name="qq"/>-->
                     <field name="category_id"/>
                     <field name="phone"/>
-                    <field name="detailed_address"/>
+                    <!--<field name="detailed_address"/>-->
                     <field name="comment"/>
                 </tree>
             </field>
