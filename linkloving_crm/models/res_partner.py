@@ -8,6 +8,8 @@ from odoo import fields, api, models
 from odoo.exceptions import UserError
 from odoo import tools, _
 from odoo.modules.module import get_module_resource
+from string import lower
+import re
 
 AVAILABLE_PRIORITIES = [
     ('0', 'badly'),
@@ -157,13 +159,76 @@ class ResPartner(models.Model):
             if line.sale_order_count > 0:
                 line.is_order = True
 
+    def select_company_new(self, vals, type):
+        # if type == 'email':
+        #     return True
+        strip_str = vals.get(type)
+        if self._name == 'crm.lead' and type == 'email':
+            type = 'email_from'
+        if strip_str != (self[type] if self else ''):
+            if strip_str:
+                if type == 'name':
+                    result_zh = re.findall(ur'[\u4e00-\u9fa5]', strip_str.decode('utf-8'))
+                    result_us = re.findall(r'[a-zA-Z]', strip_str)
+                    result_zh = ''.join(result_zh)
+                    result_us = lower(''.join(result_us))
+
+                    if result_zh and result_us:
+                        res_zh = self.env['res.partner'].search(
+                            [('name', 'ilike', result_zh), ('customer', '=', True), ('is_company', '=', True)])
+                        if res_zh:
+                            for res_zh_one in res_zh:
+                                partner_us = re.findall(r'[a-zA-Z]', res_zh_one.name)
+                                partner_us = lower(''.join(partner_us))
+                                if partner_us == result_us:
+                                    return True
+                    elif result_zh:
+                        res_zh = self.env['res.partner'].search(
+                            [('name', '=', result_zh), ('customer', '=', True), ('is_company', '=', True)])
+                        if res_zh:
+                            return True
+                    elif result_us:
+
+                        name_val = strip_str.replace('.', '').strip()
+                        is_true = True
+                        while is_true:
+                            if name_val.find('  ') != -1:
+                                name_val = name_val.replace('  ', ' ')
+                            else:
+                                is_true = False
+
+                        res_us = self.env['res.partner'].search(
+                            [('name', 'ilike', name_val), ('customer', '=', True),
+                             ('is_company', '=', True)])
+                        if res_us:
+                            for res_us_one in res_us:
+                                partner_us = re.findall(r'[a-zA-Z]', res_us_one.name)
+                                partner_us = lower(''.join(partner_us))
+                                if partner_us == result_us:
+                                    return True
+                else:
+                    result = self.env['res.partner'].search(
+                        [(type, '=', strip_str.strip()), ('customer', '=', True), ('is_company', '=', True)])
+                    return result
+
     @api.model
     def create(self, vals):
+        if vals.get('name'):
+            name_val = vals.get('name').replace('.', '').strip()
+            is_true = True
+            while is_true:
+                if name_val.find('  ') != -1:
+                    name_val = name_val.replace('  ', ' ')
+                else:
+                    is_true = False
+
+            vals['name'] = name_val
+
         if not (vals.get('company_type') == 'person'):
             if vals.get('is_company'):
-                if select_company(self, vals, 'name'):
+                if self.select_company_new(vals, 'name'):
                     raise UserError(u'此名称' + vals.get('name') + u'已绑定公司，请确认')
-                if select_company(self, vals, 'email'):
+                if self.select_company_new(vals, 'email'):
                     raise UserError(u'此邮件' + vals.get('email') + u'已绑定公司，请更换')
                 # if not vals.get('mutual_rule_id'):
                 #     raise UserError(u'请选择客户适用公海规则')
@@ -202,10 +267,22 @@ class ResPartner(models.Model):
     def write(self, vals):
         if len(self) > 1:
             return super(ResPartner, self).write(vals)
+
+        if vals.get('name'):
+            name_val = vals.get('name').replace('.', '').strip()
+            is_true = True
+            while is_true:
+                if name_val.find('  ') != -1:
+                    name_val = name_val.replace('  ', ' ')
+                else:
+                    is_true = False
+
+            vals['name'] = name_val
+
         if not (self['company_type'] == 'company' and vals.get('company_type') == 'person'):
             if self['is_company'] or vals.get('is_company'):
                 for item_type in ['name', 'email']:
-                    if select_company(self, vals, item_type):
+                    if self.select_company_new(vals, item_type):
                         item_type_name = item_type
                         if item_type == 'name':
                             item_type_name = '名称 '
@@ -216,7 +293,7 @@ class ResPartner(models.Model):
         if self['company_type'] == 'person' and vals.get('company_type') == 'company':
             for item_type in ['name', 'email']:
                 if not vals.get(item_type):
-                    if select_company(self, {item_type: self[item_type]}, item_type):
+                    if self.select_company_new({item_type: self[item_type]}, item_type):
                         raise UserError(u'此' + item_type + vals.get(item_type) + u'已绑定公司，请更换')
 
         if 'user_id' in vals:
