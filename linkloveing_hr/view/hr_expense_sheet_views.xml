@@ -481,10 +481,10 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-
-        <menuitem id="menu_hr_expense_sheet_to_receive" name="Accounting Use Only" sequence="5"
-                  parent="hr_expense.menu_hr_expense_accountant"
-                  action="action_hr_expense_sheet_to_receive"/>
+        <!--隐藏会计专用入口-->
+        <!--<menuitem id="menu_hr_expense_sheet_to_receive" name="Accounting Use Only" sequence="5"-->
+        <!--parent="hr_expense.menu_hr_expense_accountant"-->
+        <!--action="action_hr_expense_sheet_to_receive"/>-->
 
         <record id="hr_expense_sheet_actions_my_draft" model="ir.actions.act_window">
             <field name="name">我的报销单</field>
