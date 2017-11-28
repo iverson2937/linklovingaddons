@@ -27,6 +27,7 @@ from odoo import http
 from odoo.http import content_disposition, dispatch_rpc, request, \
     serialize_exception as _serialize_exception
 from odoo.exceptions import AccessError, UserError
+from pyquery import PyQuery as pq
 
 STATUS_CODE_OK = 1
 STATUS_CODE_ERROR = -1
