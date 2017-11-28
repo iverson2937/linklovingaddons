@@ -199,12 +199,12 @@
             <field name="model">res.partner</field>
             <field name="arch" type="xml">
                 <tree string="Supplier">
-                    <!--<field name="internal_code"/>-->
+                    <field name="internal_code"/>
                     <field name="display_name" string="Name"/>
                     <!--<field name="qq"/>-->
                     <field name="category_id"/>
                     <field name="phone"/>
-                    <!--<field name="detailed_address"/>-->
+                    <field name="detailed_address"/>
                     <field name="comment"/>
                 </tree>
             </field>
