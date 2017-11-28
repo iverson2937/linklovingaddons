@@ -67,11 +67,11 @@ class CreateOrderPointWizard(models.TransientModel):
     def compute_period_for_account_move(self):
         periods = self.env['account.period'].search([])
         for move in self.env["account.move"].search([]):
-            print move.id
+            if not move.period_id:
 
-            for p in periods:
-                if p.date_start <= move.date < p.date_stop:
-                    move.period_id = p.id
+                for p in periods:
+                    if p.date_start < move.date <= p.date_stop:
+                        move.period_id = p.id
 
     def action_create_in_aboard_rule(self):
         # products = self.env["product.product"].search([("inner_spec", "!=", False)])
