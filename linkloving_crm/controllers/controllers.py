@@ -14,10 +14,11 @@ class LinklovingCrm(http.Controller):
     # 建立外键关系表  初始化之前的数据
     @http.route('/linkloving_crm/init_ago_partner/', auth='public')
     def init_partner(self, **kw):
-        par_list = http.request.env['res.partner'].search([])
+        par_list = http.request.env['res.partner'].sudo().search([])
         for par_list_one in par_list:
-            ssr = http.request.env['crm.res.partner'].create({})
-            par_list_one.write({'crm_partner_id': ssr.id})
+            if not par_list_one.crm_partner_id:
+                ssr = http.request.env['crm.res.partner'].create({})
+                par_list_one.write({'crm_partner_id': ssr.id})
 
         return "init partner succeed"
 
