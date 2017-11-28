@@ -90,8 +90,9 @@ class AccountPeriod(models.Model):
 
     @api.multi
     def unlink(self):
-        if self.env['account.move.line'].search([('period_id', '=', self.id)]):
-            raise UserError(u'此会计区间已经有分录生产，不可以删除')
+        for period in self:
+            if period.env['account.move.line'].search([('period_id', '=', period.id)]):
+                raise UserError(u'此会计区间已经有分录生产，不可以删除')
         return super(AccountPeriod, self).unlink()
 
     def _get_account_period_accounts(self, accounts, period_id):
