@@ -2,6 +2,14 @@
 
 <templates xml:space="preserve">
     <t t-name="AccountDashboard">
+        <div class="account_db_top">
+            <div class="header">
+                资产负债表
+            </div>
+            <div class="assets_time">
+
+            </div>
+        </div>
         <div class="panel-group" id="account_dashboard">
            <table class="table table-bordered">
               <caption>条纹表格布局</caption>
