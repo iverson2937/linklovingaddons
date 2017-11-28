@@ -159,6 +159,16 @@ class ResPartner(models.Model):
             if line.sale_order_count > 0:
                 line.is_order = True
 
+    def fomate_name_vals(self, strip_str):
+        name_val = strip_str.replace('.', '').strip()
+        is_true = True
+        while is_true:
+            if name_val.find('  ') != -1:
+                name_val = name_val.replace('  ', ' ')
+            else:
+                is_true = False
+        return name_val
+
     def select_company_new(self, vals, type):
         # if type == 'email':
         #     return True
@@ -169,16 +179,18 @@ class ResPartner(models.Model):
             if strip_str:
                 if type == 'name':
                     result_zh = re.findall(ur'[\u4e00-\u9fa5]', strip_str.decode('utf-8'))
-                    result_us = re.findall(r'[a-zA-Z]', strip_str)
+                    result_us = re.findall(r'[a-zA-Z0-9]', strip_str)
                     result_zh = ''.join(result_zh)
                     result_us = lower(''.join(result_us))
 
                     if result_zh and result_us:
                         res_zh = self.env['res.partner'].search(
                             [('name', 'ilike', result_zh), ('customer', '=', True), ('is_company', '=', True)])
+                        if self:
+                            res_zh = res_zh - self
                         if res_zh:
                             for res_zh_one in res_zh:
-                                partner_us = re.findall(r'[a-zA-Z]', res_zh_one.name)
+                                partner_us = re.findall(r'[a-zA-Z0-9]', res_zh_one.name)
                                 partner_us = lower(''.join(partner_us))
                                 if partner_us == result_us:
                                     return True
@@ -188,21 +200,14 @@ class ResPartner(models.Model):
                         if res_zh:
                             return True
                     elif result_us:
-
-                        name_val = strip_str.replace('.', '').strip()
-                        is_true = True
-                        while is_true:
-                            if name_val.find('  ') != -1:
-                                name_val = name_val.replace('  ', ' ')
-                            else:
-                                is_true = False
-
                         res_us = self.env['res.partner'].search(
-                            [('name', 'ilike', name_val), ('customer', '=', True),
+                            [('name', 'ilike', self.fomate_name_vals(strip_str)), ('customer', '=', True),
                              ('is_company', '=', True)])
+                        if self:
+                            res_us = res_us - self
                         if res_us:
                             for res_us_one in res_us:
-                                partner_us = re.findall(r'[a-zA-Z]', res_us_one.name)
+                                partner_us = re.findall(r'[a-zA-Z0-9]', res_us_one.name)
                                 partner_us = lower(''.join(partner_us))
                                 if partner_us == result_us:
                                     return True
@@ -214,15 +219,7 @@ class ResPartner(models.Model):
     @api.model
     def create(self, vals):
         if vals.get('name'):
-            name_val = vals.get('name').replace('.', '').strip()
-            is_true = True
-            while is_true:
-                if name_val.find('  ') != -1:
-                    name_val = name_val.replace('  ', ' ')
-                else:
-                    is_true = False
-
-            vals['name'] = name_val
+            vals['name'] = self.fomate_name_vals(vals.get('name'))
 
         if not (vals.get('company_type') == 'person'):
             if vals.get('is_company'):
@@ -269,15 +266,7 @@ class ResPartner(models.Model):
             return super(ResPartner, self).write(vals)
 
         if vals.get('name'):
-            name_val = vals.get('name').replace('.', '').strip()
-            is_true = True
-            while is_true:
-                if name_val.find('  ') != -1:
-                    name_val = name_val.replace('  ', ' ')
-                else:
-                    is_true = False
-
-            vals['name'] = name_val
+            vals['name'] = self.fomate_name_vals(vals.get('name'))
 
         if not (self['company_type'] == 'company' and vals.get('company_type') == 'person'):
             if self['is_company'] or vals.get('is_company'):
