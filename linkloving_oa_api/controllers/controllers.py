@@ -2493,6 +2493,7 @@ class LinklovingOAApi(http.Controller):
                 'id': orderDetail.id,
                 'name': orderDetail.name,
                 "amount": orderDetail.amount,
+                "payment_reminding": orderDetail.payment_reminding,  # 暂支余额
                 "pre_payment_reminding": orderDetail.pre_payment_reminding,
                 "state": orderDetail.state,
                 "apply_date": orderDetail.apply_date,
@@ -2531,6 +2532,7 @@ class LinklovingOAApi(http.Controller):
                 "amount": orderDetail.amount,
                 "pre_payment_reminding": orderDetail.pre_payment_reminding,
                 "state": orderDetail.state,
+                "payment_reminding": orderDetail.payment_reminding,  # 暂支余额
                 "apply_date": orderDetail.apply_date,
                 "employee": orderDetail.employee_id.display_name,
                 "company_id": orderDetail.company_id.display_name,
