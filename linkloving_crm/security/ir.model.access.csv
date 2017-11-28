@@ -8,3 +8,4 @@ access_linkloving_crm_crm_product_series,linkloving_crm_crm_product_series,model
 access_order_person_in_charge,linkloving_crm_order_person_in_charge,model_order_person_in_charge,,1,1,1,1
 access_crm_mutual_customer,linkloving_crm_crm_mutual_customer,model_crm_mutual_customer,,1,1,1,1
 access_crm_reference_type,linkloving_crm_crm_reference_type,model_crm_reference_type,,1,1,1,1
+access_crm_res_partner,linkloving_crm_crm_res_partner,model_crm_res_partner,,1,1,1,1

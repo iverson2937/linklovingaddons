@@ -94,12 +94,12 @@
 
                 </xpath>
 
-                <xpath expr="//field[@name='website']" position="attributes">
-                    <attribute name='invisible'>1</attribute>
+                <xpath expr="//field[@name='website']" position="replace">
+
                 </xpath>
 
 
-                <xpath expr="//field[@name='type']" position="after">
+                <xpath expr="//field[@name='type']" position="before">
                     <field name="website" widget="url" placeholder="e.g. www.odoo.com"/>
                 </xpath>
 
@@ -253,8 +253,9 @@
                 <xpath expr="//tree" position="attributes">
                     <attribute name="default_order">write_date desc</attribute>
                 </xpath>
+
                 <xpath expr="//field[@name='display_name']" position="after">
-                    <field name="website"/>
+                    <field name="website" widget="url"/>
                     <field name="priority" widget="priority_star"/>
                     <field name="country_id"/>
                     <field name="customer_status"/>
