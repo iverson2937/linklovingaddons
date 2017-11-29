@@ -27,6 +27,7 @@ from odoo import http
 from odoo.http import content_disposition, dispatch_rpc, request, \
     serialize_exception as _serialize_exception
 from odoo.exceptions import AccessError, UserError
+from pyquery import PyQuery as pq
 
 STATUS_CODE_OK = 1
 STATUS_CODE_ERROR = -1
@@ -2576,6 +2577,130 @@ class LinklovingOAApi(http.Controller):
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
 
 
+    #ZWS
+    @classmethod
+    def blog_to_json(cls, blog_post):
+        data = {
+            'author_id': blog_post.author_id.id,
+            'blog_id': {
+                'blog_id': blog_post.blog_id.id,
+                'blog_name': blog_post.blog_id.name
+            },
+            'content': LinklovingOAApi.change_content(blog_post.content),
+            'create_date': blog_post.create_date,
+            'create_uid': {
+                'create_id': blog_post.sudo().create_uid.id,
+                'create_name': blog_post.sudo().create_uid.name,
+                'create_img': LinklovingAppApi.get_img_url(blog_post.sudo().create_uid.self.user_ids.id, "res.users",
+                                                           "image_medium")
+            },
+            'display_name': blog_post.display_name,
+            'id': blog_post.id,
+            'name': blog_post.name,
+            'published_date': blog_post.published_date,
+            'ranking': blog_post.ranking,
+            'subtitle': blog_post.subtitle,
+            'tag_ids': {
+                'tag_id': blog_post.tag_ids.id if blog_post.tag_ids else "",
+                'tag_name': blog_post.tag_ids.name if blog_post.tag_ids else ""
+            },
+            'visits': blog_post.visits,
+        }
 
+        return data
+
+    # 转化content
+    @classmethod
+    def change_content(cls, blog_content):
+        content = pq(blog_content)
+        if content('img'):
+            for a_html in content('img'):
+                # attachment_one = Model_Attachment.search([('datas', '=', pq(a_html).attr('src').split('base64,')[1])])
+                # if not attachment_one:
+                pq(a_html).attr('src', request.httprequest.host_url[:-1] + str(pq(a_html).attr('src')))
+        elif content('a'):
+            for a_html in content('a'):
+                # attachment_one = Model_Attachment.search([('datas', '=', pq(a_html).attr('src').split('base64,')[1])])
+                # if not attachment_one:
+
+                pq(a_html).attr('href', request.httprequest.host_url[:-1] + str(pq(a_html).attr('href')))
+        else:
+            content = content
+        return str(content)
+
+    # 获取blog列（热门和全部）
+    @http.route('/linkloving_oa_api/get_blog_list', type='json', auth='none', csrf=False, cors='*')
+    def get_blog_list(self, **kw):
+        type = request.jsonrequest.get('type')
+        limit = request.jsonrequest.get('limit')
+        offset = request.jsonrequest.get('offset')
+        search_body = request.jsonrequest.get('search_body')
+        tag_id = request.jsonrequest.get('tag_id')
+        is_tag_id = request.jsonrequest.get('is_tag_id')
+        is_first = request.jsonrequest.get('is_first')
+        if not limit:
+            limit = 60
+        if not offset:
+            offset = 0
+        blog_list_json = []
+        domain = [('website_published', '=', True)]
+        if type == 'all':
+            blog_list = request.env['blog.post'].search(domain, limit=limit, offset=offset)
+            for blog_list_bean in blog_list:
+                blog_list_json.append(LinklovingOAApi.blog_to_json(blog_list_bean))
+        elif type == 'hot':
+            blog_list = request.env['blog.post'].search(domain, limit=10, offset=offset, order='visits desc')
+            for blog_list_bean in blog_list:
+                blog_list_json.append(LinklovingOAApi.blog_to_json(blog_list_bean))
+        elif type == 'search':
+            blog_list = request.env['blog.post'].search(
+                [('website_published', '=', True), ('name', 'ilike', search_body)])
+            for blog_list_bean in blog_list:
+                blog_list_json.append(LinklovingOAApi.blog_to_json(blog_list_bean))
+        elif is_tag_id:
+            if is_first:
+                blog_list = request.env['blog.post'].search(
+                    [('website_published', '=', True), ('blog_id', '=', int(tag_id))])
+            else:
+                blog_list = request.env['blog.post'].search(
+                    [('website_published', '=', True), ('tag_ids', '=', int(tag_id))])
+            for blog_list_bean in blog_list:
+                blog_list_json.append(LinklovingOAApi.blog_to_json(blog_list_bean))
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=blog_list_json)
+
+    # 获取博客分类
+    @http.route('/linkloving_oa_api/get_blog_colum', type='json', auth='none', csrf=False, cors='*')
+    def get_blog_colum(self, **kw):
+        blog_list = request.env['blog.blog'].search([])
+        colum_blog_list = []
+        for blog_list_bean in blog_list:
+            colum_blog_list.append(LinklovingOAApi.colum_blog_to_json(blog_list_bean))
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=colum_blog_list)
+
+    # 博客分类json转化
+    @classmethod
+    def colum_blog_to_json(cls, blog_blog):
+        data = {
+            'create_date': blog_blog.create_date,
+            'create_uid': {
+                'create_id': blog_blog.sudo().create_uid.id,
+                'create_name': blog_blog.sudo().create_uid.name
+
+            },
+            'is_all_blog': blog_blog.is_all_blog,
+            'display_name': blog_blog.display_name,
+            'id': blog_blog.id,
+            'name': blog_blog.name
+            ,
+            'subtitle': blog_blog.subtitle,
+            'blog_tag_ids': [
+                {'tag_id': blog_tag_bean.id,
+                 'tag_name': blog_tag_bean.name
+                 }
+                for blog_tag_bean in blog_blog.blog_tag_ids],
+        }
+        return data
 
 
