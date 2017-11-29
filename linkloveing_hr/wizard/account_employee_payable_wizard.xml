@@ -23,9 +23,7 @@
                             <field name="amount"/>
                             <field name="remark"/>
                             <field name="pre_payment_reminding"  sum="Total Amount" widget="monetary"/>
-                            <field name="can_return"/>
-
-
+                            <field name="can_return" invisible="1"/>
                         </tree>
                     </field>
                 <footer>
