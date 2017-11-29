@@ -10,14 +10,14 @@
 }
 .arrange_production_container{
     overflow: hidden;
-    min-width: 1320px;
+    min-width: 1220px;
 }
 
 .container_header {
     margin: 5px 8px;
 }
 #a_p_left{
-    width: 50%;
+    width: 54%;
     height: 900px;
     float: left;
     padding: 10px 0;
@@ -27,7 +27,7 @@
     overflow-y: scroll;
 }
 #a_p_right{
-    width: 50%;
+    width: 46%;
     height: 900px;
     overflow-y: scroll;
     float: left;
