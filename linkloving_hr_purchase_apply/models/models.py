@@ -4,7 +4,12 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.addons import decimal_precision as dp
 import jpush
-from linklovingaddons.linkloving_app_api.models.models import JPushExtend
+
+try:
+    from linklovingaddons.linkloving_app_api.models.models import JPushExtend
+except Exception:
+    pass
+
 
 
 class PurchaseApply(models.Model):
