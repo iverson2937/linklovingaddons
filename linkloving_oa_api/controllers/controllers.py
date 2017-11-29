@@ -2063,9 +2063,10 @@ class LinklovingOAApi(http.Controller):
     def change_shenpi_line_ids_tojson(self,objs):
         data = []
         for obj in objs:
+            user_ava_id = request.env['res.users'].sudo().search([('partner_id', '=', obj.partner_id.id)])
             data.append({
                 "write_uid": self.get_department(obj.partner_id),
-                "user_ava": LinklovingAppApi.get_img_url(obj.write_uid.id,
+                "user_ava": LinklovingAppApi.get_img_url(user_ava_id.id,
                                                          "res.users", "image_medium"),
                 "state": obj.state,
                 "remark": obj.remark,
