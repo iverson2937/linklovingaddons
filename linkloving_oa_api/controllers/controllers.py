@@ -22,6 +22,7 @@ from linklovingaddons.linkloving_app_api.controllers.controllers import Linklovi
 try:
     from linklovingaddons.linkloving_app_api.models.models import JPushExtend
 except Exception:
+    print 'ddddddddddddddddddddddd'
     pass
 from odoo import fields
 from odoo.osv import expression
