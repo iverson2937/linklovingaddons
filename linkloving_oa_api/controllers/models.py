@@ -37,4 +37,9 @@ class JPushExtend:
 
 
 
+
+
+
+
+
             # JPushExtend.send_push(platform=jpush.all_, audience= "all", notification="My First Push")
