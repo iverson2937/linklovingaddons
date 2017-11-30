@@ -17,7 +17,7 @@ from pip import download
 
 import odoo
 import odoo.modules.registry
-# from linklovingaddons.linkloving_app_api.controllers.controllers import LinklovingAppApi
+from linklovingaddons.linkloving_app_api.controllers.controllers import LinklovingAppApi
 from models import JPushExtend
 
 from odoo import fields
