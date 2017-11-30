@@ -2,4 +2,3 @@
 
 from . import controllers
 from . import name_card_controller
-from . import models
