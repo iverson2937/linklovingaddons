@@ -18,8 +18,8 @@ from pip import download
 import odoo
 import odoo.modules.registry
 from linklovingaddons.linkloving_app_api.controllers.controllers import LinklovingAppApi
+from models import JPushExtend
 
-from linklovingaddons.linkloving_app_api.models.models import JPushExtend
 from odoo import fields
 from odoo.osv import expression
 from odoo.tools import float_compare, SUPERUSER_ID, werkzeug, os, safe_eval
@@ -1307,12 +1307,12 @@ class LinklovingOAApi(http.Controller):
             })
         return data
 
-    #去掉<p>标签
+    # 去掉<p>标签
     def message_to_json(self, objs):
         data = []
         for obj in objs:
             dr = re.compile(r'<[^>]+>', re.S)
-            body_str = dr.sub('',obj.body)
+            body_str = dr.sub('', obj.body)
             # body_str = body_str.replace('</p>', '')
             data.append({
                 'model': obj.model,
@@ -1396,14 +1396,14 @@ class LinklovingOAApi(http.Controller):
             'pre_payment_reminding': obj.pre_payment_reminding or '0.00',
             'line_ids': self.get_waiting_approval_detail_lists(obj.expense_line_ids),
             'message_ids': self.get_apply_record(obj.message_ids),
-            'to_approve_id':obj.to_approve_id.id,
+            'to_approve_id': obj.to_approve_id.id,
         }
 
     def get_waiting_approval_detail_lists(self, objs):
         data = []
         for obj in objs:
             data.append({
-                'line_id':obj.id,
+                'line_id': obj.id,
                 'analytic_account_id': obj.analytic_account_id.name or '',
                 'product_id': obj.product_id.name or '',
                 'account_id': obj.account_id.name or '',
@@ -1453,12 +1453,14 @@ class LinklovingOAApi(http.Controller):
             for request_line in expense_line_ids.get('data').get('expense_line_ids'):
                 if (line_ids.id == request_line.get('line_id')):
                     line_ids.write({
-                            'product_id': request_line.get('product_id'),  # 产品
-                            'unit_amount': float(request_line.get('unit_amount')),  # 金额
-                            'name': request_line.get('name'),  # 费用说明
-                            'tax_ids': ([(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [(6, 0, [4])]),
-                            'description': request_line.get('remarks'),
-                     })
+                        'product_id': request_line.get('product_id'),  # 产品
+                        'unit_amount': float(request_line.get('unit_amount')),  # 金额
+                        'name': request_line.get('name'),  # 费用说明
+                        'tax_ids': (
+                            [(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [
+                                (6, 0, [4])]),
+                        'description': request_line.get('remarks'),
+                    })
 
         confirm_approve.manager1_approve()
         if reason:
@@ -1480,12 +1482,14 @@ class LinklovingOAApi(http.Controller):
             for request_line in expense_line_ids.get('data').get('expense_line_ids'):
                 if (line_ids.id == request_line.get('line_id')):
                     line_ids.write({
-                            'product_id': request_line.get('product_id'),  # 产品
-                            'unit_amount': float(request_line.get('unit_amount')),  # 金额
-                            'name': request_line.get('name'),  # 费用说明
-                            'tax_ids': ([(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [(6, 0, [4])]),
-                            'description': request_line.get('remarks'),
-                     })
+                        'product_id': request_line.get('product_id'),  # 产品
+                        'unit_amount': float(request_line.get('unit_amount')),  # 金额
+                        'name': request_line.get('name'),  # 费用说明
+                        'tax_ids': (
+                            [(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [
+                                (6, 0, [4])]),
+                        'description': request_line.get('remarks'),
+                    })
 
         confirm_approve.manager2_approve()
         if reason:
@@ -1506,12 +1510,14 @@ class LinklovingOAApi(http.Controller):
             for request_line in expense_line_ids.get('data').get('expense_line_ids'):
                 if (line_ids.id == request_line.get('line_id')):
                     line_ids.write({
-                            'product_id': request_line.get('product_id'),  # 产品
-                            'unit_amount': float(request_line.get('unit_amount')),  # 金额
-                            'name': request_line.get('name'),  # 费用说明
-                            'tax_ids': ([(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [(6, 0, [4])]),
-                            'description': request_line.get('remarks'),
-                     })
+                        'product_id': request_line.get('product_id'),  # 产品
+                        'unit_amount': float(request_line.get('unit_amount')),  # 金额
+                        'name': request_line.get('name'),  # 费用说明
+                        'tax_ids': (
+                            [(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [
+                                (6, 0, [4])]),
+                        'description': request_line.get('remarks'),
+                    })
 
         confirm_approve.manager3_approve()
         if reason:
@@ -1646,9 +1652,9 @@ class LinklovingOAApi(http.Controller):
         employee = request.env['hr.employee'].sudo().search(
             [('user_id', '=', partner_id)])
         get_all_departments = request.env['hr.department'].sudo().search([])
-        #domain = [('address_home_id', '=', partner_id)]
-        #person_department = request.env['hr.employee'].sudo().search(domain,
-                                                                     #order='id desc')
+        # domain = [('address_home_id', '=', partner_id)]
+        # person_department = request.env['hr.employee'].sudo().search(domain,
+        # order='id desc')
         data = {
             "all_departments": self.get_department_to_json(get_all_departments),
             "default_department": self.get_name_and_id(employee.department_id),
@@ -1818,7 +1824,7 @@ class LinklovingOAApi(http.Controller):
             })
         return data
 
-    #头像json
+    # 头像json
     def get_img_url(cls, id, model, field, time):
         url = '%sweb/image?model=%s&id=%s&field=%s&unique=%s' % (
             request.httprequest.host_url, model, str(id), field, time)
@@ -1826,46 +1832,47 @@ class LinklovingOAApi(http.Controller):
             return ''
         return url
 
-    #我的工程领料单
+    # 我的工程领料单
     @http.route('/linkloving_oa_api/get_material_request_list', type='json', auth="none", csrf=False, cors='*')
-    def get_material_request_list(self,*kw):
+    def get_material_request_list(self, *kw):
         limit = request.jsonrequest.get("limit")
         offset = request.jsonrequest.get("offset")
         user_id = request.jsonrequest.get('user_id')
         material_request_list = request.env['material.request'].sudo().search([('create_uid', '=', user_id)],
-                                                                                 limit=limit,
-                                                                                 offset=offset,
-                                                                                 order='id desc')
+                                                                              limit=limit,
+                                                                              offset=offset,
+                                                                              order='id desc')
         data = []
         for material_request in material_request_list:
             data.append({
-                "name":material_request.name,
-                "picking_type":material_request.picking_type,
-                "my_create_uid":self.get_department(material_request.my_create_uid),
-                "delivery_date":material_request.delivery_date,
-                "my_create_date":material_request.my_create_date,
-                "picking_state":material_request.picking_state,
-                "who_review_now":self.get_department(material_request.who_review_now),
-                "picking_cause":material_request.picking_cause,
-                "remark":material_request.remark or '无',
-                "line_ids":self.change_material_request_line_ids_to_json((material_request.line_ids)),
-                "user_ava":LinklovingAppApi.get_img_url(material_request.create_uid.id,
-                                                                  "res.users", "image_medium"),
+                "name": material_request.name,
+                "picking_type": material_request.picking_type,
+                "my_create_uid": self.get_department(material_request.my_create_uid),
+                "delivery_date": material_request.delivery_date,
+                "my_create_date": material_request.my_create_date,
+                "picking_state": material_request.picking_state,
+                "who_review_now": self.get_department(material_request.who_review_now),
+                "picking_cause": material_request.picking_cause,
+                "remark": material_request.remark or '无',
+                "line_ids": self.change_material_request_line_ids_to_json((material_request.line_ids)),
+                "user_ava": LinklovingAppApi.get_img_url(material_request.create_uid.id,
+                                                         "res.users", "image_medium"),
                 "review_process_line_ids": self.change_shenpi_line_ids_tojson(material_request.review_process_line_ids)
 
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-    #工程领料 待我审批
+    # 工程领料 待我审批
     @http.route('/linkloving_oa_api/get_wait_me_material_request_list', type='json', auth="none", csrf=False, cors='*')
-    def get_wait_me_material_request_list(self,*kw):
+    def get_wait_me_material_request_list(self, *kw):
         limit = request.jsonrequest.get("limit")
         offset = request.jsonrequest.get("offset")
         user_id = request.jsonrequest.get('user_id')
-        wait_me_material_request_list = request.env['material.request'].sudo().search([('who_review_now_id', '=', user_id),("picking_state", "=", "review_ing")],
-                                                                              limit=limit,
-                                                                              offset=offset,
-                                                                              order='id desc')
+        wait_me_material_request_list = request.env['material.request'].sudo().search(
+            [('who_review_now_id', '=', user_id), ("picking_state", "=", "review_ing")],
+            limit=limit,
+            offset=offset,
+            order='id desc')
         total_material_request_list = request.env['material.request'].sudo().search(
             [('who_review_now_id', '=', user_id), ("picking_state", "=", "review_ing")],
             order='id desc')
@@ -1876,7 +1883,7 @@ class LinklovingOAApi(http.Controller):
 
         for material_request in wait_me_material_request_list:
             data.append({
-                "id":material_request.id,
+                "id": material_request.id,
                 "name": material_request.name,
                 "picking_type": material_request.picking_type,
                 "my_create_uid": self.get_department(material_request.my_create_uid),
@@ -1892,19 +1899,20 @@ class LinklovingOAApi(http.Controller):
                 "review_process_line_ids": self.change_shenpi_line_ids_tojson(material_request.review_process_line_ids),
 
             })
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"data":data,"count":count})
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"data": data, "count": count})
 
-    #工程领料 我已审批
+    # 工程领料 我已审批
     @http.route('/linkloving_oa_api/get_already_material_request_list', type='json', auth="none", csrf=False, cors='*')
-    def get_already_material_request_list(self,*kw):
+    def get_already_material_request_list(self, *kw):
         limit = request.jsonrequest.get("limit")
         offset = request.jsonrequest.get("offset")
         user_id = request.jsonrequest.get('user_id')
-        already_material_requset = request.env['material.request'].sudo().search([("review_i_approvaled_val", "child_of", user_id)],
-                                                                                 limit=limit,
-                                                                                 offset=offset,
-                                                                                 order='id desc'
-                                                                                 )
+        already_material_requset = request.env['material.request'].sudo().search(
+            [("review_i_approvaled_val", "child_of", user_id)],
+            limit=limit,
+            offset=offset,
+            order='id desc'
+        )
         data = []
         for material_request in already_material_requset:
             data.append({
@@ -1920,32 +1928,31 @@ class LinklovingOAApi(http.Controller):
                 "line_ids": self.change_material_request_line_ids_to_json((material_request.line_ids)),
                 "user_ava": LinklovingAppApi.get_img_url(material_request.create_uid.id,
                                                          "res.users", "image_medium"),
-                "review_process_line_ids":self.change_shenpi_line_ids_tojson(material_request.review_process_line_ids)
+                "review_process_line_ids": self.change_shenpi_line_ids_tojson(material_request.review_process_line_ids)
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-
-    #获取终审人
+    # 获取终审人
     @http.route('/linkloving_oa_api/get_final_review', type='json', auth="none", csrf=False, cors='*')
     def get_final_review(self, *kw):
         final_review_list = request.env['final.review.partner'].sudo().search([])
         data = []
         for final_review in final_review_list:
             data.append({
-                "final_review_partner_id":self.get_department(final_review.final_review_partner_id),
-                "review_type":final_review.review_type,
+                "final_review_partner_id": self.get_department(final_review.final_review_partner_id),
+                "review_type": final_review.review_type,
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-    #搜索审核人
+    # 搜索审核人
     @http.route('/linkloving_oa_api/search_employee', type='json', auth="none", csrf=False, cors='*')
     def search_employee(self, *kw):
         name = request.jsonrequest.get("name")
-        search_employee = request.env['res.partner'].sudo().search([('name', 'ilike', name),('employee', '=', 't')])
+        search_employee = request.env['res.partner'].sudo().search([('name', 'ilike', name), ('employee', '=', 't')])
         data = []
         for employee in search_employee:
             data.append({
-                "partner_id":{
+                "partner_id": {
                     "name": employee.name,
                     "id": employee.id,
                 },
@@ -1955,9 +1962,9 @@ class LinklovingOAApi(http.Controller):
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-    #终审人通过审核
+    # 终审人通过审核
     @http.route('/linkloving_oa_api/action_pass', type='json', auth="none", csrf=False, cors='*')
-    def action_pass(self,*kw):
+    def action_pass(self, *kw):
         id = request.jsonrequest.get("id")
         remark = request.jsonrequest.get("remark")
         create_uid = request.jsonrequest.get("create_uid")
@@ -1968,9 +1975,9 @@ class LinklovingOAApi(http.Controller):
         new_commit.action_oa_pass()
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
 
-    #拒绝
+    # 拒绝
     @http.route('/linkloving_oa_api/action_deny', type='json', auth="none", csrf=False, cors='*')
-    def action_deny(self,*kw):
+    def action_deny(self, *kw):
         id = request.jsonrequest.get("id")
         remark = request.jsonrequest.get("remark")
         create_uid = request.jsonrequest.get("create_uid")
@@ -1981,9 +1988,9 @@ class LinklovingOAApi(http.Controller):
         new_commit.action_oa_deny()
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
 
-    #送审
+    # 送审
     @http.route('/linkloving_oa_api/action_to_next', type='json', auth="none", csrf=False, cors='*')
-    def action_to_next(self,*kw):
+    def action_to_next(self, *kw):
         id = request.jsonrequest.get("id")
         remark = request.jsonrequest.get("remark")
         create_uid = request.jsonrequest.get("create_uid")
@@ -1993,21 +2000,22 @@ class LinklovingOAApi(http.Controller):
         new_commit = request.env['review.process.wizard'].sudo(create_uid).create({
             'remark': remark,
             'material_requests_id': id,
-            'partner_id':partner_id,
+            'partner_id': partner_id,
         })
-        new_commit.oa_action_to_next(type,to_last_review)
+        new_commit.oa_action_to_next(type, to_last_review)
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
 
-    #搜索工程领料单
+    # 搜索工程领料单
     @http.route('/linkloving_oa_api/search_material_request', type='json', auth="none", csrf=False, cors='*')
-    def search_material_request(self,*kw):
+    def search_material_request(self, *kw):
         type = request.jsonrequest.get("type")
         search_text = request.jsonrequest.get("search_text")
         user_id = request.jsonrequest.get("user_id")
         waitme_type = request.jsonrequest.get("waitme_type")
         if (type == "my"):
-           material_list = request.env['material.request'].sudo().search([('create_uid', '=', user_id),('name', 'ilike', search_text)],
-                                                          order='id desc')
+            material_list = request.env['material.request'].sudo().search(
+                [('create_uid', '=', user_id), ('name', 'ilike', search_text)],
+                order='id desc')
         elif (type == "already"):
             if (waitme_type == "name"):
                 material_list = request.env['material.request'].sudo().search(
@@ -2029,7 +2037,6 @@ class LinklovingOAApi(http.Controller):
                      ('name', 'ilike', search_text)],
                     order='id desc')
 
-
         data = []
         for material_request in material_list:
             data.append({
@@ -2049,19 +2056,18 @@ class LinklovingOAApi(http.Controller):
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-
     def change_material_request_line_ids_to_json(self, objs):
         data = []
         for obj in objs:
             data.append({
-                "product_id":self.get_department(obj.product_id),
-                "product_qty":obj.product_qty,
-                "qty_available":obj.qty_available,
-                "quantity_done":obj.quantity_done,
+                "product_id": self.get_department(obj.product_id),
+                "product_qty": obj.product_qty,
+                "qty_available": obj.qty_available,
+                "quantity_done": obj.quantity_done,
             })
         return data
 
-    def change_shenpi_line_ids_tojson(self,objs):
+    def change_shenpi_line_ids_tojson(self, objs):
         data = []
         for obj in objs:
             user_ava_id = request.env['res.users'].sudo().search([('partner_id', '=', obj.partner_id.id)])
@@ -2071,8 +2077,8 @@ class LinklovingOAApi(http.Controller):
                                                          "res.users", "image_medium"),
                 "state": obj.state,
                 "remark": obj.remark,
-                "write_date":obj.write_date,
-                "last_review_line_id":obj.last_review_line_id.id,
+                "write_date": obj.write_date,
+                "last_review_line_id": obj.last_review_line_id.id,
             })
         data.reverse()
         return data
@@ -2578,8 +2584,7 @@ class LinklovingOAApi(http.Controller):
         shengou.refuse_payment(refuse_reason);
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
 
-
-    #ZWS
+    # ZWS
     @classmethod
     def blog_to_json(cls, blog_post):
         data = {
@@ -2704,5 +2709,3 @@ class LinklovingOAApi(http.Controller):
                 for blog_tag_bean in blog_blog.blog_tag_ids],
         }
         return data
-
-
