@@ -17,9 +17,9 @@ from pip import download
 
 import odoo
 import odoo.modules.registry
-# from linklovingaddons.linkloving_app_api.controllers.controllers import LinklovingAppApi
+from linklovingaddons.linkloving_app_api.controllers.controllers import LinklovingAppApi
 
-from linklovingaddons.linkloving_app_api import *
+from linklovingaddons.linkloving_app_api.models.models import JPushExtend
 from odoo import fields
 from odoo.osv import expression
 from odoo.tools import float_compare, SUPERUSER_ID, werkzeug, os, safe_eval
@@ -1932,6 +1932,7 @@ class LinklovingOAApi(http.Controller):
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
+
     #获取终审人
     @http.route('/linkloving_oa_api/get_final_review', type='json', auth="none", csrf=False, cors='*')
     def get_final_review(self, *kw):
@@ -2585,6 +2586,7 @@ class LinklovingOAApi(http.Controller):
                                                                                order='id desc')
         shengou.refuse_payment(refuse_reason);
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
+
 
     #ZWS
     @classmethod
