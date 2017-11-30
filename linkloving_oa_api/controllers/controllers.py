@@ -17,9 +17,9 @@ from pip import download
 
 import odoo
 import odoo.modules.registry
-from linklovingaddons.linkloving_app_api.controllers.controllers import LinklovingAppApi
-
-from linklovingaddons.linkloving_app_api.models.models import JPushExtend
+# from linklovingaddons.linkloving_app_api.controllers.controllers import LinklovingAppApi
+#
+# from linklovingaddons.linkloving_app_api.models.models import JPushExtend
 from odoo import fields
 from odoo.osv import expression
 from odoo.tools import float_compare, SUPERUSER_ID, werkzeug, os, safe_eval
