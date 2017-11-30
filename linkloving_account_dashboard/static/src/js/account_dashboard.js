@@ -58,13 +58,13 @@ odoo.define('linkloving_account_dashboard.account_dashboard', function (require)
 
         start: function () {
             var self = this;
-            new Model("account.account")
-                .call("get_dashboard_datas",)
-                .then(function (result) {
-                    self.$el.eq(0).append(QWeb.render('AccountDashboard', result))
-                });
-            // self.$el.eq(0).append(QWeb.render('AccountDashboard', {}));
-            self.init_date_widget($(".assets_time"));
+            // new Model("account.account")
+            //     .call("get_dashboard_datas",)
+            //     .then(function (result) {
+            //         self.$el.eq(0).append(QWeb.render('AccountDashboard', result))
+            //     });
+            // // self.$el.eq(0).append(QWeb.render('AccountDashboard', {}));
+            // self.init_date_widget($(".assets_time"));
         },
     });
 
