@@ -1373,6 +1373,7 @@ class LinklovingAppApi(http.Controller):
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=self.convert_qc_feedback_to_json(feedback))
 
+    # 即将弃用
     @http.route('/linkloving_app_api/semi_finished_return_material', type='json', auth='none', csrf=False)
     def semi_finished_return_material(self, **kw):
         order_id = request.jsonrequest.get('order_id')  # get paramter
@@ -1432,7 +1433,7 @@ class LinklovingAppApi(http.Controller):
                     returun_material_obj._prepare_move_values(r))
                 move.action_done()
             returun_material_obj.return_ids.create_scraps()
-            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'done'})
+            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).button_mark_done()
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
 
@@ -1443,79 +1444,93 @@ class LinklovingAppApi(http.Controller):
         stock_move_ids = request.jsonrequest.get('stock_moves')
         is_check = request.jsonrequest.get('is_check')
         mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
-        if not mrp_production:
-            return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error': _("MO not found")})
-        return_lines = []
-        if all(stock_move.get("return_qty") == 0 for stock_move in stock_move_ids):
-            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).button_mark_done()
-            return JsonResponse.send_response(STATUS_CODE_OK,
-                                              res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
-        if not is_check:
-            for l in stock_move_ids:
-                product_id = l['product_tmpl_id']
-                obj = request.env['return.material.line'].sudo(LinklovingAppApi.CURRENT_USER()).create({
-                    'return_qty': l['return_qty'],
-                    'product_id': product_id,
-                    'product_type': l['product_type'],
-                })
-                return_lines.append(obj.id)
-            return_material_model = request.env['mrp.return.material']
-            returun_material_obj = return_material_model.sudo(LinklovingAppApi.CURRENT_USER()).search(
-                [('production_id', '=', order_id),
-                 ('state', '=', 'draft')])
-            if not returun_material_obj:  # 如果没生成过就生成一遍， 防止出现多条记录
+        force_cancel = request.jsonrequest.get('force_cancel')
+        return_material_model = request.env['mrp.return.material'].sudo(LinklovingAppApi.CURRENT_USER())
+
+        if force_cancel:
+            returun_material_obj = return_material_model.get_progress_return_order(order_id=order_id)
+
+        else:
+            if all(stock_move.get("return_qty") == 0 for stock_move in stock_move_ids):
+                mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).button_mark_done()
+                return JsonResponse.send_response(STATUS_CODE_OK,
+                                                  res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
+
+            returun_material_obj = return_material_model.get_normal_return_order(order_id=order_id)
+
+        # ---------------------***--------------------
+        if not returun_material_obj and not is_check:  # 如果没生成过就生成一遍， 防止出现多条记录
                 returun_material_obj = return_material_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
                     'production_id': mrp_production.id,
                 })
-            else:
-                returun_material_obj.production_id = mrp_production.id
-            returun_material_obj.return_ids = return_lines
-            mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write(
-                {'state': 'waiting_warehouse_inspection'})
+        elif not returun_material_obj and is_check:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={'error': _("Order of return material not found")})
         else:
-            return_material_model = request.env['mrp.return.material']
-            returun_material_obj = return_material_model.sudo(LinklovingAppApi.CURRENT_USER()).search(
-                [('production_id', '=', order_id),
-                 ('state', '=', 'draft')])
-            if not returun_material_obj:
-                return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                                  res_data={'error': _("Order of return material not found")})
-            returun_material_obj.state = 'done'
-            # 退料信息 已经确认
+            returun_material_obj.production_id = mrp_production.id
+
+        if not is_check:  # 清点退料
+            for l in stock_move_ids:
+                obj = request.env['return.material.line'].sudo(LinklovingAppApi.CURRENT_USER()).create({
+                    'return_qty': l['return_qty'],
+                    'product_id': l['product_tmpl_id'],
+                    'return_id': returun_material_obj.id,
+                })
+        else:  #仓库检验退料
             for r in returun_material_obj.return_ids:
                 for new_qty_dic in stock_move_ids:
                     if r.product_id.id == new_qty_dic['product_tmpl_id']:
                         r.return_qty = new_qty_dic['return_qty']
-                if r.return_qty == 0:
-                    continue
-                move = request.env['stock.move'].sudo(LinklovingAppApi.CURRENT_USER()).create(
-                    returun_material_obj._prepare_move_values(r))
-                move.action_done()
-            returun_material_obj.return_ids.create_scraps()
-            mrp_production.button_mark_done()
-            #
-            # location = request.env["stock.location"].sudo().search([("is_circulate_location", "=", True)], limit=1)
-            # if location and location.putaway_strategy_id and location.putaway_strategy_id.fixed_location_ids:
-            #     fixed_location_ids = location.putaway_strategy_id.fixed_location_ids
-            #
-            #     if mrp_production.product_id.categ_id.id in fixed_location_ids.mapped("category_id").ids:  # 半成品入库
-            #     else:
-            #         mrp_production.write({'state': 'waiting_post_inventory'})
+        # ---------------------***--------------------
+        if force_cancel:
+            returun_material_obj.do_force_cancel_return()
+        else:
+            returun_material_obj.with_context({'is_checking': is_check}).do_return()
+
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
+
+    # 任意状态退料
+    @http.route('/linkloving_app_api/return_material_anytime', type='json', auth='none', csrf=False)
+    def return_material_anytime(self, **kw):
+        order_id = request.jsonrequest.get('order_id')  # get paramter
+        stock_move_ids = request.jsonrequest.get('stock_moves')
+        mrp_production = LinklovingAppApi.get_model_by_id(order_id, request, 'mrp.production')
+        if not mrp_production:
+            return JsonResponse.send_response(STATUS_CODE_ERROR,
+                                              res_data={'error': _("MO not found")})
+        if all(stock_move.get("return_qty") == 0 for stock_move in stock_move_ids):
+            raise UserError(u"退料数量不能全为0")
+        return_material_model = request.env['mrp.return.material']
+        returun_material_obj = return_material_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
+            'production_id': mrp_production.id,
+            'return_type': 'progress_return',
+        })
+        for l in stock_move_ids:
+            obj = request.env['return.material.line'].sudo(LinklovingAppApi.CURRENT_USER()).create({
+                'return_qty': l['return_qty'],
+                'product_id': l['product_tmpl_id'],
+                'return_id': returun_material_obj.id,
+            })
+        # 直接进行退料
+        returun_material_obj.generate_move_and_action_done()
+
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
+
 
     # 获得退料单信息
     @http.route('/linkloving_app_api/get_return_detail', type='json', auth='none', csrf=False)
     def get_return_detail(self, **kw):
         order_id = request.jsonrequest.get('order_id')  # get paramter
-        return_material_model = request.env['mrp.return.material']
-        return_lines = return_material_model.sudo(LinklovingAppApi.CURRENT_USER()).search_read(
-            [('production_id', '=', order_id),
-             ('state', '=', 'draft')], limit=1)
-        return_material_obj = return_material_model.sudo(LinklovingAppApi.CURRENT_USER()).search(
-            [('production_id', '=', order_id),
-             ('state', '=', 'draft')])
+        return_material_model = request.env['mrp.return.material'].sudo(LinklovingAppApi.CURRENT_USER())
+        state = request.jsonrequest.get("state")
+        if state == 'force_cancel':
+            return_material_obj = return_material_model.get_progress_return_order(order_id=order_id)
+        else:
+            return_material_obj = return_material_model.get_normal_return_order(order_id=order_id)
+
+        return_lines = return_material_obj.read()
         if not return_lines:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error": u"退料单异常,请在网页端操作"})

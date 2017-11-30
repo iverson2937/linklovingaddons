@@ -229,6 +229,14 @@
                     <attribute name="invisible">False</attribute>
                 </xpath>
                 <div name="button_box" position="inside">
+                    <button class="oe_stat_button"
+                            name="action_view_return_material_order"
+                            type="object"
+                            icon="fa-list-alt"
+                    >
+                        <field name="return_order_count" string="退料单" widget="statinfo"/>
+                    </button>
+
                     <button class="oe_stat_button" name="action_view_qc_report"
                             type="object" icon="fa-list-alt"
                             attrs="{'invisible': [('qc_feedback_count', '=', 0)]}">
@@ -298,10 +306,22 @@
                             groups="linkloving_mrp_extend.group_charge_produce"/>
 
                     <button name="action_cancel_and_return_material"
-                            attrs="{'invisible': [('state', 'in', ('draft', 'confirmed', 'waiting_material', 'done', 'cancel'))]}"
+                            attrs="{'invisible': [('state', 'in', ('draft', 'confirmed', 'waiting_material', 'done', 'cancel',
+                            'force_cancel_waiting_return', 'force_cancel_waiting_warehouse_inspection', 'waiting_inventory_material', 'waiting_warehouse_inspection'))]}"
                             type="object"
-                            string="强制取消MO并退料"
-                            confirm="是否强制取消并将已备好的料退回至仓库?"
+                            string="强制取消MO"
+                            groups="mrp.group_mrp_manager"/>
+
+                    <button name="action_force_cancel_qingdian_return"
+                            attrs="{'invisible': [('state', 'not in', ('force_cancel_waiting_return'))]}"
+                            type="object"
+                            string="清点强制取消的退料"
+                            groups="mrp.group_mrp_manager"/>
+
+                    <button name="action_confirm_force_return_material"
+                            attrs="{'invisible': [('state', 'not in', ('force_cancel_waiting_warehouse_inspection'))]}"
+                            type="object"
+                            string="仓库检验退料"
                             groups="mrp.group_mrp_manager"/>
 
                     <!--<button name="button_return_material" attrs="{'invisible': ['|',('state', '!=', 'done')]}"-->
@@ -1120,6 +1140,50 @@
                   action="mrp_cancelled"
                   sequence="35"/>
 
+        <record id="mrp_force_cancel_waiting_return" model="ir.actions.act_window">
+            <field name="name">强制取消待清点</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">mrp.production</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph,gantt</field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="view_mrp_production_filter"/>
+            <field name="domain">[('state','=', 'force_cancel_waiting_return')]</field>
+            <field name="context">{'state':'force_cancel_waiting_return'}
+            </field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+            </field>
+        </record>
+        <menuitem id="menu_force_cancel_waiting_return"
+                  name="强制取消,待清点退料"
+                  parent="mrp.menu_mrp_production_action"
+                  action="mrp_force_cancel_waiting_return"
+                  sequence="36"/>
+
+        <record id="mrp_force_cancel_waiting_warehouse_inspection" model="ir.actions.act_window">
+            <field name="name">强制取消待仓库检验</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">mrp.production</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph,gantt</field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="view_mrp_production_filter"/>
+            <field name="domain">[('state','=', 'force_cancel_waiting_warehouse_inspection')]</field>
+            <field name="context">{'state':'force_cancel_waiting_warehouse_inspection'}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a manufacturing order.
+                </p>
+            </field>
+        </record>
+        <menuitem id="menu_force_cancel_waiting_warehouse_inspection"
+                  name="强制取消,待仓库检验"
+                  parent="mrp.menu_mrp_production_action"
+                  action="mrp_force_cancel_waiting_warehouse_inspection"
+                  sequence="37"/>
 
         <menuitem action="mrp.mrp_production_action"
                   id="mrp.menu_mrp_production_action"
