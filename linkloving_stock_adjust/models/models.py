@@ -10,6 +10,7 @@ class StockTransfer(models.Model):
     picking_type_id = fields.Many2one('stock.picking')
     input_product_ids = fields.One2many('stock.transfer.line', 'transfer_id', domain=[('product_type', '=', 'input')])
     output_product_ids = fields.One2many('stock.transfer.line', 'transfer_id', domain=[('product_type', '=', 'output')])
+    remark=fields.Text(string=u'备注')
 
     @api.model
     def _default_location_id(self):
