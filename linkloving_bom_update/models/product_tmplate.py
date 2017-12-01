@@ -95,8 +95,8 @@ class ProductProduct(models.Model):
 
     @api.multi
     def unlink(self):
-        if 'RT-ENG' in self.name and not self.env.user.has_group('mrp.group_mrp_manager'):
-            raise UserError(u'只有库存管理员才可以删除基础物料')
+        # if 'RT-ENG' in self.name and not self.env.user.has_group('mrp.group_mrp_manager'):
+        #     raise UserError(u'只有库存管理员才可以删除基础物料')
         return super(ProductProduct, self).unlink()
 
     @api.model
