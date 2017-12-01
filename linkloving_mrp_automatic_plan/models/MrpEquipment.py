@@ -62,6 +62,8 @@ class Inheritforarrangeproduction(models.Model):
     _inherit = 'mrp.process'
 
     production_line_ids = fields.One2many(comodel_name="mrp.production.line", inverse_name="process_id", string=u'产线')
+    work_type_id = fields.Many2one("work.type", string=u'工种')
+    hourly_wage = fields.Float(related="work_type_id.hourly_wage", string=u'时薪', readonly=True)
 
     @api.multi
     def arrange_production(self):

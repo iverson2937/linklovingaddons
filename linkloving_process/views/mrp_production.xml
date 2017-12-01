@@ -30,9 +30,9 @@
                     <field name="unit_price" string="单价/委外加工单价"
                            attrs="{'invisible':[('mo_type', '==', 'time')],'readonly':[('state', '!=', 'confirmed')]}"
                     />
-                    <field name="hour_price"
-                           attrs="{'invisible':[('mo_type', '==', 'unit')],'readonly':[('state', '!=', 'confirmed')]}"
-                    />
+                    <!--<field name="hour_price"-->
+                    <!--attrs="{'invisible':[('mo_type', '==', 'unit')],'readonly':[('state', '!=', 'confirmed')]}"-->
+                    <!--/>-->
                 </xpath>
 
                 <xpath expr="//field[@name='date_planned_start']" position="attributes">
