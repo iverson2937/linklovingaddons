@@ -31,7 +31,7 @@
                                 <field name="prepare_time"/>
                             </group>
                             <group>
-                                <field name="hour_price"/>
+                                <!--<field name="hour_price"/>-->
                                 <field name="cost"/>
                             </group>
 

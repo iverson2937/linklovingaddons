@@ -26,8 +26,8 @@
                 <xpath expr="//field[@name='in_charge_id']" position="after">
                     <!-- Add your fields or attributes here -->
                     <field name="outside_type" invisible="1"/>
-                    <field name="outsourcing_supplier_id" attrs="{'invisible': [('outside_type', '!=', 'outsourcing')],
-                    'required': [('outside_type', '=', 'outsourcing')]}"/>
+                    <field name="outsourcing_supplier_id"
+                           attrs="{'invisible': [('outside_type', '!=', 'outsourcing')]}"/>
                     <field name="supplier_id" attrs="{'invisible': [('outside_type', '!=', 'all_outside')],
                     'required': [('outside_type', '=', 'all_outside')]}"/>
                 </xpath>

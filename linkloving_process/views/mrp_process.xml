@@ -30,7 +30,7 @@
                             </group>
                             <group>
                                 <field name="unit_price"/>
-                                <field name="hour_price"/>
+                                <!--<field name="hour_price"/>-->
                                 <field name="company_id" string="公司"/>
                             </group>
                         </group>

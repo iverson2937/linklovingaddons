@@ -311,6 +311,7 @@ class LinklovingAppApi(http.Controller):
             domain.append(('state', '=', request.jsonrequest['state']))
             if request.jsonrequest.get('state') == 'progress':
                 domain.append(('feedback_on_rework', '=', None))
+
         if request.jsonrequest.get('process_id'):
             domain.append(('process_id', '=', request.jsonrequest['process_id']))
 
@@ -1462,6 +1463,7 @@ class LinklovingAppApi(http.Controller):
         if not returun_material_obj and not is_check:  # 如果没生成过就生成一遍， 防止出现多条记录
                 returun_material_obj = return_material_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
                     'production_id': mrp_production.id,
+                    'return_type': 'progress_return' if force_cancel else 'normal'
                 })
         elif not returun_material_obj and is_check:
             return JsonResponse.send_response(STATUS_CODE_ERROR,

@@ -937,7 +937,7 @@ class MrpProductionExtend(models.Model):
                     ('state', 'in', ('finish_prepare_material', 'already_picking', 'progress'))]
 
         if state and state in ['finish_prepare_material', 'already_picking', 'waiting_rework',
-                               'waiting_inventory_material']:
+                               'waiting_inventory_material', 'force_cancel_waiting_return']:
 
             return [('state', '=', state), ('in_charge_id', '=', self.env.user.partner_id.id)]
         elif state == "progress":
@@ -1382,6 +1382,8 @@ class ReturnOfMaterial(models.Model):
 
     @api.model
     def create(self, vals):
+        vals['name'] = self.env['ir.sequence'].next_by_code('mrp.return.material') or 'New'
+
         obj = super(ReturnOfMaterial, self).create(vals)
         if vals.get('return_ids'):
             for return_id in vals['return_ids']:
