@@ -64,9 +64,12 @@ class linklpving_product_product(models.Model):
 class linkloving_product_input_extend(models.Model):
     _inherit = 'product.template'
 
-    product_ll_type = fields.Selection(string="物料类型", selection=[('raw material', '原料'),
-                                                                 ('semi-finished', '半成品'),
-                                                                 ('finished', '成品')], copy=True)
+    product_ll_type = fields.Selection([
+        ('raw material', '原料'),
+        ('semi-finished', '半成品'),
+        ('finished', '成品'),
+        ('assets', '固定资产')
+    ], copy=True, string="物料类型")
 
     order_ll_type = fields.Selection(string="订单类型",
                                      selection=[('ordering', '订单制'),

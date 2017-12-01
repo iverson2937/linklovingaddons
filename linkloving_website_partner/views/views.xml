@@ -1,0 +1,18 @@
+<odoo>
+    <data>
+
+        <record id="linkloving_view_partners_form_website" model="ir.ui.view">
+            <field name="name">res.partner.tree.sale</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="website_partner.view_partners_form_website"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//button[@name='website_publish_button']" position="attributes">
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

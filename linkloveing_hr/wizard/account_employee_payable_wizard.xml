@@ -23,14 +23,12 @@
                             <field name="amount"/>
                             <field name="remark"/>
                             <field name="pre_payment_reminding"  sum="Total Amount" widget="monetary"/>
-                            <field name="can_return"/>
-
-
+                            <field name="can_return" invisible="1"/>
                         </tree>
                     </field>
                 <footer>
                     <button name="process" string="YES" type="object" class="oe_highlight"/>
-                    <!--<button name="no_deduct_process" string="No" type="object" class="btn-primary pull-right"/>-->
+                    <button name="no_deduct_process" string="No" type="object" class="btn-primary pull-right"/>
                     <button string="_Cancel" class="btn-default" special="cancel"/>
                 </footer>
             </form>

@@ -2,11 +2,11 @@
 
 from odoo import models, fields, api, _
 
-
+from odoo.addons import decimal_precision as dp
 class AccountAccount(models.Model):
     _inherit = 'account.account'
 
-    balance = fields.Float(compute='_compute', string='balance')
+    balance = fields.Float(compute='_compute', string='balance', digits=dp.get_precision('Payroll'))
     credit = fields.Float(compute='_compute', string='Credit', multi='balance')
     debit = fields.Float(compute='_compute', string='Debit')
     child_consol_ids = fields.Many2many('account.account', 'account_account_consol_rel', 'child_id', 'parent_id',
