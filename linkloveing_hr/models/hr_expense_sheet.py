@@ -4,12 +4,9 @@ import json
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
-try:
-    from linklovingaddons.linkloving_app_api.models.models import JPushExtend
-except Exception:
-    pass
 
 import jpush
+from JPush import JPushExtend
 
 
 class HrExpenseSheet(models.Model):
