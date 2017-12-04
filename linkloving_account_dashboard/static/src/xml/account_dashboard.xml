@@ -13,9 +13,9 @@
             </div>
         </div>
         <div class="panel-group" id="account_dashboard">
-            <t t-call="account_table_tmp">
-                <t t-set="result" t-value="result"></t>
-            </t>
+            <!--<t t-call="account_table_tmp">-->
+                <!--<t t-set="result" t-value="result"></t>-->
+            <!--</t>-->
         </div>
     </t>
 
@@ -24,7 +24,10 @@
             <t t-if="current.id==item.id">
                 <option class="account_time" t-att-data-id="item.id" selected="true"><t t-esc="item.name"/></option>
             </t>
-            <option class="account_time" t-att-data-id="item.id"><t t-esc="item.name"/></option>
+            <t t-else="">
+                <option class="account_time" t-att-data-id="item.id"><t t-esc="item.name"/></option>
+            </t>
+
         </t>
     </t>
 
