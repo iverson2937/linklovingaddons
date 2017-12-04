@@ -21,6 +21,9 @@
 
     <t t-name="AccountDashboardTimeSelect">
         <t t-foreach="result" t-as="item">
+            <t t-if="current.id==item.id">
+                <option class="account_time" t-att-data-id="item.id" selected="true"><t t-esc="item.name"/></option>
+            </t>
             <option class="account_time" t-att-data-id="item.id"><t t-esc="item.name"/></option>
         </t>
     </t>

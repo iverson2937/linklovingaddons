@@ -81,7 +81,7 @@ odoo.define('linkloving_account_dashboard.account_dashboard', function (require)
                         .call("get_period", [[]])
                         .then(function (x) {
                             console.log(x);
-                            self.$('.Account_Time_sel').append(QWeb.render('AccountDashboardTimeSelect', {result: x.periods}));
+                            self.$('.Account_Time_sel').append(QWeb.render('AccountDashboardTimeSelect', {result: x.periods,current:x.current_period}));
                         })
                 });
         },
