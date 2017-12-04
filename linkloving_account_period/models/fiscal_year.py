@@ -160,7 +160,7 @@ class AccountPeriod(models.Model):
 
     @api.multi
     def close_period(self):
-        self.state = 'done'
+
 
         accounts = self.env['account.account'].search([])
         account_res = self._get_account_period_accounts(accounts, self.id)
@@ -237,10 +237,10 @@ class AccountPeriod(models.Model):
                                            'debit': debit,
                                            'end_credit': period_partner_data.start_credit,
                                            'end_debit': period_partner_data.start_debit})
-            final_obj.create({
-                'period_id': period_id.id,
-                'partner_id': partner.id,
-                'account_id': account_id,
-                'start_credit': credit + period_partner_data.start_credit,
-                'start_debit': debit + period_partner_data.start_debit
-            })
+                # final_obj.create({
+                #     'period_id': period_id.id,
+                #     'partner_id': partner.id,
+                #     'account_id': account_id,
+                #     'start_credit': credit + period_partner_data.start_credit,
+                #     'start_debit': debit + period_partner_data.start_debit
+                # })
