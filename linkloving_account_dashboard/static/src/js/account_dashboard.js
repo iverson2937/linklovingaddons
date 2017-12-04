@@ -17,7 +17,19 @@ odoo.define('linkloving_account_dashboard.account_dashboard', function (require)
 
     var AccountDashboard = Widget.extend({
         // template: "AccountDashboard",
+        events: {
+            'change .Account_Time_sel': 'sel_func'
+        },
+        sel_func: function () {
+            var time_id = $('.Account_Time_sel option:selected').attr('data-id');
+            new Model("account.account")
+                .call("get_dashboard_datas", [[]])
+                .then(function (result) {
+                    $('#account_dashboard').html('');
+                    $('#account_dashboard').append(QWeb.render('account_table_tmp', result));
+                });
 
+        },
 
         build_widget: function () {
             return new datepicker.DateTimeWidget(this);
@@ -63,10 +75,15 @@ odoo.define('linkloving_account_dashboard.account_dashboard', function (require)
             new Model("account.account")
                 .call("get_dashboard_datas", [[]])
                 .then(function (result) {
-                    self.$el.eq(0).append(QWeb.render('AccountDashboard', result))
+                    self.$el.eq(0).append(QWeb.render('AccountDashboard', result));
+
+                    new Model("account.account")
+                        .call("get_period", [[]])
+                        .then(function (x) {
+                            console.log(x)
+                            self.$('.Account_Time_sel').append(QWeb.render('AccountDashboardTimeSelect', {result: x}));
+                        })
                 });
-            // self.$el.eq(0).append(QWeb.render('AccountDashboard', {}));
-            self.init_date_widget($(".assets_time"));
         },
     });
 
