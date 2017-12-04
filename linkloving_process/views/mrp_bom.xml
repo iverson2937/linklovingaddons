@@ -15,8 +15,9 @@
                     <field name="process_id" options="{'no_create':True}"/>
                     <field name="unit_price" attrs="{'invisible':[('mo_type', '==', 'time')]}"/>
                 </xpath>
+                <!--暂时性隐藏-->
                 <xpath expr="//field[@name='type']" position="after">
-                    <field name="mo_type" widget="radio"/>
+                    <field name="mo_type" widget="radio" invisible="1"/>
                 </xpath>
                 <xpath expr="//notebook/page[1]" position="after">
                     <page string="理论成本">
@@ -31,7 +32,7 @@
                                 <field name="prepare_time"/>
                             </group>
                             <group>
-                                <field name="hour_price"/>
+                                <!--<field name="hour_price"/>-->
                                 <field name="cost"/>
                             </group>
 
