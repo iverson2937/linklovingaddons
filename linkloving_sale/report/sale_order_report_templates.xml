@@ -70,7 +70,7 @@
                 <t t-set="display_discount" t-value="any([l.discount for l in doc.order_line])"/>
 
                 <t t-foreach="doc.order_lines_layouted()" t-as="page">
-                    <table class="table table-condensed table-boarded">
+                    <table class="table table-bordered table-condensed">
                         <thead>
                             <tr>
                                 <th>No</th>
@@ -82,7 +82,7 @@
                                 <t t-if="page[0]['is_domestic']">
                                     <th>国内型号</th>
                                 </t>
-                                <th class="text-left">规格</th>
+                                <!--<th class="text-left">规格</th>-->
                                 <th class="text-left">数量</th>
                                 <!--<th class="text-left">单位</th>-->
                                 <th t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
@@ -123,9 +123,9 @@
                                         <td t-if="l.inner_spec">
                                             <span t-field="l.inner_spec"/>
                                         </td>
-                                        <td>
-                                            <span t-field="l.product_id.product_specs"/>
-                                        </td>
+                                        <!--<td>-->
+                                            <!--<span t-field="l.product_id.product_specs"/>-->
+                                        <!--</td>-->
                                         <td class="text-right">
                                             <span t-field="l.product_uom_qty"/>
                                             <span t-field="l.product_uom" groups="product.group_uom"/>
