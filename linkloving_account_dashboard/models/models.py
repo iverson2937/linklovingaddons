@@ -32,3 +32,13 @@ class AccountDashboard(models.Model):
             'payable_amount': payable_amount,
             'accumulated_depreciation': accumulated_depreciation,
         }
+
+    @api.model
+    def get_period(self):
+        periods = self.env['account.period'].search([])
+        res = []
+        for period in periods:
+            res.append({
+                'id': period.id,
+                'name': period.name
+            })
