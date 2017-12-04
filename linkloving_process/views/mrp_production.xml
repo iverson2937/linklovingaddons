@@ -25,8 +25,8 @@
                     <field name="process_id" options="{'no_create':True}" string="Process" required="1"/>
                 </xpath>
                 <xpath expr="//field[@name='origin']" position="after">
-
-                    <field name="mo_type" widget="radio" string="Type"/>
+                    <!--暂时性隐藏-->
+                    <field name="mo_type" widget="radio" string="Type" invisible="1"/>
                     <field name="unit_price" string="单价/委外加工单价"
                            attrs="{'invisible':[('mo_type', '==', 'time')],'readonly':[('state', '!=', 'confirmed')]}"
                     />
