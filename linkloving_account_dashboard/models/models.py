@@ -42,3 +42,4 @@ class AccountDashboard(models.Model):
                 'id': period.id,
                 'name': period.name
             })
+        return res
