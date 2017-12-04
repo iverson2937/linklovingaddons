@@ -120,7 +120,7 @@
                           <td class="assets_indext1">其他应收款</td>
                           <td>9</td>
                           <td></td>
-                          <td></td>
+                          <td><a><t t-esc="other_receivable_amount"/></a></td>
                           <td class="assets_indext1">未付利润</td>
                           <td>59</td>
                           <td></td>
@@ -130,7 +130,7 @@
                           <td class="assets_indext1">存货</td>
                           <td>10</td>
                           <td></td>
-                          <td></td>
+                          <td><a><t t-esc="stock"/></a></td>
                           <td class="assets_indext1">其他未交款</td>
                           <td>60</td>
                           <td></td>

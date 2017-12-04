@@ -8,7 +8,7 @@ class AccountDashboard(models.Model):
 
     @api.model
     def get_dashboard_datas(self):
-        cash_data = self.env['account.account'].search([('name', '=', '银行存款')]).balance
+        cash_data = self.env['account.account'].search([('name', 'like', '银行存款')]).balance
         receivable_amount = self.env['account.account'].search([('name', '=', '应收账款')]).balance
         payable_amount = self.env['account.account'].search([('name', '=', '应付账款')]).balance
         other_receivable_amount = self.env['account.account'].search([('name', '=', '其他应收款')]).balance

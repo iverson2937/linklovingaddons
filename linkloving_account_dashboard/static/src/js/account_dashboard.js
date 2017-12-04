@@ -19,17 +19,17 @@ odoo.define('linkloving_account_dashboard.account_dashboard', function (require)
         // template: "AccountDashboard",
 
 
-        build_widget: function() {
+        build_widget: function () {
             return new datepicker.DateTimeWidget(this);
         },
-        init_date_widget:function (node) {
-             var self = this;
+        init_date_widget: function (node) {
+            var self = this;
             this.datewidget = this.build_widget();
-            this.datewidget.on('datetime_changed', this, function() {
+            this.datewidget.on('datetime_changed', this, function () {
                 self.chose_date = self.datewidget.get_value()
             });
             // console.log(self.$el.eq(0))
-            this.datewidget.appendTo(self.$el.eq(0).find('.assets_time')).done(function() {
+            this.datewidget.appendTo(self.$el.eq(0).find('.assets_time')).done(function () {
                 console.log(self.datewidget.$el);
                 self.setupFocus(self.datewidget.$input);
 
@@ -42,7 +42,9 @@ odoo.define('linkloving_account_dashboard.account_dashboard', function (require)
                 focus: function () {
                     self.trigger('focused');
                 },
-                blur: function () { self.trigger('blurred'); }
+                blur: function () {
+                    self.trigger('blurred');
+                }
             });
         },
 
@@ -58,13 +60,13 @@ odoo.define('linkloving_account_dashboard.account_dashboard', function (require)
 
         start: function () {
             var self = this;
-            // new Model("account.account")
-            //     .call("get_dashboard_datas",)
-            //     .then(function (result) {
-            //         self.$el.eq(0).append(QWeb.render('AccountDashboard', result))
-            //     });
-            // // self.$el.eq(0).append(QWeb.render('AccountDashboard', {}));
-            // self.init_date_widget($(".assets_time"));
+            new Model("account.account")
+                .call("get_dashboard_datas", [[]])
+                .then(function (result) {
+                    self.$el.eq(0).append(QWeb.render('AccountDashboard', result))
+                });
+            // self.$el.eq(0).append(QWeb.render('AccountDashboard', {}));
+            self.init_date_widget($(".assets_time"));
         },
     });
 
