@@ -1448,6 +1448,7 @@ class LinklovingOAApi(http.Controller):
         reason = request.jsonrequest.get("reason")
         expense_line_ids = request.jsonrequest.get("expense_line_ids")
         confirm_approve = request.env["hr.expense.sheet"].sudo(user_id).search(domain)
+        account_tax = request.env["account.tax"].sudo().search([('amount', '<', 1),('type_tax_use', '=', 'purchase')])
         for line_ids in confirm_approve.expense_line_ids:
             for request_line in expense_line_ids.get('data').get('expense_line_ids'):
                 if (line_ids.id == request_line.get('line_id')):
@@ -1457,7 +1458,7 @@ class LinklovingOAApi(http.Controller):
                         'name': request_line.get('name'),  # 费用说明
                         'tax_ids': (
                             [(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [
-                                (6, 0, [4])]),
+                                (6, 0, [account_tax.id])]),
                         'description': request_line.get('remarks'),
                     })
 
@@ -1477,6 +1478,8 @@ class LinklovingOAApi(http.Controller):
         expense_line_ids = request.jsonrequest.get("expense_line_ids")
         confirm_approve = request.env["hr.expense.sheet"].sudo(user_id).search(domain)
 
+        account_tax = request.env["account.tax"].sudo().search([('amount', '<', 1),('type_tax_use', '=', 'purchase')])
+
         for line_ids in confirm_approve.expense_line_ids:
             for request_line in expense_line_ids.get('data').get('expense_line_ids'):
                 if (line_ids.id == request_line.get('line_id')):
@@ -1486,7 +1489,7 @@ class LinklovingOAApi(http.Controller):
                         'name': request_line.get('name'),  # 费用说明
                         'tax_ids': (
                             [(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [
-                                (6, 0, [4])]),
+                                (6, 0, [account_tax.id])]),
                         'description': request_line.get('remarks'),
                     })
 
@@ -1504,7 +1507,7 @@ class LinklovingOAApi(http.Controller):
         reason = request.jsonrequest.get("reason")
         confirm_approve = request.env["hr.expense.sheet"].sudo(user_id).search(domain)
         expense_line_ids = request.jsonrequest.get("expense_line_ids")
-
+        account_tax = request.env["account.tax"].sudo().search([('amount', '<', 1),('type_tax_use', '=', 'purchase')])
         for line_ids in confirm_approve.expense_line_ids:
             for request_line in expense_line_ids.get('data').get('expense_line_ids'):
                 if (line_ids.id == request_line.get('line_id')):
@@ -1514,7 +1517,7 @@ class LinklovingOAApi(http.Controller):
                         'name': request_line.get('name'),  # 费用说明
                         'tax_ids': (
                             [(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [
-                                (6, 0, [4])]),
+                                (6, 0, [account_tax.id])]),
                         'description': request_line.get('remarks'),
                     })
 
