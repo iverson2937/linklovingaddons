@@ -7,11 +7,32 @@
                 资产负债表
             </div>
             <div class="assets_time">
+                <select class="Account_Time_sel">
 
+                </select>
             </div>
         </div>
         <div class="panel-group" id="account_dashboard">
-           <table class="table table-bordered">
+            <!--<t t-call="account_table_tmp">-->
+                <!--<t t-set="result" t-value="result"></t>-->
+            <!--</t>-->
+        </div>
+    </t>
+
+    <t t-name="AccountDashboardTimeSelect">
+        <t t-foreach="result" t-as="item">
+            <t t-if="current.id==item.id">
+                <option class="account_time" t-att-data-id="item.id" selected="true"><t t-esc="item.name"/></option>
+            </t>
+            <t t-else="">
+                <option class="account_time" t-att-data-id="item.id"><t t-esc="item.name"/></option>
+            </t>
+
+        </t>
+    </t>
+
+    <t t-name="account_table_tmp">
+        <table class="table table-bordered">
               <caption>条纹表格布局</caption>
                   <thead>
                      <tr>
@@ -120,7 +141,7 @@
                           <td class="assets_indext1">其他应收款</td>
                           <td>9</td>
                           <td></td>
-                          <td></td>
+                          <td><a><t t-esc="other_receivable_amount"/></a></td>
                           <td class="assets_indext1">未付利润</td>
                           <td>59</td>
                           <td></td>
@@ -130,7 +151,7 @@
                           <td class="assets_indext1">存货</td>
                           <td>10</td>
                           <td></td>
-                          <td></td>
+                          <td><a><t t-esc="stock"/></a></td>
                           <td class="assets_indext1">其他未交款</td>
                           <td>60</td>
                           <td></td>
@@ -388,6 +409,5 @@
                       </tr>
                   </tbody>
             </table>
-        </div>
     </t>
 </templates>

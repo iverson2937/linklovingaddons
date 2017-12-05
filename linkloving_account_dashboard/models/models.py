@@ -7,8 +7,9 @@ class AccountDashboard(models.Model):
     _inherit = 'account.account'
 
     @api.model
-    def get_dashboard_datas(self):
-        cash_data = self.env['account.account'].search([('name', '=', '银行存款')]).balance
+    def get_dashboard_datas(self, period=None):
+
+        cash_data = self.env['account.account'].search([('name', 'like', '银行存款')]).balance
         receivable_amount = self.env['account.account'].search([('name', '=', '应收账款')]).balance
         payable_amount = self.env['account.account'].search([('name', '=', '应付账款')]).balance
         other_receivable_amount = self.env['account.account'].search([('name', '=', '其他应收款')]).balance
@@ -20,15 +21,35 @@ class AccountDashboard(models.Model):
         real_receive_assets = self.env['account.account'].search([('name', '=', '实收资本')]).balance
         capital_reserves = self.env['account.account'].search([('name', '=', '资本公积')]).balance
 
+        if not period:
+            period = self.env['account.period'].search([('state', '!=', 'done')])[1].id
+            return {
+                'cash_data': cash_data,
+                'receivable_amount': receivable_amount,
+                'other_receivable_amount': other_receivable_amount,
+                'stock': stock,
+                'assets': assets,
+                'short_term_borrow': short_term_borrow,
+                'real_receive_assets': real_receive_assets,
+                'capital_reserves': capital_reserves,
+                'payable_amount': payable_amount,
+                'accumulated_depreciation': accumulated_depreciation,
+            }
+
+    @api.model
+    def get_period(self):
+        current_period_id = self.env['account.period'].search([('state', '!=', 'done')])[1]
+        periods = self.env['account.period'].search([])
+        res = []
+        for period in periods:
+            res.append({
+                'id': period.id,
+                'name': period.name
+            })
         return {
-            'cash_data': cash_data,
-            'receivable_amount': receivable_amount,
-            'other_receivable_amount': other_receivable_amount,
-            'stock': stock,
-            'assets': assets,
-            'short_term_borrow': short_term_borrow,
-            'real_receive_assets': real_receive_assets,
-            'capital_reserves': capital_reserves,
-            'payable_amount': payable_amount,
-            'accumulated_depreciation': accumulated_depreciation,
+            'current_period': {
+                'id': current_period_id.id,
+                'name': current_period_id.name
+            },
+            'periods': res
         }

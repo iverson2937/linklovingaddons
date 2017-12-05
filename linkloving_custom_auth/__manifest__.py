@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "linkloving_sale_dashboard",
+    'name': "linkloving_custom_auth",
 
     'summary': """
         Short (1 phrase/line) summary of the module's purpose, used as
@@ -20,18 +20,16 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'sale', 'crm', 'sales_team', 'linkloving_account','linkloving_account_period'],
+    'depends': ['base','sale'],
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
-        'views/crm_dashboard.xml',
-        'views/template.xml',
-        'views/crm_team.xml'
+        'security/ir.model.access.csv',
+        'views/views.xml',
+        'views/templates.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
     ],
-    'qweb': ['static/src/xml/*.xml'],
 }
