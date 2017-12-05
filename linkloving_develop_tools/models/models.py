@@ -373,6 +373,56 @@ class CreateOrderPointWizard(models.TransientModel):
             }
         }
 
+    @api.multi
+    def _set_supplier_product_code(self):
+        for line in self:
+            seller_ids = line.product_id.product_tmpl_id.seller_ids.filtered(
+                lambda x: x.name.id == line.order_id.partner_id.id)
+            if seller_ids:
+                for info in seller_ids:
+                    info.product_code = line.supplier_product_code
+            else:
+                self.env['product.supplierinfo'].create({
+                    'product_tmpl_id': line.product_id.product_tmpl_id.id,
+                    'product_code': line.supplier_product_code,
+                    'name': line.order_id.partner_id.id
+                })
+
+    def get_compute_product_price(self):
+        products = self.env['product.template'].search([('purchase_ok', '=', True)])
+        info = self.env['product.supplierinfo']
+        dis = self.env['product.price.discount']
+        for product in products:
+            if product.price1:
+                discounts = dis.search([('product_id', '=', product.product_variant_ids[0].id)])
+                for r in discounts:
+                    infos = info.search([('product_tmpl_id', '=', product.id), ('name', '=', r.partner_id.id)])
+                    if infos:
+                        print infos[0]
+                        infos[0].price = product.price1 * r.price
+                    else:
+                        if r.partner_id.id:
+                            info.create({
+                                'product_tmpl_id': product.id,
+                                'name': r.partner_id.id,
+                                'price': product.price1 * r.price
+                            })
+            elif product.price1_tax:
+                discounts = dis.search([('product_id', '=', product.product_variant_ids[0].id)])
+                for r in discounts:
+                    infos = info.search([('product_tmpl_id', '=', product.id), ('name', '=', r.partner_id.id)])
+                    if infos:
+
+                        infos[0].price = product.price1_tax * r.price_tax
+                        print infos[0]
+                    else:
+                        if r.partner_id.id:
+                            info.create({
+                                'product_tmpl_id': product.id,
+                                'name': r.partner_id.id,
+                                'price': product.price1_tax * r.price_tax
+                            })
+
     def get_today_time_and_tz(self):
         if self.env.user.tz:
             timez = fields.datetime.now(pytz.timezone(self.env.user.tz)).tzinfo._utcoffset
