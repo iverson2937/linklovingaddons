@@ -71,8 +71,9 @@ class HrExpenseSheet(models.Model):
     approve_ids = fields.Many2many('res.users')
     is_deduct_payment = fields.Selection([
         (1, '是'),
-        (1, '否')
+        (0, '否')
     ])
+
     pre_payment_reminding = fields.Float(related='employee_id.pre_payment_reminding')
     product_id = fields.Many2one(related='expense_line_ids.product_id')
     account_id = fields.Many2one(related='expense_line_ids.account_id')

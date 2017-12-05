@@ -16,10 +16,15 @@ class HrExpenseRegisterPaymentWizard(models.TransientModel):
         active_ids = context.get('active_ids', [])
         expense_sheet = self.env['hr.expense.sheet'].browse(active_ids)
         expense_sheet.accounting_date = self.payment_date
+        # 员工的应付科目识别
+        if expense_sheet.is_deduct_payment:
+            partner_type = 'employee'
+        else:
+            partner_type = 'supplier'
 
         # Create payment and post it
         payment = self.env['account.payment'].create({
-            'partner_type': 'supplier',
+            'partner_type': partner_type,
             'payment_type': 'outbound',
             'partner_id': self.partner_id.id,
             'journal_id': self.journal_id.id,
