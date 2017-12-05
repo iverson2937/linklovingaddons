@@ -14,6 +14,24 @@ class PlanMoWizard(models.TransientModel):
 
     supplier_id = fields.Many2one(comodel_name="res.partner", string=u'委外供应商')
 
+
+class MrpQcFeedbackExtend(models.Model):
+    _inherit = 'mrp.qc.feedback'
+
+    outsourcing_id = fields.Many2one("outsourcing.process.order", string=u'外协单')
+
+    # 品捡失败 -> 返工
+    def action_check_to_rework(self):
+        if self.production_id.process_id.outside_type == 'outsourcing':
+            self.state = "check_to_rework"
+            if self.outsourcing_id:
+                self.outsourcing_id.state = 'out_ing'
+            else:
+                self.state = "qc_ing"
+        else:
+            return super(MrpQcFeedbackExtend, self).action_check_to_rework()
+
+
 class MrpProductionExtend(models.Model):
     _inherit = 'mrp.production'
 
@@ -67,9 +85,10 @@ class MrpProcessExtend(models.Model):
                                     )
 
 
-
 class MrpProductionProduceExtend(models.TransientModel):
     _inherit = 'mrp.product.produce'
+
+    outsourcing_id = fields.Many2one("outsourcing.process.order", string=u'外协单')
 
     @api.multi
     def do_produce(self):
@@ -84,6 +103,23 @@ class MrpProductionProduceExtend(models.TransientModel):
                     return super(MrpProductionProduceExtend, mo).do_produce()
         else:
             return super(MrpProductionProduceExtend, self).do_produce()
+
+    # 重写
+    def feedback_create(self, qty_produced):
+        draft_sum_qty = qty_produced
+        feedback_draft = self.env["mrp.qc.feedback"]
+        if self.production_id.qc_feedback_ids:
+            feedback_draft = self.production_id.qc_feedback_ids.filtered(lambda x: x.state == 'draft')
+            draft_sum_qty += sum(feedback_draft.mapped("qty_produced"))
+        feedback = self.env['mrp.qc.feedback'].create({
+            'feedback_backorder_id': self.production_id.feedback_on_rework.id,
+            'qty_produced': draft_sum_qty,
+            'production_id': self.production_id.id,
+            'product_id': self.production_id.product_id.id,
+            'outsourcing_id': self.outsourcing_id.id
+        })
+        feedback_draft.unlink()
+        return feedback
 
     # 外协
     def outsourcing_process_produce(self):
@@ -130,7 +166,9 @@ class OutsouringPorcessOrder(models.Model):
 
     product_id = fields.Many2one('product.product', related='production_id.product_id', string=u'产品')
 
-    state = fields.Selection(string=u"状态", selection=[('draft', u'等待外协'), ('out_ing', u'外协中'), ('done', u'完成')],
+    state = fields.Selection(string=u"状态", selection=[('draft', u'等待外协'),
+                                                      ('out_ing', u'外协中'),
+                                                      ('done', u'完成')],
                              required=False,
                              default='draft')
 
@@ -166,6 +204,7 @@ class OutsouringPorcessOrder(models.Model):
             'production_id': self.production_id.id,
             'product_uom_id': self.production_id.product_uom_id.id,
             'product_id': self.production_id.product_id.id,
+            'outsourcing_id': self.id,
         })
         produce.with_context(context).do_produce()
 

@@ -435,6 +435,9 @@ class CreateOrderPointWizard(models.TransientModel):
             }
         }
 
+    def backup_standard_price(self):
+        for p in self.env["product.template"].search([]):
+            p.backup_standard_price = p.standard_price
 
 def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
     """
