@@ -149,6 +149,8 @@ class OutsouringPorcessOrder(models.Model):
     # 草稿 - > 外协中
     def action_draft_to_out(self):
         if self.state == 'draft':
+            if not self.outsourcing_supplier_id:
+                raise UserError(u"请设置外协供应商")
             self.state = 'out_ing'
         else:
             raise UserError(u"状态异常 draft -> outing")
