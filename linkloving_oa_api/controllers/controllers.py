@@ -1736,6 +1736,7 @@ class LinklovingOAApi(http.Controller):
             'state': obj.state or '',
             'line_ids': self.get_shengou_detail_lists(obj.line_ids),
             'message_ids': self.get_apply_record(obj.message_ids),
+            "to_approve_id":obj.to_approve_id.id,
         }
 
     def get_shengou_detail_lists(self, obj):
@@ -2082,9 +2083,48 @@ class LinklovingOAApi(http.Controller):
         data.reverse()
         return data
 
+    #搜索产品类别
+    @http.route('/linkloving_oa_api/search_product_category', type='json', auth="none", csrf=False, cors='*')
+    def search_product_category(self,*kw):
+        type = request.jsonrequest.get("type")
+        parent_id = request.jsonrequest.get("parent_id")
+        if (type):
+            product_category = request.env['product.category'].sudo().search([('name', '=', type)],
+                                                                             order='id desc')
+            product_list = request.env['product.category'].sudo().search([('parent_id', '=', product_category.id)],
+                                                                         order='id desc')
+            data = []
+            for product in product_list:
+                data.append(self.change_product_list_to_json(product))
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+        elif (parent_id):
+            product_list = request.env['product.category'].sudo().search([('parent_id', '=', parent_id)],
+                                                                         order='id desc')
+            data = []
+            for product in product_list:
+                data.append(self.change_product_list_to_json(product))
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-        #  XD 我的请假
 
+
+
+
+    def change_product_list_to_json(self,objs):
+        data = {
+                "parent_id": self.get_department(objs.parent_id),
+                "name":objs.display_name,
+                "child_id":objs.child_id.ids,
+                "id":objs.id,
+            }
+        # for obj in objs:
+        #     data.append({
+        #         "default_code": obj.default_code,
+        #         "name":obj.name,
+        #     })
+        return data
+
+
+    #  XD 我的请假
     @http.route('/linkloving_oa_api/get_leavelist', type='json', auth="none", csrf=False, cors='*')
     def get_leavelist(self, *kw):
         limit = request.jsonrequest.get("limit")
