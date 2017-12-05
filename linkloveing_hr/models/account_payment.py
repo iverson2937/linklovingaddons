@@ -24,6 +24,8 @@ class AccountPayment(models.Model):
                 self.destination_account_id = self.partner_id.property_account_receivable_id.id
             elif self.partner_type=='other':
                 self.destination_account_id=self.receive_account_id
+            elif self.partner_type == 'employee':
+                self.destination_account_id = self.partner_id.property_account_receivable_id.id
             else:
                 self.destination_account_id = self.partner_id.property_account_payable_id.id
         # 收款销售确认
