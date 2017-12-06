@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'linkloving_pdm'],
+    'depends': ['base', 'linkloving_approval'],
 
     # always loaded
     'data': [
