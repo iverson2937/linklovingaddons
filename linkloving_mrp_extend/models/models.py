@@ -1964,21 +1964,22 @@ class StcokPickingExtend(models.Model):
                         if pack.product_id and pack.product_id.tracking != 'none':
                             raise UserError(
                                 _('Some products require lots/serial numbers, so you need to specify those first!'))
-                view = self.env.ref('stock.view_immediate_transfer')
-                wiz = self.env['stock.immediate.transfer'].create({'pick_id': pick.id})
-                # TDE FIXME: a return in a loop, what a good idea. Really.
-                return {
-                    'name': _('Immediate Transfer?'),
-                    'type': 'ir.actions.act_window',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'res_model': 'stock.immediate.transfer',
-                    'views': [(view.id, 'form')],
-                    'view_id': view.id,
-                    'target': 'new',
-                    'res_id': wiz.id,
-                    'context': self.env.context,
-                }
+                raise UserError(u"此次入库数量为0, 请选择全部入库或者退回!")
+                # view = self.env.ref('stock.view_immediate_transfer')
+                # wiz = self.env['stock.immediate.transfer'].create({'pick_id': pick.id})
+                # # TDE FIXME: a return in a loop, what a good idea. Really.
+                # return {
+                #     'name': _('Immediate Transfer?'),
+                #     'type': 'ir.actions.act_window',
+                #     'view_type': 'form',
+                #     'view_mode': 'form',
+                #     'res_model': 'stock.immediate.transfer',
+                #     'views': [(view.id, 'form')],
+                #     'view_id': view.id,
+                #     'target': 'new',
+                #     'res_id': wiz.id,
+                #     'context': self.env.context,
+                # }
 
             # Check backorder should check for other barcodes
             if pick.check_backorder():
