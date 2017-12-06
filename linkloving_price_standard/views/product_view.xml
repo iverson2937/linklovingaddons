@@ -11,7 +11,7 @@
                       <attribute name="required">True</attribute>
                 </xpath>
                 <xpath expr="//page[@name='sales']" position="after">
-                    <page string="Price List">
+                    <page string="售价表">
                         <group>
                             <group string="No tax price">
                                 <field name="price1"/>
