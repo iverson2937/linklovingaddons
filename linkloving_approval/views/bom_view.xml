@@ -11,8 +11,6 @@
             <field name="name">BOM审核</field>
             <field name="tag">approval_bom</field>
         </record>
-        <!-- This Menu Item will appear in the Upper bar, That's why It needs NO parent or action -->
-        <menuitem id="ll_approval_root" name="工程" sequence="9"/>
 
         <!--&lt;!&ndash; This Menu Item will appear in the Upper bar, That's why It needs NO parent or action &ndash;&gt;-->
         <!--<menuitem id="ll_approval_root" name="工程审批" sequence="9"/>-->
@@ -23,6 +21,7 @@
         <!-- This Menu Item must have a parent and an action -->
         <menuitem id="my_bom" name="我的审核" parent="approval_bom" action="action_bom_approve"
                   sequence="0"/>
+
 
 
         <menuitem id="linkloving_pdm.final_review_partner_menu"

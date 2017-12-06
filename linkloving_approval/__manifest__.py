@@ -25,10 +25,9 @@
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
-        'views/bom_view.xml',
         'views/views.xml',
         'views/templates.xml',
-
+        'views/bom_view.xml',
         'wizard/batch_approval_wizard.xml',
         'views/file_view_show.xml',
     ],
