@@ -2,12 +2,15 @@
 import json
 import urllib
 import urllib2
+import logging
 
 from odoo import http
 from odoo.http import request
 
 import functools
 import xmlrpclib
+
+_logger = logging.getLogger(__name__)
 
 
 class LinklovingCrm(http.Controller):
@@ -34,9 +37,10 @@ class LinklovingCrm(http.Controller):
                 requrl = "http://erp.robotime.com/linkloving_app_api/get_one_demo_partner1"
 
                 r = urllib2.Request(url=requrl)
-                r.add_data(urllib.urlencode({'name':partner_one.name}))
+                r.add_data(urllib.urlencode({'name': partner_one.name}))
 
-                print str(partner_one.name)+'*********name********'
+                print str(partner_one.name) + '*********name********'
+                _logger.warning(str(partner_one.name) + '*********name********')
                 res_data = urllib2.urlopen(r)  # post method
 
                 # req = urllib2.Request(url=requrl)
@@ -44,6 +48,7 @@ class LinklovingCrm(http.Controller):
                 res = json.loads(res_data.read())['res_data']
 
                 print str(res) + '********* 返回********'
+                _logger.warning(str(res) + '********* 返回********')
 
                 if (not partner_one.crm_source_id) and res.get('crm_source_id'):  # 赋值来源
                     source_id = http.request.env['crm.lead.source'].search([('name', '=', res.get('crm_source_id'))])
