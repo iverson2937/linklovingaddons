@@ -100,7 +100,7 @@ msgstr "价格"
 #: model:ir.ui.view,arch_db:linkloving_price_standard.product_product_form_view
 #: model:ir.ui.view,arch_db:linkloving_price_standard.product_template_form
 msgid "Price List"
-msgstr "价格表"
+msgstr "售价表"
 
 #. module: linkloving_price_standard
 #: model:ir.model.fields,field_description:linkloving_price_standard.field_product_price_discount_price_tax
