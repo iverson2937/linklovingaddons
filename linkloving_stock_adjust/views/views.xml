@@ -26,6 +26,7 @@
                     <field name="name"/>
                     <field name="state"/>
                     <field name="create_date"/>
+                    <field name="remark"/>
 
                 </tree>
             </field>
@@ -52,7 +53,8 @@
                             </h1>
                         </div>
                         <group>
-                            <filed name="location_id"/>
+                            <field name="remark"/>
+
                         </group>
 
                         <notebook attrs="">

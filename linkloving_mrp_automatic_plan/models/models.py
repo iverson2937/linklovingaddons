@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
 import datetime
 import pytz
-
+import odoo.addons.decimal_precision as dp
 from odoo import models, fields, api
 import json
 import urllib
 
 from odoo.exceptions import MissingError, UserError
 
+
+class ProductTemplateExtend(models.Model):
+    _inherit = 'product.template'
+
+    backup_standard_price = fields.Float(string=u'标准价格(不可用,仅参考)', digits=dp.get_precision('Product Price'),
+                                         raedonly=True)
 
 class ll_auto_plan_kb(models.Model):
     _name = 'auto.plan'

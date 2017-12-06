@@ -10,6 +10,7 @@ from odoo.exceptions import UserError
 class ManualProcurementOrder(models.Model):
     _name = 'manual.procurement.order'
     _inherit = ['mail.thread']
+
     def _get_default_company_id(self):
         return self._context.get('force_company', self.env.user.company_id.id)
 
@@ -21,9 +22,10 @@ class ManualProcurementOrder(models.Model):
             lines = []
             for l in p_s:
                 if l.product_variant_ids:
+                    orderpoint = self.env["stock.warehouse.orderpoint"].search([('product_id', '=', l.product_variant_ids[0].id), ('active', '!=', None)], limit=1)
                     obj = self.env['manual.procurement.line'].create({
                         'product_id': l.product_variant_ids[0].id,
-                        'qty_ordered': 0,
+                        'qty_ordered': orderpoint.product_max_qty or 0,
                     })
                 else:
                     raise UserError(u"%s 产品模板异常,请联系管理员处理" % l.name)

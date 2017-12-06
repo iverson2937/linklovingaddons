@@ -3,8 +3,10 @@ import json
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-from linklovingaddons.linkloving_app_api.models.models import JPushExtend
+
+
 import jpush
+from JPush import JPushExtend
 
 
 class HrExpenseSheet(models.Model):
@@ -13,7 +15,14 @@ class HrExpenseSheet(models.Model):
 
     default_payment_ids = fields.One2many('account.employee.payment', compute="_get_default_payment_ids")
 
-    # related_payment_ids = fields.Many2many('account.employee.payment', 'payment_sheet_rel', 'sheet_id', 'payment_id')
+    related_payment_ids = fields.Many2many('account.employee.payment', 'payment_sheet_rel', 'sheet_id', 'payment_id')
+
+    @api.multi
+    def get_formview_id(self):
+        """ Update form view id of action to open the invoice """
+        if self._context.get('show_custom_form'):
+            return self.env.ref('linkloveing_hr.hr_expense_sheet_payment').id
+        return super(HrExpenseSheet, self).get_formview_id()
 
     @api.multi
     def _get_default_payment_ids(self):
@@ -62,8 +71,9 @@ class HrExpenseSheet(models.Model):
     approve_ids = fields.Many2many('res.users')
     is_deduct_payment = fields.Selection([
         (1, '是'),
-        (1, '否')
+        (0, '否')
     ])
+
     pre_payment_reminding = fields.Float(related='employee_id.pre_payment_reminding')
     product_id = fields.Many2one(related='expense_line_ids.product_id')
     account_id = fields.Many2one(related='expense_line_ids.account_id')

@@ -310,6 +310,17 @@ class MrpProductionExtend(models.Model):
             'target': 'current',
         }
 
+    def action_view_return_material_order(self):
+        return {
+            'name': u'退料单',
+            'type': 'ir.actions.act_window',
+            'res_model': 'mrp.return.material',
+            'view_mode': 'tree,form',
+            'views': [(False, 'tree'),
+                      (self.env.ref("linkloving_mrp_extend.view_mrp_return_material_order_form").id, 'form')],
+            'domain': [('id', 'in', self.return_material_order_ids.ids)],
+            'target': 'current',
+        }
     def action_see_scrap_moves(self):
         self.ensure_one()
         action = self.env.ref('linkloving_mrp_extend.action_mrp_production_scrap_moves').read()[0]
@@ -331,6 +342,13 @@ class MrpProductionExtend(models.Model):
         for feedback in self:
             feedback.qc_feedback_count = len(feedback.qc_feedback_ids)
 
+    @api.multi
+    def _compute_return_order_count(self):
+        for order in self:
+            order.return_order_count = len(order.return_material_order_ids)
+
+    return_order_count = fields.Integer(compute='_compute_return_order_count')
+    return_material_order_ids = fields.One2many("mrp.return.material", "production_id", string=u"退料单")
     qc_feedback_count = fields.Integer(compute='_get_qc_feedback_count')
     availability = fields.Selection([
         ('assigned', u'可发料'),
@@ -468,8 +486,11 @@ class MrpProductionExtend(models.Model):
         ('waiting_inventory_material', u'等待清点退料'),
         ('waiting_warehouse_inspection', u'等待检验退料'),
         ('waiting_post_inventory', u'等待入库'),
-        ('done', 'Done'),
-        ('cancel', 'Cancelled')], string='status',
+        ('done', u'已完成'),
+        ('cancel', u'已取消'),
+        ('force_cancel_waiting_return', u'强制取消,清点退料'),
+        ('force_cancel_waiting_warehouse_inspection', u'强制取消,仓库确认退料'),
+    ], string='status',
         copy=False, default='confirmed', track_visibility='onchange')
 
     sale_remark = fields.Text(compute='_compute_sale_remark', string=u"销售单备注")
@@ -538,8 +559,8 @@ class MrpProductionExtend(models.Model):
     def button_return_material(self, need_create_one):
         view = self.env.ref('linkloving_mrp_extend.stock_return_material_form_view2')
         if not need_create_one:
-            return_obj = self.env['mrp.return.material'].search([('production_id', '=', self.id),
-                                                                 ('state', '=', 'draft')])
+            return_obj = self.env['mrp.return.material'].get_normal_return_order(order_id=self.id)
+
             if return_obj:
 
                 res = {'type': 'ir.actions.act_window',
@@ -585,6 +606,39 @@ class MrpProductionExtend(models.Model):
         # JPushExtend.send_push(audience=jpush.audience(
         #     jpush.tag(LinklovingAppApi.get_jpush_tags("warehouse"))
         # ),notification=u"此订单已经可以开始备料")
+
+    def action_force_cancel_waiting_return(self):
+        """
+        mo可任意状态强制取消并退料, 先取消未完成的stock_move 然后再生成一张退料单
+        :return:
+        """
+        moves_to_cancel = (self.move_raw_ids | self.move_finished_ids).filtered(
+            lambda x: x.state not in ('done', 'cancel'))
+        moves_to_cancel.action_cancel()
+        self.state = 'force_cancel_waiting_return'
+
+    def action_confirm_force_return_material(self):
+        """
+        仓库检验强制取消的退料信息, 弹出对应的form
+        :return:
+        """
+        view = self.env.ref('linkloving_mrp_extend.stock_return_material_form_view2')
+        return_obj = self.env['mrp.return.material'].get_progress_return_order(order_id=self.id)
+        if return_obj:
+            res = {'type': 'ir.actions.act_window',
+                   'res_model': 'mrp.return.material',
+                   'view_mode': 'form',
+                   'view_id': view.id,
+                   'res_id': return_obj.id,
+                   'target': 'new',
+                   'context': {
+                       'is_checking': True  # 代表是确认
+                   },
+                   }
+        else:
+            raise UserError(u'未找到对应的退料单单据')
+
+        return res
 
     @api.multi
     def button_action_confirm_draft(self):
@@ -883,7 +937,7 @@ class MrpProductionExtend(models.Model):
                     ('state', 'in', ('finish_prepare_material', 'already_picking', 'progress'))]
 
         if state and state in ['finish_prepare_material', 'already_picking', 'waiting_rework',
-                               'waiting_inventory_material']:
+                               'waiting_inventory_material', 'force_cancel_waiting_return']:
 
             return [('state', '=', state), ('in_charge_id', '=', self.env.user.partner_id.id)]
         elif state == "progress":
@@ -913,7 +967,8 @@ class MrpProductionExtend(models.Model):
         force_cancel = self._context.get("force_cancel")
         if force_cancel:
             state_domain = ["draft", "confirmed", "waiting_material",
-                            "prepare_material_ing", "finish_prepare_material", "already_picking", "cancel"]
+                            "prepare_material_ing", "finish_prepare_material",
+                            "already_picking", "progress", 'force_cancel_waiting_warehouse_inspection']
         else:
             state_domain = ["draft", "confirmed", "waiting_material", "cancel"]
         for mo in self:
@@ -929,43 +984,58 @@ class MrpProductionExtend(models.Model):
         #         'production_id': p.id
         #     })
         #     move_raw = p.move_raw_ids.filtered(lambda x: x.state == 'done')
-        #     for line in return_m.return_ids:
-        #         for move in move_raw:
         #             if line.product_id.id == move.product_id.id:
         #                 line.return_qty += move.quantity_done
         #     return_m.no_confirm_return()
         # return_m.do_retrurn()
         return res
 
-    def action_cancel_and_return_material(self):
-        for p in self:
-            if p.state == 'cancel':
-                raise UserError(u"此单据已处于取消状态,无法退料")
-            return_m = self.env["mrp.return.material"].with_context({
-                'active_model': 'mrp.production',
-                'active_id': p.id
-            }).create({
-                'production_id': p.id
-            })
-            move_raw = p.move_raw_ids.filtered(lambda x: x.state == 'done')
-            for line in return_m.return_ids:
-                for move in move_raw:
-                    if line.product_id.id == move.product_id.id:
-                        line.return_qty += move.quantity_done
-            return_m.no_confirm_return()
-
-            p.with_context({
-                'force_cancel': True
-            }).action_cancel()
-        return {
-            "type": "ir.actions.client",
-            "tag": "action_notify",
-            "params": {
-                "title": u"提示",
-                "text": u"退料成功,并取消制造单",
-                "sticky": False
+    def action_force_cancel_qingdian_return(self):
+        view = self.env.ref('linkloving_mrp_extend.stock_return_material_form_view2')
+        res = {
+            'type': 'ir.actions.act_window',
+            'res_model': 'mrp.return.material',
+            'view_mode': 'form',
+            'view_id': view.id,
+            'target': 'new',
+            'context': {
+                'default_production_id': self.id,
+                'default_return_type': 'progress_return',
             }
         }
+        return res
+
+    def action_cancel_and_return_material(self):
+
+        self.action_force_cancel_waiting_return()
+        # for p in self:
+        #     if p.state == 'cancel':
+        #         raise UserError(u"此单据已处于取消状态,无法退料")
+        #     return_m = self.env["mrp.return.material"].with_context({
+        #         'active_model': 'mrp.production',
+        #         'active_id': p.id
+        #     }).create({
+        #         'production_id': p.id
+        #     })
+        #     move_raw = p.move_raw_ids.filtered(lambda x: x.state == 'done')
+        #     for line in return_m.return_ids:
+        #         for move in move_raw:
+        #             if line.product_id.id == move.product_id.id:
+        #                 line.return_qty += move.quantity_done
+        #     return_m.no_confirm_return()
+        #
+        #     p.with_context({
+        #         'force_cancel': True
+        #     }).action_cancel()
+        # return {
+        #     "type": "ir.actions.client",
+        #     "tag": "action_notify",
+        #     "params": {
+        #         "title": u"提示",
+        #         "text": u"退料成功,并取消制造单",
+        #         "sticky": False
+        #     }
+        # }
 
     def _generate_finished_moves(self):
         move = self.env['stock.move'].create({
@@ -1223,25 +1293,82 @@ class ReturnOfMaterial(models.Model):
     return_qty = fields.Float('Return Quantity', default=0.0, required=True)
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('done', 'Done')], string='Status', default="draft")
+        ('checking', u'等待检验退料中'),
+        ('done', u'已完成')], string='Status', default="draft")
     production_id = fields.Many2one('mrp.production', 'Production')
 
+    return_type = fields.Selection(string=u"退料单类型",
+                                   selection=[('normal', u'正常'),
+                                              ('progress_return', u'生产中的退料'), ],
+                                   required=False,
+                                   default='normal')
+
+    def get_normal_return_order(self, order_id, read=False):
+        """
+            获取正常产成之后的退料单
+        :param order_id: 制造单号
+        :param read: 结果返回类型 是json还是obj
+        :return: 根据read来决定
+        """
+        domain = [('production_id', '=', order_id), ('state', '=', 'draft'), ("return_type", "=", "normal")]
+        if read:
+            return self.search_read(domain, limit=1)
+        else:
+            return self.search(domain, limit=1)
+
+    def get_progress_return_order(self, order_id, read=False):
+        """
+            搜索强制退料的时候生成的退料单
+        :param order_id: 制造单号
+        :param read: 结果返回类型 是json还是obj
+        :return: 根据read来决定
+        """
+        domain = [('production_id', '=', order_id), ('state', '=', 'checking'), ("return_type", "=", "progress_return")]
+        if read:
+            return self.search_read(domain, limit=1)
+        else:
+            return self.search(domain, limit=1)
     @api.multi
     def do_return(self):
+        """
+        网页用:如果是仓库检验退料阶段, 则退料回库 并且mo标记完成, 否则 只是改变mo状态
+        :return:
+        """
         if self._context.get('is_checking'):
-            self.state = 'done'
-        if self.state == 'done':
             for r in self.return_ids:
                 if r.return_qty == 0:
                     continue
                 move = self.env['stock.move'].create(self._prepare_move_values(r))
-                r.return_qty = 0
                 move.action_done()
             self.return_ids.create_scraps()
             self.production_id.button_mark_done()
+            self.state = 'done'
         else:
             self.production_id.write({'state': 'waiting_warehouse_inspection'})
         return True
+
+    def do_force_cancel_return(self):
+        """
+        强制取消退料,  如果单据状态是draft
+        :return:
+        """
+        if self.state == 'draft':
+            self.state = 'checking'
+            self.production_id.state = 'force_cancel_waiting_warehouse_inspection'  # mo状态往下跳
+        elif self.state == 'checking':
+            self.generate_move_and_action_done()
+            self.production_id.with_context({
+                'force_cancel': True
+            }).action_cancel()
+
+    def generate_move_and_action_done(self):
+        self.ensure_one()
+        for r in self.return_ids:
+            if r.return_qty == 0:
+                continue
+            move = self.env['stock.move'].create(self._prepare_move_values(r))
+            move.action_done()
+        self.state = 'done'
 
     # 不需要确认的退料
     @api.multi
@@ -1255,6 +1382,8 @@ class ReturnOfMaterial(models.Model):
 
     @api.model
     def create(self, vals):
+        vals['name'] = self.env['ir.sequence'].next_by_code('mrp.return.material') or 'New'
+
         obj = super(ReturnOfMaterial, self).create(vals)
         if vals.get('return_ids'):
             for return_id in vals['return_ids']:
@@ -1262,17 +1391,19 @@ class ReturnOfMaterial(models.Model):
         return obj
 
     def action_done(self):
-        self.do_return()
+        """
+        分为正常退料流程和强制退料流程
+        :return:
+        """
+        if self.return_type == 'normal':
+            self.do_return()
+        elif self.return_type == 'progress_return':
+            self.do_force_cancel_return()
+
         return {'type': 'ir.actions.act_window_close'}
 
     def _prepare_move_values(self, product):
         self.ensure_one()
-
-        move_type = 'null'
-        if product.product_type == 'semi-finished':
-            move_type = 'manufacturing_mo_in'
-        elif product.product_type == 'material':
-            move_type = 'manufacturing_rejected_out'
 
         return {
             'name': '退料 %s' % self.production_id.name,
@@ -1286,7 +1417,6 @@ class ReturnOfMaterial(models.Model):
             'state': 'confirmed',
             'origin': '退料 %s' % self.production_id.name,
             'is_return_material': True,
-            'move_order_type': move_type,
             # 'restrict_partner_id': self.owner_id.id,
             # 'picking_id': self.picking_id.id
         }
@@ -1476,9 +1606,6 @@ class ReturnMaterialLine(models.Model):
                                                               ('real_semi_finished', '半成品')],
                                     required=False, compute="_compute_product_type")
 
-    @api.model
-    def create(self, vals):
-        return super(ReturnMaterialLine, self).create(vals)
 
     @api.multi
     def create_scraps(self):
@@ -1518,7 +1645,6 @@ class ReturnMaterialLine(models.Model):
                 'scrap_qty': scrap_qty
             })
         scrap_env.do_scrap()
-
 
 class HrEmployeeExtend(models.Model):
     _inherit = 'hr.employee'

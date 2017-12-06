@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-
+from JPush import JPushExtend
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.addons import decimal_precision as dp
 import jpush
-from linklovingaddons.linkloving_app_api.models.models import JPushExtend
+
+
+
 
 
 class PurchaseApply(models.Model):

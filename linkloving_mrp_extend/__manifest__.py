@@ -25,9 +25,11 @@
 
     # always loaded
     'data': [
+
         'security/mrp_groups.xml',
         'security/ir.model.access.csv',
         'views/views.xml',
+        'views/return_material_view.xml',
         'views/stock_location.xml',
         'views/templates.xml',
         'views/stock_move.xml',

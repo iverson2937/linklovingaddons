@@ -18,7 +18,8 @@
                 </xpath>
 
                 <xpath expr="//field[@name='customer_status']" position="after">
-                    <field name="is_order" attrs="{'invisible':[('customer','=', False)]}"/>
+                    <field name="is_order" invisible="1" attrs="{'invisible':[('customer','=', False)]}"/>
+                    <field name="crm_is_partner" string="线索客户"/>
                 </xpath>
 
 
@@ -93,12 +94,12 @@
 
                 </xpath>
 
-                <xpath expr="//field[@name='website']" position="attributes">
-                    <attribute name='invisible'>1</attribute>
+                <xpath expr="//field[@name='website']" position="replace">
+
                 </xpath>
 
 
-                <xpath expr="//field[@name='type']" position="after">
+                <xpath expr="//field[@name='type']" position="before">
                     <field name="website" widget="url" placeholder="e.g. www.odoo.com"/>
                 </xpath>
 
@@ -143,12 +144,12 @@
                 <!--</xpath>-->
 
 
-                <xpath expr="//page[@name='accounting_disabled']" position="after">
-                    <page string="产品" attrs="{'invisible': True}">
-                        <field name="interested_in_product" domain="[('sale_ok','=',True)]"
-                               context="{'search_default_rteng':1,'search_default_filter_categ_id':1}"/>
-                    </page>
-                </xpath>
+                <!--<xpath expr="//page[@name='accounting_disabled']" position="after">-->
+                    <!--<page string="产品" attrs="{'invisible': True}">-->
+                        <!--<field name="interested_in_product" domain="[('sale_ok','=',True)]"-->
+                               <!--context="{'search_default_rteng':1,'search_default_filter_categ_id':1}"/>-->
+                    <!--</page>-->
+                <!--</xpath>-->
 
 
                 <xpath expr="//page[@name='internal_notes']" position="replace">
@@ -252,8 +253,9 @@
                 <xpath expr="//tree" position="attributes">
                     <attribute name="default_order">write_date desc</attribute>
                 </xpath>
+
                 <xpath expr="//field[@name='display_name']" position="after">
-                    <field name="website"/>
+                    <field name="website" widget="url"/>
                     <field name="priority" widget="priority_star"/>
                     <field name="country_id"/>
                     <field name="customer_status"/>
@@ -389,33 +391,6 @@
                 </xpath>
             </field>
         </record>
-
-
-        <!--<record id="linkloving_view_partners_form_website" model="ir.ui.view">-->
-        <!--<field name="name">res.partner.tree.sale</field>-->
-        <!--<field name="model">res.partner</field>-->
-        <!--<field name="inherit_id" ref="website_partner.view_partners_form_website"/>-->
-        <!--<field name="arch" type="xml">-->
-
-        <!--<xpath expr="//button[@name='website_publish_button']" position="attributes">-->
-        <!--<attribute name='invisible'>1</attribute>-->
-        <!--</xpath>-->
-
-        <!--</field>-->
-        <!--</record>-->
-
-        <!--<record id="linkloving_res_partner_issues_button_view" model="ir.ui.view">-->
-        <!--<field name="name">res.partner.issues.button.view.inherit</field>-->
-        <!--<field name="model">res.partner</field>-->
-        <!--<field name="inherit_id" ref="project_issue.res_partner_issues_button_view"/>-->
-        <!--<field name="arch" type="xml">-->
-
-        <!--<xpath expr="//button[@name='%(project_issue.action_view_issues)d']" position="attributes">-->
-        <!--<attribute name='invisible'>1</attribute>-->
-        <!--</xpath>-->
-
-        <!--</field>-->
-        <!--</record>-->
 
 
         <!--  Partners inherited form -->

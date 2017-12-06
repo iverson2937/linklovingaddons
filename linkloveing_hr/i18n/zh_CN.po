@@ -119,7 +119,7 @@ msgstr "批准"
 #. module: linkloveing_hr
 #: model:ir.ui.menu,name:linkloveing_hr.menu_hr_expense_sheet_all_to_approved
 msgid "Approved Expense Sheet"
-msgstr "已审核暂支"
+msgstr "已审核报销单"
 
 #. module: linkloveing_hr
 #: model:ir.ui.menu,name:linkloveing_hr.menu_account_payment_approved

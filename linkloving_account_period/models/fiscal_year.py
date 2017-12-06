@@ -90,8 +90,9 @@ class AccountPeriod(models.Model):
 
     @api.multi
     def unlink(self):
-        if self.env['account.move.line'].search([('period_id', '=', self.id)]):
-            raise UserError(u'此会计区间已经有分录生产，不可以删除')
+        for period in self:
+            if period.env['account.move.line'].search([('period_id', '=', period.id)]):
+                raise UserError(u'此会计区间已经有分录生产，不可以删除')
         return super(AccountPeriod, self).unlink()
 
     def _get_account_period_accounts(self, accounts, period_id):
@@ -160,6 +161,7 @@ class AccountPeriod(models.Model):
     @api.multi
     def close_period(self):
 
+
         accounts = self.env['account.account'].search([])
         account_res = self._get_account_period_accounts(accounts, self.id)
         final_obj = self.env['account.account.final']
@@ -171,11 +173,12 @@ class AccountPeriod(models.Model):
                 'credit': account['credit'],
                 'debit': account['debit']
             }
-            period_data = final_obj.search([('account_id', '=', account['id']), ('partner_i', '=', account['id']),('period_id', '=', self.id)])
+            period_data = final_obj.search(
+                [('account_id', '=', account['id']), ('partner_id', '=', account['id']), ('period_id', '=', self.id)])
             # self.state = 'done'
             if not period_data:
                 # 系统第一个会计区间没有数据
-                period_data=final_obj.create(vals)
+                period_data = final_obj.create(vals)
             else:
                 period_data.write({'credit': account['credit'],
                                    'debit': account['debit']})
@@ -234,10 +237,10 @@ class AccountPeriod(models.Model):
                                            'debit': debit,
                                            'end_credit': period_partner_data.start_credit,
                                            'end_debit': period_partner_data.start_debit})
-            final_obj.create({
-                'period_id': period_id.id,
-                'partner_id': partner.id,
-                'account_id': account_id,
-                'start_credit': credit + period_partner_data.start_credit,
-                'start_debit': debit + period_partner_data.start_debit
-            })
+                # final_obj.create({
+                #     'period_id': period_id.id,
+                #     'partner_id': partner.id,
+                #     'account_id': account_id,
+                #     'start_credit': credit + period_partner_data.start_credit,
+                #     'start_debit': debit + period_partner_data.start_debit
+                # })

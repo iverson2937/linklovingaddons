@@ -16,6 +16,7 @@ class MultiApplyBom(models.Model):
         product_ts = self.env['product.template'].search([('id', 'in', active_ids)])
         product_ts.apply_bom_update()
 
+
 class MrpProductionExtend(models.Model):
     _inherit = 'mrp.production'
 
@@ -24,6 +25,7 @@ class MrpProductionExtend(models.Model):
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
+
     @api.multi
     def bom_update(self):
         if not self.bom_ids:
@@ -43,7 +45,7 @@ class ProductTemplate(models.Model):
                 raise UserError(u"%s 没有Bom" % (product_t.name))
 
             mos = self.env["mrp.production"].search(
-                    [('bom_id', '=', bom_id.id), ('state', 'not in', ['cancel', 'done'])])
+                [('bom_id', '=', bom_id.id), ('state', 'not in', ['cancel', 'done'])])
 
             for mo in mos:
                 if mo.state in ['draft', 'confirmed', 'waiting_material']:
@@ -73,6 +75,7 @@ class ProductTemplate(models.Model):
             }
         }
 
+
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
@@ -95,8 +98,9 @@ class ProductProduct(models.Model):
 
     @api.multi
     def unlink(self):
-        if 'RT-ENG' in self.name and not self.env.user.has_group('mrp.group_mrp_manager'):
-            raise UserError(u'只有库存管理员才可以删除基础物料')
+        for product in self:
+            if 'RT-ENG' in product.name and not self.env.user.has_group('mrp.group_mrp_manager'):
+                raise UserError(u'只有库存管理员才可以删除基础物料')
         return super(ProductProduct, self).unlink()
 
     @api.model
@@ -105,12 +109,11 @@ class ProductProduct(models.Model):
             raise UserError(u'只有库存管理员才可以创建基础物料')
         return super(ProductProduct, self).create(vals)
 
-
     def apply_bom_update(self):
         for product in self:
             bom_id = product.product_tmpl_id.bom_ids[0]
             mos = self.env["mrp.production"].search(
-                    [('bom_id', '=', bom_id.id), ('state', 'not in', ['cancel', 'done'])])
+                [('bom_id', '=', bom_id.id), ('state', 'not in', ['cancel', 'done'])])
             for mo in mos:
                 if mo.state in ['draft', 'confirmed', 'waiting_material']:
                     mo.action_cancel()

@@ -121,6 +121,7 @@ class NameCardController(http.Controller):
         product_series = dic.get("series_ids") or []
         # job_title = dic.get("job_title")
         cur_user_id = dic.get('user_id') or 1
+        crm_is_partner = True
         if company_id:
             new_company_id = company_id
         else:
@@ -149,6 +150,7 @@ class NameCardController(http.Controller):
                     'country_id': country_id,
                     'website': website,
                     "comment": comment,
+                    "crm_is_partner":crm_is_partner,
                     # 'product_series_ids': (6, 0, product_series) or [],
                 })
                 company.category_id = [tag_list] if tag_list else []
@@ -169,6 +171,7 @@ class NameCardController(http.Controller):
                     'country_id': country_id,
                     'website': website,
                     "comment": comment,
+                    "crm_is_partner":crm_is_partner,
                     # 'product_series_ids': (6, 0, product_series) or [],
                 })
                 company.category_id = [tag_list] if tag_list else []
@@ -192,6 +195,7 @@ class NameCardController(http.Controller):
                 "email": me.get("email"),
                 "type": me.get("type"),
                 "user_id": saleman_id,
+                "crm_is_partner":crm_is_partner,
             })
             if me.get("type") == 'contact':
                 s.write({

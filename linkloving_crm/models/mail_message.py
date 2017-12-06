@@ -225,6 +225,20 @@ class CrmMailMessage(models.Model):
                 for one_type in message.messages_label_ids:
                     stage_val = self.env['crm.stage'].search([('full_name_ids', 'in', one_type.id)])
                     crm_lead_val.write({'stage_id': stage_val.id})
+        elif message.model == 'res.partner' and message.messages_label_ids:
+            crm_partner_val = self.env['res.partner'].search([('id', '=', message.res_id)])
+            if not crm_partner_val.opportunity_ids:
+                if (not (crm_partner_val.company_type == 'person')) and crm_partner_val.customer:
+                    lead_vals = {
+                        'name': "默认商机-" + str(crm_partner_val.name),
+                        'partner_id': crm_partner_val.id,
+                        'planned_revenue': 0.0,
+                        'priority': crm_partner_val.priority,
+                        'type': 'opportunity',
+                    }
+                    self.env['crm.lead'].create(lead_vals)
+                    crm_partner_val.write({'crm_is_partner': False})
+
         return message
 
     @api.multi

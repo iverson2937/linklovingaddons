@@ -24,7 +24,7 @@
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'views/fiscal_year.xml',
         'views/account_account.xml',
         'views/account_move_line.xml',

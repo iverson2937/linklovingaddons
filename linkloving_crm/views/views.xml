@@ -322,16 +322,17 @@
             </field>
         </record>
 
-        <record id="crm_sale_action_partner_form" model="ir.actions.act_window">
+        <record id="crm_sale_action_partner_form1" model="ir.actions.act_window">
             <field name="name">潜在客户</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">res.partner</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,kanban,form</field>
             <field name="domain">
-                [('customer','=','1'),('is_company','=',True),('is_order','=',False),('public_partners','!=','public')]
+                [('customer','=','1'),('is_company','=',True),('is_order','=',False),('crm_is_partner','=',False),('public_partners','!=','public')]
             </field>
-            <field name="context">{'default_customer':True,'default_is_company':True}</field>
+            <field name="context">{'default_customer':True,'default_is_company':True,'default_crm_is_partner':True}
+            </field>
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="base.view_res_partner_filter"/>
             <field name="help" type="html">
@@ -342,6 +343,26 @@
                     Odoo helps you easily track all activities related to
                     a customer; discussions, history of business opportunities,
                     documents, etc.
+                </p>
+            </field>
+        </record>
+
+        <record id="crm_action_lead_form" model="ir.actions.act_window">
+            <field name="name">线索客户</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="domain">
+                [('customer','=','1'),('is_company','=',True),('crm_is_partner','=',True),('public_partners','!=','public')]
+            </field>
+            <field name="context">{'default_customer':True,'default_is_company':True,'default_crm_is_partner':True}
+            </field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="base.view_res_partner_filter"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to add a partner.
                 </p>
             </field>
         </record>
@@ -354,7 +375,8 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,kanban,form</field>
             <field name="domain">[('customer','=','1'),('is_company','=',True),('public_partners','=','public')]</field>
-            <field name="context">{'default_customer':True,'default_is_company':True}</field>
+            <field name="context">{'default_customer':True,'default_is_company':True,'default_crm_is_partner':True}
+            </field>
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="base.view_res_partner_filter"/>
             <field name="help" type="html">
@@ -370,11 +392,35 @@
         </record>
 
 
-        <menuitem action="crm_sale_action_partner_form"
-                  id="menu_message_order_status_id"
+        <menuitem
+                id="crm_sale_action_partner_menu_form"
+                name="潜在客户"
+                parent="sales_team.menu_sales"
+                sequence="1"
+                action="crm_sale_action_partner_form1"/>
+
+
+        <menuitem action="crm_action_lead_form"
+                  id="crm_lead_menu_crm_leads"
                   parent="sales_team.menu_sales"
                   groups=""
-                  sequence="1" name="潜在客户"/>
+                  sequence="1" name="线索客户"/>
+
+
+        <!--<menuitem-->
+                <!--id="crm_lead_menu_crm_leads"-->
+                <!--name="线索客户"-->
+                <!--parent="sales_team.menu_sales"-->
+                <!--sequence="1"-->
+                <!--action="crm_action_lead_form"-->
+                <!--groups="crm.group_use_lead"/>-->
+
+
+        <!--<menuitem action="crm_sale_action_partner_form"-->
+                  <!--id="menu_message_order_status_id"-->
+                  <!--parent="sales_team.menu_sales"-->
+                  <!--groups=""-->
+                  <!--sequence="1" name="潜在客户"/>-->
 
 
         <!--&lt;!&ndash;Receipt*&ndash;&gt;-->

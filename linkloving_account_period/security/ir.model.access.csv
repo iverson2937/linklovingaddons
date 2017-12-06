@@ -1,2 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_linkloving_account_period_linkloving_account_period,linkloving_account_period.linkloving_account_period,model_linkloving_account_period_linkloving_account_period,,1,0,0,0
+access_linkloving_account_period_linkloving_account_period,linkloving_account_period.account_fiscalyear,model_account_fiscalyear,,1,1,1,1
+access_account_account_final_admin,account_account_final,model_account_account_final,,1,1,1,1
+access_account_account_period_admin,model_account_period,model_account_period,,1,1,1,1

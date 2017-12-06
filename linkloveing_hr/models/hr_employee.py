@@ -3,6 +3,7 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from odoo.tools import float_is_zero
+from odoo.addons import decimal_precision as dp
 
 
 class HrEmployee(models.Model):
@@ -23,4 +24,4 @@ class HrEmployee(models.Model):
     # 该员工是否有暂支
     has_prepayment_ids = fields.Boolean(compute=_get_pre_payment_reminding)
 
-    pre_payment_reminding = fields.Float(compute=_get_pre_payment_reminding)
+    pre_payment_reminding = fields.Float(compute=_get_pre_payment_reminding, digits=dp.get_precision('Payroll'))

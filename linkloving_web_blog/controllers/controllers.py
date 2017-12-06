@@ -14,7 +14,7 @@ from odoo.addons.website_blog.controllers.main import WebsiteBlog
 #         bolog_name = ['公告栏', '发布文章','my文章审核','原生审核']
 #         bolog_url = ['/blog/new_blog_index', '/blog/new_blog_create_index','/blog/ 主页id','/blog/ago/check']
 # ------------------------------------------------------
-from odoo.addons.web.controllers.main import ensure_db, Home
+
 
 
 class LinklovingWebBlog(http.Controller):
@@ -95,7 +95,6 @@ class LinklovingWebBlog(http.Controller):
             for a_html in content('img'):
                 # attachment_one = Model_Attachment.search([('datas', '=', pq(a_html).attr('src').split('base64,')[1])])
                 # if not attachment_one:
-                # print pq(a_html).attr('src')
 
                 attachment_one = Model_Attachment.create({
                     'res_model': u'blog.post',
@@ -204,22 +203,21 @@ class LinklovingWebBlog(http.Controller):
             })
         return response
 
-    @http.route('/blog/create_attachment', type='http', auth='public', website=True, csrf=False)
-    def create_attachment_index(self, **kw):
-
-        Model_Attachment = request.env['ir.attachment']
-
-        content = kw.get('content')
-        file_name = kw.get('file')
-
-        attachment_one = Model_Attachment.create({
-            'res_model': u'blog.post',
-            'name': file_name,
-            'datas': content.split('base64,')[1] if content.split('base64,') else content,
-            'datas_fname': file_name,
-            'public': True,
-        })
-        return str(attachment_one.id)
+    # @http.route('/linkloving_blog/create_attachment', type='json', auth='public', website=True, csrf=False)
+    # def create_attachment_index(self, **kw):
+    #     Model_Attachment = request.env['ir.attachment']
+    #
+    #     content = kw.get('content')
+    #     file_name = kw.get('file')
+    #
+    #     attachment_one = Model_Attachment.create({
+    #         'res_model': u'blog.post',
+    #         'name': file_name,
+    #         'datas': content.split('base64,')[1] if content.split('base64,') else content,
+    #         'datas_fname': file_name,
+    #         'public': True,
+    #     })
+    #     return str(attachment_one.id)
 
     @http.route('/blog/ago/check', type='http', auth='public', website=True, csrf=False)
     def create_attachment_index(self, **kw):

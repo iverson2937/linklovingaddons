@@ -13,7 +13,10 @@
             <field name="model">mrp.process</field>
             <field name="inherit_id" ref="linkloving_process.mrp_process_form"/>
             <field name="arch" type="xml">
-
+                <xpath expr="//field[@name='company_id']" position="before">
+                    <field name="work_type_id"/>
+                    <field name="hourly_wage"/>
+                </xpath>
                 <xpath expr="//group" position="after">
                     <!-- Add your fields or attributes here -->
                     <notebook>
@@ -157,6 +160,7 @@
                 <tree string="工种">
                     <field name="name"/>
                     <field name="hourly_wage"/>
+                    <field name="description"/>
                 </tree>
             </field>
         </record>
@@ -317,11 +321,11 @@
 
                                 <field name="origin"/>
                                 <field name="production_order_type"/>
-                                <field name="mo_type" widget="radio" string="类型"/>
+                                <field name="mo_type" widget="radio" string="类型" invisible="1"/>
                                 <field name="unit_price" string="单价/委外加工单价"
                                        attrs="{'invisible':[('mo_type', '==', 'time')],'readonly':[('state', '!=', 'confirmed')]}"/>
-                                <field name="hour_price"
-                                       attrs="{'invisible':[('mo_type', '==', 'unit')],'readonly':[('state', '!=', 'confirmed')]}"/>
+                                <!--<field name="hour_price"-->
+                                <!--attrs="{'invisible':[('mo_type', '==', 'unit')],'readonly':[('state', '!=', 'confirmed')]}"/>-->
                                 <field name="sale_remark" readonly="1"/>
                                 <field name="remark"/>
                                 <field name="factory_remark"/>

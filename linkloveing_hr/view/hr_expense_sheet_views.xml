@@ -87,13 +87,13 @@
                                 <field name="total_amount" invisible="1"/>
                                 <field name="currency_id" invisible="1"/>
                                 <field name="address_id" invisible="1"/>
-                                <field name="has_prepayment_ids" string="是否有暂支"/>
+                                <!--<field name="has_prepayment_ids" string="是否有暂支"/>-->
 
                             </group>
                             <group>
                                 <!--<field name="pre_payment_reminding"/>-->
-                                <field name="is_deduct_payment" string="是否抵扣" widget="radio" attrs="{}"/>
-                                <field name="to_deduct_payment" widget="prepayment_button" string="暂支抵扣"/>
+                                <!--<field name="is_deduct_payment" string="是否抵扣" widget="radio" attrs="{}"/>-->
+                                <!--<field name="to_deduct_payment" widget="prepayment_button" string="暂支抵扣"/>-->
                                 <!--<field name="is_deduct_payment" required="1" widget="radio"/>-->
 
 
@@ -481,10 +481,10 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-
-        <menuitem id="menu_hr_expense_sheet_to_receive" name="Accounting Use Only" sequence="5"
-                  parent="hr_expense.menu_hr_expense_accountant"
-                  action="action_hr_expense_sheet_to_receive"/>
+        <!--隐藏会计专用入口-->
+        <!--<menuitem id="menu_hr_expense_sheet_to_receive" name="Accounting Use Only" sequence="5"-->
+        <!--parent="hr_expense.menu_hr_expense_accountant"-->
+        <!--action="action_hr_expense_sheet_to_receive"/>-->
 
         <record id="hr_expense_sheet_actions_my_draft" model="ir.actions.act_window">
             <field name="name">我的报销单</field>

@@ -8,6 +8,8 @@ from odoo import fields, api, models
 from odoo.exceptions import UserError
 from odoo import tools, _
 from odoo.modules.module import get_module_resource
+from string import lower
+import re
 
 AVAILABLE_PRIORITIES = [
     ('0', 'badly'),
@@ -77,8 +79,6 @@ class ResPartner(models.Model):
     whatsapp = fields.Char(string=u'WhatsApp')
     wechat = fields.Char(string=u'微信')
 
-    im_tool = fields.Char(string=u'即时通讯工具')
-
     crm_source_id = fields.Many2one('crm.lead.source', string=u'来源')
 
     source_id = fields.Many2one('res.partner.source')
@@ -108,29 +108,36 @@ class ResPartner(models.Model):
         ('customer_alias', 'unique (customer_code)', u'客户简称不能重复.'),
     ]
 
+    crm_partner_id = fields.Many2one('crm.res.partner', string='related partner')
+
+    crm_is_partner = fields.Boolean(related='crm_partner_id.crm_is_partner', string=u'是否线索客户')
+
+    im_tool = fields.Char(related='crm_partner_id.im_tool', string=u'即时通讯工具')
+
     customer_scale = fields.Selection(
-        [('1', u'1-10人'), ('2', u'10-49人'), ('3', u'50-100人'), ('4', u'100-500人'), ('5', u'500人以上')], string=u'规模')
+        [('1', u'1-10人'), ('2', u'10-49人'), ('3', u'50-100人'), ('4', u'100-500人'), ('5', u'500人以上')],
+        related='crm_partner_id.customer_scale', string=u'规模')
 
-    customer_store_number = fields.Integer(string=u'门店数量')
+    customer_store_number = fields.Integer(related='crm_partner_id.customer_store_number', string=u'门店数量')
 
-    customer_store_product_type = fields.Char(string=u'门店主营产品类型')
+    customer_store_product_type = fields.Char(related='crm_partner_id.customer_store_product_type', string=u'门店主营产品类型')
 
-    customer_user_group = fields.Char(string=u'用户群体')
+    customer_user_group = fields.Char(related='crm_partner_id.customer_user_group', string=u'用户群体')
 
-    # customer_bazaar = fields.Selection([('country', u'国家'), ('continent', u'大洲'), ('global', u'全球')], string=u'市场')
+    customer_social_platform = fields.Char(related='crm_partner_id.customer_social_platform', string=u'社交平台')
 
-    customer_social_platform = fields.Char(string=u'社交平台')
+    customer_birthday = fields.Date(related='crm_partner_id.customer_birthday', string=u'生日')
 
-    customer_birthday = fields.Date(string=u'生日')
-
-    customer_sex = fields.Selection([('man', '男'), ('woman', '女')], string=u'性别')
+    customer_sex = fields.Selection([('man', u'男'), ('woman', u'女')], related='crm_partner_id.customer_sex',
+                                    string=u'性别')
 
     customer_image = fields.Binary(u"照片",
                                    help="This field holds the image used as photo for the employee, limited to 1024x1024px.")
 
     customer_country_id = fields.Many2many('res.country', string=u'国家')  # 市场
     customer_continent = fields.Many2many('crm.continent', string=u'大洲')  # 市场
-    customer_is_world = fields.Boolean(string=u'世界')  # 市场
+    customer_is_world = fields.Boolean(related='crm_partner_id.customer_is_world', string=u'世界')  # 市场
+
 
     def _compute_order_partner_question(self):
         for partner in self:
@@ -152,13 +159,73 @@ class ResPartner(models.Model):
             if line.sale_order_count > 0:
                 line.is_order = True
 
+    def fomate_name_vals(self, strip_str):
+        name_val = strip_str.replace('.', '').strip()
+        is_true = True
+        while is_true:
+            if name_val.find('  ') != -1:
+                name_val = name_val.replace('  ', ' ')
+            else:
+                is_true = False
+        return name_val
+
+    def select_company_new(self, vals, type):
+        # if type == 'email':
+        #     return True
+        strip_str = vals.get(type)
+        if self._name == 'crm.lead' and type == 'email':
+            type = 'email_from'
+        if strip_str != (self[type] if self else ''):
+            if strip_str:
+                if type == 'name':
+                    result_zh = re.findall(ur'[\u4e00-\u9fa5]', strip_str.decode('utf-8'))
+                    result_us = re.findall(r'[a-zA-Z0-9]', strip_str)
+                    result_zh = ''.join(result_zh)
+                    result_us = lower(''.join(result_us))
+
+                    if result_zh and result_us:
+                        res_zh = self.env['res.partner'].search(
+                            [('name', 'ilike', result_zh), ('customer', '=', True), ('is_company', '=', True)])
+                        if self:
+                            res_zh = res_zh - self
+                        if res_zh:
+                            for res_zh_one in res_zh:
+                                partner_us = re.findall(r'[a-zA-Z0-9]', res_zh_one.name)
+                                partner_us = lower(''.join(partner_us))
+                                if partner_us == result_us:
+                                    return True
+                    elif result_zh:
+                        res_zh = self.env['res.partner'].search(
+                            [('name', '=', result_zh), ('customer', '=', True), ('is_company', '=', True)])
+                        if res_zh:
+                            return True
+                    elif result_us:
+                        res_us = self.env['res.partner'].search(
+                            [('name', 'ilike', self.fomate_name_vals(strip_str)), ('customer', '=', True),
+                             ('is_company', '=', True)])
+                        if self:
+                            res_us = res_us - self
+                        if res_us:
+                            for res_us_one in res_us:
+                                partner_us = re.findall(r'[a-zA-Z0-9]', res_us_one.name)
+                                partner_us = lower(''.join(partner_us))
+                                if partner_us == result_us:
+                                    return True
+                else:
+                    result = self.env['res.partner'].search(
+                        [(type, '=', strip_str.strip()), ('customer', '=', True), ('is_company', '=', True)])
+                    return result
+
     @api.model
     def create(self, vals):
+        if vals.get('name'):
+            vals['name'] = self.fomate_name_vals(vals.get('name'))
+
         if not (vals.get('company_type') == 'person'):
             if vals.get('is_company'):
-                if select_company(self, vals, 'name'):
+                if self.select_company_new(vals, 'name'):
                     raise UserError(u'此名称' + vals.get('name') + u'已绑定公司，请确认')
-                if select_company(self, vals, 'email'):
+                if self.select_company_new(vals, 'email'):
                     raise UserError(u'此邮件' + vals.get('email') + u'已绑定公司，请更换')
                 # if not vals.get('mutual_rule_id'):
                 #     raise UserError(u'请选择客户适用公海规则')
@@ -173,18 +240,23 @@ class ResPartner(models.Model):
                     #     # mutual_rule_id
                     #     vals['mutual_rule_id'] = vals.get('mutual_customer_id')
 
+                # 是客户 创建外部表
+                crm_res_one = self.env['crm.res.partner'].create({})
+
+                vals['crm_partner_id'] = crm_res_one.id
+
         res = super(ResPartner, self).create(vals)
-        if (not (res.company_type == 'person')) and res.customer:
-            lead_vals = {
-
-                'name': "默认商机-" + str(res.name),
-                'partner_id': res.id,
-                'planned_revenue': 0.0,
-                'priority': res.priority,
-                'type': 'opportunity',
-            }
-
-            self.env['crm.lead'].create(lead_vals)
+        # if (not (res.company_type == 'person')) and res.customer:
+        #     lead_vals = {
+        #
+        #         'name': "默认商机-" + str(res.name),
+        #         'partner_id': res.id,
+        #         'planned_revenue': 0.0,
+        #         'priority': res.priority,
+        #         'type': 'opportunity',
+        #     }
+        #
+        #     self.env['crm.lead'].create(lead_vals)
 
         return res
 
@@ -192,10 +264,14 @@ class ResPartner(models.Model):
     def write(self, vals):
         if len(self) > 1:
             return super(ResPartner, self).write(vals)
+
+        if vals.get('name'):
+            vals['name'] = self.fomate_name_vals(vals.get('name'))
+
         if not (self['company_type'] == 'company' and vals.get('company_type') == 'person'):
             if self['is_company'] or vals.get('is_company'):
                 for item_type in ['name', 'email']:
-                    if select_company(self, vals, item_type):
+                    if self.select_company_new(vals, item_type):
                         item_type_name = item_type
                         if item_type == 'name':
                             item_type_name = '名称 '
@@ -206,7 +282,7 @@ class ResPartner(models.Model):
         if self['company_type'] == 'person' and vals.get('company_type') == 'company':
             for item_type in ['name', 'email']:
                 if not vals.get(item_type):
-                    if select_company(self, {item_type: self[item_type]}, item_type):
+                    if self.select_company_new({item_type: self[item_type]}, item_type):
                         raise UserError(u'此' + item_type + vals.get(item_type) + u'已绑定公司，请更换')
 
         if 'user_id' in vals:
@@ -505,3 +581,28 @@ class CrmModelLead2OpportunityPartner(models.TransientModel):
                     self.env['res.partner'].browse(lead.partner_id.id).write({'user_id': lead.user_id.id})
 
         return leads[0].redirect_opportunity_view()
+
+
+class CrmResPartner(models.Model):
+    _name = 'crm.res.partner'
+
+    crm_is_partner = fields.Boolean(u'线索客户', default=False)
+
+    im_tool = fields.Char(string=u'即时通讯工具')
+
+    customer_scale = fields.Selection(
+        [('1', u'1-10人'), ('2', u'10-49人'), ('3', u'50-100人'), ('4', u'100-500人'), ('5', u'500人以上')], string=u'规模')
+
+    customer_store_number = fields.Integer(string=u'门店数量')
+
+    customer_store_product_type = fields.Char(string=u'门店主营产品类型')
+
+    customer_user_group = fields.Char(string=u'用户群体')
+
+    customer_social_platform = fields.Char(string=u'社交平台')
+
+    customer_birthday = fields.Date(string=u'生日')
+
+    customer_sex = fields.Selection([('man', u'男'), ('woman', u'女')], string=u'性别')
+
+    customer_is_world = fields.Boolean(string=u'世界')  # 市场
