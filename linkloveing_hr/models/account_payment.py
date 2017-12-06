@@ -22,8 +22,8 @@ class AccountPayment(models.Model):
         elif self.partner_id:
             if self.partner_type == 'customer':
                 self.destination_account_id = self.partner_id.property_account_receivable_id.id
-            elif self.partner_type=='other':
-                self.destination_account_id=self.receive_account_id
+            elif self.partner_type == 'other':
+                self.destination_account_id = self.receive_account_id
             elif self.partner_type == 'employee':
                 self.destination_account_id = self.partner_id.property_account_receivable_id.id
             else:
@@ -31,4 +31,4 @@ class AccountPayment(models.Model):
         # 收款销售确认
         elif not self.partner_id:
             if self._context.get('to_sales') and self.partner_type == 'customer':
-                self.destination_account_id = self.env.user.partner_id.property_account_receivable_id.id
+                self.destination_account_id = self.env.user.sudo().company_id.partner_id.property_account_receivable_id.id
