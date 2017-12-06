@@ -1,2 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_linkloving_res_partner_source,linkloving_sale.res.partner.source,model_res_partner_source,,1,1,1,1
+access_product_template_sale_salesman_user,product.template sale salesman use,product.model_product_template,sales_team.group_sale_salesman_all_leads,1,1,0,0
+access_product_template_sale_follow_user,product.template sale follow use,product.model_product_template,group_sale_salesman_follow_orders,1,1,0,0
