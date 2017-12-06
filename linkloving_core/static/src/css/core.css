@@ -183,3 +183,9 @@
         width: 1200px;
     }
 }
+
+
+.my_account_dashboard .o_kanban_record{
+    min-width: 370px!important;
+    -webkit-flex:0 0 300px!important;
+}
