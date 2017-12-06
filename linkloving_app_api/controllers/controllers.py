@@ -3453,6 +3453,8 @@ class LinklovingAppApi(http.Controller):
 
         partner_one = http.request.env["res.partner"].search([('name', '=', kw.get('name'))])
 
+        vals={'result': 'erro'}
+
         if partner_one:
             messages_data = series_data = ''
             if partner_one.message_ids:

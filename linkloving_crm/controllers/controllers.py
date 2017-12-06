@@ -29,13 +29,16 @@ class LinklovingCrm(http.Controller):
                         partner_one.comment and partner_one.product_series_ids and partner_one.message_ids):
 
                 # 获取 若态该客户的信息
-                # requrl = "http://192.168.88.124:8069/linkloving_app_api/get_one_demo_partner1?name=" + '中国003'
-                # requrl = "http://localhost:8069/linkloving_app_api/get_one_demo_partner1?name=" + partner_one.neme
-                requrl = "http://erp.robotime.com/linkloving_app_api/get_one_demo_partner1?name=" + partner_one.neme
-                # requrl = 'http://erp.robotime.com/linkloving_app_api/get_stock_picking_by_remark?remark=12'
+                # requrl = "http://localhost:8069/linkloving_app_api/get_one_demo_partner1?name=" + "4Kidz Inc"
+                # requrl = "http://localhost:8069/linkloving_app_api/get_one_demo_partner1"
+                requrl = "http://erp.robotime.com/linkloving_app_api/get_one_demo_partner1"
 
-                req = urllib2.Request(url=requrl)
-                res_data = urllib2.urlopen(req)
+                r = urllib2.Request(url=requrl)
+                r.add_data(urllib.urlencode({'name': partner_one.name}))
+                res_data = urllib2.urlopen(r)  # post method
+
+                # req = urllib2.Request(url=requrl)
+                # res_data = urllib2.urlopen(req)
                 res = json.loads(res_data.read())['res_data']
 
                 if (not partner_one.crm_source_id) and res.get('crm_source_id'):  # 赋值来源
