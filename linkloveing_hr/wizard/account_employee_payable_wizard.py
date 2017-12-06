@@ -56,6 +56,7 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
                 })
                 total_amount -= line_id.amount
                 # 报销单金额大于所以暂支单金额
+        self.sheet_id.is_deduct_payment = 1
         self.sheet_id.process()
         # 如果抵扣直接等于报销金额直接pass
         if float_is_zero(self.sheet_id.total_amount - self.sheet_id.payment_line_amount, 2):

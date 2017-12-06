@@ -33,7 +33,6 @@
 
     <t t-name="account_table_tmp">
         <table class="table table-bordered">
-              <caption>条纹表格布局</caption>
                   <thead>
                      <tr>
                         <th>资产</th>

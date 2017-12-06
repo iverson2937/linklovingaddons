@@ -193,5 +193,6 @@
                 parent="mrp.menu_mrp_root" sequence="0"
                 name="Dashboard"/>
 
+
     </data>
 </openerp>
