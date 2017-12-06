@@ -94,6 +94,9 @@ class LinklovingAppApi(http.Controller):
 
     @classmethod
     def CURRENT_USER(cls, force_admin=False):
+        uid = request.jsonrequest.get("uid")
+        if uid:
+            return uid
         if not force_admin:
             return request.context.get("uid")
         else:
@@ -2330,6 +2333,7 @@ class LinklovingAppApi(http.Controller):
         picking_type_id = request.jsonrequest.get('picking_type_id')
         partner_id = request.jsonrequest.get('partner_id')
         state = request.jsonrequest.get("state")
+        uid = request.jsonrequest.get("uid")
         domain = []
         if type(picking_type_id) == list:
             domain.append(('picking_type_id', 'in', picking_type_id))
@@ -2338,10 +2342,10 @@ class LinklovingAppApi(http.Controller):
         domain.append(('state', '=', state))
         if partner_id:
             domain.append(('partner_id', 'child_of', partner_id))
-
-        picking_list = request.env['stock.picking'].sudo(LinklovingAppApi.CURRENT_USER()).search(domain, limit=limit,
-                                                                                                 offset=offset,
-                                                                                                 order='name desc')
+        if uid:
+            picking_list = request.env['stock.picking'].sudo(uid).search(domain, limit=limit,offset=offset,order='name desc')
+        else :
+            picking_list = request.env['stock.picking'].sudo(LinklovingAppApi.CURRENT_USER()).search(domain, limit=limit,offset=offset,order='name desc')
         json_list = []
         for picking in picking_list:
             json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
@@ -2416,6 +2420,7 @@ class LinklovingAppApi(http.Controller):
     def change_stock_picking_state(self, **kw):
         state = request.jsonrequest.get('state')  # 状态
         picking_id = request.jsonrequest.get('picking_id')  # 订单id
+        print LinklovingAppApi.CURRENT_USER()
 
         pack_operation_product_ids = request.jsonrequest.get('pack_operation_product_ids')  # 修改
         i = 0
@@ -2429,6 +2434,7 @@ class LinklovingAppApi(http.Controller):
 
         pack_list = request.env['stock.pack.operation'].sudo(LinklovingAppApi.CURRENT_USER()).search(
             [('id', 'in', map(lambda a: a['pack_id'], pack_operation_product_ids))])
+
         # 仓库或者采购修改了数量
         qty_done_map = map(lambda a: a['qty_done'], pack_operation_product_ids)
         rejects_qty_map = map(lambda a: a.get('rejects_qty') or 0, pack_operation_product_ids)

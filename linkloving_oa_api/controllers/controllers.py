@@ -2371,6 +2371,7 @@ class LinklovingOAApi(http.Controller):
                 'name': orderDetail.name,
                 "amount": orderDetail.amount,
                 "pre_payment_reminding": orderDetail.pre_payment_reminding,
+                "payment_reminding":orderDetail.payment_reminding,  # 暂支余额
                 "state": orderDetail.state,
                 "apply_date": orderDetail.apply_date,
                 "employee": orderDetail.employee_id.display_name,
@@ -2388,7 +2389,7 @@ class LinklovingOAApi(http.Controller):
         type = request.jsonrequest.get('type')
         data = request.jsonrequest.get('data')
         text = request.jsonrequest.get('text')
-        domain = []
+        domain = [] 
         if type == "apply":
             domain.append(('employee_id.user_id', '=', user_id))
         elif type == "wait_apply":
@@ -2404,6 +2405,7 @@ class LinklovingOAApi(http.Controller):
                                                                   "res.users", "image_medium"),
                 "to_approve_id": orderDetail.to_approve_id.display_name or '',
                 'id': orderDetail.id,
+                "payment_reminding":orderDetail.payment_reminding,  # 暂支余额
                 'name': orderDetail.name,
                 "amount": orderDetail.amount,
                 "pre_payment_reminding": orderDetail.pre_payment_reminding,
@@ -2449,6 +2451,38 @@ class LinklovingOAApi(http.Controller):
                                                                                order='id desc')
         shengou.refuse_payment(refuse_reason);
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
+
+
+
+    #暂支申请准备
+    @http.route('/linkloving_oa_api/get_zanzhi_reminding', type='json', auth="none", csrf=False, cors='*')
+    def get_zanzhi_reminding(self, *kw):
+        id = request.jsonrequest.get('uid')
+        employee = request.env['hr.employee'].sudo().search(
+            [('user_id', '=', id)])
+        data = {
+            'pre_payment_reminding': employee.pre_payment_reminding,  # 暂支金额
+            'bank_account_id':employee.bank_account_id.display_name or ''
+        }
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+        # 创建暂支单
+    @http.route('/linkloving_oa_api/create_zanzhi', type='json', auth="none", csrf=False, cors='*')
+    def create_zanzhi(self, *kw):
+        data = request.jsonrequest.get("data")
+        uid = request.jsonrequest.get("uid")
+        new_zanzhi = request.env['account.employee.payment'].sudo(uid).create({
+            'amount': request.jsonrequest.get('amount'),  # 部门
+            'remark':  request.jsonrequest.get('remark'),  # 申请人
+        })
+        if request.jsonrequest.get('submit'):
+            new_zanzhi.submit()
+        data = {
+            "id": new_zanzhi.id
+        }
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+
 
 
 
