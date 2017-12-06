@@ -1456,9 +1456,9 @@ class LinklovingOAApi(http.Controller):
                         'product_id': request_line.get('product_id'),  # 产品
                         'unit_amount': float(request_line.get('unit_amount')),  # 金额
                         'name': request_line.get('name'),  # 费用说明
-                        'tax_ids': (
-                            [(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [
-                                (6, 0, [account_tax.id])]),
+                        #'tax_ids': (
+                           # [(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [
+                           #     (6, 0, [account_tax.id])]),
                         'description': request_line.get('remarks'),
                     })
 
@@ -1487,9 +1487,9 @@ class LinklovingOAApi(http.Controller):
                         'product_id': request_line.get('product_id'),  # 产品
                         'unit_amount': float(request_line.get('unit_amount')),  # 金额
                         'name': request_line.get('name'),  # 费用说明
-                        'tax_ids': (
-                            [(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [
-                                (6, 0, [account_tax.id])]),
+                        #'tax_ids': (
+                           # [(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [
+                             #   (6, 0, [account_tax.id])]),
                         'description': request_line.get('remarks'),
                     })
 
@@ -1515,9 +1515,9 @@ class LinklovingOAApi(http.Controller):
                         'product_id': request_line.get('product_id'),  # 产品
                         'unit_amount': float(request_line.get('unit_amount')),  # 金额
                         'name': request_line.get('name'),  # 费用说明
-                        'tax_ids': (
-                            [(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [
-                                (6, 0, [account_tax.id])]),
+                        #'tax_ids': (
+                           # [(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [
+                            #    (6, 0, [account_tax.id])]),
                         'description': request_line.get('remarks'),
                     })
 
