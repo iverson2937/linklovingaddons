@@ -144,6 +144,8 @@
 
                             <field name="account_id" string="Income Account" required="0"
                                    attrs="{'readonly': [('state', 'in', ['confirm','done'])]}" invisible="1"/>
+                            <field name="approve_id" readonly="1" attrs="{'invisible': [('approve_id', '=',False)]}"
+                                   string="审核人"/>
                             <field name="remark" required="0" attrs="{'readonly': [('state', '=', 'done')]}"/>
                         </group>
                         <notebook colspan="4">

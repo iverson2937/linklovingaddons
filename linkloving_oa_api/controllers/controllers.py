@@ -1448,6 +1448,7 @@ class LinklovingOAApi(http.Controller):
         reason = request.jsonrequest.get("reason")
         expense_line_ids = request.jsonrequest.get("expense_line_ids")
         confirm_approve = request.env["hr.expense.sheet"].sudo(user_id).search(domain)
+        account_tax = request.env["account.tax"].sudo().search([('amount', '<', 1),('type_tax_use', '=', 'purchase')])
         for line_ids in confirm_approve.expense_line_ids:
             for request_line in expense_line_ids.get('data').get('expense_line_ids'):
                 if (line_ids.id == request_line.get('line_id')):
@@ -1455,9 +1456,9 @@ class LinklovingOAApi(http.Controller):
                         'product_id': request_line.get('product_id'),  # 产品
                         'unit_amount': float(request_line.get('unit_amount')),  # 金额
                         'name': request_line.get('name'),  # 费用说明
-                        'tax_ids': (
-                            [(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [
-                                (6, 0, [4])]),
+                        #'tax_ids': (
+                           # [(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [
+                           #     (6, 0, [account_tax.id])]),
                         'description': request_line.get('remarks'),
                     })
 
@@ -1477,6 +1478,8 @@ class LinklovingOAApi(http.Controller):
         expense_line_ids = request.jsonrequest.get("expense_line_ids")
         confirm_approve = request.env["hr.expense.sheet"].sudo(user_id).search(domain)
 
+        account_tax = request.env["account.tax"].sudo().search([('amount', '<', 1),('type_tax_use', '=', 'purchase')])
+
         for line_ids in confirm_approve.expense_line_ids:
             for request_line in expense_line_ids.get('data').get('expense_line_ids'):
                 if (line_ids.id == request_line.get('line_id')):
@@ -1484,9 +1487,9 @@ class LinklovingOAApi(http.Controller):
                         'product_id': request_line.get('product_id'),  # 产品
                         'unit_amount': float(request_line.get('unit_amount')),  # 金额
                         'name': request_line.get('name'),  # 费用说明
-                        'tax_ids': (
-                            [(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [
-                                (6, 0, [4])]),
+                        #'tax_ids': (
+                           # [(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [
+                             #   (6, 0, [account_tax.id])]),
                         'description': request_line.get('remarks'),
                     })
 
@@ -1504,7 +1507,7 @@ class LinklovingOAApi(http.Controller):
         reason = request.jsonrequest.get("reason")
         confirm_approve = request.env["hr.expense.sheet"].sudo(user_id).search(domain)
         expense_line_ids = request.jsonrequest.get("expense_line_ids")
-
+        account_tax = request.env["account.tax"].sudo().search([('amount', '<', 1),('type_tax_use', '=', 'purchase')])
         for line_ids in confirm_approve.expense_line_ids:
             for request_line in expense_line_ids.get('data').get('expense_line_ids'):
                 if (line_ids.id == request_line.get('line_id')):
@@ -1512,9 +1515,9 @@ class LinklovingOAApi(http.Controller):
                         'product_id': request_line.get('product_id'),  # 产品
                         'unit_amount': float(request_line.get('unit_amount')),  # 金额
                         'name': request_line.get('name'),  # 费用说明
-                        'tax_ids': (
-                            [(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [
-                                (6, 0, [4])]),
+                        #'tax_ids': (
+                           # [(6, 0, [request_line.get('taxid')])] if type(request_line.get('taxid')) == int else [
+                            #    (6, 0, [account_tax.id])]),
                         'description': request_line.get('remarks'),
                     })
 
@@ -1736,6 +1739,7 @@ class LinklovingOAApi(http.Controller):
             'state': obj.state or '',
             'line_ids': self.get_shengou_detail_lists(obj.line_ids),
             'message_ids': self.get_apply_record(obj.message_ids),
+            "to_approve_id":obj.to_approve_id.id,
         }
 
     def get_shengou_detail_lists(self, obj):
@@ -1825,6 +1829,13 @@ class LinklovingOAApi(http.Controller):
 
     # 头像json
     def get_img_url(cls, id, model, field, time):
+        url = '%sweb/image?model=%s&id=%s&field=%s&unique=%s' % (
+            request.httprequest.host_url, model, str(id), field, time)
+        if not url:
+            return ''
+        return url
+
+    def get_product_img_url(cls, id, model, field, time):
         url = '%sweb/image?model=%s&id=%s&field=%s&unique=%s' % (
             request.httprequest.host_url, model, str(id), field, time)
         if not url:
@@ -2082,9 +2093,92 @@ class LinklovingOAApi(http.Controller):
         data.reverse()
         return data
 
+    #搜索产品类别
+    @http.route('/linkloving_oa_api/search_product_category', type='json', auth="none", csrf=False, cors='*')
+    def search_product_category(self,*kw):
+        type = request.jsonrequest.get("type")
+        parent_id = request.jsonrequest.get("parent_id")
+        if (type):
+            product_category = request.env['product.category'].sudo().search([('name', '=', type)],
+                                                                             order='id desc')
+            product_list = request.env['product.category'].sudo().search([('parent_id', '=', product_category.id)],
+                                                                         order='id desc')
+            data = []
+            for product in product_list:
+                data.append(self.change_product_list_to_json(product))
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+        elif (parent_id):
+            product_list = request.env['product.category'].sudo().search([('parent_id', '=', parent_id)],
+                                                                         order='id desc')
+            data = []
+            for product in product_list:
+                data.append(self.change_product_list_to_json(product))
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-        #  XD 我的请假
+    #产品详情
+    @http.route('/linkloving_oa_api/search_product_detail', type='json', auth="none", csrf=False, cors='*')
+    def search_product_detail(self,*kw):
+        categ_id = request.jsonrequest.get("categ_id")
+        search_product_detail = request.env['product.template'].sudo().search([('categ_id', '=', categ_id)],
+                                                                         order='id desc')
+        data = []
+        for product_detail in search_product_detail:
+            product_product = request.env['product.product'].sudo().search([('product_tmpl_id', '=', product_detail.id)])
+            data.append(self.change_product_detail_to_json(product_detail,product_product))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
+    # 产品BOM、库存移动
+    @http.route('/linkloving_oa_api/product_bom_stock_move', type='json', auth="none", csrf=False, cors='*')
+    def product_bom_stock_move(self, *kw):
+        id = request.jsonrequest.get("id")
+        type = request.jsonrequest.get("type")
+        product = request.env["product.template"].sudo().browse(id)
+        if (type == "bom"):
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data={'bom': self.get_boms(product)})
+        else:
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data={'stock_move': self.get_product_stock_move(product.product_variant_ids[0].id)})
+
+    def change_product_detail_to_json(self,obj,product):
+        if (product.write_date):
+            time_unque = product.write_date.replace("-", "").replace(" ", "").replace(":", "")
+        else:
+            time_unque = "2017"
+        data = {
+                'name': obj.name,
+                'id': obj.id,
+                'inner_code': obj.inner_code or '',  # 国内简称
+                'inner_spec': obj.inner_spec or '',  # 国内型号
+                'categ_id': obj.categ_id.display_name,  # 内部类别
+                'default_code': obj.default_code,  # 内部参考
+                'uom': obj.uom_id.display_name,
+                'uom_id': obj.uom_id.id,
+                'virtual_qty': obj.virtual_available,
+                'qty_available': obj.qty_available,
+                'outgoing_qty':obj.outgoing_qty,
+                'product_img':self.get_product_img_url(product.id,"product.product","image_medium",time_unque),
+                'location':obj.location_id.display_name or '',
+                'product_specs':product.product_specs or '',
+                # 'stock_move': self.get_product_stock_move(product.product_variant_ids[0].id),
+                # 'bom': self.get_boms(product),
+        }
+        return data
+
+    def change_product_list_to_json(self,objs):
+        data = {
+                "parent_id": self.get_department(objs.parent_id),
+                "name":objs.display_name,
+                "child_id":objs.child_id.ids,
+                "id":objs.id,
+            }
+        # for obj in objs:
+        #     data.append({
+        #         "default_code": obj.default_code,
+        #         "name":obj.name,
+        #     })
+        return data
+
+
+    #  XD 我的请假
     @http.route('/linkloving_oa_api/get_leavelist', type='json', auth="none", csrf=False, cors='*')
     def get_leavelist(self, *kw):
         limit = request.jsonrequest.get("limit")
@@ -2244,7 +2338,7 @@ class LinklovingOAApi(http.Controller):
     @http.route('/linkloving_oa_api/get_payment_reminding', type='json', auth="none", csrf=False, cors='*')
     def get_payment_reminding(self, *kw):
         id = request.jsonrequest.get('id')
-        orderDetail = request.env['hr.expense.sheet'].sudo().browse(id)
+        # orderDetail = request.env['hr.expense.sheet'].sudo().browse(id)
         employee = request.env['hr.employee'].sudo().search(
             [('user_id', '=', id)])
         name = request.env['hr.employee'].sudo().search(
@@ -2260,7 +2354,7 @@ class LinklovingOAApi(http.Controller):
             'employee_id': employee.id,  # 员工id
             'name': name,  # 姓名
             "taxList": self.get_name_and_id(taxList),  # 税金列表
-            'department_id': orderDetail.department_id.id,  # 部门id
+            'department_id': employee.department_id.id,  # 部门id
             'balance': shengou_amount
         }
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)

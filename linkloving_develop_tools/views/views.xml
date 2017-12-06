@@ -72,7 +72,13 @@
                         <button string="计算会计区间" name="compute_period_for_account_move" type="object"
                                 default_focus="1"
                                 class="btn-primary"/>
+                        <button string="计算价格表" name="get_compute_product_price" type="object"
+                                default_focus="1"
+                                class="btn-primary"/>
 
+                        <button string="backup_standard_price" name="backup_standard_price" type="object"
+                                default_focus="1"
+                                class="btn-primary"/>
                     </footer>
                 </form>
             </field>

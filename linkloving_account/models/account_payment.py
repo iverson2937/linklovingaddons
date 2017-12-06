@@ -35,6 +35,7 @@ class AccountPaymentRegister(models.Model):
     company_id = fields.Many2one('res.company', 'Company',
                                  default=lambda self: self.env['res.company']._company_default_get(
                                      'account.payment.register'))
+    approve_id = fields.Many2one('res.users')
 
     @api.model
     @api.returns('self', lambda value: value.id)
@@ -146,6 +147,7 @@ class AccountPaymentRegister(models.Model):
                 'amount': invoice.remain_apply_balance if balance >= invoice.remain_apply_balance else balance
             })
             balance -= balance_id.amount
+        self.approve_id = self.env.user.id
         self.state = 'confirm'
 
     @api.multi

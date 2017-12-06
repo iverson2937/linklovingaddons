@@ -16,34 +16,19 @@ odoo.define('linkloving_account_dashboard.account_dashboard', function (require)
     var datepicker = require('web.datepicker');
 
     var AccountDashboard = Widget.extend({
-        // template: "AccountDashboard",
-
-
-        build_widget: function() {
-            return new datepicker.DateTimeWidget(this);
+        template: "AccountDashboard",
+        events: {
+            'change .Account_Time_sel': 'sel_func'
         },
-        init_date_widget:function (node) {
-             var self = this;
-            this.datewidget = this.build_widget();
-            this.datewidget.on('datetime_changed', this, function() {
-                self.chose_date = self.datewidget.get_value()
-            });
-            // console.log(self.$el.eq(0))
-            this.datewidget.appendTo(self.$el.eq(0).find('.assets_time')).done(function() {
-                console.log(self.datewidget.$el);
-                self.setupFocus(self.datewidget.$input);
+        sel_func: function () {
+            var time_id = $('.Account_Time_sel option:selected').attr('data-id');
+            new Model("account.account")
+                .call("get_dashboard_datas", [])
+                .then(function (result) {
+                    $('#account_dashboard').html('');
+                    $('#account_dashboard').append(QWeb.render('account_table_tmp', result));
+                });
 
-                self.datewidget.set_datetime_default();
-            });
-        },
-        setupFocus: function ($e) {
-            var self = this;
-            $e.on({
-                focus: function () {
-                    self.trigger('focused');
-                },
-                blur: function () { self.trigger('blurred'); }
-            });
         },
 
         init: function (parent, action) {
@@ -58,13 +43,19 @@ odoo.define('linkloving_account_dashboard.account_dashboard', function (require)
 
         start: function () {
             var self = this;
-            // new Model("account.account")
-            //     .call("get_dashboard_datas",)
-            //     .then(function (result) {
-            //         self.$el.eq(0).append(QWeb.render('AccountDashboard', result))
-            //     });
-            // // self.$el.eq(0).append(QWeb.render('AccountDashboard', {}));
-            // self.init_date_widget($(".assets_time"));
+
+            new Model("account.account")
+                .call("get_period", [[]])
+                .then(function (x) {
+                    console.log(x);
+                    $('.Account_Time_sel').append(QWeb.render('AccountDashboardTimeSelect', {result: x.periods,current:x.current_period}));
+
+                    new Model("account.account")
+                        .call("get_dashboard_datas", [x.current_period.id])
+                        .then(function (result) {
+                            $('#account_dashboard').append(QWeb.render('account_table_tmp', result));
+                        });
+                })
         },
     });
 
