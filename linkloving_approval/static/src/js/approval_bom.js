@@ -235,7 +235,7 @@ odoo.define('linkloving_approval.approval_bom', function (require) {
                     console.log(result, own.begin, own.limit);
                     model.call('get_bom_info_by_type', [result], {offset: own.begin - 1, limit: own.limit})
                         .then(function (result) {
-                            console.log(own.begin - 1, own.limit);
+                            console.log(result);
                             own.length = result.length;
                             console.log(own.length, result.length)
                             self.$("#" + approval_type).html("");
