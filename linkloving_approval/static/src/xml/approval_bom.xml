@@ -72,6 +72,7 @@
                 </div>
                 <div class="document_review_list">
                     <t t-foreach="item_files.review_line" t-as="review_list">
+
                         <div data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"><t t-esc="review_list.name"/></div>
                         <t t-if="review_list.state[0]=='review_success'">
                             <span class="fa fa-long-arrow-right" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"></span>
