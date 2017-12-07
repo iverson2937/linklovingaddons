@@ -73,7 +73,12 @@
                     <t t-if="item_files.remote_path!=''">
                         <div>远程地址：<span class="remote_path"><t t-esc="item_files.remote_path"/></span></div>
                     </t>
-                    <div>版本：<span class="version_span"><t t-esc="item_files.version"/></span></div>
+
+                    <div class="row">
+                        <div class="col-md-6">版本：<span class="version_span"><t t-esc="item_files.version"/></span></div>
+                        <div class="col-md-6"> 创建日期：<span><t t-esc="item_files.create_date"/></span></div>
+                    </div>
+
                     <div>状态：<span><t t-esc="item_files.state[1]"/></span>
                         <t t-if="item_files.is_show_cancel">
                             <button class="btn btn-primary review_cancel">取消审核</button>
@@ -101,14 +106,15 @@
 
                         <div data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"><t t-esc="review_list.name"/></div>
                         <t t-if="review_list.state[0]=='review_success'">
-                            <span class="fa fa-long-arrow-right" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"></span>
+                            <span class="fa fa-long-arrow-right document_yellow_dialog" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"></span>
                         </t>
                         <t t-if="review_list.state[0]=='waiting_review'">
-                            <span class="fa fa-long-arrow-right document_yellow" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"></span>
+
+                            <span class="fa fa-long-arrow-right document_yellow document_yellow_dialog" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"></span>
                             <div data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date">等待</div>
                         </t>
                          <t t-if="review_list.state[0]=='review_fail'||review_list.state[0]=='review_canceled'">
-                            <span class="fa fa-long-arrow-right document_red" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"></span>
+                            <span class="fa fa-long-arrow-right document_red document_yellow_dialog" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"></span>
                              <!--<div>审核不通过</div>-->
                         </t>
                     </t>
