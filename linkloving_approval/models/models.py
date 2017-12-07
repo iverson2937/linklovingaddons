@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 
-try:
-    from linklovingaddons.linkloving_pdm.models.models import ATTACHINFO_FIELD
-except Exception:
-    pass
+ATTACHINFO_FIELD = ['product_tmpl_id', 'file_name', 'review_id', 'remote_path',
+                    'version', 'state', 'has_right_to_review', 'is_show_outage',
+                    'is_able_to_use', 'is_show_cancel', 'is_first_review',
+                    'create_uid', 'type', 'is_delect_view', 'is_show_action_deny']
 
 from odoo import models, fields, api
 from odoo.osv import expression

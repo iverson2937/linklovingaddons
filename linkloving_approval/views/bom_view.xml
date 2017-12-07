@@ -22,7 +22,7 @@
         <menuitem id="my_bom" name="我的审核" parent="approval_bom" action="action_bom_approve"
                   sequence="0"/>
 
-        <menuitem id="approval_setting" name="设置" parent="ll_approval_root" sequence="2"/>
+
 
         <menuitem id="linkloving_pdm.final_review_partner_menu"
                   parent="approval_setting"

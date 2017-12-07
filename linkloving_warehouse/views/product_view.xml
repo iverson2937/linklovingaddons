@@ -63,11 +63,11 @@
 
                     <field name="reordering_min_qty" string="最小"/>
                     <field name="reordering_max_qty" string="最大"/>
-                    <field name="order_point_active" string="订货规则开启"/>
+                    <!--<field name="order_point_active" string="订货规则开启"/>-->
 
-                    <field name="last1_month_qty" readonly="1"/>
-                    <field name="last2_month_qty" readonly="1"/>
-                    <field name="last3_month_qty" readonly="1"/>
+                    <field name="last1_month_qty" readonly="1" string="1个月"/>
+                    <field name="last2_month_qty" readonly="1" string="3个月"/>
+                    <field name="last3_month_qty" readonly="1" string="6个月"/>
 
                 </xpath>
 

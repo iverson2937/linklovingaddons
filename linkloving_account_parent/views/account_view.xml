@@ -8,7 +8,7 @@
         <field name="inherit_id" ref="account.view_account_form"/>
         <field name="arch" type="xml">
         	<field name="code" position="after">
-        		<field name="parent_id" domain="[('internal_type','=','view')]" groups="linkloving_account_parent.group_coas_user"
+        		<field name="parent_id" domain="[('internal_type','=','view')]" groups="account.group_account_manager"
                        context="{'show_parent_account':True}" string="父级"/>
         	</field>
         </field>

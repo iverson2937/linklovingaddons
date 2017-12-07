@@ -105,8 +105,8 @@ class ProductTemplate(models.Model):
         res = self._compute_quantities_dict()
         ress = {k: {'nbr_reordering_rules': 0, 'reordering_min_qty': 0, 'reordering_max_qty': 0} for k in self.ids}
         product_data = self.env['stock.warehouse.orderpoint'].read_group(
-                [('product_id.product_tmpl_id', 'in', self.ids)], ['product_id', 'product_min_qty', 'product_max_qty'],
-                ['product_id'])
+            [('product_id.product_tmpl_id', 'in', self.ids)], ['product_id', 'product_min_qty', 'product_max_qty'],
+            ['product_id'])
         for data in product_data:
             product = self.env['product.product'].browse([data['product_id'][0]])
             product_tmpl_id = product.product_tmpl_id.id
@@ -194,7 +194,6 @@ class ProductTemplate(models.Model):
                     'active': False
                 })
 
-
     @api.multi
     def cancel_eol(self):
         for r in self:
@@ -234,7 +233,7 @@ class ProductTemplate(models.Model):
     def _set_nbr_reordering_rules(self):
         OrderPoint = self.env['stock.warehouse.orderpoint']
         for product_tmplate in self:
-            if  product_tmplate.status=='eol':
+            if product_tmplate.status == 'eol':
                 raise UserError('已经停产,不能设置订货规则')
             if product_tmplate.reordering_max_qty < product_tmplate.reordering_min_qty:
                 raise UserError(u'最小数量不能大于最大数量')
@@ -345,3 +344,9 @@ class ProductTemplate(models.Model):
                 [('product_tmpl_id', '=', record.id), ('active', '=', active)])
             for product in products:
                 product.active = not product.active
+
+    @api.multi
+    def action_view_stock_moves(self):
+        action = super(ProductTemplate, self).action_view_stock_moves()
+        action['context'] = dict({'search_default_done': 1}, **action['context'])
+        return action

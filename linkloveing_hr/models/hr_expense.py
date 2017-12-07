@@ -91,7 +91,7 @@ class HrExpense(models.Model):
                     expense.employee_id.name))
                 emp_account = expense.employee_id.address_home_id.property_account_payable_id.id
                 # 如果是用暂支抵扣的就用其他应收科目
-                if self.sheet_id.is_deduct_payment:
+                if expense.sheet_id.is_deduct_payment:
                     emp_account = expense.employee_id.address_home_id.property_account_receivable_id.id
 
             aml_name = expense.employee_id.name + ': ' + expense.name.split('\n')[0][:64]

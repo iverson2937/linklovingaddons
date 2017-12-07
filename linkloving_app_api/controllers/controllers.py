@@ -94,6 +94,9 @@ class LinklovingAppApi(http.Controller):
 
     @classmethod
     def CURRENT_USER(cls, force_admin=False):
+        uid = request.jsonrequest.get("uid")
+        if uid:
+            return uid
         if not force_admin:
             return request.context.get("uid")
         else:
@@ -2338,6 +2341,27 @@ class LinklovingAppApi(http.Controller):
         for picking in picking_list:
             json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+        # 搜索stock picking
+
+    @http.route('/linkloving_app_api/search_stock_picking', type='json', auth='none', csrf=False, cors='*')
+    def search_stock_picking(self):
+        eventId = request.jsonrequest.get("eventId")
+        text = request.jsonrequest.get("text")
+        uid = request.jsonrequest.get("uid")
+        domain = []
+        domain.append(('picking_type_code', '=', "incoming"))
+        domain.append(("state", "=", "validate"))
+        if eventId==1:
+            domain.append(("partner_id", "child_of", text))
+        elif eventId==2:
+            domain.append(("origin", "ilike", text))
+        elif eventId==3:
+            domain.append(("product_id", "ilike", text))
+        picking_list = request.env['stock.picking'].sudo(uid).search(domain,order='id desc')
+        json_list = []
+        for picking in picking_list:
+            json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
 
     # 获取stock.PICKING列表
     @http.route('/linkloving_app_api/get_stock_picking_list', type='json', auth='none', csrf=False, cors='*')
@@ -2347,6 +2371,7 @@ class LinklovingAppApi(http.Controller):
         picking_type_id = request.jsonrequest.get('picking_type_id')
         partner_id = request.jsonrequest.get('partner_id')
         state = request.jsonrequest.get("state")
+        uid = request.jsonrequest.get("uid")
         domain = []
         if type(picking_type_id) == list:
             domain.append(('picking_type_id', 'in', picking_type_id))
@@ -2355,10 +2380,10 @@ class LinklovingAppApi(http.Controller):
         domain.append(('state', '=', state))
         if partner_id:
             domain.append(('partner_id', 'child_of', partner_id))
-
-        picking_list = request.env['stock.picking'].sudo(LinklovingAppApi.CURRENT_USER()).search(domain, limit=limit,
-                                                                                                 offset=offset,
-                                                                                                 order='name desc')
+        if uid:
+            picking_list = request.env['stock.picking'].sudo(uid).search(domain, limit=limit,offset=offset,order='name desc')
+        else :
+            picking_list = request.env['stock.picking'].sudo(LinklovingAppApi.CURRENT_USER()).search(domain, limit=limit,offset=offset,order='name desc')
         json_list = []
         for picking in picking_list:
             json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
@@ -2433,6 +2458,7 @@ class LinklovingAppApi(http.Controller):
     def change_stock_picking_state(self, **kw):
         state = request.jsonrequest.get('state')  # 状态
         picking_id = request.jsonrequest.get('picking_id')  # 订单id
+        print LinklovingAppApi.CURRENT_USER()
 
         pack_operation_product_ids = request.jsonrequest.get('pack_operation_product_ids')  # 修改
         i = 0
@@ -2446,6 +2472,7 @@ class LinklovingAppApi(http.Controller):
 
         pack_list = request.env['stock.pack.operation'].sudo(LinklovingAppApi.CURRENT_USER()).search(
             [('id', 'in', map(lambda a: a['pack_id'], pack_operation_product_ids))])
+
         # 仓库或者采购修改了数量
         qty_done_map = map(lambda a: a['qty_done'], pack_operation_product_ids)
         rejects_qty_map = map(lambda a: a.get('rejects_qty') or 0, pack_operation_product_ids)
@@ -2492,6 +2519,8 @@ class LinklovingAppApi(http.Controller):
 
         elif state == 'reject':  # 退回
             picking_obj.reject()
+        elif state == 'to_picking':  # 退回
+            picking_obj.to_picking()
         elif state == 'process':  # 创建欠单
             #### 判断库存是否不够
             if picking_obj.picking_type_code == "outgoing":
@@ -3447,15 +3476,20 @@ class LinklovingAppApi(http.Controller):
             return JsonResponse.send_response(1, res_data={'result': 'erro'}, jsonRequest=False)
 
         request.session.authenticate(u'Robotime 10_1', 'peter.wang@robotime.com', '123456')
+        # request.session.authenticate(u'20170714', 'peter.wang@robotime.com', '123456')
 
         # request.params["db"] = u'20170714'
         # request.session.db = u'20170714'
 
-        partner_one = http.request.env["res.partner"].search([('name', '=', kw.get('name'))])
+        partner_one = http.request.env["res.partner"].search(
+            [('name', '=', kw.get('name')), ('customer', '=', True), ('is_company', '=', True)])
 
         vals={'result': 'erro'}
 
         if partner_one:
+            if len(partner_one.ids)>1:
+                partner_one=partner_one[0]
+
             messages_data = series_data = ''
             if partner_one.message_ids:
                 messages_data = [
@@ -3468,7 +3502,7 @@ class LinklovingAppApi(http.Controller):
             vals = {
                 'crm_source_id': partner_one.crm_source_id.name if partner_one.crm_source_id else '',  # 来源
                 'customer_status': partner_one.customer_status.name if partner_one.customer_status else '',  # 客户状态
-                'comment': partner_one.comment,  # 备注
+                'comment': partner_one.comment if partner_one.comment else '',  # 备注
                 'product_series_ids': series_data,  # 感兴趣系列
                 'messages_ids': messages_data,  # 感兴趣系列
                 'source_id': partner_one.source_id.name if partner_one.source_id else '',  # 渠道

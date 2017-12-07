@@ -23,9 +23,17 @@ class LinklovingCrm(http.Controller):
 
     # 初始化客户 判断客户是否有销售员 有 把客户联系人销售员也改为 客户销售员
     @http.route('/linkloving_crm/init_js_partner/', auth='public')
-    def init_js_partner(self):
-        domain = [('customer', '=', True), ('is_company', '=', True)]
+    def init_js_partner(self, **kw):
+
+        domain = [('customer', '=', True), ('is_company', '=', True), ('team_id', '=', kw.get('team'))]
+
+        if kw.get('website') == 'true':
+            domain.append(('website', 'in', (False, '')))
+        elif kw.get('website') == 'false':
+            domain.append(('website', 'not in', (False, '')))
+
         partner_list = http.request.env['res.partner'].search(domain)
+
         for partner_one in partner_list:
 
             if not (partner_one.team_id and partner_one.crm_source_id and partner_one.customer_status and
@@ -51,16 +59,27 @@ class LinklovingCrm(http.Controller):
                 _logger.warning(str(res) + '********* 返回********')
 
                 if (not partner_one.crm_source_id) and res.get('crm_source_id'):  # 赋值来源
-                    source_id = http.request.env['crm.lead.source'].search([('name', '=', res.get('crm_source_id'))])
+                    source_id = http.request.env['crm.lead.source'].search(
+                        [('name', '=', res.get('crm_source_id'))])
+                    if source_id:
+                        if len(source_id.ids) > 1:
+                            source_id = source_id[0]
                     partner_one.write({'crm_source_id': source_id.id})
 
-                if (not partner_one.source_id) and res.get('source_id'):  # 赋值来源
-                    source_data = http.request.env['res.partner.source'].search([('name', '=', res.get('source_id'))])
+                if (not partner_one.source_id) and res.get('source_id'):  # 赋值渠道
+                    source_data = http.request.env['res.partner.source'].search(
+                        [('name', '=', res.get('source_id'))])
+                    if source_data:
+                        if len(source_data.ids) > 1:
+                            source_data = source_data[0]
                     partner_one.write({'source_id': source_data.id})
 
                 if (not partner_one.customer_status) and res.get('customer_status'):  # 赋值客户状态
                     status_id = http.request.env['message.order.status'].search(
                         [('name', '=', res.get('customer_status'))])
+                    if status_id:
+                        if len(status_id.ids) > 1:
+                            status_id = status_id[0]
                     partner_one.write({'customer_status': status_id.id})
 
                 if (not partner_one.comment) and res.get('comment'):  # 赋值 备注
@@ -69,7 +88,11 @@ class LinklovingCrm(http.Controller):
                 if (not partner_one.product_series_ids) and res.get('product_series_ids'):  # 赋值 感兴趣产品
                     product_series_list = []
                     for product_series_one in res.get('product_series_ids'):
-                        product_id = http.request.env['crm.product.series'].search([('name', '=', product_series_one)])
+                        product_id = http.request.env['crm.product.series'].search(
+                            [('name', '=', product_series_one)])
+                        if product_id:
+                            if len(product_id.ids) > 1:
+                                product_id = product_id[0]
                         product_series_list.append(product_id.id)
                     partner_one.write({'product_series_ids': [(6, 0, product_series_list)]})
 
@@ -84,6 +107,9 @@ class LinklovingCrm(http.Controller):
                         label_list = []
                         for label_id in msg_data.get('message_label_ids'):
                             message_label_id = http.request.env['message.label'].search([('name', '=', label_id)])
+                            if message_label_id:
+                                if len(message_label_id.ids) > 1:
+                                    message_label_id = message_label_id[0]
                             label_list.append(message_label_id.id)
 
                         msg_id = http.request.env['mail.message'].create(
