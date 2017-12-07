@@ -8,7 +8,7 @@ from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError
 
 
-class AccountFiscalYear(models.Model):
+class StockPicking(models.Model):
     _name = "stock.picking"
 
     def _get_period(self):
