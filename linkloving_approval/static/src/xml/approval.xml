@@ -84,6 +84,21 @@
                 </div>
                 <div class="document_review_list">
                     <t t-foreach="item_files.review_line" t-as="review_list">
+                        <t t-js="ctx">
+                            function change_time(date_planned){
+
+                                date_planned = date_planned.replace(/\s/g,'T').replace(/\//g,'-');
+                                var my_date = Date.parse(new Date(date_planned))
+                                var newDate = new Date();
+                                var time_offset = newDate.getTimezoneOffset() * 60000
+                                var c_date = new Date(my_date - time_offset)
+                                return moment(c_date).format('YYYY-MM-DD HH:mm:ss');
+                            }
+                            if (ctx.review_list.create_date){
+                                ctx.review_list.create_date = change_time(ctx.review_list.create_date);
+                            }
+                        </t>
+
                         <div data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"><t t-esc="review_list.name"/></div>
                         <t t-if="review_list.state[0]=='review_success'">
                             <span class="fa fa-long-arrow-right" data-toggle="tooltip" data-placement="top" t-att-title="'备注:'+review_list.remark+',审核结果：'+review_list.state[1]+'，时间：'+review_list.create_date"></span>
