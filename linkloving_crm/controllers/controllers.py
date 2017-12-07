@@ -26,6 +26,12 @@ class LinklovingCrm(http.Controller):
     def init_js_partner(self, **kw):
 
         domain = [('customer', '=', True), ('is_company', '=', True), ('team_id', '=', kw.get('team'))]
+
+        if kw.get('website') == 'true':
+            domain.append(('website', 'in', (False, '')))
+        elif kw.get('website') == 'false':
+            domain.append(('website', 'not in', (False, '')))
+
         partner_list = http.request.env['res.partner'].search(domain)
 
         for partner_one in partner_list:
