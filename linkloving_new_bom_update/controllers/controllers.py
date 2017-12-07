@@ -196,7 +196,7 @@ class LinklovingNewBomUpdate(http.Controller):
             sheet1.write(j, 1, ('      ' * self.ssg) + str(xu) + ' ' + data_s.display_name,
                          self.set_product_style('Yellow'))
             sheet1.write(j, 2, data_s.product_id['product_specs'], self.set_product_style('Yellow'))
-            sheet1.write(j, 3, str(data_s['product_qty'] * data_s.product_id['standard_price']),
+            sheet1.write(j, 3, str(data_s['product_qty']) + data_s.product_uom_id['name'],
                          self.set_product_style('Yellow'))
             sheet1.write(j, 4, [adc.display_name for adc in data_s.child_line_ids], self.set_product_style('Yellow'))
 
