@@ -12,6 +12,7 @@ class AccountDashboard(models.Model):
     @api.model
     def get_dashboard_datas(self, period=None):
         period_id = self.env['account.period'].browse(period)
+        res = {}
         short_term_borrow = self.env.ref('l10n_cn_small_business.1_small_business_chart2001')
         cash_type = self.env.ref('account.data_account_type_liquidity')
         receivable_amount = self.env.ref('l10n_cn_small_business.1_small_business_chart1122')
@@ -49,7 +50,7 @@ class AccountDashboard(models.Model):
             # 负债及所有者权益总计
             total_liabilities = liabilities
 
-            res = {
+            res.update({
                 'cash_data': {'start': 0, 'current': format_decimal(cash_data, locale='en_US')},
                 'receivable_amount': {'start': 0, 'current': format_decimal(receivable_amount.balance, locale='en_US')},
                 'other_receivable_amount': {'start': 0,
@@ -67,26 +68,29 @@ class AccountDashboard(models.Model):
                 'accumulated_depreciation': {'start': 0, 'current': format_decimal(accumulated_depreciation.balance,
                                                                                    locale='en_US')},
                 'long_loan': {'start': 0, 'current': format_decimal(long_loan.balance, locale='en_US')},
-
-                'liquid': {'start': 0,
-                           'current': format_decimal(liquid, locale='en_US')},
-                'origin_assets': {'start': 0, 'current': format_decimal(origin_assets, locale='en_US')},
-
-                'total_assets': {'start': 0, 'current': format_decimal(total_assets, locale='en_US')},
-
-                'total_assets_all': {'start': 0,
-                                     'current': format_decimal(total_assets_all, locale='en_US')},
-                'sub_liabilities': {'start': 0, 'current': format_decimal(sub_liabilities, locale='en_US')},
-                'liabilities': {'start': 0, 'current': format_decimal(liabilities, locale='en_US')},
-                'total_liabilities': {'start': 0, 'current': format_decimal(total_liabilities, locale='en_US')}
-            }
+            })
         else:
             cash_data = 0
             for cash in cashes:
                 balance = self.get_account_data(cash.id, period)
                 cash_data + balance
+            liquid = cash_data + self.get_account_data(receivable_amount, period) + self.get_account_data(
+                other_receivable_amount, period) + self.get_account_data(stock, period)
+            # 固定资产原价
+            origin_assets = self.get_account_data(assets, period) + self.get_account_data(accumulated_depreciation,
+                                                                                          period)
+            # 固定资产合计
+            total_assets = origin_assets + 0
+            ## 资产总计=流动+固定
+            total_assets_all = total_assets + liquid
+            # 流动负债合计
+            sub_liabilities = self.get_account_data(payable_amount, period) + self.get_account_data(tax, period)
+            # 负债合计
+            liabilities = sub_liabilities + long_loan.balance
+            # 负债及所有者权益总计
+            total_liabilities = liabilities
 
-            {
+            res.update({
                 'cash_data': {'start': 0, 'current': format_decimal(cash_data, locale='en_US')},
                 'receivable_amount': {'start': 0,
                                       'current': format_decimal(self.get_account_data(receivable_amount, period),
@@ -118,7 +122,22 @@ class AccountDashboard(models.Model):
                     locale='en_US')},
                 'long_loan': {'start': 0,
                               'current': format_decimal(self.get_account_data(long_loan, period), locale='en_US')},
-            }
+
+            })
+        res.update({
+            'liquid': {'start': 0,
+                       'current': format_decimal(liquid, locale='en_US')},
+            'origin_assets': {'start': 0, 'current': format_decimal(origin_assets, locale='en_US')},
+
+            'total_assets': {'start': 0, 'current': format_decimal(total_assets, locale='en_US')},
+
+            'total_assets_all': {'start': 0,
+                                 'current': format_decimal(total_assets_all, locale='en_US')},
+            'sub_liabilities': {'start': 0, 'current': format_decimal(sub_liabilities, locale='en_US')},
+            'liabilities': {'start': 0, 'current': format_decimal(liabilities, locale='en_US')},
+            'total_liabilities': {'start': 0, 'current': format_decimal(total_liabilities, locale='en_US')}
+        })
+        return res
 
     def get_account_data(self, account_id, period):
 
