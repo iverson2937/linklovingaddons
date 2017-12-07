@@ -25,7 +25,7 @@ msgstr "出库调拨"
 #: model:ir.ui.menu,name:linkloving_stock_picking.stock_picking_confirm
 #: model:ir.ui.view,arch_db:linkloving_stock_picking.view_stock_picking_form
 msgid "Confirm Receipts"
-msgstr "入库确认"
+msgstr "采购确认"
 
 #. module: linkloving_stock_picking
 #: model:ir.actions.act_window,help:linkloving_stock_picking.action_stock_picking_confirm

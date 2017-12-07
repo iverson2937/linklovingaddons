@@ -5,6 +5,22 @@ from odoo.exceptions import UserError
 from odoo.tools import float_compare
 
 
+class MultiStartOutsource(models.TransientModel):
+    _name = 'multi.start.outsourcing'
+
+    def action_start_outsourcing(self):
+        ids = self._context.get("active_ids")
+        orders = self.env[self._context.get("active_model")].search([("id", "in", ids)])
+        orders.action_draft_to_out()
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": u"操作成功",
+                "text": u"操作成功",
+                "sticky": False
+            }
+        }
 class PlanMoWizard(models.TransientModel):
     _inherit = 'plan.mo.wizard'
 
@@ -78,7 +94,7 @@ class MrpProductionExtend(models.Model):
 class MrpProcessExtend(models.Model):
     _inherit = 'mrp.process'
 
-    outside_type = fields.Selection(string=u"外协类型", selection=[('normal', u'正常'),
+    outside_type = fields.Selection(string=u"加工类型", selection=[('normal', u'正常'),
                                                                ('all_outside', u'委外'),
                                                                ('outsourcing', u'外协'), ],
                                     required=False, default='normal',
@@ -98,7 +114,7 @@ class MrpProductionProduceExtend(models.TransientModel):
                 if mo.production_id.outside_type == 'outsourcing' and mo.production_id.outsourcing_supplier_id:  # 外协
                     return self.outsourcing_process_produce()
                 elif mo.production_id.outside_type == 'outsourcing' and not mo.production_id.outsourcing_supplier_id:
-                    raise UserError(u"此单据未设置外协供应商")
+                    continue
                 else:
                     return super(MrpProductionProduceExtend, mo).do_produce()
         else:
@@ -149,6 +165,7 @@ class MrpProductionProduceExtend(models.TransientModel):
 
 class OutsouringPorcessOrder(models.Model):
     _name = 'outsourcing.process.order'
+    _inherit = ['mail.thread', 'ir.needaction_mixin']
 
     process_id = fields.Many2one("mrp.process", related="production_id.process_id", string=u'工序')
 
@@ -157,12 +174,13 @@ class OutsouringPorcessOrder(models.Model):
     employee_id = fields.Many2one(comodel_name="hr.employee", string=u"产线负责人", required=False, )
 
     outsourcing_supplier_id = fields.Many2one(comodel_name="res.partner",
-                                              related='production_id.outsourcing_supplier_id', string=u'外协加工商')
+                                              related='production_id.outsourcing_supplier_id', string=u'外协加工商',
+                                              track_visibility='onchange')
     po_user_id = fields.Many2one(comodel_name="res.users", related='outsourcing_supplier_id.po_user_id',
                                  string=u'采购负责人')
     name = fields.Char('Name', index=True, required=True, )
     production_id = fields.Many2one('mrp.production', ondelete='restrict', string=u'生产单')
-    qty_produced = fields.Float(string=u'数量')
+    qty_produced = fields.Float(string=u'数量', track_visibility='onchange')
 
     product_id = fields.Many2one('product.product', related='production_id.product_id', string=u'产品')
 
@@ -170,7 +188,19 @@ class OutsouringPorcessOrder(models.Model):
                                                       ('out_ing', u'外协中'),
                                                       ('done', u'完成')],
                              required=False,
-                             default='draft')
+                             default='draft',
+                             track_visibility='onchange')
+
+    @api.model
+    def _needaction_domain_get(self):
+        """ Returns the domain to filter records that require an action
+            :return: domain or False is no action
+
+        """
+        state = self._context.get('state')
+        if not state:
+            return [('state', '!=', None)]
+        return [('state', '=', state)]
 
     @api.model
     def create(self, vals):
@@ -185,13 +215,15 @@ class OutsouringPorcessOrder(models.Model):
         return super(OutsouringPorcessOrder, self).unlink()
 
     # 草稿 - > 外协中
+    @api.multi
     def action_draft_to_out(self):
-        if self.state == 'draft':
-            if not self.outsourcing_supplier_id:
-                raise UserError(u"请设置外协供应商")
-            self.state = 'out_ing'
-        else:
-            raise UserError(u"状态异常 draft -> outing")
+        for order in self:
+            if order.state == 'draft':
+                if not order.outsourcing_supplier_id:
+                    raise UserError(u"请设置外协供应商")
+                order.state = 'out_ing'
+            else:
+                raise UserError(u"状态异常 draft -> outing")
 
     # 外协 -> 完成
     def action_out_to_done(self):
