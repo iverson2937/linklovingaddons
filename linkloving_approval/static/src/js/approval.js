@@ -43,7 +43,20 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             'click .create_file_document_btn': 'create_file_document_fn',
             'click .document_all_checkbox': 'document_all_checkbox_realize',
             'click .outage_document_file': 'outage_document_file_fn',
+
+            'click .document_yellow_dialog': 'document_yellow_fn',
+
         },
+
+        document_yellow_fn: function (e) {
+            var tar = this;
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            console.log(target)
+            Dialog.alert(target, $(target)["0"].attributes['data-original-title'].value);
+
+        },
+
         open_file_browser: function (file_path, file_name, direct_open) {
             $.ajax({
                 type: "GET",
