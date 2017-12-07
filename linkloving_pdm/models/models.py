@@ -721,7 +721,8 @@ class ProductAttachmentInfo(models.Model):
     @api.multi
     def write(self, vals):
         if (vals.get("file_binary") or vals.get("remote_path")):
-            vals['state'] = 'waiting_release'
+            if self.state in ["cancel", "draft", "deny"]:
+                vals['state'] = 'waiting_release'
         return super(ProductAttachmentInfo, self).write(vals)
 
     def unlink_attachment_list(self, **kwargs):
@@ -787,6 +788,9 @@ class ProductAttachmentInfo(models.Model):
     # 等待发布 -> 已发布
     @api.multi
     def action_released(self):
+        for info in self:
+            if info.state not in ["review_ing"]:
+                raise UserError(u"该文件不在审核中,无法审核")
         self._check_file_or_remote_path()
         self.write({
             'state': 'released'
@@ -806,6 +810,9 @@ class ProductAttachmentInfo(models.Model):
     # 等待发布 -> 取消
     @api.multi
     def action_cancel(self):
+        for info in self:
+            if info.state in ["released", "deny", "cancel", "waiting_release"]:
+                raise UserError(u"状态异常, 请刷新页面后重试")
         self.write({
             'state': 'cancel'
         })

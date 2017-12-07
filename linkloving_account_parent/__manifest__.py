@@ -24,7 +24,7 @@
 
     # always loaded
     'data': [
-        'security/account_parent_security.xml',
+        # 'security/account_parent_security.xml',
         'views/account_view.xml',
         'views/open_chart.xml',
         'data/account_type_data.xml',
