@@ -146,7 +146,7 @@ class linkloving_procurement_order_extend(models.Model):
         procurement_list = []
 
         orderpoints_noprefetch = OrderPoint.with_context(prefetch_fields=False).search(
-                company_id and [('company_id', '=', company_id), ('active', '=', True)] or [('active', '=', True)],
+            company_id and [('company_id', '=', company_id), ('active', '=', True)] or [('active', '=', True)],
             order=self._procurement_from_orderpoint_get_order())
         new_mrp_report = self.env["mrp.report"]
         exception_happend = False
@@ -287,7 +287,7 @@ class linkloving_sale_extend(models.Model):
     def action_confirm(self):
         self.ensure_one()
         # 产生销售单时 根据销售单客户 更改客户 订单状态
-        self.env['res.partner'].search([('id', '=', self.partner_id.id)]).write({'is_order': True})
+        self.partner_id.is_order = True
         for line in self.order_line:
             if self.env.ref(
                     "mrp.route_warehouse0_manufacture") in line.product_id.route_ids and not line.product_id.bom_ids:
