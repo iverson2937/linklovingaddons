@@ -2,14 +2,10 @@
 
 from odoo import models, fields, api, _
 
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-
-from odoo.exceptions import UserError
 
 
-class AccountFiscalYear(models.Model):
-    _name = "stock.picking"
+class StockPicking(models.Model):
+    _inherit = "stock.picking"
 
     def _get_period(self):
         """
