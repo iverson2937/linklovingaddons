@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--暂支序列号-->
+        <record id="sequence_employee_payment" model="ir.sequence">
+            <field name="name">account.employee.payment</field>
+            <field name="code">account.employee.payment</field>
+            <field name="prefix">ZZ%(y)s%(month)s%(day)s</field>
+            <field eval="1" name="number_next"/>
+            <field eval="1" name="number_increment"/>
+            <field name="padding">3</field>
+        </record>
+    </data>
+</odoo>
+
+
