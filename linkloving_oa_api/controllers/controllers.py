@@ -2138,6 +2138,20 @@ class LinklovingOAApi(http.Controller):
         else:
             return JsonResponse.send_response(STATUS_CODE_OK, res_data={'stock_move': self.get_product_stock_move(product.product_variant_ids[0].id)})
 
+    #关键字搜索产品
+    @http.route('/linkloving_oa_api/search_product', type='json', auth="none", csrf=False, cors='*')
+    def search_product(self,*kw):
+        type = request.jsonrequest.get("type")
+        search_text = request.jsonrequest.get("search_text")
+        product_list = request.env['product.template'].sudo().search([(type, 'ilike', search_text)],
+                                                                         order='id desc')
+        data = []
+        for product_detail in product_list:
+            product_product = request.env['product.product'].sudo().search([('product_tmpl_id', '=', product_detail.id)])
+            data.append(self.change_product_detail_to_json(product_detail,product_product))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+
     def change_product_detail_to_json(self,obj,product):
         if (product.write_date):
             time_unque = product.write_date.replace("-", "").replace(" ", "").replace(":", "")
