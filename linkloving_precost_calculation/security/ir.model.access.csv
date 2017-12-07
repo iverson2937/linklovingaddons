@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_linkloving_precost_calculation_linkloving_precost_calculation,linkloving_precost_calculation.linkloving_precost_calculation,model_linkloving_precost_calculation_linkloving_precost_calculation,,1,0,0,0
