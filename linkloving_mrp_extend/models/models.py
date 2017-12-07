@@ -968,14 +968,14 @@ class MrpProductionExtend(models.Model):
         if force_cancel:
             state_domain = ["draft", "confirmed", "waiting_material",
                             "prepare_material_ing", "finish_prepare_material",
-                            "already_picking", "progress", 'force_cancel_waiting_warehouse_inspection']
+                            "already_picking", "progress", 'force_cancel_waiting_warehouse_inspection', "cancel",
+                            "done"]
         else:
-            state_domain = ["draft", "confirmed", "waiting_material", "cancel"]
+            state_domain = ["draft", "confirmed", "waiting_material", "cancel", "done"]
         for mo in self:
             if mo.state not in state_domain:
                 raise UserError(u"不能取消已经开始生产的制造单 或者 相关的生产单已经开始生产无法取消SO")
-
-        res = super(MrpProductionExtend, self).action_cancel()
+        res = super(MrpProductionExtend, self.filtered(lambda x: x.state not in ["done"])).action_cancel()
         # for p in self:
         #     return_m = self.env["mrp.return.material"].with_context({
         #         'active_model': 'mrp.production',
@@ -1983,7 +1983,7 @@ class StcokPickingExtend(models.Model):
                 #     'context': self.env.context,
                 # }
 
-            # Check backorder should check for other barcodes
+            # Check backorder should checpurk for other barcodes
             if pick.check_backorder():
                 view = self.env.ref('stock.view_backorder_confirmation')
                 wiz = self.env['stock.backorder.confirmation'].create({'pick_id': pick.id})
@@ -2254,6 +2254,25 @@ class MultiSetMTO(models.TransientModel):
 
 class purchase_order_extend(models.Model):
     _inherit = "purchase.order"
+
+    @api.depends("origin")
+    @api.multi
+    def _compute_first_so_number(self):
+        for order in self:
+            if order.origin:
+                origin_group = order.origin.split(",")
+                if origin_group:
+                    first_group = origin_group[0].split(":")
+                    if first_group:
+                        order.first_so_number = first_group[0]
+                    else:
+                        order.first_so_number = ''
+                else:
+                    order.first_so_number = ''
+            else:
+                order.first_so_number = ''
+
+    first_so_number = fields.Char(compute="_compute_first_so_number", string=u'so单号', store=True)
 
     @api.multi
     def change_state_to_rfq(self):
