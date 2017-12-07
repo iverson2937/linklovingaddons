@@ -2341,6 +2341,27 @@ class LinklovingAppApi(http.Controller):
         for picking in picking_list:
             json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+        # 搜索stock picking
+
+    @http.route('/linkloving_app_api/search_stock_picking', type='json', auth='none', csrf=False, cors='*')
+    def search_stock_picking(self):
+        eventId = request.jsonrequest.get("eventId")
+        text = request.jsonrequest.get("text")
+        uid = request.jsonrequest.get("uid")
+        domain = []
+        domain.append(('picking_type_code', '=', "incoming"))
+        domain.append(("state", "=", "validate"))
+        if eventId==1:
+            domain.append(("partner_id", "child_of", text))
+        elif eventId==2:
+            domain.append(("origin", "ilike", text))
+        elif eventId==3:
+            domain.append(("product_id", "ilike", text))
+        picking_list = request.env['stock.picking'].sudo(uid).search(domain,order='id desc')
+        json_list = []
+        for picking in picking_list:
+            json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
 
     # 获取stock.PICKING列表
     @http.route('/linkloving_app_api/get_stock_picking_list', type='json', auth='none', csrf=False, cors='*')
@@ -2498,6 +2519,8 @@ class LinklovingAppApi(http.Controller):
 
         elif state == 'reject':  # 退回
             picking_obj.reject()
+        elif state == 'to_picking':  # 退回
+            picking_obj.to_picking()
         elif state == 'process':  # 创建欠单
             #### 判断库存是否不够
             if picking_obj.picking_type_code == "outgoing":
