@@ -86,7 +86,7 @@ class LinklovingCrm(http.Controller):
                     partner_one.write({'product_series_ids': [(6, 0, product_series_list)]})
 
                 if (not partner_one.message_ids) and res.get('messages_ids'):  # 赋值 跟进记录
-                    request.session.authenticate(u'20170714', 'peter.wang@robotime.com', '123456')
+                    request.session.authenticate(u'js10', 'peter.wang@robotime.com', '123456')
                     msg_list = []
 
                     message_s = res.get('messages_ids')
