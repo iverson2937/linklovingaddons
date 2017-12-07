@@ -399,7 +399,8 @@ class CreateOrderPointWizard(models.TransientModel):
                     infos = info.search([('product_tmpl_id', '=', product.id), ('name', '=', r.partner_id.id)])
                     if infos:
                         print infos[0]
-                        infos[0].price = product.price1 * r.price
+                        if not infos[0].price:
+                            infos[0].price = product.price1 * r.price
                     else:
                         if r.partner_id.id:
                             info.create({
@@ -412,8 +413,8 @@ class CreateOrderPointWizard(models.TransientModel):
                 for r in discounts:
                     infos = info.search([('product_tmpl_id', '=', product.id), ('name', '=', r.partner_id.id)])
                     if infos:
-
-                        infos[0].price = product.price1_tax * r.price_tax
+                        if not infos[0].price:
+                            infos[0].price = product.price1_tax * r.price_tax
                         print infos[0]
                     else:
                         if r.partner_id.id:

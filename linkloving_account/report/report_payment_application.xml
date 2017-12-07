@@ -127,7 +127,8 @@
                                 <strong>财务:</strong>
                             </div>
                             <div class="col-xs-3">
-                                <strong>部门主管:</strong>
+                                <strong>审核人:</strong>
+                                <p t-field="o.approve_id.name"/>
                             </div>
                             <div class="col-xs-3">
                                 <strong>制单人:</strong>

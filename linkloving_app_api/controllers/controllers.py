@@ -3466,3 +3466,47 @@ class LinklovingAppApi(http.Controller):
                 # print purchase_order
                 json_list.append(LinklovingAppApi.stock_picking_to_json(ids))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    # 根据name获取客户信息
+    @http.route('/linkloving_app_api/get_one_demo_partner1', type='http', auth="none", csrf=False, cors='*')
+    def get_one_demo_partner(self, **kw):
+
+        print kw
+        if not kw.get('name'):
+            return JsonResponse.send_response(1, res_data={'result': 'erro'}, jsonRequest=False)
+
+        request.session.authenticate(u'Robotime 10_1', 'peter.wang@robotime.com', '123456')
+        # request.session.authenticate(u'20170714', 'peter.wang@robotime.com', '123456')
+
+        # request.params["db"] = u'20170714'
+        # request.session.db = u'20170714'
+
+        partner_one = http.request.env["res.partner"].search(
+            [('name', '=', kw.get('name')), ('customer', '=', True), ('is_company', '=', True)])
+
+        vals={'result': 'erro'}
+
+        if partner_one:
+            if len(partner_one.ids)>1:
+                partner_one=partner_one[0]
+
+            messages_data = series_data = ''
+            if partner_one.message_ids:
+                messages_data = [
+                    {'body': msg.body, 'message_label_ids': [label.name for label in msg.messages_label_ids]} for msg in
+                    partner_one.message_ids]
+
+            if partner_one.product_series_ids:
+                series_data = [series.name for series in partner_one.product_series_ids]
+
+            vals = {
+                'crm_source_id': partner_one.crm_source_id.name if partner_one.crm_source_id else '',  # 来源
+                'customer_status': partner_one.customer_status.name if partner_one.customer_status else '',  # 客户状态
+                'comment': partner_one.comment if partner_one.comment else '',  # 备注
+                'product_series_ids': series_data,  # 感兴趣系列
+                'messages_ids': messages_data,  # 感兴趣系列
+                'source_id': partner_one.source_id.name if partner_one.source_id else '',  # 渠道
+
+            }
+
+        return JsonResponse.send_response(1, res_data=vals, jsonRequest=False)

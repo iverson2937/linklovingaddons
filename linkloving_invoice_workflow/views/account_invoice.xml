@@ -228,7 +228,6 @@
                     <field name="date_due"/>
                     <field name="amount_total_signed" string="Total" sum="Total"/>
                     <field name="residual_signed" string="To Pay" sum="To pay" groups="account.group_account_invoice"/>
-                    <field name="amount_total_signed" string="Total" sum="Total"/>
                     <field name="currency_id" invisible="1"/>
                     <field name="company_currency_id" invisible="1"/>
                     <field name="state"/>

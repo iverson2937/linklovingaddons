@@ -1956,29 +1956,32 @@ class StcokPickingExtend(models.Model):
             if not pick.move_lines and not pick.pack_operation_ids:
                 raise UserError(_('Please create some Initial Demand or Mark as Todo and create some Operations. '))
             # In draft or with no pack operations edited yet, ask if we can just do everything
-            if pick.state == 'draft' or all([x.qty_done == 0.0 for x in pick.pack_operation_ids]):
-                # If no lots when needed, raise error
-                picking_type = pick.picking_type_id
-                if (picking_type.use_create_lots or picking_type.use_existing_lots):
-                    for pack in pick.pack_operation_ids:
-                        if pack.product_id and pack.product_id.tracking != 'none':
-                            raise UserError(
-                                _('Some products require lots/serial numbers, so you need to specify those first!'))
-                view = self.env.ref('stock.view_immediate_transfer')
-                wiz = self.env['stock.immediate.transfer'].create({'pick_id': pick.id})
-                # TDE FIXME: a return in a loop, what a good idea. Really.
-                return {
-                    'name': _('Immediate Transfer?'),
-                    'type': 'ir.actions.act_window',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'res_model': 'stock.immediate.transfer',
-                    'views': [(view.id, 'form')],
-                    'view_id': view.id,
-                    'target': 'new',
-                    'res_id': wiz.id,
-                    'context': self.env.context,
-                }
+            if pick.state not in ["picking"]:  # 去分拣 不需要做此判断
+                if pick.state == 'draft' or all([x.qty_done == 0.0 for x in pick.pack_operation_ids]):
+                    # If no lots when needed, raise error
+                    picking_type = pick.picking_type_id
+                    if (picking_type.use_create_lots or picking_type.use_existing_lots):
+                        for pack in pick.pack_operation_ids:
+                            if pack.product_id and pack.product_id.tracking != 'none':
+                                raise UserError(
+                                        _(
+                                            'Some products require lots/serial numbers, so you need to specify those first!'))
+                    raise UserError(u"此次入库数量为0, 请选择全部入库或者退回!")
+                # view = self.env.ref('stock.view_immediate_transfer')
+                # wiz = self.env['stock.immediate.transfer'].create({'pick_id': pick.id})
+                # # TDE FIXME: a return in a loop, what a good idea. Really.
+                # return {
+                #     'name': _('Immediate Transfer?'),
+                #     'type': 'ir.actions.act_window',
+                #     'view_type': 'form',
+                #     'view_mode': 'form',
+                #     'res_model': 'stock.immediate.transfer',
+                #     'views': [(view.id, 'form')],
+                #     'view_id': view.id,
+                #     'target': 'new',
+                #     'res_id': wiz.id,
+                #     'context': self.env.context,
+                # }
 
             # Check backorder should check for other barcodes
             if pick.check_backorder():

@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'account', 'linkloving_account_parent'],
+    'depends': ['base', 'account', 'linkloving_account_parent', 'stock'],
 
     # always loaded
     'data': [
@@ -30,6 +30,7 @@
         'views/account_move_line.xml',
         'views/account_move.xml',
         'views/account_final.xml',
+        # 'views/stock_picking.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
