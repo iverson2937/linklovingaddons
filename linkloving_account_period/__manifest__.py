@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'account', 'linkloving_account_parent'],
+    'depends': ['base', 'account', 'linkloving_account_parent', 'stock'],
 
     # always loaded
     'data': [
