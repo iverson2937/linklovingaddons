@@ -160,6 +160,9 @@ class LinklovingAppApi(http.Controller):
 
                 values['partner_id'] = user.partner_id.id
                 values['company'] = user.company_id.name
+                rate = request.env['mrp.config.settings'].sudo().get_default_allow_produced_qty_rate(
+                        ['allow_produced_qty_rate'])
+                values.update(rate)
                 if user.employee_ids:
                     values['barcode'] = user.employee_ids[0].barcode
                     values['phone'] = user.employee_ids[0].mobile_phone
@@ -1341,9 +1344,9 @@ class LinklovingAppApi(http.Controller):
                                               res_data={'error': _("MO not found")})
         try:
             if result == True:
-                feedback.sudo().action_qc_success()
+                feedback.action_qc_success()
             else:
-                feedback.sudo().action_qc_fail()
+                feedback.action_qc_fail()
         except UserError, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error": e.name})
@@ -2692,7 +2695,7 @@ class LinklovingAppApi(http.Controller):
             'state': stock_picking_obj.state,
 
             'back_order_id': stock_picking_obj.backorder_id.name or '',
-            'emergency': stock_picking_obj.is_emergency,
+            'emergency': stock_picking_obj.is_emergency or '',
             'creater': stock_picking_obj.sudo().create_uid.name or '',
             'location_id': stock_picking_obj.location_id.complete_name or '',
             'tracking_number': stock_picking_obj.tracking_number or '',
@@ -3097,7 +3100,7 @@ class LinklovingAppApi(http.Controller):
             'origin': picking.origin,
             'state': picking.state,
             'back_order_id': picking.backorder_id.name or '',
-            'emergency': picking.is_emergency,
+            'emergency': picking.is_emergency or '',
             'partner_id': picking.partner_id.name,
         }
         return data
