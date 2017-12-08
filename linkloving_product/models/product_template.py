@@ -105,12 +105,6 @@ class ProductTemplate11(models.Model):
                 full_code = '.'.join([categ_code, full_specs, version1])
                 self.default_code = full_code
 
-    @api.multi
-    def action_view_stock_moves(self):
-        action = super(ProductTemplate11, self).action_view_stock_moves()
-        action['context'] = dict({'search_default_done': 1}, **action['context'])
-        return action
-
     default_code = fields.Char(track_visibility='onchange')
 
 

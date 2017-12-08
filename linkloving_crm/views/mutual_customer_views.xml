@@ -58,7 +58,7 @@
                             <page name="members" string="组成员">
                                 <field name="customer_ids" widget="many2many_kanban" options="{'not_delete': True}"
                                        context="{'default_customer':True,'default_is_company':True}"
-                                       domain="[('customer','=','1'),('is_company','=',True),('mutual_rule_id','=',False),('public_partners','=','private')]">
+                                       domain="[('customer','=','1'),('is_company','=',True),('mutual_rule_id','=',False),('public_partners','in',('private','buffer'))]">
                                     <kanban quick_create="false" create="true" delete="true">
                                         <field name="name"/>
                                         <templates>
