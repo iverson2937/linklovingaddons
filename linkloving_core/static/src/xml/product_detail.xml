@@ -80,7 +80,7 @@
                                                         <!--</a>-->
 
                                                         <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
-                                             <t t-if="item.state=='草稿'">
+                                             <t t-if="item.state=='draft'">
                                                            <span>
                                                             <button t-att-data-id="item.id" class="btn btn-default demand_confirm" t-att-check-name="'chk_mo'+result.product_id" confirm="sss">需求确认</button>
                                                         </span>
@@ -91,7 +91,14 @@
                                                         <span style="margin-left:15px" data-toggle="tooltip" title="预计开始"><t t-esc="item.date_planned_start"/> </span>
                                                         <span style="margin-left:15px" data-toggle="tooltip" title="预计结束"><t t-esc="item.date_planned_finished"/> </span>
                                                         <span style="margin-left:15px" data-toggle="tooltip" title="截止时间"><t t-esc="item.planned_start_backup"/> </span>
-                                                        <span style="margin-left:15px" class="state"><t t-esc="item.state"/> </span>
+
+                                                        <t t-foreach="selection" t-as="sel">
+                                                            <t t-if="sel[0] == item.state">
+                                                                <span><t t-esc="sel[1]"/></span>
+                                                            </t>
+                                                        </t>
+
+
                                                         <!--<t t-if="item.status_light == 3">-->
                                                         <!--<span style="margin-left:15px;color:red;" class="fa fa-circle" data-toggle="tooltip" data-placement="top" title="状态灯"></span>-->
                                                         <!--</t>-->
@@ -219,7 +226,12 @@
                                                         <!--</a>-->
                                                         <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+
+                                                        <t t-foreach="selection" t-as="sel">
+                                                            <t t-if="sel[0] == item.state">
+                                                                <span><t t-esc="sel[1]"/></span>
+                                                            </t>
+                                                        </t>
 
                                                         <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
 
@@ -300,17 +312,22 @@
                                                         <!--</a>-->
                                                          <span class="show_mo_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
 
-                                                         <t t-if="item.state=='草稿'">
-                                                        <span>
-                                                            <button class="btn btn-default demand_confirm" t-att-data-id="item.id" t-att-check-name="'chk_mo'+result.product_id">需求确认</button>
-                                                        </span>
-                                                    </t>
+                                                         <t t-if="item.state=='draft'">
+                                                            <span>
+                                                                <button class="btn btn-default demand_confirm" t-att-data-id="item.id" t-att-check-name="'chk_mo'+result.product_id">需求确认</button>
+                                                            </span>
+                                                         </t>
                                                         <span style="margin-left:15px"><t t-esc="item.in_charge_id"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
                                                         <span style="margin-left:15px" data-toggle="tooltip" title="预计开始"><t t-esc="item.date_planned_start"/> </span>
                                                         <span style="margin-left:15px" data-toggle="tooltip" title="预计结束"><t t-esc="item.date_planned_finished"/> </span>
                                                         <span style="margin-left:15px" data-toggle="tooltip" title="截止时间"><t t-esc="item.planned_start_backup"/> </span>
-                                                        <span style="margin-left:15px" class="state"><t t-esc="item.state"/> </span>
+
+                                                        <t t-foreach="selection" t-as="sel">
+                                                            <t t-if="sel[0] == item.state">
+                                                                <span><t t-esc="sel[1]"/></span>
+                                                            </t>
+                                                        </t>
 
                                                         <!--<span style="margin-left:15px"><t t-esc="item.origin"/> </span>-->
                                                         <!--<t t-if="item.status_light == 3">-->
@@ -443,7 +460,13 @@
                                                         <!--</a>-->
                                                         <span class="show_po_number" t-att-data-id="item.id" style="cursor: pointer;"><t t-esc="item.name"/> </span>
                                                         <span style="margin-left:15px"><t t-esc="item.qty"/> </span>
-                                                        <span style="margin-left:15px"><t t-esc="item.state"/> </span>
+
+                                                        <t t-foreach="selection" t-as="sel">
+                                                            <t t-if="sel[0] == item.state">
+                                                                <span><t t-esc="sel[1]"/></span>
+                                                            </t>
+                                                        </t>
+
                                                         <span style="margin-left:15px"><t t-esc="item.date_planned"/> </span>
                                                         <!--<t t-if="item.status_light == 3">-->
                                                         <!--<span style="margin-left:15px;color:red;" class="fa fa-circle"></span>-->
@@ -493,7 +516,13 @@
                         <span class="po_mo_target" t-att-data-model="item.model" t-att-data-id="item.id" style="cursor:pointer"><t t-esc="item.name"/></span>
                         <span style="margin-left:15px"><t t-esc="item.product_qty"/></span>
                         <span style="margin-left:15px"><t t-esc="item.date"/></span>
-                        <span style="margin-left:15px"><t t-esc="item.state"/></span>
+
+                        <t t-foreach="selection" t-as="sel">
+                            <t t-if="sel[0] == item.state">
+                                <span><t t-esc="sel[1]"/></span>
+                            </t>
+                        </t>
+
                         <t t-if="item.partner_name">
                             <span><t t-esc="item.partner_name"/></span>
                         </t>
@@ -548,7 +577,13 @@
                         <t t-if="item.partner_name">
                             <span style="margin-left:15px"><t t-esc="item.partner_name"/></span>
                         </t>
-                        <span style="margin-left:15px"><t t-esc="item.state"/></span>
+
+                        <t t-foreach="selection" t-as="sel">
+                            <t t-if="sel[0] == item.state">
+                                <span><t t-esc="sel[1]"/></span>
+                            </t>
+                        </t>
+
                         <!--<t t-if="item.status_light == 3">-->
                         <!--<span style="margin-left:15px;color:red;" class="fa fa-circle" data-toggle="tooltip" data-placement="top" title="状态灯"></span>-->
                         <!--</t>-->
