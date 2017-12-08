@@ -16,26 +16,6 @@ PURCHASE_TYPE = {
     'purchase': u'采购订单',
     'make_by_mrp': u'MRP生成'
 }
-MO_STATE = {
-    'draft': u'草稿',
-    'confirmed': u'需求确认',
-    'waiting_material': u'等待备料',
-    'prepare_material_ing': u'备料中',
-    'finish_prepare_material': u'备料完成',
-    'waiting_inspection_finish': u'等待品检完成',
-    'already_picking': u'已领料',
-    'planned': u'安排中',
-    'progress': u'生产中',
-    'waiting_quality_inspection': u'等待品检',
-    'quality_inspection_ing': u'品检中',
-    'waiting_rework': u'等待返工',
-    'rework_ing': u'返工中',
-    'waiting_inventory_material': u'等待清点退料',
-    'waiting_warehouse_inspection': u'等待检验退料',
-    'waiting_post_inventory': u'等待入库',
-    'done': u'完成',
-    'cancel': u'取消'
-}
 
 
 class ProductTemplate(models.Model):
@@ -83,7 +63,7 @@ class ProductTemplate(models.Model):
             'id': mo_id.id,
             'product_id': mo_id.product_tmpl_id.id,
             'date_planned_start': mo_id.date_planned_start,
-            'state': MO_STATE[mo_id.state],
+            'state': mo_id.state,
             'status_light': mo_id.status_light,
             'material_light': mo_id.material_light,
         }
@@ -141,7 +121,7 @@ class ProductTemplate(models.Model):
                     'date_planned_start': mo.date_planned_start if mo.date_planned_start else '',
                     'planned_start_backup': mo.planned_start_backup if mo.planned_start_backup else '',
                     'in_charge_id': mo.in_charge_id.name,
-                    'state': MO_STATE[mo.state],
+                    'state': mo.state,
                     # 'status_light': mo.status_light,
                     # 'material_light': mo.material_light,
                     'remark': mo.remark if mo.remark else ''
