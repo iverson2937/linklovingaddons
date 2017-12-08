@@ -2160,6 +2160,43 @@ class LinklovingOAApi(http.Controller):
             data.append(self.change_product_detail_to_json(product_detail,product_product))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
+    #产品库存移动
+    @http.route('/linkloving_oa_api/get_stock_moves_by_product_id', type='json', auth="none", csrf=False, cors='*')
+    def get_stock_moves_by_product_id(self, *kw):
+        product_id = request.jsonrequest.get('product_id')
+        limit = request.jsonrequest.get('limit')
+        offset = request.jsonrequest.get('offset')
+        if not limit:
+            limit = 80
+        if not offset:
+            offset = 0
+        stock_moves = request.env['stock.move'].sudo().search(
+            [('product_tmpl_id', '=', product_id)])
+        stock_move_json_list = []
+        for stock_move in stock_moves:
+            stock_move_json_list.append(self.change_stock_move_obj_to_json(stock_move))
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=stock_move_json_list)
+
+    def change_stock_move_obj_to_json(cls, stock_move):
+        data = {
+            'name': stock_move.name,
+            'product_id': {
+                'product_name': stock_move.product_tmpl_id.display_name,
+                'id': stock_move.product_tmpl_id.id,
+            },
+            'product_uom_qty': stock_move.product_uom_qty,
+            'state': stock_move.state,
+            'location': stock_move.location_id.display_name,
+            'location_dest': stock_move.location_dest_id.display_name,
+            'write_uid': stock_move.write_uid.name if stock_move.write_uid else '',
+            'write_date': stock_move.write_date if stock_move.write_date else '',
+            'move_order_type': stock_move.move_order_type if stock_move.move_order_type else '',
+            'picking_id': stock_move.picking_id.name if stock_move.picking_id else '',
+            'quantity_adjusted_qty': stock_move.quantity_adjusted_qty if stock_move.quantity_adjusted_qty else 0,
+            'origin': stock_move.origin if stock_move.origin else '',
+        }
+        return data
 
     def change_product_detail_to_json(self,obj,product):
         if (product.write_date):
@@ -2841,6 +2878,7 @@ class LinklovingOAApi(http.Controller):
         type = request.jsonrequest.get('type')
         limit = request.jsonrequest.get('limit')
         offset = request.jsonrequest.get('offset')
+        search_type = request.jsonrequest.get('search_type')
         search_body = request.jsonrequest.get('search_body')
         tag_id = request.jsonrequest.get('tag_id')
         is_tag_id = request.jsonrequest.get('is_tag_id')
@@ -2860,21 +2898,30 @@ class LinklovingOAApi(http.Controller):
             for blog_list_bean in blog_list:
                 blog_list_json.append(LinklovingOAApi.blog_to_json(blog_list_bean))
         elif type == 'search':
-            blog_list = request.env['blog.post'].search(
-                [('website_published', '=', True), ('name', 'ilike', search_body)])
+            if search_type == 'name':
+                blog_list = request.env['blog.post'].search(
+                    [('website_published', '=', True), ('name', 'ilike', search_body)])
+            elif search_type == 'create_uid':
+                create_list = [author.id for author in
+                                   request.env['res.users'].search([('name', 'ilike', search_body)])]
+                blog_list = request.env['blog.post'].search(
+                        [('website_published', '=', True), ('create_uid', 'in', create_list)])
+            elif search_type == 'content':
+                blog_list = request.env['blog.post'].search(
+                        [('website_published', '=', True), ('content', 'ilike', search_body)])
             for blog_list_bean in blog_list:
                 blog_list_json.append(LinklovingOAApi.blog_to_json(blog_list_bean))
         elif is_tag_id:
             if is_first:
                 blog_list = request.env['blog.post'].search(
-                    [('website_published', '=', True), ('blog_id', '=', int(tag_id))])
+                        [('website_published', '=', True), ('blog_id', '=', int(tag_id))])
             else:
                 blog_list = request.env['blog.post'].search(
-                    [('website_published', '=', True), ('tag_ids', '=', int(tag_id))])
+                        [('website_published', '=', True), ('tag_ids', '=', int(tag_id))])
             for blog_list_bean in blog_list:
                 blog_list_json.append(LinklovingOAApi.blog_to_json(blog_list_bean))
         return JsonResponse.send_response(STATUS_CODE_OK,
-                                          res_data=blog_list_json)
+                                              res_data=blog_list_json)
 
     # 获取博客分类
     @http.route('/linkloving_oa_api/get_blog_colum', type='json', auth='none', csrf=False, cors='*')
