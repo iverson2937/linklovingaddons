@@ -316,7 +316,7 @@
 
 
         <record id="action_purchase_order_line" model="ir.actions.act_window">
-            <field name="name">Vendors</field>
+            <field name="name">订单明细行</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">purchase.order.line</field>
             <field name="view_type">form</field>
