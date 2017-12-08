@@ -1,0 +1,20 @@
+<openerp>
+    <data>
+        <!-- Inherit Form View to Modify it -->
+        <record id="product_template_form_view_inherit" model="ir.ui.view">
+            <field name="name">product.template.procurement</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+
+                <header position="inside">
+                    <button string="计算当前成本"
+                            type="object"
+                            name="btn_pre_cost_cal"/>
+                </header>
+
+
+            </field>
+        </record>
+    </data>
+</openerp>

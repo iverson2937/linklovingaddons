@@ -177,6 +177,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
         refresh_part_func: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
+            var self = this;
             target = $(target).parents('.show_bom_line_one').prevAll('.click_tag_a');
             if (target.attr('data-product-id')) {
                 var product_id = target.attr('data-product-id');
@@ -229,6 +230,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
                         self.$("#" + product_id + ">.panel-body").append(QWeb.render('show_bom_line_tr_add', {
                             bom_lines: result.bom_lines,
                             result: result,
+                            selection:self.selection,
                             po_length: po_length,
                             bom_length: bom_length,
                             mo_length: mo_length,
@@ -258,6 +260,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
         show_mo_detail_line: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
+            var self = this;
             //若点击的是
             if (target.classList.contains('show_bom_line_one') || target.classList.contains('show_bom_line_two')) {
                 target = target.parentNode;
@@ -295,7 +298,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
                         result[i].date = result[i].date.substr(0, 10);
                     }
                     self.$("#mo_detail" + more_mo + ">.panel-body").html(" ")
-                    self.$("#mo_detail" + more_mo + ">.panel-body").append(QWeb.render('show_mo_detail_add', {result: result}));
+                    self.$("#mo_detail" + more_mo + ">.panel-body").append(QWeb.render('show_mo_detail_add', {result: result,selection:self.selection}));
                 })
         },
         show_po_detail_line: function (e) {
@@ -342,6 +345,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
         show_po_detail_line_add: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
+            var self = this;
             //若点击的是
             if (target.classList.contains('show_bom_line_one') || target.classList.contains('show_bom_line_two')) {
                 target = target.parentNode;
@@ -378,7 +382,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
                         result[i].date = result[i].date.substr(0, 10);
                     }
                     self.$("#mo_source" + mo_id + ">.panel-body").html(" ")
-                    self.$("#mo_source" + mo_id + ">.panel-body").append(QWeb.render('show_po_detail_add', {result: result}));
+                    self.$("#mo_source" + mo_id + ">.panel-body").append(QWeb.render('show_po_detail_add', {result: result,selection:self.selection}));
                 })
         },
 
@@ -591,6 +595,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
         show_bom_line: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
+            var self = this;
             //若点击的是
             if (target.classList.contains('show_bom_line_one') || target.classList.contains('show_bom_line_two')) {
                 target = target.parentNode;
@@ -667,6 +672,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
                         self.$("#" + product_id + ">.panel-body").append(QWeb.render('show_bom_line_tr_add', {
                             bom_lines: result.bom_lines,
                             result: result,
+                            selection:self.selection,
                             po_length: po_length,
                             bom_length: bom_length,
                             mo_length: mo_length,
@@ -728,14 +734,22 @@ odoo.define('linkloving_core.product_detail', function (require) {
                                 result.bom_lines[i].service = '备货制'
                             }
                         }
-                        self.$el.append(QWeb.render('show_bom_line_tr', {
-                            bom_lines: result.bom_lines,
-                            result: result,
-                            po_length: po_length,
-                            bom_length: bom_length,
-                            mo_length: mo_length,
-                            service: service
-                        }));
+
+                        new Model("mrp.production").call("fields_get",[],{allfields: ['state', 'product_order_type','availability']}).then(function (r) {
+                            console.log(r);
+                            self.selection = r.state.selection;
+                            console.log(self.selection);
+
+                            self.$el.append(QWeb.render('show_bom_line_tr', {
+                                bom_lines: result.bom_lines,
+                                result: result,
+                                selection:self.selection,
+                                po_length: po_length,
+                                bom_length: bom_length,
+                                mo_length: mo_length,
+                                service: service
+                            }));
+                        })
 
                     });
             }

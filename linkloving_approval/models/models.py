@@ -4,7 +4,7 @@
 ATTACHINFO_FIELD = ['product_tmpl_id', 'file_name', 'review_id', 'remote_path',
                     'version', 'state', 'has_right_to_review', 'is_show_outage',
                     'is_able_to_use', 'is_show_cancel', 'is_first_review',
-                    'create_uid', 'type', 'is_delect_view', 'is_show_action_deny']
+                    'create_uid', 'type', 'is_delect_view', 'is_show_action_deny', 'create_date']
 
 from odoo import models, fields, api
 from odoo.osv import expression
@@ -139,7 +139,8 @@ class ApprovalCenter(models.TransientModel):
         for atta in attatchments:
             # attach_list.append(atta.convert_attachment_info())
             attach_list.append(
-                dict(self.env['product.attachment.info'].convert_attachment_info(atta), **{'checkbox_type': self.type}))
+                dict(self.env['product.attachment.info'].convert_attachment_info(atta),
+                     **{'checkbox_type': self.type, 'create_date': atta.get('create_date')}))
 
         length = self.env[self.res_model].search_count(domain)
         return {"records": attach_list,

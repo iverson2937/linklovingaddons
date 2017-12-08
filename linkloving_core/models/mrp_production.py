@@ -2,7 +2,6 @@
 import json
 
 from odoo import models, fields, api
-from models import MO_STATE
 import uuid
 
 from odoo.exceptions import UserError

@@ -16,5 +16,13 @@
             <field name="groups"
                    eval="[(4,ref('purchase.group_purchase_manager')),(4,ref('linkloving_mrp_extend.group_charge_warehouse'))]"/>
         </record>
+
+        <record id="linkloving_purchase.my_team_orders" model="ir.rule">
+            <field name="name">订单</field>
+            <field ref="purchase.model_purchase_order" name="model_id"/>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="groups"
+                   eval="[(4, ref('purchase.group_purchase_manager')),(4, ref('linkloving_warehouse.group_stock_control_manager')),(4, ref('mrp.group_mrp_manager'))]"/>
+        </record>
     </data>
 </openerp>

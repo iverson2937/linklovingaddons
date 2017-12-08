@@ -355,7 +355,6 @@ class manual_combine_po(models.TransientModel):
                 self.combine_origin(po_first, po)
                 po.button_cancel()
                 po.unlink()
-
         same_origin = {}
         for po_line in po_first.order_line:
             if po_line.product_id.id in same_origin.keys():
@@ -379,8 +378,18 @@ class manual_combine_po(models.TransientModel):
                 po_line.unlink()
 
     def combine_origin(self, po, po_to_combine):
-        if not po.origin:
+        if not po.origin or not po_to_combine.origin:
             return
+        po_to_combine_split = po_to_combine.origin.split(', ')
+        po_split = po.origin.split(', ')
+        combined_origin_set = set(po_split + po_to_combine_split)
+        combined_origin = ''
+        for o in combined_origin_set:
+            combined_origin += o + ', '
+        combined_origin = combined_origin[:len(combined_origin) - 2]
+
+        po.write({'origin': combined_origin})
+        return
         if po_to_combine.origin not in po.origin.split(', '):
             # Keep track of all procurements
             if po.origin:

@@ -109,6 +109,10 @@
                     <field name="remark"/>
                 </xpath>
 
+                <xpath expr="//field[@name='order_line']" position="attributes">
+                    <attribute name="attrs">{'readonly': [('state', 'in', ('done', 'cancel','sale'))]}</attribute>
+                </xpath>
+
 
                 <xpath expr="//field[@name='partner_shipping_id']" position="after">
                     <field name="tax_id"

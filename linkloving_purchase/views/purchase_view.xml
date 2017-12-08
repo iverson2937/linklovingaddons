@@ -80,6 +80,9 @@
                 <xpath expr="//field[@name='order_line']/form/sheet/notebook/page/field[@name='name']" position="after">
                     <field name="output_rate"/>
                 </xpath>
+                <xpath expr="//field[@name='order_line']" position="attributes">
+                    <attribute name="attrs">{'readonly': [('state', 'in', ('done', 'cancel','purchase'))]}</attribute>
+                </xpath>
                 <xpath expr="//button[@name='button_cancel']" position="replace">
                     <button name="button_cancel" states="draft,to approve,sent,purchase" type="object" string="取消订单"
                             confirm="确定取消吗？"/>
@@ -277,7 +280,7 @@
 
         <act_window id="action_purchase_order_combine"
                     multi="True"
-                    key2="client_action_multi" name="Combine Draft Purchase Order"
+                    key2="client_action_multi" name="合并采购单"
                     res_model="manual.combine.po" src_model="purchase.order"
                     view_mode="form" target="new" view_type="form"/>
 
