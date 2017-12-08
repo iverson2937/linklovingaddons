@@ -2878,6 +2878,7 @@ class LinklovingOAApi(http.Controller):
         type = request.jsonrequest.get('type')
         limit = request.jsonrequest.get('limit')
         offset = request.jsonrequest.get('offset')
+        search_type = request.jsonrequest.get('search_type')
         search_body = request.jsonrequest.get('search_body')
         tag_id = request.jsonrequest.get('tag_id')
         is_tag_id = request.jsonrequest.get('is_tag_id')
@@ -2897,21 +2898,30 @@ class LinklovingOAApi(http.Controller):
             for blog_list_bean in blog_list:
                 blog_list_json.append(LinklovingOAApi.blog_to_json(blog_list_bean))
         elif type == 'search':
-            blog_list = request.env['blog.post'].search(
-                [('website_published', '=', True), ('name', 'ilike', search_body)])
+            if search_type == 'name':
+                blog_list = request.env['blog.post'].search(
+                    [('website_published', '=', True), ('name', 'ilike', search_body)])
+            elif search_type == 'create_uid':
+                create_list = [author.id for author in
+                                   request.env['res.users'].search([('name', 'ilike', search_body)])]
+                blog_list = request.env['blog.post'].search(
+                        [('website_published', '=', True), ('create_uid', 'in', create_list)])
+            elif search_type == 'content':
+                blog_list = request.env['blog.post'].search(
+                        [('website_published', '=', True), ('content', 'ilike', search_body)])
             for blog_list_bean in blog_list:
                 blog_list_json.append(LinklovingOAApi.blog_to_json(blog_list_bean))
         elif is_tag_id:
             if is_first:
                 blog_list = request.env['blog.post'].search(
-                    [('website_published', '=', True), ('blog_id', '=', int(tag_id))])
+                        [('website_published', '=', True), ('blog_id', '=', int(tag_id))])
             else:
                 blog_list = request.env['blog.post'].search(
-                    [('website_published', '=', True), ('tag_ids', '=', int(tag_id))])
+                        [('website_published', '=', True), ('tag_ids', '=', int(tag_id))])
             for blog_list_bean in blog_list:
                 blog_list_json.append(LinklovingOAApi.blog_to_json(blog_list_bean))
         return JsonResponse.send_response(STATUS_CODE_OK,
-                                          res_data=blog_list_json)
+                                              res_data=blog_list_json)
 
     # 获取博客分类
     @http.route('/linkloving_oa_api/get_blog_colum', type='json', auth='none', csrf=False, cors='*')
