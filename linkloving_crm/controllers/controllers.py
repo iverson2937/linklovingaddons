@@ -93,8 +93,9 @@ class LinklovingCrm(http.Controller):
                         if product_id:
                             if len(product_id.ids) > 1:
                                 product_id = product_id[0]
-                        product_series_list.append(product_id.id)
-                    partner_one.write({'product_series_ids': [(6, 0, product_series_list)]})
+                            product_series_list.append(product_id.id)
+                    if product_series_list:
+                        partner_one.write({'product_series_ids': [(6, 0, product_series_list)]})
 
                 if (not partner_one.message_ids) and res.get('messages_ids'):  # 赋值 跟进记录
                     request.session.authenticate(u'js10', 'peter.wang@robotime.com', '123456')

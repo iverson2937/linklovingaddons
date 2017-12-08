@@ -138,6 +138,7 @@ class ResPartner(models.Model):
     customer_continent = fields.Many2many('crm.continent', string=u'大洲')  # 市场
     customer_is_world = fields.Boolean(related='crm_partner_id.customer_is_world', string=u'世界')  # 市场
 
+    customer_write_date = fields.Datetime(related='crm_partner_id.customer_write_date', string=u'最近操所时间')
 
     def _compute_order_partner_question(self):
         for partner in self:
@@ -221,8 +222,8 @@ class ResPartner(models.Model):
         if vals.get('name'):
             vals['name'] = self.fomate_name_vals(vals.get('name'))
 
-        if not (vals.get('company_type') == 'person'):
-            if vals.get('is_company'):
+        if not (vals.get('company_type') == 'person' or (not vals.get('company_type'))):
+            if vals.get('customer'):
                 if self.select_company_new(vals, 'name'):
                     raise UserError(u'此名称' + vals.get('name') + u'已绑定公司，请确认')
                 if self.select_company_new(vals, 'email'):
@@ -241,6 +242,7 @@ class ResPartner(models.Model):
                     #     vals['mutual_rule_id'] = vals.get('mutual_customer_id')
 
                 # 是客户 创建外部表
+
                 crm_res_one = self.env['crm.res.partner'].create({})
 
                 vals['crm_partner_id'] = crm_res_one.id
@@ -267,6 +269,10 @@ class ResPartner(models.Model):
 
         if vals.get('name'):
             vals['name'] = self.fomate_name_vals(vals.get('name'))
+
+        if vals.get('customer'):
+            crm_res_one = self.env['crm.res.partner'].create({})
+            vals['crm_partner_id'] = crm_res_one.id
 
         if not (self['company_type'] == 'company' and vals.get('company_type') == 'person'):
             if self['is_company'] or vals.get('is_company'):
@@ -301,6 +307,9 @@ class ResPartner(models.Model):
 
             else:
                 vals['public_partners'] = 'public'
+
+        if 'mutual_rule_id' not in vals:
+            vals['customer_write_date'] = datetime.now()
 
         return super(ResPartner, self).write(vals)
 
@@ -586,6 +595,8 @@ class CrmModelLead2OpportunityPartner(models.TransientModel):
 class CrmResPartner(models.Model):
     _name = 'crm.res.partner'
 
+    crm_my_partner = fields.One2many('res.partner', 'crm_partner_id', u'客户')
+
     crm_is_partner = fields.Boolean(u'线索客户', default=False)
 
     im_tool = fields.Char(string=u'即时通讯工具')
@@ -606,3 +617,14 @@ class CrmResPartner(models.Model):
     customer_sex = fields.Selection([('man', u'男'), ('woman', u'女')], string=u'性别')
 
     customer_is_world = fields.Boolean(string=u'世界')  # 市场
+
+    # @api.model
+    # def _default_crm_write_date(self):
+    #     return datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
+
+    customer_write_date = fields.Datetime(string=u'最近操所时间', compute="_compute_customer_write_date")
+
+    @api.multi
+    def _compute_customer_write_date(self):
+        for partner in self:
+            partner.customer_write_date = partner.crm_my_partner.write_date
