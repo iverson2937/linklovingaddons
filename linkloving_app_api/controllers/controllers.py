@@ -2692,7 +2692,7 @@ class LinklovingAppApi(http.Controller):
             'state': stock_picking_obj.state,
 
             'back_order_id': stock_picking_obj.backorder_id.name or '',
-            'emergency': stock_picking_obj.is_emergency,
+            'emergency': stock_picking_obj.is_emergency or '',
             'creater': stock_picking_obj.sudo().create_uid.name or '',
             'location_id': stock_picking_obj.location_id.complete_name or '',
             'tracking_number': stock_picking_obj.tracking_number or '',
@@ -3097,7 +3097,7 @@ class LinklovingAppApi(http.Controller):
             'origin': picking.origin,
             'state': picking.state,
             'back_order_id': picking.backorder_id.name or '',
-            'emergency': picking.is_emergency,
+            'emergency': picking.is_emergency or '',
             'partner_id': picking.partner_id.name,
         }
         return data
