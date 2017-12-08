@@ -250,7 +250,7 @@
 
                 <script type="text/javascript" src="/linkloving_pdm/static/src/js/document_load.js"/>
                 <link rel="stylesheet" href="/linkloving_pdm/static/src/css/document_load.css"/>
-                <script type="text/javascript" src="/linkloving_pdm/static/src/js/file_form_js.js"/>
+                <!--<script type="text/javascript" src="/linkloving_pdm/static/src/js/file_form_js.js"/>-->
             </xpath>
         </template>
 
