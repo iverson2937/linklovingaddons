@@ -138,7 +138,15 @@ class ResPartner(models.Model):
     customer_continent = fields.Many2many('crm.continent', string=u'大洲')  # 市场
     customer_is_world = fields.Boolean(related='crm_partner_id.customer_is_world', string=u'世界')  # 市场
 
-    customer_write_date = fields.Datetime(related='crm_partner_id.customer_write_date', string=u'最近操所时间')
+    # customer_write_date = fields.Datetime(related='crm_partner_id.customer_write_date', string=u'最近操所时间')
+
+
+    customer_write_date = fields.Datetime(string=u'最近操所时间', compute="_compute_customer_write_date", store=True)
+
+    @api.multi
+    def _compute_customer_write_date(self):
+        for partner in self:
+            partner.customer_write_date = partner.write_date
 
     def _compute_order_partner_question(self):
         for partner in self:
@@ -621,10 +629,3 @@ class CrmResPartner(models.Model):
     # @api.model
     # def _default_crm_write_date(self):
     #     return datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
-
-    customer_write_date = fields.Datetime(string=u'最近操所时间', compute="_compute_customer_write_date")
-
-    @api.multi
-    def _compute_customer_write_date(self):
-        for partner in self:
-            partner.customer_write_date = partner.crm_my_partner.write_date

@@ -137,6 +137,9 @@
                     <field name="customer_code" attrs="{'invisible':[('customer','!=',True)]}"/>
                     <field name="customer_alias" attrs="{'invisible':[('customer','!=',True)]}"/>
                     <field name="mutual_rule_id"/>
+
+                    <field name="customer_write_date" invisible="1"/>
+
                 </xpath>
 
                 <!--<xpath expr="//field[@name='customer_alias']" position="after">-->
@@ -145,10 +148,10 @@
 
 
                 <!--<xpath expr="//page[@name='accounting_disabled']" position="after">-->
-                    <!--<page string="产品" attrs="{'invisible': True}">-->
-                        <!--<field name="interested_in_product" domain="[('sale_ok','=',True)]"-->
-                               <!--context="{'search_default_rteng':1,'search_default_filter_categ_id':1}"/>-->
-                    <!--</page>-->
+                <!--<page string="产品" attrs="{'invisible': True}">-->
+                <!--<field name="interested_in_product" domain="[('sale_ok','=',True)]"-->
+                <!--context="{'search_default_rteng':1,'search_default_filter_categ_id':1}"/>-->
+                <!--</page>-->
                 <!--</xpath>-->
 
 
