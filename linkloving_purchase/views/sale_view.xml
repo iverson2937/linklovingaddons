@@ -41,6 +41,7 @@
                   parent="menu_purchase_order"
                   sequence="1"/>
 
+
     </data>
 </openerp>
 

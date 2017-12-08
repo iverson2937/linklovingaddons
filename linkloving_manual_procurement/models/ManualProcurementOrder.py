@@ -10,6 +10,7 @@ from odoo.exceptions import UserError
 class ManualProcurementOrder(models.Model):
     _name = 'manual.procurement.order'
     _inherit = ['mail.thread']
+    _order = 'create_date desc'
 
     def _get_default_company_id(self):
         return self._context.get('force_company', self.env.user.company_id.id)
@@ -145,6 +146,12 @@ class ManualProcurementLine(models.Model):
 
     state = fields.Selection(related="procurement_id.production_id.state", string=u'制造单状态')
 
+    @api.onchange("product_id")
+    def _onchange_product_id(self):
+        if self.product_id.product_variant_ids:
+            orderpoint = self.env["stock.warehouse.orderpoint"].search(
+                    [('product_id', '=', self.product_id.product_variant_ids[0].id), ('active', '!=', None)], limit=1)
+            self.qty_ordered = orderpoint.product_max_qty or 0
     @api.multi
     def _compute_qty_done(self):
         for line in self:
