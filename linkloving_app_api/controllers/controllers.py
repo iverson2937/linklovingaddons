@@ -160,6 +160,9 @@ class LinklovingAppApi(http.Controller):
 
                 values['partner_id'] = user.partner_id.id
                 values['company'] = user.company_id.name
+                rate = request.env['mrp.config.settings'].sudo().get_default_allow_produced_qty_rate(
+                        ['allow_produced_qty_rate'])
+                values.update(rate)
                 if user.employee_ids:
                     values['barcode'] = user.employee_ids[0].barcode
                     values['phone'] = user.employee_ids[0].mobile_phone
@@ -1341,9 +1344,9 @@ class LinklovingAppApi(http.Controller):
                                               res_data={'error': _("MO not found")})
         try:
             if result == True:
-                feedback.sudo().action_qc_success()
+                feedback.action_qc_success()
             else:
-                feedback.sudo().action_qc_fail()
+                feedback.action_qc_fail()
         except UserError, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error": e.name})
