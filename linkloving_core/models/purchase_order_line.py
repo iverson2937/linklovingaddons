@@ -2,7 +2,6 @@
 import json
 
 from odoo import models, fields, api
-from models import MO_STATE
 import uuid
 
 from odoo.exceptions import UserError
@@ -65,7 +64,7 @@ class PurchaseOrderLine(models.Model):
                                 'product_qty': move_line.product_uom_qty,
                                 'product_id': mo_id.product_tmpl_id.product_variant_ids[0].id,
                                 'date': mo_id.date_planned_start,
-                                'state': MO_STATE[mo_id.state],
+                                'state': mo_id.state,
                                 'id': mo_id.id,
                                 'model': "mrp.production",
                                 'origin': mo_id.origin,
@@ -112,7 +111,7 @@ class PurchaseOrderLine(models.Model):
                                 'product_qty': move_line.product_uom_qty,
                                 'product_id': mo_id.product_tmpl_id.product_variant_ids[0].id,
                                 'date': mo_id.date_planned_start,
-                                'state': MO_STATE[mo_id.state],
+                                'state': mo_id.state,
                                 'uuid': str(uuid.uuid1()),
                                 'id': mo_id.id,
                                 'model': "mrp.production",
