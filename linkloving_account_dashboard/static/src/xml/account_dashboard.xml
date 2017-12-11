@@ -134,7 +134,7 @@
                           <td class="assets_indext1">未交税金</td>
                           <td>58</td>
                           <td></td>
-                          <td>t-esc="tax.current"/></td>
+                          <td><t t-esc="tax.current"/></td>
                       </tr>
                       <tr>
                           <td class="assets_indext1">其他应收款</td>
