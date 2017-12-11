@@ -53,7 +53,7 @@ class AccountDashboard(models.Model):
             # 流动负债合计
             sub_liabilities = payable_amount.balance + tax.balance + short_term_borrow.balance
             # 所有者权益合计
-            owner_equity = real_receive_assets + capital_reserves
+            owner_equity = real_receive_assets.balance + capital_reserves.balance
 
             # 负债合计
             liabilities = sub_liabilities + long_loan.balance
