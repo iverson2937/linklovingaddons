@@ -64,7 +64,7 @@
                           <td class="assets_indext1">短期借款</td>
                           <td>51</td>
                           <td></td>
-                          <td><t t-esc="short_term_invest.current"/></td>
+                          <td><t t-esc="short_term_borrow.current"/></td>
                       </tr>
                       <tr>
                           <td class="assets_indext1">短期投资</td>
