@@ -10,7 +10,7 @@ class StockTransfer(models.Model):
     picking_type_id = fields.Many2one('stock.picking')
     input_product_ids = fields.One2many('stock.transfer.line', 'transfer_id', domain=[('product_type', '=', 'input')])
     output_product_ids = fields.One2many('stock.transfer.line', 'transfer_id', domain=[('product_type', '=', 'output')])
-    remark=fields.Text(string=u'备注')
+    remark = fields.Text(string=u'备注')
 
     @api.model
     def _default_location_id(self):
@@ -57,7 +57,8 @@ class StockTransfer(models.Model):
     def confirm_transfer(self):
         inv_id = self.env['stock.inventory'].create({
             'filter': 'partial',
-            'name': self.name
+            'name': self.name,
+            'reason': self.remark,
         })
         inv_id.prepare_inventory()
         print inv_id
@@ -66,14 +67,16 @@ class StockTransfer(models.Model):
                 'product_id': record.product_id.id,
                 'product_qty': record.product_id.qty_available - record.product_qty,
                 'inventory_id': inv_id.id,
-                'location_id': inv_id.location_id.id
+                'location_id': inv_id.location_id.id,
+                'remark_adjust': self.remark
             })
         for output in self.output_product_ids:
             self.env['stock.inventory.line'].create({
                 'product_id': output.product_id.id,
                 'product_qty': output.product_id.qty_available + output.product_qty,
                 'inventory_id': inv_id.id,
-                'location_id': inv_id.location_id.id
+                'location_id': inv_id.location_id.id,
+                'remark_adjust': self.remark
             })
         inv_id.action_done()
         self.state = 'done'
@@ -89,3 +92,9 @@ class StockTransferLine(models.Model):
         ('input', u'投入'),
         ('output', u'产出')
     ])
+
+
+class AdjustInventoryLine(models.Model):
+    _inherit = "stock.inventory.line"
+
+    remark_adjust = fields.Char(string=u'备注')

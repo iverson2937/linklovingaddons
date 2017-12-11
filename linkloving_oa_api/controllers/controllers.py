@@ -2438,6 +2438,7 @@ class LinklovingOAApi(http.Controller):
     @http.route('/linkloving_oa_api/create_apply_order', type='json', auth="none", csrf=False, cors='*')
     def create_apply_order(self, *kw):
         data = request.jsonrequest.get("data")
+        print data, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd'
         userId = data.get('user_id')
         is_reset = data.get('is_reset')
         id = data.get('id')

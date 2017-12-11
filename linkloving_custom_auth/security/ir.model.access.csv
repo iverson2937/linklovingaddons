@@ -15,3 +15,7 @@ access_stock_warehouse_orderpoint_all_leads,stock_warehouse_orderpoint,stock.mod
 access_model_account_account_type_user,model_account_account_type_user,account.model_account_account_type,,1,0,0,0
 access_stock_warehouse_orderpoint_user,stock_warehouse_orderpoint_user,stock.model_stock_warehouse_orderpoint,,1,0,0,0
 access_model_account_payment_user,model_account_payment_user,account.model_account_payment,,1,0,0,0
+mrp.access_product_template_user,product.template user,product.model_product_template,mrp.group_mrp_user,1,1,0,0
+access_product_template_assistant,product.template user,product.model_product_template,sales_team.group_sale_salesman_all_leads,1,1,0,0
+mrp.access_product_product_user,product.product user,product.model_product_product,mrp.group_mrp_user,1,1,0,0
+access_product_product_assistant,product.template user,product.model_product_product,sales_team.group_sale_salesman_all_leads,1,1,0,0
