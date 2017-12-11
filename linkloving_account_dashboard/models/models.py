@@ -13,7 +13,7 @@ class AccountDashboard(models.Model):
     def get_dashboard_datas(self, period=None):
         period_id = self.env['account.period'].browse(period)
         res = {}
-        short_term_borrow = self.env.ref('l10n_cn_small_business.1_small_business_chart2001')
+        short_term_borrow = self.env.ref('l10n_cn_small_business.1_small_business_chart1101')
         cash_type = self.env.ref('account.data_account_type_liquidity')
         receivable_amount = self.env.ref('l10n_cn_small_business.1_small_business_chart1122')
         payable_amount = self.env.ref('l10n_cn_small_business.1_small_business_chart2202')
