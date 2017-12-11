@@ -57,6 +57,12 @@
                 <xpath expr="//field[@name='virtual_available']" position="attributes">
                     <attribute name="string">预测</attribute>
                 </xpath>
+                <xpath expr="//field[@name='list_price']" position="attributes">
+                    <attribute name="string">售价</attribute>
+                </xpath>
+                <!--<xpath expr="//notebook/page[1]" position="attributes">-->
+                <!--<attribute name="string">供应商</attribute>-->
+                <!--</xpath>-->
 
 
                 <xpath expr="//field[@name='virtual_available']" position="after">
