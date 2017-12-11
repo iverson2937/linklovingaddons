@@ -21,7 +21,8 @@ class AccountDashboard(models.Model):
         other_payable_amount = self.env.ref('l10n_cn_small_business.1_small_business_chart2241')
         other_receivable_amount = self.env.ref('l10n_cn_small_business.1_small_business_chart1221')
         stock = self.env['account.account'].search([('name', '=', '库存商品')])
-        accumulated_depreciation = self.env.ref('l10n_cn_small_business.1_small_business_chart1602')
+
+        accumulated_depreciation = self.env['account.account'].search([('name', '=', '固定资产折旧')])
 
         tax = self.env['account.account'].search([('name', 'like', '应交税费')])
 
@@ -84,7 +85,7 @@ class AccountDashboard(models.Model):
             ## 资产总计=流动+固定
             total_assets_all = total_assets + liquid
             # 流动负债合计
-            sub_liabilities = self.get_account_data(payable_amount, period) + self.get_account_data(tax, period)
+            sub_liabilities = self.get_account_data(payable_amount, period) + self.get_account_data(-tax, period)
             # 负债合计
             liabilities = sub_liabilities + long_loan.balance
             # 负债及所有者权益总计
@@ -102,7 +103,7 @@ class AccountDashboard(models.Model):
                 'stock': {'start': 0, 'current': format_decimal(self.get_account_data(stock, period), locale='en_US')},
                 'assets': {'start': 0,
                            'current': format_decimal(self.get_account_data(assets, period), locale='en_US')},
-                'tax': {'start': 0, 'current': format_decimal(self.get_account_data(tax, period), locale='en_US')},
+                'tax': {'start': 0, 'current': format_decimal(self.get_account_data(-tax, period), locale='en_US')},
                 'short_term_borrow': {'start': 0,
                                       'current': format_decimal(self.get_account_data(short_term_borrow, period),
                                                                 locale='en_US')},
