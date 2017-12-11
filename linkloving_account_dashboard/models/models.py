@@ -24,12 +24,9 @@ class AccountDashboard(models.Model):
         # 其他应付款
         other_payable_amount = self.env.ref('l10n_cn_small_business.1_small_business_chart2241')
         other_receivable_amount = self.env.ref('l10n_cn_small_business.1_small_business_chart1221')
-        stock = self.env['account.account'].search([('name', '=', '库存商品')])
-
+        stock = self.env.ref('linkloving_account.account_account_stock_chart140')
         accumulated_depreciation = self.env['account.account'].search([('name', '=', '固定资产折旧')])
-
         tax = self.env['account.account'].search([('name', 'like', '应交税费')])
-
         assets = self.env.ref('l10n_cn_small_business.1_small_business_chart1601')
         # 实收资本
         real_receive_assets = self.env.ref('l10n_cn_small_business.1_small_business_chart3001')
