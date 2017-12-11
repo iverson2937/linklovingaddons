@@ -32,6 +32,7 @@
         'views/account_payment.xml',
         'views/account_invoice_views.xml',
         'views/sale_views.xml',
+        'views/account_account_data.xml',
         'views/account_menu.xml',
         'views/res_partner_views.xml',
         'views/res_partner_bank.xml',
@@ -41,6 +42,7 @@
         'wizard/account_supplier_payment_wizard.xml',
         'report/report_payment_application.xml',
         'report/report.xml',
+
     ],
     # only loaded in demonstration mode
     'demo': [

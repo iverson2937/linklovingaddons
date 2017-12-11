@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="account_account_stock" model="account.account">
+            <field name="name">存货</field>
+        </record>
+    </data>
+</odoo>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
