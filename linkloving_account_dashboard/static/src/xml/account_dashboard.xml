@@ -64,13 +64,13 @@
                           <td class="assets_indext1">短期借款</td>
                           <td>51</td>
                           <td></td>
-                          <td><t t-esc="short_term_borrow.current"/></td>
+                          <td></td>
                       </tr>
                       <tr>
                           <td class="assets_indext1">短期投资</td>
                           <td>2</td>
                           <td></td>
-                          <td></td>
+                          <td><t t-esc="short_term_borrow.current"/></td>
                           <td class="assets_indext1">应付票据</td>
                           <td>52</td>
                           <td></td>
