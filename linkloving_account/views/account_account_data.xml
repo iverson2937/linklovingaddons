@@ -5,6 +5,12 @@
         <record id="account_account_stock_chart140" model="account.account">
             <field name="code">140</field>
             <field name="name">存货</field>
+        </record>
+
+
+        <record id="account_account_stock_chart1409" model="account.account">
+            <field name="code">1409</field>
+            <field name="name">外发商品</field>
             <field name="user_type_id" ref="account.data_account_type_expenses"/>
         </record>
     </data>
