@@ -324,7 +324,7 @@
                           <td class="assets_indext1">实收资本</td>
                           <td>91</td>
                           <td></td>
-                          <td></td>
+                          <td><t t-esc="real_receive_assets.current"></t></td>
                       </tr>
                       <tr>
                           <td class="assets_indext1">递延资产</td>
@@ -334,7 +334,7 @@
                           <td class="assets_indext1">资本公积</td>
                           <td>92</td>
                           <td></td>
-                          <td></td>
+                          <td><t t-esc="capital_reserves.current"></t></td>
                       </tr>
                       <tr>
                           <td class="assets_indext1"></td>
@@ -374,7 +374,7 @@
                           <td class="assets_indext2">所有者权益合计</td>
                           <td>96</td>
                           <td></td>
-                          <td></td>
+                          <td><t t-esc="owner_equity.current"></t></td>
                       </tr>
                       <tr>
                           <td class="">递延税项</td>
