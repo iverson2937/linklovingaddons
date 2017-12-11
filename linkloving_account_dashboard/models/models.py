@@ -49,7 +49,7 @@ class AccountDashboard(models.Model):
             ## 资产总计=流动+固定
             total_assets_all = total_assets + liquid
             # 流动负债合计
-            sub_liabilities = payable_amount.balance + tax.balance + short_term_borrow
+            sub_liabilities = payable_amount.balance + tax.balance + short_term_borrow.balance
             # 负债合计
             liabilities = sub_liabilities + long_loan.balance
             # 负债及所有者权益总计
