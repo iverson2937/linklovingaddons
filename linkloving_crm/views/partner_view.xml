@@ -8,6 +8,14 @@
             <field name="arch" type="xml">
 
 
+                <xpath expr="//div[@class='o_row']" position="before">
+                    <div t-if="employee">
+                        <span>是否是员工:</span>
+                        <field name="employee"/>
+                    </div>
+                </xpath>
+
+
                 <xpath expr="//field[@name='category_id']" position="after">
                     <field name="public_partners" invisible="1"/>
                     <field name="old_user_id" invisible="1"/>
@@ -100,6 +108,8 @@
 
 
                 <xpath expr="//field[@name='type']" position="before">
+
+                    <field name="employee"/>
                     <field name="website" widget="url" placeholder="e.g. www.odoo.com"/>
                 </xpath>
 
