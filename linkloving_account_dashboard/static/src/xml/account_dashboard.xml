@@ -300,7 +300,7 @@
                           <td class="assets_indext2">固定资产合计</td>
                           <td>35</td>
                           <td></td>
-                          <td><a><t t-esc="total_assets.current"></t></a></td>
+                          <td><a><t t-esc="assets.current"></t></a></td>
                           <td class="assets_indext1">负债合计</td>
                           <td>90</td>
                           <td></td>
