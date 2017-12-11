@@ -108,8 +108,6 @@
 
 
                 <xpath expr="//field[@name='type']" position="before">
-
-                    <field name="employee"/>
                     <field name="website" widget="url" placeholder="e.g. www.odoo.com"/>
                 </xpath>
 
