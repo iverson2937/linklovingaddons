@@ -57,7 +57,7 @@ class AccountDashboard(models.Model):
 
             res.update({
                 'cash_data': {'start': 0, 'current': format_decimal(cash_data, locale='en_US')},
-                'short_term_borrow': {'start': 0, 'current': format_decimal(short_term_borrow, locale='en_US')},
+                'short_term_borrow': {'start': 0, 'current': format_decimal(short_term_borrow.balance, locale='en_US')},
                 'receivable_amount': {'start': 0, 'current': format_decimal(receivable_amount.balance, locale='en_US')},
                 'other_receivable_amount': {'start': 0,
                                             'current': format_decimal(other_receivable_amount.balance, locale='en_US')},
