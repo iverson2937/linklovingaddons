@@ -20,8 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'account', 'purchase', 'linkloving_invoice_workflow', 'sale', 'linkloving_sale',
-                'stock_account'],
+    'depends': ['base', 'account', 'purchase', 'linkloving_invoice_workflow', 'sale', 'linkloving_sale','linkloving_account_parent','stock_account'],
 
     # always loaded
     'data': [
@@ -34,6 +33,7 @@
         'views/sale_views.xml',
         'views/account_account_data.xml',
         'views/account_menu.xml',
+        'views/product_category.xml',
         'views/res_partner_views.xml',
         'views/res_partner_bank.xml',
         'views/account_move_line.xml',
