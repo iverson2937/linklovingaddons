@@ -1651,7 +1651,7 @@ class ReturnMaterialLine(models.Model):
                 done_qty = done_move.quantity_done
                 return_qty = done_move.return_qty
             else:
-                raise UserError(u"异常数据")
+                continue
             scrap_qty = done_qty - uom_qty - return_qty
             if scrap_qty <= 0:
                 continue
