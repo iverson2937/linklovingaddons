@@ -489,7 +489,7 @@ odoo.define('linkloving_core.product_cost', function (require) {
                     .then(function (result) {
                         console.log(result);
 
-
+                        self.$("#" + product_id + ">.panel-body").html('');
                         self.$("#" + product_id + ">.panel-body").append(QWeb.render('show_cost_line_tr_add', {
                             bom_lines: result.bom_lines,
                             result: result,
