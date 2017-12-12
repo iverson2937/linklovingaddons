@@ -15,7 +15,6 @@
                 <!--<script type="text/javascript" src="/linkloving_core/static/src/js/multi_selection.js"/>-->
 
                 <script type="text/javascript" src="/linkloving_core/static/src/js/fix_table_top.js"/>
-                <script type="text/javascript" src="/linkloving_core/static/src/js/product_cost.js"/>
                 <link rel="stylesheet" href="/linkloving_core/static/src/css/core.css"/>
 
             </xpath>
