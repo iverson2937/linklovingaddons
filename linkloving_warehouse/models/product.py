@@ -317,6 +317,15 @@ class ProductTemplate(models.Model):
     location_x = fields.Char(related='product_variant_ids.location_x')
     location_y = fields.Char(related='product_variant_ids.location_y')
     name = fields.Char('Name', index=True, required=True, translate=False)
+
+    @api.depends('stock_move_ids.state')
+    def get_stock(self):
+        res = self._compute_quantities_dict()
+        for product in self:
+            product_data = res[product.id]
+            product.stock = product_data['qty_available']
+
+    stock = fields.Float(string=u'库存', store=True, compute=get_stock)
     _sql_constraints = [
         ('default_code_uniq1', 'unique (default_code)', _('Default Code already exist!')),
         # ('name_uniq', 'unique (name)', u'产品名称已存在!')
