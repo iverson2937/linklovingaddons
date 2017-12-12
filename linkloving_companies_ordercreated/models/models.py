@@ -31,7 +31,10 @@ class PurchaseOrderExtend(models.Model):
         return res
 
     def request_to_create_so(self, so):
-        url = self.partner_id.request_host + '/linkloving_web/create_order'
+        host = self.partner_id.request_host
+        if not host.startswith("http://"):
+            host = "http://" + host
+        url = host + '/linkloving_web/create_order'
         db = self.partner_id.db_name
         header = {'Content-Type': 'application/json'}
         try:
