@@ -267,6 +267,24 @@ class BackToProgressMoLine(models.TransientModel):
     state = fields.Selection(related="production_id.state")
 
 
+class MrpConfigSettingsI(models.TransientModel):
+    _inherit = 'mrp.config.settings'
+
+    allow_produced_qty_rate = fields.Integer(string=u'允许的超产率(%)')
+
+    def get_default_allow_produced_qty_rate(self, m_fields):
+        fi_val = self.env["ir.config_parameter"].get_param("mrp.config.settings.allow_produced_qty_rate", default=3)
+        return {'allow_produced_qty_rate': int(fi_val)}
+
+    @api.multi
+    def set_allow_produced_qty_rate(self):
+        m_fields = ['allow_produced_qty_rate']
+        for record in self:
+            for fi in m_fields:
+                self.env['ir.config_parameter'].set_param("mrp.config.settings.%s" % fi, getattr(record, fi, ''))
+
+
+
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 

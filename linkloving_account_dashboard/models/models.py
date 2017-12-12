@@ -13,24 +13,28 @@ class AccountDashboard(models.Model):
     def get_dashboard_datas(self, period=None):
         period_id = self.env['account.period'].browse(period)
         res = {}
+        # 短期借款
         short_term_borrow = self.env.ref('l10n_cn_small_business.1_small_business_chart2001')
+        # 短期投资
+        short_term_invest = self.env.ref('l10n_cn_small_business.1_small_business_chart1101')
+
         cash_type = self.env.ref('account.data_account_type_liquidity')
         receivable_amount = self.env.ref('l10n_cn_small_business.1_small_business_chart1122')
         payable_amount = self.env.ref('l10n_cn_small_business.1_small_business_chart2202')
         # 其他应付款
         other_payable_amount = self.env.ref('l10n_cn_small_business.1_small_business_chart2241')
         other_receivable_amount = self.env.ref('l10n_cn_small_business.1_small_business_chart1221')
-        stock = self.env['account.account'].search([('name', '=', '库存商品')])
-        accumulated_depreciation = self.env.ref('l10n_cn_small_business.1_small_business_chart1602')
-
+        stock = self.env.ref('linkloving_account.account_account_stock_chart140')
+        accumulated_depreciation = self.env['account.account'].search([('name', '=', '固定资产折旧')])
         tax = self.env['account.account'].search([('name', 'like', '应交税费')])
-
         assets = self.env.ref('l10n_cn_small_business.1_small_business_chart1601')
-
+        # 实收资本
         real_receive_assets = self.env.ref('l10n_cn_small_business.1_small_business_chart3001')
+        # 资本公积
         capital_reserves = self.env.ref('l10n_cn_small_business.1_small_business_chart3002')
         # 长期借款
         long_loan = self.env.ref('l10n_cn_small_business.1_small_business_chart2501')
+
         cashes = self.env['account.account'].search([('user_type_id', 'like', cash_type.id)])
         if period_id.state != 'done':
 
@@ -44,27 +48,34 @@ class AccountDashboard(models.Model):
             ## 资产总计=流动+固定
             total_assets_all = total_assets + liquid
             # 流动负债合计
-            sub_liabilities = payable_amount.balance + tax.balance
+            sub_liabilities = payable_amount.balance + tax.balance + short_term_borrow.balance
+            # 所有者权益合计
+            owner_equity = real_receive_assets.balance + capital_reserves.balance
+
             # 负债合计
             liabilities = sub_liabilities + long_loan.balance
             # 负债及所有者权益总计
-            total_liabilities = liabilities
+            total_liabilities = liabilities + owner_equity
 
             res.update({
                 'cash_data': {'start': 0, 'current': format_decimal(cash_data, locale='en_US')},
+                'short_term_borrow': {'start': 0, 'current': format_decimal(short_term_borrow.balance, locale='en_US')},
                 'receivable_amount': {'start': 0, 'current': format_decimal(receivable_amount.balance, locale='en_US')},
                 'other_receivable_amount': {'start': 0,
                                             'current': format_decimal(other_receivable_amount.balance, locale='en_US')},
                 'stock': {'start': 0, 'current': format_decimal(stock.balance, locale='en_US')},
                 'assets': {'start': 0, 'current': format_decimal(assets.balance, locale='en_US')},
                 'tax': {'start': 0, 'current': format_decimal(tax.balance, locale='en_US')},
-                'short_term_borrow': {'start': 0, 'current': format_decimal(short_term_borrow.balance, locale='en_US')},
+                'short_term_invest': {'start': 0, 'current': format_decimal(short_term_invest.balance, locale='en_US')},
                 'real_receive_assets': {'start': 0,
                                         'current': format_decimal(real_receive_assets.balance, locale='en_US')},
                 'capital_reserves': {'start': 0, 'current': format_decimal(capital_reserves.balance, locale='en_US')},
+                'owner_equity': {'start': 0,
+                                 'current': format_decimal(owner_equity, locale='en_US')},
                 'payable_amount': {'start': 0, 'current': format_decimal(payable_amount.balance, locale='en_US')},
                 'other_payable_amount': {'start': 0,
                                          'current': format_decimal(other_payable_amount.balance, locale='en_US')},
+
                 'accumulated_depreciation': {'start': 0, 'current': format_decimal(accumulated_depreciation.balance,
                                                                                    locale='en_US')},
                 'long_loan': {'start': 0, 'current': format_decimal(long_loan.balance, locale='en_US')},
@@ -102,9 +113,9 @@ class AccountDashboard(models.Model):
                 'stock': {'start': 0, 'current': format_decimal(self.get_account_data(stock, period), locale='en_US')},
                 'assets': {'start': 0,
                            'current': format_decimal(self.get_account_data(assets, period), locale='en_US')},
-                'tax': {'start': 0, 'current': format_decimal(self.get_account_data(tax, period), locale='en_US')},
-                'short_term_borrow': {'start': 0,
-                                      'current': format_decimal(self.get_account_data(short_term_borrow, period),
+                'tax': {'start': 0, 'current': format_decimal(self.get_account_data(-tax, period), locale='en_US')},
+                'short_term_invest': {'start': 0,
+                                      'current': format_decimal(self.get_account_data(short_term_invest, period),
                                                                 locale='en_US')},
                 'real_receive_assets': {'start': 0,
                                         'current': format_decimal(self.get_account_data(real_receive_assets, period),

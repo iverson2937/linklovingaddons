@@ -23,3 +23,8 @@ class ProductCategory(models.Model):
         'account.account', 'Stock Valuation Account', company_dependent=True, copy=True,
         domain=[('deprecated', '=', False)],
         help="When real-time inventory valuation is enabled on a product, this account will hold the current value of the products.", )
+
+    property_stock_invoice_account_id = fields.Many2one(
+        'account.account', '对账抵扣科目', company_dependent=True, copy=True,
+        domain=[('deprecated', '=', False)],
+        help="对账冲抵出货库存.", )

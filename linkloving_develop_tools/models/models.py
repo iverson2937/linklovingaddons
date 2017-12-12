@@ -490,6 +490,17 @@ class CreateOrderPointWizard(models.TransientModel):
         for p in self.env["product.template"].search([]):
             p.backup_standard_price = p.standard_price
 
+    def set_product_category_right(self):
+        """
+        设置产品分类的成本方法  平均价格以及自动
+        :return:
+        """
+        p_gs = self.env["product.category"].search([])
+        p_gs.write({
+            'property_cost_method': 'average',
+            'property_valuation': 'real_time'
+        })
+
 def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
     """
     :param year: 年份，默认是本年，可传int或str类型
