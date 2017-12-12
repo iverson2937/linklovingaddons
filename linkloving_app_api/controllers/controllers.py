@@ -161,7 +161,7 @@ class LinklovingAppApi(http.Controller):
                 values['partner_id'] = user.partner_id.id
                 values['company'] = user.company_id.name
                 rate = request.env['mrp.config.settings'].sudo().get_default_allow_produced_qty_rate(
-                        ['allow_produced_qty_rate'])
+                    ['allow_produced_qty_rate'])
                 values.update(rate)
                 if user.employee_ids:
                     values['barcode'] = user.employee_ids[0].barcode
@@ -452,7 +452,7 @@ class LinklovingAppApi(http.Controller):
 
         order_today = request.env["mrp.production"].sudo(LinklovingAppApi.CURRENT_USER()).read_group(domain,
                                                                                                      fields=[
-            "date_planned_start"],
+                                                                                                         "date_planned_start"],
                                                                                                      groupby=[
                                                                                                          "date_planned_start"])
         order_tomorrow = request.env["mrp.production"].sudo(LinklovingAppApi.CURRENT_USER()).read_group(
@@ -634,22 +634,21 @@ class LinklovingAppApi(http.Controller):
             data.append(self.get_simple_production_json(production))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-
     def get_simple_production_json(self, production):
         return {
-                'order_id': production.id,
-                'display_name': production.display_name,
-                'product_name': production.product_id.display_name,
-                'date_planned_start': production.date_planned_start,
-                'state': production.state,
+            'order_id': production.id,
+            'display_name': production.display_name,
+            'product_name': production.product_id.display_name,
+            'date_planned_start': production.date_planned_start,
+            'state': production.state,
             'qty_produced': production.qty_unpost,
-                'product_qty': production.product_qty,
-                'in_charge_name': production.in_charge_id.name,
-                'origin': production.origin,
-                'process_id': {
-                    'process_id': production.process_id.id,
-                    'name': production.process_id.name,
-                },
+            'product_qty': production.product_qty,
+            'in_charge_name': production.in_charge_id.name,
+            'origin': production.origin,
+            'process_id': {
+                'process_id': production.process_id.id,
+                'name': production.process_id.name,
+            },
             'production_line_id': {
                 'production_line_id': production.production_line_id.id,
                 'name': production.production_line_id.name
@@ -1467,10 +1466,10 @@ class LinklovingAppApi(http.Controller):
 
         # ---------------------***--------------------
         if not returun_material_obj and not is_check:  # 如果没生成过就生成一遍， 防止出现多条记录
-                returun_material_obj = return_material_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
-                    'production_id': mrp_production.id,
-                    'return_type': 'progress_return' if force_cancel else 'normal'
-                })
+            returun_material_obj = return_material_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
+                'production_id': mrp_production.id,
+                'return_type': 'progress_return' if force_cancel else 'normal'
+            })
         elif not returun_material_obj and is_check:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={'error': _("Order of return material not found")})
@@ -1484,7 +1483,7 @@ class LinklovingAppApi(http.Controller):
                     'product_id': l['product_tmpl_id'],
                     'return_id': returun_material_obj.id,
                 })
-        else:  #仓库检验退料
+        else:  # 仓库检验退料
             for r in returun_material_obj.return_ids:
                 for new_qty_dic in stock_move_ids:
                     if r.product_id.id == new_qty_dic['product_tmpl_id']:
@@ -1525,7 +1524,6 @@ class LinklovingAppApi(http.Controller):
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
-
 
     # 获得退料单信息
     @http.route('/linkloving_app_api/get_return_detail', type='json', auth='none', csrf=False)
@@ -1679,7 +1677,6 @@ class LinklovingAppApi(http.Controller):
         for done_move in done_stock_moves:
             done_move['product_id'] = done_move['product_id'][1]
             done_move['product_tmpl_id'] = done_move['product_id'][0]
-
 
         for l in stock_move:
             # dic = LinklovingAppApi.search(request,'product.product',[('id','=',l['product_id'][0])], ['display_name'])
@@ -2225,7 +2222,7 @@ class LinklovingAppApi(http.Controller):
                 state_group_list = request.env[model].sudo().read_group(temp_domain,
                                                                         fields=['state'],
                                                                         groupby=[
-                                                                                                           'state'])
+                                                                            'state'])
 
                 new_group = {
                     'picking_type_id': group_id,
@@ -2354,13 +2351,13 @@ class LinklovingAppApi(http.Controller):
         domain = []
         domain.append(('picking_type_code', '=', "incoming"))
         domain.append(("state", "=", "validate"))
-        if eventId==1:
+        if eventId == 1:
             domain.append(("partner_id", "child_of", text))
-        elif eventId==2:
+        elif eventId == 2:
             domain.append(("origin", "ilike", text))
-        elif eventId==3:
+        elif eventId == 3:
             domain.append(("product_id", "ilike", text))
-        picking_list = request.env['stock.picking'].sudo(uid).search(domain,order='id desc')
+        picking_list = request.env['stock.picking'].sudo(uid).search(domain, order='id desc')
         json_list = []
         for picking in picking_list:
             json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
@@ -2384,9 +2381,13 @@ class LinklovingAppApi(http.Controller):
         if partner_id:
             domain.append(('partner_id', 'child_of', partner_id))
         if uid:
-            picking_list = request.env['stock.picking'].sudo(uid).search(domain, limit=limit,offset=offset,order='name desc')
-        else :
-            picking_list = request.env['stock.picking'].sudo(LinklovingAppApi.CURRENT_USER()).search(domain, limit=limit,offset=offset,order='name desc')
+            picking_list = request.env['stock.picking'].sudo(uid).search(domain, limit=limit, offset=offset,
+                                                                         order='name desc')
+        else:
+            picking_list = request.env['stock.picking'].sudo(LinklovingAppApi.CURRENT_USER()).search(domain,
+                                                                                                     limit=limit,
+                                                                                                     offset=offset,
+                                                                                                     order='name desc')
         json_list = []
         for picking in picking_list:
             json_list.append(LinklovingAppApi.stock_picking_to_json(picking))
@@ -3146,12 +3147,12 @@ class LinklovingAppApi(http.Controller):
                 move_todo = sim_stock_move.stock_moves.filtered(lambda x: x.state not in ["cancel", "done"])
                 if not move_todo:
                     split_move = sim_stock_move.stock_moves[0].copy(
-                            default={'quantity_done': move['quantity_ready'],
-                                     'product_uom_qty': move['quantity_ready'],
-                                     'production_id': sim_stock_move.production_id.id,
-                                     'raw_material_production_id': sim_stock_move.raw_material_production_id.id,
-                                     'procurement_id': sim_stock_move.procurement_id.id or False,
-                                     'is_over_picking': True})
+                        default={'quantity_done': move['quantity_ready'],
+                                 'product_uom_qty': move['quantity_ready'],
+                                 'production_id': sim_stock_move.production_id.id,
+                                 'raw_material_production_id': sim_stock_move.raw_material_production_id.id,
+                                 'procurement_id': sim_stock_move.procurement_id.id or False,
+                                 'is_over_picking': True})
                     split_move.write({'state': 'assigned'})
                     # sim_stock_move.production_id.move_raw_ids = sim_stock_move.production_id.move_raw_ids + split_move
                     split_move.action_done()
@@ -3169,7 +3170,7 @@ class LinklovingAppApi(http.Controller):
                     move_todo.action_done()
                     move_todo.authorized_stock_move(employee_id, uid)
             sim_stock_move.quantity_ready = 0  # 清0
-                # sim_stock_move.quantity_done = sim_stock_move.quantity_done + move['quantity_ready']
+            # sim_stock_move.quantity_done = sim_stock_move.quantity_done + move['quantity_ready']
         # except Exception, e:
         #     return JsonResponse.send_response(STATUS_CODE_ERROR,
         #                                       res_data={"error": e.name})
@@ -3487,11 +3488,11 @@ class LinklovingAppApi(http.Controller):
         partner_one = http.request.env["res.partner"].search(
             [('name', '=', kw.get('name')), ('customer', '=', True), ('is_company', '=', True)])
 
-        vals={'result': 'erro'}
+        vals = {'result': 'erro'}
 
         if partner_one:
-            if len(partner_one.ids)>1:
-                partner_one=partner_one[0]
+            if len(partner_one.ids) > 1:
+                partner_one = partner_one[0]
 
             messages_data = series_data = ''
             if partner_one.message_ids:
@@ -3513,3 +3514,46 @@ class LinklovingAppApi(http.Controller):
             }
 
         return JsonResponse.send_response(1, res_data=vals, jsonRequest=False)
+
+    @http.route('/linkloving_app_api/get_account_data', type='json', auth='none', csrf=False)
+    def get_account_data(self, **kw):
+        cash_type = self.env.ref('account.data_account_type_liquidity')
+
+        def _today():
+            return (datetime.date.today() + datetime.timedelta(days=0)).strftime('%Y-%m-%d %H:%M:%S')
+
+        accounts = self.env['account.move.line'].read_group(
+            [('user_type_id', '=', cash_type.id), ('create_date', '>', _today())],
+            ['account_id', 'credit', 'debit', 'balance', 'date'],
+            ['account_id'])
+        account_list = []
+        credit_all = debit_all = balance_all = last_day_balance_all = 0.0
+        for account in accounts:
+            # 收钱
+            credit_all += account['credit']
+            # 付钱
+            debit_all += account['debit']
+            balance_all += account['balance']
+            last_day_balance = account['credit'] - account['debit'] + account['balance']
+            last_day_balance_all += last_day_balance
+            res = {
+                'name': account['account_id'][1],
+                'credit': account['credit'],
+                'debit': account['debit'],
+                'balance': account['balance'],
+                'last_day_balance': last_day_balance
+            }
+            account_list.append(res)
+        jason_list = {
+            'month_begin': '',
+            # 期初
+            'last_day_balance_all': last_day_balance_all,
+            # 收入
+            'credit_all': credit_all,
+            # 支出
+            'debit_all': debit_all,
+            # 期末
+            'balance_all': balance_all,
+            'account_list': account_list
+        }
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=jason_list)

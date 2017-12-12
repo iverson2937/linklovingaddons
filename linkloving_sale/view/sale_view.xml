@@ -117,7 +117,7 @@
                 <xpath expr="//field[@name='partner_shipping_id']" position="after">
                     <field name="tax_id"
                            domain="[('type_tax_use','&lt;&gt;','purchase')]" string="税金"
-                           attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                           attrs="{'readonly': [('state', '!=', 'draft')]}" required="1"/>
                 </xpath>
                 <xpath expr="//field[@name='amount_untaxed']" position="before">
                     <field name="product_count" string="总数量"/>

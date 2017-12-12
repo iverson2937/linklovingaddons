@@ -168,7 +168,8 @@ class SaleOrderLine(models.Model):
             except Exception:
                 _, tax_id = vals.get('tax_id')[1]
             tax_id = self.env['account.tax'].browse(tax_id)
-
+        else:
+            tax_id = None
         price_unit = vals.get('price_unit')
         product_id = self.env['product.product'].browse(vals.get('product_id'))
         price = 0.0
@@ -181,7 +182,8 @@ class SaleOrderLine(models.Model):
                     'partner_id': partner_id.id,
                     'product_id': product_id.id
                 })
-
+            if not tax_id:
+                return super(SaleOrderLine, self).create(vals)
             if partner_id.level == 1:
                 if not tax_id.amount:
                     if not product_id.price1:

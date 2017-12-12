@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+     <t t-name="ProductCost">
+        <div class="panel-group" id="accordion">
+
+        </div>
+    </t>
+
+
+
+    <t t-name="show_cost_line_tr">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" class="click_tag_a" data-level="true"
+                       href="#name">
+                       <span class="fa fa-caret-down open-sign"></span>
+                    </a>
+                    [<t t-esc="result.part_no"/> ]
+                    <span class="product_name" t-att-data-id="result.product_id" style="cursor:pointer"><t t-esc="result.name"/></span>
+                    <span class="show_bom_line_one" style="margin-left:15px">
+                         [
+                            <t t-if="result.type">
+                                  <t t-esc="result.type"/>
+                            </t>
+                         ]
+                        <span class="show_bom_line_two">[材料:<t t-esc="result.material_cost"/>,加工:<t t-esc="result.man_cost"/>,总:<t t-esc="result.total_cost"/>]</span>
+                    </span>
+                </h4>
+            </div>
+            <div id="name" class="panel-collapse collapse in">
+                <div class="panel-body">
+
+
+                    <t t-foreach="bom_lines" t-as="item">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#name" t-att-data-level="item.level" t-att-href="'#'+item.product_id" class="click_tag_a" t-att-data-product-id="item.product_id">
+                                        <t t-if="item.level">
+                                            <span class="fa fa-caret-right open-sign"></span>
+                                        </t>
+                                    </a>
+                                    [<t t-esc="item.part_no"/> ]
+                                    <span class="product_name" t-att-data-id="item.product_id" style="cursor:pointer"><t t-esc="item.name"/></span>
+                                    <span class="show_bom_line_one" style="margin-left:15px">
+                                            [
+                                            1:<t t-esc="item.product_qty"/>
+                                            ]
+                                             [
+                                            <t t-if="item.type">
+                                                <t t-esc="item.type"/>
+                                            </t>
+
+                                             ]
+                                        <!--<t t-if="item.state_bom">-->
+                                        <!--<t t-if="item.state_bom=='draft'">-->
+                                        <!--<span class="fa fa-circle" style="padding-left:10px;color:red;"></span>-->
+                                        <!--</t>-->
+                                        <!--<t t-if="item.state_bom=='release'">-->
+                                        <!--<span class="fa fa-circle" style="padding-left:10px;color:green;"></span>-->
+                                        <!--</t>-->
+                                        <!--</t>-->
+
+                                        <!--2017/11/6修改，需求库存等移到此处-->
+                                        <span class="show_bom_line_two">[材料:<t t-esc="item.material_cost"/>,加工:<t t-esc="item.man_cost"/>,总:<t t-esc="item.total_cost"/>]</span>
+
+                                        <!--2017/11/6添加部分刷新功能-->
+                                        <!--<span style="margin-left:20px;" class="fa fa-refresh part_refresh"></span>-->
+                                    </span>
+                                </h4>
+                            </div>
+                            <!--<t t-if="item.level">-->
+                                <div t-att-id="item.product_id" class="panel-collapse collapse">
+                                    <div class="panel-body">
+
+                                    </div>
+                                </div>
+                            <!--</t>-->
+                        </div>
+                    </t>
+
+
+
+                </div>
+            </div>
+        </div>
+    </t>
+
+
+    <t t-name="show_cost_line_tr_add">
+        <script>
+            $(function () { $("[data-toggle='tooltip']").tooltip(); });
+        </script>
+        <div class="panel panel-default">
+            <div id="name" class="panel-collapse collapse in">
+                <div class="panel-body">
+
+
+                    <t t-foreach="bom_lines" t-as="item">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#name" t-att-data-level="item.level" t-att-href="'#'+item.product_id" class="click_tag_a" t-att-data-product-id="item.product_id">
+                                        <t t-if="item.level">
+                                            <span class="fa fa-caret-right open-sign"></span>
+                                        </t>
+
+                                        <!--<span class="show_bom_line_two">[需求:<t t-esc="item.require"/>,库存:<t t-esc="item.stock"/>,在产:<t t-esc="item.on_produce"/>,草稿:<t t-esc="item.draft"/>]</span>-->
+                                    </a>
+                                    [<t t-esc="item.part_no"/> ]
+
+                                    <span class="product_name" t-att-data-id="item.product_id" style="cursor:pointer"><t t-esc="item.name"/></span>
+                                    <span class="show_bom_line_one" style="margin-left:15px">
+                                         [
+                                        1:<t t-esc="item.product_qty"/>
+                                        ]
+                                         [
+                                        <t t-if="item.type">
+                                              <t t-esc="item.type"/>
+                                        </t>
+
+
+                                         ]
+                                        <!--<t t-if="item.state_bom">-->
+                                        <!--<t t-if="item.state_bom=='draft'">-->
+                                        <!--<span class="fa fa-circle" style="padding-left:10px;color:red;"></span>-->
+                                        <!--</t>-->
+                                        <!--<t t-if="item.state_bom=='release'">-->
+                                        <!--<span class="fa fa-circle" style="padding-left:10px;color:green;"></span>-->
+                                        <!--</t>-->
+                                        <!--</t>-->
+
+                                        <!--2017/11/6修改，需求库存等移到此处-->
+                                        <span class="show_bom_line_two">[材料:<t t-esc="item.material_cost"/>,加工:<t t-esc="item.man_cost"/>,总:<t t-esc="item.total_cost"/>/>]</span>
+
+                                        <!--2017/11/6添加部分刷新功能-->
+                                        <span style="margin-left:20px;" class="fa fa-refresh part_refresh"></span>
+                                    </span>
+                                </h4>
+                            </div>
+                            <!--<t t-if="item.level">-->
+                                <div t-att-id="item.product_id" class="panel-collapse collapse">
+                                    <div class="panel-body">
+
+                                    </div>
+                                </div>
+                            <!--</t>-->
+                        </div>
+                    </t>
+
+
+                </div>
+            </div>
+        </div>
+    </t>
+
+
+
+</templates>

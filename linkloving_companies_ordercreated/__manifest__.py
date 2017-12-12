@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "linkloving_precost_calculation",
+    'name': "linkloving_companies_ordercreated",
 
     'summary': """
         Short (1 phrase/line) summary of the module's purpose, used as
@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'product', 'stock'],
+    'depends': ['base', 'purchase'],
 
     # always loaded
     'data': [
@@ -32,5 +32,4 @@
     'demo': [
         'demo/demo.xml',
     ],
-    'qweb': ['static/src/xml/*.xml'],
 }

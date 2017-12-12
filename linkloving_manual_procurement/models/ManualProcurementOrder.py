@@ -152,11 +152,15 @@ class ManualProcurementLine(models.Model):
             orderpoint = self.env["stock.warehouse.orderpoint"].search(
                     [('product_id', '=', self.product_id.product_variant_ids[0].id), ('active', '!=', None)], limit=1)
             self.qty_ordered = orderpoint.product_max_qty or 0
+
     @api.multi
     def _compute_qty_done(self):
         for line in self:
             if line.procurement_id.production_id:
                 line.qty_done = line.procurement_id.production_id.qty_produced
+            elif line.procurement_id.purchase_line_id:
+                line.qty_done = line.procurement_id.purchase_line_id.qty_received
+
 
     def show_product_detail(self):
         return {

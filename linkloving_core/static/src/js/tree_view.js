@@ -13,6 +13,7 @@ odoo.define('web.OLListEditor', function (require) {
     var FormView = require('web.FormView');
     var common = require('web.list_common');
     var ListView = require('web.ListView');
+    var Model = require('web.Model');
     var utils = require('web.utils');
     var Widget = require('web.Widget');
 

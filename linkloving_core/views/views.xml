@@ -27,8 +27,6 @@
                   action="action_product_detail"/>
 
 
-
-
         <record id="journal_dashboard_view_inherit_style" model="ir.ui.view">
             <field name="name">account.journal.dashboard.kanban.inherit.style</field>
             <field name="model">account.journal</field>
@@ -36,7 +34,9 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//kanban[contains(@class, 'o_kanban_dashboard')]" position="attributes">
-                    <attribute name="class">o_kanban_view oe_background_grey o_kanban_dashboard my_account_dashboard o_kanban_ungrouped o_account_kanban</attribute>
+                    <attribute name="class">o_kanban_view oe_background_grey o_kanban_dashboard my_account_dashboard
+                        o_kanban_ungrouped o_account_kanban
+                    </attribute>
                 </xpath>
             </field>
         </record>
