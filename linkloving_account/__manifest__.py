@@ -20,7 +20,8 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'account', 'purchase', 'linkloving_invoice_workflow', 'sale', 'linkloving_sale','linkloving_account_parent','stock_account'],
+    'depends': ['base', 'account', 'purchase', 'linkloving_invoice_workflow', 'linkloving_sale',
+                'linkloving_account_parent', 'stock_account'],
 
     # always loaded
     'data': [
