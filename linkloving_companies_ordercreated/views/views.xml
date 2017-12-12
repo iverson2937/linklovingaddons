@@ -1,0 +1,28 @@
+<openerp>
+    <data>
+        <record id="crm_view_partner_form_linkloving" model="ir.ui.view">
+            <field name="name">crm form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@class='o_row']" position="before">
+                    <div t-if="employee">
+                        <group>
+                            <field name="sub_company" widget="radio"
+                                   attrs="{'invisible':['|',('company_type', '!=', 'company')]}"/>
+                        </group>
+                    </div>
+                </xpath>
+
+                <xpath expr="//notebook" position="inside">
+                    <page string="子公司信息配置" attrs="{'invisible': [('sub_company', '!=', 'sub')]}" autofocus="autofocus">
+                        <group>
+                            <field name="request_host" attrs="{'required': [('sub_company', '=', 'sub')]}"/>
+                            <field name="db_name" attrs="{'required': [('sub_company', '=', 'sub')]}"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>
