@@ -2206,7 +2206,8 @@ class LinklovingOAApi(http.Controller):
             'quantity_adjusted_qty': stock_move.quantity_adjusted_qty if stock_move.quantity_adjusted_qty else 0,
             'origin': stock_move.origin if stock_move.origin else '',
         }
-        return data    def change_product_detail_to_json(self,obj,product):
+        return data
+    def change_product_detail_to_json(self,obj,product):
         if (product.write_date):
             time_unque = product.write_date.replace("-", "").replace(" ", "").replace(":", "")
         else:
@@ -2449,7 +2450,6 @@ class LinklovingOAApi(http.Controller):
         userId = data.get('user_id')
         is_reset = data.get('is_reset')
         id = data.get('id')
-        account_tax = request.env["account.tax"].sudo().search([('amount', '<', 1), ('type_tax_use', '=', 'purchase')])
         account_tax = request.env["account.tax"].sudo().search([('amount', '<', 1),('type_tax_use', '=', 'purchase')])
         if is_reset:
             new_order_draft = request.env['hr.expense.sheet'].sudo(userId).browse(id)
