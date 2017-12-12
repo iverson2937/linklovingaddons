@@ -21,6 +21,8 @@
                 <xpath expr="//div[@name='button_box']" position="inside">
                     <button class="oe_stat_button ol_button" name="show_detail" icon="fa-tasks" string="产品详细"
                             type="object"/>
+                    <button class="oe_stat_button ol_button" name="cost_detail" icon="fa-tasks" string="成本明细"
+                            type="object"/>
                 </xpath>
 
             </field>

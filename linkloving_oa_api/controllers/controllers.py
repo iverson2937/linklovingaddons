@@ -2403,7 +2403,7 @@ class LinklovingOAApi(http.Controller):
             [('user_id', '=', id)])
         name = request.env['hr.employee'].sudo().search(
             [('user_id', '=', id)]).name
-        products = request.env['product.product'].sudo().search(
+        products = request.env['product.product'].sudo(id).search(
             [('can_be_expensed', '=', True)])
         taxList = request.env['account.tax'].sudo().search([])
         shengou_amount = self.get_shengou_momey(employee.id)
@@ -2442,6 +2442,7 @@ class LinklovingOAApi(http.Controller):
         userId = data.get('user_id')
         is_reset = data.get('is_reset')
         id = data.get('id')
+        account_tax = request.env["account.tax"].sudo().search([('amount', '<', 1),('type_tax_use', '=', 'purchase')])
         if is_reset:
             new_order_draft = request.env['hr.expense.sheet'].sudo(userId).browse(id)
             expense_lines = new_order_draft.expense_line_ids
@@ -2454,7 +2455,7 @@ class LinklovingOAApi(http.Controller):
                     'name': p.get('name'),  # 费用说明
                     'employee_id': p.get('employee_id'),
                     'department_id': p.get('department_id'),
-                    'tax_ids': ([(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [4])]),
+                    'tax_ids': ([(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [account_tax.id])]),
                     'description': p.get('remarks') or '',
                 }) for p in data.get('expense_line_ids')]
             })
@@ -2471,7 +2472,7 @@ class LinklovingOAApi(http.Controller):
                     'name': p.get('name'),  # 费用说明
                     'employee_id': p.get('employee_id'),
                     'department_id': p.get('department_id'),
-                    'tax_ids': ([(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [4])]),
+                    'tax_ids': ([(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [account_tax.id])]),
                     'description': p.get('remarks') or '',
                 }) for p in data.get('expense_line_ids')]
             })

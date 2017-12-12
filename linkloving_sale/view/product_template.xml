@@ -25,10 +25,10 @@
                     <field name="product_specs"/>
                     <field name="list_price"/>
                     <field name="standard_price"/>
-                    <field name="qty_available"/>
+                    <field name="stock" string="库存"/>
                     <field name="virtual_available"/>
-                    <field name="reordering_min_qty"/>
-                    <field name="reordering_max_qty"/>
+                    <field name="reordering_min_qty" string="最小"/>
+                    <field name="reordering_max_qty" string="最大"/>
                 </tree>
             </field>
         </record>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+        <record id="view_category_property_form_inherit" model="ir.ui.view">
+            <field name="name">product.category.form.inherit</field>
+            <field name="model">product.category</field>
+            <field name="inherit_id" ref="stock_account.view_category_property_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='property_stock_account_output_categ_id']" position="after">
+                     <field name="property_stock_invoice_account_id" domain="[('internal_type','=','other'),('deprecated', '=', False)]" string="对账抵扣科目"/>
+
+                </xpath>
+
+
+            </field>
+        </record>
+
+    </data>
+</openerp>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="account_journal_sale" model="account.journal">
+            <field name="name">外发商品日记账</field>
+            <field name="type">general</field>
+            <field name="code">WFJ</field>
+            <field name="sequence">9</field>
+        </record>
+
+        <record id="account_journal_purchase" model="account.journal">
+            <field name="name">库存商品日记账</field>
+            <field name="type">general</field>
+            <field name="code">KCJ</field>
+            <field name="sequence">9</field>
+        </record>
+    </data>
+</odoo>
+
