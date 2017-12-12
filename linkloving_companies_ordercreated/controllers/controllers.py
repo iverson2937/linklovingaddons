@@ -32,6 +32,11 @@ class LinklovingCompanies(http.Controller):
             for line in order_line_vals:
                 default_code = line["default_code"]
                 p_obj = request.env["product.product"].sudo().search([("default_code", "=", default_code)])
+                if not p_obj:
+                    return {
+                        "code": -4,
+                        "msg": u"%s此料号在%s账套中找不到" % (default_code, db)
+                    }
                 one_line_val = {
                     'product_id': p_obj.id,
                     'product_uom': p_obj.uom_id.id,
