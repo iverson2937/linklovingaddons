@@ -97,6 +97,7 @@ class linkloving_procurement_order(models.Model):
 
             domain = (
                 ('state', '=', 'make_by_mrp'),
+                ('origin', 'like', self.origin),
                 ('picking_type_id', '=', procurement.rule_id.picking_type_id.id),
                 ('company_id', '=', procurement.company_id.id),
                 ('dest_address_id', '=', procurement.partner_dest_id.id))

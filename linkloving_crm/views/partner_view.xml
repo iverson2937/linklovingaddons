@@ -10,8 +10,10 @@
 
                 <xpath expr="//div[@class='o_row']" position="before">
                     <div t-if="employee">
-                        <span>是否是员工:</span>
-                        <field name="employee"/>
+                        <group>
+                            <field name="employee" string="是否是员工:"/>
+                        </group>
+
                     </div>
                 </xpath>
 
