@@ -46,10 +46,10 @@ class LinklovingCompanies(http.Controller):
                 order_line.append([0, False, one_line_val])
             vals["order_line"] = order_line
             so = request.env["sale.order"].sudo().create(vals)
-            return {
-                'so': so.name,
-                'so_id': so.id,
-            }
+            return {"code": 1,
+                    'so': so.name,
+                    'so_id': so.id,
+                    }
         except Exception, e:
             return {
                 "code": -1,
