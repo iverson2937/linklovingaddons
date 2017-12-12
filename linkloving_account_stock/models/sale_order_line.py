@@ -10,10 +10,12 @@ class SaleOrderLine(models.Model):
     @api.multi
     def create_account_move(self):
         for line in self:
-            self.env['account.move'].create({
-                ''
+            move_id = self.env['account.move'].create({
+                'journal_id': self.env.ref('account_journal_sale').id
             })
-
+            self.env['account.move.line'].create({
+                'account_id': ''
+            })
     @api.multi
     def write(self, vals):
         for line in self:
