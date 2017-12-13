@@ -3537,7 +3537,7 @@ class LinklovingAppApi(http.Controller):
             acoount_dict.update({
                 account['account_id'][1]: res
             })
-        account_datas = self.env['account.account'].search([('user_type_id', '=', cash_type.id)])
+        account_datas = request.env['account.account'].search([('user_type_id', '=', cash_type.id)])
         for account in account_datas:
             if acoount_dict.get(account.id):
                 debit = acoount_dict[account].get('debit')
