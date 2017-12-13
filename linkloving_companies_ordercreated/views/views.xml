@@ -19,6 +19,8 @@
                         <group>
                             <field name="request_host" attrs="{'required': [('sub_company', '=', 'sub')]}"/>
                             <field name="db_name" attrs="{'required': [('sub_company', '=', 'sub')]}"/>
+                            <field name="discount_to_sub" attrs="{'required': [('sub_company', '=', 'sub')]}"/>
+
                         </group>
                     </page>
                 </xpath>

@@ -17,7 +17,7 @@ class ResPartnerExtend(models.Model):
                                    default="normal")
     request_host = fields.Char(string=u'请求地址(包含端口)')
     db_name = fields.Char(string=u'账套名称')
-
+    discount_to_sub = fields.Float(string=u'成本折算率', default=0.8, help=u"跨系统生成的so单单价 = 当前成本/折算率")
 
 class PurchaseOrderExtend(models.Model):
     _inherit = 'purchase.order'
@@ -26,11 +26,15 @@ class PurchaseOrderExtend(models.Model):
         # todo
         res = super(PurchaseOrderExtend, self).button_confirm()
         if self.partner_id.sub_company == 'sub':
-            so_val = self._prepare_so_values()
-            self.request_to_create_so(so_val)
+            response = self.request_to_create_so()
+            order_line = response.get("order_line")
+            self.write({
+                'order_line': order_line
+            })
         return res
 
-    def request_to_create_so(self, so):
+    def request_to_create_so(self):
+        so = self._prepare_so_values()  # 解析采购单,生成so单信息
         host = self.partner_id.request_host
         if not host.startswith("http://"):
             host = "http://" + host
@@ -39,6 +43,7 @@ class PurchaseOrderExtend(models.Model):
         header = {'Content-Type': 'application/json'}
         try:
             response = requests.post(url, data=json.dumps({
+                "discount_to_sub": self.partner_id.discount_to_sub,
                 "db": db,
                 "vals": so,
             }), headers=header)
@@ -65,6 +70,7 @@ class PurchaseOrderExtend(models.Model):
         line_list = []
         for order_line in self.order_line:
             line_list.append({
+                "line_id": order_line.id,
                 "default_code": order_line.product_id.default_code,
                 "product_name": order_line.product_id.name,
                 "product_uom_qty": order_line.product_qty,
