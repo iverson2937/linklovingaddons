@@ -19,10 +19,19 @@ class ResPartnerExtend(models.Model):
     db_name = fields.Char(string=u'账套名称')
     discount_to_sub = fields.Float(string=u'成本折算率', default=0.8, help=u"跨系统生成的so单单价 = 当前成本/折算率")
 
+
+class SaleOrderExtend(models.Model):
+    _inherit = 'sale.order'
+
+    po_name_from_main = fields.Char(string=u'主系统的po单号')
+
 class PurchaseOrderExtend(models.Model):
     _inherit = 'purchase.order'
 
     sub_company = fields.Selection(string=u'附属公司类型', related="partner_id.sub_company")
+    so_id_from_sub = fields.Integer(string=u'关联的id')
+    so_name_from_sub = fields.Char(string=u'关联的子系统so单号')
+
     def get_precost_price(self):
         if self.state not in ['draft', 'make_by_mrp']:
             raise UserError(u'只有询价单状态才能获取最新价格')
@@ -45,35 +54,38 @@ class PurchaseOrderExtend(models.Model):
             }
         }
     def button_confirm(self):
-        # todo
         res = super(PurchaseOrderExtend, self).button_confirm()
         if self.partner_id.sub_company == 'sub':
             response = self.request_to_create_so()
             if response:
-                pass
+                self.write({
+                    'so_id_from_sub': response.get("so_id"),
+                    'so_name_from_sub': response.get("so")
+                })
+                a_url = u"%s/web?#id=%d&view_type=form&model=sale.order" % (
+                    self.partner_id.request_host, response.get("so_id"))
+                return {
+                    "type": "ir.actions.client",
+                    "tag": "action_notify",
+                    "params": {
+                        "title": u"操作成功",
+                        "text": u"自动创建销售单成功! 对应单号为: <a target='_blank' href=%s>%s</a>" % (a_url, response.get("so")),
+                        "sticky": False
+                    }
+                }
                 # order_line = response.get("order_line")
                 # self.write({
                 #     'order_line': order_line
                 # })
             else:
                 raise UserError(u'未收到返回')
-            a_url = u"%s/web?#id=%d&view_type=form&model=sale.order" % (
-            self.partner_id.request_host, response.get("so_id"))
-            return {
-                "type": "ir.actions.client",
-                "tag": "action_notify",
-                "params": {
-                    "title": u"操作成功",
-                    "text": u"自动创建销售单成功! 对应单号为: <a target='_blank' href=%s>%s</a>" % (a_url, response.get("so")),
-                    "sticky": False
-                }
-            }
+        return res
 
-    def get_request_info(self, str):
+    def get_request_info(self, str1):
         host = self.partner_id.request_host
         if not host.startswith("http://"):
             host = "http://" + host
-        url = host + str
+        url = host + str1
         db = self.partner_id.db_name
         header = {'Content-Type': 'application/json'}
         return url, db, header
@@ -125,6 +137,7 @@ class PurchaseOrderExtend(models.Model):
         origin_so = self.env["sale.order"].search([("name", "=", self.first_so_number)])
         data = {
             'remark': self.first_so_number or '' + ':' + self.name or '' + ':' + origin_so.partner_id.name or '',
+            'po_name_from_main': self.name,
         }
         line_list = []
         for order_line in self.order_line:

@@ -96,6 +96,7 @@ class linkloving_procurement_order(models.Model):
                     (gpo == 'propagate' and procurement.group_id) or False
 
             domain = (
+                ('partner_id', '=', partner.id),
                 ('state', '=', 'make_by_mrp'),
                 ('origin', '=', self.origin),
                 ('picking_type_id', '=', procurement.rule_id.picking_type_id.id),
@@ -106,16 +107,20 @@ class linkloving_procurement_order(models.Model):
 
             if domain in cache:
                 po = cache[domain]
-            else:
-                po = None
-                pos = self.env['purchase.order'].search([dom for dom in domain])
-                for po1 in pos:
-                    for line in po1.order_line:
-                        if line.product_id.id == self.product_id.id:
-                            po = po1  #
-                            break
-                if po:
-                    cache[domain] = po
+            else:  # 相同供应商合并
+                po = self.env['purchase.order'].search([dom for dom in domain])
+                po = po[0] if po else False
+                cache[domain] = po
+                # 不合并
+                # po = None
+                # pos = self.env['purchase.order'].search([dom for dom in domain])
+                # for po1 in pos:
+                #     for line in po1.order_line:
+                #         if line.product_id.id == self.product_id.id:
+                #             po = po1  #
+                #             break
+                # if po:
+                #     cache[domain] = po
 
             if not po:
                 vals = procurement._prepare_purchase_order(partner)
