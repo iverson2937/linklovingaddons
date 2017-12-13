@@ -96,6 +96,7 @@ class linkloving_procurement_order(models.Model):
                     (gpo == 'propagate' and procurement.group_id) or False
 
             domain = (
+                ('partner_id', '=', partner.id),
                 ('state', '=', 'make_by_mrp'),
                 ('origin', '=', self.origin),
                 ('picking_type_id', '=', procurement.rule_id.picking_type_id.id),
