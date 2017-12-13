@@ -15,7 +15,7 @@ class SaleOrder(models.Model):
     """""
 
     _inherit = 'sale.order'
-    tax_id = fields.Many2one('account.tax', required=True)
+    tax_id = fields.Many2one('account.tax')
     product_count = fields.Float(compute='get_product_count')
     invoiced_amount = fields.Float(compute='_compute_invoice_amount')
     remaining_amount = fields.Float(compute='_compute_invoice_amount')

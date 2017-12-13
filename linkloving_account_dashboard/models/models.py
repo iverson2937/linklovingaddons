@@ -35,7 +35,7 @@ class AccountDashboard(models.Model):
         # 长期借款
         long_loan = self.env.ref('l10n_cn_small_business.1_small_business_chart2501')
 
-        cashes = self.env['account.account'].search([('user_type_id', 'like', cash_type.id)])
+        cashes = self.env['account.account'].search([('user_type_id', '=', cash_type.id)])
         if period_id.state != 'done':
 
             cash_data = sum(cash.balance for cash in cashes)

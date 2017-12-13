@@ -119,14 +119,9 @@
                                          [
                                         <t t-if="item.type">
                                               <t t-esc="item.type"/>
-                                        </t>/
-                                        <t t-if="item.service">
-                                            <t t-esc="item.service"/>
-                                            <!--<t t-esc="service[item.service]"/>-->
-                                        </t>/
-                                        <t t-if="item.process">
-                                              <t t-esc="item.process"/>
                                         </t>
+
+
                                          ]
                                         <!--<t t-if="item.state_bom">-->
                                         <!--<t t-if="item.state_bom=='draft'">-->
@@ -138,7 +133,7 @@
                                         <!--</t>-->
 
                                         <!--2017/11/6修改，需求库存等移到此处-->
-                                        <span class="show_bom_line_two">[材料价格:<t t-esc="item.material_cost"/>,加工成本:<t t-esc="item.man_cost"/>,总成本:<t t-esc="item.total_cost"/>/>]</span>
+                                        <span class="show_bom_line_two">[材料:<t t-esc="item.material_cost"/>,加工:<t t-esc="item.man_cost"/>,总:<t t-esc="item.total_cost"/>/>]</span>
 
                                         <!--2017/11/6添加部分刷新功能-->
                                         <span style="margin-left:20px;" class="fa fa-refresh part_refresh"></span>

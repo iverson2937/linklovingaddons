@@ -17,25 +17,92 @@ class ResPartnerExtend(models.Model):
                                    default="normal")
     request_host = fields.Char(string=u'请求地址(包含端口)')
     db_name = fields.Char(string=u'账套名称')
-
+    discount_to_sub = fields.Float(string=u'成本折算率', default=0.8, help=u"跨系统生成的so单单价 = 当前成本/折算率")
 
 class PurchaseOrderExtend(models.Model):
     _inherit = 'purchase.order'
 
+    sub_company = fields.Selection(string=u'附属公司类型', related="partner_id.sub_company")
+    def get_precost_price(self):
+        if self.state not in ['draft', 'make_by_mrp']:
+            raise UserError(u'只有询价单状态才能获取最新价格')
+        if self.partner_id.sub_company == 'sub':
+            response = self.request_to_get_price()
+            if response:
+                order_line = response.get("order_line")
+                self.write({
+                    'order_line': order_line
+                })
+            else:
+                raise UserError(u'未收到返回')
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": u"成功",
+                "text": u"价格更新成功\n",
+                "sticky": False
+            }
+        }
     def button_confirm(self):
         # todo
         res = super(PurchaseOrderExtend, self).button_confirm()
         if self.partner_id.sub_company == 'sub':
-            so_val = self._prepare_so_values()
-            self.request_to_create_so(so_val)
-        return res
+            response = self.request_to_create_so()
+            if response:
+                pass
+                # order_line = response.get("order_line")
+                # self.write({
+                #     'order_line': order_line
+                # })
+            else:
+                raise UserError(u'未收到返回')
+            a_url = u"%s/web?#id=%d&view_type=form&model=sale.order" % (
+            self.partner_id.request_host, response.get("so_id"))
+            return {
+                "type": "ir.actions.client",
+                "tag": "action_notify",
+                "params": {
+                    "title": u"操作成功",
+                    "text": u"自动创建销售单成功! 对应单号为: <a target='_blank' href=%s>%s</a>" % (a_url, response.get("so")),
+                    "sticky": False
+                }
+            }
 
-    def request_to_create_so(self, so):
-        url = self.partner_id.request_host + '/linkloving_web/create_order'
+    def get_request_info(self, str):
+        host = self.partner_id.request_host
+        if not host.startswith("http://"):
+            host = "http://" + host
+        url = host + str
         db = self.partner_id.db_name
         header = {'Content-Type': 'application/json'}
+        return url, db, header
+
+    def request_to_get_price(self):
+        line_list = []
+        for order_line in self.order_line:
+            line_list.append({
+                "line_id": order_line.id,
+                "default_code": order_line.product_id.default_code,
+            })
+        url, db, header = self.get_request_info('/linkloving_web/precost_price')
+        response = requests.post(url, data=json.dumps({
+            "db": db,
+            "discount_to_sub": self.partner_id.discount_to_sub,
+            "vals": line_list,
+        }), headers=header)
+        res_json = json.loads(response.content).get("result")
+        if res_json and res_json.get("code") < 0:
+            raise UserError(res_json.get("msg"))
+        return res_json
+
+    def request_to_create_so(self):
+        so = self._prepare_so_values()  # 解析采购单,生成so单信息
+        host = self.partner_id.request_host
+        url, db, header = self.get_request_info('/linkloving_web/create_order')
         try:
             response = requests.post(url, data=json.dumps({
+                # "discount_to_sub": self.partner_id.discount_to_sub,
                 "db": db,
                 "vals": so,
             }), headers=header)
@@ -57,14 +124,16 @@ class PurchaseOrderExtend(models.Model):
         #             origin += order_id.name or '' + ':' + self.name + ":" + order_id.partner_id.name + ', '
         origin_so = self.env["sale.order"].search([("name", "=", self.first_so_number)])
         data = {
-            'remark': self.first_so_number or '' + ':' + self.name + ':' + origin_so.partner_id.name or '',
+            'remark': self.first_so_number or '' + ':' + self.name or '' + ':' + origin_so.partner_id.name or '',
         }
         line_list = []
         for order_line in self.order_line:
             line_list.append({
+                "line_id": order_line.id,
                 "default_code": order_line.product_id.default_code,
                 "product_name": order_line.product_id.name,
                 "product_uom_qty": order_line.product_qty,
+                "price_unit": order_line.price_unit,
             })
         data["order_line"] = line_list
         return data
