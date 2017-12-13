@@ -202,7 +202,8 @@ class LinklovingOAApi(http.Controller):
                      'qty_invoiced': order_line.qty_invoiced,  # 开单数量
                      'qty_received': order_line.qty_received,  # 已接收数量
                      'price_tax': order_line.taxes_id.name,  # 税金
-                     'shipping_rate':(order_line.qty_received*100/order_line.product_qty)
+                     'shipping_rate':(order_line.qty_received*100/order_line.product_qty),
+                     'id':order_line.order_id.product_id.id
                      }
                 )
             return JsonResponse.send_response(STATUS_CODE_OK, res_data=po_order_detail)
@@ -290,6 +291,7 @@ class LinklovingOAApi(http.Controller):
                 "price_unit": obj.price_unit,  # 单价
                 "price_subtotal": obj.price_subtotal,  # 小计
                 "qty_to_invoice": obj.qty_to_invoice,  # 待对账数量
+                'id':obj.product_id.id
             })
         return data
 
@@ -2142,6 +2144,16 @@ class LinklovingOAApi(http.Controller):
                 [('product_tmpl_id', '=', product_detail.id)])
             data.append(self.change_product_detail_to_json(product_detail, product_product))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+        #
+    @http.route('/linkloving_oa_api/get_product_detail_by_id', type='json', auth="none", csrf=False, cors='*')
+    def get_product_detail_by_id(self, *kw):
+        id = request.jsonrequest.get("id")
+        product_product = request.env['product.product'].sudo().browse(id)
+        product_detail = request.env['product.template'].sudo().browse(product_product.product_tmpl_id.id)
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data= self.change_product_detail_to_json(product_detail, product_product))
+
+
 
     # 产品BOM、库存移动
     @http.route('/linkloving_oa_api/product_bom_stock_move', type='json', auth="none", csrf=False, cors='*')
