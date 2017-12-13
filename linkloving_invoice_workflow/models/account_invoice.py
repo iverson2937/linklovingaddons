@@ -13,6 +13,22 @@ class AccountInvoice(models.Model):
     commission = fields.Float(string=u'折算提成金额', track_visibility='onchange')
 
     @api.multi
+    def parse_invoice_line_data(self):
+
+        for invoice in self:
+            data = []
+            for line in invoice.invoice_line_ids:
+                res = {
+                    'product_name': line.product_id.name,
+                    'quantity': line.quantity,
+                    'price_unit': line.price_unit,
+                    'price_subtotal': line.price_subtotal,
+                    'tax_name': line.tax_name
+                }
+                data.append(res)
+            return data
+
+    @api.multi
     def _get_po_number(self):
         for invoice in self:
             if invoice.origin:
