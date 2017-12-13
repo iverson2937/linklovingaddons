@@ -70,16 +70,16 @@ class ProductTemplate(models.Model):
                     'product_qty': line.product_qty,
                     'part_no': line.product_id.default_code,
                     'service': line.product_id.order_ll_type,
-                    'man_cost': man_cost,
-                    'material_cost': material_cost,
-                    'total_cost': total_cost
+                    'man_cost': round(man_cost, 2),
+                    'material_cost': round(material_cost, 2),
+                    'total_cost': round(total_cost, 2)
 
                 })
                 bom_lines.append(res)
         bom_lines.sort(key=lambda k: (k.get('type', 0)))
         total_cost = self.product_variant_ids[0].pre_cost_cal()
-        mateial_cost = self.product_variant_ids[0].get_material_cost()
-        man_cost = total_cost - mateial_cost
+        material_cost = self.product_variant_ids[0].get_material_cost()
+        man_cost = total_cost - material_cost
         return {
             'name': self.name,
             'bom_lines': bom_lines,
@@ -90,9 +90,9 @@ class ProductTemplate(models.Model):
             'part_no': self.default_code,
             'service': self.order_ll_type,
             'state_bom': state_bom,
-            'man_cost': man_cost,
-            'material_cost': mateial_cost,
-            'total_cost': total_cost
+            'man_cost': round(man_cost, 2),
+            'material_cost': round(material_cost, 2),
+            'total_cost': round(total_cost, 2)
         }
 
     @api.multi
