@@ -12,7 +12,11 @@ class SaleOrderLine(models.Model):
         Compute the amounts of the SO line.
         """
         for line in self:
-            price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+            if hasattr(line.order_id.partner_id, "sub_company") and line.order_id.partner_id.sub_company == 'main':
+                price = line.price_unit
+            else:
+                price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+
             taxes = line.tax_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty,
                                             product=line.product_id, partner=line.order_id.partner_id)
             line.update({
@@ -252,9 +256,13 @@ class SaleOrder(models.Model):
         if self.order_line:
 
             for line in self.order_line:
+                line.tax_id = [(6, 0, [self.tax_id.id])]
+
+                if hasattr(self.partner_id, "sub_company"):
+                    if self.partner_id.sub_company == 'main':
+                        return
                 discount_id = self.env['product.price.discount'].search(
                     [('partner_id', '=', self.partner_id.id), ('product_id', '=', line.product_id.id)], limit=1)
-                line.tax_id = [(6, 0, [self.tax_id.id])]
                 if discount_id:
                     discount = discount_id.price
                     discount_tax = discount_id.price_tax

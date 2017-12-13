@@ -45,35 +45,34 @@ class PurchaseOrderExtend(models.Model):
             }
         }
     def button_confirm(self):
-        # todo
         res = super(PurchaseOrderExtend, self).button_confirm()
         if self.partner_id.sub_company == 'sub':
             response = self.request_to_create_so()
             if response:
-                pass
+                a_url = u"%s/web?#id=%d&view_type=form&model=sale.order" % (
+                    self.partner_id.request_host, response.get("so_id"))
+                return {
+                    "type": "ir.actions.client",
+                    "tag": "action_notify",
+                    "params": {
+                        "title": u"操作成功",
+                        "text": u"自动创建销售单成功! 对应单号为: <a target='_blank' href=%s>%s</a>" % (a_url, response.get("so")),
+                        "sticky": False
+                    }
+                }
                 # order_line = response.get("order_line")
                 # self.write({
                 #     'order_line': order_line
                 # })
             else:
                 raise UserError(u'未收到返回')
-            a_url = u"%s/web?#id=%d&view_type=form&model=sale.order" % (
-            self.partner_id.request_host, response.get("so_id"))
-            return {
-                "type": "ir.actions.client",
-                "tag": "action_notify",
-                "params": {
-                    "title": u"操作成功",
-                    "text": u"自动创建销售单成功! 对应单号为: <a target='_blank' href=%s>%s</a>" % (a_url, response.get("so")),
-                    "sticky": False
-                }
-            }
+        return res
 
-    def get_request_info(self, str):
+    def get_request_info(self, str1):
         host = self.partner_id.request_host
         if not host.startswith("http://"):
             host = "http://" + host
-        url = host + str
+        url = host + str1
         db = self.partner_id.db_name
         header = {'Content-Type': 'application/json'}
         return url, db, header
