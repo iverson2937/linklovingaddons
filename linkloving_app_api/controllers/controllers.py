@@ -3515,14 +3515,14 @@ class LinklovingAppApi(http.Controller):
 
         return JsonResponse.send_response(1, res_data=vals, jsonRequest=False)
 
-    @http.route('/linkloving_app_api/get_account_data', type='json', auth='none', csrf=False)
+    @http.route('/linkloving_app_api/get_account_data', type='json', auth="none", csrf=False, cors='*')
     def get_account_data(self, **kw):
-        cash_type = self.env.ref('account.data_account_type_liquidity')
+        cash_type = request.env.ref('account.data_account_type_liquidity')
 
         def _today():
             return (datetime.date.today() + datetime.timedelta(days=0)).strftime('%Y-%m-%d %H:%M:%S')
 
-        accounts = self.env['account.move.line'].read_group(
+        accounts = request.env['account.move.line'].sudo().read_group(
             [('user_type_id', '=', cash_type.id), ('create_date', '>', _today())],
             ['account_id', 'credit', 'debit', 'balance', 'date'],
             ['account_id'])
@@ -3541,11 +3541,12 @@ class LinklovingAppApi(http.Controller):
                 'credit': account['credit'],
                 'debit': account['debit'],
                 'balance': account['balance'],
-                'last_day_balance': last_day_balance
+                'last_day_balance': last_day_balance,
+                'month_begin':"0",
             }
             account_list.append(res)
         jason_list = {
-            'month_begin': '',
+            'month_begin': '0',
             # 期初
             'last_day_balance_all': last_day_balance_all,
             # 收入
