@@ -40,7 +40,7 @@ class PurchaseOrderExtend(models.Model):
             "tag": "action_notify",
             "params": {
                 "title": u"成功",
-                "text": u"价格更新成功\ns",
+                "text": u"价格更新成功\n",
                 "sticky": False
             }
         }
@@ -57,15 +57,17 @@ class PurchaseOrderExtend(models.Model):
                 # })
             else:
                 raise UserError(u'未收到返回')
-        return {
-            "type": "ir.actions.client",
-            "tag": "action_notify",
-            "params": {
-                "title": u"操作成功",
-                "text": u"自动创建销售单成功! 单号为:%s" % response.get("so"),
-                "sticky": False
+            a_url = u"%s/web?#id=%d&view_type=form&model=sale.order" % (
+            self.partner_id.request_host, response.get("so_id"))
+            return {
+                "type": "ir.actions.client",
+                "tag": "action_notify",
+                "params": {
+                    "title": u"操作成功",
+                    "text": u"自动创建销售单成功! 对应单号为: <a target='_blank' href=%s>%s</a>" % (a_url, response.get("so")),
+                    "sticky": False
+                }
             }
-        }
 
     def get_request_info(self, str):
         host = self.partner_id.request_host
@@ -122,7 +124,7 @@ class PurchaseOrderExtend(models.Model):
         #             origin += order_id.name or '' + ':' + self.name + ":" + order_id.partner_id.name + ', '
         origin_so = self.env["sale.order"].search([("name", "=", self.first_so_number)])
         data = {
-            'remark': self.first_so_number or '' + ':' + self.name + ':' + origin_so.partner_id.name or '',
+            'remark': self.first_so_number or '' + ':' + self.name or '' + ':' + origin_so.partner_id.name or '',
         }
         line_list = []
         for order_line in self.order_line:

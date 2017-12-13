@@ -38,7 +38,7 @@
                     <field name="sub_company" invisible="1"/>
                     <button name="get_precost_price"
                             string="获取产品价格"
-                            class="oe_highlight"
+                            class="oe_highlight pull-right"
                             type="object"
                             attrs="{'invisible': ['|', ('sub_company', '!=', 'sub'), ('state', 'in', ('done', 'cancel', 'purchase'))],}">
                         获取产品价格
