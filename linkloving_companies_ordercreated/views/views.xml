@@ -26,5 +26,20 @@
                 </xpath>
             </field>
         </record>
+
+        <!-- Inherit Form View to Modify it -->
+        <record id="purchase_order_form_inherit" model="ir.ui.view">
+            <field name="name">Purchase Order</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='order_line']" position="before">
+                    <!-- Add your fields or attributes here -->
+                    <button name="get_precost_price" string="获取产品价格" class="oe_highlight" type="object">获取产品价格</button>
+                </xpath>
+
+            </field>
+        </record>
     </data>
 </openerp>
