@@ -3540,8 +3540,8 @@ class LinklovingAppApi(http.Controller):
         account_datas = request.env['account.account'].sudo().search([('user_type_id', '=', cash_type.id)])
         for account in account_datas:
             if acoount_dict.get(account.id):
-                debit = acoount_dict[account].get('debit')
-                credit = acoount_dict[account].get('credit')
+                debit = acoount_dict[account.id].get('debit')
+                credit = acoount_dict[account.id].get('credit')
             else:
                 debit = 0
                 credit = 0
