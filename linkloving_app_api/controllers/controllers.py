@@ -3528,30 +3528,45 @@ class LinklovingAppApi(http.Controller):
             ['account_id'])
         account_list = []
         credit_all = debit_all = balance_all = last_day_balance_all = 0.0
+        acoount_dict = {}
         for account in accounts:
-            # 收钱
-            credit_all += account['credit']
-            # 付钱
-            debit_all += account['debit']
-            balance_all += account['balance']
-            last_day_balance = account['credit'] - account['debit'] + account['balance']
-            last_day_balance_all += last_day_balance
             res = {
-                'name': account['account_id'][1],
                 'credit': account['credit'],
                 'debit': account['debit'],
-                'balance': account['balance'],
-                'last_day_balance': last_day_balance,
-                'month_begin':"0",
+            }
+            acoount_dict.update({
+                account['account_id'][1]: res
+            })
+        account_datas = self.env['account.account'].search([('user_type_id', '=', cash_type.id)])
+        for account in account_datas:
+            if acoount_dict.get(account.id):
+                debit = acoount_dict[account].get('debit')
+                credit = acoount_dict[account].get('credit')
+            else:
+                debit = 0
+                credit = 0
+            balance = account.balance
+            last_day_balance = credit - debit + balance
+            res = {
+                'month_begin': 0,
+                'name': account.name,
+                'debit': debit,
+                'credit': credit,
+                'balance': balance,
+                'last_day_balance': last_day_balance
             }
             account_list.append(res)
+            credit_all += credit
+            debit_all += debit
+            balance_all += balance
+            last_day_balance_all += last_day_balance
         jason_list = {
             'month_begin': '0',
             # 期初
             'last_day_balance_all': last_day_balance_all,
-            # 收入
-            'credit_all': credit_all,
             # 支出
+            'credit_all': credit_all,
+            # 收入
             'debit_all': debit_all,
             # 期末
             'balance_all': balance_all,
