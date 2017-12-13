@@ -20,7 +20,6 @@
                             <field name="request_host" attrs="{'required': [('sub_company', '=', 'sub')]}"/>
                             <field name="db_name" attrs="{'required': [('sub_company', '=', 'sub')]}"/>
                             <field name="discount_to_sub" attrs="{'required': [('sub_company', '=', 'sub')]}"/>
-
                         </group>
                     </page>
                 </xpath>
@@ -36,7 +35,14 @@
 
                 <xpath expr="//field[@name='order_line']" position="before">
                     <!-- Add your fields or attributes here -->
-                    <button name="get_precost_price" string="获取产品价格" class="oe_highlight" type="object">获取产品价格</button>
+                    <field name="sub_company" invisible="1"/>
+                    <button name="get_precost_price"
+                            string="获取产品价格"
+                            class="oe_highlight"
+                            type="object"
+                            attrs="{'invisible': ['|', ('sub_company', '!=', 'sub'), ('state', 'in', ('done', 'cancel', 'purchase'))],}">
+                        获取产品价格
+                    </button>
                 </xpath>
 
             </field>

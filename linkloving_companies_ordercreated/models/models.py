@@ -22,7 +22,10 @@ class ResPartnerExtend(models.Model):
 class PurchaseOrderExtend(models.Model):
     _inherit = 'purchase.order'
 
+    sub_company = fields.Selection(string=u'附属公司类型', related="partner_id.sub_company")
     def get_precost_price(self):
+        if self.state not in ['draft', 'make_by_mrp']:
+            raise UserError(u'只有询价单状态才能获取最新价格')
         if self.partner_id.sub_company == 'sub':
             response = self.request_to_get_price()
             if response:
@@ -37,7 +40,7 @@ class PurchaseOrderExtend(models.Model):
             "tag": "action_notify",
             "params": {
                 "title": u"成功",
-                "text": u"价格更新成功",
+                "text": u"价格更新成功\ns",
                 "sticky": False
             }
         }
@@ -128,7 +131,7 @@ class PurchaseOrderExtend(models.Model):
                 "default_code": order_line.product_id.default_code,
                 "product_name": order_line.product_id.name,
                 "product_uom_qty": order_line.product_qty,
-                "price_unit": order_line.price,
+                "price_unit": order_line.price_unit,
             })
         data["order_line"] = line_list
         return data
