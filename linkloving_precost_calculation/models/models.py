@@ -78,8 +78,8 @@ class ProductTemplate(models.Model):
                 bom_lines.append(res)
         bom_lines.sort(key=lambda k: (k.get('type', 0)))
         total_cost = self.product_variant_ids[0].pre_cost_cal()
-        mateial_cost = self.product_variant_ids[0].get_material_cost()
-        man_cost = total_cost - mateial_cost
+        material_cost = self.product_variant_ids[0].get_material_cost()
+        man_cost = total_cost - material_cost
         return {
             'name': self.name,
             'bom_lines': bom_lines,
