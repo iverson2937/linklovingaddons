@@ -3574,3 +3574,18 @@ class LinklovingAppApi(http.Controller):
             'account_list': account_list
         }
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=jason_list)
+
+    @http.route('/linkloving_app_api/get_invoice_data', type='json', auth="none", csrf=False, cors='*')
+    def get_invoice_data(self):
+        invoice = request.jsonrequest.get("invoice_name")
+        invoice = request.env['account.invoice'].sudo().search([('name', '=', invoice)])
+        jason_list = {
+            'customer': invoice.partner_id.name,
+            'user_id': invoice.user_id.name,
+            'origin': invoice.origin,
+            'amount_total': invoice.amount_total,
+            'amount_tax': invoice.amount_tax,
+            'amount_untaxed': invoice.amount_untaxed,
+            'line_ids': invoice.parse_invoice_line_data()
+        }
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=jason_list)
