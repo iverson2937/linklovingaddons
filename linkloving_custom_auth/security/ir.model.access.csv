@@ -19,3 +19,4 @@ mrp.access_product_template_user,product.template user,product.model_product_tem
 access_product_template_assistant,product.template user,product.model_product_template,sales_team.group_sale_salesman_all_leads,1,1,0,0
 mrp.access_product_product_user,product.product user,product.model_product_product,mrp.group_mrp_user,1,1,0,0
 access_product_product_assistant,product.template user,product.model_product_product,sales_team.group_sale_salesman_all_leads,1,1,0,0
+access_model_product_price_history user,product.model_product_price_history user,product.model_product_price_history ,,1,0,0,0
