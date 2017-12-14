@@ -35,7 +35,7 @@ class SubCompanyInfo(models.Model):
             info.host_correct = host
 
     host = fields.Char(string=u'请求地址(包含端口)')
-    host_correct = fields.Char(computed='_compute_host_correct')
+    host_correct = fields.Char(compute='_compute_host_correct')
     db_name = fields.Char(string=u'账套名称')
     discount_to_sub = fields.Float(string=u'成本折算率', default=0.8, help=u"跨系统生成的so单单价 = 当前成本/折算率")
 
