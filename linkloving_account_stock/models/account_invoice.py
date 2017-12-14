@@ -7,11 +7,23 @@ class AccountInvoice(models.Model):
     _inherit = "account.invoice"
 
     @api.model
-    def _anglo_saxon_sale_move_lines(self, i_line):
-        """Return the additional move lines for sales invoices and refunds.
+    def _compute_for_in_invoice_account_move_line(self):
+        '''
+        采购对账单的时候多产生两笔凭证
+        材料采购到库存商品
 
-        i_line: An account.invoice.line object.
-        res: The move line entries produced so far by the parent move_line_get.
+
+        :return:
+        '''
+
+
+    @api.model
+    def _anglo_saxon_sale_move_lines(self, i_line):
+        """
+        重写销售对账凭证科目
+        外发商品-->主营业务成本
+        应收账款-->主营业务收入
+
         """
         inv = i_line.invoice_id
         company_currency = inv.company_id.currency_id
@@ -22,7 +34,8 @@ class AccountInvoice(models.Model):
             # debit account dacc will be the output account
             dacc = accounts['stock_output'].id
             # credit account cacc will be the expense account
-            cacc = accounts['expense'].id
+            # cacc = accounts['expense'].id
+            cacc = accounts['stock_account'].id
             print dacc
             print cacc
             if dacc and cacc:
@@ -67,3 +80,11 @@ class AccountInvoice(models.Model):
                     },
                 ]
         return []
+
+    @api.model
+    def invoice_line_move_line_get(self):
+        res = super(AccountInvoice, self).invoice_line_move_line_get()
+        if self.company_id.anglo_saxon_accounting and self.type in ('in_invoice'):
+            for i_line in self.invoice_line_ids:
+                res.extend(self._compute_for_in_invoice_account_move_line(i_line))
+        return res
