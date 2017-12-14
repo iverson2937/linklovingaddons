@@ -12,9 +12,10 @@ class MrpProcess(models.Model):
     _order = 'sequence , name'
     name = fields.Char(string=u'Name')
     description = fields.Text(string=u'Description')
+    # 时薪 已经不使用
     unit_price = fields.Float(string=u'Price Unit')
-    partner_id = fields.Many2one('res.partner', string=u'Responsible By',
-                                 )
+    partner_id = fields.Many2one('res.partner', string=u'Responsible By')
+    # 时薪 已经不使用
     hour_price = fields.Float(string=u'Price Per Hour')
     color = fields.Integer("Color Index")
     count_mo_waiting = fields.Integer(compute='_compute_process_count')

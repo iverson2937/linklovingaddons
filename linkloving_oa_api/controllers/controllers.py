@@ -234,7 +234,10 @@ class LinklovingOAApi(http.Controller):
             'product_count': po_order.amount_total,  # 总数量
             'amount_total': po_order.product_count,  # 总金额
             'shipping_rate':po_order.shipping_rate,
-            'state':po_order.state #状态
+            'state':po_order.state, #状态
+            'invoice_status': po_order.invoice_status, #对账单状态
+            'handle_date':po_order.handle_date #交货日期
+
         }
         return data
 
