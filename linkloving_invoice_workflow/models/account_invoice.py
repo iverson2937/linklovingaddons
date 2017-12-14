@@ -20,7 +20,7 @@ class AccountInvoice(models.Model):
             for line in invoice.invoice_line_ids:
                 if line.invoice_line_tax_ids:
                     tax_name = line.invoice_line_tax_ids[0].amount / 100
-                    tax_type = line.invoice_line_tax_ids[0].type
+                    tax_type = line.invoice_line_tax_ids[0].type_tax_use
                 else:
                     tax_name = 0
                     tax_type = 'bank'
