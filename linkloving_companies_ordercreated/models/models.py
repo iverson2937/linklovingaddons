@@ -8,6 +8,18 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 
+class FollowOrderPartner(models.Model):
+    _name = 'follow.order.partner'
+
+    @api.multi
+    def name_get(self):
+        return [(partner.id, '%s - %s' % (partner.prefix_name or '', partner.follow_partner_id.name))
+                for partner in self]
+
+    prefix_name = fields.Char(string=u'名称')
+    follow_partner_id = fields.Many2one('res.partner', string=u'跟单员')
+
+
 class ResPartnerExtend(models.Model):
     _inherit = 'res.partner'
 
@@ -16,11 +28,20 @@ class ResPartnerExtend(models.Model):
                                                                 ('main', u'下单公司')],
                                    default="normal")
     sub_company_id = fields.Many2one('sub.company.info', string=u'公司信息')
+    follow_partner_id = fields.Many2one('follow.order.partner', string=u'跟单员')
+
 
 class SaleOrderExtend(models.Model):
     _inherit = 'sale.order'
 
     po_name_from_main = fields.Char(string=u'主系统的po单号')
+    so_name_from_main = fields.Char(string=u'主系统的so单号')
+    pi_name_from_main = fields.Char(string=u'主系统的PI号')
+    order_date_from_main = fields.Char(string=u'订单交期')
+    follow_partner_name_from_main = fields.Char(string=u'跟单员')
+    sale_man_from_main = fields.Char(string=u'业务员')
+    partner_name_from_main = fields.Char(string=u'客户名称')
+    order_type_from_main = fields.Char(string=u'订单类型')
 
 
 class SubCompanyInfo(models.Model):
@@ -34,6 +55,7 @@ class SubCompanyInfo(models.Model):
                 host = "http://" + host
             info.host_correct = host
 
+    name = fields.Char(string=u'名称')
     host = fields.Char(string=u'请求地址(包含端口)')
     host_correct = fields.Char(compute='_compute_host_correct')
     db_name = fields.Char(string=u'账套名称')
@@ -78,7 +100,7 @@ class PurchaseOrderExtend(models.Model):
                     'so_name_from_sub': response.get("so")
                 })
                 a_url = u"%s/web?#id=%d&view_type=form&model=sale.order" % (
-                    self.partner_id.sub_company_id.host, response.get("so_id"))
+                    self.partner_id.sub_company_id.host_correct, response.get("so_id"))
                 return {
                     "type": "ir.actions.client",
                     "tag": "action_notify",
@@ -143,8 +165,9 @@ class PurchaseOrderExtend(models.Model):
     def _prepare_so_values(self):
         origin_so = self.env["sale.order"].search([("name", "=", self.first_so_number)])
         data = {
-            'remark': self.first_so_number or '' + ':' + self.name or '' + ':' + origin_so.partner_id.name or '',
+            'remark': (self.first_so_number or '') + ':' + self.name + ':' + origin_so.partner_id.name,
             'po_name_from_main': self.name,
+            'so_name_from_main': self.first_so_number or '',
         }
         line_list = []
         for order_line in self.order_line:
