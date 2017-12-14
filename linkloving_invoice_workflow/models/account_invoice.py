@@ -18,15 +18,20 @@ class AccountInvoice(models.Model):
         for invoice in self:
             data = []
             for line in invoice.invoice_line_ids:
-                tax_name = ''
                 if line.invoice_line_tax_ids:
-                    tax_name = line.invoice_line_tax_ids[0].name
+                    tax_name = line.invoice_line_tax_ids[0].amount / 100
+                    tax_type = line.invoice_line_tax_ids[0].type
+                else:
+                    tax_name = 0
+                    tax_type = 'bank'
+
                 res = {
                     'product_name': line.product_id.name,
                     'quantity': line.quantity,
                     'price_unit': line.price_unit,
                     'price_subtotal': line.price_subtotal,
-                    'tax_name': tax_name
+                    'tax_name': tax_name,
+                    'tax_type': tax_type
                 }
                 data.append(res)
             return data
