@@ -140,8 +140,9 @@ class ResPartner(models.Model):
 
     # customer_write_date = fields.Datetime(related='crm_partner_id.customer_write_date', string=u'最近操所时间')
 
-
     customer_write_date = fields.Datetime(string=u'最近操所时间', compute="_compute_customer_write_date", store=True)
+
+    crm_is_partner_temporary = fields.Boolean(related='crm_partner_id.crm_is_partner_temporary', string=u'是否是客户')
 
     @api.multi
     def _compute_customer_write_date(self):
@@ -318,6 +319,9 @@ class ResPartner(models.Model):
 
         if 'mutual_rule_id' not in vals:
             vals['customer_write_date'] = datetime.now()
+
+        if 'crm_is_partner_temporary' in vals:
+            vals['is_order'] = vals.get('crm_is_partner_temporary')
 
         return super(ResPartner, self).write(vals)
 
@@ -625,6 +629,9 @@ class CrmResPartner(models.Model):
     customer_sex = fields.Selection([('man', u'男'), ('woman', u'女')], string=u'性别')
 
     customer_is_world = fields.Boolean(string=u'世界')  # 市场
+
+    crm_is_partner_temporary = fields.Boolean(string=u'是否是客户')
+
 
     # @api.model
     # def _default_crm_write_date(self):
