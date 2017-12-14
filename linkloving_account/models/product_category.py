@@ -25,6 +25,10 @@ class ProductCategory(models.Model):
         help="When real-time inventory valuation is enabled on a product, this account will hold the current value of the products.", )
 
     property_stock_invoice_account_id = fields.Many2one(
-        'account.account', '对账抵扣科目', company_dependent=True, copy=True,
+        'account.account', '库存成本科目', company_dependent=True, copy=True,
         domain=[('deprecated', '=', False)],
-        help="对账冲抵出货库存.", )
+        help="库存成本科目.", )
+    property_stock_material_in_account_id = fields.Many2one(
+        'account.account', '原材料入库科目', company_dependent=True, copy=True,
+        domain=[('deprecated', '=', False)],
+        help="原材料入库科目.", )
