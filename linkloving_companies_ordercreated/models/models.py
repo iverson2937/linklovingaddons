@@ -165,7 +165,7 @@ class PurchaseOrderExtend(models.Model):
     def _prepare_so_values(self):
         origin_so = self.env["sale.order"].search([("name", "=", self.first_so_number)])
         data = {
-            'remark': (self.first_so_number or '') + ':' + self.name + ':' + origin_so.partner_id.name,
+            'remark': (self.first_so_number or '') + ':' + self.name + ':' + (origin_so.partner_id.name or ''),
             'po_name_from_main': self.name,
             'so_name_from_main': self.first_so_number or '',
         }
