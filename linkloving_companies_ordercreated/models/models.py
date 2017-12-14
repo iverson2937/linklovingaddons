@@ -168,6 +168,12 @@ class PurchaseOrderExtend(models.Model):
             'remark': (self.first_so_number or '') + ':' + self.name + ':' + (origin_so.partner_id.name or ''),
             'po_name_from_main': self.name,
             'so_name_from_main': self.first_so_number or '',
+            'pi_name_from_main': origin_so.pi_number or '',
+            'order_date_from_main': self.handle_date,
+            'validity_date': self.handle_date,
+            'follow_partner_name_from_main': self.partner_id.follow_partner_id.follow_partner_id.name or '',
+            'sale_man_from_main': origin_so.user_id.name or '',
+            'partner_name_from_main': origin_so.partner_id.name or ''
         }
         line_list = []
         for order_line in self.order_line:
