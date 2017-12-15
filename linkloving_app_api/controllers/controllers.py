@@ -3580,13 +3580,19 @@ class LinklovingAppApi(http.Controller):
         invoice_number = request.jsonrequest.get("invoice_number")
         # d
         invoice = request.env['account.invoice'].sudo().search([('move_name', '=', invoice_number)])
-        jason_list = {
-            'customer': invoice.partner_id.name,
-            'user_id': invoice.user_id.name,
-            'origin': invoice.origin,
-            'amount_total': invoice.amount_total,
-            'amount_tax': invoice.amount_tax,
-            'amount_untaxed': invoice.amount_untaxed,
-            'line_ids': invoice.parse_invoice_line_data()
-        }
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data=jason_list)
+        jason_list = {}
+        if invoice:
+            jason_list = {
+                'customer': invoice.partner_id.name,
+                'user_id': invoice.user_id.name,
+                'origin': invoice.origin,
+                'amount_total': invoice.amount_total,
+                'amount_tax': invoice.amount_tax,
+                'amount_untaxed': invoice.amount_untaxed,
+                'line_ids': invoice.parse_invoice_line_data()
+            }
+            code = STATUS_CODE_OK
+        else:
+            code = STATUS_CODE_ERROR
+
+        return JsonResponse.send_response(code, res_data=jason_list)
