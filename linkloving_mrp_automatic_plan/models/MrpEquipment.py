@@ -766,21 +766,15 @@ class MrpProductionExtend(models.Model):
 
     # base_on_today 第一个mo的排产时间是否基于今天
     def replanned_mo(self, origin_production_line, production_line, base_on_today=False, is_priority=False):
-
-        # if not production_line:
-        #     no_production_line = True
-        #     if self.production_line_id:
-        #         production_line = self.production_line_id
-        #     else:  # 从未排产拖到未排产
-        #         return
-        #
-        #     self.write({
-        #         'production_line_id': None
-        #     })
-        # else:
-        #     self.write({
-        #         'production_line_id': production_line.id
-        #     })
+        """
+        批量排产
+        :param origin_production_line: 从哪条产线
+        :param production_line: 到哪条产线
+        :param base_on_today: mo排产时间是否基于今天
+        :param is_priority:  是否优先排产
+        :return:
+        """
+        self = self.sorted(key='planned_start_backup', )
         # 取出这条产线所有的mo
         domain = [("state", "not in", DONE_CANCEL_DOMAIN)]
         origin_mos = self.env["mrp.production"]
@@ -820,11 +814,12 @@ class MrpProductionExtend(models.Model):
             self.compute_mo_time(origin_mos, origin_production_line, base_on_today)
         # 如果此条产线暂时无任何mo,
         if len(all_mos) == 1:
-            self.planned_one_mo(self, self.get_today_time(day_offset=1), production_line)
+            for mo in self:
+                self.planned_one_mo(mo, self.get_today_time(day_offset=1), production_line)
         else:
             if all_mos:
                 if not base_on_today:
-                    if all_mos[0] == self:  # 如果本次排产的单子本身就再第一个,要取第二个的时间来作为排产时间了
+                    if all_mos[0] in self:  # 如果本次排产的单子本身就再第一个,要取第二个的时间来作为排产时间了
                         planned_start_backup = fields.Datetime.from_string(all_mos[1].date_planned_start)
                     else:
                         planned_start_backup = fields.Datetime.from_string(all_mos[0].date_planned_start)
