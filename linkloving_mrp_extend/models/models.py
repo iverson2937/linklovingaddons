@@ -291,6 +291,13 @@ class MrpProductionExtend(models.Model):
     is_secondary_produce = fields.Boolean(default=False)
     secondary_produce_time_ids = fields.One2many("production.time.record", 'production_id', )
 
+    @api.model
+    def create(self, vals):
+        print vals,
+        print '***************************************'
+
+        return super(MrpProductionExtend, self).create(vals)
+
     def action_view_secondary_mos(self):
         mos = self.env["mrp.production"].search([("origin", "ilike", self.name),
                                                  ("state", "=", "done")])
