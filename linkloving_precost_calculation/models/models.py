@@ -28,6 +28,24 @@ PURCHASE_TYPE = {
 }
 
 
+class SetPriceToProduct(models.TransientModel):
+    _name = 'price.to.product'
+
+    def action_set(self):
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+        for record in self.env['product.template'].browse(active_ids):
+            if record.product_variant_count == 1:
+                record.standard_price = record.product_variant_id.pre_cost_cal()
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": u"操作成功",
+                "text": u"操作成功",
+                "sticky": False
+            }
+        }
 class ProductTemplate(models.Model):
     _name = 'product.template'
     _inherit = 'product.template'
