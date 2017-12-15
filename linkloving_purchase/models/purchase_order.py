@@ -345,10 +345,14 @@ class manual_combine_po(models.TransientModel):
     def action_confirm(self):
         ids = self._context.get("active_ids")
         pos = self.env[self._context.get("active_model")].search([("id", "in", ids)])
+        min_handle_date = min(po.handle_date for po in pos)
+        if any(po.state not in ['make_by_mrp', 'draft'] for po in pos):
+            raise UserError(u'只能合并草稿状态的采购单')
         if len(pos.mapped("partner_id").ids) != 1:  # 如果相等 代表不重复
             raise UserError("请选择相同供应商的采购单进行合并.")
         else:
             po_first = pos[0]
+            po_first.handle_date = min_handle_date
             for po in pos[1:]:
                 for line in po.order_line:
                     line.order_id = po_first.id

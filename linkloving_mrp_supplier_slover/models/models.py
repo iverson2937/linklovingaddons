@@ -8,6 +8,32 @@ from odoo.osv import osv
 from odoo.tools import float_compare, float_round
 
 
+class PurchaseConfiguration(models.TransientModel):
+    _inherit = 'purchase.config.settings'
+
+    combine_rule = fields.Selection(selection=[('same_supplier', u'相同供应商'),
+                                               ('same_supplier_origin', u'相同供应商和源')],
+                                    default='same_supplier',
+                                    string=u'采购单合并规则')
+
+    @api.model
+    def get_default_combine_rule(self, m_fields):
+        dica = {}
+        fi_val = self.env["ir.config_parameter"].get_param("purchase.config.settings.combine_rule", default=None)
+        dica.update({
+            'combine_rule': fi_val
+        })
+
+        return dica
+
+    @api.multi
+    def set_combine_rule(self):
+        m_fields = ['combine_rule']
+        for record in self:
+            for fi in m_fields:
+                self.env['ir.config_parameter'].set_param("purchase.config.settings.%s" % fi,
+                                                          getattr(record, fi, 'same_supplier'))
+
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
@@ -94,14 +120,15 @@ class linkloving_procurement_order(models.Model):
             gpo = procurement.rule_id.group_propagation_option
             group = (gpo == 'fixed' and procurement.rule_id.group_id) or \
                     (gpo == 'propagate' and procurement.group_id) or False
-
             domain = (
                 ('partner_id', '=', partner.id),
                 ('state', '=', 'make_by_mrp'),
-                ('origin', '=', self.origin),
                 ('picking_type_id', '=', procurement.rule_id.picking_type_id.id),
                 ('company_id', '=', procurement.company_id.id),
                 ('dest_address_id', '=', procurement.partner_dest_id.id))
+            rule = self.env['purchase.config.settings'].get_default_combine_rule([]).get("combine_rule")
+            if rule == 'same_supplier_origin':
+                domain += (('origin', '=', self.origin),)
             if group:
                 domain += (('group_id', '=', group.id),)
 

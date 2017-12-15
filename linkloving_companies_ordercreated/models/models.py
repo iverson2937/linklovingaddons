@@ -142,8 +142,11 @@ class PurchaseOrderExtend(models.Model):
             "vals": line_list,
         }), headers=header)
         res_json = json.loads(response.content).get("result")
+        res_error = json.loads(response.content).get("error")
         if res_json and res_json.get("code") < 0:
             raise UserError(res_json.get("msg"))
+        if res_error:
+            raise UserError(res_error.get("message"))
         return res_json
 
     def request_to_create_so(self):
