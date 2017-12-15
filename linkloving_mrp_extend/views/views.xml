@@ -422,22 +422,24 @@
                 </xpath>
 
 
-                <xpath expr="//field[@name='move_raw_ids']" position="replace">
-                    <field name="sim_stock_move_lines">
-                        <tree editable="bottom" delete="0" decoration-warning="quantity_done&gt;product_uom_qty"
-                              decoration-success="quantity_done>=product_uom_qty"
-                              decoration-danger="qty_available&lt;product_uom_qty" create="0">
-                            <field name="product_id" string="产品" options="{'no_create':True}"/>
-                            <field name="product_uom_qty" string="Demand Quantity"/>
-                            <field name="suggest_qty" string="Suggest Quantity"/>
-                            <field name="qty_available" string="库存"/>
-                            <field name="remaining_qty"/>
-                            <field name="quantity_done" string="备料数量"/>
-                            <field name="return_qty" readonly="1" string="Return Quantity"/>
-                            <field name="virtual_available" string="Forecast Quantity"/>
-                        </tree>
-                    </field>
-                </xpath>
+                <!--<xpath expr="//field[@name='move_raw_ids']" position="replace">-->
+                <!--<field name="sim_stock_move_lines">-->
+                <!--<tree editable="bottom"-->
+                <!--delete="0"-->
+                <!--decoration-success="remaining_qty==0"-->
+                <!--decoration-danger="qty_available&lt;remaining_qty"-->
+                <!--create="0">-->
+                <!--<field name="product_id" string="产品" options="{'no_create':True}"/>-->
+                <!--<field name="product_uom_qty" string="Demand Quantity"/>-->
+                <!--<field name="suggest_qty" string="Suggest Quantity"/>-->
+                <!--<field name="qty_available" string="库存"/>-->
+                <!--<field name="remaining_qty" invisible="1"/>-->
+                <!--<field name="quantity_done" string="备料数量"/>-->
+                <!--<field name="return_qty" readonly="1" string="Return Quantity"/>-->
+                <!--<field name="virtual_available" string="Forecast Quantity"/>-->
+                <!--</tree>-->
+                <!--</field>-->
+                <!--</xpath>-->
                 <xpath expr="//field[@name='state']" position="replace">
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,confirmed,waiting_material,prepare_material_ing,finish_prepare_material,already_picking,progress,waiting_quality_inspection,quality_inspection_ing,waiting_post_inventory,done"/>

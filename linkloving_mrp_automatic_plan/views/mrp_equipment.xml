@@ -338,10 +338,11 @@
                         <notebook>
                             <page string="消耗的物料">
                                 <field name="sim_stock_move_lines" string="消耗的物料">
-                                    <tree editable="bottom" delete="0"
-                                          decoration-warning="quantity_done&gt;product_uom_qty"
-                                          decoration-success="quantity_done&gt;=product_uom_qty"
-                                          decoration-danger="qty_available&lt;product_uom_qty" create="0">
+                                    <tree editable="bottom"
+                                          delete="0"
+                                          decoration-success="remaining_qty==0"
+                                          decoration-danger="qty_available&lt;remaining_qty"
+                                          create="0">
                                         <field name="product_id" string="产品" options="{'no_create':True}"/>
                                         <field name="product_uom_qty" string="需求数量"/>
                                         <field name="suggest_qty" string="建议数量"/>
