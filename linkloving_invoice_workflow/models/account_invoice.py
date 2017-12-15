@@ -27,6 +27,7 @@ class AccountInvoice(models.Model):
 
                 res = {
                     'product_name': line.product_id.name,
+                    'product_id': line.product_id.id,
                     'quantity': line.quantity,
                     'price_unit': line.price_unit,
                     'price_subtotal': line.price_subtotal,
