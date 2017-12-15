@@ -439,6 +439,7 @@ class MrpProductionExtend(models.Model):
     def _compute_prepare_material_state(self):
         for mo in self:
             rate_list = []
+            mo.sim_stock_move_lines._default_product_uom_qty()  # 解决 搜索时的结果与现实列表时的结果不一样的问题
             for move in mo.sim_stock_move_lines:
                 if move.product_uom_qty == 0:
                     rate_list.append(0)
@@ -456,7 +457,7 @@ class MrpProductionExtend(models.Model):
     def _compute_material_state(self):
         for mo in self:
             rate_list = []
-            mo.sim_stock_move_lines._default_product_uom_qty()
+            mo.sim_stock_move_lines._default_product_uom_qty()  #解决 搜索时的结果与现实列表时的结果不一样的问题
             for move in mo.sim_stock_move_lines:
                 if move.product_uom_qty == 0:
                     rate_list.append(0)
