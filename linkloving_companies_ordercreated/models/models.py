@@ -29,7 +29,7 @@ class ResPartnerExtend(models.Model):
                                    default="normal")
     sub_company_id = fields.Many2one('sub.company.info', string=u'公司信息')
     follow_partner_id = fields.Many2one('follow.order.partner', string=u'跟单员')
-
+    discount_to_sub = fields.Float(string=u'成本折算率', default=0.8, help=u"跨系统生成的so单单价 = 当前成本/折算率")
 
 class SaleOrderExtend(models.Model):
     _inherit = 'sale.order'
@@ -59,7 +59,6 @@ class SubCompanyInfo(models.Model):
     host = fields.Char(string=u'请求地址(包含端口)')
     host_correct = fields.Char(compute='_compute_host_correct')
     db_name = fields.Char(string=u'账套名称')
-    discount_to_sub = fields.Float(string=u'成本折算率', default=0.8, help=u"跨系统生成的so单单价 = 当前成本/折算率")
 
 
 class PurchaseOrderExtend(models.Model):
@@ -138,7 +137,7 @@ class PurchaseOrderExtend(models.Model):
         url, db, header = self.get_request_info('/linkloving_web/precost_price')
         response = requests.post(url, data=json.dumps({
             "db": db,
-            "discount_to_sub": self.partner_id.sub_company_id.discount_to_sub,
+            "discount_to_sub": self.partner_id.discount_to_sub,
             "vals": line_list,
         }), headers=header)
         return self.handle_response(response)

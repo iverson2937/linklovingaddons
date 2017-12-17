@@ -19,6 +19,7 @@
                         <group>
                             <field name="sub_company_id" attrs="{'required': [('sub_company', '=', 'sub')]}"/>
                             <field name="follow_partner_id"/>
+                            <field name="discount_to_sub" attrs="{'required': [('sub_company', '=', 'sub')]}"/>
                         </group>
                     </page>
                 </xpath>
@@ -95,7 +96,6 @@
                     <field name="name"/>
                     <field name="host"/>
                     <field name="db_name"/>
-                    <field name="discount_to_sub"/>
                 </tree>
             </field>
         </record>
@@ -110,7 +110,6 @@
                             <field name="name" required="1"/>
                             <field name="host" required="1"/>
                             <field name="db_name" required="1"/>
-                            <field name="discount_to_sub" required="1"/>
                         </group>
                     </sheet>
                 </form>
