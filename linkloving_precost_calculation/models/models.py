@@ -212,6 +212,12 @@ class ProductProductExtend(models.Model):
     def get_highest_purchase_price(self):
         for p in self:
             if p.seller_ids:
-                return max(p.seller_ids.mapped("price"))
+                max_seller = self.env["product.supplierinfo"]
+                for seller in p.seller_ids:
+                    if seller.price > max_seller.price:
+                        max_seller = seller
+                # 税点计算
+                max_price = max_seller.price / (1 + (max_seller.tax_id.amount or 0) / 100)
+                return max_price
             else:
                 raise UserError(u'%s 未设置采购价' % p.display_name)
