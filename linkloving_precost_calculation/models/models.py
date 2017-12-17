@@ -28,6 +28,33 @@ PURCHASE_TYPE = {
 }
 
 
+class MultisupplierinfoTax(models.TransientModel):
+    _name = 'multi.supplierinfo.tax'
+
+    def _default_tax_id(self):
+        user = self.env.user
+        return self.env['account.tax'].search(
+                [('company_id', '=', user.company_id.id), ('type_tax_use', '=', 'purchase'),
+                 ('amount_type', '=', 'percent'), ('account_id', '!=', False)], limit=1, order='amount asc')
+
+    tax_id = fields.Many2one('account.tax', default=_default_tax_id, domain=[('type_tax_use', '=', 'purchase')])
+
+    def action_set_taxes(self):
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+        for record in self.env['product.template'].browse(active_ids):
+            for seller in record.seller_ids:
+                seller.tax_id = self.tax_id.id
+
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": u"操作成功",
+                "text": u"操作成功",
+                "sticky": False
+            }
+        }
 class SetPriceToProduct(models.TransientModel):
     _name = 'price.to.product'
 
