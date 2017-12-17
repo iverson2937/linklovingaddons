@@ -230,6 +230,8 @@ class ProductProductExtend(models.Model):
 
         bom_obj = self.env['mrp.bom']
         for pp in self:
+            if pp.qty_available == 0:
+                return 0
             bom = bom_obj._bom_find(product=pp)
             if bom:
                 real_time_cost = _calc_price(bom)
