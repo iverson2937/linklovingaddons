@@ -216,6 +216,8 @@ class ProductProductExtend(models.Model):
                     total_price += sub_bom_price
                 else:
                     # 判断是否是采购件
+                    if sbom.product_id.qty_available == 0:
+                        continue
                     pruchase_price = sbom.product_id.uom_id._compute_price(sbom.product_id.get_highest_purchase_price(),
                                                                            sbom.product_uom_id)
                     sub_price = pruchase_price * sbom_data['qty']
