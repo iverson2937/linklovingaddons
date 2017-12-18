@@ -2386,8 +2386,8 @@ class LinklovingOAApi(http.Controller):
     def get_apply_record(self, objs):
         data = []
         for obj in objs:
-            old_state = obj.tracking_value_ids and obj.tracking_value_ids[0].old_value_char or ''
-            new_state = obj.tracking_value_ids and obj.tracking_value_ids[0].new_value_char or ''
+            old_state = obj.sudo().tracking_value_ids and obj.sudo().tracking_value_ids[0].old_value_char or ''
+            new_state = obj.sudo().tracking_value_ids and obj.sudo().tracking_value_ids[0].new_value_char or ''
 
             data.append({
                 "create_time": obj.create_date,
@@ -2477,7 +2477,7 @@ class LinklovingOAApi(http.Controller):
                     'unit_amount': float(p.get('unit_amount')),  # 金额
                     'name': p.get('name'),  # 费用说明
                     'employee_id': p.get('employee_id'),
-                    'department_id': p.get('department_id'),
+                    #'department_id': p.get('department_id'),
                     'tax_ids': (
                         [(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [account_tax.id])]),
                     'description': p.get('remarks') or '',
