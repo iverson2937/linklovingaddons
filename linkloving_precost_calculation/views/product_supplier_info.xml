@@ -18,7 +18,7 @@
             <field name="model">product.supplierinfo</field>
             <field name="inherit_id" ref="product.product_supplierinfo_form_view"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='min_qty']" position="before">
+                <xpath expr="//field[@name='product_uom']" position="after">
                     <field name="tax_id" string="税率"/>
                 </xpath>
 
