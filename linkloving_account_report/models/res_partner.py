@@ -16,8 +16,8 @@ class ResPartner(models.Model):
         for res in self:
             orders = self.env['purchase.order'].search(
                 [('partner_id', '=', res.id), ('invoice_status', '=', 'to invoice')])
-            res.payable_amount = sum(order.shipped_amount for order in orders)
-            # - sum(order.invoiced_amount for order in orders)
+            res.payable_amount = sum(order.shipped_amount for order in orders) - sum(
+                order.invoiced_amount for order in orders)
             res.payable_amount_real = res.debit + res.payable_amount
 
     receivable_amount = fields.Float(string=u'已出货未对账金额', compute=_compute_receivable_amount)
