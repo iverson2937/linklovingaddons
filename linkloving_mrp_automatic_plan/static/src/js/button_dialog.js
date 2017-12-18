@@ -44,7 +44,7 @@ odoo.define('linkloving_mrp_automatic_plan.button_dialog', function (require) {
 
             var multi_select = !_.isNumber(options.res_id) && !options.disable_multiple_selection;
             var readonly = _.isNumber(options.res_id) && options.readonly;
-
+            self.hide_footer = options.hide_footer;
             if (!options || !options.buttons) {
                 options = options || {};
                 options.buttons = [
@@ -141,7 +141,10 @@ odoo.define('linkloving_mrp_automatic_plan.button_dialog', function (require) {
         set_buttons: function (buttons) {
             var self = this;
             var res = this._super(buttons);
-
+            if (self.hide_footer) {
+                self.$footer.prop('hidden', true);
+                return res;
+            }
             _.each(self.$footer.children(), function (b) {
                 $(b).on('click', function (e) {
                     $(b).prop('disabled', true);

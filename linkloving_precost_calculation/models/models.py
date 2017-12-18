@@ -216,8 +216,8 @@ class ProductProductExtend(models.Model):
                     total_price += sub_bom_price
                 else:
                     # 判断是否是采购件
-                    if sbom.product_id.qty_available == 0:
-                        continue
+                    # if sbom.product_id.qty_available == 0:
+                    #     continue
                     pruchase_price = sbom.product_id.uom_id._compute_price(sbom.product_id.get_highest_purchase_price(),
                                                                            sbom.product_uom_id)
                     sub_price = pruchase_price * sbom_data['qty']
@@ -243,7 +243,9 @@ class ProductProductExtend(models.Model):
             if p.seller_ids:
                 max_seller = self.env["product.supplierinfo"]
                 for seller in p.seller_ids:
-                    if seller.price > max_seller.price:
+                    tax_price = seller.price / (1 + (seller.tax_id.amount or 0) / 100)
+                    max_tax_price = max_seller.price / (1 + (max_seller.tax_id.amount or 0) / 100)
+                    if tax_price > max_tax_price:
                         max_seller = seller
                 # 税点计算
                 max_price = max_seller.price / (1 + (max_seller.tax_id.amount or 0) / 100)
