@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="linkloving_crm_crm_case_kanban_view_leads" model="ir.ui.view">
+            <field name="name">crm.lead.kanban.lead</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//div[contains(@class, 'oe_clear')]" position="after">
+                    <field name="write_date"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="message_label_quote_id1" model="message.label">
+            <field name="name">报价</field>
+            <field name="type">service</field>
+            <!--<field name="categ_id" ref="hr_expense.cat_expense"/>-->
+            <!--<field name="can_be_expensed" eval="True"/>-->
+        </record>
+
+        <record id="message_label_sample_id" model="message.label">
+            <field name="name">寄样</field>
+            <field name="type">service</field>
+            <!--<field name="categ_id" ref="hr_expense.cat_expense"/>-->
+            <!--<field name="can_be_expensed" eval="True"/>-->
+        </record>
+
+        <record id="linkloving_crm_view_crm_case_opportunities_filter" model="ir.ui.view">
+            <field name="name">crm.lead.search.opportunity</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.view_crm_case_opportunities_filter"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//filter[@name='message_needaction']" position="after">
+                    <filter string="新增的商机(创建时间)" name="this_day_new"
+                            domain="[ ('create_date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter string="新增的商机(修改时间)" name="this_day_write"
+                            domain="[ ('write_date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                </xpath>
+            </field>
+        </record>
+
+
+        <record model="ir.actions.act_window" id="crm_lead_opportunities_tree_view_new">
+            <field name="name">新增商机</field>
+            <field name="res_model">crm.lead</field>
+            <field name="view_mode">kanban,tree,graph,pivot,form,calendar</field>
+            <field name="domain">[('type','=','opportunity')]</field>
+            <field name="context">{
+                'default_type': 'opportunity',
+                'default_user_id': uid,
+                'search_default_assigned_to_me': 1,
+                'search_default_this_day_new': 1,
+                }
+            </field>
+            <field name="view_ids"
+                   eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'kanban', 'view_id': ref('crm.crm_case_kanban_view_leads')}),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('crm.crm_case_tree_view_oppor')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('crm.crm_case_form_view_oppor')}),
+                          (0, 0, {'view_mode': 'calendar'}),
+                          (0, 0, {'view_mode': 'pivot'}),
+                          (0, 0, {'view_mode': 'graph'})]"/>
+            <field name="search_view_id" ref="crm.view_crm_case_opportunities_filter"/>
+            <field name="help" type="html">
+                <p>
+                    Odoo helps you keep track of your sales pipeline to follow
+                    up potential sales and better forecast your future revenues.
+                </p>
+                <p>
+                    You will be able to plan meetings and phone calls from
+                    opportunities, convert them into quotations, attach related
+                    documents, track all discussions, and much more.
+                </p>
+            </field>
+        </record>
+
+
+        <record model="ir.actions.act_window" id="crm_lead_opportunities_tree_view_new_quote1">
+            <field name="name">今日报价商机</field>
+            <field name="res_model">crm.lead</field>
+            <field name="view_mode">kanban,tree,graph,pivot,form,calendar</field>
+            <field name="domain">[('type','=','opportunity'),('lead_is_quote','=',True)]</field>
+            <field name="context">{
+                'default_type': 'opportunity',
+                'default_user_id': uid,
+                'default_lead_is_quote': True,
+                'search_default_assigned_to_me': 1,
+                'search_default_this_day_write': 1,
+                }
+            </field>
+            <field name="view_ids"
+                   eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'kanban', 'view_id': ref('crm.crm_case_kanban_view_leads')}),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('crm.crm_case_tree_view_oppor')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('crm.crm_case_form_view_oppor')}),
+                          (0, 0, {'view_mode': 'calendar'}),
+                          (0, 0, {'view_mode': 'pivot'}),
+                          (0, 0, {'view_mode': 'graph'})]"/>
+            <field name="search_view_id" ref="crm.view_crm_case_opportunities_filter"/>
+            <field name="help" type="html">
+                <p>
+                    Odoo helps you keep track of your sales pipeline to follow
+                    up potential sales and better forecast your future revenues.
+                </p>
+                <p>
+                    You will be able to plan meetings and phone calls from
+                    opportunities, convert them into quotations, attach related
+                    documents, track all discussions, and much more.
+                </p>
+            </field>
+        </record>
+
+
+        <record model="ir.actions.act_window" id="crm_lead_opportunities_tree_view_new_sample">
+            <field name="name">今日寄样商机</field>
+            <field name="res_model">crm.lead</field>
+            <field name="view_mode">kanban,tree,graph,pivot,form,calendar</field>
+            <field name="domain">[('type','=','opportunity'),('lead_is_sample','=',True)]</field>
+            <field name="context">{
+                'default_type': 'opportunity',
+                'default_user_id': uid,
+                'default_lead_is_sample': True,
+                'search_default_assigned_to_me': 1,
+                'search_default_this_day_write': 1,
+                }
+            </field>
+            <field name="view_ids"
+                   eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'kanban', 'view_id': ref('crm.crm_case_kanban_view_leads')}),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('crm.crm_case_tree_view_oppor')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('crm.crm_case_form_view_oppor')}),
+                          (0, 0, {'view_mode': 'calendar'}),
+                          (0, 0, {'view_mode': 'pivot'}),
+                          (0, 0, {'view_mode': 'graph'})]"/>
+            <field name="search_view_id" ref="crm.view_crm_case_opportunities_filter"/>
+            <field name="help" type="html">
+                <p>
+                    Odoo helps you keep track of your sales pipeline to follow
+                    up potential sales and better forecast your future revenues.
+                </p>
+                <p>
+                    You will be able to plan meetings and phone calls from
+                    opportunities, convert them into quotations, attach related
+                    documents, track all discussions, and much more.
+                </p>
+            </field>
+        </record>
+
+
+        <record model="ir.actions.act_window" id="crm_lead_opportunities_tree_view_new_follow_up">
+            <field name="name">今日跟进商机</field>
+            <field name="res_model">crm.lead</field>
+            <field name="view_mode">kanban,tree,graph,pivot,form,calendar</field>
+            <field name="domain">[('type','=','opportunity'),('lead_is_follow_up','=',True)]</field>
+            <field name="context">{
+                'default_type': 'opportunity',
+                'default_user_id': uid,
+                'default_lead_is_follow_up': True,
+                'search_default_assigned_to_me': 1,
+                'search_default_this_day_write': 1,
+                }
+            </field>
+            <field name="view_ids"
+                   eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'kanban', 'view_id': ref('crm.crm_case_kanban_view_leads')}),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('crm.crm_case_tree_view_oppor')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('crm.crm_case_form_view_oppor')}),
+                          (0, 0, {'view_mode': 'calendar'}),
+                          (0, 0, {'view_mode': 'pivot'}),
+                          (0, 0, {'view_mode': 'graph'})]"/>
+            <field name="search_view_id" ref="crm.view_crm_case_opportunities_filter"/>
+            <field name="help" type="html">
+                <p>
+                    Odoo helps you keep track of your sales pipeline to follow
+                    up potential sales and better forecast your future revenues.
+                </p>
+                <p>
+                    You will be able to plan meetings and phone calls from
+                    opportunities, convert them into quotations, attach related
+                    documents, track all discussions, and much more.
+                </p>
+            </field>
+        </record>
+
+
+        <record id="crm_action_lead_form_new" model="ir.actions.act_window">
+            <field name="name">新增线索客户</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="domain">
+                [('customer','=','1'),('is_company','=',True),('crm_is_partner','=',True),('public_partners','!=','public')]
+            </field>
+            <field name="context">
+                {'default_customer':True,'default_is_company':True,'default_crm_is_partner':True,'search_default_partner_day_new':
+                1}
+            </field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="base.view_res_partner_filter"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to add a partner.
+                </p>
+            </field>
+        </record>
+
+
+        <record id="crm_sale_action_partner_form1_new" model="ir.actions.act_window">
+            <field name="name">新增潜在客户</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="domain">
+                [('customer','=','1'),('is_company','=',True),('is_order','=',False),('crm_is_partner','=',False),('public_partners','!=','public')]
+            </field>
+            <field name="context">
+                {'default_customer':True,'default_is_company':True,'default_crm_is_partner':True,'search_default_partner_day_new':
+                1}
+            </field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="base.view_res_partner_filter"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to add a contact in your address book.
+                </p>
+                <p>
+                    Odoo helps you easily track all activities related to
+                    a customer; discussions, history of business opportunities,
+                    documents, etc.
+                </p>
+            </field>
+        </record>
+
+        <record id="sale_action_partner_form_new" model="ir.actions.act_window">
+            <field name="name">新增客户</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="domain">
+                [('customer','=','1'),('is_company','=',True),('is_order','=',True),('crm_is_partner','=',False),('public_partners','!=','public')]
+            </field>
+            <field name="context">
+                {'default_customer':True,'default_is_company':True,'default_crm_is_partner':True,'search_default_partner_day_new':1}
+            </field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="base.view_res_partner_filter"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to add a contact in your address book.
+                </p>
+                <p>
+                    Odoo helps you easily track all activities related to
+                    a customer; discussions, history of business opportunities,
+                    documents, etc.
+                </p>
+            </field>
+        </record>
+
+
+        <record id="sales_team.crm_team_salesteams_view_kanban" model="ir.ui.view">
+            <field name="name">crm.team.dashboard</field>
+            <field name="model">crm.team</field>
+            <field name="arch" type="xml">
+                <kanban class="oe_background_grey o_kanban_dashboard o_salesteam_kanban" create="0"
+                        js_class="sales_team_dashboard">
+                    <field name="name"/>
+                    <field name="user_id"/>
+                    <field name="member_ids"/>
+                    <field name="color"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="#{kanban_color(record.color.raw_value)}">
+                                <div class="o_kanban_card_header">
+                                    <div class="o_kanban_card_header_title">
+                                        <div class="o_primary">
+                                            <field name="name"/>
+                                            哔哔哔
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_manage_button_section">
+                                        <a class="o_kanban_manage_toggle_button" href="#">More
+                                            <i class="fa fa-caret-down"/>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="container o_kanban_card_content o_visible">
+                                    <div class="row">
+                                        <div class="col-xs-6 o_kanban_primary_left" name="to_replace_in_sale_crm">
+                                        </div>
+                                        <div class="col-xs-6 o_kanban_primary_right">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="container o_kanban_card_manage_pane o_invisible">
+                                    <div class="row">
+                                        <div class="col-xs-4 o_kanban_card_manage_section o_kanban_manage_view">
+                                            <div class="o_kanban_card_manage_title">
+                                                <span>View</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-4 o_kanban_card_manage_section o_kanban_manage_new">
+                                            <div class="o_kanban_card_manage_title">
+                                                <span>New</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-4 o_kanban_card_manage_section o_kanban_manage_reports">
+                                            <div class="o_kanban_card_manage_title">
+                                                <span>Reports</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div t-if="widget.editable" class="o_kanban_card_manage_settings row"
+                                         groups="sales_team.group_sale_manager">
+                                        <div class="col-xs-8">
+                                            <ul class="oe_kanban_colorpicker" data-field="color"/>
+                                        </div>
+                                        <div class="col-xs-4 text-right">
+                                            <a type="edit">Settings</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+
+        <record id="set_invoiced_target_view_tree" model="ir.ui.view">
+            <field name="name">设置用户目标</field>
+            <field name="model">res.users</field>
+            <field name="arch" type="xml">
+                <tree string="备注记录" editable="bottom">
+                    <field name="name"/>
+                    <!--<field name="target_sales_invoiced"/>-->
+                </tree>
+            </field>
+        </record>
+
+
+    </data>
+</openerp>

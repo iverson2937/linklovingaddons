@@ -31,7 +31,7 @@
         'security/crm_rule.xml',
         'views/message_label_views.xml',
         'views/mutual_customer_views.xml',
-        # 'views/sales_team_dashboard_views.xml',
+        'views/sales_team_dashboard_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
