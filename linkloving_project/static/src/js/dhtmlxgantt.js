@@ -3681,6 +3681,12 @@ gantt._prepare_scale_html = function (config, fromPos, toPos) {
         if (!config.trace_x[i]) break;
 
         date = new Date(config.trace_x[i]);
+
+        if(date.getDay()==0 || date.getDay()==6){
+            var is_weekends = true;
+        }else{
+            var is_weekends = false;
+        }
         var value = content.call(this, date),
             width = config.width[i],
             height = config.height - (this.config.smart_scales ? (config.index ? 1 : 0) : 0),
@@ -3688,11 +3694,13 @@ gantt._prepare_scale_html = function (config, fromPos, toPos) {
             style = "",
             template = "",
             cssclass = "";
-
         if (width) {
             var position = this.config.smart_scales ? ("position:absolute;left:" + left + "px") : "";
 
             style = "width:" + (width) + "px;height:" + height + "px;" + position;
+            if(is_weekends){
+                style = style + ';background:#e02d2d;color:white'
+            }
             cssclass = "gantt_scale_cell" + (i == config.count - 1 ? " gantt_last_cell" : "");
 
             template = css.call(this, date);

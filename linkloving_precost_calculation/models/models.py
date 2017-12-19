@@ -104,7 +104,7 @@ class ProductTemplate(models.Model):
                 if line.product_id.bom_ids:
                     level = True
 
-                total_cost = line.product_id.pre_cost_cal()
+                total_cost = line.product_id.pre_cost_cal(raise_exception=False)
                 material_cost = line.product_id.get_material_cost()
                 man_cost = total_cost - material_cost
                 res.update({
@@ -122,7 +122,7 @@ class ProductTemplate(models.Model):
                 })
                 bom_lines.append(res)
         bom_lines.sort(key=lambda k: (k.get('type', 0)))
-        total_cost = self.product_variant_ids[0].pre_cost_cal()
+        total_cost = self.product_variant_ids[0].pre_cost_cal(raise_exception=False)
         material_cost = self.product_variant_ids[0].get_material_cost()
         man_cost = total_cost - material_cost
         return {
