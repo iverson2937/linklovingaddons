@@ -14,7 +14,7 @@ class AccountAccountExternal(models.Model):
         for r in self:
             r.total_amount = sum(line.sub_total for line in r.line_ids)
 
-    total_amount = fields.Float(compute='_get_total_amount')
+    total_amount = fields.Float(compute='_get_total_amount', string=u'折合人民币总计')
 
 
 class AccountAccountExternalLine(models.Model):
