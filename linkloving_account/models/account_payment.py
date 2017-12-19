@@ -217,7 +217,9 @@ class AccountPayment(models.Model):
         if not res.get('domain', {}):
             res['domain'] = {}
         res['domain']['journal_id'] = self.payment_type == 'inbound' and [('at_least_one_inbound', '=', True)] or [('at_least_one_outbound', '=', True)]
-        res['domain']['journal_id'].append(('type', 'in', ('bank', 'cash')),('deprecated', '=', False))
+        res['domain']['journal_id'].append(('type', 'in', ('bank', 'cash')))
+        res['domain']['journal_id'].append(('deprecated', '=', False))
+
         return res
 
     @api.multi
