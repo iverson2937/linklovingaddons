@@ -146,8 +146,18 @@
                             </div>
                         </t>
                     </t>
-                    <t t-if="o.state not in ['approve']">
-                        <div>ddddddddddd</div>
+                    <t t-if="o.state not in ['approve,paid']">
+                        <t t-call="report.external_layout">
+                            <div class="page">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div>只有审核通过的申购单,才可以打印</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </t>
+
                     </t>
 
 
