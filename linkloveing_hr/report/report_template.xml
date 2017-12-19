@@ -167,10 +167,18 @@
                             </div>
                         </t>
                     </t>
-                    <t t-if="o.state not in ['approve','paid']">
-                        <div class="text-center">
-                            <strong>只有审核通过的单据才能被打印</strong>
-                        </div>
+                    <t t-if="o.state not in ['approve,paid']">
+                        <t t-call="report.external_layout">
+                            <div class="page">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div>只有审核通过的单据才可以打印</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </t>
+
                     </t>
                 </t>
             </t>
