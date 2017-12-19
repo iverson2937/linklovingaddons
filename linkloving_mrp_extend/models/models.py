@@ -1241,11 +1241,15 @@ class MrpProductionProduceExtend(models.TransientModel):
             qty = quantity
             copy_moves = self.production_id.move_finished_ids.filtered(
                 lambda x: x.product_id.id == self.production_id.product_id.id)
-            new_move = copy_moves[0].copy(default={'quantity_done': qty,
+            if copy_moves:
+                new_move = copy_moves[0].copy(default={'quantity_done': qty,
                                                    'ordered_qty': qty,
                                                    'product_uom_qty': qty,
                                                    'production_id': self.production_id.id
                                                    })
+            else:  # stock——move 被意外取消
+                new_move = self.production_id._generate_finished_moves()
+                new_move.quantity_done = qty
             new_move.action_confirm()
         for move in moves:
             if move.product_id.id == self.production_id.product_id.id:
@@ -1478,8 +1482,9 @@ class SimStockMove(models.Model):
                     sim_move.quantity_done += move.quantity_done
 
     def _default_product_uom_qty(self):
-        boms, lines = self[0].production_id.bom_id.explode(self[0].production_id.product_id,
-                                                           self[0].production_id.product_qty)
+        if self:
+            boms, lines = self[0].production_id.bom_id.explode(self[0].production_id.product_id,
+                                                               self[0].production_id.product_qty)
         for sim_move in self:
 
             if sim_move.stock_moves:

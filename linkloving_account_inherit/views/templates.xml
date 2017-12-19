@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+        <record model="ir.ui.view" id="account_account_additional_tree">
+            <field name="name">账户</field>
+            <field name="model">account.account.additional</field>
+            <field name="priority" eval="100"/>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" string="名称"/>
+                    <field name="total_amount" string="折合人民币金额"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="account_account_additional_form">
+            <field name="name">香港账户</field>
+            <field name="model">account.account.additional</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <div class="oe_title">
+                                <h1>
+                                    <field name="name"/>
+                                </h1>
+                            </div>
+                        </group>
+
+                        <group>
+                            <notebook>
+                                <page string="明细">
+                                    <field name="line_ids" mode="tree,kanban">
+                                        <tree string="明细" editable="bottom">
+                                            <field name="name"/>
+                                            <field name="amount"/>
+                                            <field name="rate"/>
+                                            <field name="sub_total"/>
+
+
+                                        </tree>
+                                    </field>
+                                    <group class="oe_subtotal_footer oe_right">
+                                        <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                            <label for="total_amount"/>
+
+                                        </div>
+                                        <field name="total_amount" nolabel="1" class="oe_subtotal_footer_separator"/>
+                                    </group>
+                                </page>
+                            </notebook>
+                        </group>
+                    </sheet>
+                </form>
+
+            </field>
+        </record>
+
+
+        <record id="action_account_hongkong" model="ir.actions.act_window">
+            <field name="name">香港账户</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.account.additional</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    点击创建香港账户
+                </p>
+            </field>
+        </record>
+
+
+        <!--Receipt*-->
+        <menuitem id="menu_hongkong_account"
+                  parent="account.menu_finance_entries"
+                  action="action_account_hongkong"
+                  sequence="1" name="香港账户"/>
+
+
+    </data>
+</openerp>

@@ -3596,3 +3596,62 @@ class LinklovingAppApi(http.Controller):
             code = STATUS_CODE_ERROR
 
         return JsonResponse.send_response(code, res_data=jason_list)
+
+    # 获取备料列表(小幸福改的)
+    @http.route('/linkloving_app_api/get_new_mrp_production', type='json', auth='none', csrf=False)
+    def get_new_mrp_production(self, **kw):
+        limit = request.jsonrequest.get('limit')
+        offset = request.jsonrequest.get('offset')
+        date_to_show = request.jsonrequest.get("date")
+        process_id = request.jsonrequest.get("process_id")
+        one_days_after = datetime.timedelta(days=1)
+        today_time, timez = LinklovingAppApi.get_today_time_and_tz()
+        today_time = fields.datetime.strptime(fields.datetime.strftime(today_time, '%Y-%m-%d'),
+                                              '%Y-%m-%d')
+        # locations = request.env["stock.location"].sudo().get_semi_finished_location_by_user(request.context.get("uid"))
+
+        if date_to_show not in ["delay", "all"]:
+            today_time = fields.datetime.strptime(date_to_show, '%Y-%m-%d')
+
+        one_millisec_before = datetime.timedelta(milliseconds=1)  #
+        today_time = today_time - one_millisec_before  # 今天的最后一秒
+        after_day = today_time + one_days_after
+        # location_cir = request.env["stock.location"].sudo().search([("is_circulate_location", '=', True)], limit=1).ids
+        # location_domain = locations.ids + location_cir
+        if not process_id:
+            return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "未找到工序id"})
+
+        if date_to_show == "delay":
+            domain = [('date_planned_start', '<', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S'))]
+
+        elif date_to_show == 'all':
+            domain = []
+
+        else:
+            domain = [
+                ('date_planned_start', '>', (today_time - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                ('date_planned_start', '<', (after_day - timez).strftime('%Y-%m-%d %H:%M:%S')),
+            ]
+
+        if request.jsonrequest.get('process_id'):
+            domain.append(('process_id', '=', request.jsonrequest['process_id']))
+
+        if request.jsonrequest.get('production_line_id'):
+            domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
+
+        if request.jsonrequest.get('state'):
+            if request.jsonrequest.get('state') in ('waiting_material', 'prepare_material_ing'):
+                domain.append(('state', 'in', ['waiting_material', 'prepare_material_ing']))
+            elif request.jsonrequest.get('state') == 'progress':
+                domain.append(('feedback_on_rework', '=', None))
+            else:
+                domain.append(('state', '=', request.jsonrequest['state']))
+
+        orders_today = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).search(domain,
+                                                                                                  limit=limit,
+                                                                                                  offset=offset)
+
+        data = []
+        for production in orders_today:
+            data.append(self.get_simple_production_json(production))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)

@@ -89,12 +89,13 @@ class ApprovalCenter(models.TransientModel):
 
         return {'bom_list': bom_list, 'length': length}
 
-    def get_attachment_info_by_type(self, offset, limit):
+    def get_attachment_info_by_type(self, offset, limit, **kwargs):
+        domain_my = kwargs.get("domains") or []
 
         if self.type == 'waiting_submit':
             domain = [('create_uid', '=', self.env.user.id),
                       ('state', 'in', ['waiting_release', 'cancel', 'deny'])]
-            attatchments = self.env[self.res_model].search_read(domain,
+            attatchments = self.env[self.res_model].search_read(expression.AND([domain, domain_my]),
                                                                 limit=limit,
                                                                 offset=offset,
                                                                 order='create_date desc',
@@ -104,7 +105,7 @@ class ApprovalCenter(models.TransientModel):
                       (
                           'state', 'not in',
                           ['waiting_release', 'draft', 'cancel', 'deny'])]
-            attatchments = self.env[self.res_model].search_read(domain,
+            attatchments = self.env[self.res_model].search_read(expression.AND([domain, domain_my]),
                                                                 limit=limit,
                                                                 offset=offset,
                                                                 order='create_date desc',
@@ -117,7 +118,7 @@ class ApprovalCenter(models.TransientModel):
             review_ids = lines.mapped("review_id")
             domain = [("review_id", "in", review_ids.ids),
                       ('state', 'in', ['review_ing'])]
-            attatchments = self.env[self.res_model].search_read(domain,
+            attatchments = self.env[self.res_model].search_read(expression.AND([domain, domain_my]),
                                                                 limit=limit,
                                                                 offset=offset,
                                                                 fields=ATTACHINFO_FIELD)
@@ -129,7 +130,7 @@ class ApprovalCenter(models.TransientModel):
                                                            order='create_date desc')
             review_ids = lines.mapped("review_id")
             domain = [("review_id", "in", review_ids.ids)]
-            attatchments = self.env[self.res_model].search_read(domain,
+            attatchments = self.env[self.res_model].search_read(expression.AND([domain, domain_my]),
                                                                 order='create_date desc',
                                                                 limit=limit,
                                                                 offset=offset,
@@ -142,7 +143,7 @@ class ApprovalCenter(models.TransientModel):
                 dict(self.env['product.attachment.info'].convert_attachment_info(atta),
                      **{'checkbox_type': self.type, 'create_date': atta.get('create_date')}))
 
-        length = self.env[self.res_model].search_count(domain)
+        length = self.env[self.res_model].search_count(expression.AND([domain, domain_my]))
         return {"records": attach_list,
                 "length": length
                 }
