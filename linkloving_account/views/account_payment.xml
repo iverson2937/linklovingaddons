@@ -48,6 +48,9 @@
                 <xpath expr="//field[@name='payment_date']" position="replace">
                     <field name="payment_date"/>
                 </xpath>
+                <xpath expr="//field[@name='journal_id']" position="attributes">
+                    <attribute name="domain">[('deprecated','=',False)]</attribute>
+                        </xpath>
                 <xpath expr="//field[@name='journal_id']" position="after">
                     <field name="product_id" options="{'no_create':True}"
                            string="产品"
