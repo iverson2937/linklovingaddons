@@ -192,8 +192,7 @@ class AccountPayment(models.Model):
                              track_visibility='onchange')
     remark = fields.Text(string='备注')
     product_id = fields.Many2one('product.product')
-    journal_id = fields.Many2one('account.journal', string='Payment Journal', required=True,
-                                 domain=[('type', 'in', ('bank', 'cash')),('deprecated', '=', False)])
+
     res_model = fields.Char()
     res_id = fields.Integer()
 
@@ -204,6 +203,22 @@ class AccountPayment(models.Model):
     @api.multi
     def set_to_post(self):
         self.state = 'posted'
+
+    @api.onchange('payment_type')
+    def _onchange_payment_type(self):
+        if not self.invoice_ids:
+            # Set default partner type for the payment type
+            if self.payment_type == 'inbound':
+                self.partner_type = 'customer'
+            elif self.payment_type == 'outbound':
+                self.partner_type = 'supplier'
+        # Set payment method domain
+        res = self._onchange_journal()
+        if not res.get('domain', {}):
+            res['domain'] = {}
+        res['domain']['journal_id'] = self.payment_type == 'inbound' and [('at_least_one_inbound', '=', True)] or [('at_least_one_outbound', '=', True)]
+        res['domain']['journal_id'].append(('type', 'in', ('bank', 'cash')),('deprecated', '=', False))
+        return res
 
     @api.multi
     def set_to_cancel(self):
