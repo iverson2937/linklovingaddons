@@ -192,6 +192,8 @@ class AccountPayment(models.Model):
                              track_visibility='onchange')
     remark = fields.Text(string='备注')
     product_id = fields.Many2one('product.product')
+    journal_id = fields.Many2one('account.journal', string='Payment Journal', required=True,
+                                 domain=[('type', 'in', ('bank', 'cash')),('deprecated', '=', False)])
     res_model = fields.Char()
     res_id = fields.Integer()
 
