@@ -563,12 +563,14 @@ odoo.define('linkloving_approval.approval_core', function (require) {
 
         setup_search_view: function () {
             var self = this;
+            var search_defaults = {};
             if (this.searchview) {
+                search_defaults = self.search_results;
                 this.searchview.destroy();
                 self.search_results = {};
             }
 
-            var search_defaults = {};
+
             // var context = this.action.context || [];
             // _.each(context, function (value, key) {
             //     var match = /^search_default_(.*)$/.exec(key);
@@ -641,7 +643,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                 model.call("create", [{res_model: res_model, type: approval_type}])
                     .then(function (result) {
                         model.call('get_attachment_info_by_type', [[result]], {
-                            offset: own.begin - 1,
+                            offset: 0,
                             limit: own.limit,
                             domains: results.domain,
                             contexts: results.context,
@@ -650,6 +652,8 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                             .then(function (result) {
                                 console.log(result);
                                 own.length = result.length;
+                                own.flag = 1;
+                                own.begin=1;
                                 self.$("#" + approval_type).html("");
                                 self.$("#" + approval_type).append(QWeb.render('approval_tab_content', {
                                     result: result.records,
@@ -701,8 +705,9 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                 this.pager = new Pager(this, this.length, this.begin, this.limit);
                 this.pager.appendTo($node);
 
-
-                this.setup_search_view();
+                if (!this.search_results.domain) {
+                    this.setup_search_view();
+                }
 
                 this.pager.on('pager_changed', this, function (new_state) {
                     var self = this;
@@ -741,12 +746,12 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             model.call("create", [{res_model: res_model, type: approval_type}])
                 .then(function (result) {
                     model.call('get_attachment_info_by_type', [result], {
-                            offset: own.begin - 1,
-                            limit: own.limit,
-                            domains: self.search_results.domain,
-                            contexts: self.search_results.context,
-                            groupbys: self.search_results.groupby
-                        })
+                        offset: own.begin - 1,
+                        limit: own.limit,
+                        domains: self.search_results.domain,
+                        contexts: self.search_results.context,
+                        groupbys: self.search_results.groupby
+                    })
                         .then(function (result) {
                             console.log(result);
                             own.length = result.length;
