@@ -89,7 +89,7 @@ class LinklovingOAApi(http.Controller):
     def supplier_detail_object_to_json(self, supplier_detail_object):
         supplier_details = {
             "name": supplier_detail_object.name,
-            "phone": supplier_detail_object.phone or '',
+            "phone": supplier_detail_object.mobile or '',
             "street": self.get_supplier_address(supplier_detail_object) or '',
             "email": supplier_detail_object.email or '',
             "website": supplier_detail_object.website or '',
@@ -125,6 +125,7 @@ class LinklovingOAApi(http.Controller):
                 "email": obj.email or '',
                 "street": obj.street2 or '',
                 "type": LinklovingOAApi.selection_get_map("res.partner", "type", obj.type),
+                "function":obj.function or '',
             })
         return json_lists
 
@@ -150,7 +151,7 @@ class LinklovingOAApi(http.Controller):
             'city': feedback.city or '',
             'company_name': feedback.commercial_company_name or '',
             'email': feedback.email or '',
-            'phone': feedback.mobile or feedback.phone or '',
+            'phone': feedback.mobile or '',
             'id': feedback.id or ''
         }
         return data
