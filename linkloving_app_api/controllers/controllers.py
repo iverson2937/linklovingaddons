@@ -3658,7 +3658,7 @@ class LinklovingAppApi(http.Controller):
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
     @http.route('/linkloving_app_api/account_hk', type='json', auth="none", csrf=False, cors='*')
-    def get_account_data(self, **kw):
+    def account_hk(self, **kw):
         account = request.env.ref('linkloving_account_inherit.account_hk')
         if account:
             jason_list = account.sudo().json_data()
