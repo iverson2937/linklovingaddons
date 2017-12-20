@@ -9,6 +9,10 @@
 
                 <xpath expr="//field[@name='country_id']" position="after">
                     <field name="continent" placeholder="大洲"/>
+                    <field name="lead_is_quote" invisible="1"/>
+                    <field name="lead_is_sample" invisible="1"/>
+                    <field name="lead_is_follow_up" invisible="1"/>
+
                 </xpath>
                 <!--右-->
                 <xpath expr="//field[@name='tag_ids']" position="after">
@@ -571,6 +575,129 @@
                     <separator string="Requirements"/>
                     <field name="requirements" nolabel="1"/>
                 </form>
+            </field>
+        </record>
+
+        <record id="crm_sale_daily_search_view" model="ir.ui.view">
+            <field name="name">crm.sale.daily.search</field>
+            <field name="model">crm.sale.daily</field>
+            <field name="arch" type="xml">
+                <search string="类型">
+
+                    <filter string="日报" name="day_search" domain="[('type','=','day_daily')]"/>
+                    <filter string="周报" name="week_search" domain="[('type', '=', 'week_daily')]"/>
+                    <filter string="月报" name="month_search" domain="[('type','=','mouth_daily')]"/>
+
+                    <group expand="0" string="Group By">
+                        <filter string="月份" domain="[]" context="{'group_by':'create_date'}"/>
+                    </group>
+
+                </search>
+            </field>
+        </record>
+
+
+        <record id="linkloving_crm_sale_daily_form" model="ir.ui.view">
+            <field name="name">工作报告</field>
+            <field name="model">crm.sale.daily</field>
+            <field name="arch" type="xml">
+                <form string="工作报告">
+                    <group>
+                        <group>
+                            <field name="name" invisible="1"/>
+                            <field name="type"/>
+                        </group>
+                        <group>
+                            <field name="summit_time"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="summary" placeholder="总结"/>
+                        <field name="plan" placeholder="计划"/>
+                    </group>
+                    <footer>
+                        <button string="确定" name="set_daily_save" type="object" default_focus="1"
+                                class="btn-primary"/>
+                        <button string="取消" class="btn-default" special="cancel"/>
+                    </footer>
+
+                </form>
+            </field>
+        </record>
+
+        <record id="linkloving_crm_sale_daily_tree" model="ir.ui.view">
+            <field name="name">工作报告</field>
+            <field name="model">crm.sale.daily</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="summit_time"/>
+                    <field name="summary" placeholder="总结" invisible="1"/>
+                    <field name="plan" placeholder="计划" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="crm_crm_sale_daily_day_tree" model="ir.actions.act_window">
+            <field name="name">工作报告-日报</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">crm.sale.daily</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('type','=','day_daily'),('create_uid','=',uid)]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    暂时没有工作报告
+                </p>
+            </field>
+        </record>
+
+        <record id="crm_crm_sale_daily_week_tree" model="ir.actions.act_window">
+            <field name="name">工作报告-周报</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">crm.sale.daily</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('type','=','week_daily'),('create_uid','=',uid)]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    暂时没有工作报告
+                </p>
+            </field>
+        </record>
+
+        <record id="crm_crm_sale_daily_month_tree" model="ir.actions.act_window">
+            <field name="name">工作报告-月报</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">crm.sale.daily</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('type','=','mouth_daily'),('create_uid','=',uid)]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    暂时没有工作报告
+                </p>
+            </field>
+        </record>
+
+
+        <record id="crm_crm_sale_daily_manager_tree" model="ir.actions.act_window">
+            <field name="name">工作报告</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">crm.sale.daily</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{
+                }
+            </field>
+            <field name="search_view_id" ref="crm_sale_daily_search_view"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    暂时没有工作报告
+                </p>
             </field>
         </record>
 

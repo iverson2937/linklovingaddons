@@ -6,6 +6,24 @@
                add sequence field
           -->
 
+
+        <record id="account.action_account_bank_journal_form" model="ir.actions.act_window">
+            <field name="domain">[('type', '=', 'bank'),('deprecated', '=', False)]</field>
+        </record>
+
+
+                <record id="view_account_journal_search_inherit" model="ir.ui.view">
+            <field name="name">account.journal.form</field>
+            <field name="model">account.journal</field>
+            <field name="inherit_id" ref="account.view_account_journal_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='dashboard']" position="before">
+                    <filter name="deprecated" string="废弃" domain="[('deprecated', '=', True)]"/>
+                </xpath>
+            </field>
+
+        </record>
+
         <record id="view_account_journal_form_inherit" model="ir.ui.view">
             <field name="name">account.journal.form</field>
             <field name="model">account.journal</field>
@@ -13,6 +31,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='code']" position="before">
                     <field name="sequence"/>
+                    <field name="deprecated"/>
                 </xpath>
             </field>
 

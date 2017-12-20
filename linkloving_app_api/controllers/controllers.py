@@ -3538,7 +3538,7 @@ class LinklovingAppApi(http.Controller):
                 account['account_id'][0]: res
             })
 
-        account_datas = request.env['account.account'].sudo().search([('user_type_id', '=', cash_type.id)])
+        account_datas = request.env['account.account'].sudo().search([('user_type_id', '=', cash_type.id),('deprecated', '=', False)])
         for account in account_datas:
             if acoount_dict.get(account.id):
                 debit = acoount_dict[account.id].get('debit')

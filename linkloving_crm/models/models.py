@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
+import json
+import calendar
+import time
+
 from odoo import models, fields, api
 from odoo import tools
 from odoo.exceptions import UserError
+from datetime import datetime, timedelta, date
 
 AVAILABLE_PRIORITIES = [
     ('0', 'badly'),
@@ -37,6 +42,10 @@ class CrmLead(models.Model):
     mutual_rule_id = fields.Integer()
 
     lead_price_sheet = fields.Boolean(string=u'产品报价单')
+
+    lead_is_quote = fields.Boolean(string=u'已报价', default=False)
+    lead_is_sample = fields.Boolean(string=u'已寄样', default=False)
+    lead_is_follow_up = fields.Boolean(string=u'已跟进', default=False)
 
     @api.multi
     def _lead_create_contact(self, name, is_company, parent_id=False, customer=False):
@@ -189,8 +198,171 @@ class CrmLead(models.Model):
         else:
             raise UserError(u'操作失败')
 
+    @api.model
+    def retrieve_sales_dashboard(self):
+        res = super(CrmLead, self).retrieve_sales_dashboard()
+
+        new_res = {
+            'basic_information': {
+                'all_lead_partner': 0,
+                'all_latent_partner': 0,
+                'all_partner': 0,
+                'all_opportunity': 0,
+            },
+            'follow_up': {
+                'all_follow_record': 0,
+                'all_quote_cont': 0,
+                'all_sample_cont': 0,
+            },
+            'new_message': {
+                'new_lead_partner': 0,
+                'new_latent_partner': 0,
+                'new_partner': 0,
+                'new_lead': 0,
+            },
+            'is_manage': 0,
+            'char_data': '',
+            'is_show_custom_module': 0,
+            'salesman_name_list': [],
+        }
+        # 基础信息
+        domain_all = [('customer', '=', '1'), ('is_company', '=', True)]
+        all_lead_partner = self.env['res.partner'].search(domain_all + [('crm_is_partner', '=', True),
+                                                                        ('public_partners', '!=', 'public')])
+        new_res['basic_information']['all_lead_partner'] = len(all_lead_partner)
+
+        all_latent_partner = self.env['res.partner'].search(
+            domain_all + [('is_order', '=', False), ('crm_is_partner', '=', False),
+                          ('public_partners', '!=', 'public')])
+        new_res['basic_information']['all_latent_partner'] = len(all_latent_partner)
+
+        all_partner = self.env['res.partner'].search(
+            domain_all + [('is_order', '=', True), ('crm_is_partner', '=', False), ('public_partners', '!=', 'public')])
+        new_res['basic_information']['all_partner'] = len(all_partner)
+
+        all_opportunity = self.search([('type', '=', 'opportunity')])
+        new_res['basic_information']['all_opportunity'] = len(all_opportunity)
+
+        # 跟进信息
+
+        for opp in all_opportunity:
+            # Expected closing
+            if opp.message_ids:
+                for msg in opp.message_ids:
+
+                    date_msg_record = fields.Date.from_string(msg.create_date)
+                    # quote_id = self.env['message.label'].search([('name', 'ilike', '报价')])
+                    # sample_id = self.env['message.label'].search([('name', 'ilike', '送样')])
+                    quote_id = self.env.ref('linkloving_crm.message_label_quote_id1')
+                    sample_id = self.env.ref('linkloving_crm.message_label_sample_id')
+
+                    if date_msg_record == date.today() and msg.message_type != 'notification':
+                        new_res['follow_up']['all_follow_record'] += 1
+                        if quote_id.id in msg.messages_label_ids.ids:
+                            new_res['follow_up']['all_quote_cont'] += 1
+                        elif sample_id.id in msg.messages_label_ids.ids:
+                            new_res['follow_up']['all_sample_cont'] += 1
+
+                            # if date.today() <= date_msg_record <= date.today() + timedelta(days=7):
+                            #     new_res['closing']['next_7_days'] += 1
+                            # if date_msg_record < date.today():
+                            #     new_res['closing']['overdue'] += 1
+        # 新增信息
+        data_partner = [all_lead_partner, all_latent_partner, all_partner, all_opportunity]
+        key_partner = ['new_lead_partner', 'new_latent_partner', 'new_partner', 'new_lead']
+        for val in range(0, len(data_partner)):
+            for lead_partner_one in data_partner[val]:
+                date_lead_partner = fields.Date.from_string(lead_partner_one.create_date)
+                if date_lead_partner == date.today():
+                    new_res['new_message'][key_partner[val]] += 1
+
+        if self.env.ref('sales_team.group_sale_manager').id in self.env.user.groups_id.ids or self.env.user.sale_team_id.user_id == self.env.user:
+            new_res['is_manage'] = 1
+
+        data_list = []
+        day_now = time.localtime()
+        day_begin = '%d-%02d-01' % (day_now.tm_year, day_now.tm_mon)  # 月初肯定是1号
+        wday, monthRange = calendar.monthrange(day_now.tm_year, day_now.tm_mon)  # 得到本月的天数 第一返回为月第一日为星期几（0-6）, 第二返回为此月天数
+        day_end = '%d-%02d-%02d' % (day_now.tm_year, day_now.tm_mon, monthRange)
+
+        # state= sale
+        for team_user_one in self.env.user.sale_team_id.member_ids:
+            sale_sum = 0
+            sale_order_list = self.env['sale.order'].sudo().search(
+                [('user_id', '=', team_user_one.id), ('create_date', '>', day_begin), ('create_date', '<', day_end)])
+            for sale_one in sale_order_list:
+                sale_sum += sale_one.amount_total
+            data_list.append(sale_sum)
+
+        new_res['salesman_name_list'] = [str(team_user_one.name) for team_user_one in
+                                         self.env.user.sale_team_id.member_ids]
+
+        char_data = {
+            'labels': [str(team_user_one.name) for team_user_one in self.env.user.sale_team_id.member_ids],
+            'datasets': [{
+                'label': '销售额(¥)',
+                'data': data_list,
+                'backgroundColor': ['rgba(54, 162, 235, 0.2)'] * len(self.env.user.sale_team_id.member_ids),
+                'borderWidth': 1
+            }]
+        }
+        if self.env.user.sale_team_id:
+            new_res['is_show_custom_module'] = 1
+
+        new_res['char_data'] = json.dumps(char_data)
+
+        return dict(res, **new_res)
+
 
 class CrmContinent(models.Model):
     _name = 'crm.continent'
 
     name = fields.Char(string=u'大洲')
+
+
+class CrmCrmTeam(models.Model):
+    _inherit = "crm.team"
+
+    @api.multi
+    def write(self, vals):
+
+        if vals.get('user_id'):
+            team_master = self.env['res.users'].browse(int(vals.get('user_id')))
+            team_master.write({'sale_team_id': self.id})
+        else:
+            if self.user_id:
+                self.user_id.write({'sale_team_id': False})
+
+        res = super(CrmCrmTeam, self).write(vals)
+        return res
+
+
+class CrmSaleDaily(models.Model):
+    _name = 'crm.sale.daily'
+
+    name = fields.Char(string=u'名称')
+    summit_time = fields.Date(string=u'时间')
+    type = fields.Selection([('day_daily', u'日报'), ('week_daily', u'周报'), ('mouth_daily', u'月报')], string=u'类型')
+    summary = fields.Html(string=u'总结')
+    plan = fields.Text(string=u'计划')
+    team_id = fields.Many2one('crm.team', string='Sales Team', oldname='section_id')
+
+    @api.multi
+    def set_daily_save(self):
+        return {'type': 'ir.actions.act_window_close'}
+
+    @api.model
+    def create(self, vals):
+        user_name = ''
+        if vals.get('type'):
+            if vals.get('type') == 'day_daily':
+                user_name = '日报'
+            elif vals.get('type') == 'week_daily':
+                user_name = '周报'
+            elif vals.get('type') == 'mouth_daily':
+                user_name = '月报'
+
+        vals['team_id'] = self.env.user.sale_team_id.id
+
+        vals['name'] = self.env.user.name + user_name
+        return super(CrmSaleDaily, self).create(vals)

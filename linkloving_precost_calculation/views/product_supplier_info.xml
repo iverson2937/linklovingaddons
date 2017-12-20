@@ -6,7 +6,7 @@
             <field name="model">product.supplierinfo</field>
             <field name="inherit_id" ref="product.product_supplierinfo_tree_view"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='price']" position="before">
+                <xpath expr="//field[@name='date_start']" position="before">
                     <field name="tax_id" string="税率"/>
                 </xpath>
             </field>
