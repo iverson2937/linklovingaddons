@@ -4,7 +4,7 @@
         <template id="linkloving_hr_purchase_apply.hr_purchase_apply_sheet">
             <t t-call="report.html_container">
                 <t t-foreach="docs" t-as="o">
-                    <t t-if="o.state in ['approve']">
+                    <t t-if="o.state in ['approve','paid']">
                         <t t-call="report.external_layout">
                             <div class="page">
                                 <div class="row">
