@@ -9,6 +9,24 @@ class AccountAccountExternal(models.Model):
     name = fields.Char()
     line_ids = fields.One2many('account.account.additional.line', 'account_id')
 
+    @api.one
+    def json_data(self):
+        line_ids = []
+        for line in self.line_ids:
+            res = {
+                'id': line.id,
+                'name': line.name,
+                'rate': line.rate,
+                'amount': line.amount,
+                'sub_total': line.sub_total
+            }
+        line_ids.append(res)
+        return {
+            'name': self.name,
+            'line_ids': line_ids,
+            'total_amount': self.total_amount
+        }
+
     @api.multi
     def _get_total_amount(self):
         for r in self:

@@ -3538,7 +3538,8 @@ class LinklovingAppApi(http.Controller):
                 account['account_id'][0]: res
             })
 
-        account_datas = request.env['account.account'].sudo().search([('user_type_id', '=', cash_type.id),('deprecated', '=', False)])
+        account_datas = request.env['account.account'].sudo().search(
+            [('user_type_id', '=', cash_type.id), ('deprecated', '=', False)])
         for account in account_datas:
             if acoount_dict.get(account.id):
                 debit = acoount_dict[account.id].get('debit')
@@ -3655,3 +3656,10 @@ class LinklovingAppApi(http.Controller):
         for production in orders_today:
             data.append(self.get_simple_production_json(production))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    @http.route('/linkloving_app_api/account_hk', type='json', auth="none", csrf=False, cors='*')
+    def get_account_data(self, **kw):
+        account = request.env.ref('linkloving_account_inherit.account_hk')
+        if account:
+            jason_list = account.json_data
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=jason_list)
