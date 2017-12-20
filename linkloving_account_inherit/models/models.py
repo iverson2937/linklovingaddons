@@ -20,7 +20,7 @@ class AccountAccountExternal(models.Model):
                 'amount': line.amount,
                 'sub_total': line.sub_total
             }
-        line_ids.append(res)
+            line_ids.append(res)
         return {
             'name': self.name,
             'line_ids': line_ids,
