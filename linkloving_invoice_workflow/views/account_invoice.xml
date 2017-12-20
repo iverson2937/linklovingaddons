@@ -292,15 +292,7 @@
                     <field name="po_id" string="采购单"/>
 
                 </xpath>
-                <!--<xpath expr="//tree/field[@name='price_unit']" position="before">-->
-                <!--<field name="price_unit_o" string="原始单价" readonly="1"/>-->
-                <!--</xpath>-->
-                <!--<xpath expr="//tree/field[@name='price_unit']" position="attributes">-->
-                <!--<attrbute name="readonly">1</attrbute>-->
-                <!--</xpath>-->
-                <!--<xpath expr="//field[@name='amount_total']" position="after">-->
-                <!--<field name="amount_total_o" string="Total Amount" invisible="1"/>-->
-                <!--</xpath>-->
+
                 <xpath expr="//field[@name='amount_tax']" position="replace">
                     <div>
                         <label for="amount_tax"/>
@@ -311,7 +303,7 @@
                     <field name="amount_tax" nolabel="1"/>
                 </xpath>
                 <xpath expr="//notebook/page[1]" position="after">
-                    <page string="Order Lines">
+                    <page string="采购单明细">
                         <field name="order_line"/>
                     </page>
 
@@ -319,6 +311,7 @@
 
                 <xpath expr="//field[@name='product_id']" position="attributes">
                     <attribute name="options">{'no_create': True}</attribute>
+                    <attribute name="domain">[('sale_ok','=',True),('can_be_expensed','!=',True)]</attribute>
                 </xpath>
 
 
