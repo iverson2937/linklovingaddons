@@ -31,8 +31,7 @@ class InventoryLine(models.Model):
                 continue
             diff = line.theoretical_qty - line.product_qty
             vals = {
-                'name': _('INV:') + (
-                line.remark_adjust if hasattr(line, 'remark_adjust') else (line.inventory_id.name or '')),
+                'name': _('INV:') + (line.inventory_id.name or ''),
                 'product_id': line.product_id.id,
                 'product_uom': line.product_uom_id.id,
                 'date': line.inventory_id.date,
