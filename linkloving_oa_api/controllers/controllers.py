@@ -237,7 +237,7 @@ class LinklovingOAApi(http.Controller):
             'shipping_rate':po_order.shipping_rate,
             'state':po_order.state, #状态
             'invoice_status': po_order.invoice_status, #对账单状态
-            'handle_date':po_order.handle_date #交货日期
+            'handle_date':po_order.handle_date or '' #交货日期
 
         }
         return data
@@ -910,10 +910,14 @@ class LinklovingOAApi(http.Controller):
             'amount_untaxed': "%.2f" % so_object.amount_untaxed,  # 未含税金额
             'amount_tax': "%.2f" % so_object.amount_tax,  # 税金
             'amount_total': "%.2f" % so_object.amount_total,  # 总计
-            'order_line': self.get_so_detail_order_line(so_object.order_line)
+            'order_line': self.get_so_detail_order_line(so_object.order_line),
+            'create_date':so_object.create_date,  #单据创建日期
+            'remark':so_object.remark or '' ,  #备注
+            'picking_ids': self.get_picking_ids_detail(so_object.picking_ids) #交货单
         }
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
+    # 销售订单详细
     def get_so_detail_order_line(self, objs):
         data = []
         for obj in objs:
@@ -922,13 +926,60 @@ class LinklovingOAApi(http.Controller):
                 'inner_code': obj.inner_spec or '',
                 'inner_spec': obj.inner_code or '',  # 国内型号
                 'uom': obj.product_uom.display_name,
-                'qty': obj.product_uom_qty,  # 数量
+                'qty': obj.product_uom_qty,  # 订购数量
                 'price_total': "%.2f" % obj.price_total,  # 小计
                 'price_unit': "%.2f" % obj.price_unit,  # 单价
                 'qty_delivered': obj.qty_delivered,  # 已送货
                 'qty_invoiced': obj.qty_invoiced,  # 已开票
+                'qty_available' :obj.qty_available, # 库存
+                "id": obj.product_id.id, # 产品id
+                'product_specs':obj.product_specs, # 规格
             })
         return data
+
+    def get_picking_ids_detail(self, objs):
+        data = []
+        for obj in objs:
+            data.append({
+                'name': obj.name,  #
+                'min_date' :obj.min_date,  # 安排日期
+                'location_dest_id':obj.location_dest_id.display_name,
+                'origin':obj.origin,
+                'partner_id':obj.partner_id.display_name,
+                'backorder':obj.backorder_id.display_name or '', #欠单于
+                'location_id':obj.location_id.display_name ,  # 源仓库
+                'tracking_number' :obj.tracking_number ,
+                'state':obj.state,
+                'product_id':self.get_jiaohuo_order_detail(obj.pack_operation_product_ids),
+                'moving':self.get_picking_detail(obj.id)
+            })
+        return data
+
+    #产品
+    def get_jiaohuo_order_detail(self, objs):
+        data = []
+        for obj in objs:
+            data.append({
+                'name': obj.product_id.display_name,
+                'ordered_qty':obj.ordered_qty,#待办
+                'qty_done':obj.qty_done, #完成
+                'picking':self.get_picking_detail(obj.picking_id)
+            })
+        return data
+
+    def get_picking_detail(self, objs):
+        domain=[]
+        domain.append(('res_id','in',[objs]))
+        so_object = request.env['ir.attachment'].sudo().search(domain)
+        data = []
+        for obj in so_object:
+            data.append({
+                'create_date':obj.create_date,
+                'local_url':request.httprequest.host_url+'payment/order_status_show?pidsss='+str(obj.id)
+            })
+        return data
+
+
 
     # 订单详情页（销售退货）
     @http.route('/linkloving_oa_api/get_sale_return_details', type='json', auth="none", csrf=False, cors='*')
@@ -2852,6 +2903,23 @@ class LinklovingOAApi(http.Controller):
         })
         new_order_draft.prepayment_refuse_reason()
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
+
+    #搜索订单
+    @http.route('/linkloving_oa_api/search_sales_order', type='json', auth="none", csrf=False, cors='*')
+    def search_sales_order(self, *kw):
+        user_id = request.jsonrequest.get('user_id')
+        type = request.jsonrequest.get('type')
+        text = request.jsonrequest.get('search_text')
+        pet = request.jsonrequest.get('pet')
+        domain = []
+        if pet == "1":
+            domain.append(("state", 'in', ["draft","sent"]))
+        elif pet == "2":
+            domain.append(("state", 'not in', ["draft","sent"]))
+        domain.append((type,"ilike",text))
+        # domain.append(("user_id","=",user_id))
+        orders = request.env['sale.order'].sudo().search(domain)
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.get_so_orders_lists(orders))
 
     # ZWS
     @classmethod
