@@ -1,5 +1,57 @@
 <openerp>
     <data>
+
+
+        <record id='set_taxes_view' model='ir.ui.view'>
+            <field name='name'>multi.supplierinfo.tax</field>
+            <field name='model'>multi.supplierinfo.tax</field>
+            <field name='type'>form</field>
+            <field name='arch' type='xml'>
+                <form name='批量设置供应商税率'>
+                    <group>
+                        <field name='tax_id' required='1'/>
+                    </group>
+
+                    <footer>
+                        <button name='action_set_taxes' type='object' string='确认' class='oe_highlight'/>
+                        or
+                        <button string='取消' class='oe_link' special='cancel'/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window id="action_set_taxes"
+                    multi="True"
+                    key2="client_action_multi" name="批量设置供应商税率"
+                    res_model="multi.supplierinfo.tax" src_model="product.template"
+                    view_mode="form" target="new" view_type="form"/>
+
+
+        <record id='set_to_price' model='ir.ui.view'>
+            <field name='name'>set_to_price</field>
+            <field name='model'>price.to.product</field>
+            <field name='type'>form</field>
+            <field name='arch' type='xml'>
+                <form name='批量设置成本'>
+                    <p>
+                        该操作不可逆,请谨慎执行.
+                    </p>
+                    <footer>
+                        <button name='action_set' type='object' string='确认' class='oe_highlight'/>
+                        or
+                        <button string='取消' class='oe_link' special='cancel'/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window id="action_set_to_price"
+                    multi="True"
+                    key2="client_action_multi" name="批量设置成本"
+                    res_model="price.to.product" src_model="product.template"
+                    view_mode="form" target="new" view_type="form"/>
+
         <!-- Inherit Form View to Modify it -->
         <record id="product_template_form_view_inherit" model="ir.ui.view">
             <field name="name">product.template.procurement</field>

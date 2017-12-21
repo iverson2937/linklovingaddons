@@ -1,0 +1,10 @@
+<odoo>
+    <data noupdate="1">
+
+        <!-- Sequences for sale.order -->
+        <record id="account_hk" model="account.account.additional">
+            <field name="name">香港账户</field>
+        </record>
+
+    </data>
+</odoo>

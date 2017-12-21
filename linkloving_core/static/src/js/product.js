@@ -450,6 +450,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
                         self.$el.append(QWeb.render('show_bom_line_tr', {
                             bom_lines: result.bom_lines,
                             result: result,
+                            selection: self.selection,
                             po_length: po_length,
                             bom_length: bom_length,
                             mo_length: mo_length,

@@ -19,7 +19,7 @@ class AccountAccount(models.Model):
     _inherit = "account.account"
 
     parent_id = fields.Many2one('account.account', 'Parent Account')
-    child_ids = fields.One2many('account.account', 'parent_id', 'Child Accounts')
+    child_ids = fields.One2many('account.account', 'parent_id', 'Child Accounts', domain=[('deprecated', '=', False)])
 
     @api.model
     def search(self, args, offset=0, limit=None, order=None, count=False):
@@ -27,5 +27,3 @@ class AccountAccount(models.Model):
         if not context.get('show_parent_account', False):
             args += [('user_type_id.type', '!=', 'view')]
         return super(AccountAccount, self).search(args, offset, limit, order, count=count)
-
-

@@ -113,7 +113,7 @@
         <record id="mrp_production_form_view_inherit" model="ir.ui.view">
             <field name="name">mrp.production.tree.inherit</field>
             <field name="model">mrp.production</field>
-            <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+            <field name="inherit_id" ref="linkloving_mrp_extend.linkloving_mrp_production_form_view"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='product_uom_id']" position="replace">
                     <field name="product_uom_id" options="{'no_open':True,'no_create':True}" groups="product.group_uom"

@@ -13,7 +13,8 @@
                 </div>
                 <xpath expr="//field[@name='product_tmpl_id']" position="after">
                     <field name="process_id" options="{'no_create':True}"/>
-                    <field name="unit_price" attrs="{'invisible':[('mo_type', '==', 'time')]}"/>
+                    <!--不使用了 ，隐藏 12/13 allen-->
+                    <!--<field name="unit_price" attrs="{'invisible':[('mo_type', '==', 'time')]}"/>-->
                 </xpath>
                 <!--暂时性隐藏-->
                 <xpath expr="//field[@name='type']" position="after">

@@ -2,17 +2,40 @@
 <odoo>
     <data>
 
+
+        <record id="view_account_account_final_search_form" model="ir.ui.view">
+            <field name="name">project.task.search.form</field>
+            <field name="model">account.account.final</field>
+            <field name="arch" type="xml">
+                <search string="Tasks">
+                    <field name="account_id" string="科目"/>
+                    <field name="period_id" string="会计区间"/>
+                    <field name="fiscalyear_id" string="会计年度"/>
+                </search>
+            </field>
+        </record>
+
         <!--总账 form-->
         <record id="view_account_account_final_form" model="ir.ui.view">
             <field name="name">account.account.final.form</field>
             <field name="model">account.account.final</field>
             <field name="arch" type="xml">
                 <form>
-                    <field name="fiscalyear_id"/>
-                    <field name="period_id"/>
-                    <field name="account_id"/>
-                    <!--<field name="debit"/>-->
-                    <!--<field name="credit"/>-->
+                    <sheet>
+                        <group>
+                            <field name="fiscalyear_id" readonly="1"/>
+                            <field name="period_id" readonly="1"/>
+                            <field name="account_id" readonly="1"/>
+                            <field name="start_debit" readonly="1"/>
+                            <field name="start_credit" readonly="1"/>
+                            <field name="debit" readonly="1"/>
+                            <field name="credit" readonly="1"/>
+                            <field name="end_credit" readonly="1"/>
+                            <field name="end_debit" readonly="1"/>
+                        </group>
+
+
+                    </sheet>
                 </form>
             </field>
         </record>

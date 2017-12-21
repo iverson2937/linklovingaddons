@@ -289,13 +289,14 @@
                                     <field name="product_qty" attrs="{'readonly': [('has_moves', '=', True)]}"/>
                                     <field name="product_uom_id" options="{'no_open':True,'no_create':True}"
                                            groups="product.group_uom" attrs="{'readonly': [('has_moves', '=', True)]}"/>
-                                    <!--<button type="action"-->
-                                    <!--name="%(mrp.action_change_production_qty)d"-->
-                                    <!--string="编辑数量"-->
-                                    <!--states="confirmed,planned,progress"-->
-                                    <!--class="oe_highlight"-->
-                                    <!--attrs="{'invisible': [('state','=','done')]}"-->
-                                    <!--/>-->
+                                    <button type="formview_dialog"
+                                            name="get_change_prod_qty_formview"
+                                            string="更新数量"
+                                            states="confirmed,draft"
+                                            class="oe_highlight"
+                                            attrs="{'invisible': [('state','!=','confirmed,draft')]}"
+                                            context="{'default_mo_id':active_id,'default_product_qty': product_qty}"
+                                    />
                                 </div>
                                 <field name="process_id" options="{'no_create':True}" string="工序" required="1"
                                        readonly="1"/>
@@ -338,10 +339,11 @@
                         <notebook>
                             <page string="消耗的物料">
                                 <field name="sim_stock_move_lines" string="消耗的物料">
-                                    <tree editable="bottom" delete="0"
-                                          decoration-warning="quantity_done&gt;product_uom_qty"
-                                          decoration-success="quantity_done&gt;=product_uom_qty"
-                                          decoration-danger="qty_available&lt;product_uom_qty" create="0">
+                                    <tree editable="bottom"
+                                          delete="0"
+                                          decoration-success="remaining_qty==0"
+                                          decoration-danger="qty_available&lt;remaining_qty"
+                                          create="0">
                                         <field name="product_id" string="产品" options="{'no_create':True}"/>
                                         <field name="product_uom_qty" string="需求数量"/>
                                         <field name="suggest_qty" string="建议数量"/>

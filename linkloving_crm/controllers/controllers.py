@@ -32,6 +32,9 @@ class LinklovingCrm(http.Controller):
         elif kw.get('website') == 'false':
             domain.append(('website', 'not in', (False, '')))
 
+            if kw.get('star'):
+                domain.append(('priority', '=', kw.get('star')))
+
         partner_list = http.request.env['res.partner'].search(domain)
 
         for partner_one in partner_list:
@@ -47,7 +50,6 @@ class LinklovingCrm(http.Controller):
                 r = urllib2.Request(url=requrl)
                 r.add_data(urllib.urlencode({'name': partner_one.name}))
 
-                print str(partner_one.name) + '*********name********'
                 _logger.warning(str(partner_one.name) + '*********name********')
                 res_data = urllib2.urlopen(r)  # post method
 
@@ -55,7 +57,6 @@ class LinklovingCrm(http.Controller):
                 # res_data = urllib2.urlopen(req)
                 res = json.loads(res_data.read())['res_data']
 
-                print str(res) + '********* 返回********'
                 _logger.warning(str(res) + '********* 返回********')
 
                 if (not partner_one.crm_source_id) and res.get('crm_source_id'):  # 赋值来源

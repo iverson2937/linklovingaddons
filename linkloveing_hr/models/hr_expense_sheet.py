@@ -215,6 +215,7 @@ class HrExpenseSheet(models.Model):
         else:
             if not department.parent_id.manager_id:
                 raise UserError(u'上级部门没有设置经理,请联系管理员')
+
             self.to_approve_id = department.parent_id.manager_id.user_id.id
 
             self.write({'state': 'manager2_approve', 'approve_ids': [(4, self.env.user.id)]})

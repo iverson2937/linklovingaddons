@@ -25,7 +25,28 @@
                                   <t t-esc="result.type"/>
                             </t>
                          ]
-                        <span class="show_bom_line_two">[材料:<t t-esc="result.material_cost"/>,加工:<t t-esc="result.man_cost"/>,总:<t t-esc="result.total_cost"/>]</span>
+                        <span class="show_bom_line_two">[材料:
+                            <t t-if="result.material_cost==0">
+                                <span style="color:red"><t t-esc="result.material_cost"/>,</span>
+                            </t>
+                            <t t-else="">
+                                <t t-esc="result.material_cost"/>,
+                            </t>
+                            加工:
+                            <t t-if="result.man_cost==0">
+                                <span style="color:red"><t t-esc="result.man_cost"/>,</span>
+                            </t>
+                            <t t-else="">
+                                <t t-esc="result.man_cost"/>,
+                            </t>
+                            总:
+                            <t t-if="result.total_cost==0">
+                                <span style="color:red"><t t-esc="result.total_cost"/>  </span>
+                            </t>
+                            <t t-else="">
+                                <t t-esc="result.total_cost"/>
+                            </t>
+                            ]</span>
                     </span>
                 </h4>
             </div>
@@ -64,7 +85,28 @@
                                         <!--</t>-->
 
                                         <!--2017/11/6修改，需求库存等移到此处-->
-                                        <span class="show_bom_line_two">[材料:<t t-esc="item.material_cost"/>,加工:<t t-esc="item.man_cost"/>,总:<t t-esc="item.total_cost"/>]</span>
+                                        <span class="show_bom_line_two">[材料:
+                                            <t t-if="result.material_cost==0">
+                                                <span style="color:red"><t t-esc="result.material_cost"/>,</span>
+                                            </t>
+                                            <t t-else="">
+                                                <t t-esc="result.material_cost"/>,
+                                            </t>
+                                            加工:
+                                            <t t-if="result.man_cost==0">
+                                                <span style="color:red"><t t-esc="result.man_cost"/>,</span>
+                                            </t>
+                                            <t t-else="">
+                                                <t t-esc="result.man_cost"/>,
+                                            </t>
+                                            总:
+                                            <t t-if="result.total_cost==0">
+                                                <span style="color:red"><t t-esc="result.total_cost"/>  </span>
+                                            </t>
+                                            <t t-else="">
+                                                <t t-esc="result.total_cost"/>
+                                            </t>
+                                            ]</span>
 
                                         <!--2017/11/6添加部分刷新功能-->
                                         <!--<span style="margin-left:20px;" class="fa fa-refresh part_refresh"></span>-->

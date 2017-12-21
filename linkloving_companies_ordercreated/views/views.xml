@@ -17,8 +17,8 @@
                 <xpath expr="//notebook" position="inside">
                     <page string="子公司信息配置" attrs="{'invisible': [('sub_company', '!=', 'sub')]}" autofocus="autofocus">
                         <group>
-                            <field name="request_host" attrs="{'required': [('sub_company', '=', 'sub')]}"/>
-                            <field name="db_name" attrs="{'required': [('sub_company', '=', 'sub')]}"/>
+                            <field name="sub_company_id" attrs="{'required': [('sub_company', '=', 'sub')]}"/>
+                            <field name="follow_partner_id"/>
                             <field name="discount_to_sub" attrs="{'required': [('sub_company', '=', 'sub')]}"/>
                         </group>
                     </page>
@@ -47,5 +47,95 @@
 
             </field>
         </record>
+        <menuitem
+                id="menu_sub_company_cate"
+                name="下属公司设置"
+                parent="base.menu_administration"
+                sequence="3"
+                groups="base.group_system"/>
+
+        <record id="follow_partner_tree" model="ir.ui.view">
+            <field name="name">跟单员信息</field>
+            <field name="model">follow.order.partner</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="prefix_name" required="1"/>
+                    <field name="follow_partner_id" required="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="follow_partner_form" model="ir.ui.view">
+            <field name="name">跟单员信息</field>
+            <field name="model">follow.order.partner</field>
+            <field name="arch" type="xml">
+                <form string="跟单员信息">
+                    <sheet>
+                        <group>
+                            <field name="prefix_name" required="1"/>
+                            <field name="follow_partner_id" required="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="action_follow_partner" model="ir.actions.act_window">
+            <field name="name">跟单员信息</field>
+            <field name="res_model">follow.order.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="sub_company_info_tree" model="ir.ui.view">
+            <field name="name">下属公司信息</field>
+            <field name="model">sub.company.info</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="name"/>
+                    <field name="host"/>
+                    <field name="db_name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="sub_company_info_form" model="ir.ui.view">
+            <field name="name">下属公司信息</field>
+            <field name="model">sub.company.info</field>
+            <field name="arch" type="xml">
+                <form string="下属公司信息">
+                    <sheet>
+                        <group>
+                            <field name="name" required="1"/>
+                            <field name="host" required="1"/>
+                            <field name="db_name" required="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="action_sub_company_info" model="ir.actions.act_window">
+            <field name="name">下属公司信息</field>
+            <field name="res_model">sub.company.info</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="menu_sub_company_info"
+                  name="下属公司信息"
+                  parent="menu_sub_company_cate"
+                  action="action_sub_company_info"
+                  sequence="1"/>
+
+        <menuitem id="menu_follow_partner"
+                  name="跟单员信息"
+                  parent="menu_sub_company_cate"
+                  action="action_follow_partner"
+                  sequence="2"/>
+
     </data>
 </openerp>

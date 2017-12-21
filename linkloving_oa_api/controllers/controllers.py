@@ -89,7 +89,7 @@ class LinklovingOAApi(http.Controller):
     def supplier_detail_object_to_json(self, supplier_detail_object):
         supplier_details = {
             "name": supplier_detail_object.name,
-            "phone": supplier_detail_object.phone or '',
+            "phone": supplier_detail_object.mobile or '',
             "street": self.get_supplier_address(supplier_detail_object) or '',
             "email": supplier_detail_object.email or '',
             "website": supplier_detail_object.website or '',
@@ -125,6 +125,7 @@ class LinklovingOAApi(http.Controller):
                 "email": obj.email or '',
                 "street": obj.street2 or '',
                 "type": LinklovingOAApi.selection_get_map("res.partner", "type", obj.type),
+                "function":obj.function or '',
             })
         return json_lists
 
@@ -150,7 +151,7 @@ class LinklovingOAApi(http.Controller):
             'city': feedback.city or '',
             'company_name': feedback.commercial_company_name or '',
             'email': feedback.email or '',
-            'phone': feedback.mobile or feedback.phone or '',
+            'phone': feedback.mobile or '',
             'id': feedback.id or ''
         }
         return data
@@ -2437,8 +2438,8 @@ class LinklovingOAApi(http.Controller):
     def get_apply_record(self, objs):
         data = []
         for obj in objs:
-            old_state = obj.tracking_value_ids and obj.tracking_value_ids[0].old_value_char or ''
-            new_state = obj.tracking_value_ids and obj.tracking_value_ids[0].new_value_char or ''
+            old_state = obj.sudo().tracking_value_ids and obj.sudo().tracking_value_ids[0].old_value_char or ''
+            new_state = obj.sudo().tracking_value_ids and obj.sudo().tracking_value_ids[0].new_value_char or ''
 
             data.append({
                 "create_time": obj.create_date,
@@ -2528,7 +2529,7 @@ class LinklovingOAApi(http.Controller):
                     'unit_amount': float(p.get('unit_amount')),  # 金额
                     'name': p.get('name'),  # 费用说明
                     'employee_id': p.get('employee_id'),
-                    'department_id': p.get('department_id'),
+                    #'department_id': p.get('department_id'),
                     'tax_ids': (
                         [(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [account_tax.id])]),
                     'description': p.get('remarks') or '',

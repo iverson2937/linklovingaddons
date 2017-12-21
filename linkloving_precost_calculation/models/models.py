@@ -28,6 +28,51 @@ PURCHASE_TYPE = {
 }
 
 
+class MultisupplierinfoTax(models.TransientModel):
+    _name = 'multi.supplierinfo.tax'
+
+    def _default_tax_id(self):
+        user = self.env.user
+        return self.env['account.tax'].search(
+                [('company_id', '=', user.company_id.id), ('type_tax_use', '=', 'purchase'),
+                 ('amount_type', '=', 'percent'), ('account_id', '!=', False)], limit=1, order='amount asc')
+
+    tax_id = fields.Many2one('account.tax', default=_default_tax_id, domain=[('type_tax_use', '=', 'purchase')])
+
+    def action_set_taxes(self):
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+        for record in self.env['product.template'].browse(active_ids):
+            for seller in record.seller_ids:
+                seller.tax_id = self.tax_id.id
+
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": u"操作成功",
+                "text": u"操作成功",
+                "sticky": False
+            }
+        }
+class SetPriceToProduct(models.TransientModel):
+    _name = 'price.to.product'
+
+    def action_set(self):
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+        for record in self.env['product.template'].browse(active_ids):
+            if record.product_variant_count == 1:
+                record.standard_price = record.product_variant_id.pre_cost_cal()
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_notify",
+            "params": {
+                "title": u"操作成功",
+                "text": u"操作成功",
+                "sticky": False
+            }
+        }
 class ProductTemplate(models.Model):
     _name = 'product.template'
     _inherit = 'product.template'
@@ -59,7 +104,7 @@ class ProductTemplate(models.Model):
                 if line.product_id.bom_ids:
                     level = True
 
-                total_cost = line.product_id.pre_cost_cal()
+                total_cost = line.product_id.pre_cost_cal(raise_exception=False)
                 material_cost = line.product_id.get_material_cost()
                 man_cost = total_cost - material_cost
                 res.update({
@@ -77,7 +122,7 @@ class ProductTemplate(models.Model):
                 })
                 bom_lines.append(res)
         bom_lines.sort(key=lambda k: (k.get('type', 0)))
-        total_cost = self.product_variant_ids[0].pre_cost_cal()
+        total_cost = self.product_variant_ids[0].pre_cost_cal(raise_exception=False)
         material_cost = self.product_variant_ids[0].get_material_cost()
         man_cost = total_cost - material_cost
         return {
@@ -150,13 +195,13 @@ class ProductProductExtend(models.Model):
             if bom:
                 material_cost = 0.0
                 for line in bom.bom_line_ids:
-                    material_cost += line.product_id.pre_cost_cal() * line.product_qty
+                    material_cost += line.product_id.pre_cost_cal(raise_exception=False) * line.product_qty
                 return material_cost
             else:
-                return product.get_highest_purchase_price()
+                return product.get_highest_purchase_price(raise_exception=False)
 
     @api.multi
-    def pre_cost_cal(self):
+    def pre_cost_cal(self, raise_exception=True):
         """
         计算成本(工程核价)
         :return:
@@ -171,8 +216,11 @@ class ProductProductExtend(models.Model):
                     total_price += sub_bom_price
                 else:
                     # 判断是否是采购件
-                    pruchase_price = sbom.product_id.uom_id._compute_price(sbom.product_id.get_highest_purchase_price(),
-                                                                           sbom.product_uom_id)
+                    # if sbom.product_id.qty_available == 0:
+                    #     continue
+                    pruchase_price = sbom.product_id.uom_id._compute_price(
+                        sbom.product_id.get_highest_purchase_price(raise_exception),
+                        sbom.product_uom_id)
                     sub_price = pruchase_price * sbom_data['qty']
                     total_price += sub_price
             if total_price >= 0:
@@ -188,12 +236,23 @@ class ProductProductExtend(models.Model):
                 real_time_cost = _calc_price(bom)
                 return real_time_cost
             else:
-                return pp.get_highest_purchase_price()
+                return pp.get_highest_purchase_price(raise_exception)
 
     @api.multi
-    def get_highest_purchase_price(self):
+    def get_highest_purchase_price(self, raise_exception=True):
         for p in self:
             if p.seller_ids:
-                return max(p.seller_ids.mapped("price"))
+                max_seller = self.env["product.supplierinfo"]
+                for seller in p.seller_ids:
+                    tax_price = seller.price / (1 + (seller.tax_id.amount or 0) / 100)
+                    max_tax_price = max_seller.price / (1 + (max_seller.tax_id.amount or 0) / 100)
+                    if tax_price > max_tax_price:
+                        max_seller = seller
+                # 税点计算
+                max_price = max_seller.price / (1 + (max_seller.tax_id.amount or 0) / 100)
+                return max_price
             else:
-                raise UserError(u'%s 未设置采购价' % p.display_name)
+                if raise_exception:
+                    raise UserError(u'%s 未设置采购价' % p.display_name)
+                else:
+                    return 0

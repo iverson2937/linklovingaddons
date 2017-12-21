@@ -24,12 +24,12 @@ class PurchaseOrderLine(models.Model):
             if seller_ids:
                 for info in seller_ids:
                     info.product_code = line.supplier_product_code
-            else:
-                self.env['product.supplierinfo'].create({
-                    'product_tmpl_id': line.product_id.product_tmpl_id.id,
-                    'product_code': line.supplier_product_code,
-                    'name': line.order_id.partner_id.id
-                })
+                    # else:
+                    #     self.env['product.supplierinfo'].create({
+                    #         'product_tmpl_id': line.product_id.product_tmpl_id.id,
+                    #         'product_code': line.supplier_product_code,
+                    #         'name': line.order_id.partner_id.id,
+                    #     })
 
     @api.onchange('product_id')
     def onchange_product_id(self):

@@ -288,6 +288,7 @@ class linkloving_sale_extend(models.Model):
         self.ensure_one()
         # 产生销售单时 根据销售单客户 更改客户 订单状态
         self.partner_id.is_order = True
+        self.partner_id.crm_is_partner = False
         for line in self.order_line:
             if self.env.ref(
                     "mrp.route_warehouse0_manufacture") in line.product_id.route_ids and not line.product_id.bom_ids:

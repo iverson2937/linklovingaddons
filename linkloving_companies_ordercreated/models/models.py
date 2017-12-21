@@ -8,6 +8,18 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 
+class FollowOrderPartner(models.Model):
+    _name = 'follow.order.partner'
+
+    @api.multi
+    def name_get(self):
+        return [(partner.id, '%s - %s' % (partner.prefix_name or '', partner.follow_partner_id.name))
+                for partner in self]
+
+    prefix_name = fields.Char(string=u'名称')
+    follow_partner_id = fields.Many2one('res.partner', string=u'跟单员')
+
+
 class ResPartnerExtend(models.Model):
     _inherit = 'res.partner'
 
@@ -15,15 +27,39 @@ class ResPartnerExtend(models.Model):
                                                                 ('sub', u'子公司'),
                                                                 ('main', u'下单公司')],
                                    default="normal")
-    request_host = fields.Char(string=u'请求地址(包含端口)')
-    db_name = fields.Char(string=u'账套名称')
+    sub_company_id = fields.Many2one('sub.company.info', string=u'公司信息')
+    follow_partner_id = fields.Many2one('follow.order.partner', string=u'跟单员')
     discount_to_sub = fields.Float(string=u'成本折算率', default=0.8, help=u"跨系统生成的so单单价 = 当前成本/折算率")
-
 
 class SaleOrderExtend(models.Model):
     _inherit = 'sale.order'
 
     po_name_from_main = fields.Char(string=u'主系统的po单号')
+    so_name_from_main = fields.Char(string=u'主系统的so单号')
+    pi_name_from_main = fields.Char(string=u'主系统的PI号')
+    order_date_from_main = fields.Char(string=u'订单交期')
+    follow_partner_name_from_main = fields.Char(string=u'跟单员')
+    sale_man_from_main = fields.Char(string=u'业务员')
+    partner_name_from_main = fields.Char(string=u'客户名称')
+    order_type_from_main = fields.Char(string=u'订单类型')
+
+
+class SubCompanyInfo(models.Model):
+    _name = 'sub.company.info'
+
+    @api.multi
+    def _compute_host_correct(self):
+        for info in self:
+            host = info.host
+            if not host.startswith("http://"):
+                host = "http://" + host
+            info.host_correct = host
+
+    name = fields.Char(string=u'名称')
+    host = fields.Char(string=u'请求地址(包含端口)')
+    host_correct = fields.Char(compute='_compute_host_correct')
+    db_name = fields.Char(string=u'账套名称')
+
 
 class PurchaseOrderExtend(models.Model):
     _inherit = 'purchase.order'
@@ -63,7 +99,7 @@ class PurchaseOrderExtend(models.Model):
                     'so_name_from_sub': response.get("so")
                 })
                 a_url = u"%s/web?#id=%d&view_type=form&model=sale.order" % (
-                    self.partner_id.request_host, response.get("so_id"))
+                    self.partner_id.sub_company_id.host_correct, response.get("so_id"))
                 return {
                     "type": "ir.actions.client",
                     "tag": "action_notify",
@@ -82,11 +118,12 @@ class PurchaseOrderExtend(models.Model):
         return res
 
     def get_request_info(self, str1):
-        host = self.partner_id.request_host
-        if not host.startswith("http://"):
-            host = "http://" + host
+        if not self.partner_id.sub_company_id:
+            raise UserError(u"未设置子公司信息")
+
+        host = self.partner_id.sub_company_id.host_correct
         url = host + str1
-        db = self.partner_id.db_name
+        db = self.partner_id.sub_company_id.db_name
         header = {'Content-Type': 'application/json'}
         return url, db, header
 
@@ -103,14 +140,10 @@ class PurchaseOrderExtend(models.Model):
             "discount_to_sub": self.partner_id.discount_to_sub,
             "vals": line_list,
         }), headers=header)
-        res_json = json.loads(response.content).get("result")
-        if res_json and res_json.get("code") < 0:
-            raise UserError(res_json.get("msg"))
-        return res_json
+        return self.handle_response(response)
 
     def request_to_create_so(self):
         so = self._prepare_so_values()  # 解析采购单,生成so单信息
-        host = self.partner_id.request_host
         url, db, header = self.get_request_info('/linkloving_web/create_order')
         try:
             response = requests.post(url, data=json.dumps({
@@ -118,26 +151,31 @@ class PurchaseOrderExtend(models.Model):
                 "db": db,
                 "vals": so,
             }), headers=header)
-            res_json = json.loads(response.content).get("result")
-            if res_json and res_json.get("code") < 0:
-                raise UserError(res_json.get("msg"))
-            return res_json
+            return self.handle_response(response)
         except ConnectionError:
             raise UserError(u"请求地址错误, 请确认")
 
+    def handle_response(self, response):
+        res_json = json.loads(response.content).get("result")
+        res_error = json.loads(response.content).get("error")
+        if res_json and res_json.get("code") < 0:
+            raise UserError(res_json.get("msg"))
+        if res_error:
+            raise UserError(res_error.get("data").get("message"))
+        return res_json
+
     def _prepare_so_values(self):
-        # if self.order_line.procurement_ids:
-        #     origin = ''
-        #     for procurement in self.order_line.procurement_ids:
-        #         if procurement.move_dest_id and \
-        #                 procurement.move_dest_id.procurement_id and \
-        #                 procurement.move_dest_id.procurement_id.sale_line_id:
-        #             order_id = procurement.move_dest_id.procurement_id.sale_line_id.order_id
-        #             origin += order_id.name or '' + ':' + self.name + ":" + order_id.partner_id.name + ', '
         origin_so = self.env["sale.order"].search([("name", "=", self.first_so_number)])
         data = {
-            'remark': self.first_so_number or '' + ':' + self.name or '' + ':' + origin_so.partner_id.name or '',
+            'remark': (self.first_so_number or '') + ':' + self.name + ':' + (origin_so.partner_id.name or ''),
             'po_name_from_main': self.name,
+            'so_name_from_main': self.first_so_number or '',
+            'pi_name_from_main': origin_so.pi_number or '',
+            'order_date_from_main': self.handle_date,
+            'validity_date': self.handle_date,
+            'follow_partner_name_from_main': self.partner_id.follow_partner_id.follow_partner_id.name or '',
+            'sale_man_from_main': origin_so.user_id.name or '',
+            'partner_name_from_main': origin_so.partner_id.name or ''
         }
         line_list = []
         for order_line in self.order_line:
