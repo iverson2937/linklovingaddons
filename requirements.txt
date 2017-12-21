@@ -1,6 +1,6 @@
 jpush ==3.2.4.1
-
-
+pyquery
+simplejson
 爬虫软件环境搭建    [顺序安装]
 
 1   [Ubuntu安装需求]
