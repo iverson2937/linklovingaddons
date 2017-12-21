@@ -212,6 +212,7 @@ class LinklovingOAApi(http.Controller):
         limit = request.jsonrequest.get("limit")
         offset = request.jsonrequest.get("offset")
         state = request.jsonrequest.get("state")
+        user_id = request.jsonrequest.get("user_id")
         domain = [('state', '=', state)]
         if state == 'purchase':
             domain = [('state', 'in', ('to approval', 'done', 'purchase'))]
@@ -253,7 +254,8 @@ class LinklovingOAApi(http.Controller):
 
         limit = request.jsonrequest.get("limit")
         offset = request.jsonrequest.get("offset")
-        prma_lists = request.env['return.goods'].sudo().search([('supplier', '=', True)],
+        user_id = request.jsonrequest.get("user_id")
+        prma_lists = request.env['return.goods'].sudo(user_id).search([('supplier', '=', True)],
                                                                limit=limit,
                                                                offset=offset,
                                                                order='id desc')
@@ -304,7 +306,7 @@ class LinklovingOAApi(http.Controller):
             'id': prma_list.id,
             'name': prma_list.name,
             'date': prma_list.date,
-            'supplier': prma_list.partner_id.display_name,
+            'supplier': prma_list.sudo().partner_id.display_name,
             'remark': prma_list.remark or '',
             'amount_total': prma_list.amount_total
         }
@@ -809,13 +811,13 @@ class LinklovingOAApi(http.Controller):
         if request.jsonrequest.get("type"):
             type = request.jsonrequest.get("type")  # 报价单传 in  销售订单传 not in
             domain.append(('state', type, ['draft', 'sent']))
-            if user_id != 1:
-                domain.append(('user_id', '=', user_id))
+            # if user_id != 1:
+            #     domain.append(('user_id', '=', user_id))
             model = 'sale.order'
         else:
             model = 'return.goods'
             domain.append(('customer', '=', True))
-        so_orders = request.env[model].sudo().search(domain,
+        so_orders = request.env[model].sudo(user_id).search(domain,
                                                      limit=limit,
                                                      offset=offset,
                                                      order='id desc')
@@ -846,14 +848,14 @@ class LinklovingOAApi(http.Controller):
                 # 'date_order':  time.strftime("%Y-%m-%d %H:%M:%S", time.strptime(so_order.date_order, "%Y-%m-%d %H:%M:%S") + timez),
                 'date_order': so_order.date_order,
                 'validity_date': so_order.validity_date or '',
-                'customer': so_order.partner_id.display_name,
+                'customer': so_order.sudo().partner_id.display_name,
                 'salesman': so_order.user_id.display_name,
                 'invoice_status': LinklovingOAApi.selection_get_map("sale.order", "invoice_status",
                                                                     so_order.invoice_status),
                 'state': so_order.state,
                 'amount_total': "%.2f" % so_order.amount_total,
                 'pi_number': so_order.pi_number or '',
-                'team': so_order.team_id.display_name or ''
+                'team': so_order.sudo().team_id.display_name or ''
             })
         return data
 
@@ -863,7 +865,7 @@ class LinklovingOAApi(http.Controller):
             data.append({
                 'id': so_order.id,
                 'name': so_order.name,
-                'customer': so_order.partner_id.display_name,
+                'customer': so_order.sudo().partner_id.display_name,
                 'amount_total': so_order.amount_total,
                 'date': so_order.date,
                 'remark': so_order.remark,
@@ -1035,9 +1037,7 @@ class LinklovingOAApi(http.Controller):
                 domain = [('state', 'not in', ('draft', 'sent')), ('name', 'ilike', name)]
         elif model == 'return.goods':
             domain = [('customer', '=', True), ('name', 'ilike', name)]
-        if user_id != 1:
-            domain.append(('user_id', '=', user_id))
-        sale_orders = request.env[model].sudo().search(domain, limit=10, offset=0, order='id desc')
+        sale_orders = request.env[model].sudo(user_id).search(domain, limit=10, offset=0, order='id desc')
         if model == 'sale.order':
             return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.get_so_orders_lists(sale_orders))
         else:
