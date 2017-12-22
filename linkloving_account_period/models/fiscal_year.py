@@ -208,9 +208,16 @@ class AccountPeriod(models.Model):
                 })
             # 建立新的会计区间初始数据
             period_id = self._get_next_period()
-            final_obj.create({
-                'period_id': period_id.id,
-                'account_id': account['id'],
+            next_period_data = final_obj.search(
+                [('account_id', '=', account['id']), ('partner_id', '=', account['id']), ('period_id', '=', period_id)])
+            if not next_period_data:
+                final_obj.create({
+                    'period_id': period_id.id,
+                    'account_id': account['id'],
+                    'start_credit': account.credit,
+                    'start_debit': account.debit
+                })
+            next_period_data.write({
                 'start_credit': account.credit,
                 'start_debit': account.debit
             })
