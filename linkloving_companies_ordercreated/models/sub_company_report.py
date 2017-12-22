@@ -32,8 +32,8 @@ class SubCompanyReport(models.Model):
             'sub_so_name': po.so_name_from_sub or ''
         }
         if po.first_so_number:
-            so_order = self.env["sale.order"].search([('name', '=', po.first_so_number)])
-            manual_order = self.env["manual.procurement.order"].search([('name', '=', po.first_so_number)])
+            so_order = self.env["sale.order"].search([('name', '=', po.first_so_number)], limit=1)
+            manual_order = self.env["manual.procurement.order"].search([('name', '=', po.first_so_number)], limit=1)
             if so_order:
                 data.update({
                     'so_name': so_order.name or '',
