@@ -4,7 +4,7 @@ import json
 import requests
 from requests import ConnectionError
 
-from odoo import models, fields, api
+from odoo import models, fields, api, registry
 from odoo.exceptions import UserError
 
 
@@ -20,6 +20,13 @@ class SubCompanyTransfer(models.Model):
 
     feedback_id = fields.Many2one('mrp.qc.feedback', string=u'品检单')
     product_qty = fields.Float(string=u'数量')
+
+    def tranfer_in_sub_sub(self, db_name, feedback_id):
+        cr = registry(db_name).cursor()
+        self = self.with_env(self.env(cr=cr))  # TDE FIXME
+        feedback = self.env["mrp.qc.feedback"].sudo().search([('id', '=', int(feedback_id))])
+        return feedback
+
 
     def get_request_info(self, str1):
         origin_sale_id = self.feedback_id.production_id.origin_sale_id

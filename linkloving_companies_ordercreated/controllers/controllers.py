@@ -50,19 +50,11 @@ class LinklovingCompanies(http.Controller):
         data = json.loads(decode_data)
         if not data.get("db"):
             raise UserError(u'未找到账套信息')
-
-        LinklovingCompanies.change_db(data.get("db"))
-
         if not data.get("feedback_id"):
             raise UserError(u'品检单为空')
-
-        # requests.post(data.get("url") + '/view_feedback_detail', {
-        #     'db': data.get("db"),
-        #     'feedback_id': data.get("feedback_id")
-        # })
         feedback_id = data.get("feedback_id")
         try:
-            feedback = request.env["mrp.qc.feedback"].sudo().search([('id', '=', int(feedback_id))])
+            feedback = request.env["sub.company.transfer"].sudo().tranfer_in_sub_sub(data.get("db"), feedback_id)
             f_dic = self.convert_qc_feedback_to_json(feedback)
         except Exception, e:
             raise e
