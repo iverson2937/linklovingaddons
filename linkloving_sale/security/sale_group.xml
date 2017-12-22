@@ -64,7 +64,7 @@
     </record>
     <record id="my_team_customer" model="ir.rule">
         <field name="name">我团队客户</field>
-        <field eval="0" name="perm_write"/>
+        <field eval="1" name="perm_write"/>
         <field eval="0" name="perm_create"/>
         <field eval="0" name="perm_unlink"/>
         <field ref="base.model_res_partner" name="model_id"/>

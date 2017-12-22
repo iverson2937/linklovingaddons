@@ -125,7 +125,7 @@ class LinklovingOAApi(http.Controller):
                 "email": obj.email or '',
                 "street": obj.street2 or '',
                 "type": LinklovingOAApi.selection_get_map("res.partner", "type", obj.type),
-                "function":obj.function or '',
+                "function": obj.function or '',
             })
         return json_lists
 
@@ -203,8 +203,8 @@ class LinklovingOAApi(http.Controller):
                      'qty_invoiced': order_line.qty_invoiced,  # 开单数量
                      'qty_received': order_line.qty_received,  # 已接收数量
                      'price_tax': order_line.taxes_id.name,  # 税金
-                     'shipping_rate':(order_line.qty_received*100/order_line.product_qty),
-                     'id':order_line.order_id.product_id.id
+                     'shipping_rate': (order_line.qty_received * 100 / order_line.product_qty),
+                     'id': order_line.order_id.product_id.id
                      }
                 )
             return JsonResponse.send_response(STATUS_CODE_OK, res_data=po_order_detail)
@@ -235,11 +235,10 @@ class LinklovingOAApi(http.Controller):
             'status_light': po_order.status_light,
             'product_count': po_order.amount_total,  # 总数量
             'amount_total': po_order.product_count,  # 总金额
-            'shipping_rate':po_order.shipping_rate,
-            'state':po_order.state, #状态
-            'invoice_status': po_order.invoice_status, #对账单状态
-            'handle_date':po_order.handle_date or '' #交货日期
-
+            'shipping_rate': po_order.shipping_rate,
+            'state': po_order.state,  # 状态
+            'invoice_status': po_order.invoice_status,  # 对账单状态
+            'handle_date': po_order.handle_date or ''  # 交货日期
         }
         return data
 
@@ -256,9 +255,9 @@ class LinklovingOAApi(http.Controller):
         offset = request.jsonrequest.get("offset")
         user_id = request.jsonrequest.get("user_id")
         prma_lists = request.env['return.goods'].sudo(user_id).search([('supplier', '=', True)],
-                                                               limit=limit,
-                                                               offset=offset,
-                                                               order='id desc')
+                                                                      limit=limit,
+                                                                      offset=offset,
+                                                                      order='id desc')
         json_list = []
         for prma_list in prma_lists:
             json_list.append(self.prma_list_to_json(prma_list))
@@ -297,7 +296,7 @@ class LinklovingOAApi(http.Controller):
                 "price_unit": obj.price_unit,  # 单价
                 "price_subtotal": obj.price_subtotal,  # 小计
                 "qty_to_invoice": obj.qty_to_invoice,  # 待对账数量
-                'id':obj.product_id.id
+                'id': obj.product_id.id
             })
         return data
 
@@ -818,9 +817,9 @@ class LinklovingOAApi(http.Controller):
             model = 'return.goods'
             domain.append(('customer', '=', True))
         so_orders = request.env[model].sudo(user_id).search(domain,
-                                                     limit=limit,
-                                                     offset=offset,
-                                                     order='id desc')
+                                                            limit=limit,
+                                                            offset=offset,
+                                                            order='id desc')
         # print limit,offset, user_id
         if model == 'sale.order':
             return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.get_so_orders_lists(so_orders))
@@ -913,9 +912,9 @@ class LinklovingOAApi(http.Controller):
             'amount_tax': "%.2f" % so_object.amount_tax,  # 税金
             'amount_total': "%.2f" % so_object.amount_total,  # 总计
             'order_line': self.get_so_detail_order_line(so_object.order_line),
-            'create_date':so_object.create_date,  #单据创建日期
-            'remark':so_object.remark or '' ,  #备注
-            'picking_ids': self.get_picking_ids_detail(so_object.picking_ids) #交货单
+            'create_date': so_object.create_date,  # 单据创建日期
+            'remark': so_object.remark or '',  # 备注
+            'picking_ids': self.get_picking_ids_detail(so_object.picking_ids)  # 交货单
         }
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
@@ -933,9 +932,9 @@ class LinklovingOAApi(http.Controller):
                 'price_unit': "%.2f" % obj.price_unit,  # 单价
                 'qty_delivered': obj.qty_delivered,  # 已送货
                 'qty_invoiced': obj.qty_invoiced,  # 已开票
-                'qty_available' :obj.qty_available, # 库存
-                "id": obj.product_id.id, # 产品id
-                'product_specs':obj.product_specs, # 规格
+                'qty_available': obj.qty_available,  # 库存
+                "id": obj.product_id.id,  # 产品id
+                'product_specs': obj.product_specs,  # 规格
             })
         return data
 
@@ -944,44 +943,42 @@ class LinklovingOAApi(http.Controller):
         for obj in objs:
             data.append({
                 'name': obj.name,  #
-                'min_date' :obj.min_date,  # 安排日期
-                'location_dest_id':obj.location_dest_id.display_name,
-                'origin':obj.origin,
-                'partner_id':obj.partner_id.display_name,
-                'backorder':obj.backorder_id.display_name or '', #欠单于
-                'location_id':obj.location_id.display_name ,  # 源仓库
-                'tracking_number' :obj.tracking_number ,
-                'state':obj.state,
-                'product_id':self.get_jiaohuo_order_detail(obj.pack_operation_product_ids),
-                'moving':self.get_picking_detail(obj.id)
+                'min_date': obj.min_date,  # 安排日期
+                'location_dest_id': obj.location_dest_id.display_name,
+                'origin': obj.origin,
+                'partner_id': obj.partner_id.display_name,
+                'backorder': obj.backorder_id.display_name or '',  # 欠单于
+                'location_id': obj.location_id.display_name,  # 源仓库
+                'tracking_number': obj.tracking_number,
+                'state': obj.state,
+                'product_id': self.get_jiaohuo_order_detail(obj.pack_operation_product_ids),
+                'moving': self.get_picking_detail(obj.id)
             })
         return data
 
-    #产品
+    # 产品
     def get_jiaohuo_order_detail(self, objs):
         data = []
         for obj in objs:
             data.append({
                 'name': obj.product_id.display_name,
-                'ordered_qty':obj.ordered_qty,#待办
-                'qty_done':obj.qty_done, #完成
-                'picking':self.get_picking_detail(obj.picking_id)
+                'ordered_qty': obj.ordered_qty,  # 待办
+                'qty_done': obj.qty_done,  # 完成
+                'picking': self.get_picking_detail(obj.picking_id)
             })
         return data
 
     def get_picking_detail(self, objs):
-        domain=[]
-        domain.append(('res_id','in',[objs]))
+        domain = []
+        domain.append(('res_id', 'in', [objs]))
         so_object = request.env['ir.attachment'].sudo().search(domain)
         data = []
         for obj in so_object:
             data.append({
-                'create_date':obj.create_date,
-                'local_url':request.httprequest.host_url+'payment/order_status_show?pidsss='+str(obj.id)
+                'create_date': obj.create_date,
+                'local_url': request.httprequest.host_url + 'payment/order_status?pidsss=' + str(obj.id)
             })
         return data
-
-
 
     # 订单详情页（销售退货）
     @http.route('/linkloving_oa_api/get_sale_return_details', type='json', auth="none", csrf=False, cors='*')
@@ -1451,7 +1448,7 @@ class LinklovingOAApi(http.Controller):
         domain = [("to_approve_id", '=', user_id),
                   ('state', 'in', ('submit', 'manager1_approve', 'manager2_approve'))]
         acount = request.env['hr.expense.sheet'].sudo().search_count(domain)
-        data = { "acount" :acount}
+        data = {"acount": acount}
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
     def approval_list_to_json(self, obj):
@@ -2201,14 +2198,14 @@ class LinklovingOAApi(http.Controller):
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
         #
+
     @http.route('/linkloving_oa_api/get_product_detail_by_id', type='json', auth="none", csrf=False, cors='*')
     def get_product_detail_by_id(self, *kw):
         id = request.jsonrequest.get("id")
         product_product = request.env['product.product'].sudo().browse(id)
         product_detail = request.env['product.template'].sudo().browse(product_product.product_tmpl_id.id)
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data= self.change_product_detail_to_json(product_detail, product_product))
-
-
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=self.change_product_detail_to_json(product_detail, product_product))
 
     # 产品BOM、库存移动
     @http.route('/linkloving_oa_api/product_bom_stock_move', type='json', auth="none", csrf=False, cors='*')
@@ -2236,8 +2233,7 @@ class LinklovingOAApi(http.Controller):
             data.append(self.change_product_detail_to_json(product_detail, product_product))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-
-#产品库存移动
+    # 产品库存移动
     @http.route('/linkloving_oa_api/get_stock_moves_by_product_id', type='json', auth="none", csrf=False, cors='*')
     def get_stock_moves_by_product_id(self, *kw):
         product_id = request.jsonrequest.get('product_id')
@@ -2274,7 +2270,8 @@ class LinklovingOAApi(http.Controller):
             'origin': stock_move.origin if stock_move.origin else '',
         }
         return data
-    def change_product_detail_to_json(self,obj,product):
+
+    def change_product_detail_to_json(self, obj, product):
         if (product.write_date):
             time_unque = product.write_date.replace("-", "").replace(" ", "").replace(":", "")
         else:
@@ -2444,7 +2441,7 @@ class LinklovingOAApi(http.Controller):
             data.append({
                 "create_time": obj.create_date,
                 "create_person_ava": LinklovingGetImageUrl.get_img_url(obj.create_uid.self.user_ids.id,
-                                                                  "res.users", "image_medium"),
+                                                                       "res.users", "image_medium"),
                 "create_person": obj.create_uid.display_name,
                 "description": obj.compyter_body,
                 "old_state": old_state,
@@ -2517,7 +2514,7 @@ class LinklovingOAApi(http.Controller):
         userId = data.get('user_id')
         is_reset = data.get('is_reset')
         id = data.get('id')
-        account_tax = request.env["account.tax"].sudo().search([('amount', '<', 1),('type_tax_use', '=', 'purchase')])
+        account_tax = request.env["account.tax"].sudo().search([('amount', '<', 1), ('type_tax_use', '=', 'purchase')])
         if is_reset:
             new_order_draft = request.env['hr.expense.sheet'].sudo(userId).browse(id)
             expense_lines = new_order_draft.expense_line_ids
@@ -2529,7 +2526,7 @@ class LinklovingOAApi(http.Controller):
                     'unit_amount': float(p.get('unit_amount')),  # 金额
                     'name': p.get('name'),  # 费用说明
                     'employee_id': p.get('employee_id'),
-                    #'department_id': p.get('department_id'),
+                    # 'department_id': p.get('department_id'),
                     'tax_ids': (
                         [(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [account_tax.id])]),
                     'description': p.get('remarks') or '',
@@ -2547,7 +2544,7 @@ class LinklovingOAApi(http.Controller):
                     'unit_amount': float(p.get('unit_amount')),  # 金额
                     'name': p.get('name'),  # 费用说明
                     'employee_id': p.get('employee_id'),
-                    'department_id': p.get('department_id'),
+                    # 'department_id': p.get('department_id'),
                     'tax_ids': (
                         [(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [account_tax.id])]),
                     'description': p.get('remarks') or '',
@@ -2904,7 +2901,7 @@ class LinklovingOAApi(http.Controller):
         new_order_draft.prepayment_refuse_reason()
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
 
-    #搜索订单
+    # 搜索订单
     @http.route('/linkloving_oa_api/search_sales_order', type='json', auth="none", csrf=False, cors='*')
     def search_sales_order(self, *kw):
         user_id = request.jsonrequest.get('user_id')
@@ -2913,10 +2910,10 @@ class LinklovingOAApi(http.Controller):
         pet = request.jsonrequest.get('pet')
         domain = []
         if pet == "1":
-            domain.append(("state", 'in', ["draft","sent"]))
+            domain.append(("state", 'in', ["draft", "sent"]))
         elif pet == "2":
-            domain.append(("state", 'not in', ["draft","sent"]))
-        domain.append((type,"ilike",text))
+            domain.append(("state", 'not in', ["draft", "sent"]))
+        domain.append((type, "ilike", text))
         # domain.append(("user_id","=",user_id))
         orders = request.env['sale.order'].sudo().search(domain)
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.get_so_orders_lists(orders))
@@ -3003,25 +3000,25 @@ class LinklovingOAApi(http.Controller):
                     [('website_published', '=', True), ('name', 'ilike', search_body)])
             elif search_type == 'create_uid':
                 create_list = [author.id for author in
-                                   request.env['res.users'].search([('name', 'ilike', search_body)])]
+                               request.env['res.users'].search([('name', 'ilike', search_body)])]
                 blog_list = request.env['blog.post'].search(
-                        [('website_published', '=', True), ('create_uid', 'in', create_list)])
+                    [('website_published', '=', True), ('create_uid', 'in', create_list)])
             elif search_type == 'content':
                 blog_list = request.env['blog.post'].search(
-                        [('website_published', '=', True), ('content', 'ilike', search_body)])
+                    [('website_published', '=', True), ('content', 'ilike', search_body)])
             for blog_list_bean in blog_list:
                 blog_list_json.append(LinklovingOAApi.blog_to_json(blog_list_bean))
         elif is_tag_id:
             if is_first:
                 blog_list = request.env['blog.post'].search(
-                        [('website_published', '=', True), ('blog_id', '=', int(tag_id))])
+                    [('website_published', '=', True), ('blog_id', '=', int(tag_id))])
             else:
                 blog_list = request.env['blog.post'].search(
-                        [('website_published', '=', True), ('tag_ids', '=', int(tag_id))])
+                    [('website_published', '=', True), ('tag_ids', '=', int(tag_id))])
             for blog_list_bean in blog_list:
                 blog_list_json.append(LinklovingOAApi.blog_to_json(blog_list_bean))
         return JsonResponse.send_response(STATUS_CODE_OK,
-                                              res_data=blog_list_json)
+                                          res_data=blog_list_json)
 
     # 获取博客分类
     @http.route('/linkloving_oa_api/get_blog_colum', type='json', auth='none', csrf=False, cors='*')
