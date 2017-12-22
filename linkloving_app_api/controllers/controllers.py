@@ -3637,20 +3637,33 @@ class LinklovingAppApi(http.Controller):
         if request.jsonrequest.get('process_id'):
             domain.append(('process_id', '=', request.jsonrequest['process_id']))
 
-        if request.jsonrequest.get('production_line_id'):
-            domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
+        if 'production_line_id' in request.jsonrequest.keys():
+            if request.jsonrequest.get('production_line_id'):
+                domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
+            else:
+                domain.append(('production_line_id', '=', False))
+
+
+        if 'origin_sale_id' in request.jsonrequest.keys():
+            if request.jsonrequest.get('origin_sale_id'):
+                domain.append(('origin_sale_id', '=', request.jsonrequest['origin_sale_id']))
+            else:
+                domain.append(('origin_sale_id', '=', False))
 
         if request.jsonrequest.get('state'):
             if request.jsonrequest.get('state') in ('waiting_material', 'prepare_material_ing'):
                 domain.append(('state', 'in', ['waiting_material', 'prepare_material_ing']))
             elif request.jsonrequest.get('state') == 'progress':
                 domain.append(('feedback_on_rework', '=', None))
+                domain.append(('state', '=', 'progress'))
+                domain.append(("is_secondary_produce", '=', False))
             else:
                 domain.append(('state', '=', request.jsonrequest['state']))
 
-        orders_today = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).search(domain,
-                                                                                                  limit=limit,
-                                                                                                  offset=offset)
+        orders_today = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).search(domain
+                                                                                                  # ,limit=limit,
+                                                                                                  # offset=offset
+                                                                                                  )
 
         data = []
         for production in orders_today:
@@ -3680,14 +3693,17 @@ class LinklovingAppApi(http.Controller):
         if request.jsonrequest.get('process_id'):
             domain.append(('process_id', '=', request.jsonrequest['process_id']))
 
-        if request.jsonrequest.get('origin_sale_id'):
-            domain.append(('origin_sale_id', '=', request.jsonrequest['origin_sale_id']))
-        else:
-            domain.append(('origin_sale_id', '=', False))
+        if 'origin_sale_id' in request.jsonrequest.keys():
+            if request.jsonrequest.get('origin_sale_id'):
+                domain.append(('origin_sale_id', '=', request.jsonrequest['origin_sale_id']))
+            else:
+                domain.append(('origin_sale_id', '=', False))
 
         if 'production_line_id' in request.jsonrequest.keys():
-            production_line_id = request.jsonrequest.get("production_line_id")
-            domain.append(('production_line_id', '=', production_line_id))
+            if request.jsonrequest.get('production_line_id'):
+                domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
+            else:
+                domain.append(('production_line_id', '=', False))
 
         production_rework = mrp_production.search(domain,
                                                   offset=request.jsonrequest['offset'],
@@ -3722,8 +3738,10 @@ class LinklovingAppApi(http.Controller):
 
 
         if 'production_line_id' in request.jsonrequest.keys():
-            production_line_id = request.jsonrequest.get("production_line_id")
-            domain.append(('production_line_id', '=', production_line_id))
+            if request.jsonrequest.get('production_line_id'):
+                domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
+            else:
+                domain.append(('production_line_id', '=', False))
 
         if is_group_by:
             mos = request.env["mrp.production"].sudo(LinklovingAppApi.CURRENT_USER()).search(domain)
@@ -3773,8 +3791,10 @@ class LinklovingAppApi(http.Controller):
             domain.append(('process_id', '=', request.jsonrequest['process_id']))
 
         if 'production_line_id' in request.jsonrequest.keys():
-            production_line_id = request.jsonrequest.get("production_line_id")
-            domain.append(('production_line_id', '=', production_line_id))
+            if request.jsonrequest.get('production_line_id'):
+                domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
+            else:
+                domain.append(('production_line_id', '=', False))
 
         mos = request.env["mrp.production"].sudo().search(domain).filtered(lambda x: x.state not in ['cancel', 'done'])
 
@@ -3805,8 +3825,11 @@ class LinklovingAppApi(http.Controller):
         if request.jsonrequest.get('process_id'):
             domain.append(('process_id', '=', request.jsonrequest['process_id']))
 
-        if request.jsonrequest.get('production_line_id'):
-            domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
+        if 'production_line_id' in request.jsonrequest.keys():
+            if request.jsonrequest.get('production_line_id'):
+                domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
+            else:
+                domain.append(('production_line_id', '=', False))
 
         if request.jsonrequest.get('state'):
             if request.jsonrequest.get('state') in ('waiting_material', 'prepare_material_ing'):
@@ -3817,6 +3840,9 @@ class LinklovingAppApi(http.Controller):
                 domain.append(("is_secondary_produce", '=', False))
             elif request.jsonrequest.get('state') == 'is_secondary_produce':
                 domain.append(("is_secondary_produce", '=', True))
+            elif request.jsonrequest.get('state') == 'rework_ing':
+                domain.append(('state', '=', 'progress'))
+                domain.append(('feedback_on_rework', '!=', None))
             else:
                 domain.append(('state', '=', request.jsonrequest['state']))
 
@@ -3853,9 +3879,11 @@ class LinklovingAppApi(http.Controller):
         if request.jsonrequest.get('process_id'):
             domain.append(('process_id', '=', request.jsonrequest['process_id']))
 
-
-        if request.jsonrequest.get('production_line_id'):
-            domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
+        if 'production_line_id' in request.jsonrequest.keys():
+            if request.jsonrequest.get('production_line_id'):
+                domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
+            else:
+                domain.append(('production_line_id', '=', False))
 
         if request.jsonrequest.get('state'):
             if request.jsonrequest.get('state') in ('waiting_material', 'prepare_material_ing'):
@@ -3905,8 +3933,11 @@ class LinklovingAppApi(http.Controller):
         if request.jsonrequest.get('process_id'):
             domain.append(('process_id', '=', request.jsonrequest['process_id']))
 
-        if request.jsonrequest.get('production_line_id'):
-            domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
+        if 'production_line_id' in request.jsonrequest.keys():
+            if request.jsonrequest.get('production_line_id'):
+                domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
+            else:
+                domain.append(('production_line_id', '=', False))
 
 
 
