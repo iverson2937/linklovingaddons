@@ -3,6 +3,8 @@
 from odoo import models, fields, api, _
 
 from odoo.addons import decimal_precision as dp
+
+
 class AccountAccount(models.Model):
     _inherit = 'account.account'
 
@@ -14,6 +16,14 @@ class AccountAccount(models.Model):
 
     parent_id = fields.Many2one('account.account')
     child_parent_ids = fields.One2many('account.account', 'parent_id', 'Children')
+
+    @api.multi
+    def get_month_begin_balance(self):
+        period_id = self.env['account.period'].get_current_period_id()
+        for account in self:
+            final = self.env['account.account.final'].search(
+                [('account_id', '=', account.id), ('period_id', '=', period_id)])
+            return final.start_debit - final.start_credit
 
     @api.multi
     def _get_children_and_consol(self):

@@ -79,6 +79,13 @@ class AccountPeriod(models.Model):
         ('done', 'Close')
     ], default='open')
 
+    def get_current_period(self):
+
+        account_period_obj = self.env['account.period']
+        ids = account_period_obj.search([('state', '!=', 'done')])
+        period_id = ids[0]
+        return period_id.id
+
     def _get_next_period(self):
         account_period_obj = self.env['account.period']
         ids = account_period_obj.search([('state', '!=', 'done')])
@@ -112,10 +119,10 @@ class AccountPeriod(models.Model):
         # Prepare sql query base on selected parameters from wizard
         # compute the balance, debit and credit for the provided accounts
         request = (
-            "SELECT account_id AS id, SUM(debit) AS debit, SUM(credit) AS credit, (SUM(debit) - SUM(credit)) AS balance" + \
-            " FROM " + "account_move_line" + " WHERE account_id IN %s  "
-            + " AND period_id = %s "
-            + "GROUP BY account_id"
+                "SELECT account_id AS id, SUM(debit) AS debit, SUM(credit) AS credit, (SUM(debit) - SUM(credit)) AS balance" + \
+                " FROM " + "account_move_line" + " WHERE account_id IN %s  "
+                + " AND period_id = %s "
+                + "GROUP BY account_id"
 
         )
         params = (tuple(accounts.ids), str(period_id))
