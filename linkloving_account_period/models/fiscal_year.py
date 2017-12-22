@@ -268,3 +268,4 @@ class AccountPeriod(models.Model):
                 #     'start_credit': credit + period_partner_data.start_credit,
                 #     'start_debit': debit + period_partner_data.start_debit
                 # })
+        self.state = 'done'
