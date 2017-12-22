@@ -3707,3 +3707,258 @@ class LinklovingAppApi(http.Controller):
         if account:
             jason_list = account.sudo().json_data()
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=jason_list)
+
+    # 返工中(小幸福更改，在原来基础上再分产线工序)
+    @http.route('/linkloving_app_api/get_new_reworking_production', type='json', auth='none', csrf=False)
+    def get_new_reworking_production(self):
+        partner_id = request.jsonrequest.get('partner_id')
+        mrp_production = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER())
+        domain = []
+        if partner_id:
+            domain.append('|')
+            domain.append(('in_charge_id', '=', partner_id))
+            domain.append(('create_uid', '=', partner_id))
+        domain.append(('state', '=', 'progress'))
+        domain.append(('feedback_on_rework', '!=', None))
+
+        if request.jsonrequest.get('process_id'):
+            domain.append(('process_id', '=', request.jsonrequest['process_id']))
+
+        if request.jsonrequest.get('origin_sale_id'):
+            domain.append(('origin_sale_id', '=', request.jsonrequest['origin_sale_id']))
+        else:
+            domain.append(('origin_sale_id', '=', False))
+
+        if 'production_line_id' in request.jsonrequest.keys():
+            production_line_id = request.jsonrequest.get("production_line_id")
+            domain.append(('production_line_id', '=', production_line_id))
+
+        production_rework = mrp_production.search(domain,
+                                                  offset=request.jsonrequest['offset'],
+                                                  limit=request.jsonrequest['limit'],
+                                                  order='date_planned_start desc'
+                                                  )
+
+        data = []
+        for production in production_rework:
+            data.append(self.get_simple_production_json(production))
+        # user_data = LinklovingAppApi.odoo10.execute('res.users', 'read', [LinklovingAppApi.odoo10.env.user.id])
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    # 获取生产入库品检单（邹邹改）
+    @http.route('/linkloving_app_api/get_new_qc_feedback', type='json', auth='none', csrf=False)
+    def get_new_qc_feedback(self, **kw):
+        limit = request.jsonrequest.get("limit")
+        offset = request.jsonrequest.get("offset")
+        partner_id = request.jsonrequest.get('partner_id')
+        state = request.jsonrequest.get('state')
+        is_group_by = request.jsonrequest.get('is_group_by')
+        # mrp_production = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER())
+        domain = []
+
+        if partner_id:
+            domain.append('|')
+            domain.append(('in_charge_id', '=', partner_id))
+            domain.append(('create_uid', '=', partner_id))
+
+        if request.jsonrequest.get('process_id'):
+            domain.append(('process_id', '=', request.jsonrequest['process_id']))
+
+
+        if 'production_line_id' in request.jsonrequest.keys():
+            production_line_id = request.jsonrequest.get("production_line_id")
+            domain.append(('production_line_id', '=', production_line_id))
+
+        if is_group_by:
+            mos = request.env["mrp.production"].sudo(LinklovingAppApi.CURRENT_USER()).search(domain)
+            feedbacks = request.env["mrp.qc.feedback"].sudo(LinklovingAppApi.CURRENT_USER()).search(
+                [("state", '=', state), ("production_id", "in", mos.ids)],
+                limit=limit,
+                offset=offset,
+                order='production_id desc')
+            group_list = {}
+            for feed in feedbacks:
+                group_feed = group_list.get(feed.production_id.origin_sale_id.name)
+                if group_feed:
+                    group_feed.get("feedbacks").append(self.convert_qc_feedback_to_json(feed))
+                else:
+                    group_list[feed.production_id.origin_sale_id.name or ''] = {
+                        'sale_id': feed.production_id.origin_sale_id.id or -1,
+                        'feedbacks': [self.convert_qc_feedback_to_json(feed)]
+                        }
+
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=self.transferJson(group_list))
+
+    #json转化
+    def transferJson(self, group_list):
+        so_list = []
+        for i in range(len(group_list)):
+            key = group_list.keys()[i]
+            timestamp = group_list[key]['feedbacks']
+            streamArr = group_list[key]['sale_id']
+            so =  {
+                'soname': key,
+                'feedback': timestamp,
+                'sale_id': streamArr
+             }
+            so_list.append(so)
+        return so_list
+
+
+
+    # 二次生产增加工序产线分类
+    @http.route('/linkloving_app_api/get_secondary_mos', type='json', auth='none', csrf=False, cors='*')
+    def get_secondary_mos(self, **kw):
+        # order_id = request.jsonrequest.get('material_id')
+        domain = [("is_secondary_produce", '=', True)]
+
+        if request.jsonrequest.get('process_id'):
+            domain.append(('process_id', '=', request.jsonrequest['process_id']))
+
+        if 'production_line_id' in request.jsonrequest.keys():
+            production_line_id = request.jsonrequest.get("production_line_id")
+            domain.append(('production_line_id', '=', production_line_id))
+
+        mos = request.env["mrp.production"].sudo().search(domain).filtered(lambda x: x.state not in ['cancel', 'done'])
+
+        data = []
+        for production in mos:
+            data.append(self.get_simple_production_json(production))
+        # user_data = LinklovingAppApi.odoo10.execute('res.users', 'read', [LinklovingAppApi.odoo10.env.user.id])
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    # 获取so源(小幸福加的)
+    @http.route('/linkloving_app_api/get_so_mrp_production', type='json', auth='none', csrf=False)
+    def get_so_mrp_production(self, **kw):
+        # limit = request.jsonrequest.get('limit')
+        # offset = request.jsonrequest.get('offset')
+        process_id = request.jsonrequest.get("process_id")
+        is_group_by = request.jsonrequest.get("is_group_by")
+        partner_id = request.jsonrequest.get('partner_id')
+
+        domain = []
+        if partner_id:
+            domain.append('|')
+            domain.append(('in_charge_id', '=', partner_id))
+            domain.append(('create_uid', '=', partner_id))
+
+        if not process_id:
+            return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "未找到工序id"})
+
+        if request.jsonrequest.get('process_id'):
+            domain.append(('process_id', '=', request.jsonrequest['process_id']))
+
+        if request.jsonrequest.get('production_line_id'):
+            domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
+
+        if request.jsonrequest.get('state'):
+            if request.jsonrequest.get('state') in ('waiting_material', 'prepare_material_ing'):
+                domain.append(('state', 'in', ['waiting_material', 'prepare_material_ing']))
+            elif request.jsonrequest.get('state') == 'progress':
+                domain.append(('feedback_on_rework', '=', None))
+                domain.append(('state', '=', 'progress'))
+                domain.append(("is_secondary_produce", '=', False))
+            elif request.jsonrequest.get('state') == 'is_secondary_produce':
+                domain.append(("is_secondary_produce", '=', True))
+            else:
+                domain.append(('state', '=', request.jsonrequest['state']))
+
+
+        if is_group_by:
+            group_by = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(domain=domain,
+                                                                                                      fields=[
+                                                                                                          'origin_sale_id'],
+                                                                                                      groupby=[
+                                                                                                          'origin_sale_id'])
+        data = []
+        for production in group_by:
+            data.append(self.get_so_production(production))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    def get_so_production(self, production):
+        return {
+            'origin_id': production.get('origin_sale_id')[0] if production.get('origin_sale_id') else 0,
+            'origin_name': production.get('origin_sale_id')[1] if production.get('origin_sale_id') else '',
+            'origin_count': production.get('origin_sale_id_count')
+        }
+
+    # 获取生产状态的数目(邹邹改的)
+    @http.route('/linkloving_app_api/get_count_mrp_production', type='json', auth='none', csrf=False)
+    def get_count_mrp_production(self, **kw):
+        process_id = request.jsonrequest.get("process_id")
+        is_group_by = request.jsonrequest.get("is_group_by")
+
+        domain = []
+        if not process_id:
+            return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "未找到工序id"})
+
+
+        if request.jsonrequest.get('process_id'):
+            domain.append(('process_id', '=', request.jsonrequest['process_id']))
+
+
+        if request.jsonrequest.get('production_line_id'):
+            domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
+
+        if request.jsonrequest.get('state'):
+            if request.jsonrequest.get('state') in ('waiting_material', 'prepare_material_ing'):
+                pass
+                # domain.append(('state', 'in', ['waiting_material', 'prepare_material_ing']))
+            elif request.jsonrequest.get('state') == 'progress':
+                domain.append(('feedback_on_rework', '=', None))
+                domain.append(("is_secondary_produce", '=', False))
+            else:
+                # domain.append(('state', '=', request.jsonrequest['state']))
+                pass
+
+
+        orders_today = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(domain=domain,
+                                                                                                  fields=[
+                                                                                                      'state'],
+                                                                                                  groupby=[
+                                                                                                      'state'])
+
+        data = []
+        for production in orders_today:
+            data.append(self.getJsonCount(production))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    #处理下json格式（邹邹）
+    def getJsonCount(self, production):
+        return {
+            'state': production.get('state'),
+            'state_count': production.get('state_count')
+        }
+
+    #二次生产单据修改
+    @http.route('/linkloving_app_api/get_new_secondary_mos', type='json', auth='none', csrf=False, cors='*')
+    def get_new_secondary_mos(self, **kw):
+        process_id = request.jsonrequest.get("process_id")
+        partner_id = request.jsonrequest.get('partner_id')
+
+        domain = []
+        if partner_id:
+            domain.append('|')
+            domain.append(('in_charge_id', '=', partner_id))
+            domain.append(('create_uid', '=', partner_id))
+
+        if not process_id:
+            return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "未找到工序id"})
+
+        if request.jsonrequest.get('process_id'):
+            domain.append(('process_id', '=', request.jsonrequest['process_id']))
+
+        if request.jsonrequest.get('production_line_id'):
+            domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
+
+
+
+        domain.append(("is_secondary_produce", '=', True))
+        mos = request.env["mrp.production"].sudo().search(domain).filtered(lambda x: x.state not in ['cancel', 'done'])
+
+        data = []
+        for production in mos:
+            data.append(self.get_simple_production_json(production))
+        # user_data = LinklovingAppApi.odoo10.execute('res.users', 'read', [LinklovingAppApi.odoo10.env.user.id])
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)

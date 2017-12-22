@@ -218,7 +218,7 @@ class linkloving_procurement_order_extend(models.Model):
                                                                                                   report_id=new_mrp_report,
                                                                                                   orderpoint_id=orderpoint,
                                                                                                   order_qty=qty_rounded))
-                            orderpoint.active = False  # 运算完补货规则之后,将补货规则设置成无效
+                            # orderpoint.active = False  # 运算完补货规则之后,将补货规则设置成无效
                             if new_mrp_report:
                                 new_mrp_report.report_end_time = fields.Datetime.now()  # 刷新最后记录时间
                         except OperationalError:

@@ -349,7 +349,7 @@
 
         <record id="action_customer_invoice_refund"
                 model="ir.actions.act_window">
-            <field name="name">退货对账单</field>
+            <field name="name">销售退款对账单</field>
             <field name="res_model">account.invoice</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,kanban,form,calendar,pivot,graph
@@ -381,11 +381,11 @@
 
         <menuitem id="menu_customer_invoice_refund"
                   action="action_customer_invoice_refund"
-                  name="退货对账单"
+                  name="退款对账单"
                   parent="sale.menu_sale_invoicing" sequence="2"/>
 
         <record id="action_vendor_refund_bill" model="ir.actions.act_window">
-            <field name="name">退货对账单</field>
+            <field name="name">采购退款对账单</field>
             <field name="res_model">account.invoice</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,kanban,form,calendar,pivot,graph
