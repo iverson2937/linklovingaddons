@@ -54,6 +54,8 @@ class LinklovingCompanies(http.Controller):
             raise UserError(u'品检单为空')
         feedback_id = data.get("feedback_id")
         try:
+            request.session.db = data.get("db")  # 设置账套
+            request.params["db"] = data.get("db")
             feedback = request.env["sub.company.transfer"].sudo().tranfer_in_sub_sub(data.get("db"), feedback_id)
             f_dic = self.convert_qc_feedback_to_json(feedback)
         except Exception, e:
@@ -128,6 +130,8 @@ class LinklovingCompanies(http.Controller):
             confirmation = request.env["stock.backorder.confirmation"].sudo().create({
                 'pick_id': picking_to_in.id
             })
+            if picking_to_in.state != 'assigned':
+                picking_to_in.force_assign()
             confirmation.process()
             picking_to_in.to_stock()
             picking_to_in.write({
