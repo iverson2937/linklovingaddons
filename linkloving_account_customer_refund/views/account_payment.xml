@@ -1,0 +1,29 @@
+<odoo>
+    <data>
+
+
+        <record id="action_customer_payment_refund" model="ir.actions.act_window">
+            <field name="name">客户退款申请</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('payment_type','=','outbound')，('partner_type','=','customer')]</field>
+            <field name="context">
+                {'default_payment_type':'outbound','default_partner_type':'customer','default_partner_type':'customer','apply':True}
+            </field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    创建客户退款申请
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem id="menu_customer_payment_refund"
+                  action="action_customer_payment_refund"
+                  name="客户退款申请"
+                  parent="sale.menu_sale_invoicing" sequence="6"/>
+
+    </data>
+</odoo>
