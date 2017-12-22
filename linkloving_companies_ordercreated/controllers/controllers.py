@@ -4,7 +4,6 @@ import json
 import requests
 from psycopg2._psycopg import OperationalError
 
-from linklovingaddons.linkloving_app_api.controllers.controllers import LinklovingAppApi
 from odoo import http, registry
 from odoo.exceptions import UserError
 from odoo.http import request
@@ -12,6 +11,16 @@ import base64
 
 
 class LinklovingCompanies(http.Controller):
+    @classmethod
+    def get_qc_img_url(cls, worker_id, ):
+        # DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
+        imgs = []
+        for img_id in worker_id:
+            url = '%slinkloving_app_api/get_worker_image?worker_id=%s&model=%s&field=%s' % (
+                request.httprequest.host_url, str(img_id), 'qc.feedback.img', 'qc_img')
+            imgs.append(url)
+        return imgs
+
     def convert_qc_feedback_to_json(self, qc_feedback):
         data = {
             'feedback_id': qc_feedback.id,
@@ -32,7 +41,7 @@ class LinklovingCompanies(http.Controller):
             'qc_fail_qty': qc_feedback.qc_fail_qty,
             'qc_fail_rate': qc_feedback.qc_fail_rate,
             'qc_note': qc_feedback.qc_note or '',
-            'qc_img': LinklovingAppApi.get_qc_img_url(qc_feedback.qc_imgs.ids),
+            'qc_img': LinklovingCompanies.get_qc_img_url(qc_feedback.qc_imgs.ids),
         }
         return data
 
