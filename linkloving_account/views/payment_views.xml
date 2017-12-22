@@ -186,7 +186,7 @@
             <field name="arch" type="xml">
                 <tree decoration-danger="state=='posted'" decoration-muted="state == 'done'">
                     <field name="name" string="单号"/>
-                    <field name="amount"/>
+                    <field name="amount" sum="总计"/>
                     <field name="partner_id"/>
                     <field name="create_uid"/>
                     <field name="create_date"/>
@@ -262,9 +262,9 @@
 
 
         <!--收款登记add by allen 暂时性隐藏-->
-        <menuitem id="payment_received_register" action="action_payment_received_register"
-                  groups="base.group_no_one"
-                  parent="account.menu_finance_receivables" sequence="5"/>
+        <!--<menuitem id="payment_received_register" action="action_payment_received_register"-->
+        <!--groups="base.group_no_one"-->
+        <!--parent="account.menu_finance_receivables" sequence="5"/>-->
 
     </data>
 </openerp>

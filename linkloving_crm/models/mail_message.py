@@ -187,6 +187,28 @@ class CrmMailMessage(models.Model):
 
         return True
 
+    @api.multi
+    def write(self, vals):
+        res = super(CrmMailMessage, self).write(vals)
+        if self.model == 'crm.lead':
+
+            lead_val = self.env['crm.lead'].browse(self.res_id)
+            # 跟进的类行为报价的话 就改变商机状态为 报价
+            mail_quote_id = self.env.ref('linkloving_crm.message_label_quote_id1')
+            mail_sample_id = self.env.ref('linkloving_crm.message_label_sample_id')
+            if self.message_type != 'notification' and vals.get('messages_label_ids'):
+                message_label_list = vals.get('messages_label_ids')[0][2]
+                if mail_quote_id.id in message_label_list:
+                    lead_val.write({'lead_is_quote': True})
+                else:
+                    lead_val.write({'lead_is_quote': False})
+                if mail_sample_id.id in message_label_list:
+                    lead_val.write({'lead_is_sample': True})
+                else:
+                    lead_val.write({'lead_is_sample': False})
+
+        return res
+
     @api.model
     def create(self, values):
 
@@ -225,6 +247,18 @@ class CrmMailMessage(models.Model):
                 for one_type in message.messages_label_ids:
                     stage_val = self.env['crm.stage'].search([('full_name_ids', 'in', one_type.id)])
                     crm_lead_val.write({'stage_id': stage_val.id})
+
+            # 跟进的类行为报价的话 就改变商机状态为 报价
+            mail_quote_id = self.env.ref('linkloving_crm.message_label_quote_id1')
+            mail_sample_id = self.env.ref('linkloving_crm.message_label_sample_id')
+
+            if message.message_type != 'notification':
+                crm_lead_val.write({'lead_is_follow_up': True})
+                if mail_quote_id.id in message.messages_label_ids.ids:
+                    crm_lead_val.write({'lead_is_quote': True})
+                elif mail_sample_id.id in message.messages_label_ids.ids:
+                    crm_lead_val.write({'lead_is_sample': True})
+
         elif message.model == 'res.partner' and message.messages_label_ids:
             crm_partner_val = self.env['res.partner'].search([('id', '=', message.res_id)])
             if not crm_partner_val.opportunity_ids:

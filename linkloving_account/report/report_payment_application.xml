@@ -4,141 +4,159 @@
         <template id="report_payment_application">
             <t t-call="report.html_container">
                 <t t-foreach="docs" t-as="o">
-                    <t t-call="report.internal_layout">
-                        <div class="page">
-                            <div class="oe_structure"/>
+                    <t t-if="o.state in ['confirm','done']">
+                        <t t-call="report.internal_layout">
+                            <div class="page">
+                                <div class="oe_structure"/>
 
 
-                            <h2 class="text-center">Payment Application</h2>
+                                <h2 class="text-center">Payment Application</h2>
 
-                            <h2>
-                                <p t-field="o.name"/>
-                            </h2>
+                                <h2>
+                                    <p t-field="o.name"/>
+                                </h2>
 
-                            <div class="row mt32 mb32">
-                                <div class="col-xs-2">
-                                    <strong>Company Name:</strong>
-                                    <p t-field="o.partner_id.name"/>
-                                </div>
-                                <t t-if="o.bank_id">
+                                <div class="row mt32 mb32">
+                                    <div class="col-xs-2">
+                                        <strong>Company Name:</strong>
+                                        <p t-field="o.partner_id.name"/>
+                                    </div>
+                                    <t t-if="o.bank_id">
+
+                                        <div class="col-xs-2">
+                                            <strong>Payee:</strong>
+                                            <p t-field="o.bank_id.owner"/>
+                                        </div>
+                                        <div class="col-xs-2">
+                                            <strong>银行账户:</strong>
+                                            <p t-field="o.bank_id.acc_number"/>
+                                        </div>
+                                        <div class="col-xs-2">
+                                            <strong>Due bank:</strong>
+                                            <t t-if="o.bank_id.bank_id">
+                                                <p t-field="o.bank_id.bank_id.name"/>
+                                            </t>
+
+                                        </div>
+                                    </t>
+
 
                                     <div class="col-xs-2">
-                                        <strong>Payee:</strong>
-                                        <p t-field="o.bank_id.owner"/>
+                                        <strong>Apply Date:</strong>
+                                        <p t-field="o.receive_date"/>
                                     </div>
-                                    <div class="col-xs-2">
-                                        <strong>银行账户:</strong>
-                                        <p t-field="o.bank_id.acc_number"/>
-                                    </div>
-                                    <div class="col-xs-2">
-                                        <strong>Due bank:</strong>
-                                        <t t-if="o.bank_id.bank_id">
-                                            <p t-field="o.bank_id.bank_id.name"/>
-                                        </t>
+
+
+                                    <!--<div class="col-xs-3">-->
+                                    <!--<strong>金额:</strong>-->
+                                    <!--<p t-field="o.amount"/>-->
+
+                                    <!--</div>-->
+
+                                    <div class="col-xs-12">
+                                        <strong>Remark:</strong>
+                                        <p t-field="o.remark"/>
 
                                     </div>
-                                </t>
-
-
-                                <div class="col-xs-2">
-                                    <strong>Apply Date:</strong>
-                                    <p t-field="o.receive_date"/>
                                 </div>
-
-
-                                <!--<div class="col-xs-3">-->
-                                <!--<strong>金额:</strong>-->
-                                <!--<p t-field="o.amount"/>-->
-
-                                <!--</div>-->
-
-                                <div class="col-xs-12">
-                                    <strong>Remark:</strong>
-                                    <p t-field="o.remark"/>
-
-                                </div>
-                            </div>
-                            <strong>Invoices:</strong>
-                            <table class="table table-condensed">
-                                <thead>
-                                    <tr>
-                                        <th>Invoice Date</th>
-                                        <th class="text-center">Invoice No</th>
-                                        <th class="text-center">Order No</th>
-                                        <th class="text-center">Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr t-foreach="o.invoice_ids" t-as="invoice">
-                                        <td t-if="invoice.date_invoice">
-                                            <p t-field="invoice.date_invoice"/>
-
-                                        </td>
-                                        <td t-if="invoice.number" class="text-center">
-                                            <p t-field="invoice.number"/>
-
-                                        </td>
-                                        <td t-if="invoice.origin" class="text-center">
-                                            <p t-field="invoice.origin"/>
-                                        </td>
-                                        <td t-if="invoice.amount_total" class="text-center">
-                                            <p t-field="invoice.amount_total"/>
-                                        </td>
-
-
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                            <div class="row">
-                                <div class="col-xs-6">
-
-                                </div>
-                                <div class="col-xs-2">
-
-                                    <strong t-esc="in_amount"></strong>
-                                </div>
-
-                                <div class="col-xs-2">
-                                    <strong t-esc="out_amount"></strong>
-                                </div>
-                                <div class="col-xs-2 pull-right">
-                                    <table class="table table-condensed">
-                                        <tr class="border-black">
-                                            <td>
-                                                <strong>Total Amount:</strong>
-                                            </td>
-                                            <td class="text-right">
-                                                <strong t-esc="o.amount"></strong>
-
-                                            </td>
-                                        </tr>
+                                <strong>Invoices:</strong>
+                                <table class="table table-condensed">
+                                    <thead>
                                         <tr>
+                                            <th>Invoice Date</th>
+                                            <th class="text-center">Invoice No</th>
+                                            <th class="text-center">Order No</th>
+                                            <th class="text-center">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="o.invoice_ids" t-as="invoice">
+                                            <td t-if="invoice.date_invoice">
+                                                <p t-field="invoice.date_invoice"/>
+
+                                            </td>
+                                            <td t-if="invoice.number" class="text-center">
+                                                <p t-field="invoice.number"/>
+
+                                            </td>
+                                            <td t-if="invoice.origin" class="text-center">
+                                                <p t-field="invoice.origin"/>
+                                            </td>
+                                            <td t-if="invoice.amount_total" class="text-center">
+                                                <p t-field="invoice.amount_total"/>
+                                            </td>
+
 
                                         </tr>
-                                    </table>
+                                    </tbody>
+                                </table>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+
+                                    </div>
+                                    <div class="col-xs-2">
+
+                                        <strong t-esc="in_amount"></strong>
+                                    </div>
+
+                                    <div class="col-xs-2">
+                                        <strong t-esc="out_amount"></strong>
+                                    </div>
+                                    <div class="col-xs-2 pull-right">
+                                        <table class="table table-condensed">
+                                            <tr class="border-black">
+                                                <td>
+                                                    <strong>Total Amount:</strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <strong t-esc="o.amount"></strong>
+
+                                                </td>
+                                            </tr>
+                                            <tr>
+
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-3">
+                                    <strong>总经理:</strong>
+                                </div>
+                                <div class="col-xs-3">
+                                    <strong>财务:</strong>
+                                </div>
+                                <div class="col-xs-3">
+                                    <strong>审核人:</strong>
+                                    <p t-field="o.approve_id.name"/>
+                                </div>
+                                <div class="col-xs-3">
+                                    <strong>制单人:</strong>
+                                    <p t-field="o.create_uid.name"/>
+                                </div>
+
+                                <div class="oe_structure"/>
+                            </div>
+                        </t>
+
+                    </t>
+                    <t t-if="o.state not in ['confirm','done']">
+                        <t t-call="report.external_layout">
+                            <div class="page">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div>只有审核通过的申购单,才可以打印</div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="col-xs-3">
-                                <strong>总经理:</strong>
-                            </div>
-                            <div class="col-xs-3">
-                                <strong>财务:</strong>
-                            </div>
-                            <div class="col-xs-3">
-                                <strong>审核人:</strong>
-                                <p t-field="o.approve_id.name"/>
-                            </div>
-                            <div class="col-xs-3">
-                                <strong>制单人:</strong>
-                                <p t-field="o.create_uid.name"/>
-                            </div>
+                        </t>
 
-                            <div class="oe_structure"/>
-                        </div>
                     </t>
                 </t>
+
+
             </t>
         </template>
     </data>

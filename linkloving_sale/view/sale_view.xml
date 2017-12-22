@@ -159,21 +159,20 @@
         </record>
 
 
-        <!--<record model="ir.ui.view" id="website_crm_partner_assign.view_res_partner_filter_assign_tree">-->
-        <!--<field name="name">res.partner.tree.form.inherit</field>-->
-        <!--<field name="model">res.partner</field>-->
-        <!--<field name="inherit_id" ref="base_geolocalize.view_crm_partner_geo_form"/>-->
-        <!--<field name="arch" type="xml">-->
-        <!--<field name="email" position="after">-->
-        <!--<field name="internal_code"/>-->
-        <!--<field name="team_id"/>-->
-        <!--<field name="state_id"/>-->
-        <!--</field>-->
-        <!--&lt;!&ndash;<field name="date_review_next" position="replace"/>&ndash;&gt;-->
-        <!--&lt;!&ndash;<field name="level" position="replace"/>&ndash;&gt;-->
-        <!--&lt;!&ndash;<field name="activation" position="replace"/>&ndash;&gt;-->
-        <!--</field>-->
-        <!--</record>-->
+        <record id="product_template_action" model="ir.actions.act_window">
+            <field name="name">Products</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">tree,form,kanban</field>
+            <field name="view_type">form</field>
+            <field name="domain">[]</field>
+            <field name="context">{"search_default_filter_to_sell":1}</field>
+            <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'tree', 'view_id': ref('linkloving_sale.product_template_tree_ol')}),
+            (0,0,{'view_mode':'form', 'view_id': ref('product.product_template_only_form_view')})]"/>
+        </record>
+
+
         <record id="linkloving_view_partner_tree" model="ir.ui.view">
             <field name="name">res.partner.tree</field>
             <field name="model">res.partner</field>

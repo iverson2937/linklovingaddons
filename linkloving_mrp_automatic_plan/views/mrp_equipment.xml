@@ -289,13 +289,14 @@
                                     <field name="product_qty" attrs="{'readonly': [('has_moves', '=', True)]}"/>
                                     <field name="product_uom_id" options="{'no_open':True,'no_create':True}"
                                            groups="product.group_uom" attrs="{'readonly': [('has_moves', '=', True)]}"/>
-                                    <!--<button type="action"-->
-                                    <!--name="%(mrp.action_change_production_qty)d"-->
-                                    <!--string="编辑数量"-->
-                                    <!--states="confirmed,planned,progress"-->
-                                    <!--class="oe_highlight"-->
-                                    <!--attrs="{'invisible': [('state','=','done')]}"-->
-                                    <!--/>-->
+                                    <button type="formview_dialog"
+                                            name="get_change_prod_qty_formview"
+                                            string="更新数量"
+                                            states="confirmed,draft"
+                                            class="oe_highlight"
+                                            attrs="{'invisible': [('state','!=','confirmed,draft')]}"
+                                            context="{'default_mo_id':active_id,'default_product_qty': product_qty}"
+                                    />
                                 </div>
                                 <field name="process_id" options="{'no_create':True}" string="工序" required="1"
                                        readonly="1"/>

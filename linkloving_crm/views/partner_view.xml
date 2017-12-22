@@ -317,6 +317,12 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_res_partner_filter"/>
             <field name="arch" type="xml">
+
+                <xpath expr="//filter[@name='inactive']" position="after">
+                    <filter string="新增的客户" name="partner_day_new"
+                            domain="[ ('create_date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                </xpath>
+
                 <xpath expr="//group[@name='group_by']/filter[@name='salesperson']" position="after">
                     <filter string="销售团队" name="team_id" context="{'group_by' : 'team_id'}" domain="[]"/>
                     <filter string="客户星级" name="priority" context="{'group_by' : 'priority'}" domain="[]"/>
@@ -324,6 +330,26 @@
 
             </field>
         </record>
+
+        <!--<record id="crm_view_crm_team_form" model="ir.ui.view">-->
+            <!--<field name="name">crm.team.form</field>-->
+            <!--<field name="model">crm.team</field>-->
+            <!--<field name="inherit_id" ref="sales_team.crm_team_view_form"/>-->
+            <!--<field name="arch" type="xml">-->
+
+                <!--<xpath expr="//div[@name='button_box']" position="inside">-->
+
+                    <!--<button type="object"-->
+                            <!--name="action_view_partner_img"-->
+                            <!--class="oe_stat_button"-->
+                            <!--icon="fa-photo fa-image fa-picture-o"-->
+                    <!--string="设置销售员目标">-->
+                    <!--</button>-->
+
+                <!--</xpath>-->
+
+            <!--</field>-->
+        <!--</record>-->
 
 
         <record id="crm_view_document_file_kanban_img" model="ir.ui.view">

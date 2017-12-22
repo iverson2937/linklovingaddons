@@ -68,6 +68,7 @@ class linkloving_product_input_extend(models.Model):
         ('raw material', '原料'),
         ('semi-finished', '半成品'),
         ('finished', '成品'),
+        ('service', '服务'),
         ('assets', '固定资产')
     ], copy=True, string="物料类型")
 

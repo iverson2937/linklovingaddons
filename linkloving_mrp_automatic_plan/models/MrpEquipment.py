@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta
 import pytz
 from dateutil.relativedelta import relativedelta
-
+from odoo.addons import decimal_precision as dp
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 from odoo.osv import expression
@@ -15,6 +15,28 @@ WEEKEND_LIST = [6]  # 从0 - 6 周一到周天
 REWORK_DEFAULT_TIME = 8 * 60 * 60
 
 DONE_CANCEL_DOMAIN = ["done", "cancel"]
+
+
+class ChangeProductionQtyExtend(models.TransientModel):
+    _name = 'change.production.qty.dialog'
+
+    # TDE FIXME: add production_id field
+    mo_id = fields.Many2one('mrp.production', u'制造单', required=True, readonly=True)
+    product_qty = fields.Float(
+            u'生产数量',
+            digits=dp.get_precision('Product Unit of Measure'), required=True)
+
+    @api.model
+    def create(self, vals):
+        res = super(ChangeProductionQtyExtend, self).create(vals)
+        if res.mo_id.state in ["confirmed", "draft"]:
+            qty_wizard = self.env['change.production.qty'].create({
+                'mo_id': res.mo_id.id,
+                'product_qty': vals.get("product_qty")
+            })
+            qty_wizard.with_context({}).change_prod_qty()
+        return res
+
 class PlanMoWizard(models.TransientModel):
     _name = 'plan.mo.wizard'
 
@@ -369,6 +391,16 @@ class MrpProductionExtend(models.Model):
     # def write(self, vals):
     #     for mo in self:
     #         if vals.get("")
+
+    def get_change_prod_qty_formview(self):
+        view_id = self.env.ref('mrp.view_change_production_qty_wizard').id
+        return {
+            'title': u'打开',
+            'res_model': 'change.production.qty.dialog',
+            # 'view_id': view_id,
+            'disable_multiple_selection': True,
+        }
+
     def get_formview(self):
         view_id = self.env.ref('linkloving_mrp_automatic_plan.form_plan_mo_wizard').id
         return {

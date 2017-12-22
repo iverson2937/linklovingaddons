@@ -92,7 +92,6 @@
                             class="oe_stat_button"
                             icon="fa-photo fa-image fa-picture-o"
                             context="{'type_btn':'Inspection'}"
-                            attrs="{'invisible': [('qc_img_count', '=', 0)]}"
                             groups="">
                         <field name="qc_img_count" widget="statinfo" string="品检信息"/>
                     </button>
@@ -102,7 +101,6 @@
                             class="oe_stat_button"
                             icon="fa-photo fa-image fa-picture-o"
                             context="{'type_btn':'Logistical'}"
-                            attrs="{'invisible': [('attachment_img_count', '=', 0)]}"
                             groups="">
                         <field name="attachment_img_count" widget="statinfo" string="物流信息"/>
                     </button>

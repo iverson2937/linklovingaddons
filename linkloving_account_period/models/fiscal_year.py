@@ -161,34 +161,51 @@ class AccountPeriod(models.Model):
     @api.multi
     def close_period(self):
 
-
         accounts = self.env['account.account'].search([])
         account_res = self._get_account_period_accounts(accounts, self.id)
         final_obj = self.env['account.account.final']
+        account_datas = {}
+        # 本期发生的借贷
         for account in account_res:
-
+            account_datas.update({
+                account['id']: {
+                    'credit': account['credit'],
+                    'debit': account['debit']
+                }
+            })
+        for account in self.env['account.account'].search([('deprecated', '=', False)]):
+            credit = debit = 0
+            if account_datas.get(account.id):
+                credit = account_datas[account.id]['credit']
+                debit = account_datas[account.id]['debit']
             vals = {
+                'credit': credit,
+                'debit': debit,
+                'end_credit': account.credit,
+                'end_debit': account.debit,
                 'period_id': self.id,
-                'account_id': account['id'],
-                'credit': account['credit'],
-                'debit': account['debit']
+                'account_id': account.id,
             }
             period_data = final_obj.search(
                 [('account_id', '=', account['id']), ('partner_id', '=', account['id']), ('period_id', '=', self.id)])
             # self.state = 'done'
             if not period_data:
                 # 系统第一个会计区间没有数据
-                period_data = final_obj.create(vals)
+                final_obj.create(vals)
             else:
-                period_data.write({'credit': account['credit'],
-                                   'debit': account['debit']})
+                period_data.write({
+                    'end_credit': account.credit,
+                    'end_debit': account.debit,
+                    'credit': account['credit'],
+                    'debit': account['debit']
+                })
             # 建立新的会计区间初始数据
             period_id = self._get_next_period()
             final_obj.create({
                 'period_id': period_id.id,
                 'account_id': account['id'],
-                'start_credit': account['credit'] + period_data.start_credit,
-                'start_debit': account['debit'] + period_data.start_debit
+                'start_credit': account.credit,
+                'start_debit': account.debit
             })
 
         # 获取每个业务伙伴的应收应付汇总
