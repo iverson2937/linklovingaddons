@@ -209,7 +209,8 @@ class AccountPeriod(models.Model):
             # 建立新的会计区间初始数据
             period_id = self._get_next_period()
             next_period_data = final_obj.search(
-                [('account_id', '=', account['id']), ('partner_id', '=', account['id']), ('period_id', '=', period_id)])
+                [('account_id', '=', account['id']), ('partner_id', '=', account['id']),
+                 ('period_id', '=', period_id.id)])
             if not next_period_data:
                 final_obj.create({
                     'period_id': period_id.id,
