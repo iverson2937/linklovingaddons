@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+
+
+        <!-- 自交税 -->
+        <record id="view_account_account_tax_form" model="ir.ui.view">
+            <field name="name">account.account.tax.form</field>
+            <field name="model">account.account.tax</field>
+            <field name="arch" type="xml">
+                <form string="Account Period">
+                    <header>
+                        <button name="confirm" string="确认" states="draft" type="object" class="oe_highlight"
+                                groups="account.group_account_invoice"/>
+                        <field name="state" widget="statusbar" statusbar_visible="open,done"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="amount" attrs="{'readonly':[('state','=','done')]}"/>
+                                <field name="rate" attrs="{'readonly':[('state','=','done')]}"/>
+                                <field name="amount_tax"/>
+
+                            </group>
+                            <group>
+                                <field name="date"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_account_account_tax_tree" model="ir.ui.view">
+            <field name="name">account.account.tax.tree</field>
+            <field name="model">account.account.tax</field>
+            <field name="arch" type="xml">
+                <tree string="Period">
+                    <field name="date"/>
+                    <field name="amount"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="action_custom_tax" model="ir.actions.act_window">
+            <field name="name">Periods</field>
+            <field name="res_model">account.account.tax</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to add a fiscal period.
+                </p>
+                <p>
+                    An accounting period typically is a month or a quarter. It
+                    usually corresponds to the periods of the tax declaration.
+                </p>
+            </field>
+        </record>
+        <menuitem id="menu_custom_tax" action="action_custom_tax" parent="account.menu_finance_entries"/>
+    </data>
+</odoo>

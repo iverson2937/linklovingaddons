@@ -1,0 +1,16 @@
+#table > thead {
+    display: table-header-group !important;
+}
+
+#table {
+    background-color: #fff;
+}
+
+#header {
+    text-align: center;
+}
+
+.bootstrap-table .table > thead > tr > .font_35_header {
+    font-size: 35px;
+    padding: 15px;
+}
