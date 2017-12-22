@@ -2059,6 +2059,50 @@ class LinklovingAppApi(http.Controller):
         response.status_code = status
         return response
 
+
+
+    @http.route('/payment/order_status', type='http', auth='none', csrf=False,cors='*')
+    def order_status(self, **kw):
+        DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
+        product_id = kw.get('pidsss')
+        status, headers, content = request.registry['ir.http'].binary_content(xmlid=None, model="ir.attachment",
+                                                                              id=product_id,
+                                                                              unique=time.strftime(
+                                                                                  DEFAULT_SERVER_DATE_FORMAT,
+                                                                                  time.localtime()),
+                                                                              default_mimetype='image/png',
+                                                                              env=request.env(user=SUPERUSER_ID))
+        if status == 304:
+            return werkzeug.wrappers.Response(status=304, headers=headers)
+        elif status == 301:
+            return werkzeug.utils.redirect(content, code=301)
+        elif status != 200 and download:
+            return request.not_found()
+
+        if content:
+            content = odoo.tools.image_resize_image(base64_source=content, size=(None, None),
+                                                    encoding='base64', filetype='PNG')
+            # resize force png as filetype
+            headers = self.force_contenttype(headers, contenttype='image/png')
+
+        if content:
+            image_base64 = base64.b64decode(content)
+        else:
+            image_base64 = self.placeholder(image='placeholder.png')  # could return (contenttype, content) in master
+            headers = self.force_contenttype(headers, contenttype='image/png')
+
+        headers.append(('Content-Length', len(image_base64)))
+        response = request.make_response(image_base64, headers)
+        response.status_code = status
+        return response
+
+
+
+
+
+
+
+
     def placeholder(self, image='placeholder.png'):
         addons_path = http.addons_manifest['web']['addons_path']
         return open(os.path.join(addons_path, 'web', 'static', 'src', 'img', image), 'rb').read()
