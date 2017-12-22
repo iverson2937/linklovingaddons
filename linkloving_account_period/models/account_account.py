@@ -19,7 +19,7 @@ class AccountAccount(models.Model):
 
     @api.multi
     def get_month_begin_balance(self):
-        period_id = self.env['account.period'].get_current_period_id()
+        period_id = self.env['account.period'].get_current_period()
         for account in self:
             final = self.env['account.account.final'].search(
                 [('account_id', '=', account.id), ('period_id', '=', period_id)])
