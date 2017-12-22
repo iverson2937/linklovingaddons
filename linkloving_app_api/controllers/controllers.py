@@ -3587,7 +3587,7 @@ class LinklovingAppApi(http.Controller):
                 debit = 0
                 credit = 0
             balance = account.balance
-            month_begin = account.get_month_begin_balance()
+            month_begin = account.month_begin_balance
             last_day_balance = credit - debit + balance
             res = {
                 'month_begin': month_begin,
