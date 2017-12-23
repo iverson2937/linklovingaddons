@@ -9,9 +9,9 @@
         <menuitem id="menuitem_sub_company_report"
                   action="action_sub_company_report"
                   name="跨系统订单报表"
-                  parent="mrp.menu_mrp_reporting"
+                  parent="sales_team.menu_sale_report"
                   sequence="2"
-                  groups="base.group_user"/>
+                  groups="sales_team.group_sale_manager"/>
 
         <record id="crm_view_partner_form_linkloving" model="ir.ui.view">
             <field name="name">crm form</field>
