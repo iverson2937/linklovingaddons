@@ -120,8 +120,6 @@ class MrpQcFeedbackExtend(models.Model):
     picking_name_from_main = fields.Char(string=u'对应主系统的入库单号')
 
     def action_post_inventory(self):
-        if self.state != 'qc_success':
-            raise UserError(u'此状态不能进行入库操作')
         res = super(MrpQcFeedbackExtend, self).action_post_inventory()
         if self._context.get("from_sub"):
             if self.production_id.origin_sale_id and self.production_id.origin_sale_id.partner_id.sub_company == 'main':

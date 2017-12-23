@@ -86,6 +86,8 @@ class LinklovingCompanies(http.Controller):
         try:
             feedback = request.env["mrp.qc.feedback"].sudo().browse(int(feedback_id))
             if feedback:
+                if feedback.state != 'qc_success':
+                    raise UserError(u'此状态不能进行入库操作')
                 feedback.with_context({'from_sub': True}).action_post_inventory()
                 f_dic = self.convert_qc_feedback_to_json(feedback)
             else:
