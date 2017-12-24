@@ -58,7 +58,7 @@ class AccountDashboard(models.Model):
         # 流动资产合计
         liquid = cash_data + receivable_amount.get_period_balance(
             period_id) + other_receivable_amount.get_period_balance(
-            period_id) + stock.get_period_balance(period_id)
+            period_id) + stock
         # 固定资产原价
         origin_assets = assets.get_period_balance(period_id) + accumulated_depreciation.balance
         # 固定资产合计
@@ -88,7 +88,7 @@ class AccountDashboard(models.Model):
             'other_receivable_amount': {'start': 0,
                                         'current': format_decimal(other_receivable_amount.get_period_balance(period_id),
                                                                   locale='en_US')},
-            'stock': {'start': 0, 'current': format_decimal(stock.get_period_balance(period_id), locale='en_US')},
+            'stock': {'start': 0, 'current': format_decimal(stock, locale='en_US')},
             'assets': {'start': 0, 'current': format_decimal(assets.get_period_balance(period_id), locale='en_US')},
             'tax': {'start': 0, 'current': format_decimal(tax.get_period_balance(period_id), locale='en_US')},
             'short_term_invest': {'start': 0,
