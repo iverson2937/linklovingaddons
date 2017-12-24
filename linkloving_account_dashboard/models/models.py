@@ -15,14 +15,10 @@ class AccountDashboard(models.Model):
         if period.state == 'done':
             final = self.env['account.account.final'].search(
                 [('account_id', '=', self.id), ('period_id', '=', period.id), ('partner_id', '=', False)])
-            print self.name
-            print final
             return final.end_debit - final.end_credit
         else:
 
             return self.balance
-
-
 
     @api.model
     def get_dashboard_datas(self, period=None):
@@ -39,7 +35,9 @@ class AccountDashboard(models.Model):
         # 其他应付款
         other_payable_amount = self.env.ref('l10n_cn_small_business.1_small_business_chart2241')
         other_receivable_amount = self.env.ref('l10n_cn_small_business.1_small_business_chart1221')
-        stock = self.env.ref('linkloving_account.account_account_stock_chart140')
+        # 库存商品
+        stock_1 = self.env.ref('l10n_cn_small_business.1_small_business_chart1405')
+        stock_2 = self.env.ref('linkloving_account.account_account_stock_chart1409')
         accumulated_depreciation = self.env['account.account'].search([('name', '=', '固定资产折旧')])
         tax = self.env['account.account'].search([('name', 'like', '应交税费')])
         assets = self.env.ref('l10n_cn_small_business.1_small_business_chart1601')
@@ -51,9 +49,11 @@ class AccountDashboard(models.Model):
         long_loan = self.env.ref('l10n_cn_small_business.1_small_business_chart2501')
 
         cashes = self.env['account.account'].search([('user_type_id', '=', cash_type.id)])
+
         cash_data = 0
         for cash in cashes:
             cash_data += float(cash.get_period_balance(period_id))
+        stock = stock_1.get_period_balance(period_id) + stock_2.get_get_period_balance(period_id)
 
         # 流动资产合计
         liquid = cash_data + receivable_amount.get_period_balance(
