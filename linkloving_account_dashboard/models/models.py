@@ -53,7 +53,7 @@ class AccountDashboard(models.Model):
         cash_data = 0
         for cash in cashes:
             cash_data += float(cash.get_period_balance(period_id))
-        stock = stock_1.get_period_balance(period_id) + stock_2.get_get_period_balance(period_id)
+        stock = stock_1.get_period_balance(period_id) + stock_2.get_period_balance(period_id)
 
         # 流动资产合计
         liquid = cash_data + receivable_amount.get_period_balance(
