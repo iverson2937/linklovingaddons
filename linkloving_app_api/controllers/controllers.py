@@ -3527,7 +3527,7 @@ class LinklovingAppApi(http.Controller):
             ['account_id', 'credit', 'debit', 'balance', 'date'],
             ['account_id'])
         account_list = []
-        credit_all = debit_all = balance_all = last_day_balance_all = 0.0
+        credit_all = debit_all = balance_all =month_begin_all= last_day_balance_all = 0.0
         acoount_dict = {}
         for account in accounts:
             res = {
@@ -3548,9 +3548,11 @@ class LinklovingAppApi(http.Controller):
                 debit = 0
                 credit = 0
             balance = account.balance
+            month_begin = account.get_month_begin_balance()
             last_day_balance = credit - debit + balance
+
             res = {
-                'month_begin': 0,
+                'month_begin': month_begin,
                 'name': account.name,
                 'debit': debit,
                 'credit': credit,
@@ -3562,8 +3564,9 @@ class LinklovingAppApi(http.Controller):
             debit_all += debit
             balance_all += balance
             last_day_balance_all += last_day_balance
+            month_begin_all+=month_begin
         jason_list = {
-            'month_begin': '0',
+            'month_begin': month_begin_all,
             # 期初
             'last_day_balance_all': last_day_balance_all,
             # 支出
