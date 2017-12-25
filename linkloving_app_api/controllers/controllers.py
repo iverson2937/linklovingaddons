@@ -3422,6 +3422,7 @@ class LinklovingAppApi(http.Controller):
             "remark": material.remark,
             'line_ids': [{
                              'id': lines.id,
+                             'qty_product': lines.qty_available,
                              'name': lines.product_id.name,
                              'location': lines.product_id.area_id.name,
                              'quantity_available': lines.quantity_available,
