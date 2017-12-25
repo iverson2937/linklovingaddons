@@ -1,5 +1,17 @@
 <odoo>
     <data>
+        <record id="view_account_payment_form_inherit" model="ir.ui.view">
+            <field name="name">account.payment.form</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='amount']" position="attributes">
+                    <attribute name="readonly">[('state','not in',['apply','draft'])]</attribute>
+
+                </xpath>
+
+            </field>
+        </record>
 
 
         <record id="action_customer_payment_refund" model="ir.actions.act_window">
@@ -8,9 +20,9 @@
             <field name="res_model">account.payment</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[('payment_type','=','outbound')，('partner_type','=','customer')]</field>
+            <field name="domain">[('payment_type','=','outbound'),('partner_type','=','customer')]</field>
             <field name="context">
-                {'default_payment_type':'outbound','default_partner_type':'customer','default_partner_type':'customer','apply':True}
+                {'default_payment_type':'outbound','default_partner_type':'customer','apply':True}
             </field>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">

@@ -5,6 +5,9 @@ from odoo import models, fields, api
 
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
+    journal_id = fields.Many2one('account.journal', string='Payment Journal', required=False,
+                                 domain=[('type', 'in', ('bank', 'cash'))])
+
 
     @api.model
     def _get_default_state(self):
