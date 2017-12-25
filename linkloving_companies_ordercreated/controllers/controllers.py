@@ -1,12 +1,165 @@
 # -*- coding: utf-8 -*-
+import json
+
+import requests
 from psycopg2._psycopg import OperationalError
 
-from odoo import http
+from odoo import http, registry
+from odoo.exceptions import UserError
 from odoo.http import request
+import base64
 
 
 class LinklovingCompanies(http.Controller):
-    @http.route('/linkloving_web/precost_price', auth='none', type='json', csrf=False)
+    @classmethod
+    def get_qc_img_url(cls, worker_id, ):
+        # DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
+        imgs = []
+        for img_id in worker_id:
+            url = '%slinkloving_app_api/get_worker_image?worker_id=%s&model=%s&field=%s' % (
+                request.httprequest.host_url, str(img_id), 'qc.feedback.img', 'qc_img')
+            imgs.append(url)
+        return imgs
+
+    def convert_qc_feedback_to_json(self, qc_feedback):
+        data = {
+            'feedback_id': qc_feedback.id,
+            'name': qc_feedback.name,
+            'production_id': {
+                "order_id": qc_feedback.sudo().production_id.id,
+                "display_name": qc_feedback.sudo().production_id.display_name,
+                'product_id': {
+                    'product_id': qc_feedback.product_id.id,
+                    'product_name': qc_feedback.product_id.name,
+                    'area_name': qc_feedback.product_id.area_id.name or '',
+                },
+            },
+            'state': qc_feedback.state,
+            'qty_produced': qc_feedback.qty_produced,
+            'qc_test_qty': qc_feedback.qc_test_qty,
+            'qc_rate': qc_feedback.qc_rate,
+            'qc_fail_qty': qc_feedback.qc_fail_qty,
+            'qc_fail_rate': qc_feedback.qc_fail_rate,
+            'qc_note': qc_feedback.qc_note or '',
+            'qc_img': LinklovingCompanies.get_qc_img_url(qc_feedback.qc_imgs.ids),
+        }
+        return data
+
+    @classmethod
+    def change_db(cls, db_name):
+        request.session.db = db_name  # 设置账套
+        request.params["db"] = db_name
+        cr = registry(db_name).cursor()
+        request.env.cr = cr
+
+    @http.route('/linkloving_web/view_feedback_detail', auth='none', type='json', csrf=False)
+    def view_feedback_detail(self):
+        encode_data = request.jsonrequest.get("data")  # 加密数据
+        decode_data = base64.b64decode(encode_data)
+        data = json.loads(decode_data)
+        if not data.get("db"):
+            raise UserError(u'未找到账套信息')
+        if not data.get("feedback_id"):
+            raise UserError(u'品检单为空')
+        feedback_id = data.get("feedback_id")
+        try:
+            request.session.db = data.get("db")  # 设置账套
+            request.params["db"] = data.get("db")
+            feedback = request.env["sub.company.transfer"].sudo().tranfer_in_sub_sub(data.get("db"), feedback_id)
+            f_dic = self.convert_qc_feedback_to_json(feedback)
+        except Exception, e:
+            raise e
+        return {'feedback': f_dic}
+
+    @http.route('/linkloving_web/action_transfer_from_sub', auth='none', type='json', csrf=False)
+    def action_transfer_from_sub(self):
+        encode_data = request.jsonrequest.get("data")  # 加密数据
+        decode_data = base64.b64decode(encode_data)
+        data = json.loads(decode_data)
+        if data.get("db"):
+            request.session.db = data.get("db")  # 设置账套
+            request.params["db"] = data.get("db")
+        else:
+            raise UserError(u'未找到账套信息')
+
+        feedback_id = data.get("feedback_id")
+        try:
+            feedback = request.env["mrp.qc.feedback"].sudo().browse(int(feedback_id))
+            if feedback:
+                if feedback.state != 'qc_success':
+                    raise UserError(u'此状态不能进行入库操作')
+                feedback.with_context({'from_sub': True}).action_post_inventory()
+                f_dic = self.convert_qc_feedback_to_json(feedback)
+            else:
+                raise UserError(u'未找到对应的品检单')
+        except Exception, e:
+            raise e
+        return {'feedback': f_dic}
+
+    @http.route('/linkloving_web/transfer_in', auth='none', type='json', csrf=False, methods=['POST'])
+    def transfer_in(self, **kw):
+        db = request.jsonrequest.get("db")  # 所选账套
+        request.session.db = db  # 设置账套
+        request.params["db"] = db
+
+        vals = request.jsonrequest.get("vals")  # 需要查询的产品数据
+        try:
+            default_code = vals.get("default_code")
+            p_obj = request.env["product.product"].sudo().search([("default_code", "=", default_code)])
+        except OperationalError:
+            return {
+                "code": -2,
+                "msg": u"账套%s不存在" % db
+            }
+        if not p_obj:
+            return {
+                "code": -4,
+                "msg": u"%s此料号在%s账套中找不到" % (default_code, db)
+            }
+
+        po_name = vals.get("po_name")
+        product_qty = vals.get("product_qty")
+        po = request.env["purchase.order"].sudo().search([('name', '=', po_name)])
+        if not po:
+            return {
+                "code": -5,
+                "msg": u"%s此采购单在%s账套中找不到" % (po_name, db)
+            }
+        picking_to_in = po.picking_ids.filtered(lambda x: x.state not in ["done", "cancel"])  # 对应子系统入库的单子
+        if len(picking_to_in) != 1:
+            return {
+                "code": -6,
+                "msg": u"%s此采购单出货单异常" % (po_name)
+            }
+        op_to_do = request.env["stock.pack.operation"]
+        for op in picking_to_in.pack_operation_product_ids:
+            if op.product_id.id == p_obj.id:  # 找到对应的产品
+                op_to_do = op
+                break
+        op_to_do.qty_done = product_qty
+        try:
+            confirmation = request.env["stock.backorder.confirmation"].sudo().create({
+                'pick_id': picking_to_in.id
+            })
+            if picking_to_in.state != 'assigned':
+                picking_to_in.force_assign()
+            confirmation.process()
+            picking_to_in.to_stock()
+            picking_to_in.write({
+                'feedback_name_from_sub': vals.get("feedback_name_from_sub"),
+                'feedback_id_from_sub': vals.get("feedback_id_from_sub")
+            })
+        except Exception, e:
+            raise e
+        return {
+            "code": 1,
+            "vals": {
+                'picking_id_from_main': picking_to_in.id,
+                'picking_name_from_main': picking_to_in.name,
+            }
+        }
+
+    @http.route('/linkloving_web/precost_price', auth='none', type='json', csrf=False, methods=['POST'])
     def precost_price(self, **kw):
         db = request.jsonrequest.get("db")  # 所选账套
         request.session.db = db  # 设置账套
@@ -39,7 +192,7 @@ class LinklovingCompanies(http.Controller):
             'order_line': data_return,
         }
 
-    @http.route('/linkloving_web/create_order', auth='none', type='json', csrf=False)
+    @http.route('/linkloving_web/create_order', auth='none', type='json', csrf=False, methods=['POST'])
     def ll_call_kw(self, **kw):
         db = request.jsonrequest.get("db")  # 所选账套
         vals = request.jsonrequest.get("vals")  # so的数据

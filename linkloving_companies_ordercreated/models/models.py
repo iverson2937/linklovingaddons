@@ -28,6 +28,8 @@ class ResPartnerExtend(models.Model):
                                                                 ('main', u'下单公司')],
                                    default="normal")
     sub_company_id = fields.Many2one('sub.company.info', string=u'公司信息')
+    main_company_id = fields.Many2one('sub.company.info', string=u'下单公司信息')
+
     follow_partner_id = fields.Many2one('follow.order.partner', string=u'跟单员')
     discount_to_sub = fields.Float(string=u'成本折算率', default=0.8, help=u"跨系统生成的so单单价 = 当前成本/折算率")
 

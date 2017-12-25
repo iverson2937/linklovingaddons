@@ -23,7 +23,7 @@ odoo.define('linkloving_account_dashboard.account_dashboard', function (require)
         sel_func: function () {
             var time_id = $('.Account_Time_sel option:selected').attr('data-id');
             new Model("account.account")
-                .call("get_dashboard_datas", [])
+                .call("get_dashboard_datas", [parseInt(time_id)])
                 .then(function (result) {
                     $('#account_dashboard').html('');
                     $('#account_dashboard').append(QWeb.render('account_table_tmp', result));

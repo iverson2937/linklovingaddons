@@ -107,6 +107,11 @@ class linkloving_product_input_extend(models.Model):
             self.sale_ok = True
             self.purchase_ok = False
             self.route_ids = [(6, 0, [self.env.ref('mrp.route_warehouse0_manufacture').id, ])]
+        elif self.product_ll_type == "service":  # 服务
+            self.type='service'
+            self.can_be_expensed=True
+            self.sale_ok = False
+            self.purchase_ok = False
 
 
 class StockOrdering(models.TransientModel):

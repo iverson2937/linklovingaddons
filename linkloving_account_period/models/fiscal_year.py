@@ -79,6 +79,13 @@ class AccountPeriod(models.Model):
         ('done', 'Close')
     ], default='open')
 
+    def get_current_period(self):
+
+        account_period_obj = self.env['account.period']
+        ids = account_period_obj.search([('state', '!=', 'done')])
+        period_id = ids[0]
+        return period_id.id
+
     def _get_next_period(self):
         account_period_obj = self.env['account.period']
         ids = account_period_obj.search([('state', '!=', 'done')])
@@ -112,10 +119,10 @@ class AccountPeriod(models.Model):
         # Prepare sql query base on selected parameters from wizard
         # compute the balance, debit and credit for the provided accounts
         request = (
-            "SELECT account_id AS id, SUM(debit) AS debit, SUM(credit) AS credit, (SUM(debit) - SUM(credit)) AS balance" + \
-            " FROM " + "account_move_line" + " WHERE account_id IN %s  "
-            + " AND period_id = %s "
-            + "GROUP BY account_id"
+                "SELECT account_id AS id, SUM(debit) AS debit, SUM(credit) AS credit, (SUM(debit) - SUM(credit)) AS balance" + \
+                " FROM " + "account_move_line" + " WHERE account_id IN %s  "
+                + " AND period_id = %s "
+                + "GROUP BY account_id"
 
         )
         params = (tuple(accounts.ids), str(period_id))
@@ -201,9 +208,17 @@ class AccountPeriod(models.Model):
                 })
             # 建立新的会计区间初始数据
             period_id = self._get_next_period()
-            final_obj.create({
-                'period_id': period_id.id,
-                'account_id': account['id'],
+            next_period_data = final_obj.search(
+                [('account_id', '=', account['id']), ('partner_id', '=', account['id']),
+                 ('period_id', '=', period_id.id)])
+            if not next_period_data:
+                final_obj.create({
+                    'period_id': period_id.id,
+                    'account_id': account['id'],
+                    'start_credit': account.credit,
+                    'start_debit': account.debit
+                })
+            next_period_data.write({
                 'start_credit': account.credit,
                 'start_debit': account.debit
             })
@@ -261,3 +276,4 @@ class AccountPeriod(models.Model):
                 #     'start_credit': credit + period_partner_data.start_credit,
                 #     'start_debit': debit + period_partner_data.start_debit
                 # })
+        self.state = 'done'
