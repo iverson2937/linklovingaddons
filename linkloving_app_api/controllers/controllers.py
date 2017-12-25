@@ -2059,6 +2059,42 @@ class LinklovingAppApi(http.Controller):
         response.status_code = status
         return response
 
+    @http.route('/payment/order_status', type='http', auth='none', csrf=False,cors='*')
+    def order_status(self, **kw):
+        DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
+        product_id = kw.get('pidsss')
+        status, headers, content = request.registry['ir.http'].binary_content(xmlid=None, model="ir.attachment",
+                                                                              id=product_id,
+                                                                              unique=time.strftime(
+                                                                                  DEFAULT_SERVER_DATE_FORMAT,
+                                                                                  time.localtime()),
+                                                                              default_mimetype='image/png',
+                                                                              env=request.env(user=SUPERUSER_ID))
+        if status == 304:
+            return werkzeug.wrappers.Response(status=304, headers=headers)
+        elif status == 301:
+            return werkzeug.utils.redirect(content, code=301)
+        elif status != 200 and download:
+            return request.not_found()
+
+        if content:
+            content = odoo.tools.image_resize_image(base64_source=content, size=(None, None),
+                                                    encoding='base64', filetype='PNG')
+            # resize force png as filetype
+            headers = self.force_contenttype(headers, contenttype='image/png')
+
+        if content:
+            image_base64 = base64.b64decode(content)
+        else:
+            image_base64 = self.placeholder(image='placeholder.png')  # could return (contenttype, content) in master
+            headers = self.force_contenttype(headers, contenttype='image/png')
+
+        headers.append(('Content-Length', len(image_base64)))
+        response = request.make_response(image_base64, headers)
+        response.status_code = status
+        return response
+
+
     def placeholder(self, image='placeholder.png'):
         addons_path = http.addons_manifest['web']['addons_path']
         return open(os.path.join(addons_path, 'web', 'static', 'src', 'img', image), 'rb').read()
@@ -3386,6 +3422,7 @@ class LinklovingAppApi(http.Controller):
             "remark": material.remark,
             'line_ids': [{
                              'id': lines.id,
+                             'qty_product': lines.qty_available,
                              'name': lines.product_id.name,
                              'location': lines.product_id.area_id.name,
                              'quantity_available': lines.quantity_available,
@@ -3527,7 +3564,7 @@ class LinklovingAppApi(http.Controller):
             ['account_id', 'credit', 'debit', 'balance', 'date'],
             ['account_id'])
         account_list = []
-        credit_all = debit_all = balance_all = last_day_balance_all = 0.0
+        credit_all = debit_all = balance_all =month_begin_all= last_day_balance_all = 0.0
         acoount_dict = {}
         for account in accounts:
             res = {
@@ -3548,9 +3585,11 @@ class LinklovingAppApi(http.Controller):
                 debit = 0
                 credit = 0
             balance = account.balance
+            month_begin = account.month_begin_balance
             last_day_balance = credit - debit + balance
+
             res = {
-                'month_begin': 0,
+                'month_begin': month_begin,
                 'name': account.name,
                 'debit': debit,
                 'credit': credit,
@@ -3562,8 +3601,9 @@ class LinklovingAppApi(http.Controller):
             debit_all += debit
             balance_all += balance
             last_day_balance_all += last_day_balance
+            month_begin_all+=month_begin
         jason_list = {
-            'month_begin': '0',
+            'month_begin': month_begin_all,
             # 期初
             'last_day_balance_all': last_day_balance_all,
             # 支出

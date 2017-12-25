@@ -174,7 +174,8 @@
 }
 
 .o_form_view .o_form_sheet_bg .o_form_sheet{
-    min-width: 1050px;
+    width: 92%!important;
+    min-width: 1200px!important;
 }
 
 
