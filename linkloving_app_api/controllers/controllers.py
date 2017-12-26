@@ -3405,36 +3405,35 @@ class LinklovingAppApi(http.Controller):
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
 
-    #
-    # @http.route('/linkloving_app_api/get_one_material_request_show/', type='json', auth='none', csrf=False, cors='*')
-    # def get_one_material_request_show(self, **kw):
-    #
-    #     material_id = request.jsonrequest.get('material_id')  # 领料单id
-    #
-    #     material = request.env['material.request'].sudo().browse(material_id)
-    #
-    #     # stock_quant = request.env["stock.quant"].sudo()   quantity_available
-    #
-    #     json_list = {
-    #         'create_uid': material.my_create_uid.name,
-    #         'create_date': material.my_create_date,
-    #         'delivery_date': material.delivery_date,
-    #         "picking_cause": material.picking_cause,
-    #         "remark": material.remark,
-    #         'dddd': 'ddddddddddddddd',
-    #         'line_ids': [{
-    #                          'id': lines.id,
-    #                          'qty_product': lines.qty_available,
-    #                          'name': lines.product_id.name,
-    #                          'location': lines.product_id.area_id.name,
-    #                          'quantity_available': lines.quantity_available,
-    #                          'quantity_done': lines.quantity_done,
-    #                          'product_qty': lines.product_qty,
-    #                          'reserve': lines.reserve_qty,
-    #                      } for lines in material.line_ids],
-    #     }
-    #
-    #     return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+    @http.route('/linkloving_app_api/get_one_material_request_show', type='json', auth='none', csrf=False, cors='*')
+    def get_one_material_request_show(self, **kw):
+
+        material_id = request.jsonrequest.get('material_id')  # 领料单id
+
+        material = request.env['material.request'].sudo().browse(material_id)
+
+        # stock_quant = request.env["stock.quant"].sudo()   quantity_available
+
+        json_list = {
+            'create_uid': material.my_create_uid.name,
+            'create_date': material.my_create_date,
+            'delivery_date': material.delivery_date,
+            "picking_cause": material.picking_cause,
+            "remark": material.remark,
+            'dddd': 'ddddddddddddddd',
+            'line_ids': [{
+                'id': lines.id,
+                'qty_product': lines.qty_available,
+                'name': lines.product_id.name,
+                'location': lines.product_id.area_id.name,
+                'quantity_available': lines.quantity_available,
+                'quantity_done': lines.quantity_done,
+                'product_qty': lines.product_qty,
+                'reserve': lines.reserve_qty,
+            } for lines in material.line_ids],
+        }
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
 
     @http.route('/linkloving_app_api/change_material_request_state/', type='json', auth='none', csrf=False, cors='*')
     def change_material_request_state(self, **kw):
