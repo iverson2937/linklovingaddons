@@ -22,7 +22,10 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
             }
             if (action && action.context && action.context["sub_company_order_track"]) {
                 this.sub_company_order_track = true;
-                this.so_id = action.context["active_id"];
+            }
+            if (action && action.params) {
+                this.so_id = action.params["active_id"];
+                this.sub_company_order_track = true;
             }
         },
 
