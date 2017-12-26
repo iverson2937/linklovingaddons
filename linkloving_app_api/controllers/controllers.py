@@ -3420,7 +3420,6 @@ class LinklovingAppApi(http.Controller):
             'delivery_date': material.delivery_date,
             "picking_cause": material.picking_cause,
             "remark": material.remark,
-            'dddd': 'ddddddddddddddd',
             'line_ids': [{
                 'id': lines.id,
                 'qty_product': lines.qty_available,
