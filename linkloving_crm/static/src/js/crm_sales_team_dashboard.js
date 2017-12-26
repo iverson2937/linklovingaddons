@@ -13,6 +13,8 @@ odoo.define('linkloving_crm.crm_dashboard', function (require) {
     var _t = core._t;
     var _lt = core._lt;
 
+    var UsersModel = new Model('res.users', session.user_context);
+
     // var crm_dashboard = Dashboard_crm.extend({
     //
     //     events: {
@@ -40,7 +42,13 @@ odoo.define('linkloving_crm.crm_dashboard', function (require) {
 
         },
 
-        edit_schedule_report_fn: function () {
+        edit_schedule_report_fn: function (e) {
+
+            var self = this;
+            var $input = $(e.target);
+            var target_name = $input.attr('id');
+
+
             var action = {
                 name: "工作报告",
                 type: 'ir.actions.act_window',
@@ -48,9 +56,12 @@ odoo.define('linkloving_crm.crm_dashboard', function (require) {
                 view_type: 'form',
                 view_mode: 'tree,form',
                 views: [[false, 'form']],
-                target: "new"
+                target: "new",
+                context: {
+                    'default_type': target_name
+                }
             };
-            this.do_action(action);
+            self.do_action(action);
         },
 
         set_invoiced_target_fn: function () {
@@ -64,15 +75,35 @@ odoo.define('linkloving_crm.crm_dashboard', function (require) {
         },
         submit_set_target_summit_fn: function (e) {
 
-            console.log($('.salesman_one'))
 
+            var salesman_data = $('.set_user_body >table tr');
 
+            var data = [];
+
+            for (var i = 1; i < salesman_data.length; i++) {
+                console.log($(salesman_data[i]));
+
+                data.push({
+                    'id': $(salesman_data[i]).attr('class'),
+                    'order_name': $(salesman_data[i])["0"].children[1].children["0"].value,
+                    'opportunity_name': $(salesman_data[i])["0"].children[2].children["0"].value,
+                    'year_order_name': $(salesman_data[i])["0"].children[3].children["0"].value,
+                });
+            }
+            UsersModel.call('set_salesman_target', [], {
+                data: data,
+            }).then(function (msgs) {
+                if (msgs == 'ok') {
+                    $('.set_user_target').hide();
+                }
+            });
         },
 
     });
 
 
-});
+})
+;
 
 
 
