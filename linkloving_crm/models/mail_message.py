@@ -259,9 +259,14 @@ class CrmMailMessage(models.Model):
                 elif mail_sample_id.id in message.messages_label_ids.ids:
                     crm_lead_val.write({'lead_is_sample': True})
 
-        elif message.model == 'res.partner' and message.messages_label_ids:
+        elif message.model == 'res.partner':
             crm_partner_val = self.env['res.partner'].search([('id', '=', message.res_id)])
-            if not crm_partner_val.opportunity_ids:
+
+            if message.message_type != 'notification':
+                crm_partner_val.write(
+                    {'customer_follow_up_date': time.strftime('%Y-%m-%d', time.localtime(time.time()))})
+
+            if (not crm_partner_val.opportunity_ids) and message.messages_label_ids:
                 if (not (crm_partner_val.company_type == 'person')) and crm_partner_val.customer:
                     lead_vals = {
                         'name': "默认商机-" + str(crm_partner_val.name),

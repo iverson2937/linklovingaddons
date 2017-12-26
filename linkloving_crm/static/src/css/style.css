@@ -92,8 +92,7 @@
 }
 
 .myChart_sale_bar {
-    width: 98%;
-    /*height: 400px;*/
+    min-width: 1200px;
 }
 
 .oe_view_nocontent {
