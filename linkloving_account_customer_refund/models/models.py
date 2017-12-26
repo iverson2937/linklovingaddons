@@ -8,7 +8,6 @@ class AccountPayment(models.Model):
     journal_id = fields.Many2one('account.journal', string='Payment Journal', required=False,
                                  domain=[('type', 'in', ('bank', 'cash'))])
 
-
     @api.model
     def _get_default_state(self):
         if self._context.get('apply'):
@@ -18,3 +17,9 @@ class AccountPayment(models.Model):
 
     state = fields.Selection(selection_add=[('apply', u'申请'), ('apply_confirm', u'确认申请')],
                              track_visibility='onchange', default=_get_default_state)
+
+    def set_to_confirm(self):
+        self.state = 'apply_confirm'
+
+    def set_to_draft(self):
+        self.state = 'draft'
