@@ -24,7 +24,7 @@ class ManualProcurementOrder(models.Model):
             for l in p_s:
                 if l.product_variant_ids:
                     orderpoint = self.env["stock.warehouse.orderpoint"].search([('product_id', '=', l.product_variant_ids[0].id), ('active', '!=', None)], limit=1)
-                    a_qty = (orderpoint.product_max_qty or 0) - p_s.virtual_available
+                    a_qty = (orderpoint.product_max_qty or 0) - l.virtual_available
                     if a_qty < 0:
                         a_qty = 0
                     obj = self.env['manual.procurement.line'].create({
