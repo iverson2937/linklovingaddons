@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_linkloving_account_tax_inherit_linkloving_account_tax_inherit,linkloving_account_tax_inherit.linkloving_account_tax_inherit,model_linkloving_account_tax_inherit_linkloving_account_tax_inherit,,1,0,0,0
