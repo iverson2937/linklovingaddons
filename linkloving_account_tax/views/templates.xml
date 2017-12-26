@@ -6,20 +6,21 @@
         <!-- 自交税 -->
         <record id="view_account_account_tax_form" model="ir.ui.view">
             <field name="name">account.account.tax.form</field>
-            <field name="model">account.account.tax</field>
+            <field name="model">account.custom.tax</field>
             <field name="arch" type="xml">
-                <form string="Account Period">
+                <form string="明细">
+
+
                     <header>
-                        <button name="confirm" string="确认" states="draft" type="object" class="oe_highlight"
-                                groups="account.group_account_invoice"/>
-                        <field name="state" widget="statusbar" statusbar_visible="open,done"/>
+                        <button name="confirm" string="确认" states="draft" type="object" class="oe_highlight"/>
+                        <field name="state" widget="statusbar" readonly="1"/>
                     </header>
                     <sheet>
                         <group>
                             <group>
                                 <field name="amount" attrs="{'readonly':[('state','=','done')]}"/>
                                 <field name="rate" attrs="{'readonly':[('state','=','done')]}"/>
-                                <field name="amount_tax"/>
+                                <field name="tax_amount"/>
 
                             </group>
                             <group>
@@ -33,19 +34,20 @@
 
         <record id="view_account_account_tax_tree" model="ir.ui.view">
             <field name="name">account.account.tax.tree</field>
-            <field name="model">account.account.tax</field>
+            <field name="model">account.custom.tax</field>
             <field name="arch" type="xml">
                 <tree string="Period">
                     <field name="date"/>
                     <field name="amount"/>
+                    <field name="tax_amount"/>
                 </tree>
             </field>
         </record>
 
 
         <record id="action_custom_tax" model="ir.actions.act_window">
-            <field name="name">Periods</field>
-            <field name="res_model">account.account.tax</field>
+            <field name="name">发票</field>
+            <field name="res_model">account.custom.tax</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="help" type="html">
@@ -58,6 +60,6 @@
                 </p>
             </field>
         </record>
-        <menuitem id="menu_custom_tax" action="action_custom_tax" parent="account.menu_finance_entries"/>
+        <menuitem id="menu_custom_tax" action="action_custom_tax" parent="account.menu_finance_entries" name="发票"/>
     </data>
 </odoo>
