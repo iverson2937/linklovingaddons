@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "linkloving_account_tax",
+    'name': "linkloving_purchase_authority",
 
     'summary': """
-        Short (1 phrase/line) summary of the module's purpose, used as
-        subtitle on modules listing or apps.openerp.com""",
+        修改付款申请权限
+        """,
 
     'description': """
         Long description of module's purpose
@@ -20,13 +20,15 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'account'],
+    'depends': ['base', 'linkloving_account'],
 
     # always loaded
     'data': [
+        # 'security/ir.model.access.csv',
         'security/ir.model.access.csv',
-        'views/data.xml',
+        'views/views.xml',
         'views/templates.xml',
+
     ],
     # only loaded in demonstration mode
     'demo': [

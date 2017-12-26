@@ -3405,7 +3405,7 @@ class LinklovingAppApi(http.Controller):
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
 
-    @http.route('/linkloving_app_api/get_one_material_request_show/', type='json', auth='none', csrf=False, cors='*')
+    @http.route('/linkloving_app_api/get_one_material_request_show', type='json', auth='none', csrf=False, cors='*')
     def get_one_material_request_show(self, **kw):
 
         material_id = request.jsonrequest.get('material_id')  # 领料单id
@@ -3421,15 +3421,15 @@ class LinklovingAppApi(http.Controller):
             "picking_cause": material.picking_cause,
             "remark": material.remark,
             'line_ids': [{
-                             'id': lines.id,
-                             'qty_product': lines.qty_available,
-                             'name': lines.product_id.name,
-                             'location': lines.product_id.area_id.name,
-                             'quantity_available': lines.quantity_available,
-                             'quantity_done': lines.quantity_done,
-                             'product_qty': lines.product_qty,
-                             'reserve': lines.reserve_qty,
-                         } for lines in material.line_ids],
+                'id': lines.id,
+                'qty_product': lines.qty_available,
+                'name': lines.product_id.name,
+                'location': lines.product_id.area_id.name,
+                'quantity_available': lines.quantity_available,
+                'quantity_done': lines.quantity_done,
+                'product_qty': lines.product_qty,
+                'reserve': lines.reserve_qty,
+            } for lines in material.line_ids],
         }
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
