@@ -24,9 +24,12 @@ class ManualProcurementOrder(models.Model):
             for l in p_s:
                 if l.product_variant_ids:
                     orderpoint = self.env["stock.warehouse.orderpoint"].search([('product_id', '=', l.product_variant_ids[0].id), ('active', '!=', None)], limit=1)
+                    a_qty = (orderpoint.product_max_qty or 0) - p_s.virtual_available
+                    if a_qty < 0:
+                        a_qty = 0
                     obj = self.env['manual.procurement.line'].create({
                         'product_id': l.product_variant_ids[0].id,
-                        'qty_ordered': orderpoint.product_max_qty or 0,
+                        'qty_ordered': a_qty,
                     })
                 else:
                     raise UserError(u"%s 产品模板异常,请联系管理员处理" % l.name)
@@ -60,7 +63,9 @@ class ManualProcurementOrder(models.Model):
             else:
                 order.qty_done_rate = total_qty_done * 100 / total_qty_ordered
 
-    name = fields.Char(string=u'单号', readyonly=True)
+    name = fields.Char(string=u'单号',
+                       readyonly=True,
+                       default=lambda self: self.env['ir.sequence'].next_by_code('manual.procurement.order'))
     alia_name = fields.Char(string=u'别名', track_visibility='onchange')
     date_excepted = fields.Date(string=u'期望完成日期', track_visibility='onchange')
     remark = fields.Text(string=u'备注', track_visibility='onchange')
@@ -85,6 +90,9 @@ class ManualProcurementOrder(models.Model):
 
     qty_done_rate = fields.Integer(string=u'完成率', compute='_compute_qty_done_rate')
 
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', "单号必须唯一"),
+    ]
     @api.multi
     def unlink(self):
         for order in self:
@@ -98,7 +106,8 @@ class ManualProcurementOrder(models.Model):
 
     @api.model
     def create(self, vals):
-        vals['name'] = self.env['ir.sequence'].next_by_code('manual.procurement.order') or '/'
+        if not vals.get('name'):
+            vals['name'] = self.env['ir.sequence'].next_by_code('manual.procurement.order') or '/'
         obj = super(ManualProcurementOrder, self).create(vals)
         if vals.get('procurement_line_ids'):
             for return_id in vals['procurement_line_ids']:
