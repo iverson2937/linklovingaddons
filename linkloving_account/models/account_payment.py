@@ -221,6 +221,10 @@ class AccountPayment(models.Model):
         res['domain']['journal_id'].append(('type', 'in', ('bank', 'cash')))
         res['domain']['journal_id'].append(('deprecated', '=', False))
 
+        res['domain']['payment_method_id'] = [('payment_type', '=', self.payment_type)]
+        self.payment_method_id = self.env['account.payment.method'].search([('payment_type', '=', self.payment_type)])[
+            0].id
+
         return res
 
     @api.multi
