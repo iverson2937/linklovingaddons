@@ -142,6 +142,8 @@ class ResPartner(models.Model):
 
     customer_write_date = fields.Datetime(string=u'最近操所时间', compute="_compute_customer_write_date", store=True)
 
+    customer_follow_up_date = fields.Date(related='crm_partner_id.customer_follow_up_date', string=u'最近跟进时间')
+
     crm_is_partner_temporary = fields.Boolean(related='crm_partner_id.crm_is_partner_temporary', string=u'是否是客户')
 
     @api.multi
@@ -322,6 +324,8 @@ class ResPartner(models.Model):
 
         if 'crm_is_partner_temporary' in vals:
             vals['is_order'] = vals.get('crm_is_partner_temporary')
+            if vals.get('crm_is_partner_temporary'):
+                vals['crm_is_partner'] = False
 
         return super(ResPartner, self).write(vals)
 
@@ -631,6 +635,8 @@ class CrmResPartner(models.Model):
     customer_is_world = fields.Boolean(string=u'世界')  # 市场
 
     crm_is_partner_temporary = fields.Boolean(string=u'是否是客户')
+
+    customer_follow_up_date = fields.Date(string=u'最近跟进时间')
 
 
     # @api.model

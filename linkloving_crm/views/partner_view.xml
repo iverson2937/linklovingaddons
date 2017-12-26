@@ -32,7 +32,7 @@
                     <field name="crm_is_partner" string="线索客户"/>
 
 
-                    <field name="crm_is_partner_temporary" string="线索客户"/>
+                    <field name="crm_is_partner_temporary" string="是否是客户"/>
 
                 </xpath>
 
@@ -150,7 +150,7 @@
                 <xpath expr="//field[@name='lang']" position="after">
                     <field name="customer_code" attrs="{'invisible':[('customer','!=',True)]}"/>
                     <field name="customer_alias" attrs="{'invisible':[('customer','!=',True)]}"/>
-                    <field name="mutual_rule_id"/>
+                    <field name="mutual_rule_id" attrs="{'invisible':[('customer','=', False)]}"/>
 
                     <field name="customer_write_date" invisible="1"/>
 
@@ -171,9 +171,9 @@
 
                 <xpath expr="//page[@name='internal_notes']" position="replace">
 
-                    <page name='internal_notes' string="客户信息">
+                    <page name='internal_notes' string="信息备注">
 
-                        <group>
+                        <group attrs="{'invisible':[('customer','=', False)]}">
                             <label for="customer_country_id" string="市场"/>
                             <div class="o_customer_country_id_format">
                                 <div>
@@ -189,7 +189,7 @@
                             </div>
                         </group>
                         <group>
-                            <group>
+                            <group attrs="{'invisible':[('customer','=', False)]}">
                                 <!--<field name="customer_bazaar"/>-->
                                 <field name="customer_scale"/>
                                 <field name="source_id" string="渠道"
@@ -202,7 +202,7 @@
                         </group>
                     </page>
 
-                    <page string="产品">
+                    <page string="产品" attrs="{'invisible':[('customer','=', False)]}">
                         <field name="product_series_ids" widget="crm_tree_list_js" attrs="">
                             <tree string="产品系列" default_order="crm_product_type" create="0">
                                 <field name="crm_product_type"/>
@@ -321,6 +321,10 @@
                 <xpath expr="//filter[@name='inactive']" position="after">
                     <filter string="新增的客户" name="partner_day_new"
                             domain="[ ('create_date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+
+                    <filter string="今日跟进客户" name="partner_today_follow"
+                            domain="[ ('customer_follow_up_date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+
                 </xpath>
 
                 <xpath expr="//group[@name='group_by']/filter[@name='salesperson']" position="after">
@@ -332,23 +336,23 @@
         </record>
 
         <!--<record id="crm_view_crm_team_form" model="ir.ui.view">-->
-            <!--<field name="name">crm.team.form</field>-->
-            <!--<field name="model">crm.team</field>-->
-            <!--<field name="inherit_id" ref="sales_team.crm_team_view_form"/>-->
-            <!--<field name="arch" type="xml">-->
+        <!--<field name="name">crm.team.form</field>-->
+        <!--<field name="model">crm.team</field>-->
+        <!--<field name="inherit_id" ref="sales_team.crm_team_view_form"/>-->
+        <!--<field name="arch" type="xml">-->
 
-                <!--<xpath expr="//div[@name='button_box']" position="inside">-->
+        <!--<xpath expr="//div[@name='button_box']" position="inside">-->
 
-                    <!--<button type="object"-->
-                            <!--name="action_view_partner_img"-->
-                            <!--class="oe_stat_button"-->
-                            <!--icon="fa-photo fa-image fa-picture-o"-->
-                    <!--string="设置销售员目标">-->
-                    <!--</button>-->
+        <!--<button type="object"-->
+        <!--name="action_view_partner_img"-->
+        <!--class="oe_stat_button"-->
+        <!--icon="fa-photo fa-image fa-picture-o"-->
+        <!--string="设置销售员目标">-->
+        <!--</button>-->
 
-                <!--</xpath>-->
+        <!--</xpath>-->
 
-            <!--</field>-->
+        <!--</field>-->
         <!--</record>-->
 
 
