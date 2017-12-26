@@ -3432,6 +3432,9 @@ class LinklovingAppApi(http.Controller):
                          } for lines in material.line_ids],
         }
 
+        logging.warning("charlie0910--------%s" % (lines.qty_available
+        ))
+
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
 
     @http.route('/linkloving_app_api/change_material_request_state/', type='json', auth='none', csrf=False, cors='*')
