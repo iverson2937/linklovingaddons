@@ -3420,6 +3420,7 @@ class LinklovingAppApi(http.Controller):
             'delivery_date': material.delivery_date,
             "picking_cause": material.picking_cause,
             "remark": material.remark,
+            'dddd': 'ddddddddddddddd',
             'line_ids': [{
                              'id': lines.id,
                              'qty_product': lines.qty_available,
@@ -3431,9 +3432,6 @@ class LinklovingAppApi(http.Controller):
                              'reserve': lines.reserve_qty,
                          } for lines in material.line_ids],
         }
-
-        logging.warning("charlie0910--------%s" % (lines.qty_available
-        ))
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
 
