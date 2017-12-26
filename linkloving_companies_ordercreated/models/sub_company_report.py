@@ -18,7 +18,9 @@ class SaleOrderExtend(models.Model):
             'name': self.name + u'-生产跟踪单',
             'type': 'ir.actions.client',
             'tag': 'sub_company_report',
-            'context': {"sub_company_order_track": True}
+            'context': {"sub_company_order_track": True,
+                        "so_id": self.id
+                        }
         }
 
 class SubCompanyReport(models.Model):
