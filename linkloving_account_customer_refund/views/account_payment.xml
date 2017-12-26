@@ -6,7 +6,7 @@
             <field name="inherit_id" ref="account.view_account_payment_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='amount']" position="attributes">
-                    <attribute name="readonly">[('state','not in',['apply','draft'])]</attribute>
+                    <attribute name="attrs">{'readonly':[('state','not in',['apply','draft'])]}</attribute>
 
                 </xpath>
 
