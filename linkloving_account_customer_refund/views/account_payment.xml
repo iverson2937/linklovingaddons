@@ -9,6 +9,10 @@
                     <attribute name="attrs">{'readonly':[('state','not in',['apply','draft'])]}</attribute>
 
                 </xpath>
+                <xpath expr="//field[@name='journal_id']" position="attributes">
+                    <attribute name="attrs">{'required':[('state','in',['draft'])]}</attribute>
+
+                </xpath>
                 <xpath expr="//button[@name='post']" position="after">
                     <button name="set_to_draft" class="oe_highlight" states="apply_confirm" string="确认" type="object"/>
                     <button name="set_to_confirm" class="oe_highlight" states="apply" string="提交" type="object"
