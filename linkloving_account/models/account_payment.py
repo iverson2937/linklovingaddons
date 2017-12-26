@@ -210,7 +210,8 @@ class AccountPayment(models.Model):
             # Set default partner type for the payment type
             if self.payment_type == 'inbound':
                 self.partner_type = 'customer'
-            elif self.payment_type == 'outbound':
+            # 如果默认给客户付钱的话，partner_type就不修改了
+            elif self.payment_type == 'outbound' and not self._context.get('apply'):
                 self.partner_type = 'supplier'
         # Set payment method domain
         res = self._onchange_journal()
