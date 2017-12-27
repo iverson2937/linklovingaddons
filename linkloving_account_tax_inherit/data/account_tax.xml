@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="account_account_tax_chart2221" model="account.account">
+            <field name="code">22211</field>
+            <field name="name">应交税费</field>
+            <field name="user_type_id" ref="linkloving_account_parent.data_account_type_view"/>
+        </record>
+
+    </data>
+</odoo>
+
