@@ -113,8 +113,8 @@
                                 states="posted,confirm" groups="purchase.group_purchase_manager"/>
                         <button name="confirm" string="Confirm" type="object" class="oe_highlight"
                                 states="posted" groups="purchase.group_purchase_manager"/>
-                        <button name="done" string="Done" type="object"
-                                states="confirm" groups="account.group_account_invoice"/>
+                        <!--<button name="done" string="Done" type="object"-->
+                        <!--states="confirm" groups="account.group_account_invoice"/>-->
                         <button name="register_payment" string="Register Payment" type="object"
                                 states="confirm" groups="account.group_account_invoice"/>
 
