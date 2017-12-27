@@ -504,13 +504,14 @@ class CreateOrderPointWizard(models.TransientModel):
     def unlink_useless_supplier_info(self):
         products = self.env['product.template'].search([('purchase_ok', '=', True)])
         for product in products:
-            if product.seller_ids:
+            if product.seller_ids and len(product.seller_ids) > 1:
                 for s in product.seller_ids:
+                    print s.id
                     line = self.env['purchase.order.line'].search(
-                        [('product_id', '=', s.product_id), ('state', 'in', ['purchase', 'done'])])
+                        [('product_id', '=', s.product_tmpl_id.product_variant_ids[0].id),
+                         ('state', 'in', ['purchase', 'done'])])
                     if not line:
                         print s.id
-
 
 
 def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
