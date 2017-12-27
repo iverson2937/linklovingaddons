@@ -82,6 +82,12 @@
                         <button string="批量设置产品分类为平均价格" name="set_product_category_right" type="object"
                                 default_focus="1"
                                 class="btn-primary"/>
+
+                        <button string="删除多余价格表" name="unlink_useless_supplier_info" type="object"
+                                default_focus="1"
+                                class="btn-primary"/>
+
+
                     </footer>
                 </form>
             </field>

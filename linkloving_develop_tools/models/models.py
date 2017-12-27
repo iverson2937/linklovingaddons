@@ -200,11 +200,11 @@ class CreateOrderPointWizard(models.TransientModel):
             company_obj = self.env["res.partner"]
             for similar_company in company2.filtered(lambda x: x.id != company.id):
                 if ((similar_company.name and company.name and similar_company.name.upper() in company.name.upper()) or \
-                            (
-                                            similar_company.name and company.name and company.name.upper() in similar_company.name.upper()) or \
-                            (company.phone == similar_company.phone and company.phone and similar_company.phone) or \
-                            (
-                                            company.email and similar_company.email and company.email.upper() == similar_company.email.upper())):
+                        (
+                                similar_company.name and company.name and company.name.upper() in similar_company.name.upper()) or \
+                        (company.phone == similar_company.phone and company.phone and similar_company.phone) or \
+                        (
+                                company.email and similar_company.email and company.email.upper() == similar_company.email.upper())):
                     company_obj += similar_company
 
             print(company_obj)
@@ -500,6 +500,18 @@ class CreateOrderPointWizard(models.TransientModel):
             'property_cost_method': 'average',
             'property_valuation': 'real_time'
         })
+
+    def unlink_useless_supplier_info(self):
+        products = self.env['product.template'].search([('purchase_ok', '=', True)])
+        for product in products:
+            if product.seller_ids:
+                for s in product.seller_ids:
+                    line = self.env['purchase.order.line'].search(
+                        [('product_id', '=', s.product_id), ('state', 'in', ['purchase', 'done'])])
+                    if not line:
+                        print s.id
+
+
 
 def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
     """
