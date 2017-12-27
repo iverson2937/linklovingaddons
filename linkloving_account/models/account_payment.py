@@ -125,7 +125,7 @@ class AccountPaymentRegister(models.Model):
 
     @api.multi
     def unlink(self):
-        if self.state not in ['draft', 'posted']:
+        if self.state not in ['draft', 'manager', 'posted']:
             raise UserError(_('Only can delete records state in Draft and Post'))
 
         return super(AccountPaymentRegister, self).unlink()

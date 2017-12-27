@@ -3,12 +3,11 @@
     <record id="purchase_manager_plus" model="res.groups">
         <field name="name">采购经理</field>
         <field name="category_id" ref="base.module_category_purchase_management"/>
-        <field name="implied_ids" eval="[(4, ref('base.group_purchase_manager'))]"/>
-        <field name="comment">付款申请终极审核权限</field>
+        <field name="groups" eval="[(4, ref('purchase.group_purchase_manager'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        <field name="comment">采购经理权限.</field>
     </record>
 
 
 </odoo>
-
-
 

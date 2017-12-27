@@ -187,6 +187,6 @@
 
 
 .my_account_dashboard .o_kanban_record{
-    min-width: 370px!important;
-    -webkit-flex:0 0 300px!important;
+    min-width: calc(100%/3 - 15px)!important;
+    -webkit-flex:0 0 calc(100%/3 - 15px)!important;
 }
