@@ -317,9 +317,27 @@
                     <tr>
                         <td class="o_text">年度目标</td>
                         <td class="o_secondary" title="To Activity Report">
-                            <a href="#" class="set_invoiced_target">
-                                <t t-esc="values['sale_order']['target_sales_year']"/>
-                            </a>
+
+                            <span class="set_invoiced_target" t-if="values['is_manage']">
+                                <t t-if="values['sale_order']['target_sales_year']">
+                                    <t t-esc="values['sale_order']['target_sales_year']"/>
+                                </t>
+                                <t t-if="!values['sale_order']['target_sales_year']">
+                                    Click to set
+                                </t>
+
+                            </span>
+
+                            <span t-if="!values['is_manage']">
+                                <t t-if="values['sale_order']['target_sales_year']">
+                                    <t t-esc="values['sale_order']['target_sales_year']"/>
+                                </t>
+                                <t t-if="!values['sale_order']['target_sales_year']">
+                                    未设置
+                                </t>
+                            </span>
+
+
                         </td>
                         <td class="o_secondary" title="To Opportunity Report">
                             无
