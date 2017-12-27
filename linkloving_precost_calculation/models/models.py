@@ -61,7 +61,8 @@ class SetPriceToProduct(models.TransientModel):
     def action_set(self):
         context = dict(self._context or {})
         active_ids = context.get('active_ids', []) or []
-        for record in self.env['product.template'].browse(active_ids):
+        for record in self.env['product.template'].browse(active_ids).filtered(
+                lambda x: x.qty_available > 0 and x.virtual_available != 0):
             if record.product_variant_count == 1:
                 record.standard_price = record.product_variant_id.pre_cost_cal()
         return {
