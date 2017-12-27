@@ -317,7 +317,7 @@
                     <tr>
                         <td class="o_text">年度目标</td>
                         <td class="o_secondary" title="To Activity Report">
-                            <a href="#" class="o_dashboard_action" name="crm.crm_activity_report_action">
+                            <a href="#" class="set_invoiced_target">
                                 <t t-esc="values['sale_order']['target_sales_year']"/>
                             </a>
                         </td>
