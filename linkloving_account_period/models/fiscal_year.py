@@ -79,6 +79,9 @@ class AccountPeriod(models.Model):
         ('done', 'Close')
     ], default='open')
 
+    def reopen_period(self):
+        self.state = 'open'
+
     def get_current_period(self):
 
         account_period_obj = self.env['account.period']
