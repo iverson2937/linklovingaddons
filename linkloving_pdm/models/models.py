@@ -3,6 +3,7 @@ import os
 
 import base64
 from odoo import models, fields, api, _
+from odoo.exceptions import UserError, ValidationError
 
 # class linkloving_pdm(models.Model):
 #     _name = 'linkloving_pdm.linkloving_pdm'
@@ -15,7 +16,6 @@ from odoo import models, fields, api, _
 #     @api.depends('value')
 #     def _value_pc(self):
 #         self.value2 = float(self.value) / 100
-from odoo.exceptions import UserError, ValidationError
 
 REVIEW_LINE_STATE = {'waiting_review': u'等待审核',
                      'review_success': u'审核通过',
@@ -26,6 +26,8 @@ ATTACHINFO_FIELD = ['product_tmpl_id', 'file_name', 'review_id', 'remote_path',
                     'version', 'state', 'has_right_to_review', 'is_show_outage',
                     'is_able_to_use', 'is_show_cancel', 'is_first_review',
                     'create_uid', 'type', 'is_delect_view', 'is_show_action_deny']
+
+
 class ReviewProcess(models.Model):
     _name = 'review.process'
 
@@ -708,13 +710,21 @@ class ProductAttachmentInfo(models.Model):
             attach = Model.create(val)
             filename = attach.get_download_filename()
             attach.file_name = filename
-        self.unlink()
+        # self.unlink()
+        self.search([('product_tmpl_id', '=', None)]).unlink()
         return True
 
     @api.model
     def create(self, vals):
         if (vals.get("file_binary") or vals.get("remote_path")):
             vals['state'] = 'waiting_release'
+
+        now_exist = self.search(
+            [('product_tmpl_id', '=', int(vals.get('product_tmpl_id')) if vals.get('product_tmpl_id') else None),
+             ('state', 'not in', ('cancel', 'released')), ('type', '=', vals.get('type'))])
+        if len(now_exist) > 3:
+            raise UserError(u"同时存在审核中 超过规定")
+
         res = super(ProductAttachmentInfo, self).create(vals)
         return res
 
