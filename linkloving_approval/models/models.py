@@ -91,6 +91,7 @@ class ApprovalCenter(models.TransientModel):
 
     def get_attachment_info_by_type(self, offset, limit, **kwargs):
         domain_my = kwargs.get("domains") or []
+        domain_my += [('product_tmpl_id', '!=', None)]
 
         if self.type == 'waiting_submit':
             domain = [('create_uid', '=', self.env.user.id),

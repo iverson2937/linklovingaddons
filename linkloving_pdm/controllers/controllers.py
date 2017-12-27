@@ -21,6 +21,13 @@ class LinklovingPdm(http.Controller):
             error = u"缺少必要的参数"
             args = {"error": error}
             return out % (func, json.dumps(args), json.dumps({}))
+
+        now_exist = Model.search(
+            [('product_tmpl_id', '=', int(active_id)),
+             ('state', 'not in', ('cancel', 'released')), ('type', '=', active_type)])
+        if len(now_exist) > 3:
+            return out % (func, json.dumps({"error": u"同时存在审核中 超过规定"}), json.dumps({}))
+
         try:
             attach = Model.create({
                 'file_name': my_load_file_name,
