@@ -425,6 +425,7 @@ class CrmLead(models.Model):
             'self_year_sale_amount_total'] = year_sale_sum if year_sale_sum > 0 else year_sale_sum_temporary
 
         new_res['salesman_name_list'] = [{'name': str(team_user_one.name), 'id': team_user_one.id,
+                                          'target_sales_year': team_user_one.target_sales_year,
                                           'target_sales_invoiced': team_user_one.target_sales_invoiced,
                                           'target_sales_won': team_user_one.target_sales_won} for team_user_one in (
                                              data_manage_team_name_list if data_manage_team_name_list else self.env.user.sale_team_id.member_ids)]
