@@ -16,11 +16,19 @@
                         <field name="state" widget="statusbar" readonly="1"/>
                     </header>
                     <sheet>
+
+                        <div class="oe_button_box">
+
+                            <button name="action_open_journal_entries" class="oe_stat_button" icon="fa-book"
+                                    string="会计分录" attrs="{'invisible': [('move_id', '=', False)]}" type="object">
+                            </button>
+                        </div>
                         <group>
                             <group>
                                 <field name="amount" attrs="{'readonly':[('state','=','done')]}"/>
                                 <field name="rate" attrs="{'readonly':[('state','=','done')]}"/>
                                 <field name="tax_amount"/>
+                                <field name="move_id"/>
 
                             </group>
                             <group>
@@ -39,7 +47,7 @@
                 <tree string="Period">
                     <field name="date"/>
                     <field name="amount"/>
-                    <field name="tax_amount"/>
+                    <field name="tax_amount" sum="税金总和"/>
                 </tree>
             </field>
         </record>
