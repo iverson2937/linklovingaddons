@@ -63,7 +63,7 @@ class SetPriceToProduct(models.TransientModel):
         active_ids = context.get('active_ids', []) or []
         for record in self.env['product.template'].browse(active_ids):
             if record.product_variant_count == 1:
-                record.standard_price = record.product_variant_id.pre_cost_cal(raise_exception=False)
+                record.standard_price = record.product_variant_id.pre_cost_cal()
         return {
             "type": "ir.actions.client",
             "tag": "action_notify",
