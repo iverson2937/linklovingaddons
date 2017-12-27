@@ -56,6 +56,7 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
 
         },
         initTable: function (data) {
+            var self = this;
             var formatter_func = function (value, row, index) {
                 if (value) {
                     var url = 'http://' + location.host + '/web?#view_type=form&model=' + value.model + '&id=' + value.id;
@@ -130,39 +131,8 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                 field: 'state',
                 title: '出货状态',
                 sortable: true,
-            }]
-            self.$('#table').bootstrapTable({
-                cache: false,
-                sortable: true,
-                showToggle: true,
-                search: true,
-                striped: true,
-                showColumns: true,
-                showExport: true,
-                iconsPrefix: 'fa', // glyphicon of fa (font awesome)
-                //onClickCell: function (field, value, row, $element) {
-                //    if(value){
-                //        //http://localhost:8089/web?#id=17947&view_type=form&model=purchase.order
-                //        window.open('http://' + location.host + '/web?#view_type=form&model=' + value.model + '&id=' + value.id, ''+value.id);
-                //    }
-                //    return true;
-                //},
-                exportTypes: ['csv', 'txt', 'excel'],
-                exportOptions: {
-                    fileName: '江苏若态订单汇总' + new Date().Format("yyyy-MM-dd"),
-                    excelstyles: ['border-bottom', 'border-top', 'border-left', 'border-right'],
-                },
-                icons: {
-                    paginationSwitchDown: 'glyphicon-collapse-down icon-chevron-down',
-                    paginationSwitchUp: 'glyphicon-collapse-up icon-chevron-up',
-                    refresh: 'glyphicon-refresh icon-refresh',
-                    toggle: 'fa-lg fa-list-ul',
-                    columns: 'fa-th',
-                    detailOpen: 'glyphicon-plus icon-plus',
-                    detailClose: 'glyphicon-minus icon-minus',
-                    export: 'fa-upload',
-                },
-                columns: [[{
+                }];
+            var options = self.options_init('江苏若态订单汇总' + new Date().Format("yyyy-MM-dd"), [[{
                     field: 'title',
                     title: '江苏若态订单汇总',
                     halign: "center",
@@ -170,17 +140,11 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                     colspan: coloums.length,
                     'class': "font_35_header",
                 }], coloums
-                ],
-                data: data
-            });
+            ], data);
+            self.$('#table').bootstrapTable(options);
         },
-        initTableSubCompany: function (data) {
-            var self = this;
-            if (!data) {
-                return;
-            }
-            var colomns = self.initSubColumns(data);
-            self.$('#table').bootstrapTable({
+        options_init: function (filename, coloums, data) {
+            return {
                 cache: false,
                 sortable: true,
                 showToggle: true,
@@ -189,17 +153,10 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                 showColumns: true,
                 showExport: true,
                 iconsPrefix: 'fa', // glyphicon of fa (font awesome)
-                //onClickCell: function (field, value, row, $element) {
-                //    if(value){
-                //        //http://localhost:8089/web?#id=17947&view_type=form&model=purchase.order
-                //        window.open('http://' + location.host + '/web?#view_type=form&model=' + value.model + '&id=' + value.id, ''+value.id);
-                //    }
-                //    return true;
-                //},
-                exportTypes: ['csv', 'txt', 'excel'],
+                exportTypes: ['excel'],
                 exportOptions: {
-                    fileName: '生产跟踪单' + data.so_name,
-                    excelstyles: ['border-bottom', 'border-top', 'border-left', 'border-right'],
+                    fileName: filename,//'生产跟踪单' + data.so_name,
+                    excelstyles: ['background-color', 'color', 'font-weight', 'border-top', 'border-bottom', 'border-left', 'border-right'],
                 },
                 icons: {
                     paginationSwitchDown: 'glyphicon-collapse-down icon-chevron-down',
@@ -211,9 +168,18 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                     detailClose: 'glyphicon-minus icon-minus',
                     export: 'fa-upload',
                 },
-                columns: colomns,
-                data: data.order_line,
-            });
+                columns: coloums,
+                data: data,//data.order_line,
+            }
+        },
+        initTableSubCompany: function (data) {
+            var self = this;
+            if (!data) {
+                return;
+            }
+            var colomns = self.initSubColumns(data);
+            var options = self.options_init('生产跟踪单' + data.so_name, colomns, data.order_line);
+            self.$('#table').bootstrapTable(options);
         },
         initSubColumns: function (data) {
             var colspan_xishu = 1;
@@ -341,7 +307,7 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                 {
                     field: 'order',
                     title: '订单类型',//变量
-                    colspan: colspan_xishu * 4,
+                    colspan: colspan_xishu * 3,
                     rowspan: 1,
                     halign: "center",
                     align: "center",
