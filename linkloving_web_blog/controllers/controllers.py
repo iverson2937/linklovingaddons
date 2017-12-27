@@ -10,6 +10,7 @@ from odoo import http, fields, _
 from odoo.addons.website.controllers.main import QueryURL
 from odoo.addons.website_blog.controllers.main import WebsiteBlog
 
+
 # ------------------------------------------------------
 #         bolog_name = ['公告栏', '发布文章','my文章审核','原生审核']
 #         bolog_url = ['/blog/new_blog_index', '/blog/new_blog_create_index','/blog/ 主页id','/blog/ago/check']
@@ -37,6 +38,9 @@ class LinklovingWebBlog(http.Controller):
 
     @http.route('/blog/new_blog_create_index', type='http', auth='public', website=True, csrf=False)
     def new_blog_create_index_show(self, **kw):
+
+        if not request.env.ref('base.group_user') in request.env.user.groups_id:
+            return http.local_redirect('/')
 
         if not request.env.user.active:
             return http.local_redirect('/web/login?redirect=blog.post')
@@ -222,12 +226,15 @@ class LinklovingWebBlog(http.Controller):
     @http.route('/blog/ago/check', type='http', auth='public', website=True, csrf=False)
     def create_attachment_index(self, **kw):
 
+        if not request.env.ref('base.group_user') in request.env.user.groups_id:
+            return http.local_redirect('/')
         menu_id = request.env.ref('linkloving_web_blog.menu_blog_my_blog')
         action = request.env.ref('linkloving_web_blog.blog_post_action')
 
         return http.local_redirect(
             '/web#min=1&limit=80&view_type=list&model=blog.post&menu_id=' + str(menu_id.id) + '&action=' + str(
                 action.id))
+
 
         # return {'name': u'我的文章',
         #         'type': 'ir.actions.act_window',

@@ -212,7 +212,7 @@ class ProductProductExtend(models.Model):
             total_price = 0.0000
             result, result2 = bom.explode(self, 1)
             for sbom, sbom_data in result2:
-                if sbom.child_bom_id and man_route_id in sbom.child_bom_id.product_id.route_ids:  # 如果有子阶
+                if sbom.child_bom_id and man_route_id in sbom.child_bom_id.product_tmpl_id.route_ids:  # 如果有子阶
                     sub_bom_price = _calc_price(sbom.child_bom_id) * sbom_data['qty']
                     total_price += sub_bom_price
                 elif buy_route_id in sbom.product_id.route_ids:
