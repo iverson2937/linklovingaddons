@@ -25,9 +25,9 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
-        # 'security/outsource_process_seq.xml',
-        # 'views/views.xml',
-        # 'views/templates.xml',
+        'security/outsource_process_seq.xml',
+        'views/views.xml',
+        'views/templates.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
