@@ -55,6 +55,17 @@ class ProductProduct(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    has_bom_line_lines = fields.Boolean(compute='has_bom_line_ids', string='是否有在BOM中')
+
+    @api.multi
+    def has_bom_line_ids(self):
+        for product in self:
+            line = self.env['mrp.bom.line'].search([('product_id', '=', product.product_variant_ids[0].id)])
+            if line:
+                product.has_bom_line_lines = True
+            else:
+                product.has_bom_line_lines = False
+
     @api.model
     @api.depends("all_mo_ids", "all_mo_ids.state")
     def _compute_has_mo_procure(self):
@@ -301,6 +312,8 @@ class ProductTemplate(models.Model):
                 [('product_id', 'in', updated.mapped('product_variant_ids').ids)])
             for line in bom_line_ids:
                 line.product_uom_id = vals['uom_id']
+
+            print 1111111111
         return super(ProductTemplate, self).write(vals)
 
     def _get_default_uom_id(self):
@@ -340,7 +353,6 @@ class ProductTemplate(models.Model):
     #             [('product_id', 'in', updated.mapped('product_variant_ids').ids)], limit=1)
     #
     #     return super(models.Model, self).write(vals)
-
 
     @api.multi
     def toggle_active(self):
