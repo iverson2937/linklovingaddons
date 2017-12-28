@@ -174,7 +174,8 @@
 }
 
 .o_form_view .o_form_sheet_bg .o_form_sheet{
-    min-width: 1050px;
+    width: 92%!important;
+    min-width: 1200px!important;
 }
 
 
@@ -186,6 +187,6 @@
 
 
 .my_account_dashboard .o_kanban_record{
-    min-width: 370px!important;
-    -webkit-flex:0 0 300px!important;
+    min-width: calc(100%/3 - 15px)!important;
+    -webkit-flex:0 0 calc(100%/3 - 15px)!important;
 }

@@ -1,0 +1,53 @@
+<odoo>
+    <data>
+        <record id="purchase_account_payment_register_form_inherit" model="ir.ui.view">
+            <field name="name">account.payment.register</field>
+            <field name="model">account.payment.register</field>
+            <field name="inherit_id" ref="linkloving_account.purchase_account_payment_register_form"/>
+            <field name="arch" type="xml">
+                <xpath expr='//button[@name="confirm"]' position='replace'>
+                    <button name="to_manager_approve" string="送审经理" type="object" class="oe_highlight"
+                            states="posted" groups="purchase.group_purchase_manager"/>
+
+                    <button name="confirm" string="确认" type="object" class="oe_highlight"
+                            states="manager" groups="linkloving_purchase_authority.purchase_manager_plus"/>
+                </xpath>
+                <xpath expr='//button[@name="reject"]' position='attributes'>
+                    <attribute name="states">posted,manager,confirm</attribute>
+                </xpath>
+            </field>
+        </record>
+    </data>
+
+
+    <record id="action_payment_register_to_approve" model="ir.actions.act_window">
+        <field name="name">Payment Application</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.payment.register</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('payment_type','=',1),('state','=','manager')]</field>
+        <field name="context">{'default_payment_type':1,'manager':True}</field>
+        <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'tree', 'view_id': ref('linkloving_account.account_payment_register_tree')}),
+            (0,0,{'view_mode':'form', 'view_id': ref('linkloving_account.purchase_account_payment_register_form')})]"/>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to add a contact in your address book.
+            </p>
+            <p>
+                No Invoice need to Prepayment!
+            </p>
+        </field>
+    </record>
+
+
+    <menuitem id="payment_register_apply_to_approve"
+              action="action_payment_register_to_approve"
+              parent="linkloving_purchase.menu_purchase_account_invoice"
+              groups="linkloving_purchase_authority.purchase_manager_plus"
+              sequence="1" name="待审核付款申请"/>
+</odoo>
+
+
+

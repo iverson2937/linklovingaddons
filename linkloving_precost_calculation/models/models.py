@@ -63,7 +63,7 @@ class SetPriceToProduct(models.TransientModel):
         active_ids = context.get('active_ids', []) or []
         for record in self.env['product.template'].browse(active_ids):
             if record.product_variant_count == 1:
-                record.standard_price = record.product_variant_id.pre_cost_cal()
+                record.standard_price = record.product_variant_id.pre_cost_cal(raise_exception=False)
         return {
             "type": "ir.actions.client",
             "tag": "action_notify",
@@ -206,15 +206,16 @@ class ProductProductExtend(models.Model):
         计算成本(工程核价)
         :return:
         """
-
+        buy_route_id = self.env.ref("purchase.route_warehouse0_buy")
+        man_route_id = self.env.ref("mrp.route_warehouse0_manufacture")
         def _calc_price(bom):
             total_price = 0.0000
             result, result2 = bom.explode(self, 1)
             for sbom, sbom_data in result2:
-                if sbom.child_bom_id and sbom.product_id.type == 'product':  # 如果有子阶
+                if sbom.child_bom_id and man_route_id in sbom.child_bom_id.product_tmpl_id.route_ids:  # 如果有子阶
                     sub_bom_price = _calc_price(sbom.child_bom_id) * sbom_data['qty']
                     total_price += sub_bom_price
-                else:
+                elif buy_route_id in sbom.product_id.route_ids:
                     # 判断是否是采购件
                     # if sbom.product_id.qty_available == 0:
                     #     continue
@@ -223,6 +224,7 @@ class ProductProductExtend(models.Model):
                         sbom.product_uom_id)
                     sub_price = pruchase_price * sbom_data['qty']
                     total_price += sub_price
+
             if total_price >= 0:
                 expense_cost = bom.produced_spend_per_pcs * bom.process_id.hourly_wage / 3600
                 total_price = bom.product_uom_id._compute_price(total_price / bom.product_qty,
@@ -231,11 +233,14 @@ class ProductProductExtend(models.Model):
 
         bom_obj = self.env['mrp.bom']
         for pp in self:
-            bom = bom_obj._bom_find(product=pp)
-            if bom:
-                real_time_cost = _calc_price(bom)
-                return real_time_cost
-            else:
+            if man_route_id in pp.route_ids:
+                bom = bom_obj._bom_find(product=pp)
+                if bom:
+                    real_time_cost = _calc_price(bom)
+                    return real_time_cost
+                else:
+                    return 0
+            elif buy_route_id in pp.route_ids:
                 return pp.get_highest_purchase_price(raise_exception)
 
     @api.multi

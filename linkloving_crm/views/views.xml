@@ -412,19 +412,19 @@
 
 
         <!--<menuitem-->
-                <!--id="crm_lead_menu_crm_leads"-->
-                <!--name="线索客户"-->
-                <!--parent="sales_team.menu_sales"-->
-                <!--sequence="1"-->
-                <!--action="crm_action_lead_form"-->
-                <!--groups="crm.group_use_lead"/>-->
+        <!--id="crm_lead_menu_crm_leads"-->
+        <!--name="线索客户"-->
+        <!--parent="sales_team.menu_sales"-->
+        <!--sequence="1"-->
+        <!--action="crm_action_lead_form"-->
+        <!--groups="crm.group_use_lead"/>-->
 
 
         <!--<menuitem action="crm_sale_action_partner_form"-->
-                  <!--id="menu_message_order_status_id"-->
-                  <!--parent="sales_team.menu_sales"-->
-                  <!--groups=""-->
-                  <!--sequence="1" name="潜在客户"/>-->
+        <!--id="menu_message_order_status_id"-->
+        <!--parent="sales_team.menu_sales"-->
+        <!--groups=""-->
+        <!--sequence="1" name="潜在客户"/>-->
 
 
         <!--&lt;!&ndash;Receipt*&ndash;&gt;-->
@@ -589,7 +589,8 @@
                     <filter string="月报" name="month_search" domain="[('type','=','mouth_daily')]"/>
 
                     <group expand="0" string="Group By">
-                        <filter string="月份" domain="[]" context="{'group_by':'create_date'}"/>
+                        <filter string="月份" name="group_month" domain="[]" context="{'group_by':'create_date'}"/>
+                        <filter string="类型" name="group_type" domain="[]" context="{'group_by':'type'}"/>
                     </group>
 
                 </search>
@@ -612,6 +613,10 @@
                         </group>
                     </group>
                     <group>
+                        <!--<group>-->
+                        <field name="approval_man_ids" widget="many2many_tags"/>
+                        <!--<field name="remember_me"/>-->
+                        <!--</group>-->
                         <field name="summary" placeholder="总结"/>
                         <field name="plan" placeholder="计划"/>
                     </group>
@@ -629,10 +634,11 @@
             <field name="name">工作报告</field>
             <field name="model">crm.sale.daily</field>
             <field name="arch" type="xml">
-                <tree>
+                <tree create="0" default_order="summit_time desc">
                     <field name="name"/>
                     <field name="type"/>
                     <field name="summit_time"/>
+                    <field name="approval_man_ids" invisible="1"/>
                     <field name="summary" placeholder="总结" invisible="1"/>
                     <field name="plan" placeholder="计划" invisible="1"/>
                 </tree>
@@ -689,7 +695,7 @@
             <field name="res_model">crm.sale.daily</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[]</field>
+            <field name="domain">[('approval_man_ids', 'in', [uid])]</field>
             <field name="context">{
                 }
             </field>
@@ -700,6 +706,8 @@
                 </p>
             </field>
         </record>
+
+        <!--'search_default_group_type':1-->
 
     </data>
 </openerp>

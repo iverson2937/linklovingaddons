@@ -1,0 +1,15 @@
+<openerp>
+    <data>
+        <record id="crm_view_partner_form_linkloving" model="ir.ui.view">
+            <field name="name">crm form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="linkloving_companies_ordercreated.crm_view_partner_form_linkloving"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='discount_to_sub']" position="after">
+                    <field name="is_automatic_combine_po"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>

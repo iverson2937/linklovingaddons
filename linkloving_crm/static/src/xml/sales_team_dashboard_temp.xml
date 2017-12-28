@@ -8,7 +8,7 @@
 
         <div t-if="show_demo or values" class="o_sales_dashboard">
 
-            <div t-attf-class="#{show_demo ? 'o_demo' : ''}">
+            <div>
                 <table class="table table-condensed">
                     <tr>
                         <td class="o_text">
@@ -110,26 +110,29 @@
                 </table>
             </div>
 
-            <div t-attf-class="#{show_demo ? 'o_demo' : ''}">
+            <div>
                 <table class="hidden-xs table table-condensed">
                     <tr>
                         <td class="o_text">
                             <div class="o_highlight">Performance</div>
                             This Month
                         </td>
-                        <td t-attf-class="#{values and values['done']['target'] and values['done']['this_month'] >= values['done']['target'] ? 'o_main' : 'o_secondary'}"
-                            title="To Activity Report">
-                            <a href="#" class="o_dashboard_action" name="crm.crm_activity_report_action">
+                        <td t-attf-class="#{values and values['sale_order']['self_sale_amount_total'] and values['sale_order']['self_sale_amount_total'] >= values['invoiced']['target'] ? 'o_main' : 'o_secondary'}"
+                            title="销售额">
+                            <a href="#" class="o_dashboard_action"
+                               name="linkloving_crm.crm_action_sale_order_this_month">
                                 <span class="o_highlight">
                                     <t t-if="!show_demo">
-                                        <t t-esc="values['done']['this_month']"/>
+                                        <!--<t t-esc="values['sale_order']['self_sale_amount_total'], values['currency_id'])"/>-->
+                                        <t t-esc="widget.render_monetary_field(values['sale_order']['self_sale_amount_total'], values['currency_id'])"/>
+
                                     </t>
                                     <t t-if="show_demo">
-                                        94
+                                        <t t-esc="widget.render_monetary_field(values['sale_order']['self_sale_amount_total'], values['currency_id'])"/>
                                     </t>
                                 </span>
                                 <br/>
-                                Activities Done
+                                销售额
                             </a>
                         </td>
                         <td t-attf-class="#{values and values['won']['target'] and values['won']['this_month'] >= values['won']['target'] ? 'o_main' : 'o_secondary'}"
@@ -137,10 +140,15 @@
                             <a href="#" class="o_dashboard_action" name="crm.crm_opportunity_report_action_graph">
                                 <span class="o_highlight">
                                     <t t-if="!show_demo">
-                                        <t t-esc="widget.render_monetary_field(values['won']['this_month'], values['currency_id'])"/>
+
+                                        <t t-if="values['won']['this_month']"
+                                           t-esc="widget.render_monetary_field(values['won']['this_month'], values['currency_id'])"/>
+                                        <t t-if="!values['won']['this_month']"
+                                           t-esc="widget.render_monetary_field(values['won_this_month'], values['currency_id'])"/>
+
                                     </t>
                                     <t t-if="show_demo">
-                                        78,140.03€
+                                        <t t-esc="widget.render_monetary_field(values['won']['this_month'], values['currency_id'])"/>
                                     </t>
                                 </span>
                                 <br/>
@@ -151,50 +159,99 @@
                             t-attf-class="#{values and values['invoiced']['target'] and values['invoiced']['this_month'] >= values['invoiced']['target'] ? 'o_main' : 'o_secondary'}"
                             title="To Invoice Report">
                             <a href="#" class="o_dashboard_action" name="account.action_account_invoice_report_all">
-                                <span class="o_highlight">
-                                    <t t-if="!show_demo">
-                                        <t t-esc="widget.render_monetary_field(values['invoiced']['this_month'], values['currency_id'])"/>
-                                    </t>
-                                    <t t-if="show_demo">
-                                        35,029.39€
-                                    </t>
+
+                                <span class="o_highlight" t-if="values['invoiced']['this_month']">
+                                    <t t-esc="widget.render_monetary_field(values['invoiced']['this_month'], values['currency_id'])"/>
                                 </span>
+                                <span class="o_highlight" t-if="!values['invoiced']['this_month']">
+                                    <t t-esc="widget.render_monetary_field(values['invoiced_my']['this_invoiced_month'], values['currency_id'])"/>
+                                </span>
+
                                 <br/>
                                 Invoiced
                             </a>
                         </td>
                     </tr>
                     <tr>
-                        <td class="o_text">Target</td>
-                        <td class="o_secondary">
-                            <span t-if="!show_demo" class="o_target_to_set" name='done'
-                                  t-att-value="values['done']['target'] ? values['done']['target'] : undefined"
-                                  title="Click to set">
-                                <t t-if="values['done']['target']">
-                                    <t t-esc="values['done']['target']"/>
+                        <td class="o_text">当前总销售额</td>
+                        <td class="o_secondary" title="年销售额">
+                            <a href="#" class="o_dashboard_action"
+                               name="linkloving_crm.crm_action_sale_order_this_year">
+
+                                <t t-esc="widget.render_monetary_field(values['sale_order']['self_year_sale_amount_total'], values['currency_id'])"/>
+
+                            </a>
+                        </td>
+                        <td class="o_secondary" title="To Opportunity Report">
+                            <t t-esc="widget.render_monetary_field(values['won']['last_month'], values['currency_id'])"/>
+                        </td>
+                        <td class="o_secondary" title="年总开票金额">
+                            <!--<t t-esc="values['this_year']"/>-->
+
+                            <t t-esc="widget.render_monetary_field(values['invoiced_my']['this_year'], values['currency_id'])"/>
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="o_text">月目标</td>
+                        <td t-if="show_demo or values['invoiced']" class="o_secondary">
+                            <span class="set_invoiced_target" t-if="values['is_manage']">
+                                <t t-if="values['invoiced']['target']">
+                                    <t t-esc="values['invoiced']['target']"/>
                                 </t>
-                                <t t-if="!values['done']['target']">
+                                <t t-if="!values['invoiced']['target']">
                                     Click to set
                                 </t>
+
                             </span>
-                            <span t-if="show_demo">
-                                100
+
+                            <span t-if="!values['is_manage']">
+                                <t t-if="values['invoiced']['target']">
+                                    <t t-esc="values['invoiced']['target']"/>
+                                </t>
+                                <t t-if="!values['invoiced']['target']">
+                                    未设置
+                                </t>
                             </span>
+
                         </td>
                         <td class="o_secondary">
-                            <span t-if="!show_demo" class="o_target_to_set" name='won'
-                                  t-att-value="values['won']['target'] ? values['won']['target'] : undefined"
-                                  title="Click to set">
+                            <!--<span t-if="!show_demo" class="o_target_to_set" name='won'-->
+                            <!--t-att-value="values['won']['target'] ? values['won']['target'] : undefined"-->
+                            <!--title="Click to set">-->
+                            <!--<t t-if="values['won']['target']">-->
+                            <!--<t t-esc="values['won']['target']"/>-->
+                            <!--</t>-->
+                            <!--<t t-if="!values['won']['target']">-->
+                            <!--Click to set-->
+                            <!--</t>-->
+                            <!--</span>-->
+                            <!--<span t-if="show_demo">-->
+                            <!--80.000€-->
+                            <!--</span>-->
+
+
+                            <span class="set_invoiced_target" t-if="values['is_manage']">
                                 <t t-if="values['won']['target']">
                                     <t t-esc="values['won']['target']"/>
                                 </t>
                                 <t t-if="!values['won']['target']">
                                     Click to set
                                 </t>
+
                             </span>
-                            <span t-if="show_demo">
-                                80.000€
+
+                            <span t-if="!values['is_manage']">
+                                <t t-if="values['won']['target']">
+                                    <t t-esc="values['won']['target']"/>
+                                </t>
+                                <t t-if="!values['won']['target']">
+                                    未设置
+                                </t>
                             </span>
+
+
                         </td>
                         <td t-if="show_demo or values['invoiced']" class="o_secondary">
                             <!--<span t-if="!show_demo" class="o_target_to_set" name='invoiced'-->
@@ -212,47 +269,114 @@
                             <!--</span>-->
 
 
-                            <span class="set_invoiced_target" t-if="values['is_manage']">
-                                Click to set
-                            </span>
-
-                            <span class="set_invoiced_target" t-if="!values['is_manage']">
+                            <span>
                                 未设置
                             </span>
+
+
+                            <!--<span class="set_invoiced_target" t-if="values['is_manage']">-->
+                            <!--<t t-if="values['invoiced']['target']">-->
+                            <!--<t t-esc="values['invoiced']['target']"/>-->
+                            <!--</t>-->
+                            <!--<t t-if="!values['invoiced']['target']">-->
+                            <!--Click to set-->
+                            <!--</t>-->
+
+                            <!--</span>-->
+
+                            <!--<span class="set_invoiced_target" t-if="!values['is_manage']">-->
+                            <!--<t t-if="values['invoiced']['target']">-->
+                            <!--<t t-esc="values['invoiced']['target']"/>-->
+                            <!--</t>-->
+                            <!--<t t-if="!values['invoiced']['target']">-->
+                            <!--未设置-->
+                            <!--</t>-->
+                            <!--</span>-->
                         </td>
                     </tr>
+                    <!--<tr>-->
+                    <!--<td class="o_text">Last Month</td>-->
+                    <!--&lt;!&ndash;<td class="o_secondary" title="To Activity Report">&ndash;&gt;-->
+                    <!--&lt;!&ndash;<a href="#" class="o_dashboard_action" name="crm.crm_activity_report_action">&ndash;&gt;-->
+                    <!--&lt;!&ndash;<t t-esc="values['done']['last_month']"/>&ndash;&gt;-->
+                    <!--&lt;!&ndash;</a>&ndash;&gt;-->
+                    <!--&lt;!&ndash;</td>&ndash;&gt;-->
+                    <!--<td class="o_secondary" title="To Opportunity Report">-->
+                    <!--<a href="#" class="o_dashboard_action" name="crm.crm_opportunity_report_action_graph">-->
+                    <!--<t t-esc="widget.render_monetary_field(values['won']['last_month'], values['currency_id'])"/>-->
+                    <!--</a>-->
+                    <!--</td>-->
+                    <!--<td t-if="values['invoiced']" class="o_secondary" title="To Invoice Report">-->
+                    <!--<a href="#" class="o_dashboard_action" name="account.action_account_invoice_report_all">-->
+                    <!--<t t-esc="widget.render_monetary_field(values['invoiced']['last_month'], values['currency_id'])"/>-->
+                    <!--</a>-->
+                    <!--</td>-->
+                    <!--</tr>-->
+
+
                     <tr>
-                        <td class="o_text">Last Month</td>
+                        <td class="o_text">年度目标</td>
                         <td class="o_secondary" title="To Activity Report">
-                            <a href="#" class="o_dashboard_action" name="crm.crm_activity_report_action">
-                                <t t-esc="values['done']['last_month']"/>
-                            </a>
+
+                            <span class="set_invoiced_target" t-if="values['is_manage']">
+                                <t t-if="values['sale_order']['target_sales_year']">
+                                    <t t-esc="values['sale_order']['target_sales_year']"/>
+                                </t>
+                                <t t-if="!values['sale_order']['target_sales_year']">
+                                    Click to set
+                                </t>
+
+                            </span>
+
+                            <span t-if="!values['is_manage']">
+                                <t t-if="values['sale_order']['target_sales_year']">
+                                    <t t-esc="values['sale_order']['target_sales_year']"/>
+                                </t>
+                                <t t-if="!values['sale_order']['target_sales_year']">
+                                    未设置
+                                </t>
+                            </span>
+
+
                         </td>
                         <td class="o_secondary" title="To Opportunity Report">
-                            <a href="#" class="o_dashboard_action" name="crm.crm_opportunity_report_action_graph">
-                                <t t-esc="widget.render_monetary_field(values['won']['last_month'], values['currency_id'])"/>
-                            </a>
+                            无
                         </td>
                         <td t-if="values['invoiced']" class="o_secondary" title="To Invoice Report">
-                            <a href="#" class="o_dashboard_action" name="account.action_account_invoice_report_all">
-                                <t t-esc="widget.render_monetary_field(values['invoiced']['last_month'], values['currency_id'])"/>
-                            </a>
+                            无
                         </td>
                     </tr>
+
+
+                    <tr>
+                        <td class="o_text">完成率</td>
+                        <td class="o_secondary" title="To Activity Report">
+                            <a href="#" class="o_dashboard_action" name="crm.crm_activity_report_action">
+                                <t t-esc="values['sale_order']['target_sales_year_finishing_rate']"/>
+                            </a>
+                        </td>
+                        <td class="o_secondary" title="商机年度完成率">
+                            无
+                        </td>
+                        <td t-if="values['invoiced']" class="o_secondary" title="To Invoice Report">
+                            无
+                        </td>
+                    </tr>
+
+
                 </table>
             </div>
 
-            <div t-if="show_demo" class="o_welcome_message">
-                <div class="o_welcome_image">
-                    <i class="fa fa-smile-o fa-5x"></i>
-                </div>
-                <div class="o_welcome_content">
-                    <h2>Hi there!</h2>
-                    <h4>Great sales journeys start with a clean pipeline.</h4>
-                    <h4>Create a few opportunities in it.</h4>
-                    <a class="btn btn-primary o_dashboard_action" name="crm.action_your_pipeline">My Pipeline</a>
-                </div>
-            </div>
+            <!--<div t-if="show_demo" class="o_welcome_message">-->
+            <!--<div class="o_welcome_image">-->
+            <!--<i class="fa fa-smile-o fa-5x"></i>-->
+            <!--</div>-->
+            <!--<div class="o_welcome_content">-->
+            <!--<h2>Hi there!</h2>-->
+            <!--<h4>Great sales journeys start with a clean pipeline.</h4>-->
+            <!--<h4>Create a few opportunities in it.</h4>-->
+            <!--</div>-->
+            <!--</div>-->
             <hr/>
 
             <!--开始自己写的-->
@@ -323,8 +447,8 @@
                     <div class="col-sm-12 color9_title">跟进</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-4">
-                        <div>总跟进次数</div>
+                    <div class="col-sm-3">
+                        <div>商机总跟进次数</div>
                         <div class="fz20">
                             <a href="#" class="o_dashboard_action fg-blue"
                                name="linkloving_crm.crm_lead_opportunities_tree_view_new_follow_up">
@@ -333,8 +457,19 @@
                             </a>
                         </div>
                     </div>
-                    <div class="col-sm-4">
-                        <div>报价次数</div>
+
+                    <div class="col-sm-3">
+                        <div>客户总跟进次数</div>
+                        <div class="fz20">
+                            <a href="#" class="o_dashboard_action fg-blue"
+                               name="linkloving_crm.crm_action_today_follow_view">
+                                <t t-esc="values['follow_up']['all_partner_follow_record']"/>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div>商机报价次数</div>
                         <div class="fz20">
                             <a href="#" class="o_dashboard_action fg-blue"
                                name="linkloving_crm.crm_lead_opportunities_tree_view_new_quote1">
@@ -344,8 +479,8 @@
                         </div>
                     </div>
 
-                    <div class="col-sm-4">
-                        <div>送样次数</div>
+                    <div class="col-sm-3">
+                        <div>商机送样次数</div>
                         <div class="fz20">
                             <a href="#" class="o_dashboard_action fg-blue"
                                name="linkloving_crm.crm_lead_opportunities_tree_view_new_sample">
@@ -423,9 +558,8 @@
             <div class="col-md-12">&#160;</div>
         </div>
 
-
-        <div t-if="values['is_show_custom_module']" class="myChart_sale_bar oe_kanban_color_0 o_kanban_record">
-            <div class="">
+        <div class="myChart_sale_bar" t-if="values['is_show_custom_module']">
+            <div class="oe_kanban_color_0 o_kanban_record">
 
                 <div class="o_kanban_card_header">
                     <div class="o_kanban_card_header_title">
@@ -492,17 +626,17 @@
                             <td>写</td>
                             <td>
                                 <a href="javascript:void(0)" class="edit_schedule_report">
-                                    <i class="fa fa-pencil"></i>
+                                    <i id="day_daily" class="fa fa-pencil"></i>
                                 </a>
                             </td>
                             <td>
                                 <a href="javascript:void(0)" data-cycle="weekly" class="edit_schedule_report">
-                                    <i class="fa fa-pencil"></i>
+                                    <i id="week_daily" class="fa fa-pencil"></i>
                                 </a>
                             </td>
                             <td>
                                 <a href="javascript:void(0)" data-cycle="monthly" class="edit_schedule_report">
-                                    <i class="fa fa-pencil"></i>
+                                    <i id="mouth_daily" class="fa fa-pencil"></i>
                                 </a>
                             </td>
                         </tr>
@@ -559,21 +693,25 @@
                 <table>
                     <tr>
                         <td>姓名</td>
-                        <td>商机目标</td>
-                        <td>订单目标</td>
+                        <td>月销售目标</td>
+                        <td>月商机目标</td>
+                        <td>年销售目标</td>
                     </tr>
 
                     <t t-foreach="values['salesman_name_list']" t-as="val">
                         <div class="salesman_one">
-                            <tr>
+                            <tr t-attf-class="#{val['id']}">
                                 <td>
-                                    <t t-esc="val"/>
+                                    <t t-esc="val['name']"/>
                                 </td>
                                 <td>
-                                    <input type="text" class="my_load_file_name"/>
+                                    <input type="text" class="my_order_name" t-att-value="val.target_sales_invoiced"/>
                                 </td>
                                 <td>
-                                    <input type="text" class="my_load_file_name"/>
+                                    <input type="text" class="my_opportunity_name" t-att-value="val.target_sales_won"/>
+                                </td>
+                                <td>
+                                    <input type="text" class="my_order_name" t-att-value="val.target_sales_year"/>
                                 </td>
                             </tr>
                         </div>

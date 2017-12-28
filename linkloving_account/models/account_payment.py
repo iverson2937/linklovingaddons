@@ -125,7 +125,7 @@ class AccountPaymentRegister(models.Model):
 
     @api.multi
     def unlink(self):
-        if self.state not in ['draft', 'posted']:
+        if self.state not in ['draft', 'manager', 'posted']:
             raise UserError(_('Only can delete records state in Draft and Post'))
 
         return super(AccountPaymentRegister, self).unlink()
@@ -210,7 +210,8 @@ class AccountPayment(models.Model):
             # Set default partner type for the payment type
             if self.payment_type == 'inbound':
                 self.partner_type = 'customer'
-            elif self.payment_type == 'outbound':
+            # 如果默认给客户付钱的话，partner_type就不修改了
+            elif self.payment_type == 'outbound' and not self._context.get('apply'):
                 self.partner_type = 'supplier'
         # Set payment method domain
         res = self._onchange_journal()
@@ -220,40 +221,15 @@ class AccountPayment(models.Model):
         res['domain']['journal_id'].append(('type', 'in', ('bank', 'cash')))
         res['domain']['journal_id'].append(('deprecated', '=', False))
 
+        res['domain']['payment_method_id'] = [('payment_type', '=', self.payment_type)]
+        self.payment_method_id = self.env['account.payment.method'].search([('payment_type', '=', self.payment_type)])[
+            0].id
+
         return res
 
     @api.multi
     def set_to_cancel(self):
         self.state = 'cancel'
-        # account_invoices = self.env['account.invoice'].search([('type', '=', 'out_invoice'), ('state', '=', 'open')],
-        #                                                       limit=300)
-        # for invoice in account_invoices:
-        #     invoice.auto_set_to_done()
-
-        # account_invoices = self.env['account.invoice'].search([('type', '=', 'in_invoice')], limit=400, offset=2500)
-        # print len(account_invoices)
-        # for invoice in account_invoices:
-        #     if invoice.partner_id.supplier:
-        #         print invoice.name
-        #         invoice.journal_id = 2
-        # payment_ids = self.env['account.payment'].search([('payment_type', '=', 'inbound')])
-        # ids = []
-        # for payment in payment_ids:
-        #     if payment.partner_id:
-        #         for move in payment.move_line_ids:
-        #             if not move.partner_id:
-        #                 ids.append(payment.id)
-        #                 move.partner_id = payment.partner_id.id
-        #
-
-
-
-
-        # # FIXME: 怎么样的可以取消
-        # if self.move_line_ids and len(self.move_line_ids) == 2 and self.payment_type != 'transfer':
-        #     raise UserError('不可以取消,请联系系统管理员')
-        # else:
-        #     self.state = 'cancel'
 
     @api.onchange('product_id')
     def _onchange_product_id(self):

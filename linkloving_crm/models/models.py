@@ -211,6 +211,7 @@ class CrmLead(models.Model):
             },
             'follow_up': {
                 'all_follow_record': 0,
+                'all_partner_follow_record': 0,
                 'all_quote_cont': 0,
                 'all_sample_cont': 0,
             },
@@ -220,11 +221,31 @@ class CrmLead(models.Model):
                 'new_partner': 0,
                 'new_lead': 0,
             },
+            'sale_order': {
+                'self_sale_amount_total': 0,
+                'self_year_sale_amount_total': 0,
+                'target_sales_year': 0,
+                'target_sales_year_finishing_rate': '',
+            },
+            'invoiced_my': {
+                'this_year': 0,
+                'this_invoiced_month': 0,
+            },
+            'won_this_month': 0,
             'is_manage': 0,
             'char_data': '',
             'is_show_custom_module': 0,
             'salesman_name_list': [],
+
         }
+
+        day_now = time.localtime()
+        day_begin = '%d-%02d-01' % (day_now.tm_year, day_now.tm_mon)  # 月初肯定是1号
+        wday, monthRange = calendar.monthrange(day_now.tm_year, day_now.tm_mon)  # 得到本月的天数 第一返回为月第一日为星期几（0-6）, 第二返回为此月天数
+        day_end = '%d-%02d-%02d' % (day_now.tm_year, day_now.tm_mon, monthRange)
+        year_begin = '%d-01-01' % (day_now.tm_year)
+        now_day = '%d-%02d-%02d' % (day_now.tm_year, day_now.tm_mon, day_now.tm_mday)
+
         # 基础信息
         domain_all = [('customer', '=', '1'), ('is_company', '=', True)]
         all_lead_partner = self.env['res.partner'].search(domain_all + [('crm_is_partner', '=', True),
@@ -244,6 +265,11 @@ class CrmLead(models.Model):
         new_res['basic_information']['all_opportunity'] = len(all_opportunity)
 
         # 跟进信息
+
+        all_partner_follow = self.env['res.partner'].search(
+            domain_all + [('customer_follow_up_date', '>=', now_day)])
+
+        new_res['follow_up']['all_partner_follow_record'] += len(all_partner_follow)
 
         for opp in all_opportunity:
             # Expected closing
@@ -267,6 +293,15 @@ class CrmLead(models.Model):
                             #     new_res['closing']['next_7_days'] += 1
                             # if date_msg_record < date.today():
                             #     new_res['closing']['overdue'] += 1
+            if opp.date_closed:
+                date_closed = fields.Date.from_string(opp.date_closed)
+                if date.today().replace(day=1) <= date_closed <= date.today():
+                    if opp.planned_revenue:
+                        new_res['won_this_month'] += opp.planned_revenue
+                if fields.Date.from_string(year_begin) <= date_closed:
+                    if opp.planned_revenue:
+                        res['won']['last_month'] = opp.planned_revenue
+
         # 新增信息
         data_partner = [all_lead_partner, all_latent_partner, all_partner, all_opportunity]
         key_partner = ['new_lead_partner', 'new_latent_partner', 'new_partner', 'new_lead']
@@ -276,42 +311,156 @@ class CrmLead(models.Model):
                 if date_lead_partner == date.today():
                     new_res['new_message'][key_partner[val]] += 1
 
-        if self.env.ref('sales_team.group_sale_manager').id in self.env.user.groups_id.ids or self.env.user.sale_team_id.user_id == self.env.user:
+        if self.env.ref(
+                'sales_team.group_sale_manager').id in self.env.user.groups_id.ids or self.env.user.sale_team_id.user_id == self.env.user:
             new_res['is_manage'] = 1
 
         data_list = []
-        day_now = time.localtime()
-        day_begin = '%d-%02d-01' % (day_now.tm_year, day_now.tm_mon)  # 月初肯定是1号
-        wday, monthRange = calendar.monthrange(day_now.tm_year, day_now.tm_mon)  # 得到本月的天数 第一返回为月第一日为星期几（0-6）, 第二返回为此月天数
-        day_end = '%d-%02d-%02d' % (day_now.tm_year, day_now.tm_mon, monthRange)
+        data_team_list = []
+        data_team_name_list = []
+        data_manage_team_name_list = self.env['res.users']  # 管理员 为给个 销售团队主管分配目标  列表
+        domain_salesman = [('state', '=', 'sale'), ('create_date', '<=', day_end)]
+
+        account_invoice_domain = [
+            ('state', 'in', ['open', 'paid']),
+            ('type', 'in', ['out_invoice', 'out_refund'])
+        ]
+
+        all_salesman_team = self.env['res.users']
+
+        if self.env.ref('sales_team.group_sale_manager').id in self.env.user.groups_id.ids:
+            invoice_data = self.env['account.invoice'].search_read(account_invoice_domain + [('date', '>=', day_begin)],
+                                                                   ['date', 'amount_untaxed_signed'])
+            for invoice in invoice_data:
+                new_res['invoiced_my']['this_invoiced_month'] += invoice['amount_untaxed_signed']
+
+            account_invoice_domain += [('date', '>=', year_begin)]
+
+            for team_one in self.env['crm.team'].search([]):
+                all_salesman_team += team_one.member_ids
+                data_team_name_list.append(team_one.name)
+                team_sale_sum = 0
+
+                data_manage_team_name_list += team_one.user_id
+
+                for team_user_one in team_one.member_ids:
+
+                    sale_order_list = self.env['sale.order'].sudo().search(
+                        domain_salesman + [('user_id', '=', team_user_one.id), ('create_date', '>', day_begin)])
+                    for sale_one in sale_order_list:
+                        team_sale_sum += sale_one.amount_total
+                data_team_list.append(team_sale_sum)
+
+        else:
+            all_salesman_team = self.env.user.sale_team_id.member_ids
+
+            for new_salesman_one in all_salesman_team:
+                if self.env.ref('sales_team.group_sale_salesman_all_leads').id in new_salesman_one.groups_id.ids:
+                    all_salesman_team -= new_salesman_one
+
+            if self.env.user.sale_team_id.user_id != self.env.user:
+                account_invoice_domain += [('date', '>=', year_begin), ('user_id', '=', self.env.uid)]
+            else:
+                account_invoice_domain += [('date', '>=', year_begin),
+                                           ('user_id', 'in', [ad.id for ad in all_salesman_team])]
+
+        invoice_data_year = self.env['account.invoice'].search_read(account_invoice_domain,
+                                                                    ['date', 'amount_untaxed_signed'])
+
+        for invoice_year in invoice_data_year:
+            new_res['invoiced_my']['this_year'] += invoice_year['amount_untaxed_signed']
 
         # state= sale
-        for team_user_one in self.env.user.sale_team_id.member_ids:
-            sale_sum = 0
-            sale_order_list = self.env['sale.order'].sudo().search(
-                [('user_id', '=', team_user_one.id), ('create_date', '>', day_begin), ('create_date', '<', day_end)])
-            for sale_one in sale_order_list:
-                sale_sum += sale_one.amount_total
-            data_list.append(sale_sum)
+        year_sale_sum = 0  # 团队成员 年总销售金额 与 团队主管 销售金额
+        year_sale_sum_temporary = 0
 
-        new_res['salesman_name_list'] = [str(team_user_one.name) for team_user_one in
-                                         self.env.user.sale_team_id.member_ids]
+        if self.env.ref('sales_team.group_sale_manager').id in self.env.user.groups_id.ids:
+            sale_order_man_list = self.env['sale.order'].search(domain_salesman + [('create_date', '>', year_begin)])
+            for sale_one_man in sale_order_man_list:
+                year_sale_sum_temporary += sale_one_man.amount_total
+            sale_order_man_month_list = self.env['sale.order'].search(
+                domain_salesman + [('create_date', '>', day_begin)])
+            for sale_one_month_man in sale_order_man_month_list:
+                new_res['sale_order']['self_sale_amount_total'] += sale_one_month_man.amount_total
+        else:
+            for team_user_one in all_salesman_team:
+                sale_sum = 0
+                sale_order_list = self.env['sale.order'].sudo().search(
+                    domain_salesman + [('user_id', '=', team_user_one.id), ('create_date', '>', day_begin)])
+                for sale_one in sale_order_list:
+                    sale_sum += sale_one.amount_total
+                data_list.append(sale_sum)
+
+                if team_user_one == self.env.user:
+                    new_res['sale_order']['self_sale_amount_total'] = sale_sum
+                    year_sale_order_list = self.env['sale.order'].search(domain_salesman +
+                                                                         [('user_id', '=', team_user_one.id),
+                                                                          ('create_date', '>', year_begin)])
+                    for year_sale_one in year_sale_order_list:
+                        year_sale_sum += year_sale_one.amount_total
+
+        if self.env.user.sale_team_id.user_id == self.env.user:
+            #     团队管理员
+            year_sale_sum_charge = 0
+            year_sale_order_list = self.env['sale.order'].search(
+                domain_salesman + [('user_id', 'in', [ad.id for ad in all_salesman_team]),
+                                   ('create_date', '>', year_begin)])
+            for year_sale_one in year_sale_order_list:
+                year_sale_sum_charge += year_sale_one.amount_total
+            year_sale_sum = year_sale_sum_charge
+
+            invoice_data = self.env['account.invoice'].search_read(account_invoice_domain + [('date', '>=', day_begin),
+                                                                                             ('user_id', 'in',
+                                                                                              [ad.id for ad in
+                                                                                               all_salesman_team])],
+                                                                   ['date', 'amount_untaxed_signed'])
+            for invoice in invoice_data:
+                new_res['invoiced_my']['this_invoiced_month'] += invoice['amount_untaxed_signed']
+
+        if self.env.user.sale_team_id.user_id == self.env.user and self.env.ref(
+                'sales_team.group_sale_manager').id not in self.env.user.groups_id.ids:
+            new_res['sale_order']['self_sale_amount_total'] = sum(data_list)
+
+        new_res['sale_order'][
+            'self_year_sale_amount_total'] = year_sale_sum if year_sale_sum > 0 else year_sale_sum_temporary
+
+        new_res['salesman_name_list'] = [{'name': str(team_user_one.name), 'id': team_user_one.id,
+                                          'target_sales_year': team_user_one.target_sales_year,
+                                          'target_sales_invoiced': team_user_one.target_sales_invoiced,
+                                          'target_sales_won': team_user_one.target_sales_won} for team_user_one in (
+                                             data_manage_team_name_list if data_manage_team_name_list else self.env.user.sale_team_id.member_ids)]
 
         char_data = {
-            'labels': [str(team_user_one.name) for team_user_one in self.env.user.sale_team_id.member_ids],
+            'labels': data_team_name_list if data_team_name_list else [str(team_user_one.name) for team_user_one in
+                                                                       all_salesman_team],
             'datasets': [{
                 'label': '销售额(¥)',
-                'data': data_list,
-                'backgroundColor': ['rgba(54, 162, 235, 0.2)'] * len(self.env.user.sale_team_id.member_ids),
+                'data': data_team_list if data_team_list else data_list,
+                'backgroundColor': ['rgba(54, 162, 235, 0.2)'] * len(all_salesman_team),
                 'borderWidth': 1
             }]
         }
-        if self.env.user.sale_team_id:
+        if self.env.user.sale_team_id or self.env.ref(
+                'sales_team.group_sale_manager').id in self.env.user.groups_id.ids:
             new_res['is_show_custom_module'] = 1
+
+        new_res['sale_order']['target_sales_year'] = self.env.user.target_sales_year
+
+        if self.env.user.target_sales_year > 0:
+            new_res['sale_order']['target_sales_year_finishing_rate'] = str(
+                round((new_res['sale_order']['self_year_sale_amount_total'] / self.env.user.target_sales_year) * 100, 2)
+            ) + '%'
 
         new_res['char_data'] = json.dumps(char_data)
 
         return dict(res, **new_res)
+
+        # def sum_sale_total(self, domain):
+        #     sale_sum = 0
+        #     sale_order_list = self.env['sale.order'].sudo().search(
+        #         [('user_id', '=', team_user_one.id), ('create_date', '>', day_begin), ('create_date', '<', day_end)])
+        #     for sale_one in sale_order_list:
+        #         sale_sum += sale_one.amount_total
 
 
 class CrmContinent(models.Model):
@@ -340,12 +489,20 @@ class CrmCrmTeam(models.Model):
 class CrmSaleDaily(models.Model):
     _name = 'crm.sale.daily'
 
+    @api.model
+    def _shenheren(self):
+        # self.env['res.partner'].search([('id', 'in', (3624, 3455))])
+        partner_list = self.env.user.sale_team_id.user_id
+
+        return partner_list
+
     name = fields.Char(string=u'名称')
-    summit_time = fields.Date(string=u'时间')
+    summit_time = fields.Date(string=u'时间', default=fields.Datetime.now)
     type = fields.Selection([('day_daily', u'日报'), ('week_daily', u'周报'), ('mouth_daily', u'月报')], string=u'类型')
     summary = fields.Html(string=u'总结')
     plan = fields.Text(string=u'计划')
-    team_id = fields.Many2one('crm.team', string='Sales Team', oldname='section_id')
+    team_id = fields.Many2one('crm.team', string='Sales Team')
+    approval_man_ids = fields.Many2many("res.users", string=u'提交给...审核', default=_shenheren)
 
     @api.multi
     def set_daily_save(self):
@@ -366,3 +523,25 @@ class CrmSaleDaily(models.Model):
 
         vals['name'] = self.env.user.name + user_name
         return super(CrmSaleDaily, self).create(vals)
+
+
+class CrmResUsers(models.Model):
+    _inherit = 'res.users'
+
+    target_sales_year = fields.Integer(u'年目标')
+
+    @api.model
+    def set_salesman_target(self, data):
+        print data
+
+        for salesman_one in data:
+            sale_user = self.env['res.users'].browse(int(salesman_one.get('id')))
+
+            sale_user.sudo().write({'target_sales_won': int(salesman_one.get('opportunity_name')) if salesman_one.get(
+                'opportunity_name') else False,
+                                    'target_sales_invoiced': int(salesman_one.get('order_name')) if salesman_one.get(
+                                        'order_name') else False,
+                                    'target_sales_year': int(salesman_one.get('year_order_name')) if salesman_one.get(
+                                        'year_order_name') else False})
+
+        return 'ok'

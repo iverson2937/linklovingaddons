@@ -87,6 +87,9 @@
             <field name="arch" type="xml">
                 <form string="Account Period">
                     <header>
+
+                        <button name="reopen_period" string="重新打来会计区间" states="done" type="object" class="oe_highlight"
+                                groups="account.group_account_invoice"/>
                         <button name="close_period" string="关闭会计区间" states="open" type="object" class="oe_highlight" groups="account.group_account_invoice"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,done"/>
                     </header>

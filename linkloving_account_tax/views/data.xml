@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="linkloving_account_tax.custom_tax" model="account.account">
+            <field name="code">221001005</field>
+            <field name="name">自开票税金</field>
+            <field name="user_type_id" ref="linkloving_account_parent.data_account_type_view"/>
+        </record>
+
+
+    </data>
+</odoo>

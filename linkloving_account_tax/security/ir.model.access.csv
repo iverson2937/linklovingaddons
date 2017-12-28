@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_linkloving_account_tax_linkloving_account_tax_admin,linkloving_account_tax.linkloving_account_tax,model_account_custom_tax,account.group_account_manager,1,1,1,1

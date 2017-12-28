@@ -111,7 +111,7 @@ class MrpProductionProduceExtend(models.TransientModel):
         qc_direct = self._context.get("qc_direct")  # 是否直接去QC, 外协完成之后的动作
         if not qc_direct:
             for mo in self:
-                if mo.production_id.outside_type == 'outsourcing' and mo.production_id.outsourcing_supplier_id:  # 外协
+                if mo.production_id.outside_type == 'outsourcing':  # 外协
                     return self.outsourcing_process_produce()
                 elif mo.production_id.outside_type == 'outsourcing' and not mo.production_id.outsourcing_supplier_id:
                     continue
