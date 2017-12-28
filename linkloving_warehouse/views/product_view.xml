@@ -196,13 +196,15 @@
                     <separator/>
                     <filter name="filter_unplan" string="有MO未排产的" domain="[('has_mo_unplan', '=', True)]"/>
                     <separator/>
-                    <filter name="has_bom" string="不有在bom里面" domain="[('has_bom_line_lines', '=', False)]"/>
+
                     <separator/>
                     <filter name="filter_is_virtual_lt_reordering" string="预测 &lt;最小存货"
                             domain="[('is_virtual_lt_reordering', '=', True)]"/>
                     <separator/>
                     <filter name="filter_is_available_lt_required" string="库存 &lt;订单量"
                             domain="[('is_available_lt_required', '=', True)]"/>
+                    <separator/>
+                    <filter name="has_bom" string="不有在bom里面" domain="[('has_bom_line_lines', '=', False)]"/>
                 </field>
 
             </field>

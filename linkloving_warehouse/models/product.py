@@ -55,13 +55,14 @@ class ProductProduct(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    has_bom_line_lines = fields.Boolean(compute='has_bom_line_ids', string='是否有在BOM中')
+    has_bom_line_lines = fields.Boolean(compute='has_bom_line_ids', string='是否有在BOM中', store=True)
 
-    @api.multi
+    @api.model
     def has_bom_line_ids(self):
         for product in self:
             line = self.env['mrp.bom.line'].search([('product_id', '=', product.product_variant_ids[0].id)])
             if line:
+                print line
                 product.has_bom_line_lines = True
             else:
                 product.has_bom_line_lines = False
