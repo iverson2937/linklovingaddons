@@ -1,0 +1,18 @@
+<odoo>
+    <data>
+        <record id="purchase_order_form_inherit" model="ir.ui.view">
+            <field name="name">purchase.order.form</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//button[@name='button_cancel']" position="button_cancel">
+                    <button name="invoice_done" states="purchase" type="object" string="设置为对账完成"
+                            groups="base.group_erp_manager"
+                            confirm="确定设置完成吗？"/>
+                </xpath>
+
+            </field>
+        </record>
+    </data>
+</odoo>
