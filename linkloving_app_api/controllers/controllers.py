@@ -3663,3 +3663,97 @@ class LinklovingAppApi(http.Controller):
         if account:
             jason_list = account.sudo().json_data()
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=jason_list)
+
+    # ---------------------------------------分割线, 工单---------------------------------------
+    # 创建工单
+    @http.route('/linkloving_app_api/create_work_order', type='json', auth="none", csrf=False, cors='*')
+    def create_work_order(self):
+        name = request.jsonrequest.get("title")
+        description = request.jsonrequest.get("description")
+        priority = request.jsonrequest.get("priority")
+        assign_user_id = request.jsonrequest.get("assign_user_id")
+        uid = request.jsonrequest.get("uid")
+        wo_images = request.jsonrequest.get('wo_images')  # 图片
+        departments = request.jsonrequest.get('departments')  # 谁可以看
+        user = request.env['res.users'].sudo().browse(uid)
+
+        effective_department_ids = departments
+        if not departments:
+            effective_department_ids = request.env['hr_department'].sudo().search([]).ids
+
+        issue_state = 1
+        if assign_user_id:
+            issue_state = 2
+        work_order_model = request.env['linkloving.work.order']
+        work_order = work_order_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
+            'name': name,
+            'description': description,
+            'priority': priority,
+            'assign_user_id': assign_user_id,
+            'issue_state': issue_state,
+            'create_user_id': uid,
+            'effective_department_ids': effective_department_ids
+        })
+
+        for img in wo_images:
+            wo_img_id = request.env["linkloving.work.order.image"].sudo(LinklovingAppApi.CURRENT_USER()).create({
+                'work_order_id': work_order.id,
+                'work_order_image': img,
+            })
+            work_order.attachments = [(4, wo_img_id.id)]
+
+        return JsonResponse.send_response(STATUS_CODE_OK,res_data=self.convert_work_order_to_json(work_order))
+
+
+
+    # "我的"工单统计
+    @http.route('/linkloving_app_api/my_work_order_statistics', type='json', auth="none", csrf=False, cors='*')
+    def my_work_order_statistics(self, **kw):
+        uid = request.jsonrequest.get("uid")
+        work_order_model = request.env['linkloving.work.order']
+        work_order_data = work_order_model.sudo().read_group([('issue_state', 'in', [2, 3]), ('execute_uid', '=', uid)], ['issue_state'],
+                                                             ['issue_state'])
+        result = dict((data['issue_state'][0], data['issue_state_count']) for data in work_order_data)
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=result)
+
+    # "工单池"工单统计
+    @http.route('/linkloving_app_api/work_order_statistics', type='json', auth="none", csrf=False, cors='*')
+    def work_order_statistics(self, **kw):
+        uid = request.jsonrequest.get("uid")
+        user = request.env['res.users'].sudo().browse(uid)
+        work_order_model = request.env['linkloving.work.order']
+        work_order_data = work_order_model.sudo().read_group([('issue_state', 'in', [1, 2, 3]), ('effective_department_ids', 'in', user.employee_ids.mapped('department_id'))], ['issue_state'], ['issue_state'])
+        result = dict((data['issue_state'][0], data['issue_state_count']) for data in work_order_data)
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=result)
+
+    #"工单池"查询
+    @http.route('/linkloving_app_api/work_order_search', type='json', auth="none", csrf=False, cors='*')
+    def work_order_statistics(self, **kw):
+        uid = request.jsonrequest.get("uid")
+        return JsonResponse.send_response(STATUS_CODE_OK)
+
+    @staticmethod
+    def convert_work_order_to_json(work_order):
+        data = {
+            'work_order_id': work_order.id,
+            'name': work_order.name,
+            'description': work_order.description,
+            'priority': work_order.priority,
+            'assign_user_id': work_order.assign_user_id,
+            'issue_state': work_order.issue_state,
+            'create_user_id': work_order.create_user_id,
+            'work_order_images': LinklovingAppApi.get_work_order_img_url(work_order.attachments.ids),
+        }
+        return data
+
+    @classmethod
+    def get_work_order_img_url(cls, worker_id, ):
+        # DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
+        imgs = []
+        for img_id in worker_id:
+            url = '%slinkloving_app_api/get_worker_image?worker_id=%s&model=%s&field=%s' % (
+                request.httprequest.host_url, str(img_id), 'linkloving.work.order.image', 'work_order_image')
+            imgs.append(url)
+        return imgs
