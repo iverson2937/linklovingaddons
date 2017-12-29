@@ -30,9 +30,12 @@ class InventoryLine(models.Model):
                                          precision_rounding=line.product_id.uom_id.rounding) == 0:
                 continue
             diff = line.theoretical_qty - line.product_qty
+            Inventory_conversion_name = ''
+            if hasattr(line, 'remark_adjust'):
+                Inventory_conversion_name = line.remark_adjust if line.remark_adjust else ''
             vals = {
                 'name': _('INV:') + (
-                    (line.remark_adjust or '') if hasattr(line, 'remark_adjust') else (line.inventory_id.name or '')),
+                    Inventory_conversion_name if Inventory_conversion_name else (line.inventory_id.name or '')),
                 'product_id': line.product_id.id,
                 'product_uom': line.product_uom_id.id,
                 'date': line.inventory_id.date,
