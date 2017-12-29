@@ -53,7 +53,7 @@ class AccountDashboard(models.Model):
         for t in tax.child_ids:
             total_tax += t.get_period_balance(period_id)
 
-        payable_amount = self.env.ref('inkloving_account_purchase.account_account_receive')
+        payable_amount = self.env.ref('linkloving_account_purchase.account_account_receive')
         for p in payable_amount.child_ids:
             total_payable_amount = p.get_period_balance(period_id)
 
