@@ -3959,6 +3959,9 @@ class LinklovingAppApi(http.Controller):
                 }
                 group_by.append(bean)
             elif state == 'is_secondary_produce':
+                domain.append('|')
+                domain.append(('in_charge_id', '=', partner_id))
+                domain.append(('create_uid', '=', partner_id))
                 domain.append(("is_secondary_produce", '=', True))
                 bean_list = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(
                     domain=domain,
@@ -3993,6 +3996,9 @@ class LinklovingAppApi(http.Controller):
                 group_by.append(bean)
             elif state == 'already_picking':
                 domain.append(('state', '=', state))
+                domain.append('|')
+                domain.append(('in_charge_id', '=', partner_id))
+                domain.append(('create_uid', '=', partner_id))
                 bean_list = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(
                     domain=domain,
                     fields=[
@@ -4227,16 +4233,16 @@ class LinklovingAppApi(http.Controller):
 
         if is_group_by:
             groupList = []
-            domain = []
-            if request.jsonrequest.get('process_id'):
-                domain.append(('process_id', '=', request.jsonrequest['process_id']))
-
-            if 'production_line_id' in request.jsonrequest.keys():
-                if request.jsonrequest.get('production_line_id'):
-                    domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
-                else:
-                    domain.append(('production_line_id', '=', False))
             for statesub in state:
+                domain = []
+                if request.jsonrequest.get('process_id'):
+                    domain.append(('process_id', '=', request.jsonrequest['process_id']))
+
+                if 'production_line_id' in request.jsonrequest.keys():
+                    if request.jsonrequest.get('production_line_id'):
+                        domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
+                    else:
+                        domain.append(('production_line_id', '=', False))
                 if statesub == 'qc_success':
                     pass
                 elif statesub == 'qc_fail':
@@ -4246,8 +4252,7 @@ class LinklovingAppApi(http.Controller):
 
                 mos = request.env["mrp.production"].sudo(LinklovingAppApi.CURRENT_USER()).search(domain)
                 feedbacks = request.env["mrp.qc.feedback"].sudo(LinklovingAppApi.CURRENT_USER()).search(
-                    [("state", '=', statesub), ("production_id", "in", mos.ids)],
-                    order='production_id desc')
+                    [("state", '=', statesub), ("production_id", "in", mos.ids)],order='production_id desc')
                 group_list = {}
                 for feed in feedbacks:
                     group_feed = group_list.get(feed.production_id.origin_sale_id.name)
