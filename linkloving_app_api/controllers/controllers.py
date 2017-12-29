@@ -3879,6 +3879,7 @@ class LinklovingAppApi(http.Controller):
                 domain.append(('state', '=', 'progress'))
                 domain.append(('feedback_on_rework', '!=', None))
             else:
+                domain.append(("is_secondary_produce", '=', False))
                 domain.append(('state', '=', request.jsonrequest['state']))
 
         if is_group_by:
@@ -3903,41 +3904,132 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/get_count_mrp_production', type='json', auth='none', csrf=False)
     def get_count_mrp_production(self, **kw):
         process_id = request.jsonrequest.get("process_id")
-        is_group_by = request.jsonrequest.get("is_group_by")
+        states = request.jsonrequest.get('state')
+        partner_id = request.jsonrequest.get('partner_id')
 
-        domain = []
+        # domain = []
         if not process_id:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "未找到工序id"})
 
-        if request.jsonrequest.get('process_id'):
-            domain.append(('process_id', '=', request.jsonrequest['process_id']))
+        # if partner_id:
+        #     domain.append('|')
+        #     domain.append(('in_charge_id', '=', partner_id))
+        #     domain.append(('create_uid', '=', partner_id))
 
-        if 'production_line_id' in request.jsonrequest.keys():
-            if request.jsonrequest.get('production_line_id'):
-                domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
-            else:
-                domain.append(('production_line_id', '=', False))
 
-        if request.jsonrequest.get('state'):
-            if request.jsonrequest.get('state') in ('waiting_material', 'prepare_material_ing'):
-                pass
-                # domain.append(('state', 'in', ['waiting_material', 'prepare_material_ing']))
-            elif request.jsonrequest.get('state') == 'progress':
+        # if request.jsonrequest.get('process_id'):
+        #     domain.append(('process_id', '=', request.jsonrequest['process_id']))
+        #
+        # if 'production_line_id' in request.jsonrequest.keys():
+        #     if request.jsonrequest.get('production_line_id'):
+        #         domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
+        #     else:
+        #         domain.append(('production_line_id', '=', False))
+        orders_today = []
+        for state in states:
+            domain = []
+            if request.jsonrequest.get('process_id'):
+                domain.append(('process_id', '=', request.jsonrequest['process_id']))
+
+            if 'production_line_id' in request.jsonrequest.keys():
+                if request.jsonrequest.get('production_line_id'):
+                    domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
+                else:
+                    domain.append(('production_line_id', '=', False))
+            if state in ('waiting_material', 'prepare_material_ing'):
+                domain.append(('state', '=', state))
+                order = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(
+                    domain=domain,
+                    fields=[
+                        'state'],
+                    groupby=[
+                        'state'])
+                if order:
+                    orders_today.append(order)
+            elif state == 'progress':
                 domain.append(('feedback_on_rework', '=', None))
                 domain.append(("is_secondary_produce", '=', False))
+                domain.append(('state', '=', state))
+                domain.append('|')
+                domain.append(('in_charge_id', '=', partner_id))
+                domain.append(('create_uid', '=', partner_id))
+                order = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(
+                    domain=domain,
+                    fields=[
+                        'state'],
+                    groupby=[
+                        'state'])
+                if order:
+                    orders_today.append(order)
+            elif state in ('qc_success', 'already_picking', 'force_cancel_waiting_return'):
+                domain.append('|')
+                domain.append(('in_charge_id', '=', partner_id))
+                domain.append(('create_uid', '=', partner_id))
+                domain.append(('state', '=', state))
+                order = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(
+                    domain=domain,
+                    fields=[
+                        'state'],
+                    groupby=[
+                        'state'])
+                if order:
+                    orders_today.append(order)
+            elif state in ('waiting_inventory_material', 'waiting_warehouse_inspection'):
+                domain.append(("is_secondary_produce", '=', False))
+                domain.append('|')
+                domain.append(('in_charge_id', '=', partner_id))
+                domain.append(('create_uid', '=', partner_id))
+                domain.append(('state', '=', state))
+                order = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(
+                    domain=domain,
+                    fields=[
+                        'state'],
+                    groupby=[
+                        'state'])
+                if order:
+                    orders_today.append(order)
+            elif state == 'rework_ing':
+                domain.append(('state', '=', 'progress'))
+                domain.append(('feedback_on_rework', '!=', None))
+                domain.append('|')
+                domain.append(('in_charge_id', '=', partner_id))
+                domain.append(('create_uid', '=', partner_id))
+                order = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(
+                    domain=domain,
+                    fields=[
+                        'state'],
+                    groupby=[
+                        'state'])
+                if order:
+                    orders_today.append(order)
+            elif state == 'is_secondary_produce':
+                domain.append(("is_secondary_produce", '=', True))
+                domain.append(('state', '=', state))
+                domain.append('|')
+                domain.append(('in_charge_id', '=', partner_id))
+                domain.append(('create_uid', '=', partner_id))
+                order = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(
+                    domain=domain,
+                    fields=[
+                        'state'],
+                    groupby=[
+                        'state'])
+                if order:
+                    orders_today.append(order)
             else:
-                # domain.append(('state', '=', request.jsonrequest['state']))
-                pass
-
-        orders_today = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(domain=domain,
-                                                                                                      fields=[
-                                                                                                          'state'],
-                                                                                                      groupby=[
-                                                                                                          'state'])
+                domain.append(('state', '=', state))
+                order = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(
+                    domain=domain,
+                    fields=[
+                        'state'],
+                    groupby=[
+                        'state'])
+                if order:
+                    orders_today.append(order)
 
         data = []
         for production in orders_today:
-            data.append(self.getJsonCount(production))
+            data.append(self.getJsonCount(production[0]))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
     # 处理下json格式（邹邹）
@@ -4074,3 +4166,39 @@ class LinklovingAppApi(http.Controller):
             imgs.append(url)
         return imgs
         # end--------------模块:工单---------------分割线--------------------------------------------------end
+    #根据工序获取产线 邹
+    @http.route('/linkloving_app_api/get_new_production_lines', type='json', auth='none', csrf=False)
+    def get_new_production_lines(self, **kw):
+        # request.session.db = request.jsonrequest["db"]
+        # request.params["db"] = request.jsonrequest["db"]
+
+        mrp_production = request.env['mrp.production.line'].sudo()
+        partner_id = request.jsonrequest.get('partner_id')
+        domain = []
+        if partner_id:
+            domain.append('|')
+            domain.append(('in_charge_id', '=', partner_id))
+            domain.append(('create_uid', '=', partner_id))
+
+
+        if request.jsonrequest.get('process_id'):
+            domain.append(('process_id', '=', request.jsonrequest['process_id']))
+        g = mrp_production.search(domain)
+        line_list = []
+        for gg in g:
+            line_list.append(self.transter_json_line(gg))
+        no_line = {
+            'line_id': -1000,
+            'line_name': '未分组'
+        }
+        line_list.append(no_line)
+        # g = mrp_production.read_group(domain, fields=['production_line_id'], groupby="production_line_id")
+        print(g)
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=line_list)
+
+    def transter_json_line(self, line):
+        return {
+            'line_id': line.id,
+            'line_name': line.name
+        }
+

@@ -1241,10 +1241,15 @@ class LinklovingOAApi(http.Controller):
     def order_confirm(self, *kw):
         order_id = request.jsonrequest.get("id")
         confirm_order = request.env["sale.order"].sudo().browse(order_id)
-        confirm_order.action_confirm()
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
+        if (confirm_order.tax_id):
+            confirm_order.action_confirm()
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
+        else:
+            return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"success": 2})
 
-    # 客户详情页
+
+
+            # 客户详情页
     @http.route('/linkloving_oa_api/customer_details', type='json', auth="none", csrf=False, cors='*')
     def customer_details(self, *kw):
         id = request.jsonrequest.get("id")
