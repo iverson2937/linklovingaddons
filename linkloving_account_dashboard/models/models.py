@@ -55,7 +55,7 @@ class AccountDashboard(models.Model):
 
         payable_amount = self.env.ref('linkloving_account_purchase.account_account_receive')
         for p in payable_amount.child_ids:
-            total_payable_amount = p.get_period_balance(period_id)
+            total_payable_amount += p.get_period_balance(period_id)
 
 
         assets = self.env.ref('l10n_cn_small_business.1_small_business_chart1601')
