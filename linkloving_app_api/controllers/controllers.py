@@ -3996,6 +3996,9 @@ class LinklovingAppApi(http.Controller):
                 group_by.append(bean)
             elif state == 'already_picking':
                 domain.append(('state', '=', state))
+                domain.append('|')
+                domain.append(('in_charge_id', '=', partner_id))
+                domain.append(('create_uid', '=', partner_id))
                 bean_list = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(
                     domain=domain,
                     fields=[
