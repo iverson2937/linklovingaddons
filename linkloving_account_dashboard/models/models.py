@@ -11,6 +11,13 @@ from odoo.exceptions import UserError
 class AccountDashboard(models.Model):
     _inherit = 'account.account'
 
+    def get_fiscal_year_begin(self):
+        fiscalyear = self.env['account.fiscalyear'].get_current_fiscalyear()
+        period_id = fiscalyear.period_ids[0]
+        final_data = self.env['account.account.final'].search(
+            [('account_id', '=', self.id), ('period_id', '=', period_id.id), ('partner_id', '=', False)])
+        return final_data.end_debit - final_data.end_credit
+
     def get_period_balance(self, period):
         if period.state == 'done':
             final = self.env['account.account.final'].search(
@@ -38,8 +45,19 @@ class AccountDashboard(models.Model):
         # 库存商品
         stock_1 = self.env.ref('l10n_cn_small_business.1_small_business_chart1405')
         stock_2 = self.env.ref('linkloving_account.account_account_stock_chart1409')
+        stock_3 = self.env.ref('l10n_cn_small_business.1_small_business_chart4001')
         accumulated_depreciation = self.env['account.account'].search([('name', '=', '固定资产折旧')])
-        tax = self.env['account.account'].search([('name', 'like', '应交税费')])
+        tax = self.env.ref('linkloving_account_tax_inherit.account_account_tax_chart2221')
+
+        total_tax = total_payable_amount = 0
+        for t in tax.child_ids:
+            total_tax += t.get_period_balance(period_id)
+
+        payable_amount = self.env.ref('inkloving_account_purchase.account_account_receive')
+        for p in payable_amount.child_ids:
+            total_payable_amount = p.get_period_balance(period_id)
+
+
         assets = self.env.ref('l10n_cn_small_business.1_small_business_chart1601')
         # 实收资本
         real_receive_assets = self.env.ref('l10n_cn_small_business.1_small_business_chart3001')
@@ -53,7 +71,8 @@ class AccountDashboard(models.Model):
         cash_data = 0
         for cash in cashes:
             cash_data += float(cash.get_period_balance(period_id))
-        stock = stock_1.get_period_balance(period_id) + stock_2.get_period_balance(period_id)
+        stock = stock_1.get_period_balance(period_id) + stock_2.get_period_balance(
+            period_id) + stock_3.get_period_balance(period_id)
 
         # 流动资产合计
         liquid = cash_data + receivable_amount.get_period_balance(
@@ -90,7 +109,7 @@ class AccountDashboard(models.Model):
                                                                   locale='en_US')},
             'stock': {'start': 0, 'current': format_decimal(stock, locale='en_US')},
             'assets': {'start': 0, 'current': format_decimal(assets.get_period_balance(period_id), locale='en_US')},
-            'tax': {'start': 0, 'current': format_decimal(tax.get_period_balance(period_id), locale='en_US')},
+            'tax': {'start': 0, 'current': format_decimal(total_tax, locale='en_US')},
             'short_term_invest': {'start': 0,
                                   'current': format_decimal(short_term_invest.get_period_balance(period_id),
                                                             locale='en_US')},
@@ -103,7 +122,7 @@ class AccountDashboard(models.Model):
             'owner_equity': {'start': 0,
                              'current': format_decimal(owner_equity, locale='en_US')},
             'payable_amount': {'start': 0,
-                               'current': format_decimal(payable_amount.get_period_balance(period_id), locale='en_US')},
+                               'current': format_decimal(total_payable_amount, locale='en_US')},
             'other_payable_amount': {'start': 0,
                                      'current': format_decimal(other_payable_amount.get_period_balance(period_id),
                                                                locale='en_US')},
