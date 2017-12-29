@@ -110,6 +110,7 @@ class LinklovingWebBlog(http.Controller):
                     'public': True,
                 })
                 pq(a_html).attr('src', '/web/image/' + str(attachment_one.id))
+            content = (str(content)).decode("unicode-escape")
         else:
             content = kw.get('content')
 
@@ -119,8 +120,9 @@ class LinklovingWebBlog(http.Controller):
             'subtitle': kw.get('subtitle'),
             'tag_ids': http.request.env['blog.tag'].search(
                 [('name', '=', kw.get('blog_tag_type_id'))]).id,
-            'content': (str(content)).decode("unicode-escape"),
+            'content': content,
             'keyword': kw.get('keyword'),
+            'where_is_look': kw.get('where_is_look'),
         })
         print attach
 
@@ -168,6 +170,9 @@ class LinklovingWebBlog(http.Controller):
         data = []
 
         for res in result:
+            if res.where_user_look:
+                if request.env.user not in res.where_user_look:
+                    continue
             res_one = {
                 'blog_post_id': res.id,
                 'blog_post_name': res.create_uid.name,

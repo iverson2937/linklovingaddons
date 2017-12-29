@@ -12,15 +12,48 @@ class LinkLovingBlogPost(models.Model):
     keyword = fields.Char(string=u'关键字')
     visits = fields.Integer('No of Views', default=0)
 
+    where_is_look = fields.Boolean(string='是否需要设置访问权限', defalut=False)
+
+    where_user_look = fields.Many2many('res.users', string=u'谁可以看')
+    where_user_team_look = fields.Many2many('crm.team')
+
     # @api.model
     # def create(self, vals):
     #     post_id = super(LinkLovingBlogPost, self).create(vals)
     #     return post_id
+
+    @api.onchange('where_is_look')
+    def _onchange_where_is_look(self):
+        self.where_user_look = []
+        self.where_user_team_look = []
+
+    @api.onchange('where_user_team_look')
+    def _onchange_where_user_team_look(self):
+        # self.where_user_look += self.where_user_team_look.member_ids
+
+        my_all_line = self.where_user_look
+        all_temp_line = []
+        for user_team in self.where_user_team_look:
+            all_temp_line += user_team.member_ids
+
+            for user_team_one in user_team.member_ids:
+                if not user_team_one in my_all_line:
+                    self.where_user_look += user_team_one
+
+        for my_all_line_one in my_all_line:
+            if not my_all_line_one in all_temp_line:
+                self.where_user_look = self.where_user_look - my_all_line_one
+
     @api.multi
     def website_publish_button_new(self):
         # if self.env.user.has_group('website.group_website_publisher') and self.website_url != '#':
         #     return self.open_website_url()
-        return self.write({'website_published': not self.website_published})
+        for self_one in self:
+            if self_one.where_is_look:
+                if not self_one.where_user_look:
+                    raise UserError(u'不能发布,请联系作者设置本文章访问人员')
+            self.write({'website_published': not self.website_published})
+            # return self.write({'website_published': not self.website_published})
 
 
 class LinkLovingWebsiteMenu(models.Model):

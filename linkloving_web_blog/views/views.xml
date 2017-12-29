@@ -107,6 +107,20 @@
 
                             <field name="name" placeholder="Blog Post Title" string="主题"/>
                             <field name="subtitle" placeholder="Blog Subtitle"/>
+                            <field name="where_is_look" string="谁可以看到权限设置完毕"/>
+
+                            <label attrs="{'invisible':[('where_is_look','=',False)]}" for="where_user_look" string="谁可以看到"/>
+                            <div attrs="{'invisible':[('where_is_look','=',False)]}">
+                                <field name="where_user_look" widget="many2many_tags" options="{'no_create':True}"
+                                       class="oe_inline"/>
+                                或者销售团队
+                                <field name="where_user_team_look" widget="many2many_tags" options="{'no_create':True}"
+                                       class="oe_inline"/>
+                            </div>
+
+                            <!--<field name="where_user_look" widget="many2many_tags"/>-->
+                            <!--<field name="where_user_team_look" widget="many2many_tags"/>-->
+
                         </group>
                         <group invisible="1">
                             <!--<field name="blog_post_type_ids" placeholder="文章分类"/>-->
