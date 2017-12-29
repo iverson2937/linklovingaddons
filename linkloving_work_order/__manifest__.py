@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "linkloving_app_api",
+    'name': "linkloving_issue",
 
     'summary': """
         Short (1 phrase/line) summary of the module's purpose, used as
@@ -20,14 +20,12 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'mrp', 'sale', 'purchase', 'linkloving_bom_update', 'linkloving_account', 'hr_attendance',
-                'hr_holidays', ],
+    'depends': ['base', 'mail', 'base_action_rule', 'web_calendar'],
 
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
-        'views/views.xml',
-        'views/templates.xml',
+        'views/calendar_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

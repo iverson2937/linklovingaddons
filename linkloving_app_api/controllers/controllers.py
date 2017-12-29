@@ -1647,7 +1647,7 @@ class LinklovingAppApi(http.Controller):
         done_stock_moves = []
         is_multi_output = is_random_output = False
         if (hasattr(production, 'is_multi_output') and production.is_multi_output) or (
-                hasattr(production, 'is_random_output') and production.is_random_output):
+                    hasattr(production, 'is_random_output') and production.is_random_output):
             done_stock_moves = request.env['stock.move.finished'].sudo().search_read(
                 [('id', 'in', production.stock_move_lines_finished.ids)],
                 fields=['product_id',
@@ -2059,7 +2059,7 @@ class LinklovingAppApi(http.Controller):
         response.status_code = status
         return response
 
-    @http.route('/payment/order_status', type='http', auth='none', csrf=False,cors='*')
+    @http.route('/payment/order_status', type='http', auth='none', csrf=False, cors='*')
     def order_status(self, **kw):
         DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
         product_id = kw.get('pidsss')
@@ -2093,7 +2093,6 @@ class LinklovingAppApi(http.Controller):
         response = request.make_response(image_base64, headers)
         response.status_code = status
         return response
-
 
     def placeholder(self, image='placeholder.png'):
         addons_path = http.addons_manifest['web']['addons_path']
@@ -3421,15 +3420,15 @@ class LinklovingAppApi(http.Controller):
             "picking_cause": material.picking_cause,
             "remark": material.remark,
             'line_ids': [{
-                'id': lines.id,
-                'qty_product': lines.qty_available,
-                'name': lines.product_id.name,
-                'location': lines.product_id.area_id.name,
-                'quantity_available': lines.quantity_available,
-                'quantity_done': lines.quantity_done,
-                'product_qty': lines.product_qty,
-                'reserve': lines.reserve_qty,
-            } for lines in material.line_ids],
+                             'id': lines.id,
+                             'qty_product': lines.qty_available,
+                             'name': lines.product_id.name,
+                             'location': lines.product_id.area_id.name,
+                             'quantity_available': lines.quantity_available,
+                             'quantity_done': lines.quantity_done,
+                             'product_qty': lines.product_qty,
+                             'reserve': lines.reserve_qty,
+                         } for lines in material.line_ids],
         }
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
@@ -3564,7 +3563,7 @@ class LinklovingAppApi(http.Controller):
             ['account_id', 'credit', 'debit', 'balance', 'date'],
             ['account_id'])
         account_list = []
-        credit_all = debit_all = balance_all =month_begin_all= last_day_balance_all = 0.0
+        credit_all = debit_all = balance_all = month_begin_all = last_day_balance_all = 0.0
         acoount_dict = {}
         for account in accounts:
             res = {
@@ -3601,7 +3600,7 @@ class LinklovingAppApi(http.Controller):
             debit_all += debit
             balance_all += balance
             last_day_balance_all += last_day_balance
-            month_begin_all+=month_begin
+            month_begin_all += month_begin
         jason_list = {
             'month_begin': month_begin_all,
             # 期初
@@ -3682,7 +3681,6 @@ class LinklovingAppApi(http.Controller):
                 domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
             else:
                 domain.append(('production_line_id', '=', False))
-
 
         if 'origin_sale_id' in request.jsonrequest.keys():
             if request.jsonrequest.get('origin_sale_id'):
@@ -3776,7 +3774,6 @@ class LinklovingAppApi(http.Controller):
         if request.jsonrequest.get('process_id'):
             domain.append(('process_id', '=', request.jsonrequest['process_id']))
 
-
         if 'production_line_id' in request.jsonrequest.keys():
             if request.jsonrequest.get('production_line_id'):
                 domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
@@ -3799,27 +3796,25 @@ class LinklovingAppApi(http.Controller):
                     group_list[feed.production_id.origin_sale_id.name or ''] = {
                         'sale_id': feed.production_id.origin_sale_id.id or -1,
                         'feedbacks': [self.convert_qc_feedback_to_json(feed)]
-                        }
+                    }
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=self.transferJson(group_list))
 
-    #json转化
+    # json转化
     def transferJson(self, group_list):
         so_list = []
         for i in range(len(group_list)):
             key = group_list.keys()[i]
             timestamp = group_list[key]['feedbacks']
             streamArr = group_list[key]['sale_id']
-            so =  {
+            so = {
                 'soname': key,
                 'feedback': timestamp,
                 'sale_id': streamArr
-             }
+            }
             so_list.append(so)
         return so_list
-
-
 
     # 二次生产增加工序产线分类
     @http.route('/linkloving_app_api/get_secondary_mos', type='json', auth='none', csrf=False, cors='*')
@@ -3886,7 +3881,6 @@ class LinklovingAppApi(http.Controller):
             else:
                 domain.append(('state', '=', request.jsonrequest['state']))
 
-
         if is_group_by:
             group_by = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(domain=domain,
                                                                                                       fields=[
@@ -3915,7 +3909,6 @@ class LinklovingAppApi(http.Controller):
         if not process_id:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "未找到工序id"})
 
-
         if request.jsonrequest.get('process_id'):
             domain.append(('process_id', '=', request.jsonrequest['process_id']))
 
@@ -3936,26 +3929,25 @@ class LinklovingAppApi(http.Controller):
                 # domain.append(('state', '=', request.jsonrequest['state']))
                 pass
 
-
         orders_today = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(domain=domain,
-                                                                                                  fields=[
-                                                                                                      'state'],
-                                                                                                  groupby=[
-                                                                                                      'state'])
+                                                                                                      fields=[
+                                                                                                          'state'],
+                                                                                                      groupby=[
+                                                                                                          'state'])
 
         data = []
         for production in orders_today:
             data.append(self.getJsonCount(production))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-    #处理下json格式（邹邹）
+    # 处理下json格式（邹邹）
     def getJsonCount(self, production):
         return {
             'state': production.get('state'),
             'state_count': production.get('state_count')
         }
 
-    #二次生产单据修改
+    # 二次生产单据修改
     @http.route('/linkloving_app_api/get_new_secondary_mos', type='json', auth='none', csrf=False, cors='*')
     def get_new_secondary_mos(self, **kw):
         process_id = request.jsonrequest.get("process_id")
@@ -3979,8 +3971,6 @@ class LinklovingAppApi(http.Controller):
             else:
                 domain.append(('production_line_id', '=', False))
 
-
-
         domain.append(("is_secondary_produce", '=', True))
         mos = request.env["mrp.production"].sudo().search(domain).filtered(lambda x: x.state not in ['cancel', 'done'])
 
@@ -3989,3 +3979,98 @@ class LinklovingAppApi(http.Controller):
             data.append(self.get_simple_production_json(production))
         # user_data = LinklovingAppApi.odoo10.execute('res.users', 'read', [LinklovingAppApi.odoo10.env.user.id])
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    # start--------------模块:工单---------------分割线--------------------------------------------------start
+    # 创建工单
+    @http.route('/linkloving_app_api/create_work_order', type='json', auth="none", csrf=False, cors='*')
+    def create_work_order(self):
+        name = request.jsonrequest.get("title")
+        description = request.jsonrequest.get("description")
+        priority = request.jsonrequest.get("priority")
+        assign_user_id = request.jsonrequest.get("assign_user_id")
+        uid = request.jsonrequest.get("uid")
+        wo_images = request.jsonrequest.get('wo_images')  # 图片
+        departments = request.jsonrequest.get('departments')  # 谁可以看
+        user = request.env['res.users'].sudo().browse(uid)
+
+        effective_department_ids = departments
+        if not departments:
+            effective_department_ids = request.env['hr_department'].sudo().search([]).ids
+
+        issue_state = 1
+        if assign_user_id:
+            issue_state = 2
+        work_order_model = request.env['linkloving.work.order']
+        work_order = work_order_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
+            'name': name,
+            'description': description,
+            'priority': priority,
+            'assign_user_id': assign_user_id,
+            'issue_state': issue_state,
+            'create_user_id': uid,
+            'effective_department_ids': effective_department_ids
+        })
+
+        for img in wo_images:
+            wo_img_id = request.env["linkloving.work.order.image"].sudo(LinklovingAppApi.CURRENT_USER()).create({
+                'work_order_id': work_order.id,
+                'work_order_image': img,
+            })
+            work_order.attachments = [(4, wo_img_id.id)]
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.convert_work_order_to_json(work_order))
+
+    # "我的"工单统计
+    @http.route('/linkloving_app_api/my_work_order_statistics', type='json', auth="none", csrf=False, cors='*')
+    def my_work_order_statistics(self, **kw):
+        uid = request.jsonrequest.get("uid")
+        work_order_model = request.env['linkloving.work.order']
+        work_order_data = work_order_model.sudo().read_group([('issue_state', 'in', [2, 3]), ('execute_uid', '=', uid)],
+                                                             ['issue_state'],
+                                                             ['issue_state'])
+        result = dict((data['issue_state'][0], data['issue_state_count']) for data in work_order_data)
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=result)
+
+    # "工单池"工单统计
+    @http.route('/linkloving_app_api/work_order_statistics', type='json', auth="none", csrf=False, cors='*')
+    def work_order_statistics(self, **kw):
+        uid = request.jsonrequest.get("uid")
+        user = request.env['res.users'].sudo().browse(uid)
+        work_order_model = request.env['linkloving.work.order']
+        work_order_data = work_order_model.sudo().read_group([('issue_state', 'in', [1, 2, 3]), (
+            'effective_department_ids', 'in', user.employee_ids.mapped('department_id'))], ['issue_state'], ['issue_state'])
+        result = dict((data['issue_state'][0], data['issue_state_count']) for data in work_order_data)
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=result)
+
+    # "工单池"查询
+    @http.route('/linkloving_app_api/work_order_search', type='json', auth="none", csrf=False, cors='*')
+    def work_order_statistics(self, **kw):
+        uid = request.jsonrequest.get("uid")
+        return JsonResponse.send_response(STATUS_CODE_OK)
+
+    @staticmethod
+    def convert_work_order_to_json(work_order):
+        data = {
+            'work_order_id': work_order.id,
+            'name': work_order.name,
+            'description': work_order.description,
+            'priority': work_order.priority,
+            'assign_user_id': work_order.assign_user_id,
+            'issue_state': work_order.issue_state,
+            'create_user_id': work_order.create_user_id,
+            'work_order_images': LinklovingAppApi.get_work_order_img_url(work_order.attachments.ids),
+        }
+        return data
+
+    @classmethod
+    def get_work_order_img_url(cls, worker_id, ):
+        # DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
+        imgs = []
+        for img_id in worker_id:
+            url = '%slinkloving_app_api/get_worker_image?worker_id=%s&model=%s&field=%s' % (
+                request.httprequest.host_url, str(img_id), 'linkloving.work.order.image', 'work_order_image')
+            imgs.append(url)
+        return imgs
+        # end--------------模块:工单---------------分割线--------------------------------------------------end
