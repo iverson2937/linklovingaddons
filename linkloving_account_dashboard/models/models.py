@@ -85,8 +85,7 @@ class AccountDashboard(models.Model):
         ## 资产总计=流动+固定
         total_assets_all = total_assets + liquid
         # 流动负债合计
-        sub_liabilities = payable_amount.get_period_balance(period_id) + tax.get_period_balance(
-            period_id) + short_term_borrow.get_period_balance(period_id)
+        sub_liabilities = payable_amount + total_tax + short_term_borrow.get_period_balance(period_id)
         # 所有者权益合计
         owner_equity = real_receive_assets.get_period_balance(period_id) + capital_reserves.get_period_balance(
             period_id)
