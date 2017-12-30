@@ -11,8 +11,8 @@
                 <xpath expr="//field[@name='property_stock_account_output_categ_id']" position="after">
                     <field name="property_stock_invoice_account_id"
                            domain="[('internal_type','=','other'),('deprecated', '=', False)]" string="库存成本科目"/>
-                    <field name="property_stock_material_in_account_id"
-                           domain="[('internal_type','=','other'),('deprecated', '=', False)]" string="原材料入库科目"/>
+                    <!--<field name="property_stock_material_in_account_id"-->
+                    <!--domain="[('internal_type','=','other'),('deprecated', '=', False)]" string="原材料入库科目"/>-->
 
                 </xpath>
 

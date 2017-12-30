@@ -21,7 +21,7 @@ class AccountEmployeeRegisterPaymentWizard(models.TransientModel):
 
     partner_id = fields.Many2one('res.partner', string='Partner', required=True)
     journal_id = fields.Many2one('account.journal', string='Payment Method', required=True,
-                                 domain=[('type', 'in', ('bank', 'cash'))])
+                                 domain=[('type', 'in', ('bank', 'cash')), ('deprecated', '=', False)])
     company_id = fields.Many2one('res.company', related='journal_id.company_id', string='Company', readonly=True,
                                  required=True)
     payment_method_id = fields.Many2one('account.payment.method', string='Payment Type', required=True)

@@ -63,7 +63,7 @@ class SetPriceToProduct(models.TransientModel):
         active_ids = context.get('active_ids', []) or []
         for record in self.env['product.template'].browse(active_ids):
             if record.product_variant_count == 1:
-                record.standard_price = record.product_variant_id.pre_cost_cal()
+                record.standard_price = record.product_variant_id.pre_cost_cal(raise_exception=False)
         return {
             "type": "ir.actions.client",
             "tag": "action_notify",
@@ -212,7 +212,7 @@ class ProductProductExtend(models.Model):
             total_price = 0.0000
             result, result2 = bom.explode(self, 1)
             for sbom, sbom_data in result2:
-                if sbom.child_bom_id and man_route_id in sbom.child_bom_id.product_id.route_ids:  # 如果有子阶
+                if sbom.child_bom_id and man_route_id in sbom.child_bom_id.product_tmpl_id.route_ids:  # 如果有子阶
                     sub_bom_price = _calc_price(sbom.child_bom_id) * sbom_data['qty']
                     total_price += sub_bom_price
                 elif buy_route_id in sbom.product_id.route_ids:
