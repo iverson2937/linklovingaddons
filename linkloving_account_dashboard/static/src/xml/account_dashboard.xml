@@ -199,7 +199,7 @@
                       <tr>
                           <td class="assets_indext2">流动资产合计</td>
                           <td>20</td>
-                          <td></td>
+                          <td><t t-esc="liquid.start"/></td>
                           <td><a><t t-esc="liquid.current"/></a></td>
                           <td class="">长期负债：</td>
                           <td></td>
@@ -259,7 +259,7 @@
                       <tr>
                           <td class="assets_indext1">固定资产净值</td>
                           <td>26</td>
-                          <td></td>
+                          <td><t t-esc="assets.start"></t></td>
                           <td class="o_form_field_monetary"><a><t t-esc="assets.current"></t></a></td>
                           <td class="assets_indext2"></td>
                           <td></td>
