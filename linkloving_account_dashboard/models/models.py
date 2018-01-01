@@ -16,7 +16,7 @@ class AccountDashboard(models.Model):
         period_id = fiscalyear.period_ids[0]
         final_data = self.env['account.account.final'].search(
             [('account_id', '=', self.id), ('period_id', '=', period_id.id), ('partner_id', '=', False)])
-        return final_data.end_debit - final_data.end_credit
+        return final_data.start_debit - final_data.start_credit
 
     def get_period_balance(self, period):
         if period.state == 'done':
