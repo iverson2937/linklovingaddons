@@ -59,17 +59,17 @@
                       <tr>
                           <td class="assets_indext1">货币资金</td>
                           <td>1</td>
-                          <td></td>
+                          <td><a><t t-esc="cash_data.start"/></a></td>
                           <td><a><t t-esc="cash_data.current"/></a></td>
                           <td class="assets_indext1">短期借款</td>
                           <td>51</td>
-                          <td></td>
+                          <td><t t-esc="short_term_borrow.start"/></td>
                           <td><t t-esc="short_term_borrow.current"/></td>
                       </tr>
                       <tr>
                           <td class="assets_indext1">短期投资</td>
                           <td>2</td>
-                          <td></td>
+                          <td><t t-esc="short_term_invest.start"/></td>
                           <td><t t-esc="short_term_invest.current"/></td>
                           <td class="assets_indext1">应付票据</td>
                           <td>52</td>
@@ -83,13 +83,13 @@
                           <td></td>
                           <td class="assets_indext1">应付账款</td>
                           <td>53</td>
-                          <td></td>
+                          <td><a><t t-esc="payable_amount.start"/></a></td>
                           <td><a><t t-esc="payable_amount.current"/></a></td>
                       </tr>
                       <tr>
                           <td class="assets_indext1">应收账款</td>
                           <td>4</td>
-                          <td></td>
+                          <td><t t-esc="receivable_amount.start"/></td>
                           <td><t t-esc="receivable_amount.current"/></td>
                           <td class="assets_indext1">预收账款</td>
                           <td>54</td>
@@ -139,7 +139,7 @@
                       <tr>
                           <td class="assets_indext1">其他应收款</td>
                           <td>9</td>
-                          <td></td>
+                          <td><t t-esc="other_receivable_amount.start"/></td>
                           <td><a><t t-esc="other_receivable_amount.current"/></a></td>
                           <td class="assets_indext1">未付利润</td>
                           <td>59</td>
@@ -149,7 +149,7 @@
                       <tr>
                           <td class="assets_indext1">存货</td>
                           <td>10</td>
-                          <td></td>
+                          <td><t t-esc="stock.start"/></td>
                           <td widget="monetary"><a><t t-esc="stock.current"/></a></td>
                           <td class="assets_indext1">其他未交款</td>
                           <td>60</td>
@@ -193,7 +193,7 @@
                           <td></td>
                           <td class="assets_indext2">流动负债合计</td>
                           <td>64</td>
-                          <td></td>
+                          <td><t t-esc="sub_liabilities.start"/></td>
                           <td widget="monetary"><t t-esc="sub_liabilities.current"/></td>
                       </tr>
                       <tr>
@@ -239,7 +239,7 @@
                       <tr>
                           <td class="assets_indext1">固定资产原价</td>
                           <td>24</td>
-                          <td></td>
+                          <td><a><t t-esc="origin_assets.start"/></a></td>
                           <td><a><t t-esc="origin_assets.current"/></a></td>
                           <td class="assets_indext1">其他长期负债</td>
                           <td>80</td>
@@ -249,7 +249,7 @@
                       <tr>
                           <td class="assets_indext2">减：累计折旧</td>
                           <td>25</td>
-                          <td></td>
+                          <td><t t-esc="accumulated_depreciation.start"></t></td>
                           <td><a><t t-esc="accumulated_depreciation.current"></t></a></td>
                           <td class="assets_indext2">其中：住房周转金</td>
                           <td>81</td>
@@ -299,11 +299,11 @@
                       <tr>
                           <td class="assets_indext2">固定资产合计</td>
                           <td>35</td>
-                          <td></td>
+                          <td><t t-esc="assets.start"></t></td>
                           <td><a><t t-esc="assets.current"></t></a></td>
                           <td class="assets_indext1">负债合计</td>
                           <td>90</td>
-                          <td></td>
+                          <td><t t-esc="liabilities.start"></t></td>
                           <td><a><t t-esc="liabilities.current"></t></a></td>
                       </tr>
                       <tr>
@@ -323,7 +323,7 @@
                           <td></td>
                           <td class="assets_indext1">实收资本</td>
                           <td>91</td>
-                          <td></td>
+                          <td><t t-esc="real_receive_assets.start"></t></td>
                           <td><t t-esc="real_receive_assets.current"></t></td>
                       </tr>
                       <tr>
@@ -333,7 +333,7 @@
                           <td></td>
                           <td class="assets_indext1">资本公积</td>
                           <td>92</td>
-                          <td></td>
+                          <td><t t-esc="capital_reserves.start"></t></td>
                           <td><t t-esc="capital_reserves.current"></t></td>
                       </tr>
                       <tr>
@@ -373,7 +373,7 @@
                           <td></td>
                           <td class="assets_indext2">所有者权益合计</td>
                           <td>96</td>
-                          <td></td>
+                          <td><t t-esc="owner_equity.start"></t></td>
                           <td><t t-esc="owner_equity.current"></t></td>
                       </tr>
                       <tr>
@@ -399,11 +399,11 @@
                       <tr>
                           <td class="assets_indext2">资产总计</td>
                           <td>50</td>
-                          <td></td>
+                          <td><t t-esc="total_assets_all.start"></t></td>
                           <td><a><t t-esc="total_assets_all.current"></t></a></td>
                           <td class="assets_indext2">负债及所有者权益总计</td>
                           <td>100</td>
-                          <td></td>
+                          <td><t t-esc="total_liabilities.start"></t></td>
                           <td><a><t t-esc="total_liabilities.current"></t></a></td>
                       </tr>
                   </tbody>
