@@ -86,6 +86,15 @@
                 report_type="qweb-pdf"
         />
 
+        <report
+                string="打印工序流转卡"
+                id="ssg_action_report_production_gunqi_process"
+                model="mrp.production"
+                name="linkloving_mrp_extend.report_mrporder_gunqi_process"
+                file="linkloving_mrp_extend.report.mrp_production_gunqi_process.xml"
+                report_type="qweb-pdf"
+        />
+
 
     </data>
 </openerp>

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_mrporder_gunqi_process">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="report.internal_layout">
+                    <div class="page">
+                        <table class="table table-bordered" border="2">
+                            <!--<thead>-->
+                            <!---->
+                            <!--</thead>-->
+                            <tbody>
+                                <tr>
+                                    <td colspan="8" style="font-size:35px;" rowspan="3" class="text-center">
+                                        <strong>鲁班DIY激光车间流转卡</strong>
+                                    </td>
+                                    <td colspan="2" rowspan="3" class="text-center">
+                                        <strong>二维码</strong>
+                                    </td>
+
+                                    <td colspan="4" rowspan="9" class="text-center">
+                                        <img width="100%"
+                                             t-att-src="'/web/image?model=product.product&amp;id=%d&amp;field=image' % (o.product_id.id)"
+                                        />
+                                    </td>
+                                </tr>
+                                <tr height="38px"></tr>
+                                <tr height="38px"></tr>
+                                <tr>
+                                    <td class="text-center" colspan="1">
+                                        <strong>MO单号</strong>
+                                    </td>
+                                    <td class="text-center" colspan="4">
+                                        <span t-field="o.name"/>
+                                    </td>
+                                    <td class="text-center" colspan="1">
+                                        <strong>SO单号</strong>
+                                    </td>
+                                    <td class="text-center" colspan="4">
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center" colspan="1">
+                                        <strong>料号</strong>
+                                    </td>
+                                    <td class="text-center" colspan="4">
+                                        <span t-field="o.product_id.default_code"/>
+                                    </td>
+                                    <td class="text-center" colspan="1">
+                                        <strong>品名</strong>
+                                    </td>
+                                    <td class="text-center" colspan="4">
+                                        <span t-field="o.product_id.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center" colspan="1">
+                                        <strong>数量</strong>
+                                    </td>
+                                    <td class="text-center" colspan="4">
+                                        <span t-field="o.product_qty"/>
+                                    </td>
+                                    <td class="text-center" colspan="1">
+                                        <strong>理论时间</strong>
+                                    </td>
+                                    <td class="text-center" colspan="4">
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center" colspan="1">
+                                        <strong>材料</strong>
+                                    </td>
+                                    <td class="text-center" colspan="4">
+                                        <span t-field="o.sim_stock_move_lines[0].product_id.display_name"/>
+                                    </td>
+                                    <td class="text-center" colspan="1">
+                                        <strong>用量</strong>
+                                    </td>
+                                    <td class="text-center" colspan="4">
+                                        <span t-field="o.sim_stock_move_lines[0].product_uom_qty"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center" colspan="1">
+                                        <strong>备注</strong>
+                                    </td>
+                                    <td class="text-center" colspan="9">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center" colspan="2">
+                                        <strong>实际入库</strong>
+                                    </td>
+                                    <td class="text-center" colspan="8">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center" colspan="1">
+                                        <strong>工序</strong>
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                        <strong>设备</strong>
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                        <strong>作业人</strong>
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                        <strong>开始时间</strong>
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                        <strong>不良数</strong>
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                        <strong>良品数量</strong>
+                                    </td>
+                                    <td class="text-center" colspan="3">
+                                        <strong>备注</strong>
+                                    </td>
+                                </tr>
+                                <tr height="38px">
+                                    <td class="text-center" colspan="1">
+
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="3">
+                                    </td>
+                                </tr>
+                                <tr height="38px">
+                                    <td class="text-center" colspan="1">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="3">
+                                    </td>
+                                </tr>
+                                <tr height="38px">
+                                    <td class="text-center" colspan="1">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="3">
+                                    </td>
+                                </tr>
+                                <tr height="38px">
+                                    <td class="text-center" colspan="1">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="3">
+                                    </td>
+                                </tr>
+                                <tr height="38px">
+                                    <td class="text-center" colspan="1">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="2">
+                                    </td>
+                                    <td class="text-center" colspan="3">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center" colspan="1">
+                                        <strong>备注</strong>
+                                    </td>
+                                    <td class="text-center" colspan="13">
+                                        <span>（1）凭此单作为工资结算的依据；（2）此单最终由仓库收集并交于财务；（3）下道工序监督上道工序的数量和质量。</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="oe_structure"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
