@@ -133,8 +133,8 @@
                           <td></td>
                           <td class="assets_indext1">未交税金</td>
                           <td>58</td>
-                          <td><t t-esc="total_tax_start.start"/></td>
-                          <td><t t-esc="total_tax.current"/></td>
+                          <td><t t-esc="tax.start"/></td>
+                          <td><t t-esc="tax.current"/></td>
                       </tr>
                       <tr>
                           <td class="assets_indext1">其他应收款</td>
