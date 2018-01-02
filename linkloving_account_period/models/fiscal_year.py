@@ -139,7 +139,7 @@ class AccountPeriod(models.Model):
         for row in self.env.cr.dictfetchall():
             print row
             account_result[row.pop('id')] = row
-
+        print account_result
         account_res = []
         for account in accounts:
             res = dict((fn, 0.0) for fn in ['credit', 'debit', 'balance'])
@@ -203,22 +203,22 @@ class AccountPeriod(models.Model):
                 'account_id': account.id,
             }
             period_data = final_obj.search(
-                [('account_id', '=', account['id']), ('partner_id', '=', account['id']), ('period_id', '=', self.id)])
+                [('account_id', '=', account['id']), ('partner_id', '=', False), ('period_id', '=', self.id)])
             # self.state = 'done'
             if not period_data:
                 # 系统第一个会计区间没有数据
                 final_obj.create(vals)
             else:
                 period_data.write({
-                    'end_credit': account.credit,
-                    'end_debit': account.debit,
-                    'credit': account['credit'],
-                    'debit': account['debit']
+                    'end_credit': period_data.start_credit + credit,
+                    'end_debit': period_data.start_debit + debit,
+                    'credit': credit,
+                    'debit': debit
                 })
             # 建立新的会计区间初始数据
             period_id = self._get_next_period()
             next_period_data = final_obj.search(
-                [('account_id', '=', account['id']), ('partner_id', '=', account['id']),
+                [('account_id', '=', account['id']), ('partner_id', '=', False),
                  ('period_id', '=', period_id.id)])
             if not next_period_data:
                 final_obj.create({
@@ -228,8 +228,8 @@ class AccountPeriod(models.Model):
                     'start_debit': account.debit
                 })
             next_period_data.write({
-                'start_credit': account.credit,
-                'start_debit': account.debit
+                'start_credit': period_data.start_credit + credit,
+                'start_debit': period_data.start_debit + debit
             })
 
         # 获取每个业务伙伴的应收应付汇总

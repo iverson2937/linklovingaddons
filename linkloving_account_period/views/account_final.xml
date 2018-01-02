@@ -30,8 +30,9 @@
                             <field name="start_credit" readonly="0"/>
                             <field name="debit" readonly="0"/>
                             <field name="credit" readonly="0"/>
-                            <field name="end_credit" readonly="0"/>
                             <field name="end_debit" readonly="0"/>
+                            <field name="end_credit" readonly="0"/>
+
                         </group>
 
 
