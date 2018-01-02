@@ -3991,7 +3991,6 @@ class LinklovingAppApi(http.Controller):
         uid = request.jsonrequest.get("uid")
         wo_images = request.jsonrequest.get('wo_images')  # 图片
         departments = request.jsonrequest.get('departments')  # 谁可以看
-        user = request.env['res.users'].sudo().browse(uid)
 
         effective_department_ids = departments
         if not departments:
