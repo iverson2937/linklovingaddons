@@ -4084,6 +4084,12 @@ class LinklovingAppApi(http.Controller):
             else:
                 domain.append(('production_line_id', '=', False))
 
+        if 'origin_sale_id' in request.jsonrequest.keys():
+            if request.jsonrequest.get('origin_sale_id'):
+                domain.append(('origin_sale_id', '=', request.jsonrequest['origin_sale_id']))
+            else:
+                domain.append(('origin_sale_id', '=', False))
+
         domain.append(("is_secondary_produce", '=', True))
         mos = request.env["mrp.production"].sudo().search(domain).filtered(lambda x: x.state not in ['cancel', 'done'])
 

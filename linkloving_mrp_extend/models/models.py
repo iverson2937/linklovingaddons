@@ -1891,7 +1891,7 @@ class MrpQcFeedBack(models.Model):
 
     # 品捡失败 -> 返工
     def action_check_to_rework(self):
-        if self.production_id.state == "waiting_rework":
+        if self.production_id.state in ["waiting_rework", "done"]:
 
             self.state = "check_to_rework"
             p_time = self.env["production.time.record"].create({
