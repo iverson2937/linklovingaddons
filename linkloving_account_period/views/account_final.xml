@@ -26,12 +26,12 @@
                             <field name="fiscalyear_id" readonly="1"/>
                             <field name="period_id" readonly="1"/>
                             <field name="account_id" readonly="1"/>
-                            <field name="start_debit" readonly="1"/>
-                            <field name="start_credit" readonly="1"/>
-                            <field name="debit" readonly="1"/>
-                            <field name="credit" readonly="1"/>
-                            <field name="end_credit" readonly="1"/>
-                            <field name="end_debit" readonly="1"/>
+                            <field name="start_debit" readonly="0"/>
+                            <field name="start_credit" readonly="0"/>
+                            <field name="debit" readonly="0"/>
+                            <field name="credit" readonly="0"/>
+                            <field name="end_credit" readonly="0"/>
+                            <field name="end_debit" readonly="0"/>
                         </group>
 
 
