@@ -22,7 +22,7 @@ class AccountDashboard(models.Model):
         if period.state == 'done':
             final = self.env['account.account.final'].search(
                 [('account_id', '=', self.id), ('period_id', '=', period.id), ('partner_id', '=', False)])
-            return final[0].end_debit - final[0].end_credit
+            return final.end_debit - final.end_credit
         else:
 
             return self.balance
@@ -38,7 +38,6 @@ class AccountDashboard(models.Model):
 
         cash_type = self.env.ref('account.data_account_type_liquidity')
         receivable_amount = self.env.ref('l10n_cn_small_business.1_small_business_chart1122')
-        payable_amount = self.env.ref('l10n_cn_small_business.1_small_business_chart2202')
         # 其他应付款
         other_payable_amount = self.env.ref('l10n_cn_small_business.1_small_business_chart2241')
         other_receivable_amount = self.env.ref('l10n_cn_small_business.1_small_business_chart1221')
@@ -53,7 +52,7 @@ class AccountDashboard(models.Model):
         for t in tax.child_ids:
             total_tax += t.get_period_balance(period_id)
             total_tax_start += t.get_fiscal_year_begin()
-
+        # 应收账款
         payable_amount = self.env.ref('linkloving_account_purchase.account_account_receive')
         for p in payable_amount.child_ids:
             total_payable_amount += p.get_period_balance(period_id)
