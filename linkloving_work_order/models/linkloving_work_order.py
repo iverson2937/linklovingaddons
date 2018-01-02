@@ -14,6 +14,8 @@ class linkloving_work_order(models.Model):
 
     name = fields.Char()
 
+    assign_uid = fields.Many2one('res_user')
+
     execute_uid = fields.Many2one('res_user')
 
     effective_department_ids = fields.Many2many('hr_department', 'linkloving_work_order_department_rel', 'work_order_id', 'department_id', 'Department id')

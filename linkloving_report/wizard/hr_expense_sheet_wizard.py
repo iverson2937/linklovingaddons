@@ -198,8 +198,8 @@ class HrExpenseSheetWizard(models.TransientModel):
         sheet_sequence = 1
         for sheet in hr_expense_sheet_ids:
             ids = []
-            if sheet.payment_line_ids:
-                ids = ';'.join(line.payment_id.name for line in sheet.payment_line_ids)
+            if sheet.account_payment_line_ids:
+                ids = ';'.join(line.payment_id.name for line in sheet.account_payment_line_ids)
             returnDict[sheet.id] = {'data': {}, 'line': {}}
             returnDict[sheet.id]['data'] = {
                 'sequence': sheet_sequence,

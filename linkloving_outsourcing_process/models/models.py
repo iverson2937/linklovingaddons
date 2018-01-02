@@ -80,17 +80,6 @@ class MrpProductionExtend(models.Model):
             'target': 'current',
         }
 
-    @api.multi
-    def button_mark_done(self):
-        if self.outside_type in ['outsourcing', 'all_outside'] and not self.mo_invoice_count:
-            if self.outside_type == 'outsourcing':
-                self._prepare_invoice(self.outsourcing_supplier_id)
-            else:
-                self._prepare_invoice(self.supplier_id)
-
-        return super(MrpProductionExtend, self).button_mark_done()
-
-
 class MrpProcessExtend(models.Model):
     _inherit = 'mrp.process'
 
@@ -239,7 +228,6 @@ class OutsouringPorcessOrder(models.Model):
             'outsourcing_id': self.id,
         })
         produce.with_context(context).do_produce()
-
         if self.state == 'out_ing':
             self.state = 'done'
         else:

@@ -20,6 +20,12 @@ class AccountFiscalYear(models.Model):
     date_stop = fields.Date('End Date', required=True)
     period_ids = fields.One2many('account.period', 'fiscalyear_id', 'Periods')
 
+    def get_current_fiscalyear(self):
+        account_fiscal_obj = self.env['account.fiscalyear']
+        ids = account_fiscal_obj.search([('state', '!=', 'done')])
+        fiscal_id = ids[0]
+        return fiscal_id
+
     state = fields.Selection([
         ('open', 'Open'),
         ('done', 'Close')
@@ -56,7 +62,7 @@ class AccountFiscalYear(models.Model):
 
     @api.multi
     def close_fiscal_year(self):
-        pass
+        self.state = 'done'
 
 
 class AccountPeriod(models.Model):
