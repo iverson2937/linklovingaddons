@@ -22,7 +22,7 @@ class AccountDashboard(models.Model):
         if period.state == 'done':
             final = self.env['account.account.final'].search(
                 [('account_id', '=', self.id), ('period_id', '=', period.id), ('partner_id', '=', False)])
-            return final.end_debit - final.end_credit
+            return final[0].end_debit - final[0].end_credit
         else:
 
             return self.balance
