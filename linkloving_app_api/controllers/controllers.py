@@ -4106,8 +4106,7 @@ class LinklovingAppApi(http.Controller):
         name = request.jsonrequest.get("title")
         description = request.jsonrequest.get("description")
         priority = request.jsonrequest.get("priority")
-        assign_user_id = request.jsonrequest.get("assign_user_id")
-        uid = request.jsonrequest.get("uid")
+        assign_uid = request.jsonrequest.get("assign_uid")
         wo_images = request.jsonrequest.get('wo_images')  # 图片
         departments = request.jsonrequest.get('departments')  # 谁可以看
 
@@ -4116,16 +4115,15 @@ class LinklovingAppApi(http.Controller):
             effective_department_ids = request.env['hr_department'].sudo().search([]).ids
 
         issue_state = 1
-        if assign_user_id:
+        if assign_uid:
             issue_state = 2
         work_order_model = request.env['linkloving.work.order']
         work_order = work_order_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
             'name': name,
             'description': description,
             'priority': priority,
-            'assign_user_id': assign_user_id,
+            'assign_uid': assign_uid,
             'issue_state': issue_state,
-            'create_user_id': uid,
             'effective_department_ids': effective_department_ids
         })
 
@@ -4191,7 +4189,8 @@ class LinklovingAppApi(http.Controller):
                 request.httprequest.host_url, str(img_id), 'linkloving.work.order.image', 'work_order_image')
             imgs.append(url)
         return imgs
-        # end--------------模块:工单---------------分割线--------------------------------------------------end
+    # end--------------模块:工单---------------分割线--------------------------------------------------end
+
     #根据工序获取产线 邹
     @http.route('/linkloving_app_api/get_new_production_lines', type='json', auth='none', csrf=False)
     def get_new_production_lines(self, **kw):
