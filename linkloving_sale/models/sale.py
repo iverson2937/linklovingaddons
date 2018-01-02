@@ -34,7 +34,7 @@ class SaleOrder(models.Model):
             invoiced_amount = remaining_amount = shipped_amount = 0.0
             for line in order.order_line:
                 if line.product_id.type in ['consu', 'product']:
-                    shipped_amount += line.qty_delivered * line.price_unit
+                    shipped_amount += line.qty_delivered * line.product_id.standard_price
                 else:
                     shipped_amount += line.product_uom_qty * line.price_unit
             for invoice in order.invoice_ids:

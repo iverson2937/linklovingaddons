@@ -38,6 +38,7 @@
         'report/mrp_production_templates.xml',
         'report/stock_picking_operations.xml',
         'report/mrp_production_templates_extend.xml',
+        'report/mrp_production_gunqi_process.xml',
         'wizard/tracking_number_wizard.xml',
         'wizard/change_product_qty_wizard.xml',
         'report/stock_picking_report.xml',

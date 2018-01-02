@@ -159,7 +159,7 @@
                     <field name="apply_date" string="Apply Date"/>
                     <field name="state"/>
                     <field name="can_return" invisible="1"/>
-                    <field name="pre_payment_reminding"/>
+                    <field name="pre_payment_reminding" sum="总余额"/>
                 </tree>
             </field>
         </record>

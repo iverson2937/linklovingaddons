@@ -44,6 +44,9 @@ class ProcurementOrderExtend(models.Model):
                     vals = procurement._prepare_purchase_order_line(po, supplier)
                     if vals.get("product_qty") > 0:
                         self.env['purchase.order.line'].create(vals)
+                    else:
+                        if not po.order_line:
+                            po.unlink()
                     return res
                 else:
                     return super(ProcurementOrderExtend, procurement).make_po()

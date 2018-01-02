@@ -10,6 +10,7 @@
                 <form string="Fiscal year">
                 <header>
                     <button name="create_period" string="Create Monthly Periods" type="object" class="oe_highlight"/>
+                    <button name="close_fiscal_year" string="关闭财年" type="object" class="oe_highlight"/>
                 </header>
                     <group>
                         <group>

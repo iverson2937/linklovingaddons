@@ -1,1 +1,2 @@
 import mrp_bom_structure_report
+import mrp_production_gunqi_report

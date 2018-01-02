@@ -19,7 +19,7 @@ class MrpProduction(models.Model):
         pass
 
     @api.multi
-    def _prepare_invoice(self, supplier_id=None):
+    def _prepare_invoice(self, supplier_id=None, qty_produced=0):
         inv_obj = self.env['account.invoice']
         cost_account_id = self.env['account.account'].search([('name', 'ilike', u'生产成本')], limit=1)
         if not cost_account_id:
@@ -45,7 +45,7 @@ class MrpProduction(models.Model):
                 'origin': self.name,
                 'price_unit': self.unit_price,
                 'account_id': cost_account_id.id,
-                'quantity': self.qty_produced,
+                'quantity': qty_produced,
                 'uom_id': self.product_id.uom_id.id,
                 'product_id': self.product_id.id,
                 # 'invoice_line_tax_ids': [(4, order.tax_id.id)],
