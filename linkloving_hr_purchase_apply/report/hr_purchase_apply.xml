@@ -146,7 +146,7 @@
                             </div>
                         </t>
                     </t>
-                    <t t-if="o.state not in ['approve,paid']">
+                    <t t-if="o.state not in ['approve','paid']">
                         <t t-call="report.external_layout">
                             <div class="page">
                                 <div class="row">
