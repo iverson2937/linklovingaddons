@@ -130,7 +130,7 @@ class ReviewProcessLine(models.Model):
     state_copy = fields.Text(u"状态", compute="_compute_process_line_state_copy")
 
     def oa_submit_to_next_reviewer(self, review_type, to_last_review=False, partner_id=None, remark=None,
-                                material_requests_id=None, bom_id=None):
+                                   material_requests_id=None, bom_id=None):
         if not partner_id:
             raise UserError(u"请选择审核人!")
 
@@ -367,8 +367,8 @@ class ReviewProcessLine(models.Model):
 
     def action_oa_pass(self, remark, material_requests_id, bom_id):
         review_type_two = 'picking_review_project'
-        #if self.env["final.review.partner"].get_final_review_partner_id(
-                #review_type_two).id == self.env.user.partner_id.id:
+        # if self.env["final.review.partner"].get_final_review_partner_id(
+        # review_type_two).id == self.env.user.partner_id.id:
         self.write({
             'review_time': fields.datetime.now(),
             'state': 'review_success',
@@ -665,6 +665,14 @@ class ProductAttachmentInfo(models.Model):
 
         if outage_state == 'on':
             attachment_to_outage.write({'is_show_outage': True})
+
+            type_info_list = self.env["product.attachment.info"].search(
+                [('product_tmpl_id', '=', attachment_to_outage.product_tmpl_id.id),
+                 ('type', '=', attachment_to_outage.type), ('state', '=', u'released')])
+
+            for info_one in (type_info_list - attachment_to_outage):
+                info_one.write({'is_show_outage': False})
+
         if outage_state == 'off':
             attachment_to_outage.write({'is_show_outage': False})
 
@@ -733,6 +741,16 @@ class ProductAttachmentInfo(models.Model):
         if (vals.get("file_binary") or vals.get("remote_path")):
             if self.state in ["cancel", "draft", "deny"]:
                 vals['state'] = 'waiting_release'
+
+        if vals.get('state') == 'released':
+
+            type_info_list = self.env["product.attachment.info"].search(
+                [('product_tmpl_id', '=', self.product_tmpl_id.id),
+                 ('type', '=', self.type), ('state', '=', u'released')])
+
+            for info_one in (type_info_list - self):
+                info_one.write({'is_show_outage': False})
+
         return super(ProductAttachmentInfo, self).write(vals)
 
     def unlink_attachment_list(self, **kwargs):
@@ -1030,8 +1048,8 @@ class ReviewProcessWizard(models.TransientModel):
     remark = fields.Text(u"备注")
     is_show_action_deny = fields.Boolean(default=True)
 
-    #oa送审
-    def oa_action_to_next(self,type,to_last_review):
+    # oa送审
+    def oa_action_to_next(self, type, to_last_review):
         if not self.material_requests_id.review_id:  # 如果没审核过
             self.material_requests_id.action_send_to_review()
 
@@ -1201,8 +1219,6 @@ class ReviewProcessWizard(models.TransientModel):
         self.material_requests_id.picking_state = 'Refused'
         self.material_requests_id.write({'review_i_approvaled_val': [(4, self.env.uid)]})
         self.material_line.action_deny(self.remark, self.material_requests_id, self.bom_id)
-
-
 
     # 审核不通过
     def action_deny(self):
