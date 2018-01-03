@@ -119,7 +119,8 @@
                                             </t>
                                         </t>
                                     </t>
-                                    <t t-if="item_files.is_able_to_use == true || approval_type=='waiting_submit' ||approval_type=='waiting_approval'">
+                                    <!--<t t-if="item_files.is_able_to_use == true || approval_type=='waiting_submit' ||approval_type=='waiting_approval'">-->
+                                    <t t-if="item_files.state[0] == 'released' || approval_type=='waiting_submit' ||approval_type=='waiting_approval'">
                                         <t t-if="item_files.is_show_outage == true ">
                                             <button class="btn btn-primary document_download" t-att-data="item_files.type">下载</button>
                                         </t>
