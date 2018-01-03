@@ -179,8 +179,8 @@
                                    options="{'no_create':True}"
                                    domain="[('id','!=',cur_partner_id),('employee', '=', True)]"/>
                             <field name="remark"/>
-                            <field name="need_sop" widget="radio" invisible="context.get('review_type')!='bom_review'"/>
-                            <field name="sop_name" readonly="1" invisible="context.get('review_type')!='bom_review'"/>
+                            <!--<field name="need_sop" widget="radio" invisible="context.get('review_type')!='bom_review'"/>-->
+                            <!--<field name="sop_name" readonly="1" invisible="context.get('review_type')!='bom_review'"/>-->
                         </group>
                         <p style="color:red;">提示：如需终审，请提交给以下终审人</p>
                         <group>
