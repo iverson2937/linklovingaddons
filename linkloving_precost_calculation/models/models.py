@@ -87,7 +87,7 @@ class ProductTemplate(models.Model):
         state_bom = False
         manufacture = self.env.ref('mrp.route_warehouse0_manufacture').id
 
-        if bom_ids and manufacture in self.route_ids:
+        if bom_ids and manufacture in self.route_ids.ids:
             bom = bom_ids[0]
             state_bom = bom.state
             lines = bom.bom_line_ids
