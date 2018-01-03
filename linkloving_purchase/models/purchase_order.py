@@ -33,6 +33,7 @@ class PurchaseOrder(models.Model):
                 if pick.state in ['qc_check', 'validate', 'picking', 'waiting_in', 'done']:
                     raise UserError(u'不能取消已经收到货的订单: %s.' % (order.name))
         return super(PurchaseOrder, self).button_cancel()
+
     @api.multi
     @api.depends('invoice_ids')
     def _compute_invoice_amount(self):
@@ -78,10 +79,10 @@ class PurchaseOrder(models.Model):
         for order in self:
 
             if order.state == 'purchase' and all(
-                            picking.state in ["cancel", "done", "waiting_in"] for picking in order.picking_ids):
+                    picking.state in ["cancel", "done", "waiting_in"] for picking in order.picking_ids):
                 order.shipping_status = 'done'
             elif order.state == 'purchase ' and any(
-                            picking.state in ["cancel", "done", "waiting_in"] for picking in order.picking_ids):
+                    picking.state in ["cancel", "done", "waiting_in"] for picking in order.picking_ids):
                 order.shipping_status = 'part_shipping'
             else:
                 order.shipping_status = 'no'
@@ -173,6 +174,13 @@ class PurchaseOrderLine(models.Model):
         ('done', u'出货完成'),
     ], default='no', compute='_compute_shipping_status', store=True, readonly=True)
 
+    @api.multi
+    def _compute_to_ship_qty(self):
+        for line in self:
+            line.to_ship_qty = line.product_qty - line.qty_received
+
+    to_ship_qty = fields.Float(compute=_compute_to_ship_qty, string='待出货数量')
+
     @api.depends('product_qty', 'qty_received', 'qty_to_invoice', 'qty_invoiced')
     def _compute_shipping_status(self):
         """
@@ -224,7 +232,7 @@ class PurchaseOrderLine(models.Model):
             on_way_qty = draft_qty + line.product_id.incoming_qty
             if line.product_id.outgoing_qty:
                 rate = ((
-                            draft_qty + line.product_id.incoming_qty + line.product_id.qty_available) / line.product_id.outgoing_qty)
+                                draft_qty + line.product_id.incoming_qty + line.product_id.qty_available) / line.product_id.outgoing_qty)
                 rate = round(rate, 2)
 
                 line.output_rate = (u"(草稿量: %s+在途量: " + "%s " + u"+库存:" + "%s ) /"u" 需求量：" + "%s = %s") % (
