@@ -72,7 +72,9 @@ class AutoSmtpMailMail(models.Model):
     def send_get_email_dict(self, partner=None):
         res = super(AutoSmtpMailMail, self).send_get_email_dict(partner)
 
-        res['body'] = res.get('body').replace('src="', 'src="' + self.sudo().env['ir.config_parameter'].get_param(
-            'web.base.url'))
+        res['body'] = (res.get('body') + "<br/><p>" + self.create_uid.signature + "</p>").replace('src="', 'src="' +
+                                                                                                  self.sudo().env[
+                                                                                                      'ir.config_parameter'].get_param(
+                                                                                                      'web.base.url'))
 
         return res
