@@ -528,7 +528,7 @@ def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
     if not period:
         period = 0
     if month <= 0:
-        year = -1
+        year = year - 1
         month = 12 + month
         # 获取当月第一天的星期和当月的总天数
     firstDayWeekDay, monthRange = calendar.monthrange(year, month)
