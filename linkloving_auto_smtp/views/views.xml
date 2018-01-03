@@ -1,21 +1,119 @@
 <openerp>
-  <data>
-    <record id="linkloving_view_users_form_simple_modif_mail" model="ir.ui.view">
+    <data>
+        <record id="linkloving_view_users_form_simple_modif_mail" model="ir.ui.view">
             <field name="name">res.users.preferences.form.mail</field>
             <field name="model">res.users</field>
             <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
             <field name="arch" type="xml">
-            <data>
-                <field name="email" position="replace"/>
-              <field name="signature" position="before">
-                <group>
-                    <field name="email"/>
-                    <field name="mail_server" context="{'default_name':email}" options="{'no_open':True}"/>
-                  </group>
-              </field>
-            </data>
+                <data>
+                    <field name="email" position="replace"/>
+                    <field name="signature" position="before">
+                        <group>
+                            <field name="email"/>
+                            <field name="mail_server" context="{'default_name':email}" options="{'no_open':True}"/>
+                        </group>
+                    </field>
+                </data>
             </field>
-    </record>
+        </record>
 
-  </data>
+        <record id="menu_sales_email_send_action" model="ir.actions.act_window">
+            <field name="name">发件箱</field>
+            <field name="res_model">mail.mail</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">
+                {
+                'search_default_sent': 1,
+                }
+            </field>
+            <field name="search_view_id" ref="mail.view_mail_search"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to add a Email.
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem id="menu_sales_email" name="邮件销售" parent="sales_team.menu_base_partner" sequence="4"/>
+
+        <!--<menuitem action="menu_sales_email_send_action"-->
+        <!--id="menu_sales_email_inbox"-->
+        <!--parent="menu_sales_email"-->
+        <!--groups=""-->
+        <!--sequence="1" name="收件箱"/>-->
+
+
+        <menuitem action="menu_sales_email_send_action"
+                  id="menu_sales_email_send"
+                  parent="menu_sales_email"
+                  groups=""
+                  sequence="2" name="发件箱"/>
+
+
+        <!--<menuitem action="menu_sales_email_send_action"-->
+        <!--id="menu_sales_email_draft"-->
+        <!--parent="menu_sales_email"-->
+        <!--groups=""-->
+        <!--sequence="3" name="草稿"/>-->
+
+        <record id="linkloving_auto_smtp_view_mail_form" model="ir.ui.view">
+            <field name="name">mail.mail.form</field>
+            <field name="model">mail.mail</field>
+            <field name="inherit_id" ref="mail.view_mail_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='recipient_ids']" position="replace">
+                </xpath>
+
+                <xpath expr="//field[@name='reply_to']" position="attributes">
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='scheduled_date']" position="attributes">
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+
+                <xpath expr="//notebook/page[2]" position="attributes">
+                    <attribute name='invisible'>1</attribute>
+                </xpath>
+
+                <xpath expr="//notebook/page[3]" position="after">
+
+                    <page string="发送至客户">
+                        <field name="recipient_ids" widget="many2many_kanban" options="{'not_delete': True}"
+                               context="{'default_customer':True,'default_is_company':True}"
+                               domain="[('customer','=','1'),('is_company','=',True)]">
+                            <kanban quick_create="false" create="true" delete="true">
+                                <field name="name"/>
+                                <templates>
+                                    <t t-name="kanban-box">
+                                        <div class="oe_kanban_global_click" style="position: relative">
+                                            <a t-if="! read_only_mode" type="delete"
+                                               style="position: absolute; right: 0; padding: 4px; diplay: inline-block">
+                                                X
+                                            </a>
+                                            <div class="oe_module_vignette">
+                                                <img t-att-src="kanban_image('res.users', 'image_small', record.id.value)"
+                                                     class="oe_avatar oe_kanban_avatar_smallbox"/>
+                                                <div class="oe_module_desc">
+                                                    <field name="name"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </templates>
+                            </kanban>
+                        </field>
+                    </page>
+
+                </xpath>
+
+            </field>
+        </record>
+
+
+    </data>
 </openerp>
