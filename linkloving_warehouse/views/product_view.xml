@@ -126,7 +126,7 @@
 
                     <button name="%(stock.action_view_change_product_quantity)d" string="更新库存" type="action"
                             attrs="{'invisible': [('type', '!=', 'product')]}"
-                            groups="linkloving_warehouse.group_stock_control_manager"/>
+                            groups="base.group_erp_manager"/>
                     <button string="标记为停产"
                             type="object"
                             class=" btn-primary"
