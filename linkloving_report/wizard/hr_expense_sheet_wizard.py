@@ -216,6 +216,7 @@ class HrExpenseSheetWizard(models.TransientModel):
                     'unit_amount': line.unit_amount,
                     'name': line.name,
                     'employee': sheet.employee_id.name,
+                    'remark': line.description,
                     'payment_line_ids': ids,
                     'total_amount': line.total_amount,
                 }})

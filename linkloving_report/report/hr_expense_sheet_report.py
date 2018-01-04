@@ -35,7 +35,7 @@ class ReportHrExpenseSheet(http.Controller):
             )
 
             header_list = [
-                u'支出日期', u'报销单号', u'部门', u'产品', u'单价', u'数量', u'小计', u'费用说明', u'报销单金额', u'暂支单', u'人员'
+                u'支出日期', u'报销单号', u'部门', u'产品', u'单价', u'数量', u'小计', u'费用说明', u'报销单金额', u'暂支单', u'人员', u'备注'
             ]
 
             [data_sheet.write(0, row, line, style) for row, line in enumerate(header_list)]
@@ -70,6 +70,7 @@ class ReportHrExpenseSheet(http.Controller):
                     data_sheet.write(current_row, 9,
                                      line.get('payment_line_ids') and line.get('payment_line_ids') or '', style)
                     data_sheet.write(current_row, 10, line.get('employee') and line.get('employee') or '', style)
+                    data_sheet.write(current_row, 11, line.get('remark') and line.get('remark') or '', style)
 
                     current_row += 1
                     i += 1
