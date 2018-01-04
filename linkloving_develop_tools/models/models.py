@@ -514,6 +514,7 @@ class CreateOrderPointWizard(models.TransientModel):
                          ('state', 'in', ['purchase', 'done'])])
 
                     if not line and s.name.customer:
+                        print s.id
                         s.unlink()
 
     def set_standard_price_from_subcompany(self):
