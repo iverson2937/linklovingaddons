@@ -4112,7 +4112,7 @@ class LinklovingAppApi(http.Controller):
 
         effective_department_ids = departments
         if not departments:
-            effective_department_ids = request.env['hr_department'].sudo().search([]).ids
+            effective_department_ids = request.env['hr.department'].sudo().search([]).ids
 
         issue_state = 1
         if assign_uid:
