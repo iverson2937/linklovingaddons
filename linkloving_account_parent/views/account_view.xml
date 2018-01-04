@@ -18,8 +18,8 @@
     	<field name="context">{'show_parent_account':True}</field>
         <field  name="domain">[('deprecated', '=', False)]</field>
     </record>
-        <menuitem action="account.action_account_type_form" id="menu_action_account_type_form" 
-    		parent="account.account_account_menu" sequence="1" groups="linkloving_account_parent.group_coas_user"/>
+        <menuitem action="account.action_account_type_form" id="menu_action_account_type_form"
+                  parent="account.account_account_menu" sequence="1"/>
     		
    
            <record id="view_account_tree" model="ir.ui.view">
