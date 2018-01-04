@@ -135,10 +135,10 @@ class AccountInvoice(models.Model):
                 ]
         return []
 
-    @api.model
-    def invoice_line_move_line_get(self):
-        res = super(AccountInvoice, self).invoice_line_move_line_get()
-        if self.company_id.anglo_saxon_accounting and self.type in ('in_invoice'):
-            for i_line in self.invoice_line_ids:
-                res.extend(self._compute_for_in_invoice_account_move_line(i_line))
-        return res
+    # @api.model
+    # def invoice_line_move_line_get(self):
+    #     res = super(AccountInvoice, self).invoice_line_move_line_get()
+    #     if self.company_id.anglo_saxon_accounting and self.type in ('in_invoice'):
+    #         for i_line in self.invoice_line_ids:
+    #             res.extend(self._compute_for_in_invoice_account_move_line(i_line))
+    #     return res
