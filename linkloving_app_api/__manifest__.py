@@ -21,7 +21,7 @@
 
     # any module necessary for this one to work correctly
     'depends': ['base', 'mrp', 'sale', 'purchase', 'linkloving_bom_update', 'linkloving_account', 'hr_attendance',
-                'hr_holidays','linklovig_work_order', ],
+                'hr_holidays', 'linklovig_work_order', ],
 
     # always loaded
     'data': [
