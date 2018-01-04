@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--t-if='widget.options.import_enabled'-->
+<templates xml:space="preserve">
+    <t t-name="tmpl_copy_code">
+        <t t-if="widget.model == 'product.template'">
+            <button  type="button" class="btn btn-sm btn-primary o_button_copy_code">
+                从子系统复制料号
+            </button>
+        </t>
+    </t>
+
+        <t t-extend="ListView.buttons">
+        <t t-jquery="button.o_list_button_add" t-operation="after">
+           <t t-call="tmpl_copy_code"/>
+        </t>
+    </t>
+</templates>

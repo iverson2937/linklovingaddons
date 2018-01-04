@@ -33,8 +33,6 @@ odoo.define('linkloving_product_query.product_query', function (require) {
     }
 
     function execute_query_action() {
-        console.log("execute_query_action");
-        this.select_ids;
         var self = this;
         var action = {
             type: 'ir.actions.act_window',

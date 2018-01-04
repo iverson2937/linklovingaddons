@@ -250,3 +250,28 @@ class LinklovingCompanies(http.Controller):
                 "code": -1,
                 "msg": u"创建订单出现异常, %s" % e.name if hasattr(e, "name") else '',
             }
+
+    @http.route('/linkloving_web/get_stand_price', auth='none', type='json', csrf=False, methods=['POST'])
+    def get_stand_price(self, **kw):
+        db = request.jsonrequest.get("db")  # 所选账套
+        request.session.db = db  # 设置账套
+        request.params["db"] = db
+
+        vals = request.jsonrequest.get("vals")  # 需要查询的产品数据
+        p_obj = request.env["product.product"].sudo().search([("default_code", "in", vals)])
+        data_return = []
+        try:
+            for p in p_obj:
+                data_return.append({
+                    'default_code': p.default_code,
+                    'price_unit': p.pre_cost_cal()
+                })
+        except Exception, e:
+            return {
+                "code": -2,
+                "msg": u"出现异常 %s" % e.name
+            }
+        return {
+            "code": 1,
+            'vals': data_return,
+        }

@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 import calendar
+import json
 import logging
 
 import datetime
 
 import pytz
+import requests
+from requests.packages.urllib3.exceptions import ConnectionError
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
@@ -513,6 +516,58 @@ class CreateOrderPointWizard(models.TransientModel):
                     if not line and s.name.customer:
                         s.unlink()
 
+    def set_standard_price_from_subcompany(self):
+        """
+        从子公司回填成本到RT公司
+        :return:
+        """
+        product_tmpl = self.env["product.template"]
+        company_info_rober = self.env["sub.company.info"].search([("name", "=", "若贝尔 ")])
+        company_info_diy = self.env["sub.company.info"].search([("name", "=", "鲁班DIY")])
+        sub_company_rober = self.env["res.partner"].search(
+                [("sub_company", "=", "sub"), ("sub_company_id", "=", company_info_rober.id)])  # 子公司鲁 2.4的地址
+        sub_company_diy = self.env["res.partner"].search(
+                [("sub_company", "=", "sub"), ("sub_company_id", "=", company_info_diy.id)])  # 子公司
+
+        products = product_tmpl.search([])
+
+        products_from_rober = products.filtered(lambda x: x.seller_ids.mapped("name") in sub_company_rober)
+        products_from_diy = products.filtered(lambda x: x.seller_ids.mapped("name") in sub_company_diy)
+        response = None
+        if products_from_rober:
+            url, db, header = company_info_rober.get_request_info('/linkloving_web/get_stand_price')
+            response = self.request_to_get_stand_price(url, db, header, products_from_rober.mapped("default_code"))
+
+        if products_from_diy:
+            url, db, header = company_info_diy.get_request_info('/linkloving_web/get_stand_price')
+            response = self.request_to_get_stand_price(url, db, header, products_from_rober.mapped("default_code"))
+
+        if response:
+            vals = response.get("vals")
+            for val in vals:
+                p = product_tmpl.search([("default_code", "=", val.get("default_code"))])
+                p.standard_price = val["price_unit"]
+        else:
+            raise UserError(u"未收到返回")
+
+    def request_to_get_stand_price(self, url, db, header, codes):
+        try:
+            response = requests.post(url, data=json.dumps({
+                "db": db,
+                "vals": codes
+            }), headers=header)
+            return self.handle_response(response)
+        except ConnectionError:
+            raise UserError(u"请求地址错误, 请确认")
+
+    def handle_response(self, response):
+        res_json = json.loads(response.content).get("result")
+        res_error = json.loads(response.content).get("error")
+        if res_json and res_json.get("code") < 0:
+            raise UserError(res_json.get("msg"))
+        if res_error:
+            raise UserError(res_error.get("data").get("message"))
+        return res_json
 
 def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
     """

@@ -10,8 +10,7 @@ odoo.define('linkloving_core.notify', function (require) {
                 // 'subtitle': params.text,
                 $content: $("<div/>").html(params.text)
             }).open()
-        }
-        ;
+        };
         return {'type': 'ir.actions.act_window_close'};
     });
 });

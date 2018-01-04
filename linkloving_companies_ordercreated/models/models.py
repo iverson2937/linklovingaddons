@@ -62,6 +62,20 @@ class SubCompanyInfo(models.Model):
     host_correct = fields.Char(compute='_compute_host_correct')
     db_name = fields.Char(string=u'账套名称')
 
+    def get_request_info(self, str1):
+        """
+
+        :param str1:
+        :return: url,db,header
+        """
+        if not self:
+            raise UserError(u"未设置子公司信息")
+
+        url = self.host_correct + str1
+        db = self.db_name
+        header = {'Content-Type': 'application/json'}
+        return url, db, header
+
 
 class PurchaseOrderExtend(models.Model):
     _inherit = 'purchase.order'
@@ -119,16 +133,6 @@ class PurchaseOrderExtend(models.Model):
                 raise UserError(u'未收到返回')
         return res
 
-    def get_request_info(self, str1):
-        if not self.partner_id.sub_company_id:
-            raise UserError(u"未设置子公司信息")
-
-        host = self.partner_id.sub_company_id.host_correct
-        url = host + str1
-        db = self.partner_id.sub_company_id.db_name
-        header = {'Content-Type': 'application/json'}
-        return url, db, header
-
     def request_to_get_price(self):
         line_list = []
         for order_line in self.order_line:
@@ -136,7 +140,7 @@ class PurchaseOrderExtend(models.Model):
                 "line_id": order_line.id,
                 "default_code": order_line.product_id.default_code,
             })
-        url, db, header = self.get_request_info('/linkloving_web/precost_price')
+        url, db, header = self.partner_id.sub_company_id.get_request_info('/linkloving_web/precost_price')
         response = requests.post(url, data=json.dumps({
             "db": db,
             "discount_to_sub": self.partner_id.discount_to_sub,
@@ -146,7 +150,7 @@ class PurchaseOrderExtend(models.Model):
 
     def request_to_create_so(self):
         so = self._prepare_so_values()  # 解析采购单,生成so单信息
-        url, db, header = self.get_request_info('/linkloving_web/create_order')
+        url, db, header = self.partner_id.sub_company_id.get_request_info('/linkloving_web/create_order')
         try:
             response = requests.post(url, data=json.dumps({
                 # "discount_to_sub": self.partner_id.discount_to_sub,
