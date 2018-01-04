@@ -21,5 +21,5 @@ class linkloving_work_order_record(models.Model):
 
     record_type = fields.Integer(default=WORK_ORDER_RECORD_STATE_REPLY)
 
-    reply_uid = fields.Many2one("res.user")
+    reply_uid = fields.Many2one("res.users")
 

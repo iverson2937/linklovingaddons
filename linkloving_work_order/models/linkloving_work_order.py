@@ -14,17 +14,15 @@ class linkloving_work_order(models.Model):
 
     name = fields.Char()
 
-    assign_uid = fields.Many2one('res_user')
+    assign_uid = fields.Many2one('res.users')
 
-    execute_uid = fields.Many2one('res_user')
+    execute_uid = fields.Many2one('res.users')
 
-    effective_department_ids = fields.Many2many('hr_department', 'linkloving_work_order_department_rel', 'work_order_id', 'department_id', 'Department id')
+    effective_department_ids = fields.Many2many('hr.department', 'linkloving_work_order_department_rel', 'work_order_id', 'department_id', 'Department id')
 
     priority = fields.Integer()
 
     description = fields.Text()
-
-    create_date = fields.Date()
 
     issue_state = fields.Integer()
 
