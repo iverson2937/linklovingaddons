@@ -4164,7 +4164,46 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/work_order_search', type='json', auth="none", csrf=False, cors='*')
     def work_order_statistics(self, **kw):
         uid = request.jsonrequest.get("uid")
+
         return JsonResponse.send_response(STATUS_CODE_OK)
+
+    # "工单详情"
+    @http.route('/linkloving_app_api/work_order_search_by_id', type='json', auth="none", csrf=False, cors='*')
+    def work_order_deltail(self, **kw):
+        uid = request.jsonrequest.get("uid")
+        work_order_id = request.jsonrequest.get("work_order_id")
+        user = request.env['res.users'].sudo().browse(uid)
+
+        work_order = request.env['linkloving.work.order'].sudo().search(
+            [('id', '=', work_order_id), ('effective_department_ids', 'in', user.employee_ids.mapped('department_id'))])
+
+        if work_order:
+            work_order_records = request.env['linkloving.work.order.record'].sudo().search(
+                [('work_order_id', '=', work_order_id)])
+
+        else:
+            return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "work_order_id不存在或无权限访问"})
+
+    # "工单详情 - 操作记录"
+    @http.route('/linkloving_app_api/work_order_add_record', type='json', auth="none", csrf=False, cors='*')
+    def work_order_statistics(self, **kw):
+        content = request.jsonrequest.get("content")
+        reply_uid = request.jsonrequest.get("reply_uid")
+        record_type = request.jsonrequest.get("record_type")
+        work_order_id = request.jsonrequest.get("work_order_id")
+
+        work_order_record_model = request.env['linkloving.work.order.record']
+        work_order_record = work_order_record_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
+            'work_order_id': work_order_id,
+            'record_type': record_type,
+            'content': content,
+            'reply_uid': reply_uid
+        })
+
+        if work_order_record:
+            return JsonResponse.send_response(STATUS_CODE_OK)
+        else:
+            return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "操作失败"})
 
     @staticmethod
     def convert_work_order_to_json(work_order):
