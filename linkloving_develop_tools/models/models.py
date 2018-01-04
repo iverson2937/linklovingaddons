@@ -511,6 +511,7 @@ class CreateOrderPointWizard(models.TransientModel):
                          ('state', 'in', ['purchase', 'done'])])
 
                     if not line and s.name.customer:
+                        print s.id
                         s.unlink()
 
 
