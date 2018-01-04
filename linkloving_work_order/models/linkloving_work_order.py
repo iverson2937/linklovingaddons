@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields
 
+WORK_ORDER_ISSUE_STATE_UNACCEPT = 0
 WORK_ORDER_ISSUE_STATE_UNASSIGNED = 1
 WORK_ORDER_ISSUE_STATE_PROCESS = 2
 WORK_ORDER_ISSUE_STATE_CHECK = 3
 WORK_ORDER_ISSUE_STATE_FINISH = 9
+
 
 class linkloving_work_order(models.Model):
     _name = 'linkloving.work.order'
