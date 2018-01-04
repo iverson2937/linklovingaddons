@@ -32,6 +32,7 @@ class SubCompanyReport(models.Model):
         sub_companies = self.env["res.partner"].search([('sub_company', '=', 'sub')])
         pos = self.env["purchase.order"].search([('partner_id', 'in', sub_companies.ids),
                                                  ('state', '=', 'purchase')])
+
         report_vals = []
         for po in pos:
             if po.picking_ids.filtered(lambda x: x.state not in ["done", "cancel"]):  # 如果收货未完成了
@@ -88,7 +89,8 @@ class SubCompanyReport(models.Model):
             'po': self.prepare_order_info(po),
             'follow_partner': po.partner_id.follow_partner_id.follow_partner_id.name or '',
             'state': po.state,
-            'sub_so_name': po.so_name_from_sub or ''
+            'sub_so_name': po.so_name_from_sub or '',
+            'report_remark': po.report_remark or ''
         }
         if po.first_so_number:
             so_order = self.env["sale.order"].search([('name', '=', po.first_so_number)], limit=1)
@@ -110,3 +112,16 @@ class SubCompanyReport(models.Model):
                     'sale_man': manual_order.create_uid.name or '',
                 })
         return data
+
+    def save_report_remark(self,**kwargs):
+        report_remark = kwargs['report_remark']
+
+
+
+class PurchaseOrderInherit(models.Model):
+     _inherit = 'purchase.order'
+     report_remark = fields.Char(string=u'备注')
+     
+     @api.multi
+     def write(self, vals):
+         return super(PurchaseOrderInherit, self).write(vals)

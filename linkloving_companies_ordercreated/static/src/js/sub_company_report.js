@@ -89,7 +89,7 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
             }, {
                 field: 'producer',
                 title: '生产者',
-                sortable: true,
+                sortable: true
             }, {
                 field: 'so',
                 title: '销售SO号',
@@ -131,7 +131,16 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                 field: 'state',
                 title: '出货状态',
                 sortable: true,
-                }];
+                },
+                {
+                    field: 'report_remark',
+                    title: '备注',
+                    sortable: true,
+                    editable: {
+                        type: 'text',
+                    }
+                }
+            ];
             var options = self.options_init('江苏若态订单汇总' + new Date().Format("yyyy-MM-dd"), [[{
                     field: 'title',
                     title: '江苏若态订单汇总',
@@ -152,6 +161,9 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                 striped: true,
                 showColumns: true,
                 showExport: true,
+
+                editable: true,
+
                 iconsPrefix: 'fa', // glyphicon of fa (font awesome)
                 exportTypes: ['excel'],
                 exportOptions: {
@@ -170,6 +182,15 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                 },
                 columns: coloums,
                 data: data,//data.order_line,
+
+                onEditableSave: function(field, row, oldValue, $el) {
+                    console.log(row)
+                    return new Model("purchase.order")
+                        .call("write",[row.po.id, {report_remark:row.report_remark}])
+                        .then(function (result) {
+
+                        })
+                },
             }
         },
         initTableSubCompany: function (data) {

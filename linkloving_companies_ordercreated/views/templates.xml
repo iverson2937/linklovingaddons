@@ -10,7 +10,11 @@
                 <script typ="text/javascript"
                         src="/linkloving_companies_ordercreated/static/src/js/bootstrap-table/bootstrap-table.js"/>
                 <script type="text/javascript"
+                        src="/linkloving_companies_ordercreated/static/src/js/bootstrap-table/bootstrap-editable.js"/>
+                <script type="text/javascript"
                         src="/linkloving_companies_ordercreated/static/src/js/bootstrap-table/bootstrap-table-export.min.js"/>
+                 <script type="text/javascript"
+                        src="/linkloving_companies_ordercreated/static/src/js/bootstrap-table/bootstrap-table-editable.js"/>
                 <script type="text/javascript"
                         src="/linkloving_companies_ordercreated/static/src/js/bootstrap-table/tableExport.js"/>
                 <script typ="text/javascript"
