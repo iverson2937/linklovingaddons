@@ -137,7 +137,8 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                     title: '备注',
                     sortable: true,
                     editable: {
-                        type: 'text',
+                        type: 'textarea',
+                        emptytext: '暂无备注',
                     }
                 }
             ];
