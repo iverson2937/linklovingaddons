@@ -58,13 +58,15 @@ class AutoSmtpMailMail(models.Model):
     @api.multi
     def send(self, auto_commit=False, raise_exception=False):
 
-        par_list = self.env['res.partner']
-        for partner_one in self.recipient_ids:
-            for child_one in partner_one.child_ids:
-                if child_one.email:
-                    par_list += child_one
+        for self_one in self:
+            par_list = self.env['res.partner']
 
-        self.recipient_ids = par_list
+            for partner_one in self_one.recipient_ids:
+                for child_one in partner_one.child_ids:
+                    if child_one.email:
+                        par_list += child_one
+
+                self_one.recipient_ids = par_list
 
         return super(AutoSmtpMailMail, self).send(auto_commit=False, raise_exception=False)
 
