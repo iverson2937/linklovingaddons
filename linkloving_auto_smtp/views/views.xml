@@ -7,8 +7,8 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//field[@name='email']" position="replace">
-                    <field name="email" readonly="0"/>
-                    <field name="mail_server" context="{'default_name':email}" readonly="0"/>
+                    <field name="email" string="邮箱地址" readonly="0"/>
+                    <field name="mail_server" string="配置邮箱服务" context="{'default_name':email}" readonly="0"/>
                 </xpath>
                 <!--<data>-->
                 <!--<field name="email" position="replace"/>-->
@@ -117,23 +117,9 @@
                 </xpath>
 
                 <xpath expr="//notebook/page[1]" position="replace">
-                    <page string="Body">
-                        <field name="body_html" widget="html" options="{'style-inline': true}"/>
-
-                        <script language="javascript">
-                            var _check = setTimeout("t()",500);
-
-                            function t(){
-
-                            var ofrm = document.getElementsByClassName("o_readonly")[0].contentWindow.document;
-                            if (ofrm!=undefined)
-                            {
-                            $('.o_readonly').height(document.getElementsByClassName("o_readonly")[0].contentWindow.document.body.scrollHeight);
-                            clearInterval(_check);
-                            }
-                            }
-                        </script>
-
+                    <page string="正文">
+                        <field name="body_html" class="email_this_body_html" widget="html"
+                               options="{'style-inline': true}"/>
                     </page>
                 </xpath>
 
@@ -169,6 +155,15 @@
 
         <!--</field>-->
         <!--</record>-->
+
+        <record model="ir.actions.act_window" id="base.action_ir_mail_server_list">
+            <field name="name">Outgoing Mail Servers</field>
+            <field name="res_model">ir.mail_server</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="base.ir_mail_server_list"/>
+            <field name="search_view_id" ref="base.view_ir_mail_server_search"/>
+        </record>
 
 
     </data>
