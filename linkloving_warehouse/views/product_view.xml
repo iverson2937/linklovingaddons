@@ -34,9 +34,6 @@
 
                 </xpath>
 
-                <xpath expr="//field[@name='virtual_available']" position="attributes">
-                    <!--<attribute name="invisible">1</attribute>-->
-                </xpath>
 
                 <xpath expr="//field[@name='categ_id']" position="replace">
                 </xpath>
@@ -53,15 +50,7 @@
                     <attribute name="invisible">1</attribute>
                 </xpath>
 
-                <xpath expr="//field[@name='qty_available']" position="after">
-                    <field name="incoming_qty" string="在产"/>
-                </xpath>
-                <xpath expr="//field[@name='qty_available']" position="replace">
-                    <field name="stock" string="库存"/>
-                </xpath>
-                <xpath expr="//field[@name='virtual_available']" position="attributes">
-                    <attribute name="string">预测</attribute>
-                </xpath>
+
                 <xpath expr="//field[@name='list_price']" position="attributes">
                     <attribute name="string">售价</attribute>
                 </xpath>
@@ -69,8 +58,10 @@
                 <!--<attribute name="string">供应商</attribute>-->
                 <!--</xpath>-->
 
-
-                <xpath expr="//field[@name='virtual_available']" position="after">
+                <xpath expr="//field[@name='qty_available']" position="replace">
+                    <field name="incoming_qty" string="在产"/>
+                    <field name="stock" string="库存"/>
+                    <field name="forecast_qty"/>
 
                     <field name="reordering_min_qty" string="最小"/>
                     <field name="reordering_max_qty" string="最大"/>

@@ -105,7 +105,6 @@ class ProductTemplate11(models.Model):
                 full_code = '.'.join([categ_code, full_specs, version1])
                 self.default_code = full_code
 
-    default_code = fields.Char(track_visibility='onchange')
 
 
 class ProductProduct(models.Model):
