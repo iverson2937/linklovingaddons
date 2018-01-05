@@ -23,10 +23,9 @@
                     <field name="default_code"/>
                     <field name="name"/>
                     <field name="product_specs"/>
-                    <field name="list_price"/>
                     <field name="standard_price"/>
                     <field name="stock" string="库存"/>
-                    <field name="virtual_available"/>
+                    <field name="forecast_qty" string="预测"/>
                     <field name="reordering_min_qty" string="最小"/>
                     <field name="reordering_max_qty" string="最大"/>
                 </tree>
