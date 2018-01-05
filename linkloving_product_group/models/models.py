@@ -62,6 +62,7 @@ class ProductCategory(models.Model):
             'view_type': 'form',
             'view_mode': 'tree,form,kanban',
             'domain': '[["categ_id", "child_of", %d]]' % int(category.id),
+            'context': "{'is_show_procuremnt_create_btn': True}",
             'view_id': view_id,
         }
         return self.env['ir.actions.act_window'].create(val)

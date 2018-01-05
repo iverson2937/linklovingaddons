@@ -61,3 +61,17 @@ class AccountMoveLine(models.Model):
             remaining_moves = (remaining_moves + writeoff_to_reconcile).auto_reconcile_lines()
             return writeoff_to_reconcile
         return True
+
+
+class AccountJournalInherit(models.Model):
+    _inherit = "account.journal"
+
+    @api.multi
+    @api.depends('name', 'currency_id', 'company_id', 'company_id.currency_id')
+    def name_get(self):
+        res = []
+        for journal in self:
+            currency = journal.currency_id or journal.company_id.currency_id
+            name = "%s (%s) (%s)" % (journal.name, currency.name, journal.default_debit_account_id.balance)
+            res += [(journal.id, name)]
+        return res
