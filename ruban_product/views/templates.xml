@@ -26,9 +26,9 @@
             <field name="inherit_id" ref="product.product_template_tree_view"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='name']" position="after">
-                    <field name="l_size" class="o_address_city" placeholder="长"/>
-                    <field name="wide" class="o_address_city" placeholder="宽"/>
-                    <field name="high" class="o_address_city" placeholder="高"/>
+                    <field name="l_size" class="o_address_state" placeholder="长"/>
+                    <field name="wide" class="o_address_state" placeholder="宽"/>
+                    <field name="high" class="o_address_state" placeholder="高"/>
 
                 </xpath>
 
