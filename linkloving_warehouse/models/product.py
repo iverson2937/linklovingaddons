@@ -56,6 +56,9 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     has_bom_line_lines = fields.Boolean(compute='has_bom_line_ids', string='是否有在BOM中', store=True)
+    name = fields.Char('Name', index=True, required=True, translate=True, track_visibility='onchange')
+    default_code = fields.Char(track_visibility='onchange')
+
 
     @api.model
     def has_bom_line_ids(self):
