@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ruban_product_ruban_product,ruban_product.ruban_product,model_ruban_product_ruban_product,,1,0,0,0
