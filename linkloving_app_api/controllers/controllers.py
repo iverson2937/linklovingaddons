@@ -160,9 +160,9 @@ class LinklovingAppApi(http.Controller):
 
                 values['partner_id'] = user.partner_id.id
                 values['company'] = user.company_id.name
-                rate = request.env['mrp.config.settings'].sudo().get_default_allow_produced_qty_rate(
-                    ['allow_produced_qty_rate'])
-                values.update(rate)
+                # rate = request.env['mrp.config.settings'].sudo().get_default_allow_produced_qty_rate(
+                #     ['allow_produced_qty_rate'])
+                # values.update(rate)
                 if user.employee_ids:
                     values['barcode'] = user.employee_ids[0].barcode
                     values['phone'] = user.employee_ids[0].mobile_phone
@@ -4114,9 +4114,9 @@ class LinklovingAppApi(http.Controller):
         if not departments:
             effective_department_ids = request.env['hr.department'].sudo().search([]).ids
 
-        issue_state = 1
+        issue_state = 0
         if assign_uid:
-            issue_state = 2
+            issue_state = 1
         work_order_model = request.env['linkloving.work.order']
         work_order = work_order_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
             'name': name,
@@ -4126,13 +4126,13 @@ class LinklovingAppApi(http.Controller):
             'issue_state': issue_state,
             'effective_department_ids': effective_department_ids
         })
-
-        for img in wo_images:
-            wo_img_id = request.env["linkloving.work.order.image"].sudo(LinklovingAppApi.CURRENT_USER()).create({
-                'work_order_id': work_order.id,
-                'work_order_image': img,
-            })
-            work_order.attachments = [(4, wo_img_id.id)]
+        if wo_images:
+            for img in wo_images:
+                wo_img_id = request.env["linkloving.work.order.image"].sudo(LinklovingAppApi.CURRENT_USER()).create({
+                    'work_order_id': work_order.id,
+                    'work_order_image': img,
+                })
+                work_order.attachments = [(4, wo_img_id.id)]
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.convert_work_order_to_json(work_order))
 
@@ -4212,9 +4212,10 @@ class LinklovingAppApi(http.Controller):
             'name': work_order.name,
             'description': work_order.description,
             'priority': work_order.priority,
-            'assign_user_id': work_order.assign_user_id,
+            'assign_uid': work_order.assign_uid.id,
             'issue_state': work_order.issue_state,
-            'create_user_id': work_order.create_user_id,
+            'create_uid': work_order.write_uid.id,
+            'create_time': work_order.write_date,
             'work_order_images': LinklovingAppApi.get_work_order_img_url(work_order.attachments.ids),
         }
         return data
