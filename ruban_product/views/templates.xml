@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="view_product_form_ruban" model="ir.ui.view">
+            <field name="name">product.template.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='barcode']" position="before">
+                    <label for="l_size" string="尺寸"/>
+                    <div class="o_address_format">
+                        <field name="l_size" class="o_address_city" placeholder="长"/>
+                        <field name="wide" class="o_address_city" placeholder="宽"/>
+                        <field name="high" class="o_address_city" placeholder="高"/>
+                    </div>
+
+                </xpath>
+
+
+            </field>
+        </record>
+        <record id="view_product_tree_ruban" model="ir.ui.view">
+            <field name="name">product.template.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_tree_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="l_size" class="o_address_city" placeholder="长"/>
+                    <field name="wide" class="o_address_city" placeholder="宽"/>
+                    <field name="high" class="o_address_city" placeholder="高"/>
+
+                </xpath>
+
+
+            </field>
+        </record>
+
+
+    </data>
+</openerp>
+
+
+
+
