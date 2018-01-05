@@ -233,6 +233,16 @@ class ProcurementOrderManualExtend(models.Model):
     manual_order_id = fields.Many2one('manual.procurement.order', string=u'生产需求单')
     manual_procurement_line_id = fields.Many2one('manual.procurement.line')
 
+    @api.multi
+    def _prepare_purchase_order(self, partner):
+        self.ensure_one()
+        res = super(ProcurementOrderManualExtend, self)._prepare_purchase_order(partner)
+        if self.not_base_on_available:
+            res.update({
+                'date_order': fields.datetime.now(),
+                'handle_date': self.date_planned,
+            })
+        return res
     # def _prepare_mo_vals(self, bom):
     #     res = super(ProcurementOrderManualExtend, self)._prepare_mo_vals(bom)
     #

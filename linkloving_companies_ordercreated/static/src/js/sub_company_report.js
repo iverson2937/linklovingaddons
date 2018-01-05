@@ -128,11 +128,6 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                 sorter: sorter,
             },
                 {
-                field: 'state',
-                title: '出货状态',
-                sortable: true,
-                },
-                {
                     field: 'report_remark',
                     title: '备注',
                     sortable: true,
@@ -140,7 +135,13 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                         type: 'textarea',
                         emptytext: '暂无备注',
                     }
-                }
+                },
+                {
+                    field: 'shipping_rate',
+                    title: '收货率',
+                    sortable: true,
+                },
+
             ];
             var options = self.options_init('江苏若态订单汇总' + new Date().Format("yyyy-MM-dd"), [[{
                     field: 'title',

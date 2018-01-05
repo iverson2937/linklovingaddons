@@ -90,7 +90,8 @@ class SubCompanyReport(models.Model):
             'follow_partner': po.partner_id.follow_partner_id.follow_partner_id.name or '',
             'state': po.state,
             'sub_so_name': po.so_name_from_sub or '',
-            'report_remark': po.report_remark or ''
+            'report_remark': po.report_remark or '',
+            'shipping_rate': str(round(po.shipping_rate, 2)) + '%' or '0.00%',
         }
         if po.first_so_number:
             so_order = self.env["sale.order"].search([('name', '=', po.first_so_number)], limit=1)
