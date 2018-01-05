@@ -1469,7 +1469,7 @@ class LinklovingOAApi(http.Controller):
             'pre_payment_reminding': obj.pre_payment_reminding or '0.00',
             'line_ids': self.get_waiting_approval_detail_lists(obj.expense_line_ids),
             'message_ids': self.get_apply_record(obj.message_ids),
-            'to_approve_id': obj.to_approve_id.id,
+            'to_approve_id': obj.to_approve_id.name or '',
         }
 
     def get_waiting_approval_detail_lists(self, objs):
@@ -1813,7 +1813,7 @@ class LinklovingOAApi(http.Controller):
             'state': obj.state or '',
             'line_ids': self.get_shengou_detail_lists(obj.line_ids),
             'message_ids': self.get_apply_record(obj.message_ids),
-            "to_approve_id": obj.to_approve_id.id,
+            "to_approve_id": obj.to_approve_id.name,
         }
 
     def get_shengou_detail_lists(self, obj):
@@ -2674,7 +2674,8 @@ class LinklovingOAApi(http.Controller):
                 "name": orderDetail.name,
                 "state": orderDetail.state,
                 "total_amount": orderDetail.total_amount,
-                "id": orderDetail.id
+                "id": orderDetail.id,
+                "to_approve_id": orderDetail.to_approve_id.name,
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
