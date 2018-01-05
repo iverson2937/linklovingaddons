@@ -36,6 +36,19 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
 
             'click .document_all_checkbox': 'document_all_checkbox_realize',
             'click .outage_document_file': 'outage_document_file_fn',
+
+            'click .document_yellow_dialog_pdm': 'document_yellow_dialog_pdm_fn',
+
+        },
+
+
+        document_yellow_dialog_pdm_fn: function (e) {
+            var tar = this;
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            console.log(target)
+            Dialog.alert(target, $(target)["0"].attributes['data-original-title'].value);
+
         },
 
         get_default_pdm_intranet_ip: function (then_cb) {
@@ -418,7 +431,6 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
             $(".file_active_type").val("");
             $(".my_load_file_remote_path").val("");
             $(".my_load_file_version").val("");
-
 
 
             $(".load_container").show();
