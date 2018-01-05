@@ -2315,6 +2315,72 @@ class LinklovingOAApi(http.Controller):
         #     })
         return data
 
+    #获取所有需处理
+    @http.route('/linkloving_oa_api/get_all_need_do', type='json', auth="none", csrf=False, cors='*')
+    def get_all_need_do(self,*kw):
+        user_id = request.jsonrequest.get('user_id')
+        domain_bx = [("to_approve_id", '=', user_id),
+                  ('state', 'in', ('submit', 'manager1_approve', 'manager2_approve'))]
+        bx_lists = request.env["hr.expense.sheet"].sudo().search(domain_bx,
+                                                                       order='id desc')
+        bx = 0
+        for bx_list in bx_lists:
+            bx = bx + 1
+
+        domain_sg = [("to_approve_id", '=', user_id)]
+        sg_lists = request.env['hr.purchase.apply'].sudo().search(domain_sg,
+                                                                order='id desc')
+        sg = 0
+        for sg_list in sg_lists:
+            sg = sg + 1
+
+        domain_zz = [("to_approve_id", '=', user_id)]
+        zz_lists = request.env['account.employee.payment'].sudo().search(domain_zz,
+                                                                       order='id desc')
+        zz = 0
+        for zz_list in zz_lists:
+            zz = zz + 1
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"bx":bx,"sg":sg,"zz":zz})
+
+
+    #付款审核列表
+    @http.route('/linkloving_oa_api/get_payment_request_list', type='json', auth="none", csrf=False, cors='*')
+    def get_payment_request_list(self,*kw):
+        limit = request.jsonrequest.get("limit")
+        offset = request.jsonrequest.get("offset")
+        user_id = request.jsonrequest.get('user_id')
+        type = request.jsonrequest.get('type')
+        if type == "me":
+            domain = [('payment_type', '=', 1), ('create_uid', '=', user_id)]
+            payment_list = request.env['account.payment.register'].sudo().search(domain,
+                                                              limit=limit,
+                                                              offset=offset,
+                                                              order='id desc')
+            return JsonResponse.send_response(STATUS_CODE_OK,
+                                              res_data=self.change_payment_list_to_json(payment_list))
+        elif type == "wait_me":
+            domain = [('payment_type', '=', 1), ('approve_id', '=', user_id)]
+            payment_list = request.env['account.payment.register'].sudo().search(domain,
+                                                                                 limit=limit,
+                                                                                 offset=offset,
+                                                                                 order='id desc')
+            return JsonResponse.send_response(STATUS_CODE_OK,
+                                              res_data=self.change_payment_list_to_json(payment_list))
+
+    def change_payment_list_to_json(self, objs):
+        data = []
+        for obj in objs:
+            data.append({
+                "name":obj.display_name,
+                "create_uid":self.get_department(obj.create_uid),
+                "create_date":obj.create_date,
+                "parent_id":self.get_department(obj.partner_id),
+                "state":obj.state,
+                "approve_id":self.get_department(obj.approve_id),
+            })
+        return data
+
+
     #  XD 我的请假
     @http.route('/linkloving_oa_api/get_leavelist', type='json', auth="none", csrf=False, cors='*')
     def get_leavelist(self, *kw):
