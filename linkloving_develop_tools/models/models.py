@@ -7,7 +7,7 @@ import datetime
 
 import pytz
 import requests
-from requests.packages.urllib3.exceptions import ConnectionError
+# from requests.packages.urllib3.exceptions import ConnectionError
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
@@ -526,9 +526,9 @@ class CreateOrderPointWizard(models.TransientModel):
         company_info_rober = self.env["sub.company.info"].search([("name", "=", "若贝尔 ")])
         company_info_diy = self.env["sub.company.info"].search([("name", "=", "鲁班DIY")])
         sub_company_rober = self.env["res.partner"].search(
-                [("sub_company", "=", "sub"), ("sub_company_id", "=", company_info_rober.id)])  # 子公司鲁 2.4的地址
+            [("sub_company", "=", "sub"), ("sub_company_id", "=", company_info_rober.id)])  # 子公司鲁 2.4的地址
         sub_company_diy = self.env["res.partner"].search(
-                [("sub_company", "=", "sub"), ("sub_company_id", "=", company_info_diy.id)])  # 子公司
+            [("sub_company", "=", "sub"), ("sub_company_id", "=", company_info_diy.id)])  # 子公司
 
         products = product_tmpl.search([])
 
@@ -558,7 +558,7 @@ class CreateOrderPointWizard(models.TransientModel):
                 "vals": codes
             }), headers=header)
             return self.handle_response(response)
-        except ConnectionError:
+        except Exception:
             raise UserError(u"请求地址错误, 请确认")
 
     def handle_response(self, response):
@@ -569,6 +569,7 @@ class CreateOrderPointWizard(models.TransientModel):
         if res_error:
             raise UserError(res_error.get("data").get("message"))
         return res_json
+
 
 def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
     """
