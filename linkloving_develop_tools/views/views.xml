@@ -87,7 +87,9 @@
                                 default_focus="1"
                                 class="btn-primary"/>
 
-
+                        <button string="从子系统回填成本" name="set_standard_price_from_subcompany" type="object"
+                                default_focus="1"
+                                class="btn-primary"/>
                     </footer>
                 </form>
             </field>
