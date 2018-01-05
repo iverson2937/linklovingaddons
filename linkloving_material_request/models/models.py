@@ -84,40 +84,54 @@ class MaterialRequest(models.Model):
     @api.multi
     def write(self, vals):
 
+        # if vals.get('line_ids'):
+        #     for vals_line in vals.get('line_ids'):
+        #         if type(vals_line[2]) == dict:
+        #             if not vals_line[2].get('reference_bom'):
+        #                 if not vals_line[2].get('quantity_done'):
+        #                     if vals_line[1]:
+        #                         product_one1 = self.env['material.request.line'].browse(vals_line[1])
+        #                         qty_vals = product_one1.product_id.qty_available
+        #                         if qty_vals < 0 or qty_vals < vals_line[2].get('product_qty'):
+        #                             raise UserError(u"库存不足： '%s' " % product_one1.product_id.name)
+        #                         if vals_line[2].get('product_qty') <= 0:
+        #                             raise UserError(u"产品  '%s'  申请数量不能为0" % product_one1.product_id.name)
+        #                     else:
+        #                         product_one2 = self.env['product.product'].browse(vals_line[2].get('product_id'))
+        #                         qty_vals = vals_line[2].get('qty_available') if vals_line[2].get(
+        #                             'qty_available') else product_one2.qty_available
+        #                         if qty_vals < 0 or qty_vals < vals_line[2].get('product_qty'):
+        #                             raise UserError(u"库存不足： '%s' " % product_one2.name)
+        #                         if vals_line[2].get('product_qty') <= 0:
+        #                             raise UserError(u"产品  '%s'  申请数量不能为0" % product_one2.name)
+        #                 else:
+        #                     lin_ids_one = self.env['material.request.line'].browse(vals_line[1])
+        #                     if lin_ids_one:
+        #                         if vals_line[2].get('quantity_done') > lin_ids_one.product_qty:
+        #                             raise UserError(u"产品  '%s'  领料数量不能大于需求数量" % lin_ids_one.product_id.name)
+        null_add = True
         if vals.get('line_ids'):
-            null_lines = True
             for vals_line in vals.get('line_ids'):
-                if vals_line[2]:
-                    if not vals_line[2].get('quantity_done'):
-                        if vals_line[1]:
-                            product_one1 = self.env['material.request.line'].browse(vals_line[1])
-                            qty_vals = product_one1.product_id.qty_available
-                            if qty_vals < 0 or qty_vals < vals_line[2].get('product_qty'):
-                                raise UserError(u"库存不足： '%s' " % product_one1.product_id.name)
-                            if vals_line[2].get('product_qty') <= 0:
-                                raise UserError(u"产品  '%s'  申请数量不能为0" % product_one1.product_id.name)
-                        else:
-                            product_one2 = self.env['product.product'].browse(vals_line[2].get('product_id'))
-                            qty_vals = vals_line[2].get('qty_available') if vals_line[2].get(
-                                'qty_available') else product_one2.qty_available
-                            if qty_vals < 0 or qty_vals < vals_line[2].get('product_qty'):
-                                raise UserError(u"库存不足： '%s' " % product_one2.name)
-                            if vals_line[2].get('product_qty') <= 0:
-                                raise UserError(u"产品  '%s'  申请数量不能为0" % product_one2.name)
-                    else:
-                        lin_ids_one = self.env['material.request.line'].browse(vals_line[1])
-                        if lin_ids_one:
-                            if vals_line[2].get('quantity_done') > lin_ids_one.product_qty:
-                                raise UserError(u"产品  '%s'  领料数量不能大于需求数量" % lin_ids_one.product_id.name)
+                if type(vals_line[2]) == dict and vals_line[2].get('reference_bom'):
+                    null_add = False
+                    break
 
-                    null_lines = False
-            if null_lines:
-                raise UserError(u"订单行 不能为空！")
         res = super(MaterialRequest, self).write(vals)
+
+        if not self.line_ids:
+            raise UserError(u"订单行 不能为空！")
+        
+        if null_add:
+            for line_one in self.line_ids:
+                if line_one.qty_available < 0 or line_one.qty_available < line_one.product_qty:
+                    raise UserError(u"库存不足： '%s' " % line_one.product_id.name)
+                if line_one.product_qty <= 0:
+                    raise UserError(u"产品  '%s'  申请数量不能为0" % line_one.product_id.name)
+
         if vals.get('line_ids'):
             for bom_one in vals.get('line_ids'):
-                if bom_one[2]:
-                    if not bom_one[2].get('request_id'):
+                if type(bom_one[2]) == dict:
+                    if not bom_one[2].get('request_id') and not bom_one[2].get('reference_bom'):
                         line_one = self.env['material.request.line'].browse(bom_one[1])
                         line_one.write({'request_id': self.id})
 
@@ -305,6 +319,14 @@ class MaterialRequest(models.Model):
         self.picking_state = 'finish_pick'
         # return {'type': 'ir.actions.empty'}
 
+    def open_product_select_window(self):
+        return {'type': 'ir.actions.act_window',
+                'res_model': 'temp.material.request',
+                'view_mode': 'form',
+                'context': '{"order_id":%s}' % (self.id),
+                # 'res_id': self.product_tmpl_id.id,
+                'target': 'new'}
+
 
 class MaterialRequestLine(models.Model):
     _name = 'material.request.line'
@@ -360,3 +382,41 @@ class MaterialStockPicking(models.Model):
 class MaterialRequestStockMove(models.Model):
     _inherit = 'stock.move'
     raw_material_id = fields.Many2one('material.request')
+
+
+class TempMaterialRequest(models.Model):
+    _name = "temp.material.request"
+
+    product_ids = fields.Many2many('product.product', string='产品', )
+    user_id = fields.Many2one('res.users', default=lambda self: self.env.user.id)
+
+    def create_order_line_model(self):
+        sale_order_obj = self.env['material.request']
+        order_id = self._context.get('order_id')
+        new_order = sale_order_obj.browse(order_id)
+        new_order.line_ids = self.create_order_line(order_id)
+        return {'type': 'ir.actions.act_window_close',
+                }
+
+    def create_order_line(self, order_id):
+        material_order = self.env['material.request'].browse(order_id)
+
+        material_line_obj = self.env['material.request.line']
+        material_lines = []
+        for product_tmpl_id in self.product_ids:
+            already_exist = False
+            for line in material_order.line_ids:
+                if line.product_id == product_tmpl_id:
+                    already_exist = True
+            if not already_exist:
+                # material_request_line = material_line_obj.create({
+                #     'quantity_done': 0.0,
+                #     'product_qty': 0.0,
+                #     'product_id': product_tmpl_id.id,
+                #     'qty_available': product_tmpl_id.qty_available,
+                # })
+                # material_lines.append(material_request_line.id)
+                material_lines.append(
+                    [0, False, {u'product_id': product_tmpl_id.id, u'product_qty': 0, u'reference_bom': 0}])
+
+        return material_lines

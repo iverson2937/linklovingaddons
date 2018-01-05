@@ -133,7 +133,7 @@
                         <group>
                             <notebook>
                                 <page string="订单行">
-                                    <field name="line_ids"  mode="tree,kanban">
+                                    <field name="line_ids" mode="tree,kanban">
                                         <form string="Sales Order Lines">
                                             <group>
                                                 <field name="reference_bom" readonly="1" string="参考BOM" invisible="1"/>
@@ -144,7 +144,8 @@
 
 
                                                 <field name="qty_available" string="库存" readonly="1"/>
-                                                <field name="quantity_available" string="系统可用" readonly="1" invisible="1"/>
+                                                <field name="quantity_available" string="系统可用" readonly="1"
+                                                       invisible="1"/>
                                                 <field name="product_qty" string="需求数量" readonly="0"/>
                                                 <field name="quantity_done" string="领料数量" readonly="1"/>
 
@@ -153,7 +154,8 @@
                                         </form>
                                         <tree string="Sales Order Lines" editable="bottom">
                                             <field name="reference_bom" readonly="1" string="参考BOM" invisible="1"/>
-                                            <field name="product_id" options="{'no_create': True}"  string="产品" readonly="0"/>
+                                            <field name="product_id" options="{'no_create': True}" string="产品"
+                                                   readonly="0"/>
                                             <field name="inner_code" string="国内简码" readonly="1" invisible="1"/>
                                             <field name="inner_spec" string="国内类型" readonly="1" invisible="1"/>
 
@@ -201,6 +203,13 @@
                                         </kanban>
                                     </field>
                                     <div class="oe_clear"/>
+                                    <br/>
+
+
+                                    <button name="open_product_select_window" string="批量添加产品" type="object"
+                                            class="btn-primary oe_edit_only"/>
+
+
                                 </page>
                                 <page string="审核记录">
                                     <field name="review_process_line_ids">
@@ -386,6 +395,44 @@
                 </xpath>
 
 
+            </field>
+        </record>
+
+
+        <record id="ll_view_sale_advance_payment_inv" model="ir.ui.view">
+            <field name="name">添加订单行</field>
+            <field name="model">temp.material.request</field>
+            <field name="arch" type="xml">
+                <form string="创建订单行">
+                    <p class="oe_grey">
+                        创建订单
+                    </p>
+                    <group>
+                        <!--<field name="product_ids" context="{'search_default_filter_categ_id':1}" readonly="False"-->
+                        <!--domain="['|',('sale_ok','=',context.get('sale_ok')), ('purchase_ok', '=', context.get('purchase_ok'))]">-->
+                        <!--<tree>-->
+                        <!--<field name="name"/>-->
+                        <!--<field name="qty_available"/>-->
+                        <!--<field name="virtual_available"/>-->
+                        <!--</tree>-->
+                        <!--</field>-->
+
+                        <field name="product_ids" readonly="False">
+                            <tree >
+                                <field name="name"/>
+                                <field name="qty_available"/>
+                                <field name="virtual_available"/>
+                            </tree>
+                        </field>
+
+                    </group>
+                    <footer>
+                        <button name="create_order_line_model" string="确认添加" type="object" class="btn-primary"/>
+                        <!--<button name="create_purchase_order" string="Create Purchase Order" type="object"-->
+                        <!--class="btn-primary"/>-->
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
             </field>
         </record>
 
