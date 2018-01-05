@@ -34,8 +34,8 @@
 
                 </xpath>
 
-                <xpath expr="//field[@name='virtual_available']" position="attributes">
-                    <!--<attribute name="invisible">1</attribute>-->
+                <xpath expr="//field[@name='virtual_available']" position="replace">
+                    <field name="forecast_qty"/>
                 </xpath>
 
                 <xpath expr="//field[@name='categ_id']" position="replace">

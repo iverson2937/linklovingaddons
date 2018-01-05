@@ -47,7 +47,6 @@ class ProductProduct(models.Model):
             [('product_id', '=', self.id), ('state', '=', 'sale'), ('order_id.date_order', '>=', start),
              ('order_id.date_order', '<=', end)])
         res = sum(order.product_uom_qty for order in orders)
-        print res
 
         return res
 
@@ -58,7 +57,6 @@ class ProductTemplate(models.Model):
     has_bom_line_lines = fields.Boolean(compute='has_bom_line_ids', string='是否有在BOM中', store=True)
     name = fields.Char('Name', index=True, required=True, translate=True, track_visibility='onchange')
     default_code = fields.Char(track_visibility='onchange')
-
 
     @api.model
     def has_bom_line_ids(self):
@@ -317,7 +315,6 @@ class ProductTemplate(models.Model):
             for line in bom_line_ids:
                 line.product_uom_id = vals['uom_id']
 
-            print 1111111111
         return super(ProductTemplate, self).write(vals)
 
     def _get_default_uom_id(self):
@@ -341,8 +338,11 @@ class ProductTemplate(models.Model):
         for product in self:
             product_data = res[product.id]
             product.stock = product_data['qty_available']
+            product.forecast_qty = product_data['virtual_available']
 
     stock = fields.Float(string=u'库存', store=True, compute=get_stock)
+    forecast_qty = fields.Float(string=u'预测数量', compute=get_stock)
+
     _sql_constraints = [
         ('default_code_uniq1', 'unique (default_code)', _('Default Code already exist!')),
         # ('name_uniq', 'unique (name)', u'产品名称已存在!')
