@@ -10,9 +10,9 @@
                 <xpath expr="//field[@name='barcode']" position="before">
                     <label for="l_size" string="尺寸"/>
                     <div class="o_address_format">
-                        <field name="l_size" class="o_address_city" placeholder="长"/>
-                        <field name="wide" class="o_address_city" placeholder="宽"/>
-                        <field name="high" class="o_address_city" placeholder="高"/>
+                        <field name="l_size" class="o_address_street" placeholder="长"/>
+                        <field name="wide" class="o_address_street" placeholder="宽"/>
+                        <field name="high" class="o_address_street" placeholder="高"/>
                     </div>
 
                 </xpath>
