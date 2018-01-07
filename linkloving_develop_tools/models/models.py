@@ -512,7 +512,7 @@ class CreateOrderPointWizard(models.TransientModel):
                     line = self.env['purchase.order.line'].search(
                         [('product_id', '=', s.product_tmpl_id.product_variant_ids[0].id),
                          ('state', 'in', ['purchase', 'done'])])
-
+                    _logger.warning("update menu action list, %d/%d" % (s.id, len(line)))
                     if not line and s.name.customer:
                         print s.id
                         s.unlink()
