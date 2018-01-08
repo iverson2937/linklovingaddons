@@ -511,10 +511,10 @@ class CreateOrderPointWizard(models.TransientModel):
                 for s in product.seller_ids:
                     line = self.env['purchase.order.line'].search(
                         [('product_id', '=', s.product_tmpl_id.product_variant_ids[0].id),
+                         ('partner_id','=',s.name.id),
                          ('state', 'in', ['purchase', 'done'])])
-
                     if not line and s.name.customer:
-                        print s.id
+                        _logger.warning("delete, %d-------%s" % (s.id, s.name.name))
                         s.unlink()
 
     def set_standard_price_from_subcompany(self):
