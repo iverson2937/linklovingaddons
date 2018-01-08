@@ -59,7 +59,12 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
             var self = this;
             var formatter_func = function (value, row, index) {
                 if (value) {
-                    var url = 'http://' + location.host + '/web?#view_type=form&model=' + value.model + '&id=' + value.id;
+                    if (value["sub_ip"]) {
+                        var url = value["sub_ip"] + '/web?#view_type=form&model=' + value.model + '&id=' + value.id;
+                    }
+                    else {
+                        var url = 'http://' + location.host + '/web?#view_type=form&model=' + value.model + '&id=' + value.id;
+                    }
                     return '<a href="' + url + '" target="_blank">' + value.name + '</a>';
                 }
                 else {
@@ -120,6 +125,8 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                 field: 'sub_so_name',
                 title: '生产SO号',
                 sortable: true,
+                formatter: formatter_func,
+                sorter: sorter,
             }, {
                 field: 'po',
                 title: '采购PO号',

@@ -1886,7 +1886,6 @@ class LinklovingAppApi(http.Controller):
         new_lines = []
         try:
             for line in stock_inventory_lines:
-                print 'line11111111111111'
                 product_obj = LinklovingAppApi.get_model_by_id(line['product']['product_id'], request,
                                                                'product.product')
                 line['product_uom_id'] = product_obj.uom_id.id
@@ -1916,9 +1915,11 @@ class LinklovingAppApi(http.Controller):
             inventory = request.env['stock.inventory'].sudo(LinklovingAppApi.CURRENT_USER()).create({
                 'name': name,
                 'filter': 'partial',
-                'line_ids': new_lines
+                'line_ids': new_lines,
+                'state': 'confirm',
+                'date': fields.Datetime.now()
             })
-            inventory.action_done()
+            # inventory.action_done()
         except UserError, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error": e.name})

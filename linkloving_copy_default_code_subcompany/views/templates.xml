@@ -1,0 +1,115 @@
+<openerp>
+    <data>
+        <template id="assets_backend" name="statistic" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <link rel="stylesheet" href="/linkloving_copy_default_code_subcompany/static/src/css/css.css"/>
+                <script typ="text/javascript"
+                        src="/linkloving_copy_default_code_subcompany/static/src/js/web_planner_code_copy.js"/>
+            </xpath>
+        </template>
+        <template id="website_code_copy">
+            <t t-call="web_planner.pages">
+                <t t-call="web_planner.page">
+                    <t t-set="page_title">选择子公司</t>
+                    <t t-set="hide_mark_as_done" t-value="True"/>
+                    <div class="o_planner_intro">
+                        将从所选子公司中复制产品信息至当前公司.
+                        <div class="alert alert-info info_icon" role="alert">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">请选择子公司:</label>
+                                <div class="col-md-9">
+                                    <t t-foreach="sub_companies" t-as="company">
+                                        <label class="radio_right">
+                                            <input type="radio" name="optionsRadios"
+                                                   t-att-value="company.get('id')">
+                                                <span class="span_right">
+                                                    <t t-esc="company.get('name')"/>
+                                                </span>
+                                            </input>
+                                        </label>
+                                    </t>
+
+                                    <!--<label class="radio_right">-->
+                                    <!--<input type="radio" name="optionsRadios" id="diy"-->
+                                    <!--value="diy">-->
+                                    <!--<span class="span_right">DIY</span>-->
+                                    <!--</input>-->
+                                    <!--</label>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+                <t t-call="web_planner.page">
+                    <t t-set="page_title">填写料号</t>
+                    <t t-set="hide_mark_as_done" t-value="True"/>
+                    <div class="o_planner_intro">
+                        如有多个料号,请输入 "回车" 分割
+                        <div class="alert alert-info info_icon" role="alert">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">请输入料号:</label>
+                                <div class="col-md-9">
+                                    <textarea name="default_code" id="default_codes"
+                                              onpropertychange="this.scrollTop = this.scrollHeight"
+                                              onfocus="this.scrollTop = this.scrollHeight"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+                <t t-call="web_planner.page">
+                    <t t-set="page_title">检查料号是否存在</t>
+                    <t t-set="hide_mark_as_done" t-value="True"/>
+                    <div class="o_planner_intro">
+                        <button class="btn btn-primary btn_check_codes">开始检查</button>
+
+                        <div class="code_area">
+                            <div>
+                                <table id="exist_code_table"></table>
+                            </div>
+                            <div class="invalid_code_table_area">
+                                <table id="invalid_code_table"></table>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+
+                <t t-call="web_planner.page">
+                    <t t-set="page_title">End</t>
+                    <t t-set="hide_title" t-value="True"/>
+                    <t t-set="hide_from_menu" t-value="True"/>
+                    <t t-set="hide_mark_as_done" t-value="True"/>
+                    <h1 class="text-center o_planner_trophy" data-icon="&#xe006;"/>
+                    <div class="text-center">
+                        <h1>Congratulations, you're done!</h1>
+                        <h3>We hope this planner helped you to create your website.</h3>
+                        <h4>Don't hesitate in
+                            <a href="mailto:info@odoo.com?subject=Website%20Planner%20feeedback" target="_blank">sending
+                                us an email
+                            </a>
+                            to describe
+                            <br/>
+                            your experience or to suggest improvements!
+                        </h4>
+                        <p>- The Odoo Team</p>
+                        <img src="/web_planner/static/src/img/odoo_logo.png"/>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <!--Planner Data-->
+        <record id="planner_code_copy" model="web.planner">
+            <field name="name">Website Code Copy</field>
+            <field name="view_id" ref="website_code_copy"/>
+            <field name="menu_id" ref="website.menu_website"/>
+            <field name="progress">6</field>
+            <field name="planner_application">planner_copy_code</field>
+            <field name="tooltip_planner"><![CDATA[
+        Plan your website strategy, design your pages, sell your products and grow your online business!
+        ]]>
+            </field>
+        </record>
+
+    </data>
+</openerp>
