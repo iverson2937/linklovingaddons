@@ -120,8 +120,8 @@ class MaterialRequest(models.Model):
 
         if not self.line_ids:
             raise UserError(u"订单行 不能为空！")
-        
-        if null_add:
+
+        if null_add and not vals.get('picking_state'):
             for line_one in self.line_ids:
                 if line_one.qty_available < 0 or line_one.qty_available < line_one.product_qty:
                     raise UserError(u"库存不足： '%s' " % line_one.product_id.name)
@@ -417,6 +417,6 @@ class TempMaterialRequest(models.Model):
                 # })
                 # material_lines.append(material_request_line.id)
                 material_lines.append(
-                    [0, False, {u'product_id': product_tmpl_id.id, u'product_qty': 0, u'reference_bom': 0}])
+                    [0, False, {u'product_id': product_tmpl_id.id, u'product_qty': 1, u'reference_bom': 0}])
 
         return material_lines
