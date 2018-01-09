@@ -20,7 +20,7 @@
                         <tree editable="bottom">
                             <field name="sequence" widget="handle"/>
                             <field name="name" placeholder="部门"/>
-                            <field name="group_ids" widget="many2many_tags"/>
+                            <field name="group_id"/>
                         </tree>
                     </field>
                 </sheet>

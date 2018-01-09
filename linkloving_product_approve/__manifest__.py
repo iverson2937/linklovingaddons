@@ -26,8 +26,8 @@
     'data': [
         # 'security/ir.model.access.csv',
         'data/approve_groups.xml',
-        'views/views.xml',
         'views/mrp_approve_stage.xml',
+        'views/product_template.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

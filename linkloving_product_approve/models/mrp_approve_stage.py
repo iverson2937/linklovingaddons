@@ -3,15 +3,12 @@
 from odoo import models, fields, api
 
 
-class ProductApproveStage(models.Model):
-    _name = 'product.approve.stage'
-    name = fields.Char(string='名称')
-
-
 class MrpApprovalTemplate(models.Model):
     _name = 'mrp.approval.template'
+    name = fields.Char()
+    sequence = fields.Integer()
     stage_id = fields.Many2one('mrp.approve.stage')
-    group_ids = fields.Many2many('res.groups')
+    group_id = fields.Many2one('res.groups')
 
 
 class MrpApproveStage(models.Model):
@@ -30,12 +27,12 @@ class MrpApproveStage(models.Model):
     # approval_roles = fields.Char('Approval Roles', compute='_compute_approvals', store=True)
     # is_blocking = fields.Boolean('Blocking Stage', compute='_compute_is_blocking', store=True)
 
-    @api.one
-    @api.depends('approval_template_ids.name')
-    def _compute_approvals(self):
-        self.approval_roles = ', '.join(self.approval_template_ids.mapped('name'))
-
-    @api.one
-    @api.depends('approval_template_ids.approval_type')
-    def _compute_is_blocking(self):
-        self.is_blocking = any(template.approval_type == 'mandatory' for template in self.approval_template_ids)
+    # @api.one
+    # @api.depends('approval_template_ids.name')
+    # def _compute_approvals(self):
+    #     self.approval_roles = ', '.join(self.approval_template_ids.mapped('name'))
+    #
+    # @api.one
+    # @api.depends('approval_template_ids.approval_type')
+    # def _compute_is_blocking(self):
+    #     self.is_blocking = any(template.approval_type == 'mandatory' for template in self.approval_template_ids)
