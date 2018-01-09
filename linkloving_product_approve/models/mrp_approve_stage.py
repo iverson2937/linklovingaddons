@@ -3,13 +3,15 @@
 from odoo import models, fields, api
 
 
-class ProductTemplate(models.Model):
+class ProductApproveStage(models.Model):
     _name = 'product.approve.stage'
     name = fields.Char(string='名称')
 
 
 class MrpApprovalTemplate(models.Model):
     _name = 'mrp.approval.template'
+    stage_id = fields.Many2one('mrp.approve.stage')
+    group_ids = fields.Many2many('res.groups')
 
 
 class MrpApproveStage(models.Model):
