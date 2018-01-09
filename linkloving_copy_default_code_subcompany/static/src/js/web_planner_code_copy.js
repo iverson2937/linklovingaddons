@@ -9,6 +9,7 @@ odoo.define('linkloving_copy_default_code_subcompany.code_copy', function (requi
     var webclient = require('web.web_client');
     var PlannerDialog = planner.PlannerDialog;
     var ListView = require('web.ListView');
+    var framework = require('web.framework');
     ListView.prototype.defaults.import_enabled = true;
     ListView.include({
 
@@ -59,16 +60,51 @@ odoo.define('linkloving_copy_default_code_subcompany.code_copy', function (requi
 
                 });
                 self.$('.btn_check_codes').on('click', function (ev) {
+                    framework.blockUI();
+                    self.$(".exist_code_table_area").html('');//
+                    self.$(".invalid_code_table_area").html('');//
+                    var exist_node = '<table id="exist_code_table"></table>';
+                    var not_exist_node = '<table id="invalid_code_table"></table>';
+                    self.$(".exist_code_table_area").html($(exist_node));
+                    self.$(".invalid_code_table_area").html($(not_exist_node));
+                    self.$('.btn_import').prop('disabled', false);
                     new Model("web.planner")
                         .call('check_codes', [self.planner.id, self.copy_info])
                         .then(function (res) {
+                            framework.unblockUI();
                             if (!res.error_msg) {
                                 self.init2Tables(res);
                             } else {
-                                self.do_warn("警告", res.error_msg);
+                                self.do_warn("警告", res.error_msg)
                             }
-                        });
-                })
+                        }).done(function () {
+                        framework.unblockUI();
+                    });
+                });
+                self.$('.btn_import').prop('disabled', true);
+                self.$('.btn_import').on('click', function (ev) {
+                    if (!self.validate_codes) {
+                        self.do_warn("警告", "请先检查");
+                        return;
+                    }
+                    framework.blockUI();
+                    new Model("web.planner")
+                        .call('import_codes', [self.planner.id, self.validate_codes])
+                        .then(function (res) {
+                            console.log(res);
+                            framework.unblockUI();
+                            self.$('#success_count').html(res[0].success_count);
+                            self.initCategNotFoundTable(res[0].not_found_list);
+
+                            var next_page_id = self.get_next_page_id();
+                            if (next_page_id) {
+                                self._display_page(next_page_id);
+                            }
+
+                        }).done(function () {
+                        framework.unblockUI();
+                    });
+                });
             }
         },
         init: function (parent, planner) {
@@ -104,6 +140,13 @@ odoo.define('linkloving_copy_default_code_subcompany.code_copy', function (requi
 
             self.prepare_planner_event();
         },
+        rerender_page: function (index) {//根据下标来确定重新渲染哪个页面
+            var self = this;
+            var pages = self.$res.find('.o_planner_page').andSelf().filter('.o_planner_page');
+            var page = new Page(pages[index], index);
+            page.menu_item = self._find_menu_item_by_page_id(page.id);
+            self.pages[index] = page;
+        },
         init2Tables: function (data) {
             var self = this;
             var columns = [[{
@@ -129,8 +172,12 @@ odoo.define('linkloving_copy_default_code_subcompany.code_copy', function (requi
                 field: 'product_specs',
                 title: '规格',
             }, {
-                field: 'categ_id',
+                field: 'category_name',
                 title: '产品类别',
+                formatter: function (value, row, index) {
+                    console.log(value);
+                    return value[0][1];
+                }
             }]];
 
             var invalid_columns = [[{
@@ -159,13 +206,48 @@ odoo.define('linkloving_copy_default_code_subcompany.code_copy', function (requi
                     //}
                 },
             ]]
-
-            var exist_options = self.options_init(columns, data.exist_codes);
+            self.validate_codes = data.exist_codes;
+            var exist_options = self.options_init(columns, self.validate_codes);
             var invalid_codes_options = self.options_init(invalid_columns, data.error_codes);
             self.$('#exist_code_table').bootstrapTable(exist_options);
             self.$('#invalid_code_table').bootstrapTable(invalid_codes_options);
 
 
+        },
+        initCategNotFoundTable: function (data) {
+            var self = this;
+            var columns = [[{
+                field: 'title',
+                title: '找不到对应分类的料号信息',
+                halign: "center",
+                align: "center",
+                'class': "font_35_header",
+                colspan: 5,
+            }], [{
+                field: 'seq',
+                title: '序号',
+                formatter: function (value, row, index) {
+                    return index + 1;
+                }
+            }, {
+                field: 'default_code',
+                title: '料号',
+            }, {
+                field: 'name',
+                title: '品名',
+            }, {
+                field: 'product_specs',
+                title: '规格',
+            }, {
+                field: 'category_name',
+                title: '产品类别',
+                formatter: function (value, row, index) {
+                    console.log(value);
+                    return value[0][1];
+                }
+            }]];
+            var categ_not_found = self.options_init(columns, data);
+            self.$('#categ_not_found_table').bootstrapTable(categ_not_found);
         },
         options_init: function (coloums, data) {
             return {
@@ -204,10 +286,10 @@ odoo.define('linkloving_copy_default_code_subcompany.code_copy', function (requi
                     return;
                 }
                 //料号
-                if (self.currently_shown_page.id == self.pages[1].id) {
+                if (self.currently_shown_page.id == self.pages[1].id) {//
                     var codes = self.$("#default_codes").val();
                     var code_list = codes.trim().split("\n");
-                    if (code_list) {
+                    if (codes && code_list) {
                         self.copy_info = _.extend(self.copy_info, {
                             default_codes: code_list
                         })
@@ -218,6 +300,7 @@ odoo.define('linkloving_copy_default_code_subcompany.code_copy', function (requi
                     }
 
                 }
+
             }
             var next_page_id = this.get_next_page_id();
 
@@ -228,10 +311,23 @@ odoo.define('linkloving_copy_default_code_subcompany.code_copy', function (requi
             }
         },
         change_page: function (ev) {
+            var self = this;
+            ev.preventDefault();
+            var page_id = $(ev.currentTarget).attr('href').replace('#', '');
+            if (page_id == self.pages[0].id || page_id == self.pages[1].id) {
+                self.rerender_page(2);
+            }
+            this._display_page(page_id);
             //ev.preventDefault();
-            //var page_id = $(ev.currentTarget).attr('href').replace('#', '');
-            //this._display_page(page_id);
         },
+        _display_page: function (page_id) {
+            this._super(page_id);
+            if (page_id == this.pages[2].id) {
+                var next_button = this.$('a.btn-next');
+                next_button.hide();
+            }
+        }
+
     });
     var Page = core.Class.extend({
         init: function (dom, page_index) {
