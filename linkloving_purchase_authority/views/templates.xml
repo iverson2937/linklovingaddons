@@ -5,6 +5,14 @@
             <field name="model">account.payment.register</field>
             <field name="inherit_id" ref="linkloving_account.purchase_account_payment_register_form"/>
             <field name="arch" type="xml">
+
+                <xpath expr='//button[@name="confirm"]' position='replace'>
+                    <button name="to_manager_approve" string="送审经理" type="object" class="oe_highlight"
+                            states="posted" groups="purchase.group_purchase_manager"/>
+
+                    <button name="confirm" string="确认" type="object" class="oe_highlight"
+                            states="manager" groups="linkloving_purchase_authority.purchase_manager_plus"/>
+                </xpath>
                 <xpath expr='//button[@name="confirm"]' position='replace'>
                     <button name="to_manager_approve" string="送审经理" type="object" class="oe_highlight"
                             states="posted" groups="purchase.group_purchase_manager"/>
@@ -14,6 +22,10 @@
                 </xpath>
                 <xpath expr='//button[@name="reject"]' position='attributes'>
                     <attribute name="states">posted,manager,confirm</attribute>
+                </xpath>
+
+                <xpath expr='//field[@name="state"]' position='attributes'>
+                    <attribute name="statusbar_visible">draft,posted,confirm,manager,done</attribute>
                 </xpath>
             </field>
         </record>

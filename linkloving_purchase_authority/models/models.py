@@ -10,12 +10,22 @@ class AccountPaymentRegister(models.Model):
 
     _inherit = 'account.payment.register'
 
-    state = fields.Selection(selection_add=[('manager', '经理审核')])
+    state = fields.Selection([
+        ('draft', u'Draft'),
+        ('posted', u'Post'),
+        ('confirm', u'Confirm'),
+        ('manager', '经理审核'),
+        ('done', u'Done'),
+        ('cancel', u'Cancel')
+    ], 'State', readonly=True, default='draft', track_visibility='onchange')
 
     @api.multi
     def to_manager_approve(self):
         for record in self:
             record.state = 'manager'
+            record.manager_id = self.env.user.id
+
+    manager_id = fields.Many2one('res.users')
 
     @api.model
     def _needaction_domain_get(self):
