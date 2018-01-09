@@ -20,7 +20,7 @@ class linkloving_work_order(models.Model):
 
     execute_uid = fields.Many2one('res.users')
 
-    effective_department_ids = fields.Many2many('hr.department', 'linkloving_work_order_department_rel', 'work_order_id', 'department_id', 'Department id')
+    effective_department_ids = fields.Many2many('hr.department', 'linkloving_work_order_department_rel', 'work_order_id', 'department_id', 'Department id', ondelete='cascade')
 
     priority = fields.Integer()
 

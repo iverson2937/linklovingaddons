@@ -4243,6 +4243,18 @@ class LinklovingAppApi(http.Controller):
         else:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "操作失败"})
 
+    # "工单详情 - 撤回"
+    @http.route('/linkloving_app_api/work_order_retract', type='json', auth="none", csrf=False, cors='*')
+    def work_order_retract(self, **kw):
+        uid = request.jsonrequest.get("uid")
+        work_order_id = request.jsonrequest.get("work_order_id")
+
+        request.env['linkloving.work.order'].sudo().search([
+            ('id', '=', work_order_id), ('write_uid', '=', uid)
+        ]).unlink()
+
+        return JsonResponse.send_response(STATUS_CODE_OK)
+
     @staticmethod
     def convert_work_order_record_to_json(record):
         data = {
