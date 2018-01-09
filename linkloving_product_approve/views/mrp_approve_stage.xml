@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <record id="mrp_approve_stage_view_form" model="ir.ui.view">
+        <field name="name">mrp.approve.view.form</field>
+        <field name="model">mrp.approve.stage</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+                    <h2>Approvals</h2>
+                    <field name="approval_template_ids">
+                        <tree editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="name" placeholder="部门"/>
+                            <field name="group_ids" widget="many2many_tags"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="action_mrp_approve_stage" model="ir.actions.act_window">
+        <field name="name">审核流程</field>
+        <field name="res_model">mrp.approve.stage</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p>
+                请自定义审核流程
+            </p>
+        </field>
+    </record>
+
+
+    <menuitem id="mrp_approve_stage_setting"
+              parent="linkloving_approval.approval_setting"
+              action="action_mrp_approve_stage"
+              sequence="2"/>
+
+
+</odoo>

@@ -8,4 +8,4 @@ class linkloving_work_order_image(models.Model):
 
     work_order_image = fields.Binary(u"工单图片")
 
-    work_order_id = fields.Many2one("linkloving.work.order")
+    work_order_id = fields.Many2one("linkloving.work.order", ondelete='cascade')
