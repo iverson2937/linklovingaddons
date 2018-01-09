@@ -6,7 +6,7 @@ WORK_ORDER_ISSUE_STATE_UNACCEPT = 0
 WORK_ORDER_ISSUE_STATE_UNASSIGNED = 1
 WORK_ORDER_ISSUE_STATE_PROCESS = 2
 WORK_ORDER_ISSUE_STATE_CHECK = 3
-WORK_ORDER_ISSUE_STATE_FINISH = 9
+WORK_ORDER_ISSUE_STATE_DONE = 9
 
 
 class linkloving_work_order(models.Model):
@@ -26,7 +26,13 @@ class linkloving_work_order(models.Model):
 
     description = fields.Text()
 
-    issue_state = fields.Integer()
+    issue_state = fields.Selection([
+        ('unaccept', '未指定受理人'),
+        ('unassign ', '未指派'),
+        ('process', '处理中'),
+        ('check', '待审核'),
+        ('done', '已完成')
+    ], default='unaccept')
 
     assign_time = fields.Datetime()
 

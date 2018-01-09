@@ -23,3 +23,5 @@ class linkloving_work_order_record(models.Model):
 
     reply_uid = fields.Many2one("res.users")
 
+    content = fields.Char()
+
