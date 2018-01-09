@@ -4158,21 +4158,48 @@ class LinklovingAppApi(http.Controller):
                                                               ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)], ['issue_state'], ['issue_state'])
         print work_order_data
         result = dict((data['issue_state'], data['issue_state_count']) for data in work_order_data)
-        #
-        # work_order_list = work_order_model.sudo().search([])
-        #
-        # order_json = []
-        # for order in work_order_list:
-        #     order_json.append(LinklovingAppApi.convert_work_order_to_json(self, order))
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=result)
 
-    # "工单池"查询
+    # "工单池"查询-时间
     @http.route('/linkloving_app_api/work_order_search', type='json', auth="none", csrf=False, cors='*')
     def work_order_search(self, **kw):
         uid = request.jsonrequest.get("uid")
+        user = request.env["res.users"].sudo().browse(uid)
+        domain = [('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)]
 
-        return JsonResponse.send_response(STATUS_CODE_OK)
+        start_date = request.jsonrequest.get("start_date")
+        end_date = request.jsonrequest.get("end_date")
+        issue_state = request.jsonrequest.get("issue_state")
+        create_uid = request.jsonrequest.get("create_uid")
+        assign_uid = request.jsonrequest.get("assign_uid")
+        work_order_number = request.jsonrequest.get("work_order_number")
+
+        if start_date and end_date:
+            timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
+            begin = fields.datetime.strptime(start_date, '%Y-%m-%d')
+            end = fields.datetime.strptime(end_date, '%Y-%m-%d')
+            domain += [
+                    ('write_date', '<', (end - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                    ('write_date', '>', (begin - timez).strftime('%Y-%m-%d %H:%M:%S'))
+            ]
+        elif issue_state:
+            domain += [('issue_state', '=', issue_state)]
+        elif create_uid:
+            domain += [('write_uid', '=', create_uid)]
+        elif assign_uid:
+            domain += [('assign_uid', '=', assign_uid)]
+        elif work_order_number:
+            domain += [('work_order_number', '=', work_order_number)]
+
+        work_orders = request.env['linkloving.work.order'].sudo().search(
+            domain, order='write_date desc')
+
+        work_order_json = []
+        for order in work_orders:
+            work_order_json.append(LinklovingAppApi.convert_work_order_to_json(order))
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=work_order_json)
 
     # "工单详情"
     @http.route('/linkloving_app_api/work_order_search_by_id', type='json', auth="none", csrf=False, cors='*')
@@ -4231,6 +4258,7 @@ class LinklovingAppApi(http.Controller):
     @staticmethod
     def convert_work_order_to_json(work_order):
         data = {
+            'work_order_number': work_order.work_order_number,
             'work_order_id': work_order.id,
             'name': work_order.name,
             'description': work_order.description,

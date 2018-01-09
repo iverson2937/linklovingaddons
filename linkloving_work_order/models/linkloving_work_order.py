@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields
+from odoo import models, fields, api
 
 WORK_ORDER_ISSUE_STATE_UNACCEPT = 0
 WORK_ORDER_ISSUE_STATE_UNASSIGNED = 1
@@ -40,3 +40,9 @@ class linkloving_work_order(models.Model):
 
     attachments = fields.One2many(comodel_name="linkloving.work.order.image", inverse_name="work_order_id", string="工单图片",
                               required=False, )
+
+    @api.model
+    def create(self, vals):
+        if not vals.get('order_number'):
+            vals['name'] = self.env['ir.sequence'].next_by_code('work.order.number') or '/'
+        return super(linkloving_work_order, self).create(vals)
