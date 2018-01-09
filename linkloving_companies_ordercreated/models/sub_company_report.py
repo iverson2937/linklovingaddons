@@ -110,10 +110,11 @@ class SubCompanyReport(models.Model):
                     'sale_man': so_order.user_id.name or '',
                 })
             elif manual_order:
+                res_partner = self.env["res.partner"].search([('sub_company', '=', "main")], limit=1)
                 data.update({
                     'so': self.prepare_order_info(manual_order),
                     'pi_number': manual_order.alia_name or '',
-                    'partner': '',
+                    'partner': res_partner.name or '',
                     'handle_date': manual_order.date_excepted,
                     'sale_man': manual_order.create_uid.name or '',
                 })

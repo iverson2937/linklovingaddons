@@ -60,11 +60,14 @@
                 <t t-call="web_planner.page">
                     <t t-set="page_title">检查料号是否存在</t>
                     <t t-set="hide_mark_as_done" t-value="True"/>
-                    <div class="o_planner_intro">
-                        <button class="btn btn-primary btn_check_codes">开始检查</button>
+                    <note>点击 "<strong>开始检查</strong>" 按钮后,将会显示检查结果,并可以点击 "<strong>开始导入</strong>" 按钮,导入有效的料号信息.
+                    </note>
 
+                    <div class="o_planner_intro px10_margin_top">
+                        <button class="btn btn-primary btn_check_codes">开始检查</button>
+                        <button class="btn btn-primary btn_import">开始导入</button>
                         <div class="code_area">
-                            <div>
+                            <div class="exist_code_table_area">
                                 <table id="exist_code_table"></table>
                             </div>
                             <div class="invalid_code_table_area">
@@ -75,29 +78,24 @@
                 </t>
 
                 <t t-call="web_planner.page">
-                    <t t-set="page_title">End</t>
+                    <t t-set="page_title">导入结果</t>
                     <t t-set="hide_title" t-value="True"/>
                     <t t-set="hide_from_menu" t-value="True"/>
                     <t t-set="hide_mark_as_done" t-value="True"/>
-                    <h1 class="text-center o_planner_trophy" data-icon="&#xe006;"/>
+                    <h1 class="text-center o_planner_trophy">
+                        <span class="icon_import_success fa fa-check-circle"></span>
+                    </h1>
                     <div class="text-center">
-                        <h1>Congratulations, you're done!</h1>
-                        <h3>We hope this planner helped you to create your website.</h3>
-                        <h4>Don't hesitate in
-                            <a href="mailto:info@odoo.com?subject=Website%20Planner%20feeedback" target="_blank">sending
-                                us an email
-                            </a>
-                            to describe
-                            <br/>
-                            your experience or to suggest improvements!
-                        </h4>
-                        <p>- The Odoo Team</p>
-                        <img src="/web_planner/static/src/img/odoo_logo.png"/>
+                        <h1>导入完成</h1>
+                        <h3>导入成功
+                            <strong id="success_count"></strong>
+                            个, 以下为找不到对应类别的料号信息
+                        </h3>
+                        <table id="categ_not_found_table"></table>
                     </div>
                 </t>
             </t>
         </template>
-
         <!--Planner Data-->
         <record id="planner_code_copy" model="web.planner">
             <field name="name">Website Code Copy</field>
