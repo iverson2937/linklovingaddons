@@ -4190,7 +4190,7 @@ class LinklovingAppApi(http.Controller):
         elif assign_uid:
             domain += [('assign_uid', '=', assign_uid)]
         elif work_order_number:
-            domain += [('work_order_number', '=', work_order_number)]
+            domain += [('order_number', '=', work_order_number)]
 
         work_orders = request.env['linkloving.work.order'].sudo().search(
             domain, order='write_date desc')
@@ -4270,7 +4270,7 @@ class LinklovingAppApi(http.Controller):
     @staticmethod
     def convert_work_order_to_json(work_order):
         data = {
-            'work_order_number': work_order.work_order_number,
+            'work_order_number': work_order.order_number,
             'work_order_id': work_order.id,
             'name': work_order.name,
             'description': work_order.description,
