@@ -26,11 +26,12 @@ class MrpProduction(models.Model):
             raise UserError('请设置成本科目')
 
         account_id = supplier_id.property_account_payable_id.id or self.supplier_id.property_account_payable_id.id
+        if not supplier_id:
+            raise UserError(u'制造单未设置外协供应商')
         if not account_id:
-            raise UserError(
-                    _(
+            raise UserError(_(
                     'There is no income account defined for this product: "%s". You may have to install a chart of account from Accounting app, settings menu.') %
-                    (supplier_id.name or self.supplier_id.name,))
+                            (supplier_id.name or self.supplier_id.name,))
 
 
         invoice = inv_obj.create({
