@@ -195,7 +195,7 @@
                 </div>
 
             </t>
-            <t t-if="o.state not in ['purchase','done']">
+            <t t-if="o.state in ['draft','to approve','mark_by_mrp','sent']">
                 <div class="text-center">
                     <strong>只有审核通过的采购单才能被打印</strong>
                 </div>
