@@ -4275,10 +4275,10 @@ class LinklovingAppApi(http.Controller):
             'title': work_order.name,
             'description': work_order.description,
             'priority': work_order.priority,
-            'assign_uid': [work_order.assign_uid.id, work_order.assign_uid.name],
+            'assign_user': LinklovingAppApi.get_user_json(work_order.assign_uid.id),
             'issue_state': work_order.issue_state,
-            'create_uid': [work_order.write_uid.id, work_order.write_uid.name],
-            'create_user_ava': LinklovingAppApi.get_img_url(work_order.write_uid.id, "res.users", "image_medium"),
+            'create_user': LinklovingAppApi.get_user_json(work_order.write_uid.id),
+            'execute_user': LinklovingAppApi.get_user_json(work_order.execute_uid.id),
             'create_time': work_order.write_date,
             'work_order_images': LinklovingAppApi.get_work_order_img_url(work_order.attachments.ids),
         }
@@ -4293,6 +4293,18 @@ class LinklovingAppApi(http.Controller):
                 request.httprequest.host_url, str(img_id), 'linkloving.work.order.image', 'work_order_image')
             imgs.append(url)
         return imgs
+
+    @classmethod
+    def get_user_json(uid):
+        user = request.env["res.users"].sudo().browse(uid)
+        data = {
+            'id': user.id,
+            'name': user.name,
+            'user_ava': LinklovingAppApi.get_img_url(user.id, "res.users", "image_medium"),
+        }
+        return data
+
+
 
     # end--------------模块:工单---------------分割线--------------------------------------------------end
 
