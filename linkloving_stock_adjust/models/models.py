@@ -58,7 +58,7 @@ class StockTransfer(models.Model):
             'filter': 'partial',
             'name': '_'.join([self.name, self.remark]),
             'reason': self.remark,
-            'adjust_type': 'transfer'
+            'remark': 'transfer'
         })
         inv_id.prepare_inventory()
         print inv_id
