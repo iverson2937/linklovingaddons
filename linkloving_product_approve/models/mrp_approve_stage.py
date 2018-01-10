@@ -6,6 +6,7 @@ from odoo import models, fields, api
 class MrpApprovelType(models.Model):
     _name = 'mrp.approve.type'
     name = fields.Char(string='名称')
+    description = fields.Char(string='描述')
 
 
 class MrpApprovalTemplate(models.Model):
@@ -37,10 +38,10 @@ class MrpApprovalRecord(models.Model):
     required_user_ids = fields.Many2many(
         'res.users', string='Requested Users', related='approval_template_id.user_ids')
     template_stage_id = fields.Many2one(
-        'mrp.mrp.stage', 'Approval Stage',
+        'mrp.approve.stage', 'Approval Stage',
         related='approval_template_id.stage_id', store=True)
     eco_stage_id = fields.Many2one(
-        'mrp.eco.stage', 'ECO Stage',
+        'mrp.approve.stage', 'ECO Stage',
         related='product_id.stage_id', store=True)
     status = fields.Selection([
         ('none', 'Not Yet'),
