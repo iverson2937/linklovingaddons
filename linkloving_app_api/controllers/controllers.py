@@ -4116,7 +4116,7 @@ class LinklovingAppApi(http.Controller):
         print departments
         issue_state = 'unaccept'
         if assign_uid:
-            issue_state = 'unassign'
+            issue_state = 'process'
         work_order_model = request.env['linkloving.work.order']
         work_order = work_order_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
             'name': name,
@@ -4141,10 +4141,10 @@ class LinklovingAppApi(http.Controller):
     def my_work_order_statistics(self, **kw):
         uid = request.jsonrequest.get("uid")
         work_order_model = request.env['linkloving.work.order']
-        work_order_data = work_order_model.sudo().read_group([('issue_state', 'in', ['unassign', 'process']), ('execute_uid', '=', uid)],
-                                                             ['issue_state'],
-                                                             ['issue_state'])
-        result = dict((data['issue_state'][0], data['issue_state_count']) for data in work_order_data)
+        work_order_data = work_order_model.sudo().read_group([('assign_uid', '=', uid)],
+                                                             'issue_state',
+                                                             'issue_state')
+        result = dict((data['issue_state'], data['issue_state_count']) for data in work_order_data)
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=result)
 
@@ -4278,7 +4278,6 @@ class LinklovingAppApi(http.Controller):
             'assign_user': LinklovingAppApi.get_user_json(work_order.assign_uid.id),
             'issue_state': work_order.issue_state,
             'create_user': LinklovingAppApi.get_user_json(work_order.write_uid.id),
-            'execute_user': LinklovingAppApi.get_user_json(work_order.execute_uid.id),
             'create_time': work_order.write_date,
             'work_order_images': LinklovingAppApi.get_work_order_img_url(work_order.attachments.ids),
         }
