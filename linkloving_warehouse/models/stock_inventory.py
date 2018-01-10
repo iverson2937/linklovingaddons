@@ -9,4 +9,4 @@ class StockInventoryInherit(models.Model):
     remark = fields.Selection([
         ('transfer', '物料转换'),
         ('adjust', '库存调整')
-    ], string=u'来源备注', defalut='adjust')
+    ], string=u'来源备注', default='adjust')
