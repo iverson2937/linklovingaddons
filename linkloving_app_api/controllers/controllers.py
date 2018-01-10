@@ -4262,7 +4262,7 @@ class LinklovingAppApi(http.Controller):
             'name': record.name,
             'work_order_id': record.work_order_id,
             'record_type': record.record_type,
-            'reply_uid': record.reply_uid,
+            'reply_uid': [record.reply_uid.id, record.reply_uid.name],
             'content': record.content,
         }
         return data
@@ -4275,10 +4275,9 @@ class LinklovingAppApi(http.Controller):
             'title': work_order.name,
             'description': work_order.description,
             'priority': work_order.priority,
-            'assign_uid': work_order.assign_uid.id,
+            'assign_uid': [work_order.assign_uid.id, work_order.assign_uid.name],
             'issue_state': work_order.issue_state,
-            'create_uid': work_order.write_uid.id,
-            'create_user_name': work_order.write_uid.name,
+            'create_uid': [work_order.write_uid.id, work_order.write_uid.name],
             'create_user_ava': LinklovingAppApi.get_img_url(work_order.write_uid.id, "res.users", "image_medium"),
             'create_time': work_order.write_date,
             'work_order_images': LinklovingAppApi.get_work_order_img_url(work_order.attachments.ids),
