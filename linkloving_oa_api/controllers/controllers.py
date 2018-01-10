@@ -2319,6 +2319,7 @@ class LinklovingOAApi(http.Controller):
     @http.route('/linkloving_oa_api/get_all_need_do', type='json', auth="none", csrf=False, cors='*')
     def get_all_need_do(self,*kw):
         user_id = request.jsonrequest.get('user_id')
+        is_plus = request.jsonrequest.get('is_plus')
         domain_bx = [("to_approve_id", '=', user_id),
                   ('state', 'in', ('submit', 'manager1_approve', 'manager2_approve'))]
         bx_lists = request.env["hr.expense.sheet"].sudo().search(domain_bx,
@@ -2340,7 +2341,21 @@ class LinklovingOAApi(http.Controller):
         zz = 0
         for zz_list in zz_lists:
             zz = zz + 1
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"bx":bx,"sg":sg,"zz":zz})
+
+        py = 0
+        if is_plus:
+            domain_py = [('payment_type', '=', 1), ('state', '=', "manager")]
+            payment_list = request.env['account.payment.register'].sudo().search(domain_py,
+                                                                                 order='id desc')
+            for payment in payment_list:
+                py = py + 1
+        else:
+            domain_py = [('payment_type', '=', 1), ('state', '=', "posted")]
+            payment_list = request.env['account.payment.register'].sudo().search(domain_py,
+                                                                                 order='id desc')
+            for payment in payment_list:
+                py = py + 1
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"bx":bx,"sg":sg,"zz":zz,"py":py})
 
 
     #付款审核列表
@@ -2376,7 +2391,7 @@ class LinklovingOAApi(http.Controller):
                                               res_data=self.change_payment_list_to_json(payment_list))
 
         elif type == "already":
-            domain = [('payment_type', '=', 1), '|', ('approve_id', '=', user_id), ('manager_id', '=', user_id), ("state", 'in', ["confirm", "register","manager"])]
+            domain = [('payment_type', '=', 1), '|', ('approve_id', '=', user_id), ('manager_id', '=', user_id)]
             payment_list = request.env['account.payment.register'].sudo().search(domain,
                                                                              limit=limit,
                                                                              offset=offset,
@@ -2427,8 +2442,9 @@ class LinklovingOAApi(http.Controller):
         search_type = request.jsonrequest.get("search_type")
         payment_type = request.jsonrequest.get("payment_type")
         user_id = request.jsonrequest.get("user_id")
+        search_domain = request.jsonrequest.get("search_domain")
         if payment_type == "me":
-            payment = request.env['account.payment.register'].sudo().search([('payment_type', '=', 1), ('create_uid', '=', user_id), ('name', 'ilike', search_name)],
+            payment = request.env['account.payment.register'].sudo().search([('payment_type', '=', 1), ('create_uid', '=', user_id), (search_domain, 'ilike', search_name)],
                                                           order='id desc')
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=self.change_payment_list_to_json(payment))
@@ -2436,14 +2452,14 @@ class LinklovingOAApi(http.Controller):
             if (search_type == "need"):
                 payment = request.env['account.payment.register'].sudo().search(
                     [('payment_type', '=', 1), ('state', '=', "manager"),
-                     ('name', 'ilike', search_name)],
+                     (search_domain, 'ilike', search_name)],
                     order='id desc')
                 return JsonResponse.send_response(STATUS_CODE_OK,
                                                   res_data=self.change_payment_list_to_json(payment))
             else:
                 payment = request.env['account.payment.register'].sudo().search(
                     [('payment_type', '=', 1), ('state', '=', "posted"),
-                     ('name', 'ilike', search_name)],
+                     (search_domain, 'ilike', search_name)],
                     order='id desc')
                 return JsonResponse.send_response(STATUS_CODE_OK,
                                                   res_data=self.change_payment_list_to_json(payment))
@@ -2451,7 +2467,7 @@ class LinklovingOAApi(http.Controller):
         else:
             payment = request.env['account.payment.register'].sudo().search(
                 [('payment_type', '=', 1), ('approve_id', '=', user_id), ("state", 'in', ["confirm", "register"]),
-                 ('name', 'ilike', search_name)],
+                 (search_domain, 'ilike', search_name)],
                 order='id desc')
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=self.change_payment_list_to_json(payment))
@@ -2489,12 +2505,12 @@ class LinklovingOAApi(http.Controller):
             data.append({
                 "id":obj.id,
                 'origin':obj.origin,
-                'number':obj.number,
+                'number':obj.number or '暂无单号',
                 'date_invoice':obj.date_invoice or '', #开票日期
                 'date_due':obj.date_due or '',
                 'tax':tax,
                 'amount_total':obj.amount_total,
-                'amount_total_o':obj.amount_total_o,
+                'amount_total_o':obj.residual,#待支付
                 'state':obj.state,
                 # 'amount_untaxed':obj.amount_untaxed,#未税金额
                 # 'amount_tax':obj.amount_tax,#税金
