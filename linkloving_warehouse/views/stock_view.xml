@@ -10,7 +10,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='filter']" position="after">
                     <field name="create_uid"/>
-                    <field name="remark"/>
+                    <field name="remark" string="来源备注"/>
                 </xpath>
                 <xpath expr="//button[@name='action_done']" position="attributes">
                     <attribute name="groups">base.group_erp_manager</attribute>
