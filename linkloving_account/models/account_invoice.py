@@ -50,7 +50,7 @@ class AccountInvoice(models.Model):
         self.amount_total_company_signed = amount_total_company_signed * sign
         self.amount_total_signed = self.amount_total * sign
         self.amount_untaxed_signed = amount_untaxed_signed * sign
-        self.remain_apply_balance = self.amount_total*sign
+        self.remain_apply_balance = amount_total_company_signed * sign
         if len(self.balance_ids) >= 1:
             amount = 0.0
             for balance_id in self.balance_ids:
