@@ -28,7 +28,7 @@ class linkloving_work_order(models.Model):
 
     issue_state = fields.Selection([
         ('unaccept', '未指定受理人'),
-        ('unassign ', '未指派'),
+        ('unassign', '未指派'),
         ('process', '处理中'),
         ('check', '待审核'),
         ('done', '已完成')
@@ -44,5 +44,5 @@ class linkloving_work_order(models.Model):
     @api.model
     def create(self, vals):
         if not vals.get('order_number'):
-            vals['name'] = self.env['ir.sequence'].next_by_code('work.order.number') or '/'
+            vals['order_number'] = self.env['ir.sequence'].next_by_code('work.order.number') or '/'
         return super(linkloving_work_order, self).create(vals)
