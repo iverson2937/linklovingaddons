@@ -3,6 +3,11 @@
 from odoo import models, fields, api
 
 
+class MrpApprovelType(models.Model):
+    _name = 'mrp.approve.type'
+    name = fields.Char(string='名称')
+
+
 class MrpApprovalTemplate(models.Model):
     _name = 'mrp.approval.template'
     approve_type = fields.Selection([
@@ -43,6 +48,8 @@ class MrpApprovalRecord(models.Model):
         ('approved', 'Approved'),
         ('rejected', 'Rejected')], string='Status',
         default='none', required=True)
+
+    remark = fields.Char(string='备注')
     # is_approved = fields.Boolean(
     #     compute='_compute_is_approved', store=True)
     # is_rejected = fields.Boolean(
@@ -63,7 +70,6 @@ class MrpApprovalRecord(models.Model):
     #         self.is_rejected = self.status == 'rejected'
     #     else:
     #         self.is_rejected = False
-
 
 
 class MrpApproveStage(models.Model):
