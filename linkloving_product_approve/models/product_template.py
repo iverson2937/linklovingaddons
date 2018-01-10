@@ -7,5 +7,3 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
     stage_id = fields.Many2one('mrp.approve.stage')
 
-    def submit(self):
-        self.state = 'research'

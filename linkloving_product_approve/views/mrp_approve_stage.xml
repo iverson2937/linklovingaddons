@@ -13,14 +13,15 @@
                             <field name="name"/>
                         </group>
                         <group>
+                            <field name="allow_apply_change"/>
                         </group>
                     </group>
                     <h2>Approvals</h2>
                     <field name="approval_template_ids">
                         <tree editable="bottom">
                             <field name="sequence" widget="handle"/>
-                            <field name="name" placeholder="部门"/>
-                            <field name="group_id"/>
+                            <field name="approve_type" placeholder="部门"/>
+                            <field name="user_ids" widget="many2many_tags"/>
                         </tree>
                     </field>
                 </sheet>
