@@ -28,7 +28,7 @@ class linkloving_work_order(models.Model):
 
     issue_state = fields.Selection([
         ('unaccept', '未指定受理人'),
-        ('unassign ', '未指派'),
+        ('unassign', '未指派'),
         ('process', '处理中'),
         ('check', '待审核'),
         ('done', '已完成')
