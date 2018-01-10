@@ -4272,12 +4272,14 @@ class LinklovingAppApi(http.Controller):
         data = {
             'work_order_number': work_order.order_number,
             'work_order_id': work_order.id,
-            'name': work_order.name,
+            'title': work_order.name,
             'description': work_order.description,
             'priority': work_order.priority,
             'assign_uid': work_order.assign_uid.id,
             'issue_state': work_order.issue_state,
             'create_uid': work_order.write_uid.id,
+            'create_user_name': work_order.write_uid.name,
+            'create_user_ava': LinklovingAppApi.get_img_url(work_order.write_uid.id, "res.users", "image_medium"),
             'create_time': work_order.write_date,
             'work_order_images': LinklovingAppApi.get_work_order_img_url(work_order.attachments.ids),
         }
