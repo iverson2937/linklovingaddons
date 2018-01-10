@@ -9,3 +9,15 @@
 .invalid_code_table_area, .code_area {
     margin-top: 20px;
 }
+
+#success_count {
+    color: #0fb10f;
+    font-size: 25px;
+}
+
+/*.icon_import_success {*/
+/*color: #0fb10f;*/
+/*}*/
+.px10_margin_top {
+    margin-top: 10px;
+}

@@ -89,9 +89,15 @@ class SubCompanyReport(models.Model):
             'po': self.prepare_order_info(po),
             'follow_partner': po.partner_id.follow_partner_id.follow_partner_id.name or '',
             'state': po.state,
-            'sub_so_name': po.so_name_from_sub or '',
+            'sub_so_name': {
+                'id': po.so_id_from_sub or 0,
+                'name': po.so_name_from_sub or '',
+                'model': 'sale.order',
+                'sub_ip': po.partner_id.sub_company_id.host_correct or '',  # 子系统的ip地址 用于跳转
+            },
             'report_remark': po.report_remark or '',
             'shipping_rate': str(round(po.shipping_rate, 2)) + '%' or '0.00%',
+            'handle_date': po.handle_date,
         }
         if po.first_so_number:
             so_order = self.env["sale.order"].search([('name', '=', po.first_so_number)], limit=1)
@@ -101,14 +107,14 @@ class SubCompanyReport(models.Model):
                     'so': self.prepare_order_info(so_order),
                     'pi_number': so_order.pi_number or '',
                     'partner': so_order.partner_id.name or '',
-                    'handle_date': so_order.validity_date,
                     'sale_man': so_order.user_id.name or '',
                 })
             elif manual_order:
+                res_partner = self.env["res.partner"].search([('sub_company', '=', "main")], limit=1)
                 data.update({
                     'so': self.prepare_order_info(manual_order),
                     'pi_number': manual_order.alia_name or '',
-                    'partner': '',
+                    'partner': res_partner.name or '',
                     'handle_date': manual_order.date_excepted,
                     'sale_man': manual_order.create_uid.name or '',
                 })

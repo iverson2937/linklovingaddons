@@ -1,6 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--t-if='widget.options.import_enabled'-->
 <templates xml:space="preserve">
+    <div t-name="web_planner.PlannerDialog" class="modal" id="PlannerDialog" tabindex="-1" role="dialog" aria-labelledby="PlannerDialogLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg o_planner_dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="o_planner_title_block">
+                        <h4 class="o_currently_shown_page"/>
+                    </div><div class="o_planner_progress_block">
+                        <div class="progress"><div class="progress-bar"/></div> <div class="o_progress_text"></div>
+                    </div><div class="o_planner_close_block"><button aria-hidden="true" class="close" data-dismiss="modal" type="button"><span class="fa fa-close"></span></button></div>
+                </div>
+                <div class="modal-body">
+                    <div class="o_planner_content_wrapper">
+                        <div class="o_planner_menu">
+                            <ul role="menu" aria-labelledby="dLabel"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="o_planner_header_left">
+                        <button class="btn btn-primary mark_as_done">
+                            <i class="fa fa-square-o"></i>
+                            <span>Mark As Done</span>
+                        </button>
+                    </div>
+
+                    <div class="o_planner_header_right text-right">
+                        <a class="btn btn-back">
+                            <i class="fa fa-angle-left"></i>
+                            上一步
+                        </a>
+                        <a class="btn btn-next">
+                            Next step
+                            <i class="fa fa-angle-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <t t-name="tmpl_copy_code">
         <t t-if="widget.model == 'product.template'">
             <button  type="button" class="btn btn-sm btn-primary o_button_copy_code">
@@ -9,9 +49,22 @@
         </t>
     </t>
 
-        <t t-extend="ListView.buttons">
+    <t t-extend="ListView.buttons">
         <t t-jquery="button.o_list_button_add" t-operation="after">
            <t t-call="tmpl_copy_code"/>
         </t>
     </t>
+
+
+    <!--<t t-extend="PlannerDialog">-->
+    <!--<t t-jquery=".modal-footer.o_planner_header_right" t-operation="append">-->
+    <!--<div class="o_planner_header_middle text-right">-->
+    <!--<a class="btn btn-back">-->
+    <!--<i class="fa fa-angle-left"></i>-->
+    <!--上一步-->
+    <!--</a>-->
+    <!--</div>-->
+    <!--</t>-->
+    <!--</t>-->
+
 </templates>

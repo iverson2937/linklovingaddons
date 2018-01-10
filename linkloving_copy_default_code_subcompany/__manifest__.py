@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "linkloving_work_order",
+    'name': "linkloving_copy_default_code_subcompany",
 
     'summary': """
         Short (1 phrase/line) summary of the module's purpose, used as
@@ -20,16 +20,17 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'mail', 'base_action_rule', 'web_calendar'],
+    'depends': ['base', 'website', 'product'],
 
     # always loaded
     'data': [
-        'security/ir.model.access.csv',
-        'views/calendar_views.xml',
-        'views/data.xml',
+        # 'security/ir.model.access.csv',
+        'views/views.xml',
+        'views/templates.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
     ],
+    'qweb': ['static/src/xml/*.xml'],
 }

@@ -21,5 +21,16 @@ class linkloving_work_order_record(models.Model):
 
     record_type = fields.Integer(default=WORK_ORDER_RECORD_STATE_REPLY)
 
+    record_type = fields.Selection([
+        ('reply', '回复'),
+        ('create ', '创建'),
+        ('assign', '指派'),
+        ('check', '审核'),
+        ('reject', '驳回'),
+        ('finish', '完成')
+    ], default='reply')
+
     reply_uid = fields.Many2one("res.users")
+
+    content = fields.Char()
 
