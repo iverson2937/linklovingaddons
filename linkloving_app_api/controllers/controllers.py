@@ -4295,7 +4295,7 @@ class LinklovingAppApi(http.Controller):
         return imgs
 
     @classmethod
-    def get_user_json(uid):
+    def get_user_json(cls, uid):
         user = request.env["res.users"].sudo().browse(uid)
         data = {
             'id': user.id,
