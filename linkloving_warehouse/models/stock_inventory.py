@@ -6,4 +6,7 @@ from odoo import api, fields, models
 
 class StockInventoryInherit(models.Model):
     _inherit = 'stock.inventory'
-    remark = fields.Char(string=u'备注')
+    adjust_type = fields.Selection([
+        ('transfer', '物料转换'),
+        ('adjust', '库存调整')
+    ], string=u'来源备注', defalut='adjust')
