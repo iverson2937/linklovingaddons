@@ -10,6 +10,31 @@ from odoo.exceptions import UserError
 class WebsitePlanner(models.Model):
     _inherit = 'web.planner'
 
+    @api.one
+    def import_codes(self, validate_codes):
+        product_cate = self.env["product.category"]
+        product_tmpl = self.env["product.template"]
+        not_found_list = []
+        success_count = 0
+
+        for code in validate_codes:
+            categ_id = product_cate.name_search(code.get("category_name")[0][1], operator="=")
+            categ = product_cate.browse(categ_id[0][0])
+            if not categ:
+                not_found_list.append(code)
+            else:
+                code.update({
+                    'categ_id': categ.id,
+                    'route_ids': [(6, 0, [self.env.ref(rou).id for rou in code["routes"]])]
+                })
+
+                product_tmpl.create(code)
+                success_count += 1
+        return {
+            'success_count': success_count,
+            'not_found_list': not_found_list
+        }
+
     @api.model
     def _get_planner_application(self):
         planner = super(WebsitePlanner, self)._get_planner_application()
@@ -75,3 +100,19 @@ class WebsitePlanner(models.Model):
         if res_error:
             raise UserError(res_error.get("data").get("name") + res_error.get("data").get("message"))
         return res_json
+
+
+class ProductCategoryExtend(models.Model):
+    _inherit = 'product.category'
+
+    @api.multi
+    def full_name_get(self):
+        def get_names(cat):
+            """ Return the list [cat.name, cat.parent_id.name, ...] """
+            res = []
+            while cat:
+                res.append(cat.name)
+                cat = cat.parent_id
+            return res
+
+        return [(cat.id, " / ".join(reversed(get_names(cat)))) for cat in self]

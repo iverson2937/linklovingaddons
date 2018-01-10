@@ -118,22 +118,24 @@ class MaterialRequest(models.Model):
 
         res = super(MaterialRequest, self).write(vals)
 
-        if not self.line_ids:
-            raise UserError(u"订单行 不能为空！")
+        if not vals.get('name'):
 
-        if null_add and not vals.get('picking_state'):
-            for line_one in self.line_ids:
-                if line_one.qty_available < 0 or line_one.qty_available < line_one.product_qty:
-                    raise UserError(u"库存不足： '%s' " % line_one.product_id.name)
-                if line_one.product_qty <= 0:
-                    raise UserError(u"产品  '%s'  申请数量不能为0" % line_one.product_id.name)
+            if not self.line_ids:
+                raise UserError(u"订单行 不能为空！")
 
-        if vals.get('line_ids'):
-            for bom_one in vals.get('line_ids'):
-                if type(bom_one[2]) == dict:
-                    if not bom_one[2].get('request_id') and not bom_one[2].get('reference_bom'):
-                        line_one = self.env['material.request.line'].browse(bom_one[1])
-                        line_one.write({'request_id': self.id})
+            if null_add and not vals.get('picking_state'):
+                for line_one in self.line_ids:
+                    if line_one.qty_available < 0 or line_one.qty_available < line_one.product_qty:
+                        raise UserError(u"库存不足： '%s' " % line_one.product_id.name)
+                    if line_one.product_qty <= 0:
+                        raise UserError(u"产品  '%s'  申请数量不能为0" % line_one.product_id.name)
+
+            if vals.get('line_ids'):
+                for bom_one in vals.get('line_ids'):
+                    if type(bom_one[2]) == dict:
+                        if not bom_one[2].get('request_id') and not bom_one[2].get('reference_bom'):
+                            line_one = self.env['material.request.line'].browse(bom_one[1])
+                            line_one.write({'request_id': self.id})
 
         return res
 

@@ -25,7 +25,26 @@ class LinklovingCopyDefaultCodeSubcompany(http.Controller):
             # intersection
             not_exist_codes = list(set(codes).difference(set(exist_codes)))  # 不存在的code
             repeat_codes_list = [{'default_code': code, 'reason': u'不存在'} for code in not_exist_codes]
-            products_list = products.read(fields=[])
+
+            routes = request.env["ir.model.data"].sudo().search([("model", "=", "stock.location.route")])
+            products_list = []
+            for p in products:
+                p_routes = routes.filtered(lambda x: x.res_id in p.route_ids.ids)
+                products_list.append({
+                    'id': p.id,
+                    'name': p.name,
+                    'default_code': p.default_code,
+                    'category_name': p.categ_id.full_name_get(),
+                    'product_specs': p.product_specs,
+                    'product_ll_type': p.product_ll_type,
+                    'order_ll_type': p.order_ll_type,
+                    'sale_ok': p.sale_ok,
+                    'purchase_ok': p.purchase_ok,
+                    'can_be_expensed': p.can_be_expensed,
+                    'type': p.type,
+                    # 'routes': [{'modules': rou.modules, 'name': rou.name} for rou in p_routes]
+                    'routes': [rou.module + '.' + rou.name for rou in p_routes]
+                })
             return {
                 'code': 1,
                 'exist_codes': products_list,

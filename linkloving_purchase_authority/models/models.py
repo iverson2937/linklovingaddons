@@ -13,8 +13,8 @@ class AccountPaymentRegister(models.Model):
     state = fields.Selection([
         ('draft', u'Draft'),
         ('posted', u'Post'),
-        ('confirm', u'Confirm'),
         ('manager', '经理审核'),
+        ('confirm', u'Confirm'),
         ('done', u'Done'),
         ('cancel', u'Cancel')
     ], 'State', readonly=True, default='draft', track_visibility='onchange')
