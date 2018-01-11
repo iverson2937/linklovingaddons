@@ -8,8 +8,19 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <field name="reject" invisble="1"/>
+                    <group>
+                        <field name="remark" attrs="{'required':[('reject','=',True)]}"/>
+                    </group>
 
 
+                    <footer>
+                        <button name="confirm_submit" string="确定submit" type="object"
+                                attrs="{'invisible':[('reject','=',True)]}" class="oe_highlight"/>
+                        <button name="confirm_reject" string="确定reject" type="object" class="oe_highlight"
+                                attrs="{'invisible':[('reject','=',False)]}"/>
+                        <button string="_Cancel" class="btn-default" special="cancel"/>
+                    </footer>
                 </sheet>
             </form>
         </field>

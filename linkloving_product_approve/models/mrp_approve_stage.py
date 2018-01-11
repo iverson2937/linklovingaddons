@@ -42,7 +42,7 @@ class MrpApprovalRecord(models.Model):
     template_stage_id = fields.Many2one(
         'mrp.approve.stage', 'Approval Stage',
         related='approval_template_id.stage_id', store=True)
-    eco_stage_id = fields.Many2one(
+    stage_id = fields.Many2one(
         'mrp.approve.stage', 'ECO Stage',
         related='product_id.stage_id', store=True)
     status = fields.Selection([
@@ -51,6 +51,7 @@ class MrpApprovalRecord(models.Model):
         ('approved', 'Approved'),
         ('rejected', 'Rejected')], string='Status',
         default='none', required=True)
+    active = fields.Boolean(default=True)
 
     remark = fields.Char(string='备注')
     # is_approved = fields.Boolean(
@@ -80,6 +81,7 @@ class MrpApproveStage(models.Model):
     _description = 'Engineering Change Order Stage'
     _order = "sequence, id"
     _fold_name = 'folded'
+    type_id = fields.Many2one('mrp.approve.type')
 
     name = fields.Char('Name', required=True)
     # 拒绝回退的状态
