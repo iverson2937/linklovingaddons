@@ -34,8 +34,8 @@ class MultisupplierinfoTax(models.TransientModel):
     def _default_tax_id(self):
         user = self.env.user
         return self.env['account.tax'].search(
-                [('company_id', '=', user.company_id.id), ('type_tax_use', '=', 'purchase'),
-                 ('amount_type', '=', 'percent'), ('account_id', '!=', False)], limit=1, order='amount asc')
+            [('company_id', '=', user.company_id.id), ('type_tax_use', '=', 'purchase'),
+             ('amount_type', '=', 'percent'), ('account_id', '!=', False)], limit=1, order='amount asc')
 
     tax_id = fields.Many2one('account.tax', default=_default_tax_id, domain=[('type_tax_use', '=', 'purchase')])
 
@@ -55,6 +55,8 @@ class MultisupplierinfoTax(models.TransientModel):
                 "sticky": False
             }
         }
+
+
 class SetPriceToProduct(models.TransientModel):
     _name = 'price.to.product'
 
@@ -73,6 +75,8 @@ class SetPriceToProduct(models.TransientModel):
                 "sticky": False
             }
         }
+
+
 class ProductTemplate(models.Model):
     _name = 'product.template'
     _inherit = 'product.template'
@@ -105,8 +109,10 @@ class ProductTemplate(models.Model):
                 if line.product_id.bom_ids:
                     level = True
 
-                total_cost = line.product_id.pre_cost_cal(raise_exception=False)
-                material_cost = line.product_id.get_material_cost()
+                product_cost = line.product_id.pre_cost_cal(raise_exception=False)
+                total_cost = product_cost * line.product_qty
+                product_material_cost = line.product_id.get_material_cost()
+                material_cost = product_material_cost * line.product_qty
                 man_cost = total_cost - material_cost
                 res.update({
                     'product_id': line.product_id.product_tmpl_id.id,
@@ -209,6 +215,7 @@ class ProductProductExtend(models.Model):
         """
         buy_route_id = self.env.ref("purchase.route_warehouse0_buy")
         man_route_id = self.env.ref("mrp.route_warehouse0_manufacture")
+
         def _calc_price(bom):
             total_price = 0.0000
             result, result2 = bom.explode(self, 1)

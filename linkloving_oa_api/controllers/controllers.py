@@ -1250,6 +1250,7 @@ class LinklovingOAApi(http.Controller):
 
 
             # 客户详情页
+
     @http.route('/linkloving_oa_api/customer_details', type='json', auth="none", csrf=False, cors='*')
     def customer_details(self, *kw):
         id = request.jsonrequest.get("id")
@@ -2315,37 +2316,51 @@ class LinklovingOAApi(http.Controller):
         #     })
         return data
 
-    #获取所有需处理
+    # 获取所有需处理
     @http.route('/linkloving_oa_api/get_all_need_do', type='json', auth="none", csrf=False, cors='*')
-    def get_all_need_do(self,*kw):
+    def get_all_need_do(self, *kw):
         user_id = request.jsonrequest.get('user_id')
+        is_plus = request.jsonrequest.get('is_plus')
         domain_bx = [("to_approve_id", '=', user_id),
-                  ('state', 'in', ('submit', 'manager1_approve', 'manager2_approve'))]
+                     ('state', 'in', ('submit', 'manager1_approve', 'manager2_approve'))]
         bx_lists = request.env["hr.expense.sheet"].sudo().search(domain_bx,
-                                                                       order='id desc')
+                                                                 order='id desc')
         bx = 0
         for bx_list in bx_lists:
             bx = bx + 1
 
         domain_sg = [("to_approve_id", '=', user_id)]
         sg_lists = request.env['hr.purchase.apply'].sudo().search(domain_sg,
-                                                                order='id desc')
+                                                                  order='id desc')
         sg = 0
         for sg_list in sg_lists:
             sg = sg + 1
 
         domain_zz = [("to_approve_id", '=', user_id)]
         zz_lists = request.env['account.employee.payment'].sudo().search(domain_zz,
-                                                                       order='id desc')
+                                                                         order='id desc')
         zz = 0
         for zz_list in zz_lists:
             zz = zz + 1
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"bx":bx,"sg":sg,"zz":zz})
 
+        py = 0
+        if is_plus:
+            domain_py = [('payment_type', '=', 1), ('state', '=', "manager")]
+            payment_list = request.env['account.payment.register'].sudo().search(domain_py,
+                                                                                 order='id desc')
+            for payment in payment_list:
+                py = py + 1
+        else:
+            domain_py = [('payment_type', '=', 1), ('state', '=', "posted")]
+            payment_list = request.env['account.payment.register'].sudo().search(domain_py,
+                                                                                 order='id desc')
+            for payment in payment_list:
+                py = py + 1
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"bx": bx, "sg": sg, "zz": zz, "py": py})
 
-    #付款审核列表
+    # 付款审核列表
     @http.route('/linkloving_oa_api/get_payment_request_list', type='json', auth="none", csrf=False, cors='*')
-    def get_payment_request_list(self,*kw):
+    def get_payment_request_list(self, *kw):
         limit = request.jsonrequest.get("limit")
         offset = request.jsonrequest.get("offset")
         user_id = request.jsonrequest.get('user_id')
@@ -2354,9 +2369,9 @@ class LinklovingOAApi(http.Controller):
         if type == "me":
             domain = [('payment_type', '=', 1), ('create_uid', '=', user_id)]
             payment_list = request.env['account.payment.register'].sudo().search(domain,
-                                                              limit=limit,
-                                                              offset=offset,
-                                                              order='id desc')
+                                                                                 limit=limit,
+                                                                                 offset=offset,
+                                                                                 order='id desc')
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=self.change_payment_list_to_json(payment_list))
         elif type == "wait_me":
@@ -2369,30 +2384,30 @@ class LinklovingOAApi(http.Controller):
             else:
                 domain = [('payment_type', '=', 1), ('state', '=', "posted")]
                 payment_list = request.env['account.payment.register'].sudo().search(domain,
+                                                                                     limit=limit,
+                                                                                     offset=offset,
+                                                                                     order='id desc')
+            return JsonResponse.send_response(STATUS_CODE_OK,
+                                              res_data=self.change_payment_list_to_json(payment_list))
+
+        elif type == "already":
+            domain = [('payment_type', '=', 1), '|', ('approve_id', '=', user_id), ('manager_id', '=', user_id)]
+            payment_list = request.env['account.payment.register'].sudo().search(domain,
                                                                                  limit=limit,
                                                                                  offset=offset,
                                                                                  order='id desc')
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=self.change_payment_list_to_json(payment_list))
 
-        elif type == "already":
-            domain = [('payment_type', '=', 1), '|', ('approve_id', '=', user_id), ('manager_id', '=', user_id), ("state", 'in', ["confirm", "register","manager"])]
-            payment_list = request.env['account.payment.register'].sudo().search(domain,
-                                                                             limit=limit,
-                                                                             offset=offset,
-                                                                             order='id desc')
-            return JsonResponse.send_response(STATUS_CODE_OK,
-                                                 res_data=self.change_payment_list_to_json(payment_list))
-
-    #获取详情
+    # 获取详情
     @http.route('/linkloving_oa_api/get_bill_detail', type='json', auth="none", csrf=False, cors='*')
-    def get_bill_detail(self,*kw):
+    def get_bill_detail(self, *kw):
         payment_id = request.jsonrequest.get("payment_id")
         payment = request.env['account.invoice'].sudo().browse(payment_id)
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=self.invoice_lines_detail(payment))
 
-    #付款申请经理审核
+    # 付款申请经理审核
     @http.route('/linkloving_oa_api/manager_confirm', type='json', auth="none", csrf=False, cors='*')
     def manager_confirm(self, *kw):
         payment_id = request.jsonrequest.get("payment_id")
@@ -2401,7 +2416,7 @@ class LinklovingOAApi(http.Controller):
         payment.sudo(user_id).to_manager_approve()
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
 
-    #付款申请拒绝
+    # 付款申请拒绝
     @http.route('/linkloving_oa_api/reject_payment', type='json', auth="none", csrf=False, cors='*')
     def reject_payment(self, *kw):
         reject_reason = request.jsonrequest.get("reject_reason")
@@ -2420,30 +2435,32 @@ class LinklovingOAApi(http.Controller):
         payment.sudo(user_id).confirm()
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
 
-    #搜索付款申请单
+    # 搜索付款申请单
     @http.route('/linkloving_oa_api/search_payment', type='json', auth="none", csrf=False, cors='*')
-    def search_payment(self,*kw):
+    def search_payment(self, *kw):
         search_name = request.jsonrequest.get("search_name")
         search_type = request.jsonrequest.get("search_type")
         payment_type = request.jsonrequest.get("payment_type")
         user_id = request.jsonrequest.get("user_id")
+        search_domain = request.jsonrequest.get("search_domain")
         if payment_type == "me":
-            payment = request.env['account.payment.register'].sudo().search([('payment_type', '=', 1), ('create_uid', '=', user_id), ('name', 'ilike', search_name)],
-                                                          order='id desc')
+            payment = request.env['account.payment.register'].sudo().search(
+                [('payment_type', '=', 1), ('create_uid', '=', user_id), (search_domain, 'ilike', search_name)],
+                order='id desc')
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=self.change_payment_list_to_json(payment))
         elif payment_type == "wait_me":
             if (search_type == "need"):
                 payment = request.env['account.payment.register'].sudo().search(
                     [('payment_type', '=', 1), ('state', '=', "manager"),
-                     ('name', 'ilike', search_name)],
+                     (search_domain, 'ilike', search_name)],
                     order='id desc')
                 return JsonResponse.send_response(STATUS_CODE_OK,
                                                   res_data=self.change_payment_list_to_json(payment))
             else:
                 payment = request.env['account.payment.register'].sudo().search(
                     [('payment_type', '=', 1), ('state', '=', "posted"),
-                     ('name', 'ilike', search_name)],
+                     (search_domain, 'ilike', search_name)],
                     order='id desc')
                 return JsonResponse.send_response(STATUS_CODE_OK,
                                                   res_data=self.change_payment_list_to_json(payment))
@@ -2451,7 +2468,7 @@ class LinklovingOAApi(http.Controller):
         else:
             payment = request.env['account.payment.register'].sudo().search(
                 [('payment_type', '=', 1), ('approve_id', '=', user_id), ("state", 'in', ["confirm", "register"]),
-                 ('name', 'ilike', search_name)],
+                 (search_domain, 'ilike', search_name)],
                 order='id desc')
             return JsonResponse.send_response(STATUS_CODE_OK,
                                               res_data=self.change_payment_list_to_json(payment))
@@ -2460,26 +2477,26 @@ class LinklovingOAApi(http.Controller):
         data = []
         for obj in objs:
             data.append({
-                "id":obj.id,
+                "id": obj.id,
                 "create_person_ava": LinklovingGetImageUrl.get_img_url(obj.create_uid.self.user_ids.id,
                                                                        "res.users", "image_medium"),
-                "name":obj.display_name,
-                "create_uid":self.get_department(obj.create_uid),
-                "create_date":obj.create_date,
-                "parent_id":self.get_department(obj.partner_id),
-                "state":obj.state,
-                "approve_id":self.get_department(obj.approve_id),
-                "amount":obj.amount,
+                "name": obj.display_name,
+                "create_uid": self.get_department(obj.create_uid),
+                "create_date": obj.create_date,
+                "parent_id": self.get_department(obj.partner_id),
+                "state": obj.state,
+                "approve_id": self.get_department(obj.approve_id),
+                "amount": obj.amount,
                 'message_ids': self.get_apply_record(obj.message_ids),
-                'receive_date':obj.receive_date,
-                'bank_id':obj.bank_id.bank_name or '',
-                'remark':obj.remark or '',
-                'state':obj.state,
-                'invoice_ids':self.change_invoice_ids_to_json(obj.invoice_ids),
+                'receive_date': obj.receive_date,
+                'bank_id': obj.bank_id.bank_name or '',
+                'remark': obj.remark or '',
+                'state': obj.state,
+                'invoice_ids': self.change_invoice_ids_to_json(obj.invoice_ids),
             })
         return data
 
-    def change_invoice_ids_to_json(self,objs):
+    def change_invoice_ids_to_json(self, objs):
         data = []
         for obj in objs:
             tax = ""
@@ -2487,15 +2504,15 @@ class LinklovingOAApi(http.Controller):
                 tax = obj.tax_line_ids[0].name or ''
 
             data.append({
-                "id":obj.id,
-                'origin':obj.origin,
-                'number':obj.number,
-                'date_invoice':obj.date_invoice or '', #开票日期
-                'date_due':obj.date_due or '',
-                'tax':tax,
-                'amount_total':obj.amount_total,
-                'amount_total_o':obj.amount_total_o,
-                'state':obj.state,
+                "id": obj.id,
+                'origin': obj.origin,
+                'number': obj.number or '暂无单号',
+                'date_invoice': obj.date_invoice or '',  # 开票日期
+                'date_due': obj.date_due or '',
+                'tax': tax,
+                'amount_total': obj.amount_total,
+                'amount_total_o': obj.residual,  # 待支付
+                'state': obj.state,
                 # 'amount_untaxed':obj.amount_untaxed,#未税金额
                 # 'amount_tax':obj.amount_tax,#税金
                 # 'residual':obj.residual,#截止金额
@@ -2503,19 +2520,19 @@ class LinklovingOAApi(http.Controller):
             })
         return data
 
-    def invoice_lines_detail(self,obj):
+    def invoice_lines_detail(self, obj):
         data = {
-            'invoice_line_ids':self.invoice_line_ids(obj.invoice_line_ids),
-            'order_line':self.change_order_line(obj.order_line),
-            'amount_untaxed':obj.amount_untaxed,#未税金额
-            'amount_tax':obj.amount_tax,#税金
-            'amount_total':obj.amount_total,#总计
-            'residual':obj.residual,#截止金额
-            'move_name':obj.move_name,
+            'invoice_line_ids': self.invoice_line_ids(obj.invoice_line_ids),
+            'order_line': self.change_order_line(obj.order_line),
+            'amount_untaxed': obj.amount_untaxed,  # 未税金额
+            'amount_tax': obj.amount_tax,  # 税金
+            'amount_total': obj.amount_total,  # 总计
+            'residual': obj.residual,  # 截止金额
+            'move_name': obj.move_name,
         }
         return data
 
-    def all_invoice_data(self,objs):
+    def all_invoice_data(self, objs):
         data = []
         for obj in objs:
             data.append({
@@ -2530,39 +2547,38 @@ class LinklovingOAApi(http.Controller):
                 'amount_untaxed': obj.amount_untaxed,  # 未税金额
                 'amount_tax': obj.amount_tax,  # 税金
                 'residual': obj.residual,  # 截止金额
-                'invoice_line_ids':self.invoice_line_ids(obj.invoice_line_ids),
-                'order_line':self.change_order_line(obj.order_line),
+                'invoice_line_ids': self.invoice_line_ids(obj.invoice_line_ids),
+                'order_line': self.change_order_line(obj.order_line),
             })
         return data
 
-    def invoice_line_ids(self,objs):
+    def invoice_line_ids(self, objs):
         data = []
         for obj in objs:
             data.append({
-                "origin":obj.origin,
-                "name":obj.name,
-                "price_subtotal":obj.price_subtotal,#金额
-                "price_unit":obj.price_unit,#单价
-                "quantity":obj.quantity,
-                "invoice_line_tax_ids":obj.invoice_line_tax_ids[0].display_name or '',
-                "account_id":obj.account_id.display_name,
+                "origin": obj.origin,
+                "name": obj.name,
+                "price_subtotal": obj.price_subtotal,  # 金额
+                "price_unit": obj.price_unit,  # 单价
+                "quantity": obj.quantity,
+                "invoice_line_tax_ids": obj.invoice_line_tax_ids[0].display_name or '',
+                "account_id": obj.account_id.display_name,
             })
         return data
 
-    def change_order_line(self,objs):
+    def change_order_line(self, objs):
         data = []
         for obj in objs:
             data.append({
-                "po_name":obj.order_id.display_name,
-                "name":obj.name,
-                "qty_invoiced":obj.qty_invoiced,#开单数量
-                "qty_received":obj.qty_received,#接受数量
-                "product_qty":obj.product_qty,#下单数量
-                "price_unit":obj.price_unit,
-                "price_subtotal":obj.price_subtotal,
+                "po_name": obj.order_id.display_name,
+                "name": obj.name,
+                "qty_invoiced": obj.qty_invoiced,  # 开单数量
+                "qty_received": obj.qty_received,  # 接受数量
+                "product_qty": obj.product_qty,  # 下单数量
+                "price_unit": obj.price_unit,
+                "price_subtotal": obj.price_subtotal,
             })
         return data
-
 
     #  XD 我的请假
     @http.route('/linkloving_oa_api/get_leavelist', type='json', auth="none", csrf=False, cors='*')
@@ -2780,7 +2796,8 @@ class LinklovingOAApi(http.Controller):
                     'unit_amount': float(p.get('unit_amount')),  # 金额
                     'name': p.get('name'),  # 费用说明
                     'employee_id': p.get('employee_id'),
-                    'account_id': request.env["product.product"].sudo().browse(p.get('product_id')).property_account_expense_id.id,
+                    'account_id': request.env["product.product"].sudo().browse(
+                        p.get('product_id')).property_account_expense_id.id,
                     'tax_ids': (
                         [(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [account_tax.id])]),
                     'description': p.get('remarks') or '',
@@ -2798,7 +2815,8 @@ class LinklovingOAApi(http.Controller):
                     'unit_amount': float(p.get('unit_amount')),  # 金额
                     'name': p.get('name'),  # 费用说明
                     'employee_id': p.get('employee_id'),
-                    'account_id': request.env["product.product"].sudo().browse(p.get('product_id')).property_account_expense_id.id,
+                    'account_id': request.env["product.product"].sudo().browse(
+                        p.get('product_id')).property_account_expense_id.id,
                     'tax_ids': (
                         [(6, 0, [p.get('taxid')])] if type(p.get('taxid')) == int else [(6, 0, [account_tax.id])]),
                     'description': p.get('remarks') or '',
@@ -3308,3 +3326,83 @@ class LinklovingOAApi(http.Controller):
                 for blog_tag_bean in blog_blog.blog_tag_ids],
         }
         return data
+
+    # 库存调整审批
+    @http.route('/linkloving_oa_api/get_wait_meapply', type='json', auth='none', csrf=False, cors='*')
+    def get_wait_meapply(self, **kw):
+        state = request.jsonrequest.get('state')
+        searchText = request.jsonrequest.get('searchText')
+        type = request.jsonrequest.get('type')
+        user_id = request.jsonrequest.get('user_id')
+
+
+        domain = [('state', '=', state)]
+        if 'searchText' in request.jsonrequest.keys():
+            if type == 1:
+                domain.append(('name', 'ilike', searchText))
+            elif type == 2:
+                create_list = [author.id for author in
+                               request.env['res.users'].search([('name', 'ilike', searchText)])]
+                domain.append(('create_uid', 'in', create_list))
+
+        waitList = request.env['stock.inventory'].sudo(user_id).search(domain)
+        wait_list = []
+        for waitBean in waitList:
+            wait_list.append(self.changeWait_to_json(waitBean))
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=wait_list)
+
+    @classmethod
+    def changeWait_to_json(cls, waitBean):
+        data = {
+            'name': waitBean.name,
+            'id': waitBean.id,
+            'date': waitBean.date,
+            'state': waitBean.state,
+            'filter': waitBean.filter,
+            'remark': waitBean.remark if waitBean.remark else '',
+            'location_name': waitBean.location_id.display_name,
+            'create_name': waitBean.create_uid.name,
+            'isShow': waitBean.user_has_groups('base.group_erp_manager'),
+            'create_img': LinklovingGetImageUrl.get_img_url(waitBean.sudo().create_uid.self.user_ids.id,
+                                                            "res.users",
+                                                            "image_medium"),
+            'line_ids': [
+                {
+                    'line_id': line.id,
+                    'theoretical_qty': line.theoretical_qty,
+                    'product_qty': line.product_qty,
+                    'product_name': line.product_id.display_name,
+                    'location_id': line.location_id.id if line.location_id.id else 0,
+                    'location_name': line.location_name if line.location_name else '',
+                }
+                for line in waitBean.line_ids],
+            'move_ids': [
+                {
+                    'name': move.product_id.display_name,
+                    'product_qty': move.product_qty,
+                    'location_id_from': move.location_id.display_name,
+                    'location_dest_id': move.location_dest_id.display_name,
+                }
+                for move in waitBean.move_ids]
+        }
+        return data
+
+    # 库存调整改变状态
+    @http.route('/linkloving_oa_api/change_wait_meapply', type='json', auth='none', csrf=False, cors='*')
+    def change_wait_meapply(self, **kw):
+        new_state = request.jsonrequest.get('state')
+        id = request.jsonrequest.get('id')
+        user_id = request.jsonrequest.get('user_id')
+
+        kucun_json = request.env['stock.inventory'].sudo(user_id).browse(id)
+        if 'state' in request.jsonrequest.keys():
+            if new_state == 'done':
+                # kucun_json.write({'state': new_state})
+                kucun_json.action_done()
+                waitBean = self.changeWait_to_json(kucun_json)
+                return JsonResponse.send_response(STATUS_CODE_OK,
+                                                  res_data=waitBean)
+            elif new_state == 'draft':
+                kucun_json.unlink()
+                return JsonResponse.send_response(STATUS_CODE_OK)

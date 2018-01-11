@@ -37,6 +37,10 @@ odoo.define('linkloving_core.TreeView', function (require) {
 
 
                         $("tbody tr:first td").each(function (index) {
+                            if($(this).hasClass('o_list_number')){
+                                $("thead tr:first th").eq(index).css("text-align","center")
+                            }
+
                             $("thead tr:first th").eq(index).css("width", index == 0 ? $(this).width() / $("thead tr:first").width() * 100 + '%' : $(this).width() + 10);
                         })
                         if ($("tbody tr:first").hasClass("add_empty_tr")) {

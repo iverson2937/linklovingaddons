@@ -1088,9 +1088,9 @@ class ReviewProcessWizard(models.TransientModel):
                 self.bom_id.action_send_to_review()
 
             if self.bom_id.review_id.who_review_now.id == self.env.user.partner_id.id:
-
-                if not self.need_sop:
-                    raise UserError(u'请选择是否需要SOP文件')
+                #
+                # if not self.need_sop:
+                #     raise UserError(u'请选择是否需要SOP文件')
                 if not self.bom_id.review_id:  # 如果没审核过
                     self.bom_id.action_send_to_review()
                 self.bom_id.need_sop = self.need_sop
