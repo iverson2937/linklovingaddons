@@ -14,6 +14,7 @@ class ProductTemplate(models.Model):
 
     state = fields.Selection([
         ('draft', u'草稿'),
+        ('progress', u'审核中'),
         ('done', u'正式'),
     ], default='draft')
     user_can_approve = fields.Boolean(
@@ -22,6 +23,13 @@ class ProductTemplate(models.Model):
     user_can_reject = fields.Boolean(
         'Can Reject', compute='_compute_user_can_reject',
         help='Technical field to check if reject by current user is possible')
+
+    require_user_ids = fields.Many2many('res.users', compute='_compute_require_user_ids')
+
+    @api.multi
+    def _compute_require_user_ids(self):
+        for p in self:
+            pass
 
     @api.multi
     def _compute_user_can_approve(self):
