@@ -179,7 +179,7 @@
 
 
                         </div>
-                        <div t-if="o.state not in ['approve','post','done']">
+                        <div t-if="o.state not in ['approve','post','done']" class="page">
                             <div class="text-center">
                                 <strong>只有审核通过的单据才能被打印</strong>
                             </div>
