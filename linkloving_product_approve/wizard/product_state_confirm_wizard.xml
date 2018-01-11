@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <record id="product_state_confirm_wizard_form" model="ir.ui.view">
+        <field name="name">product.state.confirm.wizard.form</field>
+        <field name="model">product.state.confirm.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

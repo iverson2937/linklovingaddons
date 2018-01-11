@@ -7,6 +7,7 @@ class MrpApprovelType(models.Model):
     _name = 'mrp.approve.type'
     name = fields.Char(string='名称')
     description = fields.Char(string='描述')
+    template_ids = fields.One2many('mrp.approval.template', 'type_id')
 
 
 class MrpApprovalTemplate(models.Model):
@@ -18,6 +19,7 @@ class MrpApprovalTemplate(models.Model):
         ('engineer', '工程'),
         ('final', '终审')
     ])
+    type_id = fields.Many2one('mrp.approve.type')
     sequence = fields.Integer()
     stage_id = fields.Many2one('mrp.approve.stage')
     user_ids = fields.Many2many('res.users')
@@ -82,6 +84,7 @@ class MrpApproveStage(models.Model):
     name = fields.Char('Name', required=True)
     # 拒绝回退的状态
     pre_stage_id = fields.Many2one('mrp.approve.stage')
+    # 下一阶状态
     next_stage_id = fields.Many2one('mrp.approve.stage')
     sequence = fields.Integer('Sequence', default=0)
     # folded = fields.Boolean('Folded in kanban view')
