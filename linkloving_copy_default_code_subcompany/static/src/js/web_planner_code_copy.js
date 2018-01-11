@@ -29,6 +29,18 @@ odoo.define('linkloving_copy_default_code_subcompany.code_copy', function (requi
             if (add_button) {
                 this.$buttons.on('click', '.o_button_copy_code', this.execute_copy_code_action.bind(this));
             }
+            if (self.model == 'product.template') {
+                self.session.user_has_group('linkloving_copy_default_code_subcompany.group_copy_code')
+                    .then(function (has_group) {
+                        if (has_group) {
+                            $('.o_button_copy_code').show();
+                        }
+                        else {
+                            $('.o_button_copy_code').hide();
+                        }
+                    });
+            }
+
         },
         execute_copy_code_action: function (ev) {
             var self = this;

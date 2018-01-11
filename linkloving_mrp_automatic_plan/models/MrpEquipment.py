@@ -385,7 +385,7 @@ class MrpBomExtend(models.Model):
 
     theory_factor = fields.Integer(string=u'理论 人数/设备数', require=True)
 
-    amount_of_producer = fields.Integer(string=u'人数/设备数')
+    amount_of_producer = fields.Integer(string=u'生产速度')
     produced_speed_per_hour = fields.Float(string=u'个/每小时')
     produced_speed_per_sec_new = fields.Float(compute='_compute_produced_speed_per_sec_new')
 
