@@ -179,7 +179,7 @@ class PurchaseOrderLine(models.Model):
         for line in self:
             line.to_ship_qty = line.product_qty - line.qty_received
 
-    to_ship_qty = fields.Float(compute=_compute_to_ship_qty, string='待出货数量')
+    to_ship_qty = fields.Float(compute=_compute_to_ship_qty, string='欠货数量')
 
     @api.depends('product_qty', 'qty_received', 'qty_to_invoice', 'qty_invoiced')
     def _compute_shipping_status(self):
@@ -277,7 +277,7 @@ class PurchaseOrderLine(models.Model):
         return result
 
     invoice_status = fields.Selection([
-        ('no', u'待出货'),
+        ('no', u'没有要对账的'),
         ('to invoice', u'待对账'),
         ('invoiced', u'已对账完成'),
     ], string=u'对账单状态', compute='_get_invoiced', store=True, readonly=True, copy=False, default='no')

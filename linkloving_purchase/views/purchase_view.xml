@@ -311,7 +311,7 @@
                     <field name="qty_received" string="已接收数量"/>
                     <field name="to_ship_qty"/>
                     <field name="qty_invoiced" string="开单数量"/>
-                    <field name="shipping_status"/>
+                    <field name="shipping_status" string="出货状态"/>
                     <field name="invoice_status"/>
                 </xpath>
             </field>
