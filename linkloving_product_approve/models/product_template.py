@@ -11,6 +11,11 @@ class ProductTemplate(models.Model):
         default=lambda self: self.env['mrp.approve.stage'].search(
             [('type_id', '=', self._context.get('default_type_id'))], limit=1))
 
+    state = fields.Selection([
+        ('draft', u'草稿'),
+        ('done', u'正式'),
+    ], default='draft')
+
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
         """ Read group customization in order to display all the stages of the ECO type
@@ -26,24 +31,34 @@ class ProductTemplate(models.Model):
     @api.multi
     def approve(self):
         for product in self:
-            for approval in product.approval_ids.filtered(lambda app: app.template_stage_id == self.stage_id):
-                if self.env.user in approval.approval_template_id.user_ids:
-                    approval.write({
-                        'status': 'approved',
-                        'user_id': self.env.uid
-                    })
+            self.env['mrp.approval.record'].create({
+                'product_id': product.id,
+                # 'approval_template_id': '',
+                'status': 'approved',
+                'user_id': self.env.uid
+            })
 
     @api.multi
-    def _create_approvals(self):
+    def reject(self):
         for product in self:
-            for approval_template in product.stage_id.approval_template_ids:
-                self.env['mrp.approval.record'].create({
-                    'product_id': product.id,
-                    'approval_template_id': approval_template.id,
-                })
+            self.env['mrp.approval.record'].create({
+                'product_id': product.id,
+                # 'approval_template_id': '',
+                'status': 'rejected',
+                'user_id': self.env.uid
+            })
 
-    @api.model
-    def create(self, vals):
-        product = super(ProductTemplate, self).create(vals)
-        product._create_approvals()
-        return product
+    # @api.multi
+    # def _create_approvals(self):
+    #     for product in self:
+    #         for approval_template in product.stage_id.approval_template_ids:
+    #             self.env['mrp.approval.record'].create({
+    #                 'product_id': product.id,
+    #                 'approval_template_id': approval_template.id,
+    #             })
+    #
+    # @api.model
+    # def create(self, vals):
+    #     product = super(ProductTemplate, self).create(vals)
+    #     product._create_approvals()
+    #     return product

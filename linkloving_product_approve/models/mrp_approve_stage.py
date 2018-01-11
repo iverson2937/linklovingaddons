@@ -80,6 +80,9 @@ class MrpApproveStage(models.Model):
     _fold_name = 'folded'
 
     name = fields.Char('Name', required=True)
+    # 拒绝回退的状态
+    pre_stage_id = fields.Many2one('mrp.approve.stage')
+    next_stage_id = fields.Many2one('mrp.approve.stage')
     sequence = fields.Integer('Sequence', default=0)
     # folded = fields.Boolean('Folded in kanban view')
     allow_apply_change = fields.Boolean('Final Stage')
