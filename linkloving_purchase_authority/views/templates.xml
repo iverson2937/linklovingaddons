@@ -51,7 +51,7 @@
     <menuitem id="payment_register_apply_to_approve"
               action="action_payment_register_to_approve"
               parent="linkloving_purchase.menu_purchase_account_invoice"
-              groups="linkloving_purchase_authority.purchase_manager_plus"
+              groups=""
               sequence="1" name="待审核付款申请"/>
 </odoo>
 
