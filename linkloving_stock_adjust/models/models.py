@@ -56,7 +56,7 @@ class StockTransfer(models.Model):
     def confirm_transfer(self):
         inv_id = self.env['stock.inventory'].create({
             'filter': 'partial',
-            'name': '_'.join([self.name, self.remark]),
+            'name': '_'.join([self.name, self.remark]) if self.remark else self.name,
             'reason': self.remark,
             'remark': 'transfer'
         })
