@@ -58,7 +58,7 @@ class MrpBomExtend(models.Model):
     @api.multi
     def _compute_expense_cost(self):
         for bom in self:
-            bom.expense_cost = bom.produced_spend_per_pcs * bom.process_id.hourly_wage / 3600
+            bom.expense_cost = bom.produced_speed_per_sec_new * bom.process_id.hourly_wage / 3600
 
     expense_cost = fields.Float(compute='_compute_expense_cost', string=u'人工成本')
 

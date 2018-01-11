@@ -227,7 +227,7 @@ class ProductProductExtend(models.Model):
                     total_price += sub_price
 
             if total_price >= 0:
-                expense_cost = bom.produced_spend_per_pcs * bom.process_id.hourly_wage / 3600
+                expense_cost = bom.produced_speed_per_sec_new * bom.process_id.hourly_wage / 3600
                 total_price = bom.product_uom_id._compute_price(total_price / bom.product_qty,
                                                                 self.uom_id) + expense_cost
             return total_price

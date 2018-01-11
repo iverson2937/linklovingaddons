@@ -124,13 +124,14 @@ FIELDS = ["name", "alia_name", "product_tmpl_id", "state", "product_qty",
           'theo_spent_time', 'availability', 'product_order_type', 'production_line_id',
           'produce_speed_factor', 'theory_factor', 'real_theo_spent_time', 'ava_spent_time',
           'prepare_material_state', 'material_state', 'last_mo_time', 'total_time', 'total_ava_time']
+
 class ProcurementOrderExtend(models.Model):
     _inherit = 'procurement.order'
 
     def _prepare_mo_vals(self, bom):
         res = super(ProcurementOrderExtend, self)._prepare_mo_vals(bom)
 
-        produced_spend = res["product_qty"] * bom.produced_spend_per_pcs + bom.prepare_time
+        produced_spend = res["product_qty"] * bom.produced_speed_per_sec_new + bom.prepare_time
         planned_datetime = self._get_date_planned_from_date_planned()
         # date_planned_end = fields.Datetime.to_string(planned_datetime)
         new_datetime = datetime(planned_datetime.year,
@@ -384,6 +385,26 @@ class MrpBomExtend(models.Model):
 
     theory_factor = fields.Integer(string=u'理论 人数/设备数', require=True)
 
+    amount_of_producer = fields.Integer(string=u'人数/设备数')
+    produced_speed_per_hour = fields.Float(string=u'个/每小时')
+    produced_speed_per_sec_new = fields.Float(compute='_compute_produced_speed_per_sec_new')
+
+    @api.multi
+    def _compute_produced_speed_per_sec_new(self):
+        for bom in self:
+            if bom.produced_speed_per_hour != 0:
+                bom.produced_speed_per_sec_new = bom.amount_of_producer * 3600 / bom.produced_speed_per_hour
+            else:
+                bom.produced_speed_per_sec_new = 0
+
+    @api.onchange("amount_of_producer", "produced_speed_per_hour")
+    def _onchange_produced_speed_per_sec_new(self):
+        if self.produced_speed_per_hour != 0:
+            self.produced_speed_per_sec_new = self.amount_of_producer * 3600 / self.produced_speed_per_hour
+        else:
+            self.produced_speed_per_sec_new = 0
+
+
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 
@@ -453,14 +474,14 @@ class MrpProductionExtend(models.Model):
         for mo in self:
             mo.theo_spent_time = round(
                     (
-                    mo.product_qty * mo.bom_id.produced_spend_per_pcs + mo.bom_id.prepare_time * mo.production_line_id.compute_speed_factor(
+                        mo.product_qty * mo.bom_id.produced_speed_per_sec_new + mo.bom_id.prepare_time * mo.production_line_id.compute_speed_factor(
                         mo.bom_id)) / 3600, 2)
 
     @api.multi
     def _compute_real_theo_spent_time(self):
         for mo in self:
             mo.real_theo_spent_time = round(
-                (mo.product_qty * mo.bom_id.produced_spend_per_pcs + mo.bom_id.prepare_time) / 3600, 2)
+                    (mo.product_qty * mo.bom_id.produced_speed_per_sec_new + mo.bom_id.prepare_time) / 3600, 2)
 
     @api.multi
     def _compute_ava_spent_time(self):
