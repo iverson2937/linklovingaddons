@@ -200,7 +200,7 @@
                     <label for="amount_of_producer"/>
                     <div class="o_row">
                         <field name="amount_of_producer" required="1"/>
-                        <span>个人, 每小时产出</span>
+                        <span>个人/台设备, 每小时产出</span>
                         <field name="produced_speed_per_hour" required="1" string="每小时产出数量"/>
                         <span>个</span>
                     </div>
