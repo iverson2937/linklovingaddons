@@ -2356,8 +2356,13 @@ class LinklovingOAApi(http.Controller):
                                                                                  order='id desc')
             for payment in payment_list:
                 py = py + 1
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"bx": bx, "sg": sg, "zz": zz, "py": py})
 
+        kc = 0
+        waitList = request.env['stock.inventory'].sudo(user_id).search([('state', '=', 'confirm')])
+        for wait_list in waitList:
+            kc = kc + 1
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"bx": bx, "sg": sg, "zz": zz, "py": py, "kc": kc})
     # 付款审核列表
     @http.route('/linkloving_oa_api/get_payment_request_list', type='json', auth="none", csrf=False, cors='*')
     def get_payment_request_list(self, *kw):
@@ -2904,6 +2909,8 @@ class LinklovingOAApi(http.Controller):
             confirm_approve.manager2_approve()
         elif type == "manager2_approve":
             confirm_approve.manager3_approve()
+        elif type == "manager3_approve":
+            confirm_approve.approve()
         if reason:
             confirm_approve.create_message_post(reason)
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
