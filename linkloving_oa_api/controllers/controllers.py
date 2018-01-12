@@ -2356,6 +2356,7 @@ class LinklovingOAApi(http.Controller):
                                                                                  order='id desc')
             for payment in payment_list:
                 py = py + 1
+
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"bx": bx, "sg": sg, "zz": zz, "py": py})
 
     # 付款审核列表
@@ -2904,6 +2905,8 @@ class LinklovingOAApi(http.Controller):
             confirm_approve.manager2_approve()
         elif type == "manager2_approve":
             confirm_approve.manager3_approve()
+        elif type == "manager3_approve":
+            confirm_approve.approve()
         if reason:
             confirm_approve.create_message_post(reason)
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
