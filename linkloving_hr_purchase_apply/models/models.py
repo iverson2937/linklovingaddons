@@ -221,6 +221,7 @@ class PurchaseApplyLine(models.Model):
         ('submit', u'提交'),
         ('manager1_approve', u'一级审核'),
         ('manager2_approve', u'二级审核'),
+        ('manager3_approve', u'三级审核'),
         ('cancel', u'取消'),
         ('approve', u'批准'),
         ('done', u'完成')
