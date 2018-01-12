@@ -389,6 +389,16 @@ class MrpBomExtend(models.Model):
     produced_speed_per_hour = fields.Float(string=u'个/每小时')
     produced_speed_per_sec_new = fields.Float(compute='_compute_produced_speed_per_sec_new')
 
+    piecework_unit_price = fields.Float(string=u'计件单价(元/个)')
+    produced_cost = fields.Float(string=u'生产成本',
+                                 compute='_compute_produced_cost',
+                                 digits=dp.get_precision('Product Unit of Measure'))
+
+    @api.multi
+    def _compute_produced_cost(self):
+        for bom in self:
+            bom.produced_cost = bom.produced_speed_per_sec_new * bom.process_id.hourly_wage / 3600
+
     @api.multi
     def _compute_produced_speed_per_sec_new(self):
         for bom in self:

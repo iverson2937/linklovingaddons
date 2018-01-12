@@ -195,6 +195,7 @@
                 <xpath expr="//field[@name='prepare_time']" position="after">
                     <field name="produce_speed_factor"/>
                     <field name="theory_factor"/>
+                    <field name="piecework_unit_price"/>
                 </xpath>
                 <xpath expr="//field[@name='cost']" position="after">
                     <label for="amount_of_producer"/>
@@ -205,7 +206,7 @@
                         <span>个</span>
                     </div>
                         <field name="produced_speed_per_sec_new" readonly="1" string="换算后的生产速度(秒/每个)"/>
-
+                    <field name="produced_cost"/>
                 </xpath>
 
             </field>
