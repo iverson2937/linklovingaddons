@@ -64,6 +64,39 @@ class ProductProduct(models.Model):
                     reorder_rule.write(reorder_vals)
 
 
+class SaleOrderExtend(models.Model):
+    _inherit = "sale.order"
+
+    temp_no = fields.Boolean()
+
+
+def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
+    """
+    :param year: 年份，默认是本年，可传int或str类型
+    :param month: 月份，默认是本月，可传int或str类型
+    :return: firstDay: 当月的第一天，datetime.date类型
+              lastDay: 当月的最后一天，datetime.date类型
+    """
+    if year:
+        year = int(year)
+    else:
+        year = datetime.date.today().year
+    if not period:
+        period = 0
+    if month <= 0:
+        year = year - 1
+        month = 12 + month
+        # 获取当月第一天的星期和当月的总天数
+    firstDayWeekDay, monthRange = calendar.monthrange(year, month)
+
+    # 获取当月的第一天
+    firstDay = datetime.date(year=year, month=month - period, day=1).strftime('%Y-%m-%d')
+
+    lastDay = datetime.date(year=year, month=month, day=monthRange).strftime('%Y-%m-%d')
+    print firstDay, lastDay
+
+    return firstDay, lastDay
+
 class CreateOrderPointWizard(models.TransientModel):
     _name = "create.order.point"
 
@@ -570,36 +603,16 @@ class CreateOrderPointWizard(models.TransientModel):
             raise UserError(res_error.get("data").get("message"))
         return res_json
 
-
-def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
-    """
-    :param year: 年份，默认是本年，可传int或str类型
-    :param month: 月份，默认是本月，可传int或str类型
-    :return: firstDay: 当月的第一天，datetime.date类型
-              lastDay: 当月的最后一天，datetime.date类型
-    """
-    if year:
-        year = int(year)
-    else:
-        year = datetime.date.today().year
-    if not period:
-        period = 0
-    if month <= 0:
-        year = year - 1
-        month = 12 + month
-        # 获取当月第一天的星期和当月的总天数
-    firstDayWeekDay, monthRange = calendar.monthrange(year, month)
-
-    # 获取当月的第一天
-    firstDay = datetime.date(year=year, month=month - period, day=1).strftime('%Y-%m-%d')
-
-    lastDay = datetime.date(year=year, month=month, day=monthRange).strftime('%Y-%m-%d')
-    print firstDay, lastDay
-
-    return firstDay, lastDay
-
-
-class SaleOrderExtend(models.Model):
-    _inherit = "sale.order"
-
-    temp_no = fields.Boolean()
+    def huansuan_speed(self):
+        """
+        换算生产速度 ---
+        :return:
+        """
+        for bom in self.env["mrp.bom"].search([]):
+            if bom.produced_spend_per_pcs != 0:
+                if bom.produce_speed_factor == 'human':
+                    bom.amount_of_producer = bom.theory_factor if bom.theory_factor else 1
+                    bom.produced_speed_per_hour = bom.amount_of_producer * 3600 / bom.produced_spend_per_pcs
+                else:
+                    bom.amount_of_producer = 1
+                    bom.produced_speed_per_hour = bom.amount_of_producer * 3600 / bom.produced_spend_per_pcs

@@ -1814,7 +1814,7 @@ class LinklovingOAApi(http.Controller):
             'state': obj.state or '',
             'line_ids': self.get_shengou_detail_lists(obj.line_ids),
             'message_ids': self.get_apply_record(obj.message_ids),
-            "to_approve_id": obj.to_approve_id.name,
+            "to_approve_id": obj.to_approve_id.name or '',
         }
 
     def get_shengou_detail_lists(self, obj):
@@ -2356,7 +2356,17 @@ class LinklovingOAApi(http.Controller):
                                                                                  order='id desc')
             for payment in payment_list:
                 py = py + 1
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"bx": bx, "sg": sg, "zz": zz, "py": py})
+
+        kc = 0
+        if 'is_kucun' in request.jsonrequest.keys():
+            if request.jsonrequest.get('is_kucun'):
+                waitList = request.env['stock.inventory'].sudo(user_id).search([('state', '=', 'confirm')])
+                for wait_list in waitList:
+                    kc = kc + 1
+            else:
+                kc = 0
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"bx": bx, "sg": sg, "zz": zz, "py": py, "kc": kc})
 
     # 付款审核列表
     @http.route('/linkloving_oa_api/get_payment_request_list', type='json', auth="none", csrf=False, cors='*')
@@ -2876,7 +2886,7 @@ class LinklovingOAApi(http.Controller):
                 "state": orderDetail.state,
                 "total_amount": orderDetail.total_amount,
                 "id": orderDetail.id,
-                "to_approve_id": orderDetail.to_approve_id.name,
+                "to_approve_id": orderDetail.to_approve_id.name or '',
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
@@ -2904,6 +2914,8 @@ class LinklovingOAApi(http.Controller):
             confirm_approve.manager2_approve()
         elif type == "manager2_approve":
             confirm_approve.manager3_approve()
+        elif type == "manager3_approve":
+            confirm_approve.approve()
         if reason:
             confirm_approve.create_message_post(reason)
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
