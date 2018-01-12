@@ -86,6 +86,8 @@ class ProductTemplate(models.Model):
                         break
             if change_to_next and product.stage_id.next_stage_id:
                 product.stage_id = product.stage_id.next_stage_id.id
+            if product.stage_id.final_stage:
+                product.state = 'done'
 
     @api.multi
     def reject(self):
