@@ -96,7 +96,7 @@ class ProductTemplate(models.Model):
                     'line_id': line.id,
                     'origin': line.order_id.origin,
                     'qty': line.product_qty,
-                    'date_planned': line.date_planned,
+                    'date_planned': line.order_id.handle_date,
                     'state': PURCHASE_TYPE[line.order_id.state],
                     'status_light': line.order_id.status_light,
                     'remark': line.order_id.remark if line.order_id.remark else ''
