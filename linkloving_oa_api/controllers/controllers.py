@@ -1814,7 +1814,7 @@ class LinklovingOAApi(http.Controller):
             'state': obj.state or '',
             'line_ids': self.get_shengou_detail_lists(obj.line_ids),
             'message_ids': self.get_apply_record(obj.message_ids),
-            "to_approve_id": obj.to_approve_id.name,
+            "to_approve_id": obj.to_approve_id.name or '',
         }
 
     def get_shengou_detail_lists(self, obj):
@@ -1855,6 +1855,7 @@ class LinklovingOAApi(http.Controller):
 
     def change_employee_to_json(self, obj_d):
         return {
+            'id':obj_d.user_id.id ,
             'name': obj_d.name_related,  # 姓名
             'work_phone': obj_d.work_phone or '',  # 办公电话
             'mobile_phone': obj_d.mobile_phone or '',  # 办公手机
@@ -2881,7 +2882,7 @@ class LinklovingOAApi(http.Controller):
                 "state": orderDetail.state,
                 "total_amount": orderDetail.total_amount,
                 "id": orderDetail.id,
-                "to_approve_id": orderDetail.to_approve_id.name,
+                "to_approve_id": orderDetail.to_approve_id.name or '',
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
