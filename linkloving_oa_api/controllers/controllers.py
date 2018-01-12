@@ -2357,6 +2357,13 @@ class LinklovingOAApi(http.Controller):
             for payment in payment_list:
                 py = py + 1
 
+        kc = 0
+        waitList = request.env['stock.inventory'].sudo(user_id).search([('state', '=', 'confirm')])
+        for wait_list in waitList:
+            kc = kc + 1
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"bx": bx, "sg": sg, "zz": zz, "py": py, "kc": kc})
+
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"bx": bx, "sg": sg, "zz": zz, "py": py})
 
     # 付款审核列表
