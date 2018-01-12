@@ -1869,6 +1869,12 @@ class MrpQcFeedBack(models.Model):
     def action_post_inventory(self):
         if self.state == 'alredy_post_inventory':
             raise UserError(u"该单据已入库,无需再重复入库")
+        if self.production_id.outside_type in ['outsourcing',
+                                               'all_outside'] and not self.production_id.mo_invoice_count:
+            if self.production_id.outside_type == 'outsourcing':
+                self.production_id._prepare_invoice(self.production_id.outsourcing_supplier_id, self.qty_produced)
+            else:
+                self.production_id._prepare_invoice(self.production_id.supplier_id, self.qty_produced)
         mrp_product_produce = self.env['mrp.product.produce'].with_context({'active_id': self.production_id.id})
         produce = mrp_product_produce.create({
             'product_qty': self.qty_produced,
@@ -1877,12 +1883,7 @@ class MrpQcFeedBack(models.Model):
             'product_id': self.production_id.product_id.id,
         })
         produce.do_produce_and_post_inventory()
-        if self.production_id.outside_type in ['outsourcing',
-                                               'all_outside'] and not self.production_id.mo_invoice_count:
-            if self.production_id.outside_type == 'outsourcing':
-                self.production_id._prepare_invoice(self.production_id.outsourcing_supplier_id, self.qty_produced)
-            else:
-                self.production_id._prepare_invoice(self.production_id.supplier_id, self.qty_produced)
+
         self.state = "alredy_post_inventory"
 
     def action_back_state(self):
