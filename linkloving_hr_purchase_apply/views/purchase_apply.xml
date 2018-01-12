@@ -37,6 +37,10 @@
                                 groups="hr_expense.group_hr_expense_user"
                                 attrs="{'invisible':['|',('is_show','=',False),('state','!=','manager2_approve')]}"
                                 class="oe_highlight"/>
+                        <button name="approve" string="审核通过" type="object"
+                                groups="hr_expense.group_hr_expense_user"
+                                attrs="{'invisible':['|',('is_show','=',False),('state','!=','manager3_approve')]}"
+                                class="oe_highlight"/>
                         <button name="%(hr_purchase_apply_refuse_wizard_action)d"
                                 states="draft,submit,manager1_approve,manager2_approve,manager3_approve,approve"
                                 string="拒绝" type="action" groups="base.group_user"/>
