@@ -1855,7 +1855,6 @@ class LinklovingOAApi(http.Controller):
 
     def change_employee_to_json(self, obj_d):
         return {
-            'id':obj_d.user_id.id ,
             'name': obj_d.name_related,  # 姓名
             'work_phone': obj_d.work_phone or '',  # 办公电话
             'mobile_phone': obj_d.mobile_phone or '',  # 办公手机
@@ -2359,11 +2358,16 @@ class LinklovingOAApi(http.Controller):
                 py = py + 1
 
         kc = 0
-        waitList = request.env['stock.inventory'].sudo(user_id).search([('state', '=', 'confirm')])
-        for wait_list in waitList:
-            kc = kc + 1
+        if 'is_kucun' in request.jsonrequest.keys():
+            if request.jsonrequest.get('is_kucun'):
+                waitList = request.env['stock.inventory'].sudo(user_id).search([('state', '=', 'confirm')])
+                for wait_list in waitList:
+                    kc = kc + 1
+            else:
+                kc = 0
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"bx": bx, "sg": sg, "zz": zz, "py": py, "kc": kc})
+
     # 付款审核列表
     @http.route('/linkloving_oa_api/get_payment_request_list', type='json', auth="none", csrf=False, cors='*')
     def get_payment_request_list(self, *kw):
