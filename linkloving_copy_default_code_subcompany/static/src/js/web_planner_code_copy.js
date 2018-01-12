@@ -29,6 +29,18 @@ odoo.define('linkloving_copy_default_code_subcompany.code_copy', function (requi
             if (add_button) {
                 this.$buttons.on('click', '.o_button_copy_code', this.execute_copy_code_action.bind(this));
             }
+            if (self.model == 'product.template') {
+                self.session.user_has_group('linkloving_copy_default_code_subcompany.group_copy_code')
+                    .then(function (has_group) {
+                        if (has_group) {
+                            $('.o_button_copy_code').show();
+                        }
+                        else {
+                            $('.o_button_copy_code').hide();
+                        }
+                    });
+            }
+
         },
         execute_copy_code_action: function (ev) {
             var self = this;
@@ -51,7 +63,7 @@ odoo.define('linkloving_copy_default_code_subcompany.code_copy', function (requi
             var self = this;
             this._super.apply(this, arguments);
             if (self.planner['planner_application'] == 'planner_copy_code') {
-                self.$(':radio').on('click', function (ev) {
+                self.$('input[name="optionsRadios"]').on('click', function (ev) {
                     console.log(ev);
                     var copyinfo = {
                         company: parseInt($(ev.target).val()),
@@ -59,6 +71,10 @@ odoo.define('linkloving_copy_default_code_subcompany.code_copy', function (requi
                     self.copy_info = copyinfo;
 
                 });
+                self.$('input[name="product_type"]').on('click', function (ev) {
+                    self.product_type = $(ev.target).val();
+                })
+
                 self.$('.btn_check_codes').on('click', function (ev) {
                     framework.blockUI();
                     self.$(".exist_code_table_area").html('');//
@@ -77,31 +93,33 @@ odoo.define('linkloving_copy_default_code_subcompany.code_copy', function (requi
                             } else {
                                 self.do_warn("警告", res.error_msg)
                             }
-                        }).done(function () {
+                        }).always(function () {
                         framework.unblockUI();
                     });
                 });
                 self.$('.btn_import').prop('disabled', true);
                 self.$('.btn_import').on('click', function (ev) {
                     if (!self.validate_codes) {
-                        self.do_warn("警告", "请先检查");
+                        self.do_warn("警告", "请先检查料号");
                         return;
                     }
                     framework.blockUI();
                     new Model("web.planner")
-                        .call('import_codes', [self.planner.id, self.validate_codes])
+                        .call('import_codes', [self.planner.id, self.validate_codes, self.product_type])
                         .then(function (res) {
                             console.log(res);
                             framework.unblockUI();
                             self.$('#success_count').html(res[0].success_count);
+                            //if(res[0].not_found_list && res[0].not_found_list.length > 0){
                             self.initCategNotFoundTable(res[0].not_found_list);
+                            //}
 
                             var next_page_id = self.get_next_page_id();
                             if (next_page_id) {
                                 self._display_page(next_page_id);
                             }
 
-                        }).done(function () {
+                        }).always(function () {
                         framework.unblockUI();
                     });
                 });
@@ -151,11 +169,11 @@ odoo.define('linkloving_copy_default_code_subcompany.code_copy', function (requi
             var self = this;
             var columns = [[{
                 field: 'title',
-                title: '子系统的料号信息',
+                title: '有效的料号信息',
                 halign: "center",
                 align: "center",
                 'class': "font_35_header",
-                colspan: 5,
+                colspan: 7,
             }], [{
                 field: 'seq',
                 title: '序号',
@@ -171,6 +189,12 @@ odoo.define('linkloving_copy_default_code_subcompany.code_copy', function (requi
             }, {
                 field: 'product_specs',
                 title: '规格',
+            }, {
+                field: 'inner_code',
+                title: '国内简称',
+            }, {
+                field: 'inner_spec',
+                title: '国内型号',
             }, {
                 field: 'category_name',
                 title: '产品类别',
@@ -296,6 +320,10 @@ odoo.define('linkloving_copy_default_code_subcompany.code_copy', function (requi
                         console.log(self.copy_info);
                     } else {
                         self.do_warn("警告", "请输入料号");
+                        return;
+                    }
+                    if (!self.product_type) {
+                        self.do_warn("警告", "请选择产品类型");
                         return;
                     }
 

@@ -43,7 +43,7 @@
 
     <t t-name="tmpl_copy_code">
         <t t-if="widget.model == 'product.template'">
-            <button  type="button" class="btn btn-sm btn-primary o_button_copy_code">
+            <button  type="button" class="btn btn-sm btn-primary o_button_copy_code" style="display:none;">
                 从子系统复制料号
             </button>
         </t>
