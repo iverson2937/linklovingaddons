@@ -2363,9 +2363,6 @@ class LinklovingOAApi(http.Controller):
             kc = kc + 1
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"bx": bx, "sg": sg, "zz": zz, "py": py, "kc": kc})
-
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"bx": bx, "sg": sg, "zz": zz, "py": py})
-
     # 付款审核列表
     @http.route('/linkloving_oa_api/get_payment_request_list', type='json', auth="none", csrf=False, cors='*')
     def get_payment_request_list(self, *kw):
