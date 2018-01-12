@@ -10,6 +10,13 @@ class MrpApprovelType(models.Model):
     approve_type = fields.Selection([
         ('product', '产品')
     ])
+    stage_ids = fields.One2many('mrp.approve.stage', 'type_id')
+    required_user_ids = fields.Many2many('res.users', compute='get_required_user_ids')
+
+    @api.multi
+    def get_required_user_ids(self):
+        for approve_type in self:
+            approve_type.required_user_ids = approve_type.mapped('stage_ids.required_user_ids')
 
 
 class MrpApprovalTemplate(models.Model):
@@ -84,6 +91,13 @@ class MrpApproveStage(models.Model):
     _order = "sequence, id"
     _fold_name = 'folded'
     type_id = fields.Many2one('mrp.approve.type')
+
+    required_user_ids = fields.Many2many('res.users', compute='get_required_user_ids')
+
+    @api.multi
+    def get_required_user_ids(self):
+        for stage in self:
+            stage.required_user_ids = stage.mapped('approval_template_ids.user_ids')
 
     name = fields.Char('Name', required=True)
     # 拒绝回退的状态

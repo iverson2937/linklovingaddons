@@ -46,6 +46,7 @@
                             <field name="approve_type"/>
                             <field name="description"/>
                         </group>
+                        <field name="required_user_ids"/>
                     </group>
                 </sheet>
             </form>

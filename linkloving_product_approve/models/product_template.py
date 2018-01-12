@@ -23,12 +23,7 @@ class ProductTemplate(models.Model):
         'Can Reject', compute='_compute_user_can_reject',
         help='Technical field to check if reject by current user is possible')
 
-    require_user_ids = fields.Many2many('res.users', compute='_compute_require_user_ids')
-
-    @api.multi
-    def _compute_require_user_ids(self):
-        for p in self:
-            pass
+    require_user_ids = fields.Many2many('res.users')
 
     @api.multi
     def _compute_user_can_approve(self):
@@ -57,11 +52,13 @@ class ProductTemplate(models.Model):
     def submit(self):
         for product in self:
             product.state = 'progress'
+            # 提交修改stage 添加待审核人
             type_id = self.env['mrp.approve.type'].search([('approve_type', '=', 'product')], limit=1)
             if type_id:
                 stage_id = self.env['mrp.approve.stage'].search([('type_id', '=', type_id.id)])[0]
 
             product.stage_id = stage_id.id
+            product.require_user_ids = [(6, 0, stage_id.require_user_ids)]
 
     @api.multi
     def approve(self):
@@ -75,8 +72,11 @@ class ProductTemplate(models.Model):
                         'status': 'approved',
                         'user_id': self.env.uid
                     })
+                    # 审核过待审核中取消
+                    product.require_user_ids = (3, app.user_ids)
+
             change_to_next = True
-                # 如果阶段所需要的审核都通过了就到下一个阶段
+            # 如果阶段所需要的审核都通过了就到下一个阶段
             if product.approval_record_ids:
                 for template_id in product.stage_id.approve_template_ids:
                     approvals = product.approval_record_ids.filtered(
@@ -108,6 +108,7 @@ class ProductTemplate(models.Model):
             else:
                 product.stage_id = False
                 product.state = 'draft'
+                product.require_user_ids = (5)
 
     def to_approve(self):
 
