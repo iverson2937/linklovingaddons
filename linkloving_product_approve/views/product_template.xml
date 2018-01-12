@@ -10,16 +10,84 @@
                 <header position="inside">
                     <field name="user_can_approve" invisible="0"/>
                     <field name="user_can_reject" invisible="0"/>
+                    <button string="提交审核" name="to_approve" type="object" class="oe_highlight"
+                            context="{'default_submit':True}"
+                            states="draft"
+                            attrs=""/>
 
                     <button string="Approve" name="to_approve" type="object" class="oe_highlight"
-                            attrs="{'invisible': [('user_can_approve', '=', False)]}"/>
+                            context="{'default_approve':True}"
+                            attrs="{'invisible': ['|',('user_can_approve', '=', False),('state','!=','progress')]}"/>
                     <button string="Reject" name="to_approve" type="object" class="oe_highlight"
                             context="{'default_reject':True}"
-                            attrs="{'invisible': [('user_can_reject', '=', False)]}"/>
+                            attrs="{'invisible': ['|',('user_can_reject', '=', False),('state','!=','progress')]}"/>
                     <field name="stage_id" widget="statusbar" readonly="1"/>
+                    <field name="state" invisible="1"/>
                 </header>
             </field>
         </record>
+
+
+        <record id="action_my_product_template_draft" model="ir.actions.act_window">
+            <field name="name">待提交</field>
+            <field name="res_model">product.template</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('create_uid','=',uid),('state','=','draft')]</field>
+            <field name="help" type="html">
+                <p>
+
+                </p>
+            </field>
+        </record>
+        <record id="action_my_product_not_in_draft" model="ir.actions.act_window">
+            <field name="name">已提交</field>
+            <field name="res_model">product.template</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('create_uid','=',uid),('state','!=','draft')]</field>
+            <field name="help" type="html">
+                <p>
+
+                </p>
+            </field>
+        </record>
+
+        <record id="action_my_product_in_progress" model="ir.actions.act_window">
+            <field name="name">待审核</field>
+            <field name="res_model">product.template</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('create_uid','=',uid),('state','=','progress')]</field>
+            <field name="help" type="html">
+                <p>
+
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem id="menu_mrp_approve_product_root"
+                  parent="linkloving_approval.ll_approval_root"
+                  name="物料审核"/>
+        <menuitem id="menu_mrp_my_product"
+                  parent="menu_mrp_approve_product_root"
+                  name="我的单据"/>
+        <menuitem id="menu_mrp_approve_product_draft"
+                  parent="menu_mrp_my_product"
+                  action="action_my_product_template_draft"
+                  name="待提交"/>
+        <menuitem id="menu_mrp_approve_product_not_draft"
+                  parent="menu_mrp_my_product"
+                  action="action_my_product_not_in_draft"
+                  name="已提交"/>
+
+        <menuitem id="menu_mrp_approve_product_root_to_approve"
+                  parent="menu_mrp_my_product"
+                  name="待审核"/>
+        <menuitem id="menu_mrp_approve_product_root_approved"
+                  parent="menu_mrp_my_product"
+                  name="已审核"/>
 
 
     </data>

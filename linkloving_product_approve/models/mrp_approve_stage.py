@@ -7,7 +7,9 @@ class MrpApprovelType(models.Model):
     _name = 'mrp.approve.type'
     name = fields.Char(string='名称')
     description = fields.Char(string='描述')
-    template_ids = fields.One2many('mrp.approval.template', 'type_id')
+    approve_type = fields.Selection([
+        ('product', '产品')
+    ])
 
 
 class MrpApprovalTemplate(models.Model):

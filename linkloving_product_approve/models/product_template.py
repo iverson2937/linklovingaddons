@@ -8,9 +8,8 @@ class ProductTemplate(models.Model):
 
     approval_record_ids = fields.One2many('mrp.approval.record', 'product_id')
     stage_id = fields.Many2one(
-        'mrp.approve.stage', 'Stage', copy=False,
-        group_expand='_read_group_stage_ids',
-        default=lambda self: self.env['mrp.approve.stage'].search([], limit=1))
+        'mrp.approve.stage', 'Stage', copy=False, group_expand='_read_group_stage_ids'
+    )
 
     state = fields.Selection([
         ('draft', u'草稿'),
@@ -47,11 +46,22 @@ class ProductTemplate(models.Model):
         in the Kanban view, even if there is no ECO in that stage
         """
         search_domain = []
-        if self._context.get('default_type_id'):
-            search_domain = [('type_id', '=', self._context['default_type_id'])]
+        type_id = self.env['mrp.approve.type'].search([('approve_type', '=', 'product')], limited=1)
+        if type_id:
+            search_domain = [('type_id', '=', type_id.id)]
 
         stage_ids = stages._search(search_domain, order=order, access_rights_uid=SUPERUSER_ID)
         return stages.browse(stage_ids)
+
+    @api.multi
+    def submit(self):
+        for product in self:
+            product.state = 'progress'
+            type_id = self.env['mrp.approve.type'].search([('approve_type', '=', 'product')], limit=1)
+            if type_id:
+                stage_id = self.env['mrp.approve.stage'].search([('type_id', '=', type_id.id)])[0]
+
+            product.stage_id = stage_id.id
 
     @api.multi
     def approve(self):
@@ -65,7 +75,7 @@ class ProductTemplate(models.Model):
                         'status': 'approved',
                         'user_id': self.env.uid
                     })
-                change_to_next = True
+            change_to_next = True
                 # 如果阶段所需要的审核都通过了就到下一个阶段
             if product.approval_record_ids:
                 for template_id in product.stage_id.approve_template_ids:
@@ -95,6 +105,9 @@ class ProductTemplate(models.Model):
 
             if product.stage_id.pre_stage_id:
                 product.stage_id = product.stage_id.pre_stage_id.id
+            else:
+                product.stage_id = False
+                product.state = 'draft'
 
     def to_approve(self):
 
