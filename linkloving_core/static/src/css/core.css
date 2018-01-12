@@ -190,3 +190,8 @@
     min-width: calc(100%/3 - 15px)!important;
     -webkit-flex:0 0 calc(100%/3 - 15px)!important;
 }
+
+.open > .dropdown-menu{
+    max-height: 500px;
+    overflow-y: scroll;
+}
