@@ -426,8 +426,11 @@
             <field name="model">mrp.production</field>
             <field name="inherit_id" ref="linkloving_mrp_extend.linkloving_mrp_production_form_view"/>
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='process_id']" position="after">
+                    <field name="production_line_id"
+                           attrs="{'readonly': [('state', 'not in', ['confirmed', 'draft', 'waiting_material'])]}"/>
+                </xpath>
                 <xpath expr="//button[@name='button_waiting_material']" position="replace">
-                    <field name="production_line_id" invisible="1"/>
                     <field name="planned_start_backup" invisible="1"/>
                     <button type="formview_dialog"
                             name="get_formview"
