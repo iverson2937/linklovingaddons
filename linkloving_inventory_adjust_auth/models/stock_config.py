@@ -8,6 +8,7 @@ class StockSettings(models.TransientModel):
 
     raw_material_approve_id = fields.Many2one('res.users', string=u'原材料调整审核人')
     finished_material_approve_id = fields.Many2one('res.users', string=u'制成品调整审核人')
+    stock_adjust_account_id = fields.Many2one('account.account')
 
     @api.multi
     def set_raw_material_approve_id_defaults(self):
@@ -18,3 +19,8 @@ class StockSettings(models.TransientModel):
     def set_finished_material_approve_id_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'stock.config.settings', 'finished_material_approve_id', self.finished_material_approve_id.id)
+
+    @api.multi
+    def set_stock_adjust_account_id_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'stock.config.settings', 'stock_adjust_account_id', self.stock_adjust_account_id.id)
