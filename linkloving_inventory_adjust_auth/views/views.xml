@@ -16,5 +16,21 @@
             </field>
         </record>
 
+        <record id="stock_view_inventory_form_inherit" model="ir.ui.view">
+            <field name="name">partner.vendor.form</field>
+            <field name="model">stock.inventory</field>
+            <field name="inherit_id" ref="stock.view_inventory_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//button[@name='action_done']" position="attributes">
+                    <field name="can_approve" invisible="1"/>
+                    <attribute name="states"></attribute>
+                    <attribute name="attrs">{'invisible':[('state','=','confirm'),('can_approve','=',True)]}</attribute>
+                </xpath>
+
+
+            </field>
+        </record>
+
     </data>
 </openerp>
