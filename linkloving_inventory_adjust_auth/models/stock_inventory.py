@@ -17,7 +17,7 @@ class StockInventoryInherit(models.Model):
             types = list(set(product_ll_types))
             if len(types) > 1 and 'raw material' in types:
                 raise UserError('原材料和制成品不可以同时盘点')
-            elif len(types) == 1 and types[0] == 'raw_material':
+            elif len(types) == 1 and types[0] == 'raw material':
                 s.to_approve_id = self.env['ir.values'].sudo().get_default(
                     'stock.config.settings', 'raw_material_approve_id')
             else:
