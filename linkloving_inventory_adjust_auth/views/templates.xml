@@ -19,11 +19,11 @@
                         </group>
                     </group>
 
-                    <group string="库存盘亏盘盈科目">
-                        <group>
-                            <field name="stock_adjust_account_id" options="{'no_create':True}"/>
-                        </group>
-                    </group>
+                    <!--<group string="库存盘亏盘盈科目">-->
+                    <!--<group>-->
+                    <!--<field name="stock_adjust_account_id" options="{'no_create':True}"/>-->
+                    <!--</group>-->
+                    <!--</group>-->
 
                 </xpath>
 
