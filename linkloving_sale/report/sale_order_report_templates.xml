@@ -75,7 +75,7 @@
                             <tr>
                                 <th>No</th>
                                 <!--<t t-if="not page[0]['is_domestic']">-->
-                                    <th>产品</th>
+                                <th>产品</th>
                                 <t t-if="page[0]['is_domestic']">
                                     <th>国内简称</th>
                                 </t>
@@ -117,14 +117,14 @@
                                         <td>
                                             <span t-field="l.name"/>
                                         </td>
-                                        <td t-if="l.inner_code">
+                                        <td t-if="l.inner_code and page[0]['is_domestic']">
                                             <span t-field="l.inner_code"/>
                                         </td>
-                                        <td t-if="l.inner_spec">
+                                        <td t-if="l.inner_spec and page[0]['is_domestic']">
                                             <span t-field="l.inner_spec"/>
                                         </td>
                                         <!--<td>-->
-                                            <!--<span t-field="l.product_id.product_specs"/>-->
+                                        <!--<span t-field="l.product_id.product_specs"/>-->
                                         <!--</td>-->
                                         <td class="text-right">
                                             <span t-field="l.product_uom_qty"/>
