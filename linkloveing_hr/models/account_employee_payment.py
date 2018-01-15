@@ -3,6 +3,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from odoo.tools import float_is_zero
 from .hr_expense_sheet import create_remark_comment
+from odoo.addons import decimal_precision as dp
 
 
 class AccountEmployeePayment(models.Model):
@@ -105,7 +106,8 @@ class AccountEmployeePayment(models.Model):
             used_payment = sum([payment.amount for payment in self.payment_line_ids])
             self.pre_payment_reminding = self.amount - used_payment - self.payment_return
 
-    pre_payment_reminding = fields.Float(string='Available amount', compute=_get_pre_payment_reminding_balance)
+    pre_payment_reminding = fields.Float(string='Available amount', compute=_get_pre_payment_reminding_balance,
+                                         digits=dp.get_precision('Payroll'))
 
     @api.one
     @api.depends('state', 'return_ids', 'payment_line_ids')
