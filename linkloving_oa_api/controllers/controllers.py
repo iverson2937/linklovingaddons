@@ -203,7 +203,7 @@ class LinklovingOAApi(http.Controller):
                      'qty_invoiced': order_line.qty_invoiced,  # 开单数量
                      'qty_received': order_line.qty_received,  # 已接收数量
                      'price_tax': order_line.taxes_id.name,  # 税金
-                     'shipping_rate': (order_line.qty_received * 100 / order_line.product_qty),
+                     'shipping_rate': (order_line.qty_received * 100 / order_line.product_qty) if order_line.product_qty  else 0,
                      'id': order_line.order_id.product_id.id
                      }
                 )
