@@ -32,13 +32,14 @@ class StockPickingExtend(models.Model):
     def action_view_timesheet_order_ids(self):
 
         return {
-            'name': u'分配二次加工负责人',
+            'name': u'工时单',
             'type': 'ir.actions.act_window',
             'res_model': 'linkloving.timesheet.order',
             'view_mode': 'tree,form',
             'view_type': 'form',
-            'res_id': self.timesheet_order_ids.ids,
+            # 'res_id': self.timesheet_order_ids.ids,
             'target': 'current',
+            'domain': [('id', 'in', self.timesheet_order_ids.ids)]
         }
 
     def action_assign_secondary_operation_partner(self):
@@ -67,7 +68,6 @@ class StockPickingExtend(models.Model):
                 # 'views': [(False, 'tree'), (self.env.ref('linkloving_timesheets.view_assign_timesheet_partner').id, 'form')],
                 'target': 'new',
                 'res_id': res_id.id,
-                'context': {'default_picking_id': self.id}
             }
         else:
             raise UserError(u'未找到对应的工时单')
@@ -106,8 +106,12 @@ class linkloving_timesheet_order(models.Model):
         if self.state == 'draft':
             self.state = 'running'
             self.picking_id.state = "secondary_operation"
+        else:
+            raise UserError(u'状态异常')
 
     def action_assign_hour_spent(self):
         if self.state == 'running':
             self.state = 'done'
             self.picking_id.state = "secondary_operation_done"
+        else:
+            raise UserError(u'状态异常')
