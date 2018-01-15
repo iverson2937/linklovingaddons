@@ -47,6 +47,28 @@
                         如有多个料号,请输入 "回车" 分割
                         <div class="alert alert-info info_icon" role="alert">
                             <div class="form-group">
+                                <laber class="col-md-3 control-label">导入的产品类型:</laber>
+                                <div class="col-md-9">
+                                    <label class="radio_right">
+                                        <input type="radio" name="product_type"
+                                               value="stocking">
+                                            <span class="span_right">
+                                                备货制(按生产需求单生成)
+                                            </span>
+                                        </input>
+                                    </label>
+
+                                    <label class="radio_right">
+                                        <input type="radio" name="product_type"
+                                               value="ordering">
+                                            <span class="span_right">
+                                                订单制(按订单生成)
+                                            </span>
+                                        </input>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label class="col-md-3 control-label">请输入料号:</label>
                                 <div class="col-md-9">
                                     <textarea name="default_code" id="default_codes"
@@ -61,6 +83,7 @@
                     <t t-set="page_title">检查料号是否存在</t>
                     <t t-set="hide_mark_as_done" t-value="True"/>
                     <note>点击 "<strong>开始检查</strong>" 按钮后,将会显示检查结果,并可以点击 "<strong>开始导入</strong>" 按钮,导入有效的料号信息.
+                        导入时只会从 "有效的料号信息" 表中导入.
                     </note>
 
                     <div class="o_planner_intro px10_margin_top">

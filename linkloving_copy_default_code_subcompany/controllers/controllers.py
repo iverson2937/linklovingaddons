@@ -33,9 +33,9 @@ class LinklovingCopyDefaultCodeSubcompany(http.Controller):
                 products_list.append({
                     'id': p.id,
                     'name': p.name,
-                    'default_code': p.default_code,
-                    'category_name': p.categ_id.full_name_get(),
-                    'product_specs': p.product_specs,
+                    'default_code': p.default_code or '',
+                    'category_name': p.categ_id.full_name_get() or '',
+                    'product_specs': p.product_specs or '',
                     'product_ll_type': p.product_ll_type,
                     'order_ll_type': p.order_ll_type,
                     'sale_ok': p.sale_ok,
@@ -43,7 +43,9 @@ class LinklovingCopyDefaultCodeSubcompany(http.Controller):
                     'can_be_expensed': p.can_be_expensed,
                     'type': p.type,
                     # 'routes': [{'modules': rou.modules, 'name': rou.name} for rou in p_routes]
-                    'routes': [rou.module + '.' + rou.name for rou in p_routes]
+                    'routes': [rou.module + '.' + rou.name for rou in p_routes],
+                    'inner_code': p.inner_code or '',
+                    'inner_spec': p.inner_spec or '',
                 })
             return {
                 'code': 1,

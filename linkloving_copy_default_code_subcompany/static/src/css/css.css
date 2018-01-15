@@ -21,3 +21,7 @@
 .px10_margin_top {
     margin-top: 10px;
 }
+
+#PlannerDialog .modal-dialog .modal-content .modal-body .o_planner_content_wrapper .o_planner_page .info_icon {
+    min-height: 8em !important;
+}

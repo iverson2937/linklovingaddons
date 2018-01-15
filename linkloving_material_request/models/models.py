@@ -293,7 +293,8 @@ class MaterialRequest(models.Model):
         picking_out_material = self.env['stock.picking'].create({
             'picking_type_id': self.env.ref('stock.picking_type_out').id,
             'location_id': self.env.ref('stock.stock_location_stock').id,
-            'location_dest_id': self.env.ref('linkloving_eb.stock_location_eb_transfer_2').id,
+            'location_dest_id': self.env.ref(
+                'linkloving_material_request.stock_location_engineering_material_request').id,
             'material_request_order_id': self.id,
             'origin': self.name,
             'note': self.remark,
@@ -309,7 +310,8 @@ class MaterialRequest(models.Model):
                 'product_uom': one_line.product_id.uom_id.id,
                 'picking_id': picking_out_material.id,
                 'location_id': self.env.ref('stock.stock_location_stock').id,
-                'location_dest_id': self.env.ref('linkloving_eb.stock_location_eb_transfer_2').id,
+                'location_dest_id': self.env.ref(
+                    'linkloving_material_request.stock_location_engineering_material_request').id,
                 'date': self.my_create_date,
                 'raw_material_id': self.id,
                 'origin': self.name,

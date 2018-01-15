@@ -194,7 +194,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
                         self.$("#" + product_id + ">.panel-body").html(" ");
                         if (result.po_lines.length > 0) {
                             for (var i = 0; i < result.po_lines.length; i++) {
-                                result.po_lines[i].date_planned = result.po_lines[i].date_planned.substr(0, 10);
+                                result.po_lines[i].date_planned = result.po_lines[i].date_planned?result.po_lines[i].date_planned.substr(0, 10):'';
                             }
                         }
                         if (result.mo_ids.length > 0) {
@@ -422,7 +422,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
                         }
                         if (result.po_lines.length > 0) {
                             for (var i = 0; i < result.po_lines.length; i++) {
-                                result.po_lines[i].date_planned = result.po_lines[i].date_planned.substr(0, 10);
+                                result.po_lines[i].date_planned = result.po_lines[i].date_planned?result.po_lines[i].date_planned.substr(0, 10):'';
                             }
                         }
                         var service = {
@@ -637,7 +637,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
                         self.$("#" + product_id + ">.panel-body").html(" ");
                         if (result.po_lines.length > 0) {
                             for (var i = 0; i < result.po_lines.length; i++) {
-                                result.po_lines[i].date_planned = result.po_lines[i].date_planned.substr(0, 10);
+                                result.po_lines[i].date_planned = result.po_lines[i].date_planned?result.po_lines[i].date_planned.substr(0, 10):'';
                             }
                         }
                         if (result.mo_ids.length > 0) {
@@ -710,7 +710,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
                         }
                         if (result.po_lines.length > 0) {
                             for (var i = 0; i < result.po_lines.length; i++) {
-                                result.po_lines[i].date_planned = result.po_lines[i].date_planned.substr(0, 10);
+                                result.po_lines[i].date_planned = result.po_lines[i].date_planned?result.po_lines[i].date_planned.substr(0, 10):'';
                             }
                         }
                         var service = {

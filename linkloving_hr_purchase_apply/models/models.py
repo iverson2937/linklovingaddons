@@ -6,9 +6,6 @@ from odoo.addons import decimal_precision as dp
 import jpush
 
 
-
-
-
 class PurchaseApply(models.Model):
     _name = 'hr.purchase.apply'
     _inherit = ['mail.thread', 'ir.needaction_mixin']
@@ -80,14 +77,14 @@ class PurchaseApply(models.Model):
             sheet.to_approve_id = False
             sheet.reject_reason = reason
 
-        #推送
+        # 推送
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.alias(sheet.create_uid.id)
         ), notification=_("申购单：%s被拒绝") % (sheet.name),
             body=_("原因：%s") % (reason))
 
     @api.multi
-    def create_message_post(self,body_str):
+    def create_message_post(self, body_str):
         for sheet in self:
             body = body_str
             sheet.message_post(body=body)
@@ -184,6 +181,14 @@ class PurchaseApply(models.Model):
             'approve_ids': [(4, self.env.user.id)]
         })
 
+    @api.multi
+    def approve(self):
+        self.write({
+            'state': 'approve',
+            'to_approve_id': False,
+            'approve_ids': [(4, self.env.user.id)]
+        })
+
     @api.model
     def _needaction_domain_get(self):
         """ Returns the domain to filter records that require an action
@@ -216,6 +221,7 @@ class PurchaseApplyLine(models.Model):
         ('submit', u'提交'),
         ('manager1_approve', u'一级审核'),
         ('manager2_approve', u'二级审核'),
+        ('manager3_approve', u'三级审核'),
         ('cancel', u'取消'),
         ('approve', u'批准'),
         ('done', u'完成')

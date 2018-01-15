@@ -26,7 +26,7 @@ class StockTransfer(models.Model):
     state = fields.Selection([
         ('draft', u'草稿'),
         ('confirm', u'确定'),
-        ('done', u'完成'),
+        ('done', u'提交'),
     ], default='draft')
 
     # @api.model
@@ -46,7 +46,6 @@ class StockTransfer(models.Model):
         if vals.get('name', 'New') == 'New':
             print self.env['ir.sequence'].next_by_code('stock.transfer') or 'New'
             vals['name'] = self.env['ir.sequence'].next_by_code('stock.transfer') or 'New'
-        print vals['name']
         return super(StockTransfer, self).create(vals)
 
     @api.multi
@@ -55,10 +54,15 @@ class StockTransfer(models.Model):
 
     @api.multi
     def confirm_transfer(self):
+        if self.remark:
+            name = '_'.join([self.name, self.remark])
+        else:
+            name = self.name
         inv_id = self.env['stock.inventory'].create({
             'filter': 'partial',
-            'name': self.name,
+            'name': name,
             'reason': self.remark,
+            'remark': 'transfer'
         })
         inv_id.prepare_inventory()
         print inv_id
@@ -78,7 +82,7 @@ class StockTransfer(models.Model):
                 'location_id': inv_id.location_id.id,
                 'remark_adjust': self.remark
             })
-        inv_id.action_done()
+
         self.state = 'done'
 
 

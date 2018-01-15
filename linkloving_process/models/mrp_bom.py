@@ -30,11 +30,11 @@ class MrpBom(models.Model):
                                   default=lambda self: self.env.user.company_id.currency_id)
     hour_price = fields.Float(string=u'时薪', default=30)
 
-    @api.constrains('produced_spend_per_pcs', 'prepare_time')
+    @api.constrains('prepare_time')
     def _check_cycle_spend_prepare(self):
-        if self.produced_spend_per_pcs <= 0:
-            raise ValidationError(u"生产速度 无效")
-        elif self.prepare_time <= 0:
+        # if self.produced_spend_per_pcs <= 0:
+        #     raise ValidationError(u"生产速度 无效")
+        if self.prepare_time <= 0:
             raise ValidationError(u"准备时间 无效")
 
     @api.onchange('process_id')

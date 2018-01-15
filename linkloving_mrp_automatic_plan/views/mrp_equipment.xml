@@ -189,12 +189,24 @@
         <record id="mrp_bom_from_view_inherit" model="ir.ui.view">
             <field name="name">mrp.bom.form.inherit</field>
             <field name="model">mrp.bom</field>
-            <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+            <field name="inherit_id" ref="linkloving_process.mrp_bom_form_view"/>
             <field name="arch" type="xml">
 
                 <xpath expr="//field[@name='prepare_time']" position="after">
                     <field name="produce_speed_factor"/>
                     <field name="theory_factor"/>
+                    <field name="piecework_unit_price"/>
+                </xpath>
+                <xpath expr="//field[@name='cost']" position="after">
+                    <label for="amount_of_producer"/>
+                    <div class="o_row">
+                        <field name="amount_of_producer" required="1"/>
+                        <span>个人/台设备, 每小时产出</span>
+                        <field name="produced_speed_per_hour" required="1" string="每小时产出数量"/>
+                        <span>个</span>
+                    </div>
+                        <field name="produced_speed_per_sec_new" readonly="1" string="换算后的生产速度(秒/每个)"/>
+                    <field name="produced_cost"/>
                 </xpath>
 
             </field>
