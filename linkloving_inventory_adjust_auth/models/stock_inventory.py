@@ -7,7 +7,7 @@ from odoo.exceptions import UserError
 
 class StockInventoryInherit(models.Model):
     _inherit = 'stock.inventory'
-    to_approve_id = fields.Many2one('res.users', compute='_to_approve_id')
+    to_approve_id = fields.Many2one('res.users', compute='_to_approve_id', store=True)
     can_approve = fields.Boolean(compute='_compute_can_approve')
 
     @api.depends('line_ids')
