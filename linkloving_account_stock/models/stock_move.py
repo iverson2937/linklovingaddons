@@ -21,6 +21,8 @@ class StockMove(models.Model):
         """
        制造入库重写会计分录
         """
+        # print credit_account_id.name
+        # print debit_account_id
         self.ensure_one()
 
         if self._context.get('force_valuation_amount'):
@@ -43,8 +45,11 @@ class StockMove(models.Model):
                                 (self.product_id.name,))
             return []
         credit_value = debit_value
+        # 退料会计凭证
+        if self.product_id.cost_method == 'average' and self.company_id.anglo_saxon_accounting and self.is_return_material:
+            pass
 
-        if self.product_id.cost_method == 'average' and self.company_id.anglo_saxon_accounting:
+        if self.product_id.cost_method == 'average' and self.company_id.anglo_saxon_accounting and not self.is_return_material:
             # in case of a supplier return in anglo saxon mode, for products in average costing method, the stock_input
             # account books the real purchase price, while the stock account books the average price. The difference is
             # booked in the dedicated price difference account.
