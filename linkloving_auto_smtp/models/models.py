@@ -68,7 +68,7 @@ class AutoSmtpMailMail(models.Model):
 
                 self_one.recipient_ids = par_list
 
-        return super(AutoSmtpMailMail, self).send(auto_commit=False, raise_exception=False)
+        return super(AutoSmtpMailMail, self).send(auto_commit=False, raise_exception=True)
 
     @api.multi
     def send_get_email_dict(self, partner=None):

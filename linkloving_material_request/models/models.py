@@ -120,8 +120,8 @@ class MaterialRequest(models.Model):
 
         if not vals.get('name'):
 
-            if not self.line_ids:
-                raise UserError(u"订单行 不能为空！")
+            # if not self.line_ids:
+            #     raise UserError(u"订单行 不能为空！")
 
             if null_add and not vals.get('picking_state'):
                 for line_one in self.line_ids:
@@ -151,8 +151,8 @@ class MaterialRequest(models.Model):
                     raise UserError(u"库存不足： '%s' " % product_one1.name)
                 if vals_line[2].get('product_qty') <= 0:
                     raise UserError(u"产品  '%s'  申请数量不能为0" % product_one1.name)
-        else:
-            raise UserError(u" 订单行 不能为空！ ")
+        # else:
+        #     raise UserError(u" 订单行 不能为空！ ")
 
         res = super(MaterialRequest, self).create(vals)
         if len(res.name) < 3:
