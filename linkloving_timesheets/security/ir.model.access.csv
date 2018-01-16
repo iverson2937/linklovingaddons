@@ -1,2 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_linkloving_timesheets_linkloving_timesheets,linkloving_timesheets.linkloving_timesheets,model_linkloving_timesheets_linkloving_timesheets,,1,0,0,0
+access_linkloving_timesheet_order,linkloving_timesheets.linkloving_timesheet_order,model_linkloving_timesheet_order,,1,1,1,1

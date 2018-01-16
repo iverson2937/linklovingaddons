@@ -12,10 +12,7 @@ WORK_ORDER_RECORD_STATE_FINISH = 105
 
 class linkloving_work_order_record(models.Model):
     _name = 'linkloving.work.order.record'
-
-    order_number = fields.Char()
-
-    name = fields.Char()
+    parent_id = fields.Many2one('linkloving.work.order.record')
 
     work_order_id = fields.Many2one('linkloving.work.order')
 
@@ -33,4 +30,6 @@ class linkloving_work_order_record(models.Model):
     reply_uid = fields.Many2one("res.users")
 
     content = fields.Char()
+
+    reply_record_line_ids = fields.One2many('linkloving.work.order.record', 'parent_id')
 

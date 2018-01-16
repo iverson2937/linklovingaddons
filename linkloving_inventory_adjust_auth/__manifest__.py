@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "linkloving_purchase_authority",
+    'name': "linkloving_inventory_adjust_auth",
 
     'summary': """
-        修改付款申请权限
-        """,
+        Short (1 phrase/line) summary of the module's purpose, used as
+        subtitle on modules listing or apps.openerp.com""",
 
     'description': """
         Long description of module's purpose
@@ -20,17 +20,14 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'linkloving_account'],
+    'depends': ['base', 'stock'],
 
     # always loaded
     'data': [
-        'data/purchase_group.xml',
         # 'security/ir.model.access.csv',
-        # 'security/ir.model.access.csv',
-        'views/purchase_config_setting.xml',
+        'data/groups.xml',
         'views/views.xml',
         'views/templates.xml',
-
     ],
     # only loaded in demonstration mode
     'demo': [
