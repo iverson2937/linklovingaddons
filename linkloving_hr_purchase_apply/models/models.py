@@ -9,7 +9,7 @@ import jpush
 class PurchaseApply(models.Model):
     _name = 'hr.purchase.apply'
     _inherit = ['mail.thread', 'ir.needaction_mixin']
-
+    _order = "create_date desc"
     name = fields.Char()
     apply_date = fields.Date(string=u'申请日期', default=fields.Date.context_today)
     employee_id = fields.Many2one('hr.employee',
