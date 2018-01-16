@@ -4166,8 +4166,8 @@ class LinklovingAppApi(http.Controller):
     def work_order_search(self, **kw):
         uid = request.jsonrequest.get("uid")
         user = request.env["res.users"].sudo().browse(uid)
-        domain = [('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)]
-
+        # domain = [('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)]
+        domain=[]
         start_date = request.jsonrequest.get("start_date")
         end_date = request.jsonrequest.get("end_date")
         issue_state = request.jsonrequest.get("issue_state")
@@ -4298,7 +4298,7 @@ class LinklovingAppApi(http.Controller):
         user = request.env["res.users"].sudo().browse(uid)
         data = {
             'id': user.id,
-            'name': user.name,
+            'name': user.name or "",
             'user_ava': LinklovingAppApi.get_img_url(user.id, "res.users", "image_medium"),
         }
         return data
