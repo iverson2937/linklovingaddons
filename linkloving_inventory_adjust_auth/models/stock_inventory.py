@@ -15,6 +15,7 @@ class StockInventoryInherit(models.Model):
         for s in self:
             product_ll_types = s.mapped('line_ids.product_id.product_ll_type')
             types = list(set(product_ll_types))
+            print types
             if len(types) > 1 and 'raw material' in types:
                 pass
             elif len(types) == 1 and types[0] == 'raw material':
