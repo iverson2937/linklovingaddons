@@ -2323,6 +2323,7 @@ class LinklovingOAApi(http.Controller):
     def get_all_need_do(self, *kw):
         user_id = request.jsonrequest.get('user_id')
         is_plus = request.jsonrequest.get('is_plus')
+        need_all = request.jsonrequest.get('need_all')
         domain_bx = [("to_approve_id", '=', user_id),
                      ('state', 'in', ('submit', 'manager1_approve', 'manager2_approve'))]
         bx_lists = request.env["hr.expense.sheet"].sudo().search(domain_bx,
@@ -2347,11 +2348,19 @@ class LinklovingOAApi(http.Controller):
 
         py = 0
         if is_plus:
-            domain_py = [('payment_type', '=', 1), ('state', '=', "manager")]
-            payment_list = request.env['account.payment.register'].sudo().search(domain_py,
-                                                                                 order='id desc')
-            for payment in payment_list:
-                py = py + 1
+            if need_all:
+                domain_py = [('payment_type', '=', 1), ('state', 'in', ["manager","posted"])]
+                payment_list = request.env['account.payment.register'].sudo().search(domain_py,
+                                                                                     order='id desc')
+                for payment in payment_list:
+                    py = py + 1
+            else:
+                domain_py = [('payment_type', '=', 1), ('state', '=', "manager")]
+                payment_list = request.env['account.payment.register'].sudo().search(domain_py,
+                                                                                     order='id desc')
+                for payment in payment_list:
+                    py = py + 1
+
         else:
             domain_py = [('payment_type', '=', 1), ('state', '=', "posted")]
             payment_list = request.env['account.payment.register'].sudo().search(domain_py,
@@ -2463,6 +2472,7 @@ class LinklovingOAApi(http.Controller):
         payment_type = request.jsonrequest.get("payment_type")
         user_id = request.jsonrequest.get("user_id")
         search_domain = request.jsonrequest.get("search_domain")
+        need_all = request.jsonrequest.get("need_all")
         if payment_type == "me":
             payment = request.env['account.payment.register'].sudo().search(
                 [('payment_type', '=', 1), ('create_uid', '=', user_id), (search_domain, 'ilike', search_name)],
@@ -2471,11 +2481,19 @@ class LinklovingOAApi(http.Controller):
                                               res_data=self.change_payment_list_to_json(payment))
         elif payment_type == "wait_me":
             if (search_type == "need"):
-                payment = request.env['account.payment.register'].sudo().search(
-                    [('payment_type', '=', 1), ('state', '=', "manager"),
-                     (search_domain, 'ilike', search_name)],
-                    order='id desc')
-                return JsonResponse.send_response(STATUS_CODE_OK,
+                if need_all:
+                    payment = request.env['account.payment.register'].sudo().search(
+                        [('payment_type', '=', 1), ('state', 'in', ["manager","posted"]),
+                         (search_domain, 'ilike', search_name)],
+                        order='id desc')
+                    return JsonResponse.send_response(STATUS_CODE_OK,
+                                                      res_data=self.change_payment_list_to_json(payment))
+                else:
+                    payment = request.env['account.payment.register'].sudo().search(
+                        [('payment_type', '=', 1), ('state', '=', "manager"),
+                        (search_domain, 'ilike', search_name)],
+                        order='id desc')
+                    return JsonResponse.send_response(STATUS_CODE_OK,
                                                   res_data=self.change_payment_list_to_json(payment))
             else:
                 payment = request.env['account.payment.register'].sudo().search(
