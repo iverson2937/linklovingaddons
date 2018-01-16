@@ -1855,7 +1855,8 @@ class LinklovingOAApi(http.Controller):
 
     def change_employee_to_json(self, obj_d):
         return {
-            'id':obj_d.user_id.id,
+            'id': obj_d.user_id.id if obj_d.user_id.id else 0,
+            'partner_id': obj_d.address_home_id.id,
             'name': obj_d.name_related,  # 姓名
             'work_phone': obj_d.work_phone or '',  # 办公电话
             'mobile_phone': obj_d.mobile_phone or '',  # 办公手机
@@ -2361,9 +2362,8 @@ class LinklovingOAApi(http.Controller):
         kc = 0
         if 'is_kucun' in request.jsonrequest.keys():
             if request.jsonrequest.get('is_kucun'):
-                waitList = request.env['stock.inventory'].sudo(user_id).search([('state', '=', 'confirm')])
-                for wait_list in waitList:
-                    kc = kc + 1
+                waitList = request.env['stock.inventory'].sudo(user_id).search(['|', ('to_approve_id', '=', False), ('state', '=', 'confirm'), ('to_approve_id', '=', user_id)])
+                kc = len(waitList)
             else:
                 kc = 0
 

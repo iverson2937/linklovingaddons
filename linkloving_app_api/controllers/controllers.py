@@ -2719,6 +2719,11 @@ class LinklovingAppApi(http.Controller):
                     dic["reserved_qty"] = reserved_qty
             pack_list.append(dic)
         data = {
+            'secondary_operation': stock_picking_obj.secondary_operation,  # zou增，下，
+            'timesheet_order_id': LinklovingAppApi.timesheet_order_ids_json(
+                stock_picking_obj.timesheet_order_ids.filtered(lambda x: x.state == 'running'))
+            # if stock_picking_obj.secondary_operation else {},
+            if stock_picking_obj.timesheet_order_ids.filtered(lambda x: x.state == 'running') else {},
             'picking_id': stock_picking_obj.id,
             'complete_rate': stock_picking_obj.complete_rate or 0,
             'has_attachment': LinklovingAppApi.is_has_attachment(stock_picking_obj.id, 'stock.picking'),
@@ -3120,8 +3125,9 @@ class LinklovingAppApi(http.Controller):
             elif picking.available_rate == 100 and picking.state != 'waiting':  # 可用率为100 并且不是等待其他作业的状态
                 final_pickings += picking
 
+
         json_list = {'waiting_data': [],
-                     'able_to_data': [], }
+                     'able_to_data': []}
         for picking in final_pickings:
             json_list['able_to_data'].append(self.stock_picking_to_json_simple(picking))
 
@@ -3139,9 +3145,34 @@ class LinklovingAppApi(http.Controller):
             'back_order_id': picking.backorder_id.name or '',
             'emergency': picking.is_emergency or '',
             'partner_id': picking.partner_id.name,
+            'secondary_operation': picking.secondary_operation,#zou增，下同
+            'timesheet_order_ids': self.timesheet_order_ids_json(
+                picking.timesheet_order_ids.filtered(lambda x: x.state == 'running'))
+            # if picking.secondary_operation else {}
+            if picking.timesheet_order_ids.filtered(lambda x: x.state == 'running') else {}
         }
         return data
 
+    #zou增加解析json二次加工信息
+    @classmethod
+    def timesheet_order_ids_json(cls, timesheet_order_id):
+        data = {
+            'id': timesheet_order_id.id or 0,
+            'from_partner': {
+                "id": timesheet_order_id.from_partner.id or 0,
+                "name": timesheet_order_id.from_partner.name or ''
+            },
+            'to_partner': {
+                "id": timesheet_order_id.to_partner.id or 0,
+                "name": timesheet_order_id.to_partner.name or ''
+            },
+            'work_type_id': {
+                "id": timesheet_order_id.work_type_id.id or 0,
+                "name": timesheet_order_id.work_type_id.name or ''
+            },
+            'hour_spent': timesheet_order_id.hour_spent or 0
+        }
+        return data
         ######### 生产 新版接口  ###############
 
     # 备料完成
@@ -4419,3 +4450,4 @@ class LinklovingAppApi(http.Controller):
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=groupList)
+
