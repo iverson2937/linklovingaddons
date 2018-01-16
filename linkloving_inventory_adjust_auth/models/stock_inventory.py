@@ -15,7 +15,6 @@ class StockInventoryInherit(models.Model):
         for s in self:
             product_ll_types = s.mapped('line_ids.product_id.product_ll_type')
             types = list(set(product_ll_types))
-            print types
             if s.state == 'confirm' and len(types) > 1 and 'raw material' in types:
                 raise UserError('原材料制成品不能同时盘点')
             elif len(types) == 1 and types[0] == 'raw material' and s.state == 'confirm':
