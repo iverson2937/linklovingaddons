@@ -93,6 +93,10 @@
                 <xpath expr="//field[@name='recipient_ids']" position="replace">
                 </xpath>
 
+                <xpath expr="//field[@name='email_cc']" position="after">
+                    <field name="char_filter" placeholder="多个以逗号 隔开"/>
+                </xpath>
+
                 <xpath expr="//field[@name='reply_to']" position="attributes">
                     <attribute name='invisible'>1</attribute>
                 </xpath>

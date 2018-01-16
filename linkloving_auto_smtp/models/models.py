@@ -2,6 +2,8 @@
 
 from odoo import models, fields, api
 from odoo.addons.base.ir.ir_mail_server import extract_rfc2822_addresses
+from odoo.exceptions import UserError
+import re
 
 
 class ResUserExtend(models.Model):
@@ -55,6 +57,8 @@ class ir_mail_server(models.Model):
 class AutoSmtpMailMail(models.Model):
     _inherit = 'mail.mail'
 
+    char_filter = fields.Char(string=u'需要过滤的邮件地址')
+
     @api.multi
     def send(self, auto_commit=False, raise_exception=False):
 
@@ -80,3 +84,32 @@ class AutoSmtpMailMail(models.Model):
                                                                                                       'web.base.url'))
 
         return res
+
+    @api.multi
+    def send_get_mail_to(self, partner=None):
+
+        email_to = super(AutoSmtpMailMail, self).send_get_mail_to(partner)
+
+        filter_list = self.char_filter.split(',') if self.char_filter else False
+
+        email_to_one = str(email_to)[str(email_to).find('<') + 1:str(email_to).find('>')].split(';')
+
+        for email_one in email_to_one:
+            run_email = True
+
+            if filter_list:
+                for q in filter_list:
+                    if q:
+                        if str(email_one).find(q) == 0:
+                            email_to = str(email_to[0]).replace(
+                                email_one + (';' if str(email_to).find(';') == 0 else ''), '')
+                            run_email = False
+            if run_email:
+                if len(email_one) > 7:
+                    if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$",
+                                email_one) == None:
+                        raise UserError('Email 有误' + str(email_one))
+                else:
+                    raise UserError('Email 有误' + str(email_one))
+
+        return [email_to] if type(email_to) == str else email_to
