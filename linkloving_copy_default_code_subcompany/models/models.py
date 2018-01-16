@@ -12,8 +12,8 @@ class WebsitePlanner(models.Model):
 
     @api.one
     def import_codes(self, validate_codes, product_type):
-        product_cate = self.env["product.category"]
-        product_tmpl = self.env["product.template"]
+        product_cate = self.env["product.category"].with_context(lang=self.env.lang or self.env.user.lang)
+        product_tmpl = self.env["product.template"].with_context(lang=self.env.lang or self.env.user.lang)
         not_found_list = []
         success_count = 0
 

@@ -16,7 +16,8 @@ class LinklovingCopyDefaultCodeSubcompany(http.Controller):
         request.params["db"] = db
         request.lang = lang
         try:  # 获取下单公司信息
-            products = request.env["product.template"].sudo().search([("default_code", "in", codes)])
+            products = request.env["product.template"].with_context(lang=lang).sudo().search(
+                    [("default_code", "in", codes)])
         except OperationalError:
             return {
                 "code": -2,
