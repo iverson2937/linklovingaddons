@@ -4213,12 +4213,11 @@ class LinklovingAppApi(http.Controller):
 
         if work_order:
             work_order_records = request.env['linkloving.work.order.record'].sudo().search(
-                [('work_order_id', '=', work_order_id)])
+                [('work_order_id', '=', work_order_id),('parent_id', '=', False)])
             record_json = []
             for record in work_order_records:
                 record_json.append(LinklovingAppApi.convert_work_order_record_to_json(record))
-            return JsonResponse.send_response(STATUS_CODE_OK,
-                                              res_data={"work_order": LinklovingAppApi.convert_work_order_to_json(work_order), "records": record_json})
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data={"work_order": self.convert_work_order_to_json(work_order), "records": record_json})
         else:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "work_order_id不存在或无权限访问"})
 
@@ -4229,13 +4228,15 @@ class LinklovingAppApi(http.Controller):
         reply_uid = request.jsonrequest.get("reply_uid")
         record_type = request.jsonrequest.get("record_type")
         work_order_id = request.jsonrequest.get("work_order_id")
+        parent_id = request.jsonrequest.get("parent_id")
 
         work_order_record_model = request.env['linkloving.work.order.record']
-        work_order_record = work_order_record_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
+        work_order_record = work_order_record_model.sudo(11).create({
             'work_order_id': work_order_id,
             'record_type': record_type,
             'content': content,
-            'reply_uid': reply_uid
+            'reply_uid': reply_uid,
+            'parent_id':parent_id,
         })
 
         if work_order_record:
@@ -4258,18 +4259,24 @@ class LinklovingAppApi(http.Controller):
     @staticmethod
     def convert_work_order_record_to_json(record):
         data = {
-            'order_number': record.order_number,
-            'name': record.name,
-            'work_order_id': record.work_order_id,
+            # 'order_number': record.order_number,
+            'work_order_id': record.work_order_id.id,
             'record_type': record.record_type,
-            'reply_uid': [record.reply_uid.id, record.reply_uid.name],
+            'reply_uid': LinklovingAppApi.get_user_json(record.reply_uid.id),
             'content': record.content,
+            'create_date': record.create_date,
+            'record_id':record.id,
+            'reply_record_line_ids':LinklovingAppApi.convert_work_order_arr_to_json(record.reply_record_line_ids),
+            'create_uid': LinklovingAppApi.get_user_json(record.create_uid.id),
         }
+
         return data
+
+
 
     @staticmethod
     def convert_work_order_to_json(work_order):
-        data = {
+        data = ({
             'work_order_number': work_order.order_number,
             'work_order_id': work_order.id,
             'title': work_order.name,
@@ -4280,7 +4287,8 @@ class LinklovingAppApi(http.Controller):
             'create_user': LinklovingAppApi.get_user_json(work_order.write_uid.id),
             'create_time': work_order.write_date,
             'work_order_images': LinklovingAppApi.get_work_order_img_url(work_order.attachments.ids),
-        }
+
+        })
         return data
 
     @classmethod
@@ -4292,6 +4300,22 @@ class LinklovingAppApi(http.Controller):
                 request.httprequest.host_url, str(img_id), 'linkloving.work.order.image', 'work_order_image')
             imgs.append(url)
         return imgs
+
+    @classmethod
+    def convert_work_order_arr_to_json(self,objs):
+        data = []
+        for obj in objs:
+            data.append({
+                'work_order_id': obj.work_order_id.id,
+                'record_type': obj.record_type,
+                'reply_uid': LinklovingAppApi.get_user_json(obj.reply_uid.id),
+                'content': obj.content,
+                'create_date': obj.create_date,
+                'record_id': obj.id,
+                'create_uid':LinklovingAppApi.get_user_json(obj.create_uid.id),
+                # 'reply_record_line_ids': record.reply_record_line_ids,
+            })
+        return data
 
     @classmethod
     def get_user_json(cls, uid):
