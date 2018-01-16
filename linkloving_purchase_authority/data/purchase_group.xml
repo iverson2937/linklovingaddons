@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="purchase_manager_plus" model="res.groups">
-        <field name="name">采购经理</field>
+        <field name="name">采购二级审核</field>
         <field name="category_id" ref="base.module_category_purchase_management"/>
-        <field name="groups" eval="[(4, ref('purchase.group_purchase_manager'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        <field name="comment">采购经理权限.</field>
+    </record>
+    <record id="purchase_manager_1" model="res.groups">
+        <field name="name">采购一级级审核</field>
+        <field name="category_id" ref="base.module_category_purchase_management"/>
         <field name="users" eval="[(4, ref('base.user_root'))]"/>
         <field name="comment">采购经理权限.</field>
     </record>
