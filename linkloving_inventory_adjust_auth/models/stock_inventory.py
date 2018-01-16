@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 
-from odoo import api, fields, models
+from odoo import api, fields, models, SUPERUSER_ID
 from odoo.exceptions import UserError
 
 
@@ -33,7 +33,9 @@ class StockInventoryInherit(models.Model):
     @api.multi
     def _compute_can_approve(self):
         for i in self:
-            if i.to_approve_id == self.env.user:
+            if self._uid == SUPERUSER_ID:
+                return True
+            elif i.to_approve_id == self.env.user:
                 return True
             else:
                 return False
