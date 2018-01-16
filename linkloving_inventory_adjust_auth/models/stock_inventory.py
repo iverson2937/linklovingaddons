@@ -34,8 +34,9 @@ class StockInventoryInherit(models.Model):
     def _compute_can_approve(self):
         for i in self:
             if self._uid == SUPERUSER_ID:
-                return True
+
+                i.can_approve = True
             elif i.to_approve_id == self.env.user:
-                return True
+                i.can_approve = True
             else:
-                return False
+                i.can_approve = False
