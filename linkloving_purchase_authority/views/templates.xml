@@ -9,7 +9,7 @@
 
                 <xpath expr='//button[@name="confirm"]' position='replace'>
                     <button name="to_manager_approve" string="审核通过" type="object" class="oe_highlight"
-                            states="posted" groups="purchase.group_purchase_manager"/>
+                            states="posted" groups="linkloving_purchase_authority.purchase_manager_1"/>
 
                     <button name="confirm" string="审核通过" type="object" class="oe_highlight"
                             states="manager" groups="linkloving_purchase_authority.purchase_manager_plus"/>
