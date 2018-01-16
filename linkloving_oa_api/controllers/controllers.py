@@ -1855,6 +1855,7 @@ class LinklovingOAApi(http.Controller):
 
     def change_employee_to_json(self, obj_d):
         return {
+            'id':obj_d.user_id.id,
             'name': obj_d.name_related,  # 姓名
             'work_phone': obj_d.work_phone or '',  # 办公电话
             'mobile_phone': obj_d.mobile_phone or '',  # 办公手机
