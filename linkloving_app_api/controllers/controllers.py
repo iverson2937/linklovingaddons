@@ -4213,7 +4213,7 @@ class LinklovingAppApi(http.Controller):
 
         if work_order:
             work_order_records = request.env['linkloving.work.order.record'].sudo().search(
-                [('work_order_id', '=', work_order_id)])
+                [('work_order_id', '=', work_order_id),('parent_id', '=', False)])
             record_json = []
             for record in work_order_records:
                 record_json.append(LinklovingAppApi.convert_work_order_record_to_json(record))
