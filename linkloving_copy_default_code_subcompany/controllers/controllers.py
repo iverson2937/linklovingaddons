@@ -10,9 +10,11 @@ class LinklovingCopyDefaultCodeSubcompany(http.Controller):
     def check_codes(self, **kw):
         db = request.jsonrequest.get("db")  # 所选账套
         codes = request.jsonrequest.get("vals")  # so的数据
+        lang = request.jsonrequest.get("lang")
         # discount_to_sub = request.jsonrequest.get("discount_to_sub")  # 折算率
         request.session.db = db  # 设置账套
         request.params["db"] = db
+        request.lang = lang
         try:  # 获取下单公司信息
             products = request.env["product.template"].sudo().search([("default_code", "in", codes)])
         except OperationalError:

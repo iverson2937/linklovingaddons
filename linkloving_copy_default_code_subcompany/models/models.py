@@ -117,6 +117,7 @@ class WebsitePlanner(models.Model):
         response = requests.post(url, data=json.dumps({
             "db": db,
             "vals": default_codes or [],
+            "lang": self.env.lang or self.env.user.lang,
         }), headers=header)
         return self.handle_response(response)
 
