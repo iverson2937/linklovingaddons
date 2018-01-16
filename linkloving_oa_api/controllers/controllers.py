@@ -1866,6 +1866,7 @@ class LinklovingOAApi(http.Controller):
             'image': self.get_img_url(obj_d.id, "hr.employee", "image_medium",
                                       obj_d.write_date.replace("-", "").replace(" ", "").replace(":", "")),
             # 头像
+            'user_id':self.get_department(obj_d.user_id),
         }
 
     def change_department_to_json(self, objs):
@@ -2377,6 +2378,7 @@ class LinklovingOAApi(http.Controller):
         user_id = request.jsonrequest.get('user_id')
         type = request.jsonrequest.get('type')
         is_plus = request.jsonrequest.get('is_plus')
+        need_all = request.jsonrequest.get('need_all')
         if type == "me":
             domain = [('payment_type', '=', 1), ('create_uid', '=', user_id)]
             payment_list = request.env['account.payment.register'].sudo().search(domain,
@@ -2387,8 +2389,15 @@ class LinklovingOAApi(http.Controller):
                                               res_data=self.change_payment_list_to_json(payment_list))
         elif type == "wait_me":
             if is_plus:
-                domain = [('payment_type', '=', 1), ('state', '=', "manager")]
-                payment_list = request.env['account.payment.register'].sudo().search(domain,
+                if need_all:
+                    domain = [('payment_type', '=', 1), ('state', 'in', ["manager", "posted"])]
+                    payment_list = request.env['account.payment.register'].sudo().search(domain,
+                                                                                         limit=limit,
+                                                                                         offset=offset,
+                                                                                         order='id desc')
+                else:
+                    domain = [('payment_type', '=', 1), ('state', '=', "manager")]
+                    payment_list = request.env['account.payment.register'].sudo().search(domain,
                                                                                      limit=limit,
                                                                                      offset=offset,
                                                                                      order='id desc')
@@ -2974,8 +2983,7 @@ class LinklovingOAApi(http.Controller):
 
 
 
-        # 报销时选择的申购item
-
+     # 报销时选择的申购item
     @http.route('/linkloving_oa_api/get_shengou_item', type='json', auth="none", csrf=False, cors='*')
     def get_shengou_item(self, *kw):
         employee_id = request.jsonrequest.get("employee_id")
@@ -2998,7 +3006,7 @@ class LinklovingOAApi(http.Controller):
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-    #    暂支
+    # 暂支
 
     @http.route('/linkloving_oa_api/get_zanzhi_list', type='json', auth="none", csrf=False, cors='*')
     def get_zanzhi_list(self, *kw):
