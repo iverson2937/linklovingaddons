@@ -12,11 +12,15 @@ class StockSettings(models.TransientModel):
 
     @api.multi
     def set_raw_material_approve_id_defaults(self):
+        group = self.env.ref('linkloving_inventory_adjust_auth.group_inventory_user')
+        self.raw_material_approve_id.groups_id = [(4, group.id)]
         return self.env['ir.values'].sudo().set_default(
             'stock.config.settings', 'raw_material_approve_id', self.raw_material_approve_id.id)
 
     @api.multi
     def set_finished_material_approve_id_defaults(self):
+        group = self.env.ref('linkloving_inventory_adjust_auth.group_inventory_user')
+        self.finished_material_approve_id.groups_id = [(4, group.id)]
         return self.env['ir.values'].sudo().set_default(
             'stock.config.settings', 'finished_material_approve_id', self.finished_material_approve_id.id)
 

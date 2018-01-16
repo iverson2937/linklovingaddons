@@ -9,7 +9,8 @@
             <field name="inherit_id" ref="stock.view_inventory_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='filter']" position="after">
-                    <field name="to_approve_id" readonly="1" string="审核人"/>
+                    <field name="to_approve_id" readonly="1" string="审核人"
+                           attrs="{'invisible':[('to_approve_id','=',False)]}"/>
                 </xpath>
 
 
@@ -23,9 +24,16 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//button[@name='action_done']" position="attributes">
-                    <field name="can_approve" invisible="1"/>
+                    <field name="can_approve" invisible="0"/>
                     <attribute name="states"></attribute>
-                    <attribute name="attrs">{'invisible':[('state','=','confirm'),('can_approve','=',True)]}</attribute>
+                    <attribute name="attrs">{'invisible':['|',('state','!=','confirm'),('can_approve','!=',True)]}
+                    </attribute>
+                </xpath>
+
+
+                <xpath expr="//field[@name='location_id']" position="after">
+                    <field name="can_approve" invisible="1"/>
+                    <field name="to_approve_id" invisible="0" string="待审核人"/>
                 </xpath>
 
 
