@@ -14,6 +14,8 @@ class LinklovingTimesheets(http.Controller):
         picking_id = request.jsonrequest.get("picking_id")
         to_partner = request.jsonrequest.get("to_partner")
 
+        if not to_partner or not picking_id:
+            raise UserError(u"缺少必要的参数")
         # picking = request.env['stock.picking'].sudo(LinklovingAppApi.CURRENT_USER()).browse(int(picking_id))
         sheet = request.env["linkloving.timesheet.order"].sudo(LinklovingAppApi.CURRENT_USER()).create({
             'picking_id': picking_id,
@@ -30,6 +32,10 @@ class LinklovingTimesheets(http.Controller):
         sheet_id = request.jsonrequest.get("sheet_id")
         work_type_id = request.jsonrequest.get("work_type_id")
         hour_spent = request.jsonrequest.get("hour_spent")
+
+        if not sheet_id or not picking_id or not work_type_id or not hour_spent:
+            raise UserError(u"缺少必要的参数")
+
         sheet = request.env["linkloving.timesheet.order"].sudo(LinklovingAppApi.CURRENT_USER()).browse(sheet_id)
         if sheet_id.picking_id.id != picking_id:
             raise UserError(u'工时单与调拨单不对应,请重试')
