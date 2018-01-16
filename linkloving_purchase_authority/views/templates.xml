@@ -8,10 +8,10 @@
 
 
                 <xpath expr='//button[@name="confirm"]' position='replace'>
-                    <button name="to_manager_approve" string="送审经理" type="object" class="oe_highlight"
+                    <button name="to_manager_approve" string="审核通过" type="object" class="oe_highlight"
                             states="posted" groups="purchase.group_purchase_manager"/>
 
-                    <button name="confirm" string="确认" type="object" class="oe_highlight"
+                    <button name="confirm" string="审核通过" type="object" class="oe_highlight"
                             states="manager" groups="linkloving_purchase_authority.purchase_manager_plus"/>
                 </xpath>
                 <xpath expr='//button[@name="reject"]' position='attributes'>

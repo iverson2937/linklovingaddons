@@ -21,8 +21,13 @@ class AccountPaymentRegister(models.Model):
 
     @api.multi
     def to_manager_approve(self):
+
         for record in self:
-            record.state = 'manager'
+            if record.amount <= record.company_id.payment_apply_amount:
+                record.get_approve()
+                record.state = 'confirm'
+            else:
+                record.state = 'manager'
             record.manager_id = self.env.user.id
 
     manager_id = fields.Many2one('res.users')
