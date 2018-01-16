@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- INHERITED FORM -->
+        <record id="view_purchase_configuration_inherit" model="ir.ui.view">
+            <field name="name">purchase.config.settings.form</field>
+            <field name="model">purchase.config.settings</field>
+            <field name="inherit_id" ref="purchase.view_purchase_configuration"/>
+            <field name="arch" type="xml">
+
+
+                <xpath expr="//group" position="after">
+
+                    <group string="付款申请设置">
+                        <group>
+                            <field name="payment_apply_amount" string="双重验证金额"/>
+                        </group>
+                    </group>
+
+
+                </xpath>
+
+
+            </field>
+        </record>
+
+
+    </data>
+</openerp>
+
+
+
+
+
+
+
+
+
+

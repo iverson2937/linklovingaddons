@@ -2369,9 +2369,11 @@ class LinklovingOAApi(http.Controller):
                 py = py + 1
 
         kc = 0
+
+        domain = ['|', ('to_approve_id', '=', False), ('state', '=', 'confirm'), ('to_approve_id', '=', user_id)]
         if 'is_kucun' in request.jsonrequest.keys():
             if request.jsonrequest.get('is_kucun'):
-                waitList = request.env['stock.inventory'].sudo(user_id).search([('state', '=', 'confirm')])
+                waitList = request.env['stock.inventory'].sudo(user_id).search(domain)
                 for wait_list in waitList:
                     kc = kc + 1
             else:
@@ -3374,8 +3376,7 @@ class LinklovingOAApi(http.Controller):
         type = request.jsonrequest.get('type')
         user_id = request.jsonrequest.get('user_id')
 
-
-        domain = [('state', '=', state)]
+        domain = ['|', ('to_approve_id', '=', False), ('state', '=', 'confirm'), ('to_approve_id', '=', user_id)]
         if 'searchText' in request.jsonrequest.keys():
             if type == 1:
                 domain.append(('name', 'ilike', searchText))
