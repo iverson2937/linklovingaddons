@@ -2724,8 +2724,7 @@ class LinklovingAppApi(http.Controller):
             'secondary_operation': stock_picking_obj.secondary_operation,  # zou增，下，
             'timesheet_order_id': LinklovingAppApi.timesheet_order_ids_json(
                 stock_picking_obj.timesheet_order_ids.filtered(lambda x: x.state == 'running'))
-            # if stock_picking_obj.secondary_operation else {},
-            if stock_picking_obj.timesheet_order_ids.filtered(lambda x: x.state == 'running') else {},
+            if stock_picking_obj.state=='secondary_operation' else  LinklovingAppApi.timesheet_order_ids_json(stock_picking_obj.timesheet_order_ids),
             'picking_id': stock_picking_obj.id,
             'complete_rate': stock_picking_obj.complete_rate or 0,
             'has_attachment': LinklovingAppApi.is_has_attachment(stock_picking_obj.id, 'stock.picking'),
@@ -3137,6 +3136,7 @@ class LinklovingAppApi(http.Controller):
             json_list['waiting_data'].append(self.stock_picking_to_json_simple(picking))
         return json_list
 
+
     def stock_picking_to_json_simple(self, picking):
         data = {
             'picking_id': picking.id,
@@ -3150,31 +3150,34 @@ class LinklovingAppApi(http.Controller):
             'secondary_operation': picking.secondary_operation,#zou增，下同
             'timesheet_order_ids': self.timesheet_order_ids_json(
                 picking.timesheet_order_ids.filtered(lambda x: x.state == 'running'))
-            # if picking.secondary_operation else {}
-            if picking.timesheet_order_ids.filtered(lambda x: x.state == 'running') else {}
+            if picking.state == 'secondary_operation' else  LinklovingAppApi.timesheet_order_ids_json(
+                picking.timesheet_order_ids),
         }
         return data
 
     #zou增加解析json二次加工信息
     @classmethod
     def timesheet_order_ids_json(cls, timesheet_order_id):
-        data = {
-            'id': timesheet_order_id.id or 0,
-            'from_partner': {
-                "id": timesheet_order_id.from_partner.id or 0,
-                "name": timesheet_order_id.from_partner.name or ''
-            },
-            'to_partner': {
-                "id": timesheet_order_id.to_partner.id or 0,
-                "name": timesheet_order_id.to_partner.name or ''
-            },
-            'work_type_id': {
-                "id": timesheet_order_id.work_type_id.id or 0,
-                "name": timesheet_order_id.work_type_id.name or ''
-            },
-            'hour_spent': timesheet_order_id.hour_spent or 0
-        }
-        return data
+        time_list = []
+        for time_id in timesheet_order_id:
+            data = {
+                'id': time_id.id or 0,
+                'from_partner': {
+                    "id": time_id.from_partner.id or 0,
+                    "name": time_id.from_partner.name or ''
+                },
+                'to_partner': {
+                    "id": time_id.to_partner.id or 0,
+                    "name": time_id.to_partner.name or ''
+                },
+                'work_type_id': {
+                    "id": time_id.work_type_id.id or 0,
+                    "name": time_id.work_type_id.name or ''
+                },
+                'hour_spent': time_id.hour_spent or 0
+            }
+            time_list.append(data)
+        return time_list
         ######### 生产 新版接口  ###############
 
     # 备料完成
