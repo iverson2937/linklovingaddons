@@ -29,10 +29,11 @@
 
                 <xpath expr="//field[@name='customer_status']" position="after">
                     <field name="is_order" invisible="1" attrs="{'invisible':[('customer','=', False)]}"/>
-                    <field name="crm_is_partner" string="线索客户"/>
+                    <field name="crm_is_partner" attrs="{'invisible':[('customer','=', False)]}" string="线索客户"/>
 
 
-                    <field name="crm_is_partner_temporary" string="是否是客户"/>
+                    <field name="crm_is_partner_temporary" attrs="{'invisible':[('customer','=', False)]}"
+                           string="是否是客户"/>
 
                 </xpath>
 
@@ -128,7 +129,7 @@
 
                 <!--供应商显示的字段-->
                 <xpath expr="//field[@name='email']" position="after">
-                    <field name="qq" attrs="{'invisible':[('customer','=',True)]}" string="QQ/旺旺/微信"/>
+                    <field name="qq" attrs="{'invisible':1}" string="QQ/旺旺/微信"/>
                 </xpath>
 
 
@@ -248,8 +249,11 @@
                     <attribute name='invisible'>1</attribute>
                 </xpath>
 
-                <xpath expr="//field[@name='email']" position="attributes">
-                    <attribute name='invisible'>1</attribute>
+                <xpath expr="//field[@name='email']" position="replace">
+                    <!--<attribute name='invisible'>[('customer','=', True)]</attribute>-->
+
+                    <field name="email" attrs="{'invisible':[('customer','=', True)]}"/>
+
                 </xpath>
 
                 <xpath expr="//field[@name='lang']" position="attributes">
