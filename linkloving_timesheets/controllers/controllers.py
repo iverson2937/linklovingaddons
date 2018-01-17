@@ -16,7 +16,9 @@ class LinklovingTimesheets(http.Controller):
 
         if not to_partner or not picking_id:
             raise UserError(u"缺少必要的参数")
-        # picking = request.env['stock.picking'].sudo(LinklovingAppApi.CURRENT_USER()).browse(int(picking_id))
+        picking = request.env['stock.picking'].sudo(LinklovingAppApi.CURRENT_USER()).browse(int(picking_id))
+        if picking.timesheet_order_ids.filtered(lambda x: x.state == 'running'):
+            raise UserError(u'已经有一个运行中的工时单')
         sheet = request.env["linkloving.timesheet.order"].sudo(LinklovingAppApi.CURRENT_USER()).create({
             'picking_id': picking_id,
             'to_partner': to_partner,
