@@ -135,8 +135,7 @@ class AccountPaymentRegister(models.Model):
 
         self.state = 'posted'
 
-    @api.multi
-    def confirm(self):
+    def get_approve(self):
         balance = self.amount
         if self.payment_type == 2 and balance > sum(self.mapped('invoice_ids.amount_total')):
             raise UserError(_('Apply Amount cannot less than Invoices Amount'))
@@ -147,6 +146,10 @@ class AccountPaymentRegister(models.Model):
                 'amount': invoice.remain_apply_balance if balance >= invoice.remain_apply_balance else balance
             })
             balance -= balance_id.amount
+
+    @api.multi
+    def confirm(self):
+        self.get_approve()
         self.approve_id = self.env.user.id
         self.state = 'confirm'
 
@@ -217,7 +220,8 @@ class AccountPayment(models.Model):
         res = self._onchange_journal()
         if not res.get('domain', {}):
             res['domain'] = {}
-        res['domain']['journal_id'] = self.payment_type == 'inbound' and [('at_least_one_inbound', '=', True)] or [('at_least_one_outbound', '=', True)]
+        res['domain']['journal_id'] = self.payment_type == 'inbound' and [('at_least_one_inbound', '=', True)] or [
+            ('at_least_one_outbound', '=', True)]
         res['domain']['journal_id'].append(('type', 'in', ('bank', 'cash')))
         res['domain']['journal_id'].append(('deprecated', '=', False))
 

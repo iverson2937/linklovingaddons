@@ -2578,7 +2578,8 @@ class LinklovingAppApi(http.Controller):
                             and is_yes != "yes":
                         return JsonResponse.send_response(STATUS_CODE_ERROR,
                                                           res_data={"error": u"该销售单需要一次性发完货,请等待货齐后再发"})
-                    elif picking_obj.sale_id.delivery_rule == "delivery_once" and picking_obj.state != "assigned":
+                    elif picking_obj.sale_id.delivery_rule == "delivery_once" and picking_obj.state not in ["assigned",
+                                                                                                            "secondary_operation_done"]:
                         return JsonResponse.send_response(STATUS_CODE_ERROR,
                                                           res_data={"error": u"该单据为部分可用,请等待货齐后再发"})
                     elif picking_obj.sale_id.delivery_rule == "cancel_backorder":  # 取消欠单

@@ -27,6 +27,7 @@
         'data/purchase_group.xml',
         # 'security/ir.model.access.csv',
         # 'security/ir.model.access.csv',
+        'views/purchase_config_setting.xml',
         'views/views.xml',
         'views/templates.xml',
 

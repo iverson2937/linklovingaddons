@@ -42,13 +42,33 @@
         </record>
 
 
-        <menuitem id="menu_sales_email" name="邮件销售" parent="sales_team.menu_base_partner" sequence="4"/>
+        <record id="menu_sales_email_inbox_action" model="ir.actions.act_window">
+            <field name="name">收件箱</field>
+            <field name="res_model">mail.mail</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <!--<field name="domain">[('author_id.user_id', '=', uid)]</field>-->
+            <field name="domain">[('state','=','outgoing'),('mail_message_id.create_uid', '=', uid)]</field>
+            <field name="context">
+                {
+                }
+            </field>
+            <field name="search_view_id" ref="mail.view_mail_search"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to add a Email.
+                </p>
+            </field>
+        </record>
 
-        <!--<menuitem action="menu_sales_email_send_action"-->
-        <!--id="menu_sales_email_inbox"-->
-        <!--parent="menu_sales_email"-->
-        <!--groups=""-->
-        <!--sequence="1" name="收件箱"/>-->
+
+        <menuitem id="menu_sales_email" name="邮件销售" sequence="4"/>
+
+        <menuitem action="menu_sales_email_inbox_action"
+                  id="menu_sales_email_inbox"
+                  parent="menu_sales_email"
+                  groups=""
+                  sequence="1" name="收件箱"/>
 
 
         <menuitem action="menu_sales_email_send_action"
@@ -71,6 +91,10 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//field[@name='recipient_ids']" position="replace">
+                </xpath>
+
+                <xpath expr="//field[@name='email_cc']" position="after">
+                    <field name="char_filter" placeholder="多个以逗号 隔开"/>
                 </xpath>
 
                 <xpath expr="//field[@name='reply_to']" position="attributes">
