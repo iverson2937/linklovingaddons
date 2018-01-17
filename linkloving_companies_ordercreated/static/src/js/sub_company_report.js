@@ -177,7 +177,7 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                 exportTypes: ['excel'],
                 exportOptions: {
                     fileName: filename,//'生产跟踪单' + data.so_name,
-                    excelstyles: ['background-color', 'color', 'font-weight', 'border-top', 'border-bottom', 'border-left', 'border-right'],
+                    excelstyles: ['background-color', 'color', 'font-weight', 'border', 'border-top', 'border-bottom', 'border-left', 'border-right', 'font-size', 'width', 'height'],
                 },
                 icons: {
                     paginationSwitchDown: 'glyphicon-collapse-down icon-chevron-down',
