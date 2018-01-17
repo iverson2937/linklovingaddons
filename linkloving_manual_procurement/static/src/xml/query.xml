@@ -4,7 +4,7 @@
        <t t-name="QueryView.query_button">
     <t t-if="widget.options.action.context.is_show_procuremnt_create_btn">
         <button  type="button" class="btn btn-sm btn-primary o_button_query">
-            创建生产需求单
+            创建需求单
         </button>
         </t>
     </t>
