@@ -51,9 +51,14 @@ class ProductProduct(models.Model):
         return res
 
     def count_purchase_amount(self, start, end):
+
+        location_dest_id = self.env.ref("stock.location_production")
         orders = self.env['stock.move'].search(
-            [('product_id', '=', self.id), ('state', '=', 'done'), ('date', '>=', start),
-             ('date', '<=', end)])
+            [('product_id', '=', self.id),
+             ('state', '=', 'done'),
+             ('date', '>=', start),
+             ('date', '<=', end),
+             ('location_dest_id', '=', location_dest_id.id)])
         res = sum(order.product_uom_qty for order in orders)
 
         return res

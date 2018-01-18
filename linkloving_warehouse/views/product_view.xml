@@ -7,7 +7,7 @@
             <field name="name">product.template.tree</field>
             <field name="model">product.template</field>
             <field name="arch" type="xml">
-                <tree string="">
+                <tree string="产品" decoration-danger="forecast_qty&lt;0" decoration-info="forecast_qty&gt;=0">
                     <field name="sequence" widget="handle"/>
                     <field name="default_code" string="料号" readonly="1"/>
                     <button name="view_product_id" type="object" icon="fa-arrow-right"/>
@@ -18,8 +18,8 @@
                     <field name="type" invisible="1"/>
                     <field name="uom_id" invisible="1"/>
                     <field name="active" invisible="1"/>
-                    <field name="qty_available" string="在产"/>
-                    <field name="virtual_available" string="预测数量"/>
+                    <field name="stock" string="在产"/>
+                    <field name="forecast_qty" string="预测数量"/>
                     <field name="reordering_min_qty" string="最小"/>
                     <field name="reordering_max_qty" string="最大"/>
                     <!--<field name="order_point_active" string="订货规则开启"/>-->
@@ -37,7 +37,9 @@
             <!--<field name="res_model">product.template</field>-->
             <!--<field name="view_type">form</field>-->
             <field name="view_mode">kanban,tree,form</field>
-            <field name="context">{"search_default_filter_to_purchase":1, "is_show_procuremnt_create_btn":1}</field>
+            <field name="context">{"search_default_filter_to_purchase":1, "is_show_procuremnt_create_btn":1,
+                "order_type":"purchase"}
+            </field>
             <!--<field name="search_view_id" eval="False"/> &lt;!&ndash; Force empty &ndash;&gt;-->
             <field name="view_ids" eval="[(5,0,0),
             (0,0,{'view_mode':'kanban', 'view_id': False}),
