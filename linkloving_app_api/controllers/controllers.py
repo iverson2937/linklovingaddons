@@ -27,8 +27,8 @@ from odoo.exceptions import AccessError, UserError
 
 _logger = logging.getLogger(__name__)
 
-app_key = "6e6ce8723531335ce45edd34"
-master_secret = "64ec88028aac4dda6286400e"
+app_key = "f2ae889d6e4c3400fef49696"
+master_secret = "e1d3af4d5ab66d45f6255c18"
 _jpush = jpush.JPush(app_key, master_secret)
 push = _jpush.create_push()
 _jpush.set_logging("DEBUG")
@@ -45,9 +45,7 @@ class JPushExtend:
         ios = jpush.ios(alert={"title": notification,
                                "body": body,
                                }, sound=need_sound)
-        android = jpush.android(alert={"title": notification,
-                                       "body": body,
-                                       }, priority=1, style=1)
+        android = jpush.android(alert=body, title=notification)
         push.notification = jpush.notification(ios=ios, android=android)
         push.options = {"apns_production": apns_production, }
         push.platform = platform
@@ -4126,6 +4124,22 @@ class LinklovingAppApi(http.Controller):
             'issue_state': issue_state,
             'effective_department_ids': [(6, 0, departments)]
         })
+        if assign_uid:
+            work_order_record_model = request.env['linkloving.work.order.record']
+            work_order_record = work_order_record_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
+                'work_order_id': work_order.id,
+                'record_type': "assign",
+                'reply_uid':assign_uid,
+                'content':"新建并指派受理人：",
+            })
+        else:
+            work_order_record_model = request.env['linkloving.work.order.record']
+            work_order_record = work_order_record_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
+                'work_order_id': work_order.id,
+                'record_type': "assign",
+                'content': "新建工单",
+            })
+
         if wo_images:
             for img in wo_images:
                 wo_img_id = request.env["linkloving.work.order.image"].sudo(LinklovingAppApi.CURRENT_USER()).create({
@@ -4154,7 +4168,7 @@ class LinklovingAppApi(http.Controller):
         uid = request.jsonrequest.get("uid")
         user = request.env['res.users'].sudo().browse(uid)
         work_order_model = request.env['linkloving.work.order']
-        work_order_data = work_order_model.sudo().read_group([('issue_state', 'in', ['unaccept', 'unassign', 'process']),
+        work_order_data = work_order_model.sudo().read_group([('issue_state', 'in', ['unaccept', 'check', 'process']),
                                                               ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)], ['issue_state'], ['issue_state'])
         print work_order_data
         result = dict((data['issue_state'], data['issue_state_count']) for data in work_order_data)
@@ -4191,6 +4205,7 @@ class LinklovingAppApi(http.Controller):
             domain += [('assign_uid', '=', assign_uid)]
         elif work_order_number:
             domain += [('order_number', '=', work_order_number)]
+        domain += [('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)]
 
         work_orders = request.env['linkloving.work.order'].sudo().search(
             domain, order='write_date desc')
@@ -4213,7 +4228,7 @@ class LinklovingAppApi(http.Controller):
 
         if work_order:
             work_order_records = request.env['linkloving.work.order.record'].sudo().search(
-                [('work_order_id', '=', work_order_id),('parent_id', '=', False)])
+                [('work_order_id', '=', work_order_id),('parent_id', '=', False)],order='create_date desc')
             record_json = []
             for record in work_order_records:
                 record_json.append(LinklovingAppApi.convert_work_order_record_to_json(record))
@@ -4231,7 +4246,7 @@ class LinklovingAppApi(http.Controller):
         parent_id = request.jsonrequest.get("parent_id")
 
         work_order_record_model = request.env['linkloving.work.order.record']
-        work_order_record = work_order_record_model.sudo(11).create({
+        work_order_record = work_order_record_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
             'work_order_id': work_order_id,
             'record_type': record_type,
             'content': content,
@@ -4256,6 +4271,77 @@ class LinklovingAppApi(http.Controller):
 
         return JsonResponse.send_response(STATUS_CODE_OK)
 
+    # 工单操作
+    @http.route('/linkloving_app_api/work_order_action', type='json', auth="none", csrf=False, cors='*')
+    def work_order_action(self, **kw):
+        uid = request.jsonrequest.get("uid")
+        work_order_id = request.jsonrequest.get("work_order_id")
+        action_type = request.jsonrequest.get("action_type")
+        assign_uid = request.jsonrequest.get("assign_uid")
+        user = request.env['res.users'].sudo().browse(uid)
+        if action_type == "assign":
+            work_order_record_model = request.env['linkloving.work.order.record']
+            work_order_record = work_order_record_model.sudo(uid).create({
+                'work_order_id': work_order_id,
+                'record_type': "assign",
+                'reply_uid':assign_uid,
+                'content':"指派受理人："
+            })
+            work_order = request.env['linkloving.work.order'].sudo().search(
+                [('id', '=', work_order_id),
+                 ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)])
+            work_order.sudo(work_order.create_uid.id).write({
+                'assign_uid':assign_uid,
+                'issue_state': "process",
+            })
+            JPushExtend.send_notification_push(audience=jpush.audience(
+                jpush.alias(assign_uid)
+            ), notification="有新的工单待处理",
+                body=_("【工单】%s给你指派了工单：%s") % (user.name,work_order.name))
+            return JsonResponse.send_response(STATUS_CODE_OK)
+        elif action_type == "check":
+            work_order_record_model = request.env['linkloving.work.order.record']
+            work_order_record = work_order_record_model.sudo(uid).create({
+                'work_order_id': work_order_id,
+                'record_type': "check",
+                'reply_uid': assign_uid,
+            })
+            work_order = request.env['linkloving.work.order'].sudo(assign_uid).search(
+                [('id', '=', work_order_id),
+                 ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)])
+            work_order.sudo(assign_uid).write({
+                'issue_state': "check",
+            })
+            return JsonResponse.send_response(STATUS_CODE_OK)
+        elif action_type == "reject":
+            work_order_record_model = request.env['linkloving.work.order.record']
+            work_order_record = work_order_record_model.sudo(uid).create({
+                'work_order_id': work_order_id,
+                'record_type': "reject",
+                'reply_uid': assign_uid,
+            })
+            work_order = request.env['linkloving.work.order'].sudo(uid).search(
+                [('id', '=', work_order_id),
+                 ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)])
+            work_order.sudo(uid).write({
+                'issue_state': "process",
+            })
+            return JsonResponse.send_response(STATUS_CODE_OK)
+        elif action_type == "finish":
+            work_order_record_model = request.env['linkloving.work.order.record']
+            work_order_record = work_order_record_model.sudo(uid).create({
+                'work_order_id': work_order_id,
+                'record_type': "finish",
+                'reply_uid': assign_uid,
+            })
+            work_order = request.env['linkloving.work.order'].sudo(uid).search(
+                [('id', '=', work_order_id),
+                 ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)])
+            work_order.sudo(uid).write({
+                'issue_state': "done",
+            })
+            return JsonResponse.send_response(STATUS_CODE_OK)
+
     @staticmethod
     def convert_work_order_record_to_json(record):
         data = {
@@ -4263,7 +4349,7 @@ class LinklovingAppApi(http.Controller):
             'work_order_id': record.work_order_id.id,
             'record_type': record.record_type,
             'reply_uid': LinklovingAppApi.get_user_json(record.reply_uid.id),
-            'content': record.content,
+            'content': record.content or '',
             'create_date': record.create_date,
             'record_id':record.id,
             'reply_record_line_ids':LinklovingAppApi.convert_work_order_arr_to_json(record.reply_record_line_ids),
@@ -4287,7 +4373,7 @@ class LinklovingAppApi(http.Controller):
             'create_user': LinklovingAppApi.get_user_json(work_order.write_uid.id),
             'create_time': work_order.write_date,
             'work_order_images': LinklovingAppApi.get_work_order_img_url(work_order.attachments.ids),
-
+            'effective_department_ids':LinklovingAppApi.get_department_json(work_order.effective_department_ids)
         })
         return data
 
@@ -4309,7 +4395,7 @@ class LinklovingAppApi(http.Controller):
                 'work_order_id': obj.work_order_id.id,
                 'record_type': obj.record_type,
                 'reply_uid': LinklovingAppApi.get_user_json(obj.reply_uid.id),
-                'content': obj.content,
+                'content': obj.content or '',
                 'create_date': obj.create_date,
                 'record_id': obj.id,
                 'create_uid':LinklovingAppApi.get_user_json(obj.create_uid.id),
@@ -4327,6 +4413,12 @@ class LinklovingAppApi(http.Controller):
         }
         return data
 
+    @classmethod
+    def get_department_json(self,objs):
+        data = []
+        for obj in objs:
+            data.append(obj.id)
+        return data
 
 
     # end--------------模块:工单---------------分割线--------------------------------------------------end

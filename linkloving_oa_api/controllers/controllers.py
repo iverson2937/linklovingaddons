@@ -1853,6 +1853,16 @@ class LinklovingOAApi(http.Controller):
             data.append(self.change_employee_to_json(employee))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
+    #获取指定部门联系人
+    @http.route('/linkloving_oa_api/get_department_employees', type='json', auth="none", csrf=False, cors='*')
+    def get_department_employees(self,*kw):
+        department_ids = request.jsonrequest.get('department_ids')
+        employees = request.env['hr.employee'].sudo().search([("department_id", 'in', department_ids)], order='id asc')
+        data = []
+        for employee in employees:
+            data.append(self.change_employee_to_json(employee))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
     def change_employee_to_json(self, obj_d):
         return {
             'id':obj_d.user_id.id,
