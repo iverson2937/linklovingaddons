@@ -4208,10 +4208,27 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/work_order_statistics', type='json', auth="none", csrf=False, cors='*')
     def work_order_statistics(self, **kw):
         uid = request.jsonrequest.get("uid")
-        user = request.env['res.users'].sudo().browse(uid)
-        work_order_model = request.env['linkloving.work.order']
-        work_order_data = work_order_model.sudo().read_group([('issue_state', 'in', ['unaccept', 'check', 'process']),
-                                                              ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)], ['issue_state'], ['issue_state'])
+        user = request.env["res.users"].sudo().browse(uid)
+        domain = []
+        start_date = request.jsonrequest.get("start_date")
+        end_date = request.jsonrequest.get("end_date")
+        if start_date and end_date:
+            timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
+            begin = fields.datetime.strptime(start_date, '%Y-%m-%d')
+            end = fields.datetime.strptime(end_date, '%Y-%m-%d')
+            work_order_model = request.env['linkloving.work.order']
+            work_order_data = work_order_model.sudo().read_group(
+                [('create_date', '<', (end - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                  ('create_date', '>', (begin - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                  ('issue_state', 'in', ['unaccept', 'check', 'process']), ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)],
+                ['issue_state'],
+                ['issue_state'])
+        else:
+            work_order_model = request.env['linkloving.work.order']
+            work_order_data = work_order_model.sudo().read_group(
+                [('issue_state', 'in', ['unaccept', 'check', 'process']),
+                 ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)], ['issue_state'],
+                ['issue_state'])
         print work_order_data
         result = dict((data['issue_state'], data['issue_state_count']) for data in work_order_data)
 
@@ -4222,39 +4239,62 @@ class LinklovingAppApi(http.Controller):
     def work_order_search(self, **kw):
         uid = request.jsonrequest.get("uid")
         user = request.env["res.users"].sudo().browse(uid)
-        # domain = [('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)]
-        domain=[]
+        domain = []
+
         start_date = request.jsonrequest.get("start_date")
         end_date = request.jsonrequest.get("end_date")
         issue_state = request.jsonrequest.get("issue_state")
         create_uid = request.jsonrequest.get("create_uid")
         assign_uid = request.jsonrequest.get("assign_uid")
         work_order_number = request.jsonrequest.get("work_order_number")
-
+        isSearchRecord = request.jsonrequest.get("isSearchOrder")
         if start_date and end_date:
             timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
             begin = fields.datetime.strptime(start_date, '%Y-%m-%d')
             end = fields.datetime.strptime(end_date, '%Y-%m-%d')
             domain += [
-                    ('write_date', '<', (end - timez).strftime('%Y-%m-%d %H:%M:%S')),
-                    ('write_date', '>', (begin - timez).strftime('%Y-%m-%d %H:%M:%S'))
+                ('create_date', '<', (end - timez).strftime('%Y-%m-%d %H:%M:%S')),
+                ('create_date', '>', (begin - timez).strftime('%Y-%m-%d %H:%M:%S'))
             ]
-        elif issue_state:
+        if issue_state:
             domain += [('issue_state', '=', issue_state)]
-        elif create_uid:
+        if create_uid:
             domain += [('write_uid', '=', create_uid)]
-        elif assign_uid:
+        if assign_uid:
             domain += [('assign_uid', '=', assign_uid)]
-        elif work_order_number:
+        if work_order_number:
             domain += [('order_number', '=', work_order_number)]
-        domain += [('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)]
-
-        work_orders = request.env['linkloving.work.order'].sudo().search(
-            domain, order='write_date desc')
 
         work_order_json = []
+        if isSearchRecord:
+            work_orders = request.env['linkloving.work.order.record'].sudo().search(
+                domain, order='write_date desc')
+            for order in work_orders:
+                work_order_json.append(LinklovingAppApi.convert_work_order_to_json(order.work_order_id))
+        else:
+            domain += [('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)]
+            work_orders = request.env['linkloving.work.order'].sudo().search(
+                domain, order='write_date desc')
+            for order in work_orders:
+                work_order_json.append(LinklovingAppApi.convert_work_order_to_json(order))
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=work_order_json)
+
+
+        # 查询@ 我的
+
+    @http.route('/linkloving_app_api/searchAtMe', type='json', auth="none", csrf=False, cors='*')
+    def searchAtMe(self, **kw):
+        uid = request.jsonrequest.get("uid")
+        domain = []
+        domain += [('record_type', 'in', ['reply', 'assign'])]
+        domain += [('isRead', '=', False)]
+        domain += [('reply_uid', '=', uid)]
+        work_order_json = []
+        work_orders = request.env['linkloving.work.order.record'].sudo().search(
+            domain, order='write_date desc')
         for order in work_orders:
-            work_order_json.append(LinklovingAppApi.convert_work_order_to_json(order))
+            work_order_json.append(LinklovingAppApi.convert_work_order_to_json(order.work_order_id))
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=work_order_json)
 
@@ -4266,15 +4306,20 @@ class LinklovingAppApi(http.Controller):
         user = request.env['res.users'].sudo().browse(uid)
 
         work_order = request.env['linkloving.work.order'].sudo().search(
-            [('id', '=', work_order_id), ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)])
+            [('id', '=', work_order_id),
+             ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)])
 
         if work_order:
             work_order_records = request.env['linkloving.work.order.record'].sudo().search(
                 [('work_order_id', '=', work_order_id),('parent_id', '=', False)],order='create_date desc')
             record_json = []
             for record in work_order_records:
+                if uid == work_order_records.work_order_id.assign_uid.id:
+                    record.write({"isRead": True})  # 标记成已读
                 record_json.append(LinklovingAppApi.convert_work_order_record_to_json(record))
-            return JsonResponse.send_response(STATUS_CODE_OK, res_data={"work_order": self.convert_work_order_to_json(work_order), "records": record_json})
+            return JsonResponse.send_response(STATUS_CODE_OK,
+                                              res_data={"work_order": self.convert_work_order_to_json(work_order),
+                                                        "records": record_json})
         else:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "work_order_id不存在或无权限访问"})
 
@@ -4393,8 +4438,8 @@ class LinklovingAppApi(http.Controller):
             'reply_uid': LinklovingAppApi.get_user_json(record.reply_uid.id),
             'content': record.content or '',
             'create_date': record.create_date,
-            'record_id':record.id,
-            'reply_record_line_ids':LinklovingAppApi.convert_work_order_arr_to_json(record.reply_record_line_ids),
+            'record_id': record.id,
+            'reply_record_line_ids': LinklovingAppApi.convert_work_order_arr_to_json(record.reply_record_line_ids),
             'create_uid': LinklovingAppApi.get_user_json(record.create_uid.id),
         }
 
@@ -4553,4 +4598,3 @@ class LinklovingAppApi(http.Controller):
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=groupList)
-
