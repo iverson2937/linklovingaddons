@@ -3210,7 +3210,7 @@ class LinklovingAppApi(http.Controller):
         for move in stock_moves:
             sim_stock_move = request.env["sim.stock.move"].sudo().browse(move['stock_move_lines_id'])
 
-            if move["quantity_available"] != sim_stock_move.product_id.qty_available:
+            if move.get("quantity_available") != sim_stock_move.product_id.qty_available:
                 raise UserError(u'在手数量与实际不符,请检查备料情况')
             # LinklovingAppApi.get_model_by_id(,
             #                                                   request,
@@ -3275,7 +3275,7 @@ class LinklovingAppApi(http.Controller):
                 stock_move_lines += sim_stock_move
                 if not sim_stock_move.stock_moves:
                     continue
-                if move["quantity_available"] != sim_stock_move.product_id.qty_available:
+                if move.get("quantity_available") != sim_stock_move.product_id.qty_available:
                     raise UserError(u'在手数量与实际不符,请检查备料情况')
                 if move['quantity_ready'] > 0:
                     sim_stock_move.is_prepare_finished = True
