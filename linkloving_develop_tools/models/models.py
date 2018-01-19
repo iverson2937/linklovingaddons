@@ -327,7 +327,17 @@ class CreateOrderPointWizard(models.TransientModel):
                 product.last1_month_qty = last1_month_qty
                 product.last2_month_qty = last2_month_qty
                 product.last3_month_qty = last3_month_qty
-
+        products = self.env['product.template'].search([('purchase_ok', '=', True)])
+        for product in products:
+            if product.product_variant_ids:
+                product_id = product.product_variant_ids[0]
+                last1_month_qty = product_id.count_purchase_amount(date1_start, date1_end)
+                last2_month_qty = product_id.count_purchase_amount(date2_start, date2_end)
+                last3_month_qty = product_id.count_purchase_amount(date3_start, date3_end)
+                product.last1_month_consume_qty = last1_month_qty
+                product.last3_month_consume_qty = last2_month_qty
+                product.last6_month_consume_qty = last3_month_qty
+                
     def recompute_po_chager(self):
         pos = self.env["purchase.order"].search([])
         for po in pos:

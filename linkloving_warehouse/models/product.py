@@ -50,7 +50,18 @@ class ProductProduct(models.Model):
 
         return res
 
+    def count_purchase_amount(self, start, end):
 
+        location_dest_id = self.env.ref("stock.location_production")
+        orders = self.env['stock.move'].search(
+            [('product_id', '=', self.id),
+             ('state', '=', 'done'),
+             ('date', '>=', start),
+             ('date', '<=', end),
+             ('location_dest_id', '=', location_dest_id.id)])
+        res = sum(order.product_uom_qty for order in orders)
+
+        return res
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
@@ -190,6 +201,11 @@ class ProductTemplate(models.Model):
     last1_month_qty = fields.Float(string=u'1个月')
     last2_month_qty = fields.Float(string=u'3个月')
     last3_month_qty = fields.Float(string=u'6个月')
+
+    last1_month_consume_qty = fields.Float(string=u'1个月')
+    last3_month_consume_qty = fields.Float(string=u'3个月')
+    last6_month_consume_qty = fields.Float(string=u'6个月')
+
     status = fields.Selection([
         ('eol', '已停产'),
         ('normal', '正常')

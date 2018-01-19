@@ -111,7 +111,7 @@ class LinklovingOAApi(http.Controller):
         data = []
         data.append({
             'continent': (obj.continent.display_name or '') + (obj.country_id.display_name or '') + (
-                obj.state_id.name or '') + (obj.city or '') + (obj.street2 or '') + (obj.street or ''),
+                    obj.state_id.name or '') + (obj.city or '') + (obj.street2 or '') + (obj.street or ''),
         })
         return data
 
@@ -203,7 +203,8 @@ class LinklovingOAApi(http.Controller):
                      'qty_invoiced': order_line.qty_invoiced,  # 开单数量
                      'qty_received': order_line.qty_received,  # 已接收数量
                      'price_tax': order_line.taxes_id.name,  # 税金
-                     'shipping_rate': (order_line.qty_received * 100 / order_line.product_qty) if order_line.product_qty  else 0,
+                     'shipping_rate': (
+                             order_line.qty_received * 100 / order_line.product_qty) if order_line.product_qty else 0,
                      'id': order_line.order_id.product_id.id
                      }
                 )
@@ -357,7 +358,6 @@ class LinklovingOAApi(http.Controller):
     #         'remark': feedback.remark
     #     }
     #     return data
-
 
     # 送货单详情页
     # 若是采购退货，除了id还要传一个prma  值随意
@@ -1247,8 +1247,6 @@ class LinklovingOAApi(http.Controller):
         else:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"success": 2})
 
-
-
             # 客户详情页
 
     @http.route('/linkloving_oa_api/customer_details', type='json', auth="none", csrf=False, cors='*')
@@ -1263,7 +1261,7 @@ class LinklovingOAApi(http.Controller):
             'country': obj.country_id.display_name or '',
             'name': obj.display_name,
             'address': (obj.country_id.display_name or '') + (obj.state_id.name or '') + (obj.city or '') + (
-                obj.street2 or '') + (obj.street or ''),
+                    obj.street2 or '') + (obj.street or ''),
             'phone': obj.phone or '',
             'crm_source': obj.crm_source_id.display_name or '',  # 来源
             'source': obj.source_id.display_name or '',  # 渠道
@@ -1865,7 +1863,8 @@ class LinklovingOAApi(http.Controller):
 
     def change_employee_to_json(self, obj_d):
         return {
-            'id':obj_d.user_id.id,
+            'id': obj_d.user_id.id,
+            'partner_id': obj_d.address_home_id.id or 0,
             'name': obj_d.name_related,  # 姓名
             'work_phone': obj_d.work_phone or '',  # 办公电话
             'mobile_phone': obj_d.mobile_phone or '',  # 办公手机
@@ -1876,7 +1875,7 @@ class LinklovingOAApi(http.Controller):
             'image': self.get_img_url(obj_d.id, "hr.employee", "image_medium",
                                       obj_d.write_date.replace("-", "").replace(" ", "").replace(":", "")),
             # 头像
-            'user_id':self.get_department(obj_d.user_id),
+            'user_id': self.get_department(obj_d.user_id),
         }
 
     def change_department_to_json(self, objs):
@@ -2359,7 +2358,7 @@ class LinklovingOAApi(http.Controller):
         py = 0
         if is_plus:
             if need_all:
-                domain_py = [('payment_type', '=', 1), ('state', 'in', ["manager","posted"])]
+                domain_py = [('payment_type', '=', 1), ('state', 'in', ["manager", "posted"])]
                 payment_list = request.env['account.payment.register'].sudo().search(domain_py,
                                                                                      order='id desc')
                 for payment in payment_list:
@@ -2380,12 +2379,11 @@ class LinklovingOAApi(http.Controller):
 
         kc = 0
 
-        domain = ['|', ('to_approve_id', '=', False), ('state', '=', 'confirm'), ('to_approve_id', '=', user_id)]
+        domain = [('to_approve_id', '=', False), '|', ('state', '=', 'confirm'), ('to_approve_id', '=', user_id)]
         if 'is_kucun' in request.jsonrequest.keys():
             if request.jsonrequest.get('is_kucun'):
                 waitList = request.env['stock.inventory'].sudo(user_id).search(domain)
-                for wait_list in waitList:
-                    kc = kc + 1
+                kc = len(waitList)
             else:
                 kc = 0
 
@@ -2419,9 +2417,9 @@ class LinklovingOAApi(http.Controller):
                 else:
                     domain = [('payment_type', '=', 1), ('state', '=', "manager")]
                     payment_list = request.env['account.payment.register'].sudo().search(domain,
-                                                                                     limit=limit,
-                                                                                     offset=offset,
-                                                                                     order='id desc')
+                                                                                         limit=limit,
+                                                                                         offset=offset,
+                                                                                         order='id desc')
             else:
                 domain = [('payment_type', '=', 1), ('state', '=', "posted")]
                 payment_list = request.env['account.payment.register'].sudo().search(domain,
@@ -2495,7 +2493,7 @@ class LinklovingOAApi(http.Controller):
             if (search_type == "need"):
                 if need_all:
                     payment = request.env['account.payment.register'].sudo().search(
-                        [('payment_type', '=', 1), ('state', 'in', ["manager","posted"]),
+                        [('payment_type', '=', 1), ('state', 'in', ["manager", "posted"]),
                          (search_domain, 'ilike', search_name)],
                         order='id desc')
                     return JsonResponse.send_response(STATUS_CODE_OK,
@@ -2503,10 +2501,10 @@ class LinklovingOAApi(http.Controller):
                 else:
                     payment = request.env['account.payment.register'].sudo().search(
                         [('payment_type', '=', 1), ('state', '=', "manager"),
-                        (search_domain, 'ilike', search_name)],
+                         (search_domain, 'ilike', search_name)],
                         order='id desc')
                     return JsonResponse.send_response(STATUS_CODE_OK,
-                                                  res_data=self.change_payment_list_to_json(payment))
+                                                      res_data=self.change_payment_list_to_json(payment))
             else:
                 payment = request.env['account.payment.register'].sudo().search(
                     [('payment_type', '=', 1), ('state', '=', "posted"),
@@ -3011,9 +3009,7 @@ class LinklovingOAApi(http.Controller):
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-
-
-     # 报销时选择的申购item
+    # 报销时选择的申购item
     @http.route('/linkloving_oa_api/get_shengou_item', type='json', auth="none", csrf=False, cors='*')
     def get_shengou_item(self, *kw):
         employee_id = request.jsonrequest.get("employee_id")
@@ -3116,7 +3112,6 @@ class LinklovingOAApi(http.Controller):
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-
         # 批准 发送状态的 暂支
 
     @http.route('/linkloving_oa_api/confirm_zanzhi', type='json', auth="none", csrf=False, cors='*')
@@ -3148,7 +3143,6 @@ class LinklovingOAApi(http.Controller):
                                                                                order='id desc')
         shengou.refuse_payment(refuse_reason);
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
-
 
         # 暂支申请准备
 
@@ -3198,7 +3192,6 @@ class LinklovingOAApi(http.Controller):
             "id": new_zanzhi.id
         }
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
-
 
         # 草稿=>提交
 
@@ -3386,7 +3379,7 @@ class LinklovingOAApi(http.Controller):
         type = request.jsonrequest.get('type')
         user_id = request.jsonrequest.get('user_id')
 
-        domain = ['|', ('to_approve_id', '=', False), ('state', '=', 'confirm'), ('to_approve_id', '=', user_id)]
+        domain = [('to_approve_id', '=', False), '|', ('state', '=', 'confirm'), ('to_approve_id', '=', user_id)]
         if 'searchText' in request.jsonrequest.keys():
             if type == 1:
                 domain.append(('name', 'ilike', searchText))
@@ -3413,7 +3406,7 @@ class LinklovingOAApi(http.Controller):
             'remark': waitBean.remark if waitBean.remark else '',
             'location_name': waitBean.location_id.display_name,
             'create_name': waitBean.create_uid.name,
-            'isShow': waitBean.user_has_groups('base.group_erp_manager'),
+            'isShow': waitBean.user_has_groups('linkloving_inventory_adjust_auth.group_inventory_user'),
             'create_img': LinklovingGetImageUrl.get_img_url(waitBean.sudo().create_uid.self.user_ids.id,
                                                             "res.users",
                                                             "image_medium"),

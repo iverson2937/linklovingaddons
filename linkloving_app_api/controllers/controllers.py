@@ -2576,7 +2576,8 @@ class LinklovingAppApi(http.Controller):
                             and is_yes != "yes":
                         return JsonResponse.send_response(STATUS_CODE_ERROR,
                                                           res_data={"error": u"该销售单需要一次性发完货,请等待货齐后再发"})
-                    elif picking_obj.sale_id.delivery_rule == "delivery_once" and picking_obj.state != "assigned":
+                    elif picking_obj.sale_id.delivery_rule == "delivery_once" and picking_obj.state not in ["assigned",
+                                                                                                            "secondary_operation_done"]:
                         return JsonResponse.send_response(STATUS_CODE_ERROR,
                                                           res_data={"error": u"该单据为部分可用,请等待货齐后再发"})
                     elif picking_obj.sale_id.delivery_rule == "cancel_backorder":  # 取消欠单
@@ -2586,7 +2587,8 @@ class LinklovingAppApi(http.Controller):
                     elif picking_obj.sale_id.delivery_rule == "create_backorder":  # 创建欠单
                         wiz.process()
                         picking_obj.to_stock()
-                    elif picking_obj.sale_id.delivery_rule == "delivery_once" and is_yes == "yes" and picking_obj.state == "assigned":  # 一次性出货并备货完成
+                    elif picking_obj.sale_id.delivery_rule == "delivery_once" and is_yes == "yes" and picking_obj.state in [
+                        "assigned", "secondary_operation_done"]:  # 一次性出货并备货完成
                         wiz.process()
                         picking_obj.to_stock()
                 else:
@@ -2717,6 +2719,10 @@ class LinklovingAppApi(http.Controller):
                     dic["reserved_qty"] = reserved_qty
             pack_list.append(dic)
         data = {
+            'secondary_operation': stock_picking_obj.secondary_operation,  # zou增，下，
+            'timesheet_order_id': LinklovingAppApi.timesheet_order_ids_json(
+                stock_picking_obj.timesheet_order_ids.filtered(lambda x: x.state == 'running'))
+            if stock_picking_obj.state=='secondary_operation' else  LinklovingAppApi.timesheet_order_ids_json(stock_picking_obj.timesheet_order_ids),
             'picking_id': stock_picking_obj.id,
             'complete_rate': stock_picking_obj.complete_rate or 0,
             'has_attachment': LinklovingAppApi.is_has_attachment(stock_picking_obj.id, 'stock.picking'),
@@ -3118,14 +3124,16 @@ class LinklovingAppApi(http.Controller):
             elif picking.available_rate == 100 and picking.state != 'waiting':  # 可用率为100 并且不是等待其他作业的状态
                 final_pickings += picking
 
+
         json_list = {'waiting_data': [],
-                     'able_to_data': [], }
+                     'able_to_data': []}
         for picking in final_pickings:
             json_list['able_to_data'].append(self.stock_picking_to_json_simple(picking))
 
         for picking in pickings:
             json_list['waiting_data'].append(self.stock_picking_to_json_simple(picking))
         return json_list
+
 
     def stock_picking_to_json_simple(self, picking):
         data = {
@@ -3137,9 +3145,37 @@ class LinklovingAppApi(http.Controller):
             'back_order_id': picking.backorder_id.name or '',
             'emergency': picking.is_emergency or '',
             'partner_id': picking.partner_id.name,
+            'secondary_operation': picking.secondary_operation,#zou增，下同
+            'timesheet_order_ids': self.timesheet_order_ids_json(
+                picking.timesheet_order_ids.filtered(lambda x: x.state == 'running'))
+            if picking.state == 'secondary_operation' else  LinklovingAppApi.timesheet_order_ids_json(
+                picking.timesheet_order_ids),
         }
         return data
 
+    #zou增加解析json二次加工信息
+    @classmethod
+    def timesheet_order_ids_json(cls, timesheet_order_id):
+        time_list = []
+        for time_id in timesheet_order_id:
+            data = {
+                'id': time_id.id or 0,
+                'from_partner': {
+                    "id": time_id.from_partner.id or 0,
+                    "name": time_id.from_partner.name or ''
+                },
+                'to_partner': {
+                    "id": time_id.to_partner.id or 0,
+                    "name": time_id.to_partner.name or ''
+                },
+                'work_type_id': {
+                    "id": time_id.work_type_id.id or 0,
+                    "name": time_id.work_type_id.name or ''
+                },
+                'hour_spent': time_id.hour_spent or 0
+            }
+            time_list.append(data)
+        return time_list
         ######### 生产 新版接口  ###############
 
     # 备料完成
@@ -3171,6 +3207,10 @@ class LinklovingAppApi(http.Controller):
         # try:
         for move in stock_moves:
             sim_stock_move = request.env["sim.stock.move"].sudo().browse(move['stock_move_lines_id'])
+
+            if "quantity_available" in move.keys():
+                if move.get("quantity_available") != sim_stock_move.product_id.qty_available:
+                    raise UserError(u'在手数量与实际不符,请检查备料情况')
             # LinklovingAppApi.get_model_by_id(,
             #                                                   request,
             #                                                   'sim.stock.move')
@@ -3234,7 +3274,9 @@ class LinklovingAppApi(http.Controller):
                 stock_move_lines += sim_stock_move
                 if not sim_stock_move.stock_moves:
                     continue
-
+                if "quantity_available" in move.keys():
+                    if move.get("quantity_available") != sim_stock_move.product_id.qty_available:
+                        raise UserError(u'在手数量与实际不符,请检查备料情况')
                 if move['quantity_ready'] > 0:
                     sim_stock_move.is_prepare_finished = True
                 else:
@@ -4511,3 +4553,4 @@ class LinklovingAppApi(http.Controller):
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=groupList)
+
