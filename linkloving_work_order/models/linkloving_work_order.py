@@ -22,7 +22,8 @@ class linkloving_work_order(models.Model):
         ('unaccept', '未指定受理人'),
         ('process', '受理中'),
         ('check', '待审核'),
-        ('done', '已完成')
+        ('done', '已完成'),
+        ('draft', '草稿'),
     ], default='unaccept')
 
     assign_time = fields.Datetime()

@@ -4314,7 +4314,7 @@ class LinklovingAppApi(http.Controller):
                 [('work_order_id', '=', work_order_id),('parent_id', '=', False)],order='create_date desc')
             record_json = []
             for record in work_order_records:
-                if uid == work_order_records.work_order_id.assign_uid.id:
+                if uid == record.work_order_id.assign_uid.id:
                     record.write({"isRead": True})  # 标记成已读
                 record_json.append(LinklovingAppApi.convert_work_order_record_to_json(record))
             return JsonResponse.send_response(STATUS_CODE_OK,
@@ -4352,9 +4352,17 @@ class LinklovingAppApi(http.Controller):
         uid = request.jsonrequest.get("uid")
         work_order_id = request.jsonrequest.get("work_order_id")
 
-        request.env['linkloving.work.order'].sudo().search([
+        request.env['linkloving.work.order'].sudo(uid).search([
             ('id', '=', work_order_id), ('write_uid', '=', uid)
-        ]).unlink()
+        ]).write({
+            'issue_state': "draft",
+        })
+        work_order_record_model = request.env['linkloving.work.order.record']
+        work_order_record = work_order_record_model.sudo(uid).create({
+            'work_order_id': work_order_id,
+            'record_type': "draft",
+            'content': "撤回单据"
+        })
 
         return JsonResponse.send_response(STATUS_CODE_OK)
 
@@ -4428,6 +4436,59 @@ class LinklovingAppApi(http.Controller):
                 'issue_state': "done",
             })
             return JsonResponse.send_response(STATUS_CODE_OK)
+
+    #提交草稿状态
+    @http.route('/linkloving_app_api/commit_draft', type='json', auth="none", csrf=False, cors='*')
+    def commit_draft(self):
+        name = request.jsonrequest.get("title")
+        description = request.jsonrequest.get("description")
+        priority = request.jsonrequest.get("priority")
+        assign_uid = request.jsonrequest.get("assign_uid")
+        wo_images = request.jsonrequest.get('wo_images')  # 图片
+        departments = request.jsonrequest.get('departments')  # 谁可以看
+        work_order_id = request.jsonrequest.get('work_order_id')
+        if not departments:
+            departments = request.env['hr.department'].sudo().search([]).ids
+        print departments
+        issue_state = 'unaccept'
+        if assign_uid:
+            issue_state = 'process'
+        work_order_model = request.env['linkloving.work.order']
+        work_order = work_order_model.sudo(LinklovingAppApi.CURRENT_USER()).search([('id', '=', work_order_id)])
+
+        work_order.write({
+            'name': name,
+            'description': description,
+            'priority': priority,
+            'assign_uid': assign_uid,
+            'issue_state': issue_state,
+            'effective_department_ids': [(6, 0, departments)]
+        })
+        if assign_uid:
+            work_order_record_model = request.env['linkloving.work.order.record']
+            work_order_record = work_order_record_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
+                'work_order_id': work_order.id,
+                'record_type': "assign",
+                'reply_uid': assign_uid,
+                'content': "重新提交工单并指派受理人：",
+            })
+        else:
+            work_order_record_model = request.env['linkloving.work.order.record']
+            work_order_record = work_order_record_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
+                'work_order_id': work_order.id,
+                'record_type': "assign",
+                'content': "重新提交工单",
+            })
+
+        if wo_images:
+            for img in wo_images:
+                wo_img_id = request.env["linkloving.work.order.image"].sudo(LinklovingAppApi.CURRENT_USER()).create({
+                    'work_order_id': work_order.id,
+                    'work_order_image': img,
+                })
+                work_order.attachments = [(4, wo_img_id.id)]
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.convert_work_order_to_json(work_order))
 
     @staticmethod
     def convert_work_order_record_to_json(record):
