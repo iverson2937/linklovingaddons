@@ -4500,6 +4500,28 @@ class LinklovingAppApi(http.Controller):
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.convert_work_order_to_json(work_order))
 
+    #搜索工单
+    @http.route('/linkloving_app_api/search_gongdan', type='json', auth="none", csrf=False, cors='*')
+    def search_gongdan(self):
+        search_text = request.jsonrequest.get('search_text')
+        search_type = request.jsonrequest.get('search_type')
+        uid = request.jsonrequest.get("uid")
+        user = request.env["res.users"].sudo().browse(uid)
+        work_order = request.env['linkloving.work.order'].sudo(uid).search([('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids),(search_type, 'ilike', search_text)])
+        data = []
+        for order in work_order:
+            data.append(LinklovingAppApi.convert_work_order_to_json(order))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    #获取所有工单标签
+    @http.route('/linkloving_app_api/get_all_biaoqian', type='json', auth="none", csrf=False, cors='*')
+    def get_all_biaoqian(self):
+        create_biaoqian = request.env['linkloving.work.order.tag'].sudo().create({
+            "name":"若小贝"
+        })
+        biaoqian = request.env['linkloving.work.order.tag'].sudo().search([])
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.get_tag_to_json(biaoqian))
+
     @staticmethod
     def convert_work_order_record_to_json(record):
         data = {
