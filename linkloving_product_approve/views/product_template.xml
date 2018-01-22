@@ -53,19 +53,31 @@
             </field>
         </record>
 
+
         <record id="action_my_product_in_progress" model="ir.actions.act_window">
             <field name="name">待审核</field>
             <field name="res_model">product.template</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[('create_uid','=',uid),('state','=','progress')]</field>
+            <field name="domain">[('required_user_ids','child_of',[uid]),('state','=','progress')]</field>
             <field name="help" type="html">
                 <p>
 
                 </p>
             </field>
         </record>
+        <record id="action_my_product_approved" model="ir.actions.act_window">
+            <field name="name">已审核</field>
+            <field name="res_model">product.template</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('approved_user_ids','child_of',[uid])]</field>
+            <field name="help" type="html">
+                <p>
 
+                </p>
+            </field>
+        </record>
 
         <menuitem id="menu_mrp_approve_product_root"
                   parent="linkloving_approval.ll_approval_root"
@@ -84,9 +96,11 @@
 
         <menuitem id="menu_mrp_approve_product_root_to_approve"
                   parent="menu_mrp_my_product"
+                  action="action_my_product_in_progress"
                   name="待审核"/>
         <menuitem id="menu_mrp_approve_product_root_approved"
                   parent="menu_mrp_my_product"
+                  action="action_my_product_approved"
                   name="已审核"/>
 
 
