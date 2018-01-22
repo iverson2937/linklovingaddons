@@ -4141,6 +4141,16 @@ class LinklovingAppApi(http.Controller):
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
     # start--------------模块:工单---------------分割线--------------------------------------------------start
+
+    # 获取所有标签
+    @http.route('/linkloving_app_api/get_all_tags', type='json', auth="none", csrf=False, cors='*')
+    def get_all_tags(self, *kw):
+        get_all_tags = request.env['linkloving.work.order.tag'].sudo().search([])
+        data = {
+            "all_tags": self.get_tag_to_json(get_all_tags),
+        }
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
     # 创建工单
     @http.route('/linkloving_app_api/create_work_order', type='json', auth="none", csrf=False, cors='*')
     def create_work_order(self):
@@ -4150,6 +4160,7 @@ class LinklovingAppApi(http.Controller):
         assign_uid = request.jsonrequest.get("assign_uid")
         wo_images = request.jsonrequest.get('wo_images')  # 图片
         departments = request.jsonrequest.get('departments')  # 谁可以看
+        tags = request.jsonrequest.get('tags')  # 谁可以看
 
         if not departments:
             departments = request.env['hr.department'].sudo().search([]).ids
@@ -4164,7 +4175,8 @@ class LinklovingAppApi(http.Controller):
             'priority': priority,
             'assign_uid': assign_uid,
             'issue_state': issue_state,
-            'effective_department_ids': [(6, 0, departments)]
+            'effective_department_ids': [(6, 0, departments)],
+            'tag_ids': [(6, 0, tags)]
         })
         if assign_uid:
             work_order_record_model = request.env['linkloving.work.order.record']
@@ -4280,9 +4292,7 @@ class LinklovingAppApi(http.Controller):
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=work_order_json)
 
-
-        # 查询@ 我的
-
+    # 查询@ 我的
     @http.route('/linkloving_app_api/searchAtMe', type='json', auth="none", csrf=False, cors='*')
     def searchAtMe(self, **kw):
         uid = request.jsonrequest.get("uid")
@@ -4437,7 +4447,7 @@ class LinklovingAppApi(http.Controller):
             })
             return JsonResponse.send_response(STATUS_CODE_OK)
 
-    #提交草稿状态
+    # 提交草稿状态
     @http.route('/linkloving_app_api/commit_draft', type='json', auth="none", csrf=False, cors='*')
     def commit_draft(self):
         name = request.jsonrequest.get("title")
@@ -4506,8 +4516,6 @@ class LinklovingAppApi(http.Controller):
 
         return data
 
-
-
     @staticmethod
     def convert_work_order_to_json(work_order):
         data = ({
@@ -4524,6 +4532,16 @@ class LinklovingAppApi(http.Controller):
             'effective_department_ids':LinklovingAppApi.get_department_json(work_order.effective_department_ids)
         })
         return data
+
+    @classmethod
+    def get_tag_to_json(self, objs):
+        data = []
+        for obj in objs:
+            data.append({
+                'name': obj.name,
+                'id': obj.id
+            })
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
     @classmethod
     def get_work_order_img_url(cls, worker_id, ):
