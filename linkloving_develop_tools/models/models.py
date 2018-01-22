@@ -559,6 +559,7 @@ class CreateOrderPointWizard(models.TransientModel):
                          ('state', 'in', ['purchase', 'done'])])
                     if not line and len(product.seller_ids) > 1:
                         _logger.warning("delete, %d-------%s" % (s.id, s.name.name))
+                        s.unlink()
 
     def set_standard_price_from_subcompany(self):
         """
