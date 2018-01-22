@@ -226,8 +226,9 @@ class AccountPayment(models.Model):
         res['domain']['journal_id'].append(('deprecated', '=', False))
 
         res['domain']['payment_method_id'] = [('payment_type', '=', self.payment_type)]
-        self.payment_method_id = self.env['account.payment.method'].search([('payment_type', '=', self.payment_type)])[
-            0].id
+        payment_method = self.env['account.payment.method'].search([('payment_type', '=', self.payment_type)])
+        if payment_method:
+            self.payment_method_id = payment_method[0].id
 
         return res
 
