@@ -2379,7 +2379,7 @@ class LinklovingOAApi(http.Controller):
 
         kc = 0
 
-        domain = [('to_approve_id', '=', False), '|', ('state', '=', 'confirm'), ('to_approve_id', '=', user_id)]
+        domain = [('state', '=', 'confirm'), ('to_approve_id', '=', user_id)]
         if 'is_kucun' in request.jsonrequest.keys():
             if request.jsonrequest.get('is_kucun'):
                 waitList = request.env['stock.inventory'].sudo(user_id).search(domain)
