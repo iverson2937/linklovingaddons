@@ -33,6 +33,8 @@ class linkloving_work_order(models.Model):
     attachments = fields.One2many(comodel_name="linkloving.work.order.image", inverse_name="work_order_id", string="工单图片",
                               required=False, )
 
+    tag_ids = fields.Many2many('linkloving.work.order.tag', 'linkloving_work_order_tag_rel', 'work_order_id', 'tag_id', 'Tags')
+
     @api.model
     def create(self, vals):
         if not vals.get('order_number'):
