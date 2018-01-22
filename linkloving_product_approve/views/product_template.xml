@@ -24,6 +24,27 @@
                     <field name="stage_id" widget="statusbar" readonly="1"/>
                     <field name="state" invisible="1"/>
                 </header>
+
+                <xpath expr="//notebook[last()]" position="after">
+                    <notebook name="approve" string="审核记录">
+                        <page string="审核记录">
+                            <field name="approval_record_ids" options="{'no_create': True}">
+                                <tree create="false">
+                                    <field name="stage_id"/>
+                                    <field name="user_id"/>
+                                    <field name="created_time"/>
+                                    <field name="status"/>
+                                </tree>
+
+                            </field>
+
+                        </page>
+                        <page string="审核流程">
+
+
+                        </page>
+                    </notebook>
+                </xpath>
             </field>
         </record>
 
@@ -60,6 +81,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="domain">[('required_user_ids','child_of',[uid]),('state','=','progress')]</field>
+            <field name="context">{'to_approve':True}</field>
             <field name="help" type="html">
                 <p>
 

@@ -107,7 +107,6 @@ class MrpApproveStage(models.Model):
     sequence = fields.Integer('Sequence', default=0)
     # folded = fields.Boolean('Folded in kanban view')
     allow_apply_change = fields.Boolean('Final Stage')
-    final_stage = fields.Boolean()
     # type_id = fields.Many2one('mrp.eco.type', 'Type', required=True, default=lambda self: self.env['mrp.eco.type'].search([], limit=1))
     approval_template_ids = fields.One2many('mrp.approval.template', 'stage_id', 'Approvals')
 

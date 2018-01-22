@@ -5,7 +5,8 @@ from odoo.exceptions import UserError
 
 
 class ProductTemplate(models.Model):
-    _inherit = 'product.template'
+    _name = 'product.template'
+    _inherit = ['product.template', 'ir.needaction_mixin']
 
     approval_record_ids = fields.One2many('mrp.approval.record', 'product_id')
     stage_id = fields.Many2one(
@@ -61,7 +62,6 @@ class ProductTemplate(models.Model):
                 stage_id = self.env['mrp.approve.stage'].search([('type_id', '=', type_id.id)])[0]
 
             product.stage_id = stage_id.id
-            print stage_id.required_user_ids.ids
             product.required_user_ids = [(6, 0, stage_id.required_user_ids.ids)]
 
     @api.multi
@@ -77,7 +77,7 @@ class ProductTemplate(models.Model):
                         'user_id': self.env.uid
                     })
                     # 审核过待审核中取消
-                    product.required_user_ids = (3, app.user_ids)
+                    product.required_user_ids = (3, app.user_ids.ids)
                     product.approved_user_ids = [(4, self.env.user.id)]
 
             change_to_next = True
@@ -92,10 +92,16 @@ class ProductTemplate(models.Model):
                         break
             if change_to_next and product.stage_id.next_stage_id:
                 product.stage_id = product.stage_id.next_stage_id.id
-            elif product.stage_id.final_stage:
+                product.required_user_ids = [(6, 0, product.stage_id.required_user_ids.ids)]
+                print  product.stage_id.required_user_ids.ids,'dd'
+                print product.required_user_ids
+
+            elif product.stage_id.allow_apply_change and change_to_next:
                 product.state = 'done'
-            else:
-                raise UserError('请联系管理员设置审核阶段的属性')
+            elif not  product.stage_id.allow_apply_change and not product.stage_id.next_stage_id:
+                raise UserError('请联系管理员设置')
+
+
 
     @api.multi
     def reject(self):
@@ -150,3 +156,10 @@ class ProductTemplate(models.Model):
     #     product = super(ProductTemplate, self).create(vals)
     #     product._create_approvals()
     #     return product
+    @api.model
+    def _needaction_domain_get(self):
+        """ Returns the domain to filter records that require an action
+            :return: domain or False is no action
+        """
+        if self._context.get('to_approve'):
+            return [('required_user_ids', 'child_of', self.env.user.id)]
