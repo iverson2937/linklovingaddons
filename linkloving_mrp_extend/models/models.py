@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
 import datetime
+import logging
+import traceback
 import types
 
 import jpush
@@ -2175,6 +2177,18 @@ class stock_transfer_way(models.TransientModel):
 class StockPackOperationExtend(models.Model):
     _inherit = 'stock.pack.operation'
 
+    @api.model
+    def create(self, vals):
+        logging.warning("xxxxxxxxxxxxxxxxxxxxxxx  %s" % vals)
+        if vals.get("qty_done") == 0:
+            traceback.print_stack()
+        return super(StockPackOperationExtend, self).create(vals)
+    @api.multi
+    def write(self, vals):
+        logging.warning("AAAAAAAAAAAAAAAA %s" % vals)
+        if vals.get("qty_done") == 0:
+            traceback.print_stack()
+        return super(StockPackOperationExtend, self).write(vals)
     @api.multi
     def _compute_receivied_qty(self):
         for pack in self:

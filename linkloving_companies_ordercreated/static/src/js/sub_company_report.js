@@ -174,7 +174,7 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                 editable: true,
 
                 iconsPrefix: 'fa', // glyphicon of fa (font awesome)
-                exportTypes: ['excel'],
+                exportTypes: ['excel', 'png'],
                 exportOptions: {
                     fileName: filename,//'生产跟踪单' + data.so_name,
                     excelstyles: ['background-color', 'color', 'font-weight', 'border', 'border-top', 'border-bottom', 'border-left', 'border-right', 'font-size', 'width', 'height'],

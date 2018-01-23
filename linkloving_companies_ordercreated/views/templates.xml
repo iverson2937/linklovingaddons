@@ -12,6 +12,8 @@
                 <script type="text/javascript"
                         src="/linkloving_companies_ordercreated/static/src/js/bootstrap-table/bootstrap-editable.js"/>
                 <script type="text/javascript"
+                        src="/linkloving_companies_ordercreated/static/src/js/bootstrap-table/html2canvas.js"/>
+                <script type="text/javascript"
                         src="/linkloving_companies_ordercreated/static/src/js/bootstrap-table/bootstrap-table-export.min.js"/>
                  <script type="text/javascript"
                         src="/linkloving_companies_ordercreated/static/src/js/bootstrap-table/bootstrap-table-editable.js"/>
@@ -21,7 +23,6 @@
                         src="/linkloving_companies_ordercreated/static/src/js/bootstrap-table/bootstrap-table-zh-CN.min.js"/>
                 <script type="text/javascript"
                         src="/linkloving_companies_ordercreated/static/src/js/sub_company_report.js"/>
-
             </xpath>
         </template>
     </data>
