@@ -32,7 +32,7 @@
                                 <tree create="false">
                                     <field name="stage_id"/>
                                     <field name="user_id"/>
-                                    <field name="created_time"/>
+                                    <field name="create_date"/>
                                     <field name="status"/>
                                 </tree>
 

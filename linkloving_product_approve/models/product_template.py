@@ -93,8 +93,6 @@ class ProductTemplate(models.Model):
             if change_to_next and product.stage_id.next_stage_id:
                 product.stage_id = product.stage_id.next_stage_id.id
                 product.required_user_ids = [(6, 0, product.stage_id.required_user_ids.ids)]
-                print  product.stage_id.required_user_ids.ids,'dd'
-                print product.required_user_ids
 
             elif product.stage_id.allow_apply_change and change_to_next:
                 product.state = 'done'
