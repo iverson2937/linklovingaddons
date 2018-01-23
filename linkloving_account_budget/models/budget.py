@@ -7,14 +7,14 @@ from odoo.exceptions import UserError
 class AccountBudget(models.Model):
     _name = 'linkloving.account.budget'
     _order = 'create_date desc'
-    name = fields.Char()
+    name = fields.Char(string='名称')
     department_id = fields.Many2one('hr.department', string=u'部门')
-    product_id = fields.Many2one('product.product', string=u'费用类别')
+    product_id = fields.Many2one('product.product', string=u'费用类别', domain=[('can_be_expensed', '=', True)])
     amount = fields.Float(string=u'预算总金额')
     balance = fields.Float(string=u'预算余额', compute='get_budget_balance')
     sheet_ids = fields.One2many('hr.expense.sheet', 'budget_id')
     description = fields.Text(string=u'描述')
-    fiscal_year_id = fields.Many2one('account.fiscalyear')
+    fiscal_year_id = fields.Many2one('account.fiscalyear', string='年度')
     state = fields.Selection([
         ('draft', '草稿'),
         ('done', '正式'),
@@ -31,7 +31,7 @@ class AccountBudget(models.Model):
                 raise UserError('不能删除')
         return super(AccountBudget, self).unlink()
 
-    def set_to_formal(self):
+    def set_to_done(self):
         self.state = 'done'
 
     @api.multi
