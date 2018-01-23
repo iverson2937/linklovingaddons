@@ -130,6 +130,7 @@
                                 <div class="col-xs-3">
                                     <strong>审核人:</strong>
                                     <p t-field="o.approve_id.name"/>
+                                    <p t-field="o.manager_id.name"/>
                                 </div>
                                 <div class="col-xs-3">
                                     <strong>制单人:</strong>

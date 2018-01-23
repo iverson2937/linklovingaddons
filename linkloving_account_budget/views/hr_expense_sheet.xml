@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="hr_expense_sheet_form_inherit" model="ir.ui.view">
+            <field name="name">报销单</field>
+            <field name="model">hr.expense.sheet</field>
+            <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_form"/>
+            <field name="arch" type="xml">
+                <xpath expr='//page[1]' position="after">
+                    <page>
+                        <group>
+                            <field name="fiscal_year_id" options="{'no_create':True}"/>
+                            <field name="budget_id" readonly="1"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+
+    </data>
+</openerp>
