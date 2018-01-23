@@ -27,6 +27,7 @@
         'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
+        'views/sub_company_eco.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
