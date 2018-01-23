@@ -4231,7 +4231,8 @@ class LinklovingAppApi(http.Controller):
             begin = fields.datetime.strptime(start_date, '%Y-%m-%d')
             end = fields.datetime.strptime(end_date, '%Y-%m-%d')
             work_order_model = request.env['linkloving.work.order']
-            if len(tag_ids) == 0:
+
+            if not tag_ids or len(tag_ids) == 0:
                 work_order_data = work_order_model.sudo().read_group(
                     [('create_date', '<', (end - timez).strftime('%Y-%m-%d %H:%M:%S')),
                      ('create_date', '>', (begin - timez).strftime('%Y-%m-%d %H:%M:%S')),
@@ -4357,7 +4358,6 @@ class LinklovingAppApi(http.Controller):
             [('id', '=', work_order_id),
              # ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)
              ])
-
         if work_order:
             work_order_records = request.env['linkloving.work.order.record'].sudo().search(
                 [('work_order_id', '=', work_order_id),('parent_id', '=', False)],order='create_date desc')
