@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_form"/>
             <field name="arch" type="xml">
                 <xpath expr='//page[1]' position="after">
-                    <page>
+                    <page string="预算">
                         <group>
                             <field name="fiscal_year_id" options="{'no_create':True}"/>
                             <field name="budget_id" readonly="1"/>
