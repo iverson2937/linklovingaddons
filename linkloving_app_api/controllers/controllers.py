@@ -4360,7 +4360,7 @@ class LinklovingAppApi(http.Controller):
              ])
         if work_order:
             work_order_records = request.env['linkloving.work.order.record'].sudo().search(
-                [('work_order_id', '=', work_order_id),('parent_id', '=', False)],order='create_date desc')
+                [('work_order_id', '=', work_order_id)],order='create_date desc')
             record_json = []
             for record in work_order_records:
                 if uid == record.work_order_id.assign_uid.id :
