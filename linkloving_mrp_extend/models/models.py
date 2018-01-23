@@ -2176,10 +2176,16 @@ class stock_transfer_way(models.TransientModel):
 class StockPackOperationExtend(models.Model):
     _inherit = 'stock.pack.operation'
 
+    @api.model
+    def create(self, vals):
+        print("xxxxxxxxxxxxxxxxxxxxxxx  %s" % vals)
+        if vals.get("qty_done") == 0:
+            traceback.print_stack()
+        return super(StockPackOperationExtend, self).create(vals)
     @api.multi
     def write(self, vals):
+        print("AAAAAAAAAAAAAAAA %s" % vals)
         if vals.get("qty_done") == 0:
-            print("xxxxxxxxxxxxxxxxxxxxxxx")
             traceback.print_stack()
         return super(StockPackOperationExtend, self).write(vals)
     @api.multi
