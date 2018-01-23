@@ -2,13 +2,13 @@
     <data>
 
         <record model="ir.actions.act_window" id="work_order_setting_action">
-            <field name="name">工单设置</field>
+            <field name="name">标签设置</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">linkloving.work.order.tag</field>
             <field name="view_mode">tree,form</field>
         </record>
         <menuitem id="work_order_root" name="工单" sequence="10"/>
-        <menuitem id="work_order_tag_setting" name="设置" parent="work_order_root" action="work_order_setting_action" sequence="2"/>
+        <menuitem id="work_order_tag_setting" name="标签设置" parent="work_order_root" action="work_order_setting_action" sequence="2"/>
 
 
     </data>
