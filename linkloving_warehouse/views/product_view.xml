@@ -18,7 +18,8 @@
                     <field name="type" invisible="1"/>
                     <field name="uom_id" invisible="1"/>
                     <field name="active" invisible="1"/>
-                    <field name="stock" string="在产"/>
+                    <field name="stock" string="库存"/>
+                    <field name="incoming_qty" string="在产"/>
                     <field name="forecast_qty" string="预测数量"/>
                     <field name="reordering_min_qty" string="最小"/>
                     <field name="reordering_max_qty" string="最大"/>

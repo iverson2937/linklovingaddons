@@ -24,6 +24,27 @@
                     <field name="stage_id" widget="statusbar" readonly="1"/>
                     <field name="state" invisible="1"/>
                 </header>
+
+                <xpath expr="//notebook[last()]" position="after">
+                    <notebook name="approve" string="审核记录">
+                        <page string="审核记录">
+                            <field name="approval_record_ids" options="{'no_create': True}">
+                                <tree create="false">
+                                    <field name="stage_id"/>
+                                    <field name="user_id"/>
+                                    <field name="created_time"/>
+                                    <field name="status"/>
+                                </tree>
+
+                            </field>
+
+                        </page>
+                        <page string="审核流程">
+
+
+                        </page>
+                    </notebook>
+                </xpath>
             </field>
         </record>
 
@@ -53,19 +74,32 @@
             </field>
         </record>
 
+
         <record id="action_my_product_in_progress" model="ir.actions.act_window">
             <field name="name">待审核</field>
             <field name="res_model">product.template</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[('create_uid','=',uid),('state','=','progress')]</field>
+            <field name="domain">[('required_user_ids','child_of',[uid]),('state','=','progress')]</field>
+            <field name="context">{'to_approve':True}</field>
             <field name="help" type="html">
                 <p>
 
                 </p>
             </field>
         </record>
+        <record id="action_my_product_approved" model="ir.actions.act_window">
+            <field name="name">已审核</field>
+            <field name="res_model">product.template</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('approved_user_ids','child_of',[uid])]</field>
+            <field name="help" type="html">
+                <p>
 
+                </p>
+            </field>
+        </record>
 
         <menuitem id="menu_mrp_approve_product_root"
                   parent="linkloving_approval.ll_approval_root"
@@ -84,9 +118,11 @@
 
         <menuitem id="menu_mrp_approve_product_root_to_approve"
                   parent="menu_mrp_my_product"
+                  action="action_my_product_in_progress"
                   name="待审核"/>
         <menuitem id="menu_mrp_approve_product_root_approved"
                   parent="menu_mrp_my_product"
+                  action="action_my_product_approved"
                   name="已审核"/>
 
 

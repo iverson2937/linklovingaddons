@@ -86,7 +86,7 @@ class HrExpenseSheetWizard(models.TransientModel):
                 'sequence': sheet_sequence,
                 'name': payment.name,
                 'receive_date': payment.receive_date,
-                'supplier': payment.invoice_ids[0].partner_id.name,
+                'supplier': payment.partner_id.name,
                 'amount': payment.amount,
                 'create_uid': payment.create_uid.name,
             }
@@ -199,7 +199,9 @@ class HrExpenseSheetWizard(models.TransientModel):
         for sheet in hr_expense_sheet_ids:
             ids = []
             if sheet.account_payment_line_ids:
-                ids = ';'.join(line.payment_id.name for line in sheet.account_payment_line_ids)
+                for line in sheet.account_payment_line_ids:
+                    if line.payment_id:
+                        ids.append(line.payment_id.name + ';')
             returnDict[sheet.id] = {'data': {}, 'line': {}}
             returnDict[sheet.id]['data'] = {
                 'sequence': sheet_sequence,

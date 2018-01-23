@@ -24,8 +24,11 @@ class linkloving_work_order_record(models.Model):
         ('assign', '指派'),
         ('check', '审核'),
         ('reject', '驳回'),
-        ('finish', '完成')
+        ('finish', '完成'),
+        ('draft', '草稿')
     ], default='reply')
+
+    isRead = fields.Boolean(default=False)
 
     reply_uid = fields.Many2one("res.users")
 
