@@ -1,48 +1,15 @@
 <openerp>
-  <data>
-    <!-- explicit list view definition -->
-    <record model="ir.ui.view" id="linkloving_issue.list">
-      <field name="name">linkloving_issue list</field>
-      <field name="model">linkloving_issue.linkloving_issue</field>
-      <field name="arch" type="xml">
-        <tree>
-          <field name="name"/>
-          <field name="value"/>
-          <field name="value2"/>
-        </tree>
-      </field>
-    </record>
+    <data>
 
-    <!-- actions opening views on models -->
-    <record model="ir.actions.act_window" id="linkloving_issue.action_window">
-      <field name="name">linkloving_issue window</field>
-      <field name="res_model">linkloving_issue.linkloving_issue</field>
-      <field name="view_mode">tree,form</field>
-    </record>
+        <record model="ir.actions.act_window" id="work_order_setting_action">
+            <field name="name">工单设置</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">linkloving.work.order.tag</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem id="work_order_root" name="工单" sequence="10"/>
+        <menuitem id="work_order_tag_setting" name="设置" parent="work_order_root" action="work_order_setting_action" sequence="2"/>
 
-    <!-- server action to the one above -->
-    <record model="ir.actions.server" id="linkloving_issue.action_server">
-      <field name="name">linkloving_issue server</field>
-      <field name="model_id" ref="model_linkloving_issue_linkloving_issue"/>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "tree,form",
-          "res_model": self._name,
-        }
-      </field>
-    </record>
 
-    <!-- Top menu item -->
-    <menuitem name="linkloving_issue" id="linkloving_issue.menu_root"/>
-    <!-- menu categories -->
-    <menuitem name="Menu 1" id="linkloving_issue.menu_1" parent="linkloving_issue.menu_root"/>
-    <menuitem name="Menu 2" id="linkloving_issue.menu_2" parent="linkloving_issue.menu_root"/>
-    -->
-    <!-- actions -->
-    <menuitem name="List" id="linkloving_issue.menu_1_list" parent="linkloving_issue.menu_1"
-              action="linkloving_issue.action_window"/>
-    <menuitem name="Server to list" id="linkloving_issue" parent="linkloving_issue.menu_2"
-              action="linkloving_issue.action_server"/>
-  </data>
+    </data>
 </openerp>
