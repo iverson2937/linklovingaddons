@@ -86,7 +86,7 @@ class HrExpenseSheetWizard(models.TransientModel):
                 'sequence': sheet_sequence,
                 'name': payment.name,
                 'receive_date': payment.receive_date,
-                'supplier': payment.invoice_ids[0].partner_id.name,
+                'supplier': payment.partner_id.name,
                 'amount': payment.amount,
                 'create_uid': payment.create_uid.name,
             }
