@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "linkloving_work_order",
+    'name': "linkloving_account_budget",
 
     'summary': """
         Short (1 phrase/line) summary of the module's purpose, used as
@@ -14,20 +14,19 @@
     'website': "http://www.yourcompany.com",
 
     # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml
+    # Check https://github.com/odoo/odoo/blob/master/odoo/addons/base/module/module_data.xml
     # for the full list
     'category': 'Uncategorized',
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'mail', 'base_action_rule', 'web_calendar'],
+    'depends': ['base', 'linkloving_account', 'linkloveing_hr'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
-        'views/calendar_views.xml',
-        'views/data.xml',
-       'views/views.xml',
+        'views/budget.xml',
+        'views/hr_expense_sheet.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
