@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import datetime
+import logging
 import traceback
 import types
 
@@ -2178,13 +2179,13 @@ class StockPackOperationExtend(models.Model):
 
     @api.model
     def create(self, vals):
-        print("xxxxxxxxxxxxxxxxxxxxxxx  %s" % vals)
+        logging.warning("xxxxxxxxxxxxxxxxxxxxxxx  %s" % vals)
         if vals.get("qty_done") == 0:
             traceback.print_stack()
         return super(StockPackOperationExtend, self).create(vals)
     @api.multi
     def write(self, vals):
-        print("AAAAAAAAAAAAAAAA %s" % vals)
+        logging.warning("AAAAAAAAAAAAAAAA %s" % vals)
         if vals.get("qty_done") == 0:
             traceback.print_stack()
         return super(StockPackOperationExtend, self).write(vals)
