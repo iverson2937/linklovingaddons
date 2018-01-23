@@ -2386,6 +2386,8 @@ class LinklovingOAApi(http.Controller):
                 kc = len(waitList)
             else:
                 kc = 2
+        else:
+            kc = 3
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"bx": bx, "sg": sg, "zz": zz, "py": py, "kc": kc})
 
