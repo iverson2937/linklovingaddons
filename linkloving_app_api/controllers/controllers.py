@@ -4401,20 +4401,27 @@ class LinklovingAppApi(http.Controller):
     def work_order_retract(self, **kw):
         uid = request.jsonrequest.get("uid")
         work_order_id = request.jsonrequest.get("work_order_id")
+        need_unlink = request.jsonrequest.get("need_unlink")
 
-        request.env['linkloving.work.order'].sudo(uid).search([
-            ('id', '=', work_order_id), ('write_uid', '=', uid)
-        ]).write({
-            'issue_state': "draft",
-        })
-        work_order_record_model = request.env['linkloving.work.order.record']
-        work_order_record = work_order_record_model.sudo(uid).create({
-            'work_order_id': work_order_id,
-            'record_type': "draft",
-            'content': "撤回单据"
-        })
+        if need_unlink:
+            request.env['linkloving.work.order'].sudo(uid).search([
+                ('id', '=', work_order_id)
+            ]).unlink()
+            return JsonResponse.send_response(STATUS_CODE_OK)
+        else:
+            request.env['linkloving.work.order'].sudo(uid).search([
+                ('id', '=', work_order_id), ('write_uid', '=', uid)
+            ]).write({
+                'issue_state': "draft",
+            })
+            work_order_record_model = request.env['linkloving.work.order.record']
+            work_order_record = work_order_record_model.sudo(uid).create({
+                'work_order_id': work_order_id,
+                'record_type': "draft",
+                'content': "撤回单据"
+            })
 
-        return JsonResponse.send_response(STATUS_CODE_OK)
+            return JsonResponse.send_response(STATUS_CODE_OK)
 
     # 工单操作
     @http.route('/linkloving_app_api/work_order_action', type='json', auth="none", csrf=False, cors='*')
