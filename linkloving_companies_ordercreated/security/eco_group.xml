@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record model="ir.module.category" id="module_category_cross_company">
+            <field name="name">跨系统操作</field>
+            <field name="sequence">6</field>
+        </record>
+        <record id="group_stock_picking_eco" model="res.groups">
+            <field name="name">采购需求变更单</field>
+            <!--<field name="users" eval="[(4, ref('base.user_root'))]"/>-->
+            <!--<field name="implied_ids" eval="[(4, ref('mrp.group_mrp_user'))]"/>-->
+            <field name="category_id" ref="module_category_cross_company"/>
+        </record>
+
+    </data>
+</odoo>

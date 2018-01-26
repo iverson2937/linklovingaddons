@@ -2041,6 +2041,8 @@ class StcokPickingExtend(models.Model):
             if pick.picking_type_code == 'incoming':
                 pick.is_cancel_backorder = True
                 pick.state = 'waiting_in'
+            elif pick.picking_type_code == 'outgoing':
+                self.do_transfer()
         return
 
     @api.multi
