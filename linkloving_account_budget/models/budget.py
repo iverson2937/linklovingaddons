@@ -13,7 +13,7 @@ class AccountBudget(models.Model):
     amount_used = fields.Float(string=u'已使用金额', compute='get_budget_balance')
     balance = fields.Float(string=u'预算余额', compute='get_budget_balance')
     description = fields.Text(string=u'描述')
-    fiscal_year_id = fields.Many2one('account.fiscalyear', string='年度')
+    fiscal_year_id = fields.Many2one('account.fiscalyear', string='年度', default=get_default_period)
     line_ids = fields.One2many('linkloving.account.budget.line', 'budget_id')
     state = fields.Selection([
         ('draft', '草稿'),
