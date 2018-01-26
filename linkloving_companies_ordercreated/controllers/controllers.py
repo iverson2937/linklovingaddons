@@ -71,6 +71,89 @@ class LinklovingCompanies(http.Controller):
             raise e
         return {'feedback': f_dic}
 
+    @http.route('/linkloving_web/do_eco', auth='none', type='json', csrf=False)
+    def do_eco(self):
+        db = request.jsonrequest.get("db")  # 所选账套
+        vals = request.jsonrequest.get("vals")  # 所选账套
+        request.session.db = db  # 设置账套
+        request.params["db"] = db
+
+        so_name = vals.get("so_name")
+        so_id = vals.get("so_id")
+        try:
+            so_need_change = request.env["sale.order"].sudo().browse(int(so_id))
+        except OperationalError:
+            return {
+                "code": -2,
+                "msg": u"账套%s不存在" % db
+            }
+        if so_need_change.name != so_name:
+            return {
+                "code": -3,
+                "msg": u"子系统销售单号与主系统记录的单号不符, %s->%s" % (so_name, so_need_change.name)
+            }
+        if so_need_change.partner_id.sub_company != 'main':
+            return {
+                "code": -4,
+                "msg": u"子系统销售单的客户异常,请检查",
+            }
+
+        stock_picking_cancel = request.env['ll.stock.picking.cancel'].sudo()
+        product_product = request.env["product.product"].sudo()
+        cancel_picking = so_need_change.picking_ids.filtered(lambda x: x.state not in ["done", "cancel"])
+        if cancel_picking:
+            cancel_lines_list = vals.get("cancel_lines_list")
+            tmp_list = []
+            try:
+                line_dic = self.sale_order_line_info_dic(so_need_change)
+                move_dic = self.picking_move_info_dic(cancel_picking)
+                for line in cancel_lines_list:
+                    p_id = product_product.search([('default_code', '=', line.get("default_code"))])
+                    if not p_id:
+                        return {
+                            "code": -6,
+                            "msg": u"子系统中找不到对应的料号 %s" % line.get("default_code"),
+                        }
+                    order_line_info = line_dic.get(line.get("default_code"))
+                    move_info = move_dic.get(line.get("default_code"))
+                    tmp_list.append((0, 0, {
+                        'product_id': p_id.id,
+                        'cancel_qty': line.get("cancel_qty"),
+                        'total_qty': order_line_info.product_uom_qty,
+                        'done_qty': order_line_info.qty_delivered,
+                        'product_uom': move_info.product_uom.id,
+                        'product_uom_qty': move_info.product_uom_qty,
+                        'move_id': move_info.id,
+                    }))
+                cancel_order = stock_picking_cancel.create({
+                    'picking_id': cancel_picking[0].id,
+                    'sale_id': so_id,
+                    'cancel_line_ids': tmp_list
+                })
+                cancel_order.confirm_eco_split_move()
+            except Exception, e:
+                raise e
+
+        else:
+            return {
+                "code": -5,
+                "msg": u"子系统中未找到可操作的调拨单",
+            }
+        return {
+            "code": 1
+        }
+
+    def sale_order_line_info_dic(self, so_need_change):
+        tmp_dic = {}
+        for line in so_need_change.order_line:
+            tmp_dic[line.product_id.default_code] = line
+        return tmp_dic
+
+    def picking_move_info_dic(self, picking):
+        tmp_dic = {}
+        for line in picking.move_lines:
+            tmp_dic[line.product_id.default_code] = line
+        return tmp_dic
     @http.route('/linkloving_web/action_transfer_from_sub', auth='none', type='json', csrf=False)
     def action_transfer_from_sub(self):
         encode_data = request.jsonrequest.get("data")  # 加密数据

@@ -1,0 +1,144 @@
+<openerp>
+    <data>
+        <record id="view_ll_stock_picking_cancel" model="ir.ui.view">
+            <field name="name">ll.stock.picking.cancel.select</field>
+            <field name="model">ll.stock.picking.cancel</field>
+            <field name="arch" type="xml">
+                <search string="搜索需求变更单">
+                    <field name="name" string="单号"/>
+                    <field name="purchase_id"/>
+                    <field name="sale_id"/>
+                    <field name="picking_id"/>
+                    <field name="state"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="stock_picking_cancel_tree" model="ir.ui.view">
+            <field name="name">ll.stock.picking.cancel.tree</field>
+            <field name="model">ll.stock.picking.cancel</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="name"/>
+                    <field name="purchase_id"/>
+                    <field name="picking_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record id="purchase_order_form_inherit" model="ir.ui.view">
+            <field name="name">Purchase Order</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//button[@name='button_cancel']" position="after">
+                    <!-- Add your fields or attributes here -->
+                    <field name="sub_company" invisible="1"/>
+                    <button name="button_picking_cancel"
+                            string="创建需求变更单"
+                            class="oe_highlight"
+                            type="object"
+                            attrs="{'invisible': ['|', ('sub_company', '!=', 'sub'), ('state', 'not in', ('purchase'))],}"
+                            groups="linkloving_companies_ordercreated.group_stock_picking_eco"
+                    >
+                    </button>
+                </xpath>
+            </field>
+        </record>
+
+
+        <record id="sequence_ll_stock_picking_cancel" model="ir.sequence">
+            <field name="name">ll.stock.picking.cancel</field>
+            <field name="code">ll.stock.picking.cancel</field>
+            <field name="prefix">SPCO%(year)s%(month)s%(day)s</field>
+            <field eval="1" name="number_next"/>
+            <field eval="1" name="number_increment"/>
+            <field name="padding">3</field>
+        </record>
+
+        <record model="ir.rule" id="ll_stock_picking_cancel_rule">
+            <field name="name">调拨单需求取消单multi-company</field>
+            <field name="model_id" search="[('model','=','ll.stock.picking.cancel')]" model="ir.model"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|',('company_id','child_of',[user.company_id.id]),('company_id','=',False)]
+            </field>
+        </record>
+
+        <!--sale.sale_order_view_search_inherit_quotation-->
+        <record id="stock_picking_cancel_form" model="ir.ui.view">
+            <field name="name">ll.stock.picking.cancel.form</field>
+            <field name="model">ll.stock.picking.cancel</field>
+            <field name="arch" type="xml">
+                <form string="调拨需求变更单">
+                    <header>
+                        <button name="button_confirm_order"
+                                string="确认变更需求"
+                                class="oe_highlight"
+                                states="draft"
+                                type="object"
+                                confirm="是否确认变更需求?"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="New" nolabel="1" readonly="1"/>
+                            </h1>
+                        </div>
+
+                        <group>
+                            <group>
+                                <field name="purchase_id"/>
+                                <field name="picking_id"/>
+                            </group>
+                            <group>
+                                <field name="sale_id"/>
+                                <field name="company_id"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="要取消的条目">
+                                <field name="cancel_line_ids">
+                                    <tree editable="bottom" delete="0">
+                                        <field name="product_id" readonly="1"/>
+                                        <field name="total_qty" readonly="1"/>
+                                        <field name="done_qty" readonly="1"/>
+                                        <field name="product_uom_qty" readonly="1"/>
+                                        <field name="product_uom" readonly="1"/>
+                                        <field name="cancel_qty"/>
+                                        <field name="move_id" invisible="1"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="action_stock_picking_cancel_order" model="ir.actions.act_window">
+            <field name="name">调拨单需求变更单</field>
+            <field name="res_model">ll.stock.picking.cancel</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="menu_cross_company_operation"
+                  name="跨系统操作"
+                  parent="sales_team.menu_base_partner"
+                  sequence="1"
+        />
+
+        <menuitem id="menu_stock_picking_cancel_order"
+                  name="调拨单需求变更单"
+                  parent="menu_cross_company_operation"
+                  sequence="1"
+                  action="action_stock_picking_cancel_order"
+                  groups="linkloving_companies_ordercreated.group_stock_picking_eco"
+        />
+    </data>
+</openerp>

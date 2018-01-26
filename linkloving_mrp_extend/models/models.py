@@ -2038,8 +2038,11 @@ class StcokPickingExtend(models.Model):
                     'res_id': wiz.id,
                     'context': self.env.context,
                 }
-            pick.is_cancel_backorder = True
-            pick.state = 'waiting_in'
+            if pick.picking_type_code == 'incoming':
+                pick.is_cancel_backorder = True
+                pick.state = 'waiting_in'
+            elif pick.picking_type_code == 'outgoing':
+                self.do_transfer()
         return
 
     @api.multi
@@ -2177,18 +2180,6 @@ class stock_transfer_way(models.TransientModel):
 class StockPackOperationExtend(models.Model):
     _inherit = 'stock.pack.operation'
 
-    @api.model
-    def create(self, vals):
-        logging.warning("xxxxxxxxxxxxxxxxxxxxxxx  %s" % vals)
-        if vals.get("qty_done") == 0:
-            traceback.print_stack()
-        return super(StockPackOperationExtend, self).create(vals)
-    @api.multi
-    def write(self, vals):
-        logging.warning("AAAAAAAAAAAAAAAA %s" % vals)
-        if vals.get("qty_done") == 0:
-            traceback.print_stack()
-        return super(StockPackOperationExtend, self).write(vals)
     @api.multi
     def _compute_receivied_qty(self):
         for pack in self:
