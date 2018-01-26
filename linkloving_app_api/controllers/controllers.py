@@ -4403,11 +4403,11 @@ class LinklovingAppApi(http.Controller):
         work_order_id = request.jsonrequest.get("work_order_id")
         need_unlink = request.jsonrequest.get("need_unlink")
 
-
         if need_unlink:
             request.env['linkloving.work.order'].sudo(uid).search([
                 ('id', '=', work_order_id)
             ]).unlink()
+
             return JsonResponse.send_response(STATUS_CODE_OK)
         else:
             request.env['linkloving.work.order'].sudo(uid).search([
