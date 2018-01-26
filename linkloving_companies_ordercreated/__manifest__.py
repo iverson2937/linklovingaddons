@@ -24,6 +24,7 @@
 
     # always loaded
     'data': [
+        'security/eco_group.xml',
         'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',

@@ -39,7 +39,9 @@
                             string="创建需求变更单"
                             class="oe_highlight"
                             type="object"
-                            attrs="{'invisible': ['|', ('sub_company', '!=', 'sub'), ('state', 'not in', ('purchase'))],}">
+                            attrs="{'invisible': ['|', ('sub_company', '!=', 'sub'), ('state', 'not in', ('purchase'))],}"
+                            groups="linkloving_companies_ordercreated.group_stock_picking_eco"
+                    >
                     </button>
                 </xpath>
             </field>
@@ -129,13 +131,14 @@
                   name="跨系统操作"
                   parent="sales_team.menu_base_partner"
                   sequence="1"
-                  groups=""/>
+        />
 
         <menuitem id="menu_stock_picking_cancel_order"
                   name="调拨单需求变更单"
                   parent="menu_cross_company_operation"
                   sequence="1"
                   action="action_stock_picking_cancel_order"
+                  groups="linkloving_companies_ordercreated.group_stock_picking_eco"
         />
     </data>
 </openerp>
