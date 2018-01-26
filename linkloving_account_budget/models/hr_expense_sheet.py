@@ -20,6 +20,6 @@ class HrExpense(models.Model):
             budget_id = self.env['linkloving.account.budget.line'].search(
                 [('fiscal_year_id', '=', sheet.fiscal_year_id.id), ('department_id', '=', sheet.department_id.id),
                  ('product_id', '=', sheet.product_id.id)])
-
-            if budget_id:
-                sheet.budget_id = budget_id.id
+            #
+            # if budget_id:
+            #     sheet.budget_id = budget_id.id

@@ -24,6 +24,13 @@ class AccountBudget(models.Model):
         ('name_company_uniq', 'unique(department_id, fiscal_year_id)', '每个部门费用类别只可以每年只可以做一次预算'),
     ]
 
+    @api.constrains('line_ids')
+    def _check_product_recursion(self):
+        for budget in self:
+            product_ids = budget.line_ids.mapped('product_id')
+            if len(product_ids) != len(budget.line_ids):
+                raise UserError('明细不可以重复')
+
     @api.multi
     def unlink(self):
         for budget in self:
@@ -54,6 +61,13 @@ class AccountBudgetLine(models.Model):
     expense_ids = fields.One2many('hr.expense', 'budget_id')
     description = fields.Text(string=u'描述')
     fiscal_year_id = fields.Many2one('account.fiscalyear', string='年度')
+    expense_len = fields.Integer(compute='_compute_expense_len', string=' ')
+
+    @api.multi
+    def _compute_expense_len(self):
+        for line in self:
+            line.expense_len = len(line.expense_ids)
+
     state = fields.Selection([
         ('draft', '草稿'),
         ('done', '正式'),
@@ -64,14 +78,17 @@ class AccountBudgetLine(models.Model):
     ]
 
     @api.multi
-    def unlink(self):
-        for budget in self:
-            if budget.state == 'formal':
-                raise UserError('不能删除')
-        return super(AccountBudget, self).unlink()
-
-    @api.multi
     def get_budget_balance(self):
         for budget in self:
             budget.amount_used = sum(expense.total_amount for expense in budget.expense_ids)
             budget.balance = budget.amount - budget.amount_used
+
+    def check_expense_detail(self):
+        print self.expense_ids.ids
+        return {
+            'name': u'费用明细',
+            'res_model': 'hr.expense',
+            'type': 'ir.actions.act_window',
+            'domain': [('id', 'in', self.expense_ids.ids)],
+            'view_mode': 'tree,form',
+        }

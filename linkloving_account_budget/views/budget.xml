@@ -45,6 +45,8 @@
                                             <field name="product_id"/>
                                             <field name="amount"/>
                                             <field name="amount_used"/>
+                                            <field name="expense_len"/>
+                                            <button name="check_expense_detail" type="object" icon="fa-link"/>
                                             <field name="balance"/>
                                         </tree>
                                     </field>
