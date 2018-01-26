@@ -12,6 +12,20 @@
         </record>
 
 
+        <record id="view_material_request_filter" model="ir.ui.view">
+            <field name="name">material.request.list.select</field>
+            <field name="model">material.request</field>
+            <field name="arch" type="xml">
+                <search string="搜索工程订单">
+                    <field name="name" string="系统流水号"/>
+                    <field name="picking_cause" string="领料原因"/>
+                    <field name="my_create_uid" string="申请人"/>
+                    <field name="remark" string="备注"/>
+                </search>
+            </field>
+        </record>
+
+
         <record model="ir.ui.view" id="approval_project_picking_form_lines">
             <field name="name">material.request.form gg</field>
             <field name="model">material.request</field>
@@ -118,8 +132,8 @@
                             <group>
                                 <field name="my_create_date" string="单据日期" required="1"/>
                                 <field name="delivery_date" required="1"/>
-                                <field name="who_review_now"/>
-                                <!--attrs="{'invisible': [('picking_state', 'not in', ('to_approved','approved_finish'))]}"/>-->
+                                <field name="who_review_now"
+                                       attrs="{'invisible': [('picking_state', 'in', ('approved_finish'))]}"/>
                                 <field name="remark"/>
 
                                 <field name="stock_picking_ids" invisible="1"/>
@@ -265,6 +279,7 @@
             <field name="domain">[('picking_state','=','to_submit'),('create_uid','=',uid)]</field>
             <field name="context">{'default_my_create_uid': uid}</field>
             <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="view_material_request_filter"/>
 
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
@@ -284,6 +299,7 @@
             <field name="domain">[('picking_state','!=','to_submit'),('create_uid','=',uid)]</field>
             <field name="context">{'default_my_create_uid': uid}</field>
             <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="view_material_request_filter"/>
 
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
@@ -304,6 +320,7 @@
             <field name="domain">[('picking_state','=','review_ing'),('who_review_now_id', '=', uid)]</field>
             <field name="context">{'default_my_create_uid': uid}</field>
             <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="view_material_request_filter"/>
 
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
@@ -320,6 +337,7 @@
             <field name="view_mode">tree,form</field>
             <field name="domain">[('review_i_approvaled_val','child_of',[uid])]</field>
             <field name="context">{'default_my_create_uid': uid}</field>
+            <field name="search_view_id" ref="view_material_request_filter"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
                     点击创建生成一个领料单.
@@ -335,6 +353,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="context">{'default_my_create_uid': uid}</field>
+            <field name="search_view_id" ref="view_material_request_filter"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
                     点击创建生成一个领料单.
@@ -418,7 +437,7 @@
                         <!--</field>-->
 
                         <field name="product_ids" readonly="False">
-                            <tree >
+                            <tree>
                                 <field name="name"/>
                                 <field name="qty_available"/>
                                 <field name="virtual_available"/>
