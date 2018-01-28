@@ -30,6 +30,33 @@ from odoo import fields, models, _
 from odoo.exceptions import UserError
 
 
+def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
+    """
+    :param year: 年份，默认是本年，可传int或str类型
+    :param month: 月份，默认是本月，可传int或str类型
+    :return: firstDay: 当月的第一天，datetime.date类型
+              lastDay: 当月的最后一天，datetime.date类型
+    """
+    if year:
+        year = int(year)
+    else:
+        year = datetime.date.today().year
+    if not period:
+        period = 0
+    if month <= 0:
+        year = year - 1
+        month = 12 + month
+        # 获取当月第一天的星期和当月的总天数
+    firstDayWeekDay, monthRange = calendar.monthrange(year, month)
+
+    # 获取当月的第一天
+    firstDay = datetime.date(year=year, month=month - period, day=1).strftime('%Y-%m-%d')
+
+    lastDay = datetime.date(year=year, month=month, day=monthRange).strftime('%Y-%m-%d')
+    print firstDay, lastDay
+
+    return firstDay, lastDay
+
 class ProductProduct(models.Model):
     _inherit = 'product.product'
     area_id = fields.Many2one('stock.location.area', string='Area', copy=False)
@@ -41,6 +68,36 @@ class ProductProduct(models.Model):
         ('default_code_uniq', 'unique (default_code)', _('Default Code already exist!')),
         # ('name_uniq', 'unique (name)', u'产品名称已存在!')
     ]
+
+    def compute_sale_purchase_qty(self):
+        this_month = datetime.datetime.now().month
+        last1_month = this_month - 1
+        last3_month = last1_month - 1
+        last6_month = last3_month - 3
+        date1_start, date1_end = getMonthFirstDayAndLastDay(month=last1_month)
+        date2_start, date2_end = getMonthFirstDayAndLastDay(month=last3_month, period=2)
+        date3_start, date3_end = getMonthFirstDayAndLastDay(month=last6_month, period=2)
+        products = self.env['product.template'].search([('sale_ok', '=', True)])
+        for product in products:
+            if product.product_variant_ids:
+                product_id = product.product_variant_ids[0]
+                last1_month_qty = product_id.count_amount(date1_start, date1_end)
+                last2_month_qty = product_id.count_amount(date2_start, date2_end)
+                last3_month_qty = product_id.count_amount(date3_start, date3_end)
+                product.last1_month_qty = last1_month_qty
+                product.last2_month_qty = last1_month_qty + last2_month_qty
+                product.last3_month_qty = last1_month_qty + last2_month_qty + last3_month_qty
+
+        products = self.env['product.template'].search([('purchase_ok', '=', True)])
+        for product in products:
+            if product.product_variant_ids:
+                product_id = product.product_variant_ids[0]
+                last1_month_qty = product_id.count_purchase_amount(date1_start, date1_end)
+                last2_month_qty = product_id.count_purchase_amount(date2_start, date2_end)
+                last3_month_qty = product_id.count_purchase_amount(date3_start, date3_end)
+                product.last1_month_consume_qty = last1_month_qty
+                product.last3_month_consume_qty = last1_month_qty + last2_month_qty
+                product.last6_month_consume_qty = last1_month_qty + last2_month_qty + last3_month_qty
 
     def count_amount(self, start, end):
         orders = self.env['sale.order.line'].search(

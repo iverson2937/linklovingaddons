@@ -2385,7 +2385,9 @@ class LinklovingOAApi(http.Controller):
                 waitList = request.env['stock.inventory'].sudo(user_id).search(domain)
                 kc = len(waitList)
             else:
-                kc = 0
+                kc = 2
+        else:
+            kc = 3
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"bx": bx, "sg": sg, "zz": zz, "py": py, "kc": kc})
 

@@ -1,0 +1,93 @@
+<odoo>
+    <data>
+        <!-- explicit list view definition -->
+
+        <record model="ir.ui.view" id="linkloving_account_budget_form">
+            <field name="name">预算</field>
+            <field name="model">linkloving.account.budget</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="set_to_done"
+                                states="draft" string="确定"
+                                type="object" class="oe_highlight"
+                                help="Launch Configuration Wizard"/>
+
+                        <field name="state" widget="statusbar"
+                               readonly="1"/>
+                    </header>
+                    <sheet>
+
+
+                        <div class="oe_title">
+                            <label for="name"/>
+                            <h1>
+                                <field name="name" placeholder="简单描述"/>
+                            </h1>
+                        </div>
+                        <group>
+
+
+                            <group>
+                                <field name="fiscal_year_id" options="{'no_create':True}"
+                                       attrs="{'readonly':[('state','=','done')]}"/>
+                                <field name="department_id" attrs="{'readonly':[('state','=','done')]}"
+                                       options="{'no_create':True}"/>
+
+                            </group>
+                            <group>
+                                <field name="create_uid" readonly="1" string="创建人"/>
+                            </group>
+                            <notebook colspan="2">
+                                <page string="预算明细">
+                                    <field name="line_ids">
+                                        <tree editable="bottom">
+                                            <field name="product_id"/>
+                                            <field name="amount"/>
+                                            <field name="amount_used"/>
+                                            <field name="expense_len"/>
+                                            <button name="check_expense_detail" type="object" icon="fa-link"/>
+                                            <field name="balance"/>
+                                        </tree>
+                                    </field>
+                                    <group class="oe_subtotal_footer oe_right">
+                                        <field name="amount"/>
+                                        <field name="amount_used"/>
+                                        <field name="balance" class="oe_subtotal_footer_separator"/>
+                                    </group>
+                                </page>
+                            </notebook>
+
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="linkloving_account_budget_tree">
+            <field name="name">预算</field>
+            <field name="model">linkloving.account.budget</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="department_id"/>
+                    <field name="amount"/>
+                    <field name="balance"/>
+                    <field name="create_uid" string="创建人"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- actions opening views on models -->
+        <record model="ir.actions.act_window" id="action_linkloving_account_budget">
+            <field name="name">预算</field>
+            <field name="res_model">linkloving.account.budget</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_account_payment" name="预算" sequence="10"
+                  action="action_linkloving_account_budget"
+                  parent="hr_expense.menu_hr_expense_root"/>
+
+
+    </data>
+</odoo>

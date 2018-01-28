@@ -1,3 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_sub_company_info,linkloving_companies_ordercreated.sub_company_info,model_sub_company_info,,1,1,1,1
 access_follow_partner,linkloving_companies_ordercreated.follow_order_partner,model_follow_order_partner,,1,1,1,1
+access_ll_stock_picking_cancel,linkloving_companies_ordercreated.ll_stock_picking_cancel,model_ll_stock_picking_cancel,,1,1,1,1
+access_picking_cancel_line,linkloving_companies_ordercreated.picking_cancel_line,model_picking_cancel_line,,1,1,1,1

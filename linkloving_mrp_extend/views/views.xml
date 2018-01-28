@@ -355,7 +355,7 @@
                 <xpath expr="//sheet/group/group/div/button[@type='action']" position="replace">
                     <button type="action"
                             name="%(mrp.action_change_production_qty)d"
-                            string="Update" states="confirmed,planned" class="oe_link"/>
+                            string="Update" states="draft,confirmed,planned" class="oe_link"/>
                 </xpath>
 
                 <!--添加订单类型-->

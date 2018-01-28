@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
 import datetime
+import logging
+import traceback
 import types
 
 import jpush
@@ -2036,8 +2038,11 @@ class StcokPickingExtend(models.Model):
                     'res_id': wiz.id,
                     'context': self.env.context,
                 }
-            pick.is_cancel_backorder = True
-            pick.state = 'waiting_in'
+            if pick.picking_type_code == 'incoming':
+                pick.is_cancel_backorder = True
+                pick.state = 'waiting_in'
+            elif pick.picking_type_code == 'outgoing':
+                self.do_transfer()
         return
 
     @api.multi

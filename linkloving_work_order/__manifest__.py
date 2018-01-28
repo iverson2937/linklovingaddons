@@ -27,6 +27,7 @@
         'security/ir.model.access.csv',
         'views/calendar_views.xml',
         'views/data.xml',
+       'views/views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

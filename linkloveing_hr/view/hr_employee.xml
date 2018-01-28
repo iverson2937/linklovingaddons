@@ -13,6 +13,19 @@
                 <xpath expr="//field[@name='address_id']" position="after">
                     <field name="pre_payment_reminding" string="Remaining"/>
                 </xpath>
+
+                <xpath expr="//notebook/page[1]/group[1]" position="after">
+                    <group>
+                        <group>
+                            <field name="signature" widget="image"/>
+                        </group>
+                        <group>
+
+                        </group>
+
+
+                    </group>
+                </xpath>
             </field>
         </record>
 
