@@ -153,22 +153,21 @@ def account_invoice_export(values):
     values = urllib.unquote(values)
     values = json.loads(values)
     invoice_ids = request.env['account.invoice'].browse(values)
-    print invoice_ids
+    invoices = invoice_ids.parse_invoice_data()
     # tasks_by_order_num = groupby(tasks, attrgetter('sale_order_id'))
     wb = MyWorkbook(encoding='utf-8')
-    sheet_title = u"对账单"
+    sheet_title = invoices.get('name')
     ws = wb.add_sheet(sheet_title)
-    head = [u"产品名称", u"数量", u"单价", u"小计"]
-    ws.write_merge(0, 0, 0, 17, sheet_title, title_style)
+    head = [u'序号', u"产品名称", u"数量", u"单价", u"小计"]
+    ws.write_merge(0, 0, 0, 4, sheet_title, title_style)
     wb.multiple_append(head, style=head_style)
-    for index, invoice in enumerate(invoice_ids):
+    for index, invoice in enumerate(invoices.get('line_ids')):
         index += 1
         content = [index]
-        # invoice_data = invoice.parse_invoice_data()
-        # for a_item in ['product_name', 'qty', 'price_unit', 'total_amount']:
-        #     item = invoice_data.get(a_item, '')
-        #     content.append(item)
-        # wb.multiple_append(content, style=common_style)
+        for a_item in ['product_name', 'qty', 'price_unit', 'total_amount']:
+            item = invoice.get(a_item, '')
+            content.append(item)
+        wb.multiple_append(content, style=common_style)
     filename = u'对账单.xls'
     sio = StringIO.StringIO()
     wb.save(sio)
