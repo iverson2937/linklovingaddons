@@ -144,12 +144,9 @@ def set_cols_width(xls, size, cols):
         xls.col(col).width = 256 * size
 
 
-def get_account_inovice(vals):
-    return 1
 
 
 def account_invoice_export(values):
-    print values, 'ddd'
     values = urllib.unquote(values)
     values = json.loads(values)
     invoice_ids = request.env['account.invoice'].browse(values)

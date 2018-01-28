@@ -7,7 +7,6 @@ class ExportReport(Controller):
 
     @route('/export/account_invoice', type='http', auth='public', csrf=False)
     def account_invoice(self, values):
-        print 'dddddddddddddddddddddd'
         filename, data = account_invoice_export(values)
         return request.make_response(data, headers=[('Content-Disposition', content_disposition(filename)),
                                                     ('Content-Type', 'application/vnd.ms-excel')])
