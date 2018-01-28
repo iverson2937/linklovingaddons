@@ -65,7 +65,7 @@ class ProductTemplate(models.Model):
             product.required_user_ids = [(6, 0, stage_id.required_user_ids.ids)]
 
     @api.multi
-    def approve(self):
+    def approve(self,remark):
         for product in self:
             for app in product.stage_id.approval_template_ids:
                 if self.env.user in app.user_ids:
@@ -74,6 +74,7 @@ class ProductTemplate(models.Model):
                         'stage_id': product.stage_id.id,
                         'approval_template_id': app.id,
                         'status': 'approved',
+                        'remark':remark,
                         'user_id': self.env.uid
                     })
                     # 审核过待审核中取消
@@ -102,7 +103,7 @@ class ProductTemplate(models.Model):
 
 
     @api.multi
-    def reject(self):
+    def reject(self,remark):
         for product in self:
             for app in product.stage_id.approval_template_ids:
                 if self.env.user in app.user_ids:
@@ -111,6 +112,7 @@ class ProductTemplate(models.Model):
                         'stage_id': product.stage_id.id,
                         'approval_template_id': app.id,
                         'status': 'rejected',
+                        'remark':remark,
                         'user_id': self.env.uid
                     })
 

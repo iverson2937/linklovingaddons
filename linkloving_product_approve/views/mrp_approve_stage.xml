@@ -23,7 +23,7 @@
                     <field name="approval_template_ids" string="审核流程">
                         <tree editable="bottom">
                             <field name="sequence" widget="handle"/>
-                            <field name="approve_type" placeholder="类型"/>
+                            <field name="name" placeholder="类型"/>
                             <field name="user_ids" widget="many2many_tags" string="可选用户"/>
                         </tree>
                     </field>

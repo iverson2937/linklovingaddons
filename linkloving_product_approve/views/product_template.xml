@@ -13,11 +13,11 @@
                         <button string="提交审核" name="to_approve" type="object" class="oe_highlight"
                                 context="{'default_submit':True}" states="draft" attrs=""
                                 modifiers="{'invisible': [['state', 'not in', ['draft']]]}"/>
-                        <button string="Approve" name="to_approve" type="object" class="oe_highlight"
+                        <button string="通过" name="to_approve" type="object" class="oe_highlight"
                                 context="{'default_approve':True}"
                                 attrs="{'invisible': ['|',('user_can_approve', '=', False),('state','!=','progress')]}"
                                 modifiers="{'invisible': ['|', ['user_can_approve', '=', false], ['state', '!=', 'progress']]}"/>
-                        <button string="Reject" name="to_approve" type="object" class="oe_highlight"
+                        <button string="拒绝" name="to_approve" type="object" class="oe_highlight"
                                 context="{'default_reject':True}"
                                 attrs="{'invisible': ['|',('user_can_reject', '=', False),('state','!=','progress')]}"
                                 modifiers="{'invisible': ['|', ['user_can_reject', '=', false], ['state', '!=', 'progress']]}"/>
@@ -350,7 +350,7 @@
                                         <field name="user_id" string="审核人"/>
                                         <field name="status"/>
                                         <field name="remark"/>
-                                        <field name="create_date"/>
+                                        <field name="create_date" string="审核日期"/>
                                     </tree>
                                 </field>
 

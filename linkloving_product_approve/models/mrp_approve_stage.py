@@ -21,7 +21,7 @@ class MrpApprovelType(models.Model):
 
 class MrpApprovalTemplate(models.Model):
     _name = 'mrp.approval.template'
-    approve_type = fields.Selection([
+    name = fields.Selection([
         ('document', '文件'),
         ('purchase', '采购'),
         ('research', '研发'),
