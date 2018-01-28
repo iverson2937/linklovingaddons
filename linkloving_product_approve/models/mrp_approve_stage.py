@@ -38,7 +38,7 @@ class MrpApprovalRecord(models.Model):
     _name = 'mrp.approval.record'
 
     product_id = fields.Many2one(
-        'product.template', 'ECO',
+        'product.template', '产品',
         ondelete='cascade', required=True)
     approval_template_id = fields.Many2one(
         'mrp.approval.template', 'Template',
