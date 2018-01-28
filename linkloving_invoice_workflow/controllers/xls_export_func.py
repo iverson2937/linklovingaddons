@@ -1,11 +1,12 @@
-# coding=utf-8
-import calendar
+# -*- coding: utf-8 -*-
+
 import json
 import logging
 import os
 
 import StringIO
-
+from odoo.tools import float_precision, float_repr, float_round, frozendict, \
+    html_sanitize, human_size, pg_varchar, ustr, OrderedSet
 import operator
 import urllib
 import urllib2
@@ -18,8 +19,6 @@ from xlwt import *
 
 from odoo import tools
 from ..utils.excel_tools import MyWorkbook
-
-
 
 _logger = logging.getLogger(__name__)
 
@@ -85,6 +84,7 @@ def content_disposition(filename):
     else:
         return "attachment; filename*=UTF-8''%s" % escaped
 
+
 def check_file(filename, num=1):
     exist_file = os.path.exists(filename)
     if exist_file:
@@ -98,6 +98,7 @@ def check_file(filename, num=1):
     else:
         return filename
 
+
 def write_title(xls, xlstitle, col):
     """
     写入excel标题
@@ -107,6 +108,7 @@ def write_title(xls, xlstitle, col):
     :return:
     """
     xls.write_merge(0, 0, 0, col, xlstitle, title_style)
+
 
 def write_header(xls, xlsheader):
     """
@@ -127,6 +129,7 @@ def write_header(xls, xlsheader):
         else:
             xls.write_merge(1, 1, int(col1), int(col2), name, head_style)
 
+
 def check_if_last_id(xls, current_id, filter_ids, excel_row, col, part_name, part_price, total_name, total_price):
     if current_id == filter_ids[-1]:
         xls.write(excel_row, col, part_name, bold_style)
@@ -141,112 +144,35 @@ def set_cols_width(xls, size, cols):
         xls.col(col).width = 256 * size
 
 
+def get_account_inovice(vals):
+    return 1
 
 
-
-def task_plan_export(values):
+def account_invoice_export(values):
+    print values, 'ddd'
     values = urllib.unquote(values)
     values = json.loads(values)
-    task_table = request.registry.get('ljwj.sale.order.line.install')
-    tasks = task_table.browse(request.cr, request.uid, values)
+    invoice_ids = request.env['account.invoice'].browse(values)
+    print invoice_ids
     # tasks_by_order_num = groupby(tasks, attrgetter('sale_order_id'))
     wb = MyWorkbook(encoding='utf-8')
-    sheet_title = u"任务计划表"
+    sheet_title = u"对账单"
     ws = wb.add_sheet(sheet_title)
-    head = [u"序号", u"地址", u"城市", u"甲方", u"项目编号", u"业主", u"业主联系方式", u"现场负责人", u"负责人联系方式",
-            u"产品类别", u"服务类别", u"商家合同号", u"负责工头", u"负责工匠", u"工匠预约日期", u"实际上门日期", u"下单备注", u"延期备注"]
+    head = [u"产品名称", u"数量", u"单价", u"小计"]
     ws.write_merge(0, 0, 0, 17, sheet_title, title_style)
     wb.multiple_append(head, style=head_style)
-    for index, task in enumerate(tasks):
+    for index, invoice in enumerate(invoice_ids):
         index += 1
         content = [index]
-        task_base = get_task_base(task)
-        for a_item in [u"地址", u"城市", u"甲方", u"项目编号", u"业主", u"业主联系方式", u"现场负责人", u"负责人联系方式",
-            u"产品类别", u"服务类别", u"商家产品编号", u"负责工头", u"负责工匠", u"工匠预约日期", u"实际上门日期", u"下单备注", u"延期备注"]:
-            item = task_base.get(a_item, '')
-            content.append(item)
-        wb.multiple_append(content, style=common_style)
-    filename = u'任务计划表.xls'
+        # invoice_data = invoice.parse_invoice_data()
+        # for a_item in ['product_name', 'qty', 'price_unit', 'total_amount']:
+        #     item = invoice_data.get(a_item, '')
+        #     content.append(item)
+        # wb.multiple_append(content, style=common_style)
+    filename = u'对账单.xls'
     sio = StringIO.StringIO()
     wb.save(sio)
     sio.seek(0)
     data = sio.read()
     sio.close()
     return filename, data
-
-
-
-
-class ExportReport(Controller):
-
-    @route('/export/task_plan', type='http', auth='public', csrf=False)
-    def task_plan(self, values):
-        filename, data = task_plan_export(values)
-        return request.make_response(data, headers=[('Content-Disposition', content_disposition(filename)),
-                                                    ('Content-Type', 'application/vnd.ms-excel')])
-
-    @route('/export/exception_feedback', type='http', auth='public', csrf=False)
-    def exception_feedback(self, values):
-        filename, data = exception_feedback_export(values)
-        return request.make_response(data, headers=[('Content-Disposition', content_disposition(filename)),
-                                                    ('Content-Type', 'application/vnd.ms-excel')])
-
-    @route('/export/task_statistic', type='http', auth='public', csrf=False)
-    def task_statistic(self, values):
-        user = request.env.user
-        if request.env.ref('ljwj_core.group_customer') in user.groups_id:
-            filename, data = task_statistic_export_partyA(values)
-        elif request.env.ref('ljwj_core.group_ljwj_worker') in user.groups_id:
-            filename, data = task_statistic_export_worker(values)
-        else:
-            filename, data = task_statistic_export(values)
-        return request.make_response(data, headers=[('Content-Disposition', content_disposition(filename)),
-                                                    ('Content-Type', 'application/vnd.ms-excel')])
-
-    @route('/export/attendance_xls', type='http', auth='public', csrf=False)
-    def worker_attendance(self, values, order):
-        filename, data = worker_attendance_export(values, order)
-        return request.make_response(data, headers=[('Content-Disposition', content_disposition(filename)),
-                                                    ('Content-Type', 'application/vnd.ms-excel')])
-
-    @route('/export/order_total', type='http', auth='public', csrf=False)
-    def order_total(self, values, order):
-        filename, data = order_total_export(values, order)
-        return request.make_response(data, headers=[('Content-Disposition', content_disposition(filename)),
-                                                    ('Content-Type', 'application/vnd.ms-excel')])
-
-    @route('/export/worker_unstatement', type='http', auth='public', csrf=False)
-    def unstatement_total(self, values, worker):
-        filename, data = worker_unstatement_export(values, worker)
-        return request.make_response(data, headers=[('Content-Disposition', content_disposition(filename)),
-                                                    ('Content-Type', 'application/vnd.ms-excel')])
-
-    @route('/export/partyA_bill', type='http', auth='public', csrf=False)
-    def partyA_bill(self, values):
-        filename, data = partyA_bill_xls_export(values)
-        return request.make_response(data, headers=[('Content-Disposition', content_disposition(filename)),
-                                                    ('Content-Type', 'application/vnd.ms-excel')])
-
-    @route('/export/sale_order_base_info_template', type='http', auth='public', csrf=False)
-    def sale_order_base_info_template(self):
-        path = config.downexcel() + os.path.sep + u'基础信息导入模板.xlsx'
-        if not os.path.exists(path):
-            _logger.error('未读取到模板')
-            return
-        else:
-            data = open(path, 'rb')
-        filename = u'基础信息导入模板.xlsx'
-        return request.make_response(data, headers=[('Content-Disposition', content_disposition(filename)),
-                                                    ('Content-Type', 'application/vnd.ms-excel')])
-
-    @route('/export/sale_order_quotation_template', type='http', auth='public', csrf=False)
-    def sale_order_quotation_template(self):
-        path = config.downexcel() + os.path.sep + u'报价导入模板.xlsx'
-        if not os.path.exists(path):
-            _logger.error('未读取到模板')
-            return
-        else:
-            data = open(path, 'rb')
-        filename = u'报价导入模板.xlsx'
-        return request.make_response(data, headers=[('Content-Disposition', content_disposition(filename)),
-                                                    ('Content-Type', 'application/vnd.ms-excel')])
