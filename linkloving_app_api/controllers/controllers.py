@@ -4527,6 +4527,8 @@ class LinklovingAppApi(http.Controller):
             'effective_department_ids': [(6, 0, departments)],
             'tag_ids': [(6, 0, tags)],
         })
+        request.env.cr.execute("UPDATE linkloving_work_order set create_date=%s WHERE id=%s",(fields.datetime.now(),work_order.id))
+
         if assign_uid:
             work_order_record_model = request.env['linkloving.work.order.record']
             work_order_record = work_order_record_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
@@ -4615,7 +4617,7 @@ class LinklovingAppApi(http.Controller):
             'assign_user': LinklovingAppApi.get_user_json(work_order.assign_uid.id),
             'issue_state': work_order.issue_state,
             'create_user': LinklovingAppApi.get_user_json(work_order.write_uid.id),
-            'create_time': work_order.write_date,
+            'create_time': work_order.create_date,
             'work_order_images': LinklovingAppApi.get_work_order_img_url(work_order.attachments.ids),
             'effective_department_ids':LinklovingAppApi.get_department_json(work_order.effective_department_ids),
             'tag_ids':LinklovingAppApi.get_tag_to_json(work_order.tag_ids)
