@@ -282,14 +282,7 @@
                                     </group>
                                 </group>
                                 <group name="accounting">
-                                    <group>
-                                        <field name="landed_cost_ok" class="oe_inline"
-                                               attrs="{'invisible':[('type', 'not in', ['product', 'consu', 'service'])]}"
-                                               modifiers="{'invisible': [['type', 'not in', ['product', 'consu', 'service']]]}"/>
-                                        <field name="split_method"
-                                               attrs="{'invisible':['|', ('landed_cost_ok', '=' ,False), ('type', 'not in', ['product', 'consu', 'service'])]}"
-                                               modifiers="{'invisible': ['|', ['landed_cost_ok', '=', false], ['type', 'not in', ['product', 'consu', 'service']]]}"/>
-                                    </group>
+
                                     <group name="property_inventory_valuation"
                                            attrs="{'invisible': [('type','=','service')]}"
                                            modifiers="{'invisible': [['type', '=', 'service']]}">
