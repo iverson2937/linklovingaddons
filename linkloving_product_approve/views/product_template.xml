@@ -346,6 +346,8 @@
 
                             </page>
                             <page string="审核流程">
+                                <field name="required_user_ids" readonly="1"/>
+
                                 <div class="approve_process_container">
                                     <div class="approve_process_circle">创建人</div>
                                     <div class="approve_state">提交</div>

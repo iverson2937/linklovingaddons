@@ -3,13 +3,13 @@
 from odoo import models, fields, api
 
 
-class MrpApprovelType(models.Model):
+class MrpApprovalType(models.Model):
     _name = 'mrp.approve.type'
     name = fields.Char(string='名称')
     description = fields.Char(string='描述')
     approve_type = fields.Selection([
         ('product', '产品')
-    ])
+    ], string=u'审核类型')
     stage_ids = fields.One2many('mrp.approve.stage', 'type_id')
     required_user_ids = fields.Many2many('res.users', compute='get_required_user_ids')
 
