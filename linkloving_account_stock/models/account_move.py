@@ -27,6 +27,9 @@ class StockMove(models.Model):
             acc_src = self.location_id.valuation_out_account_id.id
         else:
             acc_src = accounts_data['stock_input'].id
+            # 退货，add by allen
+            if self.is_return_material:
+                acc_src = accounts_data['stock_output'].id
 
         if self.location_dest_id.valuation_in_account_id:
             acc_dest = self.location_dest_id.valuation_in_account_id.id
