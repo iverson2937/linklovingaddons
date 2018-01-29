@@ -55,12 +55,7 @@ class StockMove(models.Model):
             if self.location_id.usage == 'customer' and self.origin_returned_move_id:
                 debit_value = self.origin_returned_move_id.price_unit * qty
                 credit_value = debit_value
-            # 盘盈
-            if self.location_id.usage == "inventory" and self.location_dest_id.usage == 'internal':
-                pass
-            # 盘亏
-            if self.location_id.usage == "internal" and self.location_dest_id.usage == 'inventory':
-                pass
+
             # add by allen for 生产入库凭证修改
             if self.location_id.usage == 'production' and self.location_dest_id.usage == 'internal' and self.product_id.cost_method == 'average':
                 credit_value = self.product_id.get_material_cost()
