@@ -32,12 +32,14 @@ class ProductTemplate(models.Model):
     @api.multi
     def _compute_user_can_approve(self):
         for p in self:
-            p.user_can_approve = True
+            if self.env.user in p.required_user_ids:
+                p.user_can_reject = True
 
     @api.multi
     def _compute_user_can_reject(self):
         for p in self:
-            p.user_can_reject = True
+            if self.env.user in p.required_user_ids:
+                p.user_can_approve = True
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
@@ -97,6 +99,7 @@ class ProductTemplate(models.Model):
 
             elif product.stage_id.allow_apply_change and change_to_next:
                 product.state = 'done'
+                product.stage_id = False
             elif not  product.stage_id.allow_apply_change and not product.stage_id.next_stage_id:
                 raise UserError('请联系管理员设置')
 
