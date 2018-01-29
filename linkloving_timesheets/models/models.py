@@ -103,6 +103,8 @@ class linkloving_timesheet_order(models.Model):
         return super(linkloving_timesheet_order, self).create(vals)
 
     def action_assign_partner(self):
+        if len(self.picking_id.timesheet_order_ids.filtered(lambda x: x.state == 'running')) > 1:
+            raise UserError(u'已经有一个运行中的工时单')
         if self.state == 'draft':
             self.state = 'running'
             self.picking_id.state = "secondary_operation"

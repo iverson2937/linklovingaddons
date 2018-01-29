@@ -41,7 +41,8 @@ odoo.define('linkloving_product_query.product_query', function (require) {
             view_type: 'form,kanban,tree',
             views: [[false, 'form']],
             context: {
-                'selected_product_ids': this.select_ids
+                'selected_product_ids': this.select_ids,
+                'default_order_type': (this.options && this.options.action && this.options.action.context.order_type) || 'sale',
             }
         };
         this.do_action(action);

@@ -27,6 +27,7 @@
         # 'security/ir.model.access.csv',
         'views/account_invoice.xml',
         'views/templates.xml',
+        'views/xls_export.xml',
         'data/decimal_precision.xml'
     ],
     # only loaded in demonstration mode

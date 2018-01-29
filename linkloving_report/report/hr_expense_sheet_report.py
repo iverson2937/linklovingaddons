@@ -15,6 +15,7 @@ class ReportHrExpenseSheet(http.Controller):
     @http.route(['/report/linkloving_report.linkloving_hr_expense_sheet_report'], type='http', auth='user',
                 multilang=True)
     def report_purchase(self, **data):
+        # 报销单
 
         data = simplejson.loads(data['options'])
         if data:
@@ -163,7 +164,7 @@ class ReportPrepaymentOutgoing(http.Controller):
             content = xls.read()
             return request.make_response(content, headers=[
                 ('Content-Type', 'application/vnd.ms-excel'),
-                ('Content-Disposition', 'attachment; filename=hr_expense_sheet_sum.xls;')
+                ('Content-Disposition', 'attachment; filename=zz_sum.xls;')
             ])
         else:
             raise UserError(_('Error!'), _('These are no records no this period.'))
@@ -244,7 +245,7 @@ class PrePaymentDeductReport(http.Controller):
             content = xls.read()
             return request.make_response(content, headers=[
                 ('Content-Type', 'application/vnd.ms-excel'),
-                ('Content-Disposition', 'attachment; filename=hr_expense_sheet_sum.xls;')
+                ('Content-Disposition', 'attachment; filename=zz_cd_sum.xls;')
             ])
         else:
             raise UserError(_('Error!'), _('These are no records no this period.'))
@@ -322,7 +323,7 @@ class PurchasePaymentReport(http.Controller):
             content = xls.read()
             return request.make_response(content, headers=[
                 ('Content-Type', 'application/vnd.ms-excel'),
-                ('Content-Disposition', 'attachment; filename=hr_expense_sheet_sum.xls;')
+                ('Content-Disposition', 'attachment; filename=fksq_sum.xls;')
             ])
         else:
             raise UserError(_('Error!'), _('These are no records no this period.'))

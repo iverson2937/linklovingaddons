@@ -2,6 +2,17 @@
 <odoo>
 
     <data>
+        <record forcecreate="True" id="monthly_compute_qty" model="ir.cron">
+            <field name="name">每月计算销售量和用量</field>
+            <field eval="True" name="active"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+            <field name="numbercall">-1</field>
+            <field eval="False" name="doall"/>
+            <field eval="'product.product'" name="model"/>
+            <field eval="'compute_sale_purchase_qty'" name="function"/>
+        </record>
 
         <!-- Multi -->
         <record model="ir.rule" id="employee_payment_rule">

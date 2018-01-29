@@ -1,20 +1,12 @@
 # -*- coding: utf-8 -*-
-from odoo import http
+from xls_export_func import account_invoice_export
+from odoo.http import content_disposition, dispatch_rpc, request, Controller, route
 
-# class LinklovingInvoiceWorkflow(http.Controller):
-#     @http.route('/linkloving_invoice_workflow/linkloving_invoice_workflow/', auth='public')
-#     def index(self, **kw):
-#         return "Hello, world"
 
-#     @http.route('/linkloving_invoice_workflow/linkloving_invoice_workflow/objects/', auth='public')
-#     def list(self, **kw):
-#         return http.request.render('linkloving_invoice_workflow.listing', {
-#             'root': '/linkloving_invoice_workflow/linkloving_invoice_workflow',
-#             'objects': http.request.env['linkloving_invoice_workflow.linkloving_invoice_workflow'].search([]),
-#         })
+class ExportReport(Controller):
 
-#     @http.route('/linkloving_invoice_workflow/linkloving_invoice_workflow/objects/<model("linkloving_invoice_workflow.linkloving_invoice_workflow"):obj>/', auth='public')
-#     def object(self, obj, **kw):
-#         return http.request.render('linkloving_invoice_workflow.object', {
-#             'object': obj
-#         })
+    @route('/export/account_invoice', type='http', auth='public', csrf=False)
+    def account_invoice(self, values):
+        filename, data = account_invoice_export(values)
+        return request.make_response(data, headers=[('Content-Disposition', content_disposition(filename)),
+                                                    ('Content-Type', 'application/vnd.ms-excel')])

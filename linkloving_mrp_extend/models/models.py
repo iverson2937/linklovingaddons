@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
 import datetime
+import logging
+import traceback
 import types
 
 import jpush
@@ -2036,8 +2038,11 @@ class StcokPickingExtend(models.Model):
                     'res_id': wiz.id,
                     'context': self.env.context,
                 }
-            pick.is_cancel_backorder = True
-            pick.state = 'waiting_in'
+            if pick.picking_type_code == 'incoming':
+                pick.is_cancel_backorder = True
+                pick.state = 'waiting_in'
+            elif pick.picking_type_code == 'outgoing':
+                self.do_transfer()
         return
 
     @api.multi
@@ -2053,8 +2058,8 @@ class StcokPickingExtend(models.Model):
             elif any(move.state in ["done"] for move in pick.move_lines) and any(
                             move.state == "assigned" for move in pick.move_lines):
                 raise UserError(u"库存异动单异常,请联系管理员解决")
-                # if sum(pick.pack_operation_product_ids.mapped("qty_done")) == 0:
-                #     raise UserError(u"出货数量不能全部为0")
+            if sum(pick.pack_operation_product_ids.mapped("qty_done")) == 0:
+                raise UserError(u"出货数量不能全部为0")
         return super(StcokPickingExtend, self).to_stock()
 
     # 分拣完成

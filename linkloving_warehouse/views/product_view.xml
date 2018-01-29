@@ -2,6 +2,64 @@
 <openerp>
     <data>
 
+
+        <record id="view_product_template_tree_purchase" model="ir.ui.view">
+            <field name="name">product.template.tree</field>
+            <field name="model">product.template</field>
+            <field name="arch" type="xml">
+                <tree string="产品" decoration-danger="forecast_qty&lt;0" decoration-info="forecast_qty&gt;=0">
+                    <field name="sequence" widget="handle"/>
+                    <field name="default_code" string="料号" readonly="1"/>
+                    <button name="view_product_id" type="object" icon="fa-arrow-right"/>
+                    <field name="name"/>
+                    <field name="list_price" invisible="1"/>
+                    <field name="standard_price" invisible="1"/>
+                    <field name="categ_id" invisible="1"/>
+                    <field name="type" invisible="1"/>
+                    <field name="uom_id" invisible="1"/>
+                    <field name="active" invisible="1"/>
+                    <field name="stock" string="库存"/>
+                    <field name="incoming_qty" string="在产"/>
+                    <field name="forecast_qty" string="预测数量"/>
+                    <field name="reordering_min_qty" string="最小"/>
+                    <field name="reordering_max_qty" string="最大"/>
+                    <!--<field name="order_point_active" string="订货规则开启"/>-->
+
+                    <field name="last1_month_consume_qty" readonly="1" string="1个月"/>
+                    <field name="last3_month_consume_qty" readonly="1" string="3个月"/>
+                    <field name="last6_month_consume_qty" readonly="1" string="6个月"/>
+
+                </tree>
+            </field>
+        </record>
+        <record id="purchase.product_normal_action_puchased" model="ir.actions.act_window">
+            <!--<field name="name">产品</field>-->
+            <!--<field name="type">ir.actions.act_window</field>-->
+            <!--<field name="res_model">product.template</field>-->
+            <!--<field name="view_type">form</field>-->
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="context">{"search_default_filter_to_purchase":1, "is_show_procuremnt_create_btn":1,
+                "order_type":"purchase"}
+            </field>
+            <!--<field name="search_view_id" eval="False"/> &lt;!&ndash; Force empty &ndash;&gt;-->
+            <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'kanban', 'view_id': False}),
+            (0,0,{'view_mode':'tree', 'view_id': ref('view_product_template_tree_purchase')}),
+            (0,0,{'view_mode':'form', 'view_id': False})]"/>
+            <!--<field name="help" type="html">-->
+            <!--<p class="oe_view_nocontent_create">-->
+            <!--Click to define a new product.-->
+            <!--</p><p>-->
+            <!--You must define a product for everything you purchase, whether-->
+            <!--it's a physical product, a consumable or services you buy to-->
+            <!--subcontractors.-->
+            <!--</p><p>-->
+            <!--The product form contains detailed information to improve the-->
+            <!--purchase process: prices, procurement logistics, accounting data,-->
+            <!--available vendors, etc.-->
+            <!--</p>-->
+            <!--</field>-->
+        </record>
         <!-- INHERITED TREE -->
         <record id="view_product_template_tree" model="ir.ui.view">
             <field name="name">product.template.tree.inherit</field>
@@ -57,6 +115,9 @@
                 <!--<xpath expr="//page[1]" position="attributes">-->
                 <!--<attribute name="string">供应商</attribute>-->
                 <!--</xpath>-->
+                <xpath expr="//field[@name='virtual_available']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
 
                 <xpath expr="//field[@name='qty_available']" position="replace">
                     <field name="incoming_qty" string="在产"/>

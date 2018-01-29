@@ -202,7 +202,8 @@ class ProductProductExtend(models.Model):
             if bom:
                 material_cost = 0.0
                 for line in bom.bom_line_ids:
-                    material_cost += line.product_id.pre_cost_cal(raise_exception=False) * line.product_qty
+                    precost = line.product_id.pre_cost_cal(raise_exception=False) or 0
+                    material_cost += precost * line.product_qty
                 return material_cost
             else:
                 return product.get_highest_purchase_price(raise_exception=False)
@@ -263,7 +264,7 @@ class ProductProductExtend(models.Model):
                         max_seller = seller
                 # 税点计算
                 max_price = max_seller.price / (1 + (max_seller.tax_id.amount or 0) / 100)
-                return max_price
+                return max_price or 0
             else:
                 if raise_exception:
                     raise UserError(u'%s 未设置采购价' % p.display_name)

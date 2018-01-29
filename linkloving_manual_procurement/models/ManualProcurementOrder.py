@@ -79,6 +79,11 @@ class ManualProcurementOrder(models.Model):
                              store=True,
                              track_visibility='onchange')
 
+    order_type = fields.Selection(string=u"类型",
+                                  selection=[('sale', u'销售'), ('purchase', u'采购'), ],
+                                  required=False,
+                                  default='sale')
+
     procurement_line_ids = fields.One2many(comodel_name='manual.procurement.line', inverse_name='manual_order_id',
                                            string=u'产品明细', default=_default_procurement_line_ids,
                                            track_visibility='onchange')

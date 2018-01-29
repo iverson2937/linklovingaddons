@@ -1,29 +1,387 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <record id="view_product_template_form_inherit" model="ir.ui.view">
+        <record id="view_product_template_approval_form" model="ir.ui.view">
             <field name="name">product.product.form</field>
             <field name="model">product.template</field>
-            <field name="inherit_id" ref="product.product_template_only_form_view"/>
             <field name="arch" type="xml">
+                <form>
 
-                <header position="inside">
-                    <field name="user_can_approve" invisible="0"/>
-                    <field name="user_can_reject" invisible="0"/>
-                    <button string="提交审核" name="to_approve" type="object" class="oe_highlight"
-                            context="{'default_submit':True}"
-                            states="draft"
-                            attrs=""/>
+                    <header>
+                        <field name="user_can_approve" invisible="1" modifiers="{'invisible': true, 'readonly': true}"/>
+                        <field name="user_can_reject" invisible="1" modifiers="{'invisible': true, 'readonly': true}"/>
+                        <button string="提交审核" name="to_approve" type="object" class="oe_highlight"
+                                context="{'default_submit':True}" states="draft" attrs=""
+                                modifiers="{'invisible': [['state', 'not in', ['draft']]]}"/>
+                        <button string="通过" name="to_approve" type="object" class="oe_highlight"
+                                context="{'default_approve':True}"
+                                attrs="{'invisible': ['|',('user_can_approve', '=', False),('state','!=','progress')]}"
+                                modifiers="{'invisible': ['|', ['user_can_approve', '=', false], ['state', '!=', 'progress']]}"/>
+                        <button string="拒绝" name="to_approve" type="object" class="oe_highlight"
+                                context="{'default_reject':True}"
+                                attrs="{'invisible': ['|',('user_can_reject', '=', False),('state','!=','progress')]}"
+                                modifiers="{'invisible': ['|', ['user_can_reject', '=', false], ['state', '!=', 'progress']]}"/>
+                        <field name="stage_id" widget="statusbar" readonly="1" on_change="1" can_create="true"
+                               can_write="true" modifiers="{'readonly': true}"/>
+                        <field name="state" invisible="1" modifiers="{'invisible': true}"/>
+                        <field name="status" widget="statusbar" statusbar_visible="eol" readonly="1"
+                               modifiers="{'readonly': true}"/>
+                    </header>
+                    <sheet>
+                        <field name="product_variant_count" invisible="1"
+                               modifiers="{'invisible': true, 'readonly': true}"/>
+                        <field name="id" invisible="True" modifiers="{'invisible': true, 'readonly': true}"/>
+                        <div class="oe_button_box" name="button_box">
 
-                    <button string="Approve" name="to_approve" type="object" class="oe_highlight"
-                            context="{'default_approve':True}"
-                            attrs="{'invisible': ['|',('user_can_approve', '=', False),('state','!=','progress')]}"/>
-                    <button string="Reject" name="to_approve" type="object" class="oe_highlight"
-                            context="{'default_reject':True}"
-                            attrs="{'invisible': ['|',('user_can_reject', '=', False),('state','!=','progress')]}"/>
-                    <field name="stage_id" widget="statusbar" readonly="1"/>
-                    <field name="state" invisible="1"/>
-                </header>
+                            <button class="oe_stat_button ol_button" name="show_detail" icon="fa-tasks" string="产品详细"/>
+
+                            <button class="oe_stat_button ol_button" name="cost_detail" icon="fa-tasks" string="成本明细"
+                                    type="object"/>
+                            <button class="oe_stat_button" name="action_template_open_bom" type="object"
+                                    attrs="{'invisible':[('type', 'not in', ['product', 'consu'])]}" icon="fa-flask"
+                                    modifiers="{'invisible': [['type', 'not in', ['product', 'consu']]]}">
+                                <field string="物料清单" name="bom_count" widget="statinfo" modifiers="{'readonly': true}"/>
+                            </button>
+
+                            <button class="oe_stat_button" name="%(linkloving_pdm.document_load_client)d" type="action"
+                                    icon="fa-tasks" string="文件上传/下载">
+
+                                <button class="oe_stat_button" name="bom_detail_new" type="object" icon="fa-tasks"
+                                        string="BOM修改">
+                                </button>
+                            </button>
+
+
+                        </div>
+                        <field name="image_medium" widget="image" class="oe_avatar" modifiers="{}"/>
+                        <div class="oe_title">
+                            <label class="oe_edit_only" for="name" string="产品名称"/>
+                            <h1>
+                                <field name="name" placeholder="产品名称" modifiers="{'required': true}"/>
+                            </h1>
+                            <div name="options">
+                                <div>
+                                    <field name="sale_ok" modifiers="{}"/>
+                                    <label for="sale_ok"/>
+                                </div>
+                                <div>
+                                    <field name="purchase_ok" modifiers="{}"/>
+                                    <label for="purchase_ok"/>
+                                </div>
+                                <div>
+                                    <field name="can_be_expensed" on_change="1" modifiers="{}"/>
+                                    <label for="can_be_expensed"/>
+                                </div>
+                            </div>
+                        </div>
+                        <notebook>
+                            <page string="通用信息" name="general_information">
+                                <group>
+                                    <group name="group_general">
+                                        <field name="product_ll_type" required="1" on_change="1"
+                                               modifiers="{'required': true}"/>
+                                        <field name="order_ll_type"
+                                               attrs="{'invisible': [('product_ll_type', '!=', 'finished')],'required':[('product_ll_type', '=', 'finished')]}"
+                                               on_change="1"
+                                               modifiers="{'invisible': [['product_ll_type', '!=', 'finished']], 'required': [['product_ll_type', '=', 'finished']]}"/>
+                                        <field name="type" on_change="1" modifiers="{'required': true}"/>
+                                        <field name="default_code"
+                                               attrs="{'invisible': [('product_variant_count', '&gt;', 1)]}"
+                                               required="True" string="料号"
+                                               modifiers="{'invisible': [['product_variant_count', '&gt;', 1]], 'required': true}"/>
+                                        <field name="inner_code" attrs="{'invisible':[('sale_ok','!=',True)]}"
+                                               string="国内简称"/>
+                                        <field name="inner_spec" attrs="{'invisible':[('sale_ok','!=',True)]}"
+                                               modifiers="{'invisible': [['sale_ok', '!=', true]]}"/>
+                                        <label for="street" string="库存位置"/>
+                                        <div class="o_address_format">
+                                            <field name="area_id" class="o_address_city" options="{'no_create':True}"
+                                                   can_create="true" can_write="true" modifiers="{}"/>
+                                            <field name="location_x" class="o_address_state" modifiers="{}"/>
+                                            <field name="location_y" class="o_address_state" modifiers="{}"/>
+                                        </div>
+                                        <field name="barcode"
+                                               attrs="{'invisible': [('product_variant_count', '&gt;', 1)]}"
+                                               modifiers="{'invisible': [['product_variant_count', '&gt;', 1]]}"/>
+                                        <field name="product_specs" modifiers="{}"/>
+                                        <field name="hs_code" modifiers="{}"/>
+                                    </group>
+                                    <group name="group_standard_price">
+                                        <field name="list_price" widget="monetary"
+                                               options="{'currency_field': 'currency_id'}" string="售价" modifiers="{}"/>
+                                        <field name="valuation" invisible="1" readonly="1"
+                                               modifiers="{'invisible': true, 'readonly': true}"/>
+                                        <field name="cost_method" invisible="1" readonly="1"
+                                               modifiers="{'invisible': true, 'readonly': true}"/>
+                                        <field name="property_cost_method" invisible="1" on_change="1"
+                                               modifiers="{'invisible': true}"/>
+                                        <label for="standard_price"
+                                               attrs="{'invisible': [('product_variant_count', '&gt;', 1)]}"
+                                               modifiers="{'invisible': [['product_variant_count', '&gt;', 1]]}"/>
+                                        <div name="standard_price_uom">
+                                            <field name="standard_price"
+                                                   attrs="{'readonly':['&amp;', ('valuation','=','real_time'), ('cost_method', 'in', ['standard', 'average'])], 'invisible': [('product_variant_count', '&gt;', 1)]}"
+                                                   class="oe_inline" widget="monetary"
+                                                   options="{'currency_field': 'currency_id'}"
+                                                   modifiers="{'invisible': [['product_variant_count', '&gt;', 1]], 'readonly': ['&amp;', ['valuation', '=', 'real_time'], ['cost_method', 'in', ['standard', 'average']]]}"/>
+                                            <group style="text-decoration:line-through; color:#7C7BAD;">
+                                                <field name="backup_standard_price"
+                                                       style="text-decoration:line-through; color:#7C7BAD;" readonly="1"
+                                                       modifiers="{'readonly': true}"/>
+                                            </group>
+                                        </div>
+                                        <button string="从平均价格计算" type="action" name="412"
+                                                attrs="{'invisible':['|', '|', ('valuation','!=', 'real_time'), ('cost_method', 'not in', ['average']), ('product_variant_count', '&gt;', 1)]}"
+                                                class="oe_link oe_read_only" colspan="2"
+                                                modifiers="{'invisible': ['|', '|', ['valuation', '!=', 'real_time'], ['cost_method', 'not in', ['average']], ['product_variant_count', '&gt;', 1]]}"/>
+                                        <button string="设置标准价" type="action" name="412"
+                                                attrs="{'invisible':['|', '|', ('valuation','!=', 'real_time'), ('cost_method', 'not in', ['standard']), ('product_variant_count', '&gt;', 1)]}"
+                                                class="oe_link oe_read_only" colspan="2"
+                                                modifiers="{'invisible': ['|', '|', ['valuation', '!=', 'real_time'], ['cost_method', 'not in', ['standard']], ['product_variant_count', '&gt;', 1]]}"/>
+                                        <field name="company_id" options="{'no_create': True}" can_create="true"
+                                               can_write="true" invisible="1" modifiers="{'invisible': true}"/>
+                                        <field name="uom_id" options="{'no_create': True}" on_change="1"
+                                               can_create="true" can_write="true" modifiers="{'required': true}"/>
+                                        <field name="uom_po_id" options="{'no_create': True}" can_create="true"
+                                               can_write="true" modifiers="{'required': true}"/>
+                                        <field name="purchase_method" widget="radio" modifiers="{}"/>
+                                        <field name="currency_id" invisible="1" can_create="true" can_write="true"
+                                               modifiers="{'invisible': true, 'readonly': true}"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="供应商">
+                                <group name="inventory">
+                                    <group>
+                                        <field name="route_ids" widget="many2many_checkboxes"
+                                               attrs="{'invisible':[('type', 'in', ['service', 'digital'])]}"
+                                               can_create="true" can_write="true"
+                                               modifiers="{'invisible': [['type', 'in', ['service', 'digital']]]}"/>
+                                        <field name="route_from_categ_ids" widget="many2many_tags" readonly="1"
+                                               attrs="{'invisible':[('route_from_categ_ids', '=', [])]}"
+                                               can_create="true" can_write="true"
+                                               modifiers="{'invisible': [['route_from_categ_ids', '=', []]], 'readonly': true}"/>
+                                    </group>
+                                    <group name="group_lots_and_weight">
+                                        <label for="weight"
+                                               attrs="{'invisible':['|', ('type', 'not in', ['product', 'consu']), ('product_variant_count', '&gt;', 1)]}"
+                                               modifiers="{'invisible': ['|', ['type', 'not in', ['product', 'consu']], ['product_variant_count', '&gt;', 1]]}"/>
+                                        <div class="o_row" name="weight"
+                                             attrs="{'invisible':['|', ('type', 'not in', ['product', 'consu']), ('product_variant_count', '&gt;', 1)]}"
+                                             modifiers="{'invisible': ['|', ['type', 'not in', ['product', 'consu']], ['product_variant_count', '&gt;', 1]]}">
+                                            <field name="weight" modifiers="{}"/>
+                                        </div>
+                                        <field name="tracking" widget="radio" on_change="1" invisible="1"
+                                               modifiers="{'invisible': true, 'required': true}"/>
+                                        <label for="volume"
+                                               attrs="{'invisible':['|', ('type', 'not in', ['product', 'consu']), ('product_variant_count', '&gt;', 1)]}"
+                                               modifiers="{'invisible': ['|', ['type', 'not in', ['product', 'consu']], ['product_variant_count', '&gt;', 1]]}"/>
+                                        <div class="o_row" name="volume"
+                                             attrs="{'invisible':['|', ('type', 'not in', ['product', 'consu']), ('product_variant_count', '&gt;', 1)]}"
+                                             modifiers="{'invisible': ['|', ['type', 'not in', ['product', 'consu']], ['product_variant_count', '&gt;', 1]]}">
+                                            <field name="volume" string="体积" modifiers="{}"/>
+                                        </div>
+                                    </group>
+                                    <group>
+                                        <field name="categ_id" string="内部类别" options="{'no_create':True}" on_change="1"
+                                               can_create="true" can_write="true" modifiers="{'required': true}"/>
+                                    </group>
+                                    <group name="stock_property">
+                                        <field name="property_stock_procurement" domain="[('usage','=','procurement')]"
+                                               can_create="true" can_write="true" modifiers="{}"/>
+                                        <field name="property_stock_production" domain="[('usage','=','production')]"
+                                               can_create="true" can_write="true" modifiers="{}"/>
+                                        <field name="property_stock_inventory" domain="[('usage','=','inventory')]"
+                                               can_create="true" can_write="true" modifiers="{}"/>
+                                    </group>
+                                </group>
+                                <separator string="供应商"/>
+                                <field name="seller_ids"
+                                       context="{'default_product_tmpl_id': context.get('product_tmpl_id', active_id)}"
+                                       modifiers="{}"/>
+                                <group name="packaging" string="包装" colspan="4" invisible="1"
+                                       modifiers="{'invisible': true}">
+                                    <field name="packaging_ids" nolabel="1" modifiers="{}"/>
+                                </group>
+                            </page>
+                            <page string="销售" attrs="{'invisible':[('sale_ok','=',False)]}" name="sales"
+                                  modifiers="{'invisible': [['sale_ok', '=', false]]}">
+                                <div name="pricelist_item" invisible="1" modifiers="{'invisible': true}">
+                                    <separator string="定价"/>
+                                    <field name="item_ids" nolabel="1"
+                                           context="{'default_base':'list_price', 'default_applied_on' :'1_product'}"
+                                           modifiers="{}"/>
+                                </div>
+                                <group name="sale">
+                                    <group name="sale_condition" string="销售条件">
+                                        <label for="warranty" invisible="1" modifiers="{'invisible': true}"/>
+                                        <div invisible="1" modifiers="{'invisible': true}">
+                                            <field name="warranty" class="oe_inline" modifiers="{}"/>
+                                            月
+
+                                        </div>
+                                        <label for="sale_delay"/>
+                                        <div>
+                                            <field name="sale_delay" attrs="{'readonly':[('sale_ok','=',False)]}"
+                                                   class="oe_inline" style="vertical-align:baseline"
+                                                   modifiers="{'readonly': [['sale_ok', '=', false]]}"/>
+                                            天
+
+                                        </div>
+                                        <label for="produce_delay" attrs="{'invisible':[('type','=','service')]}"
+                                               modifiers="{'invisible': [['type', '=', 'service']]}"/>
+                                        <div attrs="{'invisible':[('type','=','service')]}"
+                                             modifiers="{'invisible': [['type', '=', 'service']]}">
+                                            <field name="produce_delay" class="oe_inline" modifiers="{}"/>
+                                            天
+
+                                        </div>
+                                    </group>
+                                    <group name="email_template_and_project"
+                                           attrs="{'invisible':[('type', '!=', 'service')]}"
+                                           modifiers="{'invisible': [['type', '!=', 'service']]}"/>
+                                </group>
+                            </page>
+                            <page name="variants" string="变型" invisible="1">
+                                <field name="attribute_line_ids" widget="one2many_list"
+                                       context="{'show_attribute': False}"/>
+                                <p class="oe_grey">
+                                    <strong>
+                                        Warning
+                                    </strong>
+                                    : adding or deleting attributes
+                                    will delete and recreate existing variants and lead
+                                    to the loss of their possible customizations.
+
+                                </p>
+                            </page>
+                            <page string="财务" name="invoicing">
+                                <group name="properties">
+                                    <group>
+                                        <field name="property_account_income_id"
+                                               domain="[('internal_type','=','other'),('deprecated','=',False)]"
+                                               can_create="true" can_write="true" modifiers="{}"/>
+                                        <field name="taxes_id" widget="many2many_tags" can_create="true"
+                                               can_write="true" modifiers="{}"/>
+                                    </group>
+                                    <group>
+                                        <field name="asset_category_id" domain="[('type', '=', 'purchase')]"
+                                               context="{'default_type': 'purchase'}" can_create="true" can_write="true"
+                                               modifiers="{}"/>
+                                        <field name="property_account_expense_id" domain="[('deprecated','=',False)]"
+                                               attrs="{'readonly': [('purchase_ok', '=', 0)]}" can_create="true"
+                                               can_write="true" modifiers="{'readonly': [['purchase_ok', '=', 0]]}"/>
+                                        <field name="supplier_taxes_id" colspan="2" widget="many2many_tags"
+                                               attrs="{'readonly':[('purchase_ok','=',0)]}" can_create="true"
+                                               can_write="true" modifiers="{'readonly': [['purchase_ok', '=', 0]]}"/>
+                                        <label string="" colspan="2"/>
+                                        <field name="property_account_creditor_price_difference"
+                                               domain="[('deprecated','=',False)]"
+                                               attrs="{'readonly':[('purchase_ok', '=', 0)]}" can_create="true"
+                                               can_write="true" modifiers="{'readonly': [['purchase_ok', '=', 0]]}"/>
+                                    </group>
+                                </group>
+                                <group name="accounting">
+
+                                    <group name="property_inventory_valuation"
+                                           attrs="{'invisible': [('type','=','service')]}"
+                                           modifiers="{'invisible': [['type', '=', 'service']]}">
+                                        <field name="property_valuation" invisible="1" on_change="1"
+                                               modifiers="{'invisible': true}"/>
+                                        <field name="property_stock_account_input"
+                                               attrs="{'invisible':[ ('valuation', '!=', 'real_time')]}"
+                                               domain="[('deprecated', '=', False)]" can_create="true" can_write="true"
+                                               modifiers="{'invisible': [['valuation', '!=', 'real_time']]}"/>
+                                        <field name="property_stock_account_output"
+                                               attrs="{'invisible':[ ('valuation', '!=', 'real_time')]}"
+                                               domain="[('deprecated', '=', False)]" can_create="true" can_write="true"
+                                               modifiers="{'invisible': [['valuation', '!=', 'real_time']]}"/>
+                                    </group>
+                                </group>
+                                <separator string="开票策略"/>
+                                <group>
+                                    <field name="invoice_policy" widget="radio" modifiers="{}"/>
+                                    <field name="expense_policy" widget="radio"
+                                           attrs="{'invisible': [('can_be_expensed','=',False)]}"
+                                           modifiers="{'invisible': [['can_be_expensed', '=', false]]}"/>
+                                    <field name="track_service" widget="radio" invisible="True"
+                                           modifiers="{'invisible': true}"/>
+                                </group>
+                            </page>
+                            <page string="备注" name="notes">
+                                <group name="description">
+                                    <separator string="报价单说明" colspan="4"/>
+                                    <field name="description_sale" colspan="4" nolabel="1" placeholder="该说明将显示在报价单。"
+                                           modifiers="{}"/>
+                                    <separator string="供应商说明" colspan="4"/>
+                                    <field name="description_purchase" nolabel="1" placeholder="此说明将显示在询价单。" colspan="4"
+                                           modifiers="{}"/>
+                                    <separator string="分拣说明" colspan="4"/>
+                                    <field name="description_picking" placeholder="分拣说明（货架，行和箱子的信息）" nolabel="1"
+                                           colspan="4" modifiers="{}"/>
+                                </group>
+                                <group string="销售这产品时的警告" colspan="2" invisible="1" modifiers="{'invisible': true}">
+                                    <field name="sale_line_warn" nolabel="1" modifiers="{'required': true}"/>
+                                    <field name="sale_line_warn_msg" colspan="3" nolabel="1"
+                                           attrs="{'required':[('sale_line_warn','!=','no-message')],'readonly':[('sale_line_warn','=','no-message')]}"
+                                           modifiers="{'readonly': [['sale_line_warn', '=', 'no-message']], 'required': [['sale_line_warn', '!=', 'no-message']]}"/>
+                                </group>
+                                <group string="采购这产品时的警告" colspan="2" invisible="1" modifiers="{'invisible': true}">
+                                    <field name="purchase_line_warn" nolabel="1" modifiers="{'required': true}"/>
+                                    <field name="purchase_line_warn_msg" colspan="3" nolabel="1"
+                                           attrs="{'required':[('purchase_line_warn','!=','no-message')],'readonly':[('purchase_line_warn','=','no-message')]}"
+                                           modifiers="{'readonly': [['purchase_line_warn', '=', 'no-message']], 'required': [['purchase_line_warn', '!=', 'no-message']]}"/>
+                                </group>
+                            </page>
+                        </notebook>
+                        <notebook name="approve" string="审核记录">
+                            <page string="审核记录">
+                                <field name="approval_record_ids" options="{'no_create': True}">
+                                    <tree>
+                                        <field name="stage_id" string="阶段"/>
+                                        <field name="approval_template_id" string='组'/>
+                                        <field name="user_id" string="审核人"/>
+                                        <field name="status"/>
+                                        <field name="remark"/>
+                                        <field name="create_date" string="审核日期"/>
+                                    </tree>
+                                </field>
+
+                            </page>
+                            <page string="审核流程">
+                                <div class="approve_process_container">
+                                    <div class="approve_process_circle">创建人</div>
+                                    <div class="approve_state">提交</div>
+                                    <div class="approve_state_sanjiao"></div>
+                                    <div class="approve_process_circle">研发</div>
+                                    <div class="approve_state">审核</div>
+                                    <div class="approve_state_sanjiao"></div>
+                                    <div class="approve_process_circle more_role">
+                                        <span style="color: #000">采购</span>
+                                        <span style="color: yellow">工程</span>
+                                        <span style="color: #9AC0CD">文件</span>
+                                    </div>
+                                    <div class="approve_state">审核</div>
+                                    <div class="approve_state_sanjiao"></div>
+                                    <!--<div class="approve_process_circle">工程</div>-->
+                                    <!--<div class="approve_state">审核</div>-->
+                                    <!--<div class="approve_state_sanjiao"></div>-->
+                                    <!--<div class="approve_process_circle">文件</div>-->
+                                    <!--<div class="approve_state">审核</div>-->
+                                    <!--<div class="approve_state_sanjiao"></div>-->
+                                    <div class="approve_process_circle">终审人</div>
+                                    <div class="approve_state">审核</div>
+                                    <div class="approve_state_sanjiao"></div>
+                                    <div class="approve_process_circle">已发布</div>
+                                </div>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
             </field>
         </record>
 
@@ -34,6 +392,11 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="domain">[('create_uid','=',uid),('state','=','draft')]</field>
+            <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'tree', 'view_id': ref('product.product_template_tree_view')}),
+            (0,0,{'view_mode':'form', 'view_id': ref('view_product_template_approval_form')})
+            ]"
+            />
             <field name="help" type="html">
                 <p>
 
@@ -46,26 +409,55 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="domain">[('create_uid','=',uid),('state','!=','draft')]</field>
+            <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'tree', 'view_id': ref('product.product_template_tree_view')}),
+            (0,0,{'view_mode':'form', 'view_id': ref('view_product_template_approval_form')})
+            ]"
+            />
             <field name="help" type="html">
                 <p>
 
                 </p>
             </field>
         </record>
+
 
         <record id="action_my_product_in_progress" model="ir.actions.act_window">
             <field name="name">待审核</field>
             <field name="res_model">product.template</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[('create_uid','=',uid),('state','=','progress')]</field>
+            <field name="domain">[('required_user_ids','child_of',[uid]),('state','=','progress')]</field>
+            <field name="context">{'to_approve':True}</field>
+            <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'tree', 'view_id': ref('product.product_template_tree_view')}),
+            (0,0,{'view_mode':'form', 'view_id': ref('view_product_template_approval_form')})
+            ]"
+            />
+
             <field name="help" type="html">
                 <p>
 
                 </p>
             </field>
         </record>
+        <record id="action_my_product_approved" model="ir.actions.act_window">
+            <field name="name">已审核</field>
+            <field name="res_model">product.template</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('approved_user_ids','child_of',[uid])]</field>
+            <field name="view_ids" eval="[(5,0,0),
+            (0,0,{'view_mode':'tree', 'view_id': ref('product.product_template_tree_view')}),
+            (0,0,{'view_mode':'form', 'view_id': ref('view_product_template_approval_form')})
+            ]"
+            />
+            <field name="help" type="html">
+                <p>
 
+                </p>
+            </field>
+        </record>
 
         <menuitem id="menu_mrp_approve_product_root"
                   parent="linkloving_approval.ll_approval_root"
@@ -84,9 +476,11 @@
 
         <menuitem id="menu_mrp_approve_product_root_to_approve"
                   parent="menu_mrp_my_product"
+                  action="action_my_product_in_progress"
                   name="待审核"/>
         <menuitem id="menu_mrp_approve_product_root_approved"
                   parent="menu_mrp_my_product"
+                  action="action_my_product_approved"
                   name="已审核"/>
 
 
