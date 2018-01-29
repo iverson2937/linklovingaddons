@@ -3,3 +3,6 @@ access_linkloving_pdm_product_attachment_info,linkloving_pdm.product_attachment_
 access_linkloving_pdm_review_process,linkloving_pdm.review_process,model_review_process,,1,1,1,1
 access_linkloving_pdm_review_process_line,linkloving_pdm.review_process_line,model_review_process_line,,1,1,1,1
 access_linkloving_pdm_final_review_partner,linkloving_pdm.final_review_partner,model_final_review_partner,,1,1,1,1
+access_linkloving_pdm_tag_info,linkloving_pdm.tag_info,model_tag_info,,1,1,1,1
+access_linkloving_pdm_tag_info_line,linkloving_pdm.tag_info_line,model_tag_info_line,,1,1,1,1
+access_linkloving_pdm_tag_flow_info,linkloving_pdm.tag_flow_info,model_tag_flow_info,,1,1,1,1

@@ -86,6 +86,77 @@
         </record>
 
 
+        <record id="product_attachment_info_new_file" model="ir.ui.view">
+            <field name="name">文件详细</field>
+            <field name="model">product.attachment.info</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+
+                            <field name="file_product_tmpl_id" string="产品名称"/>
+
+                            <field name="type" class="this_my_type" invisible="1"/>
+                            <field name="tag_upload_file" invisible="1"/>
+                            <field name="tag_type_id"/>
+                            <field name="tag_type_flow_id"/>
+                        </group>
+                        <group>
+                            <field name="file_binary" class="this_my_file_binary"
+                                   attrs="{'invisible': [('tag_upload_file', '=', True)]}"/>
+                        </group>
+                        <group style="margin-left: 18%;">
+
+                            <group attrs="{'invisible': [('tag_upload_file', '!=', True)]}">
+                                <!--<a id="file_click_me_my" class="o_form_input" href="javascript:void(-1);">测试赋值-->
+                                <!--</a>-->
+                                <a id="file_click_me" class="o_form_input" href="javascript:void(-1);">选择文件
+                                </a>
+                            </group>
+
+                        </group>
+                        <group>
+                            <!--<field name="file_name" attrs="{'invisible': [('type', 'not in', ('design','other'))]}"/>-->
+                            <field name="file_name" class="this_my_filename" placeholder="输入格式（*.*）"/>
+                            <field name="remote_path" class="this_my_remote_path"
+                                   attrs="{'invisible': [('tag_upload_file', '!=', True)]}"/>
+                            <field name="state" invisible="1"/>
+                            <field name="version" invisible="1"/>
+                            <field name="product_tmpl_id" invisible="1"/>
+                            <field name="review_id" invisible="1"/>
+                            <field name="remark"/>
+                        </group>
+                        <script type="text/javascript" src="/linkloving_pdm/static/src/js/file_click_form.js"/>
+
+                        <notebook>
+                            <page string="审核流程记录">
+                                <field name="file_review_process_line_ids">
+                                    <tree editable="bottom" create="0">
+                                        <field name="review_order_seq" string="顺序" invisible="1"/>
+                                        <field name="last_review_line_id" string="上一级审核" invisible="1"/>
+
+                                        <field name="partner_id" readonly="1" string="待...审核"/>
+                                        <field name="state_copy" readonly="1"/>
+                                        <field name="remark" string="备注" readonly="1"/>
+                                        <field name="review_time" readonly="1"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+
+
+                    </sheet>
+                    <footer>
+                        <button string="保存" type="object" name="action_create_many_info"
+                                class="btn-primary"/>
+                        <!--<button name='action_create_many_info' type='object' string='' class='oe_highlight review_reload'/>-->
+                        <button string='取消' class='oe_link review_reload' special='cancel'/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
         <record id="product_attachment_info" model="ir.ui.view">
             <field name="name">product.attachment.info.form</field>
             <field name="model">product.attachment.info</field>
@@ -94,11 +165,14 @@
                     <sheet>
                         <group>
                             <field name="temp_product_tmpl_ids" widget="many2many_tags" options="{'no_create': True}"/>
-                            <field name="type" class="this_my_type"/>
+                            <field name="type" class="this_my_type_file" invisible="1"/>
+                            <field name="tag_upload_file" invisible="1"/>
+                            <field name="tag_type_id"/>
+                            <field name="tag_type_flow_id"/>
                         </group>
                         <group>
                             <field name="file_binary" class="this_my_file_binary"
-                                   attrs="{'invisible': [('type', 'in', ('design','other'))]}"/>
+                                   attrs="{'invisible': [('tag_upload_file', '=', True)]}"/>
                         </group>
                         <group style="margin-left: 18%;">
                             <!--<group attrs="{'invisible': [('type', 'in', ('design','other'))]}">-->
@@ -106,22 +180,23 @@
                             <!--<input type="file" class="o_form_input my_load_file_view" name="file_binary"/>-->
                             <!--</a>-->
                             <!--</group>-->
-                            <!--<group attrs="{'invisible': [('type', 'not in', ('design','other'))]}">-->
-                            <!--&lt;!&ndash;<a id="file_click_me_my" class="o_form_input" href="javascript:void(-1);">测试赋值&ndash;&gt;-->
-                            <!--&lt;!&ndash;</a>&ndash;&gt;-->
-                            <!--<a id="file_click_me" class="o_form_input" href="javascript:void(-1);">选择文件-->
+                            <group attrs="{'invisible': [('tag_upload_file', '!=', True)]}">
+                                <!--<a id="file_click_me_my" class="o_form_input" href="javascript:void(-1);">测试赋值-->
                                 <!--</a>-->
-                            <!--</group>-->
+                                <a id="file_click_me" class="o_form_input" href="javascript:void(-1);">选择文件
+                                </a>
+                            </group>
                         </group>
                         <group>
                             <!--<field name="file_name" attrs="{'invisible': [('type', 'not in', ('design','other'))]}"/>-->
                             <field name="file_name" class="this_my_filename" placeholder="输入格式（*.*）"/>
                             <field name="remote_path" class="this_my_remote_path"
-                                   attrs="{'invisible': [('type', 'not in', ('design','other'))]}"/>
+                                   attrs="{'invisible': [('tag_upload_file', '!=', True)]}"/>
                             <field name="state" invisible="1"/>
                             <field name="version" invisible="1"/>
                             <field name="product_tmpl_id" invisible="1"/>
                             <field name="review_id" invisible="1"/>
+                            <field name="remark"/>
                         </group>
                         <script type="text/javascript" src="/linkloving_pdm/static/src/js/file_click_form.js"/>
                     </sheet>
@@ -134,6 +209,80 @@
                 </form>
             </field>
         </record>
+
+        <record id="tag_product_attachment_info_form" model="ir.ui.view">
+            <field name="name">设置审核流程</field>
+            <field name="model">tag.flow.info</field>
+            <field name="arch" type="xml">
+                <form string="设置文件标签">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <!--<field name="partner_id" require="1"-->
+                            <!--options="{'no_create':True}"-->
+                            <!--domain="[('employee', '=', True)]"/>-->
+                        </group>
+
+                        <group>
+                            <notebook>
+                                <!--<page string="审批流程">-->
+                                <!--<field name="tag_approval_process" domain="[('employee', '=', True)]"/>-->
+                                <!--</page>-->
+                                <page string="审批流程002">
+                                    <field name="tag_approval_process_one" mode="tree,kanban">
+                                        <form string="审批流程">
+                                            <group>
+
+                                                <field name="tag_approval_process_partner" string="审核人" readonly="0"/>
+
+                                            </group>
+                                        </form>
+                                        <tree string="Sales Order Lines" editable="bottom">
+                                            <field name="tag_approval_process_partner" string="审核人" readonly="0"/>
+                                        </tree>
+                                        <kanban class="o_kanban_mobile">
+                                            <field name="tag_approval_process_partner"/>
+                                            <templates>
+                                                <t t-name="kanban-box">
+                                                    <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                                                        <div class="row">
+                                                            <div class="col-xs-12">
+                                                                <strong>
+                                                                    <span>
+                                                                        <t t-esc="record.tag_approval_process_partner.value"/>
+                                                                    </span>
+                                                                </strong>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-xs-8 text-muted">
+                                                                <span>
+                                                                    <t t-esc="record.product_uom_qty.value"/>
+                                                                    <t t-esc="record.product_uom.value"/>
+                                                                </span>
+                                                            </div>
+                                                            <div class="col-xs-4 text-muted">
+                                                                <span class="pull-right text-right">
+                                                                    <t t-esc="record.price_subtotal.value"/>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </t>
+                                            </templates>
+                                        </kanban>
+                                    </field>
+                                    <div class="oe_clear"/>
+                                </page>
+                            </notebook>
+                        </group>
+
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
 
         <record id="final_review_partner_tree" model="ir.ui.view">
             <field name="name">final.review.partner</field>
@@ -176,50 +325,66 @@
                         <group>
                             <field name="cur_partner_id" invisible="1"/>
                             <field name="partner_id" require="1"
-                                   options="{'no_create':True}"
+                                   options="{'no_create':True}" invisible="context.get('new_file_style')"
                                    domain="[('id','!=',cur_partner_id),('employee', '=', True)]"/>
                             <field name="remark"/>
                             <!--<field name="need_sop" widget="radio" invisible="context.get('review_type')!='bom_review'"/>-->
                             <!--<field name="sop_name" readonly="1" invisible="context.get('review_type')!='bom_review'"/>-->
                         </group>
-                        <p style="color:red;">提示：如需终审，请提交给以下终审人</p>
-                        <group>
-                            <field name="down_man" readonly="1"/>
-                        </group>
+
+                        <div invisible="context.get('new_file_style')">
+                            <p style="color:red;">提示：如需终审，请提交给以下终审人</p>
+                            <group>
+                                <field name="down_man" readonly="1"/>
+                            </group>
+                        </div>
 
                     </sheet>
                     <footer>
-                        <!--<div style="float:left">-->
-                        <button name='action_to_next' type='object' string='送审' class='oe_highlight review_reload'/>
-                        <!--</div>-->
-                        <!--<div invisible="context.get('view_material_request')" style="float:left">-->
-                        <button string='送往终审' type='object' name='action_to_next' class='oe_link review_reload'
-                                context="{'to_last_review':True}"/>
 
-                        <!--BOM审核-->
-                        <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
-                                groups="linkloving_pdm.group_final_review_partner_bom"
-                                invisible="not context.get('is_final_one')"
-                        />
-                        <!--文件审核-->
-                        <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
-                                groups="linkloving_pdm.group_final_review_partner"
-                                invisible="context.get('project_line_pass_show') or context.get('is_final_one')"
-                        />
+                        <div invisible="not context.get('new_file_style')">
 
-                        <!--工程审核-->
-                        <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
-                                groups="linkloving_pdm.group_final_review_picking_project,linkloving_pdm.group_final_review_picking_line"
-                                invisible="not context.get('project_line_pass_show')"
-                        />
+                            <button name='action_to_next' type='object' string='同意' class='oe_highlight review_reload'/>
+                            <button name='action_deny'
+                                    invisible="context.get('is_show_action_deny') == 'false' or context.get('view_show')"
+                                    type='object' string='审核不通过' class='oe_highlight review_reload'/>
+                            <button string='取消' class='oe_link review_reload' special='cancel'/>
+
+                        </div>
+
+                        <div invisible="context.get('new_file_style')">
+                            <!--<div style="float:left">-->
+                            <button name='action_to_next' type='object' string='送审' class='oe_highlight review_reload'/>
+                            <!--</div>-->
+                            <!--<div invisible="context.get('view_material_request')" style="float:left">-->
+                            <button string='送往终审' type='object' name='action_to_next' class='oe_link review_reload'
+                                    context="{'to_last_review':True}"/>
+
+                            <!--BOM审核-->
+                            <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
+                                    groups="linkloving_pdm.group_final_review_partner_bom"
+                                    invisible="not context.get('is_final_one')"
+                            />
+                            <!--文件审核-->
+                            <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
+                                    groups="linkloving_pdm.group_final_review_partner"
+                                    invisible="context.get('project_line_pass_show') or context.get('is_final_one')"
+                            />
+
+                            <!--工程审核-->
+                            <button name='action_pass' type='object' string='审核通过' class='oe_highlight review_reload'
+                                    groups="linkloving_pdm.group_final_review_picking_project,linkloving_pdm.group_final_review_picking_line"
+                                    invisible="not context.get('project_line_pass_show')"
+                            />
 
 
-                        <button name='action_deny'
-                                invisible="context.get('is_show_action_deny') == 'false' or context.get('view_show')"
-                                type='object' string='审核不通过' class='oe_highlight review_reload'/>
-                        <!--is_show_action_deny-->
-                        <!--</div>-->
-                        <button string='取消' class='oe_link review_reload' special='cancel'/>
+                            <button name='action_deny'
+                                    invisible="context.get('is_show_action_deny') == 'false' or context.get('view_show')"
+                                    type='object' string='审核不通过' class='oe_highlight review_reload'/>
+                            <!--is_show_action_deny-->
+                            <!--</div>-->
+                            <button string='取消' class='oe_link review_reload' special='cancel'/>
+                        </div>
                     </footer>
                 </form>
             </field>

@@ -10,6 +10,18 @@
 
                 </xpath>
 
+                <!--<xpath expr="//button[@name='action_view_routes']" position="after">-->
+                <div name="button_box" position="inside">
+
+                    <button type="object"
+                            name="action_view_product_img"
+                            class="oe_stat_button"
+                            icon="fa-photo fa-image fa-picture-o">
+                        <field name="product_img_count" widget="statinfo" string="产品照片"/>
+                    </button>
+
+                    <!--</xpath>-->
+                </div>
 
                 <xpath expr="//field[@name='default_code']" position="before">
                     <field name="categ_id" options="{'no_create':True}"
@@ -26,6 +38,20 @@
 
             </field>
         </record>
+
+
+        <!--<record id="product_view_document_file_kanban_img" model="ir.ui.view">-->
+            <!--<field name="name">ir.attachment kanban crm</field>-->
+            <!--<field name="model">ir.attachment</field>-->
+            <!--<field name="inherit_id" ref="mail.view_document_file_kanban"/>-->
+            <!--<field name="arch" type="xml">-->
+                <!--<xpath expr="//field[@name='name']" position="after">-->
+                    <!--<field name="product_ir_img_id" invisible="1"/>-->
+                <!--</xpath>-->
+
+            <!--</field>-->
+        <!--</record>-->
+
 
         <odoo>
             <data>
