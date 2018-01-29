@@ -6,6 +6,7 @@ from odoo import api, fields, models
 
 class StockInventoryInherit(models.Model):
     _inherit = 'stock.inventory'
+    _order = 'create_date desc'
     remark = fields.Selection([
         ('transfer', '物料转换'),
         ('adjust', '库存调整')

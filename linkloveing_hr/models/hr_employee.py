@@ -9,6 +9,7 @@ from odoo.addons import decimal_precision as dp
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
     payment_ids = fields.One2many('account.employee.payment', 'employee_id')
+    signature = fields.Binary(string=u'签名')
 
     @api.multi
     def _get_pre_payment_reminding(self):

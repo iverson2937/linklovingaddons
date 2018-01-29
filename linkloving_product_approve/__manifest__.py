@@ -20,7 +20,8 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'product'],
+    'depends': ['base', 'product', 'linkloving_warehouse', 'linkloving_sale', 'linkloving_mrp_automatic_plan',
+                'linkloving_pdm', 'linkloving_new_bom_update'],
 
     # always loaded
     'data': [

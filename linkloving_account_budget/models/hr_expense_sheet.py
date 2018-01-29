@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 
 class HrExpenseSheet(models.Model):
@@ -19,6 +20,22 @@ class HrExpenseSheet(models.Model):
 
     fiscal_year_id = fields.Many2one('account.fiscalyear', default=get_default_period)
 
+    def view_budget(self):
+        res_id = self.env['linkloving.account.budget'].search(
+            [('fiscal_year_id', '=', self.fiscal_year_id.id), ('department_id', '=', self.department_id.id)])
+        if res_id:
+
+            return {
+                'name': u'部门预算',
+                'res_model': 'linkloving.account.budget',
+                'type': 'ir.actions.act_window',
+                'res_id': res_id.id,
+                'view_type': 'form',
+                'view_mode': 'form',
+            }
+        else:
+            raise UserError('无对应预算')
+
 
 class HrExpense(models.Model):
     _inherit = 'hr.expense'
@@ -34,3 +51,4 @@ class HrExpense(models.Model):
 
             if budget_id:
                 sheet.budget_id = budget_id.id
+

@@ -34,7 +34,7 @@
             <field name="target">inline</field>
         </record>
          <menuitem id="ll_approval_root" name="工程" sequence="9"/>
-        <menuitem id="approval_setting" name="设置" parent="ll_approval_root" sequence="2"/>
+        <menuitem id="approval_setting" name="设置" parent="ll_approval_root" sequence="99"/>
 
         <menuitem id="pdm_config_setting_menu"
                   parent="linkloving_approval.approval_setting"
