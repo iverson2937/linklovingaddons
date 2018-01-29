@@ -57,8 +57,8 @@ class MrpApprovalRecord(models.Model):
     status = fields.Selection([
         ('none', 'Not Yet'),
         ('comment', 'Commented'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected')], string='Status',
+        ('approved', '通过'),
+        ('rejected', '拒绝')], string='Status',
         default='none', required=True)
     active = fields.Boolean(default=True)
 
