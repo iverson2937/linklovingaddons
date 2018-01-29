@@ -34,13 +34,13 @@ push = _jpush.create_push()
 _jpush.set_logging("DEBUG")
 
 need_sound = "a.caf"
-apns_production = False
+apns_production = True
 
 
 class JPushExtend:
     @classmethod
     def send_notification_push(cls, platform=jpush.all_, audience=None, notification=None, body='', message=None,
-                               apns_production=False):
+                               apns_production=True):
         push.audience = audience
         ios = jpush.ios(alert={"title": notification,
                                "body": body,
@@ -4444,6 +4444,7 @@ class LinklovingAppApi(http.Controller):
                 ('id', '=', work_order_id), ('write_uid', '=', uid)
             ]).write({
                 'issue_state': "draft",
+                'assign_uid':False,
             })
             work_order_record_model = request.env['linkloving.work.order.record']
             work_order_record = work_order_record_model.sudo(uid).create({
