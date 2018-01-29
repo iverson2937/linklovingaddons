@@ -33,6 +33,33 @@
 
                         this.style.transform = 'rotate('+current+'deg)';
                         }
+
+                        console.log(document.getElementById('span_list_ids').value)
+
+                        var array = eval ("(" + document.getElementById('span_list_ids').value+ ")");
+                        var num_list=array.indexOf(parseInt($('#target').attr("selfs")));
+
+
+                        document.getElementById('as_next').onclick = function(){
+
+                        if(num_list==(array.length-1)){
+                        num_list=0;}
+                        else{
+                        num_list+=1}
+                        document.getElementById('target').setAttribute('src','/web/image/'+array[num_list])
+                        }
+
+
+                        document.getElementById('as_previous').onclick = function(){
+
+                        if(num_list==0){
+                        num_list=array.length-1;}
+                        else{
+                        num_list-=1}
+                        document.getElementById('target').setAttribute('src','/web/image/'+array[num_list])
+                        }
+
+
                         };
 
 
@@ -45,7 +72,13 @@
                         return false;
                         }
 
+
                     </script>
+
+                    <link rel="stylesheet"
+                          href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css"/>
+                    <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+                    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 
                 </head>
@@ -57,11 +90,33 @@
                         </div>
                         <div>
                             <center>
-                                <img id="target" t-attf-src="/web/image/{{ transaction }}" border="1"
+                                <img id="target" t-attf-selfs="{{ transaction }}"
+                                     t-attf-src="/web/image/{{ transaction }}" border="1"
                                      onmousewheel="return bigimg(this)"/>
                             </center>
 
                         </div>
+
+                        <!--<ul class="pager">-->
+                        <!--<li class="previous">-->
+                        <!--<a href="#">Older</a>-->
+                        <!--</li>-->
+                        <!--<li class="next">-->
+                        <!--<a href="#">Newer</a>-->
+                        <!--</li>-->
+                        <!--</ul>-->
+
+                        <ul class="pager">
+                            <li>
+                                <a id="as_previous" href="#">上一页</a>
+                            </li>
+                            <li>
+                                <a id="as_next" href="#">下一页</a>
+                            </li>
+                        </ul>
+
+                        <input type="hidden" t-attf-value="#{list_ids}" id="span_list_ids"/>
+
                     </div>
 
                 </body>
