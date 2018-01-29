@@ -345,7 +345,33 @@
                                 </field>
 
                             </page>
-                            <page string="审核流程"/>
+                            <page string="审核流程">
+                                <div class="approve_process_container">
+                                    <div class="approve_process_circle">创建人</div>
+                                    <div class="approve_state">提交</div>
+                                    <div class="approve_state_sanjiao"></div>
+                                    <div class="approve_process_circle">研发</div>
+                                    <div class="approve_state">审核</div>
+                                    <div class="approve_state_sanjiao"></div>
+                                    <div class="approve_process_circle more_role">
+                                        <span style="color: #000">采购</span>
+                                        <span style="color: yellow">工程</span>
+                                        <span style="color: #9AC0CD">文件</span>
+                                    </div>
+                                    <div class="approve_state">审核</div>
+                                    <div class="approve_state_sanjiao"></div>
+                                    <!--<div class="approve_process_circle">工程</div>-->
+                                    <!--<div class="approve_state">审核</div>-->
+                                    <!--<div class="approve_state_sanjiao"></div>-->
+                                    <!--<div class="approve_process_circle">文件</div>-->
+                                    <!--<div class="approve_state">审核</div>-->
+                                    <!--<div class="approve_state_sanjiao"></div>-->
+                                    <div class="approve_process_circle">终审人</div>
+                                    <div class="approve_state">审核</div>
+                                    <div class="approve_state_sanjiao"></div>
+                                    <div class="approve_process_circle">已发布</div>
+                                </div>
+                            </page>
                         </notebook>
                     </sheet>
                     <div class="oe_chatter">
