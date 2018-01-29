@@ -13,6 +13,11 @@ class MrpApprovelType(models.Model):
     stage_ids = fields.One2many('mrp.approve.stage', 'type_id')
     required_user_ids = fields.Many2many('res.users', compute='get_required_user_ids')
 
+    _sql_constraints = {
+        ('approve_type_uniq', 'unique(approve_type)',
+         '不可以创建相同审核类型的流程')
+    }
+
     @api.multi
     def get_required_user_ids(self):
         for approve_type in self:
