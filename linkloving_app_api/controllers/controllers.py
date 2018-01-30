@@ -34,13 +34,13 @@ push = _jpush.create_push()
 _jpush.set_logging("DEBUG")
 
 need_sound = "a.caf"
-apns_production = False
+apns_production = True
 
 
 class JPushExtend:
     @classmethod
     def send_notification_push(cls, platform=jpush.all_, audience=None, notification=None, body='', message=None,
-                               apns_production=False):
+                               apns_production=True):
         push.audience = audience
         ios = jpush.ios(alert={"title": notification,
                                "body": body,
@@ -2722,7 +2722,8 @@ class LinklovingAppApi(http.Controller):
             'secondary_operation': stock_picking_obj.secondary_operation,  # zou增，下，
             'timesheet_order_id': LinklovingAppApi.timesheet_order_ids_json(
                 stock_picking_obj.timesheet_order_ids.filtered(lambda x: x.state == 'running'))
-            if stock_picking_obj.state=='secondary_operation' else  LinklovingAppApi.timesheet_order_ids_json(stock_picking_obj.timesheet_order_ids),
+            if stock_picking_obj.state == 'secondary_operation' else  LinklovingAppApi.timesheet_order_ids_json(
+                stock_picking_obj.timesheet_order_ids),
             'picking_id': stock_picking_obj.id,
             'complete_rate': stock_picking_obj.complete_rate or 0,
             'has_attachment': LinklovingAppApi.is_has_attachment(stock_picking_obj.id, 'stock.picking'),
@@ -3124,7 +3125,6 @@ class LinklovingAppApi(http.Controller):
             elif picking.available_rate == 100 and picking.state != 'waiting':  # 可用率为100 并且不是等待其他作业的状态
                 final_pickings += picking
 
-
         json_list = {'waiting_data': [],
                      'able_to_data': []}
         for picking in final_pickings:
@@ -3133,7 +3133,6 @@ class LinklovingAppApi(http.Controller):
         for picking in pickings:
             json_list['waiting_data'].append(self.stock_picking_to_json_simple(picking))
         return json_list
-
 
     def stock_picking_to_json_simple(self, picking):
         data = {
@@ -3145,7 +3144,7 @@ class LinklovingAppApi(http.Controller):
             'back_order_id': picking.backorder_id.name or '',
             'emergency': picking.is_emergency or '',
             'partner_id': picking.partner_id.name,
-            'secondary_operation': picking.secondary_operation,#zou增，下同
+            'secondary_operation': picking.secondary_operation,  # zou增，下同
             'timesheet_order_ids': self.timesheet_order_ids_json(
                 picking.timesheet_order_ids.filtered(lambda x: x.state == 'running'))
             if picking.state == 'secondary_operation' else  LinklovingAppApi.timesheet_order_ids_json(
@@ -3153,7 +3152,7 @@ class LinklovingAppApi(http.Controller):
         }
         return data
 
-    #zou增加解析json二次加工信息
+    # zou增加解析json二次加工信息
     @classmethod
     def timesheet_order_ids_json(cls, timesheet_order_id):
         time_list = []
@@ -3461,15 +3460,15 @@ class LinklovingAppApi(http.Controller):
             "picking_cause": material.picking_cause,
             "remark": material.remark,
             'line_ids': [{
-                             'id': lines.id,
-                             'qty_product': lines.qty_available,
-                             'name': lines.product_id.name,
-                             'location': lines.product_id.area_id.name,
-                             'quantity_available': lines.quantity_available,
-                             'quantity_done': lines.quantity_done,
-                             'product_qty': lines.product_qty,
-                             'reserve': lines.reserve_qty,
-                         } for lines in material.line_ids],
+                'id': lines.id,
+                'qty_product': lines.qty_available,
+                'name': lines.product_id.name,
+                'location': lines.product_id.area_id.name,
+                'quantity_available': lines.quantity_available,
+                'quantity_done': lines.quantity_done,
+                'product_qty': lines.product_qty,
+                'reserve': lines.reserve_qty,
+            } for lines in material.line_ids],
         }
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
@@ -4183,8 +4182,8 @@ class LinklovingAppApi(http.Controller):
             work_order_record = work_order_record_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
                 'work_order_id': work_order.id,
                 'record_type': "assign",
-                'reply_uid':assign_uid,
-                'content':"新建并指派受理人：",
+                'reply_uid': assign_uid,
+                'content': "新建并指派受理人：",
             })
         else:
             work_order_record_model = request.env['linkloving.work.order.record']
@@ -4210,7 +4209,8 @@ class LinklovingAppApi(http.Controller):
         uid = request.jsonrequest.get("uid")
         user = request.env["res.users"].sudo().browse(uid)
         work_order_model = request.env['linkloving.work.order']
-        work_order_data = work_order_model.sudo().read_group([('assign_uid', '=', uid), ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)],
+        work_order_data = work_order_model.sudo().read_group([('assign_uid', '=', uid), (
+        'effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)],
                                                              'issue_state',
                                                              'issue_state')
         result = dict((data['issue_state'], data['issue_state_count']) for data in work_order_data)
@@ -4236,7 +4236,7 @@ class LinklovingAppApi(http.Controller):
                 work_order_data = work_order_model.sudo().read_group(
                     [('create_date', '<', (end - timez).strftime('%Y-%m-%d %H:%M:%S')),
                      ('create_date', '>', (begin - timez).strftime('%Y-%m-%d %H:%M:%S')),
-                     ('issue_state', 'in', ['unaccept', 'check', 'process']),
+                     ('issue_state', 'in', ['unaccept', 'check', 'process','done']),
                      ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)],
                     ['issue_state'],
                     ['issue_state'])
@@ -4244,7 +4244,7 @@ class LinklovingAppApi(http.Controller):
                 work_order_data = work_order_model.sudo().read_group(
                     [('create_date', '<', (end - timez).strftime('%Y-%m-%d %H:%M:%S')),
                      ('create_date', '>', (begin - timez).strftime('%Y-%m-%d %H:%M:%S')),
-                     ('issue_state', 'in', ['unaccept', 'check', 'process']),
+                     ('issue_state', 'in', ['unaccept', 'check', 'process','done']),
                      ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids),
                      ('tag_ids', 'in', tag_ids)],
                     ['issue_state'],
@@ -4254,13 +4254,13 @@ class LinklovingAppApi(http.Controller):
             work_order_model = request.env['linkloving.work.order']
             if len(tag_ids) == 0:
                 work_order_data = work_order_model.sudo().read_group(
-                    [('issue_state', 'in', ['unaccept', 'check', 'process']),
+                    [('issue_state', 'in', ['unaccept', 'check', 'process','done']),
                      ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)
                      ], ['issue_state'],
                     ['issue_state'])
             else:
                 work_order_data = work_order_model.sudo().read_group(
-                    [('issue_state', 'in', ['unaccept', 'check', 'process']),
+                    [('issue_state', 'in', ['unaccept', 'check', 'process','done']),
                      ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids),
                      ('tag_ids', 'in', tag_ids)], ['issue_state'],
                     ['issue_state'])
@@ -4310,22 +4310,22 @@ class LinklovingAppApi(http.Controller):
         if record_type:
             domain += [('record_type', '=', record_type)]
 
-
         work_order_json = []
         word_order_list = []
         if isSearchRecord:
             work_orders = request.env['linkloving.work.order.record'].sudo().search(
-                domain, order='write_date desc')
+                domain, order='create_date desc')
             for order in work_orders:
                 word_order_list.append(order.work_order_id)
             ids = list(set(word_order_list))
+            ids.sort(key=word_order_list.index)
             for id in ids:
                 work_order_json.append(LinklovingAppApi.convert_work_order_to_json(id))
         else:
             if not create_uid:
                 domain += [('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)]
             work_orders = request.env['linkloving.work.order'].sudo().search(
-                domain, order='write_date desc')
+                domain, order='create_date desc')
             for order in work_orders:
                 work_order_json.append(LinklovingAppApi.convert_work_order_to_json(order))
 
@@ -4335,17 +4335,44 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/searchAtMe', type='json', auth="none", csrf=False, cors='*')
     def searchAtMe(self, **kw):
         uid = request.jsonrequest.get("uid")
+        isNumber = request.jsonrequest.get("isNumber")
         domain = []
         domain += [('record_type', 'in', ['reply', 'assign'])]
-        domain += [('isRead', '=', False)]
+        if isNumber:
+            domain += [('isRead', '=', False)]
         domain += [('reply_uid', '=', uid)]
         work_order_json = []
         work_orders = request.env['linkloving.work.order.record'].sudo().search(
-            domain, order='write_date desc')
+            domain, order='create_date desc')
         for order in work_orders:
-            work_order_json.append(LinklovingAppApi.convert_work_order_to_json(order.work_order_id))
-
+            work_order_json.append(LinklovingAppApi.convert_at_me_order_to_json(order))
+            if not isNumber:
+                order.write({'isRead':True})
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=work_order_json)
+
+    @staticmethod
+    def convert_at_me_order_to_json(work_order):
+        data = ({
+            'at_me_time': work_order.create_date,
+            'isRead':work_order.isRead,
+            'at_me_type':work_order.record_type,
+            'at_me_create_user': LinklovingAppApi.get_user_json(work_order.create_uid.user_ids.id),
+            "at_me_description": work_order.content or "",
+            'work_order_number': work_order.work_order_id.order_number,
+            'work_order_id': work_order.work_order_id.id,
+            'title': work_order.work_order_id.name,
+            'description': work_order.work_order_id.description,
+            'priority': work_order.work_order_id.priority,
+            'assign_user': LinklovingAppApi.get_user_json(work_order.work_order_id.assign_uid.id),
+            'issue_state': work_order.work_order_id.issue_state,
+            'create_user': LinklovingAppApi.get_user_json(work_order.work_order_id.write_uid.id),
+            'create_time': work_order.work_order_id.create_date,
+            'work_order_images': LinklovingAppApi.get_work_order_img_url(work_order.work_order_id.attachments.ids),
+            'effective_department_ids': LinklovingAppApi.get_department_json(
+                work_order.work_order_id.effective_department_ids),
+            'tag_ids': LinklovingAppApi.get_tag_to_json(work_order.work_order_id.tag_ids)
+        })
+        return data
 
     # "工单详情"
     @http.route('/linkloving_app_api/work_order_search_by_id', type='json', auth="none", csrf=False, cors='*')
@@ -4360,12 +4387,12 @@ class LinklovingAppApi(http.Controller):
              ])
         if work_order:
             work_order_records = request.env['linkloving.work.order.record'].sudo().search(
-                [('work_order_id', '=', work_order_id),('parent_id', '=', False)],order='create_date desc')
+                [('work_order_id', '=', work_order_id), ('parent_id', '=', False)], order='create_date desc')
             work_order_records1 = request.env['linkloving.work.order.record'].sudo().search(
-                [('work_order_id', '=', work_order_id)],order='create_date desc')
+                [('work_order_id', '=', work_order_id)], order='create_date desc')
             record_json = []
             for record in work_order_records1:
-                if uid == record.work_order_id.assign_uid.id :
+                if uid == record.work_order_id.assign_uid.id:
                     record.write({"isRead": True})  # 标记成已读
             for record in work_order_records:
                 record_json.append(LinklovingAppApi.convert_work_order_record_to_json(record))
@@ -4391,7 +4418,7 @@ class LinklovingAppApi(http.Controller):
             'record_type': record_type,
             'content': content,
             'reply_uid': reply_uid,
-            'parent_id':parent_id,
+            'parent_id': parent_id,
         })
 
         if work_order_record:
@@ -4417,6 +4444,7 @@ class LinklovingAppApi(http.Controller):
                 ('id', '=', work_order_id), ('write_uid', '=', uid)
             ]).write({
                 'issue_state': "draft",
+                'assign_uid':False,
             })
             work_order_record_model = request.env['linkloving.work.order.record']
             work_order_record = work_order_record_model.sudo(uid).create({
@@ -4440,20 +4468,20 @@ class LinklovingAppApi(http.Controller):
             work_order_record = work_order_record_model.sudo(uid).create({
                 'work_order_id': work_order_id,
                 'record_type': "assign",
-                'reply_uid':assign_uid,
-                'content':"指派受理人："
+                'reply_uid': assign_uid,
+                'content': "指派受理人："
             })
             work_order = request.env['linkloving.work.order'].sudo().search(
                 [('id', '=', work_order_id),
                  ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)])
             work_order.sudo(work_order.create_uid.id).write({
-                'assign_uid':assign_uid,
+                'assign_uid': assign_uid,
                 'issue_state': "process",
             })
             JPushExtend.send_notification_push(audience=jpush.audience(
                 jpush.alias(assign_uid)
             ), notification="有新的工单待处理",
-                body=_("【工单】%s给你指派了工单：%s") % (user.name,work_order.name))
+                body=_("【工单】%s给你指派了工单：%s") % (user.name, work_order.name))
             return JsonResponse.send_response(STATUS_CODE_OK)
         elif action_type == "check":
             work_order_record_model = request.env['linkloving.work.order.record']
@@ -4527,6 +4555,8 @@ class LinklovingAppApi(http.Controller):
             'effective_department_ids': [(6, 0, departments)],
             'tag_ids': [(6, 0, tags)],
         })
+        request.env.cr.execute("UPDATE linkloving_work_order set create_date=%s WHERE id=%s",(fields.datetime.now(),work_order.id))
+
         if assign_uid:
             work_order_record_model = request.env['linkloving.work.order.record']
             work_order_record = work_order_record_model.sudo(LinklovingAppApi.CURRENT_USER()).create({
@@ -4553,20 +4583,22 @@ class LinklovingAppApi(http.Controller):
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.convert_work_order_to_json(work_order))
 
-    #搜索工单
+    # 搜索工单
     @http.route('/linkloving_app_api/search_gongdan', type='json', auth="none", csrf=False, cors='*')
     def search_gongdan(self):
         search_text = request.jsonrequest.get('search_text')
         search_type = request.jsonrequest.get('search_type')
         uid = request.jsonrequest.get("uid")
         user = request.env["res.users"].sudo().browse(uid)
-        work_order = request.env['linkloving.work.order'].sudo(uid).search([('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids),(search_type, 'ilike', search_text)])
+        work_order = request.env['linkloving.work.order'].sudo(uid).search(
+            [('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids),
+             (search_type, 'ilike', search_text)])
         data = []
         for order in work_order:
             data.append(LinklovingAppApi.convert_work_order_to_json(order))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-    #获取所有工单标签
+    # 获取所有工单标签
     @http.route('/linkloving_app_api/get_all_biaoqian', type='json', auth="none", csrf=False, cors='*')
     def get_all_biaoqian(self):
         # create_biaoqian = request.env['linkloving.work.order.tag'].sudo().create({
@@ -4575,7 +4607,7 @@ class LinklovingAppApi(http.Controller):
         biaoqian = request.env['linkloving.work.order.tag'].sudo().search([])
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.get_tag_to_json(biaoqian))
 
-    #修改工单标签
+    # 修改工单标签
     @http.route('/linkloving_app_api/update_biaoqian', type='json', auth="none", csrf=False, cors='*')
     def update_biaoqian(self):
         uid = request.jsonrequest.get("uid")
@@ -4615,10 +4647,10 @@ class LinklovingAppApi(http.Controller):
             'assign_user': LinklovingAppApi.get_user_json(work_order.assign_uid.id),
             'issue_state': work_order.issue_state,
             'create_user': LinklovingAppApi.get_user_json(work_order.write_uid.id),
-            'create_time': work_order.write_date,
+            'create_time': work_order.create_date,
             'work_order_images': LinklovingAppApi.get_work_order_img_url(work_order.attachments.ids),
-            'effective_department_ids':LinklovingAppApi.get_department_json(work_order.effective_department_ids),
-            'tag_ids':LinklovingAppApi.get_tag_to_json(work_order.tag_ids)
+            'effective_department_ids': LinklovingAppApi.get_department_json(work_order.effective_department_ids),
+            'tag_ids': LinklovingAppApi.get_tag_to_json(work_order.tag_ids)
         })
         return data
 
@@ -4643,7 +4675,7 @@ class LinklovingAppApi(http.Controller):
         return imgs
 
     @classmethod
-    def convert_work_order_arr_to_json(self,objs):
+    def convert_work_order_arr_to_json(self, objs):
         data = []
         for obj in objs:
             data.append({
@@ -4653,7 +4685,7 @@ class LinklovingAppApi(http.Controller):
                 'content': obj.content or '',
                 'create_date': obj.create_date,
                 'record_id': obj.id,
-                'create_uid':LinklovingAppApi.get_user_json(obj.create_uid.id),
+                'create_uid': LinklovingAppApi.get_user_json(obj.create_uid.id),
                 # 'reply_record_line_ids': record.reply_record_line_ids,
             })
         return data
@@ -4669,12 +4701,11 @@ class LinklovingAppApi(http.Controller):
         return data
 
     @classmethod
-    def get_department_json(self,objs):
+    def get_department_json(self, objs):
         data = []
         for obj in objs:
             data.append(obj.id)
         return data
-
 
     # end--------------模块:工单---------------分割线--------------------------------------------------end
 

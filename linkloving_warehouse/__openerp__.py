@@ -35,6 +35,7 @@
         'views/product_view.xml',
         'views/product_config.xml',
         'views/mrp_production.xml',
+        # 'views/product_template.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

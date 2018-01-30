@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="product_static" name="product_static_assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+
+                <script type="text/javascript" src="/linkloving_product_approve/static/src/js/flow_widget.js"/>
+
+
+                <link rel="stylesheet" href="/linkloving_product_approve/static/src/css/core.css"/>
+
+            </xpath>
+        </template>
+
+
+    </data>
+
+
+</odoo>

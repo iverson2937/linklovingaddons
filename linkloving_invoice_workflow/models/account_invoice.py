@@ -106,6 +106,21 @@ class AccountInvoice(models.Model):
     def action_reject(self):
         self.state = 'draft'
 
+    def parse_invoice_data(self):
+        return {
+            'name': self.name,
+            'partner_name': self.partner_id.name,
+            'line_ids': [
+                {
+                    'product_name': line.product_id.name,
+                    'qty': line.quantity,
+                    'price_unit': line.price_unit,
+                    'total_amount': line.quantity * line.price_unit
+                }
+                for line in self.invoice_line_ids
+            ]
+        }
+
     @api.multi
     def button_reset_taxes(self):
         for invoice in self:

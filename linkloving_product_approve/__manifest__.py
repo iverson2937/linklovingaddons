@@ -20,16 +20,20 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'product'],
+    'depends': ['base', 'product', 'linkloving_warehouse', 'linkloving_sale', 'linkloving_mrp_automatic_plan',
+                'linkloving_pdm', 'linkloving_new_bom_update'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
         'data/approve_groups.xml',
+        'views/assets.xml',
         'views/mrp_approve_stage.xml',
         'views/product_template.xml',
+
         'wizard/product_state_confirm_wizard.xml',
     ],
+    'qweb': ['static/src/xml/*.xml'],
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',

@@ -414,7 +414,7 @@ class ProductTemplate(models.Model):
             product.forecast_qty = product_data['virtual_available']
 
     stock = fields.Float(string=u'库存', store=True, compute=get_stock)
-    forecast_qty = fields.Float(string=u'预测数量', compute=get_stock)
+    forecast_qty = fields.Float(string=u'预测数量', store=True, compute=get_stock)
 
     _sql_constraints = [
         ('default_code_uniq1', 'unique (default_code)', _('Default Code already exist!')),
