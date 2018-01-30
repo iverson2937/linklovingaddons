@@ -80,7 +80,8 @@ class ProductTemplate(models.Model):
                         'user_id': self.env.uid
                     })
                     # 审核过待审核中取消
-                    product.required_user_ids = (3, app.user_ids.ids)
+
+                    product.required_user_ids = [(3, user_id.id) for user_id in app.user_ids]
                     product.approved_user_ids = [(4, self.env.user.id)]
 
             change_to_next = True
