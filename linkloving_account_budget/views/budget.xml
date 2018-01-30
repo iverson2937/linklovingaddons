@@ -29,10 +29,10 @@
 
 
                             <group>
-                                <field name="fiscal_year_id" options="{'no_create':True}"
-                                />
+                                <field name="fiscal_year_id" options="{'no_create':True}"/>
                                 <field name="department_id"
                                        options="{'no_create':True}"/>
+                                <field name="man_power"/>
 
                             </group>
                             <group>
