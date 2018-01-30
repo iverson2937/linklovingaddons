@@ -9,6 +9,13 @@ class ProductTemplate(models.Model):
     _inherit = ['product.template', 'ir.needaction_mixin']
 
     approval_record_ids = fields.One2many('mrp.approval.record', 'product_id')
+    flow_jason = fields.Char(compute='get_flow_state')
+
+    @api.multi
+    def get_flow_state(self):
+        for template in self:
+            template.flow_json = {}
+
     stage_id = fields.Many2one(
         'mrp.approve.stage', 'Stage', copy=False, group_expand='_read_group_stage_ids'
     )
@@ -67,7 +74,7 @@ class ProductTemplate(models.Model):
             product.required_user_ids = [(6, 0, stage_id.required_user_ids.ids)]
 
     @api.multi
-    def approve(self,remark):
+    def approve(self, remark):
         for product in self:
             for app in product.stage_id.approval_template_ids:
                 if self.env.user in app.user_ids:
@@ -76,7 +83,7 @@ class ProductTemplate(models.Model):
                         'stage_id': product.stage_id.id,
                         'approval_template_id': app.id,
                         'status': 'approved',
-                        'remark':remark,
+                        'remark': remark,
                         'user_id': self.env.uid
                     })
                     # 审核过待审核中取消
@@ -101,13 +108,11 @@ class ProductTemplate(models.Model):
             elif product.stage_id.allow_apply_change and change_to_next:
                 product.state = 'done'
                 product.stage_id = False
-            elif not  product.stage_id.allow_apply_change and not product.stage_id.next_stage_id:
+            elif not product.stage_id.allow_apply_change and not product.stage_id.next_stage_id:
                 raise UserError('请联系管理员设置')
 
-
-
     @api.multi
-    def reject(self,remark):
+    def reject(self, remark):
         for product in self:
             for app in product.stage_id.approval_template_ids:
                 if self.env.user in app.user_ids:
@@ -116,7 +121,7 @@ class ProductTemplate(models.Model):
                         'stage_id': product.stage_id.id,
                         'approval_template_id': app.id,
                         'status': 'rejected',
-                        'remark':remark,
+                        'remark': remark,
                         'user_id': self.env.uid
                     })
 

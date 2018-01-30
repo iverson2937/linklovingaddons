@@ -1,0 +1,47 @@
+
+.approve_process_container {
+    padding: 10px;
+}
+
+.approve_process_container > div {
+    vertical-align: top;
+    display: inline-block;
+}
+
+.approve_process_circle {
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    background-color: #0a5aab;
+    text-align: center;
+    vertical-align: middle;
+    border-radius: 50%;
+    color: white;
+}
+
+.approve_state {
+    border-bottom: 1px solid #0a5aab;
+    width: 60px;
+    height: 30px;
+    color: #939498;;
+    text-align: center;
+    padding-top: 10px;
+}
+
+.approve_state_sanjiao {
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-left: 10px solid #0a5aab;
+    margin-top: 20px;
+}
+
+.approve_process_container .more_role {
+    background-color: red;
+    line-height: 20px;
+    font-size: 12px;
+}
+
+.approve_process_container .more_role > span {
+    display: block;
+}
