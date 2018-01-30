@@ -72,8 +72,8 @@
                     <field name="fiscal_year_id"/>
                     <field name="department_id"/>
                     <field name="man_power"/>
-                    <field name="amount"/>
-                    <field name="balance"/>
+                    <field name="amount" sum="预算总计"/>
+                    <field name="balance" sum="余额总计"/>
                     <field name="create_uid" string="创建人"/>
                 </tree>
             </field>
@@ -88,6 +88,7 @@
 
         <menuitem id="menu_account_payment" name="预算" sequence="10"
                   action="action_linkloving_account_budget"
+                  groups="hr_expense.group_hr_expense_manager"
                   parent="hr_expense.menu_hr_expense_root"/>
 
 
