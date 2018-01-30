@@ -260,3 +260,6 @@
     word-break: break-all;
     word-wrap: break-word;
 }
+.toggle_approval_process_wrap{
+    display: none;
+}

@@ -49,8 +49,19 @@ odoo.define('linkloving_approval.approval_core', function (require) {
 
             'click .search_tag_type_list': 'search_tag_type_list_fn',
 
-        },
+            'click .get_more':'get_more_toggle'
 
+        },
+        //工程  审批流程 查看更多
+        get_more_toggle:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            if($(target).hasClass('fa')){
+                $(target).parents('.get_more').next().fadeToggle();
+            }else {
+                $(target).next().fadeToggle();
+            }
+        },
 
         view_show_attachment_info_info_fn: function (e) {
             var tar = this;
