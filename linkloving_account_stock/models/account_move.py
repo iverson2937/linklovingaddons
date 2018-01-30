@@ -48,10 +48,11 @@ class StockMove(models.Model):
             acc_dest = accounts_data['stock_valuation'].id
         # 盘亏
         if self.location_id.usage == "internal" and self.location_dest_id.usage == 'inventory':
-            if not adjust_stock_account_id:
-                raise UserError('请联系管理员设置库存调整会计科目')
+
             adjust_stock_account_id = self.env['ir.values'].sudo().get_default(
                 'stock.config.settings', 'adjust_stock_account_id')
+            if not adjust_stock_account_id:
+                raise UserError('请联系管理员设置库存调整会计科目')
             acc_src = accounts_data['stock_valuation'].id
             acc_dest = adjust_stock_account_id
         acc_valuation = accounts_data.get('stock_valuation', False)
