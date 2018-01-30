@@ -222,6 +222,68 @@
                     </div>
                 </div>
 
+
+                <div class="item_toggle">
+                    <div class="get_more">查看更多<span class="fa fa-angle-down"></span></div>
+                    <div class="toggle_approval_process_wrap">
+                        <div class="top">
+                            审批流程
+                        </div>
+                        <div class="item_approval_process_detail">
+                            <div class="featurette">
+                                <div class="">
+                                    <div class="qa-message-list">
+                                        <div class="message-item">
+                                            <div class="message-inner">
+                                                <div class="message-head clearfix">
+                                                    <div class="user-detail">
+                                                        <h5 class="handle">王小白</h5>
+                                                        <div class="post-meta">
+                                                            <div class="asker-meta">
+                                                                <div class="qa-message-when">
+                                                                    2018-1-1
+                                                                </div>
+                                                                <div class="qa-message-who">
+                                                                    待审核
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="qa-message-content">
+                                            Mohtashim is an MCA from AMU (Aligarah) and a Project Management Professional. He has more than 17 years of experience in Telecom and Datacom industries covering complete SDLC. He is managing in-house innovations, business planning, implementation, finance and the overall business development of Tutorials Point.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="message-item">
+                                            <div class="message-inner">
+                                                <div class="message-head clearfix">
+                                                    <div class="user-detail">
+                                                        <h5 class="handle">王小白</h5>
+                                                        <div class="post-meta">
+                                                            <div class="asker-meta">
+                                                                <div class="qa-message-when">
+                                                                    2018-1-1
+                                                                </div>
+                                                                <div class="qa-message-who">
+                                                                    待审核
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="qa-message-content">
+                                            Mohtashim is an MCA from AMU (Aligarah) and a Project Management Professional. He has more than 17 years of experience in Telecom and Datacom industries covering complete SDLC. He is managing in-house innovations, business planning, implementation, finance and the overall business development of Tutorials Point.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!--<div class="document_review_list">-->
                 <!--<t t-foreach="item_files.review_line" t-as="review_list">-->
                 <!--<t t-js="ctx">-->

@@ -1,6 +1,6 @@
 .approval_page_container{
     width:96%;
-    min-width: 1000px;
+    min-width: 1300px;
     margin:0px auto;
     padding: 10px;
     background: white;
@@ -19,7 +19,7 @@
 }
 .approval_page_container .tab_message_display{
     overflow: hidden;
-    width: 75%;
+    width: 70%;
     display: inline-block;
     margin-left: 15px;
     /*padding-top: 20px;*/
@@ -34,6 +34,7 @@
     position: relative;
     overflow: hidden;
     margin-bottom: 15px;
+    min-width: 900px;
 }
 .approval_page_container .tab_pane_display .document_review_list{
     /*position: absolute;*/
@@ -211,4 +212,51 @@
     float: right;
     height: 25px;
     background-color: #3d9eff;
+}
+.item_toggle .get_more{
+    text-align: center;
+    cursor: pointer;
+}
+.toggle_approval_process_wrap>.top{
+    padding: 4px;
+    text-align: left;
+    background-color: #f0eeee;
+    color: #8c9099;
+}
+.item_approval_process_detail{
+    padding-left: 50px;
+    padding-top: 30px;
+}
+.item_approval_process_detail .item_obj>div{
+    display: inline-block;
+    vertical-align: top;
+}
+.item_obj_left{
+    width: 50px;
+    min-height: 50px;
+    border-left: 1px solid #8c9099;
+    position: relative;
+}
+.item_obj_right{
+    margin-top: -8px;
+}
+.obj_circle{
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #8c9099;
+    position: absolute;
+    left: -2.6px;
+    top: 0;
+}
+.item_obj_right>span{
+    display: inline-block;
+    vertical-align: top;
+}
+.item_obj_right>div{
+    width: 60%;
+    display: inline-block;
+    word-break: break-all;
+    word-wrap: break-word;
 }
