@@ -12,18 +12,20 @@
                         <group>
                             <field name="name" string="名称"/>
                             <field name="type_id" options="{'no_create':True}" string="类型"/>
-                            <field name="pre_stage_id" string="上一个阶段"/>
+
                         </group>
                         <group>
+                            <field name="pre_stage_id" string="上一个阶段"/>
                             <field name="allow_apply_change" string="是否为终审"/>
-                            <field name="next_stage_id" string="下一阶段"/>
+                            <field name="next_stage_id" string="下一阶段"
+                                   attrs="{'invisible':[('allow_apply_change','=',True)],'required':[('allow_apply_change','!=',True)]}"/>
                         </group>
                     </group>
                     <h2>审核流程</h2>
                     <field name="approval_template_ids" string="审核流程">
                         <tree editable="bottom">
                             <field name="sequence" widget="handle"/>
-                            <field name="name" placeholder="类型"/>
+                            <field name="name" placeholder="类型" string="名称"/>
                             <field name="user_ids" widget="many2many_tags" string="可选用户"/>
                         </tree>
                     </field>
