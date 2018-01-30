@@ -28,10 +28,10 @@ class AccountPaymentRegister(models.Model):
         for p in self:
             if p.state in ('posted', 'confirm', 'manager') and p.create_uid == self.env.user:
                 p.can_reject = True
-            elif p.state == 'posted' and self.env.user.user_has_group(
+            elif p.state == 'posted' and self.env.user.has_group(
                     'linkloving_purchase_authority.purchase_manager_1'):
                 p.can_reject = True
-            elif p.state == 'manager' and self.env.user.user_has_group(
+            elif p.state == 'manager' and self.env.user.has_group(
                     'linkloving_purchase_authority.purchase_manager_plus'):
                 p.can_reject = True
             else:
