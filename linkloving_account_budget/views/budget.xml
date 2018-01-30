@@ -29,10 +29,10 @@
 
 
                             <group>
-                                <field name="fiscal_year_id" options="{'no_create':True}"
-                                       attrs="{'readonly':[('state','=','done')]}"/>
-                                <field name="department_id" attrs="{'readonly':[('state','=','done')]}"
+                                <field name="fiscal_year_id" options="{'no_create':True}"/>
+                                <field name="department_id"
                                        options="{'no_create':True}"/>
+                                <field name="man_power"/>
 
                             </group>
                             <group>
@@ -69,9 +69,12 @@
             <field name="arch" type="xml">
                 <tree>
                     <field name="name"/>
+                    <field name="fiscal_year_id"/>
                     <field name="department_id"/>
-                    <field name="amount"/>
-                    <field name="balance"/>
+                    <field name="man_power"/>
+                    <field name="amount" sum="预算总计"/>
+                    <field name="amount_used" sum="已使用"/>
+                    <field name="balance" sum="余额总计"/>
                     <field name="create_uid" string="创建人"/>
                 </tree>
             </field>
@@ -86,6 +89,7 @@
 
         <menuitem id="menu_account_payment" name="预算" sequence="10"
                   action="action_linkloving_account_budget"
+                  groups="hr_expense.group_hr_expense_manager"
                   parent="hr_expense.menu_hr_expense_root"/>
 
 

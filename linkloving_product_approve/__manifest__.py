@@ -27,10 +27,13 @@
     'data': [
         'security/ir.model.access.csv',
         'data/approve_groups.xml',
+        'views/assets.xml',
         'views/mrp_approve_stage.xml',
         'views/product_template.xml',
+
         'wizard/product_state_confirm_wizard.xml',
     ],
+    'qweb': ['static/src/xml/*.xml'],
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',

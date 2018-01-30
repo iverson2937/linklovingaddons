@@ -13,8 +13,14 @@ class AccountBudget(models.Model):
     amount_used = fields.Float(string=u'已使用金额', compute='get_budget_balance')
     balance = fields.Float(string=u'预算余额', compute='get_budget_balance')
     description = fields.Text(string=u'描述')
-    fiscal_year_id = fields.Many2one('account.fiscalyear', string='年度')
+
+    def _get_fiscal_year_id(self):
+        fiscal_year_id = self.env['account.fiscalyear'].search([('state', '!=', 'done')], limit=1)
+        return fiscal_year_id.id
+
+    fiscal_year_id = fields.Many2one('account.fiscalyear', string='年度', default=_get_fiscal_year_id)
     line_ids = fields.One2many('linkloving.account.budget.line', 'budget_id')
+    man_power = fields.Integer(string='人数')
     state = fields.Selection([
         ('draft', '草稿'),
         ('done', '正式'),
@@ -58,7 +64,7 @@ class AccountBudgetLine(models.Model):
     amount = fields.Float(string=u'预算金额')
     amount_used = fields.Float(string=u'已使用金额', compute='get_budget_balance')
     balance = fields.Float(string=u'预算余额', compute='get_budget_balance')
-    expense_ids = fields.One2many('hr.expense', 'budget_id')
+    expense_ids = fields.One2many('hr.expense', 'budget_id', domain=[('state', '=', 'done')])
     description = fields.Text(string=u'描述')
     fiscal_year_id = fields.Many2one('account.fiscalyear', string='年度')
     expense_len = fields.Integer(compute='_compute_expense_len', string=' ')
@@ -84,7 +90,6 @@ class AccountBudgetLine(models.Model):
             budget.balance = budget.amount - budget.amount_used
 
     def check_expense_detail(self):
-        print self.expense_ids.ids
         return {
             'name': u'费用明细',
             'res_model': 'hr.expense',

@@ -10,7 +10,7 @@
                 <xpath expr='//page[1]' position="after">
                     <page string="预算">
                         <group>
-                            <field name="fiscal_year_id" options="{'no_create':True}"/>
+                            <field name="fiscal_year_id" options="{'no_create':True}" string="费用年度"/>
                         </group>
                     </page>
                 </xpath>

@@ -88,7 +88,7 @@
                         ' data-pk="' + row[that.options.idField] + '"',
                         ' data-value="' + result + '"',
                         editableDataMarkup.join(''),
-                        '>' + '</a>'
+                        '>' + result + '</a>'
                     ].join('');
                 } else {
                     return _dont_edit_formatter;
