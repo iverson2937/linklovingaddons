@@ -11,5 +11,6 @@
         <menuitem id="work_order_tag_setting" name="标签设置" parent="work_order_root" action="work_order_setting_action" sequence="2"/>
 
 
+
     </data>
 </openerp>

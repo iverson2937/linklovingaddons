@@ -34,13 +34,13 @@ push = _jpush.create_push()
 _jpush.set_logging("DEBUG")
 
 need_sound = "a.caf"
-apns_production = False
+apns_production = True
 
 
 class JPushExtend:
     @classmethod
     def send_notification_push(cls, platform=jpush.all_, audience=None, notification=None, body='', message=None,
-                               apns_production=False):
+                               apns_production=True):
         push.audience = audience
         ios = jpush.ios(alert={"title": notification,
                                "body": body,
@@ -4318,6 +4318,7 @@ class LinklovingAppApi(http.Controller):
             for order in work_orders:
                 word_order_list.append(order.work_order_id)
             ids = list(set(word_order_list))
+            ids.sort(key=word_order_list.index)
             for id in ids:
                 work_order_json.append(LinklovingAppApi.convert_work_order_to_json(id))
         else:
@@ -4342,7 +4343,7 @@ class LinklovingAppApi(http.Controller):
         domain += [('reply_uid', '=', uid)]
         work_order_json = []
         work_orders = request.env['linkloving.work.order.record'].sudo().search(
-            domain, order='write_date desc')
+            domain, order='create_date desc')
         for order in work_orders:
             work_order_json.append(LinklovingAppApi.convert_at_me_order_to_json(order))
             if not isNumber:
@@ -4443,6 +4444,7 @@ class LinklovingAppApi(http.Controller):
                 ('id', '=', work_order_id), ('write_uid', '=', uid)
             ]).write({
                 'issue_state': "draft",
+                'assign_uid':False,
             })
             work_order_record_model = request.env['linkloving.work.order.record']
             work_order_record = work_order_record_model.sudo(uid).create({
