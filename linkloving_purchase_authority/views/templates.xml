@@ -21,7 +21,7 @@
 
                 <xpath expr='//field[@name="receive_date"]' position='after'>
                     <field name="has_to_approve_ids" invisible="1"/>
-                    <field name="can_reject"/>
+                    <field name="can_reject" invisible="1"/>
                     <field name="to_approve_ids" string="待审核人" widget="many2many_tags"
                            attrs="{'invisible':[('has_to_approve_ids','=',False)]}"/>
                 </xpath>
