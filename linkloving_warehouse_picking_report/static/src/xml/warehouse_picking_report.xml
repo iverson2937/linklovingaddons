@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+    <t t-name="WarehousePickingReport">
+        <div class="picking_report_top">
+            <table id="picking_report_table">
+            </table>
+        </div>
+    </t>
+
+    <!--<t t-name="AccountDashboardTimeSelect">-->
+    <!--<t t-foreach="result" t-as="item">-->
+    <!--<t t-if="current.id==item.id">-->
+    <!--<option class="account_time" t-att-data-id="item.id" selected="true"><t t-esc="item.name"/></option>-->
+    <!--</t>-->
+    <!--<t t-else="">-->
+    <!--<option class="account_time" t-att-data-id="item.id"><t t-esc="item.name"/></option>-->
+    <!--</t>-->
+
+    <!--</t>-->
+    <!--</t>-->
+
+    <!--<t t-name="account_table_tmp">-->
+    <!--<table class="table table-bordered">-->
+    <!--<thead>-->
+    <!--<tr>-->
+    <!--<th>资产</th>-->
+    <!--<th style="width:45px">行次</th>-->
+    <!--<th>年初数</th>-->
+    <!--<th>期末数</th>-->
+    <!--<th>负债及所有者权益</th>-->
+    <!--<th style="width:45px">行次</th>-->
+    <!--<th>年初数</th>-->
+    <!--<th>期末数</th>-->
+    <!--</tr>-->
+    <!--</thead>-->
+    <!--<tbody>-->
+    <!--<tr>-->
+    <!--<td>流动资产:</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td>流动负债:</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">货币资金</td>-->
+    <!--<td>1</td>-->
+    <!--<td></td>-->
+    <!--<td><a><t t-esc="cash_data.current"/></a></td>-->
+    <!--<td class="assets_indext1">短期借款</td>-->
+    <!--<td>51</td>-->
+    <!--<td></td>-->
+    <!--<td><t t-esc="short_term_borrow.current"/></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">短期投资</td>-->
+    <!--<td>2</td>-->
+    <!--<td></td>-->
+    <!--<td><t t-esc="short_term_invest.current"/></td>-->
+    <!--<td class="assets_indext1">应付票据</td>-->
+    <!--<td>52</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">应收票据</td>-->
+    <!--<td>3</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext1">应付账款</td>-->
+    <!--<td>53</td>-->
+    <!--<td></td>-->
+    <!--<td><a><t t-esc="payable_amount.current"/></a></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">应收账款</td>-->
+    <!--<td>4</td>-->
+    <!--<td></td>-->
+    <!--<td><t t-esc="receivable_amount.current"/></td>-->
+    <!--<td class="assets_indext1">预收账款</td>-->
+    <!--<td>54</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext2">减：坏账准备</td>-->
+    <!--<td>5</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext1">其他应付款</td>-->
+    <!--<td>55</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">应收账款净额</td>-->
+    <!--<td>6</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext1">应付工资</td>-->
+    <!--<td>56</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">预付账款</td>-->
+    <!--<td>7</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext1">应付福利费</td>-->
+    <!--<td>57</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">应收补贴款</td>-->
+    <!--<td>8</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext1">未交税金</td>-->
+    <!--<td>58</td>-->
+    <!--<td></td>-->
+    <!--<td><t t-esc="tax.current"/></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">其他应收款</td>-->
+    <!--<td>9</td>-->
+    <!--<td></td>-->
+    <!--<td><a><t t-esc="other_receivable_amount.current"/></a></td>-->
+    <!--<td class="assets_indext1">未付利润</td>-->
+    <!--<td>59</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">存货</td>-->
+    <!--<td>10</td>-->
+    <!--<td></td>-->
+    <!--<td widget="monetary"><a><t t-esc="stock.current"/></a></td>-->
+    <!--<td class="assets_indext1">其他未交款</td>-->
+    <!--<td>60</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">待摊费用</td>-->
+    <!--<td>11</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext1">预提费用</td>-->
+    <!--<td>61</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">待处理流动资产净损失</td>-->
+    <!--<td>12</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext1">一年内到期的长期负债</td>-->
+    <!--<td>62</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">一年内到期的长期债券投资</td>-->
+    <!--<td>13</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext1">其他流动负债</td>-->
+    <!--<td>63</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">其他流动资产</td>-->
+    <!--<td>14</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext2">流动负债合计</td>-->
+    <!--<td>64</td>-->
+    <!--<td></td>-->
+    <!--<td widget="monetary"><t t-esc="sub_liabilities.current"/></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext2">流动资产合计</td>-->
+    <!--<td>20</td>-->
+    <!--<td></td>-->
+    <!--<td><a><t t-esc="liquid.current"/></a></td>-->
+    <!--<td class="">长期负债：</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="">长期投资</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext1">长期借款：</td>-->
+    <!--<td>71</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">长期投资</td>-->
+    <!--<td>21</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext1">应付债券：</td>-->
+    <!--<td>72</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="">固定资产：</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext1">长期应付款</td>-->
+    <!--<td>73</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">固定资产原价</td>-->
+    <!--<td>24</td>-->
+    <!--<td></td>-->
+    <!--<td><a><t t-esc="origin_assets.current"/></a></td>-->
+    <!--<td class="assets_indext1">其他长期负债</td>-->
+    <!--<td>80</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext2">减：累计折旧</td>-->
+    <!--<td>25</td>-->
+    <!--<td></td>-->
+    <!--<td><a><t t-esc="accumulated_depreciation.current"></t></a></td>-->
+    <!--<td class="assets_indext2">其中：住房周转金</td>-->
+    <!--<td>81</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">固定资产净值</td>-->
+    <!--<td>26</td>-->
+    <!--<td></td>-->
+    <!--<td class="o_form_field_monetary"><a><t t-esc="assets.current"></t></a></td>-->
+    <!--<td class="assets_indext2"></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">固定资产清理</td>-->
+    <!--<td>27</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext2">长期负债合计</td>-->
+    <!--<td>83</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">在建工程</td>-->
+    <!--<td>28</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="">递延税项：</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">待处理固定资产净损失</td>-->
+    <!--<td>29</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext1">递延税款贷项：</td>-->
+    <!--<td>85</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext2">固定资产合计</td>-->
+    <!--<td>35</td>-->
+    <!--<td></td>-->
+    <!--<td><a><t t-esc="assets.current"></t></a></td>-->
+    <!--<td class="assets_indext1">负债合计</td>-->
+    <!--<td>90</td>-->
+    <!--<td></td>-->
+    <!--<td><a><t t-esc="liabilities.current"></t></a></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="">无形资产及递延资产：</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="">所有者权益：</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">无形资产</td>-->
+    <!--<td>36</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext1">实收资本</td>-->
+    <!--<td>91</td>-->
+    <!--<td></td>-->
+    <!--<td><t t-esc="real_receive_assets.current"></t></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">递延资产</td>-->
+    <!--<td>37</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext1">资本公积</td>-->
+    <!--<td>92</td>-->
+    <!--<td></td>-->
+    <!--<td><t t-esc="capital_reserves.current"></t></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1"></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext1">盈余公积</td>-->
+    <!--<td>93</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext2">无形资产及递延资产合计</td>-->
+    <!--<td>40</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext2">其中：公益金</td>-->
+    <!--<td>94</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="">其他长期资产：</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext1">未分配利润</td>-->
+    <!--<td>95</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">其他长期资产</td>-->
+    <!--<td>41</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext2">所有者权益合计</td>-->
+    <!--<td>96</td>-->
+    <!--<td></td>-->
+    <!--<td><t t-esc="owner_equity.current"></t></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="">递延税项</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext2"></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext1">递延税款借项</td>-->
+    <!--<td>42</td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td class="assets_indext2"></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+    <!--<td class="assets_indext2">资产总计</td>-->
+    <!--<td>50</td>-->
+    <!--<td></td>-->
+    <!--<td><a><t t-esc="total_assets_all.current"></t></a></td>-->
+    <!--<td class="assets_indext2">负债及所有者权益总计</td>-->
+    <!--<td>100</td>-->
+    <!--<td></td>-->
+    <!--<td><a><t t-esc="total_liabilities.current"></t></a></td>-->
+    <!--</tr>-->
+    <!--</tbody>-->
+    <!--</table>-->
+    <!--</t>-->
+</templates>
