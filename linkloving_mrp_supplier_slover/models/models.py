@@ -150,19 +150,21 @@ class linkloving_procurement_order(models.Model):
                 #     cache[domain] = po
 
             if not po:
-                vals = procurement._prepare_purchase_order(partner)
-                # tax_id = self.env["account.tax"].search([('type_tax_use', '<>', "purchase")], limit=1)[0].id
-                # vals["tax"]
-                vals['state'] = "make_by_mrp"
-                po = self.env['purchase.order'].create(vals)
-                name = (procurement.group_id and (procurement.group_id.name + ":") or "") + (
-                procurement.name != "/" and procurement.name or procurement.move_dest_id.raw_material_production_id and procurement.move_dest_id.raw_material_production_id.name or "")
-                message = _(
-                    "This purchase order has been created from: <a href=# data-oe-model=procurement.order data-oe-id=%d>%s</a>") % (
-                          procurement.id, name)
-                po.message_post(body=message)
-                cache[domain] = po
-
+                if combine_rule != 'same_supplier_product':
+                    vals = procurement._prepare_purchase_order(partner)
+                    # tax_id = self.env["account.tax"].search([('type_tax_use', '<>', "purchase")], limit=1)[0].id
+                    # vals["tax"]
+                    vals['state'] = "make_by_mrp"
+                    po = self.env['purchase.order'].create(vals)
+                    name = (procurement.group_id and (procurement.group_id.name + ":") or "") + (
+                        procurement.name != "/" and procurement.name or procurement.move_dest_id.raw_material_production_id and procurement.move_dest_id.raw_material_production_id.name or "")
+                    message = _(
+                            "This purchase order has been created from: <a href=# data-oe-model=procurement.order data-oe-id=%d>%s</a>") % (
+                                  procurement.id, name)
+                    po.message_post(body=message)
+                    cache[domain] = po
+                else:
+                    po = self.env['purchase.order']
             elif not po.origin or procurement.origin not in po.origin.split(', '):
                 # Keep track of all procurements
                 if po.origin:
