@@ -42,7 +42,7 @@ $("#file_click_me").click(function (e) {
         // dataType: 'json/html',
         success: function (data) {
             if (data.result == '1') {
-                var cur_type = $("select.this_my_type").val();
+                var cur_type = $("input.this_my_type_file").val();
                 cur_type = cur_type.replace(/"/g, '');
                 var remote_file = cur_type.toUpperCase() + '/' + cur_type.toUpperCase() + '_' + product_code_str.replace(/\./g, '_') + '_v';
                 $.ajax({

@@ -1,6 +1,6 @@
 .approval_page_container{
-    width:80%;
-    min-width: 900px;
+    width:96%;
+    min-width: 1300px;
     margin:0px auto;
     padding: 10px;
     background: white;
@@ -19,8 +19,10 @@
 }
 .approval_page_container .tab_message_display{
     overflow: hidden;
-    width: 90%;
-    padding-top: 20px;
+    width: 70%;
+    display: inline-block;
+    margin-left: 15px;
+    /*padding-top: 20px;*/
 }
 .approval_page_container .tab_message_display>div{
     /*float: left;*/
@@ -28,10 +30,11 @@
 }
 .approval_page_container .tab_pane_display{
     border: 1px solid #dddede;
-    padding: 10px;
+    padding: 10px 20px;
     position: relative;
     overflow: hidden;
     margin-bottom: 15px;
+    min-width: 900px;
 }
 .approval_page_container .tab_pane_display .document_review_list{
     /*position: absolute;*/
@@ -79,7 +82,10 @@
     min-width: 880px;
 }
 #myTabContent_Approval{
-    margin-top: 33px;
+    /*margin-top: 33px;*/
+    display: inline-block;
+    min-width: 800px;
+    width: 70%;
 }
 .nav-tabs > li > a{
     border: 1px solid #dddede;
@@ -103,24 +109,157 @@
 }
 .approval_product_name{
     cursor: pointer;
+    color: #497db6;
     text-decoration: underline;
 }
 .approval_tab_pane_type{
     padding: 2px;
-    color: white;
-    width: 50px;
+    color: #409ffd;
+    width: auto;
     text-align: center;
-    background: #337ab7;
-    position: absolute;
-    left:0;
-    top:0;
-}
-.document_download{
-    width: 80px;
-    height:30px;
-    display: block;
+    background: #e6f2fe;
+    border-radius: 8px;
+    display: inline-block;
 }
 .get_version_history{
     display: block;
     margin-top: 10px;
+}
+
+#div_file_checkbox{
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 8px;
+}
+.item_second_line{
+    color: #bec7d0;
+}
+.item_second_line>span:nth-child(2){
+    margin-left: 10px;
+}
+.item_third_line{
+    color: #8c9099;
+}
+.item_remark{
+    color: #8c9099;
+}
+.tab_pane_display .item_right_content{
+    float: right;
+    text-align: right;
+}
+.tab_pane_display .item_right_content .state{
+    color: #fca08b;
+}
+.tab_pane_display .item_right_content .reviewer{
+    background-color: #f3f3f5;
+    color: #3d9eff;
+    border-radius: 6px;
+    margin-left: 5px;
+    display: inline-block;
+    padding: 1px 6px;
+}
+.item_right_content .document_download_new{
+    padding: 4px 10px;
+    /*height:30px;*/
+    border: 1px solid #dbe0e6;
+    border-radius: 5px;
+    display: inline-block;
+    cursor: pointer;
+}
+.item_right_content .approval_btn{
+    padding: 4px 12px;
+    display: inline-block;
+    background-color: #3d9eff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.versions{
+    margin-top: 10px;
+}
+.this_version{
+    color: #bcc6d0;
+}
+
+.tabcontent_right{
+    display: inline-block;
+    vertical-align: top;
+    width: 28%;
+    margin-left: 5px;
+    max-width: 160px;
+}
+.my_collections .coll_head,.documents_labels .labels_head{
+    background-color: #ecf0f3;
+    color: #89929b;
+    padding: 2px 10px;
+}
+/*.my_collections{*/
+    /*display: inline-block;*/
+    /*vertical-align: top;*/
+    /*width: 28%;*/
+    /*margin-left: 5px;*/
+    /*max-width: 160px;*/
+/*}*/
+.my_collections .coll_body,.documents_labels .labels_body{
+    padding: 5px 10px;
+    background-color: #f4f7fe;
+    color: #89929b;
+}
+
+
+.document_modify_wraper1{
+    padding: 3px;
+    float: right;
+    height: 25px;
+    background-color: #3d9eff;
+}
+.item_toggle .get_more{
+    text-align: center;
+    cursor: pointer;
+}
+.toggle_approval_process_wrap>.top{
+    padding: 4px;
+    text-align: left;
+    background-color: #f0eeee;
+    color: #8c9099;
+}
+.item_approval_process_detail{
+    padding-left: 50px;
+    padding-top: 30px;
+}
+.item_approval_process_detail .item_obj>div{
+    display: inline-block;
+    vertical-align: top;
+}
+.item_obj_left{
+    width: 50px;
+    min-height: 50px;
+    border-left: 1px solid #8c9099;
+    position: relative;
+}
+.item_obj_right{
+    margin-top: -8px;
+}
+.obj_circle{
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #8c9099;
+    position: absolute;
+    left: -2.6px;
+    top: 0;
+}
+.item_obj_right>span{
+    display: inline-block;
+    vertical-align: top;
+}
+.item_obj_right>div{
+    width: 60%;
+    display: inline-block;
+    word-break: break-all;
+    word-wrap: break-word;
+}
+.toggle_approval_process_wrap{
+    display: none;
 }
