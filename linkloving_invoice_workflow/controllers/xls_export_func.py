@@ -155,13 +155,13 @@ def account_invoice_export(values):
     wb = MyWorkbook(encoding='utf-8')
     sheet_title = invoices.get('name')
     ws = wb.add_sheet(sheet_title)
-    head = [u'序号', u"产品名称", u"数量", u"单价", u"小计"]
-    ws.write_merge(0, 0, 0, 4, sheet_title, title_style)
+    head = [u'序号', u"产品名称", u'产品简称' u"数量", u"单价", u"小计"]
+    ws.write_merge(0, 0, 0, 5, sheet_title, title_style)
     wb.multiple_append(head, style=head_style)
     for index, invoice in enumerate(invoices.get('line_ids')):
         index += 1
         content = [index]
-        for a_item in ['product_name', 'qty', 'price_unit', 'total_amount']:
+        for a_item in ['product_name', 'short_name', 'qty', 'price_unit', 'total_amount']:
             item = invoice.get(a_item, '')
             content.append(item)
         wb.multiple_append(content, style=common_style)
