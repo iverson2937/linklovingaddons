@@ -13,6 +13,7 @@ class AccountBudget(models.Model):
     amount_used = fields.Float(string=u'已使用金额', compute='get_budget_balance')
     balance = fields.Float(string=u'预算余额', compute='get_budget_balance')
     description = fields.Text(string=u'描述')
+    is_create_line = fields.Boolean(default=False)
 
     def _get_fiscal_year_id(self):
         fiscal_year_id = self.env['account.fiscalyear'].search([('state', '!=', 'done')], limit=1)
@@ -53,6 +54,22 @@ class AccountBudget(models.Model):
             budget.balance = sum(line.balance for line in budget.line_ids)
             budget.amount = sum(line.amount for line in budget.line_ids)
             budget.amount_used = sum(line.amount_used for line in budget.line_ids)
+
+    @api.multi
+    def create_budget_line(self):
+        line_obj = self.env['linkloving.account.budget.line']
+        products = self.env['product.product'].search([('can_be_expensed', '=', True)])
+        for budget in self:
+            for product in products:
+                if product.id not in budget.line_ids.mapped('product_id').ids:
+                    line_obj.create({
+                        'budget_id': budget.id,
+                        'product_id': product.id,
+                        'fiscal_year_id': budget.fiscal_year_id.id
+                    })
+            # budget.is_create_line = True
+
+        return True
 
 
 class AccountBudgetLine(models.Model):

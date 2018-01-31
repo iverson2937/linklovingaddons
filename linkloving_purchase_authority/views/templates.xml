@@ -15,7 +15,7 @@
                             states="manager" groups="linkloving_purchase_authority.purchase_manager_plus"/>
                 </xpath>
                 <xpath expr='//button[@name="reject"]' position='replace'>
-                    <button name="reject" string="拒绝" attrs="{'invisible':[('can_reject','!=',True)]}"/>
+                    <button name="reject" string="拒绝" attrs="{'invisible':[('can_reject','!=',True)]}" type="object"/>
                 </xpath>
 
 
