@@ -83,7 +83,7 @@ class ProductProductReport(http.Controller):
             content = xls.read()
             return request.make_response(content, headers=[
                 ('Content-Type', 'application/vnd.ms-excel'),
-                ('Content-Disposition', 'attachment; filename=sale_orders.xls;')
+                ('Content-Disposition', 'attachment; filename=products.xls;')
             ])
         else:
             raise UserError(_('Error!'), _('These are no records no this period.'))

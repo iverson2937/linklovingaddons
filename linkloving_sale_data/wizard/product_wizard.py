@@ -47,7 +47,6 @@ class ProductProductListWizard(models.TransientModel):
     def print_report(self):
         for report in self:
             datas = self._get_data_by_products(report.start_date, report.end_date)
-            print datas
             report_name = 'linkloving_sale_data.product_report'
 
             return self.env['report'].get_action(self, report_name, datas)
