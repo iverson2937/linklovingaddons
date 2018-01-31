@@ -21,7 +21,7 @@ class ProductProductListWizard(models.TransientModel):
         returnDict = {}
         products_obj = self.env['product.product']
 
-        product_ids = products_obj.sudo().search([('sale_ok', '=', True)], order='categ_id')
+        product_ids = products_obj.sudo().search([('sale_ok', '=', True), ('type', '!=', 'service')], order='categ_id')
 
         purchase_sequence = 1
         for product in product_ids:
