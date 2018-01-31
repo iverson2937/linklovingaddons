@@ -35,19 +35,23 @@ class ProductProductReport(http.Controller):
             )
 
             header_list = [
-                u'产品', u'数量'
+                u'分类', u'产品', u'料号', u'国内简称', u'国内型号', u'数量'
             ]
 
             [data_sheet.write(0, row, line, style) for row, line in enumerate(header_list)]
 
             current_row = 1
-            print data, 'sssss'
-            for record in data.itervalues():
+            for record in sorted(data.itervalues(), key=lambda a: a['data']['category_name']):
                 vals = record.get('data')
 
-                data_sheet.write(current_row, 0, vals.get('name') and vals.get('name') or '',
+                data_sheet.write(current_row, 0, vals.get('category_name') and vals.get('category_name') or '',
                                  style)
-                data_sheet.write(current_row, 1, vals.get('qty') and vals.get('qty') or 0, style)
+
+                data_sheet.write(current_row, 1, vals.get('name') and vals.get('name') or 0, style)
+                data_sheet.write(current_row, 2, vals.get('default_code') and vals.get('default_code') or '', style)
+                data_sheet.write(current_row, 3, vals.get('inner_code') and vals.get('inner_code') or '', style)
+                data_sheet.write(current_row, 4, vals.get('inner_spec') and vals.get('inner_spec') or '', style)
+                data_sheet.write(current_row, 5, vals.get('qty') and vals.get('qty') or 0, style)
 
                 if not record.get('line'):
                     current_row += 1

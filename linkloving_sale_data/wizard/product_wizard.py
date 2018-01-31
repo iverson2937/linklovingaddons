@@ -21,7 +21,7 @@ class ProductProductListWizard(models.TransientModel):
         returnDict = {}
         products_obj = self.env['product.product']
 
-        product_ids = products_obj.sudo().search([('sale_ok', '=', True)])
+        product_ids = products_obj.sudo().search([('sale_ok', '=', True)], order='categ_id')
 
         purchase_sequence = 1
         for product in product_ids:
@@ -32,11 +32,19 @@ class ProductProductListWizard(models.TransientModel):
                 returnDict[product.id]['data'] = {
                     'sequence': purchase_sequence,
                     'name': product.name,
+                    'category_name': product.categ_id.name,
+                    'default_code': product.default_code,
+                    'inner_code': product.inner_code,
+                    'inner_spec': product.inner_spec,
                     'qty': product.count_amount(self.start_date, self.end_date)
                 }
             elif self.report_type == 'shipping':
                 returnDict[product.id]['data'] = {
                     'sequence': purchase_sequence,
+                    'category_name': product.categ_id.name,
+                    'default_code': product.default_code,
+                    'inner_code': product.inner_code,
+                    'inner_spec': product.inner_spec,
                     'name': product.name,
                     'qty': product.count_shipped_amount(self.start_date, self.end_date)
                 }
