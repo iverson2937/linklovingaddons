@@ -22,3 +22,4 @@ access_product_product_assistant,product.template user,product.model_product_pro
 access_model_product_price_history user,product.model_product_price_history user,product.model_product_price_history,,1,1,1,0
 accesss_stock_inventory_user_admin,stock_inventory_user,stock.model_stock_inventory,,1,1,1,1
 access_stock_inventory_line_user_admin,stock_inventory_line_user,stock.model_stock_inventory_line,,1,1,1,1
+access_stock_move_lots_user,stock_move_lots_user,mrp.model_stock_move_lots,stock.group_stock_user,1,1,1,1
