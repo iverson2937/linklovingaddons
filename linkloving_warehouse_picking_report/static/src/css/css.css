@@ -1,0 +1,41 @@
+.picking_report_top {
+    padding: 8px 15px;
+    margin-top: 30px;
+}
+
+#picking_report_table > thead {
+    display: table-header-group !important;
+}
+
+#picking_report_table .add_empty_tr {
+    display: none;
+}
+
+#picking_report_table {
+    background-color: #fff;
+}
+
+a.detail-icon {
+    font-size: 30px;
+}
+
+#picking_report_table tbody tr td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+i.icon-margin {
+    margin-left: 8px;
+}
+
+/*#header {*/
+/*text-align: center;*/
+/*}*/
+
+/*.bootstrap-table .table > thead > tr > .font_35_header {*/
+/*font-size: 35px;*/
+/*padding: 15px;*/
+/*}*/
+/*.bootstrap-table .table > thead > tr > .bg_hint {*/
+/*background-color: #f5f5f5;*/
+/*}*/
