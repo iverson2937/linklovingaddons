@@ -3915,6 +3915,7 @@ class LinklovingAppApi(http.Controller):
                 domain.append(("is_secondary_produce", '=', False))
             elif request.jsonrequest.get('state') == 'is_secondary_produce':
                 domain.append(("is_secondary_produce", '=', True))
+                domain.append(('state', 'not in', ['cancel', 'done']))
             elif request.jsonrequest.get('state') == 'rework_ing':
                 domain.append(('state', '=', 'progress'))
                 domain.append(('feedback_on_rework', '!=', None))
