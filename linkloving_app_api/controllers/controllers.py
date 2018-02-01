@@ -3889,11 +3889,6 @@ class LinklovingAppApi(http.Controller):
         partner_id = request.jsonrequest.get('partner_id')
 
         domain = []
-        if partner_id:
-            domain.append('|')
-            domain.append(('in_charge_id', '=', partner_id))
-            domain.append(('create_uid', '=', partner_id))
-
         if not process_id:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "未找到工序id"})
 
@@ -3905,6 +3900,10 @@ class LinklovingAppApi(http.Controller):
                 domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
             else:
                 domain.append(('production_line_id', '=', False))
+        if partner_id:
+            domain.append('|')
+            domain.append(('in_charge_id', '=', partner_id))
+            domain.append(('create_uid', '=', partner_id))
 
         if request.jsonrequest.get('state'):
             if request.jsonrequest.get('state') in ('waiting_material', 'prepare_material_ing'):
