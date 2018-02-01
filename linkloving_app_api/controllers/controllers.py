@@ -4003,6 +4003,7 @@ class LinklovingAppApi(http.Controller):
                 domain.append(('in_charge_id', '=', partner_id))
                 domain.append(('create_uid', '=', partner_id))
                 domain.append(("is_secondary_produce", '=', True))
+                domain.append(('state', 'not in', ['cancel', 'done']))
                 bean_list = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(
                     domain=domain,
                     fields=[
