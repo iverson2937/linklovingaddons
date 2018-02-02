@@ -172,8 +172,6 @@ class PurchaseOrderExtend(models.Model):
             msg = res_error.get("data").get("message")
         if msg:
             raise UserError(msg)
-        else:
-            raise UserError(response.content)
         return res_json
 
     def _prepare_so_values(self):
