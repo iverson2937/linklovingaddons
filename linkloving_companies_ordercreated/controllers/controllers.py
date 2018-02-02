@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import logging
 
 import requests
 from psycopg2._psycopg import OperationalError
@@ -329,9 +330,10 @@ class LinklovingCompanies(http.Controller):
                 # 'order_line': order_line_return,
             }
         except Exception, e:
+
             return {
                 "code": -1,
-                "msg": u"创建订单出现异常, %s" % e.name if hasattr(e, "name") else '',
+                "msg": u"创建订单出现异常, %s" % (e.name if hasattr(e, "name") else e),
             }
 
     @http.route('/linkloving_web/get_stand_price', auth='none', type='json', csrf=False, methods=['POST'])
