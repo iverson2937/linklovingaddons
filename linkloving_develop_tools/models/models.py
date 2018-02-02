@@ -83,14 +83,16 @@ def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
         year = datetime.date.today().year
     if not period:
         period = 0
-    if month <= 0:
+    if month - period <= 0:
         year = year - 1
         month = 12 + month
         # 获取当月第一天的星期和当月的总天数
-    firstDayWeekDay, monthRange = calendar.monthrange(year, month)
+    firstDayWeekDay, monthRange = calendar.monthrange(year, month - period)
 
     # 获取当月的第一天
     firstDay = datetime.date(year=year, month=month - period, day=1).strftime('%Y-%m-%d')
+    if month > 12:
+        month = month - 12
 
     lastDay = datetime.date(year=year, month=month, day=monthRange).strftime('%Y-%m-%d')
     print firstDay, lastDay
