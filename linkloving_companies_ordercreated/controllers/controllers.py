@@ -309,6 +309,11 @@ class LinklovingCompanies(http.Controller):
                         "code": -4,
                         "msg": u"%s此料号在%s账套中找不到" % (default_code, db)
                     }
+                if len(p_obj) > 1:
+                    return {
+                        "code": -5,
+                        "msg": u'%s 此料号在子系统中对应了多个产品' % (default_code)
+                    }
                 # price_after_dis = p_obj.pre_cost_cal() / discount_to_sub
                 one_line_val = {
                     'product_id': p_obj.id,
