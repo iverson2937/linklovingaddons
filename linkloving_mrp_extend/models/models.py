@@ -2041,7 +2041,7 @@ class StcokPickingExtend(models.Model):
             if pick.picking_type_code == 'incoming':
                 pick.is_cancel_backorder = True
                 pick.state = 'waiting_in'
-            elif pick.picking_type_code == 'outgoing':
+            else:
                 self.do_transfer()
         return
 
@@ -2342,8 +2342,9 @@ class purchase_order_extend(models.Model):
     @api.multi
     def unlink(self):
         for order in self:
-            if not order.state in ["cancel", "make_by_mrp"]:
-                raise UserError(_('In order to delete a purchase order, you must cancel it first.'))
+            if order.state not in ["cancel", "make_by_mrp"]:
+                raise UserError(
+                    _('In order to delete a purchase order, you must cancel it first.') + ('%s' % self.name))
         super(models.Model, self).unlink()  ###注意 fixme
 
 
