@@ -33,6 +33,10 @@
             <field name="view_mode">tree,form</field>
         </record>
 
+        <menuitem action="action_sale_order_line"
+                  id="menu_sale_order_line" parent="linkloving_sale.menu_sales_orders"
+                  sequence="100" name="销售单明细"/>
+
 
         <menuitem id="menu_sale_order_by_order"
                   name="订单制销售单"
