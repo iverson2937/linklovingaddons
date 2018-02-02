@@ -40,6 +40,7 @@
                             </group>
                             <group>
                                 <field name="create_uid" readonly="1" string="创建人"/>
+                                <field name="sale_target"/>
                             </group>
                             <notebook colspan="2">
                                 <page string="预算明细">
