@@ -173,7 +173,7 @@ class PurchaseOrderExtend(models.Model):
         if msg:
             raise UserError(msg)
         else:
-            raise UserError(u"未知错误")
+            raise UserError(response.content)
         return res_json
 
     def _prepare_so_values(self):
