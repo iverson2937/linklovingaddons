@@ -1592,6 +1592,10 @@ class LinklovingAppApi(http.Controller):
                 'product_id': {
                     'product_id': qc_feedback.product_id.id,
                     'product_name': qc_feedback.product_id.name,
+                    'product_specs': qc_feedback.product_id.product_specs or '',
+                    'image_ids': [
+                        {'image_url': LinklovingAppApi.get_product_image_url_new(urlBean.id, 'ir.attachment')}
+                        for urlBean in qc_feedback.product_id.product_img_ids]
                 },
             },
             'state': qc_feedback.state,
@@ -3879,7 +3883,7 @@ class LinklovingAppApi(http.Controller):
         # user_data = LinklovingAppApi.odoo10.execute('res.users', 'read', [LinklovingAppApi.odoo10.env.user.id])
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-    # 获取so源(小幸福加的)
+    # 获取so源
     @http.route('/linkloving_app_api/get_so_mrp_production', type='json', auth='none', csrf=False)
     def get_so_mrp_production(self, **kw):
         # limit = request.jsonrequest.get('limit')
@@ -3940,7 +3944,7 @@ class LinklovingAppApi(http.Controller):
             'origin_count': production.get('origin_sale_id_count')
         }
 
-    # 获取生产状态的数目(邹邹改的)
+    # 获取生产状态的数目
     @http.route('/linkloving_app_api/get_count_mrp_production', type='json', auth='none', csrf=False)
     def get_count_mrp_production(self, **kw):
         process_id = request.jsonrequest.get("process_id")
