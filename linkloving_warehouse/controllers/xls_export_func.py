@@ -160,7 +160,7 @@ def product_template_export(values):
     wb = MyWorkbook(encoding='utf-8')
     sheet_title = '产品详细'
     ws = wb.add_sheet(sheet_title)
-    head = [u'序号', u"产品名称", u'料号' u"成本"]
+    head = [u'序号', u"产品名称", u'料号', u"成本"]
     ws.write_merge(0, 0, 0, 3, sheet_title, title_style)
     wb.multiple_append(head, style=head_style)
     for index, product in enumerate(products):
