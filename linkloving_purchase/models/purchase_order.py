@@ -166,6 +166,7 @@ class PurchaseOrder(models.Model):
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
+    _order = 'create_date desc'
 
     product_specs = fields.Text(string=u'Specification', related='product_id.product_specs')
     shipping_status = fields.Selection([

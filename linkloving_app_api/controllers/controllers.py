@@ -4249,7 +4249,7 @@ class LinklovingAppApi(http.Controller):
             'assign_uid': assign_uid,
             'issue_state': issue_state,
             'effective_department_ids': [(6, 0, departments)],
-            'tag_ids': [(6, 0, tags)]
+            'category_ids': [(6, 0, [11,12])]
         })
         if assign_uid:
             work_order_record_model = request.env['linkloving.work.order.record']
@@ -4301,44 +4301,43 @@ class LinklovingAppApi(http.Controller):
         start_date = request.jsonrequest.get("start_date")
         end_date = request.jsonrequest.get("end_date")
         tag_ids = request.jsonrequest.get("tag_ids")
+        brand_ids = request.jsonrequest.get("brand_ids")
+        area_ids = request.jsonrequest.get("area_ids")
+        category_ids = request.jsonrequest.get("category_ids")
         if start_date and end_date:
             timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
             begin = fields.datetime.strptime(start_date, '%Y-%m-%d')
             end = fields.datetime.strptime(end_date, '%Y-%m-%d')
             work_order_model = request.env['linkloving.work.order']
-
-            if not tag_ids or len(tag_ids) == 0:
-                work_order_data = work_order_model.sudo().read_group(
-                    [('create_date', '<', (end - timez).strftime('%Y-%m-%d %H:%M:%S')),
+            statics_domain = [('create_date', '<', (end - timez).strftime('%Y-%m-%d %H:%M:%S')),
                      ('create_date', '>', (begin - timez).strftime('%Y-%m-%d %H:%M:%S')),
                      ('issue_state', 'in', ['unaccept', 'check', 'process','done']),
-                     ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)],
-                    ['issue_state'],
-                    ['issue_state'])
-            else:
-                work_order_data = work_order_model.sudo().read_group(
-                    [('create_date', '<', (end - timez).strftime('%Y-%m-%d %H:%M:%S')),
-                     ('create_date', '>', (begin - timez).strftime('%Y-%m-%d %H:%M:%S')),
-                     ('issue_state', 'in', ['unaccept', 'check', 'process','done']),
-                     ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids),
-                     ('tag_ids', 'in', tag_ids)],
-                    ['issue_state'],
-                    ['issue_state'])
+                     ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)]
+            if brand_ids:
+                statics_domain += [('brand_ids', 'in', brand_ids)]
+            if area_ids:
+                statics_domain += [('area_ids', 'in', area_ids)]
+            if category_ids:
+                statics_domain += [('category_ids', 'in', category_ids)]
+            work_order_data = work_order_model.sudo().read_group(
+                statics_domain,
+                ['issue_state'],
+                ['issue_state'])
 
         else:
             work_order_model = request.env['linkloving.work.order']
-            if len(tag_ids) == 0:
-                work_order_data = work_order_model.sudo().read_group(
-                    [('issue_state', 'in', ['unaccept', 'check', 'process','done']),
+            statics_domain = [('issue_state', 'in', ['unaccept', 'check', 'process','done']),
                      ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)
-                     ], ['issue_state'],
-                    ['issue_state'])
-            else:
-                work_order_data = work_order_model.sudo().read_group(
-                    [('issue_state', 'in', ['unaccept', 'check', 'process','done']),
-                     ('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids),
-                     ('tag_ids', 'in', tag_ids)], ['issue_state'],
-                    ['issue_state'])
+                     ]
+            if brand_ids:
+                statics_domain += [('brand_ids', 'in', brand_ids)]
+            if area_ids:
+                statics_domain += [('area_ids', 'in', area_ids)]
+            if category_ids:
+                statics_domain += [('category_ids', 'in', category_ids)]
+            work_order_data = work_order_model.sudo().read_group(
+                statics_domain, ['issue_state'],
+                ['issue_state'])
 
         print work_order_data
         result = dict((data['issue_state'], data['issue_state_count']) for data in work_order_data)
@@ -4419,7 +4418,9 @@ class LinklovingAppApi(http.Controller):
         assign_uid = request.jsonrequest.get("assign_uid")
         work_order_number = request.jsonrequest.get("work_order_number")
         isSearchRecord = request.jsonrequest.get("isSearchOrder")
-        tag_ids = request.jsonrequest.get("tag_ids")
+        brand_ids = request.jsonrequest.get("brand_ids")
+        area_ids = request.jsonrequest.get("area_ids")
+        category_ids = request.jsonrequest.get("category_ids")
         reply_uid = request.jsonrequest.get("reply_uid")
         record_type = request.jsonrequest.get("record_type")
         search_text = request.jsonrequest.get('search_text')
@@ -4440,8 +4441,12 @@ class LinklovingAppApi(http.Controller):
             domain += [('assign_uid', '=', assign_uid)]
         if work_order_number:
             domain += [('order_number', '=', work_order_number)]
-        if tag_ids:
-            domain += [('tag_ids', 'in', tag_ids)]
+        if brand_ids:
+            domain += [('brand_ids', 'in', brand_ids)]
+        if area_ids:
+            domain += [('area_ids', 'in', area_ids)]
+        if category_ids:
+            domain += [('category_ids', 'in', category_ids)]
         if reply_uid:
             domain += [('reply_uid', '=', reply_uid)]
         if record_type:
@@ -4752,8 +4757,14 @@ class LinklovingAppApi(http.Controller):
         # create_biaoqian = request.env['linkloving.work.order.tag'].sudo().create({
         #     "name":"若小贝"
         # })
-        biaoqian = request.env['linkloving.work.order.tag'].sudo().search([])
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.get_tag_to_json(biaoqian))
+        brand_list = request.env['product.category.brand'].sudo().search([])
+        area_list = request.env['product.category.area'].sudo().search([])
+        category_list = request.env['product.category'].sudo().search([])
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"brand_list":self.get_tag_to_json(brand_list),
+                                                                    "area_list":self.get_tag_to_json(area_list),
+                                                                    "category_list": self.get_tag_to_json(category_list)})
+
+
 
     # 修改工单标签
     @http.route('/linkloving_app_api/update_biaoqian', type='json', auth="none", csrf=False, cors='*')
@@ -4799,7 +4810,9 @@ class LinklovingAppApi(http.Controller):
             'create_time': work_order.create_date,
             'work_order_images': LinklovingAppApi.get_work_order_img_url(work_order.attachments.ids),
             'effective_department_ids': LinklovingAppApi.get_department_json(work_order.effective_department_ids),
-            'tag_ids': LinklovingAppApi.get_tag_to_json(work_order.tag_ids)
+            'category_ids': LinklovingAppApi.get_tag_to_json(work_order.category_ids),
+            'brand_ids': LinklovingAppApi.get_tag_to_json(work_order.brand_ids),
+            'area_ids': LinklovingAppApi.get_tag_to_json(work_order.area_ids),
         })
         return data
 
