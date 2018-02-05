@@ -7,3 +7,7 @@ class linkloving_work_order_tag(models.Model):
     _name = 'linkloving.work.order.tag'
 
     name = fields.Char()
+
+    parent_id = fields.Many2one('linkloving.work.order.tag')
+
+    tag_ids = fields.One2many('linkloving.work.order.tag', 'parent_id')

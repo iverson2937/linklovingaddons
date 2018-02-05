@@ -44,15 +44,15 @@ class AccountPaymentRegister(models.Model):
         for payment in self:
             if payment.state == 'posted':
                 group = self.env.ref('linkloving_purchase_authority.purchase_manager_1')
-                self.to_approve_ids = group.users.filtered(lambda x: x.id != SUPERUSER_ID)
-                self.has_to_approve_ids = True
+                payment.to_approve_ids = group.users.filtered(lambda x: x.id != SUPERUSER_ID)
+                payment.has_to_approve_ids = True
             elif payment.state == 'manager':
                 group = self.env.ref('linkloving_purchase_authority.purchase_manager_plus')
-                self.to_approve_ids = group.users.filtered(lambda x: x.id != SUPERUSER_ID)
-                self.has_to_approve_ids = True
+                payment.to_approve_ids = group.users.filtered(lambda x: x.id != SUPERUSER_ID)
+                payment.has_to_approve_ids = True
             else:
-                self.to_approve_ids = False
-                self.has_to_approve_ids = False
+                payment.to_approve_ids = False
+                payment.has_to_approve_ids = False
 
     @api.multi
     def to_manager_approve(self):
