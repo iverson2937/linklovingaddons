@@ -156,6 +156,26 @@ class LinklovingOAApi(http.Controller):
         }
         return data
 
+    #获取待批准的采购订单
+    @http.route('/linkloving_oa_api/get_to_approve_po', type='json', auth="none", csrf=False, cors='*')
+    def get_to_approve_po(self, **kw):
+        domain = [('state', '=', 'to approve')]
+        PO_orders = request.env['purchase.order'].sudo().search(domain,
+                                                                order='id desc')
+        json_list = []
+        for po_order in PO_orders:
+            json_list.append(self.po_order_to_json(po_order))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
+
+    #批准订单
+    @http.route('/linkloving_oa_api/button_approve', type='json', auth="none", csrf=False, cors='*')
+    def button_approve(self, **kw):
+        po_id = request.jsonrequest.get("po_id")
+        user_id = request.jsonrequest.get("user_id")
+        PO_orders = request.env['purchase.order'].sudo().browse(po_id)
+        PO_orders.button_approve()
+        return JsonResponse.send_response(STATUS_CODE_OK)
+
     # 获取采购订单
     @http.route('/linkloving_oa_api/get_po', type='json', auth="none", csrf=False, cors='*')
     def get_po(self, **kw):
@@ -216,7 +236,7 @@ class LinklovingOAApi(http.Controller):
         user_id = request.jsonrequest.get("user_id")
         domain = [('state', '=', state)]
         if state == 'purchase':
-            domain = [('state', 'in', ('to approval', 'done', 'purchase'))]
+            domain = [('state', 'in', ('to approve', 'done', 'purchase'))]
         PO_orders = request.env['purchase.order'].sudo().search(domain,
                                                                 limit=limit,
                                                                 offset=offset,
@@ -2543,6 +2563,7 @@ class LinklovingOAApi(http.Controller):
                 'remark': obj.remark or '',
                 'state': obj.state,
                 'invoice_ids': self.change_invoice_ids_to_json(obj.invoice_ids),
+                'to_approve_ids': self.get_department_to_json(obj.to_approve_ids),
             })
         return data
 

@@ -14,6 +14,7 @@ class AccountBudget(models.Model):
     balance = fields.Float(string=u'预算余额', compute='get_budget_balance')
     description = fields.Text(string=u'描述')
     is_create_line = fields.Boolean(default=False)
+    sale_target = fields.Float(string=u'销售目标')
 
     def _get_fiscal_year_id(self):
         fiscal_year_id = self.env['account.fiscalyear'].search([('state', '!=', 'done')], limit=1)
@@ -21,7 +22,7 @@ class AccountBudget(models.Model):
 
     fiscal_year_id = fields.Many2one('account.fiscalyear', string='年度', default=_get_fiscal_year_id)
     line_ids = fields.One2many('linkloving.account.budget.line', 'budget_id')
-    man_power = fields.Integer(string='人数')
+    man_power = fields.Integer(string='预算人数')
     state = fields.Selection([
         ('draft', '草稿'),
         ('done', '正式'),
