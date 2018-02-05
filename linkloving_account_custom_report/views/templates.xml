@@ -1,22 +1,30 @@
 <odoo>
     <data>
-        <!-- <template id="listing"> -->
-        <!--   <ul> -->
-        <!--     <li t-foreach="objects" t-as="object"> -->
-        <!--       <a t-attf-href="#{ root }/objects/#{ object.id }"> -->
-        <!--         <t t-esc="object.display_name"/> -->
-        <!--       </a> -->
-        <!--     </li> -->
-        <!--   </ul> -->
-        <!-- </template> -->
-        <!-- <template id="object"> -->
-        <!--   <h1><t t-esc="object.display_name"/></h1> -->
-        <!--   <dl> -->
-        <!--     <t t-foreach="object._fields" t-as="field"> -->
-        <!--       <dt><t t-esc="field"/></dt> -->
-        <!--       <dd><t t-esc="object[field]"/></dd> -->
-        <!--     </t> -->
-        <!--   </dl> -->
-        <!-- </template> -->
+
+        <record id="account_custom_report_form" model="ir.ui.view">
+            <field name="name">account.account.report.wizard.form</field>
+            <field name="model">account.account.report.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="fiscal_year_id" options="{'no_create':True}"/>
+                                <field name="period_id_start" domain="[('fiscal_year_id','=',fiscal_year_id)]"
+                                       required="1" string="开始区间"/>
+                                <field name="account_ids" widget="radio" string="类型" options="{'no_create':True}"/>
+                            </group>
+                            <group>
+                                <field name="period_id_end" options="{'no_create':True}" string="结束区间"
+                                       required="1"
+                                       domain="[('fiscal_year_id','=',fiscal_year_id)]"/>
+                            </group>
+                        </group>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
     </data>
 </odoo>
