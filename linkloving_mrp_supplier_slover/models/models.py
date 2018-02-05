@@ -129,8 +129,8 @@ class linkloving_procurement_order(models.Model):
                 ('dest_address_id', '=', procurement.partner_dest_id.id))
             if combine_rule == 'same_supplier_origin':
                 domain += (('origin', '=', self.origin),)
-            if group:
-                domain += (('group_id', '=', group.id),)
+            # if group:
+            #     domain += (('group_id', '=', group.id),)
 
             if domain in cache:
                 po = cache[domain]
