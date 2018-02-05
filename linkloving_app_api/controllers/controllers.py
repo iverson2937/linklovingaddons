@@ -4180,7 +4180,7 @@ class LinklovingAppApi(http.Controller):
             'assign_uid': assign_uid,
             'issue_state': issue_state,
             'effective_department_ids': [(6, 0, departments)],
-            'tag_ids': [(6, 0, tags)]
+            'category_ids': [(6, 0, [11,12])]
         })
         if assign_uid:
             work_order_record_model = request.env['linkloving.work.order.record']
@@ -4683,8 +4683,14 @@ class LinklovingAppApi(http.Controller):
         # create_biaoqian = request.env['linkloving.work.order.tag'].sudo().create({
         #     "name":"若小贝"
         # })
-        biaoqian = request.env['linkloving.work.order.tag'].sudo().search([])
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.get_tag_to_json(biaoqian))
+        brand_list = request.env['product.category.brand'].sudo().search([])
+        area_list = request.env['product.category.area'].sudo().search([])
+        category_list = request.env['product.category'].sudo().search([])
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"brand_list":self.get_tag_to_json(brand_list),
+                                                                    "area_list":self.get_tag_to_json(area_list),
+                                                                    "category_list": self.get_tag_to_json(category_list)})
+
+
 
     # 修改工单标签
     @http.route('/linkloving_app_api/update_biaoqian', type='json', auth="none", csrf=False, cors='*')
@@ -4730,7 +4736,7 @@ class LinklovingAppApi(http.Controller):
             'create_time': work_order.create_date,
             'work_order_images': LinklovingAppApi.get_work_order_img_url(work_order.attachments.ids),
             'effective_department_ids': LinklovingAppApi.get_department_json(work_order.effective_department_ids),
-            'tag_ids': LinklovingAppApi.get_tag_to_json(work_order.tag_ids)
+            'category_ids': LinklovingAppApi.get_tag_to_json(work_order.category_ids)
         })
         return data
 

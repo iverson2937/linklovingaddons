@@ -8,6 +8,8 @@ class linkloving_work_order_tag(models.Model):
 
     name = fields.Char()
 
-    parent_id = fields.Many2one('linkloving.work.order.tag')
+    brand_ids = fields.Many2one('product.category.brand')
 
-    tag_ids = fields.One2many('linkloving.work.order.tag', 'parent_id')
+    area_ids = fields.Many2one('product.category.area')
+
+    product_ids = fields.Many2one('product.category')
