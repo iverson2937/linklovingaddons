@@ -57,6 +57,7 @@ def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
 
     return firstDay, lastDay
 
+
 class ProductProduct(models.Model):
     _inherit = 'product.product'
     area_id = fields.Many2one('stock.location.area', string='Area', copy=False)
@@ -101,8 +102,21 @@ class ProductProduct(models.Model):
 
     def count_amount(self, start, end):
         orders = self.env['sale.order.line'].search(
-            [('product_id', '=', self.id), ('state', '=', 'sale'), ('order_id.date_order', '>=', start),
+            [('product_id', '=', self.id),
+             ('state', '=', 'sale'),
+             ('order_id.date_order', '>=', start),
              ('order_id.date_order', '<=', end)])
+        res = sum(order.product_uom_qty for order in orders)
+        return res
+
+    def count_shipped_amount(self, start, end):
+        location_dest_id = self.env.ref("stock.stock_location_customers")
+        orders = self.env['stock.move'].search(
+            [('product_id', '=', self.id),
+             ('state', '=', 'done'),
+             ('date', '>=', start),
+             ('date', '<=', end),
+             ('location_dest_id', '=', location_dest_id.id)])
         res = sum(order.product_uom_qty for order in orders)
 
         return res
@@ -119,6 +133,8 @@ class ProductProduct(models.Model):
         res = sum(order.product_uom_qty for order in orders)
 
         return res
+
+
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 

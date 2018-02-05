@@ -294,5 +294,11 @@
         </record>
 
 
+        <menuitem action="sale.action_orders_upselling"
+                  id="sale.menu_sale_order_upselling" parent="sale.menu_sale_invoicing"
+                  groups="base.group_no_one"
+                  sequence="5"/>
+
+
     </data>
 </openerp>

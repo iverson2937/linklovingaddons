@@ -1592,6 +1592,10 @@ class LinklovingAppApi(http.Controller):
                 'product_id': {
                     'product_id': qc_feedback.product_id.id,
                     'product_name': qc_feedback.product_id.name,
+                    'product_specs': qc_feedback.product_id.product_specs or '',
+                    'image_ids': [
+                        {'image_url': LinklovingAppApi.get_product_image_url_new(urlBean.id, 'ir.attachment')}
+                        for urlBean in qc_feedback.product_id.product_img_ids]
                 },
             },
             'state': qc_feedback.state,
@@ -3879,7 +3883,7 @@ class LinklovingAppApi(http.Controller):
         # user_data = LinklovingAppApi.odoo10.execute('res.users', 'read', [LinklovingAppApi.odoo10.env.user.id])
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-    # 获取so源(小幸福加的)
+    # 获取so源
     @http.route('/linkloving_app_api/get_so_mrp_production', type='json', auth='none', csrf=False)
     def get_so_mrp_production(self, **kw):
         # limit = request.jsonrequest.get('limit')
@@ -3889,11 +3893,6 @@ class LinklovingAppApi(http.Controller):
         partner_id = request.jsonrequest.get('partner_id')
 
         domain = []
-        if partner_id:
-            domain.append('|')
-            domain.append(('in_charge_id', '=', partner_id))
-            domain.append(('create_uid', '=', partner_id))
-
         if not process_id:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "未找到工序id"})
 
@@ -3905,6 +3904,10 @@ class LinklovingAppApi(http.Controller):
                 domain.append(('production_line_id', '=', request.jsonrequest['production_line_id']))
             else:
                 domain.append(('production_line_id', '=', False))
+        if partner_id:
+            domain.append('|')
+            domain.append(('in_charge_id', '=', partner_id))
+            domain.append(('create_uid', '=', partner_id))
 
         if request.jsonrequest.get('state'):
             if request.jsonrequest.get('state') in ('waiting_material', 'prepare_material_ing'):
@@ -3915,6 +3918,7 @@ class LinklovingAppApi(http.Controller):
                 domain.append(("is_secondary_produce", '=', False))
             elif request.jsonrequest.get('state') == 'is_secondary_produce':
                 domain.append(("is_secondary_produce", '=', True))
+                domain.append(('state', 'not in', ['cancel', 'done']))
             elif request.jsonrequest.get('state') == 'rework_ing':
                 domain.append(('state', '=', 'progress'))
                 domain.append(('feedback_on_rework', '!=', None))
@@ -3940,7 +3944,7 @@ class LinklovingAppApi(http.Controller):
             'origin_count': production.get('origin_sale_id_count')
         }
 
-    # 获取生产状态的数目(邹邹改的)
+    # 获取生产状态的数目
     @http.route('/linkloving_app_api/get_count_mrp_production', type='json', auth='none', csrf=False)
     def get_count_mrp_production(self, **kw):
         process_id = request.jsonrequest.get("process_id")
@@ -4003,6 +4007,7 @@ class LinklovingAppApi(http.Controller):
                 domain.append(('in_charge_id', '=', partner_id))
                 domain.append(('create_uid', '=', partner_id))
                 domain.append(("is_secondary_produce", '=', True))
+                domain.append(('state', 'not in', ['cancel', 'done']))
                 bean_list = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(
                     domain=domain,
                     fields=[

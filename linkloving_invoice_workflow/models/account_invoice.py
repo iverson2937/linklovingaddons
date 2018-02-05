@@ -107,12 +107,14 @@ class AccountInvoice(models.Model):
         self.state = 'draft'
 
     def parse_invoice_data(self):
+
         return {
-            'name': self.name,
+            'name': self.number,
             'partner_name': self.partner_id.name,
             'line_ids': [
                 {
                     'product_name': line.product_id.name,
+                    'short_name': line.product_id.name.split('-')[0],
                     'qty': line.quantity,
                     'price_unit': line.price_unit,
                     'total_amount': line.quantity * line.price_unit

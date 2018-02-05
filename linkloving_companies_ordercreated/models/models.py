@@ -165,10 +165,13 @@ class PurchaseOrderExtend(models.Model):
     def handle_response(self, response):
         res_json = json.loads(response.content).get("result")
         res_error = json.loads(response.content).get("error")
+        msg = None
         if res_json and res_json.get("code") < 0:
-            raise UserError(res_json.get("msg"))
+            msg = res_json.get("msg")
         if res_error:
-            raise UserError(res_error.get("data").get("message"))
+            msg = res_error.get("data").get("message")
+        if msg:
+            raise UserError(msg)
         return res_json
 
     def _prepare_so_values(self):

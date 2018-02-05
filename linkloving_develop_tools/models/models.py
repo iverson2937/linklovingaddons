@@ -83,14 +83,17 @@ def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
         year = datetime.date.today().year
     if not period:
         period = 0
-    if month <= 0:
+    if month - period <= 0:
         year = year - 1
         month = 12 + month
         # 获取当月第一天的星期和当月的总天数
-    firstDayWeekDay, monthRange = calendar.monthrange(year, month)
+    firstDayWeekDay, monthRange = calendar.monthrange(year, month - period)
 
     # 获取当月的第一天
     firstDay = datetime.date(year=year, month=month - period, day=1).strftime('%Y-%m-%d')
+    if month > 12:
+        month = month - 12
+        year = year +1
 
     lastDay = datetime.date(year=year, month=month, day=monthRange).strftime('%Y-%m-%d')
     print firstDay, lastDay
@@ -325,6 +328,9 @@ class CreateOrderPointWizard(models.TransientModel):
                 last1_month_qty = product_id.count_amount(date1_start, date1_end)
                 last2_month_qty = product_id.count_amount(date2_start, date2_end)
                 last3_month_qty = product_id.count_amount(date3_start, date3_end)
+                print last1_month_qty,
+                print last2_month_qty,
+                print last3_month_qty
                 product.last1_month_qty = last1_month_qty
                 product.last2_month_qty = last2_month_qty
                 product.last3_month_qty = last3_month_qty

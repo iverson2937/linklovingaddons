@@ -42,7 +42,7 @@ class ProductTemplate(models.Model):
 
         if len(set(product_id)) > 1:
             raise UserError(_('MO product must be same'))
-        bom_id = product_id[0].bom_ids
+        bom_id = product_id[0].bom_ids[0]
         mo_id = self.env['mrp.production'].create({
             'product_qty': qty,
             'product_id': product_id[0].id,

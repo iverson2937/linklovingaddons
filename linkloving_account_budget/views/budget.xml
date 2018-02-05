@@ -12,6 +12,8 @@
                                 states="draft" string="确定"
                                 type="object" class="oe_highlight"
                                 help="Launch Configuration Wizard"/>
+                        <button name="create_budget_line" type="object" string="创建预算明细"
+                                atts="{'invisible':[('is_create_line','=',True)]}"/>
 
                         <field name="state" widget="statusbar"
                                readonly="1"/>
@@ -23,6 +25,7 @@
                             <label for="name"/>
                             <h1>
                                 <field name="name" placeholder="简单描述"/>
+                                <field name="is_create_line" invisible="1"/>
                             </h1>
                         </div>
                         <group>
@@ -37,6 +40,7 @@
                             </group>
                             <group>
                                 <field name="create_uid" readonly="1" string="创建人"/>
+                                <field name="sale_target"/>
                             </group>
                             <notebook colspan="2">
                                 <page string="预算明细">
