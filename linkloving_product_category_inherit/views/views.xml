@@ -1,7 +1,0 @@
-<odoo>
-    <data>
-        <menuitem
-                action="product.product_uom_categ_form_action" id="menu_stock_uom_categ_form_action"
-                parent="menu_product_in_config_stock" sequence="5" groups="product.group_uom"/>
-    </data>
-</odoo>
