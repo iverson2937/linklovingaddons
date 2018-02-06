@@ -39,6 +39,7 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
             self.update_control_panel(cp_status);
             var colspan_xishu = 1;
             var formatter = function (value, row, index) {
+                console.log(value, 'ddfdfsfa');
                 if (value) {
                     return value.name;
                 }
@@ -46,7 +47,23 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                     return '';
                 }
             };
-            var row5 = [];
+            var row5 = [{
+                field: 'department_id',
+                title: '部门',
+                colspan: 1,
+                valign: "middle",
+                halign: "center",
+                align: "center",
+
+            }, {
+                field: 'manpower',
+                title: '预算人数',
+                colspan: 1,
+                valign: "middle",
+                halign: "center",
+                align: "center",
+
+            }];
             new Model('product.product').call('search_read', [[['can_be_expensed', '=', true]]]).then(function (records) {
 
                 _.each(records, function (result) {
@@ -58,10 +75,6 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                         valign: "middle",
                         halign: "center",
                         align: "center",
-                        formatter: function (value, row, index) {
-                            return index + 1;
-                        }
-
 
                     };
                     row5.push(res)
@@ -92,112 +105,22 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                 }]
                 var row1 = [
                     {
-                        field: 'so_name',
-                        title: '生产SO号',
+                        field: 'total_expense_amount',
+                        title: '预计总费用',
                         colspan: colspan_xishu * 2,
                         halign: "center",
                         align: "center",
                         valign: "middle", // top, middle, bottom
-                    }, {
-                        field: 'title1',
-                        title: data["so_name"] || '',//变量
-                        colspan: colspan_xishu * 3,
-                        halign: "center",
-                        align: "center",
-                        valign: "middle", // top, middle, bottom
-                        'class': 'bg_hint',
-                    }, {
-                        field: 'title2',
-                        title: '订单交期',//变量
-                        colspan: colspan_xishu * 2,
-                        rowspan: 2,
-                        halign: "center",
-                        align: "center",
-                        valign: "middle",
-                    }, {
-                        field: 'title3',
-                        title: data["handle_date"] || '',//变量
-                        colspan: colspan_xishu * 3,
-                        rowspan: 2,
-                        halign: "center",
-                        align: "center",
-                        valign: "middle",
-                        'class': 'bg_hint',
-                    },
-                    {
-                        field: 'title4',
-                        title: '客户名',//变量
-                        colspan: colspan_xishu * 2,
-                        rowspan: 1,
-                        halign: "center",
-                        align: "center",
-                        valign: "middle",
-                    },
-                    {
-                        field: 'title5',
-                        title: data["partner_name_from_main"] || '',//变量
-                        colspan: colspan_xishu * 3,
-                        rowspan: 1,
-                        halign: "center",
-                        align: "center",
-                        valign: "middle",
-                        'class': 'bg_hint',
-                    },
-                    {
-                        field: 'order',
-                        title: '订单类型',//变量
-                        colspan: colspan_xishu * 3,
-                        rowspan: 1,
-                        halign: "center",
-                        align: "center",
-                        valign: "middle",
                     }
                 ];
                 var row2 = [
                     {
-                        field: 'title6',
-                        title: '销售PI号',
+                        field: 'sale_amount',
+                        title: '预计销售额',
                         colspan: colspan_xishu * 2,
                         halign: "center",
                         align: "center",
                         valign: "middle",
-                    }, {
-                        field: 'title7',
-                        title: data["pi_number"] || '',//变量
-                        colspan: colspan_xishu * 3,
-                        halign: "center",
-                        align: "center",
-                        valign: "middle",
-                        'class': 'bg_hint',
-                    },
-                    {
-                        field: 'title8',
-                        title: '业务员',//变量
-                        halign: "center",
-                        align: "center",
-                        valign: "middle",
-                        colspan: colspan_xishu * 2,
-                    },
-                    {
-                        field: 'title19',
-                        title: data["sale_man_from_main"] || '',//变量
-                        colspan: colspan_xishu * 3,
-                        rowspan: 1,
-                        halign: "center",
-                        align: "center",
-                        valign: "middle", // top, middle, bottom
-                        'class': 'bg_hint',
-
-                    },
-                    {
-                        field: 'title11',
-                        title: '订单制',//变量
-                        colspan: colspan_xishu * 3,
-                        rowspan: 1,
-                        halign: "center",
-                        align: "center",
-                        valign: "middle",
-                        'class': 'bg_hint',
                     },
                 ];
                 var row3 = [
@@ -284,6 +207,7 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                 new Model("linkloving.account.budget")
                     .call("get_department_budget_report", [], {})
                     .then(function (res) {
+                        console.log(res)
                         self.initTableSubCompany(res, data);
                     })
             });
@@ -398,7 +322,20 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
             ], data);
             self.$('#table').bootstrapTable(options);
         },
-        options_init: function (filename, coloums, data) {
+
+        options_init: function (filename, coloums, datas) {
+            var dict = {};
+            for (var i = 0; i < coloums.length; i++) {
+                var sub_total = 0;
+                for (var i = 0; i < datas.length; i++) {
+                    sub_total += datas[i][coloums[i]]
+
+                }
+                dict[coloums[i]] = sub_total
+
+            }
+            datas.push(dict);
+
             return {
                 cache: false,
                 sortable: true,
@@ -427,7 +364,7 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                     export: 'fa-upload',
                 },
                 columns: coloums,
-                data: [1, 1, 1],//data.order_line,
+                data: data,//data.order_line,
 
                 onEditableSave: function (field, row, oldValue, $el) {
                     console.log(row)
@@ -444,7 +381,7 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
             if (!data) {
                 return;
             }
-            var options = self.options_init('预算汇总' + data.so_name, colomns, data.order_line);
+            var options = self.options_init('预算汇总' + data.so_name, colomns, data);
             self.$('#table').bootstrapTable(options);
         },
 

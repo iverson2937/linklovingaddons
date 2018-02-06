@@ -25,14 +25,26 @@ class AccountBudget(models.Model):
     @api.model
     def get_department_budget_report(self, **kwargs):
         products = self.env['product.product'].search([('can_be_expensed', '=', True)])
-        departments = self.env['hr.department'].search([('parent_id', '!=', True)])
+        departments = self.env['hr.department'].search([])
+        print departments
         BudgetLine = self.env['linkloving.account.budget.line']
+        Budget = self.env['linkloving.account.budget']
         res = []
-        for product in products:
-            for department in departments:
+        for department in departments:
+            budget = Budget.search([('department_id', '=', department.id)])
+
+            manpower = budget.man_power
+            product_dict = {'department_id': department.name, 'manpower': manpower}
+            for product in products:
+
+
                 lines = BudgetLine.search([('product_id', '=', product.id), ('department_id', '=', department.id)])
                 amount = sum(line.amount for line in lines)
-            res
+                product_dict.update({
+                    product.default_code: amount,
+                })
+            res.append(product_dict)
+        print len(res)
 
         return res
 
