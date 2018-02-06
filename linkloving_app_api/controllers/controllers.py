@@ -4428,7 +4428,7 @@ class LinklovingAppApi(http.Controller):
         record_type = request.jsonrequest.get("record_type")
         search_text = request.jsonrequest.get('search_text')
         search_type = request.jsonrequest.get('search_type')
-        contantDraft = request.jsonrequest.get('excludeDraft')
+        contantDraft = request.jsonrequest.get('contantDraft')
         if not contantDraft:
             domain += [('issue_state', '!=', "draft")]
         if start_date and end_date:
