@@ -9,6 +9,7 @@ class AccountBudget(models.Model):
     _order = 'create_date desc'
     name = fields.Char(string='名称')
     department_id = fields.Many2one('hr.department', string=u'部门')
+    total_employee = fields.Integer(related='department_id.total_employee', string='实际人数')
     team_id = fields.Many2one('crm.team', related='department_id.team_id')
     amount = fields.Float(string=u'预算总金额', compute='get_budget_balance')
     amount_used = fields.Float(string=u'已使用金额', compute='get_budget_balance')
@@ -20,6 +21,20 @@ class AccountBudget(models.Model):
     def _get_fiscal_year_id(self):
         fiscal_year_id = self.env['account.fiscalyear'].search([('state', '!=', 'done')], limit=1)
         return fiscal_year_id.id
+
+    @api.model
+    def get_department_budget_report(self, **kwargs):
+        products = self.env['product.product'].search([('can_be_expensed', '=', True)])
+        departments = self.env['hr.department'].search([('parent_id', '!=', True)])
+        BudgetLine = self.env['linkloving.account.budget.line']
+        res = []
+        for product in products:
+            for department in departments:
+                lines = BudgetLine.search([('product_id', '=', product.id), ('department_id', '=', department.id)])
+                amount = sum(line.amount for line in lines)
+            res
+
+        return res
 
     fiscal_year_id = fields.Many2one('account.fiscalyear', string='年度', default=_get_fiscal_year_id)
     line_ids = fields.One2many('linkloving.account.budget.line', 'budget_id')
