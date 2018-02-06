@@ -35,9 +35,9 @@ class linkloving_work_order(models.Model):
 
     # tag_ids = fields.Many2many('linkloving.work.order.tag', 'linkloving_work_order_tag_rel', 'work_order_id', 'tag_id', 'Tags')
 
-    brand_ids = fields.Many2many('product.category.brand','product_category_brand_rel','work_order_id','brand_id','Brand id', ondelete='cascade')
-
-    area_ids = fields.Many2many('hr.department','hr_department_work_order_rel','work_order_id','department_id','Department id', ondelete='cascade')
+    # brand_ids = fields.Many2many('product.category.brand','product_category_brand_rel','work_order_id','brand_id','Brand id', ondelete='cascade')
+    #
+    # area_ids = fields.Many2many('hr.department','hr_department_work_order_rel','work_order_id','department_id','Department id', ondelete='cascade')
 
     category_ids = fields.Many2many('product.category','product_category_rel','work_order_id','category_id','Category id', ondelete='cascade')
 
