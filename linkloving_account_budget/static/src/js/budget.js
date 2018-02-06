@@ -32,6 +32,9 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
 
         start: function () {
             var self = this;
+            // this.$el.css({width: this.width});
+            var content = this.$el.parents();
+            console.log(content, 'ddd');
             var cp_status = {
                 breadcrumbs: self.action_manager && self.action_manager.get_breadcrumbs(),
                 // cp_content: _.extend({}, self.searchview_elements, {}),
@@ -39,7 +42,6 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
             self.update_control_panel(cp_status);
             var colspan_xishu = 1;
             var formatter = function (value, row, index) {
-                console.log(value, 'ddfdfsfa');
                 if (value) {
                     return value.name;
                 }
@@ -325,15 +327,16 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
 
         options_init: function (filename, coloums, datas) {
             var dict = {};
-            for (var i = 0; i < coloums.length; i++) {
+            var update_coloums = coloums[0];
+            for (var i = 0; i < update_coloums.length; i++) {
                 var sub_total = 0;
-                for (var i = 0; i < datas.length; i++) {
-                    sub_total += datas[i][coloums[i]]
-
+                for (var j = 0; j < datas.length; j++) {
+                    sub_total += datas[j][update_coloums[i]['field']]
                 }
-                dict[coloums[i]] = sub_total
+                dict[update_coloums[i]['field']] = sub_total
 
             }
+            dict['department_id'] = '';
             datas.push(dict);
 
             return {
@@ -364,7 +367,7 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                     export: 'fa-upload',
                 },
                 columns: coloums,
-                data: data,//data.order_line,
+                data: datas,//data.order_line,
 
                 onEditableSave: function (field, row, oldValue, $el) {
                     console.log(row)
