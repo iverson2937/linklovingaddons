@@ -4428,6 +4428,9 @@ class LinklovingAppApi(http.Controller):
         record_type = request.jsonrequest.get("record_type")
         search_text = request.jsonrequest.get('search_text')
         search_type = request.jsonrequest.get('search_type')
+        contantDraft = request.jsonrequest.get('excludeDraft')
+        if not contantDraft:
+            domain += [('issue_state', '!=', "draft")]
         if start_date and end_date:
             timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
             begin = fields.datetime.strptime(start_date, '%Y-%m-%d')
@@ -4456,6 +4459,8 @@ class LinklovingAppApi(http.Controller):
             domain += [('record_type', '=', record_type)]
         if search_type:
             domain += [(search_type, 'ilike', search_text)]
+
+
 
         work_order_json = []
         word_order_list = []
@@ -4766,7 +4771,7 @@ class LinklovingAppApi(http.Controller):
         #     "name":"若小贝"
         # })
         brand_list = request.env['product.category.brand'].sudo().search([])
-        area_list = request.env['product.category.area'].sudo().search([])
+        area_list = request.env['hr.department'].sudo().search([])
         category_list = request.env['product.category'].sudo().search([])
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"brand_list":self.get_tag_to_json(brand_list),
                                                                     "area_list":self.get_tag_to_json(area_list),
@@ -4782,7 +4787,7 @@ class LinklovingAppApi(http.Controller):
             return JsonResponse.send_response(STATUS_CODE_OK, res_data={"type":"brand",
                                                                         "data":self.get_tag_to_json(brand_list)})
         if (search_type == 'area'):
-            area_list = request.env['product.category.area'].sudo().search([("name", 'ilike', search_text)])
+            area_list = request.env['hr.department'].sudo().search([("name", 'ilike', search_text)])
             return JsonResponse.send_response(STATUS_CODE_OK, res_data={"type": "area",
                                                                         "data": self.get_tag_to_json(area_list)})
         if (search_type == 'category'):
