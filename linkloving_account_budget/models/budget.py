@@ -9,6 +9,7 @@ class AccountBudget(models.Model):
     _order = 'create_date desc'
     name = fields.Char(string='名称')
     department_id = fields.Many2one('hr.department', string=u'部门')
+    team_id = fields.Many2one('crm.team', related='department_id.team_id')
     amount = fields.Float(string=u'预算总金额', compute='get_budget_balance')
     amount_used = fields.Float(string=u'已使用金额', compute='get_budget_balance')
     balance = fields.Float(string=u'预算余额', compute='get_budget_balance')
