@@ -280,7 +280,9 @@ class PurchaseOrderLine(models.Model):
         ('no', u'没有要对账的'),
         ('to invoice', u'待对账'),
         ('invoiced', u'已对账完成'),
-    ], string=u'对账单状态', compute='_get_invoiced', store=True, readonly=True, copy=False, default='no')
+    ], string=u'对账单状态', readonly=True, copy=False, default='no')
+
+
 
     @api.multi
     def _create_stock_moves(self, picking):

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import logging
 
 import requests
 from psycopg2._psycopg import OperationalError
@@ -302,11 +303,21 @@ class LinklovingCompanies(http.Controller):
             # order_line_return = []  #往回传的line信息
             for line in order_line_vals:
                 default_code = line["default_code"]
+                if not default_code:
+                    return {
+                        "code": -6,
+                        "msg": u'料号异常不能为空 %s' % json.dumps(line)
+                    }
                 p_obj = request.env["product.product"].sudo().search([("default_code", "=", default_code)])
                 if not p_obj:
                     return {
                         "code": -4,
                         "msg": u"%s此料号在%s账套中找不到" % (default_code, db)
+                    }
+                if len(p_obj) > 1:
+                    return {
+                        "code": -5,
+                        "msg": u'%s 此料号在子系统中对应了多个产品' % (json.dumps(line))
                     }
                 # price_after_dis = p_obj.pre_cost_cal() / discount_to_sub
                 one_line_val = {
@@ -329,9 +340,10 @@ class LinklovingCompanies(http.Controller):
                 # 'order_line': order_line_return,
             }
         except Exception, e:
+
             return {
                 "code": -1,
-                "msg": u"创建订单出现异常, %s" % e.name if hasattr(e, "name") else '',
+                "msg": u"创建订单出现异常, %s" % (e.name if hasattr(e, "name") else e),
             }
 
     @http.route('/linkloving_web/get_stand_price', auth='none', type='json', csrf=False, methods=['POST'])

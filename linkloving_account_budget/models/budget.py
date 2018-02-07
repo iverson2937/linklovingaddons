@@ -9,19 +9,49 @@ class AccountBudget(models.Model):
     _order = 'create_date desc'
     name = fields.Char(string='名称')
     department_id = fields.Many2one('hr.department', string=u'部门')
+    total_employee = fields.Integer(related='department_id.total_employee', string='实际人数')
+    # team_id = fields.Many2one('crm.team', related='department_id.team_id')
     amount = fields.Float(string=u'预算总金额', compute='get_budget_balance')
     amount_used = fields.Float(string=u'已使用金额', compute='get_budget_balance')
     balance = fields.Float(string=u'预算余额', compute='get_budget_balance')
     description = fields.Text(string=u'描述')
     is_create_line = fields.Boolean(default=False)
+    sale_target = fields.Float(string=u'销售目标')
 
     def _get_fiscal_year_id(self):
         fiscal_year_id = self.env['account.fiscalyear'].search([('state', '!=', 'done')], limit=1)
         return fiscal_year_id.id
 
+    @api.model
+    def get_department_budget_report(self, **kwargs):
+        products = self.env['product.product'].search([('can_be_expensed', '=', True)])
+        departments = self.env['hr.department'].search([('has_budget', '=', True)])
+        print departments
+        BudgetLine = self.env['linkloving.account.budget.line']
+        Budget = self.env['linkloving.account.budget']
+        res = []
+        for department in departments:
+            budget = Budget.search([('department_id', '=', department.id)])
+
+            manpower = budget.man_power
+            product_dict = {'department_id': department.name, 'manpower': manpower,
+                            'sale_target': budget.sale_target if budget.sale_target else '',
+                            'sale_expense_rate': budget.amount / budget.sale_target if budget.sale_target else '',
+                            'sub_total': budget.amount}
+            for product in products:
+                lines = BudgetLine.search([('product_id', '=', product.id), ('department_id', '=', department.id)])
+                amount = sum(line.amount for line in lines)
+                product_dict.update({
+                    product.default_code: amount,
+                })
+            res.append(product_dict)
+        print len(res)
+
+        return res
+
     fiscal_year_id = fields.Many2one('account.fiscalyear', string='年度', default=_get_fiscal_year_id)
     line_ids = fields.One2many('linkloving.account.budget.line', 'budget_id')
-    man_power = fields.Integer(string='人数')
+    man_power = fields.Integer(string='预算人数')
     state = fields.Selection([
         ('draft', '草稿'),
         ('done', '正式'),

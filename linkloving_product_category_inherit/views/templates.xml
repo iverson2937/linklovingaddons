@@ -1,0 +1,57 @@
+<odoo>
+    <data>
+
+
+        <record id="product_category_brand_form" model="ir.ui.view">
+            <field name="name">product.category.brand.form</field>
+            <field name="model">product.category.brand</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="description"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_product_category_brand" model="ir.actions.act_window">
+            <field name="name">品牌</field>
+            <field name="res_model">product.category.brand</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="product_category_area_form" model="ir.ui.view">
+            <field name="name">product.category.area.form</field>
+            <field name="model">product.category.area</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="description"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_product_category_area" model="ir.actions.act_window">
+            <field name="name">区域</field>
+            <field name="res_model">product.category.area</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem
+                action="action_product_category_brand" id="menu_product_category_brand"
+                parent="stock.menu_product_in_config_stock" sequence="99"/>
+
+        <menuitem
+                action="action_product_category_area" id="menu_product_category_area"
+                parent="stock.menu_product_in_config_stock" sequence="100"/>
+
+    </data>
+</odoo>
