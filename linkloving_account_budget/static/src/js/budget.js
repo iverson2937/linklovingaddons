@@ -54,6 +54,14 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
             };
             self.update_control_panel(cp_status);
             var colspan_xishu = 1;
+            var formarter_per = function (value, row, index) {
+                if (value) {
+                    return toString(value * 100) + '%';
+                }
+                else {
+                    return '';
+                }
+            };
             var formatter = function (value, row, index) {
                 if (value) {
                     console.log(typeof value);
@@ -79,7 +87,6 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                 valign: "middle",
                 halign: "center",
                 align: "center",
-                formatter: formatter,
 
             }];
             new Model('product.product').call('search_read', [[['can_be_expensed', '=', true]]]).then(function (records) {
@@ -128,6 +135,7 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                         valign: "middle",
                         halign: "center",
                         align: "center",
+
                     }
                 row5.push(res_sub);
                 row5.push(sale_amount);
