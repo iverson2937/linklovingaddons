@@ -4429,7 +4429,7 @@ class LinklovingAppApi(http.Controller):
         search_text = request.jsonrequest.get('search_text')
         search_type = request.jsonrequest.get('search_type')
         contantDraft = request.jsonrequest.get('contantDraft')
-        if not contantDraft:
+        if not contantDraft and not isSearchRecord:
             domain += [('issue_state', '!=', "draft")]
         if start_date and end_date:
             timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
@@ -4460,8 +4460,6 @@ class LinklovingAppApi(http.Controller):
         if search_type:
             domain += [(search_type, 'ilike', search_text)]
 
-
-
         work_order_json = []
         word_order_list = []
         if isSearchRecord:
@@ -4472,7 +4470,11 @@ class LinklovingAppApi(http.Controller):
             ids = list(set(word_order_list))
             ids.sort(key=word_order_list.index)
             for id in ids:
-                work_order_json.append(LinklovingAppApi.convert_work_order_to_json(id))
+                if contantDraft:
+                    work_order_json.append(LinklovingAppApi.convert_work_order_to_json(id))
+                elif id.issue_state !='draft':
+                    work_order_json.append(LinklovingAppApi.convert_work_order_to_json(id))
+
         else:
             if not create_uid:
                 domain += [('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)]
@@ -4497,6 +4499,8 @@ class LinklovingAppApi(http.Controller):
         work_orders = request.env['linkloving.work.order.record'].sudo().search(
             domain, order='write_date desc')
         for order in work_orders:
+            if order.work_order_id.issue_state =="draft":
+                continue
             work_order_json.append(LinklovingAppApi.convert_at_me_order_to_json(order))
             if not isNumber:
                 order.write({'isRead':True})
