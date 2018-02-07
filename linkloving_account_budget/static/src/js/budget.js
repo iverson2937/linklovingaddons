@@ -56,6 +56,7 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                 valign: "middle",
                 halign: "center",
                 align: "center",
+                class: 'department'
 
             }, {
                 field: 'manpower',
@@ -83,20 +84,25 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
 
                 });
                 console.log(row5);
-                var process = data.processes;
-                if (process) {
-                    for (var i = 0; i < process.length; i++) {
-                        row5.push({
-                            field: 'process_' + i,
-                            title: process[i].name,
-                            colspan: 1,
-                            valign: "middle",
-                            halign: "center",
-                            align: "center",
-                            formatter: formatter,
-                        });
+                var res_sub = {
+                        field: 'sub_total',
+                        title: '小计',
+                        colspan: 1,
+                        valign: "middle",
+                        halign: "center",
+                        align: "center",
+
+                    },
+                    sale_amount = {
+                        field: 'sale_target',
+                        title: '预计销售额',
+                        colspan: 1,
+                        valign: "middle",
+                        halign: "center",
+                        align: "center",
                     }
-                }
+                row5.push(res_sub)
+                row5.push(sale_amount)
                 var title_row = [{
                     field: 'title',
                     title: data['company_name'] + '-生产跟踪单',
@@ -125,91 +131,13 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                         valign: "middle",
                     },
                 ];
-                var row3 = [
-                    {
-                        field: 'title333',
-                        title: '销售SO号',
-                        colspan: colspan_xishu * 2,
-                        valign: "middle", // top, middle, bottom
-                        halign: "center",
-                        align: "center",
-                    }, {
-                        field: 'title1123',
-                        title: data["so_name_from_main"] || '',//变量
-                        colspan: colspan_xishu * 3,
-                        valign: "middle",
-                        halign: "center",
-                        align: "center",
-                        'class': 'bg_hint',
-                    }, {
-                        field: 'follow_partner',
-                        title: '跟单员',//变量
-                        valign: "middle",
-                        halign: "center",
-                        align: "center",
-                        colspan: colspan_xishu * 2,
-                    }, {
-                        field: 'handle_date',
-                        title: data["follow_partner_name_from_main"] || '',//变量
-                        colspan: colspan_xishu * 3,
-                        valign: "middle",
-                        halign: "center",
-                        align: "center",
-                        'class': 'bg_hint',
-                    },
-                    {
-                        field: 'po',
-                        title: '采购PO号',//变量
-                        valign: "middle",
-                        halign: "center",
-                        align: "center",
-                        colspan: colspan_xishu * 2,
-                    },
-                    {
-                        field: 'handle_date123',
-                        title: data["po_from_main"] || '',//变量
-                        colspan: colspan_xishu * 3,
-                        valign: "middle",
-                        halign: "center",
-                        align: "center",
-                        'class': 'bg_hint',
-                    },
-                    {
-                        field: 'order1111',
-                        title: '备货制',//变量
-                        colspan: colspan_xishu * 3,
-                        rowspan: 1,
-                        valign: "middle",
-                        halign: "center",
-                        align: "center",
-                        'class': 'bg_hint',
-                    },
-                ];
-                var row4 = [
-                    {
-                        field: 'remark',
-                        title: '注意事项',
-                        colspan: colspan_xishu * 2,
-                        valign: "middle",
-                        halign: "center",
-                        align: "center",
-                    }, {
-                        field: 'remark1',
-                        title: '',
-                        colspan: colspan_xishu * 10,
-                        valign: "middle",
-                        halign: "center",
-                        align: "center",
 
-                    }
-                ];
                 data = [row5];
 
 
                 new Model("linkloving.account.budget")
                     .call("get_department_budget_report", [], {})
                     .then(function (res) {
-                        console.log(res)
                         self.initTableSubCompany(res, data);
                     })
             });

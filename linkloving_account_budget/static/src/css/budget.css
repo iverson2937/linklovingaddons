@@ -1,0 +1,12 @@
+.o_web_client > .o_main .o_main_content {
+    overflow: scroll;
+}
+
+.fixed-table-container thead th .th-inner .department {
+    padding: 8px 36px;
+    line-height: 24px;
+    vertical-align: top;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
