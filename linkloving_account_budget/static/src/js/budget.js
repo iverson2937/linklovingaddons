@@ -306,6 +306,7 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
 
             }
             dict['department_id'] = '';
+            dict['sale_expense_rate'] = '';
             datas.push(dict);
 
             return {
