@@ -271,6 +271,9 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                 for (var j = 0; j < datas.length; j++) {
                     sub_total += datas[j][update_coloums[i]['field']]
                 }
+                if (sub_total == 0) {
+                    sub_total = ''
+                }
                 dict[update_coloums[i]['field']] = sub_total
 
             }
