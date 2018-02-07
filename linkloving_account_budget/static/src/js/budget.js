@@ -46,8 +46,6 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
             };
             var self = this;
             // this.$el.css({width: this.width});
-            var content = this.$el.parents();
-            console.log(content, 'ddd');
             var cp_status = {
                 breadcrumbs: self.action_manager && self.action_manager.get_breadcrumbs(),
                 // cp_content: _.extend({}, self.searchview_elements, {}),
@@ -78,7 +76,8 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                 valign: "middle",
                 halign: "center",
                 align: "center",
-                class: 'department'
+                class: 'department',
+                sortable: true,
 
             }, {
                 field: 'manpower',
@@ -87,6 +86,7 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                 valign: "middle",
                 halign: "center",
                 align: "center",
+                sortable: true,
 
             }];
             new Model('product.product').call('search_read', [[['can_be_expensed', '=', true]]]).then(function (records) {
