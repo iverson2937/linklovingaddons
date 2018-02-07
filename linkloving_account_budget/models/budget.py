@@ -34,7 +34,7 @@ class AccountBudget(models.Model):
 
             manpower = budget.man_power
             product_dict = {'department_id': department.name, 'manpower': manpower,
-                            'sale_target': budget.sale_target if budget.sale_target else '',
+                            'sale_target': budget.sale_target if budget.sale_target else 0,
                             'sale_expense_rate': str(
                                 round(budget.amount / budget.sale_target, 4) * 100) + "%" if budget.sale_target else '',
                             'sub_total': budget.amount}
