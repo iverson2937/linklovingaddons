@@ -156,4 +156,23 @@
     </data>
 
 
+    <record id="account.action_account_payments_bank" model="ir.actions.act_window">
+        <field name="name">Payments</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">['|',('journal_id', '=', active_id),('destination_journal_id','=',active_id)]</field>
+        <field name="view_id" ref="account.view_account_payment_tree"/>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to register a payment
+            </p>
+            <p>
+                Payments are used to register liquidity movements (send, collect or transfer money).
+                You can then process those payments by your own means or by using installed facilities.
+            </p>
+        </field>
+    </record>
+
+
 </openerp>
