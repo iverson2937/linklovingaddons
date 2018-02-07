@@ -280,26 +280,9 @@ class PurchaseOrderLine(models.Model):
         ('no', u'没有要对账的'),
         ('to invoice', u'待对账'),
         ('invoiced', u'已对账完成'),
-    ], string=u'对账单状态', compute='_get_invoiced', store=True, readonly=True, copy=False, default='no')
+    ], string=u'对账单状态', readonly=True, copy=False, default='no')
 
-    @api.depends('state', 'order_line.qty_invoiced', 'order_line.qty_received', 'order_line.product_qty')
-    def _get_invoiced(self):
-        precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
-        for order in self:
-            if order.state not in ('purchase', 'done'):
-                order.invoice_status = 'no'
-                continue
 
-            if any(float_compare(line.qty_invoiced,
-                                 line.product_qty if line.product_id.purchase_method == 'purchase' else line.qty_received,
-                                 precision_digits=precision) == -1 for line in order.order_line):
-                order.invoice_status = 'to invoice'
-            elif all(float_compare(line.qty_invoiced,
-                                   line.product_qty if line.product_id.purchase_method == 'purchase' else line.qty_received,
-                                   precision_digits=precision) >= 0 for line in order.order_line) and order.invoice_ids:
-                order.invoice_status = 'invoiced'
-            else:
-                order.invoice_status = 'no'
 
     @api.multi
     def _create_stock_moves(self, picking):
