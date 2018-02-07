@@ -125,7 +125,6 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                         valign: "middle",
                         halign: "center",
                         align: "center",
-                        formatter: formatter,
 
                     },
                     sale_expense_rate = {
