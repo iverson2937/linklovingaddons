@@ -4477,7 +4477,7 @@ class LinklovingAppApi(http.Controller):
             if not create_uid:
                 domain += [('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids)]
             work_orders = request.env['linkloving.work.order'].sudo().search(
-                domain, order='create_date desc')
+                domain, order='write_date desc')
             for order in work_orders:
                 work_order_json.append(LinklovingAppApi.convert_work_order_to_json(order))
 
@@ -4495,7 +4495,7 @@ class LinklovingAppApi(http.Controller):
         domain += [('reply_uid', '=', uid)]
         work_order_json = []
         work_orders = request.env['linkloving.work.order.record'].sudo().search(
-            domain, order='create_date desc')
+            domain, order='write_date desc')
         for order in work_orders:
             work_order_json.append(LinklovingAppApi.convert_at_me_order_to_json(order))
             if not isNumber:
@@ -4758,7 +4758,7 @@ class LinklovingAppApi(http.Controller):
         user = request.env["res.users"].sudo().browse(uid)
         work_order = request.env['linkloving.work.order'].sudo(uid).search(
             [('effective_department_ids', 'in', user.employee_ids.mapped('department_id').ids),
-             (search_type, 'ilike', search_text)])
+             (search_type, 'ilike', search_text)], order='write_date desc')
         data = []
         for order in work_order:
             data.append(LinklovingAppApi.convert_work_order_to_json(order))
