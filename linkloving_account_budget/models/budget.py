@@ -34,7 +34,9 @@ class AccountBudget(models.Model):
             budget = Budget.search([('department_id', '=', department.id)])
 
             manpower = budget.man_power
-            product_dict = {'department_id': department.name, 'manpower': manpower, 'sale_target': budget.sale_target,
+            product_dict = {'department_id': department.name, 'manpower': manpower,
+                            'sale_target': budget.sale_target if budget.sale_target else '',
+                            'sale_expense_rate': budget.amount / budget.sale_target if budget.sale_target else '',
                             'sub_total': budget.amount}
             for product in products:
                 lines = BudgetLine.search([('product_id', '=', product.id), ('department_id', '=', department.id)])

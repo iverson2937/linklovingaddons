@@ -100,9 +100,19 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                         valign: "middle",
                         halign: "center",
                         align: "center",
+                    },
+                    sale_expense_rate = {
+                        field: 'sale_expense_rate',
+                        title: '占比',
+                        colspan: 1,
+                        valign: "middle",
+                        halign: "center",
+                        align: "center",
                     }
-                row5.push(res_sub)
-                row5.push(sale_amount)
+                row5.push(res_sub);
+                row5.push(sale_amount);
+                row5.push(sale_expense_rate);
+
                 var title_row = [{
                     field: 'title',
                     title: data['company_name'] + '-生产跟踪单',
