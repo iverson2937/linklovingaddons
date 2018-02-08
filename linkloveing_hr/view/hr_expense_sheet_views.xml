@@ -134,7 +134,7 @@
                                                 icon="fa-paperclip"/>
                                         <field name="analytic_account_id" string="项目" options="{'no_create':True}"/>
                                         <field name="sale_id" string="订单" options="{'no_create':True}"/>
-                                        <field name="quantity" groups="account.group_account_user"/>
+                                        <field name="quantity" groups="account.group_account_user" invisible="1"/>
                                         <field name="tax_ids" widget="many2many_tags"/>
                                         <field name="employee_id" required="1" invisible="1"/>
                                         <field name="department_id" required="1" invisible="1"/>
