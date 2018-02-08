@@ -128,9 +128,13 @@
             <field name="model">account.payment</field>
             <field name="inherit_id" ref="account.view_account_payment_search"/>
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="attributes">
+                    <attribute name="string">单号</attribute>
+                </xpath>
                 <xpath expr="//field[@name='name']" position="after">
 
                     <field name="amount" filter_domain="[('amount','=',self)]" string="金额"/>
+                    <field name="remark" filter_domain="[('remark','ilike',self)]" string="备注"/>
                     <filter string="销售确认完成" domain="[('state','=','done')]" name="state_done"/>
                     <filter string="待销售确认" domain="[('state','=','confirm')]" name="state_confirm"/>
                 </xpath>
@@ -144,6 +148,15 @@
             <field name="model">account.payment</field>
             <field name="inherit_id" ref="account.view_account_payment_tree"/>
             <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='name']" position="attributes">
+                    <attribute name="string">单号</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='payment_method_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
 
                 <xpath expr="//field[@name='amount']" position="before">
 

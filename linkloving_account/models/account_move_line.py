@@ -18,6 +18,7 @@ from lxml import etree
 
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
+    remark = fields.Text(related='payment_id.remark')
 
     @api.multi
     def reconcile(self, writeoff_acc_id=False, writeoff_journal_id=False):

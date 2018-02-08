@@ -68,6 +68,7 @@ class AccountJournal(models.Model):
         action['domain'] = self._context.get('use_domain', [])
         if action_name == 'action_account_move_new':
             action['domain'] = [('account_id', '=', self.default_debit_account_id.id)]
+            action['context'] = {}
 
         if action_name in ['action_bank_statement_tree', 'action_view_bank_statement_tree']:
             action['views'] = False
