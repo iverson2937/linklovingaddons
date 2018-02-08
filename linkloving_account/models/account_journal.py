@@ -16,6 +16,16 @@ class AccountJournal(models.Model):
     deprecated = fields.Boolean(index=True, default=False,string=u'废弃')
 
     @api.multi
+    @api.depends('name', 'currency_id', 'company_id', 'company_id.currency_id')
+    def name_get(self):
+        res = []
+        for journal in self:
+            currency = journal.currency_id or journal.company_id.currency_id
+            name = "%s (%s) (%s)" % (journal.name, currency.name, journal.default_debit_account_id.balance)
+            res += [(journal.id, name)]
+        return res
+
+    @api.multi
     def open_action(self):
         """return action based on type for related journals"""
         action_name = self._context.get('action_name', False)

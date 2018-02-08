@@ -39,7 +39,7 @@ class AccountMoveLine(models.Model):
         if not all_accounts[0].reconcile:
             raise UserError \
                 (_('The account %s (%s) is not marked as reconciliable !') % (
-                all_accounts[0].name, all_accounts[0].code))
+                    all_accounts[0].name, all_accounts[0].code))
         # 过渡账户
         if len(partners) > 2:
             raise UserError(_('The partner has to be the same on all lines for receivable and payable accounts!'))
@@ -62,16 +62,21 @@ class AccountMoveLine(models.Model):
             return writeoff_to_reconcile
         return True
 
-
-class AccountJournalInherit(models.Model):
-    _inherit = "account.journal"
+    amount = fields.Float(compute='_compute_amount')
 
     @api.multi
-    @api.depends('name', 'currency_id', 'company_id', 'company_id.currency_id')
-    def name_get(self):
-        res = []
-        for journal in self:
-            currency = journal.currency_id or journal.company_id.currency_id
-            name = "%s (%s) (%s)" % (journal.name, currency.name, journal.default_debit_account_id.balance)
-            res += [(journal.id, name)]
+    def _compute_amount(self):
+        for move in self:
+            move.amount = move.credit if move.credit else move.debit * -1
+
+    current_balance = fields.Float()
+
+    @api.multi
+    def write(self, vals):
+        res = super(AccountMoveLine, self).write(vals)
+        if vals.get("state") == 'done':
+            for move in self:
+                if move and move.state:
+                    if move.state == 'done':
+                        move.current_balance = move.account_id.balance
         return res
