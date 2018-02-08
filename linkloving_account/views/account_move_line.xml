@@ -20,6 +20,7 @@
                     <field name="current_balance"/>
                     <field name="currency_id" readonly="True" invisible="1"/>
                     <field name="remark"/>
+                    <field name="amount1" invisible="1"/>
                     <field name="date_maturity"/>
                     <field name="company_currency_id" invisible="1"/>
                     <field name="company_id" invisible="1"/>
@@ -32,11 +33,19 @@
             <field name="model">account.move.line</field>
             <field name="inherit_id" ref="account.view_account_move_line_filter"/>
             <field name="arch" type="xml">
-               <xpath expr="//filter[@name='payable']" position="after">
-                   <field name="标签"
+                <xpath expr="//field[@name='tax_line_id']" position="replace">
+                </xpath>
+                <xpath expr="//field[@name='move_id']" position="replace">
+
+                </xpath>
+                <xpath expr="//field[@name='tax_ids']" position="replace">
+
+                </xpath>
+                <xpath expr="//field[@name='name']" position="replace">
                    <field name="remark" string="备注" filter_domain="[('payment_id.remark','ilike',self)]"/>
-                    <filter string="Customer" domain="[('partner_id.customer','=',True)]" name="customer_filter"/>
-                   <filter string="Supplier" domain="[('partner_id.supplier','=',True)]" name="vendor_filter"/>
+                    <field name="amount1" string="金额" filter_domain="[('payment_id.amount','=',self)]"/>
+                    <!--<filter string="Customer" domain="[('partner_id.customer','=',True)]" name="customer_filter"/>-->
+                    <!--<filter string="Supplier" domain="[('partner_id.supplier','=',True)]" name="vendor_filter"/>-->
                 </xpath>
             </field>
 
