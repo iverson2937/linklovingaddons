@@ -161,13 +161,13 @@
     </data>
 
 
-    <record id="account.action_account_payments_bank" model="ir.actions.act_window">
+    <record id="account.action_account_move_new" model="ir.actions.act_window">
         <field name="name">Payments</field>
-        <field name="res_model">account.payment</field>
+        <field name="res_model">account.move.line</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">['|',('journal_id', '=', active_id),('destination_journal_id','=',active_id)]</field>
-        <field name="view_id" ref="account.view_account_payment_tree"/>
+        <field name="domain">[('journal_id', '=', active_id)]</field>
+        <field name="view_id" ref="account.view_move_line_tree_new"/>
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">
                 Click to register a payment

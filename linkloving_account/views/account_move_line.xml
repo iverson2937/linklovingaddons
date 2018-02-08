@@ -2,9 +2,29 @@
 <openerp>
     <data>
 
-        <!--
-                filter account move line
-          -->
+        <record id="account.view_move_line_tree_new" model="ir.ui.view">
+            <field name="name">account.move.line.tree</field>
+            <field name="model">account.move.line</field>
+            <field eval="1" name="priority"/>
+            <field name="arch" type="xml">
+                <tree string="Journal Items" create="false">
+                    <field name="date"/>
+                    <field name="move_id" required="0"/>
+                    <field name="journal_id" options='{"no_open":True}'/>
+                    <field name="name"/>
+                    <field name="statement_id" invisible="1"/>
+                    <field name="partner_id"/>
+                    <field name="account_id" options='{"no_open":True}' domain="[('company_id', '=', company_id)]"/>
+                    <field name="reconciled" invisible="1"/>
+                    <field name="amount" string="金额"/>
+                    <field name="current_balance"/>
+                    <field name="currency_id" readonly="True" invisible="1"/>
+                    <field name="date_maturity"/>
+                    <field name="company_currency_id" invisible="1"/>
+                    <field name="company_id" invisible="1"/>
+                </tree>
+            </field>
+        </record>
 
         <record id="view_account_move_line_filter_inherit" model="ir.ui.view">
            <field name="name">account.move.line</field>

@@ -30,8 +30,9 @@ class AccountJournal(models.Model):
         """return action based on type for related journals"""
         action_name = self._context.get('action_name', False)
         if not action_name:
+            # 修改部分
             if self.type == 'bank':
-                action_name = 'action_account_payments_bank'
+                action_name = 'action_account_move_new'
             elif self.type == 'cash':
                 action_name = 'action_view_bank_statement_tree'
             elif self.type == 'sale':
@@ -65,6 +66,9 @@ class AccountJournal(models.Model):
         [action] = self.env.ref('account.%s' % action_name).read()
         action['context'] = ctx
         action['domain'] = self._context.get('use_domain', [])
+        if action_name == 'action_account_move_new':
+            action['domain'] = [('account_id', '=', self.default_debit_account_id.id)]
+
         if action_name in ['action_bank_statement_tree', 'action_view_bank_statement_tree']:
             action['views'] = False
             action['view_id'] = False

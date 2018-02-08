@@ -67,9 +67,9 @@ class AccountMoveLine(models.Model):
     @api.multi
     def _compute_amount(self):
         for move in self:
-            move.amount = move.credit if move.credit else move.debit * -1
+            move.amount = move.debit if move.debit else move.credit * -1
 
-    current_balance = fields.Float()
+    current_balance = fields.Float(string=u'当前余额')
 
     @api.multi
     def write(self, vals):
@@ -79,4 +79,17 @@ class AccountMoveLine(models.Model):
                 if move and move.state:
                     if move.state == 'done':
                         move.current_balance = move.account_id.balance
+        return res
+
+
+class AccountMove(models.Model):
+    _inherit = 'account.move'
+
+    @api.multi
+    def write(self, vals):
+        res = super(AccountMove, self).write(vals)
+        for move in self:
+            for line in move.line_ids:
+                line.current_balance = line.account_id.balance
+
         return res
