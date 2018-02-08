@@ -25,7 +25,8 @@ class AccountEmployeePayment(models.Model):
     employee_id = fields.Many2one('hr.employee',
                                   default=lambda self: self.env['hr.employee'].search([('user_id', '=', self.env.uid)],
                                                                                       limit=1))
-    payment_ids = fields.One2many('account.payment', 'res_id', domain=[('res_model', '=', 'account.employee.payment')])
+    payment_ids = fields.One2many('account.payment', 'res_id', domain=[('res_model', '=', 'account.employee.payment'),
+                                                                       ('payment_type', '=', 'outbound')])
     payment_reminding = fields.Float(related='employee_id.pre_payment_reminding')
 
     def _get_paid_amount(self):
