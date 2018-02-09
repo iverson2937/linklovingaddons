@@ -8,7 +8,6 @@ class LinkLovingBlogPost(models.Model):
     _inherit = "blog.post"
 
     tag_ids = fields.Many2one('blog.tag', string='Tags')
-
     keyword = fields.Char(string=u'关键字')
     visits = fields.Integer('No of Views', default=0)
 
