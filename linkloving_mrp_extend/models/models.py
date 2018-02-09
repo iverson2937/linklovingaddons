@@ -357,6 +357,17 @@ class MrpProductionExtend(models.Model):
     qc_feedback_ids = fields.One2many('mrp.qc.feedback', 'production_id', track_visibility='onchange')
     qty_unpost = fields.Float(string=u"已生产的数量", compute="_compute_qty_unpost")
     feedback_on_rework = fields.Many2one("mrp.qc.feedback", u"返工单", track_visibility='onchange')
+    has_produced_product = fields.Boolean(compute='_compute_has_produced_product', store=True)
+
+    @api.multi
+    @api.depends('qc_feedback_ids')
+    def _compute_has_produced_product(self):
+        for mo in self:
+            print ("3123131312131231")
+            if mo.qc_feedback_ids:
+                mo.has_produced_product = True
+            else:
+                mo.has_produced_product = False
 
     @api.multi
     def _compute_qty_unpost(self):
