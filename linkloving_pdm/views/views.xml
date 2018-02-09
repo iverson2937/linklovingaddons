@@ -127,37 +127,37 @@
         <!--</record>-->
 
 
-        <!--<record id="tag_flow_update_form" model="ir.ui.view">-->
-            <!--<field name="name">tag.flow.update form</field>-->
-            <!--<field name="model">tag.flow.update</field>-->
-            <!--<field name="arch" type="xml">-->
-                <!--<form string="">-->
+        <record id="tag_flow_update_form" model="ir.ui.view">
+            <field name="name">tag.flow.update form</field>
+            <field name="model">tag.flow.update</field>
+            <field name="arch" type="xml">
+                <form string="">
 
-                    <!--<sheet>-->
+                    <sheet>
 
-                        <!--<div class="o_row">-->
-                            <!--<span>在</span>-->
-                            <!--<field name="now_parnter_id" required="1"-->
-                                   <!--domain="[('id','in',context.get('now_parnter'))]"/>-->
-                            <!--<span>审核之后, 添加审核人</span>-->
-                            <!--<field name="add_parnter_id" required="1"-->
-                                   <!--domain="[('id','not in',context.get('add_parnter')),('employee', '=', True)]"/>-->
-                            <!--<span></span>-->
-                        <!--</div>-->
+                        <div class="o_row">
+                            <span>在</span>
+                            <field name="now_parnter_id" required="1"
+                                   domain="[('id','in',context.get('now_parnter'))]"/>
+                            <span>审核之后, 添加审核人</span>
+                            <field name="add_parnter_id" required="1"
+                                   domain="[('id','not in',context.get('add_parnter')),('employee', '=', True)]"/>
+                            <span></span>
+                        </div>
 
-                        <!--&lt;!&ndash;<field name="now_parnter_ids"/>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<field name="add_parnter_id"/>&ndash;&gt;-->
+                        <!--<field name="now_parnter_ids"/>-->
+                        <!--<field name="add_parnter_id"/>-->
 
-                    <!--</sheet>-->
+                    </sheet>
 
-                    <!--<footer>-->
-                        <!--<button string="保存" type="object" name="action_create_new_update_info" class="btn-primary"/>-->
-                        <!--<button string='取消' type="object" class='oe_link review_reload' special='cancel'/>-->
-                    <!--</footer>-->
+                    <footer>
+                        <button string="保存" type="object" name="action_create_new_update_info" class="btn-primary"/>
+                        <button string='取消' type="object" class='oe_link review_reload' special='cancel'/>
+                    </footer>
 
-                <!--</form>-->
-            <!--</field>-->
-        <!--</record>-->
+                </form>
+            </field>
+        </record>
 
 
         <record id="tag_info_form" model="ir.ui.view">
