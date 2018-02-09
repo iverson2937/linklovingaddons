@@ -315,6 +315,18 @@ class CreateOrderPointWizard(models.TransientModel):
         login_password()
         click_and_login()
 
+    def check_fiscal_year(self):
+        for ex in self.env['hr.expense.sheet'].search([]):
+            import calendar
+            date1_start, date1_end = getMonthFirstDayAndLastDay(month=1)
+            print date1_start
+            print date1_end
+            if ex.create_date < date1_start:
+                print ex.create_date
+                ex.fiscal_year_id = 1
+            else:
+                ex.fiscal_year_id = 2
+
     def compute_sale_qty(self):
         this_month = datetime.datetime.now().month
         last1_month = this_month - 1

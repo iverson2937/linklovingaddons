@@ -45,7 +45,9 @@
             <xpath expr="." position="inside">
                 <script type="text/javascript" src="/linkloving_approval/static/src/js/approval.js"/>
                 <script type="text/javascript" src="/linkloving_approval/static/src/js/approval_bom.js"/>
+
                 <link rel="stylesheet" href="/linkloving_approval/static/src/css/approval.css"/>
+                <link rel="stylesheet" href="/linkloving_approval/static/src/css/timeline.css"/>
             </xpath>
         </template>
 

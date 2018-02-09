@@ -45,6 +45,128 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             'click .outage_document_file': 'outage_document_file_fn',
 
             'click .document_yellow_dialog': 'document_yellow_fn',
+            'click .view_show_attachment_info_info': 'view_show_attachment_info_info_fn',
+
+            'click .view_show_attachment_update_info_info': 'view_show_attachment_update_info_info_fn',
+
+            'click .search_tag_type_list': 'search_tag_type_list_fn',
+
+            'click .get_more': 'get_more_toggle',
+            'click .qa-message-content': 'qa_message_content_fn'
+
+        },
+
+        //审核备注 图片 查看
+        qa_message_content_fn: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+
+            if ($(target).context.nodeName == 'IMG') {
+                if ($(target).hasClass('show_img_auto')) {
+                    $(target).removeClass('show_img_auto');
+                } else {
+                    $(target).addClass("show_img_auto");
+                }
+            }
+        },
+
+        //工程  审批流程 查看更多
+        get_more_toggle: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            if ($(target).hasClass('fa')) {
+                $(target).parents('.get_more').next().fadeToggle();
+            } else {
+                $(target).next().fadeToggle();
+            }
+        },
+
+
+        view_show_attachment_update_info_info_fn: function (e) {
+            var tar = this;
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var attachment_tsg_flow_id = parseInt($(target).attr('data-id')); // 流程id
+            var attachment_info_id = parseInt($(target).attr('data-info')); // 文件 id
+            if ($(target).attr('data-id')) {
+                new Model('product.attachment.info').call('get_attachment_update_info_form_view', [[attachment_info_id]], {
+                    'flow_id': $(target).attr('data-id'),
+                    'info_id': attachment_info_id
+                }).then(function (result) {
+
+                    var action = {
+                        name: "修改流程",
+                        type: 'ir.actions.act_window',
+                        res_model: 'tag.flow.update',
+                        view_type: 'form',
+                        view_mode: 'tree,form',
+                        views: [[false, 'form']],
+                        target: "new",
+                        context: {
+                            'add_parnter': result.add_parnter,
+                            'now_parnter': result.now_parnter,
+                            'flow_id': attachment_tsg_flow_id,
+                            'info_id': attachment_info_id,
+                        }
+                    };
+                    tar.do_action(action);
+
+                    self.$(document).ajaxComplete(function (event, xhr, settings) {
+                        if (settings.data) {
+                            var data = JSON.parse(settings.data)
+                            if (data.params.model == 'tag.flow.update') {
+                                if (data.params.method == 'action_create_new_update_info') {
+
+
+                                    var approval_type = self.$("#approval_tab").attr("data-now-tab");
+
+                                    return tar.get_datas(tar, 'product.attachment.info', approval_type);
+
+
+                                }
+                            }
+                        }
+                    })
+
+
+                });
+            }
+
+        },
+
+
+        view_show_attachment_info_info_fn: function (e) {
+            var tar = this;
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+
+            var attachment_info_id = parseInt($(target).attr('data-id'));
+
+            if ($(target).attr('data-id')) {
+                // console.log(parseInt($(target).attr('data-id')));
+
+
+                new Model('product.attachment.info').call('get_attachment_info_form_view', [[attachment_info_id], {}]).then(function (view_id) {
+
+                    var action = {
+                        name: "文件详细",
+                        type: 'ir.actions.act_window',
+                        res_model: 'product.attachment.info',
+                        view_type: 'form',
+                        view_mode: 'tree,form',
+                        views: [[view_id, 'form']],
+                        res_id: attachment_info_id,
+                        target: "new"
+                    };
+                    tar.do_action(action);
+                });
+            }
+            else {
+                console.log('我不操作')
+            }
+
+
+            // console.log($('.view_show_attachment_info_info'))
 
         },
 
@@ -106,7 +228,10 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                 view_type: 'form',
                 view_mode: 'tree,form',
                 views: [[false, 'form']],
-                target: "new"
+                target: "new",
+                context: {
+                    'default_temp_product_tmpl_ids': tar.product_view_new
+                }
             };
 
             this.do_action(action);
@@ -340,7 +465,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                 remote_path[0] = '';
             }
             console.log(remote_path)
-            if (type == 'OTHER' || type == 'DESIGN') {
+            if (type == 'TRUE') {
                 $.ajax({
                     type: "GET",
                     url: PROXY_URL + "downloadfile",// "http://localhost:8088/downloadfile?remotefile=" + remote_path,
@@ -462,6 +587,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var file_id = $(target).attr("data-id");
+            var is_first = $(target).attr("data-first");
             var is_show_action_deny = $(target).attr("data-suibian");
             var context_data;
 
@@ -486,6 +612,11 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                     'file_data_list': tar.file_checkbox
                 }
             }
+
+            context_data['new_file_style'] = true;
+            context_data['is_first'] = is_first == "true" ? true : false;
+
+            // context_data['aaaaaaaa'] = true;
 
             var action = {
                 name: "详细",
@@ -549,6 +680,9 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             self.limit = 15;
             this.approval_type = null;
             this._super.apply(this, arguments);
+
+            // this._super(parent, action);
+
             if (action.product_id) {
                 this.product_id = action.product_id;
             } else {
@@ -558,6 +692,8 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             this.pager = null;
             this.registry = core.view_registry;
             this.file_checkbox = new Array();
+
+            if (action.context.product_view_new) this.product_view_new = action.context.product_view_new;
         },
 
 
@@ -628,6 +764,23 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                 });
             });
         },
+
+        search_tag_type_list_fn: function () {
+            var self = this;
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var type_name = $(target).attr('data-id');
+
+            // var approval_type_tag = $("#approval_tab").attr("data-now-tab");
+            //
+            // console.log(approval_type_tag);
+
+            if (type_name == 'all_type')
+                self.search([], [], []);
+            else
+                self.search([[["type", "=", type_name.toLowerCase()]]], [], []);
+        },
+
         search: function (domains, contexts, groupbys) {
             var self = this;
             var own = this;
@@ -647,18 +800,28 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                             limit: own.limit,
                             domains: results.domain,
                             contexts: results.context,
-                            groupbys: results.groupby
+                            groupbys: results.groupby,
+                            product_view_new: self.product_view_new,
                         })
                             .then(function (result) {
                                 console.log(result);
                                 own.length = result.length;
                                 own.flag = 1;
-                                own.begin=1;
+                                own.begin = 1;
                                 self.$("#" + approval_type).html("");
                                 self.$("#" + approval_type).append(QWeb.render('approval_tab_content', {
                                     result: result.records,
-                                    approval_type: approval_type
+                                    approval_type: approval_type,
+                                    res_product_view_new: self.product_view_new ? true : false
                                 }));
+
+                                var tag_type_name_list = "<div data-id='all_type' class='search_tag_type_list'>全部</div>";
+
+                                for (var i in result.tag_type_lists) {
+                                    tag_type_name_list += "<div data-id='" + result.tag_type_lists[i].tag_name + "' class='search_tag_type_list " + result.tag_type_lists[i].view_tag_style + "' data-name=" + result.tag_type_lists[i].product_ax + ">" + result.tag_type_lists[i].tag_name + "<span style='float: right;'>" + result.tag_type_lists[i].tag_num + "</span></div>"
+                                }
+                                self.$(".labels_body").html("");
+                                self.$(".labels_body").append(tag_type_name_list);
                                 own.render_pager(this);
                             })
                     })
@@ -696,7 +859,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
 
         },
         render_pager: function () {
-            if (this.flag == 1) {
+            if (this.flag < 3) {
                 if ($(".approval_pagination")) {
                     $(".approval_pagination").remove()
                 }
@@ -743,6 +906,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
         get_datas: function (own, res_model, approval_type) {
             var model = new Model("approval.center");
             var self = this;
+
             model.call("create", [{res_model: res_model, type: approval_type}])
                 .then(function (result) {
                     model.call('get_attachment_info_by_type', [result], {
@@ -750,7 +914,8 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                         limit: own.limit,
                         domains: self.search_results.domain,
                         contexts: self.search_results.context,
-                        groupbys: self.search_results.groupby
+                        groupbys: self.search_results.groupby,
+                        product_view_new: self.product_view_new,
                     })
                         .then(function (result) {
                             console.log(result);
@@ -758,11 +923,22 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                             self.$("#" + approval_type).html("");
                             self.$("#" + approval_type).append(QWeb.render('approval_tab_content', {
                                 result: result.records,
-                                approval_type: approval_type
+                                // approval_type: self.product_view_new ? false : approval_type
+                                approval_type: approval_type,
+                                res_product_view_new: self.product_view_new ? true : false
                             }));
+
+                            var tag_type_name_list = "<div data-id='all_type' class='search_tag_type_list'>全部</div>";
+
+                            for (var i in result.tag_type_lists) {
+                                tag_type_name_list += "<div data-id='" + result.tag_type_lists[i].tag_name + "' class='search_tag_type_list " + result.tag_type_lists[i].view_tag_style + "' data-name=" + result.tag_type_lists[i].product_ax + ">" + result.tag_type_lists[i].tag_name + "<span style='float: right;'>" + result.tag_type_lists[i].tag_num + "</span></div>"
+                            }
+                            self.$(".labels_body").html("");
+                            self.$(".labels_body").append(tag_type_name_list);
                             own.render_pager(this);
                         })
-                })
+                });
+
 
             // var approval_type = $("#approval_tab").attr("data-now-tab");
             // if (approval_type in ['submitted', 'approval']) {
@@ -781,12 +957,25 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                 console.log(result);
                 self.approval_type = result.type.selection;
                 // console.log(self);
-                self.$el.append(QWeb.render('approval_load_detail_file', {result: result.type.selection}));
+                self.$el.append(QWeb.render('approval_load_detail_file', {
+                    result: result.type.selection,
+                    tag_type_list: result.asdd,
+                    product_view_new_s: self.product_view_new ? 1 : 0,
+
+                }));
                 self.get_default_pdm_intranet_ip(function (res) {
                     self.pdm_info = res;
                     console.log(res);
                 })
             });
+
+            // if (self.product_view_new != null) {
+            //     return self.get_datas(this, 'product.attachment.info', '');
+            // } else {
+            //
+            //     return self.get_datas(this, 'product.attachment.info', 'waiting_submit');
+            // }
+
             return self.get_datas(this, 'product.attachment.info', 'waiting_submit');
 
         }

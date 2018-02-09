@@ -84,10 +84,13 @@
                                                     <t t-esc="item_files['product_id']['name']"/>
                                                 </span>
 
-                                                <button class="btn btn-primary document_download"
-                                                        style="position: absolute;right:0;top:0;"
-                                                        t-att-data="item_files['type']">下载
-                                                </button>
+
+                                                <t t-if="item_files['is_able_to_use'] == true">
+                                                    <button class="btn btn-primary document_download"
+                                                            style="position: absolute;right:0;top:0;"
+                                                            t-att-data="item_files['type']">下载
+                                                    </button>
+                                                </t>
 
                                             </div>
                                             <div style="margin: 10px 0;">文件：
@@ -112,9 +115,9 @@
                                                 <span>
                                                     <t t-esc="item_files['state'][1]"/>
                                                 </span>
-                                                <t t-if="item_files['is_show_cancel']">
-                                                    <button class="btn btn-primary review_cancel">取消审核</button>
-                                                </t>
+                                                <!--<t t-if="item_files['is_show_cancel']">-->
+                                                    <!--<button class="btn btn-primary review_cancel">取消审核</button>-->
+                                                <!--</t>-->
                                             </div>
                                             <!--<div>创建人：<span><t t-esc="item_files.create_uid_name"/></span></div>-->
 
