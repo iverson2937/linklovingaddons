@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import base64
+import copy
 import json
 import logging
 from urllib2 import URLError
@@ -650,7 +651,8 @@ class LinklovingAppApi(http.Controller):
             'production_line_id': {
                 'production_line_id': production.production_line_id.id,
                 'name': production.production_line_id.name
-            }
+            },
+            'has_produced_product': production.has_produced_product
         }
 
     def getYesterday(self):
@@ -3978,6 +3980,7 @@ class LinklovingAppApi(http.Controller):
             domain.append(('in_charge_id', '=', partner_id))
             domain.append(('create_uid', '=', partner_id))
 
+        new_domain = None
         if request.jsonrequest.get('state'):
             if request.jsonrequest.get('state') in ('waiting_material', 'prepare_material_ing'):
                 domain.append(('state', 'in', ['waiting_material', 'prepare_material_ing']))
@@ -3985,6 +3988,10 @@ class LinklovingAppApi(http.Controller):
                 domain.append(('feedback_on_rework', '=', None))
                 domain.append(('state', '=', 'progress'))
                 domain.append(("is_secondary_produce", '=', False))
+                new_domain = copy.deepcopy(domain)
+
+                domain.append(("has_produced_product", "=", True))
+                new_domain.append(("has_produced_product", "=", False))
             elif request.jsonrequest.get('state') == 'is_secondary_produce':
                 domain.append(("is_secondary_produce", '=', True))
                 domain.append(('state', 'not in', ['done', 'cancel']))
@@ -3995,22 +4002,37 @@ class LinklovingAppApi(http.Controller):
                 domain.append(("is_secondary_produce", '=', False))
                 domain.append(('state', '=', request.jsonrequest['state']))
 
+
         if is_group_by:
+            new_group_by = []
             group_by = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(domain=domain,
                                                                                                       fields=[
                                                                                                           'origin_sale_id'],
                                                                                                       groupby=[
                                                                                                           'origin_sale_id'])
+            if new_domain:
+                new_group_by = request.env['mrp.production'].sudo(LinklovingAppApi.CURRENT_USER()).read_group(domain=new_domain,
+                                                                                                       fields=[
+                                                                                                           'origin_sale_id'],
+                                                                                                       groupby=[
+                                                                                                           'origin_sale_id'])
+
         data = []
+        #不隐藏
         for production in group_by:
-            data.append(self.get_so_production(production))
+            data.append(self.get_so_production(production, have=True))
+        # 隐藏
+        for new_production in new_group_by:
+            data.append(self.get_so_production(new_production, have=False))
+
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-    def get_so_production(self, production):
+    def get_so_production(self, production, have):
         return {
             'origin_id': production.get('origin_sale_id')[0] if production.get('origin_sale_id') else 0,
             'origin_name': production.get('origin_sale_id')[1] if production.get('origin_sale_id') else '',
-            'origin_count': production.get('origin_sale_id_count')
+            'origin_count': production.get('origin_sale_id_count'),
+            'have': have,
         }
 
     # 获取生产状态的数目
