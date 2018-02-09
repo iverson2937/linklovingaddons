@@ -31,22 +31,42 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
         },
 
         start: function () {
+
+            Number.prototype.formatMoney = function (places, symbol, thousand, decimal) {
+                places = !isNaN(places = Math.abs(places)) ? places : 2;
+                symbol = symbol !== undefined ? symbol : "￥";
+                thousand = thousand || ",";
+                decimal = decimal || ".";
+                var number = this,
+                    j,
+                    negative = number < 0 ? "-" : "",
+                    i = parseInt(number = Math.abs(+number || 0).toFixed(places), 10) + "",
+                    j = (j = i.length) > 3 ? j % 3 : 0;
+                return symbol + negative + (j ? i.substr(0, j) + thousand : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousand) + (places ? decimal + Math.abs(number - i).toFixed(places).slice(2) : "");
+            };
             var self = this;
             // this.$el.css({width: this.width});
-            var content = this.$el.parents();
-            console.log(content, 'ddd');
             var cp_status = {
                 breadcrumbs: self.action_manager && self.action_manager.get_breadcrumbs(),
                 // cp_content: _.extend({}, self.searchview_elements, {}),
             };
             self.update_control_panel(cp_status);
             var colspan_xishu = 1;
-            var formatter = function (value, row, index) {
+            var formarter_per = function (value, row, index) {
                 if (value) {
-                    return value.name;
+                    return toString(value * 100) + '%';
                 }
                 else {
                     return '';
+                }
+            };
+            var formatter = function (value, row, index) {
+                if (value) {
+                    console.log(typeof value);
+                    return value.formatMoney();
+                }
+                else {
+                    return 0;
                 }
             };
             var row5 = [{
@@ -56,7 +76,8 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                 valign: "middle",
                 halign: "center",
                 align: "center",
-                class: 'department'
+                class: 'department',
+                sortable: true,
 
             }, {
                 field: 'manpower',
@@ -65,6 +86,7 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                 valign: "middle",
                 halign: "center",
                 align: "center",
+                sortable: true,
 
             }];
             new Model('product.product').call('search_read', [[['can_be_expensed', '=', true]]]).then(function (records) {
@@ -78,6 +100,8 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                         valign: "middle",
                         halign: "center",
                         align: "center",
+                        formatter: formatter,
+
 
                     };
                     row5.push(res)
@@ -91,6 +115,7 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                         valign: "middle",
                         halign: "center",
                         align: "center",
+                        formatter: formatter,
 
                     },
                     sale_amount = {
@@ -100,6 +125,8 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                         valign: "middle",
                         halign: "center",
                         align: "center",
+                        formatter: formatter,
+
                     },
                     sale_expense_rate = {
                         field: 'sale_expense_rate',
@@ -108,6 +135,7 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                         valign: "middle",
                         halign: "center",
                         align: "center",
+
                     }
                 row5.push(res_sub);
                 row5.push(sale_amount);
@@ -272,12 +300,13 @@ odoo.define('linkloving_account_budget.account_budget_report', function (require
                     sub_total += datas[j][update_coloums[i]['field']]
                 }
                 if (sub_total == 0) {
-                    sub_total = ''
+                    sub_total = ' '
                 }
-                dict[update_coloums[i]['field']] = sub_total
+                dict[update_coloums[i]['field']] = parseInt(sub_total)
 
             }
             dict['department_id'] = '';
+            dict['sale_expense_rate'] = '';
             datas.push(dict);
 
             return {

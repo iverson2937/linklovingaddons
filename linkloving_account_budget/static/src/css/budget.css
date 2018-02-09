@@ -2,11 +2,6 @@
     overflow: scroll;
 }
 
-.fixed-table-container thead th .th-inner .department {
-    padding: 8px 36px;
-    line-height: 24px;
-    vertical-align: top;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.department > div {
+    padding: 5px 45px;
 }

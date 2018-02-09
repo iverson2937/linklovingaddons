@@ -128,9 +128,13 @@
             <field name="model">account.payment</field>
             <field name="inherit_id" ref="account.view_account_payment_search"/>
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="attributes">
+                    <attribute name="string">单号</attribute>
+                </xpath>
                 <xpath expr="//field[@name='name']" position="after">
 
                     <field name="amount" filter_domain="[('amount','=',self)]" string="金额"/>
+                    <field name="remark" filter_domain="[('remark','ilike',self)]" string="备注"/>
                     <filter string="销售确认完成" domain="[('state','=','done')]" name="state_done"/>
                     <filter string="待销售确认" domain="[('state','=','confirm')]" name="state_confirm"/>
                 </xpath>
@@ -144,6 +148,20 @@
             <field name="model">account.payment</field>
             <field name="inherit_id" ref="account.view_account_payment_tree"/>
             <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='name']" position="attributes">
+                    <attribute name="string">单号</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='payment_method_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+
+                <xpath expr="//field[@name='amount']" position="before">
+
+                    <field name="payment_type"/>
+                </xpath>
                 <xpath expr="//field[@name='company_id']" position="after">
 
                     <field name="remark"/>
@@ -154,6 +172,25 @@
 
 
     </data>
+
+
+    <record id="account.action_account_move_new" model="ir.actions.act_window">
+        <field name="name">Payments</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('journal_id', '=', active_id)]</field>
+        <field name="view_id" ref="account.view_move_line_tree_new"/>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to register a payment
+            </p>
+            <p>
+                Payments are used to register liquidity movements (send, collect or transfer money).
+                You can then process those payments by your own means or by using installed facilities.
+            </p>
+        </field>
+    </record>
 
 
 </openerp>

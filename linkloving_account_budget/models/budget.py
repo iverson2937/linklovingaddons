@@ -26,7 +26,6 @@ class AccountBudget(models.Model):
     def get_department_budget_report(self, **kwargs):
         products = self.env['product.product'].search([('can_be_expensed', '=', True)])
         departments = self.env['hr.department'].search([('has_budget', '=', True)])
-        print departments
         BudgetLine = self.env['linkloving.account.budget.line']
         Budget = self.env['linkloving.account.budget']
         res = []
@@ -35,8 +34,9 @@ class AccountBudget(models.Model):
 
             manpower = budget.man_power
             product_dict = {'department_id': department.name, 'manpower': manpower,
-                            'sale_target': budget.sale_target if budget.sale_target else '',
-                            'sale_expense_rate': budget.amount / budget.sale_target if budget.sale_target else '',
+                            'sale_target': budget.sale_target if budget.sale_target else 0,
+                            'sale_expense_rate': str(
+                                round(budget.amount / budget.sale_target, 4) * 100) + "%" if budget.sale_target else '',
                             'sub_total': budget.amount}
             for product in products:
                 lines = BudgetLine.search([('product_id', '=', product.id), ('department_id', '=', department.id)])
