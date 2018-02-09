@@ -871,6 +871,13 @@ class ProductAttachmentInfo(models.Model):
         if len(now_exist) > 3:
             raise UserError(u"同时存在审核中 超过规定")
 
+        if vals.get('tag_type_id'):
+            if self.env['tag.info'].browse(int(vals.get('tag_type_id'))).file_size == 'gt_ten' and len(
+                    vals.get('temp_product_tmpl_ids')[0][2]) > 1:
+                raise UserError(u"此文件不支持批量上传")
+        else:
+            raise UserError(u"请选择文件类型")
+
         res = super(ProductAttachmentInfo, self).create(vals)
         return res
 
