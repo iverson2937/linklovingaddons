@@ -96,7 +96,7 @@
 
                             <field name="name" string="流程名称"/>
                             <field name="tag_approval_process" invisible="1"/>
-                            <field name="now_process_ids" invisible="1"/>
+                            <field name="now_process_ids" invisible="0"/>
 
                         </group>
 
