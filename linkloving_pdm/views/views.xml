@@ -105,7 +105,7 @@
                                 <field name="tag_approval_process_ids">
                                     <tree editable="bottom">
                                         <field name="tag_approval_process_partner"
-                                               domain="[('employee', '=', True),('tag_approval_process_partner','not in',now_process_ids)]"
+                                               domain="[('employee', '=', True)]"
                                                string="审核人"
                                         />
 
