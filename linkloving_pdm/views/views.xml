@@ -96,7 +96,7 @@
 
                             <field name="name" string="流程名称"/>
                             <field name="tag_approval_process" invisible="1"/>
-                            <field name="now_process_ids"/>
+                            <field name="now_process_ids" invisible="1"/>
 
                         </group>
 
@@ -345,7 +345,7 @@
                                 <!--<page string="审批流程">-->
                                 <!--<field name="tag_approval_process" domain="[('employee', '=', True)]"/>-->
                                 <!--</page>-->
-                                <page string="审批流程002">
+                                <page string="审批流程">
                                     <field name="tag_approval_process_ids" mode="tree,kanban">
                                         <form string="审批流程">
                                             <group>

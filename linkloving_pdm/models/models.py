@@ -1057,7 +1057,7 @@ class TagProductAttachmentInfo(models.Model):
     def name_get(self):
         res = []
         for self_one in self:
-            name_conent = self_one.name + '     ('
+            name_conent = self_one.name if self_one.name else ' ' + '     ('
             for tag_line_one in self_one.tag_approval_process_ids:
                 name_conent += tag_line_one.tag_approval_process_partner.name + '->'
             res.append((self_one.id, name_conent + ')'))
