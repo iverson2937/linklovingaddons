@@ -2,61 +2,61 @@
 
 <templates xml:space="preserve">
 
-    <t t-name="mail.ChatThread">
-        <t t-if="messages.length">
-            <t t-if="options.display_load_more &amp;&amp; options.display_order == ORDER.ASC"
-               t-call="mail.ChatThread.LoadMore"/>
-            <t t-call="mail.ChatThread.Content"/>
-            <t t-if="options.display_load_more &amp;&amp; options.display_order == ORDER.DESC"
-               t-call="mail.ChatThread.LoadMore"/>
-        </t>
-        <t t-if="options.display_empty_channel">
-            <t t-call="mail.EmptyChannel" />
-        </t>
-        <div t-if="options.display_no_match" class="o_mail_no_content">
-            <div class="o_thread_title">No matches found</div>
-            <div>No message matches your search. Try to change your search filters.</div>
-        </div>
-    </t>
+    <!--<t t-name="mail.ChatThread">-->
+        <!--<t t-if="messages.length">-->
+            <!--<t t-if="options.display_load_more &amp;&amp; options.display_order == ORDER.ASC"-->
+               <!--t-call="mail.ChatThread.LoadMore"/>-->
+            <!--<t t-call="mail.ChatThread.Content"/>-->
+            <!--<t t-if="options.display_load_more &amp;&amp; options.display_order == ORDER.DESC"-->
+               <!--t-call="mail.ChatThread.LoadMore"/>-->
+        <!--</t>-->
+        <!--<t t-if="options.display_empty_channel">-->
+            <!--<t t-call="mail.EmptyChannel" />-->
+        <!--</t>-->
+        <!--<div t-if="options.display_no_match" class="o_mail_no_content">-->
+            <!--<div class="o_thread_title">No matches found</div>-->
+            <!--<div>No message matches your search. Try to change your search filters.</div>-->
+        <!--</div>-->
+    <!--</t>-->
 
 
-    <t t-name="mail.ChatThread.LoadMore">
-        <div t-if="!all_messages_loaded" class="o_thread_show_more">
-            <button class="btn btn-sm btn-link">-------- Show older messages111111111111111 --------</button>
-        </div>
-    </t>
+    <!--<t t-name="mail.ChatThread.LoadMore">-->
+        <!--<div t-if="!all_messages_loaded" class="o_thread_show_more">-->
+            <!--<button class="btn btn-sm btn-link">&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45; Show older messages111111111111111 &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</button>-->
+        <!--</div>-->
+    <!--</t>-->
 
-    <t t-name="mail.ChatThread.Content">
+    <!--<t t-name="mail.ChatThread.Content">-->
 
-        <t t-if="options.messages_separator_position == 'top'" t-call="mail.MessagesSeparator"/>
-        <t t-set="current_day" t-value="0"/>
-        <t t-foreach="messages" t-as="message">
-            <div t-if="current_day != message.day" class="o_thread_date_separator">
-                <span class="o_thread_date">
-                    <t t-esc="message.day"/>
-                </span>
-                <t t-set="current_day" t-value="message.day"/>
-            </div>
+        <!--<t t-if="options.messages_separator_position == 'top'" t-call="mail.MessagesSeparator"/>-->
+        <!--<t t-set="current_day" t-value="0"/>-->
+        <!--<t t-foreach="messages" t-as="message">-->
+            <!--<div t-if="current_day != message.day" class="o_thread_date_separator">-->
+                <!--<span class="o_thread_date">-->
+                    <!--<t t-esc="message.day"/>-->
+                <!--</span>-->
+                <!--<t t-set="current_day" t-value="message.day"/>-->
+            <!--</div>-->
 
-            <t t-call="mail.ChatThread.Message"/>
-        </t>
-    </t>
+            <!--<t t-call="mail.ChatThread.Message"/>-->
+        <!--</t>-->
+    <!--</t>-->
 
 
-    <!-- Client Action -->
-    <t t-name="mail.client_action">
-        <div class="o_mail_chat">
-            <!--<div class="o_mail_chat_sidebar"/>-->
-            <div class="o_mail_chat_content">
-                <!--<t t-if="widget.notification_bar">-->
-                <!--<div class="o_mail_annoying_notification_bar">-->
-                <!--<span class="o_mail_request_permission">Odoo needs your permission to <a href="#"> enable desktop notifications</a>.</span>-->
-                <!--<span class="fa fa-close"></span>-->
-                <!--</div>-->
-                <!--</t>-->
-            </div>
-        </div>
-    </t>
+    <!--&lt;!&ndash; Client Action &ndash;&gt;-->
+    <!--<t t-name="mail.client_action">-->
+        <!--<div class="o_mail_chat">-->
+            <!--&lt;!&ndash;<div class="o_mail_chat_sidebar"/>&ndash;&gt;-->
+            <!--<div class="o_mail_chat_content">-->
+                <!--&lt;!&ndash;<t t-if="widget.notification_bar">&ndash;&gt;-->
+                <!--&lt;!&ndash;<div class="o_mail_annoying_notification_bar">&ndash;&gt;-->
+                <!--&lt;!&ndash;<span class="o_mail_request_permission">Odoo needs your permission to <a href="#"> enable desktop notifications</a>.</span>&ndash;&gt;-->
+                <!--&lt;!&ndash;<span class="fa fa-close"></span>&ndash;&gt;-->
+                <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                <!--&lt;!&ndash;</t>&ndash;&gt;-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</t>-->
 
 
     <!--<t t-name="mail.chat.Sidebar">-->
