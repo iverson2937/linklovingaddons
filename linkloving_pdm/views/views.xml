@@ -202,7 +202,7 @@
 
                             <field name="type" class="this_my_type" invisible="1"/>
                             <field name="tag_upload_file" invisible="1"/>
-                            <field name="tag_type_id"/>
+                            <field name="tag_type_id" options="{'no_create': True}"/>
                             <field name="tag_type_flow_id"/>
                         </group>
                         <group>
@@ -271,7 +271,7 @@
                             <field name="temp_product_tmpl_ids" widget="many2many_tags" options="{'no_create': True}"/>
                             <field name="type" class="this_my_type_file" invisible="1"/>
                             <field name="tag_upload_file" invisible="1"/>
-                            <field name="tag_type_id"/>
+                            <field name="tag_type_id" options="{'no_create': True}"/>
                             <field name="tag_type_flow_id"/>
                             <field name="flow_version" invisible="1"/>
                         </group>

@@ -36,12 +36,18 @@ class LinklovingApproval(http.Controller):
             fields=ATTACHINFO_FIELD)
         attach_list = []
         for atta in version_data_list:
-            attach_list.append(request.env['product.attachment.info'].sudo().convert_attachment_info(atta))
+            list_atta = request.env['product.attachment.info'].sudo().convert_attachment_info(atta)
+            temp_review_line = list_atta['review_line']
+            temp_review_line.reverse()
+            list_atta['review_line'] = temp_review_line
+
+            attach_list.append(list_atta)
 
         for attach_one in attach_list:
             for review_line_one in attach_one.get('review_line'):
                 review_line_one['title'] = '备注:' + str(review_line_one.get('remark')) + ',审核结果：' + str(
-                    review_line_one.get('state')[1] if review_line_one else '') + '，时间：' + str(review_line_one.get('create_date'))
+                    review_line_one.get('state')[1] if review_line_one else '') + '，时间：' + str(
+                    review_line_one.get('create_date'))
         values = {
             'attach_list': attach_list,
         }

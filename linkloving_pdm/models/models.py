@@ -229,14 +229,15 @@ class ReviewProcessLine(models.Model):
             # 'remark': remark
             # 'remark_content': remark,
         })
-        if '<p' in remark:
-            self.write({
-                'remark_content': remark,
-            })
-        else:
-            self.write({
-                'remark': remark
-            })
+        if remark:
+            if '<p' in remark:
+                self.write({
+                    'remark_content': remark,
+                })
+            else:
+                self.write({
+                    'remark': remark
+                })
 
         # 新建一个 审核条目 指向下一个审核人员
         self.env["review.process.line"].create({
@@ -450,15 +451,15 @@ class ReviewProcessLine(models.Model):
                 'review_time': fields.datetime.now(),
                 'state': 'review_success',
             })
-
-            if '<p' in remark:
-                self.write({
-                    'remark_content': remark,
-                })
-            else:
-                self.write({
-                    'remark': remark
-                })
+            if remark:
+                if '<p' in remark:
+                    self.write({
+                        'remark_content': remark,
+                    })
+                else:
+                    self.write({
+                        'remark': remark
+                    })
 
             if review_type == 'file_review':
                 # if self.review_id.product_line_ids.type == 'design':
@@ -1070,6 +1071,8 @@ class TagProductAttachmentInfo(models.Model):
             flow_data = self.env['tag.flow.info'].search([('name', '=', vals.get('name'))])
             if len(flow_data) > 0:
                 raise UserError('审核流名称 ' + vals.get('name') + ' 已存在')
+        if not vals.get('tag_approval_process_ids'):
+            raise UserError('审核流不能为空，请添加审核人')
 
         res = super(TagProductAttachmentInfo, self).create(vals)
         return res

@@ -814,6 +814,14 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                                     approval_type: approval_type,
                                     res_product_view_new: self.product_view_new ? true : false
                                 }));
+
+                                var tag_type_name_list = "<div data-id='all_type' class='search_tag_type_list'>全部</div>";
+
+                                for (var i in result.tag_type_lists) {
+                                    tag_type_name_list += "<div data-id='" + result.tag_type_lists[i].tag_name + "' class='search_tag_type_list " + result.tag_type_lists[i].view_tag_style + "' data-name=" + result.tag_type_lists[i].product_ax + ">" + result.tag_type_lists[i].tag_name + "<span style='float: right;'>" + result.tag_type_lists[i].tag_num + "</span></div>"
+                                }
+                                self.$(".labels_body").html("");
+                                self.$(".labels_body").append(tag_type_name_list);
                                 own.render_pager(this);
                             })
                     })

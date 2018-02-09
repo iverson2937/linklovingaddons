@@ -168,7 +168,8 @@ class ApprovalCenter(models.TransientModel):
 
             if product_view_new:
                 tag_num = len(
-                    self.env['product.attachment.info'].search([("type", "=", tag_info_one.name.lower())] + domain))
+                    self.env['product.attachment.info'].search(
+                        [("type", "=", tag_info_one.name.lower())] + domain))
             else:
                 if self.type == 'waiting_submit':
                     domain_tag = [('create_uid', '=', self.env.user.id),
@@ -198,7 +199,7 @@ class ApprovalCenter(models.TransientModel):
                     #               ('partner_id', '=', self.env.user.partner_id.id), ('review_order_seq', '!=', 1)]
 
                 tag_num = len(self.env['product.attachment.info'].search(
-                    expression.AND([[("type", "=", tag_info_one.name.lower())], domain_tag])))
+                    expression.AND([[("type", "=", tag_info_one.name.lower())], domain_tag + domain_my])))
 
             tag_info_list.append({'tag_name': tag_info_one.name, 'tag_num': tag_num,
                                   'view_tag_style': 'view_text_style_down' if tag_num == 0 else 'view_text_style_now',
