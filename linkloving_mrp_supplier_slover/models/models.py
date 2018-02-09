@@ -118,15 +118,16 @@ class linkloving_procurement_order(models.Model):
                 supplier = suppliers[0]
             partner = supplier.name
 
-            gpo = procurement.rule_id.group_propagation_option
-            group = (gpo == 'fixed' and procurement.rule_id.group_id) or \
-                    (gpo == 'propagate' and procurement.group_id) or False
+            # gpo = procurement.rule_id.group_propagation_option
+            # group = (gpo == 'fixed' and procurement.rule_id.group_id) or \
+            #         (gpo == 'propagate' and procurement.group_id) or False
             domain = (
                 ('partner_id', '=', partner.id),
                 ('state', '=', 'make_by_mrp'),
                 ('picking_type_id', '=', procurement.rule_id.picking_type_id.id),
                 ('company_id', '=', procurement.company_id.id),
-                ('dest_address_id', '=', procurement.partner_dest_id.id))
+                # ('dest_address_id', '=', procurement.partner_dest_id.id)
+            )
             if combine_rule == 'same_supplier_origin':
                 domain += (('origin', '=', self.origin),)
             # if group:
