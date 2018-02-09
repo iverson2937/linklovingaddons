@@ -446,7 +446,7 @@
                                    domain="[('id','!=',cur_partner_id),('employee', '=', True)]"/>
 
 
-                            <field name="remark" invisible="context.get('new_file_style')"/>
+                            <field name="remark"  invisible="context.get('new_file_style')"/>
 
                             <field name="remark_content" widget="html" options="{'style-inline': true}" string="备注"
                                    invisible="not context.get('new_file_style')"/>
