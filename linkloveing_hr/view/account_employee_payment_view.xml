@@ -16,7 +16,7 @@
                                 attrs="{'invisible': [('can_return', '=', False)]}"/>
                         <button name="submit" class="oe_highlight" states="draft" string="Post" type="object"/>
 
-
+                        <button name="submit" class="oe_highlight" states="cancel" string="重新提交" type="object"/>
                         <button name="manager1_approve" class="oe_highlight" string="Approve"
                                 attrs="{'invisible':['|',('is_show','=',False),('state','!=','confirm')]}"
                                 type="object"
