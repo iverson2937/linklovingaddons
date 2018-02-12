@@ -73,8 +73,10 @@
                                 <field name="department_id" string="Department" invisible="1"/>
                                 <field name="to_approve_id" string="Waiting Approve By" readonly="1"
                                        attrs="{'invisible': [('to_approve_id', '=', False)]}"/>
-                                <field name="amount" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                                <field name="remark" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="amount" required="1"
+                                       attrs="{'readonly': [('state', 'not in', ['draft','cancel'])]}"/>
+                                <field name="remark" required="1"
+                                       attrs="{'readonly': [('state', 'not in', ['draft','cancel'])]}"/>
                             </group>
                             <group>
                                 <field name="apply_date" attrs="{'readonly': [('state', '!=', 'draft')]}"
