@@ -58,8 +58,6 @@ class StockMove(models.Model):
         acc_valuation = accounts_data.get('stock_valuation', False)
         if acc_valuation:
             acc_valuation = acc_valuation.id
-        if self.picking_type_id == self.env.ref('stock.picking_type_in'):
-            acc_valuation = accounts_data['stock_material_in'].id
         if not accounts_data.get('stock_journal', False):
             raise UserError(_(
                 'You don\'t have any stock journal defined on your product category, check if you have installed a chart of accounts'))
