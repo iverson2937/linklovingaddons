@@ -14,5 +14,4 @@ class ProductTemplate(models.Model):
         """
         accounts = super(ProductTemplate, self).get_product_accounts(fiscal_pos=fiscal_pos)
         accounts.update({'stock_account': self.categ_id.property_stock_invoice_account_id or False})
-        accounts.update({'stock_material_in': self.categ_id.property_stock_material_in_account_id or False})
         return accounts
