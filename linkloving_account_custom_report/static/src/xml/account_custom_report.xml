@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <templates xml:space="preserve">
-    <t t-name="BudgetReport">
+    <t t-name="AccountCustomReport">
         <div class="sub_company_top">
             <table id="table">
             </table>

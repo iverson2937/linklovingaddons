@@ -11,8 +11,8 @@ odoo.define('linkloving_account_custom_report.account_budget_report', function (
     var ControlPanelMixin = require('web.ControlPanelMixin');
     var pyeval = require('web.pyeval');
     var QWeb = core.qweb;
-    var SubCompanyReport = Widget.extend(ControlPanelMixin, {
-        template: "BudgetReport",
+    var AccountCustomReport = Widget.extend(ControlPanelMixin, {
+        template: "AccountCustomReport",
         events: {},
         init: function (parent, action) {
             this._super(parent);
@@ -20,30 +20,10 @@ odoo.define('linkloving_account_custom_report.account_budget_report', function (
             if (parent && parent.action_stack.length > 0) {
                 this.action_manager = parent.action_stack[0].widget.action_manager
             }
-            if (action && action.context && action.context["sub_company_order_track"]) {
-                this.sub_company_order_track = true;
-                this.so_id = action.context["so_id"];
-            }
-            if (action && action.params) {
-                this.so_id = action.params["active_id"];
-                this.sub_company_order_track = true;
-            }
         },
 
         start: function () {
 
-            Number.prototype.formatMoney = function (places, symbol, thousand, decimal) {
-                places = !isNaN(places = Math.abs(places)) ? places : 2;
-                symbol = symbol !== undefined ? symbol : "￥";
-                thousand = thousand || ",";
-                decimal = decimal || ".";
-                var number = this,
-                    j,
-                    negative = number < 0 ? "-" : "",
-                    i = parseInt(number = Math.abs(+number || 0).toFixed(places), 10) + "",
-                    j = (j = i.length) > 3 ? j % 3 : 0;
-                return symbol + negative + (j ? i.substr(0, j) + thousand : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousand) + (places ? decimal + Math.abs(number - i).toFixed(places).slice(2) : "");
-            };
             var self = this;
             // this.$el.css({width: this.width});
             var cp_status = {
@@ -360,9 +340,9 @@ odoo.define('linkloving_account_custom_report.account_budget_report', function (
 
     });
 
-    core.action_registry.add('account_budget_report', SubCompanyReport);
+    core.action_registry.add('account_custom_report', AccountCustomReport);
 
-    return SubCompanyReport;
+    return AccountCustomReport;
 
 
 });
