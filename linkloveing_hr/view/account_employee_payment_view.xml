@@ -103,8 +103,9 @@
                             <page string='Return records' attrs="{'invisible':[('return_count','=',0)]}">
                                 <field name="return_ids">
                                     <tree create="0">
-                                        <field name="create_uid" string="Created By"/>
-                                        <field name="create_date" string="Return Date"/>
+                                        <field name="display_name"/>
+                                        <field name="payment_date"/>
+                                        <field name="journal_id"/>
                                         <field name="amount" sum="总计"/>
                                     </tree>
                                 </field>
