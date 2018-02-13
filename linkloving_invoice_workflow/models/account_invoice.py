@@ -45,6 +45,15 @@ class AccountInvoice(models.Model):
                 invoice.po_id = po.id if po else None
 
     po_id = fields.Many2one('purchase.order', compute=_get_po_number)
+
+    @api.multi
+    def _get_so_number(self):
+        for invoice in self:
+            if invoice.origin:
+                so = invoice.env['sale.order'].sudo().search([('name', '=', invoice.origin)])
+                invoice.so_id = so.id if so else None
+
+    so_id = fields.Many2one('sale.order', compute=_get_so_number)
     order_line = fields.One2many('purchase.order.line', related='po_id.order_line')
     deduct_amount = fields.Float(string=u'扣款')
     remark = fields.Text(string=u'备注')
