@@ -6,7 +6,7 @@ from odoo.exceptions import ValidationError, UserError
 
 
 class VisitPartner(models.Model):
-    _name = 'visit.partner'
+    _name = "visit.partner"
 
     name = fields.Char(u'表格记录人')
     team_id = fields.Many2one('crm.team', u'销售团队')
@@ -22,7 +22,7 @@ class VisitPartner(models.Model):
     partner_contact_way = fields.Char(u'QQ/Email', require=True)
     partner_state = fields.Char(u'状态', require=True)
     visit_target = fields.Char(u'拜访目标', require=True)
-    partner_img_ids = fields.Many2many('ir.attachment', u'客户名片照片', require=True)
+    partner_img_ids = fields.Many2many('ir.attachment', string=u'客户名片照片', require=True)
 
     content_description = fields.Text(u'沟通内容', require=True)
     summary = fields.Text(u'总结', require=True)
