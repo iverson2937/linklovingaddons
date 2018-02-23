@@ -463,14 +463,17 @@ class ReviewProcessLine(models.Model):
 
             if review_type == 'file_review':
                 # if self.review_id.product_line_ids.type == 'design':
-                if self.review_id:
-                    if self.review_id.product_line_ids.type == 'design':
-                        self.send_all_msg(remark, 'pass', material_requests_id, bom_id)
-                    else:
-                        self.send_chat_msg(self.review_id.product_line_ids.create_uid.partner_id, remark, 'pass',
-                                           material_requests_id, bom_id)
-                else:
-                    self.send_all_msg(remark, 'pass', material_requests_id, bom_id)
+
+                self.send_all_msg(remark, 'pass', material_requests_id, bom_id)
+
+                # if self.review_id:
+                #     if self.review_id.product_line_ids.type == 'design':
+                #         self.send_all_msg(remark, 'pass', material_requests_id, bom_id)
+                #     else:
+                #         self.send_chat_msg(self.review_id.product_line_ids.create_uid.partner_id, remark, 'pass',
+                #                            material_requests_id, bom_id)
+                # else:
+                #     self.send_all_msg(remark, 'pass', material_requests_id, bom_id)
             elif review_type == 'bom_review':
                 self.send_chat_msg(bom_id.create_uid.partner_id, remark, 'pass',
                                    material_requests_id, bom_id)
@@ -1130,9 +1133,9 @@ class TagFlowUpdate(models.TransientModel):
             new_name = new_flow.name
 
         new_flow.write(
-                {'name': new_name + ' 副本' + str(product_attachment.flow_version), 'tag_approval_process_ids': (
-                    [(0, 0, {'tag_id': new_flow.id, 'tag_approval_process_partner': p}) for p in all_flow_parnter]),
-                 'is_copy': True})
+            {'name': new_name + ' 副本' + str(product_attachment.flow_version), 'tag_approval_process_ids': (
+                [(0, 0, {'tag_id': new_flow.id, 'tag_approval_process_partner': p}) for p in all_flow_parnter]),
+             'is_copy': True})
 
         product_attachment.write({'tag_type_flow_id': new_flow.id, 'flow_version': product_attachment.flow_version + 1})
 
@@ -1207,8 +1210,8 @@ class ProductTemplateExtend(models.Model):
 
     def convert_attendment_info_list(self, type):
         files = self.env["product.attachment.info"].search_read(
-                [("type", "=", type.lower()), ("product_tmpl_id", '=', self.id)], order='version desc',
-                fields=ATTACHINFO_FIELD)
+            [("type", "=", type.lower()), ("product_tmpl_id", '=', self.id)], order='version desc',
+            fields=ATTACHINFO_FIELD)
         json_list = []
         for a_file in files:
             json_list.append(self.env['product.attachment.info'].convert_attachment_info(a_file))
@@ -1415,14 +1418,14 @@ class ReviewProcessWizard(models.TransientModel):
                             review_type=review_type,
                             to_last_review=to_last_review,
 
-                                partner_id=info_one.tag_type_flow_id.tag_approval_process_ids[
-                                    info_one.now_flow_partner_id].tag_approval_process_partner,
+                            partner_id=info_one.tag_type_flow_id.tag_approval_process_ids[
+                                info_one.now_flow_partner_id].tag_approval_process_partner,
 
-                                remark=self.remark_content, material_requests_id=self.material_requests_id,
-                                bom_id=self.bom_id)
+                            remark=self.remark_content, material_requests_id=self.material_requests_id,
+                            bom_id=self.bom_id)
                         info_one.now_flow_partner_id += 1
                     else:
-                        print '是最后一个人 通过 后发布'
+                        print '是最后一个人 通过 后发布22'
                         # self.action_pass()
                         info_one.action_released()
                         info_one.review_id.process_line_review_now.action_pass(self.remark, self.material_requests_id,
@@ -1439,12 +1442,12 @@ class ReviewProcessWizard(models.TransientModel):
                 self.product_attachment_info_id.review_id.process_line_review_now.submit_to_next_reviewer(
                     review_type=review_type,
                     to_last_review=to_last_review,
-                        partner_id=self.product_attachment_info_id.tag_type_flow_id.tag_approval_process_ids[
-                            self.product_attachment_info_id.now_flow_partner_id].tag_approval_process_partner,
-                        remark=self.remark_content, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
+                    partner_id=self.product_attachment_info_id.tag_type_flow_id.tag_approval_process_ids[
+                        self.product_attachment_info_id.now_flow_partner_id].tag_approval_process_partner,
+                    remark=self.remark_content, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
                 self.product_attachment_info_id.now_flow_partner_id += 1
             else:
-                print '是最后一个人 通过 后发布'
+                print '是最后一个人 通过 后发布1111'
 
                 self.action_pass()
 
