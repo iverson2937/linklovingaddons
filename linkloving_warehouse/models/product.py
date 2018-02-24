@@ -24,7 +24,8 @@
 ##############################################################################
 import calendar
 import datetime
-
+import logging
+_logger = logging.getLogger(__name__)
 from odoo import api
 from odoo import fields, models, _
 from odoo.exceptions import UserError
@@ -403,6 +404,13 @@ class ProductTemplate(models.Model):
                 [('product_id', 'in', updated.mapped('product_variant_ids').ids)])
             for line in bom_line_ids:
                 line.product_uom_id = vals['uom_id']
+
+            done_moves = self.env['stock.move'].search(
+                [('product_id', 'in', updated.mapped('product_variant_ids').ids)], limit=1)
+            print done_moves,'************************************************'
+
+
+
 
         return super(ProductTemplate, self).write(vals)
 
