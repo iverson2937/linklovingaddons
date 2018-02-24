@@ -936,6 +936,9 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                             self.$(".labels_body").html("");
                             self.$(".labels_body").append(tag_type_name_list);
                             own.render_pager(this);
+                            $('.o_breadcrumb_full').removeClass('o_hidden');
+                            $('.o_breadcrumb_full .o_cp_left').addClass('o_hidden');
+                            $('.o_breadcrumb_full .o_cp_right').addClass('o_hidden');
                         })
                 });
 
