@@ -871,13 +871,14 @@ class ProductAttachmentInfo(models.Model):
         if (vals.get("file_binary") or vals.get("remote_path")):
             vals['state'] = 'waiting_release'
 
-        now_exist = self.search(
-            [('product_tmpl_id', '=', int(vals.get('product_tmpl_id')) if vals.get('product_tmpl_id') else None),
-             ('state', 'not in', ('cancel', 'released')), ('type', '=', vals.get('type'))])
-        if len(now_exist) > 3:
-            raise UserError(u"同时存在审核中 超过规定")
+        if vals.get('product_tmpl_id'):
+            now_exist = self.search(
+                [('product_tmpl_id', '=', int(vals.get('product_tmpl_id'))),
+                 ('state', 'not in', ('cancel', 'released')), ('type', '=', vals.get('type'))])
+            if len(now_exist) > 3:
+                raise UserError(u"同时存在审核中 超过规定")
 
-        if vals.get('tag_type_id'):
+        if vals.get('tag_type_id') and vals.get('temp_product_tmpl_ids'):
             if self.env['tag.info'].browse(int(vals.get('tag_type_id'))).file_size == 'gt_ten' and len(
                     vals.get('temp_product_tmpl_ids')[0][2]) > 1:
                 raise UserError(u"此文件不支持批量上传")
