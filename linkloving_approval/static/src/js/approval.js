@@ -765,7 +765,7 @@ odoo.define('linkloving_approval.approval_core', function (require) {
             });
         },
 
-        search_tag_type_list_fn: function () {
+        search_tag_type_list_fn: function (e) {
             var self = this;
             var e = e || window.event;
             var target = e.target || e.srcElement;
