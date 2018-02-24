@@ -5,7 +5,9 @@ import base64
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
 import re
+import logging
 
+_logger = logging.getLogger(__name__)
 # class linkloving_pdm(models.Model):
 #     _name = 'linkloving_pdm.linkloving_pdm'
 
@@ -92,7 +94,7 @@ class ReviewProcess(models.Model):
             is_released = True
         for line in sorted_line:
             view_text_style = 'view_text_style_now' if line.review_order_seq == len(
-                    sorted_line) else 'view_text_style_down'
+                sorted_line) else 'view_text_style_down'
 
             if is_released and line.review_order_seq == len(sorted_line):
                 view_text_style = 'view_text_style_down'
@@ -835,35 +837,39 @@ class ProductAttachmentInfo(models.Model):
     def action_create_many_info(self):
         print self.temp_product_tmpl_ids
 
-        for tmpl_id in self.temp_product_tmpl_ids:
-            print tmpl_id
-            # raise UserError("meishi")
+        try:
+            for tmpl_id in self.temp_product_tmpl_ids:
+                print tmpl_id
+                # raise UserError("meishi")
 
-            Model = self.env['product.attachment.info']
+                Model = self.env['product.attachment.info']
 
-            # product_one = self.copy()
-            # product_one['product_tmpl_id'] = tmpl_id.id
+                # product_one = self.copy()
+                # product_one['product_tmpl_id'] = tmpl_id.id
 
-            val = {'file_name': self.file_name,
-                   'file_binary': self.file_binary,
-                   'remote_path': self.remote_path,
+                val = {'file_name': self.file_name,
+                       'file_binary': self.file_binary,
+                       'remote_path': self.remote_path,
 
-                   'remark': self.remark,
-                   'tag_type_id': self.tag_type_id.id,
-                   'tag_type_flow_id': self.tag_type_flow_id.id,
+                       'remark': self.remark,
+                       'tag_type_id': self.tag_type_id.id,
+                       'tag_type_flow_id': self.tag_type_flow_id.id,
 
-                   'state': 'waiting_release',
-                   'product_tmpl_id': tmpl_id.id,
-                   'type': self.type,
-                   'version': Model.with_context(
-                       {"product_id": int(tmpl_id.id), "type": self.type})._default_version(),
-                   }
+                       'state': 'waiting_release',
+                       'product_tmpl_id': tmpl_id.id,
+                       'type': self.type,
+                       'version': Model.with_context(
+                           {"product_id": int(tmpl_id.id), "type": self.type})._default_version(),
+                       }
 
-            attach = Model.create(val)
-            filename = attach.get_download_filename()
-            attach.file_name = filename
+                attach = Model.create(val)
+                filename = attach.get_download_filename()
+                attach.file_name = filename
         # self.unlink()
-        self.search([('product_tmpl_id', '=', None)]).unlink()
+        except:
+            _logger.info("创建文件审核有误")
+        finally:
+            self.search([('product_tmpl_id', '=', None)]).unlink()
         return True
 
     @api.model
