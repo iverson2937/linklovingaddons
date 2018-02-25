@@ -406,7 +406,9 @@ class ProductTemplate(models.Model):
                 line.product_uom_id = vals['uom_id']
 
             done_moves = self.env['stock.move'].search(
-                [('product_id', 'in', updated.mapped('product_variant_ids').ids)], limit=1)
+                [('product_id', 'in', updated.mapped('product_variant_ids').ids)])
+            for move in done_moves:
+                move.product_uom=vals['uom_id']
             print done_moves,'************************************************'
 
 
