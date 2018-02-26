@@ -654,8 +654,14 @@ class ProductAttachmentInfo(models.Model):
 
     def default_version(self):
         res_id = self._context.get("product_id")
-        p = self.env["product.tmplate"].browse(res_id)
-        return {'version': self._default_version(),
+        is_update = self._context.get("is_update")
+        p = self.env["product.template"].browse(res_id)
+        version_num = self._default_version()
+
+        if is_update == 'false':
+            version_num -= 1
+
+        return {'version': version_num,
                 'default_code': p.default_code}
 
     def _default_version(self):
@@ -1110,6 +1116,7 @@ class TagProductAttachmentInfoLine(models.Model):
     tag_approval_process_partner = fields.Many2one('res.partner', string=u'审批流程')
     tag_id = fields.Many2one('tag.flow.info')
     name = fields.Char('')
+    sequence = fields.Integer('Sequence', default=1, help='Gives the sequence order when displaying a product list')
 
     review_type = fields.Selection([('review_none', u'未审核'), ('review_ing', u'审核中'), ('review_ok', u'已审核')],
                                    string=u'审核人状态', default="review_none")
