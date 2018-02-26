@@ -110,6 +110,8 @@ class ProductTemplate(models.Model):
                     level = True
 
                 product_cost = line.product_id.pre_cost_cal(raise_exception=False)
+                print line.id
+                print line.product_qty
                 total_cost = product_cost * line.product_qty
                 product_material_cost = line.product_id.get_material_cost()
                 material_cost = product_material_cost * line.product_qty
