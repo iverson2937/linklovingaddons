@@ -798,6 +798,7 @@ class MrpProductionExtend(models.Model):
                                  'production_id': move.production_id.id,
                                  'raw_material_production_id': move.raw_material_production_id.id,
                                  'procurement_id': move.procurement_id.id or False,
+                                 'product_uom': move.product_id.uom_id.id,
                                  'is_over_picking': True})
                     move.production_id.move_raw_ids = move.production_id.move_raw_ids + new_move
                     move.over_picking_qty = 0
