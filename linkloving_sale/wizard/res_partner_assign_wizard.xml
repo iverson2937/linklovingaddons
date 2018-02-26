@@ -7,8 +7,8 @@
             <field name="name">res.partner.assign.wizard.form</field>
             <field name="model">res.partner.assign.wizard</field>
             <field name="arch" type="xml">
-                <form string="选择业务员">
-                    <field name="user_id" options="{'no_create':True}"/>
+                <form string="选择销售员">
+                    <field name="user_id" options="{'no_create':True}" required="1"/>
                     <footer>
                         <button string="确定" name="action_apply" type="object" default_focus="1"
                                 class="btn-primary"/>
@@ -19,11 +19,19 @@
         </record>
 
 
-        <act_window id="action_assign_res_partner"
+        <act_window id="action_assign_res_partner_sale"
                     multi="True"
-                    key2="client_action_multi" name="选择业务员"
+                    key2="client_action_multi" name="选择销售员"
+                    context="{'sale':True}"
                     res_model="res.partner.assign.wizard" src_model="res.partner"
                     view_mode="form" target="new" view_type="form"/>
+        <act_window id="action_assign_res_partner_purchase"
+                    multi="True"
+                    key2="client_action_multi" name="选择采购负责人"
+                    context="{'purchase':True}"
+                    res_model="res.partner.assign.wizard" src_model="res.partner"
+                    view_mode="form" target="new" view_type="form"/>
+
 
     </data>
 </openerp>
