@@ -1131,6 +1131,8 @@ class TagProductAttachmentInfoLine(models.Model):
 
     @api.model
     def create(self, vals):
+        if not vals.get('tag_approval_process_partner'):
+            raise UserError('序号为 ' + str(vals.get('sequence')) + '审核人为空，请添加审核人')
         res = super(TagProductAttachmentInfoLine, self).create(vals)
         return res
 
