@@ -9,7 +9,7 @@ class VisitPartner(models.Model):
     _name = "visit.partner"
 
     name = fields.Char(u'表格记录人')
-    team_id = fields.Many2one('crm.team', u'销售团队')
+    team_id = fields.Char(u'销售团队')
     partner_name = fields.Char(u'客户名称', require=True)
     partner_address = fields.Char(u'客户地址', require=True)
     partner_channel = fields.Char(u'客户渠道', require=True)
