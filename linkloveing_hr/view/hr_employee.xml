@@ -20,7 +20,7 @@
                             <field name="signature" widget="image"/>
                         </group>
                         <group>
-
+                            <field name="purchase_signature" widget="image"/>
                         </group>
 
 

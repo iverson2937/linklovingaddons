@@ -92,6 +92,7 @@ class ApprovalCenter(models.TransientModel):
 
     def get_attachment_info_by_type(self, offset, limit, **kwargs):
         domain_my = kwargs.get("domains") or []
+        is_project_search_type = True if str(domain_my).find("'type") == -1 else False
         domain_my += [('product_tmpl_id', '!=', None)]
 
         product_view_new = kwargs.get('product_view_new')
@@ -198,8 +199,13 @@ class ApprovalCenter(models.TransientModel):
                     # domain_tag = [("state", 'not in', ['waiting_review', 'review_canceled']),
                     #               ('partner_id', '=', self.env.user.partner_id.id), ('review_order_seq', '!=', 1)]
 
+                if is_project_search_type:
+                    num_domain = domain_tag + domain_my
+                else:
+                    num_domain = domain_tag
+
                 tag_num = len(self.env['product.attachment.info'].search(
-                    expression.AND([[("type", "=", tag_info_one.name.lower())], domain_tag + domain_my])))
+                    expression.AND([[("type", "=", tag_info_one.name.lower())], num_domain])))
 
             tag_info_list.append({'tag_name': tag_info_one.name, 'tag_num': tag_num,
                                   'view_tag_style': 'view_text_style_down' if tag_num == 0 else 'view_text_style_now',
