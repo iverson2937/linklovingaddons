@@ -781,6 +781,7 @@ class ProductAttachmentInfo(models.Model):
             self.tag_upload_file = True
         else:
             self.tag_upload_file = False
+        self.file_name = ''
 
     @api.multi
     def get_attachment_info_form_view(self):
@@ -926,9 +927,14 @@ class ProductAttachmentInfo(models.Model):
             else:
                 file_ext = ''
             if self.state != 'released':
-                vals['file_name'] = 'Unrelease_' + self.type.upper() + '_' + dc + '_v' + str(self.version) + file_ext
+                vals['file_name'] = 'Unrelease_' + (
+                    vals.get('type').upper() if vals.get('type') else self.type.upper()) + '_' + dc + '_v' + str(
+                    self.version) + file_ext
             else:
                 vals['file_name'] = self.type.upper() + '_' + dc + '_v' + str(self.version) + file_ext
+        if vals.get('type'):
+            if self.env['tag.info'].search([('name', '=', vals.get('type').upper())]).file_size == 'lt_ten':
+                vals['remote_path'] = ''
 
         super_res = super(ProductAttachmentInfo, self).write(vals)
 
@@ -1063,7 +1069,7 @@ class TagProductFlowInfo(models.Model):
 class TagProductAttachmentInfo(models.Model):
     _name = "tag.flow.info"
 
-    name = fields.Char(string=u'流程名称')
+    name = fields.Char(string=u'流程名称', required=True)
 
     tag_approval_process = fields.Many2many('res.partner', string=u'审批流程')
 
@@ -1072,6 +1078,8 @@ class TagProductAttachmentInfo(models.Model):
     now_process_ids = fields.Many2many('res.partner', string=u'审核人集合', copy=True)
 
     is_copy = fields.Boolean(u'是否副本', default=False)
+
+    # _sql_constraints = [('name_uniq', 'unique (name)', "流程名称必须唯一 !")]
 
     @api.onchange('tag_approval_process_ids')
     def onchange_tag_approval_process_ids(self):
@@ -1087,7 +1095,7 @@ class TagProductAttachmentInfo(models.Model):
         for self_one in self:
             name_conent = self_one.name if self_one.name else ' ' + '     ('
             for tag_line_one in self_one.tag_approval_process_ids:
-                name_conent += tag_line_one.tag_approval_process_partner.name + '->'
+                name_conent += str(tag_line_one.tag_approval_process_partner.name) + '->'
             res.append((self_one.id, name_conent + ')'))
         return res
 
