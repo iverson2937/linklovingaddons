@@ -1103,6 +1103,9 @@ class TagProductAttachmentInfo(models.Model):
     def create(self, vals):
 
         if self.name != vals.get('name'):
+            if vals.get('name').strip():
+                raise UserError('审核流名称不能为空!')
+
             flow_data = self.env['tag.flow.info'].search([('name', '=', vals.get('name'))])
             if len(flow_data) > 0:
                 raise UserError('审核流名称 ' + vals.get('name') + ' 已存在')
