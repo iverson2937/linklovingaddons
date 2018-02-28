@@ -658,8 +658,8 @@ class ProductAttachmentInfo(models.Model):
         p = self.env["product.template"].browse(res_id)
         version_num = self._default_version()
 
-        if is_update == 'false':
-            version_num -= 1
+        if is_update == 'false' and self.version > 0:
+            version_num = self.version
 
         return {'version': version_num,
                 'default_code': p.default_code}

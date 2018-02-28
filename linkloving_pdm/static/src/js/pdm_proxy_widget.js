@@ -61,11 +61,12 @@ odoo.define('linkloving_pdm.pdm_proxy_widget', function (require) {
                             var product_id = Object.keys(default_codes_dict)[0];
 
 
-                            new Model("product.attachment.info").call('default_version', [parseInt(product_id)], {
+                            new Model("product.attachment.info").call('default_version', [self.view.options.action.res_id], {
                                 context: {
                                     "product_id": parseInt(product_id),
                                     type: cur_type,
-                                    'is_update': self.view.fields.temp_product_tmpl_ids ? 'true' : 'false'
+                                    'is_update': self.view.fields.temp_product_tmpl_ids ? 'true' : 'false',
+                                    'attachment_info_id': self.view.options.action.res_id,
                                 }
                             }).then(function (ret) {
 
@@ -88,7 +89,7 @@ odoo.define('linkloving_pdm.pdm_proxy_widget', function (require) {
                                     },
                                     error: function (error) {
                                         framework.unblockUI();
-                                        Dialog.alert(e.target, "上传失败,请打开代理软件");
+                                        Dialog.alert(e, "上传失败,请打开代理软件");
                                         console.log(error);
                                     }
                                 });
@@ -97,12 +98,12 @@ odoo.define('linkloving_pdm.pdm_proxy_widget', function (require) {
                     }
                     else {
                         framework.unblockUI();
-                        Dialog.alert(e.target, "请打开代理软件!");
+                        Dialog.alert(e, "请打开代理软件!");
                     }
                 },
                 error: function (error) {
                     framework.unblockUI();
-                    Dialog.alert(e.target, "上传失败,请打开代理软件");
+                    Dialog.alert(e, "上传失败,请打开代理软件");
                     console.log(error);
                 }
             });
