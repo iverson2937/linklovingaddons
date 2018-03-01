@@ -3683,8 +3683,16 @@ class LinklovingAppApi(http.Controller):
         invoice_number = request.jsonrequest.get("invoice_number")
         origin = request.jsonrequest.get("origin")
         amount = request.jsonrequest.get("amount")
+
+        domain = []
+        if invoice_number:
+            domain.append(('move_name', 'ilike', invoice_number))
+        if origin:
+            domain.append(('origin', 'ilike', origin))
+        if amount:
+            domain.append(('amount_total', '=', amount))
         # d
-        invoices = request.env['account.invoice'].sudo().search([('move_name', 'ilike', invoice_number),('origin', 'ilike', origin),('amount_total', '=', amount)])
+        invoices = request.env['account.invoice'].sudo().search(domain)
         json_list = {}
         for invoice in invoices:
             data = {
