@@ -125,10 +125,15 @@ class MaterialRequest(models.Model):
 
             if null_add and not vals.get('picking_state'):
                 for line_one in self.line_ids:
-                    if line_one.qty_available < 0 or line_one.qty_available < line_one.product_qty:
-                        raise UserError(u"库存不足： '%s' " % line_one.product_id.name)
-                    if line_one.product_qty <= 0:
-                        raise UserError(u"产品  '%s'  申请数量不能为0" % line_one.product_id.name)
+
+                    if not vals.get('qty_available'):
+                        if line_one.quantity_done > line_one.qty_available:
+                            raise UserError(u"库存不足： '%s' " % line_one.product_id.name)
+                    else:
+                        if line_one.qty_available < 0 or line_one.qty_available < line_one.product_qty:
+                            raise UserError(u"库存不足： '%s' " % line_one.product_id.name)
+                        if line_one.product_qty <= 0:
+                            raise UserError(u"产品  '%s'  申请数量不能为0" % line_one.product_id.name)
 
             if vals.get('line_ids'):
                 for bom_one in vals.get('line_ids'):
@@ -290,6 +295,15 @@ class MaterialRequest(models.Model):
     @api.multi
     def btn_click_product_out(self):
 
+        is_num = True
+
+        for one_line in self.line_ids:
+            if one_line.quantity_done > 0:
+                is_num = False
+
+        if is_num and self.line_ids:
+            raise UserError(" 领料数量不能全为 0 ,请确认!")
+
         picking_out_material = self.env['stock.picking'].create({
             'picking_type_id': self.env.ref('stock.picking_type_out').id,
             'location_id': self.env.ref('stock.stock_location_stock').id,
@@ -302,11 +316,12 @@ class MaterialRequest(models.Model):
             'partner_id': self.create_uid.partner_id.id,
             'picking_type': self.picking_type,
         })
+
         for one_line in self.line_ids:
             move = self.env['stock.move'].create({
                 'name': '工程领料',
                 'product_id': one_line.product_id.id,
-                'product_uom_qty': one_line.quantity_done if one_line.quantity_done else one_line.product_qty,
+                'product_uom_qty': one_line.quantity_done if one_line.quantity_done else 0,
                 'product_uom': one_line.product_id.uom_id.id,
                 'picking_id': picking_out_material.id,
                 'location_id': self.env.ref('stock.stock_location_stock').id,
