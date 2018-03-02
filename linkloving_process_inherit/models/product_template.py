@@ -9,6 +9,12 @@ class ProductTemplate(models.Model):
     def view_new_product_cost(self):
         return {
             "type": "ir.actions.client",
-            "tag": "action_notify",
-
+            "tag": "cost_detail_new",
+            'product_id': self.id,
         }
+
+    @api.multi
+    def get_product_cost_new(self):
+        res = []
+
+        return res

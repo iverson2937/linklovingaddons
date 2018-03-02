@@ -17,6 +17,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
         init: function (parent, action) {
             this._super(parent);
             this._super.apply(this, arguments);
+            this.product_id = action.product_id;
             if (parent && parent.action_stack.length > 0) {
                 this.action_manager = parent.action_stack[0].widget.action_manager
             }
@@ -65,9 +66,9 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
 
 
                 new Model("linkloving.account.budget")
-                    .call("get_department_budget_report", [], {})
+                    .call("get_product_cost_new", [this.product_id], {})
                     .then(function (res) {
-                        self.initTableSubCompany(res, data);
+                        self.initTableSubCompany(res);
                     })
             });
 
