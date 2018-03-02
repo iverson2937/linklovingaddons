@@ -137,10 +137,10 @@
 
                         <div class="o_row">
                             <span>在</span>
-                            <field name="now_parnter_id" required="1"
+                            <field name="now_parnter_id" required="1" options="{'no_create': True}"
                                    domain="[('id','in',context.get('now_parnter'))]"/>
                             <span>审核之后, 添加审核人</span>
-                            <field name="add_parnter_id" required="1"
+                            <field name="add_parnter_id" required="1" options="{'no_create': True}"
                                    domain="[('id','not in',context.get('add_parnter')),('employee', '=', True)]"/>
                             <span></span>
                         </div>
