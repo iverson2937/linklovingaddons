@@ -43,22 +43,24 @@ odoo.define('linkloving_pdm.pdm_proxy_widget', function (require) {
                     if (data.result == '1') {
 
                         var cur_type = self.view.fields.type.get("value");
-                        var default_codes_dict = self.view.fields.temp_product_tmpl_ids ? self.view.fields.temp_product_tmpl_ids.dataset.cache : self.view.fields.product_tmpl_id.display_value;
+                        var product_list = self.field_manager.fields['temp_product_tmpl_ids'] ? self.field_manager.fields['temp_product_tmpl_ids'].get_value() : self.field_manager.fields['file_product_tmpl_id'].get_value();
 
-                        if (Object.keys(default_codes_dict).length > 1) {
-                            // self.do_warn("警告", "此类型文件不支持批量上传");
-                            Dialog.alert(e, "警告,此类型文件不支持批量上传");
-                            return;
+                        if (self.field_manager.fields['file_product_tmpl_id']) {
+                            product_list = [['', '', [product_list]]]
                         }
-                        if (Object.keys(default_codes_dict).length < 1) {
-                            // self.do_warn("警告", "请选择产品");
+
+                        if (product_list.length < 1) {
                             Dialog.alert(e, "警告,请选择产品");
                             return;
                         }
+                        if (product_list[0][2].length > 1) {
+                            Dialog.alert(e, "警告,此类型文件不支持批量上传");
+                            return;
+                        }
 
-                        if (Object.keys(default_codes_dict).length == 1) {
+                        if (product_list[0][2].length == 1) {
 
-                            var product_id = Object.keys(default_codes_dict)[0];
+                            var product_id = product_list[0][2][0];
 
 
                             new Model("product.attachment.info").call('default_version', [self.view.options.action.res_id], {
@@ -83,8 +85,12 @@ odoo.define('linkloving_pdm.pdm_proxy_widget', function (require) {
                                         framework.unblockUI();
                                         console.log(data);
                                         if (data.result == '1') {
-                                            $(".this_my_filename").val(data.choose_file_name)
-                                            $(".this_my_remote_path").val(data.path)
+                                            // $(".this_my_filename").val(data.choose_file_name)
+                                            // $(".this_my_remote_path").val(data.path)
+                                            $('.this_my_filename').prop('readOnly', true);
+                                            $(".this_my_remote_path").prop('readOnly', true);
+                                            self.field_manager.fields['file_name'].set_value(data.choose_file_name);
+                                            self.field_manager.fields['remote_path'].set_value(data.path);
                                         }
                                     },
                                     error: function (error) {
