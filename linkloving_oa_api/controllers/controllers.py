@@ -1865,7 +1865,29 @@ class LinklovingOAApi(http.Controller):
     # 获取所有联系人
     @http.route('/linkloving_oa_api/get_all_employees', type='json', auth="none", csrf=False, cors='*')
     def get_all_employees(self, *kw):
-        employees = request.env['hr.employee'].sudo().search([], order='id asc')
+        employees = request.env['hr.employee'].sudo().search([],order='id asc')
+        data = []
+        for employee in employees:
+            data.append(self.change_employee_to_json(employee))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    # 获取联系人
+    @http.route('/linkloving_oa_api/get_employees', type='json', auth="none", csrf=False, cors='*')
+    def get_employees(self, *kw):
+        limit = request.jsonrequest.get('limit')
+        offset = request.jsonrequest.get('offset')
+        employees = request.env['hr.employee'].sudo().search([], limit=limit, offset=offset, order='id asc')
+        data = []
+        for employee in employees:
+            data.append(self.change_employee_to_json(employee))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    # 搜索联系人 /
+    @http.route('/linkloving_oa_api/search_employees', type='json', auth="none", csrf=False, cors='*')
+    def search_employees(self, *kw):
+        name = request.jsonrequest.get('name')
+        name_str = ''
+        employees = request.env['hr.employee'].sudo().search([("name_related", "ilike", name)], order='id asc')
         data = []
         for employee in employees:
             data.append(self.change_employee_to_json(employee))
