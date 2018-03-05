@@ -122,7 +122,17 @@ class MrpQcFeedbackExtend(models.Model):
     def action_post_inventory(self):
         res = super(MrpQcFeedbackExtend, self).action_post_inventory()
         if self._context.get("from_sub"):
-            if self.production_id.origin_sale_id and self.production_id.origin_sale_id.partner_id.sub_company == 'main':
+            sale_id = self.env["sale.order"]
+            if not self.production_id.origin_sale_id:
+                origin = self.production_id.origin
+                # order_name_list = []
+                # if origin:
+                #     split_by_dot = origin.split(",")  # cccc
+                #     for split in split_by_dot:
+                #         split_by_maohao = split.split(":")
+                #         order_name_list += split_by_maohao
+                sale_id = self.env["sale.order"].search([("name", "=", origin)], limit=1)
+            if sale_id and sale_id.partner_id.sub_company == 'main':
                 trans = self.env['sub.company.transfer'].create({
                     'feedback_id': self.id,
                     'product_qty': self.qty_produced,
