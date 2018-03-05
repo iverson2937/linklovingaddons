@@ -188,6 +188,7 @@
                     <t t-if="show_more">
                         <span class="a_p_spend_time">数量(完成/需求):<t t-esc="item.qty_unpost"/> / <t t-esc="item.product_qty"/></span>
                     </t>
+                    <span>理论工时(产线/总工时):<t t-esc="item.ava_spent_time"/>h/<t t-esc="item.real_theo_spent_time"/>h </span>
 
                 </div>
                 <div class="ap_item_new_add">
@@ -199,7 +200,13 @@
                             <t t-esc="item.planned_start_backup"/>
                         </t>
                     </span>
-                    <span>理论工时(产线/总工时):<t t-esc="item.ava_spent_time"/>h/<t t-esc="item.real_theo_spent_time"/>h </span>
+                    <span>源SO交期:<t t-if="item.sale_order_handle_date == false">
+                            无
+                        </t>
+                        <t t-else="">
+                            <t t-esc="item.sale_order_handle_date"/>
+                        </t>
+                       </span>
                 </div>
                 <div class="ap_item_main_center">
                     <t t-js="ctx">

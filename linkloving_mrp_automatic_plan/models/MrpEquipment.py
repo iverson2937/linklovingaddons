@@ -123,7 +123,8 @@ FIELDS = ["name", "alia_name", "product_tmpl_id", "state", "product_qty",
           "planned_start_backup", "date_planned_start", "date_planned_finished",
           'theo_spent_time', 'availability', 'product_order_type', 'production_line_id',
           'produce_speed_factor', 'theory_factor', 'real_theo_spent_time', 'ava_spent_time',
-          'prepare_material_state', 'material_state', 'last_mo_time', 'total_time', 'total_ava_time']
+          'prepare_material_state', 'material_state', 'last_mo_time', 'total_time', 'total_ava_time',
+          'sale_order_handle_date']
 
 class ProcurementOrderExtend(models.Model):
     _inherit = 'procurement.order'
