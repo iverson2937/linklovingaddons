@@ -117,6 +117,8 @@ class LinklovingCompanies(http.Controller):
                         }
                     order_line_info = line_dic.get(line.get("default_code"))
                     move_info = move_dic.get(line.get("default_code"))
+                    if not move_info:
+                        raise UserError(u'请检查子系统中对应的出货单是否正常!')
                     tmp_list.append((0, 0, {
                         'product_id': p_id.id,
                         'cancel_qty': line.get("cancel_qty"),
