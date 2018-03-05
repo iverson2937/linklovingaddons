@@ -1,59 +1,29 @@
 <odoo>
     <data>
-        <!-- explicit list view definition -->
-        <!--
-        <record model="ir.ui.view" id="linkloving_process_inherit.list">
-          <field name="name">linkloving_process_inherit list</field>
-          <field name="model">linkloving_process_inherit.linkloving_process_inherit</field>
-          <field name="arch" type="xml">
-            <tree>
-              <field name="name"/>
-              <field name="value"/>
-              <field name="value2"/>
-            </tree>
-          </field>
-        </record>
-        -->
 
-        <!-- actions opening views on models -->
-        <!--
-        <record model="ir.actions.act_window" id="linkloving_process_inherit.action_window">
-          <field name="name">linkloving_process_inherit window</field>
-          <field name="res_model">linkloving_process_inherit.linkloving_process_inherit</field>
-          <field name="view_mode">tree,form</field>
-        </record>
-        -->
+        <!-- Inherit Form View to Modify it -->
+        <record id="mrp_process_form_inherit" model="ir.ui.view">
+            <field name="name">mrp.process.form.inherit</field>
+            <field name="model">mrp.process</field>
+            <field name="inherit_id" ref="linkloving_process.mrp_process_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group" position="after">
+                    <!-- Add your fields or attributes here -->
+                    <notebook>
+                        <page string="工序动作">
+                            <field name="process_action_ids" context="{'default_process_id': active_id}">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="cost"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </xpath>
 
-        <!-- server action to the one above -->
-        <!--
-        <record model="ir.actions.server" id="linkloving_process_inherit.action_server">
-          <field name="name">linkloving_process_inherit server</field>
-          <field name="model_id" ref="model_linkloving_process_inherit_linkloving_process_inherit"/>
-          <field name="code">
-            action = {
-              "type": "ir.actions.act_window",
-              "view_mode": "tree,form",
-              "res_model": self._name,
-            }
-          </field>
+            </field>
         </record>
-        -->
 
-        <!-- Top menu item -->
-        <!--
-        <menuitem name="linkloving_process_inherit" id="linkloving_process_inherit.menu_root"/>
-        -->
-        <!-- menu categories -->
-        <!--
-        <menuitem name="Menu 1" id="linkloving_process_inherit.menu_1" parent="linkloving_process_inherit.menu_root"/>
-        <menuitem name="Menu 2" id="linkloving_process_inherit.menu_2" parent="linkloving_process_inherit.menu_root"/>
-        -->
-        <!-- actions -->
-        <!--
-        <menuitem name="List" id="linkloving_process_inherit.menu_1_list" parent="linkloving_process_inherit.menu_1"
-                  action="linkloving_process_inherit.action_window"/>
-        <menuitem name="Server to list" id="linkloving_process_inherit" parent="linkloving_process_inherit.menu_2"
-                  action="linkloving_process_inherit.action_server"/>
-        -->
+
     </data>
 </odoo>
