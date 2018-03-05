@@ -9,7 +9,7 @@ class VisitPartner(models.Model):
     _name = "visit.partner"
 
     name = fields.Char(u'表格记录人')
-    team_id = fields.Char(u'销售团队')
+    team = fields.Many2one('crm.team', u'销售团队')
     partner_name = fields.Char(u'客户名称', require=True)
     partner_address = fields.Char(u'客户地址', require=True)
     partner_channel = fields.Char(u'客户渠道', require=True)
@@ -27,10 +27,21 @@ class VisitPartner(models.Model):
     content_description = fields.Text(u'沟通内容', require=True)
     summary = fields.Text(u'总结', require=True)
 
+    visit_images = fields.One2many(comodel_name="visit.partner.image", inverse_name="visit_partner_id",
+                                  string="客户名片照片",
+                                  required=False, )
+
     @api.model
     def create(self, vals):
         begin_time_date = datetime.strptime(str(vals.get('visit_date_begin')), '%Y-%m-%d %H:%M:%S')
         end_time_date = datetime.strptime(str(vals.get('visit_date_end')), '%Y-%m-%d %H:%M:%S')
         if begin_time_date >= end_time_date:
-            raise ValidationError(u'结束时间不能大于开始时间')
+            raise ValidationError(u'结束时间不能小于开始时间')
         return super(VisitPartner, self).create(vals)
+
+class linkloving_visit_image(models.Model):
+    _name = 'visit.partner.image'
+
+    visit_image = fields.Binary(u"客户名片照片")
+
+    visit_partner_id = fields.Many2one("visit.partner", ondelete='cascade')
