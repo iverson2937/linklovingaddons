@@ -12,9 +12,7 @@ class ProductTemplate(models.Model):
             "tag": "cost_detail_new",
             'product_id': self.id,
         }
-
     @api.multi
-    def get_product_cost_new(self):
-        res = []
-
-        return res
+    def get_product_cost_detail(self):
+        if self.bom_ids:
+            return self.bom_ids[0].get_bom_cost_new()

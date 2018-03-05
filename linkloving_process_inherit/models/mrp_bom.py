@@ -8,7 +8,7 @@ class MrpBom(models.Model):
 
     cost = fields.Float(string='BOM成本', compute='_get_bom_cost')
 
-    def get_bom(self):
+    def get_bom_cost_new(self):
         res = []
         for line in self.bom_line_ids:
             res.append(self.get_bom_line(line))
