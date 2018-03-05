@@ -525,7 +525,15 @@ class PuchaseOrderEx(models.Model):
     # def _compute_status_light(self):
     #     print("do compute status_light")
     #     self.env["linkloving_mrp_automatic_plan.linkloving_mrp_automatic_plan"].cal_po_light_status(self)
+    sale_order_handle_date = fields.Datetime(string=u'源SO交期', compute='_compute_sale_order_handle_date')
 
+    @api.multi
+    def _compute_sale_order_handle_date(self):
+        for po in self:
+            group_ids = po.order_line.mapped('procurement_ids').mapped("group_id")
+            sales = self.env["sale.order"].sudo().search([('name', 'in', group_ids.mapped("name"))])
+            if sales.mapped("validity_date"):
+                po.sale_order_handle_date = min(sales.mapped("validity_date"))
 
 class SaleOrderEx(models.Model):
     _inherit = "sale.order"
@@ -564,6 +572,15 @@ class MrpProductionEx(models.Model):
                                                                 (2, '黄'),
                                                                 (1, '绿')], )
 
+    sale_order_handle_date = fields.Datetime(string=u'源SO交期', compute='_compute_sale_order_handle_date')
+
+    @api.multi
+    def _compute_sale_order_handle_date(self):
+        for mo in self:
+            group_ids = mo.procurement_ids.mapped("group_id")
+            sales = self.env["sale.order"].sudo().search([('name', 'in', group_ids.mapped("name"))])
+            if sales.mapped("validity_date"):
+                mo.sale_order_handle_date = min(sales.mapped("validity_date"))
 
 class OrderPointEx(models.Model):
     _inherit = "stock.warehouse.orderpoint"

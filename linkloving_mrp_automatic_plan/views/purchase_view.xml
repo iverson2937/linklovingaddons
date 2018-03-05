@@ -25,7 +25,10 @@
                     <field name="waiting_file"/>
                     <!-- Add your fields or attributes here -->
                 </xpath>
-
+                <xpath expr="//field[@name='handle_date']" position="after">
+                    <field name="sale_order_handle_date"/>
+                    <!-- Add your fields or attributes here -->
+                </xpath>
             </field>
         </record>
     </data>

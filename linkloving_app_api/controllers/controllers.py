@@ -4597,6 +4597,7 @@ class LinklovingAppApi(http.Controller):
         parent_id = request.jsonrequest.get("parent_id")
         uid = request.jsonrequest.get("uid")
         record_imgs = request.jsonrequest.get("record_imgs")
+        work_order = request.env['linkloving.work.order'].sudo(uid).browse(work_order_id)
 
         work_order_record_model = request.env['linkloving.work.order.record']
         work_order_record = work_order_record_model.sudo(uid).create({
@@ -4614,7 +4615,9 @@ class LinklovingAppApi(http.Controller):
                     'work_order_record_image': img,
                 })
                 work_order_record.attachments = [(4, record_img_id.id)]
-
+        work_order.sudo(work_order.create_uid.id).write({
+            "issue_state":work_order.issue_state
+        })
         if work_order_record:
             return JsonResponse.send_response(STATUS_CODE_OK)
         else:
