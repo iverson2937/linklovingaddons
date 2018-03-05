@@ -9,20 +9,34 @@ class MrpBom(models.Model):
     cost = fields.Float(string='BOM成本', compute='_get_bom_cost')
 
     def get_bom_cost_new(self):
-        res = []
-        for line in self.bom_line_ids:
-            res.append(self.get_bom_line(line))
+        result = []
+        # for line in self.bom_line_ids:
+        #     res.append(self.get_bom_line(line))
 
-        result = {
-            'bom_id': self.id,
+        res = {
+            'id': 1,
+            'pid': 0,
             'product_id': self.product_tmpl_id.id,
             'product_tmpl_id': self.product_tmpl_id.id,
             'product_specs': self.product_tmpl_id.product_specs,
             'name': self.product_tmpl_id.name_get()[0][1],
             'code': self.product_tmpl_id.default_code,
             'process_id': [self.process_id.id, self.process_id.name],
-            'bom_ids': sorted(res, key=lambda product: product['code']),
+            # 'bom_ids': sorted(res, key=lambda product: product['code']),
         }
+        res1 = {
+            'pid': 1,
+            'id': 2,
+            'product_id': self.product_tmpl_id.id,
+            'product_tmpl_id': self.product_tmpl_id.id,
+            'product_specs': self.product_tmpl_id.product_specs,
+            'name': self.product_tmpl_id.name_get()[0][1],
+            'code': self.product_tmpl_id.default_code,
+            'process_id': [self.process_id.id, self.process_id.name],
+            # 'bom_ids': sorted(res, key=lambda product: product['code']),
+        }
+        result.append(res)
+        result.append(res1)
 
         return result
 
