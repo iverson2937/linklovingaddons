@@ -118,6 +118,9 @@
 
                     <div class="item_third_line" t-att-data-id="item_files.id">
                         文件名称：<span t-att-data-id="item_files.id" class="file_name"><t t-esc="item_files.file_name"/></span>
+                        <t t-if="item_files.file_is_update">
+                            <span style="background: #e8c2bc;">已修改</span>
+                        </t>
                     </div>
                     <!--<div>审核人：<span><t t-esc="item_files.review_id"/></span></div>-->
                     <t t-if="item_files.remote_path!=''">
@@ -168,7 +171,7 @@
 
                         <t t-if="item_files.state[0] != 'released' &amp;&amp; item_files.is_product_view">
                             <t t-if="approval_type == 'waiting_submit' || approval_type == 'waiting_approval'">
-                                <button t-att-data-info="item_files.id" t-att-data-id="item_files.tag_flow_id" class="btn btn-default view_show_attachment_update_info_info">文件流程修改</button>
+                                <button t-att-data-info="item_files.id" t-att-data-id="item_files.tag_flow_id" class="btn btn-default view_show_attachment_update_info_info">添加审核人</button>
                             </t>
                         </t>
 

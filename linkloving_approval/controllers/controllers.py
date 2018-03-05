@@ -46,7 +46,7 @@ class LinklovingApproval(http.Controller):
         for attach_one in attach_list:
             for review_line_one in attach_one.get('review_line'):
                 review_line_one['title'] = '备注:' + str(review_line_one.get('remark')) + ',审核结果：' + str(
-                    review_line_one.get('state')[1] if review_line_one else '') + '，时间：' + str(
+                    review_line_one.get('state')[1] if review_line_one.get('state') != ' ' else ' ') + '，时间：' + str(
                     review_line_one.get('create_date'))
         values = {
             'attach_list': attach_list,

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "linkloving_bom_update",
+    'name': "linkloving_process_inherit",
 
     'summary': """
         Short (1 phrase/line) summary of the module's purpose, used as
@@ -20,16 +20,14 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'mrp', 'linkloving_warehouse'],
+    'depends': ['base', 'linkloving_process'],
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
+        'views/assets.xml',
         'views/views.xml',
         'views/templates.xml',
-        'views/res_partner.xml',
-        'views/product_product.xml',
-        # 'views/review_bom_wizard.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

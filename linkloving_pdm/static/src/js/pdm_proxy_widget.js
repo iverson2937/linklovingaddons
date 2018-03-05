@@ -33,9 +33,6 @@ odoo.define('linkloving_pdm.pdm_proxy_widget', function (require) {
         },
 
         request_to_proxy: function (e) {
-            framework.blockUI();
-            var e = e || window.event;
-            var target = e.target || e.srcElement;
             var self = this;
             console.log('new new new');
 
@@ -44,63 +41,75 @@ odoo.define('linkloving_pdm.pdm_proxy_widget', function (require) {
                 url: PROXY_URL,
                 success: function (data) {
                     if (data.result == '1') {
-                        // var cur_type = $("#document_tab li.active>a").attr("data");
-                        // var cur_type = 'sopp';
-
 
                         var cur_type = self.view.fields.type.get("value");
-                        var default_codes_dict = self.view.fields.temp_product_tmpl_ids ? self.view.fields.temp_product_tmpl_ids.dataset.cache : self.view.fields.product_tmpl_id.display_value;
+                        var product_list = self.field_manager.fields['temp_product_tmpl_ids'] ? self.field_manager.fields['temp_product_tmpl_ids'].get_value() : self.field_manager.fields['file_product_tmpl_id'].get_value();
 
-                        if (Object.keys(default_codes_dict).length != 1) {
-                            self.do_warn("警告", "此类型文件不支持批量上传");
+                        if (self.field_manager.fields['file_product_tmpl_id']) {
+                            product_list = [['', '', [product_list]]]
+                        }
+
+                        if (product_list.length < 1) {
+                            Dialog.alert(e, "警告,请选择产品");
+                            return;
+                        }
+                        if (product_list[0][2].length > 1) {
+                            Dialog.alert(e, "警告,此类型文件不支持批量上传");
                             return;
                         }
 
-                        var product_id = Object.keys(default_codes_dict)[0];
+                        if (product_list[0][2].length == 1) {
+
+                            var product_id = product_list[0][2][0];
 
 
-                        new Model("product.attachment.info").call('default_version', [parseInt(product_id)], {
-                            context: {
-                                "product_id": parseInt(product_id),
-                                type: cur_type,
-                                'is_update': self.view.fields.temp_product_tmpl_ids ? 'true' : 'false'
-                            }
-                        }).then(function (ret) {
-                            // var default_code = self.product_info.default_code.trim();
-                            var default_code = ret.default_code;
-                            var default_version = ret.version;
-                            var remote_file = cur_type.toUpperCase() + '/' + default_code.split('.').join('/') + '/v' + default_version +
-                                '/' + cur_type.toUpperCase() + '_' + default_code.split('.').join('_') + '_v' + default_version
-                            console.log(default_code);
-                            $.ajax({
-                                type: "GET",
-                                url: PROXY_URL + "uploadfile",//http://localhost:8088/uploadfile?id=" + this.product_id + "&remotefile=" + remote_file,
-                                data: $.extend(self.pdm_info, {id: parseInt(product_id), remotefile: remote_file}),// "http://localhost:8088/downloadfile?remotefile=" + remote_path,
-                                success: function (data) {
-                                    framework.unblockUI();
-                                    console.log(data);
-                                    if (data.result == '1') {
-                                        $(".this_my_filename").val(data.choose_file_name)
-                                        $(".this_my_remote_path").val(data.path)
-                                    }
-                                },
-                                error: function (error) {
-                                    framework.unblockUI();
-                                    Dialog.alert(e.target, "上传失败,请打开代理软件");
-                                    console.log(error);
+                            new Model("product.attachment.info").call('default_version', [self.view.options.action.res_id], {
+                                context: {
+                                    "product_id": parseInt(product_id),
+                                    type: cur_type,
+                                    'is_update': self.view.fields.temp_product_tmpl_ids ? 'true' : 'false',
+                                    'attachment_info_id': self.view.options.action.res_id,
                                 }
-                            });
-                        })
+                            }).then(function (ret) {
 
+                                var default_code = ret.default_code;
+                                var default_version = ret.version;
+                                var remote_file = cur_type.toUpperCase() + '/' + default_code.split('.').join('/') + '/v' + default_version +
+                                    '/' + cur_type.toUpperCase() + '_' + default_code.split('.').join('_') + '_v' + default_version
+                                console.log(default_code);
+                                $.ajax({
+                                    type: "GET",
+                                    url: PROXY_URL + "uploadfile",//http://localhost:8088/uploadfile?id=" + this.product_id + "&remotefile=" + remote_file,
+                                    data: $.extend(self.pdm_info, {id: parseInt(product_id), remotefile: remote_file}),// "http://localhost:8088/downloadfile?remotefile=" + remote_path,
+                                    success: function (data) {
+                                        framework.unblockUI();
+                                        console.log(data);
+                                        if (data.result == '1') {
+                                            // $(".this_my_filename").val(data.choose_file_name)
+                                            // $(".this_my_remote_path").val(data.path)
+                                            $('.this_my_filename').prop('readOnly', true);
+                                            $(".this_my_remote_path").prop('readOnly', true);
+                                            self.field_manager.fields['file_name'].set_value(data.choose_file_name);
+                                            self.field_manager.fields['remote_path'].set_value(data.path);
+                                        }
+                                    },
+                                    error: function (error) {
+                                        framework.unblockUI();
+                                        Dialog.alert(e, "上传失败,请打开代理软件");
+                                        console.log(error);
+                                    }
+                                });
+                            })
+                        }
                     }
                     else {
                         framework.unblockUI();
-                        Dialog.alert(e.target, "请打开代理软件!");
+                        Dialog.alert(e, "请打开代理软件!");
                     }
                 },
                 error: function (error) {
                     framework.unblockUI();
-                    Dialog.alert(e.target, "上传失败,请打开代理软件");
+                    Dialog.alert(e, "上传失败,请打开代理软件");
                     console.log(error);
                 }
             });

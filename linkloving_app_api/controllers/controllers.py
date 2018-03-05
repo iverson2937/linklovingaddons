@@ -3681,11 +3681,21 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/get_invoice_data', type='json', auth="none", csrf=False, cors='*')
     def get_invoice_data(self):
         invoice_number = request.jsonrequest.get("invoice_number")
+        origin = request.jsonrequest.get("origin")
+        amount = request.jsonrequest.get("amount")
+
+        domain = []
+        if invoice_number:
+            domain.append(('move_name', 'ilike', invoice_number))
+        if origin:
+            domain.append(('origin', 'ilike', origin))
+        if amount:
+            domain.append(('amount_total', '=', amount))
         # d
-        invoice = request.env['account.invoice'].sudo().search([('move_name', '=', invoice_number)])
-        jason_list = {}
-        if invoice:
-            jason_list = {
+        invoices = request.env['account.invoice'].sudo().search(domain)
+        json_list = {}
+        for invoice in invoices:
+            data = {
                 'customer': invoice.partner_id.name,
                 'user_id': invoice.user_id.name,
                 'origin': invoice.origin,
@@ -3694,11 +3704,10 @@ class LinklovingAppApi(http.Controller):
                 'amount_untaxed': invoice.amount_untaxed,
                 'line_ids': invoice.parse_invoice_line_data()
             }
-            code = STATUS_CODE_OK
-        else:
-            code = STATUS_CODE_ERROR
+            json_list.append(data)
+        code = STATUS_CODE_OK
 
-        return JsonResponse.send_response(code, res_data=jason_list)
+        return JsonResponse.send_response(code, res_data=json_list)
 
     # 获取备料列表(小幸福改的)
     @http.route('/linkloving_app_api/get_new_mrp_production', type='json', auth='none', csrf=False)
