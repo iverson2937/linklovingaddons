@@ -191,6 +191,7 @@ odoo.define('linkloving_core.product_detail', function (require) {
                         var po_length = result.po_lines.length;
                         var bom_length = result.bom_lines.length;
                         var mo_length = result.mo_ids.length;
+                        alert(mo_length)
                         self.$("#" + product_id + ">.panel-body").html(" ");
                         if (result.po_lines.length > 0) {
                             for (var i = 0; i < result.po_lines.length; i++) {
