@@ -12,7 +12,7 @@
                     <notebook>
                         <page string="工序动作">
                             <field name="process_action_ids" context="{'default_process_id': active_id}">
-                                <tree>
+                                <tree editable="bottom">
                                     <field name="name"/>
                                     <field name="cost"/>
                                 </tree>

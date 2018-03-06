@@ -11,7 +11,9 @@
         onGetNodes: function (row, data) {
             var that = this;
             var nodes = [];
+
             $.each(data, function (i, item) {
+                console.log(that.options.idField);
                 if (row[that.options.idField] === item[that.options.parentIdField]) {
                     nodes.push(item);
                 }
@@ -48,6 +50,7 @@
         var nodes = that.options.onGetNodes.apply(that, [item, data]);
         item._nodes = nodes;
         parentDom.append(_initRow.apply(that, [item, idx, data, parentDom]));
+
 
         // init sub node
         var len = nodes.length - 1;

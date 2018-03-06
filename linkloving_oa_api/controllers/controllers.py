@@ -111,7 +111,7 @@ class LinklovingOAApi(http.Controller):
         data = []
         data.append({
             'continent': (obj.continent.display_name or '') + (obj.country_id.display_name or '') + (
-                    obj.state_id.name or '') + (obj.city or '') + (obj.street2 or '') + (obj.street or ''),
+                obj.state_id.name or '') + (obj.city or '') + (obj.street2 or '') + (obj.street or ''),
         })
         return data
 
@@ -156,7 +156,7 @@ class LinklovingOAApi(http.Controller):
         }
         return data
 
-    #获取待批准的采购订单
+    # 获取待批准的采购订单
     @http.route('/linkloving_oa_api/get_to_approve_po', type='json', auth="none", csrf=False, cors='*')
     def get_to_approve_po(self, **kw):
         domain = [('state', '=', 'to approve')]
@@ -167,7 +167,7 @@ class LinklovingOAApi(http.Controller):
             json_list.append(self.po_order_to_json(po_order))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
 
-    #批准订单
+    # 批准订单
     @http.route('/linkloving_oa_api/button_approve', type='json', auth="none", csrf=False, cors='*')
     def button_approve(self, **kw):
         po_id = request.jsonrequest.get("po_id")
@@ -224,7 +224,7 @@ class LinklovingOAApi(http.Controller):
                      'qty_received': order_line.qty_received,  # 已接收数量
                      'price_tax': order_line.taxes_id.name,  # 税金
                      'shipping_rate': (
-                             order_line.qty_received * 100 / order_line.product_qty) if order_line.product_qty else 0,
+                         order_line.qty_received * 100 / order_line.product_qty) if order_line.product_qty else 0,
                      'id': order_line.order_id.product_id.id
                      }
                 )
@@ -1281,7 +1281,7 @@ class LinklovingOAApi(http.Controller):
             'country': obj.country_id.display_name or '',
             'name': obj.display_name,
             'address': (obj.country_id.display_name or '') + (obj.state_id.name or '') + (obj.city or '') + (
-                    obj.street2 or '') + (obj.street or ''),
+                obj.street2 or '') + (obj.street or ''),
             'phone': obj.phone or '',
             'crm_source': obj.crm_source_id.display_name or '',  # 来源
             'source': obj.source_id.display_name or '',  # 渠道
@@ -1865,15 +1865,37 @@ class LinklovingOAApi(http.Controller):
     # 获取所有联系人
     @http.route('/linkloving_oa_api/get_all_employees', type='json', auth="none", csrf=False, cors='*')
     def get_all_employees(self, *kw):
-        employees = request.env['hr.employee'].sudo().search([], order='id asc')
+        employees = request.env['hr.employee'].sudo().search([],order='id asc')
         data = []
         for employee in employees:
             data.append(self.change_employee_to_json(employee))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-    #获取指定部门联系人
+    # 获取联系人
+    @http.route('/linkloving_oa_api/get_employees', type='json', auth="none", csrf=False, cors='*')
+    def get_employees(self, *kw):
+        limit = request.jsonrequest.get('limit')
+        offset = request.jsonrequest.get('offset')
+        employees = request.env['hr.employee'].sudo().search([], limit=limit, offset=offset, order='id asc')
+        data = []
+        for employee in employees:
+            data.append(self.change_employee_to_json(employee))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    # 搜索联系人 /
+    @http.route('/linkloving_oa_api/search_employees', type='json', auth="none", csrf=False, cors='*')
+    def search_employees(self, *kw):
+        name = request.jsonrequest.get('name')
+        name_str = ''
+        employees = request.env['hr.employee'].sudo().search([("name_related", "ilike", name)], order='id asc')
+        data = []
+        for employee in employees:
+            data.append(self.change_employee_to_json(employee))
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    # 获取指定部门联系人
     @http.route('/linkloving_oa_api/get_department_employees', type='json', auth="none", csrf=False, cors='*')
-    def get_department_employees(self,*kw):
+    def get_department_employees(self, *kw):
         department_ids = request.jsonrequest.get('department_ids')
         employees = request.env['hr.employee'].sudo().search([("department_id", 'in', department_ids)], order='id asc')
         data = []
@@ -3472,3 +3494,162 @@ class LinklovingOAApi(http.Controller):
             elif new_state == 'draft':
                 kucun_json.unlink()
                 return JsonResponse.send_response(STATUS_CODE_OK)
+
+    @classmethod
+    def CURRENT_USER(cls, force_admin=False):
+        uid = request.jsonrequest.get("uid")
+        if uid:
+            return uid
+        if not force_admin:
+            return request.context.get("uid")
+        else:
+            return SUPERUSER_ID
+
+    odoo10 = None
+
+    # 创建销售拜访记录
+    @http.route('/linkloving_oa_api/create_visit', type='json', auth='none', csrf=False, cors='*')
+    def create_visit(self, **kw):
+        name = request.jsonrequest.get("name")
+        team_id = request.jsonrequest.get("team_id")
+        partner_name = request.jsonrequest.get("partner_name")
+        partner_address = request.jsonrequest.get("partner_address")
+        partner_channel = request.jsonrequest.get('partner_channel')
+        visit_date_begin = request.jsonrequest.get('visit_date_begin')
+        visit_date_end = request.jsonrequest.get('visit_date_end')
+        visit_name = request.jsonrequest.get('visit_name')
+        partner_phone = request.jsonrequest.get('partner_phone')
+        partner_contact_way = request.jsonrequest.get('partner_contact_way')
+        partner_state = request.jsonrequest.get('partner_state')
+        visit_target = request.jsonrequest.get('visit_target')
+        content_description = request.jsonrequest.get('content_description')
+        summary = request.jsonrequest.get('summary')
+        imageList = request.jsonrequest.get('imageList')
+        uid = request.jsonrequest.get("uid")
+
+        visit_model = request.env['visit.partner']
+        visit = visit_model.sudo(uid).create({
+            'name': name,
+            'team': team_id,
+            'partner_name': partner_name,
+            'partner_address': partner_address,
+            'partner_channel': partner_channel,
+            'visit_date_begin': visit_date_begin,
+            'visit_date_end': visit_date_end,
+            'visit_name': visit_name,
+            'partner_phone': partner_phone,
+            'partner_contact_way': partner_contact_way,
+            'partner_state': partner_state,
+            'visit_target': visit_target,
+            'content_description': content_description,
+            'summary': summary,
+        })
+        if imageList:
+            for img in imageList:
+                visit_img_id = request.env["visit.partner.image"].sudo(uid).create({
+                    'visit_partner_id': visit.id,
+                    'visit_image': img,
+                })
+                visit.visit_images = [(4, visit_img_id.id)]
+
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.changeVisit_to_json(visit))
+
+    # 根据日期获取拜访列表
+    @http.route('/linkloving_oa_api/get_visit_list', type='json', auth='none', csrf=False, cors='*')
+    def get_visit_list(self, **kw):
+        today = request.jsonrequest.get("today")
+        num = request.jsonrequest.get("num")
+        mine = request.jsonrequest.get("mine")
+        team_id = request.jsonrequest.get("team_id")
+        todayTime = request.jsonrequest.get("todayTime")
+        startTime = request.jsonrequest.get("startTime")
+        endTime = request.jsonrequest.get("endTime")
+        uid = request.jsonrequest.get("uid")
+
+        user = request.env["res.users"].sudo().browse(uid)
+        if user.tz:
+            timez = fields.datetime.now(pytz.timezone(user.tz)).tzinfo._utcoffset
+        else:
+            timez = 8 * 60 * 60
+
+        one_days_after = datetime.timedelta(days=1)
+        one_millisec_before = datetime.timedelta(milliseconds=1)  #
+        domain = []
+        domain.append(('team', '=', team_id))
+        if todayTime:
+            today_time = fields.datetime.strptime(todayTime, '%Y-%m-%d')
+            today_time = today_time - one_millisec_before  # 今天的最后一秒
+            after_day = today_time + one_days_after
+
+        if today:
+            domain.append(('visit_date_begin', '>', today_time.strftime('%Y-%m-%d %H:%M:%S')))
+            domain.append(('visit_date_begin', '<', after_day.strftime('%Y-%m-%d %H:%M:%S')))
+        else:
+            begin = fields.datetime.strptime(startTime, '%Y-%m-%d')
+            end = fields.datetime.strptime(endTime, '%Y-%m-%d')
+            end = end + one_days_after
+            end = end - one_millisec_before  # 结束日期的最后一秒
+            domain.append(('visit_date_begin', '<', end.strftime('%Y-%m-%d %H:%M:%S')))
+            domain.append(('visit_date_begin', '>', begin.strftime('%Y-%m-%d %H:%M:%S')))
+
+        if mine:
+            domain.append(('create_uid', '=', uid))
+
+        visitList = request.env['visit.partner'].sudo().search(domain)
+        visit_list = []
+        for visitBean in visitList:
+            visit_list.append(self.changeVisit_to_json(visitBean))
+
+        if num:
+            if len(visitList) == 0:
+                data = {
+                    'num': 0
+                }
+            else:
+                data = {
+                    'num': len(visitList)
+                }
+            return JsonResponse.send_response(STATUS_CODE_OK,
+                                            res_data=data)
+
+        else:
+            return JsonResponse.send_response(STATUS_CODE_OK,
+                                            res_data=visit_list)
+
+    @classmethod
+    def changeVisit_to_json(cls, visitBean):
+        user = request.env["res.users"].sudo().browse(visitBean.create_uid.id)
+        data = {
+            'user_image': LinklovingGetImageUrl.get_img_url(user.id,
+                                                            "res.users",
+                                                            "image_medium"),
+            'name': visitBean.name,
+            'team': {
+                'team_name': visitBean.team.name,
+                'team_id': visitBean.team.id
+            },
+            'partner_name': visitBean.partner_name,
+            'partner_address': visitBean.partner_address,
+            'partner_channel': visitBean.partner_channel,
+            'visit_date_begin': visitBean.visit_date_begin,
+            'visit_date_end': visitBean.visit_date_end,
+            'visit_name': visitBean.visit_name,
+            'partner_phone': visitBean.partner_phone,
+            'partner_contact_way': visitBean.partner_contact_way,
+            'partner_state': visitBean.partner_state,
+            'visit_target': visitBean.visit_target,
+            'content_description': visitBean.content_description,
+            'summary': visitBean.summary,
+            'visit_image': LinklovingOAApi.get_visit_partner_img_url(visitBean.visit_images)
+        }
+        return data
+
+    @classmethod
+    def get_visit_partner_img_url(cls, visit_id, ):
+        # DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
+        imgs = []
+        for img_id in visit_id:
+            url = '%slinkloving_app_api/get_worker_image?worker_id=%s&model=%s&field=%s' % (
+                request.httprequest.host_url, str(img_id.id), 'visit.partner.image', 'visit_image')
+            imgs.append(url)
+        return imgs
