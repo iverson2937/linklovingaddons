@@ -128,6 +128,15 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
 
             var options = self.options_init(colomns, data);
             self.$('#table').bootstrapTable(options);
+            self.$('#table').treegrid({
+                    initialState: 'collapsed',//收缩
+                    treeColumn: 0,//指明第几列数据改为树形
+                    expanderExpandedClass: 'fa fa-caret-down',
+                    expanderCollapsedClass: 'fa fa-caret-right',
+                    onChange: function() {
+                        self.$('#table').bootstrapTable('resetWidth');
+                    }
+                });
         },
 
     });
