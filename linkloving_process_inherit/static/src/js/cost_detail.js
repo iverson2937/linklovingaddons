@@ -53,6 +53,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                     {
                         field: 'process_action',
                         title: '工序动作',
+                        editable: true
                     },
                     {
                         field: 'material_cost',
@@ -108,15 +109,6 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 },
                 columns: coloums,
                 data: datas,//data.order_line,
-
-                onEditableSave: function (field, row, oldValue, $el) {
-                    console.log(row)
-                    return new Model("purchase.order")
-                        .call("write", [row.po.id, {report_remark: row.report_remark}])
-                        .then(function (result) {
-
-                        })
-                },
             }
         },
         initTableSubCompany: function (colomns, data) {
