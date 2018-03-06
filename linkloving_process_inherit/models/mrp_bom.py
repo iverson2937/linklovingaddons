@@ -116,3 +116,17 @@ class MrpBomLine(models.Model):
     def _get_sub_total_cost(self):
         for line in self:
             line.sub_total_cost = line.cost * line.product_qty
+
+    @api.one
+    def get_action_options(self):
+        domain = []
+        if self.bom_id.process_id:
+            domain = [('process_id', '=', self.bom_id.process_id.id)]
+        res = []
+        actions = self.env['mrp.process.action'].search(domain)
+        for action in actions:
+            res.append({
+                'id': action.id,
+                'name': action.name
+            })
+        return res
