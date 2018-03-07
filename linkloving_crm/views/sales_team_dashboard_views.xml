@@ -352,8 +352,10 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//field[@name='name']" position="after">
-                    <filter string="本月订单" name="this_day_new_order"
+                    <filter string="本月订单(创建时间)" name="this_day_new_order"
                             domain="[ ('create_date', 'like', context_today().strftime('%%Y-%%m'))]"/>
+                    <filter string="本月订单(交货时间)" name="this_day_new_order"
+                            domain="[ ('validity_date', 'like', context_today().strftime('%%Y-%%m'))]"/>
                     <filter string="本年订单" name="this_day_new_year"
                             domain="[ ('create_date', 'like', context_today().strftime('%%Y'))]"/>
                 </xpath>

@@ -53,6 +53,16 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                     {
                         field: 'process_action',
                         title: '工序动作',
+                        editable: {
+                            type: 'select',
+                            title: '选择工序动作',
+                            emptytext: '暂未选工序动作<i class="icon-margin fa fa-pencil"></i>',
+                            source: [{id: 'bsb', text: '篮球'},
+                                {id: 'ftb', text: '足球'},
+                                {id: 'wsm', text: '游泳'}],
+
+
+                        },
                     },
                     {
                         field: 'material_cost',
@@ -108,15 +118,6 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 },
                 columns: coloums,
                 data: datas,//data.order_line,
-
-                onEditableSave: function (field, row, oldValue, $el) {
-                    console.log(row)
-                    return new Model("purchase.order")
-                        .call("write", [row.po.id, {report_remark: row.report_remark}])
-                        .then(function (result) {
-
-                        })
-                },
             }
         },
         initTableSubCompany: function (colomns, data) {
@@ -128,6 +129,15 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
 
             var options = self.options_init(colomns, data);
             self.$('#table').bootstrapTable(options);
+            self.$('#table').treegrid({
+                initialState: 'collapsed',//收缩
+                treeColumn: 0,//指明第几列数据改为树形
+                expanderExpandedClass: 'fa fa-caret-down',
+                expanderCollapsedClass: 'fa fa-caret-right',
+                onChange: function () {
+                    self.$('#table').bootstrapTable('resetWidth');
+                }
+            });
         },
 
     });

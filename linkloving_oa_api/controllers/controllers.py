@@ -1886,7 +1886,6 @@ class LinklovingOAApi(http.Controller):
     @http.route('/linkloving_oa_api/search_employees', type='json', auth="none", csrf=False, cors='*')
     def search_employees(self, *kw):
         name = request.jsonrequest.get('name')
-        name_str = ''
         employees = request.env['hr.employee'].sudo().search([("name_related", "ilike", name)], order='id asc')
         data = []
         for employee in employees:
@@ -3515,8 +3514,10 @@ class LinklovingOAApi(http.Controller):
         partner_name = request.jsonrequest.get("partner_name")
         partner_address = request.jsonrequest.get("partner_address")
         partner_channel = request.jsonrequest.get('partner_channel')
-        visit_date_begin = request.jsonrequest.get('visit_date_begin')
-        visit_date_end = request.jsonrequest.get('visit_date_end')
+        end = request.jsonrequest.get('visit_date_end')
+        begin = request.jsonrequest.get('visit_date_begin')
+        visit_date_begin = fields.datetime.strptime(begin, '%Y-%m-%d %H:%M')
+        visit_date_end = fields.datetime.strptime(end, '%Y-%m-%d %H:%M')
         visit_name = request.jsonrequest.get('visit_name')
         partner_phone = request.jsonrequest.get('partner_phone')
         partner_contact_way = request.jsonrequest.get('partner_contact_way')
