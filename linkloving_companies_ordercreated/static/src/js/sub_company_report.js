@@ -57,6 +57,16 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
         },
         initTable: function (data) {
             var self = this;
+            //self.$('.date-red').on('click', function (ev) {
+            //    var params = self.$("#table").bootstrapTable("getOptions");
+            //    params.queryParams = function () {
+            //        return {
+            //
+            //        }
+            //    }
+            //    console.log("getOptions");
+            //    self.$("#table").bootstrapTable("refresh");
+            //});
             var formatter_func = function (value, row, index) {
                 if (value) {
                     if (value["sub_ip"]) {
@@ -170,6 +180,10 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
             return {
                 contentType: 'application/json',
                 method: 'post',
+                toolbar: '#toolbar',
+                //pagination: true,
+                //paginationLoop: true,
+                //sidePagination: 'client',
                 cache: false,
                 sortable: true,
                 showToggle: true,
@@ -205,7 +219,6 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                         .then(function (result) {
                         })
                     }
-
                 },
                 onRefresh: function () {
                     console.log('onRefresh')
