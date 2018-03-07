@@ -53,6 +53,15 @@ class LinklovingCompanies(http.Controller):
         cr = registry(db_name).cursor()
         request.env.cr = cr
 
+    @http.route('/linkloving_web/get_report', auth='none', type='json', csrf=False)
+    def get_report(self):
+        return request.env["sub.company.report"].sudo().get_report()
+
+    @http.route('/linkloving_web/get_sub_company_report', auth='none', type='json', csrf=False)
+    def get_sub_company_report(self):
+        so_id = request.jsonrequest.get("so_id")
+        return request.env["sub.company.report"].sudo().get_sub_company_report(so_id=so_id)
+
     @http.route('/linkloving_web/view_feedback_detail', auth='none', type='json', csrf=False)
     def view_feedback_detail(self):
         encode_data = request.jsonrequest.get("data")  # 加密数据
@@ -211,32 +220,22 @@ class LinklovingCompanies(http.Controller):
                 "code": -5,
                 "msg": u"%s此采购单在%s账套中找不到" % (po_name, db)
             }
-        picking_to_in = po.picking_ids.filtered(lambda x: x.state not in ["done", "cancel"])  # 对应子系统入库的单子
-        if len(picking_to_in) != 1:
-            return {
-                "code": -6,
-                "msg": u"%s此采购单出货单异常" % (po_name)
-            }
-        op_to_do = request.env["stock.pack.operation"]
-        for op in picking_to_in.pack_operation_product_ids:
-            if op.product_id.id == p_obj.id:  # 找到对应的产品
-                op_to_do = op
-                break
-        op_to_do.qty_done = product_qty
-        try:
-            confirmation = request.env["stock.backorder.confirmation"].sudo().create({
-                'pick_id': picking_to_in.id
-            })
-            if picking_to_in.state != 'assigned':
-                picking_to_in.force_assign()
-            confirmation.process()
-            picking_to_in.to_stock()
+        picking_to_in = po.picking_ids.filtered(
+            lambda x: x.state not in ["done", "cancel"] and x.picking_type_code == 'internal')  # 对应子系统入库的单子
+        if picking_to_in:
+            self.picking_tranfer_in_auto(picking_to_in, po_name, p_obj, product_qty)
             picking_to_in.write({
                 'feedback_name_from_sub': vals.get("feedback_name_from_sub"),
                 'feedback_id_from_sub': vals.get("feedback_id_from_sub")
             })
-        except Exception, e:
-            raise e
+        picking_to_in2 = po.picking_ids.filtered(
+            lambda x: x.state not in ["done", "cancel"] and x.picking_type_code == 'incoming')  # 对应子系统入库的单子
+        if picking_to_in2:
+            self.picking_tranfer_in_auto(picking_to_in2, po_name, p_obj, product_qty)
+            picking_to_in2.write({
+                'feedback_name_from_sub': vals.get("feedback_name_from_sub"),
+                'feedback_id_from_sub': vals.get("feedback_id_from_sub")
+            })
         return {
             "code": 1,
             "vals": {
@@ -244,6 +243,30 @@ class LinklovingCompanies(http.Controller):
                 'picking_name_from_main': picking_to_in.name,
             }
         }
+
+    def picking_tranfer_in_auto(self, pickings_to_do, po_name, p_obj, product_qty):
+        for picking_to_in in pickings_to_do:
+            if len(picking_to_in) != 1:
+                return {
+                    "code": -6,
+                    "msg": u"%s此采购单出货单异常" % (po_name)
+                }
+            op_to_do = request.env["stock.pack.operation"]
+            for op in picking_to_in.pack_operation_product_ids:
+                if op.product_id.id == p_obj.id:  # 找到对应的产品
+                    op_to_do = op
+                    break
+            op_to_do.qty_done = product_qty
+            try:
+                confirmation = request.env["stock.backorder.confirmation"].sudo().create({
+                    'pick_id': picking_to_in.id
+                })
+                if picking_to_in.state != 'assigned':
+                    picking_to_in.force_assign()
+                confirmation.process()
+                picking_to_in.to_stock()
+            except Exception, e:
+                raise e
 
     @http.route('/linkloving_web/precost_price', auth='none', type='json', csrf=False, methods=['POST'])
     def precost_price(self, **kw):
