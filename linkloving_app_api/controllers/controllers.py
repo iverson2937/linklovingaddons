@@ -3673,14 +3673,36 @@ class LinklovingAppApi(http.Controller):
         }
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=jason_list)
 
+    @http.route('/linkloving_app_api/get_products', type='json', auth="none", csrf=False, cors='*')
+    def get_products(self):
+        product_name = request.jsonrequest.get("product_name")
+        # db = 'diy0102'
+        # request.session.db = db  # 设置账套
+        # request.params["db"] = db
+        domain = []
+        if product_name:
+            domain.append(('name', 'ilike', product_name))
+        products = request.env['product.product'].sudo().search(domain,
+                                                                limit=10)
+        json_list = []
+        for p in products:
+            res = {
+                'id': p.id,
+                'name': p.name
+            }
+            json_list.append(res)
+        code = STATUS_CODE_OK
+
+        return JsonResponse.send_response(code, res_data=json_list)
+
     @http.route('/linkloving_app_api/get_invoice_data', type='json', auth="none", csrf=False, cors='*')
     def get_invoice_data(self):
         invoice_number = request.jsonrequest.get("invoice_number")
         origin = request.jsonrequest.get("origin")
         amount = request.jsonrequest.get("amount")
-        db = 'diy0102'
-        request.session.db = db  # 设置账套
-        request.params["db"] = db
+        # db = 'diy0102'
+        # request.session.db = db  # 设置账套
+        # request.params["db"] = db
 
         domain = []
         if invoice_number:
