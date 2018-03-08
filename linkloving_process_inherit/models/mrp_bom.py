@@ -8,8 +8,6 @@ class MrpBom(models.Model):
 
     manpower_cost = fields.Float(string='工序动作成本', compute='_get_bom_cost')
 
-
-
     def get_bom_cost_new(self):
         result = []
         # for line in self.bom_line_ids:
@@ -21,8 +19,9 @@ class MrpBom(models.Model):
         material_cost = self.product_tmpl_id.product_variant_ids[0].get_material_cost_new()
         man_cost = total_cost - material_cost
         res = {
-            'id': self.id,
+            'id': 1,
             'pid': 0,
+            'bom_id': self.id,
             'product_id': self.product_tmpl_id.id,
             'product_tmpl_id': self.product_tmpl_id.id,
             'product_specs': self.product_tmpl_id.product_specs,
@@ -67,7 +66,7 @@ class MrpBom(models.Model):
             'product_tmpl_id': line.product_id.product_tmpl_id.id,
             'id': line.id,
             'has_lines': 0 if line.child_line_ids else 1,
-            'pid': line.bom_id.id,
+            'pid': 1,
             'product_specs': line.product_id.product_specs,
             'code': line.product_id.default_code,
             'qty': line.product_qty,
@@ -86,7 +85,6 @@ class MrpBom(models.Model):
     def _get_bom_cost(self):
         for bom in self:
             bom.manpower_cost = sum(line.cost for line in bom.bom_line_ids)
-
 
 
 def _get_rec(object, parnet, result, product_type_dict):
@@ -170,6 +168,8 @@ class MrpBomLine(models.Model):
 
     @api.model
     def save_multi_changes(self, arg, **kwargs):
+        bom_id = kwargs.get('bom_id')
         for line in arg:
             bom_line_id = self.env['mrp.bom.line'].browse(line.get('id'))
             bom_line_id.action_id = self.env['mrp.process.action'].browse(line.get('process_action'))
+        return self.env['mrp.bom'].browse(int(bom_id))
