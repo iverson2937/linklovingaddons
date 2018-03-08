@@ -4019,7 +4019,7 @@ $(function(){
         */
         getTemplate: function() {
             var tpl = this.options.template;
-
+            console.log(tpl)
             //first pass
             $.each(this.map, function(k, v) {
                 v = v[0];
