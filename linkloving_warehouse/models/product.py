@@ -181,6 +181,8 @@ class ProductTemplate(models.Model):
                     date_planned_finished = u'暂无交期'
                 info_str += date_planned_finished + ' ' + (mo.name or '') + ' ' \
                             + str(mo.product_qty) + ' ' + self.parse_state(mo.state) + '\n'
+            if info_str == '':
+                info_str = u'无在产详情信息'
             p.mos_info = info_str
 
     def parse_state(self, state):
