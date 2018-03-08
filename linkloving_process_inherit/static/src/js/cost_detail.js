@@ -16,19 +16,24 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
         events: {
             'click .sel_pro ':'sel_pro_func',
             'click .confirm_sel':'confirm_sel_func',
-            'click .alia_cancel':'alia_cancel_func'
+            'click .alia_cancel':'alia_cancel_func',
+            'click .adjusttime':'sel_pro_func'
         },
         alia_cancel_func:function () {
               $('.unlock_condition').hide()
         },
         confirm_sel_func:function () {
             var self = this;
-            console.log($('.unlock_condition select option:selected').val());
             $('.fixed-table-body tr[data-index='+ self.index +']').find('.sel_pro').html($('.unlock_condition select option:selected').val());
+            self.table_data[self.index]['process_action']=$('.unlock_condition select option:selected').val();
+            if($('.unlock_condition .change_time input').val() != ''){
+                $('.fixed-table-body tr[data-index='+ self.index +']').find('.adjusttime').html($('.unlock_condition .change_time input').val());
+                self.table_data[self.index]['adjust_time'] = $('.unlock_condition .change_time input').val()
+            }
+            console.log(self.table_data);
             $('.unlock_condition').hide();
         },
         sel_pro_func:function (e) {
-            var tar = this;
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var self = this;
@@ -87,6 +92,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                     {
                         field: 'adjust_time',
                         title: '调整时间',
+                        'class':'adjusttime'
                     },
                     {
                         field: 'material_cost',
