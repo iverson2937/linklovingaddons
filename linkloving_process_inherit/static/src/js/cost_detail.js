@@ -114,8 +114,12 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                     title: '物料类型',
                 },
                     {
+                        field: 'qty',
+                        title: '配比',
+                    },
+                    {
                         field: 'process_action',
-                        title: '工序动作1',
+                        title: '工序动作',
                         'class': 'sel_pro',
                     },
                     {

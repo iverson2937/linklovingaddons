@@ -72,7 +72,7 @@ class MrpBom(models.Model):
             'code': line.product_id.default_code,
             'qty': line.product_qty,
             'material_cost': material_cost,
-            'manpower_cost': man_cost,
+            'manpower_cost': line.action_id.cost if line.action_id else '',
             'total_cost': total_cost,
             'process_id': process_id,
             'has_extra': True,
@@ -85,7 +85,8 @@ class MrpBom(models.Model):
     @api.multi
     def _get_bom_cost(self):
         for bom in self:
-            bom.cost = sum(line.cost for line in bom.bom_line_ids)
+            bom.manpower_cost = sum(line.cost for line in bom.bom_line_ids)
+
 
 
 def _get_rec(object, parnet, result, product_type_dict):
@@ -117,8 +118,9 @@ def _get_rec(object, parnet, result, product_type_dict):
             'id': l.id,
             'pid': parnet.id,
             'has_extra': l.bom_id.process_id.has_extra,
+            'action_process': l.action_id.name if l.action_id else '',
             'material_cost': material_cost,
-            'manpower_cost': man_cost,
+            'manpower_cost': l.action_id.cost if l.action_id else '',
             'total_cost': total_cost,
             'parent_id': parnet.id,
             'qty': l.product_qty,
