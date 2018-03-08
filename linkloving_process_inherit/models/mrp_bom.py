@@ -6,7 +6,9 @@ from odoo import models, fields, api
 class MrpBom(models.Model):
     _inherit = 'mrp.bom'
 
-    cost = fields.Float(string='BOM成本', compute='_get_bom_cost')
+    manpower_cost = fields.Float(string='工序动作成本', compute='_get_bom_cost')
+
+
 
     def get_bom_cost_new(self):
         result = []
@@ -15,6 +17,9 @@ class MrpBom(models.Model):
         if self.product_tmpl_id.product_ll_type:
             product_type_dict = dict(
                 self.product_tmpl_id.fields_get(['product_ll_type'])['product_ll_type']['selection'])
+        total_cost = self.product_tmpl_id.product_variant_ids[0].pre_cost_cal_new(raise_exception=False)
+        material_cost = self.product_tmpl_id.product_variant_ids[0].get_material_cost_new()
+        man_cost = total_cost - material_cost
         res = {
             'id': self.id,
             'pid': 0,
@@ -24,7 +29,10 @@ class MrpBom(models.Model):
             'name': self.product_tmpl_id.name_get()[0][1],
             'code': self.product_tmpl_id.default_code,
             'process_id': [self.process_id.id, self.process_id.name],
-            'product_type': product_type_dict[self.product_tmpl_id.product_ll_type]
+            'product_type': product_type_dict[self.product_tmpl_id.product_ll_type],
+            'material_cost': material_cost,
+            'manpower_cost': man_cost,
+            'total_cost': total_cost,
             # 'bom_ids': sorted(res, key=lambda product: product['code']),
         }
         result.append(res)
@@ -48,6 +56,12 @@ class MrpBom(models.Model):
             process_id = bom_id[0].process_id.name
         if action:
             action_id = action_id.name
+        product_cost = line.product_id.pre_cost_cal_new(raise_exception=False)
+        print product_cost, 'product_cost'
+        total_cost = product_cost * line.product_qty if product_cost else 0
+        product_material_cost = line.product_id.get_material_cost_new()
+        material_cost = product_material_cost * line.product_qty
+        man_cost = total_cost - material_cost
 
         res = {
             'name': line.product_id.name_get()[0][1],
@@ -60,6 +74,9 @@ class MrpBom(models.Model):
             'product_specs': line.product_id.product_specs,
             'code': line.product_id.default_code,
             'qty': line.product_qty,
+            'material_cost': material_cost,
+            'manpower_cost': man_cost,
+            'total_cost': total_cost,
             'process_id': process_id,
             'process_action': action_id,
         }
@@ -83,6 +100,12 @@ def _get_rec(object, parnet, result, product_type_dict):
         if bom_id:
             process_id = [bom_id[0].process_id.id, bom_id[0].process_id.name]
 
+        product_cost = object.product_id.pre_cost_cal_new(raise_exception=False)
+        total_cost = product_cost * object.product_qty if product_cost else 0
+        product_material_cost = object.product_id.get_material_cost_new()
+        material_cost = product_material_cost * object.product_qty
+        man_cost = total_cost - material_cost
+
         res = {
             'name': l.product_id.name_get()[0][1],
             'product_id': l.product_id.id,
@@ -94,8 +117,9 @@ def _get_rec(object, parnet, result, product_type_dict):
             # 'product_type': l.product_id.product_ll_type,
             'id': l.id,
             'pid': parnet.id,
-            'material_cost': '',
-            'manpower_cost': '',
+            'material_cost': material_cost,
+            'manpower_cost': man_cost,
+            'total_cost': total_cost,
             'parent_id': parnet.id,
             'qty': l.product_qty,
             'process_id': process_id,
@@ -111,17 +135,27 @@ class MrpBomLine(models.Model):
     action_id = fields.Many2one('mrp.process.action')
     cost = fields.Float(string=u'动作成本', related='action_id.cost')
     sub_total_cost = fields.Float(compute='_get_sub_total_cost')
+    adjust_time = fields.Float(string=u'调整时间')
+    adjust_cost = fields.Float(compute="_get_adjust_total_cost")
+
+    @api.multi
+    def _get_adjust_total_cost(self):
+        for line in self:
+            if line.adjust_time and line.bom_id.process_id.hourly_wage:
+                line.adjust_cost = line.bom_id.process_id.hourly_wage * line.adjust_time
+            else:
+                line.adjust_cost = 0.0
 
     @api.multi
     def _get_sub_total_cost(self):
         for line in self:
-            line.sub_total_cost = line.cost * line.product_qty
+            line.sub_total_cost = (line.cost + line.adjust_cost) * line.product_qty
 
     @api.one
     def get_action_options(self):
         domain = []
-        if self.bom_id.process_id:
-            domain = [('process_id', '=', self.bom_id.process_id.id)]
+        # if self.bom_id.process_id:
+        #     domain = [('process_id', '=', self.bom_id.process_id.id)]
         res = []
         actions = self.env['mrp.process.action'].search(domain)
         for action in actions:
@@ -130,3 +164,7 @@ class MrpBomLine(models.Model):
                 'name': action.name
             })
         return res
+
+    @api.model
+    def save_multi_changes(self, *arg, **kwargs):
+        pass

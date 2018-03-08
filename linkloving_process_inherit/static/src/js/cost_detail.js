@@ -13,7 +13,35 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
     var QWeb = core.qweb;
     var CostDetail = Widget.extend(ControlPanelMixin, {
         template: "CostDetail",
-        events: {},
+        events: {
+            'click .sel_pro ':'sel_pro_func',
+            'click .confirm_sel':'confirm_sel_func',
+            'click .alia_cancel':'alia_cancel_func'
+        },
+        alia_cancel_func:function () {
+              $('.unlock_condition').hide()
+        },
+        confirm_sel_func:function () {
+            var self = this;
+            console.log($('.unlock_condition select option:selected').val());
+            $('.fixed-table-body tr[data-index='+ self.index +']').find('.sel_pro').html($('.unlock_condition select option:selected').val());
+            $('.unlock_condition').hide();
+        },
+        sel_pro_func:function (e) {
+            var tar = this;
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var self = this;
+            var index = $(target).parents('tr').attr('data-index');
+            index = parseInt(index);
+            self.index=index;
+            new Model('mrp.bom.line').call('get_action_options',[self.table_data[index].id]).then(function (data) {
+                console.log(data);
+                $('.unlock_condition select').html('');
+                $('.unlock_condition select').append(QWeb.render('process_option_templ',{result: data}));
+                $('.unlock_condition').show()
+            })
+        },
         init: function (parent, action) {
             this._super(parent);
             this._super.apply(this, arguments);
@@ -43,26 +71,29 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             self.update_control_panel(cp_status);
             new Model('product.template').call('get_product_cost_detail', [product_id]).then(function (records) {
                 console.log(records);
+                self.table_data = records;
                 var columns = [{
-                    field: 'name',
-                    title: '名称',
-                }, {
-                    field: 'product_type',
-                    title: '物料类型',
-                },
+                        field: 'name',
+                        title: '名称',
+                    }, {
+                        field: 'product_type',
+                        title: '物料类型',
+                    },
                     {
                         field: 'process_action',
                         title: '工序动作',
-                        editable: {
-                            type: 'select',
-                            title: '选择工序动作',
-                            emptytext: '暂未选工序动作<i class="icon-margin fa fa-pencil"></i>',
-                            source: [{id: 'bsb', text: '篮球'},
-                                {id: 'ftb', text: '足球'},
-                                {id: 'wsm', text: '游泳'}],
-
-
-                        },
+                        'class': 'sel_pro',
+                        // editable: {
+                        //     type: 'select',
+                        //     // title: '选择工序动作',
+                        //     emptytext: '暂未选工序动作<i class="icon-margin fa fa-pencil"></i>',
+                        //     // mode:'inline',
+                        //     source: [{value: 'bsb', text: '篮球'},
+                        //         {value: 'ftb', text: '足球'},
+                        //         {value: 'wsm', text: '游泳'}],
+                        //
+                        //
+                        // },
                     },
                     {
                         field: 'material_cost',
@@ -118,6 +149,10 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 },
                 columns: coloums,
                 data: datas,//data.order_line,
+
+                onEditableSave: function(field, row, oldValue, $el) {
+                    console.log(row)
+                },
             }
         },
         initTableSubCompany: function (colomns, data) {

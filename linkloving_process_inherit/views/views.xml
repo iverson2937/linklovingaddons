@@ -24,6 +24,17 @@
             </field>
         </record>
 
+        <record id="action_mrp_process_action" model="ir.actions.act_window">
+            <field name="name">work.type</field>
+            <field name="res_model">mrp.process.action</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <menuitem id="menu_mrp_work_type_config" name="工序动作" parent="mrp.menu_mrp_configuration" sequence="33"
+                  action="action_mrp_process_action"/>
+
 
     </data>
 </odoo>

@@ -6,5 +6,25 @@
             <table id="table">
             </table>
         </div>
+        <div class="unlock_condition close_this_container">
+            <div class="modal-backdrop  in"></div>
+            <div class="create_wrap">
+                <div class="sel_process_wrap">
+                    <select>
+
+                    </select>
+                </div>
+                <div class="foot">
+                    <button class=" btn btn-primary confirm_sel" style="margin-left:112px">确定</button>
+                    <button class="btn btn-default alia_cancel">取消</button>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="process_option_templ">
+        <t t-foreach="result" t-as="item">
+            <option><t t-esc="item[0].name"/></option>
+        </t>
     </t>
 </templates>
