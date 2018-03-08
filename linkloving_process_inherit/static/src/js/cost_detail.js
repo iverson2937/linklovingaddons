@@ -38,7 +38,11 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 $('.fixed-table-body tr[data-index='+ self.index +']').find('.adjusttime').html($('.unlock_condition .change_time input').val());
                 self.table_data[self.index]['adjust_time'] = $('.unlock_condition .change_time input').val()
             }
-            self.edit_arr.push(self.table_data[self.index]);
+            self.edit_arr.push({
+                'id': self.table_data[self.index].id,
+                'process_action': $('.unlock_condition select option:selected').attr('data-id'),
+                'adjust_time': self.table_data[self.index]['adjust_time'],
+            });
             $('.unlock_condition').hide();
             if($('.fixed-table-toolbar .save_process_sel').length==0){
                 $('.fixed-table-toolbar').append("<button class='btn btn-primary save_process_sel'>保存</button>")
