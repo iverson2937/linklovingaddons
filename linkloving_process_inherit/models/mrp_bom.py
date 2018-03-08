@@ -172,4 +172,4 @@ class MrpBomLine(models.Model):
         for line in arg:
             bom_line_id = self.env['mrp.bom.line'].browse(line.get('id'))
             bom_line_id.action_id = self.env['mrp.process.action'].browse(line.get('process_action'))
-        return self.env['mrp.bom'].browse(int(bom_id))
+        return self.env['mrp.bom'].browse(int(bom_id)).get_bom_cost_new()

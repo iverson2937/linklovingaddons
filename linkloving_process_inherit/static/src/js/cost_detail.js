@@ -23,14 +23,17 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
         save_process_sel_func: function () {
             var self = this;
             console.log(self.edit_arr);
-            new Model('mrp.bom.line').call('save_multi_changes', [self.edit_arr]).then(function (results) {
+            new Model('mrp.bom.line').call('save_multi_changes', [self.edit_arr],{'bom_id':self.bom_id}).then(function (results) {
                 console.log(results);
+
+                //刷新界面
+                $("#table").bootstrapTable('refresh', results);
+                // self.initTableSubCompany(self.columns, results)
+
                 //    保存后要清空数组
                 self.edit_arr = [];
 
             });
-
-            //    保存后要清空数组
         },
         alia_cancel_func: function () {
             $('.unlock_condition').hide()
@@ -106,6 +109,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             new Model('product.template').call('get_product_cost_detail', [product_id]).then(function (records) {
                 console.log(records);
                 self.table_data = records;
+                self.bom_id = records[0].bom_id;
                 var columns = [{
                     field: 'name',
                     title: '名称',
@@ -140,7 +144,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                     }
 
                 ];
-
+                self.columns=columns;
                 self.initTableSubCompany(columns, records)
 
             });
