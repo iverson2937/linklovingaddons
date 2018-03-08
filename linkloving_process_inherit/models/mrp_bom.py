@@ -78,6 +78,7 @@ class MrpBom(models.Model):
             'manpower_cost': man_cost,
             'total_cost': total_cost,
             'process_id': process_id,
+            'has_extra': True,
             'process_action': action_id,
             "adjust_time": line.adjust_time
         }
@@ -118,6 +119,7 @@ def _get_rec(object, parnet, result, product_type_dict):
             # 'product_type': l.product_id.product_ll_type,
             'id': l.id,
             'pid': parnet.id,
+            'has_extra': True,
             'material_cost': material_cost,
             'manpower_cost': man_cost,
             'total_cost': total_cost,
