@@ -26,6 +26,8 @@ import calendar
 import datetime
 import logging
 
+from odoo.tools import float_round
+
 _logger = logging.getLogger(__name__)
 from odoo import api
 from odoo import fields, models, _
@@ -151,6 +153,44 @@ class ProductTemplate(models.Model):
     has_bom_line_lines = fields.Boolean(compute='has_bom_line_ids', string='是否有在BOM中', store=True)
     name = fields.Char('Name', index=True, required=True, translate=True, track_visibility='onchange')
     default_code = fields.Char(track_visibility='onchange')
+    mos_info = fields.Text('在产详情', compute="_compute_mos_info")
+
+    @api.multi
+    def _compute_mos_info(self):
+        M_P = self.env["mrp.production"].sudo()
+        mos = M_P.search([('product_tmpl_id', 'in', self.ids),
+                          ('state', 'not in', ['done', 'cancel'])],
+                         order='date_planned_finished')
+        mos_zz = {}
+        for mo in mos:
+            if mos_zz.get(mo.product_tmpl_id.id):
+                mos_zz[mo.product_tmpl_id.id] += mo
+            else:
+                mos_zz[mo.product_tmpl_id.id] = mo
+        for p in self:
+            product_mos = mos_zz.get(p.id, M_P)
+
+            info_str = ''
+            for mo in product_mos:
+                if mo.date_planned_finished:
+                    date_planned_finished = fields.datetime.strftime(fields.datetime.strptime(
+                            mo.date_planned_finished,
+                            '%Y-%m-%d %H:%M:%S'),
+                            '%Y-%m-%d')
+                else:
+                    date_planned_finished = u'暂无交期'
+                info_str += date_planned_finished + ' ' + (mo.name or '') + ' ' \
+                            + str(mo.product_qty) + ' ' + self.parse_state(mo.state) + '\n'
+            p.mos_info = info_str
+
+    def parse_state(self, state):
+        selection = self.env["mrp.production"].sudo()._fields["state"].selection
+        state_str = ''
+        for state_tuple in selection:
+            if state == state_tuple[0]:
+                state_str = state_tuple[1]
+                break
+        return state_str
 
     @api.model
     def has_bom_line_ids(self):
