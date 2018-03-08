@@ -53,7 +53,7 @@ class MrpBom(models.Model):
 
         process_id = action_id = []
         if bom_id:
-            process_id = bom_id[0].process_id
+            process_id = bom_id[0].process_id.name
         if action:
             action_id = action_id.name
         product_cost = line.product_id.pre_cost_cal_new(raise_exception=False)
@@ -77,8 +77,8 @@ class MrpBom(models.Model):
             'material_cost': material_cost,
             'manpower_cost': man_cost,
             'total_cost': total_cost,
-            'process_id': process_id.name,
-            'has_extra': process_id.has_extra,
+            'process_id': process_id,
+            'has_extra': True,
             'process_action': action_id,
             "adjust_time": line.adjust_time
         }
