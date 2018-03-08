@@ -215,7 +215,7 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                     console.log(row)
                     if (field === 'report_remark') {
                         return new Model("purchase.order")
-                        .call("write",[row.po.id, {report_remark:row.report_remark}])
+                            .call("sudo_write", [row.po.id, {report_remark: row.report_remark}])
                         .then(function (result) {
                         })
                     }
