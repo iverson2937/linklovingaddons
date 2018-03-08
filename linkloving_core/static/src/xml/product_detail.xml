@@ -134,8 +134,8 @@
                                         </t>
                                     </div>
                                 </div>
+                            </t>
                         </div>
-                    </t>
 
                     <t t-foreach="bom_lines" t-as="item">
                         <div class="panel panel-default">
