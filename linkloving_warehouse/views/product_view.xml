@@ -122,7 +122,8 @@
                 </xpath>
 
                 <xpath expr="//field[@name='qty_available']" position="replace">
-                    <field name="incoming_qty" string="在产"/>
+                    <field name="mos_info" invisible="1"/>
+                    <field name="incoming_qty" string="在产" info_field="mos_info" widget="popup_dialog_widget"/>
                     <field name="stock" string="库存"/>
                     <field name="forecast_qty"/>
 
