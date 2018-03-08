@@ -27,7 +27,7 @@
 
     <t t-name="process_option_templ">
         <t t-foreach="result" t-as="item">
-            <option><t t-esc="item[0].name"/></option>
+            <option t-att-data-id="item[0].id"><t t-esc="item[0].name"/></option>
         </t>
     </t>
 </templates>

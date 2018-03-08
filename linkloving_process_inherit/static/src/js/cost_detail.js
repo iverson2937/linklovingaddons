@@ -17,7 +17,15 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             'click .sel_pro ':'sel_pro_func',
             'click .confirm_sel':'confirm_sel_func',
             'click .alia_cancel':'alia_cancel_func',
-            'click .adjusttime':'sel_pro_func'
+            'click .adjusttime':'sel_pro_func',
+            'click .save_process_sel':'save_process_sel_func'
+        },
+        save_process_sel_func:function () {
+            var self = this;
+            console.log(self.edit_arr);
+
+        //    保存后要清空数组
+            self.edit_arr = [];
         },
         alia_cancel_func:function () {
               $('.unlock_condition').hide()
@@ -30,22 +38,33 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 $('.fixed-table-body tr[data-index='+ self.index +']').find('.adjusttime').html($('.unlock_condition .change_time input').val());
                 self.table_data[self.index]['adjust_time'] = $('.unlock_condition .change_time input').val()
             }
-            console.log(self.table_data);
+            self.edit_arr.push(self.table_data[self.index]);
             $('.unlock_condition').hide();
+            if($('.fixed-table-toolbar .save_process_sel').length==0){
+                $('.fixed-table-toolbar').append("<button class='btn btn-primary save_process_sel'>保存</button>")
+            }
         },
         sel_pro_func:function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var self = this;
-            var index = $(target).parents('tr').attr('data-index');
-            index = parseInt(index);
-            self.index=index;
-            new Model('mrp.bom.line').call('get_action_options',[self.table_data[index].id]).then(function (data) {
-                console.log(data);
-                $('.unlock_condition select').html('');
-                $('.unlock_condition select').append(QWeb.render('process_option_templ',{result: data}));
-                $('.unlock_condition').show()
-            })
+            if($(target).parents('tr').find('.sel_pro').html()!='-'){
+                var index = $(target).parents('tr').attr('data-index');
+                index = parseInt(index);
+                self.index=index;
+                new Model('mrp.bom.line').call('get_action_options',[self.table_data[index].id]).then(function (data) {
+                    console.log(data);
+                    $('.unlock_condition select').html('');
+                    $('.unlock_condition select').append(QWeb.render('process_option_templ',{result: data}));
+                    $('.unlock_condition').show();
+                    $('.unlock_condition .change_time input').val('');
+                    if(self.table_data[index].has_extra){
+                        $('.change_time').show()
+                    }else {
+                        $('.change_time').hide()
+                    }
+                })
+            }
         },
         init: function (parent, action) {
             this._super(parent);
@@ -62,6 +81,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 this.so_id = action.params["active_id"];
                 this.sub_company_order_track = true;
             }
+            this.edit_arr = []
         },
 
         start: function () {
