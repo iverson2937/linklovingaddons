@@ -15,6 +15,7 @@
          * @returns {Object[]}
          */
         initTree: function (options) {
+            alert('dddd')
             var settings = $.extend({}, this.treegrid.defaults, options);
             return this.each(function () {
                 var $this = $(this);

@@ -23,7 +23,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
         save_process_sel_func: function () {
             var self = this;
             console.log(self.edit_arr);
-            new Model('mrp.bom.line').call('save_multi_changes', [self.edit_arr],{'bom_id':self.bom_id}).then(function (results) {
+            new Model('mrp.bom.line').call('save_multi_changes', [self.edit_arr], {'bom_id': self.bom_id}).then(function (results) {
                 console.log(results);
 
                 //刷新界面
@@ -144,7 +144,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                     }
 
                 ];
-                self.columns=columns;
+                self.columns = columns;
                 self.initTableSubCompany(columns, records)
 
             });
@@ -154,6 +154,9 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
 
         options_init: function (coloums, datas) {
             return {
+
+                contentType: 'application/json',
+                method: 'post',
                 cache: false,
                 sortable: true,
                 showToggle: true,
@@ -166,7 +169,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 idField: 'id',
                 parentIdField: 'pid',
                 editable: true,
-
+                showRefresh: true,
                 iconsPrefix: 'fa', // glyphicon of fa (font awesome)
                 exportTypes: ['excel', 'png'],
                 exportOptions: {
@@ -199,6 +202,10 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
 
 
             var options = self.options_init(colomns, data);
+            options = $.extend(options, {
+                url: '/linkloving_process_inherit/get_bom_cost?bom_id=222',
+                queryParams: {'bom_id': 222},
+            });
             self.$('#table').bootstrapTable(options);
             self.$('#table').treegrid({
                 initialState: 'collapsed',//收缩
