@@ -81,19 +81,12 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                     },
                     {
                         field: 'process_action',
-                        title: '工序动作',
+                        title: '工序动作1',
                         'class': 'sel_pro',
-                        // editable: {
-                        //     type: 'select',
-                        //     // title: '选择工序动作',
-                        //     emptytext: '暂未选工序动作<i class="icon-margin fa fa-pencil"></i>',
-                        //     // mode:'inline',
-                        //     source: [{value: 'bsb', text: '篮球'},
-                        //         {value: 'ftb', text: '足球'},
-                        //         {value: 'wsm', text: '游泳'}],
-                        //
-                        //
-                        // },
+                    },
+                    {
+                        field: 'adjust_time',
+                        title: '调整时间',
                     },
                     {
                         field: 'material_cost',

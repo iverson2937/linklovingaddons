@@ -79,6 +79,7 @@ class MrpBom(models.Model):
             'total_cost': total_cost,
             'process_id': process_id,
             'process_action': action_id,
+            "adjust_time": line.adjust_time
         }
 
         return res
@@ -123,6 +124,7 @@ def _get_rec(object, parnet, result, product_type_dict):
             'parent_id': parnet.id,
             'qty': l.product_qty,
             'process_id': process_id,
+            "adjust_time": l.adjust_time
             # 'bom_ids': bom_line_ids
         }
         result.append(res)
