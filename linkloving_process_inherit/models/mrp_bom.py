@@ -49,13 +49,10 @@ class MrpBom(models.Model):
                 _get_rec(l, line, result, product_type_dict)
 
         bom_id = line.product_id.product_tmpl_id.bom_ids
-        action = line.action_id
 
-        process_id = action_id = []
+        process_id = []
         if bom_id:
             process_id = bom_id[0].process_id.name
-        if action:
-            action_id = action_id.name
         product_cost = line.product_id.pre_cost_cal_new(raise_exception=False)
         print product_cost, 'product_cost'
         total_cost = product_cost * line.product_qty if product_cost else 0
@@ -79,7 +76,7 @@ class MrpBom(models.Model):
             'total_cost': total_cost,
             'process_id': process_id,
             'has_extra': True,
-            'process_action': action_id,
+            'process_action': line.action_id.name if line.action_id else '',
             "adjust_time": line.adjust_time
         }
 
@@ -170,5 +167,7 @@ class MrpBomLine(models.Model):
         return res
 
     @api.model
-    def save_multi_changes(self, *arg, **kwargs):
-        pass
+    def save_multi_changes(self, arg, **kwargs):
+        for line in arg:
+            bom_line_id = self.env['mrp.bom.line'].browse(line.get('id'))
+            bom_line_id.action_id = self.env['mrp.process.action'].browse(line.get('process_action'))

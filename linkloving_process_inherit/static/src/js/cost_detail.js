@@ -14,28 +14,33 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
     var CostDetail = Widget.extend(ControlPanelMixin, {
         template: "CostDetail",
         events: {
-            'click .sel_pro ':'sel_pro_func',
-            'click .confirm_sel':'confirm_sel_func',
-            'click .alia_cancel':'alia_cancel_func',
-            'click .adjusttime':'sel_pro_func',
-            'click .save_process_sel':'save_process_sel_func'
+            'click .sel_pro ': 'sel_pro_func',
+            'click .confirm_sel': 'confirm_sel_func',
+            'click .alia_cancel': 'alia_cancel_func',
+            'click .adjusttime': 'sel_pro_func',
+            'click .save_process_sel': 'save_process_sel_func'
         },
-        save_process_sel_func:function () {
+        save_process_sel_func: function () {
             var self = this;
             console.log(self.edit_arr);
+            new Model('mrp.bom.line').call('save_multi_changes', [self.edit_arr]).then(function (results) {
+                console.log(results);
+                //    保存后要清空数组
+                self.edit_arr = [];
 
-        //    保存后要清空数组
-            self.edit_arr = [];
+            });
+
+            //    保存后要清空数组
         },
-        alia_cancel_func:function () {
-              $('.unlock_condition').hide()
+        alia_cancel_func: function () {
+            $('.unlock_condition').hide()
         },
-        confirm_sel_func:function () {
+        confirm_sel_func: function () {
             var self = this;
-            $('.fixed-table-body tr[data-index='+ self.index +']').find('.sel_pro').html($('.unlock_condition select option:selected').val());
-            self.table_data[self.index]['process_action']=$('.unlock_condition select option:selected').val();
-            if($('.unlock_condition .change_time input').val() != ''){
-                $('.fixed-table-body tr[data-index='+ self.index +']').find('.adjusttime').html($('.unlock_condition .change_time input').val());
+            $('.fixed-table-body tr[data-index=' + self.index + ']').find('.sel_pro').html($('.unlock_condition select option:selected').val());
+            self.table_data[self.index]['process_action'] = $('.unlock_condition select option:selected').val();
+            if ($('.unlock_condition .change_time input').val() != '') {
+                $('.fixed-table-body tr[data-index=' + self.index + ']').find('.adjusttime').html($('.unlock_condition .change_time input').val());
                 self.table_data[self.index]['adjust_time'] = $('.unlock_condition .change_time input').val()
             }
             self.edit_arr.push({
@@ -44,27 +49,27 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 'adjust_time': self.table_data[self.index]['adjust_time'],
             });
             $('.unlock_condition').hide();
-            if($('.fixed-table-toolbar .save_process_sel').length==0){
+            if ($('.fixed-table-toolbar .save_process_sel').length == 0) {
                 $('.fixed-table-toolbar').append("<button class='btn btn-primary save_process_sel'>保存</button>")
             }
         },
-        sel_pro_func:function (e) {
+        sel_pro_func: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var self = this;
-            if($(target).parents('tr').find('.sel_pro').html()!='-'){
+            if ($(target).parents('tr').find('.sel_pro').html() != '-') {
                 var index = $(target).parents('tr').attr('data-index');
                 index = parseInt(index);
-                self.index=index;
-                new Model('mrp.bom.line').call('get_action_options',[self.table_data[index].id]).then(function (data) {
+                self.index = index;
+                new Model('mrp.bom.line').call('get_action_options', [self.table_data[index].id]).then(function (data) {
                     console.log(data);
                     $('.unlock_condition select').html('');
-                    $('.unlock_condition select').append(QWeb.render('process_option_templ',{result: data}));
+                    $('.unlock_condition select').append(QWeb.render('process_option_templ', {result: data}));
                     $('.unlock_condition').show();
                     $('.unlock_condition .change_time input').val('');
-                    if(self.table_data[index].has_extra){
+                    if (self.table_data[index].has_extra) {
                         $('.change_time').show()
-                    }else {
+                    } else {
                         $('.change_time').hide()
                     }
                 })
@@ -102,12 +107,12 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 console.log(records);
                 self.table_data = records;
                 var columns = [{
-                        field: 'name',
-                        title: '名称',
-                    }, {
-                        field: 'product_type',
-                        title: '物料类型',
-                    },
+                    field: 'name',
+                    title: '名称',
+                }, {
+                    field: 'product_type',
+                    title: '物料类型',
+                },
                     {
                         field: 'process_action',
                         title: '工序动作1',
@@ -116,7 +121,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                     {
                         field: 'adjust_time',
                         title: '调整时间',
-                        'class':'adjusttime'
+                        'class': 'adjusttime'
                     },
                     {
                         field: 'material_cost',
@@ -173,7 +178,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 columns: coloums,
                 data: datas,//data.order_line,
 
-                onEditableSave: function(field, row, oldValue, $el) {
+                onEditableSave: function (field, row, oldValue, $el) {
                     console.log(row)
                 },
             }
