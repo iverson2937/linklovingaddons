@@ -48,6 +48,7 @@
             </div>
             <div id="name" class="panel-collapse collapse in">
                 <div class="panel-body">
+                    <t t-if="bom_length>0">
                         <div class="panel panel-info">
                             <div class="panel-heading">
                                 <h4 class="panel-title">
@@ -136,6 +137,7 @@
                                 </div>
                             </t>
                         </div>
+                    </t>
 
                     <t t-foreach="bom_lines" t-as="item">
                         <div class="panel panel-default">
