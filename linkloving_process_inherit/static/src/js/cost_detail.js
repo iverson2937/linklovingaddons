@@ -154,7 +154,6 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
 
         options_init: function (coloums, datas) {
             return {
-
                 contentType: 'application/json',
                 method: 'post',
                 cache: false,
@@ -177,17 +176,28 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                     excelstyles: ['background-color', 'color', 'font-weight', 'border', 'border-top', 'border-bottom', 'border-left', 'border-right', 'font-size', 'width', 'height'],
                 },
                 icons: {
-                    paginationSwitchDown: 'glyphicon-collapse-down icon-chevron-down',
-                    paginationSwitchUp: 'glyphicon-collapse-up icon-chevron-up',
+                    paginationSwitchDown: 'fa fa-caret-down',
+                    paginationSwitchUp: 'fa fa-caret-right',
                     refresh: 'glyphicon-refresh icon-refresh',
                     toggle: 'fa-lg fa-list-ul',
                     columns: 'fa-th',
-                    detailOpen: 'glyphicon-plus icon-plus',
-                    detailClose: 'glyphicon-minus icon-minus',
+                    detailOpen: 'fa fa-caret-down',
+                    detailClose: 'fa fa-caret-right',
                     export: 'fa-upload',
                 },
                 columns: coloums,
                 data: datas,//data.order_line,
+                onLoadSuccess:function () {
+                      self.$('#table').treegrid({
+                            initialState: 'collapsed',//收缩
+                            treeColumn: 0,//指明第几列数据改为树形
+                            expanderExpandedClass: 'fa fa-caret-down',
+                            expanderCollapsedClass: 'fa fa-caret-right',
+                            onChange: function () {
+                                self.$('#table').bootstrapTable('resetWidth');
+                            }
+                        });
+                },
 
                 onEditableSave: function (field, row, oldValue, $el) {
                     console.log(row)
@@ -199,13 +209,12 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             if (!data) {
                 return;
             }
-
-
             var options = self.options_init(colomns, data);
             options = $.extend(options, {
                 url: '/linkloving_process_inherit/get_bom_cost?bom_id=222',
                 queryParams: {'bom_id': 222},
             });
+            console.log(options)
             self.$('#table').bootstrapTable(options);
             self.$('#table').treegrid({
                 initialState: 'collapsed',//收缩
