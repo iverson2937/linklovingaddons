@@ -137,7 +137,7 @@ odoo.define('linkloving_popup_dialog.popup_dialog_widget', function (require) {
             var info = row_data[this.info_field].value;
             var value = _.escape(format_value(
                 row_data[this.id].value, this, options.value_if_empty));
-            var html = '<span data-html="true" data-toggle="tooltip" title="' + info + '">' + value + '</span>'
+            var html = '<span class="popup_dialog" data-html="true" data-toggle="tooltip" title="' + info + '">' + value + '</span>'
             return html;
         }
     });
