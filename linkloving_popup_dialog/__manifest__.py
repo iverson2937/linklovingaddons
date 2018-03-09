@@ -32,4 +32,7 @@
     'demo': [
         'demo/demo.xml',
     ],
+    'qweb': [
+        'static/xml/*.xml',
+    ]
 }
