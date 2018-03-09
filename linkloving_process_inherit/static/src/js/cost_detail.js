@@ -27,8 +27,8 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 console.log(results);
 
                 //刷新界面
-                $("#table").bootstrapTable('refresh', results);
-                // self.initTableSubCompany(self.columns, results)
+                $("#table").bootstrapTable('destroy');
+                self.initTableSubCompany(self.columns, results);
 
                 //    保存后要清空数组
                 self.edit_arr = [];
@@ -111,12 +111,12 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 self.table_data = records;
                 self.bom_id = records[0].bom_id;
                 var columns = [{
-                    field: 'name',
-                    title: '名称',
-                }, {
-                    field: 'product_type',
-                    title: '物料类型',
-                },
+                        field: 'name',
+                        title: '名称',
+                    }, {
+                        field: 'product_type',
+                        title: '物料类型',
+                    },
                     {
                         field: 'qty',
                         title: '配比',
@@ -214,7 +214,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 url: '/linkloving_process_inherit/get_bom_cost',
                 queryParams: {'bom_id': data[0].bom_id},
             });
-            console.log(options)
+            self.options = options;
             self.$('#table').bootstrapTable(options);
             self.$('#table').treegrid({
                 initialState: 'collapsed',//收缩
