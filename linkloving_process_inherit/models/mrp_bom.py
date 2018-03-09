@@ -8,8 +8,6 @@ class MrpBom(models.Model):
 
     manpower_cost = fields.Float(string='工序动作成本', compute='_get_bom_cost')
 
-
-
     def get_bom_cost_new(self):
         result = []
         # for line in self.bom_line_ids:
@@ -21,8 +19,9 @@ class MrpBom(models.Model):
         material_cost = self.product_tmpl_id.product_variant_ids[0].get_material_cost_new()
         man_cost = total_cost - material_cost
         res = {
-            'id': self.id,
+            'id': 1,
             'pid': 0,
+            'bom_id': self.id,
             'product_id': self.product_tmpl_id.id,
             'product_tmpl_id': self.product_tmpl_id.id,
             'product_specs': self.product_tmpl_id.product_specs,
@@ -49,15 +48,11 @@ class MrpBom(models.Model):
                 _get_rec(l, line, result, product_type_dict)
 
         bom_id = line.product_id.product_tmpl_id.bom_ids
-        action = line.action_id
 
-        process_id = action_id = []
+        process_id = []
         if bom_id:
             process_id = bom_id[0].process_id.name
-        if action:
-            action_id = action_id.name
         product_cost = line.product_id.pre_cost_cal_new(raise_exception=False)
-        print product_cost, 'product_cost'
         total_cost = product_cost * line.product_qty if product_cost else 0
         product_material_cost = line.product_id.get_material_cost_new()
         material_cost = product_material_cost * line.product_qty
@@ -70,15 +65,16 @@ class MrpBom(models.Model):
             'product_tmpl_id': line.product_id.product_tmpl_id.id,
             'id': line.id,
             'has_lines': 0 if line.child_line_ids else 1,
-            'pid': line.bom_id.id,
+            'pid': 1,
             'product_specs': line.product_id.product_specs,
             'code': line.product_id.default_code,
             'qty': line.product_qty,
             'material_cost': material_cost,
-            'manpower_cost': man_cost,
+            'manpower_cost': line.action_id.cost if line.action_id else '',
             'total_cost': total_cost,
             'process_id': process_id,
-            'process_action': action_id,
+            'has_extra': True,
+            'process_action': line.action_id.name if line.action_id else '',
             "adjust_time": line.adjust_time
         }
 
@@ -87,7 +83,7 @@ class MrpBom(models.Model):
     @api.multi
     def _get_bom_cost(self):
         for bom in self:
-            bom.cost = sum(line.cost for line in bom.bom_line_ids)
+            bom.manpower_cost = sum(line.cost for line in bom.bom_line_ids)
 
 
 def _get_rec(object, parnet, result, product_type_dict):
@@ -118,8 +114,10 @@ def _get_rec(object, parnet, result, product_type_dict):
             # 'product_type': l.product_id.product_ll_type,
             'id': l.id,
             'pid': parnet.id,
+            'has_extra': l.bom_id.process_id.has_extra,
+            'action_process': l.action_id.name if l.action_id else '',
             'material_cost': material_cost,
-            'manpower_cost': man_cost,
+            'manpower_cost': l.action_id.cost if l.action_id else '',
             'total_cost': total_cost,
             'parent_id': parnet.id,
             'qty': l.product_qty,
@@ -168,5 +166,9 @@ class MrpBomLine(models.Model):
         return res
 
     @api.model
-    def save_multi_changes(self, *arg, **kwargs):
-        pass
+    def save_multi_changes(self, arg, **kwargs):
+        bom_id = kwargs.get('bom_id')
+        for line in arg:
+            bom_line_id = self.env['mrp.bom.line'].browse(line.get('id'))
+            bom_line_id.action_id = self.env['mrp.process.action'].browse(line.get('process_action'))
+        return self.env['mrp.bom'].browse(int(bom_id)).get_bom_cost_new()

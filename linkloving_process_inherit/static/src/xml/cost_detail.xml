@@ -14,6 +14,9 @@
 
                     </select>
                 </div>
+                <div class="change_time">
+                    调整时间：<input type="text"/>
+                </div>
                 <div class="foot">
                     <button class=" btn btn-primary confirm_sel" style="margin-left:112px">确定</button>
                     <button class="btn btn-default alia_cancel">取消</button>
@@ -24,7 +27,7 @@
 
     <t t-name="process_option_templ">
         <t t-foreach="result" t-as="item">
-            <option><t t-esc="item[0].name"/></option>
+            <option t-att-data-id="item[0].id"><t t-esc="item[0].name"/></option>
         </t>
     </t>
 </templates>
