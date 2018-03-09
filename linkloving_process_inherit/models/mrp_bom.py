@@ -39,7 +39,7 @@ class MrpBom(models.Model):
             line_ids = []
             for line in self.bom_line_ids:
                 line_ids.append(self.get_bom_line(line, result, product_type_dict))
-        return result + sorted(line_ids, key=lambda product: product['has_lines'])
+        return result + sorted(line_ids, key=lambda product: product['code'], reverse=True)
 
     def get_bom_line(self, line, result, product_type_dict):
         if line.child_line_ids:
