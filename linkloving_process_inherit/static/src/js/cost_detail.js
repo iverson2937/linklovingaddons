@@ -189,7 +189,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 data: datas,//data.order_line,
                 onLoadSuccess:function () {
                       self.$('#table').treegrid({
-                            initialState: 'collapsed',//收缩
+                          // initialState: 'collapsed',//收缩
                             treeColumn: 0,//指明第几列数据改为树形
                             expanderExpandedClass: 'fa fa-caret-down',
                             expanderCollapsedClass: 'fa fa-caret-right',
@@ -211,8 +211,8 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             }
             var options = self.options_init(colomns, data);
             options = $.extend(options, {
-                url: '/linkloving_process_inherit/get_bom_cost?bom_id=222',
-                queryParams: {'bom_id': 222},
+                url: '/linkloving_process_inherit/get_bom_cost',
+                queryParams: {'bom_id': data[0].bom_id},
             });
             console.log(options)
             self.$('#table').bootstrapTable(options);

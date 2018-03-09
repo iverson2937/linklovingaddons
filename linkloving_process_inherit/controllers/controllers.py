@@ -14,9 +14,8 @@ import base64
 class LinklovingBomCost(http.Controller):
 
     @http.route('/linkloving_process_inherit/get_bom_cost', auth='none', type='json', csrf=False)
-    def get_report(self):
-        print request.jsonrequest
+    def get_bom_cost(self):
 
         bom_id = request.jsonrequest.get('bom_id')
-        print bom_id
-        return request.env["mrp.bom"].sudo().browse(7020).get_bom_cost_new()
+        res = request.env["mrp.bom"].sudo().browse(bom_id).get_bom_cost_new()
+        return res

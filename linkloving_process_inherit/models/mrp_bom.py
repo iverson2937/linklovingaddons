@@ -53,7 +53,6 @@ class MrpBom(models.Model):
         if bom_id:
             process_id = bom_id[0].process_id.name
         product_cost = line.product_id.pre_cost_cal_new(raise_exception=False)
-        print product_cost, 'product_cost'
         total_cost = product_cost * line.product_qty if product_cost else 0
         product_material_cost = line.product_id.get_material_cost_new()
         material_cost = product_material_cost * line.product_qty
