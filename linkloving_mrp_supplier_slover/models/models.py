@@ -124,7 +124,7 @@ class linkloving_procurement_order(models.Model):
             domain = (
                 ('partner_id', '=', partner.id),
                 ('state', '=', 'make_by_mrp'),
-                ('picking_type_id', '=', procurement.rule_id.picking_type_id.id),
+                # ('picking_type_id', '=', procurement.rule_id.picking_type_id.id),
                 ('company_id', '=', procurement.company_id.id),
                 # ('dest_address_id', '=', procurement.partner_dest_id.id)
             )
@@ -150,7 +150,7 @@ class linkloving_procurement_order(models.Model):
                 # if po:
                 #     cache[domain] = po
 
-            if not po:
+            if not po:  # 如果找不到对应的po
                 if combine_rule != 'same_supplier_product':
                     vals = procurement._prepare_purchase_order(partner)
                     # tax_id = self.env["account.tax"].search([('type_tax_use', '<>', "purchase")], limit=1)[0].id
