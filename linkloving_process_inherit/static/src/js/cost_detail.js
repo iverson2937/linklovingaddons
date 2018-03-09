@@ -60,10 +60,10 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var self = this;
-            if ($(target).parents('tr').find('.sel_pro').html() != '-') {
-                var index = $(target).parents('tr').attr('data-index');
-                index = parseInt(index);
-                self.index = index;
+            var index = $(target).parents('tr').attr('data-index');
+            index = parseInt(index);
+            self.index = index;
+            if ($(target).parents('tr').find('.sel_pro').html() != '-' && index) {
                 new Model('mrp.bom.line').call('get_action_options', [self.table_data[index].id]).then(function (data) {
                     console.log(data);
                     $('.unlock_condition select').html('');
