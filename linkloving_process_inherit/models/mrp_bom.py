@@ -53,10 +53,10 @@ class MrpBom(models.Model):
         if bom_id:
             process_id = bom_id[0].process_id.name
         product_cost = line.product_id.pre_cost_cal_new(raise_exception=False)
-        total_cost = product_cost * line.product_qty if product_cost else 0
-        product_material_cost = line.product_id.get_material_cost_new()
-        material_cost = product_material_cost * line.product_qty
-        man_cost = total_cost - material_cost
+        line_cost = product_cost * line.product_qty if product_cost else 0
+        material_cost = line_cost * line.product_qty
+        man_cost = line.action_id.cost * line.line.product_qty if line.action_id else 0,
+        total_cost = material_cost + man_cost
 
         res = {
             'name': line.product_id.name_get()[0][1],
@@ -70,10 +70,10 @@ class MrpBom(models.Model):
             'code': line.product_id.default_code,
             'qty': line.product_qty,
             'material_cost': round(material_cost, 2),
-            'manpower_cost': round(line.action_id.cost) if line.action_id else '',
+            'manpower_cost': round(man_cost, 2),
             'total_cost': round(total_cost, 2),
             'process_id': process_id,
-            'has_extra': False,
+            'has_extra': line.bom_id.process_id.has_extra,
             'process_action': line.action_id.name if line.action_id else '',
             "adjust_time": line.adjust_time
         }
@@ -98,10 +98,10 @@ def _get_rec(object, parnet, result, product_type_dict):
             process_id = [bom_id[0].process_id.id, bom_id[0].process_id.name]
 
         product_cost = object.product_id.pre_cost_cal_new(raise_exception=False)
-        total_cost = product_cost * object.product_qty if product_cost else 0
-        product_material_cost = object.product_id.get_material_cost_new()
-        material_cost = product_material_cost * object.product_qty
-        man_cost = total_cost - material_cost
+        line_cost = product_cost * object.product_qty if product_cost else 0
+        material_cost = line_cost * object.product_qty
+        man_cost = l.action_id.cost if l.action_id else 0,
+        total_cost = material_cost + man_cost
 
         res = {
             'name': l.product_id.name_get()[0][1],
@@ -117,7 +117,7 @@ def _get_rec(object, parnet, result, product_type_dict):
             'has_extra': l.bom_id.process_id.has_extra,
             'process_action': l.action_id.name if l.action_id else '',
             'material_cost': round(material_cost, 2),
-            'manpower_cost': round(l.action_id.cost, 2) if l.action_id else '',
+            'manpower_cost': round(man_cost, 2),
             'total_cost': round(total_cost, 2),
             'parent_id': parnet.id,
             'qty': l.product_qty,
