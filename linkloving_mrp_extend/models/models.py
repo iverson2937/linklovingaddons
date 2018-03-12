@@ -300,6 +300,12 @@ class MrpProductionExtend(models.Model):
 
         return super(MrpProductionExtend, self).create(vals)
 
+    @api.multi
+    def write(self, vals):
+        if 'state' in vals and vals['state'] == 'waiting_material' and self.bom_id.state not in ('draft', 'release'):
+            raise UserError('BOM还没通过审核,请联系相关负责人')
+        return super(MrpProductionExtend, self).write(vals)
+
     def action_view_secondary_mos(self):
         mos = self.env["mrp.production"].search([("origin", "ilike", self.name),
                                                  ("state", "=", "done")])
