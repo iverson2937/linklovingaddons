@@ -5,6 +5,7 @@ import time
 
 from odoo import models, fields, api
 from odoo import tools
+from odoo.exceptions import UserError
 
 
 class CrmMailMessage(models.Model):
@@ -266,17 +267,26 @@ class CrmMailMessage(models.Model):
                 crm_partner_val.write(
                     {'customer_follow_up_date': time.strftime('%Y-%m-%d', time.localtime(time.time()))})
 
-            if (not crm_partner_val.opportunity_ids) and message.messages_label_ids:
-                if (not (crm_partner_val.company_type == 'person')) and crm_partner_val.customer:
-                    lead_vals = {
-                        'name': "默认商机-" + str(crm_partner_val.name),
-                        'partner_id': crm_partner_val.id,
-                        'planned_revenue': 0.0,
-                        'priority': crm_partner_val.priority,
-                        'type': 'opportunity',
-                    }
-                    self.env['crm.lead'].create(lead_vals)
-                    crm_partner_val.write({'crm_is_partner': False})
+            mail_connect_id = self.env.ref('linkloving_crm.message_label_connect')
+            mail_stage_id = self.env.ref('linkloving_crm.crm_lead_crm_stage')
+
+            #  跟进类型为 建立联系 线索客户 转化潜在客户
+            if message.message_type != 'notification':
+                if mail_connect_id.id in message.messages_label_ids.ids:
+                    if (not crm_partner_val.opportunity_ids) and message.messages_label_ids:
+                        if (not (crm_partner_val.company_type == 'person')) and crm_partner_val.customer:
+                            if not mail_connect_id.msg_stage_ids:
+                                raise UserError(u'请检查阶段是否已绑定记录类型')
+                            lead_vals = {
+                                'name': "默认商机-" + str(crm_partner_val.name),
+                                'partner_id': crm_partner_val.id,
+                                'planned_revenue': 0.0,
+                                'priority': crm_partner_val.priority,
+                                'type': 'opportunity',
+                                'stage_id': mail_stage_id.id
+                            }
+                            self.env['crm.lead'].create(lead_vals)
+                            crm_partner_val.write({'crm_is_partner': False})
 
         return message
 
