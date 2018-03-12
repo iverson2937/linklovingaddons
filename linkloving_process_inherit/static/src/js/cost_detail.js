@@ -66,15 +66,18 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             if ($(target).parents('tr').find('.sel_pro').html() != '-' && index) {
                 new Model('mrp.bom.line').call('get_action_options', [self.table_data[index].id]).then(function (data) {
                     console.log(data);
-                    $('.unlock_condition select').html('');
-                    $('.unlock_condition select').append(QWeb.render('process_option_templ', {result: data}));
-                    $('.unlock_condition').show();
-                    $('.unlock_condition .change_time input').val('');
-                    if (self.table_data[index].has_extra) {
-                        $('.change_time').show()
-                    } else {
-                        $('.change_time').hide()
+                    if (data.length > 0) {
+                        $('.unlock_condition select').html('');
+                        $('.unlock_condition select').append(QWeb.render('process_option_templ', {result: data}));
+                        $('.unlock_condition').show();
+                        $('.unlock_condition .change_time input').val('');
+                        if (self.table_data[index].has_extra) {
+                            $('.change_time').show()
+                        } else {
+                            $('.change_time').hide()
+                        }
                     }
+
                 })
             }
         },
@@ -111,12 +114,12 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 self.table_data = records;
                 self.bom_id = records[0].bom_id;
                 var columns = [{
-                        field: 'name',
-                        title: '名称',
-                    }, {
-                        field: 'product_type',
-                        title: '物料类型',
-                    },
+                    field: 'name',
+                    title: '名称',
+                }, {
+                    field: 'product_type',
+                    title: '物料类型',
+                },
                     {
                         field: 'qty',
                         title: '配比',
@@ -187,16 +190,16 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 },
                 columns: coloums,
                 data: datas,//data.order_line,
-                onLoadSuccess:function () {
-                      self.$('#table').treegrid({
-                          // initialState: 'collapsed',//收缩
-                            treeColumn: 0,//指明第几列数据改为树形
-                            expanderExpandedClass: 'fa fa-caret-down',
-                            expanderCollapsedClass: 'fa fa-caret-right',
-                            onChange: function () {
-                                self.$('#table').bootstrapTable('resetWidth');
-                            }
-                        });
+                onLoadSuccess: function () {
+                    self.$('#table').treegrid({
+                        // initialState: 'collapsed',//收缩
+                        treeColumn: 0,//指明第几列数据改为树形
+                        expanderExpandedClass: 'fa fa-caret-down',
+                        expanderCollapsedClass: 'fa fa-caret-right',
+                        onChange: function () {
+                            self.$('#table').bootstrapTable('resetWidth');
+                        }
+                    });
                 },
 
                 onEditableSave: function (field, row, oldValue, $el) {
