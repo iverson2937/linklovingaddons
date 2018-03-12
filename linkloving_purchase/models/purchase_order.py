@@ -163,10 +163,6 @@ class PurchaseOrder(models.Model):
             pick.action_cancel()
         self.write({'state': 'done', 'is_shipped': True})
 
-    @api.one
-    def set_receive_qty(self):
-        for line in self.order_line:
-            line.qty_received = line.product_qty
 
 
 class PurchaseOrderLine(models.Model):
