@@ -1,0 +1,21 @@
+<odoo>
+    <data>
+
+
+        <record id="view_category_property_form" model="ir.ui.view">
+            <field name="name">product.category.property.form.inherit</field>
+            <field name="model">product.category</field>
+            <field name="inherit_id" ref="product.product_category_form_view"/>
+            <field name="arch" type="xml">
+                <group name="first" position="after">
+                    <group name="branch" groups="">
+                        <group string="区域品牌">
+                            <field name="brand_id" options="{'no_create':True}" string="品牌"/>
+                            <field name="area_id" options="{'no_create':True}" string="区域"/>
+                        </group>
+                    </group>
+                </group>
+            </field>
+        </record>
+    </data>
+</odoo>

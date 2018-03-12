@@ -2672,6 +2672,62 @@ class LinklovingOAApi(http.Controller):
             })
         return data
 
+    # 员工当天的考勤信息
+    @http.route('/linkloving_oa_api/get_today_attendance', type='json', auth="none", csrf=False, cors='*')
+    def get_today_attendance(self, *kw):
+        user_id = request.jsonrequest.get("user_id")
+        day_start = request.jsonrequest.get("day_start")
+        day_end = request.jsonrequest.get("day_end")
+        employee = request.env['hr.employee'].sudo().search(
+            [('user_id', '=', user_id)])
+        domain = [("check_in", ">", day_start),("check_in", "<", day_end),("employee_id", "=", employee.id)]
+        attendance_list = request.env['hr.attendance'].sudo().search(domain)
+        data = []
+        for attendance in attendance_list:
+            data.append({
+                "attendance_id":attendance.id,
+                "check_in":attendance.check_in,
+                "check_out": attendance.check_out or '',
+            })
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+
+
+    # 员工签到签退
+    @http.route('/linkloving_oa_api/employee_attendance', type='json', auth="none", csrf=False, cors='*')
+    def employee_attendance(self, *kw):
+        employee_id = request.jsonrequest.get("employee_id")
+        employee = request.env['hr.employee'].sudo().search(
+            [('user_id', '=', employee_id)])
+        attendance_off = request.jsonrequest.get("attendance_off")
+        check_in = request.jsonrequest.get("check_in")
+        check_out = request.jsonrequest.get("check_out")
+        day_start = request.jsonrequest.get("day_start")
+        day_end = request.jsonrequest.get("day_end")
+        employee = request.env['hr.employee'].sudo().search(
+            [('user_id', '=', employee_id)])
+        if attendance_off:
+            domain_person = [("check_in", ">", day_start), ("check_in", "<", day_end), ("employee_id", "=", employee.id),("check_out", "=", False)]
+            attendance = request.env['hr.attendance'].sudo().search(domain_person)
+            attendance.write({
+                "check_out":check_out,
+            })
+        else:
+            new_attendance = request.env['hr.attendance'].sudo(employee_id).create({
+                "employee_id":employee.id,
+                "check_in":check_in,
+            })
+        domain = [("check_in", ">", day_start), ("check_in", "<", day_end), ("employee_id", "=", employee.id)]
+        attendance_list = request.env['hr.attendance'].sudo().search(domain)
+        data = []
+        for attendance in attendance_list:
+            data.append({
+                "attendance_id": attendance.id,
+                "check_in": attendance.check_in,
+                "check_out": attendance.check_out or '',
+            })
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
     #  XD 我的请假
     @http.route('/linkloving_oa_api/get_leavelist', type='json', auth="none", csrf=False, cors='*')
     def get_leavelist(self, *kw):
