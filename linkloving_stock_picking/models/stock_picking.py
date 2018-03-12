@@ -17,8 +17,8 @@ class StockPicking(models.Model):
             for move in picking.move_lines:
                 line_id = self.env['purchase.order'].search([('name', '=', picking.origin)]).mapped(
                     'order_line').filtered(lambda x: x.product_id.id == move.product_id.id)
-
-                move.purchase_line_id = line_id[0].id
+                if line_id:
+                    move.purchase_line_id = line_id[0].id
 
     @api.multi
     def action_view_qc_result(self):
