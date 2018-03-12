@@ -2020,6 +2020,9 @@
             contentType: this.options.contentType,
             dataType: this.options.dataType,
             success: function (res) {
+                if (res.result) {
+                    res = res.result;
+                }
                 res = calculateObjectValue(that.options, that.options.responseHandler, [res], res);
 
                 that.load(res);

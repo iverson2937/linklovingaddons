@@ -3713,7 +3713,7 @@ class LinklovingAppApi(http.Controller):
             domain.append(('amount_total', '=', amount))
         # d
         invoices = request.env['account.invoice'].sudo().search(domain,
-                                                                limit=10)
+                                                                limit=20)
         json_list = []
         for invoice in invoices:
             data = {

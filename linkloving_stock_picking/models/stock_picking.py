@@ -11,7 +11,19 @@ class StockPicking(models.Model):
     tracking_number = fields.Char(string=u'Tracking Number')
     remark = fields.Text(string=u'备注', compute='_get_origin_number')
 
+    @api.multi
+    def check_purchase_order_line(self):
+        """
+        莫名其妙stock.move 没有purchase_line_id,重新赋值
+        :return:
+        """
 
+        for picking in self:
+            for move in picking.move_lines:
+                line_id = self.env['purchase.order'].search([('name', '=', picking.origin)]).mapped(
+                    'order_line').filtered(lambda x: x.product_id.id == move.product_id.id)
+                if line_id:
+                    move.purchase_line_id = line_id[0].id
 
     @api.multi
     def action_view_qc_result(self):
@@ -58,7 +70,7 @@ class StockPicking(models.Model):
             if op:
                 op.sorted(
                     key=lambda x: ((x.package_id and not x.product_id) and -4 or 0) + (x.package_id and -2 or 0) + (
-                        x.pack_lot_ids and -1 or 0))
+                            x.pack_lot_ids and -1 or 0))
                 for ops in op:
                     # TDE FIXME: this code seems to be in action_done, isn't it ?
                     # first try to find quants based on specific domains given by linked operations for the case where we want to rereserve according to existing pack operations
@@ -237,7 +249,7 @@ class StockPicking(models.Model):
             if self.move_type == 'one':
                 self.state = moves_todo[0].state
             elif moves_todo[0].state != 'assigned' and any(
-                            x.partially_available or x.state == 'assigned' for x in moves_todo):
+                    x.partially_available or x.state == 'assigned' for x in moves_todo):
                 self.state = 'partially_available'
             else:
                 self.state = moves_todo[-1].state

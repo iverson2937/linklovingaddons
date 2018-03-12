@@ -48,7 +48,7 @@
             </div>
             <div id="name" class="panel-collapse collapse in">
                 <div class="panel-body">
-                    <t t-if="mo_length>0">
+                    <t t-if="result.process">
                         <div class="panel panel-info">
                             <div class="panel-heading">
                                 <h4 class="panel-title">

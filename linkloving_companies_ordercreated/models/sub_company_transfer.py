@@ -83,6 +83,7 @@ class SubCompanyTransfer(models.Model):
             'pick_id': picking_to_out.id
         })
         confirmation.process()
+        picking_to_out.to_stock()
 
     def action_transfer_in_automatic(self):
         origin_sale_id = self.feedback_id.production_id.origin_sale_id

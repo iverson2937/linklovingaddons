@@ -12,6 +12,11 @@
                             groups="stock.group_stock_user"/>
 
                 </xpath>
+                <!--<xpath expr="//button[@name='action_cancel']" position="after">-->
+                <!--<button name="check_purchase_order_line" string="赋值源采购行" type="object" class="oe_highlight"-->
+                <!--groups="base.group_erp_manager"/>-->
+                <!--</xpath>-->
+
 
                 <xpath expr="//button[@name='action_cancel']" position="attributes">
                     <attribute name="string">取消订单</attribute>

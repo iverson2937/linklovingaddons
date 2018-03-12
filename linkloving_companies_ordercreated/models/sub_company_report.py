@@ -121,7 +121,7 @@ class SubCompanyReport(models.Model):
                 })
         return data
 
-    def save_report_remark(self,**kwargs):
+    def save_report_remark(self, **kwargs):
         report_remark = kwargs['report_remark']
 
 
@@ -133,3 +133,7 @@ class PurchaseOrderInherit(models.Model):
      @api.multi
      def write(self, vals):
          return super(PurchaseOrderInherit, self).write(vals)
+
+     @api.multi
+     def sudo_write(self, vals):
+         return self.sudo().write(vals)
