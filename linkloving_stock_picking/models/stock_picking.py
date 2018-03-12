@@ -13,6 +13,11 @@ class StockPicking(models.Model):
 
     @api.multi
     def check_purchase_order_line(self):
+        """
+        莫名其妙stock.move 没有purchase_line_id,重新赋值
+        :return:
+        """
+
         for picking in self:
             for move in picking.move_lines:
                 line_id = self.env['purchase.order'].search([('name', '=', picking.origin)]).mapped(
