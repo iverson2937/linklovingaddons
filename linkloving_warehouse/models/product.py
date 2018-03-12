@@ -25,6 +25,9 @@
 import calendar
 import datetime
 import logging
+
+from odoo.tools import float_round
+
 _logger = logging.getLogger(__name__)
 from odoo import api
 from odoo import fields, models, _
@@ -38,6 +41,7 @@ def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
     :return: firstDay: 当月的第一天，datetime.date类型
               lastDay: 当月的最后一天，datetime.date类型
     """
+    print month, period
     if year:
         year = int(year)
     else:
@@ -45,15 +49,22 @@ def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
     if not period:
         period = 0
     if month <= 0:
-        year = year - 1
-        month = 12 + month
-        # 获取当月第一天的星期和当月的总天数
-    firstDayWeekDay, monthRange = calendar.monthrange(year, month)
+        last_year = year - 1
+        lastday_month = 12 + month
+    else:
+        lastday_month = month
+        last_year = year
+    if month - period <= 0:
+        first_year = year - 1
+        firstday_month = month - period + 12
+    else:
+        firstday_month = month - period
+        first_year = year
+    firstDay = datetime.date(year=first_year, month=firstday_month, day=1).strftime('%Y-%m-%d')
 
-    # 获取当月的第一天
-    firstDay = datetime.date(year=year, month=month - period, day=1).strftime('%Y-%m-%d')
+    firstDayWeekDay, monthRange = calendar.monthrange(year, lastday_month)
 
-    lastDay = datetime.date(year=year, month=month, day=monthRange).strftime('%Y-%m-%d')
+    lastDay = datetime.date(year=last_year, month=lastday_month, day=monthRange).strftime('%Y-%m-%d')
     print firstDay, lastDay
 
     return firstDay, lastDay
@@ -142,6 +153,46 @@ class ProductTemplate(models.Model):
     has_bom_line_lines = fields.Boolean(compute='has_bom_line_ids', string='是否有在BOM中', store=True)
     name = fields.Char('Name', index=True, required=True, translate=True, track_visibility='onchange')
     default_code = fields.Char(track_visibility='onchange')
+    mos_info = fields.Text('在产详情', compute="_compute_mos_info")
+
+    @api.multi
+    def _compute_mos_info(self):
+        M_P = self.env["mrp.production"].sudo()
+        mos = M_P.search([('product_tmpl_id', 'in', self.ids),
+                          ('state', 'not in', ['done', 'cancel'])],
+                         order='date_planned_finished')
+        mos_zz = {}
+        for mo in mos:
+            if mos_zz.get(mo.product_tmpl_id.id):
+                mos_zz[mo.product_tmpl_id.id] += mo
+            else:
+                mos_zz[mo.product_tmpl_id.id] = mo
+        for p in self:
+            product_mos = mos_zz.get(p.id, M_P)
+
+            info_str = ''
+            for mo in product_mos:
+                if mo.date_planned_finished:
+                    date_planned_finished = fields.datetime.strftime(fields.datetime.strptime(
+                            mo.date_planned_finished,
+                            '%Y-%m-%d %H:%M:%S'),
+                            '%Y-%m-%d')
+                else:
+                    date_planned_finished = u'暂无交期'
+                info_str += date_planned_finished + ' ' + (mo.name or '') + ' ' \
+                            + str(mo.product_qty) + ' ' + self.parse_state(mo.state) + '\n'
+            if info_str == '':
+                info_str = u'无在产详情信息'
+            p.mos_info = info_str
+
+    def parse_state(self, state):
+        selection = self.env["mrp.production"].sudo()._fields["state"].selection
+        state_str = ''
+        for state_tuple in selection:
+            if state == state_tuple[0]:
+                state_str = state_tuple[1]
+                break
+        return state_str
 
     @api.model
     def has_bom_line_ids(self):
@@ -272,13 +323,13 @@ class ProductTemplate(models.Model):
              "resized as a 64x64px image, with aspect ratio preserved. "
              "Use this field anywhere a small image is required.")
 
-    last1_month_qty = fields.Float(string=u'1个月')
-    last2_month_qty = fields.Float(string=u'3个月')
-    last3_month_qty = fields.Float(string=u'6个月')
+    last1_month_qty = fields.Float(string=u'1个月', copy=False)
+    last2_month_qty = fields.Float(string=u'3个月', copy=False)
+    last3_month_qty = fields.Float(string=u'6个月', copy=False)
 
-    last1_month_consume_qty = fields.Float(string=u'1个月')
-    last3_month_consume_qty = fields.Float(string=u'3个月')
-    last6_month_consume_qty = fields.Float(string=u'6个月')
+    last1_month_consume_qty = fields.Float(string=u'1个月', copy=False)
+    last3_month_consume_qty = fields.Float(string=u'3个月', copy=False)
+    last6_month_consume_qty = fields.Float(string=u'6个月', copy=False)
 
     status = fields.Selection([
         ('eol', '已停产'),
@@ -408,11 +459,8 @@ class ProductTemplate(models.Model):
             done_moves = self.env['stock.move'].search(
                 [('product_id', 'in', updated.mapped('product_variant_ids').ids)])
             for move in done_moves:
-                move.product_uom=vals['uom_id']
-            print done_moves,'************************************************'
-
-
-
+                move.product_uom = vals['uom_id']
+            print done_moves, '************************************************'
 
         return super(ProductTemplate, self).write(vals)
 

@@ -19,19 +19,30 @@ class AccountInvoice(models.Model):
             data = []
             for line in invoice.invoice_line_ids:
                 if line.invoice_line_tax_ids:
+
                     tax_name = line.invoice_line_tax_ids[0].amount / 100
+                    untax_price_unit = line.price_unit / (1 + float(tax_name))
                     tax_type = line.invoice_line_tax_ids[0].type_tax_use
                 else:
                     tax_name = 0
+                    untax_price_unit = line.price_unit
                     tax_type = 'bank'
 
                 res = {
                     'product_name': line.product_id.name,
                     'product_id': line.product_id.id,
+                    'product_uom': line.uom_id.name,
                     'quantity': line.quantity,
+                    # 未税单价
+                    'untax_price_unit': untax_price_unit,
+                    # 单价
                     'price_unit': line.price_unit,
+                    # 未税金额
                     'price_subtotal': line.price_subtotal,
+                    # 含稅金額
+                    'subtotal': line.quantity * line.price_unit,
                     'tax_name': tax_name,
+
                     'tax_type': tax_type
                 }
                 data.append(res)

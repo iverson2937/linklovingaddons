@@ -29,8 +29,8 @@ class SubCompanyReport(models.Model):
 
     @api.model
     def get_report(self):
-        sub_companies = self.env["res.partner"].search([('sub_company', '=', 'sub')])
-        pos = self.env["purchase.order"].search([('partner_id', 'in', sub_companies.ids),
+        sub_companies = self.env["res.partner"].sudo().search([('sub_company', '=', 'sub')])
+        pos = self.env["purchase.order"].sudo().search([('partner_id', 'in', sub_companies.ids),
                                                  ('state', '=', 'purchase')])
 
         report_vals = []
@@ -43,7 +43,7 @@ class SubCompanyReport(models.Model):
     @api.model
     def get_sub_company_report(self, **kwargs):
         so_id = kwargs.get("so_id")
-        so = self.env["sale.order"].browse(int(so_id))
+        so = self.env["sale.order"].sudo().browse(int(so_id))
         if not so:
             raise UserError(u'未找到对应的销售单')
 
@@ -63,8 +63,8 @@ class SubCompanyReport(models.Model):
         return so_data
 
     def get_all_process(self):
-        process = self.env["mrp.process"].search_read([("company_id", "=", self.env.user.company_id.id)],
-                                                      fields=["name"])
+        process = self.env["mrp.process"].sudo().search_read([("company_id", "=", self.env.user.company_id.id)],
+                                                             fields=["name"])
         return process
 
     def get_order_line_info(self, so):
@@ -100,8 +100,9 @@ class SubCompanyReport(models.Model):
             'handle_date': po.handle_date,
         }
         if po.first_so_number:
-            so_order = self.env["sale.order"].search([('name', '=', po.first_so_number)], limit=1)
-            manual_order = self.env["manual.procurement.order"].search([('name', '=', po.first_so_number)], limit=1)
+            so_order = self.env["sale.order"].sudo().search([('name', '=', po.first_so_number)], limit=1)
+            manual_order = self.env["manual.procurement.order"].sudo().search([('name', '=', po.first_so_number)],
+                                                                              limit=1)
             if so_order:
                 data.update({
                     'so': self.prepare_order_info(so_order),
@@ -110,7 +111,7 @@ class SubCompanyReport(models.Model):
                     'sale_man': so_order.user_id.name or '',
                 })
             elif manual_order:
-                res_partner = self.env["res.partner"].search([('sub_company', '=', "main")], limit=1)
+                res_partner = self.env["res.partner"].sudo().search([('sub_company', '=', "main")], limit=1)
                 data.update({
                     'so': self.prepare_order_info(manual_order),
                     'pi_number': manual_order.alia_name or '',
@@ -120,7 +121,7 @@ class SubCompanyReport(models.Model):
                 })
         return data
 
-    def save_report_remark(self,**kwargs):
+    def save_report_remark(self, **kwargs):
         report_remark = kwargs['report_remark']
 
 
@@ -132,3 +133,7 @@ class PurchaseOrderInherit(models.Model):
      @api.multi
      def write(self, vals):
          return super(PurchaseOrderInherit, self).write(vals)
+
+     @api.multi
+     def sudo_write(self, vals):
+         return self.sudo().write(vals)

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import logging
 
 import requests
 from requests import ConnectionError
@@ -20,7 +21,7 @@ class ProcurementOrderExtend(models.Model):
     @api.multi
     def make_po(self):
         res = []
-
+        logging.warning("0309_make_po_origin____________")
         for procurement in self:
             suppliers = procurement.product_id.seller_ids.filtered(
                     lambda r: not r.product_id or r.product_id == procurement.product_id)
@@ -51,4 +52,4 @@ class ProcurementOrderExtend(models.Model):
                 else:
                     return super(ProcurementOrderExtend, procurement).make_po()
             else:
-                return super(ProcurementOrderExtend, self).make_po()
+                return super(ProcurementOrderExtend, procurement).make_po()

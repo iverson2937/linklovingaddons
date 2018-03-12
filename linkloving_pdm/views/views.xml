@@ -137,10 +137,10 @@
 
                         <div class="o_row">
                             <span>在</span>
-                            <field name="now_parnter_id" required="1"
+                            <field name="now_parnter_id" required="1" options="{'no_create': True}"
                                    domain="[('id','in',context.get('now_parnter'))]"/>
                             <span>审核之后, 添加审核人</span>
-                            <field name="add_parnter_id" required="1"
+                            <field name="add_parnter_id" required="1" options="{'no_create': True}"
                                    domain="[('id','not in',context.get('add_parnter')),('employee', '=', True)]"/>
                             <span></span>
                         </div>
@@ -352,13 +352,13 @@
                                         <form string="审批流程">
                                             <group>
 
-                                                <field name="tag_approval_process_partner" string="审核人" readonly="0"/>
+                                                <field name="tag_approval_process_partner" domain="[('employee', '=', True)]" string="审核人" readonly="0"/>
 
                                             </group>
                                         </form>
                                         <tree string="Sales Order Lines" editable="bottom">
                                             <field name="sequence" widget="handle"/>
-                                            <field name="tag_approval_process_partner" string="审核人" readonly="0"/>
+                                            <field name="tag_approval_process_partner" domain="[('employee', '=', True)]" string="审核人" readonly="0"/>
                                         </tree>
                                         <kanban class="o_kanban_mobile">
                                             <!--<field name="sequence" widget="handle"/>-->

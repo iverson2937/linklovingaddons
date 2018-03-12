@@ -15,3 +15,30 @@
 
 /*.treegrid-expander-expanded{background-image: url(../img/collapse.png); }*/
 /*.treegrid-expander-collapsed{background-image: url(../img/expand.png);}*/
+
+.unlock_condition{
+    display: none;
+}
+.sel_pro,.adjusttime{
+    cursor: pointer;
+}
+.create_wrap{
+    position: fixed;
+    top: 5%;
+    left:0;
+    right:0;
+    margin: 0 auto;
+    width: 500px;
+    z-index: 1040;
+    background-color: white;
+    padding: 30px;
+}
+.unlock_condition .foot{
+    margin-top: 20px;
+}
+.change_time{
+    margin-top: 10px;
+}
+.save_process_sel{
+    margin: -100px 10px -128px 15px
+}
