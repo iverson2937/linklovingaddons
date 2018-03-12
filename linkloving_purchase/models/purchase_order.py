@@ -163,6 +163,11 @@ class PurchaseOrder(models.Model):
             pick.action_cancel()
         self.write({'state': 'done', 'is_shipped': True})
 
+    @api.one
+    def set_receive_qty(self):
+        for line in self.order_line:
+            line.qty_received = line.product_qty
+
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
@@ -281,8 +286,6 @@ class PurchaseOrderLine(models.Model):
         ('to invoice', u'待对账'),
         ('invoiced', u'已对账完成'),
     ], string=u'对账单状态', readonly=True, copy=False, default='no')
-
-
 
     @api.multi
     def _create_stock_moves(self, picking):
