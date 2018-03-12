@@ -2051,11 +2051,21 @@ class StcokPickingExtend(models.Model):
                     'res_id': wiz.id,
                     'context': self.env.context,
                 }
+            for operation in pick.pack_operation_ids:
+                if operation.qty_done < 0:
+                    raise UserError(_('No negative quantities allowed'))
+                if operation.qty_done > 0:
+                    operation.write({'product_qty': operation.qty_done})
+                else:
+                    pack_operations_delete |= operation
+            if pack_operations_delete:
+                pack_operations_delete.unlink()
+
             if pick.picking_type_code == 'incoming':
                 pick.is_cancel_backorder = True
                 pick.state = 'waiting_in'
             else:
-                self.do_transfer()
+                pick.do_transfer()
         return
 
     @api.multi
