@@ -37,15 +37,15 @@ class StockInventoryInherit(models.Model):
             mc = self.env['product.category'].search([('name', '=', '10木板原材料')])
             if mc:
                 wood.append(mc)
-            # if s.state == 'confirm' and wood:
-            #     categ_ids = s.mapped('line_ids.product_id.categ_id')
-            #
-            #     wood_material_approve_id = self.env['ir.values'].sudo().get_default(
-            #         'stock.config.settings', 'wood_material_approve_id')
-            #     if not wood_material_approve_id:
-            #         raise UserError('请设置木材库存调整审核人')
-            #     if any(c.id in wood for c in categ_ids):
-            #         s.to_approve_id = wood_material_approve_id
+            if s.state == 'confirm' and wood:
+                categ_ids = s.mapped('line_ids.product_id.categ_id')
+
+                wood_material_approve_id = self.env['ir.values'].sudo().get_default(
+                    'stock.config.settings', 'wood_material_approve_id')
+                if not wood_material_approve_id:
+                    raise UserError('请设置木材库存调整审核人')
+                if any(c.id in wood for c in categ_ids):
+                    s.to_approve_id = wood_material_approve_id
 
     @api.multi
     def _compute_can_approve(self):
