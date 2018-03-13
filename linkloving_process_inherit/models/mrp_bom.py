@@ -55,7 +55,7 @@ class MrpBom(models.Model):
         product_cost = line.product_id.pre_cost_cal_new(raise_exception=False)
         line_cost = product_cost * line.product_qty if product_cost else 0
         material_cost = line_cost * line.product_qty
-        man_cost = line.action_id.cost * line.line.product_qty if line.action_id else 0,
+        man_cost = line.action_id.cost * line.product_qty if line.action_id else 0
         total_cost = material_cost + man_cost
 
         res = {
@@ -100,7 +100,7 @@ def _get_rec(object, parnet, result, product_type_dict):
         product_cost = object.product_id.pre_cost_cal_new(raise_exception=False)
         line_cost = product_cost * object.product_qty if product_cost else 0
         material_cost = line_cost * object.product_qty
-        man_cost = l.action_id.cost if l.action_id else 0,
+        man_cost = l.action_id.cost if l.action_id else 0
         total_cost = material_cost + man_cost
 
         res = {

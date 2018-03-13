@@ -162,7 +162,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 cache: false,
                 sortable: true,
                 showToggle: true,
-                search: true,
+                // search: true,
                 striped: true,
                 showColumns: true,
                 showExport: true,
@@ -181,7 +181,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 icons: {
                     paginationSwitchDown: 'fa fa-caret-down',
                     paginationSwitchUp: 'fa fa-caret-right',
-                    refresh: 'glyphicon-refresh icon-refresh',
+                    refresh: 'fa fa-refresh',
                     toggle: 'fa-lg fa-list-ul',
                     columns: 'fa-th',
                     detailOpen: 'fa fa-caret-down',

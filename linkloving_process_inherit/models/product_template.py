@@ -17,6 +17,30 @@ class ProductTemplate(models.Model):
     def get_product_cost_detail(self):
         if self.bom_ids:
             return self.bom_ids[0].get_bom_cost_new()
+        else:
+            if self.product_ll_type:
+                product_type_dict = dict(
+                    self.fields_get(['product_ll_type'])['product_ll_type']['selection'])
+
+            material_cost = self.product_variant_ids[0].get_material_cost_new()
+            result = []
+            res = {
+                'id': 1,
+                'pid': 0,
+                'bom_id': self.id,
+                'product_tmpl_id': self.id,
+                'product_specs': self.product_specs,
+                'name': self.name_get()[0][1],
+                'code': self.default_code,
+                # 'process_id': [self.process_id.id, self.process_id.name],
+                'product_type': product_type_dict[self.product_ll_type],
+                'material_cost': round(material_cost, 2),
+                'manpower_cost': 0,
+                'total_cost': round(material_cost, 2),
+                # 'bom_ids': sorted(res, key=lambda product: product['code']),
+            }
+            result.append(res)
+            return result
 
 
 class ProductProduct(models.Model):
