@@ -33,10 +33,10 @@ class StockInventoryInherit(models.Model):
             wood = []
             kb = self.env['product.category'].search([('name', '=', 'KB卡板制程品')])
             if kb:
-                wood.append(kb)
+                wood.append(kb.id)
             mc = self.env['product.category'].search([('name', '=', '10木板原材料')])
             if mc:
-                wood.append(mc)
+                wood.append(mc.id)
             if s.state == 'confirm' and wood:
                 categ_ids = s.mapped('line_ids.product_id.categ_id')
 
