@@ -111,7 +111,8 @@ class CreateOrderPointWizard(models.TransientModel):
     def compute_shipping_date(self):
         sale_orders = self.env['sale.order'].search([('validity_date', '=', False)])
         for order in sale_orders:
-            order.validity_date = order.confirmation_date
+            if not order.validity_date:
+                order.validity_date = order.confirmation_date
 
     def compute_period_for_account_move(self):
         periods = self.env['account.period'].search([])
