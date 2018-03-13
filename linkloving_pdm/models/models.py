@@ -915,6 +915,13 @@ class ProductAttachmentInfo(models.Model):
 
     @api.model
     def create(self, vals):
+
+        if vals.get('remote_path'):
+            erro_data = self.env["product.attachment.info"].search(
+                [('temp_product_tmpl_ids', '=', False), ('remote_path', '=', vals.get('remote_path'))])
+            if erro_data:
+                raise UserError('修改导致的bug******' + str(erro_data.product_tmpl_id.name))
+
         if (vals.get("file_binary") or vals.get("remote_path")):
             vals['state'] = 'waiting_release'
 
