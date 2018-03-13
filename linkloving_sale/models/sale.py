@@ -173,7 +173,7 @@ class SaleOrderLine(models.Model):
     price_tax = fields.Monetary(string='Taxes', readonly=True, store=True, compute=None)
     price_total = fields.Monetary(string='Total', readonly=True, store=True, compute=None)
     qty_available = fields.Float(string=u'库存', related='product_id.qty_available')
-    validity_date = fields.Date(string=u'交货日期', related='order_id.validity_date')
+    validity_date = fields.Date(string=u'交货日期', related='order_id.validity_date', store=True)
 
     # FIXME:allen  how to remove this
     @api.onchange('product_uom_qty', 'product_uom', 'route_id')
@@ -272,7 +272,7 @@ class SaleOrderLine(models.Model):
                     'consu', 'product'):
                 line.invoice_status = 'to invoice'
             elif line.state == 'sale' and line.product_id.invoice_policy == 'order' and \
-                            float_compare(line.qty_delivered, line.product_uom_qty, precision_digits=precision) == 1:
+                    float_compare(line.qty_delivered, line.product_uom_qty, precision_digits=precision) == 1:
                 line.invoice_status = 'upselling'
             elif float_compare(line.qty_invoiced, line.product_uom_qty, precision_digits=precision) >= 0:
                 line.invoice_status = 'invoiced'
@@ -308,7 +308,7 @@ class SaleProcurementOrder(models.Model):
             'product_uom': self.product_uom.id,
             'product_uom_qty': qty_left,
             'partner_id': self.rule_id.partner_address_id.id or (
-                self.group_id and self.group_id.partner_id.id) or False,
+                    self.group_id and self.group_id.partner_id.id) or False,
             'location_id': self.rule_id.location_src_id.id,
             'location_dest_id': self.location_id.id,
             'move_dest_id': self.move_dest_id and self.move_dest_id.id or False,
