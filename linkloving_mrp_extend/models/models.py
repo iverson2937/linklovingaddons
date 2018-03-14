@@ -889,7 +889,7 @@ class MrpProductionExtend(models.Model):
             'bom_line_id': bom_line.id,
             'product_id': bom_line.product_id.id,
             'product_uom_qty': quantity,
-            'product_uom': self.product_id.uom_id.id,
+            'product_uom': bom_line.product_uom_id.id,
             'location_id': source_location.id,
             'location_dest_id': self.product_id.property_stock_production.id,
             'raw_material_production_id': self.id,
