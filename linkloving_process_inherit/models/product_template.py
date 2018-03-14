@@ -61,6 +61,33 @@ class ProductProduct(models.Model):
                 return product.get_highest_purchase_price(raise_exception=False)
 
     @api.multi
+    def get_pure_manpower_cost(self):
+        def _calc_manpower_cost(bom):
+            total_price = 0.0000
+            result, result2 = bom.explode(self, 1)
+            for sbom, sbom_data in result2:
+                if sbom.child_bom_id:  # 如果有子阶
+                    sub_bom_price = _calc_manpower_cost(sbom.child_bom_id) * sbom_data['qty']
+                    total_price += sub_bom_price
+                else:
+                    total_price = bom.manpower_cost
+
+            #  bom.manpower_cost
+
+            return total_price
+
+        bom_obj = self.env['mrp.bom']
+        for pp in self:
+            bom = bom_obj._bom_find(product=pp)
+            if bom:
+                man_power_cost = _calc_manpower_cost(bom)
+                return man_power_cost
+            else:
+                return 0
+
+
+
+    @api.multi
     def pre_cost_cal_new(self, raise_exception=True):
         """
         计算成本(工程核价)
@@ -89,7 +116,6 @@ class ProductProduct(models.Model):
             if total_price >= 0:
                 total_price = bom.product_uom_id._compute_price(total_price / bom.product_qty,
                                                                 self.uom_id) + bom.manpower_cost
-            print total_price, 'ddddd'
             return total_price
 
         bom_obj = self.env['mrp.bom']

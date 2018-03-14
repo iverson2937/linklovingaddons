@@ -16,8 +16,9 @@ class MrpBom(models.Model):
             product_type_dict = dict(
                 self.product_tmpl_id.fields_get(['product_ll_type'])['product_ll_type']['selection'])
         total_cost = self.product_tmpl_id.product_variant_ids[0].pre_cost_cal_new(raise_exception=False)
-        material_cost = self.product_tmpl_id.product_variant_ids[0].get_material_cost_new()
-        man_cost = total_cost - material_cost
+
+        man_cost = self.product_tmpl_id.product_variant_ids[0].get_pure_manpower_cost()
+        material_cost = total_cost - man_cost
         res = {
             'id': 1,
             'pid': 0,
@@ -53,7 +54,7 @@ class MrpBom(models.Model):
         if bom_id:
             process_id = bom_id[0].process_id.name
         product_cost = line.product_id.pre_cost_cal_new(raise_exception=False)
-        line_cost = product_cost * line.product_qty if product_cost else 0
+        line_cost = product_cost if product_cost else 0
         material_cost = line_cost * line.product_qty
         man_cost = line.action_id.cost * line.product_qty if line.action_id else 0
         total_cost = material_cost + man_cost
@@ -98,7 +99,7 @@ def _get_rec(object, parnet, result, product_type_dict):
             process_id = [bom_id[0].process_id.id, bom_id[0].process_id.name]
 
         product_cost = object.product_id.pre_cost_cal_new(raise_exception=False)
-        line_cost = product_cost * object.product_qty if product_cost else 0
+        line_cost = product_cost if product_cost else 0
         material_cost = line_cost * object.product_qty
         man_cost = l.action_id.cost if l.action_id else 0
         total_cost = material_cost + man_cost
