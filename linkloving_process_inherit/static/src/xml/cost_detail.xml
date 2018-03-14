@@ -10,12 +10,14 @@
             <div class="modal-backdrop  in"></div>
             <div class="create_wrap">
                 <div class="sel_process_wrap">
-                    <select>
+                    工序动作1<select class="sel_action_1">
 
-                    </select>
+                    </select>  系数<input type="text"/>
                 </div>
-                <div class="change_time">
-                    调整时间：<input type="text"/>
+                <div class="sel_process_wrap">
+                    工序动作2<select class="sel_action_2">
+
+                    </select>系数<input type="text"/>
                 </div>
                 <div class="foot">
                     <button class=" btn btn-primary confirm_sel" style="margin-left:112px">确定</button>
