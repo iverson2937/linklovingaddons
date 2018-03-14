@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+import logging
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
+_logger = logging.getLogger(__name__)
 
 class MrpProduction(models.Model):
     _inherit = 'mrp.production'
@@ -48,5 +50,7 @@ class MrpProduction(models.Model):
 
         else:
             for bom_line, line_data in exploded_lines:
+                _logger.warning("bom bom_line, %d/%d" % (bom_line.id, bom_line.bom_id.id))
+
                 moves += self._generate_raw_move(bom_line, line_data)
         return moves
