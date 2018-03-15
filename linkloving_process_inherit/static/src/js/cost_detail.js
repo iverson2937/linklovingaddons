@@ -106,7 +106,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             self.update_control_panel(cp_status);
 
             var formatter_func = function (value, row, index) {
-                var res = '<div>'
+                var res = '<div>';
                 if (value) {
                     for (var i = 0; i < value.length; i++) {
                         alert(value[i]['action_name'])
