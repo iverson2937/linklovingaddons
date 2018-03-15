@@ -1,0 +1,48 @@
+.mo_planned_top {
+    padding: 8px 15px;
+    margin-top: 30px;
+}
+
+#mo_planned_table > thead {
+    display: table-header-group !important;
+}
+
+#mo_planned_table .add_empty_tr {
+    display: none;
+}
+
+#mo_planned_table {
+    background-color: #fff;
+}
+
+a.detail-icon {
+    font-size: 30px;
+}
+
+#mo_planned_table tbody tr td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+i.icon-margin {
+    margin-left: 8px;
+}
+
+.mo_planned_top .fixed-table-body {
+    overflow: inherit;
+}
+
+th {
+    text-align: center;
+}
+
+/*text-align: center;*/
+/*}*/
+
+/*.bootstrap-table .table > thead > tr > .font_35_header {*/
+/*font-size: 35px;*/
+/*padding: 15px;*/
+/*}*/
+/*.bootstrap-table .table > thead > tr > .bg_hint {*/
+/*background-color: #f5f5f5;*/
+/*}*/

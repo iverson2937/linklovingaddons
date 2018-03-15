@@ -1,0 +1,15 @@
+<openerp>
+    <data>
+        <template id="assets_backend" name="statistic" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <!--<link rel="stylesheet" href="linkloving_companies_ordercreated/static/src/css/css.css"/>-->
+                <link rel="stylesheet" href="linkloving_mo_planned_report/static/css/css.css"/>
+
+                <!-- import stylesheet -->
+                <!-- import iView -->
+                <script typ="text/javascript"
+                        src="/linkloving_mo_planned_report/static/js/mo_planned_report.js"/>
+            </xpath>
+        </template>
+    </data>
+</openerp>
