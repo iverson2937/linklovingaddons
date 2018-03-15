@@ -878,35 +878,37 @@ class ProductAttachmentInfo(models.Model):
         print self.temp_product_tmpl_ids
 
         try:
-            for tmpl_id in self.temp_product_tmpl_ids:
-                print tmpl_id
-                # raise UserError("meishi")
+            if not self.product_tmpl_id:
+                for tmpl_id in self.temp_product_tmpl_ids:
+                    print tmpl_id
+                    # raise UserError("meishi")
 
-                Model = self.env['product.attachment.info']
+                    Model = self.env['product.attachment.info']
 
-                # product_one = self.copy()
-                # product_one['product_tmpl_id'] = tmpl_id.id
+                    # product_one = self.copy()
+                    # product_one['product_tmpl_id'] = tmpl_id.id
 
-                val = {'file_name': self.file_name,
-                       'file_binary': self.file_binary,
-                       'remote_path': self.remote_path,
+                    val = {'file_name': self.file_name,
+                           'file_binary': self.file_binary,
+                           'remote_path': self.remote_path,
 
-                       'remark': self.remark,
-                       'tag_type_id': self.tag_type_id.id,
-                       'tag_type_flow_id': self.tag_type_flow_id.id,
+                           'remark': self.remark,
+                           'tag_type_id': self.tag_type_id.id,
+                           'tag_type_flow_id': self.tag_type_flow_id.id,
 
-                       'state': 'waiting_release',
-                       'product_tmpl_id': tmpl_id.id,
-                       'type': self.type,
-                       'version': Model.with_context(
-                           {"product_id": int(tmpl_id.id), "type": self.type})._default_version(),
-                       }
+                           'state': 'waiting_release',
+                           'product_tmpl_id': tmpl_id.id,
+                           'type': self.type,
+                           'version': Model.with_context(
+                               {"product_id": int(tmpl_id.id), "type": self.type})._default_version(),
+                           }
 
-                attach = Model.create(val)
-                filename = attach.get_download_filename()
-                attach.write({'file_name': filename, 'state': attach.state})
-                # attach.file_name = filename
-        # self.unlink()
+                    attach = Model.create(val)
+                    filename = attach.get_download_filename()
+                    attach.write({'file_name': filename, 'state': attach.state})
+                    # attach.file_name = filename
+            else:
+                self.temp_product_tmpl_ids = False
         except:
             _logger.info("创建文件审核有误")
         finally:
@@ -915,12 +917,6 @@ class ProductAttachmentInfo(models.Model):
 
     @api.model
     def create(self, vals):
-
-        if vals.get('remote_path'):
-            erro_data = self.env["product.attachment.info"].search(
-                [('temp_product_tmpl_ids', '=', False), ('remote_path', '=', vals.get('remote_path'))])
-            if erro_data:
-                raise UserError('修改导致的bug******' + str(erro_data.product_tmpl_id.name))
 
         if (vals.get("file_binary") or vals.get("remote_path")):
             vals['state'] = 'waiting_release'

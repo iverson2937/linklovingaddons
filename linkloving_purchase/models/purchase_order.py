@@ -93,6 +93,31 @@ class PurchaseOrder(models.Model):
         ('invoiced', u'已对账完成'),
     ], string=u'对账单状态', compute='_get_invoiced', store=True, readonly=True, copy=False, default='no')
 
+    @api.depends('state', 'order_line.qty_invoiced', 'order_line.qty_received', 'order_line.product_qty')
+    def _get_invoiced(self):
+        precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+        for order in self:
+            if order.state not in ('purchase', 'done'):
+                order.invoice_status = 'no'
+                continue
+
+            if any(float_compare(line.qty_invoiced,
+                                 line.product_qty if line.product_id.purchase_method == 'purchase' else line.qty_received,
+                                 precision_digits=precision) == -1 for line in order.order_line):
+                order.invoice_status = 'to invoice'
+            elif all(float_compare(line.qty_invoiced,
+                                   line.product_qty if line.product_id.purchase_method == 'purchase' else line.qty_received,
+                                   precision_digits=precision) >= 0 for line in order.order_line) and order.invoice_ids:
+                order.invoice_status = 'invoiced'
+            elif all(float_compare(line.qty_invoiced,
+                                   line.qty_received if line.product_id.purchase_method == 'purchase' else line.qty_received,
+                                   precision_digits=precision) >= 0 for line in
+                     order.order_line) and order.invoice_ids and not order.picking_ids.filtered(
+                lambda picking_id: picking_id.state not in ('cancel', 'done')):
+                order.invoice_status = 'invoiced'
+            else:
+                order.invoice_status = 'no'
+
     shipping_status = fields.Selection([
         ('no', u'未入库'),
         ('part_shipping', u'部分入库'),
@@ -162,7 +187,6 @@ class PurchaseOrder(models.Model):
         for pick in self.picking_ids.filtered(lambda r: r.state not in ('cancel', 'done')):
             pick.action_cancel()
         self.write({'state': 'done', 'is_shipped': True})
-
 
 
 class PurchaseOrderLine(models.Model):
