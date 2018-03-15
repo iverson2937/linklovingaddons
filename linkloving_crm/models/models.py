@@ -353,7 +353,9 @@ class CrmLead(models.Model):
 
         else:
             # 根据用户获取销售团队 然后再除去团队管理者
-            all_salesman_team = self.env.user.sale_team_id.member_ids - self.env.user.sale_team_id.user_id
+            # all_salesman_team = self.env.user.sale_team_id.member_ids - self.env.user.sale_team_id.user_id
+            # 不取出团队管理者
+            all_salesman_team = self.env.user.sale_team_id.member_ids
 
             # 这是过滤销售团队里面 权限为所有文档的人
             # for new_salesman_one in all_salesman_team:

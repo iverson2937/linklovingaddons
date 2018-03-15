@@ -1594,6 +1594,7 @@ class LinklovingAppApi(http.Controller):
                 'product_id': {
                     'product_id': qc_feedback.product_id.id,
                     'product_name': qc_feedback.product_id.name,
+                    "product_default_code": qc_feedback.product_id.default_code or '',
                     'product_specs': qc_feedback.product_id.product_specs or '',
                     'image_ids': [
                         {'image_url': LinklovingAppApi.get_product_image_url_new(urlBean.id, 'ir.attachment')}
