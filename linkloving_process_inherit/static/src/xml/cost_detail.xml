@@ -12,16 +12,14 @@
         <div class="unlock_condition close_this_container">
             <div class="modal-backdrop  in"></div>
             <div class="create_wrap">
-                <div class="sel_process_wrap">
-                    工序动作1<select class="sel_action_1">
+                <table id="action_table" class="table table-bordered">
+                     <tr>
+    <th>工序动作</th>
+    <th>系数</th>
+  </tr>
 
-                    </select>  系数<input type="text"/>
-                </div>
-                <div class="sel_process_wrap">
-                    工序动作2<select class="sel_action_2">
+                </table>
 
-                    </select>系数<input type="text"/>
-                </div>
                 <div class="foot">
                     <button class=" btn btn-primary confirm_sel" style="margin-left:112px">确定</button>
                     <button class="btn btn-default alia_cancel">取消</button>
