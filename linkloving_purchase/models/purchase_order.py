@@ -370,6 +370,36 @@ class PurchaseOrderLine(models.Model):
                 done += moves.create(template)
         return done
 
+    # 重写变更价格条件,只有在产品变更的时候再找价格
+    @api.onchange('product_id')
+    def _onchange_quantity(self):
+        if not self.product_id:
+            return
+
+        seller = self.product_id._select_seller(
+            partner_id=self.partner_id,
+            quantity=self.product_qty,
+            date=self.order_id.date_order and self.order_id.date_order[:10],
+            uom_id=self.product_uom)
+
+        if seller or not self.date_planned:
+            self.date_planned = self._get_date_planned(seller).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+
+        if not seller:
+            return
+
+        price_unit = self.env['account.tax']._fix_tax_included_price_company(seller.price,
+                                                                             seller.tax_id,
+                                                                             self.taxes_id,
+                                                                             self.company_id) if seller else 0.0
+        if price_unit and seller and self.order_id.currency_id and seller.currency_id != self.order_id.currency_id:
+            price_unit = seller.currency_id.compute(price_unit, self.order_id.currency_id)
+
+        if seller and self.product_uom and seller.product_uom != self.product_uom:
+            price_unit = seller.product_uom._compute_price(price_unit, self.product_uom)
+
+        self.price_unit = price_unit
+
 
 class manual_combine_po(models.TransientModel):
     _name = "manual.combine.po"
