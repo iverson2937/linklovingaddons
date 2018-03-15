@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+    <t t-name="MoPlannedReport">
+        <div class="mo_planned_top">
+            <div class="toolbar">
+                <button id="btn-expand-all" class="btn btn-default">全部展开</button>
+                <button id="btn-collapse-all" class="btn btn-default">全部收起</button>
+            </div>
+            <table id="mo_planned_table">
+            </table>
+        </div>
+    </t>
+</templates>
