@@ -6,7 +6,7 @@ from odoo import models, fields, api
 class BomCostCategoryTemp(models.Model):
     _name = 'bom.cost.category.temp'
     category_id = fields.Many2one('product.category')
-    p_product_id = fields.Many2one('product.product')
+    p_categ_id = fields.Many2one('product.category')
     product_id = fields.Many2one('product.product')
     action_id_1 = fields.Many2one('mrp.process.action')
     rate1 = fields.Float()

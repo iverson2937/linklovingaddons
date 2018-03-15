@@ -72,7 +72,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             self.edit_arr.push({
                 'id': self.table_data[self.index].id,
                 'process_action_1': action_1,
-                'process_action_2': action_2
+                'process_action_2': action_2,
             });
             $('.unlock_condition').hide();
             if ($('.fixed-table-toolbar .save_process_sel').length == 0) {
@@ -104,54 +104,64 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 // cp_content: _.extend({}, self.searchview_elements, {}),
             };
             self.update_control_panel(cp_status);
+
+            var formatter_func = function (value, row, index) {
+                var res = '<div>'
+                if (value) {
+                    for (var i = 0; i < value.length; i++) {
+                        alert(value[i]['action_name'])
+                        res = res + value[i]['action_name'] + '<span>' + res + value[i]['rate'] + '</span>'
+                    }
+                }
+                res + '</div>'
+
+
+                console.log(res)
+                return res
+            };
             new Model('product.template').call('get_product_cost_detail', [product_id]).then(function (records) {
                 console.log(records);
                 self.table_data = records;
                 self.bom_id = records[0].bom_id;
                 var columns = [{
-                    field: 'name',
-                    title: '名称',
-                }, {
-                    field: 'product_type',
-                    title: '物料类型',
-                },
-                    {
-                        field: 'qty',
-                        title: '配比',
-                    },
-                    {
-                        field: 'process_action_1',
-                        title: '工序动作1',
-                        'class': 'sel_action_1',
-                    },
-                    {
-                        field: 'action_rate2',
-                        title: '系数',
-                        'class': 'action_rate1',
-                    },
-                    {
-                        field: 'process_action_2',
-                        title: '工序动作2',
-                        'class': 'sel_action_2',
-                    },
-                    {
-                        field: 'action_rate2',
-                        title: '系数',
-                        'class': 'action_rate2',
-                    },
-                    {
-                        field: 'material_cost',
-                        title: '材料成本',
+                        field: 'name',
+                        title: '名称',
                     }, {
-                        field: 'manpower_cost',
-                        title: '人工成本',
+                        field: 'product_type',
+                        title: '物料类型',
                     },
-                    {
-                        field: 'total_cost',
-                        title: '总计',
-                    }
+                        {
+                            field: 'qty',
+                            title: '配比',
+                        },
+                        {
+                            field: 'process_action',
+                            title: '工序动作',
+                            class: 'sel_action',
+                            formatter: formatter_func
 
-                ];
+                        },
+
+                        {
+                            field: 'material_cost',
+                            title:
+                                '材料成本',
+                        }
+                        ,
+                        {
+                            field: 'manpower_cost',
+                            title:
+                                '人工成本',
+                        }
+                        ,
+                        {
+                            field: 'total_cost',
+                            title:
+                                '总计',
+                        }
+
+                    ]
+                ;
                 self.columns = columns;
                 self.initTableSubCompany(columns, records)
 

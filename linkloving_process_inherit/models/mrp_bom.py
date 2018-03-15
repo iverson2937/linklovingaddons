@@ -98,10 +98,13 @@ class MrpBom(models.Model):
             # 'manpower_cost': round(man_cost, 2),
             # 'total_cost': round(total_cost, 2),
             'process_id': process_id,
-            'process_action_1': temp_date.get('action_id_1'),
-            'action_rate_1': temp_date.get('rate_1'),
-            'process_action_2': temp_date.get('action_id_2'),
-            'action_rate_1': temp_date.get('rate_2'),
+            'process_action': [
+                {
+                    'action_id': 12,
+                    'action_name': '包装',
+                    'rate': 1
+                }
+            ],
 
         }
         return res
@@ -170,9 +173,13 @@ class MrpBom(models.Model):
             # 'manpower_cost': round(man_cost, 2),
             # 'total_cost': round(total_cost, 2),
             'process_id': process_id,
-            'process_action_1': line.action_id_1.name if line.action_id_1 else '',
-            'process_action_2': line.action_id_2.name if line.action_id_2 else '',
-
+            'process_action': [
+                {
+                    'action_id': 12,
+                    'action_name': '包装',
+                    'rate': 1
+                }
+            ]
         }
 
         return res
@@ -273,14 +280,20 @@ def _get_rec(object, parnet, result, product_type_dict):
 
 class MrpBomLine(models.Model):
     _inherit = 'mrp.bom.line'
-    action_id_1 = fields.Many2one('mrp.process.action')
-    rate1 = fields.Float()
-    rate3 = fields.Float()
-    cost1 = fields.Float(string=u'动作成本1', related='action_id_1.cost')
-    action_id_2 = fields.Many2one('mrp.process.action')
-    cost2 = fields.Float(string=u'动作成本2', related='action_id_2.cost')
 
     # sub_total_cost = fields.Float(compute='_get_sub_total_cost')
+    action_line_ids = fields.One2many('process.action.line', 'bom_line_id')
+
+    def parse_action_line_data(self):
+        res = []
+        for line in self.action_line_ids:
+            data = {
+                'action_id': line.action_id.id,
+                'action_name': line.action_id.name,
+                'rate': line.rate
+            }
+            res.append(data)
+        return res
 
     @api.multi
     def _get_adjust_total_cost(self):
@@ -332,3 +345,10 @@ class MrpBomLine(models.Model):
             bom_line_id.write(action_date)
 
         return self.env['mrp.bom'].browse(int(bom_id)).get_bom_cost_new()
+
+
+class ProcessActionLine(models.Model):
+    _name = 'process.action.line'
+    bom_line_id = fields.Many2one('mrp.bom.line')
+    action_id = fields.Many2one('mrp.process.action')
+    rate = fields.Float()
