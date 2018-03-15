@@ -225,21 +225,18 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                         console.log(item)
                         console.log($element)
 
-                        new Model('mrp.bom.line').call('get_action_options', [item.id]).then(function (data) {
+                        new Model('mrp.bom.line').call('get_process_action_ids', [item.id]).then(function (data) {
                             console.log(data);
                             if (data.length > 0) {
 
-                                ('.unlock_condition table').show()
-
-
-                                // $('.unlock_condition select').html('');
+                                $('.unlock_condition').show();
                                 // $('.unlock_condition select').append(QWeb.render('process_option_templ', {result: data}));
                                 // $('.unlock_condition').attr('data-id', item.id).show();
-                                // // if (self.table_data[index].has_extra) {
-                                // //     $('.change_time').show()
-                                // // } else {
-                                // //     $('.change_time').hide()
-                                // // }
+                                // if (self.table_data[index].has_extra) {
+                                //     $('.change_time').show()
+                                // } else {
+                                //     $('.change_time').hide()
+                                // }
                             }
 
                         })

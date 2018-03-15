@@ -284,6 +284,9 @@ class MrpBomLine(models.Model):
     # sub_total_cost = fields.Float(compute='_get_sub_total_cost')
     action_line_ids = fields.One2many('process.action.line', 'bom_line_id')
 
+    def get_process_action_ids(self):
+        pass
+
     def parse_action_line_data(self):
         res = []
         for line in self.action_line_ids:
