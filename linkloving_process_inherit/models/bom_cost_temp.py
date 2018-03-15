@@ -13,15 +13,15 @@ class BomCostCategoryTemp(models.Model):
     action_id_2 = fields.Many2one('mrp.process.action')
     rate2 = fields.Float()
 
-    @api.model
-    def create_temp_data(self, category_id, p_product_id, product_id, action_id_1, rate1, action_id_2, rate2):
-        vals = {
-            'category_id': category_id,
-            'p_product_id': p_product_id,
-            'product_id': product_id,
-            'action_id_1': action_id_1,
-            'rate1': rate1,
-            'action_id_2': action_id_2,
-            'rate2': rate2
-        }
-        self.env['bom.cost.category.temp'].create(vals)
+    # @api.model
+    # def create_temp_data(self, category_id, p_product_id, product_id, action_id_1, rate1, action_id_2, rate2):
+    #     vals = {
+    #         'category_id': category_id,
+    #         'p_product_id': p_product_id,
+    #         'product_id': product_id,
+    #         'action_id_1': action_id_1,
+    #         'rate1': rate1,
+    #         'action_id_2': action_id_2,
+    #         'rate2': rate2
+    #     }
+    #     self.env['bom.cost.category.temp'].create(vals)

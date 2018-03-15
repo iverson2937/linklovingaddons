@@ -18,7 +18,23 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             'click .confirm_sel': 'confirm_sel_func',
             'click .alia_cancel': 'alia_cancel_func',
             'click .adjusttime': 'sel_pro_func',
-            'click .save_process_sel': 'save_process_sel_func'
+            'click .save_process_sel': 'save_process_sel_func',
+            'click .get_default': 'get_default_func',
+
+        },
+        get_default_func: function () {
+            var self = this;
+            new Model('mrp.bom.line').call('get_default_data', [self.edit_arr], {'bom_id': self.bom_id}).then(function (results) {
+                console.log(results);
+
+                //刷新界面
+                $("#table").bootstrapTable('destroy');
+
+                //    保存后要清空数组
+                self.edit_arr = [];
+
+            });
+
         },
         save_process_sel_func: function () {
             var self = this;
