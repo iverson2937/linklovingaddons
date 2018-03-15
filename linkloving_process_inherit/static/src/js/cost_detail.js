@@ -229,15 +229,17 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                             console.log(data);
                             if (data.length > 0) {
 
-                                $('.unlock_condition select').html('');
-                                $('.unlock_condition select').append(QWeb.render('process_option_templ', {result: data}));
-                                $('.unlock_condition').attr('data-id', item.id).show();
-                                $('.unlock_condition .change_time input').val('');
-                                // if (self.table_data[index].has_extra) {
-                                //     $('.change_time').show()
-                                // } else {
-                                //     $('.change_time').hide()
-                                // }
+                                ('.unlock_condition table').show()
+
+
+                                // $('.unlock_condition select').html('');
+                                // $('.unlock_condition select').append(QWeb.render('process_option_templ', {result: data}));
+                                // $('.unlock_condition').attr('data-id', item.id).show();
+                                // // if (self.table_data[index].has_extra) {
+                                // //     $('.change_time').show()
+                                // // } else {
+                                // //     $('.change_time').hide()
+                                // // }
                             }
 
                         })

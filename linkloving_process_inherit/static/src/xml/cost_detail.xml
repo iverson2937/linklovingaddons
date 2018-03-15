@@ -14,9 +14,25 @@
             <div class="create_wrap">
                 <table id="action_table" class="table table-bordered">
                      <tr>
-    <th>工序动作</th>
-    <th>系数</th>
-  </tr>
+                        <th>工序动作</th>
+                        <th>系数</th>
+                     </tr>
+                    <!--<t t-foreach="values['salesman_name_list']" t-as="val">-->
+                    <!--<tr >-->
+                    <!--<td>-->
+                    <!--<t t-esc="val['name']"/>-->
+                    <!--</td>-->
+                    <!--<td>-->
+                    <!--<input type="text" class="my_order_name" t-att-value="val.target_sales_invoiced"/>-->
+                    <!--</td>-->
+                    <!--<td>-->
+                    <!--<input type="text" class="my_opportunity_name" t-att-value="val.target_sales_won"/>-->
+                    <!--</td>-->
+                    <!--<td>-->
+                    <!--<input type="text" class="my_order_name" t-att-value="val.target_sales_year"/>-->
+                    <!--</td>-->
+                    <!--</tr>-->
+                    <!--</t>-->
 
                 </table>
 
