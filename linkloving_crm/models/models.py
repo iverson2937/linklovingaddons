@@ -346,7 +346,7 @@ class CrmLead(models.Model):
                 for team_user_one in team_one.member_ids:
 
                     sale_order_list = self.env['sale.order'].sudo().search(
-                        domain_salesman + [('user_id', '=', team_user_one.id), ('create_date', '>', day_begin)])
+                        domain_salesman + [('user_id', '=', team_user_one.id), ('create_date', '>=', day_begin)])
                     for sale_one in sale_order_list:
                         team_sale_sum += sale_one.amount_total
                 data_team_list.append(team_sale_sum)
@@ -379,18 +379,18 @@ class CrmLead(models.Model):
         year_sale_sum_temporary = 0
 
         if self.env.ref('sales_team.group_sale_manager').id in self.env.user.groups_id.ids:
-            sale_order_man_list = self.env['sale.order'].search(domain_salesman + [('create_date', '>', year_begin)])
+            sale_order_man_list = self.env['sale.order'].search(domain_salesman + [('create_date', '>=', year_begin)])
             for sale_one_man in sale_order_man_list:
                 year_sale_sum_temporary += sale_one_man.amount_total
             sale_order_man_month_list = self.env['sale.order'].search(
-                domain_salesman + [('create_date', '>', day_begin)])
+                domain_salesman + [('create_date', '>=', day_begin)])
             for sale_one_month_man in sale_order_man_month_list:
                 new_res['sale_order']['self_sale_amount_total'] += sale_one_month_man.amount_total
         else:
             for team_user_one in all_salesman_team:
                 sale_sum = 0
                 sale_order_list = self.env['sale.order'].sudo().search(
-                    domain_salesman + [('user_id', '=', team_user_one.id), ('create_date', '>', day_begin)])
+                    domain_salesman + [('user_id', '=', team_user_one.id), ('create_date', '>=', day_begin)])
                 for sale_one in sale_order_list:
                     sale_sum += sale_one.amount_total
                 data_list.append(sale_sum)
@@ -399,7 +399,7 @@ class CrmLead(models.Model):
                     new_res['sale_order']['self_sale_amount_total'] = sale_sum
                     year_sale_order_list = self.env['sale.order'].search(domain_salesman +
                                                                          [('user_id', '=', team_user_one.id),
-                                                                          ('create_date', '>', year_begin)])
+                                                                          ('create_date', '>=', year_begin)])
                     for year_sale_one in year_sale_order_list:
                         year_sale_sum += year_sale_one.amount_total
 
@@ -408,7 +408,7 @@ class CrmLead(models.Model):
             year_sale_sum_charge = 0
             year_sale_order_list = self.env['sale.order'].search(
                 domain_salesman + [('user_id', 'in', [ad.id for ad in all_salesman_team]),
-                                   ('create_date', '>', year_begin)])
+                                   ('create_date', '>=', year_begin)])
             for year_sale_one in year_sale_order_list:
                 year_sale_sum_charge += year_sale_one.amount_total
             year_sale_sum = year_sale_sum_charge
