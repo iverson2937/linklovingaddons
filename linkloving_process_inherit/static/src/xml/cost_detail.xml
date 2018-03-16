@@ -14,6 +14,7 @@
             <div class="create_wrap">
                 <table id="action_table" class="table table-bordered">
                      <tr>
+                         <th>  </th>
                         <th>工序动作</th>
                         <th>系数</th>
                      </tr>
@@ -48,6 +49,9 @@
     <t t-name="process_action_table" >
     <t t-foreach="result" t-as="item">
         <tr>
+             <td>
+                <i class="fa fa-plus-square-o" aria-hidden="true"></i>
+            </td>
             <td>
                 <select t-data-id="item.line_id">
                      <t t-foreach="options" t-as="item">

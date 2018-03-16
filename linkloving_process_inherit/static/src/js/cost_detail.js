@@ -20,8 +20,18 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             'click .adjusttime': 'sel_pro_func',
             'click .save_process_sel': 'save_process_sel_func',
             'click .get_default': 'get_default_func',
+            'click .fa-plus-square-o': 'add_action_line_func',
 
         },
+        add_action_line_func: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var self = this;
+            $(target).parents('tr').append(" <b>Hello world!</b>");
+
+
+        },
+
         get_default_func: function () {
             var self = this;
             new Model('mrp.bom.line').call('get_default_data', [self.edit_arr], {'bom_id': self.bom_id}).then(function (results) {
@@ -109,7 +119,6 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 var res = '<div>';
                 if (value) {
                     for (var i = 0; i < value.length; i++) {
-                        alert(value[i]['action_name'])
                         res = res + value[i]['action_name'] + '<span>' + res + value[i]['rate'] + '</span>'
                     }
                 }
