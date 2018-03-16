@@ -240,7 +240,6 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                         console.log($element)
 
                         new Model('mrp.bom.line').call('parse_action_line_data', [item.id]).then(function (data) {
-                            console.log(data);
                             var data = [
                                 {'line_id': 1, 'selected_action_id': 1, 'selected_action_name': '包装', 'rate': 1},
                                 {'action_id': 2, 'action_name': '包装', 'rate': 1}
@@ -256,7 +255,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                                 }
                             ]
                             $('.unlock_condition').show();
-
+                            $('#action_table').html();
                             $('#action_table').append(QWeb.render('process_action_table', {
                                 result: data,
                                 options: options
