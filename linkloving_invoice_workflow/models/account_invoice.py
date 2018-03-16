@@ -41,7 +41,7 @@ class AccountInvoice(models.Model):
                     'price_subtotal': line.price_subtotal,
                     # 含稅金額
                     'subtotal': line.quantity * line.price_unit,
-                    'tax_name': tax_name,
+                    'tax_name': 0.17,
 
                     'tax_type': tax_type
                 }
