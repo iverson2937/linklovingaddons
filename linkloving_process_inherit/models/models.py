@@ -13,4 +13,3 @@ class MrpProcessAction(models.Model):
 class MrpProcess(models.Model):
     _inherit = 'mrp.process'
     process_action_ids = fields.One2many('mrp.process.action', 'process_id')
-    has_extra = fields.Boolean()
