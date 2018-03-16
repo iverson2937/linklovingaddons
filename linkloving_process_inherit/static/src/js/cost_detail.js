@@ -69,8 +69,10 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var bom_line_id = $('.unlock_condition').data('id');
             var action_1 = $('.sel_action_1 select option:selected').val();
             var action_2 = $('.sel_action_2 select option:selected').val();
-            $('.treegrid-' + bom_line_id).find('.sel_action_1').html(action_2);
-            $('.treegrid-' + bom_line_id).find('.sel_action_2').html(action_2);
+            var result = [];
+
+
+            $('.treegrid-' + bom_line_id).find('.sel_action').html(action_2);
             // self.table_data[self.index]['process_action_1'] = $('.unlock_condition select option:selected').val();
             // if ($('.unlock_condition .change_time input').val() != '') {
             //     $('.fixed-table-body tr[data-index=' + self.index + ']').find('.adjusttime').html($('.unlock_condition .change_time input').val());
@@ -116,17 +118,20 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             self.update_control_panel(cp_status);
 
             var formatter_func = function (value, row, index) {
-                var res = '<div>';
-                if (value) {
-                    for (var i = 0; i < value.length; i++) {
-                        res = res + value[i]['action_name'] + '<span>' + res + value[i]['rate'] + '</span>'
-                    }
-                }
-                res + '</div>'
 
 
-                console.log(res)
-                return res
+                var abc = QWeb.render('action_process');
+                // QWeb.render('action_process')
+                //  var res = '<div>';
+                //  if (value) {
+                //      for (var i = 0; i < value.length; i++) {
+                //          res = res + value[i]['action_name'] + '<span>' + res + value[i]['rate'] + '</span>'
+                //      }
+                //  }
+                //  res + '</div>'
+
+
+                return abc
             };
             new Model('product.template').call('get_product_cost_detail', [product_id]).then(function (records) {
                 console.log(records);

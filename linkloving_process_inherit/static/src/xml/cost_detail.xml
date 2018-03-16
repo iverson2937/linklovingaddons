@@ -14,7 +14,6 @@
             <div class="create_wrap">
                 <table id="action_table" class="table table-bordered">
                      <tr>
-                         <th>  </th>
                         <th>工序动作</th>
                         <th>系数</th>
                      </tr>
@@ -49,11 +48,9 @@
     <t t-name="process_action_table" >
     <t t-foreach="result" t-as="item">
         <tr>
-             <td>
-                <i class="fa fa-plus-square-o" aria-hidden="true"></i>
-            </td>
+
             <td>
-                <select t-data-id="item.line_id">
+                <select t-data-id="item.line_id" class="form-control">
                      <t t-foreach="options" t-as="item">
             <option t-att-data-id="item.option_id"><t t-esc="item.option_name"/></option>
         </t>
@@ -61,7 +58,7 @@
         </select>
             </td>
             <td>
-                <input name="rate" value="2"/>
+                <input name="rate" value="2" class="form-control"/>
             </td>
         </tr>
 
@@ -69,6 +66,16 @@
         </t>
 
     </t>
+
+
+    <t t-name="action_process">
+        <ul class="list-group">
+            <li class="list-group-item">ww<span class="badge">新</span></li>
+            <li class="list-group-item">ww<span class="badge">新</span></li>
+        </ul>
+
+    </t>
+
 
     <t t-name="process_option_templ">
         <t t-foreach="result[0]" t-as="item">
