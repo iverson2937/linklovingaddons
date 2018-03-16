@@ -63,8 +63,26 @@ class PlannedDetailReport(models.Model):
             if state == sel[0]:
                 return sel[1]
 
+    def get_purchase_product(self, product):
+        if product.purchase_ok and self.env.ref("purchase.route_warehouse0_buy") in product.route_ids:
+            return product
+
+        def reci_bom_po(product):
+            product_can_pruchase = self.env["product.product"].sudo()
+            boms, lines = product.bom_ids[0].explode(product, 1)
+            for bom_line, data in lines:
+                sub_product = bom_line.product_id
+                if sub_product.purchase_ok and self.env.ref("purchase.route_warehouse0_buy") in sub_product.route_ids:
+                    product_can_pruchase += sub_product
+                else:
+                    product_can_pruchase += reci_bom_po(sub_product)
+            return product_can_pruchase
+
+        all_can_purchase_product = reci_bom_po(product)
+        return all_can_purchase_product
+
     def _prepare_report_vals(self):
-        process_ids = self.env["mrp.process"].sudo().search([])
+        # process_ids = self.env["mrp.process"].sudo().search([])
         mrp_production = self.env["mrp.production"].sudo()
         vals = []
         mos = mrp_production.search([('origin_sale_id', 'in', self.sale_ids.ids)])
@@ -72,17 +90,17 @@ class PlannedDetailReport(models.Model):
         index = 1
         for sale in self.sale_ids:
             for line in sale.order_line:
+                all_can_purchase_product = self.get_purchase_product(line.product_id)
+
                 line_mo = mos.filtered(
                     lambda x: x.origin_sale_id == sale and line.product_id == x.product_id)  # 对应这个订单行的MO号
-                related_mos = self.get_related_mos(line_mo, mos)
-                orders = related_mos.read(fields=MO_FIELDS)
-                mos_vals = []
-                for mo_order in related_mos:
-                    pos = self.env["purchase.order"].sudo().search([('state', 'not in', ['done', 'cancel', 'purchase']),
-                                                                    ('origin', 'like', mo_order.name)])
+
+                product_vals = []
+                for purchase_product in all_can_purchase_product:
+                    po_lines = self.env["purchase.order.line"].sudo().search([('product_id', '=', purchase_product.id)])
 
                     pos_vals = []
-                    for po_line in pos.mapped("order_line"):
+                    for po_line in po_lines.filtered(lambda x: x.order_id.state not in ['cancel']):
                         pos_vals.append({
                             'id': po_line.order_id.id,
                             'name': po_line.order_id.name,
@@ -90,20 +108,19 @@ class PlannedDetailReport(models.Model):
                             'state': self.selection_mapped(po_line.order_id._fields.get("state").selection,
                                                            po_line.order_id.state),
                             'product_name': po_line.product_id.display_name,
-                            'qty_available': po_line.product_id.qty_available,
-                            'virtual_available': po_line.product_id.virtual_available,
-                            'incoming_qty': po_line.product_id.incoming_qty,
+                            # 'qty_available': po_line.product_id.qty_available,
+                            # 'virtual_available': po_line.product_id.virtual_available,
+                            # 'incoming_qty': po_line.product_id.incoming_qty,
                             'product_qty': po_line.product_qty,
+                            'qty_received': po_line.qty_received,
                         })
 
-                    mos_vals.append({
-                        'name': mo_order.name,
-                        'state': self.selection_mapped(mo_order._fields.get("state").selection, mo_order.state),
-
-                        'product_name': mo_order.product_id.display_name,
-                        'process_name': mo_order.process_id.name or '',
-                        'date_planned_finished': mo_order.date_planned_finished,
-                        'product_qty': mo_order.product_qty,
+                    product_vals.append({
+                        'name': purchase_product.display_name,
+                        'qty_available': purchase_product.qty_available,
+                        'virtual_available': purchase_product.virtual_available,
+                        'incoming_qty': purchase_product.incoming_qty,
+                        # 'state': self.selection_mapped(purchase_product._fields.get("state").selection, purchase_product.state),
                         'orders': pos_vals,
                     })
 
@@ -112,8 +129,9 @@ class PlannedDetailReport(models.Model):
                     'validity_date': sale.validity_date or '',
                     'partner_name': sale.partner_id.name,
                     'pi_number': sale.pi_number or '',
+                    'product_name': line.product_id.display_name,
                     'order_qty': line.product_qty,
-                    'orders': mos_vals,
+                    'orders': product_vals,
                 })
                 index += 1
 

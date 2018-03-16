@@ -92,7 +92,12 @@ odoo.define('linkloving_mo_planned_report.mo_planned_report', function (require)
                 {
                     field: 'pi_number',
                     title: 'PI号码',
+                }, {
+                    field: 'product_name',
+                    title: '产品',
+                    sortable: true,
                 },
+
                 {
                     field: 'order_qty',
                     title: '订单数量',
@@ -181,6 +186,18 @@ odoo.define('linkloving_mo_planned_report.mo_planned_report', function (require)
                 onExpandRow: function (index, row, $detail) {
                     self.initTablePos(row.orders, $detail);
                 },
+                rowStyle: function (row, index) {
+                    //这里有5个取值代表5中颜色['active', 'success', 'info', 'warning', 'danger'];
+                    var strclass = "";
+                    if (row.virtual_available <= 0) {
+                        strclass = 'danger';//还有一个active
+                    }
+                    else {
+                        return {}
+                    }
+
+                    return {classes: strclass}
+                },
             });
             self.$(cur_table).bootstrapTable(options);
         },
@@ -242,38 +259,21 @@ odoo.define('linkloving_mo_planned_report.mo_planned_report', function (require)
             }
             var row1 = [{
                 field: 'name',
-                title: '单号',
-                sortable: true,
-            }, {
-                field: 'state',
-                title: '状态',
-                sortable: true,
-            }, {
-                field: 'product_name',
                 title: '产品',
                 sortable: true,
             }, {
-                field: 'process_name',
-                title: '工序',
+                field: 'qty_available',
+                title: '库存',
+                sortable: true,
+            }, {
+                field: 'virtual_available',
+                title: '预测数量',
+                sortable: true,
+            }, {
+                field: 'incoming_qty',
+                title: '在产数量',
                 sortable: true,
             },
-                {
-                    field: 'date_planned_finished',
-                    title: 'MO预计结束日期',
-                    sortable: true,
-                    formatter: function (value, row, index) {
-                        if (value) {
-                            return new Date(value.replace(/-/g, "/")).Format("yyyy-MM-dd");
-                        } else {
-                            return '暂无时间'
-                        }
-                    },
-                },
-                {
-                    field: 'product_qty',
-                    title: '订单数量',
-                    sortable: true,
-                },
             ]
             return [row1];
         },
@@ -329,16 +329,12 @@ odoo.define('linkloving_mo_planned_report.mo_planned_report', function (require)
                 field: 'product_qty',
                 title: '订单数量',
                 sortable: true,
-            }, {
-                field: 'qty_available',
-                title: '库存',
-            }, {
-                field: 'virtual_available',
-                title: '预测数量',
-            }, {
-                field: 'incoming_qty',
-                title: '在产数量',
             },
+                {
+                    field: 'qty_received',
+                    title: '已收货数量',
+                    sortable: true,
+                },
                 {
                     field: 'handle_date',
                     title: 'PO交期',
