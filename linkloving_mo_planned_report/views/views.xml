@@ -1,0 +1,77 @@
+<openerp>
+    <data>
+        <record id="view_planned_detail_report_tree" model="ir.ui.view">
+            <field name="name">planned.detail.report.tree</field>
+            <field name="model">planned.detail.report</field>
+            <field name="arch" type="xml">
+                <tree string="排产记录表">
+                    <field name="name"/>
+                    <field name="create_date"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_planned_detail_report_form" model="ir.ui.view">
+            <field name="name">planned.detail.report.form</field>
+            <field name="model">planned.detail.report</field>
+            <field name="arch" type="xml">
+                <form string="排产记录表">
+                    <header>
+                        <button name="action_view_detail_report" string="查看详细报表" class="oe_highlight" type="object"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" required="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <field name="sale_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="validity_date"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!--<record id="mo_planned_report_form" model="ir.ui.view">-->
+        <!--<field name="name">mo.planned.report.form</field>-->
+        <!--<field name="model">mo.planned.report</field>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<form string="报表筛选">-->
+        <!--<sheet>-->
+        <!--<group>-->
+        <!--<field name="sale_ids" require="1" widget="many2many_tags"/>-->
+        <!--</group>-->
+        <!--</sheet>-->
+        <!--<footer>-->
+        <!--<button name="action_view_report" string="查看报表" type="object" default_focus="1"-->
+        <!--class="oe_highlight"/>-->
+        <!--or-->
+        <!--<button string="取消" class="oe_link" special="cancel"/>-->
+        <!--</footer>-->
+        <!--</form>-->
+        <!--</field>-->
+        <!--</record>-->
+
+        <record model="ir.actions.act_window" id="action_view_wizard_form">
+            <field name="name">排产记录表</field>
+            <field name="res_model">planned.detail.report</field>
+            <!--<field name="context">{'search_default_stockable':1}</field>-->
+            <field name="view_mode">tree,form</field>
+            <!--<field name="help">Display the latest Inventories and Moves done on your products and easily sort them with specific filtering criteria. If you do frequent and partial inventories, you need this report in order to ensure that the stock of each product is controlled at least once a year. This also lets you find out which products have seen little move lately and may deserve special measures (discounted sale, quality control...)</field>-->
+        </record>
+
+        <menuitem id="menuitem_mo_planned_report"
+                  action="action_view_wizard_form"
+                  name="排产记录表"
+                  parent="mrp.menu_mrp_reporting"
+                  sequence="1"
+        />
+    </data>
+</openerp>

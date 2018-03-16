@@ -3,20 +3,40 @@
 <templates xml:space="preserve">
     <t t-name="CostDetail">
         <div class="sub_company_top">
+            <div class="toolbar">
+                <button  class="btn btn-default get-default">获取默认</button>
             <table id="table">
             </table>
         </div>
+            </div>
         <div class="unlock_condition close_this_container">
             <div class="modal-backdrop  in"></div>
             <div class="create_wrap">
-                <div class="sel_process_wrap">
-                    <select>
+                <table id="action_table" class="table table-bordered">
+                     <tr>
+                         <th>  </th>
+                        <th>工序动作</th>
+                        <th>系数</th>
+                     </tr>
+                    <!--<t t-foreach="values['salesman_name_list']" t-as="val">-->
+                    <!--<tr >-->
+                    <!--<td>-->
+                    <!--<t t-esc="val['name']"/>-->
+                    <!--</td>-->
+                    <!--<td>-->
+                    <!--<input type="text" class="my_order_name" t-att-value="val.target_sales_invoiced"/>-->
+                    <!--</td>-->
+                    <!--<td>-->
+                    <!--<input type="text" class="my_opportunity_name" t-att-value="val.target_sales_won"/>-->
+                    <!--</td>-->
+                    <!--<td>-->
+                    <!--<input type="text" class="my_order_name" t-att-value="val.target_sales_year"/>-->
+                    <!--</td>-->
+                    <!--</tr>-->
+                    <!--</t>-->
 
-                    </select>
-                </div>
-                <div class="change_time">
-                    调整时间：<input type="text"/>
-                </div>
+                </table>
+
                 <div class="foot">
                     <button class=" btn btn-primary confirm_sel" style="margin-left:112px">确定</button>
                     <button class="btn btn-default alia_cancel">取消</button>
@@ -25,9 +45,34 @@
         </div>
     </t>
 
+
+    <t t-name="process_action_table" >
+    <t t-foreach="result" t-as="item">
+        <tr>
+             <td>
+                <i class="fa fa-plus-square-o" aria-hidden="true"></i>
+            </td>
+            <td>
+                <select t-data-id="item.line_id">
+                     <t t-foreach="options" t-as="item">
+            <option t-att-data-id="item.option_id"><t t-esc="item.option_name"/></option>
+        </t>
+
+        </select>
+            </td>
+            <td>
+                <input name="rate" value="2"/>
+            </td>
+        </tr>
+
+
+        </t>
+
+    </t>
+
     <t t-name="process_option_templ">
-        <t t-foreach="result" t-as="item">
-            <option t-att-data-id="item[0].id"><t t-esc="item[0].name"/></option>
+        <t t-foreach="result[0]" t-as="item">
+            <option t-att-data-id="item.id"><t t-esc="item.name"/></option>
         </t>
     </t>
 </templates>

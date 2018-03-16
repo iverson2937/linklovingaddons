@@ -398,7 +398,7 @@
 
         <menuitem
                 id="crm_sale_action_partner_menu_form"
-                name="潜在客户"
+                name="活动客户"
                 parent="sales_team.menu_sales"
                 sequence="1"
                 action="crm_sale_action_partner_form1"/>

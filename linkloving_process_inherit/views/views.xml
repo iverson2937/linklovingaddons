@@ -7,6 +7,7 @@
             <field name="model">mrp.process</field>
             <field name="inherit_id" ref="linkloving_process.mrp_process_form"/>
             <field name="arch" type="xml">
+
                 <xpath expr="//group" position="after">
                     <!-- Add your fields or attributes here -->
                     <notebook>

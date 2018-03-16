@@ -93,6 +93,31 @@ class PurchaseOrder(models.Model):
         ('invoiced', u'已对账完成'),
     ], string=u'对账单状态', compute='_get_invoiced', store=True, readonly=True, copy=False, default='no')
 
+    @api.depends('state', 'order_line.qty_invoiced', 'order_line.qty_received', 'order_line.product_qty')
+    def _get_invoiced(self):
+        precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+        for order in self:
+            if order.state not in ('purchase', 'done'):
+                order.invoice_status = 'no'
+                continue
+
+            if any(float_compare(line.qty_invoiced,
+                                 line.product_qty if line.product_id.purchase_method == 'purchase' else line.qty_received,
+                                 precision_digits=precision) == -1 for line in order.order_line):
+                order.invoice_status = 'to invoice'
+            elif all(float_compare(line.qty_invoiced,
+                                   line.product_qty if line.product_id.purchase_method == 'purchase' else line.qty_received,
+                                   precision_digits=precision) >= 0 for line in order.order_line) and order.invoice_ids:
+                order.invoice_status = 'invoiced'
+            elif all(float_compare(line.qty_invoiced,
+                                   line.qty_received if line.product_id.purchase_method == 'purchase' else line.qty_received,
+                                   precision_digits=precision) >= 0 for line in
+                     order.order_line) and order.invoice_ids and not order.picking_ids.filtered(
+                lambda picking_id: picking_id.state not in ('cancel', 'done')):
+                order.invoice_status = 'invoiced'
+            else:
+                order.invoice_status = 'no'
+
     shipping_status = fields.Selection([
         ('no', u'未入库'),
         ('part_shipping', u'部分入库'),
@@ -282,8 +307,6 @@ class PurchaseOrderLine(models.Model):
         ('invoiced', u'已对账完成'),
     ], string=u'对账单状态', readonly=True, copy=False, default='no')
 
-
-
     @api.multi
     def _create_stock_moves(self, picking):
         moves = self.env['stock.move']
@@ -346,6 +369,36 @@ class PurchaseOrderLine(models.Model):
                 template['product_uom_qty'] = diff_quantity
                 done += moves.create(template)
         return done
+
+    # 重写变更价格条件,只有在产品变更的时候再找价格
+    @api.onchange('product_id')
+    def _onchange_quantity(self):
+        if not self.product_id:
+            return
+
+        seller = self.product_id._select_seller(
+            partner_id=self.partner_id,
+            quantity=self.product_qty,
+            date=self.order_id.date_order and self.order_id.date_order[:10],
+            uom_id=self.product_uom)
+
+        if seller or not self.date_planned:
+            self.date_planned = self._get_date_planned(seller).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+
+        if not seller:
+            return
+
+        price_unit = self.env['account.tax']._fix_tax_included_price_company(seller.price,
+                                                                             seller.tax_id,
+                                                                             self.taxes_id,
+                                                                             self.company_id) if seller else 0.0
+        if price_unit and seller and self.order_id.currency_id and seller.currency_id != self.order_id.currency_id:
+            price_unit = seller.currency_id.compute(price_unit, self.order_id.currency_id)
+
+        if seller and self.product_uom and seller.product_uom != self.product_uom:
+            price_unit = seller.product_uom._compute_price(price_unit, self.product_uom)
+
+        self.price_unit = price_unit
 
 
 class manual_combine_po(models.TransientModel):
@@ -487,3 +540,15 @@ class PurchaseReturnPicking(models.TransientModel):
         new_picking.action_confirm()
         new_picking.action_assign()
         return new_picking.id, picking_type_id
+
+
+class AccountTax(models.Model):
+    _inherit = 'account.tax'
+
+    @api.model
+    def _fix_tax_included_price_company(self, price, prod_taxes, line_taxes, company_id):
+        if company_id:
+            # To keep the same behavior as in _compute_tax_id
+            prod_taxes = prod_taxes.filtered(lambda tax: tax.company_id == company_id)
+            line_taxes = line_taxes.filtered(lambda tax: tax.company_id == company_id)
+        return self._fix_tax_included_price(price, prod_taxes, line_taxes)

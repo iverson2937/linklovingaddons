@@ -300,6 +300,12 @@ class MrpProductionExtend(models.Model):
 
         return super(MrpProductionExtend, self).create(vals)
 
+    @api.multi
+    def write(self, vals):
+        if 'state' in vals and vals['state'] == 'waiting_material' and self.bom_id.state not in ('draft', 'release'):
+            raise UserError('BOM还没通过审核,请联系相关负责人')
+        return super(MrpProductionExtend, self).write(vals)
+
     def action_view_secondary_mos(self):
         mos = self.env["mrp.production"].search([("origin", "ilike", self.name),
                                                  ("state", "=", "done")])
@@ -2051,11 +2057,21 @@ class StcokPickingExtend(models.Model):
                     'res_id': wiz.id,
                     'context': self.env.context,
                 }
+            for operation in pick.pack_operation_ids:
+                if operation.qty_done < 0:
+                    raise UserError(_('No negative quantities allowed'))
+                if operation.qty_done > 0:
+                    operation.write({'product_qty': operation.qty_done})
+                else:
+                    pack_operations_delete |= operation
+            if pack_operations_delete:
+                pack_operations_delete.unlink()
+
             if pick.picking_type_code == 'incoming':
                 pick.is_cancel_backorder = True
                 pick.state = 'waiting_in'
             else:
-                self.do_transfer()
+                pick.do_transfer()
         return
 
     @api.multi

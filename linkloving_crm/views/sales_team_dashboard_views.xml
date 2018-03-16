@@ -28,6 +28,19 @@
             <!--<field name="can_be_expensed" eval="True"/>-->
         </record>
 
+        <record id="message_label_connect" model="message.label">
+            <field name="name">建立联系</field>
+            <field name="type">service</field>
+            <!--<field name="categ_id" ref="hr_expense.cat_expense"/>-->
+            <!--<field name="can_be_expensed" eval="True"/>-->
+        </record>
+
+        <record id="crm_lead_crm_stage" model="crm.stage">
+            <field name="name">建立联系</field>
+            <field name="type">service</field>
+        </record>
+
+
         <record id="linkloving_crm_view_crm_case_opportunities_filter" model="ir.ui.view">
             <field name="name">crm.lead.search.opportunity</field>
             <field name="model">crm.lead</field>

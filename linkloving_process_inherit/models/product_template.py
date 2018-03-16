@@ -17,6 +17,30 @@ class ProductTemplate(models.Model):
     def get_product_cost_detail(self):
         if self.bom_ids:
             return self.bom_ids[0].get_bom_cost_new()
+        else:
+            if self.product_ll_type:
+                product_type_dict = dict(
+                    self.fields_get(['product_ll_type'])['product_ll_type']['selection'])
+
+            material_cost = self.product_variant_ids[0].get_material_cost_new()
+            result = []
+            res = {
+                'id': 1,
+                'pid': 0,
+                'bom_id': self.id,
+                'product_tmpl_id': self.id,
+                'product_specs': self.product_specs,
+                'name': self.name_get()[0][1],
+                'code': self.default_code,
+                # 'process_id': [self.process_id.id, self.process_id.name],
+                'product_type': product_type_dict[self.product_ll_type],
+                'material_cost': round(material_cost, 2),
+                'manpower_cost': 0,
+                'total_cost': round(material_cost, 2),
+                # 'bom_ids': sorted(res, key=lambda product: product['code']),
+            }
+            result.append(res)
+            return result
 
 
 class ProductProduct(models.Model):
@@ -35,6 +59,33 @@ class ProductProduct(models.Model):
                 return material_cost
             else:
                 return product.get_highest_purchase_price(raise_exception=False)
+
+    @api.multi
+    def get_pure_manpower_cost(self):
+        def _calc_manpower_cost(bom):
+            total_price = 0.0000
+            result, result2 = bom.explode(self, 1)
+            for sbom, sbom_data in result2:
+                if sbom.child_bom_id:  # 如果有子阶
+                    sub_bom_price = _calc_manpower_cost(sbom.child_bom_id) * sbom_data['qty']
+                    total_price += sub_bom_price
+                else:
+                    total_price = bom.manpower_cost
+
+            #  bom.manpower_cost
+
+            return total_price
+
+        bom_obj = self.env['mrp.bom']
+        for pp in self:
+            bom = bom_obj._bom_find(product=pp)
+            if bom:
+                man_power_cost = _calc_manpower_cost(bom)
+                return man_power_cost
+            else:
+                return 0
+
+
 
     @api.multi
     def pre_cost_cal_new(self, raise_exception=True):
@@ -65,7 +116,6 @@ class ProductProduct(models.Model):
             if total_price >= 0:
                 total_price = bom.product_uom_id._compute_price(total_price / bom.product_qty,
                                                                 self.uom_id) + bom.manpower_cost
-            print total_price, 'ddddd'
             return total_price
 
         bom_obj = self.env['mrp.bom']

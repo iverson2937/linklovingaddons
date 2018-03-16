@@ -122,7 +122,7 @@
                                         <field name="state" invisible="1"/>
                                         <field name="account_id" groups="account.group_account_user"
                                                attrs="{'no_create':True}"/>
-                                        <field name="unit_amount" sum="Total Amount" widget="monetary" string="金额"
+                                        <field name="unit_amount" widget="monetary" string="金额"
                                                readonly="0"/>
                                         <field name="analytic_account_id" groups="analytic.group_analytic_accounting"
                                                invisible="1"/>
@@ -139,6 +139,7 @@
                                         <field name="employee_id" required="1" invisible="1"/>
                                         <field name="department_id" required="1" invisible="1"/>
                                         <field name="state" invisible="1"/>
+                                        <field name="total_amount" sum="Total Amount"/>
                                         <field name="description" string="备注"/>
                                     </tree>
                                     <form>

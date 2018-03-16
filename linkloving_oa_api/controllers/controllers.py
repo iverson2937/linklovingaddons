@@ -3828,9 +3828,9 @@ class LinklovingOAApi(http.Controller):
             'visit_date_begin': visitBean.visit_date_begin,
             'visit_date_end': visitBean.visit_date_end,
             'visit_name': visitBean.visit_name,
-            'partner_phone': visitBean.partner_phone,
-            'partner_contact_way': visitBean.partner_contact_way,
-            'partner_state': visitBean.partner_state,
+            'partner_phone': visitBean.partner_phone if visitBean.partner_phone else '',
+            'partner_contact_way': visitBean.partner_contact_way if visitBean.partner_contact_way else '',
+            # 'partner_state': visitBean.partner_state,
             'visit_target': visitBean.visit_target,
             'content_description': visitBean.content_description,
             'summary': visitBean.summary,
@@ -3847,3 +3847,40 @@ class LinklovingOAApi(http.Controller):
                 request.httprequest.host_url, str(img_id.id), 'visit.partner.image', 'visit_image')
             imgs.append(url)
         return imgs
+
+    @http.route('/linkloving_oa_api/get_sale_team', type='json', auth='none', csrf=False, cors='*')
+    def get_sale_team(self, **kw):
+        uid = request.jsonrequest.get("uid")
+        user = request.env["res.users"].sudo().browse(uid)
+        team_list=[]
+        for team in user.sale_team_id:
+            data = {
+                'team_id': team.id,
+                'team_name': team.name
+            }
+            team_list.append(data)
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=team_list)
+
+    #查询一个销售团队的成员
+    @http.route('/linkloving_oa_api/get_saleteam_person', type='json', auth='none', csrf=False, cors='*')
+    def get_saleteam_person(self, **kw):
+        team_id = request.jsonrequest.get("team_id")
+        domain = [('sale_team_id', '=', team_id)]
+        user = request.env["res.users"].sudo().search(domain)
+        user_list = []
+        bean = {
+            'user_id': -1,
+            'user_name': '全部',
+            'is_choose': True
+        }
+        user_list.append(bean)
+        for userBean in user:
+            data = {
+                'user_id': userBean.id,
+                'user_name': userBean.display_name,
+                'is_choose': False
+            }
+            user_list.append(data)
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=user_list)

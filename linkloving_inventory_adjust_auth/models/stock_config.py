@@ -8,7 +8,7 @@ class StockSettings(models.TransientModel):
 
     raw_material_approve_id = fields.Many2one('res.users', string=u'原材料调整审核人')
     finished_material_approve_id = fields.Many2one('res.users', string=u'制成品调整审核人')
-    wood_material_approve_id = fields.Many2one('res.users', string=u'制成品调整审核人')
+    wood_material_approve_id = fields.Many2one('res.users', string=u'木板半成品调整审核人')
     stock_adjust_account_id = fields.Many2one('account.account')
 
     @api.multi

@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_planned_detail_report,linkloving_mo_planned_report.planned_detail_report,model_planned_detail_report,,1,1,1,1
