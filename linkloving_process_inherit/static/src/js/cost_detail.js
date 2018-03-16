@@ -225,19 +225,34 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                         console.log(item)
                         console.log($element)
 
-                        new Model('mrp.bom.line').call('get_process_action_ids', [item.id]).then(function (data) {
+                        new Model('mrp.bom.line').call('parse_action_line_data', [item.id]).then(function (data) {
                             console.log(data);
-                            if (data.length > 0) {
+                            var data = [
+                                {'line_id': 1, 'selected_action_id': 1, 'selected_action_name': '包装', 'rate': 1},
+                                {'action_id': 2, 'action_name': '包装', 'rate': 1}
+                            ];
+                            var options = [
+                                {
+                                    'id': 1,
+                                    'name': '包装'
+                                },
+                                {
+                                    'id': 2,
+                                    'name': '包装1'
+                                }
+                            ]
+                            $('.unlock_condition').show();
 
-                                $('.unlock_condition').show();
-                                // $('.unlock_condition select').append(QWeb.render('process_option_templ', {result: data}));
-                                // $('.unlock_condition').attr('data-id', item.id).show();
-                                // if (self.table_data[index].has_extra) {
-                                //     $('.change_time').show()
-                                // } else {
-                                //     $('.change_time').hide()
-                                // }
-                            }
+                            $('#action_table').append(QWeb.render('process_action_table', {
+                                result: data,
+                                options: options
+                            }));
+                            // $('.unlock_condition').attr('data-id', item.id).show();
+                            // if (self.table_data[index].has_extra) {
+                            //     $('.change_time').show()
+                            // } else {
+                            //     $('.change_time').hide()
+                            // }
 
                         })
 
