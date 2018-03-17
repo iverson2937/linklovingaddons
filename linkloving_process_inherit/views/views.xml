@@ -16,6 +16,8 @@
                                 <tree editable="bottom">
                                     <field name="name"/>
                                     <field name="cost"/>
+                                    <field name="speed"/>
+                                    <field name="hour_price"/>
                                 </tree>
                             </field>
                         </page>

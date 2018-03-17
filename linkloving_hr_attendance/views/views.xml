@@ -1,59 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-  <data>
-    <!-- explicit list view definition -->
-    <!--
-    <record model="ir.ui.view" id="linklovinr_hr_attendance.list">
-      <field name="name">linklovinr_hr_attendance list</field>
-      <field name="model">linklovinr_hr_attendance.linklovinr_hr_attendance</field>
-      <field name="arch" type="xml">
-        <tree>
-          <field name="name"/>
-          <field name="value"/>
-          <field name="value2"/>
-        </tree>
-      </field>
-    </record>
-    -->
+      <record model="ir.actions.act_window" id="hr_attendance_devices">
+            <field name="name">考勤机</field>
+            <field name="res_model">linkloving.ble.device</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
 
-    <!-- actions opening views on models -->
-    <!--
-    <record model="ir.actions.act_window" id="linklovinr_hr_attendance.action_window">
-      <field name="name">linklovinr_hr_attendance window</field>
-      <field name="res_model">linklovinr_hr_attendance.linklovinr_hr_attendance</field>
-      <field name="view_mode">tree,form</field>
+      <record id="view_attendance_device_tree" model="ir.ui.view">
+        <field name="name">linkloving.ble.device.tree</field>
+        <field name="model">linkloving.ble.device</field>
+        <field name="arch" type="xml">
+            <tree string="1">
+                  <field name="device_name" string="设备名"/>
+                  <field name="company_name" string="公司名"/>
+            </tree>
+        </field>
     </record>
-    -->
+      <menuitem id="menu_hr_attendance_devices" name="考勤机" parent="hr_attendance.menu_hr_attendance_manage_attendances" sequence="25" action="hr_attendance_devices"/>
 
-    <!-- server action to the one above -->
-    <!--
-    <record model="ir.actions.server" id="linklovinr_hr_attendance.action_server">
-      <field name="name">linklovinr_hr_attendance server</field>
-      <field name="model_id" ref="model_linklovinr_hr_attendance_linklovinr_hr_attendance"/>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "tree,form",
-          "res_model": self._name,
-        }
-      </field>
-    </record>
-    -->
-
-    <!-- Top menu item -->
-    <!--
-    <menuitem name="linklovinr_hr_attendance" id="linklovinr_hr_attendance.menu_root"/>
-    -->
-    <!-- menu categories -->
-    <!--
-    <menuitem name="Menu 1" id="linklovinr_hr_attendance.menu_1" parent="linklovinr_hr_attendance.menu_root"/>
-    <menuitem name="Menu 2" id="linklovinr_hr_attendance.menu_2" parent="linklovinr_hr_attendance.menu_root"/>
-    -->
-    <!-- actions -->
-    <!--
-    <menuitem name="List" id="linklovinr_hr_attendance.menu_1_list" parent="linklovinr_hr_attendance.menu_1"
-              action="linklovinr_hr_attendance.action_window"/>
-    <menuitem name="Server to list" id="linklovinr_hr_attendance" parent="linklovinr_hr_attendance.menu_2"
-              action="linklovinr_hr_attendance.action_server"/>
-    -->
-  </data>
 </odoo>

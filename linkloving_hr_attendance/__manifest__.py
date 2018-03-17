@@ -27,6 +27,7 @@
         # 'security/ir.model.access.csv',
         'report/hr_employee_badge.xml',
         'views/templates.xml',
+        'views/views.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
