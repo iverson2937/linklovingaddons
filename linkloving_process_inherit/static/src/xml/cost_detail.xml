@@ -18,6 +18,9 @@
                         <th>系数</th>
                          <th>操作</th>
                      </tr>
+                    <tbody>
+
+                    </tbody>
                     <!--<t t-foreach="values['salesman_name_list']" t-as="val">-->
                     <!--<tr >-->
                     <!--<td>-->

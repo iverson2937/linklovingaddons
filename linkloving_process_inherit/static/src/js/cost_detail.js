@@ -283,9 +283,9 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                                 }
                             ];
                             $('.unlock_condition').show();
-                            $('#action_table').html();
+                            $('#action_table').find('tbody').html('');
                             console.log(datas);
-                            $('#action_table').append(QWeb.render('process_action_table', {
+                            $('#action_table').find('tbody').append(QWeb.render('process_action_table', {
                                 result: datas,
                                 options: options
                             }));
