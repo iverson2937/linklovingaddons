@@ -27,7 +27,11 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var self = this;
-            $(target).parents('tr').append(" <b>Hello world!</b>");
+            var options = [{
+                'id': 'name'
+            }];
+            var tr = QWeb.render('action_process_tr', {'options': options})
+            $(target).parents('tr').after(tr);
 
 
         },
@@ -67,9 +71,19 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
         confirm_sel_func: function () {
             var self = this;
             var bom_line_id = $('.unlock_condition').data('id');
-            var action_1 = $('.sel_action_1 select option:selected').val();
-            var action_2 = $('.sel_action_2 select option:selected').val();
-            var result = [];
+            var trs = $('.unlock_condition').find('tr');
+            var actions = [];
+
+            for (var i = 0; i < trs.length; i++) {
+                console.log($(trs[i]))
+                var res= {
+                    'id': $(trs[i]).find('select').data('id'),
+                    'action_id': $(trs[i]).find('select').val(),
+                    'rate': $(trs[i]).find('input').val()
+                };
+                console.log(res);
+                actions.push(res)
+            }
 
 
             $('.treegrid-' + bom_line_id).find('.sel_action').html(action_2);
@@ -82,9 +96,8 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             console.log(self.index);
             console.log(self);
             self.edit_arr.push({
-                'id': self.table_data[self.index].id,
-                'process_action_1': action_1,
-                'process_action_2': action_2,
+                'id': bom_line_id,
+                'actions':actions
             });
             $('.unlock_condition').hide();
             if ($('.fixed-table-toolbar .save_process_sel').length == 0) {
@@ -158,24 +171,21 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
 
                         {
                             field: 'material_cost',
-                            title:
-                                '材料成本',
+                            title: '材料成本',
                         }
                         ,
                         {
                             field: 'manpower_cost',
-                            title:
-                                '人工成本',
+                            title: '人工成本',
                         }
                         ,
                         {
                             field: 'total_cost',
-                            title:
-                                '总计',
+                            title: '总计',
                         }
 
                     ]
-                ;
+                    ;
                 self.columns = columns;
                 self.initTableSubCompany(columns, records)
 

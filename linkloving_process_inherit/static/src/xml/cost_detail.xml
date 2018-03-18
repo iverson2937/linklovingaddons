@@ -16,6 +16,7 @@
                      <tr>
                         <th>工序动作</th>
                         <th>系数</th>
+                         <th>操作</th>
                      </tr>
                     <!--<t t-foreach="values['salesman_name_list']" t-as="val">-->
                     <!--<tr >-->
@@ -58,7 +59,11 @@
         </select>
             </td>
             <td>
-                <input name="rate" value="2" class="form-control"/>
+                <input name="rate" class="form-control"/>
+            </td>
+            <td>
+            <span class="fa fa-plus-square-o"></span>
+
             </td>
         </tr>
 
@@ -67,7 +72,25 @@
 
     </t>
 
+<t t-name="action_process_tr">
+    <tr>
+        <td>
+                          <select  class="form-control">
+                     <t t-foreach="options" t-as="item">
+                          <option t-att-data-id="item.option_id"><t t-esc="item.option_name"/></option>
+        </t>
 
+        </select>
+        </td>
+        <td>
+            <input name="rate" class="form-control" />
+
+        </td>
+        <td>
+             <span class="fa fa-plus-square-o"></span>
+        </td>
+    </tr>
+</t>
     <t t-name="action_process">
         <ul class="list-group">
             <li class="list-group-item">ww<span class="badge">新</span></li>
