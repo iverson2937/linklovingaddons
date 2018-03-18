@@ -281,7 +281,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                                     'id': 2,
                                     'name': '包装1'
                                 }
-                            ]
+                            ];
                             $('.unlock_condition').show();
                             $('#action_table').html();
                             console.log(datas);

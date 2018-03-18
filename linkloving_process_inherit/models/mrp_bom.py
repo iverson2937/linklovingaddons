@@ -328,21 +328,22 @@ class MrpBomLine(models.Model):
         bom_id = kwargs.get('bom_id')
         for arg in args:
             bom_line_id = self.env['mrp.bom.line'].browse(arg.get('id'))
-            action_date = {
-                'action_id_1': arg.get('action_id_1'),
-                'rate1': arg.get('rate1'),
-                'action_id_2': arg.get('action_id_2'),
-                'rate2': arg.get('rate2'),
-            }
-            temp_date = {
-                'category_id': bom_line_id.bom_id.product_tmpl_id.categ_id.id,
-                'p_product_id': arg.get('product_id'),
-                'product_id': arg.get('product_id'),
-            }
-            temp_date.update(action_date)
-            self.env['bom.cost.category.temp'].create({
-                temp_date
-            })
+
+            # action_date = {
+            #     'action_id_1': arg.get('action_id_1'),
+            #     'rate1': arg.get('rate1'),
+            #     'action_id_2': arg.get('action_id_2'),
+            #     'rate2': arg.get('rate2'),
+            # }
+            # temp_date = {
+            #     'category_id': bom_line_id.bom_id.product_tmpl_id.categ_id.id,
+            #     'p_product_id': arg.get('product_id'),
+            #     'product_id': arg.get('product_id'),
+            # }
+            # temp_date.update(action_date)
+            # self.env['bom.cost.category.temp'].create({
+            #     temp_date
+            # })
             bom_line_id.write(action_date)
 
         return self.env['mrp.bom'].browse(int(bom_id)).get_bom_cost_new()
