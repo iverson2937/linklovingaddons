@@ -288,6 +288,7 @@ class MrpBomLine(models.Model):
         res = []
         for line in self.action_line_ids:
             data = {
+                'line_id':line.id,
                 'action_id': line.action_id.id,
                 'action_name': line.action_id.name,
                 'rate': line.rate

@@ -76,7 +76,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
 
             for (var i = 0; i < trs.length; i++) {
                 console.log($(trs[i]))
-                var res= {
+                var res = {
                     'id': $(trs[i]).find('select').data('id'),
                     'action_id': $(trs[i]).find('select').val(),
                     'rate': $(trs[i]).find('input').val()
@@ -85,7 +85,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 actions.push(res)
             }
 
-
+            var action_2 = '';
             $('.treegrid-' + bom_line_id).find('.sel_action').html(action_2);
             // self.table_data[self.index]['process_action_1'] = $('.unlock_condition select option:selected').val();
             // if ($('.unlock_condition .change_time input').val() != '') {
@@ -97,7 +97,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             console.log(self);
             self.edit_arr.push({
                 'id': bom_line_id,
-                'actions':actions
+                'actions': actions
             });
             $('.unlock_condition').hide();
             if ($('.fixed-table-toolbar .save_process_sel').length == 0) {
@@ -133,18 +133,18 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var formatter_func = function (value, row, index) {
 
 
-                var abc = QWeb.render('action_process');
+                // var abc = QWeb.render('action_process');
                 // QWeb.render('action_process')
-                //  var res = '<div>';
-                //  if (value) {
-                //      for (var i = 0; i < value.length; i++) {
-                //          res = res + value[i]['action_name'] + '<span>' + res + value[i]['rate'] + '</span>'
-                //      }
-                //  }
-                //  res + '</div>'
+                var res = '<div>';
+                if (value) {
+                    for (var i = 0; i < value.length; i++) {
+                        res = res + value[i]['action_name'] + '<span>' + res + value[i]['rate'] + '</span>'
+                    }
+                }
+                res + '</div>'
 
 
-                return abc
+                return res
             };
             new Model('product.template').call('get_product_cost_detail', [product_id]).then(function (records) {
                 console.log(records);
@@ -249,11 +249,29 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                         console.log(item)
                         console.log($element)
 
-                        new Model('mrp.bom.line').call('parse_action_line_data', [item.id]).then(function (data) {
-                            var data = [
-                                {'line_id': 1, 'selected_action_id': 1, 'selected_action_name': '包装', 'rate': 1},
-                                {'action_id': 2, 'action_name': '包装', 'rate': 1}
-                            ];
+                        new Model('mrp.bom.line').call('parse_action_line_data', [item.id]).then(function (results) {
+                            var datas = [];
+                            console.log(results)
+                            if (results.length>0) {
+                                for (var i = 0; i < results.length; i++) {
+
+                                    var res = {
+                                        'line_id': results[i].line_id,
+                                        'action_id': results[i].action_id,
+                                        'rate': results[i].rate
+                                    };
+                                    console.log(res);
+                                    datas.push(res)
+                                }
+                            }
+                            else {
+                                console.log('else')
+                               var res = {
+                                    'action_id':2,
+                                    'rate': 1,
+                                };
+                                datas.push(res);
+                            }
                             var options = [
                                 {
                                     'id': 1,
@@ -266,8 +284,9 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                             ]
                             $('.unlock_condition').show();
                             $('#action_table').html();
+                            console.log(datas);
                             $('#action_table').append(QWeb.render('process_action_table', {
-                                result: data,
+                                result: datas,
                                 options: options
                             }));
                             // $('.unlock_condition').attr('data-id', item.id).show();
