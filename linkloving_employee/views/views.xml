@@ -550,7 +550,7 @@
         <record id="hr_hr_employee_view_form_worker" model="ir.ui.view">
             <field name="name">hr.hr.employee.view.form2</field>
             <field name="model">hr.employee</field>
-            <field name="inherit_id" ref="linkloving_mrp_extend.view_employee_form"/>
+            <field name="inherit_id" ref="linkloving_mrp_extend.hr_hr_employee_view_form_worker"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='category_ids']" position="before">
                     <group>
