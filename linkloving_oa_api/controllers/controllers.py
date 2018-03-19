@@ -2851,6 +2851,7 @@ class LinklovingOAApi(http.Controller):
                 "device_name": device.device_name,
                 "company_name": device.company_name,
             })
+            print device.device_name
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
     #模拟绑定
