@@ -148,7 +148,7 @@ class LinklovingAppApi(http.Controller):
             old_uid = request.uid
             uid = request.session.authenticate(request.session.db, request.jsonrequest['login'],
                                                request.jsonrequest['password'])
-            cur_partner = request.env['res.partner'].search([('sub_company', '=', 'sub')])
+            cur_partner = request.env['res.partner'].sudo().search([('sub_company', '=', 'sub')])
             values['is_company_main'] = False
             if cur_partner:
                 if len(cur_partner)>0:
