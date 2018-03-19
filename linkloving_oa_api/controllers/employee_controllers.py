@@ -17,7 +17,7 @@ from pip import download
 
 import odoo
 import odoo.modules.registry
-from linklovingaddons.linkloving_oa_api.controllers.controllers import JsonResponse
+from controllers import JsonResponse
 from models import LinklovingGetImageUrl, JPushExtend
 
 from odoo import fields
