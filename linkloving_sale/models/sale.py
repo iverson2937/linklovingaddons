@@ -174,6 +174,7 @@ class SaleOrderLine(models.Model):
     price_total = fields.Monetary(string='Total', readonly=True, store=True, compute=None)
     qty_available = fields.Float(string=u'库存', related='product_id.qty_available')
     validity_date = fields.Date(string=u'交货日期', related='order_id.validity_date', store=True)
+    remark = fields.Text(string='备注')
 
     # FIXME:allen  how to remove this
     @api.onchange('product_uom_qty', 'product_uom', 'route_id')
