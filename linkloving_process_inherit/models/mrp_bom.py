@@ -283,18 +283,34 @@ class MrpBomLine(models.Model):
 
     # sub_total_cost = fields.Float(compute='_get_sub_total_cost')
     action_line_ids = fields.One2many('process.action.line', 'bom_line_id')
+    action_id = fields.Many2one('process.action')
 
     def parse_action_line_data(self):
         res = []
+        options = []
+
         for line in self.action_line_ids:
             data = {
-                'line_id':line.id,
+                'line_id': line.id,
                 'action_id': line.action_id.id,
                 'action_name': line.action_id.name,
                 'rate': line.rate
             }
             res.append(data)
-        return res
+
+        if self.bom_id.process_id:
+            domain = [('process_id', '=', self.bom_id.process_id.id)]
+
+        actions = self.env['mrp.process.action'].search(domain)
+        print actions
+        for action in actions:
+            options.append({
+                'id': action.id,
+                'name': action.name
+            })
+        print res, 'res'
+        print options, 'options'
+        return {'res': res, 'options': options}
 
     @api.multi
     def _get_adjust_total_cost(self):
@@ -328,7 +344,7 @@ class MrpBomLine(models.Model):
         bom_id = kwargs.get('bom_id')
         for arg in args:
             bom_line_id = self.env['mrp.bom.line'].browse(arg.get('id'))
-
+            action_date = ''
             # action_date = {
             #     'action_id_1': arg.get('action_id_1'),
             #     'rate1': arg.get('rate1'),

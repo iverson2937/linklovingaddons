@@ -27,10 +27,16 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var self = this;
-            var options = [{
-                'id': 'name'
-            }];
-            var tr = QWeb.render('action_process_tr', {'options': options})
+            var array = new Array();
+            console.log($(target))
+            $(target).find("select option").each(function () {  //遍历所有option
+                var txt = $(this).data('id');   //获取option值
+                if (txt != '') {
+                    array.push({'id': txt, 'name': $(this).val()});  //添加到数组中
+                }
+            })
+            console.log(array);
+            var tr = QWeb.render('action_process_tr', {'options': array});
             $(target).parents('tr').after(tr);
 
 
@@ -78,7 +84,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 console.log($(trs[i]))
                 var res = {
                     'id': $(trs[i]).find('select').data('id'),
-                    'action_id': $(trs[i]).find('select').val(),
+                    'action_id': $(trs[i]).find('select option:selected').attr('data-id'),
                     'rate': $(trs[i]).find('input').val()
                 };
                 console.log(res);
@@ -185,7 +191,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                         }
 
                     ]
-                    ;
+                ;
                 self.columns = columns;
                 self.initTableSubCompany(columns, records)
 
@@ -251,8 +257,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
 
                         new Model('mrp.bom.line').call('parse_action_line_data', [item.id]).then(function (results) {
                             var datas = [];
-                            console.log(results)
-                            if (results.length>0) {
+                            if (results.res && results.res.length > 0) {
                                 for (var i = 0; i < results.length; i++) {
 
                                     var res = {
@@ -265,30 +270,20 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                                 }
                             }
                             else {
-                                console.log('else')
-                               var res = {
-                                    'action_id':2,
+                                var res = {
                                     'rate': 1,
                                 };
                                 datas.push(res);
                             }
-                            var options = [
-                                {
-                                    'id': 1,
-                                    'name': '包装'
-                                },
-                                {
-                                    'id': 2,
-                                    'name': '包装1'
-                                }
-                            ];
+
                             $('.unlock_condition').show();
-                            $('#action_table').find('tbody').html('');
+                            $('#action_table').html('');
                             console.log(datas);
-                            $('#action_table').find('tbody').append(QWeb.render('process_action_table', {
+                            $('#action_table').append(QWeb.render('process_action_table', {
                                 result: datas,
-                                options: options
-                            }));
+                                options: results.options
+                            }))
+
                             // $('.unlock_condition').attr('data-id', item.id).show();
                             // if (self.table_data[index].has_extra) {
                             //     $('.change_time').show()
