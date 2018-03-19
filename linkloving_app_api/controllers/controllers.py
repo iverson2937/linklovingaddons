@@ -112,7 +112,7 @@ class LinklovingAppApi(http.Controller):
     # 换头像。
     @http.route('/linkloving_app_api/change_img', type='json', auth="none", csrf=False, cors='*')
     def change_img(self, **kw):
-        uid = request.context.get("uid")
+        uid = request.jsonrequest.get("uid")
         user = request.env['res.users'].sudo().browse(
             uid)  # LinklovingAppApi.get_model_by_id(uid, request, 'res.users')
         user.partner_id.image = request.jsonrequest['img']
@@ -156,6 +156,9 @@ class LinklovingAppApi(http.Controller):
             if uid is not False:
                 request.params['login_success'] = True
                 cur_user = request.env['res.users'].browse(request.uid)
+
+                employee_all_child = request.env['hr.employee'].get_employee_child(cur_user.employee_ids)
+                values['employee_all_child'] = employee_all_child.ids
                 values['name'] = cur_user.name
                 values['user_id'] = request.uid
                 # get group ids
@@ -198,6 +201,7 @@ class LinklovingAppApi(http.Controller):
             else:
                 request.uid = old_uid
                 values['error'] = _("Wrong login/password")
+
         else:
             values['error'] = _("Wrong Request Method")
         return JsonResponse.send_response(STATUS_CODE_ERROR, res_data=values)
@@ -1657,7 +1661,7 @@ class LinklovingAppApi(http.Controller):
         done_stock_moves = []
         is_multi_output = is_random_output = False
         if (hasattr(production, 'is_multi_output') and production.is_multi_output) or (
-                hasattr(production, 'is_random_output') and production.is_random_output):
+                    hasattr(production, 'is_random_output') and production.is_random_output):
             done_stock_moves = request.env['stock.move.finished'].sudo().search_read(
                 [('id', 'in', production.stock_move_lines_finished.ids)],
                 fields=['product_id',
@@ -3484,15 +3488,15 @@ class LinklovingAppApi(http.Controller):
             "picking_cause": material.picking_cause,
             "remark": material.remark,
             'line_ids': [{
-                'id': lines.id,
-                'qty_product': lines.qty_available,
-                'name': lines.product_id.display_name,
-                'location': lines.product_id.area_id.name,
-                'quantity_available': lines.quantity_available,
-                'quantity_done': lines.quantity_done,
-                'product_qty': lines.product_qty,
-                'reserve': lines.reserve_qty,
-            } for lines in material.line_ids],
+                             'id': lines.id,
+                             'qty_product': lines.qty_available,
+                             'name': lines.product_id.display_name,
+                             'location': lines.product_id.area_id.name,
+                             'quantity_available': lines.quantity_available,
+                             'quantity_done': lines.quantity_done,
+                             'product_qty': lines.product_qty,
+                             'reserve': lines.reserve_qty,
+                         } for lines in material.line_ids],
         }
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
@@ -4644,7 +4648,7 @@ class LinklovingAppApi(http.Controller):
                 })
                 work_order_record.attachments = [(4, record_img_id.id)]
         work_order.sudo(work_order.create_uid.id).write({
-            "issue_state":work_order.issue_state
+            "issue_state": work_order.issue_state
         })
         if work_order_record:
             return JsonResponse.send_response(STATUS_CODE_OK)
