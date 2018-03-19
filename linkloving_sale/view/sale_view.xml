@@ -301,25 +301,6 @@
                 <xpath expr="//field[@name='name']" position="before">
                     <field name="validity_date"/>
                 </xpath>
-                <xpath expr="//field[@name='salesman_id']" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath>
-                <xpath expr="//field[@name='qty_to_invoice']" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath>
-                <xpath expr="//field[@name='qty_invoiced']" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath>
-                <xpath expr="//field[@name='product_uom']" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath>
-                <xpath expr="//field[@name='price_subtotal']" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath>
-                <xpath expr="//field[@name='price_subtotal']" position="after">
-                    <field name="remark"/>
-                </xpath>
-
 
             </field>
         </record>
