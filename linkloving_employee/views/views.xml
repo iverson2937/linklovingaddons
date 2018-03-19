@@ -552,11 +552,10 @@
             <field name="model">hr.employee</field>
             <field name="inherit_id" ref="linkloving_mrp_extend.hr_hr_employee_view_form_worker"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='category_ids']" position="before">
-                    <group>
-                        <field name="is_worker" string="Is Worker"
-                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
-                    </group>
+                <xpath expr="//field[@name='is_worker']" position="attributes">
+                    <attribute name="attrs">
+                        {'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}
+                    </attribute>
                 </xpath>
             </field>
         </record>
