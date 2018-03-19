@@ -122,7 +122,7 @@
                                 class="oe_highlight"/>
 
 
-                        <!--<button string="创建民族" type="object" name="create_nation" class="oe_highlight"/>-->
+                        <button string="创建民族" type="object" name="create_nation" class="oe_highlight"/>
                         <!--<button string="测试权限" type="object" name="compute_is_view_more_msg11" class="oe_highlight"/>-->
 
 
