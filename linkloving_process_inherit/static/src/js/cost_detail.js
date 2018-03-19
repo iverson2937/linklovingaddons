@@ -27,17 +27,17 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var self = this;
+            var tr = $(target).parents('tr');
             var array = new Array();
-            console.log($(target))
-            $(target).find("select option").each(function () {  //遍历所有option
+            tr.find("select option").each(function () {  //遍历所有option
                 var txt = $(this).data('id');   //获取option值
                 if (txt != '') {
                     array.push({'id': txt, 'name': $(this).val()});  //添加到数组中
                 }
             })
-            console.log(array);
-            var tr = QWeb.render('action_process_tr', {'options': array});
-            $(target).parents('tr').after(tr);
+            console.log(array)
+            var new_tr = QWeb.render('action_process_tr', {'options': array});
+            $(target).parents('tr').after(new_tr);
 
 
         },
