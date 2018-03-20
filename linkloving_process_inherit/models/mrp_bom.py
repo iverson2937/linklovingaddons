@@ -143,7 +143,7 @@ class MrpBom(models.Model):
             process_id = bom_id[0].process_id.name
         product_cost = line.product_id.pre_cost_cal_new(raise_exception=False)
         line_cost = product_cost if product_cost else 0
-        # material_cost = line_cost * line.product_qty
+        material_cost = line_cost * line.product_qty
         # man_cost = line.action_id.cost * line.product_qty if line.action_id else 0
         # total_cost = material_cost + man_cost
 
@@ -171,8 +171,7 @@ class MrpBom(models.Model):
     @api.multi
     def _get_bom_cost(self):
         for bom in self:
-            bom.manpower_cost = 0
-            # bom.manpower_cost = sum(line.cost for line in bom.bom_line_ids)
+            bom.manpower_cost = sum(bom_line.bom_line_man_cost for bom_line in bom.bom_line_ids)
 
 
 def _get_rec_default(categ_id, object, parnet, result, product_type_dict):
@@ -270,6 +269,12 @@ class MrpBomLine(models.Model):
     # sub_total_cost = fields.Float(compute='_get_sub_total_cost')
     action_line_ids = fields.One2many('process.action.line', 'bom_line_id')
     action_id = fields.Many2one('mrp.process.action')
+    bom_line_man_cost = fields.Float(compute='get_bom_line_man_cost')
+
+    def get_bom_line_man_cost(self):
+        for line in self:
+            line.bom_line_man_cost = sum(
+                action_line.line_cost for action_line in line.action_line_ids) * line.product_qty
 
     def get_product_action_default(self, categ_id):
         domain = [('categ_id', '=', categ_id), ('product_id', '=', self.product_id.id)]
@@ -312,19 +317,6 @@ class MrpBomLine(models.Model):
             })
 
         return res
-
-    @api.multi
-    def _get_adjust_total_cost(self):
-        for line in self:
-            if line.adjust_time and line.bom_id.process_id.hourly_wage:
-                line.adjust_cost = line.bom_id.process_id.hourly_wage * line.adjust_time
-            else:
-                line.adjust_cost = 0.0
-
-    # @api.multi
-    # def _get_sub_total_cost(self):
-    #     for line in self:
-    #         line.sub_total_cost = (line.cost + line.adjust_cost) * line.product_qty
 
     @api.one
     def get_action_options(self):
