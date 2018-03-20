@@ -69,6 +69,15 @@ class MrpBom(models.Model):
         # man_cost = line.action_id.cost * line.product_qty if line.action_id else 0
         # total_cost = material_cost + man_cost
         temp_date = line.get_product_action_default(categ_id, root_bom_id)
+
+        # 没有值有默认工序动作默认工序动作
+        if not line.parse_action_line_data(no_option=True) and line.get_product_action_default():
+            is_default = True
+            action_process = line.get_product_action_default()
+        else:
+            action_process = line.parse_action_line_data(no_option=True)
+            is_default = False
+
         res = {
             'name': line.product_id.name_get()[0][1],
             'product_type': product_type_dict[line.product_id.product_ll_type],
@@ -84,8 +93,8 @@ class MrpBom(models.Model):
             # 'manpower_cost': round(man_cost, 2),
             # 'total_cost': round(total_cost, 2),
             'process_id': process_id,
-            'process_action': line.parse_action_line_data(no_option=True),
-            'default_process_action': line.get_product_action_default(),
+            'process_action': action_process,
+            'is_default': is_default
 
         }
         return res
@@ -183,7 +192,14 @@ def _get_rec_default(categ_id, object, parnet, result, product_type_dict):
         material_cost = line_cost * object.product_qty
         # man_cost = l.action_id.cost if l.action_id else 0
         # total_cost = material_cost + man_cost
-        temp_date = object.get_product_action_default(categ_id)
+
+        if not l.parse_action_line_data(no_option=True) and l.get_product_action_default():
+            is_default = True
+            action_process = l.get_product_action_default()
+        else:
+            action_process = l.parse_action_line_data(no_option=True)
+            is_default = False
+
         res = {
             'name': l.product_id.name_get()[0][1],
             'product_id': l.product_id.id,
@@ -195,9 +211,8 @@ def _get_rec_default(categ_id, object, parnet, result, product_type_dict):
             # 'product_type': l.product_id.product_ll_type,
             'id': l.id,
             'pid': parnet.id,
-            'process_action': line.parse_action_line_data(no_option=True),
-
-            'default_process_action': line.get_product_action_default(),
+            'process_action': action_process,
+            'is_default': is_default,
             'material_cost': round(material_cost, 2),
             # 'manpower_cost': round(man_cost, 2),
             # 'total_cost': round(total_cost, 2),
@@ -291,6 +306,12 @@ class MrpBomLine(models.Model):
                 'options': options
             }
             res.append(data)
+        if not res:
+            res.append({
+                'line_id': '',
+                'rate': 1,
+                'options': options
+            })
 
         return res
 

@@ -98,9 +98,13 @@
     <t t-name="action_process">
         <t t-if="result">
         <t t-foreach="result" t-as="item">
+            <t t-if="item.action_name">
+
+
         <div>
             <span><t t-esc="item.action_name"/></span><span><t t-esc="item.rate"/></span>
         </div>
+                </t>
         </t>
             </t>
     </t>

@@ -44,11 +44,13 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
 
         get_default_func: function () {
             var self = this;
-            new Model('mrp.bom.line').call('get_default_data', [self.edit_arr], {'bom_id': self.bom_id}).then(function (results) {
+            new Model('product.template').call('get_product_default_cost_detail', [this.product_id]).then(function (records) {
                 console.log(results);
 
                 //刷新界面
                 $("#table").bootstrapTable('destroy');
+                self.initTableSubCompany(self.columns, results);
+
 
                 //    保存后要清空数组
                 self.edit_arr = [];
@@ -56,6 +58,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             });
 
         },
+
         save_process_sel_func: function () {
             var self = this;
             console.log(self.edit_arr);
@@ -141,7 +144,6 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             self.update_control_panel(cp_status);
 
             var formatter_func = function (value, row, index) {
-                console.log(value);
 
 
                 var res = QWeb.render('action_process', {'result': value});
@@ -265,14 +267,6 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                                     datas.push(res)
                                 }
                             }
-                            else {
-                                var res = {
-                                    'rate': 1,
-                                    'options': results[i].options,
-                                };
-                                datas.push(res);
-                            }
-
                             $('.unlock_condition').attr('data-id', item.id).show();
                             $('#action_table').html('');
                             console.log(datas);
