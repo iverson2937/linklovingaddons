@@ -15,3 +15,10 @@ class MrpProcessAction(models.Model):
 class MrpProcess(models.Model):
     _inherit = 'mrp.process'
     process_action_ids = fields.One2many('mrp.process.action', 'process_id')
+
+
+class ProcessActionLine(models.Model):
+    _name = 'process.action.line'
+    bom_line_id = fields.Many2one('mrp.bom.line')
+    action_id = fields.Many2one('mrp.process.action')
+    rate = fields.Float(default=1)

@@ -58,16 +58,16 @@
             <tr>
 
                 <td>
-                    <select t-data-id="item.line_id" class="form-control">
-                        <t t-if="options">
-                        <t t-foreach="options" t-as="options">
+                    <select t-att-data-id="item.line_id" class="form-control">
+                        <t t-if="item.options">
+                        <t t-foreach="item.options" t-as="options">
                         <option t-att-data-id="options.id" t-att-selected="id == item.action_id ? 'selected' : null"><t t-esc="options.name"/></option>
                         </t>
                         </t>
                     </select>
                 </td>
                 <td>
-                    <input name="rate" class="form-control"  t-value="item.rate"/>
+                    <input name="rate" class="form-control"  t-att-value="item.rate"/>
                 </td>
                 <td>
                 <span class="fa fa-plus-square-o"></span>
@@ -95,13 +95,15 @@
         </td>
     </tr>
 </t>
-    <!--<t t-name="action_process">-->
-    <!--<ul class="list-group">-->
-    <!--<li class="list-group-item">ww<span class="badge">新</span></li>-->
-    <!--<li class="list-group-item">ww<span class="badge">新</span></li>-->
-    <!--</ul>-->
-
-    <!--</t>-->
+    <t t-name="action_process">
+        <t t-if="result">
+        <t t-foreach="result" t-as="item">
+        <div>
+            <span><t t-esc="item.action_name"/></span><span><t t-esc="item.rate"/></span>
+        </div>
+        </t>
+            </t>
+    </t>
 
 
     <t t-name="process_option_templ">
