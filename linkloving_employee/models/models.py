@@ -58,7 +58,7 @@ class LinkLovingEmployee(models.Model):
         [('class_a', u'甲类'), ('class_b', u'乙类'), ('null', u'无')], string=u'交金类别')
     insurance_type = fields.Many2one('hr.insurance', string=u'保险类别')
     buy_balance = fields.Float(u'申购余额')
-    is_create_account = fields.Boolean(u'相关用户', default=True)
+    is_create_account = fields.Boolean(u'相关用户')
     probation_period = fields.Selection(
         [('nothing', u'无'), ('half_month', u'半个月'), ('one_month', u'一个月'), ('two_month', u'两个月'),
          ('three_month', u'三个月')],
@@ -200,7 +200,10 @@ class LinkLovingEmployee(models.Model):
         if email_one:
             if re.match(r'^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$', email_one):
                 em_one = self.env['hr.employee'].search([('work_email', '=', email_one.strip())])
-                user_one = self.env['res.users'].search([('login', '=', email_one.strip())])
+                user_one = False
+                if vals.get('is_create_account'):
+                    user_one = self.env['res.users'].search([('login', '=', email_one.strip())])
+
                 if em_one or user_one:
                     raise UserError('此Email：' + str(email_one) + '已存在')
             else:
@@ -289,6 +292,12 @@ class LinkLovingEmployee(models.Model):
         #     self.probation_date = self.entry_date + '-' + \
         #                           str(entry_date_self + probation_end_date - relativedelta(days=+1)).split(' ')[0]
         self.probation_date = self.get_probation_date(self.entry_date, self.probation_period)
+
+    @api.onchange('user_id')
+    def _onchange_user(self):
+        self.work_email = self.user_id.login
+        self.name = self.user_id.name
+        self.image = self.user_id.image
 
 
 class LinkLovingEmployeeWorkExperience(models.Model):

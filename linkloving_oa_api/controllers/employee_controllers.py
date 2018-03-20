@@ -252,6 +252,9 @@ class LinklovingEmployeeControllers(http.Controller):
         if not request.jsonrequest.get("work_email"):
             request.jsonrequest.pop('work_email')
 
+        if not request.jsonrequest.get("identification_id"):
+            request.jsonrequest.pop('identification_id')
+
         if request.jsonrequest.get("id") and request.jsonrequest.get("edit_id"):
             employee = request.env['hr.employee'].sudo(int(request.jsonrequest.get("edit_id"))).browse(
                 int(request.jsonrequest.get("id")))
@@ -510,6 +513,7 @@ class LinklovingEmployeeControllers(http.Controller):
             "probation_begin_date": employeebean.probation_begin_date or '',
             "probation_end_date": employeebean.probation_end_date or '',
             "mining_productivity": productivity_data,
+            "mining_productivity_id": employeebean.mining_productivity,
             "contract_begin_date": employeebean.contract_begin_date or '',
             "contract_end_date": employeebean.contract_end_date or '',
             "accumulation_fund": accumulation_data,
@@ -537,6 +541,7 @@ class LinklovingEmployeeControllers(http.Controller):
             "marital": marital_data or "",
             "marital_id": employeebean.marital or "",
             "card_num": employeebean.card_num or '',
+            "hr_job_ids": [emp.name for emp in employeebean.hr_job_ids],
         }
         return vals
 

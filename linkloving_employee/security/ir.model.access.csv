@@ -7,5 +7,6 @@ access_linkloving_employee_hr_insurance,linkloving_employee_hr_insurance,model_h
 hr.access_hr_employee_system_user,hr.employee system user,model_hr_employee,base.group_user,1,1,0,0
 hr.access_hr_employee_user,hr.employee user,model_hr_employee,hr.group_hr_user,1,1,0,0
 access_hr_employee_hr_manager,hr.employee manager user,model_hr_employee,hr.group_hr_manager,1,1,1,1
+access_hr_employee_hr_null,hr.employee null user,model_hr_employee,,1,0,0,0
 access_hr_employee_res_users,employee manager user,base.model_res_users,hr.group_hr_manager,1,1,1,1
 
