@@ -21,8 +21,24 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             'click .save_process_sel': 'save_process_sel_func',
             'click .get_default': 'get_default_func',
             'click .fa-plus-square-o': 'add_action_line_func',
+            'click .fa-trash-o': 'remove_action_line_func',
 
         },
+        remove_action_line_func: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var self = this;
+            var tr = $(target).parents('tr');
+            if (tr.find('select').attr('data-id')) {
+                self.edit_arr.push({
+                    'action_line_id': tr.find('select').data('id'),
+                    'delete': true
+                });
+            }
+            tr.remove()
+
+        },
+
         add_action_line_func: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
@@ -34,7 +50,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 if (txt != '') {
                     array.push({'id': txt, 'name': $(this).val()});  //添加到数组中
                 }
-            })
+            });
             console.log(array)
             var new_tr = QWeb.render('action_process_tr', {'options': array});
             $(target).parents('tr').after(new_tr);
@@ -44,16 +60,26 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
 
         get_default_func: function () {
             var self = this;
-            new Model('product.template').call('get_product_default_cost_detail', [this.product_id]).then(function (records) {
+            new Model('product.template').call('get_product_default_cost_detail', [this.product_id]).then(function (results) {
                 console.log(results);
+                var show_save = false;
 
                 //刷新界面
                 $("#table").bootstrapTable('destroy');
                 self.initTableSubCompany(self.columns, results);
 
-
-                //    保存后要清空数组
-                self.edit_arr = [];
+                _.each(results, function (result) {
+                    if (result.is_default) {
+                        show_save = true;
+                        self.edit_arr.push({
+                            'id': result.line_id,
+                            'actions': result.actions
+                        });
+                    }
+                });
+                if (show_save) {
+                    $('.save_process_sel').removeClass('hidden')
+                }
 
             });
 
@@ -79,20 +105,17 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
         },
         confirm_sel_func: function () {
             var self = this;
-            var bom_line_id = $('.unlock_condition').data('id');
-            console.log(bom_line_id, 'bom_line_id');
+            var bom_line_id = $('.unlock_condition').attr('data-id');
             var trs = $('.unlock_condition').find('tr');
             var actions = [];
 
             for (var i = 0; i < trs.length; i++) {
-                console.log($(trs[i]));
                 var res = {
                     'id': $(trs[i]).find('select').data('id'),
                     'action_id': $(trs[i]).find('select option:selected').attr('data-id'),
                     'action_name': $(trs[i]).find('select option:selected').val(),
                     'rate': $(trs[i]).find('input').val()
                 };
-                console.log(res);
                 actions.push(res)
             }
 
@@ -108,13 +131,13 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             console.log(self.index);
             console.log(self);
             self.edit_arr.push({
-                'id': bom_line_id,
+                'id': parseInt(bom_line_id),
                 'actions': actions
             });
             console.log(self.edit_arr);
             $('.unlock_condition').hide();
             if ($('.fixed-table-toolbar .save_process_sel').length == 0) {
-                $('.fixed-table-toolbar').append("<button class='btn btn-primary save_process_sel'>保存</button>")
+                $('.save_process_sel').removeClass('hidden')
             }
         },
 
@@ -247,11 +270,8 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 onClickRow: function (item, $element) {
                     var self = this;
                     self.index = item.id;
-                    console.log(this);
+                    console.log(item);
                     if (!item.bom_id) {
-                        console.log(item)
-                        console.log($element)
-
                         new Model('mrp.bom.line').call('parse_action_line_data', [item.id]).then(function (results) {
                             var datas = [];
                             if (results && results.length > 0) {

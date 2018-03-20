@@ -39,7 +39,7 @@ class MrpBom(models.Model):
         if self.bom_line_ids:
             line_ids = []
             for line in self.bom_line_ids:
-                line_ids.append(self.get_bom_line_default(self.product_templ_id.categ_id.id, self.id, line, result,
+                line_ids.append(self.get_bom_line_default(self.product_tmpl_id.categ_id.id, self.id, line, result,
                                                           product_type_dict))
         return result + sorted(line_ids, key=lambda product: product['code'], reverse=True)
 
@@ -56,7 +56,7 @@ class MrpBom(models.Model):
         if line.child_line_ids:
 
             for l in line.child_line_ids:
-                _get_rec_default(categ_id, root_bom_id, l, line, result, product_type_dict)
+                _get_rec_default(categ_id, l, line, result, product_type_dict)
 
         bom_id = line.product_id.product_tmpl_id.bom_ids
 
@@ -68,7 +68,6 @@ class MrpBom(models.Model):
         # material_cost = line_cost * line.product_qty
         # man_cost = line.action_id.cost * line.product_qty if line.action_id else 0
         # total_cost = material_cost + man_cost
-        temp_date = line.get_product_action_default(categ_id, root_bom_id)
 
         # 没有值有默认工序动作默认工序动作
         if not line.parse_action_line_data(no_option=True) and line.get_product_action_default():
@@ -253,9 +252,7 @@ def _get_rec(object, parnet, result, product_type_dict):
             # 'product_type': l.product_id.product_ll_type,
             'id': l.id,
             'pid': parnet.id,
-            'process_action_1': l.action_id_1.name if l.action_id_1 else '',
-            'process_action_2': l.action_id_2.name if l.action_id_2 else '',
-            'material_cost': round(material_cost, 2),
+            'process_action': l.parse_action_line_data(),
             # 'manpower_cost': round(man_cost, 2),
             # 'total_cost': round(total_cost, 2),
             'parent_id': parnet.id,
@@ -287,6 +284,7 @@ class MrpBomLine(models.Model):
         options = []
 
         if not no_option:
+            domain = []
             if self.bom_id.process_id:
                 domain = [('process_id', '=', self.bom_id.process_id.id)]
             actions = self.env['mrp.process.action'].search(domain)
@@ -346,8 +344,10 @@ class MrpBomLine(models.Model):
     def save_multi_changes(self, args, **kwargs):
         bom_id = kwargs.get('bom_id')
         for arg in args:
+            if arg.get('action_line_id'):
+                self.env['process.action.line'].browse(arg.get('action_line_id')).unlink()
             bom_line_id = self.env['mrp.bom.line'].browse(arg.get('id'))
-            actions = arg.get('actions')
+            actions = arg.get('actions', [])
             for action in actions:
                 if action.get('id'):
                     a = self.env['process.action.line'].browse(action.get('id')).write({
