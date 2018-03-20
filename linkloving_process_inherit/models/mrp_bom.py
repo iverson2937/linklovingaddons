@@ -144,8 +144,8 @@ class MrpBom(models.Model):
         product_cost = line.product_id.pre_cost_cal_new(raise_exception=False)
         line_cost = product_cost if product_cost else 0
         material_cost = line_cost * line.product_qty
-        # man_cost = line.action_id.cost * line.product_qty if line.action_id else 0
-        # total_cost = material_cost + man_cost
+        man_cost = line.bom_line_man_cost
+        total_cost = material_cost + man_cost
 
         res = {
             'name': line.product_id.name_get()[0][1],
@@ -158,9 +158,9 @@ class MrpBom(models.Model):
             'product_specs': line.product_id.product_specs,
             'code': line.product_id.default_code,
             'qty': line.product_qty,
-            # 'material_cost': round(material_cost, 2),
-            # 'manpower_cost': round(man_cost, 2),
-            # 'total_cost': round(total_cost, 2),
+            'material_cost': round(material_cost, 2),
+            'manpower_cost': round(man_cost, 2),
+            'total_cost': round(total_cost, 2),
             'process_id': process_id,
             'process_action': line.parse_action_line_data()
 
@@ -237,8 +237,8 @@ def _get_rec(object, parnet, result, product_type_dict):
         product_cost = object.product_id.pre_cost_cal_new(raise_exception=False)
         line_cost = product_cost if product_cost else 0
         material_cost = line_cost * object.product_qty
-        # man_cost = l.action_id.cost if l.action_id else 0
-        # total_cost = material_cost + man_cost
+        man_cost = l.bom_line_man_cost()
+        total_cost = material_cost + man_cost
 
         res = {
             'name': l.product_id.name_get()[0][1],
@@ -252,8 +252,8 @@ def _get_rec(object, parnet, result, product_type_dict):
             'id': l.id,
             'pid': parnet.id,
             'process_action': l.parse_action_line_data(),
-            # 'manpower_cost': round(man_cost, 2),
-            # 'total_cost': round(total_cost, 2),
+            'manpower_cost': round(man_cost, 2),
+            'total_cost': round(total_cost, 2),
             'parent_id': parnet.id,
             'qty': l.product_qty,
             'process_id': process_id,
