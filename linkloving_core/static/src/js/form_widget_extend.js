@@ -39,19 +39,22 @@ odoo.define('linkloving_core.form_widget_extend', function (require) {
     });
     FormView.include({
         load_record: function (record) {
-            var res = this._super.apply(this, arguments);
+            var res1 = this._super.apply(this, arguments);
             var self = this;
             console.log("----load_record-----")
-            var edit = JSON.parse(self.fields_view.arch.attrs['edit'])
-            if (edit instanceof Array) {
-                var res = self.compute_domain([edit])
-                if (res) {
-                    self.$buttons.find('.o_form_button_edit').show()
-                } else {
-                    self.$buttons.find('.o_form_button_edit').hide()
+            if (self.fields_view.arch.attrs['edit']) {
+                var edit = JSON.parse(self.fields_view.arch.attrs['edit'])
+                if (edit instanceof Array) {
+                    var res = self.compute_domain([edit])
+                    if (res) {
+                        self.$buttons.find('.o_form_button_edit').show()
+                    } else {
+                        self.$buttons.find('.o_form_button_edit').hide()
+                    }
                 }
             }
-            return res;
+            return res1;
+
         }
     });
 
