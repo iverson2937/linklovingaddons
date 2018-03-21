@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 
 from odoo import models, fields, api
 
@@ -38,24 +39,9 @@ class MrpBom(models.Model):
         if self.bom_line_ids:
             line_ids = []
             for line in self.bom_line_ids:
-                line_ids.append(self.get_bom_line_default(self.product_templ_id.categ_id.id, self.id, line, result,
+                line_ids.append(self.get_bom_line_default(self.product_tmpl_id.categ_id.id, self.id, line, result,
                                                           product_type_dict))
         return result + sorted(line_ids, key=lambda product: product['code'], reverse=True)
-
-    def get_product_action_default(self, categ_id, p_product_id):
-        res = {}
-        domain = [('categ_id', '=', categ_id),
-                  ('p_product_id', '=', p_product_id)('product_id', '=', self.product_id.id)]
-
-        temp_id = self.env['bom.cost.category.temp'].search([domain])
-        if temp_id:
-            res.update({
-                'action_id_1': temp_id.action_id_1.id,
-                'action_id_1': temp_id.action_id_1.id,
-                'rate1': temp_id.rate1,
-                'rate2': temp_id.rate2,
-            })
-        return res
 
     def get_bom_line_default(self, categ_id, root_bom_id, line, result, product_type_dict):
         '''
@@ -70,7 +56,7 @@ class MrpBom(models.Model):
         if line.child_line_ids:
 
             for l in line.child_line_ids:
-                _get_rec_default(categ_id, root_bom_id, l, line, result, product_type_dict)
+                _get_rec_default(categ_id, l, line, result, product_type_dict)
 
         bom_id = line.product_id.product_tmpl_id.bom_ids
 
@@ -82,7 +68,15 @@ class MrpBom(models.Model):
         # material_cost = line_cost * line.product_qty
         # man_cost = line.action_id.cost * line.product_qty if line.action_id else 0
         # total_cost = material_cost + man_cost
-        temp_date = line.get_product_action_default(categ_id, root_bom_id)
+
+        # 没有值有默认工序动作默认工序动作
+        if not line.parse_action_line_data(no_option=True) and line.get_product_action_default():
+            is_default = True
+            action_process = line.get_product_action_default()
+        else:
+            action_process = line.parse_action_line_data(no_option=True)
+            is_default = False
+
         res = {
             'name': line.product_id.name_get()[0][1],
             'product_type': product_type_dict[line.product_id.product_ll_type],
@@ -98,13 +92,8 @@ class MrpBom(models.Model):
             # 'manpower_cost': round(man_cost, 2),
             # 'total_cost': round(total_cost, 2),
             'process_id': process_id,
-            'process_action': [
-                {
-                    'action_id': 12,
-                    'action_name': '包装',
-                    'rate': 1
-                }
-            ],
+            'process_action': action_process,
+            'is_default': is_default
 
         }
         return res
@@ -154,9 +143,9 @@ class MrpBom(models.Model):
             process_id = bom_id[0].process_id.name
         product_cost = line.product_id.pre_cost_cal_new(raise_exception=False)
         line_cost = product_cost if product_cost else 0
-        # material_cost = line_cost * line.product_qty
-        # man_cost = line.action_id.cost * line.product_qty if line.action_id else 0
-        # total_cost = material_cost + man_cost
+        material_cost = line_cost * line.product_qty
+        man_cost = line.bom_line_man_cost
+        total_cost = material_cost + man_cost
 
         res = {
             'name': line.product_id.name_get()[0][1],
@@ -169,17 +158,12 @@ class MrpBom(models.Model):
             'product_specs': line.product_id.product_specs,
             'code': line.product_id.default_code,
             'qty': line.product_qty,
-            # 'material_cost': round(material_cost, 2),
-            # 'manpower_cost': round(man_cost, 2),
-            # 'total_cost': round(total_cost, 2),
+            'material_cost': round(material_cost, 2),
+            'manpower_cost': round(man_cost, 2),
+            'total_cost': round(total_cost, 2),
             'process_id': process_id,
-            'process_action': [
-                {
-                    'action_id': 12,
-                    'action_name': '包装',
-                    'rate': 1
-                }
-            ]
+            'process_action': line.parse_action_line_data()
+
         }
 
         return res
@@ -187,8 +171,7 @@ class MrpBom(models.Model):
     @api.multi
     def _get_bom_cost(self):
         for bom in self:
-            bom.manpower_cost = 0
-            # bom.manpower_cost = sum(line.cost for line in bom.bom_line_ids)
+            bom.manpower_cost = sum(bom_line.bom_line_man_cost for bom_line in bom.bom_line_ids)
 
 
 def _get_rec_default(categ_id, object, parnet, result, product_type_dict):
@@ -207,7 +190,14 @@ def _get_rec_default(categ_id, object, parnet, result, product_type_dict):
         material_cost = line_cost * object.product_qty
         # man_cost = l.action_id.cost if l.action_id else 0
         # total_cost = material_cost + man_cost
-        temp_date = object.get_product_action_default(categ_id, parnet.id)
+
+        if not l.parse_action_line_data(no_option=True) and l.get_product_action_default():
+            is_default = True
+            action_process = l.get_product_action_default()
+        else:
+            action_process = l.parse_action_line_data(no_option=True)
+            is_default = False
+
         res = {
             'name': l.product_id.name_get()[0][1],
             'product_id': l.product_id.id,
@@ -219,11 +209,8 @@ def _get_rec_default(categ_id, object, parnet, result, product_type_dict):
             # 'product_type': l.product_id.product_ll_type,
             'id': l.id,
             'pid': parnet.id,
-            'process_action_1': temp_date.get('action_id_1'),
-            'process_action_2': temp_date.get('action_id_2'),
-            'action_rate2': temp_date.get('rate1'),
-            'action_rate1': temp_date.get('rate12'),
-
+            'process_action': action_process,
+            'is_default': is_default,
             'material_cost': round(material_cost, 2),
             # 'manpower_cost': round(man_cost, 2),
             # 'total_cost': round(total_cost, 2),
@@ -250,8 +237,8 @@ def _get_rec(object, parnet, result, product_type_dict):
         product_cost = object.product_id.pre_cost_cal_new(raise_exception=False)
         line_cost = product_cost if product_cost else 0
         material_cost = line_cost * object.product_qty
-        # man_cost = l.action_id.cost if l.action_id else 0
-        # total_cost = material_cost + man_cost
+        man_cost = l.bom_line_man_cost
+        total_cost = material_cost + man_cost
 
         res = {
             'name': l.product_id.name_get()[0][1],
@@ -264,11 +251,9 @@ def _get_rec(object, parnet, result, product_type_dict):
             # 'product_type': l.product_id.product_ll_type,
             'id': l.id,
             'pid': parnet.id,
-            'process_action_1': l.action_id_1.name if l.action_id_1 else '',
-            'process_action_2': l.action_id_2.name if l.action_id_2 else '',
-            'material_cost': round(material_cost, 2),
-            # 'manpower_cost': round(man_cost, 2),
-            # 'total_cost': round(total_cost, 2),
+            'process_action': l.parse_action_line_data(),
+            'manpower_cost': round(man_cost, 2),
+            'total_cost': round(total_cost, 2),
             'parent_id': parnet.id,
             'qty': l.product_qty,
             'process_id': process_id,
@@ -283,30 +268,55 @@ class MrpBomLine(models.Model):
 
     # sub_total_cost = fields.Float(compute='_get_sub_total_cost')
     action_line_ids = fields.One2many('process.action.line', 'bom_line_id')
+    action_id = fields.Many2one('mrp.process.action')
+    bom_line_man_cost = fields.Float(compute='get_bom_line_man_cost')
 
-    def parse_action_line_data(self):
+    def get_bom_line_man_cost(self):
+        for line in self:
+            line.bom_line_man_cost = sum(
+                action_line.line_cost for action_line in line.action_line_ids) * line.product_qty
+
+    def get_product_action_default(self, categ_id):
+        domain = [('categ_id', '=', categ_id), ('product_id', '=', self.product_id.id)]
+        temp_id = self.env['bom.cost.category.temp'].search([domain])
         res = []
-        for line in self.action_line_ids:
-            data = {
-                'action_id': line.action_id.id,
-                'action_name': line.action_id.name,
-                'rate': line.rate
-            }
-            res.append(data)
+        if temp_id:
+            res = json.loads(temp_id.action_data)
         return res
 
-    @api.multi
-    def _get_adjust_total_cost(self):
-        for line in self:
-            if line.adjust_time and line.bom_id.process_id.hourly_wage:
-                line.adjust_cost = line.bom_id.process_id.hourly_wage * line.adjust_time
-            else:
-                line.adjust_cost = 0.0
+    def parse_action_line_data(self, no_option=False):
+        res = []
+        options = []
 
-    # @api.multi
-    # def _get_sub_total_cost(self):
-    #     for line in self:
-    #         line.sub_total_cost = (line.cost + line.adjust_cost) * line.product_qty
+        if not no_option:
+            domain = []
+            if self.bom_id.process_id:
+                domain = [('process_id', '=', self.bom_id.process_id.id)]
+            actions = self.env['mrp.process.action'].search(domain)
+            print actions
+            for action in actions:
+                options.append({
+                    'id': action.id,
+                    'name': action.name
+                })
+
+        for line in self.action_line_ids:
+            data = {
+                'line_id': line.id,
+                'action_id': line.action_id.id,
+                'action_name': line.action_id.name,
+                'rate': line.rate,
+                'options': options
+            }
+            res.append(data)
+        if not res:
+            res.append({
+                'line_id': '',
+                'rate': 1,
+                'options': options
+            })
+
+        return res
 
     @api.one
     def get_action_options(self):
@@ -326,29 +336,34 @@ class MrpBomLine(models.Model):
     def save_multi_changes(self, args, **kwargs):
         bom_id = kwargs.get('bom_id')
         for arg in args:
+            if arg.get('action_line_id'):
+                self.env['process.action.line'].browse(arg.get('action_line_id')).unlink()
             bom_line_id = self.env['mrp.bom.line'].browse(arg.get('id'))
-            action_date = {
-                'action_id_1': arg.get('action_id_1'),
-                'rate1': arg.get('rate1'),
-                'action_id_2': arg.get('action_id_2'),
-                'rate2': arg.get('rate2'),
-            }
-            temp_date = {
-                'category_id': bom_line_id.bom_id.product_tmpl_id.categ_id.id,
-                'p_product_id': arg.get('product_id'),
-                'product_id': arg.get('product_id'),
-            }
-            temp_date.update(action_date)
-            self.env['bom.cost.category.temp'].create({
-                temp_date
-            })
-            bom_line_id.write(action_date)
+            actions = arg.get('actions', [])
+            for action in actions:
+                if action.get('id'):
+                    a = self.env['process.action.line'].browse(action.get('id')).write({
+                        'action_id': action.get('action_id'),
+                        'rate': action.get('rate')
+                    })
+                else:
+                    b = self.env['process.action.line'].create({
+                        'action_id': action.get('action_id'),
+                        'rate': action.get('rate'),
+                        'bom_line_id': arg.get('id')
+                    })
+            action_data = bom_line_id.parse_action_line_data(no_option=True)
+            category_id = bom_line_id.bom_id.product_tmpl_id.categ_id.id
+            product_id = arg.get('product_id')
+            tmp_obj = self.env['bom.cost.category.temp']
+            temp_id = tmp_obj.search(
+                [('category_id', '=', category_id), ('product_id', '=', product_id)])
+            if temp_id:
+                temp_id.action_data = json.dumps(action_data)
+            else:
+                tmp_obj.create({'category_id': bom_line_id.bom_id.product_tmpl_id.categ_id.id,
+                                'product_id': arg.get('product_id'),
+                                'action_data': json.dumps(action_data)
+                                })
 
         return self.env['mrp.bom'].browse(int(bom_id)).get_bom_cost_new()
-
-
-class ProcessActionLine(models.Model):
-    _name = 'process.action.line'
-    bom_line_id = fields.Many2one('mrp.bom.line')
-    action_id = fields.Many2one('mrp.process.action')
-    rate = fields.Float()

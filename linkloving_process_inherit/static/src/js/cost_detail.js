@@ -21,36 +21,75 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             'click .save_process_sel': 'save_process_sel_func',
             'click .get_default': 'get_default_func',
             'click .fa-plus-square-o': 'add_action_line_func',
+            'click .fa-trash-o': 'remove_action_line_func',
 
         },
+        remove_action_line_func: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var self = this;
+            var tr = $(target).parents('tr');
+            if (tr.find('select').attr('data-id')) {
+                self.edit_arr.push({
+                    'action_line_id': tr.find('select').data('id'),
+                    'delete': true
+                });
+            }
+            tr.remove()
+
+        },
+
         add_action_line_func: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var self = this;
-            $(target).parents('tr').append(" <b>Hello world!</b>");
+            var tr = $(target).parents('tr');
+            var array = new Array();
+            tr.find("select option").each(function () {  //遍历所有option
+                var txt = $(this).data('id');   //获取option值
+                if (txt != '') {
+                    array.push({'id': txt, 'name': $(this).val()});  //添加到数组中
+                }
+            });
+            console.log(array)
+            var new_tr = QWeb.render('action_process_tr', {'options': array});
+            $(target).parents('tr').after(new_tr);
 
 
         },
 
         get_default_func: function () {
             var self = this;
-            new Model('mrp.bom.line').call('get_default_data', [self.edit_arr], {'bom_id': self.bom_id}).then(function (results) {
+            new Model('product.template').call('get_product_default_cost_detail', [this.product_id]).then(function (results) {
                 console.log(results);
+                var show_save = false;
 
                 //刷新界面
                 $("#table").bootstrapTable('destroy');
+                self.initTableSubCompany(self.columns, results);
 
-                //    保存后要清空数组
-                self.edit_arr = [];
+                _.each(results, function (result) {
+                    if (result.is_default) {
+                        show_save = true;
+                        self.edit_arr.push({
+                            'id': result.line_id,
+                            'actions': result.actions
+                        });
+                    }
+                });
+                if (show_save) {
+                    $('.save_process_sel').removeClass('hidden')
+                }
 
             });
 
         },
+
         save_process_sel_func: function () {
             var self = this;
             console.log(self.edit_arr);
             new Model('mrp.bom.line').call('save_multi_changes', [self.edit_arr], {'bom_id': self.bom_id}).then(function (results) {
-                console.log(results);
+                console.log(self.edit_arr);
 
                 //刷新界面
                 $("#table").bootstrapTable('destroy');
@@ -66,11 +105,23 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
         },
         confirm_sel_func: function () {
             var self = this;
-            var bom_line_id = $('.unlock_condition').data('id');
-            var action_1 = $('.sel_action_1 select option:selected').val();
-            var action_2 = $('.sel_action_2 select option:selected').val();
-            $('.treegrid-' + bom_line_id).find('.sel_action_1').html(action_2);
-            $('.treegrid-' + bom_line_id).find('.sel_action_2').html(action_2);
+            var bom_line_id = $('.unlock_condition').attr('data-id');
+            var trs = $('.unlock_condition').find('tr');
+            var actions = [];
+
+            for (var i = 0; i < trs.length; i++) {
+                var res = {
+                    'id': $(trs[i]).find('select').data('id'),
+                    'action_id': $(trs[i]).find('select option:selected').attr('data-id'),
+                    'action_name': $(trs[i]).find('select option:selected').val(),
+                    'rate': $(trs[i]).find('input').val()
+                };
+                actions.push(res)
+            }
+
+            var new_div = QWeb.render('action_process', {'result': actions});
+            console.log(new_div);
+            $('.treegrid-' + bom_line_id).find('.sel_action').html(new_div);
             // self.table_data[self.index]['process_action_1'] = $('.unlock_condition select option:selected').val();
             // if ($('.unlock_condition .change_time input').val() != '') {
             //     $('.fixed-table-body tr[data-index=' + self.index + ']').find('.adjusttime').html($('.unlock_condition .change_time input').val());
@@ -80,13 +131,13 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             console.log(self.index);
             console.log(self);
             self.edit_arr.push({
-                'id': self.table_data[self.index].id,
-                'process_action_1': action_1,
-                'process_action_2': action_2,
+                'id': parseInt(bom_line_id),
+                'actions': actions
             });
+            console.log(self.edit_arr);
             $('.unlock_condition').hide();
             if ($('.fixed-table-toolbar .save_process_sel').length == 0) {
-                $('.fixed-table-toolbar').append("<button class='btn btn-primary save_process_sel'>保存</button>")
+                $('.save_process_sel').removeClass('hidden')
             }
         },
 
@@ -116,16 +167,9 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             self.update_control_panel(cp_status);
 
             var formatter_func = function (value, row, index) {
-                var res = '<div>';
-                if (value) {
-                    for (var i = 0; i < value.length; i++) {
-                        res = res + value[i]['action_name'] + '<span>' + res + value[i]['rate'] + '</span>'
-                    }
-                }
-                res + '</div>'
 
 
-                console.log(res)
+                var res = QWeb.render('action_process', {'result': value});
                 return res
             };
             new Model('product.template').call('get_product_cost_detail', [product_id]).then(function (records) {
@@ -153,20 +197,17 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
 
                         {
                             field: 'material_cost',
-                            title:
-                                '材料成本',
+                            title: '材料成本',
                         }
                         ,
                         {
                             field: 'manpower_cost',
-                            title:
-                                '人工成本',
+                            title: '人工成本',
                         }
                         ,
                         {
                             field: 'total_cost',
-                            title:
-                                '总计',
+                            title: '总计',
                         }
 
                     ]
@@ -229,33 +270,30 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 onClickRow: function (item, $element) {
                     var self = this;
                     self.index = item.id;
-                    console.log(this);
+                    console.log(item);
                     if (!item.bom_id) {
-                        console.log(item)
-                        console.log($element)
+                        new Model('mrp.bom.line').call('parse_action_line_data', [item.id]).then(function (results) {
+                            var datas = [];
+                            if (results && results.length > 0) {
+                                for (var i = 0; i < results.length; i++) {
 
-                        new Model('mrp.bom.line').call('parse_action_line_data', [item.id]).then(function (data) {
-                            console.log(data);
-                            var data = [
-                                {'line_id': 1, 'selected_action_id': 1, 'selected_action_name': '包装', 'rate': 1},
-                                {'action_id': 2, 'action_name': '包装', 'rate': 1}
-                            ];
-                            var options = [
-                                {
-                                    'id': 1,
-                                    'name': '包装'
-                                },
-                                {
-                                    'id': 2,
-                                    'name': '包装1'
+                                    var res = {
+                                        'line_id': results[i].line_id,
+                                        'action_id': results[i].action_id,
+                                        'rate': results[i].rate,
+                                        'options': results[i].options,
+                                    };
+                                    console.log(res);
+                                    datas.push(res)
                                 }
-                            ]
-                            $('.unlock_condition').show();
-
+                            }
+                            $('.unlock_condition').attr('data-id', item.id).show();
+                            $('#action_table').html('');
+                            console.log(datas);
                             $('#action_table').append(QWeb.render('process_action_table', {
-                                result: data,
-                                options: options
-                            }));
+                                result: datas,
+                            }))
+
                             // $('.unlock_condition').attr('data-id', item.id).show();
                             // if (self.table_data[index].has_extra) {
                             //     $('.change_time').show()

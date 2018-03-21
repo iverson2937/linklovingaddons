@@ -4,7 +4,7 @@ odoo.define('linkloving_core.form_widget_extend', function (require) {
     var core = require('web.core');
     var Model = require('web.Model');
     var Widget = require('web.Widget');
-
+    var FormView = require('web.FormView');
     var ajax = require('web.ajax');
     var crash_manager = require('web.crash_manager');
     var data = require('web.data');
@@ -35,6 +35,26 @@ odoo.define('linkloving_core.form_widget_extend', function (require) {
                 this.datewidget.set_value(this.get('value'));
             }
             // console.log("opopopop")
+        }
+    });
+    FormView.include({
+        load_record: function (record) {
+            var res1 = this._super.apply(this, arguments);
+            var self = this;
+            console.log("----load_record-----")
+            if (self.fields_view.arch.attrs['edit']) {
+                var edit = JSON.parse(self.fields_view.arch.attrs['edit'])
+                if (edit instanceof Array) {
+                    var res = self.compute_domain([edit])
+                    if (res) {
+                        self.$buttons.find('.o_form_button_edit').show()
+                    } else {
+                        self.$buttons.find('.o_form_button_edit').hide()
+                    }
+                }
+            }
+            return res1;
+
         }
     });
 

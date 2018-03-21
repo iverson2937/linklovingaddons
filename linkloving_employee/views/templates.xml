@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <template id="linkloving_employee_static" name="linkloving_employee_assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+
+                <script type="text/javascript" src="/linkloving_employee/static/src/js/many_two_many_img_widget.js"/>
+                <script type="text/javascript" src="/linkloving_employee/static/src/js/employee_index_manage.js"/>
+
+            </xpath>
+        </template>
+    </data>
+</openerp>

@@ -4,7 +4,8 @@
     <t t-name="CostDetail">
         <div class="sub_company_top">
             <div class="toolbar">
-                <button  class="btn btn-default get-default">获取默认</button>
+                <button  class="btn btn-default get_default">获取默认</button>
+                <button  class="btn btn-primary save_process_sel hidden">保存</button>
             <table id="table">
             </table>
         </div>
@@ -13,11 +14,17 @@
             <div class="modal-backdrop  in"></div>
             <div class="create_wrap">
                 <table id="action_table" class="table table-bordered">
-                     <tr>
-                         <th>  </th>
+                    <thead>
+                          <tr>
                         <th>工序动作</th>
                         <th>系数</th>
+                         <th>操作</th>
                      </tr>
+                    </thead>
+
+                    <tbody>
+
+                    </tbody>
                     <!--<t t-foreach="values['salesman_name_list']" t-as="val">-->
                     <!--<tr >-->
                     <!--<td>-->
@@ -46,29 +53,67 @@
     </t>
 
 
-    <t t-name="process_action_table" >
-    <t t-foreach="result" t-as="item">
-        <tr>
-             <td>
-                <i class="fa fa-plus-square-o" aria-hidden="true"></i>
-            </td>
-            <td>
-                <select t-data-id="item.line_id">
-                     <t t-foreach="options" t-as="item">
-            <option t-att-data-id="item.option_id"><t t-esc="item.option_name"/></option>
+    <t t-name="process_action_table">
+
+        <t t-foreach="result" t-as="item">
+            <tr>
+
+                <td>
+                    <select t-att-data-id="item.line_id" class="form-control">
+                        <t t-if="item.options">
+                        <t t-foreach="item.options" t-as="options">
+                        <option t-att-data-id="options.id" t-att-selected="id == item.action_id ? 'selected' : null"><t t-esc="options.name"/></option>
+                        </t>
+                        </t>
+                    </select>
+                </td>
+                <td>
+                    <input name="rate" class="form-control"  t-att-value="item.rate"/>
+                </td>
+                <td>
+                    <span class="fa fa-plus-square-o"></span>
+
+                </td>
+                <td>
+                    <span class="fa fa-trash-o"></span>
+                </td>
+            </tr>
+        </t>
+    </t>
+
+<t t-name="action_process_tr">
+    <tr>
+        <td>
+                          <select  class="form-control">
+                     <t t-foreach="options" t-as="options">
+                          <option t-att-data-id="options.id"><t t-esc="options.name"/></option>
         </t>
 
         </select>
-            </td>
-            <td>
-                <input name="rate" value="2"/>
-            </td>
-        </tr>
+        </td>
+        <td>
+            <input name="rate" class="form-control" />
+
+        </td>
+        <td>
+             <span class="fa fa-plus-square-o"></span>
+        </td>
+    </tr>
+</t>
+    <t t-name="action_process">
+        <t t-if="result">
+        <t t-foreach="result" t-as="item">
+            <t t-if="item.action_name">
 
 
+        <div>
+            <span><t t-esc="item.action_name"/></span><span class="pull-right"><t t-esc="item.rate"/></span>
+        </div>
+                </t>
         </t>
-
+            </t>
     </t>
+
 
     <t t-name="process_option_templ">
         <t t-foreach="result[0]" t-as="item">

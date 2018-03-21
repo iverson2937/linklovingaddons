@@ -75,7 +75,9 @@ class PlannedDetailReport(models.Model):
                 if sub_product.purchase_ok and self.env.ref("purchase.route_warehouse0_buy") in sub_product.route_ids:
                     product_can_pruchase += sub_product
                 else:
-                    product_can_pruchase += reci_bom_po(sub_product)
+                    if sub_product.bom_count > 0:
+                        product_can_pruchase += reci_bom_po(sub_product)
+
             return product_can_pruchase
 
         all_can_purchase_product = reci_bom_po(product)
@@ -83,17 +85,17 @@ class PlannedDetailReport(models.Model):
 
     def _prepare_report_vals(self):
         # process_ids = self.env["mrp.process"].sudo().search([])
-        mrp_production = self.env["mrp.production"].sudo()
+        # mrp_production = self.env["mrp.production"].sudo()
         vals = []
-        mos = mrp_production.search([('origin_sale_id', 'in', self.sale_ids.ids)])
-        finished_product_mos = self.env["mrp.production"]
+        # mos = mrp_production.search([('origin_sale_id', 'in', self.sale_ids.ids)])
+        # finished_product_mos = self.env["mrp.production"]
         index = 1
         for sale in self.sale_ids:
             for line in sale.order_line:
                 all_can_purchase_product = self.get_purchase_product(line.product_id)
 
-                line_mo = mos.filtered(
-                    lambda x: x.origin_sale_id == sale and line.product_id == x.product_id)  # 对应这个订单行的MO号
+                # line_mo = mos.filtered(
+                #     lambda x: x.origin_sale_id == sale and line.product_id == x.product_id)  # 对应这个订单行的MO号
 
                 product_vals = []
                 for purchase_product in all_can_purchase_product:
