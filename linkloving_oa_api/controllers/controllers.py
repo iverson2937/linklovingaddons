@@ -2,6 +2,8 @@
 import base64
 import json
 import logging
+
+_logger = logging.getLogger(__name__)
 from urllib2 import URLError
 import re
 import time
@@ -111,7 +113,7 @@ class LinklovingOAApi(http.Controller):
         data = []
         data.append({
             'continent': (obj.continent.display_name or '') + (obj.country_id.display_name or '') + (
-                obj.state_id.name or '') + (obj.city or '') + (obj.street2 or '') + (obj.street or ''),
+                    obj.state_id.name or '') + (obj.city or '') + (obj.street2 or '') + (obj.street or ''),
         })
         return data
 
@@ -224,7 +226,7 @@ class LinklovingOAApi(http.Controller):
                      'qty_received': order_line.qty_received,  # 已接收数量
                      'price_tax': order_line.taxes_id.name,  # 税金
                      'shipping_rate': (
-                         order_line.qty_received * 100 / order_line.product_qty) if order_line.product_qty else 0,
+                             order_line.qty_received * 100 / order_line.product_qty) if order_line.product_qty else 0,
                      'id': order_line.order_id.product_id.id
                      }
                 )
@@ -1281,7 +1283,7 @@ class LinklovingOAApi(http.Controller):
             'country': obj.country_id.display_name or '',
             'name': obj.display_name,
             'address': (obj.country_id.display_name or '') + (obj.state_id.name or '') + (obj.city or '') + (
-                obj.street2 or '') + (obj.street or ''),
+                    obj.street2 or '') + (obj.street or ''),
             'phone': obj.phone or '',
             'crm_source': obj.crm_source_id.display_name or '',  # 来源
             'source': obj.source_id.display_name or '',  # 渠道
@@ -1865,7 +1867,7 @@ class LinklovingOAApi(http.Controller):
     # 获取所有联系人
     @http.route('/linkloving_oa_api/get_all_employees', type='json', auth="none", csrf=False, cors='*')
     def get_all_employees(self, *kw):
-        employees = request.env['hr.employee'].sudo().search([],order='id asc')
+        employees = request.env['hr.employee'].sudo().search([], order='id asc')
         data = []
         for employee in employees:
             data.append(self.change_employee_to_json(employee))
@@ -1904,6 +1906,7 @@ class LinklovingOAApi(http.Controller):
 
     def change_employee_to_json(self, obj_d):
         return {
+            'employee_id': obj_d.id,
             'id': obj_d.user_id.id,
             'partner_id': obj_d.address_home_id.id or 0,
             'name': obj_d.name_related,  # 姓名
@@ -2706,8 +2709,6 @@ class LinklovingOAApi(http.Controller):
                 })
             return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-
-
     # 员工签到签退
     @http.route('/linkloving_oa_api/employee_attendance', type='json', auth="none", csrf=False, cors='*')
     def employee_attendance(self, *kw):
@@ -2790,10 +2791,9 @@ class LinklovingOAApi(http.Controller):
                 })
             return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-
-    #erp、diy获取所有员工的考勤信息
+    # erp、diy获取所有员工的考勤信息
     @http.route('/linkloving_oa_api/get_employee_attendance', type='json', auth="none", csrf=False, cors='*')
-    def get_employee_attendance(self,*kw):
+    def get_employee_attendance(self, *kw):
         day_start = request.jsonrequest.get("day_start")
         day_end = request.jsonrequest.get("day_end")
         user_id = request.jsonrequest.get("user_id")
@@ -2821,7 +2821,7 @@ class LinklovingOAApi(http.Controller):
             return JsonResponse.send_response(STATUS_CODE_OK, res_data={"total": len(employees),
                                                                         "attendance_on": len(attendance)})
 
-    #判断用户是否是当前部门的管理员
+    # 判断用户是否是当前部门的管理员
     @http.route('/linkloving_oa_api/get_is_department', type='json', auth="none", csrf=False, cors='*')
     def get_is_department(self, *kw):
         employee_id = request.jsonrequest.get("employee_id")
@@ -2841,7 +2841,7 @@ class LinklovingOAApi(http.Controller):
             else:
                 return JsonResponse.send_response(STATUS_CODE_OK, res_data={"is_manager": False})
 
-    #获取蓝牙考勤机列表
+    # 获取蓝牙考勤机列表
     @http.route('/linkloving_oa_api/get_ble_device', type='json', auth="none", csrf=False, cors='*')
     def get_ble_device(self, *kw):
         devices = request.env['linkloving.ble.device'].sudo().search([])
@@ -2851,19 +2851,19 @@ class LinklovingOAApi(http.Controller):
                 "device_name": device.device_name,
                 "company_name": device.company_name,
             })
+            _logger.warning("device is  %s" % (device.device_name))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-    #模拟绑定
+    # 模拟绑定
     @http.route('/linkloving_oa_api/bind_employee', type='json', auth="none", csrf=False, cors='*')
     def bind_employee(self, *kw):
         employee_id = request.jsonrequest.get("employee_id")
         user_employee = request.env['hr.employee'].sudo().search([("id", "=", employee_id)])
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={
-            "id":user_employee.id,
-            "name":user_employee.name,
+            "id": user_employee.id,
+            "name": user_employee.name,
             "user_ava": LinklovingGetImageUrl.get_img_url(user_employee.user_id, "res.users", "image_medium")
         })
-
 
     #  XD 我的请假
     @http.route('/linkloving_oa_api/get_leavelist', type='json', auth="none", csrf=False, cors='*')
@@ -3804,11 +3804,11 @@ class LinklovingOAApi(http.Controller):
                     'num': len(visitList)
                 }
             return JsonResponse.send_response(STATUS_CODE_OK,
-                                            res_data=data)
+                                              res_data=data)
 
         else:
             return JsonResponse.send_response(STATUS_CODE_OK,
-                                            res_data=visit_list)
+                                              res_data=visit_list)
 
     @classmethod
     def changeVisit_to_json(cls, visitBean):
@@ -3852,7 +3852,7 @@ class LinklovingOAApi(http.Controller):
     def get_sale_team(self, **kw):
         uid = request.jsonrequest.get("uid")
         user = request.env["res.users"].sudo().browse(uid)
-        team_list=[]
+        team_list = []
         for team in user.sale_team_id:
             data = {
                 'team_id': team.id,
@@ -3862,7 +3862,7 @@ class LinklovingOAApi(http.Controller):
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=team_list)
 
-    #查询一个销售团队的成员
+    # 查询一个销售团队的成员
     @http.route('/linkloving_oa_api/get_saleteam_person', type='json', auth='none', csrf=False, cors='*')
     def get_saleteam_person(self, **kw):
         team_id = request.jsonrequest.get("team_id")

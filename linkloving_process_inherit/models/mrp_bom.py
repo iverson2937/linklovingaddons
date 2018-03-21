@@ -98,13 +98,7 @@ class MrpBom(models.Model):
             # 'manpower_cost': round(man_cost, 2),
             # 'total_cost': round(total_cost, 2),
             'process_id': process_id,
-            'process_action': [
-                {
-                    'action_id': 12,
-                    'action_name': '包装',
-                    'rate': 1
-                }
-            ],
+            'process_action': line.parse_action_line_data(no_option=True)
 
         }
         return res
@@ -173,13 +167,8 @@ class MrpBom(models.Model):
             # 'manpower_cost': round(man_cost, 2),
             # 'total_cost': round(total_cost, 2),
             'process_id': process_id,
-            'process_action': [
-                {
-                    'action_id': 12,
-                    'action_name': '包装',
-                    'rate': 1
-                }
-            ]
+            'process_action': line.parse_action_line_data()
+
         }
 
         return res
@@ -283,17 +272,33 @@ class MrpBomLine(models.Model):
 
     # sub_total_cost = fields.Float(compute='_get_sub_total_cost')
     action_line_ids = fields.One2many('process.action.line', 'bom_line_id')
+    action_id = fields.Many2one('mrp.process.action')
 
-    def parse_action_line_data(self):
+    def parse_action_line_data(self, no_option=False):
         res = []
+        options = []
+
+        if not no_option:
+            if self.bom_id.process_id:
+                domain = [('process_id', '=', self.bom_id.process_id.id)]
+            actions = self.env['mrp.process.action'].search(domain)
+            print actions
+            for action in actions:
+                options.append({
+                    'id': action.id,
+                    'name': action.name
+                })
+
         for line in self.action_line_ids:
             data = {
-                'line_id':line.id,
+                'line_id': line.id,
                 'action_id': line.action_id.id,
                 'action_name': line.action_id.name,
-                'rate': line.rate
+                'rate': line.rate,
+                'options': options
             }
             res.append(data)
+
         return res
 
     @api.multi
@@ -328,7 +333,19 @@ class MrpBomLine(models.Model):
         bom_id = kwargs.get('bom_id')
         for arg in args:
             bom_line_id = self.env['mrp.bom.line'].browse(arg.get('id'))
-
+            actions = arg.get('actions')
+            for action in actions:
+                if action.get('id'):
+                    a = self.env['process.action.line'].browse(action.get('id')).write({
+                        'action_id': action.get('action_id'),
+                        'rate': action.get('rate')
+                    })
+                else:
+                    b = self.env['process.action.line'].create({
+                        'action_id': action.get('action_id'),
+                        'rate': action.get('rate'),
+                        'bom_line_id': arg.get('id')
+                    })
             # action_date = {
             #     'action_id_1': arg.get('action_id_1'),
             #     'rate1': arg.get('rate1'),
@@ -344,13 +361,6 @@ class MrpBomLine(models.Model):
             # self.env['bom.cost.category.temp'].create({
             #     temp_date
             # })
-            bom_line_id.write(action_date)
+            # bom_line_id.write(action_date)
 
         return self.env['mrp.bom'].browse(int(bom_id)).get_bom_cost_new()
-
-
-class ProcessActionLine(models.Model):
-    _name = 'process.action.line'
-    bom_line_id = fields.Many2one('mrp.bom.line')
-    action_id = fields.Many2one('mrp.process.action')
-    rate = fields.Float()

@@ -27,11 +27,17 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             var self = this;
-            var options = [{
-                'id': 'name'
-            }];
-            var tr = QWeb.render('action_process_tr', {'options': options})
-            $(target).parents('tr').after(tr);
+            var tr = $(target).parents('tr');
+            var array = new Array();
+            tr.find("select option").each(function () {  //遍历所有option
+                var txt = $(this).data('id');   //获取option值
+                if (txt != '') {
+                    array.push({'id': txt, 'name': $(this).val()});  //添加到数组中
+                }
+            })
+            console.log(array)
+            var new_tr = QWeb.render('action_process_tr', {'options': array});
+            $(target).parents('tr').after(new_tr);
 
 
         },
@@ -54,7 +60,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var self = this;
             console.log(self.edit_arr);
             new Model('mrp.bom.line').call('save_multi_changes', [self.edit_arr], {'bom_id': self.bom_id}).then(function (results) {
-                console.log(results);
+                console.log(self.edit_arr);
 
                 //刷新界面
                 $("#table").bootstrapTable('destroy');
@@ -71,22 +77,25 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
         confirm_sel_func: function () {
             var self = this;
             var bom_line_id = $('.unlock_condition').data('id');
+            console.log(bom_line_id, 'bom_line_id');
             var trs = $('.unlock_condition').find('tr');
             var actions = [];
 
             for (var i = 0; i < trs.length; i++) {
-                console.log($(trs[i]))
+                console.log($(trs[i]));
                 var res = {
                     'id': $(trs[i]).find('select').data('id'),
-                    'action_id': $(trs[i]).find('select').val(),
+                    'action_id': $(trs[i]).find('select option:selected').attr('data-id'),
+                    'action_name': $(trs[i]).find('select option:selected').val(),
                     'rate': $(trs[i]).find('input').val()
                 };
                 console.log(res);
                 actions.push(res)
             }
 
-            var action_2 = '';
-            $('.treegrid-' + bom_line_id).find('.sel_action').html(action_2);
+            var new_div = QWeb.render('action_process', {'result': actions});
+            console.log(new_div);
+            $('.treegrid-' + bom_line_id).find('.sel_action').html(new_div);
             // self.table_data[self.index]['process_action_1'] = $('.unlock_condition select option:selected').val();
             // if ($('.unlock_condition .change_time input').val() != '') {
             //     $('.fixed-table-body tr[data-index=' + self.index + ']').find('.adjusttime').html($('.unlock_condition .change_time input').val());
@@ -99,6 +108,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 'id': bom_line_id,
                 'actions': actions
             });
+            console.log(self.edit_arr);
             $('.unlock_condition').hide();
             if ($('.fixed-table-toolbar .save_process_sel').length == 0) {
                 $('.fixed-table-toolbar').append("<button class='btn btn-primary save_process_sel'>保存</button>")
@@ -131,19 +141,10 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             self.update_control_panel(cp_status);
 
             var formatter_func = function (value, row, index) {
+                console.log(value);
 
 
-                // var abc = QWeb.render('action_process');
-                // QWeb.render('action_process')
-                var res = '<div>';
-                if (value) {
-                    for (var i = 0; i < value.length; i++) {
-                        res = res + value[i]['action_name'] + '<span>' + res + value[i]['rate'] + '</span>'
-                    }
-                }
-                res + '</div>'
-
-
+                var res = QWeb.render('action_process', {'result': value});
                 return res
             };
             new Model('product.template').call('get_product_cost_detail', [product_id]).then(function (records) {
@@ -185,7 +186,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                         }
 
                     ]
-                    ;
+                ;
                 self.columns = columns;
                 self.initTableSubCompany(columns, records)
 
@@ -251,44 +252,34 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
 
                         new Model('mrp.bom.line').call('parse_action_line_data', [item.id]).then(function (results) {
                             var datas = [];
-                            console.log(results)
-                            if (results.length>0) {
+                            if (results && results.length > 0) {
                                 for (var i = 0; i < results.length; i++) {
 
                                     var res = {
                                         'line_id': results[i].line_id,
                                         'action_id': results[i].action_id,
-                                        'rate': results[i].rate
+                                        'rate': results[i].rate,
+                                        'options': results[i].options,
                                     };
                                     console.log(res);
                                     datas.push(res)
                                 }
                             }
                             else {
-                                console.log('else')
-                               var res = {
-                                    'action_id':2,
+                                var res = {
                                     'rate': 1,
+                                    'options': results[i].options,
                                 };
                                 datas.push(res);
                             }
-                            var options = [
-                                {
-                                    'id': 1,
-                                    'name': '包装'
-                                },
-                                {
-                                    'id': 2,
-                                    'name': '包装1'
-                                }
-                            ];
-                            $('.unlock_condition').show();
-                            $('#action_table').find('tbody').html('');
+
+                            $('.unlock_condition').attr('data-id', item.id).show();
+                            $('#action_table').html('');
                             console.log(datas);
-                            $('#action_table').find('tbody').append(QWeb.render('process_action_table', {
+                            $('#action_table').append(QWeb.render('process_action_table', {
                                 result: datas,
-                                options: options
-                            }));
+                            }))
+
                             // $('.unlock_condition').attr('data-id', item.id).show();
                             // if (self.table_data[index].has_extra) {
                             //     $('.change_time').show()

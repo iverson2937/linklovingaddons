@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+       <div t-name="FieldBinaryFileUploader.files" class="oe_attachments">
+        <t t-if="widget.get('effective_readonly')">
+
+            <!--<div t-foreach="widget.get('value')" t-as="id">-->
+            <!--<t t-set="file" t-value="widget.data[id]"/>-->
+            <!--<a target="_blank" t-att-href="file.url" t-attf-title="#{(file.name || file.filename) + (file.date?' \n('+file.date+')':'' )}"><t t-raw="file.name || file.filename"/></a>-->
+            <!--</div>-->
+
+            <div t-foreach="widget.get('value')" t-as="id" class="o_form_field_image oe_avatar o_form_field">
+                <t t-set="file" t-value="widget.data[id]"/>
+                <img class="this_my_employee_img" target="_blank" t-att-src="file.url" t-attf-title="#{(file.name || file.filename) + (file.date?' \n('+file.date+')':'' )}"/>
+            </div>
+        </t>
+        <t t-if="!widget.get('effective_readonly')">
+            <div t-foreach="values" t-as="id" class="oe_attachment">
+                <t t-set="file" t-value="widget.data[id]"/>
+                <span t-if="file.upload or file.percent_loaded&lt;100"
+                      t-att-title="(file.name || file.filename) + ((file.date)? (' \n(' + file.date + ')') : '')"
+                      t-att-name="file.name || file.filename">
+                    <span class="oe_fileuploader_in_process">...Upload in progress...</span>
+                    <t t-raw="file.name || file.filename"/>
+                </span>
+                <t t-if="!file.upload or file.percent_loaded&gt;=100">
+                    <div>
+                        <a href="#" class="fa fa-times pull-right oe_delete" title="Delete this file" t-att-data-id="file.id"/>
+                        <t t-raw="file.name || file.filename"/>
+                    </div>
+                    <a class="o_image" target="_blank" t-att-href="file.url"
+                       t-att-title="(file.name || file.filename) + ((file.date)? (' \n(' + file.date + ')') : '')"
+                       t-att-data-mimetype="file.mimetype"
+                       t-attf-data-src="/web/image/#{file.id}/100x80"/>
+                </t>
+            </div>
+        </t>
+    </div>
+
+</templates>
