@@ -122,6 +122,7 @@ class PlannedDetailReport(models.Model):
                         'qty_available': purchase_product.qty_available,
                         'virtual_available': purchase_product.virtual_available,
                         'incoming_qty': purchase_product.incoming_qty,
+                        'outgoing_qty': purchase_product.outgoing_qty,
                         # 'state': self.selection_mapped(purchase_product._fields.get("state").selection, purchase_product.state),
                         'orders': pos_vals,
                     })
