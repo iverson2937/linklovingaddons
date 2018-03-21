@@ -2711,7 +2711,7 @@ class LinklovingOAApi(http.Controller):
 
 
 
-    # 员工签到签退 js
+    # 员工签到签退 江苏若态
     @http.route('/linkloving_oa_api/employee_attendance', type='json', auth="none", csrf=False, cors='*')
     def employee_attendance(self, *kw):
         employee_id = request.jsonrequest.get("employee_id")
