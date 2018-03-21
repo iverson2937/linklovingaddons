@@ -2,15 +2,9 @@
 <openerp>
     <data>
 
-        <template id="assets_backend" name="statistic" inherit_id="web.assets_backend">
+        <template id="assets_backend" name="statistic" inherit_id="linkloving_core.core_static">
             <xpath expr="." position="inside">
-                <script type="text/javascript" src="/linkloving_process_inherit/static/src/js/jquery.treegrid.js"/>
-                <script type="text/javascript"
-                        src="/linkloving_process_inherit/static/src/js/treegrid/bootstrap-table-treegrid.js"/>
                 <script type="text/javascript" src="/linkloving_process_inherit/static/src/js/cost_detail.js"/>
-
-                <link rel="stylesheet" href="/linkloving_process_inherit/static/src/css/jquery.treegrid.css"/>
-
 
                 <!--<link rel="stylesheet" href="/linkloving_account_budget/static/src/css/budget.css"/>-->
             </xpath>
