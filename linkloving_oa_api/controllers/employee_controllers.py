@@ -110,48 +110,6 @@ class LinklovingEmployeeControllers(http.Controller):
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data_list)
 
-    # 创建用户
-    @http.route('/linkloving_oa_api/create_employee1', auth='none', csrf=False, cors='*')
-    def create_employee1(self, **kw):
-
-        name = request.jsonrequest.get("name")
-        english_name = request.jsonrequest.get("english_name")
-        gender = request.jsonrequest.get("gender")
-        nation = request.jsonrequest.get("nation")
-        birthday = request.jsonrequest.get("birthday")
-        identification_id = request.jsonrequest.get("identification_id")
-        address_home_two = request.jsonrequest.get("address_home_two")
-        now_address_home = request.jsonrequest.get("now_address_home")
-        marital = request.jsonrequest.get("marital")
-        work_phone = request.jsonrequest.get("work_phone")
-        work_email = request.jsonrequest.get("work_email")
-        department_id = request.jsonrequest.get("department_id")
-        hr_job_ids = request.jsonrequest.get("hr_job_ids")
-        identification_A = request.jsonrequest.get("identification_A")
-        identification_B = request.jsonrequest.get("identification_B")
-
-        vals = {
-            "name": name,
-            "english_name": english_name,
-            "gender": gender,
-            "nation": int(nation) if nation else False,
-            "birthday": birthday,
-            "identification_id": identification_id,
-            "address_home_two": address_home_two,
-            "now_address_home": now_address_home,
-            "marital": marital,
-            "work_phone": work_phone,
-            "work_email": work_email,
-            "department_id": int(department_id) if department_id else False,
-            "hr_job_ids": [(6, 0, hr_job_ids)],
-            "identification_A": identification_A,
-            "identification_B": identification_B,
-
-        }
-        employee = request.env['hr.employee'].sudo().create(vals)
-
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.employee_to_json(employee))
-
     # 修改用户
     @http.route('/linkloving_oa_api/update_employee', type='json', auth='none', csrf=False, cors='*')
     def update_employee(self, **kw):
@@ -263,134 +221,6 @@ class LinklovingEmployeeControllers(http.Controller):
         else:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "没有识别到员工或者登录用户"})
 
-    # 修改用户 one
-    @http.route('/linkloving_oa_api/update_employee1', auth='none', csrf=False, cors='*')
-    def update_employee1(self, **kw):
-        english_name = request.jsonrequest.get("english_name")
-        work_card = request.jsonrequest.get("work_card")
-        nation = request.jsonrequest.get("nation")
-        now_address_home = request.jsonrequest.get("now_address_home")
-        emergency_contact_name = request.jsonrequest.get("emergency_contact_name")
-        emergency_contact_relation = request.jsonrequest.get("emergency_contact_relation")
-        emergency_contact_way = request.jsonrequest.get("emergency_contact_way")
-
-        work_experience_ids = request.jsonrequest.get("work_experience_ids")  # 工作经验
-
-        education_experience_ids = request.jsonrequest.get("education_experience_ids")  # 教育经历
-
-        identification_A = request.jsonrequest.get("identification_A")
-        identification_B = request.jsonrequest.get("identification_B")
-        bank_card = request.jsonrequest.get("bank_card")
-
-        certificate_image_ids = request.jsonrequest.get("certificate_image_ids")  # 证书
-
-        entry_date = request.jsonrequest.get("entry_date")
-        probation_begin_date = request.jsonrequest.get("probation_begin_date")
-        probation_end_date = request.jsonrequest.get("probation_end_date")
-        mining_productivity = request.jsonrequest.get("mining_productivity")
-        contract_begin_date = request.jsonrequest.get("contract_begin_date")
-        contract_end_date = request.jsonrequest.get("contract_end_date")
-        accumulation_fund = request.jsonrequest.get("accumulation_fund")
-        insurance_type = request.jsonrequest.get("insurance_type")
-        buy_balance = request.jsonrequest.get("buy_balance")
-        is_create_account = request.jsonrequest.get("is_create_account")
-        name = request.jsonrequest.get("name")
-        mobile_phone = request.jsonrequest.get("mobile_phone")
-        work_phone = request.jsonrequest.get("work_phone")
-        work_email = request.jsonrequest.get("work_email")
-        company_id = request.jsonrequest.get("company_id")
-        department_id = request.jsonrequest.get("department_id")
-        job_id = request.jsonrequest.get("job_id")
-        parent_id = request.jsonrequest.get("parent_id")
-        calendar_id = request.jsonrequest.get("calendar_id")
-        gender = request.jsonrequest.get("gender")
-        birthday = request.jsonrequest.get("birthday")
-        identification_id = request.jsonrequest.get("identification_id")
-        address_home_two = request.jsonrequest.get("address_home_two")
-        marital = request.jsonrequest.get("marital")
-        card_num = request.jsonrequest.get("card_num")
-        hr_job_ids = request.jsonrequest.get("hr_job_ids")
-
-        certificate_list = []
-        for certificate_one in certificate_image_ids:
-            experience_id = request.env['ir.attachment'].sudo().create({
-                'res_model': u'hr.employee',
-                'name': certificate_one.name,
-                'datas': certificate_one.content,
-                'datas_fname': certificate_one.satas_fname,
-                'public': True,
-            })
-            certificate_list.append(experience_id.id)
-
-        experience_data = [(0, 0, {
-            "name": experience_one.name,
-            "department": experience_one.department,
-            "position": experience_one.position,
-            "entry_time": experience_one.entry_time,
-            "Leaving_time": experience_one.Leaving_time,
-        }) for experience_one in work_experience_ids
-                           ]
-
-        education_data = [(0, 0, {
-            "name": education_one.name,
-            "attainment": education_one.department,
-            "major": education_one.position,
-            "entry_time": education_one.entry_time,
-            "Leaving_time": education_one.Leaving_time,
-        }) for education_one in education_experience_ids
-                          ]
-
-        vals = {
-            "english_name": english_name,
-            "work_card": work_card,
-            "nation": int(nation) if nation else False,
-            "now_address_home": now_address_home,
-            "emergency_contact_name": emergency_contact_name,
-            "emergency_contact_relation": emergency_contact_relation,
-            "emergency_contact_way": emergency_contact_way,
-
-            "work_experience_ids": experience_data,
-
-            "education_experience_ids": education_data,
-
-            "identification_A": identification_A,
-            "identification_B": identification_B,
-            "bank_card": bank_card,
-
-            "certificate_image_ids": [(6, 0, certificate_list)],
-
-            "entry_date": entry_date,
-            "probation_begin_date": probation_begin_date,
-            "probation_end_date": probation_end_date,
-            "mining_productivity": mining_productivity,
-            "contract_begin_date": contract_begin_date,
-            "contract_end_date": contract_end_date,
-            "accumulation_fund": accumulation_fund,
-            "insurance_type": insurance_type,
-            "buy_balance": buy_balance,
-            "is_create_account": '已绑定' if is_create_account else '无',
-            "name": name,
-            "mobile_phone": mobile_phone,
-            "work_phone": work_phone,
-            "work_email": work_email,
-            "company_id": int(company_id) if company_id else False,
-            "department_id": int(department_id) if department_id else False,
-            "job_id": job_id,
-            "parent_id": int(parent_id) if parent_id else False,
-            "calendar_id": int(calendar_id) if company_id else False,
-            "gender": gender,
-            "birthday": birthday,
-            "identification_id": identification_id,
-            "address_home_two": address_home_two,
-            "marital": marital,
-            "card_num": card_num,
-            "hr_job_ids": [(6, 0, hr_job_ids)]
-        }
-
-        # employee = request.env['hr.employee'].create(vals)
-
-        # return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.changeVisit_to_json(employee))
-        return 'ok'
 
     @classmethod
     def employee_to_json(cls, employeebean):
@@ -541,7 +371,7 @@ class LinklovingEmployeeControllers(http.Controller):
             "marital": marital_data or "",
             "marital_id": employeebean.marital or "",
             "card_num": employeebean.card_num or '',
-            "hr_job_ids": [emp.name for emp in employeebean.hr_job_ids],
+            # "hr_job_ids": [emp.name for emp in employeebean.hr_job_ids],
         }
         return vals
 
