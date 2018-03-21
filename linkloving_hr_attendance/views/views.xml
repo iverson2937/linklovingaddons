@@ -7,6 +7,38 @@
             <field name="view_mode">tree,form</field>
         </record>
 
+    <record id="view_attendance_tree_inherit" model="ir.ui.view">
+        <field name="name">hr.attendance.tree</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
+        <field name="arch" type="xml">
+            <!--<tree string="Employee attendances">-->
+            <xpath expr="//field[@name='check_in']" position="replace">
+                <field name="new_check_in" string="签到"/>
+            </xpath>
+            <!--</tree>-->
+        </field>
+    </record>
+
+    <record id="hr_attendance_view_form_inherit" model="ir.ui.view">
+        <field name="name">hr.attendance.form</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
+        <field name="arch" type="xml">
+            <!--<form string="Employee attendances">-->
+                <!--<sheet>-->
+                    <!--<group>-->
+            <!--<field name="employee_id"/>-->
+            <xpath expr="//field[@name='check_in']" position="replace">
+                <field name="new_check_in" string="签到"/>
+            </xpath>
+            <!--<field name="check_out"/>-->
+                    <!--</group>-->
+                <!--</sheet>-->
+            <!--</form>-->
+        </field>
+    </record>
+
       <record id="view_attendance_device_tree" model="ir.ui.view">
         <field name="name">linkloving.ble.device.tree</field>
         <field name="model">linkloving.ble.device</field>
