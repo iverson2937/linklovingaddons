@@ -229,6 +229,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 showToggle: true,
                 // search: true,
                 striped: true,
+                stickyHeader: true,
                 showColumns: true,
                 showExport: true,
                 treeShowField: 'name',
