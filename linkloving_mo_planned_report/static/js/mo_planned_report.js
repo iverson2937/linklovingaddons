@@ -262,9 +262,14 @@ odoo.define('linkloving_mo_planned_report.mo_planned_report', function (require)
                 title: '产品',
                 sortable: true,
             }, {
-                field: 'qty_available',
-                title: '库存',
+                field: 'outgoing',
+                title: '需求数量',
                 sortable: true,
+            },
+                {
+                    field: 'qty_available',
+                    title: '库存',
+                    sortable: true,
             }, {
                 field: 'virtual_available',
                 title: '预测数量',

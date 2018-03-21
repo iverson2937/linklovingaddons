@@ -154,14 +154,16 @@
                                     <tree editable="bottom">
                                         <field name="bom_id" required="1"/>
                                         <field name="operate_type" required="1"/>
-                                        <field name="bom_line_id" attrs="{'invisible': [('operate_type', '=', 'add')],
+                                        <!--<field name="bom_line_id" attrs="{'invisible': [('operate_type', '=', 'add')],-->
+                                        <!--'required': [('operate_type', '!=', 'add')]}"/>-->
+                                        <field name="product_id" attrs="{'invisible': [('operate_type', '=', 'add')],
                                                       'required': [('operate_type', '!=', 'add')]}"/>
                                         <field name="new_product_id"
                                                attrs="{'invisible': [('operate_type', 'not in', ['add'])],
-                                   'required': [('operate_type', 'in', ['add'])]}"/>
+                                                    'required': [('operate_type', 'in', ['add'])]}"/>
                                         <field name="new_product_qty"
                                                attrs="{'invisible': [('operate_type', 'not in', ['add', 'update'])],
-                                   'required': [('operate_type', 'in', ['add', 'update'])]}"/>
+                                                    'required': [('operate_type', 'in', ['add', 'update'])]}"/>
 
                                         <field name="effectivity"/>
                                         <!--<field name="effectivity_date"-->

@@ -10,6 +10,11 @@ class MrpBom(models.Model):
     version = fields.Integer(u'版本号', default=1)
 
 
+class ProductProductExtend(models.Model):
+    _inherit = 'product.product'
+
+    bom_line_ids = fields.One2many('mrp.bom.line', 'product_id')
+
 class MrpEcoOrder(models.Model):
     _name = 'mrp.eco.order'
     _inherit = ['mail.thread', 'ir.needaction_mixin']
@@ -141,12 +146,14 @@ class MrpEcoLine(models.Model):
             'mrp.bom', u"物料清单", ondelete="restrict", required=True)
 
     bom_line_id = fields.Many2one('mrp.bom.line',
-                                  string=u'明细行',
-                                  domain="[('bom_id', '=', bom_id)]")
+                                  string=u'BOM明细行',
+                                  compute="_compute_bom_line_id",
+                                  )
     operate_type = fields.Selection(selection=[('add', u'新增'),
                                                ('remove', u'移除此项'),
                                                ('update', u'更新配比')],
                                     string=u'操作')
+    product_id = fields.Many2one('product.product', string=u'产品', domain="[('bom_line_ids.bom_id', '=', bom_id)]")
     new_product_qty = fields.Float(
             u'更新后的配比',
             digits=dp.get_precision('Product Unit of Measure'),
@@ -156,6 +163,18 @@ class MrpEcoLine(models.Model):
 
     bom_eco_id = fields.Many2one(comodel_name="mrp.bom.eco", ondelete="restrict")
 
+    @api.multi
+    def _compute_bom_line_id(self):
+        bom_line_obj = self.env["mrp.bom.line"]
+        for line in self:
+            line.bom_line_id = bom_line_obj.search([('product_id', '=', line.product_id.id),
+                                                    ('bom_id', '=', line.bom_id.id)], limit=1)
+
+    @api.multi
+    @api.onchange("bom_line_id")
+    def _onchange_bom_line_id(self):
+        for line in self:
+            line.product_id = self.bom_line_id.product_id.id
 
 class MrpBomEco(models.Model):
     _name = 'mrp.bom.eco'
@@ -199,6 +218,14 @@ class MrpBomEco(models.Model):
         return True
 
     @api.multi
+    def apply_new_version_number(self):
+        for bom_eco in self:
+            if bom_eco.bom_id.version != bom_eco.old_version:
+                raise UserError(u'BOM版本不匹配,请检查')
+            else:
+                bom_eco.bom_id.version = bom_eco.new_version
+
+    @api.multi
     def apply_to_bom(self):
         if not self._check_bom_line():
             raise UserError(u'不能在一张变更单中,同时变更一个物料')
@@ -213,6 +240,15 @@ class MrpBomEco(models.Model):
                         'product_qty': bom_change.new_product_qty,
                     })
                 elif bom_change.operate_type == 'update':
+                    if not bom_change.bom_line_id:
+                        raise UserError(u'未找到对应的BOM明细行')
                     bom_change.bom_line_id.product_qty = bom_change.new_product_qty
                 elif bom_change.operate_type == 'remove':
+                    if not bom_change.bom_line_id:
+                        raise UserError(u'未找到对应的BOM明细行')
                     bom_change.bom_line_id.unlink()
+        self.apply_new_version_number()
+
+    @api.multi
+    def apply_new_bom_to_orders(self):
+        pass
