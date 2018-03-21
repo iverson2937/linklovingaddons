@@ -15,7 +15,7 @@ class HrExpense(models.Model):
         if employee_id == self.manager_id:
             # 报销金额小于部门允许金额直接通过
             if not self.parent_id or (
-                        self.allow_amount and total_amount < self.allow_amount):
+                    self.allow_amount and total_amount < self.allow_amount):
                 state = 'approve'
             else:
                 if not self.parent_id.manager_id:
