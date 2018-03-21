@@ -246,10 +246,10 @@
                                         <br/>
                                         <div class="o_horizontal_separator">银行账号</div>
                                         <br/>
-                                        <field name="bank_card_num" required="1"
+                                        <field name="bank_card_num"
                                                attrs="{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"/>
 
-                                        <field name="bank_card_opening_bank" required="1"
+                                        <field name="bank_card_opening_bank"
                                                attrs="{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"/>
 
                                     </group>
@@ -367,14 +367,19 @@
 
                                     <group string='用户信息' name="active_group">
 
-                                        <label for="is_create_account"/>
-                                        <div class="o_row" attrs="{'invisible': [('create_date','!=',False)]}">
-                                            <field name="is_create_account"
-                                                   attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
-                                            <span>同步开通员工的系统账号</span>
-                                        </div>
-                                        <field name="user_id" string=" "
+                                        <field name="is_create_account" invisible="1"/>
+
+                                        <field name="user_id" string="相关用户"
                                                attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+
+                                        <!--<label for="is_create_account"/>-->
+                                        <!--<div class="o_row" attrs="{'invisible': [('create_date','!=',False)]}">-->
+                                        <!--<field name="is_create_account" invisible="1"-->
+                                        <!--attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>-->
+                                        <!--<span>同步开通员工的系统账号</span>-->
+                                        <!--</div>-->
+                                        <!--<field name="user_id" string=" "-->
+                                        <!--attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>-->
 
                                         <br/>
                                         <br/>
@@ -534,17 +539,17 @@
 
 
         <!--<record id="linkloving_auth_group.hr_employee_form_inherit" model="ir.ui.view">-->
-            <!--<field name="name">hr.employee.form</field>-->
-            <!--<field name="model">hr.employee</field>-->
-            <!--<field name="inherit_id" ref="hr.view_employee_form"/>-->
-            <!--<field name="arch" type="xml">-->
-                <!--<xpath expr="//field[@name='job_id']" position="replace">-->
-                    <!--<field name="hr_job_ids"-->
-                           <!--attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"-->
-                           <!--widget="many2many_tags" options="{'no_create':True}" string="工作头衔"/>-->
-                <!--</xpath>-->
+        <!--<field name="name">hr.employee.form</field>-->
+        <!--<field name="model">hr.employee</field>-->
+        <!--<field name="inherit_id" ref="hr.view_employee_form"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<xpath expr="//field[@name='job_id']" position="replace">-->
+        <!--<field name="hr_job_ids"-->
+        <!--attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"-->
+        <!--widget="many2many_tags" options="{'no_create':True}" string="工作头衔"/>-->
+        <!--</xpath>-->
 
-            <!--</field>-->
+        <!--</field>-->
         <!--</record>-->
 
         <record id="hr_hr_employee_view_form_worker" model="ir.ui.view">
