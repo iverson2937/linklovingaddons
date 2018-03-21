@@ -22,3 +22,9 @@ class ProcessActionLine(models.Model):
     bom_line_id = fields.Many2one('mrp.bom.line')
     action_id = fields.Many2one('mrp.process.action')
     rate = fields.Float(default=1)
+    line_cost = fields.Float(compute='_get_line_cost')
+
+    @api.multi
+    def _get_line_cost(self):
+        for line in self:
+            line.line_cost = line.action_id.cost * line.rate

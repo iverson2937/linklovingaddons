@@ -3,24 +3,7 @@
         <template id="assets_backend" name="statistic" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
                 <link rel="stylesheet" href="linkloving_companies_ordercreated/static/src/css/css.css"/>
-                <link rel="stylesheet" href="linkloving_companies_ordercreated/static/src/css/bootstrap-table.min.css"/>
 
-                <!-- import stylesheet -->
-                <!-- import iView -->
-                <script typ="text/javascript"
-                        src="/linkloving_companies_ordercreated/static/src/js/bootstrap-table/bootstrap-table.js"/>
-                <script type="text/javascript"
-                        src="/linkloving_companies_ordercreated/static/src/js/bootstrap-table/bootstrap-editable.js"/>
-                <script type="text/javascript"
-                        src="/linkloving_companies_ordercreated/static/src/js/bootstrap-table/html2canvas.js"/>
-                <script type="text/javascript"
-                        src="/linkloving_companies_ordercreated/static/src/js/bootstrap-table/bootstrap-table-export.min.js"/>
-                 <script type="text/javascript"
-                        src="/linkloving_companies_ordercreated/static/src/js/bootstrap-table/bootstrap-table-editable.js"/>
-                <script type="text/javascript"
-                        src="/linkloving_companies_ordercreated/static/src/js/bootstrap-table/tableExport.js"/>
-                <script typ="text/javascript"
-                        src="/linkloving_companies_ordercreated/static/src/js/bootstrap-table/bootstrap-table-zh-CN.min.js"/>
                 <script type="text/javascript"
                         src="/linkloving_companies_ordercreated/static/src/js/sub_company_report.js"/>
             </xpath>

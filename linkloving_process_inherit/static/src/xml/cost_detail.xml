@@ -4,7 +4,8 @@
     <t t-name="CostDetail">
         <div class="sub_company_top">
             <div class="toolbar">
-                <button  class="btn btn-default get-default">获取默认</button>
+                <button  class="btn btn-default get_default">获取默认</button>
+                <button  class="btn btn-primary save_process_sel hidden">保存</button>
             <table id="table">
             </table>
         </div>
@@ -70,7 +71,11 @@
                     <input name="rate" class="form-control"  t-att-value="item.rate"/>
                 </td>
                 <td>
-                <span class="fa fa-plus-square-o"></span>
+                    <span class="fa fa-plus-square-o"></span>
+
+                </td>
+                <td>
+                    <span class="fa fa-trash-o"></span>
                 </td>
             </tr>
         </t>
@@ -98,9 +103,13 @@
     <t t-name="action_process">
         <t t-if="result">
         <t t-foreach="result" t-as="item">
+            <t t-if="item.action_name">
+
+
         <div>
-            <span><t t-esc="item.action_name"/></span><span><t t-esc="item.rate"/></span>
+            <span><t t-esc="item.action_name"/></span><span class="pull-right"><t t-esc="item.rate"/></span>
         </div>
+                </t>
         </t>
             </t>
     </t>

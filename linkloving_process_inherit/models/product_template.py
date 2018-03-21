@@ -13,6 +13,10 @@ class ProductTemplate(models.Model):
             'product_id': self.id,
         }
 
+    def get_product_default_cost_detail(self):
+        if self.bom_ids:
+            return self.bom_ids[0].get_default_bom_cost()
+
     @api.multi
     def get_product_cost_detail(self):
         if self.bom_ids:
