@@ -2711,7 +2711,7 @@ class LinklovingOAApi(http.Controller):
 
 
 
-    # 员工签到签退
+    # 员工签到签退 js
     @http.route('/linkloving_oa_api/employee_attendance', type='json', auth="none", csrf=False, cors='*')
     def employee_attendance(self, *kw):
         employee_id = request.jsonrequest.get("employee_id")
@@ -2724,6 +2724,7 @@ class LinklovingOAApi(http.Controller):
         is_wx = request.jsonrequest.get("is_wx")
         device_version = request.jsonrequest.get("device_version")
         open_id = request.jsonrequest.get("open_id")
+
 
         if is_wx:
             if attendance_off:
