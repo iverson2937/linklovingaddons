@@ -237,7 +237,7 @@ def _get_rec(object, parnet, result, product_type_dict):
         product_cost = object.product_id.pre_cost_cal_new(raise_exception=False)
         line_cost = product_cost if product_cost else 0
         material_cost = line_cost * object.product_qty
-        man_cost = l.bom_line_man_cost()
+        man_cost = l.bom_line_man_cost
         total_cost = material_cost + man_cost
 
         res = {
