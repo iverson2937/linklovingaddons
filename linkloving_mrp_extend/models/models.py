@@ -1757,7 +1757,7 @@ class LLWorkerLine(models.Model):
             if not line.worker_time_line_ids:
                 continue
             else:
-                new_time_line = line.get_newest_time_line()
+                new_time_line = line.get_newest_time_line().sudo()
                 if new_time_line.state != state:  # 若状态改变
                     if state == 'outline':
                         new_time_line.worker_id.now_mo_id = None
