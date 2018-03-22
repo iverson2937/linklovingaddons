@@ -126,7 +126,11 @@ class ProductProduct(models.Model):
             print stock_move
             if stock_move:
                 print stock_move.quantity_adjusted_qty
-                product.period_stock = stock_move.quantity_adjusted_qty
+                if not stock_move.quantity_adjusted_qty:
+                    product.period_stock = product.qty_available
+                else:
+
+                    product.period_stock = stock_move.quantity_adjusted_qty
             else:
                 product.period_stock = 0
 
