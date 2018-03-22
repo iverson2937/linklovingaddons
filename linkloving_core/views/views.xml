@@ -5,6 +5,7 @@
             <xpath expr="." position="inside">
 
                 <script type="text/javascript" src="/linkloving_core/static/src/js/form_widget_extend.js"/>
+                <script type="text/javascript" src="/linkloving_core/static/src/js/date_format.js"/>
                 <script type="text/javascript" src="/linkloving_core/static/src/js/product.js"/>
                 <script type="text/javascript" src="/linkloving_core/static/src/js/tree_view.js"/>
                 <script type="text/javascript" src="/linkloving_core/static/src/js/notify.js"/>
