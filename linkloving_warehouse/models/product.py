@@ -81,6 +81,54 @@ class ProductProduct(models.Model):
         ('default_code_uniq', 'unique (default_code)', _('Default Code already exist!')),
         # ('name_uniq', 'unique (name)', u'产品名称已存在!')
     ]
+    period_stock = fields.Float(compute='_get_period_stock', string=u'库存增减', store=True)
+
+    def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
+        """
+        :param year: 年份，默认是本年，可传int或str类型
+        :param month: 月份，默认是本月，可传int或str类型
+        :return: firstDay: 当月的第一天，datetime.date类型
+                  lastDay: 当月的最后一天，datetime.date类型
+        """
+        if year:
+            year = int(year)
+        else:
+            year = datetime.date.today().year
+        if not period:
+            period = 0
+            # 获取当月第一天的星期和当月的总天数
+        firstDayWeekDay, monthRange = calendar.monthrange(year, month)
+
+        if month - period <= 0:
+            year = year - 1
+            month = 12 + month
+
+        # 获取当月的第一天
+
+        firstDay = datetime.date(year=year, month=month - period, day=1).strftime('%Y-%m-%d')
+
+        print year, month, monthRange
+        if month > 12:
+            month = month - 12
+            year = year + 1
+        lastDay = datetime.date(year=year, month=month, day=monthRange).strftime('%Y-%m-%d')
+
+        return firstDay, lastDay
+
+    @api.multi
+    def _get_period_stock(self):
+        firstDay, last = getMonthFirstDayAndLastDay(year=2018, month=1)
+
+        for product in self:
+            stock_move = self.env['stock.move'].search(
+                [('product_id', '=', product.id), ('state', '=', 'done'), ('date', '<', firstDay)], limit=1,
+                order='date desc')
+            print stock_move
+            if stock_move:
+                print stock_move.quantity_adjusted_qty
+                product.period_stock = stock_move.quantity_adjusted_qty
+            else:
+                product.period_stock = 0
 
     def compute_sale_purchase_qty(self):
         this_month = datetime.datetime.now().month
@@ -174,9 +222,9 @@ class ProductTemplate(models.Model):
             for mo in product_mos:
                 if mo.date_planned_finished:
                     date_planned_finished = fields.datetime.strftime(fields.datetime.strptime(
-                            mo.date_planned_finished,
-                            '%Y-%m-%d %H:%M:%S'),
-                            '%Y-%m-%d')
+                        mo.date_planned_finished,
+                        '%Y-%m-%d %H:%M:%S'),
+                        '%Y-%m-%d')
                 else:
                     date_planned_finished = u'暂无交期'
                 info_str += date_planned_finished + ' ' + (mo.name or '') + ' ' \
