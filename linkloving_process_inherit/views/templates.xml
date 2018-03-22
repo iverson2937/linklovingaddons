@@ -31,6 +31,10 @@
 
                     </button>
                 </xpath>
+                <xpath expr="//field[@name='barcode']" position="after">
+                    <field name="head_circle"/>
+                </xpath>
+
 
             </field>
         </record>

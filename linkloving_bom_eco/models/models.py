@@ -4,6 +4,17 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 
+class MrpProductionExtend(models.Model):
+    _inherit = 'mrp.production'
+
+    @api.multi
+    def _compute_bom_version(self):
+        for mo in self:
+            mo.bom_version = mo.bom_id.version or 1
+
+    bom_version = fields.Integer(u"BOM版本号", compute="_compute_bom_version", store=True)
+
+
 class MrpBom(models.Model):
     _inherit = 'mrp.bom'
 
@@ -14,6 +25,7 @@ class ProductProductExtend(models.Model):
     _inherit = 'product.product'
 
     bom_line_ids = fields.One2many('mrp.bom.line', 'product_id')
+
 
 class MrpEcoOrder(models.Model):
     _name = 'mrp.eco.order'
@@ -176,6 +188,7 @@ class MrpEcoLine(models.Model):
         for line in self:
             line.product_id = self.bom_line_id.product_id.id
 
+
 class MrpBomEco(models.Model):
     _name = 'mrp.bom.eco'
     _description = u'BOM 变更单'
@@ -219,6 +232,10 @@ class MrpBomEco(models.Model):
 
     @api.multi
     def apply_new_version_number(self):
+        """
+        更新版本号
+        :return:
+        """
         for bom_eco in self:
             if bom_eco.bom_id.version != bom_eco.old_version:
                 raise UserError(u'BOM版本不匹配,请检查')
@@ -227,6 +244,10 @@ class MrpBomEco(models.Model):
 
     @api.multi
     def apply_to_bom(self):
+        """
+        将bOM按照表单进行更新, 并增加版本号
+        :return:
+        """
         if not self._check_bom_line():
             raise UserError(u'不能在一张变更单中,同时变更一个物料')
         bom_line_obj = self.env['mrp.bom.line']
@@ -250,5 +271,50 @@ class MrpBomEco(models.Model):
         self.apply_new_version_number()
 
     @api.multi
-    def apply_new_bom_to_orders(self):
-        pass
+    def apply_bom_update(self):
+        """
+        将修改应用到MO PO等单据
+        :return:
+        """
+        move_obj = self.env["stock.move"]
+        for bom_eco in self:
+            mos = self.env["mrp.production"].search(
+                    [('bom_id', '=', bom_eco.bom_id.id),
+                     ('state', 'not in', ['cancel', 'done']),
+                     ('bom_version', '=', bom_eco.old_version)])
+            for mo in mos:
+                # 算出的所需物料的数量, 要减去已完成的数量
+                done_moves = mo.move_finished_ids.filtered(
+                        lambda x: x.state == 'done' and x.product_id == mo.product_id)
+                qty_produced = mo.product_id.uom_id._compute_quantity(sum(done_moves.mapped('product_qty')),
+                                                                      mo.product_uom_id)
+                factor = mo.product_uom_id._compute_quantity(mo.product_qty - qty_produced,
+                                                             mo.bom_id.product_uom_id) / mo.bom_id.product_qty
+                boms, lines = mo.bom_id.explode(mo.product_id, factor, picking_type=mo.bom_id.picking_type_id)
+
+                for change in bom_eco.bom_change_ids:
+                    bom_line_id = change.bom_line_id
+                    line_data = self.find_line_data_with_bom_line(lines, bom_line_id=bom_line_id,
+                                                                  product_id=change.product_id)
+                    if change.operate_type == 'add':  # 新增物料需求, 直接在这个mo上面
+                        move_obj += self._generate_raw_move(bom_line_id, line_data)
+                        move_obj.action_confirm()
+                    elif change.operate_type == 'update':  # 更新时,计算出更新后所需要的物料数量 并 更新
+                        self._update_raw_move(bom_line_id, line_data)
+                    elif change.operate_tsype == 'remove':  # 移除时,筛选出相同产品的,并且可用的move单 取消他们.
+                        moves_to_cancel = mo.move_raw_ids.filtered(
+                                lambda x: x.product_id == change.product_id and x.state not in ["done", "cancel"])
+                        moves_to_cancel.action_cancel()
+
+    def find_line_data_with_bom_line(self, lines, bom_line_id=None, product_id=None):
+        """
+        找到bom中对应修改的那条
+        :param lines:
+        :param bom_line_id:
+        :return:
+        """
+        for bom_line, line_data in lines:
+            if bom_line_id and bom_line_id == bom_line:  # 如果参数有 bom明细行 就使用明细行, 如果没有就使用产品
+                return line_data
+            if product_id and bom_line.product_id == product_id:
+                return line_data

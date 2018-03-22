@@ -5,6 +5,7 @@ from odoo import models, fields, api
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
+    head_circle = fields.Float(string=u'刀长/面积')
 
     def view_new_product_cost(self):
         return {
@@ -88,8 +89,6 @@ class ProductProduct(models.Model):
                 return man_power_cost
             else:
                 return 0
-
-
 
     @api.multi
     def pre_cost_cal_new(self, raise_exception=True):

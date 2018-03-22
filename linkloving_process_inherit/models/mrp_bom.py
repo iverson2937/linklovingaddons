@@ -251,6 +251,7 @@ def _get_rec(object, parnet, result, product_type_dict):
             # 'product_type': l.product_id.product_ll_type,
             'id': l.id,
             'pid': parnet.id,
+            'material_cost': round(material_cost, 2),
             'process_action': l.parse_action_line_data(),
             'manpower_cost': round(man_cost, 2),
             'total_cost': round(total_cost, 2),

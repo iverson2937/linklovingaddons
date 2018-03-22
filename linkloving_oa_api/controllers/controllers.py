@@ -2870,13 +2870,33 @@ class LinklovingOAApi(http.Controller):
             user_employee = request.env['hr.employee'].sudo().search([("user_id", "=", user_id)])
             employees = request.env['hr.employee'].sudo().search(
                 [("department_id", "=", user_employee.department_id.id)])
+            department_ids = []
+            for department_line in user_employee.manager_department_ids:
+                department_ids.append(department_line.id)
+            department = request.env['hr.department'].sudo().search([("id", "in", department_ids)])
             data = []
             for employee in employees:
                 data.append(employee.id)
+            data_child_ids = self.get_department_childs(department)
+            for child_id in data_child_ids:
+                data.append(child_id)
             domain = [("new_check_in", ">", day_start), ("new_check_in", "<", day_end), ("employee_id", "in", data)]
             attendance = request.env['hr.attendance'].sudo().read_group(domain, ['employee_id'], ['employee_id'])
-            return JsonResponse.send_response(STATUS_CODE_OK, res_data={"total": len(employees),
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data={"total": len(data),
                                                                         "attendance_on": len(attendance)})
+
+    def get_department_childs(self,obj):
+        data = []
+        if obj.child_ids:
+            for department in obj.child_ids:
+                employees = request.env['hr.employee'].sudo().search([("department_id", "=", department.id)])
+                for employee in employees:
+                    data.append(employee.id)
+                if department.child_ids:
+                    self.get_department_childs(department)
+        return data
+
+
 
     #判断用户是否是当前部门的管理员
     @http.route('/linkloving_oa_api/get_is_department', type='json', auth="none", csrf=False, cors='*')
@@ -2892,8 +2912,8 @@ class LinklovingOAApi(http.Controller):
                 return JsonResponse.send_response(STATUS_CODE_OK, res_data={"is_manager": False})
         else:
             employee = request.env['hr.employee'].sudo().search([("user_id", "=", employee_id)])
-            department = request.env['hr.department'].sudo().search([("id", "=", employee.department_id.id)])
-            if department.manager_id.id == employee.id:
+            # department = request.env['hr.department'].sudo().search([("id", "=", employee.department_id.id)])
+            if employee.manager_department_ids:
                 return JsonResponse.send_response(STATUS_CODE_OK, res_data={"is_manager": True})
             else:
                 return JsonResponse.send_response(STATUS_CODE_OK, res_data={"is_manager": False})
@@ -2930,9 +2950,16 @@ class LinklovingOAApi(http.Controller):
         user_employee = request.env['hr.employee'].sudo().search([("user_id", "=", manager_id)])
         employees = request.env['hr.employee'].sudo().search(
             [("department_id", "=", user_employee.department_id.id)])
+        department_ids = []
+        for department_line in user_employee.manager_department_ids:
+            department_ids.append(department_line.id)
+        department = request.env['hr.department'].sudo().search([("id", "in", department_ids)])
         data = []
         for employee in employees:
             data.append(employee.id)
+        data_child_ids = self.get_department_childs(department)
+        for child_id in data_child_ids:
+            data.append(child_id)
         domain = [("new_check_in", ">", day_start), ("new_check_in", "<", day_end), ("employee_id", "in", data)]
         attendance = request.env['hr.attendance'].sudo().read_group(domain, ['employee_id'], ['employee_id'])
         data_attendance = []

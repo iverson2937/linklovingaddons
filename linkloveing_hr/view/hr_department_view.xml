@@ -10,7 +10,24 @@
                 <xpath expr="//field[@name='manager_id']"
                        position="after">
                     <field name="allow_amount"/>
+
                 </xpath>
+                <xpath expr="//group" position="after">
+                    <notebook>
+                        <page>
+
+
+                            <field name="child_ids">
+                                <tree no_create="True">
+                                    <field name="name"/>
+                                    <field name="manager_id"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </xpath>
+
+
             </field>
         </record>
 
