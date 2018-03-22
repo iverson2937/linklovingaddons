@@ -9,6 +9,7 @@ class MrpProcessAction(models.Model):
     process_id = fields.Many2one('mrp.process', string=u'工序')
     cost = fields.Float(string=u'成本')
     speed = fields.Float(string=u'速度')
+    time = fields.Float(string=u'时间')
     hour_price = fields.Float(string=u'时薪')
 
 
@@ -19,8 +20,8 @@ class MrpProcess(models.Model):
 
 class ProcessActionLine(models.Model):
     _name = 'process.action.line'
-    bom_line_id = fields.Many2one('mrp.bom.line')
-    action_id = fields.Many2one('mrp.process.action')
+    bom_line_id = fields.Many2one('mrp.bom.line', on_delete="cascade")
+    action_id = fields.Many2one('mrp.process.action', on_delete="restrict")
     rate = fields.Float(default=1)
     line_cost = fields.Float(compute='_get_line_cost')
 
