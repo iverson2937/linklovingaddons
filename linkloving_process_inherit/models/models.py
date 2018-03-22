@@ -9,9 +9,7 @@ class MrpProcessAction(models.Model):
     name = fields.Char(string='名称')
     process_id = fields.Many2one('mrp.process', string=u'工序')
     cost = fields.Float(string=u'成本', digits=dp.get_precision('Discount'))
-    speed = fields.Float(string=u'速度(mm/s)')
-    time = fields.Float(string=u'时间')
-    hour_price = fields.Float(string=u'时薪')
+    remark = fields.Char(string='备注')
 
 
 class MrpProcess(models.Model):
@@ -29,13 +27,7 @@ class ProcessActionLine(models.Model):
     @api.multi
     def _get_line_cost(self):
         for line in self:
-            circle = line.bom_line_id.product_id.head_circle
-            speed = line.action_id.speed
-            hour_price = line.action_id.hour_price
-            time = line.action_id.time
             if line.action_id and line.action_id.cost:
                 line.line_cost = line.action_id.cost * line.rate
-            elif not line.action_id.cost and line.action_id.speed and line.action_id.hour_price:
-                line.line_cost = ((circle / speed) * hour_price / 3600) * line.rate
-            elif not line.action_id.cost and line.action_id.time and line.action_id.hour_price:
-                line.line_cost = time * hour_price
+            else:
+                line.line_cost = 0
