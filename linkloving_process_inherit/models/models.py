@@ -8,7 +8,7 @@ class MrpProcessAction(models.Model):
     _name = 'mrp.process.action'
     name = fields.Char(string='名称')
     process_id = fields.Many2one('mrp.process', string=u'工序')
-    cost = fields.Float(string=u'成本', digits=dp.get_precision('Produce Price'))
+    cost = fields.Float(string=u'成本', digits=dp.get_precision('Discount'))
     speed = fields.Float(string=u'速度(mm/s)')
     time = fields.Float(string=u'时间')
     hour_price = fields.Float(string=u'时薪')
