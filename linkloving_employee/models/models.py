@@ -334,3 +334,21 @@ class LinkLovingEmployeeInsurance(models.Model):
     _name = 'hr.insurance'
 
     name = fields.Char(u'保险名称')
+
+
+class ResUsers(models.Model):
+    _inherit = 'res.users'
+
+    @api.model
+    def create(self, vals):
+        res = super(ResUsers, self).create(vals)
+        # 设定初始的密码
+        pass_wizard = self.env['change.password.wizard'].create({})
+
+        self.env['change.password.user'].create({
+            'wizard_id': pass_wizard.id,
+            'user_id': res.id,
+            'new_passwd': '123456'
+        })
+        pass_wizard.change_password_button()
+        return res
