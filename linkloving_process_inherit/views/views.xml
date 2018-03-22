@@ -17,6 +17,7 @@
                                     <field name="name"/>
                                     <field name="cost"/>
                                     <field name="speed"/>
+                                    <field name="time"/>
                                     <field name="hour_price"/>
                                 </tree>
                             </field>
