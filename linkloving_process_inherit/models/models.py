@@ -29,12 +29,13 @@ class ProcessActionLine(models.Model):
     @api.multi
     def _get_line_cost(self):
         for line in self:
+            circle = line.bom_line_id.product_id.head_circle
+            speed = line.action_id.speed
+            hour_price = line.action_id.hour_price
+            time = line.action_id.time
             if line.action_id and line.action_id.cost:
                 line.line_cost = line.action_id.cost * line.rate
             elif not line.action_id.cost and line.action_id.speed and line.action_id.hour_price:
-                circle = line.bom_line_id.product_id.head_circle
-                speed = line.action_id.speed
-                hour_price = line.action_id.hour_price
-                if line.bom_line_id.product_id.head_circle:
-                    if speed:
-                        line.line_cost = ((circle / speed) * hour_price / 3600) * line.rate
+                line.line_cost = ((circle / speed) * hour_price / 3600) * line.rate
+            elif not line.action_id.cost and line.action_id.time and line.action_id.hour_price:
+                line.line_cost = time * hour_price
