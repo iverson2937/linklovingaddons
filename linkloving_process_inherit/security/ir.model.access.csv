@@ -1,4 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_mrp_process_action_process_admin,mrp_process_action_process_admin,model_mrp_process_action,,1,1,1,1
 access_mrp_process_action_process_line_admin,mrp_process_action_process_line_admin,model_process_action_line,,1,1,1,1
-access_mode_bom_cost_category_temp,mode_bom_cost_category_temp_amdin,mode_bom_cost_category_temp,,1,1,1,1
+access_mode_bom_cost_category_temp,mode_bom_cost_category_temp_amdin,model_bom_cost_category_temp,,1,1,1,1
