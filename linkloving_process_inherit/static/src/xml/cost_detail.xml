@@ -14,13 +14,11 @@
             <div class="modal-backdrop  in"></div>
             <div class="create_wrap">
                 <table id="action_table" class="table table-bordered">
-                    <thead>
                           <tr>
                         <th>工序动作</th>
                         <th>系数</th>
                          <th>操作</th>
                      </tr>
-                    </thead>
 
                     <tbody>
 
@@ -68,13 +66,13 @@
                     </select>
                 </td>
                   <td>
-                    <span><t t-esc="item.cost"/></span>
+                   <input name="rate" class="form-control"  t-att-value="item.cost" readonly="1"/>
                 </td>
                 <td>
                     <input name="rate" class="form-control"  t-att-value="item.rate"/>
                 </td>
                   <td>
-                    <span><t t-esc="item.remark"/></span>
+                    <input name="rate" class="form-control"  t-att-value="item.remark" readonly="1"/>
                 </td>
 
                 <td>

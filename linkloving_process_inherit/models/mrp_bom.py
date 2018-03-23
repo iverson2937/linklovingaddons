@@ -311,6 +311,8 @@ class MrpBomLine(models.Model):
                 'line_id': line.id,
                 'action_id': line.action_id.id,
                 'action_name': line.action_id.name,
+                'cost': line.action_id.cost,
+                'remark': line.action_id.remark,
                 'rate': line.rate,
                 'options': options
             }
