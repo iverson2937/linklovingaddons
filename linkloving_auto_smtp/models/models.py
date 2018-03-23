@@ -116,3 +116,12 @@ class AutoSmtpMailMail(models.Model):
                     raise UserError('Email 有误' + str(email_one))
 
         return [email_to] if type(email_to) == str else email_to
+
+
+class EmailSendStatistics(models.Model):
+    _name = 'email.send.statistics'
+
+    name = fields.Char(u'邮件标题')
+    request_type = fields.Selection([('subscribe', u'订阅'), ('read', u'读取')], string=u'请求类型')
+    is_subscribe = fields.Boolean(u'是否退订', default=True)
+    email = fields.Char(u'Email')
