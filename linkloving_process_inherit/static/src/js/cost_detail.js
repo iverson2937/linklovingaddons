@@ -167,12 +167,13 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             self.update_control_panel(cp_status);
 
             var formatter_func = function (value, row, index) {
+                console.log(value)
 
 
                 var res = QWeb.render('action_process', {'result': value});
                 return res
             };
-            new Model('product.template').call('get_product_cost_detail', [product_id]).then(function (records) {
+            new Model('product.template').call('get_product_default_cost_detail', [product_id]).then(function (records) {
                 console.log(records);
                 self.table_data = records;
                 self.bom_id = records[0].bom_id;

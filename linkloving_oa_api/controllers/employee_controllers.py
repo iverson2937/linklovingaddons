@@ -1,35 +1,11 @@
 # -*- coding: utf-8 -*-
-import base64
-import json
 import logging
-from urllib2 import URLError
-import re
-import time
-import datetime
-
-import operator
-
-import datetime
-
-import jpush
-import pytz
-from pip import download
-
-import odoo
-import odoo.modules.registry
 from controllers import JsonResponse
-from models import LinklovingGetImageUrl, JPushExtend
-
-from odoo import fields
-from odoo.osv import expression
-from odoo.tools import float_compare, SUPERUSER_ID, werkzeug, os, safe_eval
-from odoo.tools.translate import _
 from odoo import http
 from odoo.http import content_disposition, dispatch_rpc, request, \
     serialize_exception as _serialize_exception
-from odoo.exceptions import AccessError, UserError
-from pyquery import PyQuery as pq
 
+_logger = logging.getLogger(__name__)
 STATUS_CODE_OK = 1
 STATUS_CODE_ERROR = -1
 
@@ -50,6 +26,8 @@ class LinklovingEmployeeControllers(http.Controller):
     # 创建用户
     @http.route('/linkloving_oa_api/create_employee', type='json', auth='none', csrf=False, cors='*')
     def create_employee(self, **kw):
+        import datetime
+        _logger.warning("starttime %s" % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
 
         request.jsonrequest['department_id'] = int(
             request.jsonrequest.get("department_id")) if request.jsonrequest.get("department_id") else False
@@ -85,8 +63,10 @@ class LinklovingEmployeeControllers(http.Controller):
         request.jsonrequest['parent_id'] = department_manager.manager_id.id
 
         try:
+            _logger.warning("start create %s" % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
             employee = request.env['hr.employee'].sudo(int(request.jsonrequest.get("edit_id"))).create(
                 request.jsonrequest)
+            _logger.warning("end create %s" % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
         except Exception, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={'body': u'创建失败' + e.name})
 
@@ -221,7 +201,6 @@ class LinklovingEmployeeControllers(http.Controller):
         else:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "没有识别到员工或者登录用户"})
 
-
     @classmethod
     def employee_to_json(cls, employeebean):
         # user = request.env["res.users"].sudo().browse(visitBean.create_uid.id)
@@ -313,12 +292,12 @@ class LinklovingEmployeeControllers(http.Controller):
             "emergency_contact_way": employeebean.emergency_contact_way or '',
 
             "work_experience_ids": [{
-                                        "name": experience_one.name or '',
-                                        "department": experience_one.department or '',
-                                        "position": experience_one.position or '',
-                                        "entry_time": experience_one.entry_time or '',
-                                        "Leaving_time": experience_one.Leaving_time or '',
-                                    } for experience_one in employeebean.work_experience_ids],
+                "name": experience_one.name or '',
+                "department": experience_one.department or '',
+                "position": experience_one.position or '',
+                "entry_time": experience_one.entry_time or '',
+                "Leaving_time": experience_one.Leaving_time or '',
+            } for experience_one in employeebean.work_experience_ids],
 
             "education_experience_ids": education_data,
 
