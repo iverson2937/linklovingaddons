@@ -71,9 +71,10 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 _.each(results, function (result) {
                     if (result.is_default) {
                         show_save = true;
+                        console.log(result);
                         self.edit_arr.push({
-                            'id': result.line_id,
-                            'actions': result.actions
+                            'id': result.id,
+                            'actions': result.process_action
                         });
                     }
                 });
@@ -167,13 +168,12 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             self.update_control_panel(cp_status);
 
             var formatter_func = function (value, row, index) {
-                console.log(value)
 
 
                 var res = QWeb.render('action_process', {'result': value});
                 return res
             };
-            new Model('product.template').call('get_product_default_cost_detail', [product_id]).then(function (records) {
+            new Model('product.template').call('get_product_cost_detail', [product_id]).then(function (records) {
                 console.log(records);
                 self.table_data = records;
                 self.bom_id = records[0].bom_id;
@@ -320,14 +320,14 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 return;
             }
             var options = self.options_init(colomns, data);
-            options = $.extend(options, {
-                url: '/linkloving_process_inherit/get_bom_cost',
-                queryParams: {'bom_id': data[0].bom_id},
-            });
+            // options = $.extend(options, {
+            //     url: '/linkloving_process_inherit/get_bom_cost',
+            //     queryParams: {'bom_id': data[0].bom_id},
+            // });
             self.options = options;
             self.$('#table').bootstrapTable(options);
             self.$('#table').treegrid({
-                initialState: 'collapsed',//收缩
+                // initialState: 'collapsed',//收缩
                 treeColumn: 0,//指明第几列数据改为树形
                 expanderExpandedClass: 'fa fa-caret-down',
                 expanderCollapsedClass: 'fa fa-caret-right',

@@ -70,9 +70,10 @@ class MrpBom(models.Model):
         # total_cost = material_cost + man_cost
 
         # 没有值有默认工序动作默认工序动作
-        if line.get_product_action_default():
+        if not line.parse_action_line_data(no_option=True, no_data=True) and line.get_product_action_default():
             is_default = True
             action_process = line.get_product_action_default()
+            print action_process
             print action_process, 'default'
         else:
             action_process = line.parse_action_line_data(no_option=True)
@@ -194,7 +195,7 @@ def _get_rec_default(categ_id, object, parnet, result, product_type_dict):
         # man_cost = l.action_id.cost if l.action_id else 0
         # total_cost = material_cost + man_cost
 
-        if not l.parse_action_line_data(no_option=True) and l.get_product_action_default():
+        if not l.parse_action_line_data(no_option=True, no_data=True) and l.get_product_action_default():
             is_default = True
             action_process = l.get_product_action_default()
         else:
@@ -287,9 +288,10 @@ class MrpBomLine(models.Model):
         res = []
         if temp_id:
             res = json.loads(temp_id.action_data)
+            print res, 'res'
         return res
 
-    def parse_action_line_data(self, no_option=False):
+    def parse_action_line_data(self, no_option=False, no_data=False):
         res = []
         options = []
 
@@ -313,7 +315,8 @@ class MrpBomLine(models.Model):
                 'options': options
             }
             res.append(data)
-        if not res:
+
+        if not res and not no_data:
             res.append({
                 'line_id': '',
                 'rate': 1,
@@ -357,15 +360,15 @@ class MrpBomLine(models.Model):
                         'rate': action.get('rate'),
                         'bom_line_id': arg.get('id')
                     })
-            action_data = bom_line_id.parse_action_line_data(no_option=True)
+            action_data = bom_line_id.parse_action_line_data(no_option=True, no_data=True)
             category_id = bom_line_id.bom_id.product_tmpl_id.categ_id.id
             tmp_obj = self.env['bom.cost.category.temp']
             product_id = bom_line_id.product_id.id
             temp_id = tmp_obj.search(
                 [('category_id', '=', category_id), ('product_id', '=', product_id)])
-            if temp_id:
+            if temp_id and action_data and action_data[0].get('action_id'):
                 temp_id.action_data = json.dumps(action_data)
-            else:
+            elif product_id and bom_line_id.bom_id.product_tmpl_id.categ_id:
                 tmp_obj.create({'category_id': bom_line_id.bom_id.product_tmpl_id.categ_id.id,
                                 'product_id': product_id,
                                 'action_data': json.dumps(action_data)
