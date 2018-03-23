@@ -70,11 +70,14 @@ class MrpBom(models.Model):
         # total_cost = material_cost + man_cost
 
         # 没有值有默认工序动作默认工序动作
-        if not line.parse_action_line_data(no_option=True) and line.get_product_action_default():
+        if line.get_product_action_default():
             is_default = True
             action_process = line.get_product_action_default()
+            print action_process, 'default'
         else:
             action_process = line.parse_action_line_data(no_option=True)
+            print action_process, 'line'
+
             is_default = False
 
         res = {
@@ -278,8 +281,9 @@ class MrpBomLine(models.Model):
                 action_line.line_cost for action_line in line.action_line_ids) * line.product_qty
 
     def get_product_action_default(self):
-        domain = [('categ_id', '=', self.product_id.categ_id.id), ('product_id', '=', self.product_id.id)]
-        temp_id = self.env['bom.cost.category.temp'].search([domain])
+        domain = [('category_id', '=', self.bom_id.product_tmpl_id.categ_id.id),
+                  ('product_id', '=', self.product_id.id)]
+        temp_id = self.env['bom.cost.category.temp'].search(domain)
         res = []
         if temp_id:
             res = json.loads(temp_id.action_data)
@@ -294,7 +298,6 @@ class MrpBomLine(models.Model):
             if self.bom_id.process_id:
                 domain = [('process_id', '=', self.bom_id.process_id.id)]
             actions = self.env['mrp.process.action'].search(domain)
-            print actions
             for action in actions:
                 options.append({
                     'id': action.id,
@@ -341,29 +344,30 @@ class MrpBomLine(models.Model):
                 self.env['process.action.line'].browse(arg.get('action_line_id')).unlink()
             bom_line_id = self.env['mrp.bom.line'].browse(arg.get('id'))
             actions = arg.get('actions', [])
+
             for action in actions:
                 if action.get('id'):
-                    a = self.env['process.action.line'].browse(action.get('id')).write({
+                    line = self.env['process.action.line'].browse(action.get('id')).write({
                         'action_id': action.get('action_id'),
                         'rate': action.get('rate')
                     })
                 else:
-                    b = self.env['process.action.line'].create({
+                    line = self.env['process.action.line'].create({
                         'action_id': action.get('action_id'),
                         'rate': action.get('rate'),
                         'bom_line_id': arg.get('id')
                     })
             action_data = bom_line_id.parse_action_line_data(no_option=True)
             category_id = bom_line_id.bom_id.product_tmpl_id.categ_id.id
-            product_id = arg.get('product_id')
             tmp_obj = self.env['bom.cost.category.temp']
+            product_id = bom_line_id.product_id.id
             temp_id = tmp_obj.search(
                 [('category_id', '=', category_id), ('product_id', '=', product_id)])
             if temp_id:
                 temp_id.action_data = json.dumps(action_data)
             else:
-                tmp_obj.create({'category_id': bom_line_id.product_id.categ_id.id,
-                                'product_id': arg.get('product_id'),
+                tmp_obj.create({'category_id': bom_line_id.bom_id.product_tmpl_id.categ_id.id,
+                                'product_id': product_id,
                                 'action_data': json.dumps(action_data)
                                 })
 
