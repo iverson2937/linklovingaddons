@@ -277,8 +277,8 @@ class MrpBomLine(models.Model):
             line.bom_line_man_cost = sum(
                 action_line.line_cost for action_line in line.action_line_ids) * line.product_qty
 
-    def get_product_action_default(self, categ_id):
-        domain = [('categ_id', '=', categ_id), ('product_id', '=', self.product_id.id)]
+    def get_product_action_default(self):
+        domain = [('categ_id', '=', self.product_id.categ_id.id), ('product_id', '=', self.product_id.id)]
         temp_id = self.env['bom.cost.category.temp'].search([domain])
         res = []
         if temp_id:
@@ -362,7 +362,7 @@ class MrpBomLine(models.Model):
             if temp_id:
                 temp_id.action_data = json.dumps(action_data)
             else:
-                tmp_obj.create({'category_id': bom_line_id.bom_id.product_tmpl_id.categ_id.id,
+                tmp_obj.create({'category_id': bom_line_id.product_id.categ_id.id,
                                 'product_id': arg.get('product_id'),
                                 'action_data': json.dumps(action_data)
                                 })
