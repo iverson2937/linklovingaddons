@@ -67,9 +67,16 @@
                         </t>
                     </select>
                 </td>
+                  <td>
+                    <span><t t-esc="item.cost"/></span>
+                </td>
                 <td>
                     <input name="rate" class="form-control"  t-att-value="item.rate"/>
                 </td>
+                  <td>
+                    <span><t t-esc="item.remark"/></span>
+                </td>
+
                 <td>
                     <span class="fa fa-plus-square-o"></span>
 
@@ -84,16 +91,20 @@
 <t t-name="action_process_tr">
     <tr>
         <td>
-                          <select  class="form-control">
+            <select  class="form-control">
                      <t t-foreach="options" t-as="options">
-                          <option t-att-data-id="options.id"><t t-esc="options.name"/></option>
-        </t>
-
+                          <option t-att-data-id="options.id">
+                              <t t-esc="options.name"/>
+                          </option>
+                        </t>
         </select>
         </td>
+        <span><t t-esc="item.cost"/></span>
         <td>
-            <input name="rate" class="form-control" />
-
+            <input name="rate" class="form-control"/>
+        </td>
+        <td>
+            <span><t t-esc="item.remark"/></span>
         </td>
         <td>
              <span class="fa fa-plus-square-o"></span>
@@ -104,8 +115,6 @@
         <t t-if="result">
         <t t-foreach="result" t-as="item">
             <t t-if="item.action_name">
-
-
         <div>
             <span><t t-esc="item.action_name"/></span><span class="pull-right"><t t-esc="item.rate"/></span>
         </div>
