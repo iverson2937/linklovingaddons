@@ -51,7 +51,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                     array.push({'id': txt, 'name': $(this).val()});  //添加到数组中
                 }
             });
-            console.log(array)
+            console.log(array);
             var new_tr = QWeb.render('action_process_tr', {'options': array});
             $(target).parents('tr').after(new_tr);
 

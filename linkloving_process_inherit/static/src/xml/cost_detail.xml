@@ -14,11 +14,7 @@
             <div class="modal-backdrop  in"></div>
             <div class="create_wrap">
                 <table id="action_table" class="table table-bordered">
-                          <tr>
-                        <th>工序动作</th>
-                        <th>系数</th>
-                         <th>操作</th>
-                     </tr>
+
 
                     <tbody>
 
@@ -43,7 +39,7 @@
                 </table>
 
                 <div class="foot">
-                    <button class=" btn btn-primary confirm_sel" style="margin-left:112px">确定</button>
+                    <button class=" btn btn-primary confirm_sel" style="margin-left:201px">确定</button>
                     <button class="btn btn-default alia_cancel">取消</button>
                 </div>
             </div>
@@ -52,6 +48,16 @@
 
 
     <t t-name="process_action_table">
+        <table class="table table-bordered">
+     <tr>
+         <th>工序动作</th>
+         <th>单价</th>
+         <th style="width:56px">系数</th>
+         <th style="width:120px">备注</th>
+         <th>添加</th>
+         <th>删除</th>
+     </tr>
+
 
         <t t-foreach="result" t-as="item">
             <tr>
@@ -66,13 +72,13 @@
                     </select>
                 </td>
                   <td>
-                   <input name="rate" class="form-control"  t-att-value="item.cost" readonly="1"/>
+                   <span ><t t-esc="item.cost"/></span>
                 </td>
                 <td>
                     <input name="rate" class="form-control"  t-att-value="item.rate"/>
                 </td>
                   <td>
-                    <input name="rate" class="form-control"  t-att-value="item.remark" readonly="1"/>
+                     <span><t t-esc="item.remark"/></span>
                 </td>
 
                 <td>
@@ -84,6 +90,7 @@
                 </td>
             </tr>
         </t>
+        </table>
     </t>
 
 <t t-name="action_process_tr">
@@ -97,15 +104,19 @@
                         </t>
         </select>
         </td>
-        <span><t t-esc="item.cost"/></span>
+        <td><span></span></td>
+
         <td>
             <input name="rate" class="form-control"/>
         </td>
         <td>
-            <span><t t-esc="item.remark"/></span>
+            <span></span>
         </td>
         <td>
              <span class="fa fa-plus-square-o"></span>
+        </td>
+         <td>
+             <span class="fa fa-trash-o"></span>
         </td>
     </tr>
 </t>
