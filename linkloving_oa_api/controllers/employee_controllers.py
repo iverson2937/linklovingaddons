@@ -58,9 +58,10 @@ class LinklovingEmployeeControllers(http.Controller):
 
         if request.jsonrequest.get("work_email"):
             request.jsonrequest['is_create_account'] = True
-
-        department_manager = request.env['hr.department'].sudo().browse(int(request.jsonrequest.get('department_id')))
-        request.jsonrequest['parent_id'] = department_manager.manager_id.id
+        if request.jsonrequest.get('department_id'):
+            department_manager = request.env['hr.department'].sudo().browse(
+                int(request.jsonrequest.get('department_id')))
+            request.jsonrequest['parent_id'] = department_manager.manager_id.id
 
         try:
             _logger.warning("start create %s" % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
@@ -292,12 +293,12 @@ class LinklovingEmployeeControllers(http.Controller):
             "emergency_contact_way": employeebean.emergency_contact_way or '',
 
             "work_experience_ids": [{
-                "name": experience_one.name or '',
-                "department": experience_one.department or '',
-                "position": experience_one.position or '',
-                "entry_time": experience_one.entry_time or '',
-                "Leaving_time": experience_one.Leaving_time or '',
-            } for experience_one in employeebean.work_experience_ids],
+                                        "name": experience_one.name or '',
+                                        "department": experience_one.department or '',
+                                        "position": experience_one.position or '',
+                                        "entry_time": experience_one.entry_time or '',
+                                        "Leaving_time": experience_one.Leaving_time or '',
+                                    } for experience_one in employeebean.work_experience_ids],
 
             "education_experience_ids": education_data,
 
