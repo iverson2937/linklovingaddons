@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_linkloving_auto_smtp_linkloving_auto_smtp,linkloving_auto_smtp.linkloving_auto_smtp,base.model_ir_mail_server,,1,1,1,0
 base.access_res_users_all,res_users all,model_res_users,,1,1,0,0
+access_linkloving_auto_smtp_email,email_send_statistics user,model_email_send_statistics,,1,1,1,1
