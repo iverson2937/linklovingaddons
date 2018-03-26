@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import time
+import re
 from controllers import JsonResponse
 from odoo import http
 from odoo.http import content_disposition, dispatch_rpc, request, \
@@ -100,8 +101,8 @@ class LinklovingEmployeeControllers(http.Controller):
         if request.jsonrequest.get('certificate_image_ids'):
             certificate_list = []
             for certificate_one in request.jsonrequest.get('certificate_image_ids'):
-                if type(certificate_one) == int:
-                    certificate_list.append(certificate_one)
+                if re.match("^\d+$", certificate_one) and True or False:
+                    certificate_list.append(int(certificate_one))
                 elif 'base64' in certificate_one:
                     experience_id = request.env['ir.attachment'].sudo(int(request.jsonrequest.get("edit_id"))).create({
                         'res_model': u'hr.employee',
@@ -354,7 +355,7 @@ class LinklovingEmployeeControllers(http.Controller):
             "marital": marital_data or "",
             "marital_id": employeebean.marital or "",
             "card_num": employeebean.card_num or '',
-            # "hr_job_ids": [emp.name for emp in employeebean.hr_job_ids],
+            "hr_job_ids": [emp.name for emp in employeebean.hr_job_ids] if employeebean.hr_job_ids else '',
         }
         return vals
 
