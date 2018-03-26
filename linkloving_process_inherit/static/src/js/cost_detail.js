@@ -284,6 +284,8 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                                         'action_id': results[i].action_id,
                                         'rate': results[i].rate,
                                         'options': results[i].options,
+                                        'remark': results[i].remark,
+                                        'cost': results[i].cost
                                     };
                                     console.log(res);
                                     datas.push(res)
