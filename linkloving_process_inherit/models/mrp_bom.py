@@ -351,17 +351,18 @@ class MrpBomLine(models.Model):
             actions = arg.get('actions', [])
 
             for action in actions:
-                if action.get('id'):
+                if action.get('id') and action.get('action_id'):
                     line = self.env['process.action.line'].browse(action.get('id')).write({
                         'action_id': action.get('action_id'),
                         'rate': action.get('rate')
                     })
                 else:
-                    line = self.env['process.action.line'].create({
-                        'action_id': action.get('action_id'),
-                        'rate': action.get('rate'),
-                        'bom_line_id': arg.get('id')
-                    })
+                    if action.get('action_id'):
+                        line = self.env['process.action.line'].create({
+                            'action_id': action.get('action_id'),
+                            'rate': action.get('rate'),
+                            'bom_line_id': arg.get('id')
+                        })
             action_data = bom_line_id.parse_action_line_data(no_option=True, no_data=True)
             category_id = bom_line_id.bom_id.product_tmpl_id.categ_id.id
             tmp_obj = self.env['bom.cost.category.temp']
