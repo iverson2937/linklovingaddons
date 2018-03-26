@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 from odoo.addons import decimal_precision as dp
+from odoo.exceptions import UserError
 
 
 class MrpProcessAction(models.Model):
@@ -10,6 +11,13 @@ class MrpProcessAction(models.Model):
     process_id = fields.Many2one('mrp.process', string=u'工序')
     cost = fields.Float(string=u'成本', digits=dp.get_precision('Discount'))
     remark = fields.Char(string='备注')
+    line_ids = fields.One2many('process.action.line', 'action_id')
+
+    @api.model
+    def unlink(self):
+        if self.line_ids:
+            raise UserError('已经在bom中使用，不可以删除')
+        return super(MrpProcessAction, self).unlink()
 
 
 class MrpProcess(models.Model):
