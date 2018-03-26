@@ -78,7 +78,9 @@
                     <input name="rate" class="form-control"  t-att-value="item.rate"/>
                 </td>
                   <td>
+                      <t t-if="item.remark">
                      <span><t t-esc="item.remark"/></span>
+                      </t>
                 </td>
 
                 <td>
