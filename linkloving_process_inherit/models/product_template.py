@@ -39,9 +39,9 @@ class ProductTemplate(models.Model):
                 'code': self.default_code,
                 # 'process_id': [self.process_id.id, self.process_id.name],
                 'product_type': product_type_dict[self.product_ll_type],
-                'material_cost': round(material_cost, 2),
+                'material_cost': round(material_cost, 5),
                 'manpower_cost': 0,
-                'total_cost': round(material_cost, 2),
+                'total_cost': round(material_cost, 5),
                 # 'bom_ids': sorted(res, key=lambda product: product['code']),
             }
             result.append(res)
