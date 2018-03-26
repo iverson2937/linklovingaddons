@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import time
 from controllers import JsonResponse
 from odoo import http
 from odoo.http import content_disposition, dispatch_rpc, request, \
@@ -54,6 +55,7 @@ class LinklovingEmployeeControllers(http.Controller):
                     'public': True,
                 })
                 certificate_list.append(experience_id.id)
+                experience_id.write({'name': str(int(time.time())) + '.' + experience_id.mimetype.split('/')[1]})
                 request.jsonrequest['certificate_image_ids'] = [(6, 0, certificate_list)]
 
         if request.jsonrequest.get("work_email"):
@@ -108,6 +110,7 @@ class LinklovingEmployeeControllers(http.Controller):
                         'datas_fname': '',
                         'public': True,
                     })
+                    experience_id.write({'name': str(int(time.time())) + '.' + experience_id.mimetype.split('/')[1]})
                     certificate_list.append(experience_id.id)
             request.jsonrequest['certificate_image_ids'] = [(6, 0, certificate_list)]
 
