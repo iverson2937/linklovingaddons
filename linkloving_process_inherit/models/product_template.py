@@ -74,10 +74,6 @@ class ProductProduct(models.Model):
                 if sbom.child_bom_id:  # 如果有子阶
                     sub_bom_price = _calc_manpower_cost(sbom.child_bom_id) * sbom_data['qty']
                     total_price += sub_bom_price
-                else:
-                    total_price = bom.manpower_cost
-
-            #  bom.manpower_cost
 
             return total_price
 
