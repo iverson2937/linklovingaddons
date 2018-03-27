@@ -70,11 +70,15 @@ class MrpBom(models.Model):
         # total_cost = material_cost + man_cost
 
         # 没有值有默认工序动作默认工序动作
-        if not line.parse_action_line_data(no_option=True) and line.get_product_action_default():
+        if not line.parse_action_line_data(no_option=True, no_data=True) and line.get_product_action_default():
             is_default = True
             action_process = line.get_product_action_default()
+            print action_process
+            print action_process, 'default'
         else:
             action_process = line.parse_action_line_data(no_option=True)
+            print action_process, 'line'
+
             is_default = False
 
         res = {
@@ -118,9 +122,9 @@ class MrpBom(models.Model):
             'code': self.product_tmpl_id.default_code,
             'process_id': [self.process_id.id, self.process_id.name],
             'product_type': product_type_dict[self.product_tmpl_id.product_ll_type],
-            'material_cost': round(material_cost, 2),
-            'manpower_cost': round(man_cost, 2),
-            'total_cost': round(total_cost, 2),
+            'material_cost': round(material_cost, 5),
+            'manpower_cost': round(man_cost, 5),
+            'total_cost': round(total_cost, 5),
             # 'bom_ids': sorted(res, key=lambda product: product['code']),
         }
         result.append(res)
@@ -191,7 +195,7 @@ def _get_rec_default(categ_id, object, parnet, result, product_type_dict):
         # man_cost = l.action_id.cost if l.action_id else 0
         # total_cost = material_cost + man_cost
 
-        if not l.parse_action_line_data(no_option=True) and l.get_product_action_default():
+        if not l.parse_action_line_data(no_option=True, no_data=True) and l.get_product_action_default():
             is_default = True
             action_process = l.get_product_action_default()
         else:
@@ -277,24 +281,25 @@ class MrpBomLine(models.Model):
             line.bom_line_man_cost = sum(
                 action_line.line_cost for action_line in line.action_line_ids) * line.product_qty
 
-    def get_product_action_default(self, categ_id):
-        domain = [('categ_id', '=', categ_id), ('product_id', '=', self.product_id.id)]
-        temp_id = self.env['bom.cost.category.temp'].search([domain])
+    def get_product_action_default(self):
+        domain = [('category_id', '=', self.bom_id.product_tmpl_id.categ_id.id),
+                  ('product_id', '=', self.product_id.id)]
+        temp_id = self.env['bom.cost.category.temp'].search(domain)
         res = []
         if temp_id:
             res = json.loads(temp_id.action_data)
+            print res, 'res'
         return res
 
-    def parse_action_line_data(self, no_option=False):
+    def parse_action_line_data(self, no_option=False, no_data=False):
         res = []
         options = []
 
         if not no_option:
             domain = []
             if self.bom_id.process_id:
-                domain = [('process_id', '=', self.bom_id.process_id.id)]
+                domain = ['|', ('process_id', '=', self.bom_id.process_id.id), ('process_id', '=', False)]
             actions = self.env['mrp.process.action'].search(domain)
-            print actions
             for action in actions:
                 options.append({
                     'id': action.id,
@@ -306,11 +311,14 @@ class MrpBomLine(models.Model):
                 'line_id': line.id,
                 'action_id': line.action_id.id,
                 'action_name': line.action_id.name,
+                'cost': line.action_id.cost,
+                'remark': line.action_id.remark,
                 'rate': line.rate,
                 'options': options
             }
             res.append(data)
-        if not res:
+
+        if not res and not no_data:
             res.append({
                 'line_id': '',
                 'rate': 1,
@@ -341,29 +349,31 @@ class MrpBomLine(models.Model):
                 self.env['process.action.line'].browse(arg.get('action_line_id')).unlink()
             bom_line_id = self.env['mrp.bom.line'].browse(arg.get('id'))
             actions = arg.get('actions', [])
+
             for action in actions:
-                if action.get('id'):
-                    a = self.env['process.action.line'].browse(action.get('id')).write({
+                if action.get('id') and action.get('action_id'):
+                    line = self.env['process.action.line'].browse(action.get('id')).write({
                         'action_id': action.get('action_id'),
                         'rate': action.get('rate')
                     })
                 else:
-                    b = self.env['process.action.line'].create({
-                        'action_id': action.get('action_id'),
-                        'rate': action.get('rate'),
-                        'bom_line_id': arg.get('id')
-                    })
-            action_data = bom_line_id.parse_action_line_data(no_option=True)
+                    if action.get('action_id'):
+                        line = self.env['process.action.line'].create({
+                            'action_id': action.get('action_id'),
+                            'rate': action.get('rate'),
+                            'bom_line_id': arg.get('id')
+                        })
+            action_data = bom_line_id.parse_action_line_data(no_option=True, no_data=True)
             category_id = bom_line_id.bom_id.product_tmpl_id.categ_id.id
-            product_id = arg.get('product_id')
             tmp_obj = self.env['bom.cost.category.temp']
+            product_id = bom_line_id.product_id.id
             temp_id = tmp_obj.search(
                 [('category_id', '=', category_id), ('product_id', '=', product_id)])
-            if temp_id:
+            if temp_id and action_data and action_data[0].get('action_id'):
                 temp_id.action_data = json.dumps(action_data)
-            else:
+            elif product_id and bom_line_id.bom_id.product_tmpl_id.categ_id:
                 tmp_obj.create({'category_id': bom_line_id.bom_id.product_tmpl_id.categ_id.id,
-                                'product_id': arg.get('product_id'),
+                                'product_id': product_id,
                                 'action_data': json.dumps(action_data)
                                 })
 

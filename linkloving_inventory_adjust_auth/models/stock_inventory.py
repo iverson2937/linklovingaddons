@@ -15,17 +15,20 @@ class StockInventoryInherit(models.Model):
         for s in self:
             product_ll_types = s.mapped('line_ids.product_id.product_ll_type')
             types = list(set(product_ll_types))
-            if s.state == 'confirm' and len(types) > 1 and 'raw material' in types:
+            raw_material_approve_id = self.env['ir.values'].sudo().get_default(
+                'stock.config.settings', 'raw_material_approve_id')
+            finished_material_approve_id = self.env['ir.values'].sudo().get_default(
+                'stock.config.settings', 'finished_material_approve_id')
+            if s.state == 'confirm' and len(
+                    types) > 1 and 'raw material' in types and raw_material_approve_id != finished_material_approve_id:
                 raise UserError('原材料制成品不能同时盘点')
             elif len(types) == 1 and types[0] == 'raw material' and s.state == 'confirm':
-                raw_material_approve_id = self.env['ir.values'].sudo().get_default(
-                    'stock.config.settings', 'raw_material_approve_id')
+
                 if not raw_material_approve_id:
                     raise UserError('请联系管理员设置员材料库存调整审核人')
                 s.to_approve_id = raw_material_approve_id
             elif s.state == 'confirm':
-                finished_material_approve_id = self.env['ir.values'].sudo().get_default(
-                    'stock.config.settings', 'finished_material_approve_id')
+
                 if not finished_material_approve_id:
                     raise UserError('请设置制成品库存调整审核人')
                 s.to_approve_id = finished_material_approve_id

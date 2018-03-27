@@ -12,7 +12,7 @@ odoo.define('sticky_table_header.ListView',function(require){
         {
             var self = this;
             $(document).delegate("table.o_list_view","mouseenter", function(){
-                if($('.o_form_view').length>0){
+                if($('.o_form_sheet').length>0){
                     return
                 }
 

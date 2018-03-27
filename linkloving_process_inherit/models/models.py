@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 from odoo.addons import decimal_precision as dp
+from odoo.exceptions import UserError
 
 
 class MrpProcessAction(models.Model):
@@ -9,9 +10,14 @@ class MrpProcessAction(models.Model):
     name = fields.Char(string='名称')
     process_id = fields.Many2one('mrp.process', string=u'工序')
     cost = fields.Float(string=u'成本', digits=dp.get_precision('Discount'))
-    speed = fields.Float(string=u'速度(mm/s)')
-    time = fields.Float(string=u'时间')
-    hour_price = fields.Float(string=u'时薪')
+    remark = fields.Char(string='备注')
+    line_ids = fields.One2many('process.action.line', 'action_id')
+
+    @api.model
+    def unlink(self):
+        if self.line_ids:
+            raise UserError('已经在bom中使用，不可以删除')
+        return super(MrpProcessAction, self).unlink()
 
 
 class MrpProcess(models.Model):
@@ -31,10 +37,5 @@ class ProcessActionLine(models.Model):
         for line in self:
             if line.action_id and line.action_id.cost:
                 line.line_cost = line.action_id.cost * line.rate
-            elif not line.action_id.cost and line.action_id.speed and line.action_id.hour_price:
-                circle = line.bom_line_id.product_id.head_circle
-                speed = line.action_id.speed
-                hour_price = line.action_id.hour_price
-                if line.bom_line_id.product_id.head_circle:
-                    if speed:
-                        line.line_cost = ((circle / speed) * hour_price / 3600) * line.rate
+            else:
+                line.line_cost = 0

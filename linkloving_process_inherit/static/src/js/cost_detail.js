@@ -14,10 +14,9 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
     var CostDetail = Widget.extend(ControlPanelMixin, {
         template: "CostDetail",
         events: {
-            'click .sel_pro ': 'sel_pro_func',
+            'click .sel_action': 'sel_pro_func',
             'click .confirm_sel': 'confirm_sel_func',
             'click .alia_cancel': 'alia_cancel_func',
-            'click .adjusttime': 'sel_pro_func',
             'click .save_process_sel': 'save_process_sel_func',
             'click .get_default': 'get_default_func',
             'click .fa-plus-square-o': 'add_action_line_func',
@@ -51,7 +50,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                     array.push({'id': txt, 'name': $(this).val()});  //添加到数组中
                 }
             });
-            console.log(array)
+            console.log(array);
             var new_tr = QWeb.render('action_process_tr', {'options': array});
             $(target).parents('tr').after(new_tr);
 
@@ -71,9 +70,10 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 _.each(results, function (result) {
                     if (result.is_default) {
                         show_save = true;
+                        console.log(result);
                         self.edit_arr.push({
-                            'id': result.line_id,
-                            'actions': result.actions
+                            'id': result.id,
+                            'actions': result.process_action
                         });
                     }
                 });
@@ -138,6 +138,44 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             $('.unlock_condition').hide();
             if ($('.fixed-table-toolbar .save_process_sel').length == 0) {
                 $('.save_process_sel').removeClass('hidden')
+            }
+        },
+        sel_pro_func: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var self = this;
+            var index = $(target).parents('tr').attr('data-index');
+            index = parseInt(index);
+            self.index = index;
+            console.log(self.table_data)
+
+            if (!self.table_data.bom_id) {
+                new Model('mrp.bom.line').call('parse_action_line_data', [self.table_data[index].id]).then(function (results) {
+                    var datas = [];
+                    if (results && results.length > 0) {
+                        for (var i = 0; i < results.length; i++) {
+
+                            var res = {
+                                'line_id': results[i].line_id,
+                                'action_id': results[i].action_id,
+                                'rate': results[i].rate,
+                                'options': results[i].options,
+                                'remark': results[i].remark,
+                                'cost': results[i].cost
+                            };
+                            datas.push(res)
+                        }
+                    }
+                    $('.unlock_condition').attr('data-id', self.table_data[index].id).show();
+                    $('#action_table').html('');
+                    console.log(datas);
+                    $('#action_table').append(QWeb.render('process_action_table', {
+                        result: datas
+                    }))
+
+
+                })
+
             }
         },
 
@@ -269,42 +307,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 },
 
                 onClickRow: function (item, $element) {
-                    var self = this;
-                    self.index = item.id;
-                    console.log(item);
-                    if (!item.bom_id) {
-                        new Model('mrp.bom.line').call('parse_action_line_data', [item.id]).then(function (results) {
-                            var datas = [];
-                            if (results && results.length > 0) {
-                                for (var i = 0; i < results.length; i++) {
 
-                                    var res = {
-                                        'line_id': results[i].line_id,
-                                        'action_id': results[i].action_id,
-                                        'rate': results[i].rate,
-                                        'options': results[i].options,
-                                    };
-                                    console.log(res);
-                                    datas.push(res)
-                                }
-                            }
-                            $('.unlock_condition').attr('data-id', item.id).show();
-                            $('#action_table').html('');
-                            console.log(datas);
-                            $('#action_table').append(QWeb.render('process_action_table', {
-                                result: datas,
-                            }))
-
-                            // $('.unlock_condition').attr('data-id', item.id).show();
-                            // if (self.table_data[index].has_extra) {
-                            //     $('.change_time').show()
-                            // } else {
-                            //     $('.change_time').hide()
-                            // }
-
-                        })
-
-                    }
 
                 },
 
@@ -319,14 +322,14 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 return;
             }
             var options = self.options_init(colomns, data);
-            options = $.extend(options, {
-                url: '/linkloving_process_inherit/get_bom_cost',
-                queryParams: {'bom_id': data[0].bom_id},
-            });
+            // options = $.extend(options, {
+            //     url: '/linkloving_process_inherit/get_bom_cost',
+            //     queryParams: {'bom_id': data[0].bom_id},
+            // });
             self.options = options;
             self.$('#table').bootstrapTable(options);
             self.$('#table').treegrid({
-                initialState: 'collapsed',//收缩
+                // initialState: 'collapsed',//收缩
                 treeColumn: 0,//指明第几列数据改为树形
                 expanderExpandedClass: 'fa fa-caret-down',
                 expanderCollapsedClass: 'fa fa-caret-right',

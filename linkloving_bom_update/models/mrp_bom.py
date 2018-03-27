@@ -139,7 +139,7 @@ class MrpBomLine(models.Model):
                 and not self.env.user.has_group('mrp.group_mrp_manager'):
             raise UserError(u'你没有权限修改请联系管理员')
 
-        if self.bom_id.state != 'new':
+        if self.bom_id.state != 'new' and 'action_line_ids' not in vals:
             vals.update({
                 'is_highlight': True
             })

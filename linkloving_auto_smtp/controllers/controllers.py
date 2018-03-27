@@ -1,20 +1,53 @@
 # -*- coding: utf-8 -*-
 from odoo import http
+from odoo.http import request
 
-# class LinklovingAutoSmtp(http.Controller):
-#     @http.route('/linkloving_auto_smtp/linkloving_auto_smtp/', auth='public')
-#     def index(self, **kw):
-#         return "Hello, world"
 
-#     @http.route('/linkloving_auto_smtp/linkloving_auto_smtp/objects/', auth='public')
-#     def list(self, **kw):
-#         return http.request.render('linkloving_auto_smtp.listing', {
-#             'root': '/linkloving_auto_smtp/linkloving_auto_smtp',
-#             'objects': http.request.env['linkloving_auto_smtp.linkloving_auto_smtp'].search([]),
-#         })
+class LinklovingAutoSmtp(http.Controller):
+    # email 退订
+    @http.route('/linkloving_app_api/unsubscribe_success', auth='public')
+    def unsubscribe_success(self, **kw):
+        message_data = '你好！退订成功'
+        print kw.get('email')
 
-#     @http.route('/linkloving_auto_smtp/linkloving_auto_smtp/objects/<model("linkloving_auto_smtp.linkloving_auto_smtp"):obj>/', auth='public')
-#     def object(self, obj, **kw):
-#         return http.request.render('linkloving_auto_smtp.object', {
-#             'object': obj
-#         })
+        if request.context.get('lang') != 'zh_CN':
+            message_data = 'Unsubscribe success!'
+
+        Model = request.env['email.send.statistics'].sudo()
+
+        try:
+            subscribe_list = Model.search([('email', 'ilike', kw.get('email')), ('request_type', '=', 'subscribe')])
+            if not subscribe_list:
+                Model.create({
+                    'email': kw.get('email'),
+                    'name': 'subscribe',
+                    'request_type': 'subscribe',
+                    'is_subscribe': True,
+                })
+        except Exception, e:
+            print e
+        finally:
+            return message_data
+
+    # 记录已读
+    @http.route('/linkloving_app_api/load_email', auth='public')
+    def load_email(self, **kw):
+        message_data = '记录已读'
+
+        print kw.get('email'), kw.get('title')
+
+        Model = request.env['email.send.statistics'].sudo()
+        try:
+            subscribe_load_list = Model.search([('email', '=', kw.get('email')), ('name', '=', str(kw.get('title')))])
+            if not subscribe_load_list:
+                Model.create({
+                    'email': kw.get('email'),
+                    'name': kw.get('title'),
+                    'request_type': 'read',
+                })
+        except Exception, e:
+            print e
+        finally:
+            return message_data
+
+            # return message_data

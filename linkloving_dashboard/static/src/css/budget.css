@@ -1,0 +1,7 @@
+.o_web_client > .o_main .o_main_content {
+    overflow: scroll;
+}
+
+.department > div {
+    padding: 5px 45px;
+}
