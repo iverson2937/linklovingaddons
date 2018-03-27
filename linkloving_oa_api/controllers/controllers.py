@@ -2683,7 +2683,7 @@ class LinklovingOAApi(http.Controller):
         day_end = request.jsonrequest.get("day_end")
         is_wx = request.jsonrequest.get("is_wx")
         if is_wx:
-            domain = [("new_check_in", ">", day_start), ("new_check_in", "<", day_end), ("employee_id", "=", user_id)]
+            domain = [("write_date", ">", day_start), ("write_date", "<", day_end), ("employee_id", "=", user_id)]
             attendance_list = request.env['hr.attendance'].sudo().search(domain)
             data = []
             for attendance in attendance_list:
@@ -2706,6 +2706,11 @@ class LinklovingOAApi(http.Controller):
                     "check_in": attendance.new_check_in,
                     "check_out": attendance.check_out or '',
                     "company_name": attendance.company_name or '',
+                    "company_off_name":attendance.company_off_name or '',
+                    "attendance_on_ids": self.get_attendance_img_url(attendance.attendance_on_ids.ids),
+                    "attendance_off_ids": self.get_attendance_off_img_url(attendance.attendance_off_ids.ids),
+                    "is_location_on": attendance.is_location_on,
+                    "is_location_off": attendance.is_location_off,
                 })
             return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
@@ -2724,37 +2729,69 @@ class LinklovingOAApi(http.Controller):
         is_wx = request.jsonrequest.get("is_wx")
         device_version = request.jsonrequest.get("device_version")
         open_id = request.jsonrequest.get("open_id")
-
-
         if is_wx:
             if attendance_off:
-                domain_person = [("new_check_in", ">", day_start), ("new_check_in", "<", day_end),
-                                 ("employee_id", "=", employee_id), ("check_out", "=", False)]
-                attendance = request.env['hr.attendance'].sudo().search(domain_person)
+                domain_person = [("write_date", ">", day_start), ("write_date", "<", check_out),
+                                 ("employee_id", "=", employee_id)]
+                # domain_one = ['|', ("check_out", "=", False), '&',("check_out", ">", day_start), ("check_out", "<", check_out)]
+                domain_person = domain_person
+                attendance = request.env['hr.attendance'].sudo().search(domain_person, order='write_date desc', limit=1)
                 if attendance.id:
                     attendance.write({
                         "check_out": check_out,
-                        "company_name": company_name,
-                        "device_version":device_version,
-                        "open_id":open_id,
+                        "company_off_name": company_name,
+                        "device_version": device_version,
+                        "open_id": open_id,
                     })
                 else:
-                    attendance_before = request.env['hr.attendance'].sudo().search(
-                        [(("employee_id", "=", employee_id))])
-                    attendance_before[0].write({
+                    new_attendance = request.env['hr.attendance'].sudo().create({
+                        "employee_id": employee_id,
                         "check_out": check_out,
-                        "company_name": company_name,
+                        # "check_in":check_out,
+                        "company_off_name": company_name,
                         "device_version": device_version,
                         "open_id": open_id,
                     })
             else:
-                new_attendance = request.env['hr.attendance'].sudo().create({
-                    "employee_id": employee_id,
-                    "new_check_in": check_in,
-                    "company_name": company_name,
-                    "device_version": device_version,
-                    "open_id": open_id,
-                })
+                last_attendance_before_check_in = request.env['hr.attendance'].sudo().search([
+                    ('employee_id', '=', employee_id),
+                    ('new_check_in', '<=', check_in),
+                ], order='check_in desc', limit=1)
+
+                if last_attendance_before_check_in.id:
+                    last_time_check_in = fields.datetime.strptime(last_attendance_before_check_in.check_in,
+                                                                  '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours=8)
+                    today_time = fields.datetime.now() + datetime.timedelta(hours=8)
+                    if last_time_check_in.year == today_time.year and last_time_check_in.month == today_time.month and last_time_check_in.day == today_time.day:
+                        if last_attendance_before_check_in.check_out:
+                            new_attendance = request.env['hr.attendance'].sudo().create({
+                                "employee_id": employee_id,
+                                "new_check_in": check_in,
+                                "company_name": company_name,
+                                "device_version": device_version,
+                                "open_id": open_id,
+                            })
+                        else:
+                            raise exceptions.ValidationError(_(
+                                "用户 %(empl_name)s, 今天已经签到过了") % {
+                                                                 'empl_name': last_attendance_before_check_in.employee_id.name_related,
+                                                             })
+                    else:
+                        new_attendance = request.env['hr.attendance'].sudo().create({
+                            "employee_id": employee_id,
+                            "new_check_in": check_in,
+                            "company_name": company_name,
+                            "device_version": device_version,
+                            "open_id": open_id,
+                        })
+                else:
+                    new_attendance = request.env['hr.attendance'].sudo().create({
+                        "employee_id": employee_id,
+                        "new_check_in": check_in,
+                        "company_name": company_name,
+                        "device_version": device_version,
+                        "open_id": open_id,
+                    })
             domain = [("new_check_in", ">", day_start), ("new_check_in", "<", day_end), ("employee_id", "=", employee_id)]
             attendance_list = request.env['hr.attendance'].sudo().search(domain)
             data = []
@@ -2778,16 +2815,20 @@ class LinklovingOAApi(http.Controller):
                 if attendance.id:
                     attendance.write({
                         "check_out": check_out,
-                        "company_name": company_name,
+                        "company_off_name": company_name,
                         "device_version": device_version,
                         "open_id": open_id,
                     })
+                    attendance_off_list = request.env["linkloving.hr.attendance.off.image"].sudo().search(
+                        [("attendance_id", "=", attendance.id)])
+                    for list in attendance_off_list:
+                        list.unlink()
                 else:
                     new_attendance = request.env['hr.attendance'].sudo().create({
                         "employee_id": employee.id,
                         "check_out": check_out,
                         # "check_in":check_out,
-                        "company_name": company_name,
+                        "company_off_name": company_name,
                         "device_version": device_version,
                         "open_id": open_id,
                     })
@@ -2844,6 +2885,12 @@ class LinklovingOAApi(http.Controller):
                     "check_in": attendance.new_check_in,
                     "check_out": attendance.check_out or '',
                     "company_name": attendance.company_name or '',
+                    "company_off_name":attendance.company_off_name or '',
+                    # "attendance_ids": attendance.attendance_ids,
+                    "attendance_on_ids": self.get_attendance_img_url(attendance.attendance_on_ids.ids),
+                    "attendance_off_ids": self.get_attendance_off_img_url(attendance.attendance_off_ids.ids),
+                    "is_location_on": attendance.is_location_on,
+                    "is_location_off": attendance.is_location_off,
                 })
             return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
@@ -2859,9 +2906,16 @@ class LinklovingOAApi(http.Controller):
             user_employee = request.env['hr.employee'].sudo().search([("id", "=", user_id)])
             employees = request.env['hr.employee'].sudo().search(
                 [("department_id", "=", user_employee.department_id.id)])
+            department_ids = []
+            for department_line in user_employee.manager_department_ids:
+                department_ids.append(department_line.id)
+            department = request.env['hr.department'].sudo().search([("id", "in", department_ids)])
             data = []
             for employee in employees:
                 data.append(employee.id)
+            data_child_ids = self.get_department_childs(department)
+            for child_id in data_child_ids:
+                data.append(child_id)
             domain = [("new_check_in", ">", day_start), ("new_check_in", "<", day_end), ("employee_id", "in", data)]
             attendance = request.env['hr.attendance'].sudo().read_group(domain, ['employee_id'], ['employee_id'])
             return JsonResponse.send_response(STATUS_CODE_OK, res_data={"total": len(employees),
@@ -2869,7 +2923,7 @@ class LinklovingOAApi(http.Controller):
         else:
             user_employee = request.env['hr.employee'].sudo().search([("user_id", "=", user_id)])
             employees = request.env['hr.employee'].sudo().search(
-                [("department_id", "=", user_employee.department_id.id)])
+                [("department_id", "in", user_employee.manager_department_ids.ids)])
             department_ids = []
             for department_line in user_employee.manager_department_ids:
                 department_ids.append(department_line.id)
@@ -2905,8 +2959,8 @@ class LinklovingOAApi(http.Controller):
         is_wx = request.jsonrequest.get("is_wx")
         if is_wx:
             employee = request.env['hr.employee'].sudo().search([("id", "=", employee_id)])
-            department = request.env['hr.department'].sudo().search([("id", "=", employee.department_id.id)])
-            if department.manager_id.id == employee.id:
+            # department = request.env['hr.department'].sudo().search([("id", "=", employee.department_id.id)])
+            if employee.manager_department_ids:
                 return JsonResponse.send_response(STATUS_CODE_OK, res_data={"is_manager": True})
             else:
                 return JsonResponse.send_response(STATUS_CODE_OK, res_data={"is_manager": False})
@@ -2941,6 +2995,244 @@ class LinklovingOAApi(http.Controller):
             "user_ava": LinklovingGetImageUrl.get_img_url(user_employee.user_id, "res.users", "image_medium")
         })
 
+    #考勤定位补打卡
+    @http.route('/linkloving_oa_api/location_attendance', type='json', auth="none", csrf=False, cors='*')
+    def location_attendance(self, *kw):
+        employee_id = request.jsonrequest.get("employee_id")
+        attendance_off = request.jsonrequest.get("attendance_off")
+        check_in = request.jsonrequest.get("check_in")
+        check_out = request.jsonrequest.get("check_out")
+        day_start = request.jsonrequest.get("day_start")
+        day_end = request.jsonrequest.get("day_end")
+        company_name = request.jsonrequest.get("company_name")
+        location_imgs = request.jsonrequest.get("location_imgs")
+        is_wx = request.jsonrequest.get("is_wx")
+        device_version = request.jsonrequest.get("device_version")
+        open_id = request.jsonrequest.get("open_id")
+        if is_wx:
+            if attendance_off:
+                domain_person = [("write_date", ">", day_start), ("write_date", "<", check_out),
+                                 ("employee_id", "=", employee_id)]
+                # domain_one = ['|', ("check_out", "=", False), '&',("check_out", ">", day_start), ("check_out", "<", check_out)]
+                domain_person = domain_person
+                attendance = request.env['hr.attendance'].sudo().search(domain_person, order='write_date desc', limit=1)
+                if attendance.id:
+                    attendance.write({
+                        "check_out": check_out,
+                        "company_off_name": company_name,
+                        "device_version": device_version,
+                        "open_id": open_id,
+                    })
+                else:
+                    new_attendance = request.env['hr.attendance'].sudo().create({
+                        "employee_id": employee_id,
+                        "check_out": check_out,
+                        # "check_in":check_out,
+                        "company_off_name": company_name,
+                        "device_version": device_version,
+                        "open_id": open_id,
+                    })
+            else:
+                last_attendance_before_check_in = request.env['hr.attendance'].sudo().search([
+                    ('employee_id', '=', employee_id),
+                    ('new_check_in', '<=', check_in),
+                ], order='check_in desc', limit=1)
+
+                if last_attendance_before_check_in.id:
+                    last_time_check_in = fields.datetime.strptime(last_attendance_before_check_in.check_in,
+                                                                  '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours=8)
+                    today_time = fields.datetime.now() + datetime.timedelta(hours=8)
+                    if last_time_check_in.year == today_time.year and last_time_check_in.month == today_time.month and last_time_check_in.day == today_time.day:
+                        if last_attendance_before_check_in.check_out:
+                            new_attendance = request.env['hr.attendance'].sudo().create({
+                                "employee_id": employee_id,
+                                "new_check_in": check_in,
+                                "company_name": company_name,
+                                "device_version": device_version,
+                                "open_id": open_id,
+                            })
+                        else:
+                            raise exceptions.ValidationError(_(
+                                "用户 %(empl_name)s, 今天已经签到过了") % {
+                                                                 'empl_name': last_attendance_before_check_in.employee_id.name_related,
+                                                             })
+                    else:
+                        new_attendance = request.env['hr.attendance'].sudo().create({
+                            "employee_id": employee_id,
+                            "new_check_in": check_in,
+                            "company_name": company_name,
+                            "device_version": device_version,
+                            "open_id": open_id,
+                        })
+                else:
+                    new_attendance = request.env['hr.attendance'].sudo().create({
+                        "employee_id": employee_id,
+                        "new_check_in": check_in,
+                        "company_name": company_name,
+                        "device_version": device_version,
+                        "open_id": open_id,
+                    })
+            domain = [("new_check_in", ">", day_start), ("new_check_in", "<", day_end), ("employee_id", "=", employee_id)]
+            attendance_list = request.env['hr.attendance'].sudo().search(domain)
+            data = []
+            for attendance in attendance_list:
+                data.append({
+                    "attendance_id": attendance.id,
+                    "check_in": attendance.new_check_in,
+                    "check_out": attendance.check_out or '',
+                    "company_name": attendance.company_name or '',
+                    "company_off_name":attendance.company_off_name or '',
+                })
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+        else:
+            employee = request.env['hr.employee'].sudo().search(
+                [('user_id', '=', employee_id)])
+            if attendance_off:
+                domain_person = [("write_date", ">", day_start), ("write_date", "<", check_out),
+                                 ("employee_id", "=", employee.id)]
+                # domain_one = ['|', ("check_out", "=", False), '&',("check_out", ">", day_start), ("check_out", "<", check_out)]
+                domain_person = domain_person
+                attendance = request.env['hr.attendance'].sudo().search(domain_person, order='write_date desc', limit=1)
+                if attendance.id:
+                    attendance.write({
+                        "check_out": check_out,
+                        "company_off_name": company_name,
+                        "device_version": device_version,
+                        "open_id": open_id,
+                        "is_location_off":True,
+                    })
+                    attendance_off_list = request.env["linkloving.hr.attendance.off.image"].sudo().search([("attendance_id", "=",attendance.id )])
+                    for list in attendance_off_list:
+                        list.unlink()
+                    if location_imgs:
+                        for img in location_imgs:
+                            wo_img_id = request.env["linkloving.hr.attendance.off.image"].sudo().create({
+                                'attendance_id': attendance.id,
+                                'attendance_image': img,
+                            })
+                            attendance.attendance_off_ids = [(4, wo_img_id.id)]
+                else:
+                    new_attendance = request.env['hr.attendance'].sudo().create({
+                        "employee_id": employee.id,
+                        "check_out": check_out,
+                        # "check_in":check_out,
+                        "company_off_name": company_name,
+                        "device_version": device_version,
+                        "open_id": open_id,
+                        "is_location_off": True,
+                    })
+                    if location_imgs:
+                        for img in location_imgs:
+                            wo_img_id = request.env["linkloving.hr.attendance.off.image"].sudo().create({
+                                'attendance_id': new_attendance.id,
+                                'attendance_image': img,
+                            })
+                            new_attendance.attendance_off_ids = [(4, wo_img_id.id)]
+            else:
+                last_attendance_before_check_in = request.env['hr.attendance'].sudo().search([
+                    ('employee_id', '=', employee.id),
+                    ('new_check_in', '<=', check_in),
+                ], order='check_in desc', limit=1)
+
+                if last_attendance_before_check_in.id:
+                    last_time_check_in = fields.datetime.strptime(last_attendance_before_check_in.check_in,
+                                                                  '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours=8)
+                    today_time = fields.datetime.now() + datetime.timedelta(hours=8)
+                    if last_time_check_in.year == today_time.year and last_time_check_in.month == today_time.month and last_time_check_in.day == today_time.day:
+                        if last_attendance_before_check_in.check_out:
+                            new_attendance = request.env['hr.attendance'].sudo().create({
+                                "employee_id": employee.id,
+                                "new_check_in": check_in,
+                                "company_name": company_name,
+                                "device_version": device_version,
+                                "open_id": open_id,
+                                "is_location_on": True,
+                            })
+                            if location_imgs:
+                                for img in location_imgs:
+                                    wo_img_id = request.env["linkloving.hr.attendance.image"].sudo().create({
+                                        'attendance_id': new_attendance.id,
+                                        'attendance_image': img,
+                                    })
+                                    new_attendance.attendance_on_ids = [(4, wo_img_id.id)]
+                        else:
+                            raise exceptions.ValidationError(_(
+                                "用户 %(empl_name)s, 今天已经签到过了") % {
+                                                                 'empl_name': last_attendance_before_check_in.employee_id.name_related,
+                                                             })
+                    else:
+                        new_attendance = request.env['hr.attendance'].sudo().create({
+                            "employee_id": employee.id,
+                            "new_check_in": check_in,
+                            "company_name": company_name,
+                            "device_version": device_version,
+                            "open_id": open_id,
+                            "is_location_on": True,
+                        })
+                        if location_imgs:
+                            for img in location_imgs:
+                                wo_img_id = request.env["linkloving.hr.attendance.image"].sudo().create({
+                                    'attendance_id': new_attendance.id,
+                                    'attendance_image': img,
+                                })
+                                new_attendance.attendance_on_ids = [(4, wo_img_id.id)]
+                else:
+                    new_attendance = request.env['hr.attendance'].sudo().create({
+                        "employee_id": employee.id,
+                        "new_check_in": check_in,
+                        "company_name": company_name,
+                        "device_version": device_version,
+                        "open_id": open_id,
+                        "is_location_on": True,
+                    })
+                    if location_imgs:
+                        for img in location_imgs:
+                            wo_img_id = request.env["linkloving.hr.attendance.image"].sudo().create({
+                                'attendance_id': new_attendance.id,
+                                'attendance_image': img,
+                            })
+                            new_attendance.attendance_on_ids = [(4, wo_img_id.id)]
+
+
+
+
+            domain = [("write_date", ">", day_start), ("write_date", "<", day_end), ("employee_id", "=", employee.id)]
+
+            attendance_list = request.env['hr.attendance'].sudo().search(domain)
+            data = []
+            for attendance in attendance_list:
+                data.append({
+                    "attendance_id": attendance.id,
+                    "check_in": attendance.new_check_in,
+                    "check_out": attendance.check_out or '',
+                    "company_name": attendance.company_name or '',
+                    "company_off_name":attendance.company_off_name or '',
+                    "attendance_on_ids":self.get_attendance_img_url(attendance.attendance_on_ids.ids),
+                    "attendance_off_ids": self.get_attendance_off_img_url(attendance.attendance_off_ids.ids),
+                    "is_location_on": attendance.is_location_on,
+                    "is_location_off": attendance.is_location_off,
+                })
+            return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+    def get_attendance_img_url(cls, worker_id, ):
+        # DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
+        imgs = []
+        for img_id in worker_id:
+            url = '%slinkloving_app_api/get_worker_image?worker_id=%s&model=%s&field=%s' % (
+                    request.httprequest.host_url, str(img_id), 'linkloving.hr.attendance.image', 'attendance_image')
+            imgs.append(url)
+        return imgs
+
+    def get_attendance_off_img_url(cls, worker_id, ):
+        # DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
+        imgs = []
+        for img_id in worker_id:
+            url = '%slinkloving_app_api/get_worker_image?worker_id=%s&model=%s&field=%s' % (
+                    request.httprequest.host_url, str(img_id), 'linkloving.hr.attendance.off.image', 'attendance_image')
+            imgs.append(url)
+        return imgs
+
+
     # 获取部门内员工打卡情况
     @http.route('/linkloving_oa_api/get_department_employee_attendance', type='json', auth="none", csrf=False, cors='*')
     def get_department_employee_attendance(self, *kw):
@@ -2949,7 +3241,7 @@ class LinklovingOAApi(http.Controller):
         day_end = request.jsonrequest.get("day_end")
         user_employee = request.env['hr.employee'].sudo().search([("user_id", "=", manager_id)])
         employees = request.env['hr.employee'].sudo().search(
-            [("department_id", "=", user_employee.department_id.id)])
+            [("department_id", "in", user_employee.manager_department_ids.ids)])
         department_ids = []
         for department_line in user_employee.manager_department_ids:
             department_ids.append(department_line.id)
@@ -3193,7 +3485,7 @@ class LinklovingOAApi(http.Controller):
             new_order_draft = request.env['hr.expense.sheet'].sudo(userId).browse(id)
             expense_lines = new_order_draft.expense_line_ids
             new_order_draft.write({
-                'department_id': data.get('department_id'),  # 部门
+                'department_id': data.get('department_id'),  # 部门c
                 'employee_id': data.get('employee_id'),  # 申请人
                 'expense_line_ids': [(0, 0, {
                     'product_id': p.get('product_id'),  # 产品
