@@ -114,7 +114,7 @@ class ProductProduct(models.Model):
             #  bom.manpower_cost
             if total_price >= 0:
                 total_price = bom.product_uom_id._compute_price(total_price / bom.product_qty,
-                                                                self.uom_id) + bom.manpower_cost
+                                                                self.uom_id)
             return total_price
 
         bom_obj = self.env['mrp.bom']
