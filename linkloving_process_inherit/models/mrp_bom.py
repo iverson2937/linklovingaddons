@@ -350,11 +350,15 @@ class MrpBomLine(models.Model):
             bom_line_id = self.env['mrp.bom.line'].browse(arg.get('id'))
             actions = arg.get('actions', [])
 
+
             for action in actions:
+                rate = action.get('rate')
+                if rate == '1/2':
+                    rate = 0.5
                 if action.get('id') and action.get('action_id'):
                     line = self.env['process.action.line'].browse(action.get('id')).write({
                         'action_id': action.get('action_id'),
-                        'rate': action.get('rate')
+                        'rate': rate
                     })
                 else:
                     if action.get('action_id'):
