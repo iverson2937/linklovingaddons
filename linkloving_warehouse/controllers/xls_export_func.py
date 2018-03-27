@@ -165,7 +165,7 @@ def product_template_export(values):
     for index, product in enumerate(products):
         index += 1
         content = [index]
-        for a_item in ['name', 'product_ll_type', 'default_code', 'standard_price']:
+        for a_item in ['name', 'default_code', 'standard_price']:
             item = product.get(a_item, '')
             content.append(item)
         wb.multiple_append(content, style=common_style)
