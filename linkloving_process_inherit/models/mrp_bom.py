@@ -355,6 +355,8 @@ class MrpBomLine(models.Model):
                 rate = action.get('rate')
                 if rate == '1/2':
                     rate = 0.5
+                if rate == '1/3':
+                    rate = 0.333
                 if action.get('id') and action.get('action_id'):
                     line = self.env['process.action.line'].browse(action.get('id')).write({
                         'action_id': action.get('action_id'),
