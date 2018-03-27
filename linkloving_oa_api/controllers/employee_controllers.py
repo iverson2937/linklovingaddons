@@ -355,7 +355,7 @@ class LinklovingEmployeeControllers(http.Controller):
             "marital": marital_data or "",
             "marital_id": employeebean.marital or "",
             "card_num": employeebean.card_num or '',
-            "hr_job_ids": [emp.name for emp in employeebean.hr_job_ids] if employeebean.hr_job_ids else '',
+            # "hr_job_ids": [emp.name for emp in employeebean.hr_job_ids] if employeebean.hr_job_ids else '',
         }
         return vals
 
