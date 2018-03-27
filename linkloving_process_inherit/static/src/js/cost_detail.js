@@ -110,13 +110,24 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var actions = [];
 
             for (var i = 0; i < trs.length; i++) {
-                var res = {
-                    'id': $(trs[i]).find('select').data('id'),
-                    'action_id': $(trs[i]).find('select option:selected').attr('data-id'),
-                    'action_name': $(trs[i]).find('select option:selected').val(),
-                    'rate': $(trs[i]).find('input').val()
-                };
-                actions.push(res)
+                var action_id = $(trs[i]).find('select option:selected').attr('data-id');
+                var rate = $(trs[i]).find('input').val();
+                alert(rate)
+                // if (!isNaN(ival)) {
+                //     alert(val + "是数字");
+                // }
+
+                if (action_id) {
+                    var res = {
+                        'id': $(trs[i]).find('select').data('id'),
+                        'action_id': action_id,
+                        'action_name': $(trs[i]).find('select option:selected').val(),
+                        'rate': rate
+                    };
+                    actions.push(res)
+
+                }
+
             }
 
             var new_div = QWeb.render('action_process', {'result': actions});

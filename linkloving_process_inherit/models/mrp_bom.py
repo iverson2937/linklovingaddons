@@ -279,7 +279,7 @@ class MrpBomLine(models.Model):
     def get_bom_line_man_cost(self):
         for line in self:
             line.bom_line_man_cost = sum(
-                action_line.line_cost for action_line in line.action_line_ids) * line.product_qty
+                action_line.line_cost for action_line in line.action_line_ids)
 
     def get_product_action_default(self):
         domain = [('category_id', '=', self.bom_id.product_tmpl_id.categ_id.id),
