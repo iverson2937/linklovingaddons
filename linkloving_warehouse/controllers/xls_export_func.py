@@ -154,7 +154,6 @@ def product_template_export(values):
         res.update({
             'name': product.name,
             'default_code': product.default_code,
-            'real_time_cost': product.product_variant_id.pre_cost_cal()
         })
         products.append(res)
     wb = MyWorkbook(encoding='utf-8')
