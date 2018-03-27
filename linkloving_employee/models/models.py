@@ -177,7 +177,7 @@ class LinkLovingEmployee(models.Model):
                 raise UserError('入职日期不能大于今天')
 
         if mobile_phone_one:
-            if not re.match(r'^1[358]\d{9}$', mobile_phone_one):
+            if not re.match(r'^1[1-9]\d{9}$', mobile_phone_one):
                 raise UserError('办公手机 格式有问题 ：' + str(mobile_phone_one))
 
         if identification_one:
