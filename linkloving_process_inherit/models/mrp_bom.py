@@ -278,8 +278,12 @@ class MrpBomLine(models.Model):
 
     def get_bom_line_man_cost(self):
         for line in self:
-            line.bom_line_man_cost = sum(
-                action_line.line_cost for action_line in line.action_line_ids) * line.product_qty
+            line_man_cost = sum(
+                action_line.line_cost for action_line in line.action_line_ids)
+            if any(action_line.rate_2 for action_line in line.action_line_ids):
+                line.bom_line_man_cost = line_man_cost
+            else:
+                line.bom_line_man_cost = line_man_cost * line.product_qty
 
     def get_product_action_default(self):
         domain = [('category_id', '=', self.bom_id.product_tmpl_id.categ_id.id),
@@ -314,6 +318,7 @@ class MrpBomLine(models.Model):
                 'cost': line.action_id.cost,
                 'remark': line.action_id.remark,
                 'rate': line.rate,
+                'rate_2': line.rate_2,
                 'options': options
             }
             res.append(data)
@@ -322,6 +327,7 @@ class MrpBomLine(models.Model):
             res.append({
                 'line_id': '',
                 'rate': 1,
+                'rate_2': 0,
                 'options': options
             })
 
@@ -351,17 +357,26 @@ class MrpBomLine(models.Model):
             actions = arg.get('actions', [])
 
             for action in actions:
+                rate = action.get('rate')
+                rate_2 = action.get('rate_2')
+                if rate == '1/2':
+                    rate = 0.5
+                if rate == '1/3':
+                    rate = 0.333
                 if action.get('id') and action.get('action_id'):
                     line = self.env['process.action.line'].browse(action.get('id')).write({
                         'action_id': action.get('action_id'),
-                        'rate': action.get('rate')
+                        'rate': rate,
+                        'rate_2': rate_2
+
                     })
                 else:
                     if action.get('action_id'):
                         line = self.env['process.action.line'].create({
                             'action_id': action.get('action_id'),
                             'rate': action.get('rate'),
-                            'bom_line_id': arg.get('id')
+                            'bom_line_id': arg.get('id'),
+                            'rate_2': rate_2
                         })
             action_data = bom_line_id.parse_action_line_data(no_option=True, no_data=True)
             category_id = bom_line_id.bom_id.product_tmpl_id.categ_id.id

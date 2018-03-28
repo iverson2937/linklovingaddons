@@ -154,19 +154,19 @@ def product_template_export(values):
         res.update({
             'name': product.name,
             'default_code': product.default_code,
-            'real_time_cost': product.product_variant_id.pre_cost_cal()
+            'total': product.qty_available * product.standard_price
         })
         products.append(res)
     wb = MyWorkbook(encoding='utf-8')
     sheet_title = '产品详细'
     ws = wb.add_sheet(sheet_title)
-    head = [u'序号', u"产品名称", u'料号', u"成本"]
+    head = [u'序号', u"产品名称", u'料号', u"成本", u'数量', u'总成本']
     ws.write_merge(0, 0, 0, 3, sheet_title, title_style)
     wb.multiple_append(head, style=head_style)
     for index, product in enumerate(products):
         index += 1
         content = [index]
-        for a_item in ['name', 'default_code', 'real_time_cost']:
+        for a_item in ['name', 'default_code', 'standard_price', 'qty_available', 'total']:
             item = product.get(a_item, '')
             content.append(item)
         wb.multiple_append(content, style=common_style)
