@@ -94,6 +94,21 @@ class LinklovingEmployeeControllers(http.Controller):
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data_list)
 
+
+        # 更新nfc 号码的接口
+
+    @http.route('/linkloving_oa_api/update_nfc_number', type='json', auth='none', csrf=False, cors='*')
+    def update_nfc_number(self, **kw):
+
+        card_num = request.jsonrequest.get("card_num")
+        employee = request.env['hr.employee'].sudo(int(request.jsonrequest.get("edit_id"))).browse(
+            int(request.jsonrequest.get("id")))
+        employee.write({
+            "card_num": card_num
+        })
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.employee_to_json(employee))
+
+
     # 修改用户
     @http.route('/linkloving_oa_api/update_employee', type='json', auth='none', csrf=False, cors='*')
     def update_employee(self, **kw):
@@ -297,12 +312,12 @@ class LinklovingEmployeeControllers(http.Controller):
             "emergency_contact_way": employeebean.emergency_contact_way or '',
 
             "work_experience_ids": [{
-                                        "name": experience_one.name or '',
-                                        "department": experience_one.department or '',
-                                        "position": experience_one.position or '',
-                                        "entry_time": experience_one.entry_time or '',
-                                        "Leaving_time": experience_one.Leaving_time or '',
-                                    } for experience_one in employeebean.work_experience_ids],
+                "name": experience_one.name or '',
+                "department": experience_one.department or '',
+                "position": experience_one.position or '',
+                "entry_time": experience_one.entry_time or '',
+                "Leaving_time": experience_one.Leaving_time or '',
+            } for experience_one in employeebean.work_experience_ids],
 
             "education_experience_ids": education_data,
 
