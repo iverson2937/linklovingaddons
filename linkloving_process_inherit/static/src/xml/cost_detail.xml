@@ -14,13 +14,7 @@
             <div class="modal-backdrop  in"></div>
             <div class="create_wrap">
                 <table id="action_table" class="table table-bordered">
-                    <thead>
-                          <tr>
-                        <th>工序动作</th>
-                        <th>系数</th>
-                         <th>操作</th>
-                     </tr>
-                    </thead>
+
 
                     <tbody>
 
@@ -45,7 +39,7 @@
                 </table>
 
                 <div class="foot">
-                    <button class=" btn btn-primary confirm_sel" style="margin-left:112px">确定</button>
+                    <button class=" btn btn-primary confirm_sel" style="margin-left:201px">确定</button>
                     <button class="btn btn-default alia_cancel">取消</button>
                 </div>
             </div>
@@ -54,9 +48,23 @@
 
 
     <t t-name="process_action_table">
+        <table class="table table-bordered">
+     <tr>
+         <th style="width:80px"><button type="button" class="btn btn-success btn-sm custom_rate">自定义</button></th>
+         <th >工序动作</th>
+         <th>单价</th>
+         <th style="width:100px">系数</th>
+         <th style="width:120px">备注</th>
+         <th>添加</th>
+         <th>删除</th>
+     </tr>
+
 
         <t t-foreach="result" t-as="item">
             <tr>
+                <td>
+                    <input name="rate_2" class="form-control rate_2"  t-att-value="item.rate_2" readonly="True"/>
+                </td>
 
                 <td>
                     <select t-att-data-id="item.line_id" class="form-control">
@@ -67,9 +75,18 @@
                         </t>
                     </select>
                 </td>
+                  <td>
+                   <span ><t t-esc="item.cost"/></span>
+                </td>
                 <td>
                     <input name="rate" class="form-control"  t-att-value="item.rate"/>
                 </td>
+                  <td>
+                      <t t-if="item.remark">
+                     <span><t t-esc="item.remark"/></span>
+                      </t>
+                </td>
+
                 <td>
                     <span class="fa fa-plus-square-o"></span>
 
@@ -79,24 +96,37 @@
                 </td>
             </tr>
         </t>
+        </table>
     </t>
 
 <t t-name="action_process_tr">
+
     <tr>
         <td>
-                          <select  class="form-control">
-                     <t t-foreach="options" t-as="options">
-                          <option t-att-data-id="options.id"><t t-esc="options.name"/></option>
-        </t>
-
-        </select>
+            <input name="rate_2" class="form-control"/>
         </td>
         <td>
-            <input name="rate" class="form-control" />
+            <select  class="form-control">
+                     <t t-foreach="options" t-as="options">
+                          <option t-att-data-id="options.id">
+                              <t t-esc="options.name"/>
+                          </option>
+                        </t>
+        </select>
+        </td>
+        <td><span></span></td>
 
+        <td>
+            <input name="rate" class="form-control"/>
+        </td>
+        <td>
+            <span></span>
         </td>
         <td>
              <span class="fa fa-plus-square-o"></span>
+        </td>
+         <td>
+             <span class="fa fa-trash-o"></span>
         </td>
     </tr>
 </t>
@@ -104,8 +134,6 @@
         <t t-if="result">
         <t t-foreach="result" t-as="item">
             <t t-if="item.action_name">
-
-
         <div>
             <span><t t-esc="item.action_name"/></span><span class="pull-right"><t t-esc="item.rate"/></span>
         </div>

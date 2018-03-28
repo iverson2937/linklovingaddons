@@ -17,6 +17,7 @@ class LinkLovingEmployee(models.Model):
     is_self = fields.Boolean(u'是不是本人', compute='_compute_is_self')
 
     is_manager = fields.Boolean(u'是不是经理', compute='_compute_is_manager')
+    address_home_id = fields.Many2one('res.partner', related='user_id.partner_id')
 
     # 公开信息
     employee_state = fields.Selection([('draft', u'草稿'), ('submitted_ing', u'已提交'), ('official', u'正式')],
@@ -57,7 +58,11 @@ class LinkLovingEmployee(models.Model):
     accumulation_fund = fields.Selection(
         [('class_a', u'甲类'), ('class_b', u'乙类'), ('null', u'无')], string=u'交金类别')
     insurance_type = fields.Many2one('hr.insurance', string=u'保险类别')
-    buy_balance = fields.Float(u'申购余额')
+
+    buy_balance = fields.Float(u'申购余额', compute='_compute_buy_balance')
+    balance_ids = fields.One2many('hr.purchase.apply', 'employee_id', u'申购单')
+    expense_ids = fields.One2many('hr.expense.sheet', 'employee_id', u'费用单')
+
     is_create_account = fields.Boolean(u'相关用户')
     probation_period = fields.Selection(
         [('nothing', u'无'), ('half_month', u'半个月'), ('one_month', u'一个月'), ('two_month', u'两个月'),
@@ -90,35 +95,23 @@ class LinkLovingEmployee(models.Model):
 
         return em_data_all
 
-    # def get_employee_child11111(self, data):
-    #
-    #     em_data_all = self.env['hr.employee']
-    #
-    #     def get_employee_child_inner(data, em):
-    #         for em_one in data.child_ids:
-    #             em += data.child_ids
-    #             get_employee_child_inner(em_one, em)
-    #
-    #     get_employee_child_inner(data, em_data_all)
-    #     return em_data_all
-
-    # def compute_is_view_more_msg11(self):
-    #
-    #     # department_manager = self.env.user.employee_ids.department_id.manager_id  # 得到登录用户所在部门 的经理
-    #
-    #     if self.env.ref('hr.group_hr_manager').id in self.env.user.groups_id.ids:
-    #         for emp_one in self:
-    #             emp_one.is_view_more_msg = True
-    #     else:
-    #         for emp_one in self:
-    #             if emp_one in self.env.user.employee_ids + self.env.user.employee_ids.child_ids:
-    #                 emp_one.is_view_more_msg = True
-
-
     def _compute_is_self(self):
         for emp_one in self:
             if emp_one in self.env.user.employee_ids:
                 emp_one.is_self = True
+
+    @api.multi
+    def _compute_buy_balance(self):
+        for employee in self:
+            balance_num = 0
+            expense_num = 0
+            # 申购单
+            for balance_one in employee.balance_ids:
+                balance_num += balance_one.total_amount
+            # 费用单
+            # for expense_one in employee.expense_ids:
+            #     expense_num += expense_one.total_amount
+            employee.buy_balance = balance_num
 
     def _compute_is_manager(self):
         for emp_one in self:
@@ -184,7 +177,7 @@ class LinkLovingEmployee(models.Model):
                 raise UserError('入职日期不能大于今天')
 
         if mobile_phone_one:
-            if not re.match(r'^1[358]\d{9}$', mobile_phone_one):
+            if not re.match(r'^1[1-9]\d{9}$', mobile_phone_one):
                 raise UserError('办公手机 格式有问题 ：' + str(mobile_phone_one))
 
         if identification_one:
@@ -334,3 +327,21 @@ class LinkLovingEmployeeInsurance(models.Model):
     _name = 'hr.insurance'
 
     name = fields.Char(u'保险名称')
+
+
+class ResUsers(models.Model):
+    _inherit = 'res.users'
+
+    @api.model
+    def create(self, vals):
+        res = super(ResUsers, self).create(vals)
+        # 设定初始的密码
+        pass_wizard = self.env['change.password.wizard'].create({})
+
+        self.env['change.password.user'].create({
+            'wizard_id': pass_wizard.id,
+            'user_id': res.id,
+            'new_passwd': '123456'
+        })
+        pass_wizard.change_password_button()
+        return res

@@ -283,7 +283,7 @@
 
 
         <record id="model_product_template_excel_export" model="ir.actions.server">
-            <field name="name">导出实时成本</field>
+            <field name="name">导出成本</field>
             <field name="type">ir.actions.server</field>
             <field name="model_id" ref="product.model_product_template"/>
             <field name="state">code</field>
@@ -297,7 +297,7 @@
         </record>
 
         <record id="action_product_template_excel_export" model="ir.values">
-            <field name="name">导出实时成本</field>
+            <field name="name">导出成本</field>
             <field name="action_id" ref="linkloving_warehouse.model_product_template_excel_export"/>
             <field name="value"
                    eval="'ir.actions.server,%d' %ref('linkloving_warehouse.model_product_template_excel_export')"/>

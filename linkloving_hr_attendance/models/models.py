@@ -4,12 +4,26 @@ from odoo import models, fields, api,exceptions
 
 class Linkloving_hr_attendance(models.Model):
      _inherit = 'hr.attendance'
-     company_name = fields.Char(string="打卡所在地")
+     company_name = fields.Char(string="上班打卡所在地")
+     company_off_name = fields.Char(string="下班打卡所在地")
 
      open_id = fields.Char(string="员工微信唯一标识")
      new_check_in = fields.Datetime(string="Check In")
 
      device_version = fields.Char(string="设备型号")
+
+     attendance_on_ids = fields.One2many(comodel_name="linkloving.hr.attendance.image",
+                                   inverse_name="attendance_id",
+                                   string="上班补考勤图片",
+                                   required=False,)
+
+     attendance_off_ids = fields.One2many(comodel_name="linkloving.hr.attendance.off.image",
+                                         inverse_name="attendance_id",
+                                         string="下班补考勤图片",
+                                         required=False, )
+
+     is_location_on = fields.Boolean(string='上班是否是定位打卡', default=False)
+     is_location_off = fields.Boolean(string='下班是否是定位打卡', default=False)
 
      @api.constrains('check_in', 'check_out', 'employee_id')
      def _check_validity(self):

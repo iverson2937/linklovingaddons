@@ -1,35 +1,13 @@
 # -*- coding: utf-8 -*-
-import base64
-import json
 import logging
-from urllib2 import URLError
-import re
 import time
-import datetime
-
-import operator
-
-import datetime
-
-import jpush
-import pytz
-from pip import download
-
-import odoo
-import odoo.modules.registry
+import re
 from controllers import JsonResponse
-from models import LinklovingGetImageUrl, JPushExtend
-
-from odoo import fields
-from odoo.osv import expression
-from odoo.tools import float_compare, SUPERUSER_ID, werkzeug, os, safe_eval
-from odoo.tools.translate import _
 from odoo import http
 from odoo.http import content_disposition, dispatch_rpc, request, \
     serialize_exception as _serialize_exception
-from odoo.exceptions import AccessError, UserError
-from pyquery import PyQuery as pq
 
+_logger = logging.getLogger(__name__)
 STATUS_CODE_OK = 1
 STATUS_CODE_ERROR = -1
 
@@ -50,6 +28,8 @@ class LinklovingEmployeeControllers(http.Controller):
     # 创建用户
     @http.route('/linkloving_oa_api/create_employee', type='json', auth='none', csrf=False, cors='*')
     def create_employee(self, **kw):
+        import datetime
+        _logger.warning("starttime %s" % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
 
         request.jsonrequest['department_id'] = int(
             request.jsonrequest.get("department_id")) if request.jsonrequest.get("department_id") else False
@@ -76,17 +56,21 @@ class LinklovingEmployeeControllers(http.Controller):
                     'public': True,
                 })
                 certificate_list.append(experience_id.id)
+                experience_id.write({'name': str(int(time.time())) + '.' + experience_id.mimetype.split('/')[1]})
                 request.jsonrequest['certificate_image_ids'] = [(6, 0, certificate_list)]
 
         if request.jsonrequest.get("work_email"):
             request.jsonrequest['is_create_account'] = True
-
-        department_manager = request.env['hr.department'].sudo().browse(int(request.jsonrequest.get('department_id')))
-        request.jsonrequest['parent_id'] = department_manager.manager_id.id
+        if request.jsonrequest.get('department_id'):
+            department_manager = request.env['hr.department'].sudo().browse(
+                int(request.jsonrequest.get('department_id')))
+            request.jsonrequest['parent_id'] = department_manager.manager_id.id
 
         try:
+            _logger.warning("start create %s" % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
             employee = request.env['hr.employee'].sudo(int(request.jsonrequest.get("edit_id"))).create(
                 request.jsonrequest)
+            _logger.warning("end create %s" % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
         except Exception, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={'body': u'创建失败' + e.name})
 
@@ -110,6 +94,21 @@ class LinklovingEmployeeControllers(http.Controller):
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data_list)
 
+
+        # 更新nfc 号码的接口
+
+    @http.route('/linkloving_oa_api/update_nfc_number', type='json', auth='none', csrf=False, cors='*')
+    def update_nfc_number(self, **kw):
+
+        card_num = request.jsonrequest.get("card_num")
+        employee = request.env['hr.employee'].sudo(int(request.jsonrequest.get("edit_id"))).browse(
+            int(request.jsonrequest.get("id")))
+        employee.write({
+            "card_num": card_num
+        })
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.employee_to_json(employee))
+
+
     # 修改用户
     @http.route('/linkloving_oa_api/update_employee', type='json', auth='none', csrf=False, cors='*')
     def update_employee(self, **kw):
@@ -117,8 +116,8 @@ class LinklovingEmployeeControllers(http.Controller):
         if request.jsonrequest.get('certificate_image_ids'):
             certificate_list = []
             for certificate_one in request.jsonrequest.get('certificate_image_ids'):
-                if type(certificate_one) == int:
-                    certificate_list.append(certificate_one)
+                if re.match("^\d+$", certificate_one) and True or False:
+                    certificate_list.append(int(certificate_one))
                 elif 'base64' in certificate_one:
                     experience_id = request.env['ir.attachment'].sudo(int(request.jsonrequest.get("edit_id"))).create({
                         'res_model': u'hr.employee',
@@ -127,6 +126,7 @@ class LinklovingEmployeeControllers(http.Controller):
                         'datas_fname': '',
                         'public': True,
                     })
+                    experience_id.write({'name': str(int(time.time())) + '.' + experience_id.mimetype.split('/')[1]})
                     certificate_list.append(experience_id.id)
             request.jsonrequest['certificate_image_ids'] = [(6, 0, certificate_list)]
 
@@ -221,7 +221,6 @@ class LinklovingEmployeeControllers(http.Controller):
         else:
             return JsonResponse.send_response(STATUS_CODE_ERROR, res_data={"error": "没有识别到员工或者登录用户"})
 
-
     @classmethod
     def employee_to_json(cls, employeebean):
         # user = request.env["res.users"].sudo().browse(visitBean.create_uid.id)
@@ -313,12 +312,12 @@ class LinklovingEmployeeControllers(http.Controller):
             "emergency_contact_way": employeebean.emergency_contact_way or '',
 
             "work_experience_ids": [{
-                                        "name": experience_one.name or '',
-                                        "department": experience_one.department or '',
-                                        "position": experience_one.position or '',
-                                        "entry_time": experience_one.entry_time or '',
-                                        "Leaving_time": experience_one.Leaving_time or '',
-                                    } for experience_one in employeebean.work_experience_ids],
+                "name": experience_one.name or '',
+                "department": experience_one.department or '',
+                "position": experience_one.position or '',
+                "entry_time": experience_one.entry_time or '',
+                "Leaving_time": experience_one.Leaving_time or '',
+            } for experience_one in employeebean.work_experience_ids],
 
             "education_experience_ids": education_data,
 
@@ -371,7 +370,7 @@ class LinklovingEmployeeControllers(http.Controller):
             "marital": marital_data or "",
             "marital_id": employeebean.marital or "",
             "card_num": employeebean.card_num or '',
-            # "hr_job_ids": [emp.name for emp in employeebean.hr_job_ids],
+            # "hr_job_ids": [emp.name for emp in employeebean.hr_job_ids] if employeebean.hr_job_ids else '',
         }
         return vals
 

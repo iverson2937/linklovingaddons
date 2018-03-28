@@ -11,9 +11,8 @@
         onGetNodes: function (row, data) {
             var that = this;
             var nodes = [];
-
             $.each(data, function (i, item) {
-                console.log(that.options.idField);
+                // console.log(that.options.idField);
                 if (row[that.options.idField] === item[that.options.parentIdField]) {
                     nodes.push(item);
                 }
@@ -68,7 +67,9 @@
                     classes: 'treegrid-' + id + ' treegrid-parent-' + pid
                 };
             };
-            initTr.apply(that, [node, $.inArray(node, data), data, parentDom]);
+            var idx = $.inArray(node, data);
+
+            initTr.apply(that, [node,idx, data, parentDom]);
         }
     };
 
@@ -88,6 +89,7 @@
                         classes: 'treegrid-' + x
                     };
                 };
+
                 initTr.apply(that, [item, idx, data, parentDom]);
                 return true;
             }

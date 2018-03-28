@@ -218,11 +218,11 @@
                                                attrs="{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"
                                                context="{'default_partner_id': address_home_id}"/>
 
-                                        <field name="address_home_id"
+                                        <field name="address_home_id" groups="account.group_account_manager"
                                                attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"
                                                context="{'show_address': 1}"
                                                options='{"always_reload": True, "highlight_first_line": True}'
-                                               invisible="1"/>
+                                        />
                                         <field name="address_home_two"
                                                attrs="{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"/>
                                         <field name="now_address_home"
@@ -487,7 +487,7 @@
                     <attribute name="invisible">1</attribute>
                 </xpath>
 
-                <xpath expr="//notebook/page[@name='hr_settings']/group/group[5]" position="attributes">
+                <xpath expr="//notebook/page[@name='hr_settings']/group/group[4]" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
 
@@ -498,42 +498,79 @@
             </field>
         </record>
 
-        <record id="hr_payroll.payroll_hr_employee_view_form" model="ir.ui.view">
+        <!--<record id="hr_payroll.payroll_hr_employee_view_form" model="ir.ui.view">-->
+        <!--<field name="name">payroll.hr.employee.view.form</field>-->
+        <!--<field name="model">hr.employee</field>-->
+        <!--<field name="inherit_id" ref="hr.view_employee_form"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<div name="button_box" position="inside">-->
+        <!--<button name="%(hr_payroll.act_hr_employee_payslip_list)d"-->
+        <!--class="oe_stat_button"-->
+        <!--icon="fa-money"-->
+        <!--type="action"-->
+        <!--groups="hr.group_hr_manager">-->
+        <!--<field name="payslip_count" widget="statinfo" string="Payslips"/>-->
+        <!--</button>-->
+        <!--</div>-->
+        <!--</field>-->
+        <!--</record>-->
+
+
+        <record id="hr_payroll_payroll_hr_employee_view_form" model="ir.ui.view">
             <field name="name">payroll.hr.employee.view.form</field>
             <field name="model">hr.employee</field>
-            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="inherit_id" ref="hr_payroll.payroll_hr_employee_view_form"/>
             <field name="arch" type="xml">
-                <div name="button_box" position="inside">
-                    <button name="%(hr_payroll.act_hr_employee_payslip_list)d"
-                            class="oe_stat_button"
-                            icon="fa-money"
-                            type="action"
-                            groups="hr.group_hr_manager">
-                        <field name="payslip_count" widget="statinfo" string="Payslips"/>
-                    </button>
-                </div>
+
+                <xpath expr="//button[@name='%(hr_payroll.act_hr_employee_payslip_list)d']" position="attributes">
+                    <attribute name="groups">hr.group_hr_manager</attribute>
+                </xpath>
+
             </field>
         </record>
 
-        <record id="hr_attendance.view_employee_form_inherit_hr_attendance" model="ir.ui.view">
+        <!--<record id="hr_attendance.view_employee_form_inherit_hr_attendance" model="ir.ui.view">-->
+        <!--<field name="name">hr.employee</field>-->
+        <!--<field name="model">hr.employee</field>-->
+        <!--<field name="inherit_id" ref="hr.view_employee_form"/>-->
+        <!--<field name="priority">10</field>-->
+        <!--<field name="groups_id" eval="[(4,ref('hr_attendance.group_hr_attendance_user'))]"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<field name="name" position="replace">-->
+        <!--<div id="textbox">-->
+        <!--<field name="attendance_state" widget="hr_attendance_form_presence_indicator"/>-->
+        <!--<field name="name" placeholder="Employee's Name"/>-->
+        <!--</div>-->
+        <!--</field>-->
+        <!--<field name="user_id" position="after">-->
+        <!--<field name="barcode" groups="hr_attendance.group_hr_attendance_user" invisible="1"/>-->
+        <!--<field name="pin" invisible="1"-->
+        <!--groups="hr_attendance.group_hr_attendance_user,hr_attendance.group_hr_attendance_use_pin"/>-->
+        <!--<field name="manual_attendance" groups="hr_attendance.group_hr_attendance_user" invisible="1"/>-->
+        <!--</field>-->
+        <!--</field>-->
+        <!--</record>-->
+
+        <record id="hr_attendance_view_employee_form_inherit_hr_attendance" model="ir.ui.view">
             <field name="name">hr.employee</field>
             <field name="model">hr.employee</field>
-            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="inherit_id" ref="hr_attendance.view_employee_form_inherit_hr_attendance"/>
             <field name="priority">10</field>
-            <field name="groups_id" eval="[(4,ref('hr_attendance.group_hr_attendance_user'))]"/>
             <field name="arch" type="xml">
-                <field name="name" position="replace">
-                    <div id="textbox">
-                        <field name="attendance_state" widget="hr_attendance_form_presence_indicator"/>
-                        <field name="name" placeholder="Employee's Name"/>
-                    </div>
-                </field>
-                <field name="user_id" position="after">
-                    <field name="barcode" groups="hr_attendance.group_hr_attendance_user" invisible="1"/>
-                    <field name="pin" invisible="1"
-                           groups="hr_attendance.group_hr_attendance_user,hr_attendance.group_hr_attendance_use_pin"/>
-                    <field name="manual_attendance" groups="hr_attendance.group_hr_attendance_user" invisible="1"/>
-                </field>
+
+                <xpath expr="//field[@name='barcode']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='pin']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='manual_attendance']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+
             </field>
         </record>
 
@@ -565,7 +602,7 @@
             </field>
         </record>
 
-        <record id="linkloveing_hr.hr_timesheet_employee_extd_form" model="ir.ui.view">
+        <record id="new_hr_timesheet_employee_extd_form" model="ir.ui.view">
             <field name="name">hr.timesheet.employee.extd_form</field>
             <field name="model">hr.employee</field>
             <field name="inherit_id" ref="hr.view_employee_form"/>
@@ -599,6 +636,49 @@
                 </xpath>
             </field>
         </record>
+
+        <!--<record id="linkloveing_hr_hr_timesheet_employee_extd_form" model="ir.ui.view">-->
+        <!--<field name="name">hr.timesheet.employee.extd_form</field>-->
+        <!--<field name="model">hr.employee</field>-->
+        <!--<field name="inherit_id" ref="linkloveing_hr.hr_timesheet_employee_extd_form"/>-->
+        <!--<field name="arch" type="xml">-->
+
+
+        <!--<xpath expr="//field[@name='parent_id']" position="attributes">-->
+        <!--<attribute name="attrs">-->
+        <!--{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}-->
+        <!--</attribute>-->
+        <!--</xpath>-->
+
+        <!--<xpath expr="//field[@name='parent_id']" position="attributes">-->
+        <!--<attribute name="attrs">-->
+        <!--{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}-->
+        <!--</attribute>-->
+        <!--</xpath>-->
+
+
+        <!--<xpath expr="//field[@name='buy_balance']" position="after">-->
+        <!--<field name="pre_payment_reminding" string="暂支余额"/>-->
+        <!--</xpath>-->
+
+        <!--<xpath expr="//notebook/page[3]/group[1]" position="after">-->
+        <!--<group>-->
+        <!--<group>-->
+        <!--<field name="signature"-->
+        <!--attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"-->
+        <!--widget="image"/>-->
+        <!--</group>-->
+        <!--<group>-->
+        <!--<field name="purchase_signature"-->
+        <!--attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"-->
+        <!--widget="image"/>-->
+        <!--</group>-->
+
+
+        <!--</group>-->
+        <!--</xpath>-->
+        <!--</field>-->
+        <!--</record>-->
 
 
         <record model="ir.actions.client" id="to_employee_index_page_action">

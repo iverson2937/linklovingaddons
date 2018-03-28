@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'hr', 'hr_contract', 'linkloving_mrp_extend'],
+    'depends': ['base', 'hr', 'hr_contract', 'linkloving_mrp_extend', 'account'],
 
     # always loaded
     'data': [

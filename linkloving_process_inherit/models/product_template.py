@@ -5,6 +5,7 @@ from odoo import models, fields, api
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
+    head_circle = fields.Float(string=u'刀长/面积')
 
     def view_new_product_cost(self):
         return {
@@ -38,9 +39,9 @@ class ProductTemplate(models.Model):
                 'code': self.default_code,
                 # 'process_id': [self.process_id.id, self.process_id.name],
                 'product_type': product_type_dict[self.product_ll_type],
-                'material_cost': round(material_cost, 2),
+                'material_cost': round(material_cost, 5),
                 'manpower_cost': 0,
-                'total_cost': round(material_cost, 2),
+                'total_cost': round(material_cost, 5),
                 # 'bom_ids': sorted(res, key=lambda product: product['code']),
             }
             result.append(res)
@@ -73,11 +74,7 @@ class ProductProduct(models.Model):
                 if sbom.child_bom_id:  # 如果有子阶
                     sub_bom_price = _calc_manpower_cost(sbom.child_bom_id) * sbom_data['qty']
                     total_price += sub_bom_price
-                else:
-                    total_price = bom.manpower_cost
-
-            #  bom.manpower_cost
-
+            total_price += bom.manpower_cost
             return total_price
 
         bom_obj = self.env['mrp.bom']
@@ -88,8 +85,6 @@ class ProductProduct(models.Model):
                 return man_power_cost
             else:
                 return 0
-
-
 
     @api.multi
     def pre_cost_cal_new(self, raise_exception=True):

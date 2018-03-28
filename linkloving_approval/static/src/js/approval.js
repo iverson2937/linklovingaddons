@@ -14,6 +14,8 @@ odoo.define('linkloving_approval.approval_core', function (require) {
     var pyeval = require('web.pyeval');
 
     var pdm_mange = require('linkloving_pdm.document_manage');
+    var ControlPanelMixin = require('web.ControlPanelMixin');
+    var Web_ControlPanel = require('web.ControlPanel');
 
 
     var ViewManager = require('web.ViewManager');
@@ -938,6 +940,11 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                             self.$(".labels_body").html("");
                             self.$(".labels_body").append(tag_type_name_list);
                             own.render_pager(this);
+
+                            // $('.o_breadcrumb_full .breadcrumb').show();
+
+                            // this.$el.toggleClass('o_breadcrumb_full', true);
+
                             $('.o_breadcrumb_full').removeClass('o_hidden');
                             $('.o_breadcrumb_full .o_cp_left').addClass('o_hidden');
                             $('.o_breadcrumb_full .o_cp_right').addClass('o_hidden');
@@ -955,6 +962,14 @@ odoo.define('linkloving_approval.approval_core', function (require) {
         },
         start: function () {
             var self = this;
+
+            // var cp_status = {
+            //     breadcrumbs: self.action_manager && self.action_manager.get_breadcrumbs(),
+            //     // cp_content: _.extend({}, self.searchview_elements, {}),
+            // };
+            // self.update_control_panel(cp_status);
+
+
             var model = new Model("approval.center");
             self.search_results = {}
             //var info_model = new Model("product.attachment.info")
@@ -1003,6 +1018,27 @@ odoo.define('linkloving_approval.approval_core', function (require) {
                 }
             }
         },
+    });
+
+
+    Web_ControlPanel.include({
+
+        _update_search_view: function (searchview, is_hidden) {
+
+            var res = this._super.apply(this, arguments);
+
+            if ($('.o_control_panel').hasClass('o_hidden')) {
+                console.log('我不显示')
+            } else {
+                // $('.o_breadcrumb_full').removeClass('o_hidden');
+                $('.o_control_panel .o_cp_left').removeClass('o_hidden');
+                $('.o_control_panel .o_cp_right').removeClass('o_hidden');
+            }
+
+            return res;
+        },
+
+
     });
 
 
