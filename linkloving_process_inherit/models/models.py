@@ -31,11 +31,12 @@ class ProcessActionLine(models.Model):
     action_id = fields.Many2one('mrp.process.action', on_delete="restrict")
     rate = fields.Float(default=1)
     line_cost = fields.Float(compute='_get_line_cost')
+    rate_2 = fields.Integer(string='自定义系数', default=0)
 
     @api.multi
     def _get_line_cost(self):
         for line in self:
-            if line.action_id and line.action_id.cost:
-                line.line_cost = line.action_id.cost * line.rate
+            if line.action_id and line.action_id.cost and line.rate_2:
+                line.line_cost = line.action_id.cost * line.rate * line.rate_2
             else:
-                line.line_cost = 0
+                line.line_cost = line.action_id.cost * line.rate

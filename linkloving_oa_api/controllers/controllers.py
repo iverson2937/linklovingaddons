@@ -2809,7 +2809,7 @@ class LinklovingOAApi(http.Controller):
             if attendance_off:
                 new_attendance = request.env['hr.attendance'].sudo().create({
                     "employee_id": employee.id,
-                    "check_out": check_out,
+                    "check_out": fields.datetime.now(),
                     "company_off_name": company_name,
                     "device_version": device_version,
                     "open_id": open_id,
@@ -2817,7 +2817,7 @@ class LinklovingOAApi(http.Controller):
             else:
                 new_attendance = request.env['hr.attendance'].sudo().create({
                     "employee_id": employee.id,
-                    "new_check_in": check_in,
+                    "new_check_in": fields.datetime.now(),
                     "company_name": company_name,
                     "device_version": device_version,
                     "open_id": open_id,
@@ -3038,7 +3038,7 @@ class LinklovingOAApi(http.Controller):
             if attendance_off:
                 new_attendance = request.env['hr.attendance'].sudo().create({
                     "employee_id": employee.id,
-                    "check_out": check_out,
+                    "check_out": fields.datetime.now(),
                     # "check_in":check_out,
                     "company_off_name": company_name,
                     "device_version": device_version,
@@ -3055,7 +3055,7 @@ class LinklovingOAApi(http.Controller):
             else:
                 new_attendance = request.env['hr.attendance'].sudo().create({
                     "employee_id": employee.id,
-                    "new_check_in": check_in,
+                    "new_check_in": fields.datetime.now(),
                     "company_name": company_name,
                     "device_version": device_version,
                     "open_id": open_id,
