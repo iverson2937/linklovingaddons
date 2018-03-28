@@ -9,5 +9,13 @@
             <field name="padding">4</field>
             <field name="company_id" eval="False"/>
         </record>
+
+        <record id="seq_eco" model="ir.sequence">
+            <field name="name">Eco Effect Order</field>
+            <field name="code">eco.effect.order</field>
+            <field name="prefix">EEO</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
     </data>
 </odoo>
