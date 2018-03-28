@@ -2,6 +2,7 @@
 
 from odoo import models, fields
 
+
 class linkloving_work_order_record_image(models.Model):
     _name = 'linkloving.work.order.record.image'
 
