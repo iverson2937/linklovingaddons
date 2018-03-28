@@ -36,7 +36,6 @@
             <field name='res_model'>account_account_report_wizard</field>
             <field name='view_type'>form</field>
             <field name='view_mode'>form</field>
-            <field name="view_id" ref="account_custom_report_form"/>
             <field name='target'>new</field>
         </record>
 
