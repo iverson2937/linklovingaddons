@@ -21,6 +21,20 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             'click .get_default': 'get_default_func',
             'click .fa-plus-square-o': 'add_action_line_func',
             'click .fa-trash-o': 'remove_action_line_func',
+            'click .custom_rate': 'custom_rate_func',
+
+        },
+        custom_rate_func: function () {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var self = this;
+            var table = $(target).parents('table');
+            var rates = table.find('.rate_2')
+            _.each(rates, function (result) {
+                $(result).removeAttr("readonly");
+
+            });
+
 
         },
         remove_action_line_func: function (e) {
@@ -100,6 +114,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
 
             });
         },
+
         alia_cancel_func: function () {
             $('.unlock_condition').hide()
         },
@@ -109,14 +124,23 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var trs = $('.unlock_condition').find('tr');
             var actions = [];
 
+            function isInteger(obj) {
+                return Math.floor(obj) === obj
+            }
+
             for (var i = 0; i < trs.length; i++) {
                 var action_id = $(trs[i]).find('select option:selected').attr('data-id');
                 if (action_id) {
+                    var rate2 = $(trs[i]).find("input[name='rate_2']").val();
+                    if (!isInteger(rate2)) {
+                        alert('自定义比例必须为整数')
+                    }
                     var res = {
                         'id': $(trs[i]).find('select').data('id'),
                         'action_id': action_id,
                         'action_name': $(trs[i]).find('select option:selected').val(),
-                        'rate': $(trs[i]).find('input').val()
+                        'rate': $(trs[i]).find("input[name='rate']").val(),
+                        'rate_2': rate2
                     };
                     actions.push(res)
 
@@ -125,7 +149,6 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             }
 
             var new_div = QWeb.render('action_process', {'result': actions});
-            console.log(new_div);
             $('.treegrid-' + bom_line_id).find('.sel_action').html(new_div);
             // self.table_data[self.index]['process_action_1'] = $('.unlock_condition select option:selected').val();
             // if ($('.unlock_condition .change_time input').val() != '') {
@@ -166,7 +189,8 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                                 'rate': results[i].rate,
                                 'options': results[i].options,
                                 'remark': results[i].remark,
-                                'cost': results[i].cost
+                                'cost': results[i].cost,
+                                'rate_2': results[i].rate_2
                             };
                             datas.push(res)
                         }
