@@ -589,18 +589,18 @@
         <!--</field>-->
         <!--</record>-->
 
-        <record id="hr_hr_employee_view_form_worker" model="ir.ui.view">
-            <field name="name">hr.hr.employee.view.form2</field>
-            <field name="model">hr.employee</field>
-            <field name="inherit_id" ref="linkloving_mrp_extend.hr_hr_employee_view_form_worker"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='is_worker']" position="attributes">
-                    <attribute name="attrs">
-                        {'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}
-                    </attribute>
-                </xpath>
-            </field>
-        </record>
+        <!--<record id="hr_hr_employee_view_form_worker" model="ir.ui.view">-->
+        <!--<field name="name">hr.hr.employee.view.form2</field>-->
+        <!--<field name="model">hr.employee</field>-->
+        <!--<field name="inherit_id" ref="linkloving_mrp_extend.hr_hr_employee_view_form_worker"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<xpath expr="//field[@name='is_worker']" position="attributes">-->
+        <!--<attribute name="attrs">-->
+        <!--{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}-->
+        <!--</attribute>-->
+        <!--</xpath>-->
+        <!--</field>-->
+        <!--</record>-->
 
         <record id="new_hr_timesheet_employee_extd_form" model="ir.ui.view">
             <field name="name">hr.timesheet.employee.extd_form</field>
