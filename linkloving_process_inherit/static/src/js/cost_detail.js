@@ -22,6 +22,38 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             'click .fa-plus-square-o': 'add_action_line_func',
             'click .fa-trash-o': 'remove_action_line_func',
             'click .custom_rate': 'custom_rate_func',
+            'click .delete i':'delete_tr_node',
+            'click .add_tr':'add_tr_func',
+            'change .top_calc_rule input':'change_rule_func',
+            'change .action_select select':'action_select_func',
+            'change .process_select select':'process_select_func'
+        },
+        //工序改变,渲染动作里面的选择项
+        process_select_func:function () {
+              console.log('工序改变')
+        },
+        //动作改变，渲染相应的td标签内的数据
+        action_select_func:function () {
+            console.log('动作改变')
+        },
+        // 计算规则改变
+        change_rule_func:function () {
+            console.log($('.top_calc_rule input[name="calc_rule"]:checked').val());
+            if($('.top_calc_rule input[name="calc_rule"]:checked').val()=='by_material'){
+                $('#action_table .times').prop('disabled',true)
+            }else {
+                $('#action_table .times').prop('disabled',false)
+            }
+        },
+        //添加tr
+        add_tr_func:function () {
+            $('#action_table tbody').append(QWeb.render('add_tr_templ',{}));
+        },
+        //弹出框里的删除tr
+        delete_tr_node:function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            $(target).parents('tr').remove();
 
         },
         custom_rate_func: function () {
@@ -114,7 +146,6 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
 
             });
         },
-
         alia_cancel_func: function () {
             $('.unlock_condition').hide()
         },

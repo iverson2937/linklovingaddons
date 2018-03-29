@@ -423,6 +423,11 @@ class MrpProductionExtend(models.Model):
         res._compute_location_ids()
         return res
 
+    def add_one_sim_stock_move(self, move):
+        if move:
+            res = self.env['sim.stock.move'].create(self._prepare_sim_stock_move_values(move.product_id.id))
+            return res
+
     @api.multi
     def _compute_sim_stock_move_lines(self, new_pr):
         list = []
@@ -1142,6 +1147,7 @@ class ChangeProductionQty(models.TransientModel):
             moves.action_assign()
             for wo in production.workorder_ids:
                 operation = wo.operation_id
+
                 if operation_bom_qty.get(operation.id):
                     cycle_number = math.ceil(
                         operation_bom_qty[operation.id] / operation.workcenter_id.capacity)  # TODO: float_round UP

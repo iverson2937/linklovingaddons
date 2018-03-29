@@ -40,15 +40,15 @@ class PurchaseOrder(models.Model):
 
     state = fields.Selection(selection_add=[('make_by_mrp', u'由MRP生成')])
 
-    @api.one
-    def write(self, vals):
-        res = super(PurchaseOrder, self).write(vals)
-        if 'state' not in vals.keys():
-            is_exception_order = self.partner_id == self.env.ref(
-                'linkloving_mrp_supplier_slover.res_partner_exception_supplier')
-            if is_exception_order:
-                self.check_product_has_supplier()
-        return res
+    # @api.one
+    # def write(self, vals):
+    #     res = super(PurchaseOrder, self).write(vals)
+    #     if 'state' not in vals.keys():
+    #         is_exception_order = self.partner_id == self.env.ref(
+    #             'linkloving_mrp_supplier_slover.res_partner_exception_supplier')
+    #         if is_exception_order:
+    #             self.check_product_has_supplier()
+    #     return res
 
     @api.depends('order_line.date_planned')
     def _compute_date_planned(self):
