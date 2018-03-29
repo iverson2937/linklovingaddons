@@ -395,20 +395,20 @@
             </field>
         </record>
 
-
+        <!--本来是活动客户 tifa要求变为线索客户-->
         <menuitem
                 id="crm_sale_action_partner_menu_form"
-                name="活动客户"
+                name="线索客户"
                 parent="sales_team.menu_sales"
                 sequence="1"
                 action="crm_sale_action_partner_form1"/>
 
-
+        <!--本来是线索客户 tifa要求变为活动客户-->
         <menuitem action="crm_action_lead_form"
                   id="crm_lead_menu_crm_leads"
                   parent="sales_team.menu_sales"
                   groups=""
-                  sequence="1" name="线索客户"/>
+                  sequence="1" name="活动客户"/>
 
 
         <!--<menuitem-->
