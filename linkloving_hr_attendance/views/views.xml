@@ -25,17 +25,9 @@
         <field name="model">hr.attendance</field>
         <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
         <field name="arch" type="xml">
-            <!--<form string="Employee attendances">-->
-                <!--<sheet>-->
-                    <!--<group>-->
-            <!--<field name="employee_id"/>-->
             <xpath expr="//field[@name='check_in']" position="replace">
                 <field name="new_check_in" string="签到"/>
             </xpath>
-            <!--<field name="check_out"/>-->
-                    <!--</group>-->
-                <!--</sheet>-->
-            <!--</form>-->
         </field>
     </record>
 
@@ -49,6 +41,10 @@
             </tree>
         </field>
     </record>
-      <menuitem id="menu_hr_attendance_devices" name="考勤机" parent="hr_attendance.menu_hr_attendance_manage_attendances" sequence="25" action="hr_attendance_devices"/>
 
+
+
+      <menuitem id="menu_hr_attendance_devices" name="考勤机" parent="hr_attendance.menu_hr_attendance_manage_attendances" sequence="25" action="hr_attendance_devices"/>
+      <menuitem id="menu_hr_attendance_report" name="导出考勤" parent="hr_attendance.menu_hr_attendance_manage_attendances"
+                  sequence="30" action="export_hr_attendance"/>
 </odoo>

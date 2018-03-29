@@ -100,6 +100,11 @@ class Linkloving_hr_attendance(models.Model):
      # @api.depends('value')
      # def _value_pc(self):
      #     self.value2 = float(self.value) / 100
+
+     @api.multi
+     def print_report(self):
+         print self
+
 class Linkloving_ble_device(models.Model):
      _name = 'linkloving.ble.device'
 
