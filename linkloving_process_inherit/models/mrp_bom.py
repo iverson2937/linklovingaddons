@@ -295,6 +295,22 @@ class MrpBomLine(models.Model):
             print res, 'res'
         return res
 
+    @api.model
+    def get_process_action_options(self, process_id):
+        options = []
+        domain = []
+        if process_id:
+            domain = ['|', ('process_id', '=', process_id), ('process_id', '=', False)]
+        actions = self.env['mrp.process.action'].search(domain)
+        for action in actions:
+            options.append({
+                'id': action.id,
+                'name': action.name,
+                'cost': action.cost,
+                'remark': action.remark,
+            })
+        return options
+
     def parse_action_line_data(self, no_option=False, no_data=False):
         res = []
         options = []
@@ -304,6 +320,8 @@ class MrpBomLine(models.Model):
             p_data = {
                 'id': p.id,
                 'name': p.name,
+                'remark': p.remark,
+                'cost': p.cost
             }
             process_options.append(p_data)
 
@@ -315,7 +333,9 @@ class MrpBomLine(models.Model):
             for action in actions:
                 options.append({
                     'id': action.id,
-                    'name': action.name
+                    'name': action.name,
+                    'cost': action.cost,
+                    'remark': action.remark,
                 })
 
         for line in self.action_line_ids:

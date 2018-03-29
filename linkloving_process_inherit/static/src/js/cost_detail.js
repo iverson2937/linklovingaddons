@@ -22,36 +22,37 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             'click .fa-plus-square-o': 'add_action_line_func',
             'click .fa-trash-o': 'remove_action_line_func',
             'click .custom_rate': 'custom_rate_func',
-            'click .delete i':'delete_tr_node',
-            'click .add_tr':'add_tr_func',
-            'change .top_calc_rule input':'change_rule_func',
-            'change .action_select select':'action_select_func',
-            'change .process_select select':'process_select_func'
+            'click .delete i': 'delete_tr_node',
+            'click .add_tr': 'add_tr_func',
+            'change .top_calc_rule input': 'change_rule_func',
+            'change .action_select select': 'action_select_func',
+            'change .process_select select': 'process_select_func'
         },
         //工序改变,渲染动作里面的选择项
-        process_select_func:function () {
-              console.log('工序改变')
+        process_select_func: function () {
+            console.log('工序改变')
         },
         //动作改变，渲染相应的td标签内的数据
-        action_select_func:function () {
+        action_select_func: function () {
             console.log('动作改变')
         },
         // 计算规则改变
-        change_rule_func:function () {
+        change_rule_func: function () {
             console.log($('.top_calc_rule input[name="calc_rule"]:checked').val());
-            if($('.top_calc_rule input[name="calc_rule"]:checked').val()=='by_material'){
-                $('#action_table .times').prop('disabled',true)
-            }else {
-                $('#action_table .times').prop('disabled',false)
+            if ($('.top_calc_rule input[name="calc_rule"]:checked').val() == 'by_material') {
+                $('#action_table .times').prop('disabled', true).val('0')
+            } else {
+                $('#action_table .times').prop('disabled', false).val('1')
             }
         },
         //添加tr
-        add_tr_func:function () {
-          console.log(this);
-            $('#action_table tbody').append(QWeb.render('add_tr_templ',this.tr_datas));
+        add_tr_func: function () {
+            var self = this;
+            var results = self.tr_datas;
+            $('#action_table tbody').append(QWeb.render('add_tr_templ', {'result': self.tr_datas.results}));
         },
         //弹出框里的删除tr
-        delete_tr_node:function (e) {
+        delete_tr_node: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
             $(target).parents('tr').remove();
@@ -64,7 +65,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var table = $(target).parents('table');
             var rates = table.find('.rate_2');
             _.each(rates, function (result) {
-                $(result).removeAttr("readonly").val(1);
+                $(result).removeAttr("readonly").val('1');
 
             });
 
@@ -229,7 +230,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                     // }
                     $('.unlock_condition').attr('data-id', self.table_data[index].id).show();
                     $('#action_table').html('');
-                    console.log(datas);
+                    self.tr_datas.results = results;
 
                     $('#action_table').append(QWeb.render('process_action_table', {
                         result: results
@@ -252,7 +253,8 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             if (action && action.params) {
                 this.product_id = action.params["active_id"];
             }
-            this.edit_arr = []
+            this.edit_arr = [];
+            this.tr_datas = {};
         },
 
         start: function () {
@@ -311,7 +313,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                         }
 
                     ]
-                ;
+                    ;
                 self.columns = columns;
                 self.initTableSubCompany(columns, records)
 
