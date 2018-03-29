@@ -46,7 +46,8 @@ class HrExpenseSheetWizard(models.TransientModel):
         employee_payment = self.env['account.payment']
 
         payment_ids = employee_payment.search([
-            ('partner_type', '=', 'customer'),
+            ('payment_type', '=', 'inbound'),
+            ('state', '!=', 'draft'),
             ('payment_date', '>=', date1), ('payment_date', '<=', date2)], order='name desc')
 
         sheet_sequence = 1
@@ -56,10 +57,12 @@ class HrExpenseSheetWizard(models.TransientModel):
                 'sequence': sheet_sequence,
                 'name': payment.name,
                 'payment_date': payment.payment_date,
+                'journal_id': payment.journal_id.name,
                 'partner_id': payment.partner_id.name,
                 'team_id': payment.partner_id.team_id.name if payment.partner_id.team_id.name else u'未设置团队',
                 'sale_man': payment.partner_id.user_id.name if payment.partner_id.user_id else u'为设置业务员',
                 'amount': payment.amount,
+                'remark': payment.remark
                 # 'create_uid': payment.create_uid.name,
             }
             # for line in payment.payment_line_ids:

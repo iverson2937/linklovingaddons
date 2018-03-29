@@ -353,7 +353,7 @@ class SaleAccountPaymentReport(http.Controller):
             )
 
             header_list = [
-                u'到款日期', u'单号', u'销售团队', u'客户', u'金额', u'业务员'
+                u'到款日期', u'单号', u'收入账户', u'销售团队', u'客户', u'金额', u'业务员', u'备注'
             ]
 
             [data_sheet.write(0, row, line, style) for row, line in enumerate(header_list)]
@@ -365,10 +365,12 @@ class SaleAccountPaymentReport(http.Controller):
                 data_sheet.write(current_row, 0, vals.get('payment_date') and vals.get('payment_date') or '',
                                  style)
                 data_sheet.write(current_row, 1, vals.get('name') and vals.get('name') or '', style)
-                data_sheet.write(current_row, 2, vals.get('team_id') and vals.get('team_id') or '', style)
-                data_sheet.write(current_row, 3, vals.get('partner_id') and vals.get('partner_id') or '', style)
-                data_sheet.write(current_row, 4, vals.get('amount') and vals.get('amount') or '', style)
-                data_sheet.write(current_row, 5, vals.get('sale_man') and vals.get('sale_man') or '', style)
+                data_sheet.write(current_row, 2, vals.get('journal_id') and vals.get('journal_id') or '', style)
+                data_sheet.write(current_row, 3, vals.get('team_id') and vals.get('team_id') or '', style)
+                data_sheet.write(current_row, 4, vals.get('partner_id') and vals.get('partner_id') or '', style)
+                data_sheet.write(current_row, 5, vals.get('amount') and vals.get('amount') or '', style)
+                data_sheet.write(current_row, 6, vals.get('sale_man') and vals.get('sale_man') or '', style)
+                data_sheet.write(current_row, 7, vals.get('remark') and vals.get('remark') or '', style)
                 # data_sheet.write(current_row, 8,
                 #                  vals.get('pre_payment_reminding') and vals.get('pre_payment_reminding') or '0.00',
                 #                  style)
