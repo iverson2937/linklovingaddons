@@ -272,6 +272,10 @@
                     <filter name="filter_is_virtual_lt_reordering" string="预测 &lt;最小存货"
                             domain="[('is_virtual_lt_reordering', '=', True)]"/>
                     <separator/>
+                    <filter name="filter_is_virtual_lt_reordering_max" string="预测 &lt;最大存货"
+                            domain="[('is_virtual_lt_reordering_max', '=', True)]"/>
+                    <separator/>
+
                     <filter name="filter_is_available_lt_required" string="库存 &lt;订单量"
                             domain="[('is_available_lt_required', '=', True)]"/>
                     <separator/>
