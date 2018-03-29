@@ -47,7 +47,8 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
         },
         //添加tr
         add_tr_func:function () {
-            $('#action_table tbody').append(QWeb.render('add_tr_templ',{}));
+          console.log(this);
+            $('#action_table tbody').append(QWeb.render('add_tr_templ',this.tr_datas));
         },
         //弹出框里的删除tr
         delete_tr_node:function (e) {
@@ -61,9 +62,9 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var target = e.target || e.srcElement;
             var self = this;
             var table = $(target).parents('table');
-            var rates = table.find('.rate_2')
+            var rates = table.find('.rate_2');
             _.each(rates, function (result) {
-                $(result).removeAttr("readonly");
+                $(result).removeAttr("readonly").val(1);
 
             });
 
@@ -211,26 +212,27 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             if (!self.table_data.bom_id) {
                 new Model('mrp.bom.line').call('parse_action_line_data', [self.table_data[index].id]).then(function (results) {
                     var datas = [];
-                    if (results && results.length > 0) {
-                        for (var i = 0; i < results.length; i++) {
-
-                            var res = {
-                                'line_id': results[i].line_id,
-                                'action_id': results[i].action_id,
-                                'rate': results[i].rate,
-                                'options': results[i].options,
-                                'remark': results[i].remark,
-                                'cost': results[i].cost,
-                                'rate_2': results[i].rate_2
-                            };
-                            datas.push(res)
-                        }
-                    }
+                    // if (results && results.length > 0) {
+                    //     for (var i = 0; i < results.length; i++) {
+                    //
+                    //         var res = {
+                    //             'line_id': results[i].line_id,
+                    //             'action_id': results[i].action_id,
+                    //             'rate': results[i].rate,
+                    //             'options': results[i].options,
+                    //             'remark': results[i].remark,
+                    //             'cost': results[i].cost,
+                    //             'rate_2': results[i].rate_2
+                    //         };
+                    //         datas.push(res)
+                    //     }
+                    // }
                     $('.unlock_condition').attr('data-id', self.table_data[index].id).show();
                     $('#action_table').html('');
                     console.log(datas);
+
                     $('#action_table').append(QWeb.render('process_action_table', {
-                        result: datas
+                        result: results
                     }))
 
 

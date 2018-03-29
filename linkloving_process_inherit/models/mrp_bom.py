@@ -298,6 +298,14 @@ class MrpBomLine(models.Model):
     def parse_action_line_data(self, no_option=False, no_data=False):
         res = []
         options = []
+        process_options = []
+        process = self.env['mrp.process'].search([])
+        for p in process:
+            p_data = {
+                'id': p.id,
+                'name': p.name,
+            }
+            process_options.append(p_data)
 
         if not no_option:
             domain = []
@@ -319,7 +327,9 @@ class MrpBomLine(models.Model):
                 'remark': line.action_id.remark,
                 'rate': line.rate,
                 'rate_2': line.rate_2,
-                'options': options
+                'options': options,
+                'process_id': self.bom_id.process_id.id,
+                'process_options': process_options
             }
             res.append(data)
 
@@ -328,7 +338,9 @@ class MrpBomLine(models.Model):
                 'line_id': '',
                 'rate': 1,
                 'rate_2': 0,
-                'options': options
+                'options': options,
+                'process_options': process_options,
+                'process_id': self.bom_id.process_id.id,
             })
 
         return res
