@@ -129,16 +129,17 @@ class StockPackOpertionExtend(models.Model):
 
     @api.model
     def create(self, vals):
-        if vals.get("qty_done") and vals.get("qty_done") == 0:
-            logging.warning("stock.pack.operation create qtydone = 0")
+        if vals.get("qty_done") and vals.get("qty_done") == 480.0:
+            import traceback
+            logging.warning("stock.pack.operation create qtydone = 0 %s" % traceback.format_exc())
         return super(StockPackOpertionExtend, self).create(vals)
 
-    @api.multi
-    def write(self, values):
-        # TDE FIXME: weird stuff, protectin pack op ?
-        if values.get("qty_done") and values.get("qty_done") == 0:
-            logging.warning("stock.pack.operation write qtydone = 0")
-        return super(StockPackOpertionExtend, self).write(values)
+        # @api.multi
+        # def write(self, values):
+        #     # TDE FIXME: weird stuff, protectin pack op ?
+        #     import traceback
+        #     logging.warning("stock.pack.operation create qtydone = 0 %s" % traceback.format_exc())
+        #     return super(StockPackOpertionExtend, self).write(values)
 
 
 class MrpQcFeedbackExtend(models.Model):
