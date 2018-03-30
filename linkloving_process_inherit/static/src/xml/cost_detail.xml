@@ -46,8 +46,9 @@
                      <th>备注</th>
                      <th style="width:30px"></th>
                  </tr>
+
                 <t t-call="add_tr_templ">
-                    <!--<t t-set="result" t-value="result"></t>-->
+                    <t t-set="result" t-value="result"></t>
                 </t>
             </tbody>
         </table>
@@ -56,33 +57,37 @@
 
 
     <t t-name="add_tr_templ">
-        <!--<t t-foreach="" t-as="">-->
+        <t t-foreach="result" t-as="data">
             <tr>
                 <td class="process_select">
                     <select>
-                        <option>丝印</option>
-                        <option>排产</option>
-                        <option>裱纸</option>
+                       <t t-foreach="data.process_options" t-as="option">
+                          <option t-att-data-id="option.id" t-att-selected="id == data.process_id ? 'selected' : null">
+                              <t t-esc="option.name"/>
+                          </option>
+                        </t>
                     </select>
                 </td>
                 <td class="action_select">
                     <select>
-                        <option>动作1</option>
-                        <option>动作2</option>
-                        <option>动作3</option>
+                           <t t-foreach="data.options" t-as="options">
+                          <option t-att-data-id="options.id">
+                              <t t-esc="options.name"/>
+                          </option>
+                        </t>
                     </select>
                 </td>
                 <td>
-                    <input type="text" class="times" disabled="disabled"/>
+                    <input type="text" class="times" disabled="disabled" name="rate2"/>
                 </td>
                 <td>
-                    <input type="text" />
+                    <input type="text" name="rate" t-att-value="data.rate" />
                 </td>
-                <td>0.31</td>
-                <td>这是备注这是备注这是备注</td>
+                <td><t t-esc="data.cost"/></td>
+                <td> <t t-esc="data.remark"/></td>
                 <td class="delete"><i class="fa fa-trash"/></td>
             </tr>
-        <!--</t>-->
+        </t>
     </t>
 
 
