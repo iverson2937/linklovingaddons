@@ -52,16 +52,21 @@ class ReportHrAttendanceSheet(http.Controller):
             rows_arr = []
             rows_arr.append(" ")
             for record in data.itervalues():
-
                 for index_now in range(0, ((date2 - date1).days + 2)):
                     rows_arr.append(" ")
                 vals = record.get('data')
-                print vals.get('time_arr')
+                # print vals.get('time_arr')
                 for time in vals.get('time_arr'):
                     time_date = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
                     inside = 0
                     for time_header_detail in header_list:
-                        if time_header_detail == str((time_date + timedelta(hours=8)).day) :
+                        time_string = ""
+                        if (time_date + timedelta(hours=8)).day > 9:
+                            time_string = str((time_date + timedelta(hours=8)).day)
+                        else:
+                            time_string = "0" + str((time_date + timedelta(hours=8)).day)
+                        if time_header_detail == time_string:
+                            print time_header_detail
                             rows_arr[inside] = rows_arr[inside] + "\r\n" + (time_date + timedelta(hours=8)).strftime('%H:%M:%S')
                         inside = inside + 1
 
@@ -77,7 +82,7 @@ class ReportHrAttendanceSheet(http.Controller):
                     continue
                 i = 0
 
-            for x, i in enumerate([2, 2, 2, 2, 3, 3, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]):
+            for x, i in enumerate([2, 2, 2, 2, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,2, 2, 2]):
                 data_sheet.col(x).width = 2560 * i
 
             for x in range(0, row):
