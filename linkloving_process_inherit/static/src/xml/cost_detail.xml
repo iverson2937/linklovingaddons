@@ -78,7 +78,7 @@
                     </select>
                 </td>
                 <td>
-                    <input type="text" class="times" disabled="disabled" name="rate2" value="0"/>
+                    <input type="text" class="times" disabled="disabled" name="rate_2" value="0"/>
                 </td>
                 <td>
                     <input type="text" name="rate" t-att-value="data.rate" />
