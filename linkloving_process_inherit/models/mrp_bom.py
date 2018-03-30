@@ -295,9 +295,33 @@ class MrpBomLine(models.Model):
             print res, 'res'
         return res
 
+    @api.model
+    def get_process_action_options(self, process_id):
+        options = []
+        domain = []
+        if process_id:
+            domain = ['|', ('process_id', '=', process_id), ('process_id', '=', False)]
+        actions = self.env['mrp.process.action'].search(domain)
+        for action in actions:
+            options.append({
+                'id': action.id,
+                'name': action.name,
+                'cost': action.cost,
+                'remark': action.remark,
+            })
+        return options
+
     def parse_action_line_data(self, no_option=False, no_data=False):
         res = []
         options = []
+        process_options = []
+        process = self.env['mrp.process'].search([])
+        for p in process:
+            p_data = {
+                'id': p.id,
+                'name': p.name,
+            }
+            process_options.append(p_data)
 
         if not no_option:
             domain = []
@@ -307,7 +331,9 @@ class MrpBomLine(models.Model):
             for action in actions:
                 options.append({
                     'id': action.id,
-                    'name': action.name
+                    'name': action.name,
+                    'cost': action.cost,
+                    'remark': action.remark,
                 })
 
         for line in self.action_line_ids:
@@ -319,7 +345,9 @@ class MrpBomLine(models.Model):
                 'remark': line.action_id.remark,
                 'rate': line.rate,
                 'rate_2': line.rate_2,
-                'options': options
+                'options': options,
+                'process_id': self.bom_id.process_id.id,
+                'process_options': process_options
             }
             res.append(data)
 
@@ -328,7 +356,9 @@ class MrpBomLine(models.Model):
                 'line_id': '',
                 'rate': 1,
                 'rate_2': 0,
-                'options': options
+                'options': options,
+                'process_options': process_options,
+                'process_id': self.bom_id.process_id.id,
             })
 
         return res

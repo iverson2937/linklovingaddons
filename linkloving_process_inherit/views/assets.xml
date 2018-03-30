@@ -6,7 +6,7 @@
             <xpath expr="." position="inside">
                 <script type="text/javascript" src="/linkloving_process_inherit/static/src/js/cost_detail.js"/>
 
-                <!--<link rel="stylesheet" href="/linkloving_account_budget/static/src/css/budget.css"/>-->
+                <link rel="stylesheet" href="/linkloving_process_inherit/static/src/css/budget.css"/>
             </xpath>
         </template>
     </data>

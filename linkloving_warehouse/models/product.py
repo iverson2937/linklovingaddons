@@ -321,6 +321,25 @@ class ProductTemplate(models.Model):
             else:
                 product.is_virtual_lt_reordering = False
 
+    @api.depends('stock_move_ids', 'stock_move_ids.state', 'product_variant_ids.orderpoint_ids.product_max_qty')
+    def _compute_is_virtual_lt_reordering_max(self):
+        res = self._compute_quantities_dict()
+        ress = {k: {'nbr_reordering_rules': 0, 'reordering_min_qty': 0, 'reordering_max_qty': 0} for k in self.ids}
+        product_data = self.env['stock.warehouse.orderpoint'].read_group(
+                [('product_id.product_tmpl_id', 'in', self.ids)], ['product_id', 'product_min_qty', 'product_max_qty'],
+                ['product_id'])
+        for data in product_data:
+            product = self.env['product.product'].browse([data['product_id'][0]])
+            product_tmpl_id = product.product_tmpl_id.id
+            ress[product_tmpl_id]['reordering_max_qty'] = data['product_max_qty']
+
+        for product in self:
+            product_data = res[product.id]
+            if product_data["virtual_available"] < ress[product.id]['reordering_max_qty']:  # 库存小于最小存货规则
+                product.is_virtual_lt_reordering_max = True
+            else:
+                product.is_virtual_lt_reordering_max = False
+
     @api.multi
     @api.depends("all_mo_ids", "all_mo_ids.state")
     def _compute_has_confirmed_mo(self):
@@ -344,6 +363,7 @@ class ProductTemplate(models.Model):
     stock_move_ids = fields.One2many(comodel_name="stock.move", inverse_name="product_tmpl_id")
     is_virtual_lt_reordering = fields.Boolean(compute="_compute_is_virtual_lt_reordering", store=True)
     is_available_lt_required = fields.Boolean(compute='_compute_is_available_lt_required', store=True)
+    is_virtual_lt_reordering_max = fields.Boolean(compute='_compute_is_virtual_lt_reordering_max', store=True)
     all_mo_ids = fields.One2many('mrp.production', 'product_tmpl_id')
     has_mo_in_plan = fields.Boolean(compute='_compute_has_mo_in_plan', store=True)
     has_mo_unplan = fields.Boolean(compute='_compute_has_mo_unplan', store=True)
