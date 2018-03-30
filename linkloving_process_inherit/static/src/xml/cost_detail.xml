@@ -138,7 +138,7 @@
         <t t-foreach="result" t-as="item">
             <t t-if="item.action_name">
         <div>
-            <span><t t-esc="item.action_name"/></span><span class="pull-right"><t t-esc="item.rate"/></span>
+            <span><t t-esc="item.action_name"/><t t-esc="item.action_name"/></span><span class="pull-right"><t t-esc="item.rate_2"/>X<t t-esc="item.rate"/></span>
         </div>
                 </t>
         </t>
