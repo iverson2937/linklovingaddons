@@ -449,12 +449,13 @@ class MrpBomLine(models.Model):
             product_id = bom_line_id.product_id.id
             temp_id = tmp_obj.search(
                 [('category_id', '=', category_id), ('product_id', '=', product_id)])
-            if temp_id and action_data and action_data[0].get('action_id'):
-                temp_id.action_data = json.dumps(action_data)
-            elif product_id and bom_line_id.bom_id.product_tmpl_id.categ_id:
-                tmp_obj.create({'category_id': bom_line_id.bom_id.product_tmpl_id.categ_id.id,
-                                'product_id': product_id,
-                                'action_data': json.dumps(action_data)
-                                })
+            if action_data:
+                if temp_id and action_data and action_data[0].get('action_id'):
+                    temp_id.action_data = json.dumps(action_data)
+                elif product_id and bom_line_id.bom_id.product_tmpl_id.categ_id:
+                    tmp_obj.create({'category_id': bom_line_id.bom_id.product_tmpl_id.categ_id.id,
+                                    'product_id': product_id,
+                                    'action_data': json.dumps(action_data)
+                                    })
 
         return self.env['mrp.bom'].browse(int(bom_id)).get_bom_cost_new()
