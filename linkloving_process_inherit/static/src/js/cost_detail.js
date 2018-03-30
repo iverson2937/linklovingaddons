@@ -183,7 +183,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             }
 
             for (var i = 0; i < trs.length; i++) {
-                var action_id = $(trs[i]).find('select option:selected').attr('data-id');
+                var action_id = $(trs[i]).find('.action_select option:selected').attr('data-id');
                 if (action_id) {
                     var rate2 = $(trs[i]).find("input[name='rate_2']").val();
                     if (!isInteger(rate2)) {
