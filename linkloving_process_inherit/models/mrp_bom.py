@@ -335,14 +335,14 @@ class MrpBomLine(models.Model):
                 'remark': action.remark,
             })
 
-            res.append({
-                'line_id': '',
-                'rate': 1,
-                'rate_2': 0,
-                'options': options,
-                'process_options': process_options,
-                'process_id': self.bom_id.process_id.id,
-            })
+        res.append({
+            'line_id': '',
+            'rate': 1,
+            'rate_2': 0,
+            'options': options,
+            'process_options': process_options,
+            'process_id': self.bom_id.process_id.id,
+        })
 
         return res
 
