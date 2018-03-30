@@ -165,9 +165,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 var action_id = $(trs[i]).find('select option:selected').attr('data-id');
                 if (action_id) {
                     var rate2 = $(trs[i]).find("input[name='rate_2']").val();
-                    if (!isInteger(rate2)) {
-                        alert('自定义比例必须为整数')
-                    }
+
                     var res = {
                         'id': $(trs[i]).find('select').data('id'),
                         'action_id': action_id,
