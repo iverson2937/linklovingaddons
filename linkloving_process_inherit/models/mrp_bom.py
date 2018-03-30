@@ -337,6 +337,15 @@ class MrpBomLine(models.Model):
                 })
 
         for line in self.action_line_ids:
+            domain = ['|', ('process_id', '=', line.action_id.process_id.id), ('process_id', '=', False)]
+            actions = self.env['mrp.process.action'].search(domain)
+            for action in actions:
+                options.append({
+                    'id': action.id,
+                    'name': action.name,
+                    'cost': action.cost,
+                    'remark': action.remark,
+                })
             data = {
                 'line_id': line.id,
                 'action_id': line.action_id.id,
