@@ -368,7 +368,6 @@ class MrpBomLine(models.Model):
                     'name': action.name,
                     'cost': action.cost,
                     'remark': action.remark,
-                    'process_id': action.process_id.id,
                 })
 
         for line in self.action_line_ids:
@@ -381,7 +380,7 @@ class MrpBomLine(models.Model):
                 'rate': line.rate,
                 'rate_2': line.rate_2,
                 'options': options,
-                'process_id': self.bom_id.process_id.id,
+                'process_id': line.action_id.process_id.id,
                 'process_options': process_options
             }
             res.append(data)
@@ -424,10 +423,7 @@ class MrpBomLine(models.Model):
             for action in actions:
                 rate = action.get('rate')
                 rate_2 = action.get('rate_2')
-                if rate == '1/2':
-                    rate = 0.5
-                if rate == '1/3':
-                    rate = 0.333
+
                 if action.get('id') and action.get('action_id'):
                     line = self.env['process.action.line'].browse(action.get('id')).write({
                         'action_id': action.get('action_id'),
