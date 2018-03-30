@@ -346,7 +346,7 @@ class MrpBomLine(models.Model):
                 'rate': line.rate,
                 'rate_2': line.rate_2,
                 'options': options,
-                'process_id': self.bom_id.process_id.id,
+                'process_id': line.action_id.process_id.id,
                 'process_options': process_options
             }
             res.append(data)
