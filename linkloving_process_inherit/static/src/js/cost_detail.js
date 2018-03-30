@@ -43,8 +43,8 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                     self.$tr.find('.cost').html(result[0].cost);
                     self.$tr.find('.remark').html(result[0].remark);
                 }
-                $('.action_select select').html('');
-                $('.action_select select').append(QWeb.render('action_select_option_templ', {result: result}))
+                self.$tr.find('.action_select select').html('');
+                self.$tr.find('.action_select select').append(QWeb.render('action_select_option_templ', {result: result}))
             })
         },
         //动作改变，渲染相应的td标签内的数据
@@ -54,7 +54,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var self = this;
             self.$tr = $(target).parents('tr');
             var self = this;
-            var index = $('.action_select option:selected').attr('data-index');
+            var index = self.$tr.find('.action_select option:selected').attr('data-index');
             self.$tr.find('.cost').html(self.actions[index].cost);
             self.$tr.find('.remark').html(self.actions[index].remark);
         },

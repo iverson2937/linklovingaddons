@@ -70,10 +70,12 @@
                 </td>
                 <td class="action_select">
                     <select t-att-data-id="data.line_id">
+                        <t t-set="index" t-value="0"></t>
                            <t t-foreach="data.options" t-as="options">
-                          <option t-att-data-id="options.id">
+                          <option t-att-data-id="options.id" t-att-data-index="index">
                               <t t-esc="options.name"/>
                           </option>
+                               <t t-set="index" t-value="index+1"></t>
                         </t>
                     </select>
                 </td>
