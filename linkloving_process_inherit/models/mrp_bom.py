@@ -292,6 +292,7 @@ class MrpBomLine(models.Model):
         res = []
         if temp_id:
             res = json.loads(temp_id.action_data)
+            print res, 'res'
         return res
 
     @api.model
@@ -310,41 +311,6 @@ class MrpBomLine(models.Model):
             })
         return options
 
-    def add_action_line_data(self):
-        res = []
-        options = []
-        process_options = []
-        process = self.env['mrp.process'].search([])
-        for p in process:
-            p_data = {
-                'id': p.id,
-                'name': p.name,
-            }
-            process_options.append(p_data)
-
-        domain = []
-        if self.bom_id.process_id:
-            domain = ['|', ('process_id', '=', self.bom_id.process_id.id), ('process_id', '=', False)]
-        actions = self.env['mrp.process.action'].search(domain)
-        for action in actions:
-            options.append({
-                'id': action.id,
-                'name': action.name,
-                'cost': action.cost,
-                'remark': action.remark,
-            })
-
-        res.append({
-            'line_id': '',
-            'rate': 1,
-            'rate_2': 0,
-            'options': options,
-            'process_options': process_options,
-            'process_id': self.bom_id.process_id.id,
-        })
-
-        return res
-
     def parse_action_line_data(self, no_option=False, no_data=False):
         res = []
         options = []
@@ -354,6 +320,8 @@ class MrpBomLine(models.Model):
             p_data = {
                 'id': p.id,
                 'name': p.name,
+                'remark': p.remark,
+                'cost': p.cost
             }
             process_options.append(p_data)
 
@@ -380,7 +348,7 @@ class MrpBomLine(models.Model):
                 'rate': line.rate,
                 'rate_2': line.rate_2,
                 'options': options,
-                'process_id': line.action_id.process_id.id,
+                'process_id': self.bom_id.process_id.id,
                 'process_options': process_options
             }
             res.append(data)
@@ -416,14 +384,17 @@ class MrpBomLine(models.Model):
         bom_id = kwargs.get('bom_id')
         for arg in args:
             if arg.get('action_line_id'):
-                self.env['process.action.line'].browse(int(arg.get('action_line_id'))).unlink()
+                self.env['process.action.line'].browse(arg.get('action_line_id')).unlink()
             bom_line_id = self.env['mrp.bom.line'].browse(arg.get('id'))
             actions = arg.get('actions', [])
 
             for action in actions:
                 rate = action.get('rate')
                 rate_2 = action.get('rate_2')
-
+                if rate == '1/2':
+                    rate = 0.5
+                if rate == '1/3':
+                    rate = 0.333
                 if action.get('id') and action.get('action_id'):
                     line = self.env['process.action.line'].browse(action.get('id')).write({
                         'action_id': action.get('action_id'),
@@ -445,13 +416,12 @@ class MrpBomLine(models.Model):
             product_id = bom_line_id.product_id.id
             temp_id = tmp_obj.search(
                 [('category_id', '=', category_id), ('product_id', '=', product_id)])
-            if action_data:
-                if temp_id and action_data and action_data[0].get('action_id'):
-                    temp_id.action_data = json.dumps(action_data)
-                elif product_id and bom_line_id.bom_id.product_tmpl_id.categ_id:
-                    tmp_obj.create({'category_id': bom_line_id.bom_id.product_tmpl_id.categ_id.id,
-                                    'product_id': product_id,
-                                    'action_data': json.dumps(action_data)
-                                    })
+            if temp_id and action_data and action_data[0].get('action_id'):
+                temp_id.action_data = json.dumps(action_data)
+            elif product_id and bom_line_id.bom_id.product_tmpl_id.categ_id:
+                tmp_obj.create({'category_id': bom_line_id.bom_id.product_tmpl_id.categ_id.id,
+                                'product_id': product_id,
+                                'action_data': json.dumps(action_data)
+                                })
 
         return self.env['mrp.bom'].browse(int(bom_id)).get_bom_cost_new()
