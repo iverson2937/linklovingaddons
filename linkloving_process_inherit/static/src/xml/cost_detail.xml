@@ -69,7 +69,7 @@
                     </select>
                 </td>
                 <td class="action_select">
-                    <select>
+                    <select t-att-data-id="data.line_id">
                            <t t-foreach="data.options" t-as="options">
                           <option t-att-data-id="options.id">
                               <t t-esc="options.name"/>
