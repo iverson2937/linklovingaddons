@@ -292,7 +292,6 @@ class MrpBomLine(models.Model):
         res = []
         if temp_id:
             res = json.loads(temp_id.action_data)
-            print res, 'res'
         return res
 
     @api.model

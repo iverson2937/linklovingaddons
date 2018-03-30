@@ -4,7 +4,7 @@
     <t t-name="CostDetail">
         <div class="sub_company_top">
             <div class="toolbar">
-                <button  class="btn btn-default get_default">获取默认</button>
+                <!--<button  class="btn btn-default get_default">获取默认</button>-->
                 <button  class="btn btn-primary save_process_sel hidden">保存</button>
                 <table id="table">
                 </table>
