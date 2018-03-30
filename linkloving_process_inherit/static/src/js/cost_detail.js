@@ -51,7 +51,8 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
         action_select_func: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
-            console.log($(target).parents('tr'))
+            var self = this;
+            self.$tr = $(target).parents('tr');
             var self = this;
             var index = $('.action_select option:selected').attr('data-index');
             self.$tr.find('.cost').html(self.actions[index].cost);

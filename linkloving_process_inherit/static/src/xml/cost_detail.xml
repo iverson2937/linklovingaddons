@@ -39,10 +39,10 @@
             <tbody>
                 <tr>
                      <th style="width:85px">工序</th>
-                     <th style="width:110px">动作</th>
+                     <th style="width:160px">动作</th>
                      <th style="width:56px">次数</th>
-                     <th style="width:56px">参数</th>
-                     <th style="width:56px">单价</th>
+                     <th style="width:100px">参数</th>
+                     <th style="width:100px">单价</th>
                      <th>备注</th>
                      <th style="width:30px"></th>
                  </tr>
