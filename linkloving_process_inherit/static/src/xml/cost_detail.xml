@@ -78,15 +78,23 @@
                     </select>
                 </td>
                 <td>
-                    <input type="text" class="times" disabled="disabled" name="rate2"/>
+                    <input type="text" class="times" disabled="disabled" name="rate2" value="0"/>
                 </td>
                 <td>
                     <input type="text" name="rate" t-att-value="data.rate" />
                 </td>
-                <td><t t-esc="data.cost"/></td>
-                <td> <t t-esc="data.remark"/></td>
+                <td class="cost"><t t-esc="data.cost"/></td>
+                <td class="remark"> <t t-esc="data.remark"/></td>
                 <td class="delete"><i class="fa fa-trash"/></td>
             </tr>
+        </t>
+    </t>
+
+    <t t-name="action_select_option_templ">
+        <t t-set="index" t-value="0"></t>
+        <t t-foreach="result" t-as="item">
+            <option t-att-data-id="item.id" t-att-data-index="index"><t t-esc="item.name"/></option>
+            <t t-set="index" t-value="index+1"></t>
         </t>
     </t>
 

@@ -29,12 +29,33 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             'change .process_select select': 'process_select_func'
         },
         //工序改变,渲染动作里面的选择项
-        process_select_func: function () {
-            console.log('工序改变')
+        process_select_func: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var self =this;
+            self.$tr = $(target).parents('tr');
+
+            var process_id = $('.process_select option:selected').attr('data-id');
+            new Model('mrp.bom.line').call('get_process_action_options', [parseInt(process_id)]).then(function (result) {
+                console.log(result);
+                self.actions = result;
+                if(result.length>0){
+                    self.$tr.find('.cost').html(result[0].cost);
+                    self.$tr.find('.remark').html(result[0].remark);
+                }
+                $('.action_select select').html('');
+                $('.action_select select').append(QWeb.render('action_select_option_templ',{result:result}))
+            })
         },
         //动作改变，渲染相应的td标签内的数据
-        action_select_func: function () {
-            console.log('动作改变')
+        action_select_func: function (e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            console.log($(target).parents('tr'))
+            var self = this;
+            var index = $('.action_select option:selected').attr('data-index');
+            self.$tr.find('.cost').html(self.actions[index].cost);
+            self.$tr.find('.remark').html(self.actions[index].remark);
         },
         // 计算规则改变
         change_rule_func: function () {
@@ -162,7 +183,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             }
 
             for (var i = 0; i < trs.length; i++) {
-                var action_id = $(trs[i]).find('select option:selected').attr('data-id');
+                var action_id = $(trs[i]).find('.action_select option:selected').attr('data-id');
                 if (action_id) {
                     var rate2 = $(trs[i]).find("input[name='rate_2']").val();
 
