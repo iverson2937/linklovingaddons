@@ -131,7 +131,8 @@ class StockPackOpertionExtend(models.Model):
     def create(self, vals):
         if vals.get("qty_done") and vals.get("qty_done") == 480.0:
             import traceback
-            logging.warning("stock.pack.operation create qtydone = 0 %s" % traceback.format_exc())
+            traceback.print_exc()
+            logging.warning("stock.pack.operation create qtydone = 0")
         return super(StockPackOpertionExtend, self).create(vals)
 
         # @api.multi
