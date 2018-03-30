@@ -320,8 +320,6 @@ class MrpBomLine(models.Model):
             p_data = {
                 'id': p.id,
                 'name': p.name,
-                'remark': p.remark,
-                'cost': p.cost
             }
             process_options.append(p_data)
 
