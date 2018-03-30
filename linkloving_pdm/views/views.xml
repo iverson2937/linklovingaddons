@@ -358,7 +358,7 @@
                                         </form>
                                         <tree string="Sales Order Lines" editable="bottom">
                                             <field name="sequence" widget="handle"/>
-                                            <field name="tag_approval_process_partner" domain="[('employee', '=', True)]" string="审核人" readonly="0"/>
+                                            <field name="tag_approval_process_partner" options="{'no_create':True}" domain="[('employee', '=', True)]" string="审核人" readonly="0"/>
                                         </tree>
                                         <kanban class="o_kanban_mobile">
                                             <!--<field name="sequence" widget="handle"/>-->
