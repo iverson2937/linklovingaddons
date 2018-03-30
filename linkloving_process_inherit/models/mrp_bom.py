@@ -341,6 +341,7 @@ class MrpBomLine(models.Model):
             'rate_2': 0,
             'options': options,
             'process_options': process_options,
+            'process_id': self.bom_id.process_id.id,
 
         })
 
