@@ -332,6 +332,7 @@ class MrpBomLine(models.Model):
                 'name': action.name,
                 'cost': action.cost,
                 'remark': action.remark,
+                'process_id': action.process_id.id,
             })
 
         res.append({
@@ -340,7 +341,7 @@ class MrpBomLine(models.Model):
             'rate_2': 0,
             'options': options,
             'process_options': process_options,
-            'process_id': self.bom_id.process_id.id,
+
         })
 
         return res

@@ -63,7 +63,7 @@
                     <select>
                         <t t-set="index" t-value="0"></t>
                        <t t-foreach="data.process_options" t-as="option">
-                          <option t-att-data-index="index" t-att-data-id="option.id" t-att-selected="id == data.process_id ? 'selected' : null">
+                          <option t-att-data-index="index" t-att-data-id="option.id" t-att-selected="id == option.process_id ? 'selected' : null">
                               <t t-esc="option.name"/>
                           </option>
                            <t t-set="index" t-value="index+1"></t>
