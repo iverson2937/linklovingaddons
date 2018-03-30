@@ -74,7 +74,7 @@
                     <select t-att-data-id="data.line_id">
                         <t t-set="index" t-value="0"></t>
                            <t t-foreach="data.options" t-as="options">
-                          <option t-att-data-id="options.id" t-att-data-index="index">
+                          <option t-att-data-id="options.id" t-att-data-index="index" t-att-selected="id == data.action_id ? 'selected' : null">
                               <p style="width:150px"><t t-esc="options.name"/></p>
                           </option>
                                <t t-set="index" t-value="index+1"></t>
