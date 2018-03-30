@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-      <record model="ir.actions.act_window" id="hr_attendance_devices">
+    <record id='export_hr_attendance' model='ir.actions.act_window'>
+            <field name='name'>考勤</field>
+            <field name='res_model'>ll.hr.attendance.wizard</field>
+            <field name='view_type'>form</field>
+            <field name='view_mode'>form</field>
+            <!--<field name="context">{'expense':True}</field>-->
+            <field name="view_id" ref="hr_attendance_form"/>
+            <field name='target'>new</field>
+    </record>
+    <record model="ir.actions.act_window" id="hr_attendance_devices">
             <field name="name">考勤机</field>
             <field name="res_model">linkloving.ble.device</field>
             <field name="view_type">form</field>
