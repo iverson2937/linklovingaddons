@@ -200,7 +200,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                     var rate2 = $(trs[i]).find("input[name='rate_2']").val();
 
                     var res = {
-                        'id': $(trs[i]).find('select').data('id'),
+                        'id': $(trs[i]).find('.action_select select').data('id'),
                         'action_id': action_id,
                         'action_name': $(trs[i]).find('.action_select option:selected').val(),
                         'rate': $(trs[i]).find("input[name='rate']").val(),
