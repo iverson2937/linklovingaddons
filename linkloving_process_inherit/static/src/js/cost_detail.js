@@ -35,10 +35,13 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var self = this;
             self.$tr = $(target).parents('tr');
 
-            var process_id = $('.process_select option:selected').attr('data-id');
+            var process_id = self.$tr.find('.process_select option:selected').attr('data-id');
             new Model('mrp.bom.line').call('get_process_action_options', [parseInt(process_id)]).then(function (result) {
                 console.log(result);
-                self.actions = result;
+                self.actions.push({
+                    'id': parseInt(process_id),
+                    'options': result
+                })
                 if (result.length > 0) {
                     self.$tr.find('.cost').html(result[0].cost);
                     self.$tr.find('.remark').html(result[0].remark);
@@ -53,10 +56,17 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var target = e.target || e.srcElement;
             var self = this;
             self.$tr = $(target).parents('tr');
-            var self = this;
-            var index = self.$tr.find('.action_select option:selected').attr('data-index');
-            self.$tr.find('.cost').html(self.actions[index].cost);
-            self.$tr.find('.remark').html(self.actions[index].remark);
+            console.log(self.actions);
+            //当前动作选择下标
+            var action_index = self.$tr.find('.action_select option:selected').attr('data-index');
+            //当前工序id
+            var this_process_id = self.$tr.find('.process_select option:selected').attr('data-id');
+            $.each(self.actions, function (index, value) {
+                if(value.id==parseInt(this_process_id)){
+                     self.$tr.find('.cost').html(value.options[action_index].cost);
+                     self.$tr.find('.remark').html(value.options[action_index].remark);
+                }
+            });
         },
         // 计算规则改变
         change_rule_func: function () {
@@ -239,26 +249,16 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var index = $(target).parents('tr').attr('data-index');
             index = parseInt(index);
             self.index = index;
-            console.log(self.table_data)
+            console.log(self.table_data);
+            self.actions.push({
+                'id':self.table_data[index].process_action[0].process_id,
+                'options':self.table_data[index].process_action[0].options
+            });
 
             if (!self.table_data.bom_id) {
                 new Model('mrp.bom.line').call('parse_action_line_data', [self.table_data[index].id]).then(function (results) {
                     var datas = [];
-                    // if (results && results.length > 0) {
-                    //     for (var i = 0; i < results.length; i++) {
-                    //
-                    //         var res = {
-                    //             'line_id': results[i].line_id,
-                    //             'action_id': results[i].action_id,
-                    //             'rate': results[i].rate,
-                    //             'options': results[i].options,
-                    //             'remark': results[i].remark,
-                    //             'cost': results[i].cost,
-                    //             'rate_2': results[i].rate_2
-                    //         };
-                    //         datas.push(res)
-                    //     }
-                    // }
+
                     $('.unlock_condition').attr('data-id', self.table_data[index].id).show();
                     $('#action_table').html('');
                     self.tr_datas.results = results;
@@ -286,6 +286,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             }
             this.edit_arr = [];
             this.tr_datas = {};
+            this.actions = [];
         },
 
         start: function () {
