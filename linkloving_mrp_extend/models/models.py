@@ -2094,7 +2094,7 @@ class StcokPickingExtend(models.Model):
                             move.state == "assigned" for move in pick.move_lines):
                 raise UserError(u"库存异动单异常,请联系管理员解决")
             if sum(pick.pack_operation_product_ids.mapped("qty_done")) == 0:
-                raise UserError(u"出货数量不能全部为0")
+                raise UserError(u"出货数量不能全部为0 %s" % pick.id)
         return super(StcokPickingExtend, self).to_stock()
 
     # 分拣完成
