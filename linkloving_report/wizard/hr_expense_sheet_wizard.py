@@ -19,22 +19,22 @@ class HrExpenseSheetWizard(models.TransientModel):
         account_payment = self.env['account.payment']
 
         payment_ids = account_payment.sudo().search([
-            ('res_model', '=', 'hr.expense.sheet')], order='create_date desc')
+            ('payment_date', '>=', date1), ('payment_date', '<=', date2)], order='create_date desc')
 
         sheet_sequence = 1
         for payment_id in payment_ids:
             res_id = payment_id.res_id
-            hr_expense_sheet = self.env['hr.expense.sheet'].browse(res_id)
+            # hr_expense_sheet = self.env['hr.expense.sheet'].browse(res_id)
             returnDict[payment_id.id] = {'data': {}, 'line': {}}
             returnDict[payment_id.id]['data'] = {
                 'sequence': sheet_sequence,
                 'accounting_date': payment_id.payment_date,
                 'employee_id': payment_id.partner_id.name,
                 'amount': payment_id.amount,
-                'department_id': hr_expense_sheet.department_id.name,
-                'expense_no': hr_expense_sheet.expense_no,
-                'name': payment_id.name,
-                'expense_sheet_amount': hr_expense_sheet.total_amount,
+                # 'department_id': hr_expense_sheet.department_id.name,
+                # 'expense_no': hr_expense_sheet.expense_no,
+                # 'name': payment_id.name,
+                # 'expense_sheet_amount': hr_expense_sheet.total_amount,
                 # 'create_uid': payment.create_uid.name,
             }
             # for line in payment.payment_line_ids:
