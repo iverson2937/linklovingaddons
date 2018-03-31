@@ -428,7 +428,7 @@ class MrpBomLine(models.Model):
         bom_id = kwargs.get('bom_id')
         for arg in args:
             if arg.get('action_line_id'):
-                self.env['process.action.line'].browse(arg.get('action_line_id')).unlink()
+                self.env['process.action.line'].browse(int(arg.get('action_line_id'))).unlink()
             bom_line_id = self.env['mrp.bom.line'].browse(arg.get('id'))
             actions = arg.get('actions', [])
 
