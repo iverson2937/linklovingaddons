@@ -16,7 +16,7 @@ class HrExpenseSheetWizard(models.TransientModel):
     def _get_payment_by_hr_expense_sheet(self, date1, date2):
 
         returnDict = {}
-        account_payment = self.env['account.payment']
+        account_payment = self.env['account.payment'].sudo()
 
         payment_ids = account_payment.search([
             ('res_model', '=', 'hr.expense.sheet')], order='create_date desc')
