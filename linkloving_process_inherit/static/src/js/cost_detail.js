@@ -24,7 +24,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             'click .custom_rate': 'custom_rate_func',
             'click .delete i': 'remove_action_line_func',
             'click .add_tr': 'add_tr_func',
-            'change .top_calc_rule input': 'change_rule_func',
+            // 'change .top_calc_rule input': 'change_rule_func',
             'change .action_select select': 'action_select_func',
             'change .process_select select': 'process_select_func'
         },
@@ -69,14 +69,14 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             });
         },
         // 计算规则改变
-        change_rule_func: function () {
-            console.log($('.top_calc_rule input[name="calc_rule"]:checked').val());
-            if ($('.top_calc_rule input[name="calc_rule"]:checked').val() == 'by_material') {
-                $('#action_table .times').prop('disabled', true).val('0')
-            } else {
-                $('#action_table .times').prop('disabled', false).val('1')
-            }
-        },
+        // change_rule_func: function () {
+        //     console.log($('.top_calc_rule input[name="calc_rule"]:checked').val());
+        //     if ($('.top_calc_rule input[name="calc_rule"]:checked').val() == 'by_material') {
+        //         $('#action_table .times').prop('disabled', true).val('0')
+        //     } else {
+        //         $('#action_table .times').prop('disabled', false).val('1')
+        //     }
+        // },
         //添加tr
         add_tr_func: function (e) {
             var self = this;
