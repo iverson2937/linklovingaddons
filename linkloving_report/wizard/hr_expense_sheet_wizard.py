@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import datetime
+import logging
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 
 class HrExpenseSheetWizard(models.TransientModel):
@@ -16,15 +19,23 @@ class HrExpenseSheetWizard(models.TransientModel):
     def _get_payment_by_hr_expense_sheet(self, date1, date2):
 
         returnDict = {}
-        account_payment = self.env['account.payment'].sudo()
+        account_payment = self.env['account.payment']
 
         payment_ids = account_payment.search([
-            ('res_model', '=', 'hr.expense.sheet')], order='create_date desc')
+            ('res_model', '=', 'hr.expense.sheet'),
+            ('payment_date', '>=', date1), ('payment_date', '<=', date2)],
+            order='create_date desc')
 
         sheet_sequence = 1
         for payment_id in payment_ids:
             res_id = payment_id.res_id
-            hr_expense_sheet = self.env['hr.expense.sheet'].browse(res_id)
+
+            try:
+                hr_expense_sheet = self.env['hr.expense.sheet'].browse(res_id)
+            except:
+                _logger.warning("no sheet_id, %d" % (res_id))
+                continue
+
             returnDict[payment_id.id] = {'data': {}, 'line': {}}
             returnDict[payment_id.id]['data'] = {
                 'sequence': sheet_sequence,
