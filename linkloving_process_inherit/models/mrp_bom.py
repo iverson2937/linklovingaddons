@@ -435,7 +435,7 @@ class MrpBomLine(models.Model):
             for action in actions:
                 rate = action.get('rate')
                 rate_2 = action.get('rate_2')
-                if rate_2=='0.5':
+                if rate_2=='0.05':
                     rate_2=0
                 if rate == '1/2':
                     rate = 0.5
