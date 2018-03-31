@@ -19,8 +19,7 @@ class HrExpenseSheetWizard(models.TransientModel):
         account_payment = self.env['account.payment']
 
         payment_ids = account_payment.sudo().search([
-            ('res_model', '=', 'hr.expense.sheet'),
-            ('payment_date', '>=', date1), ('payment_date', '<=', date2)], order='create_date desc')
+            ('res_model', '=', 'hr.expense.sheet')], order='create_date desc')
 
         sheet_sequence = 1
         for payment_id in payment_ids:
