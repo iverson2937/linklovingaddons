@@ -19,7 +19,7 @@ class HrExpenseSheetWizard(models.TransientModel):
         account_payment = self.env['account.payment']
 
         payment_ids = account_payment.search([
-            ('res_model', '=', 'hr.expense.sheet')
+            ('res_model', '=', 'hr.expense.sheet'),
             ('payment_date', '>=', date1), ('payment_date', '<=', date2)], order='create_date desc')
 
         sheet_sequence = 1
@@ -33,6 +33,8 @@ class HrExpenseSheetWizard(models.TransientModel):
                 'employee_id': payment_id.partner_id.name,
                 'amount': payment_id.amount,
                 'department_id': hr_expense_sheet.department_id.name,
+                'expense_no': hr_expense_sheet.expense_no,
+                'name': payment_id.name,
                 'expense_sheet_amount': hr_expense_sheet.total_amount,
                 # 'create_uid': payment.create_uid.name,
             }
@@ -287,7 +289,7 @@ class HrExpenseSheetWizard(models.TransientModel):
                 datas = self._get_data_by_turn_payment(report.start_date, report.end_date)
                 report_name = 'linkloving_report.return_account_payment_report'
             elif self._context.get('payment_sheet'):
-                datas = self.__get_payment_by_hr_expense_sheet(report.start_date, report.end_date)
+                datas = self._get_payment_by_hr_expense_sheet(report.start_date, report.end_date)
                 report_name = 'linkloving_report.linkloving_account_payment_hr_expense_sheet'
 
             if not datas:

@@ -36,7 +36,7 @@
 
             <field name='target'>new</field>
         </record>
-        <record id='action_account_payment_hr_expense_sheet_wizard' model='ir.actions.act_window'>
+        <record id='action_hr_expense_sheet_wizard_2' model='ir.actions.act_window'>
             <field name='name'>报销单</field>
             <field name='res_model'>hr.expense.sheet.wizard</field>
             <field name='view_type'>form</field>

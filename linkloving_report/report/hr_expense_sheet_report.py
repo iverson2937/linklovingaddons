@@ -97,7 +97,7 @@ class ReportHrExpenseSheet(http.Controller):
 class AccountPaymenttHrExpenseSheet(http.Controller):
     @http.route(['/report/linkloving_report.linkloving_account_payment_hr_expense_sheet'], type='http', auth='user',
                 multilang=True)
-    def report_account_payment(self, **data):
+    def report_purchase(self, **data):
         # 报销单
 
         data = simplejson.loads(data['options'])
@@ -132,9 +132,9 @@ class AccountPaymenttHrExpenseSheet(http.Controller):
                                  style)
                 data_sheet.write(current_row, 1, vals.get('name') and vals.get('name') or '', style)
                 data_sheet.write(current_row, 2, vals.get('expense_no') and vals.get('expense_no') or '', style)
-                data_sheet.write(current_row, 3, vals.get('department_id') and vals.get('expense_no') or '', style)
-                data_sheet.write(current_row, 4, vals.get('employee_id') and vals.get('expense_no') or '', style)
-                data_sheet.write(current_row, 5, vals.get('amount') and vals.get('total_amount') or '', style)
+                data_sheet.write(current_row, 3, vals.get('department_id') and vals.get('department_id') or '', style)
+                data_sheet.write(current_row, 4, vals.get('employee_id') and vals.get('employee_id') or '', style)
+                data_sheet.write(current_row, 5, vals.get('amount') and vals.get('amount') or '', style)
                 data_sheet.write(current_row, 6,
                                  vals.get('expense_sheet_amount') and vals.get('expense_sheet_amount') or '', style)
 
