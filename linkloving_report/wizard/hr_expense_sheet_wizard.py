@@ -13,6 +13,38 @@ class HrExpenseSheetWizard(models.TransientModel):
     end_date = fields.Date(u'结束时间', default=datetime.datetime.now())
     employee_ids = fields.Many2many('hr.employee')
 
+    def _get_payment_by_hr_expense_sheet(self, date1, date2):
+
+        returnDict = {}
+        account_payment = self.env['account.payment']
+
+        payment_ids = account_payment.search([
+            ('res_model', '=', 'hr.expense.sheet')
+            ('payment_date', '>=', date1), ('payment_date', '<=', date2)], order='create_date desc')
+
+        sheet_sequence = 1
+        for payment_id in payment_ids:
+            res_id = payment_id.res_id
+            hr_expense_sheet = self.env['hr.expense.sheet'].browse(res_id)
+            returnDict[payment_id.id] = {'data': {}, 'line': {}}
+            returnDict[payment_id.id]['data'] = {
+                'sequence': sheet_sequence,
+                'accounting_date': payment_id.payment_date,
+                'employee_id': payment_id.partner_id.name,
+                'amount': payment_id.amount,
+                'department_id': hr_expense_sheet.department_id.name,
+                'expense_sheet_amount': hr_expense_sheet.total_amount,
+                # 'create_uid': payment.create_uid.name,
+            }
+            # for line in payment.payment_line_ids:
+            #     returnDict[payment.id]['line'].update({line.id: {
+            #         'expense_no': line.expense_no,
+            #         'name': line.name,
+            #         'amount_total': line.sheet_id.total_amount,
+            #         'amount': line.amount,
+            #     }})
+        return returnDict
+
     def _get_data_by_turn_payment(self, date1, date2):
         returnDict = {}
         return_payment = self.env['account.employee.payment.return']
@@ -254,6 +286,9 @@ class HrExpenseSheetWizard(models.TransientModel):
             elif self._context.get('return'):
                 datas = self._get_data_by_turn_payment(report.start_date, report.end_date)
                 report_name = 'linkloving_report.return_account_payment_report'
+            elif self._context.get('payment_sheet'):
+                datas = self.__get_payment_by_hr_expense_sheet(report.start_date, report.end_date)
+                report_name = 'linkloving_report.linkloving_account_payment_hr_expense_sheet'
 
             if not datas:
                 raise UserError(u'没找到相关数据')

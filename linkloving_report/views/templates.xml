@@ -7,6 +7,10 @@
 
         <menuitem id="menu_expense_sheet_report" name="报销费用报告" parent="menu_excel_report"
                   action="action_hr_expense_sheet_wizard" groups="account.group_account_user"/>
+
+        <menuitem id="menu_expense_sheet_report" name="报销费用报告(付款部分)" parent="menu_excel_report"
+                  action="action_account_payment_hr_expense_sheet_wizard" groups="account.group_account_user"/>
+
         <menuitem id="menu_pre_payment_outgoing_report" name="暂支支出报告" parent="menu_excel_report"
                   action="action_pre_payment_report_wizard"
                   groups="account.group_account_user"/>

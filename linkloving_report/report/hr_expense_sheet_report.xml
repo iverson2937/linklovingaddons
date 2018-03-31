@@ -17,6 +17,14 @@
             <field name="report_name">linkloving_report.linkloving_hr_expense_sheet_report</field>
         </record>
 
+        <record id='action_account_payment_hr_expense_sheet_wizard' model='ir.actions.report.xml'>
+            <field name="name">报销付款</field>
+            <field name='report_type'>controller</field>
+            <field name='model'>hr.expense.sheet</field>
+            <field name='report_rml'>/report/linkloving_report.linkloving_account_payment_hr_expense_sheet</field>
+            <field name="report_name">linkloving_report.linkloving_account_payment_hr_expense_sheet</field>
+        </record>
+
         <record id='action_pre_payment_report' model='ir.actions.report.xml'>
             <field name="name">暂支单</field>
             <field name='report_type'>controller</field>
@@ -31,7 +39,7 @@
             <field name='report_rml'>/report/linkloving_report.pre_payment_deduct_report</field>
             <field name="report_name">linkloving_report.pre_payment_deduct_report</field>
         </record>
-               <record id='action_purchase_payment_report' model='ir.actions.report.xml'>
+        <record id='action_purchase_payment_report' model='ir.actions.report.xml'>
             <field name="name">采购支出报告</field>
             <field name='report_type'>controller</field>
             <field name='model'>account.payment.register</field>
@@ -54,7 +62,6 @@
             <field name='report_rml'>/report/linkloving_report.return_account_payment_report</field>
             <field name="report_name">linkloving_report.return_account_payment_report</field>
         </record>
-
 
 
     </data>

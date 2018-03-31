@@ -94,6 +94,98 @@ class ReportHrExpenseSheet(http.Controller):
             raise UserError(_('Error!'), _('These are no records no this period.'))
 
 
+class AccountPaymenttHrExpenseSheet(http.Controller):
+    @http.route(['/report/linkloving_report.linkloving_account_payment_hr_expense_sheet'], type='http', auth='user',
+                multilang=True)
+    def report_account_payment(self, **data):
+        # 报销单
+
+        data = simplejson.loads(data['options'])
+        if data:
+            xls = StringIO.StringIO()
+            xls_wookbook = xlwt.Workbook()
+            data_sheet = xls_wookbook.add_sheet('data')
+
+            style = xlwt.easyxf(
+                'font: height 250;'
+                'alignment: vert center, horizontal center;'
+                'borders: left thin, right thin, top thin, bottom thin;'
+            )
+
+            header_style = xlwt.easyxf(
+                'font: height 250, bold True;'
+                'borders: left thin, right thin, top thin, bottom thin;'
+                'align: vertical center, horizontal center;'
+            )
+
+            header_list = [
+                u'支出日期', u'付款单号', u'报销单号', u'部门', u'员工', u'付款金额', u'报销单金额(参考)'
+            ]
+
+            [data_sheet.write(0, row, line, style) for row, line in enumerate(header_list)]
+
+            current_row = 1
+            for record in data.itervalues():
+                vals = record.get('data')
+
+                data_sheet.write(current_row, 0, vals.get('accounting_date') and vals.get('accounting_date') or '',
+                                 style)
+                data_sheet.write(current_row, 1, vals.get('name') and vals.get('name') or '', style)
+                data_sheet.write(current_row, 2, vals.get('expense_no') and vals.get('expense_no') or '', style)
+                data_sheet.write(current_row, 3, vals.get('department_id') and vals.get('expense_no') or '', style)
+                data_sheet.write(current_row, 4, vals.get('employee_id') and vals.get('expense_no') or '', style)
+                data_sheet.write(current_row, 5, vals.get('amount') and vals.get('total_amount') or '', style)
+                data_sheet.write(current_row, 6,
+                                 vals.get('expense_sheet_amount') and vals.get('expense_sheet_amount') or '', style)
+
+                if not record.get('line'):
+                    current_row += 1
+                    continue
+                i = 0
+                for line in record.get('line').itervalues():
+
+                    if i > 0:
+                        data_sheet.write(current_row, 0,
+                                         vals.get('accounting_date') and vals.get('accounting_date') or '', style)
+                        data_sheet.write(current_row, 1, vals.get('expense_no') and vals.get('expense_no') or '', style)
+                        data_sheet.write(current_row, 2, vals.get('department') and vals.get('department') or '', style)
+                    data_sheet.write(current_row, 3, line.get('product') and line.get('product') or '', style)
+                    data_sheet.write(current_row, 4, line.get('unit_amount') and line.get('unit_amount') or '', style)
+                    data_sheet.write(current_row, 5, line.get('quantity') and line.get('quantity') or '', style)
+                    data_sheet.write(current_row, 6, line.get('total_amount') and line.get('total_amount') or '', style)
+                    data_sheet.write(current_row, 7, line.get('name') and line.get('name') or '', style)
+
+                    data_sheet.write(current_row, 9,
+                                     line.get('payment_line_ids') and line.get('payment_line_ids') or '', style)
+                    data_sheet.write(current_row, 10, line.get('employee') and line.get('employee') or '', style)
+                    data_sheet.write(current_row, 11, line.get('remark') and line.get('remark') or '', style)
+
+                    current_row += 1
+                    i += 1
+
+            for x, i in enumerate([2, 2, 2, 2, 3, 3, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]):
+                data_sheet.col(x).width = 2560 * i
+
+            for x in range(0, row):
+                data_sheet.row(x).height_mismatch = 1
+                data_sheet.row(x).height = 500
+
+            xls_wookbook.save(xls)
+            xls.seek(0)
+            content = xls.read()
+            return request.make_response(content, headers=[
+                ('Content-Type', 'application/vnd.ms-excel'),
+                ('Content-Disposition', 'attachment; filename=payment_hr_expense_sheet_sum.xls;')
+            ])
+        else:
+            raise UserError(_('Error!'), _('These are no records no this period.'))
+
+
+
+
+
+
+
 class ReportPrepaymentOutgoing(http.Controller):
     @http.route(['/report/linkloving_report.pre_payment_report'], type='http', auth='user',
                 multilang=True)

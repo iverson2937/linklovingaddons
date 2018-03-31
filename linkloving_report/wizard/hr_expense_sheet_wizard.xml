@@ -36,6 +36,16 @@
 
             <field name='target'>new</field>
         </record>
+        <record id='action_account_payment_hr_expense_sheet_wizard' model='ir.actions.act_window'>
+            <field name='name'>报销单</field>
+            <field name='res_model'>hr.expense.sheet.wizard</field>
+            <field name='view_type'>form</field>
+            <field name='view_mode'>form</field>
+            <field name="context">{'payment_sheet':True}</field>
+            <field name="view_id" ref="hr_expense_sheet_wizard_form"/>
+
+            <field name='target'>new</field>
+        </record>
 
 
         <record id='action_pre_payment_report_wizard' model='ir.actions.act_window'>
