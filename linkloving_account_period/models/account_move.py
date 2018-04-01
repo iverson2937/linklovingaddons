@@ -123,6 +123,13 @@ class AccountMoveLine(models.Model):
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
+    
+    @api.multi
+    def button_cancel(self):
+        for move in self:
+            if move.period_id.state=='done':
+                raise UserError('不可以取消一个完成会计区间的分录')
+        return super(AccountMove, self).button_cancel()
 
     def _get_period(self):
         """
