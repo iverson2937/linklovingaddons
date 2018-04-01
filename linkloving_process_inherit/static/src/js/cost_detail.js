@@ -62,9 +62,9 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             //当前工序id
             var this_process_id = self.$tr.find('.process_select option:selected').attr('data-id');
             $.each(self.actions, function (index, value) {
-                if(value.id==parseInt(this_process_id)){
-                     self.$tr.find('.cost').html(value.options[action_index].cost);
-                     self.$tr.find('.remark').html(value.options[action_index].remark);
+                if (value.id == parseInt(this_process_id)) {
+                    self.$tr.find('.cost').html(value.options[action_index].cost);
+                    self.$tr.find('.remark').html(value.options[action_index].remark);
                 }
             });
         },
@@ -201,19 +201,38 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var actions = [];
 
             function isInteger(obj) {
-                return Math.floor(obj) === obj
+                return obj % 1 === 0
+            }
+
+            function isNumber(val) {
+                var regPos = /^\d+(\.\d+)?$/; //非负浮点数
+                var regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
+                if (regPos.test(val) || regNeg.test(val)) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
 
             for (var i = 0; i < trs.length; i++) {
                 var action_id = $(trs[i]).find('.action_select option:selected').attr('data-id');
                 if (action_id) {
                     var rate2 = $(trs[i]).find("input[name='rate_2']").val();
+                    var rate = $(trs[i]).find("input[name='rate']").val();
+                    if (!isNumber(rate)) {
+                        alert('参数格式不正确');
+                        return
+                    }
+                    if (!isInteger(rate2)) {
+                        alert('次数必须为整数');
+                        return
+                    }
 
                     var res = {
                         'id': $(trs[i]).find('.action_select select').data('id'),
                         'action_id': action_id,
                         'action_name': $(trs[i]).find('.action_select option:selected').val(),
-                        'rate': $(trs[i]).find("input[name='rate']").val(),
+                        'rate': rate,
                         'rate_2': rate2
                     };
                     actions.push(res)
@@ -251,8 +270,8 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             self.index = index;
             console.log(self.table_data);
             self.actions.push({
-                'id':self.table_data[index].process_action[0].process_id,
-                'options':self.table_data[index].process_action[0].options
+                'id': self.table_data[index].process_action[0].process_id,
+                'options': self.table_data[index].process_action[0].options
             });
 
             if (!self.table_data.bom_id) {
@@ -345,7 +364,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                         }
 
                     ]
-                ;
+                    ;
                 self.columns = columns;
                 self.initTableSubCompany(columns, records)
 
