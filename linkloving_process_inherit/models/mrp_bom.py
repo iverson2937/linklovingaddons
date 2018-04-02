@@ -162,9 +162,9 @@ class MrpBom(models.Model):
             'product_specs': line.product_id.product_specs,
             'code': line.product_id.default_code,
             'qty': line.product_qty,
-            'material_cost': round(material_cost, 2),
-            'manpower_cost': round(man_cost, 2),
-            'total_cost': round(total_cost, 2),
+            'material_cost': round(material_cost, 5),
+            'manpower_cost': round(man_cost, 5),
+            'total_cost': round(total_cost, 5),
             'process_id': process_id,
             'process_action': line.parse_action_line_data()
 
@@ -255,10 +255,10 @@ def _get_rec(object, parnet, result, product_type_dict):
             # 'product_type': l.product_id.product_ll_type,
             'id': l.id,
             'pid': parnet.id,
-            'material_cost': round(material_cost, 2),
+            'material_cost': round(material_cost, 5),
             'process_action': l.parse_action_line_data(),
-            'manpower_cost': round(man_cost, 2),
-            'total_cost': round(total_cost, 2),
+            'manpower_cost': round(man_cost, 5),
+            'total_cost': round(total_cost, 5),
             'parent_id': parnet.id,
             'qty': l.product_qty,
             'process_id': process_id,
@@ -337,6 +337,15 @@ class MrpBomLine(models.Model):
                 })
 
         for line in self.action_line_ids:
+            domain = ['|', ('process_id', '=', line.action_id.process_id.id), ('process_id', '=', False)]
+            actions = self.env['mrp.process.action'].search(domain)
+            for action in actions:
+                options.append({
+                    'id': action.id,
+                    'name': action.name,
+                    'cost': action.cost,
+                    'remark': action.remark,
+                })
             data = {
                 'line_id': line.id,
                 'action_id': line.action_id.id,
@@ -346,7 +355,7 @@ class MrpBomLine(models.Model):
                 'rate': line.rate,
                 'rate_2': line.rate_2,
                 'options': options,
-                'process_id': self.bom_id.process_id.id,
+                'process_id': line.action_id.process_id.id,
                 'process_options': process_options
             }
             res.append(data)
@@ -360,6 +369,43 @@ class MrpBomLine(models.Model):
                 'process_options': process_options,
                 'process_id': self.bom_id.process_id.id,
             })
+
+        return res
+
+    def add_action_line_data(self):
+        res = []
+        options = []
+        process_options = []
+        process = self.env['mrp.process'].search([])
+        for p in process:
+            p_data = {
+                'id': p.id,
+                'name': p.name,
+            }
+            process_options.append(p_data)
+
+        domain = []
+        if self.bom_id.process_id:
+            domain = ['|', ('process_id', '=', self.bom_id.process_id.id), ('process_id', '=', False)]
+        actions = self.env['mrp.process.action'].search(domain)
+        for action in actions:
+            options.append({
+                'id': action.id,
+                'name': action.name,
+                'cost': action.cost,
+                'remark': action.remark,
+                'process_id': action.process_id.id,
+            })
+
+        res.append({
+            'line_id': '',
+            'rate': 1,
+            'rate_2': 0,
+            'options': options,
+            'process_id': self.bom_id.process_id.id,
+            'process_options': process_options,
+
+        })
 
         return res
 
@@ -382,13 +428,15 @@ class MrpBomLine(models.Model):
         bom_id = kwargs.get('bom_id')
         for arg in args:
             if arg.get('action_line_id'):
-                self.env['process.action.line'].browse(arg.get('action_line_id')).unlink()
+                self.env['process.action.line'].browse(int(arg.get('action_line_id'))).unlink()
             bom_line_id = self.env['mrp.bom.line'].browse(arg.get('id'))
             actions = arg.get('actions', [])
 
             for action in actions:
                 rate = action.get('rate')
                 rate_2 = action.get('rate_2')
+                if rate_2=='0.05':
+                    rate_2=0
                 if rate == '1/2':
                     rate = 0.5
                 if rate == '1/3':

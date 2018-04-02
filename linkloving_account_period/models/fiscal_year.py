@@ -128,10 +128,10 @@ class AccountPeriod(models.Model):
         # Prepare sql query base on selected parameters from wizard
         # compute the balance, debit and credit for the provided accounts
         request = (
-                "SELECT account_id AS id, SUM(debit) AS debit, SUM(credit) AS credit, (SUM(debit) - SUM(credit)) AS balance" + \
-                " FROM " + "account_move_line" + " WHERE account_id IN %s  "
-                + " AND period_id = %s "
-                + "GROUP BY account_id"
+            "SELECT account_id AS id, SUM(debit) AS debit, SUM(credit) AS credit, (SUM(debit) - SUM(credit)) AS balance" + \
+            " FROM " + "account_move_line" + " WHERE account_id IN %s  "
+            + " AND period_id = %s "
+            + "GROUP BY account_id"
 
         )
         params = (tuple(accounts.ids), str(period_id))
@@ -210,8 +210,10 @@ class AccountPeriod(models.Model):
                 final_obj.create(vals)
             else:
                 period_data.write({
-                    'end_credit': period_data.start_credit + credit,
-                    'end_debit': period_data.start_debit + debit,
+                    # 'end_credit': period_data.start_credit + credit,
+                    # 'end_debit': period_data.start_debit + debit,
+                    'end_credit': account.credit,
+                    'end_debit': account.debit,
                     'credit': credit,
                     'debit': debit
                 })
@@ -228,8 +230,10 @@ class AccountPeriod(models.Model):
                     'start_debit': account.debit
                 })
             next_period_data.write({
-                'start_credit': period_data.start_credit + credit,
-                'start_debit': period_data.start_debit + debit
+                # 'start_credit': period_data.start_credit + credit,
+                # 'start_debit': period_data.start_debit + debit
+                'start_credit': account.credit,
+                'start_debit': account.debit
             })
 
         # 获取每个业务伙伴的应收应付汇总

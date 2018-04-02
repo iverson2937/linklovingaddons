@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <!--<report-->
-        <!--string="打印采购合同汇总表"-->
-        <!--id="tr_action_report_purchase"-->
-        <!--model="purchase.order"-->
-        <!--menu="False"-->
-        <!--name="linkloving_purchase.report_purchase"-->
-        <!--/>-->
+
 
         <record id='action_hr_expense_sheet_report' model='ir.actions.report.xml'>
             <field name="name">报销单</field>
@@ -15,6 +9,14 @@
             <field name='model'>hr.expense.sheet</field>
             <field name='report_rml'>/report/linkloving_report.linkloving_hr_expense_sheet_report</field>
             <field name="report_name">linkloving_report.linkloving_hr_expense_sheet_report</field>
+        </record>
+
+        <record id='action_hr_expense_sheet_report_2' model='ir.actions.report.xml'>
+            <field name="name">报销付款</field>
+            <field name='report_type'>controller</field>
+            <field name='model'>hr.expense.sheet</field>
+            <field name='report_rml'>/report/linkloving_report.linkloving_account_payment_hr_expense_sheet</field>
+            <field name="report_name">linkloving_report.linkloving_account_payment_hr_expense_sheet</field>
         </record>
 
         <record id='action_pre_payment_report' model='ir.actions.report.xml'>
@@ -31,7 +33,7 @@
             <field name='report_rml'>/report/linkloving_report.pre_payment_deduct_report</field>
             <field name="report_name">linkloving_report.pre_payment_deduct_report</field>
         </record>
-               <record id='action_purchase_payment_report' model='ir.actions.report.xml'>
+        <record id='action_purchase_payment_report' model='ir.actions.report.xml'>
             <field name="name">采购支出报告</field>
             <field name='report_type'>controller</field>
             <field name='model'>account.payment.register</field>
@@ -54,7 +56,6 @@
             <field name='report_rml'>/report/linkloving_report.return_account_payment_report</field>
             <field name="report_name">linkloving_report.return_account_payment_report</field>
         </record>
-
 
 
     </data>

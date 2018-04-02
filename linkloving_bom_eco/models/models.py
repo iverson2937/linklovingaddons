@@ -613,8 +613,8 @@ class MrpBomEco(models.Model):
                                                    moves_to_cancel.product_uom_qty, 0)
                         procurements = ProcurementOrder.search([('move_dest_id', 'in', moves_to_cancel.ids)])
                         if procurements:
-                            procurements.cancel()
-
+                            procurements.with_context(context).cancel()
+                mo.is_bom_update = True
                 mo.bom_version = bom_eco.new_version  # 将MO 版本号更新到新的版本
 
     def procurement_context(self, new_effect_order=None, bom_eco_id=None, bom_change_line_id=None, from_qty=None,

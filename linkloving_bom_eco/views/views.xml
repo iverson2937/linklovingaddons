@@ -212,9 +212,9 @@
                                     attrs="{'invisible':[('bom_eco_count', '=', 0)]}" icon="fa-flask">
                                 <field string="变更的BOM" name="bom_eco_count" widget="statinfo"/>
                             </button>
-                            <button class="oe_stat_button" name="action_view_bom_effect_line" type="object"
-                                    icon="fa-flask" string="影响的单据">
-                            </button>
+                            <!--<button class="oe_stat_button" name="action_view_bom_effect_line" type="object"-->
+                            <!--icon="fa-flask" string="影响的单据">-->
+                            <!--</button>-->
                         </div>
                         <div class="oe_title">
                             <label for="name" class="oe_edit_only"/>

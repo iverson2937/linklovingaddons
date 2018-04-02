@@ -22,7 +22,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             'click .fa-plus-square-o': 'add_action_line_func',
             'click .fa-trash-o': 'remove_action_line_func',
             'click .custom_rate': 'custom_rate_func',
-            'click .delete i': 'delete_tr_node',
+            'click .delete i': 'remove_action_line_func',
             'click .add_tr': 'add_tr_func',
             'change .top_calc_rule input': 'change_rule_func',
             'change .action_select select': 'action_select_func',
@@ -32,30 +32,41 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
         process_select_func: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
-            var self =this;
+            var self = this;
             self.$tr = $(target).parents('tr');
 
-            var process_id = $('.process_select option:selected').attr('data-id');
+            var process_id = self.$tr.find('.process_select option:selected').attr('data-id');
             new Model('mrp.bom.line').call('get_process_action_options', [parseInt(process_id)]).then(function (result) {
                 console.log(result);
-                self.actions = result;
-                if(result.length>0){
+                self.actions.push({
+                    'id': parseInt(process_id),
+                    'options': result
+                })
+                if (result.length > 0) {
                     self.$tr.find('.cost').html(result[0].cost);
                     self.$tr.find('.remark').html(result[0].remark);
                 }
-                $('.action_select select').html('');
-                $('.action_select select').append(QWeb.render('action_select_option_templ',{result:result}))
+                self.$tr.find('.action_select select').html('');
+                self.$tr.find('.action_select select').append(QWeb.render('action_select_option_templ', {result: result}))
             })
         },
         //动作改变，渲染相应的td标签内的数据
         action_select_func: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
-            console.log($(target).parents('tr'))
             var self = this;
-            var index = $('.action_select option:selected').attr('data-index');
-            self.$tr.find('.cost').html(self.actions[index].cost);
-            self.$tr.find('.remark').html(self.actions[index].remark);
+            self.$tr = $(target).parents('tr');
+            console.log(self.actions);
+            //当前动作选择下标
+            var action_index = self.$tr.find('.action_select option:selected').attr('data-index');
+            //当前工序id
+            var this_process_id = self.$tr.find('.process_select option:selected').attr('data-id');
+            $.each(self.actions, function (index, value) {
+                if (value.id == parseInt(this_process_id)) {
+                    self.$tr.find('.cost').html(value.options[action_index].cost);
+                    self.$tr.find('.remark').html(value.options[action_index].remark);
+                }
+            });
         },
         // 计算规则改变
         change_rule_func: function () {
@@ -67,10 +78,21 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             }
         },
         //添加tr
-        add_tr_func: function () {
+        add_tr_func: function (e) {
             var self = this;
-            var results = self.tr_datas;
-            $('#action_table tbody').append(QWeb.render('add_tr_templ', {'result': self.tr_datas.results}));
+
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            var bom_line_id = $('.unlock_condition').attr('data-id');
+
+
+            new Model('mrp.bom.line').call('add_action_line_data', [parseInt(bom_line_id)]).then(function (results) {
+                $('#action_table tbody').append(QWeb.render('add_tr_templ', {'result': results}));
+
+
+            })
+
+
         },
         //弹出框里的删除tr
         delete_tr_node: function (e) {
@@ -97,9 +119,9 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var target = e.target || e.srcElement;
             var self = this;
             var tr = $(target).parents('tr');
-            if (tr.find('select').attr('data-id')) {
+            if (tr.find('.action_select select').attr('data-id')) {
                 self.edit_arr.push({
-                    'action_line_id': tr.find('select').data('id'),
+                    'action_line_id': tr.find('.action_select select').attr('data-id'),
                     'delete': true
                 });
             }
@@ -179,21 +201,38 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var actions = [];
 
             function isInteger(obj) {
-                return Math.floor(obj) === obj
+                return obj % 1 === 0
+            }
+
+            function isNumber(val) {
+                var regPos = /^\d+(\.\d+)?$/; //非负浮点数
+                var regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
+                if (regPos.test(val) || regNeg.test(val)) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
 
             for (var i = 0; i < trs.length; i++) {
-                var action_id = $(trs[i]).find('select option:selected').attr('data-id');
+                var action_id = $(trs[i]).find('.action_select option:selected').attr('data-id');
                 if (action_id) {
                     var rate2 = $(trs[i]).find("input[name='rate_2']").val();
-                    if (!isInteger(rate2)) {
-                        alert('自定义比例必须为整数')
+                    var rate = $(trs[i]).find("input[name='rate']").val();
+                    if (!isNumber(rate)) {
+                        alert('参数格式不正确');
+                        return
                     }
+                    if (!isInteger(rate2)) {
+                        alert('次数必须为整数');
+                        return
+                    }
+
                     var res = {
-                        'id': $(trs[i]).find('select').data('id'),
+                        'id': $(trs[i]).find('.action_select select').data('id'),
                         'action_id': action_id,
-                        'action_name': $(trs[i]).find('select option:selected').val(),
-                        'rate': $(trs[i]).find("input[name='rate']").val(),
+                        'action_name': $(trs[i]).find('.action_select option:selected').val(),
+                        'rate': rate,
                         'rate_2': rate2
                     };
                     actions.push(res)
@@ -229,26 +268,16 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var index = $(target).parents('tr').attr('data-index');
             index = parseInt(index);
             self.index = index;
-            console.log(self.table_data)
+            console.log(self.table_data);
+            self.actions.push({
+                'id': self.table_data[index].process_action[0].process_id,
+                'options': self.table_data[index].process_action[0].options
+            });
 
             if (!self.table_data.bom_id) {
                 new Model('mrp.bom.line').call('parse_action_line_data', [self.table_data[index].id]).then(function (results) {
                     var datas = [];
-                    // if (results && results.length > 0) {
-                    //     for (var i = 0; i < results.length; i++) {
-                    //
-                    //         var res = {
-                    //             'line_id': results[i].line_id,
-                    //             'action_id': results[i].action_id,
-                    //             'rate': results[i].rate,
-                    //             'options': results[i].options,
-                    //             'remark': results[i].remark,
-                    //             'cost': results[i].cost,
-                    //             'rate_2': results[i].rate_2
-                    //         };
-                    //         datas.push(res)
-                    //     }
-                    // }
+
                     $('.unlock_condition').attr('data-id', self.table_data[index].id).show();
                     $('#action_table').html('');
                     self.tr_datas.results = results;
@@ -276,6 +305,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             }
             this.edit_arr = [];
             this.tr_datas = {};
+            this.actions = [];
         },
 
         start: function () {

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import logging
 
 import requests
 from requests import ConnectionError
@@ -75,6 +76,7 @@ class SubCompanyTransfer(models.Model):
                     break
             if op_to_do:  # 若找到了
                 op_to_do.qty_done = self.feedback_id.qty_produced
+                logging.warning(u"op_to_do.qty_done ===%s" % str(op_to_do.qty_done))
             else:
                 raise UserError(u'找不到对应的出货条目')
         else:
@@ -120,6 +122,25 @@ class SubCompanyTransfer(models.Model):
         self.action_transfer_out_automatic()
         # 主系统采购单自动入库
         self.action_transfer_in_automatic()
+
+
+class StockPackOpertionExtend(models.Model):
+    _inherit = 'stock.pack.operation'
+
+    @api.model
+    def create(self, vals):
+        if vals.get("qty_done") and vals.get("qty_done") == 480.0:
+            import traceback
+            traceback.print_exc()
+            logging.warning("stock.pack.operation create qtydone = 0")
+        return super(StockPackOpertionExtend, self).create(vals)
+
+        # @api.multi
+        # def write(self, values):
+        #     # TDE FIXME: weird stuff, protectin pack op ?
+        #     import traceback
+        #     logging.warning("stock.pack.operation create qtydone = 0 %s" % traceback.format_exc())
+        #     return super(StockPackOpertionExtend, self).write(values)
 
 
 class MrpQcFeedbackExtend(models.Model):

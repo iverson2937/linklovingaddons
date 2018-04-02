@@ -58,7 +58,7 @@ class StockMove(models.Model):
 
             # add by allen for 生产入库凭证修改
             if self.location_id.usage == 'production' and self.location_dest_id.usage == 'internal' and self.product_id.cost_method == 'average':
-                credit_value = self.product_id.get_material_cost()
+                credit_value = self.product_id.get_material_cost() * qty
         partner_id = (self.picking_id.partner_id and self.env['res.partner']._find_accounting_partner(
             self.picking_id.partner_id).id) or False
         debit_line_vals = {
