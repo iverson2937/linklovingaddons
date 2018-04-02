@@ -440,19 +440,19 @@ class MrpBomLine(models.Model):
                     for action in actions:
                         if action.get('id'):
                             process_action_line = action_line_obj.browse(action.get('id'))
-                            if action.get('action_id') in self.env['mrp.process.action'].search([]).ids:
-                                process_action_line.write({
-                                    'rate': action.get('rate'),
-                                    'rate_2': action.get('rate_2'),
-                                    'action_id': action.get('action_id')
-                                })
+                            action_id_new = int(action.get('action_id'))
+                            process_action_line.write({
+                                'rate': action.get('rate'),
+                                'rate_2': action.get('rate_2'),
+                                'action_id': action_id_new
+                            })
                         elif action.get('delete_line_id'):
                             action_line_obj.browse(int(action.get('delete_line_id'))).unlink()
                         else:
                             action_line_obj.create({
                                 'rate': action.get('rate'),
                                 'rate_2': action.get('rate_2'),
-                                'action_id': action.get('action_id'),
+                                'action_id': int(action.get('action_id')),
                                 'bom_line_id': int(bom_line_id)
                             })
                     # else:
