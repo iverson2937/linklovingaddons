@@ -251,10 +251,11 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             console.log(self.table_data);
             console.log(self.index);
             console.log(self);
-            self.edit_arr.push({
-                'id': parseInt(bom_line_id),
-                'actions': actions
-            });
+            var item_data = {};
+            item_data[bom_line_id] = actions;
+            item_data['id'] = parseInt(bom_line_id);
+            self.edit_arr.push(item_data);
+            
             console.log(self.edit_arr);
             $('.unlock_condition').hide();
             if ($('.fixed-table-toolbar .save_process_sel').length == 0) {
