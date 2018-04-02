@@ -67,7 +67,7 @@ class ReportHrAttendanceSheet(http.Controller):
                             time_string = "0" + str((time_date + timedelta(hours=8)).day)
                         if time_header_detail == time_string:
                             print time_header_detail
-                            rows_arr[inside] = rows_arr[inside] + "\r\n" + (time_date + timedelta(hours=8)).strftime('%H:%M:%S')
+                            rows_arr[inside] = rows_arr[inside] + "\r\n" + (time_date + timedelta(hours=8)).strftime('%H:%M')
                         inside = inside + 1
 
                 data_sheet.write(current_row, 0, vals.get('employee_id') and vals.get('employee_id') or '',
