@@ -2729,7 +2729,8 @@ class LinklovingOAApi(http.Controller):
         is_wx = request.jsonrequest.get("is_wx")
         device_version = request.jsonrequest.get("device_version")
         open_id = request.jsonrequest.get("open_id")
-
+        if not device_version:
+            raise UserError(u"请更新新版OA,否则无法使用")
         if is_wx:
             if attendance_off:
                 new_attendance = request.env['hr.attendance'].sudo().create({
@@ -2914,6 +2915,8 @@ class LinklovingOAApi(http.Controller):
         is_wx = request.jsonrequest.get("is_wx")
         device_version = request.jsonrequest.get("device_version")
         open_id = request.jsonrequest.get("open_id")
+        if not device_version:
+            raise UserError(u"请更新新版OA,否则无法使用")
         if is_wx:
             if attendance_off:
                 new_attendance = request.env['hr.attendance'].sudo().create({
