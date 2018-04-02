@@ -13,14 +13,16 @@ class AccountMoveLine(models.Model):
 
     @api.multi
     def write(self, vals):
-        if self.period_id.state == 'done':
-            raise UserError('不可以修改一个结账的分录')
+        for line in self:
+            if line.period_id.state == 'done' and 'full_reconcile_id' not in vals:
+                raise UserError('不可以修改一个结账的分录')
         return super(AccountMoveLine, self).write(vals)
 
     @api.multi
     def unlink(self):
-        if self.period_id.state == 'done':
-            raise UserError('不可以删除一个结账的分录')
+        for line in self:
+            if line.period_id.state == 'done':
+                raise UserError('不可以删除一个结账的分录')
         return super(AccountMoveLine, self).unlink()
 
     def _query_get_period(self, context=None):
