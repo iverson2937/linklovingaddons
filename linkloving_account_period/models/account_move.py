@@ -14,7 +14,7 @@ class AccountMoveLine(models.Model):
     @api.multi
     def write(self, vals):
         for line in self:
-            if line.period_id.state == 'done' and 'full_reconcile_id' not in vals:
+            if line.period_id.state == 'done' and 'full_reconcile_id' not in vals and 'partner_id' not in vals:
                 raise UserError('不可以修改一个结账的分录')
         return super(AccountMoveLine, self).write(vals)
 
