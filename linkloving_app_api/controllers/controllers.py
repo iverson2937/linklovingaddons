@@ -141,6 +141,10 @@ class LinklovingAppApi(http.Controller):
 
         request.params['login_success'] = False
         values = request.params.copy()
+        app_version = request.jsonrequest.get("app_version")
+        if not app_version:
+            raise UserError(u"请更新新版OA,否则无法使用")
+
         if not request.uid:
             request.uid = odoo.SUPERUSER_ID
 

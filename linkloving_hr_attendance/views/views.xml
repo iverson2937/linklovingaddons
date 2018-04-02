@@ -43,9 +43,13 @@
         <field name="model">hr.attendance</field>
         <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
         <field name="arch" type="xml">
+
             <!--<tree string="Employee attendances">-->
             <xpath expr="//field[@name='check_in']" position="replace">
                 <field name="new_check_in" string="签到"/>
+            </xpath>
+            <xpath expr="//field[@name='check_out']" position="after">
+                <field name="device_version" string="设备uuid"/>
             </xpath>
             <!--</tree>-->
         </field>
@@ -59,6 +63,7 @@
             <xpath expr="//field[@name='check_in']" position="replace">
                 <field name="new_check_in" string="签到"/>
             </xpath>
+
         </field>
     </record>
 
