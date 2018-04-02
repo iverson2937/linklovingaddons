@@ -119,11 +119,14 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var target = e.target || e.srcElement;
             var self = this;
             var tr = $(target).parents('tr');
-            if (tr.find('.action_select select').attr('data-id')) {
-                self.edit_arr.push({
-                    'action_line_id': tr.find('.action_select select').attr('data-id'),
-                    'delete': true
-                });
+            var action_line_id = tr.find('.action_select select').attr('data-id');
+            var bom_line_id = $('.unlock_condition').attr('data-id');
+
+            if (action_line_id) {
+                var item_data = {};
+                item_data[bom_line_id] = [{'delete_line_id': action_line_id}];
+                // var item_date[action_line_id]
+                self.edit_arr.push(item_data);
             }
             tr.remove()
 
@@ -161,11 +164,10 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 _.each(results, function (result) {
                     if (result.is_default) {
                         show_save = true;
+                        var item_data = {};
                         console.log(result);
-                        self.edit_arr.push({
-                            'id': result.id,
-                            'actions': result.process_action
-                        });
+                        item_data[result.id] = result.process_action;
+                        self.edit_arr.push(item_data);
                     }
                 });
                 if (show_save) {
@@ -253,7 +255,6 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             console.log(self);
             var item_data = {};
             item_data[bom_line_id] = actions;
-            item_data['id'] = parseInt(bom_line_id);
             self.edit_arr.push(item_data);
             
             console.log(self.edit_arr);

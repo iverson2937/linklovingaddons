@@ -14,20 +14,22 @@
         <div class="unlock_condition close_this_container">
             <div class="modal-backdrop  in"></div>
             <div class="create_wrap" style="width: 800px">
-                <div class="top_calc_rule">
-                    <span>计算规则</span>
-                    <label><input type="radio" value="by_material" checked="checked" name="calc_rule"/>按物料配比</label>
-                    <label><input type="radio" value="by_action" name="calc_rule"/>按动作次数</label>
+                   <div class="add_tr">
+                    <i class="fa fa-plus"/> 新增
                 </div>
+                <!--<div class="top_calc_rule">-->
+                <!--<span>计算规则</span>-->
+                <!--<label><input type="radio" value="by_material" checked="checked" name="calc_rule"/>按物料配比</label>-->
+                <!--<label><input type="radio" value="by_action" name="calc_rule"/>按动作次数</label>-->
+                <!--</div>-->
                 <div id="action_table">
 
                 </div>
-                <div class="add_tr">
-                    <i class="fa fa-plus"/> 新增
-                </div>
+
                 <div class="foot">
-                    <button class=" btn btn-primary confirm_sel" style="margin-left:201px">确定</button>
-                    <button class="btn btn-default alia_cancel">取消</button>
+
+                    <button class=" btn btn-primary confirm_sel pull-right" style="margin-left:10px">确定</button>
+                    <button class="btn btn-default alia_cancel pull-right">取消</button>
                 </div>
             </div>
         </div>
@@ -82,7 +84,7 @@
                     </select>
                 </td>
                 <td>
-                    <input type="text" class="times" disabled="disabled" name="rate_2" t-att-value="data.rate_2"/>
+                    <input type="text" class="times" name="rate_2" t-att-value="data.rate_2"/>
                 </td>
                 <td>
                     <input type="text" name="rate" t-att-value="data.rate" />
@@ -140,7 +142,7 @@
         <t t-foreach="result" t-as="item">
             <t t-if="item.action_name">
         <div>
-            <span><t t-esc="item.action_name"/></span><span class="pull-right"><t t-esc="item.rate_2"/>X<t t-esc="item.rate"/></span>
+            <span><t t-esc="item.action_name"/></span><span class="pull-right"><t t-esc="item.rate_2"/>x<t t-esc="item.rate"/></span>
         </div>
                 </t>
         </t>
