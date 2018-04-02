@@ -89,7 +89,7 @@
                 <td>
                     <input type="text" name="rate" t-att-value="data.rate" />
                 </td>
-                <td class="cost"><t t-esc="data.options[0].cost"/></td>
+                <td class="cost"><t t-esc="data.cost"/></td>
                 <td class="remark"> <t t-esc="data.options[0].remark"/></td>
                 <td class="delete"><i class="fa fa-trash"/></td>
             </tr>
