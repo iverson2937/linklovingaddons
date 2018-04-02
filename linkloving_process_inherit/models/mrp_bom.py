@@ -460,8 +460,9 @@ class MrpBomLine(models.Model):
                     tmp_obj = self.env['bom.cost.category.temp']
                     product_id = bom_line.product_id.id
                     temp_id = tmp_obj.search(
-                        [('category_id', '=', category_id), ('product_id', '=', product_id)])
+                        [('category_id', '=', category_id), ('product_id', '=', product_id)], limit=1)
                     if temp_id:
+
                         temp_id.action_data = json.dumps(action_data)
                     else:
                         tmp_obj.create({'category_id': bom_line.bom_id.product_tmpl_id.categ_id.id,
