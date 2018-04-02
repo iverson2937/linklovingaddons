@@ -292,6 +292,7 @@ class MrpBomLine(models.Model):
                   ('product_id', '=', self.product_id.id)]
         temp_id = self.env['bom.cost.category.temp'].search(domain)
         res = []
+        print temp_id, 'temp_id'
         if temp_id:
             res = json.loads(temp_id.action_data)
             print res, 'res'
@@ -433,7 +434,7 @@ class MrpBomLine(models.Model):
             for bom_line_id, actions in arg.iteritems():
 
                 if actions:
-                    bom_line = self.env['mrp.bom.line'].browse(bom_line_id)
+                    bom_line = self.env['mrp.bom.line'].browse(int(bom_line_id))
                     for action in actions:
                         if action.get('id'):
                             process_action_line = action_line_obj.browse(action.get('id'))
@@ -449,23 +450,23 @@ class MrpBomLine(models.Model):
                                 'rate': action.get('rate'),
                                 'rate_2': action.get('rate_2'),
                                 'action_id': action.get('action_id'),
-                                'bom_line_id': bom_line_id
+                                'bom_line_id': int(bom_line_id)
                             })
-                # else:
-                #     self.env['process.action.line'].browse()
+                    # else:
+                    #     self.env['process.action.line'].browse()
 
-                # action_data = bom_line.pasre_action_line_data(no_option=True, no_data=True)
-                # category_id = bom_line.bom_id.product_tmpl_id.categ_id.id
-                # tmp_obj = self.env['bom.cost.category.temp']
-                # product_id = bom_line_id.product_id.id
-                # temp_id = tmp_obj.search(
-                #     [('category_id', '=', category_id), ('product_id', '=', product_id)])
-                # if temp_id and action_data and action_data[0].get('action_id'):
-                #     temp_id.action_data = json.dumps(action_data)
-                # elif product_id and bom_line_id.bom_id.product_tmpl_id.categ_id:
-                #     tmp_obj.create({'category_id': bom_line_id.bom_id.product_tmpl_id.categ_id.id,
-                #                     'product_id': product_id,
-                #                     'action_data': json.dumps(action_data)
-                #                     })
+                    action_data = bom_line.parse_action_line_data(no_option=True, no_data=True)
+                    category_id = bom_line.bom_id.product_tmpl_id.categ_id.id
+                    tmp_obj = self.env['bom.cost.category.temp']
+                    product_id = bom_line.product_id.id
+                    temp_id = tmp_obj.search(
+                        [('category_id', '=', category_id), ('product_id', '=', product_id)])
+                    if temp_id:
+                        temp_id.action_data = json.dumps(action_data)
+                    else:
+                        tmp_obj.create({'category_id': bom_line.bom_id.product_tmpl_id.categ_id.id,
+                                        'product_id': product_id,
+                                        'action_data': json.dumps(action_data)
+                                        })
 
         return self.env['mrp.bom'].browse(int(bom_id)).get_bom_cost_new()
