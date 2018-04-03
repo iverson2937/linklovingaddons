@@ -3080,6 +3080,51 @@ class LinklovingOAApi(http.Controller):
             })
         return data
 
+
+        # 获取组织架构 :
+    @http.route('/linkloving_oa_api/get_all_department', type='json', auth="none", csrf=False, cors='*')
+    def get_all_department(self, *kw):
+        parent_department = request.env['hr.department'].sudo().search([("parent_id", "=", False)])
+        data = []
+        data_child_ids = self.get_childs_department(parent_department)
+        data.append({
+            "name":parent_department.name,
+            "id":parent_department.id,
+            "child": data_child_ids,
+            "employees":self.get_employee_by_department(parent_department.id),
+            "childEmployeeNumber":  self.get_childs_employee_number(parent_department),
+        })
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+
+    def get_employee_by_department(self,department_id):
+        data = []
+        user_employees = request.env['hr.employee'].sudo().search([("department_id", "=", department_id)])
+        for user_employee in user_employees:
+            data.append(self.change_employee_to_json(user_employee))
+        return data
+
+
+    def get_childs_department(self, obj):
+        child_data = []
+        if obj.child_ids:
+            for department in obj.child_ids:
+                child_data.append({
+                    "name":department.name,
+                    "id":department.id,
+                    "child": self.get_childs_department(department),
+                    "employees":self.get_employee_by_department(department.id),
+                    "childEmployeeNumber":  self.get_childs_employee_number(department),
+                })
+        return child_data
+
+    def get_childs_employee_number(self, obj):
+        number =len(request.env['hr.employee'].sudo().search([("department_id", "=", obj.id)]))
+        if obj.child_ids:
+            for department in obj.child_ids:
+                number +=self.get_childs_employee_number(department)
+        return number
+
     #  XD 我的请假
     @http.route('/linkloving_oa_api/get_leavelist', type='json', auth="none", csrf=False, cors='*')
     def get_leavelist(self, *kw):
