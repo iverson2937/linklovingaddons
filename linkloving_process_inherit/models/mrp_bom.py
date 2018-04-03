@@ -316,7 +316,7 @@ class MrpBomLine(models.Model):
 
     def parse_action_line_data(self, no_option=False, no_data=False):
         res = []
-        options = []
+
         process_options = []
         process = self.env['mrp.process'].search([])
         for p in process:
@@ -328,6 +328,7 @@ class MrpBomLine(models.Model):
 
         if not no_option:
             domain = []
+            options = []
             if self.bom_id.process_id:
                 domain = ['|', ('process_id', '=', self.bom_id.process_id.id), ('process_id', '=', False)]
             actions = self.env['mrp.process.action'].search(domain)
@@ -342,6 +343,7 @@ class MrpBomLine(models.Model):
         for line in self.action_line_ids:
             domain = ['|', ('process_id', '=', line.action_id.process_id.id), ('process_id', '=', False)]
             actions = self.env['mrp.process.action'].search(domain)
+            options = []
             for action in actions:
                 options.append({
                     'id': action.id,
