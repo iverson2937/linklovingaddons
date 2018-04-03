@@ -96,19 +96,57 @@ class BomUpdateWizard(models.TransientModel):
                         'product_qty': qty,
                         'is_highlight': True,
                     })
+                if product_id == currnet_bom_line_id.product_id:
 
-                    vals = {
-                        'new_product_id': product_id,
+                    add_vals = {
                         'bom_id': bom_id.id,
-                        'new_product_qty': qty,
-                        'operate_type': 'update'
+                        'product_id': product_id,
+                        'operate_type': 'add'
                     }
+                    delete_vals = {
+                        'bom_id': bom_id.id,
+                        'product_id': currnet_bom_line_id.product_id.id,
+                        'operate_type': 'remove'
+                    }
+                    eco_lines.append(add_vals)
+                    eco_lines.append(delete_vals)
+                else:
+                    print 'sssssssssssssssssssssssssssssssssss'
+                    update_val = {
+                        'bom_id': bom_id.id,
+                        'product_id': product_id,
+                        'operate_type': 'update',
+                        'new_product_qty': qty
+                    }
+                    eco_lines.append(update_val)
+
 
             # 直接删除line无需添加
             elif modify_type == 'delete':
                 del_bom_line_id = val.get('id')
                 old_product_id = line_obj.browse(del_bom_line_id).product_id
                 update_bom_line_delete(bom_id, old_product_id)
+
+                delete_vals = {
+                    'bom_id': bom_id.id,
+                    'product_id': currnet_bom_line_id.product_id.id,
+                    'operate_type': 'remove'
+
+                }
+                eco_lines.append(delete_vals)
+            for line in eco_lines:
+                bom_id = line.get('bom_id')
+
+            # eco_order_obj.create({
+            #     'eco_line_ids':
+            #         [(0, 0, {
+            #             'bom_id': line.get('bom_id'),
+            #             'product_id': line.get('product_id'),
+            #             'operate_type': line.get('operate_type'),
+            #             'new_product_qty': line.get('new_product_qty'),
+            #         }) for line in eco_lines]
+            #
+            # })
 
         return {}
 
