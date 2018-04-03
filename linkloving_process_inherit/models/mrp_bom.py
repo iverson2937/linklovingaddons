@@ -367,6 +367,7 @@ class MrpBomLine(models.Model):
 
         if not res and not no_data:
             options = []
+            domain = []
             if self.bom_id.process_id:
                 domain = ['|', ('process_id', '=', self.bom_id.process_id.id), ('process_id', '=', False)]
             actions = self.env['mrp.process.action'].search(domain)
