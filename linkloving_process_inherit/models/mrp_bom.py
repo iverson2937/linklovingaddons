@@ -459,7 +459,7 @@ class MrpBomLine(models.Model):
             if actions:
                 bom_line = self.env['mrp.bom.line'].browse(int(bom_line_id))
                 for action in actions:
-                    if action.get('id'):
+                    if type(action) == dict and action.get('id'):
                         process_action_line = action_line_obj.browse(action.get('id'))
                         action_id_new = int(action.get('action_id'))
                         if action_id_new in self.env['mrp.process.action'].search([]).ids:
