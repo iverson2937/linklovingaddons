@@ -419,6 +419,7 @@ class MrpBomEco(models.Model):
     _inherit = ['mail.thread', 'ir.needaction_mixin']
     _order = 'create_date desc'
 
+    state = fields.Selection(string=u"状态", selection=[('draft', u'草稿'), ('done', u'已完成'), ], default="draft", )
     old_version = fields.Integer(string=u'变更前的版本号')
     new_version = fields.Integer(string=u'变更后的版本号')
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.user.company_id)
@@ -530,10 +531,11 @@ class MrpBomEco(models.Model):
     @api.multi
     def apply_new_version_number(self):
         """
-        更新版本号
+        更新版本号, 并且设置成完成
         :return:
         """
         for bom_eco in self:
+            bom_eco.state = 'done'
             if bom_eco.bom_id.version != bom_eco.old_version:
                 raise UserError(u'BOM版本不匹配,请检查')
             else:
