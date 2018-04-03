@@ -121,12 +121,18 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var tr = $(target).parents('tr');
             var action_line_id = tr.find('.action_select select').attr('data-id');
             var bom_line_id = $('.unlock_condition').attr('data-id');
-
             if (action_line_id) {
-                var item_data = {};
-                item_data[bom_line_id] = [{'delete_line_id': action_line_id}];
+                var delete_data = [];
+                if (self.delete_action_ids[bom_line_id]) {
+                    delete_data = self.delete_action_ids[bom_line_id];
+                }
+                delete_data.push({'delete_line_id': action_line_id});
+                // console.log(action_line_id)
                 // var item_date[action_line_id]
-                self.edit_arr.push(item_data);
+                console.log(delete_data);
+                self.delete_action_ids[bom_line_id] = delete_data;
+                console.log(self.delete_action_ids);
+
             }
             tr.remove()
 
@@ -164,10 +170,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 _.each(results, function (result) {
                     if (result.is_default) {
                         show_save = true;
-                        var item_data = {};
-                        console.log(result);
-                        item_data[result.id] = result.process_action;
-                        self.edit_arr.push(item_data);
+                        self.edit_arr[result.id] = result.process_action;
                     }
                 });
                 if (show_save) {
@@ -189,7 +192,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 self.initTableSubCompany(self.columns, results);
 
                 //    保存后要清空数组
-                self.edit_arr = [];
+                self.edit_arr = {};
 
             });
         },
@@ -253,10 +256,12 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             console.log(self.table_data);
             console.log(self.index);
             console.log(self);
-            var item_data = {};
-            item_data[bom_line_id] = actions;
-            self.edit_arr.push(item_data);
-            
+            if (self.delete_action_ids[bom_line_id]) {
+                actions = actions.concat(self.delete_action_ids[bom_line_id]);
+            }
+            ;
+
+            self.edit_arr[bom_line_id] = actions;
             console.log(self.edit_arr);
             $('.unlock_condition').hide();
             if ($('.fixed-table-toolbar .save_process_sel').length == 0) {
@@ -305,7 +310,8 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             if (action && action.params) {
                 this.product_id = action.params["active_id"];
             }
-            this.edit_arr = [];
+            this.edit_arr = {};
+            this.delete_action_ids = {};
             this.tr_datas = {};
             this.actions = [];
         },
@@ -366,7 +372,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                         }
 
                     ]
-                    ;
+                ;
                 self.columns = columns;
                 self.initTableSubCompany(columns, records)
 

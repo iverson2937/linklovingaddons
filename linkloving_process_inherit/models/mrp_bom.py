@@ -446,46 +446,45 @@ class MrpBomLine(models.Model):
     def save_multi_changes(self, args, **kwargs):
         bom_id = kwargs.get('bom_id')
         action_line_obj = self.env['process.action.line']
-        for arg in args:
-            for bom_line_id, actions in arg.iteritems():
+        for bom_line_id, actions in args.iteritems():
 
-                if actions:
-                    bom_line = self.env['mrp.bom.line'].browse(int(bom_line_id))
-                    for action in actions:
-                        if action.get('id'):
-                            process_action_line = action_line_obj.browse(action.get('id'))
-                            action_id_new = int(action.get('action_id'))
-                            if action_id_new in self.env['mrp.process.action'].search([]).ids:
-                                process_action_line.write({
-                                    'rate': action.get('rate'),
-                                    'rate_2': action.get('rate_2'),
-                                    'action_id': action_id_new
-                                })
-                        elif action.get('delete_line_id'):
-                            action_line_obj.browse(int(action.get('delete_line_id'))).unlink()
-                        else:
-                            action_line_obj.create({
+            if actions:
+                bom_line = self.env['mrp.bom.line'].browse(int(bom_line_id))
+                for action in actions:
+                    if action.get('id'):
+                        process_action_line = action_line_obj.browse(action.get('id'))
+                        action_id_new = int(action.get('action_id'))
+                        if action_id_new in self.env['mrp.process.action'].search([]).ids:
+                            process_action_line.write({
                                 'rate': action.get('rate'),
                                 'rate_2': action.get('rate_2'),
-                                'action_id': int(action.get('action_id')),
-                                'bom_line_id': int(bom_line_id)
+                                'action_id': action_id_new
                             })
-                    # else:
-                    #     self.env['process.action.line'].browse()
-
-                    action_data = bom_line.parse_action_line_data(no_option=True, no_data=True)
-                    category_id = bom_line.bom_id.product_tmpl_id.categ_id.id
-                    tmp_obj = self.env['bom.cost.category.temp']
-                    product_id = bom_line.product_id.id
-                    temp_id = tmp_obj.search(
-                        [('category_id', '=', category_id), ('product_id', '=', product_id)], limit=1)
-                    if temp_id:
-
-                        temp_id.action_data = json.dumps(action_data)
+                    elif action.get('delete_line_id'):
+                        action_line_obj.browse(int(action.get('delete_line_id'))).unlink()
                     else:
-                        tmp_obj.create({'category_id': bom_line.bom_id.product_tmpl_id.categ_id.id,
-                                        'product_id': product_id,
-                                        'action_data': json.dumps(action_data)
-                                        })
+                        action_line_obj.create({
+                            'rate': action.get('rate'),
+                            'rate_2': action.get('rate_2'),
+                            'action_id': int(action.get('action_id')),
+                            'bom_line_id': int(bom_line_id)
+                        })
+                # else:
+                #     self.env['process.action.line'].browse()
+
+                action_data = bom_line.parse_action_line_data(no_option=True, no_data=True)
+                category_id = bom_line.bom_id.product_tmpl_id.categ_id.id
+                tmp_obj = self.env['bom.cost.category.temp']
+                product_id = bom_line.product_id.id
+                temp_id = tmp_obj.search(
+                    [('category_id', '=', category_id), ('product_id', '=', product_id)], limit=1)
+                if temp_id:
+
+                    temp_id.action_data = json.dumps(action_data)
+                else:
+                    tmp_obj.create({'category_id': bom_line.bom_id.product_tmpl_id.categ_id.id,
+                                    'product_id': product_id,
+                                    'action_data': json.dumps(action_data)
+                                    })
 
         return self.env['mrp.bom'].browse(int(bom_id)).get_bom_cost_new()
