@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
 
@@ -7,6 +8,10 @@
 
         <menuitem id="menu_expense_sheet_report" name="报销费用报告" parent="menu_excel_report"
                   action="action_hr_expense_sheet_wizard" groups="account.group_account_user"/>
+
+        <menuitem id="menu_expense_sheet_report_payment" name="报销费用报告Payment" parent="menu_excel_report"
+                  action="action_hr_expense_sheet_wizard_2" groups="account.group_account_user"/>
+
         <menuitem id="menu_pre_payment_outgoing_report" name="暂支支出报告" parent="menu_excel_report"
                   action="action_pre_payment_report_wizard"
                   groups="account.group_account_user"/>

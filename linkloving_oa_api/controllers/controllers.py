@@ -2729,69 +2729,25 @@ class LinklovingOAApi(http.Controller):
         is_wx = request.jsonrequest.get("is_wx")
         device_version = request.jsonrequest.get("device_version")
         open_id = request.jsonrequest.get("open_id")
+        if not device_version:
+            raise UserError(u"请更新新版OA,否则无法使用")
         if is_wx:
             if attendance_off:
-                domain_person = [("write_date", ">", day_start), ("write_date", "<", check_out),
-                                 ("employee_id", "=", employee_id)]
-                # domain_one = ['|', ("check_out", "=", False), '&',("check_out", ">", day_start), ("check_out", "<", check_out)]
-                domain_person = domain_person
-                attendance = request.env['hr.attendance'].sudo().search(domain_person, order='write_date desc', limit=1)
-                if attendance.id:
-                    attendance.write({
-                        "check_out": check_out,
-                        "company_off_name": company_name,
-                        "device_version": device_version,
-                        "open_id": open_id,
-                    })
-                else:
-                    new_attendance = request.env['hr.attendance'].sudo().create({
-                        "employee_id": employee_id,
-                        "check_out": check_out,
-                        # "check_in":check_out,
-                        "company_off_name": company_name,
-                        "device_version": device_version,
-                        "open_id": open_id,
-                    })
+                new_attendance = request.env['hr.attendance'].sudo().create({
+                    "employee_id": employee_id,
+                    "check_out": fields.datetime.now(),
+                    "company_off_name": company_name,
+                    "device_version": device_version,
+                    "open_id": open_id,
+                })
             else:
-                last_attendance_before_check_in = request.env['hr.attendance'].sudo().search([
-                    ('employee_id', '=', employee_id),
-                    ('new_check_in', '<=', check_in),
-                ], order='check_in desc', limit=1)
-
-                if last_attendance_before_check_in.id:
-                    last_time_check_in = fields.datetime.strptime(last_attendance_before_check_in.check_in,
-                                                                  '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours=8)
-                    today_time = fields.datetime.now() + datetime.timedelta(hours=8)
-                    if last_time_check_in.year == today_time.year and last_time_check_in.month == today_time.month and last_time_check_in.day == today_time.day:
-                        if last_attendance_before_check_in.check_out:
-                            new_attendance = request.env['hr.attendance'].sudo().create({
-                                "employee_id": employee_id,
-                                "new_check_in": check_in,
-                                "company_name": company_name,
-                                "device_version": device_version,
-                                "open_id": open_id,
-                            })
-                        else:
-                            raise exceptions.ValidationError(_(
-                                "用户 %(empl_name)s, 今天已经签到过了") % {
-                                                                 'empl_name': last_attendance_before_check_in.employee_id.name_related,
-                                                             })
-                    else:
-                        new_attendance = request.env['hr.attendance'].sudo().create({
-                            "employee_id": employee_id,
-                            "new_check_in": check_in,
-                            "company_name": company_name,
-                            "device_version": device_version,
-                            "open_id": open_id,
-                        })
-                else:
-                    new_attendance = request.env['hr.attendance'].sudo().create({
-                        "employee_id": employee_id,
-                        "new_check_in": check_in,
-                        "company_name": company_name,
-                        "device_version": device_version,
-                        "open_id": open_id,
-                    })
+                new_attendance = request.env['hr.attendance'].sudo().create({
+                    "employee_id": employee_id,
+                    "new_check_in": fields.datetime.now(),
+                    "company_name": company_name,
+                    "device_version": device_version,
+                    "open_id": open_id,
+                })
             domain = [("new_check_in", ">", day_start), ("new_check_in", "<", day_end), ("employee_id", "=", employee_id)]
             attendance_list = request.env['hr.attendance'].sudo().search(domain)
             data = []
@@ -2936,11 +2892,13 @@ class LinklovingOAApi(http.Controller):
     @http.route('/linkloving_oa_api/bind_employee', type='json', auth="none", csrf=False, cors='*')
     def bind_employee(self, *kw):
         employee_id = request.jsonrequest.get("employee_id")
+        request_url = request.jsonrequest.get("request_url")
         user_employee = request.env['hr.employee'].sudo().search([("id", "=", employee_id)])
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={
             "id":user_employee.id,
             "name":user_employee.name,
-            "user_ava": LinklovingGetImageUrl.get_img_url(user_employee.user_id, "res.users", "image_medium")
+            "user_ava": LinklovingGetImageUrl.get_img_url(user_employee.user_id, "res.users", "image_medium"),
+            "request_url":request_url,
         })
 
     #考勤定位补打卡
@@ -2957,69 +2915,42 @@ class LinklovingOAApi(http.Controller):
         is_wx = request.jsonrequest.get("is_wx")
         device_version = request.jsonrequest.get("device_version")
         open_id = request.jsonrequest.get("open_id")
+        if not device_version:
+            raise UserError(u"请更新新版OA,否则无法使用")
         if is_wx:
             if attendance_off:
-                domain_person = [("write_date", ">", day_start), ("write_date", "<", check_out),
-                                 ("employee_id", "=", employee_id)]
-                # domain_one = ['|', ("check_out", "=", False), '&',("check_out", ">", day_start), ("check_out", "<", check_out)]
-                domain_person = domain_person
-                attendance = request.env['hr.attendance'].sudo().search(domain_person, order='write_date desc', limit=1)
-                if attendance.id:
-                    attendance.write({
-                        "check_out": check_out,
-                        "company_off_name": company_name,
-                        "device_version": device_version,
-                        "open_id": open_id,
-                    })
-                else:
-                    new_attendance = request.env['hr.attendance'].sudo().create({
-                        "employee_id": employee_id,
-                        "check_out": check_out,
-                        # "check_in":check_out,
-                        "company_off_name": company_name,
-                        "device_version": device_version,
-                        "open_id": open_id,
-                    })
-            else:
-                last_attendance_before_check_in = request.env['hr.attendance'].sudo().search([
-                    ('employee_id', '=', employee_id),
-                    ('new_check_in', '<=', check_in),
-                ], order='check_in desc', limit=1)
-
-                if last_attendance_before_check_in.id:
-                    last_time_check_in = fields.datetime.strptime(last_attendance_before_check_in.check_in,
-                                                                  '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours=8)
-                    today_time = fields.datetime.now() + datetime.timedelta(hours=8)
-                    if last_time_check_in.year == today_time.year and last_time_check_in.month == today_time.month and last_time_check_in.day == today_time.day:
-                        if last_attendance_before_check_in.check_out:
-                            new_attendance = request.env['hr.attendance'].sudo().create({
-                                "employee_id": employee_id,
-                                "new_check_in": check_in,
-                                "company_name": company_name,
-                                "device_version": device_version,
-                                "open_id": open_id,
-                            })
-                        else:
-                            raise exceptions.ValidationError(_(
-                                "用户 %(empl_name)s, 今天已经签到过了") % {
-                                                                 'empl_name': last_attendance_before_check_in.employee_id.name_related,
-                                                             })
-                    else:
-                        new_attendance = request.env['hr.attendance'].sudo().create({
-                            "employee_id": employee_id,
-                            "new_check_in": check_in,
-                            "company_name": company_name,
-                            "device_version": device_version,
-                            "open_id": open_id,
+                new_attendance = request.env['hr.attendance'].sudo().create({
+                    "employee_id": employee_id,
+                    "check_out": fields.datetime.now(),
+                    # "check_in":check_out,
+                    "company_off_name": company_name,
+                    "device_version": device_version,
+                    "open_id": open_id,
+                    "is_location_off": True,
+                })
+                if location_imgs:
+                    for img in location_imgs:
+                        wo_img_id = request.env["linkloving.hr.attendance.off.image"].sudo().create({
+                            'attendance_id': new_attendance.id,
+                            'attendance_image': img,
                         })
-                else:
-                    new_attendance = request.env['hr.attendance'].sudo().create({
-                        "employee_id": employee_id,
-                        "new_check_in": check_in,
-                        "company_name": company_name,
-                        "device_version": device_version,
-                        "open_id": open_id,
-                    })
+                        new_attendance.attendance_off_ids = [(4, wo_img_id.id)]
+            else:
+                new_attendance = request.env['hr.attendance'].sudo().create({
+                    "employee_id": employee_id,
+                    "new_check_in": fields.datetime.now(),
+                    "company_name": company_name,
+                    "device_version": device_version,
+                    "open_id": open_id,
+                    "is_location_on": True,
+                })
+                if location_imgs:
+                    for img in location_imgs:
+                        wo_img_id = request.env["linkloving.hr.attendance.image"].sudo().create({
+                            'attendance_id': new_attendance.id,
+                            'attendance_image': img,
+                        })
+                        new_attendance.attendance_on_ids = [(4, wo_img_id.id)]
             domain = [("new_check_in", ">", day_start), ("new_check_in", "<", day_end), ("employee_id", "=", employee_id)]
             attendance_list = request.env['hr.attendance'].sudo().search(domain)
             data = []
@@ -3148,6 +3079,51 @@ class LinklovingOAApi(http.Controller):
                 "name":obj.name
             })
         return data
+
+
+        # 获取组织架构 :
+    @http.route('/linkloving_oa_api/get_all_department', type='json', auth="none", csrf=False, cors='*')
+    def get_all_department(self, *kw):
+        parent_department = request.env['hr.department'].sudo().search([("parent_id", "=", False)])
+        data = []
+        data_child_ids = self.get_childs_department(parent_department)
+        data.append({
+            "name":parent_department.name,
+            "id":parent_department.id,
+            "child": data_child_ids,
+            "employees":self.get_employee_by_department(parent_department.id),
+            "childEmployeeNumber":  self.get_childs_employee_number(parent_department),
+        })
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+
+
+    def get_employee_by_department(self,department_id):
+        data = []
+        user_employees = request.env['hr.employee'].sudo().search([("department_id", "=", department_id)])
+        for user_employee in user_employees:
+            data.append(self.change_employee_to_json(user_employee))
+        return data
+
+
+    def get_childs_department(self, obj):
+        child_data = []
+        if obj.child_ids:
+            for department in obj.child_ids:
+                child_data.append({
+                    "name":department.name,
+                    "id":department.id,
+                    "child": self.get_childs_department(department),
+                    "employees":self.get_employee_by_department(department.id),
+                    "childEmployeeNumber":  self.get_childs_employee_number(department),
+                })
+        return child_data
+
+    def get_childs_employee_number(self, obj):
+        number =len(request.env['hr.employee'].sudo().search([("department_id", "=", obj.id)]))
+        if obj.child_ids:
+            for department in obj.child_ids:
+                number +=self.get_childs_employee_number(department)
+        return number
 
     #  XD 我的请假
     @http.route('/linkloving_oa_api/get_leavelist', type='json', auth="none", csrf=False, cors='*')

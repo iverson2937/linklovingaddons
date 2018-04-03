@@ -14,20 +14,22 @@
         <div class="unlock_condition close_this_container">
             <div class="modal-backdrop  in"></div>
             <div class="create_wrap" style="width: 800px">
-                <div class="top_calc_rule">
-                    <span>计算规则</span>
-                    <label><input type="radio" value="by_material" checked="checked" name="calc_rule"/>按物料配比</label>
-                    <label><input type="radio" value="by_action" name="calc_rule"/>按动作次数</label>
+                   <div class="add_tr">
+                    <i class="fa fa-plus"/> 新增
                 </div>
+                <!--<div class="top_calc_rule">-->
+                <!--<span>计算规则</span>-->
+                <!--<label><input type="radio" value="by_material" checked="checked" name="calc_rule"/>按物料配比</label>-->
+                <!--<label><input type="radio" value="by_action" name="calc_rule"/>按动作次数</label>-->
+                <!--</div>-->
                 <div id="action_table">
 
                 </div>
-                <div class="add_tr">
-                    <i class="fa fa-plus"/> 新增
-                </div>
+
                 <div class="foot">
-                    <button class=" btn btn-primary confirm_sel" style="margin-left:201px">确定</button>
-                    <button class="btn btn-default alia_cancel">取消</button>
+
+                    <button class=" btn btn-primary confirm_sel pull-right" style="margin-left:10px">确定</button>
+                    <button class="btn btn-default alia_cancel pull-right">取消</button>
                 </div>
             </div>
         </div>
@@ -39,10 +41,10 @@
             <tbody>
                 <tr>
                      <th style="width:85px">工序</th>
-                     <th style="width:110px">动作</th>
+                     <th style="width:160px">动作</th>
                      <th style="width:56px">次数</th>
-                     <th style="width:56px">参数</th>
-                     <th style="width:56px">单价</th>
+                     <th style="width:100px">参数</th>
+                     <th style="width:100px">单价</th>
                      <th>备注</th>
                      <th style="width:30px"></th>
                  </tr>
@@ -61,30 +63,34 @@
             <tr>
                 <td class="process_select">
                     <select>
+                        <t t-set="index" t-value="0"></t>
                        <t t-foreach="data.process_options" t-as="option">
-                          <option t-att-data-id="option.id" t-att-selected="id == data.process_id ? 'selected' : null">
+                          <option t-att-data-index="index" t-att-data-id="option.id" t-att-selected="id == data.process_id ? 'selected' : null">
                               <t t-esc="option.name"/>
                           </option>
+                           <t t-set="index" t-value="index+1"></t>
                         </t>
                     </select>
                 </td>
                 <td class="action_select">
                     <select t-att-data-id="data.line_id">
+                        <t t-set="index" t-value="0"></t>
                            <t t-foreach="data.options" t-as="options">
-                          <option t-att-data-id="options.id">
-                              <t t-esc="options.name"/>
+                          <option t-att-data-id="options.id" t-att-data-index="index" t-att-selected="id == data.action_id ? 'selected' : null">
+                              <p style="width:150px"><t t-esc="options.name"/></p>
                           </option>
+                               <t t-set="index" t-value="index+1"></t>
                         </t>
                     </select>
                 </td>
                 <td>
-                    <input type="text" class="times" disabled="disabled" name="rate2" value="0"/>
+                    <input type="text" class="times" name="rate_2" t-att-value="data.rate_2"/>
                 </td>
                 <td>
                     <input type="text" name="rate" t-att-value="data.rate" />
                 </td>
                 <td class="cost"><t t-esc="data.cost"/></td>
-                <td class="remark"> <t t-esc="data.remark"/></td>
+                <td class="remark"> <t t-esc="data.options[0].remark"/></td>
                 <td class="delete"><i class="fa fa-trash"/></td>
             </tr>
         </t>
@@ -136,7 +142,7 @@
         <t t-foreach="result" t-as="item">
             <t t-if="item.action_name">
         <div>
-            <span><t t-esc="item.action_name"/></span><span class="pull-right"><t t-esc="item.rate"/></span>
+            <span><t t-esc="item.action_name"/></span><span class="pull-right"><t t-esc="item.rate_2"/>x<t t-esc="item.rate"/></span>
         </div>
                 </t>
         </t>

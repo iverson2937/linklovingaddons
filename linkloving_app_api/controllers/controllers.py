@@ -141,6 +141,10 @@ class LinklovingAppApi(http.Controller):
 
         request.params['login_success'] = False
         values = request.params.copy()
+        app_version = request.jsonrequest.get("app_version")
+        if not app_version:
+            raise UserError(u"请更新新版OA,否则无法使用")
+
         if not request.uid:
             request.uid = odoo.SUPERUSER_ID
 
@@ -151,7 +155,7 @@ class LinklovingAppApi(http.Controller):
             cur_partner = request.env['res.partner'].sudo().search([('sub_company', '=', 'sub')])
             values['is_company_main'] = False
             if cur_partner:
-                if len(cur_partner)>0:
+                if len(cur_partner) > 0:
                     values['is_company_main'] = True
             if uid is not False:
                 request.params['login_success'] = True
@@ -1661,7 +1665,7 @@ class LinklovingAppApi(http.Controller):
         done_stock_moves = []
         is_multi_output = is_random_output = False
         if (hasattr(production, 'is_multi_output') and production.is_multi_output) or (
-                    hasattr(production, 'is_random_output') and production.is_random_output):
+                hasattr(production, 'is_random_output') and production.is_random_output):
             done_stock_moves = request.env['stock.move.finished'].sudo().search_read(
                 [('id', 'in', production.stock_move_lines_finished.ids)],
                 fields=['product_id',
@@ -3488,15 +3492,15 @@ class LinklovingAppApi(http.Controller):
             "picking_cause": material.picking_cause,
             "remark": material.remark,
             'line_ids': [{
-                             'id': lines.id,
-                             'qty_product': lines.qty_available,
-                             'name': lines.product_id.display_name,
-                             'location': lines.product_id.area_id.name,
-                             'quantity_available': lines.quantity_available,
-                             'quantity_done': lines.quantity_done,
-                             'product_qty': lines.product_qty,
-                             'reserve': lines.reserve_qty,
-                         } for lines in material.line_ids],
+                'id': lines.id,
+                'qty_product': lines.qty_available,
+                'name': lines.product_id.display_name,
+                'location': lines.product_id.area_id.name,
+                'quantity_available': lines.quantity_available,
+                'quantity_done': lines.quantity_done,
+                'product_qty': lines.product_qty,
+                'reserve': lines.reserve_qty,
+            } for lines in material.line_ids],
         }
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=json_list)
@@ -3691,7 +3695,7 @@ class LinklovingAppApi(http.Controller):
         # request.params["db"] = db
         domain = []
         if product_name:
-            domain.append(('name', 'ilike', product_name))
+            domain.append(('name', 'ilike', product_name), ('active', '!=', -1))
         products = request.env['product.product'].sudo().search(domain,
                                                                 limit=10)
         json_list = []
