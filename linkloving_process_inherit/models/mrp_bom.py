@@ -366,6 +366,17 @@ class MrpBomLine(models.Model):
             res.append(data)
 
         if not res and not no_data:
+            options = []
+            if self.bom_id.process_id:
+                domain = ['|', ('process_id', '=', self.bom_id.process_id.id), ('process_id', '=', False)]
+            actions = self.env['mrp.process.action'].search(domain)
+            for action in actions:
+                options.append({
+                    'id': action.id,
+                    'name': action.name,
+                    'cost': action.cost,
+                    'remark': action.remark,
+                })
             res.append({
                 'line_id': '',
                 'rate': 1,
