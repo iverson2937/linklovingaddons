@@ -9,6 +9,14 @@ class MrpBom(models.Model):
 
     manpower_cost = fields.Float(string='工序动作成本', compute='_get_bom_cost')
 
+    @api.model
+    def get_diff_bom_date(self, source_id, dest_id):
+        bom_obj = self.env['mrp.bom']
+        source_bom = bom_obj.browse(source_id)
+        dest_bom = bom_obj.browse(dest_id)
+        source_bom_product_ids = source_bom.mapped('bom_line_ids.product_id').ids
+        dest_bom_produt_ids = source_bom.mapped('bom_line_ids.product_id').ids
+
     def _get_product_type_dict(self):
         return dict(
             self.product_tmpl_id.fields_get(['product_ll_type'])['product_ll_type']['selection'])

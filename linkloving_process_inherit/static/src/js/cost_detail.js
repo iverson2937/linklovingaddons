@@ -259,7 +259,6 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             if (self.delete_action_ids[bom_line_id]) {
                 actions = actions.concat(self.delete_action_ids[bom_line_id]);
             }
-            ;
 
             self.edit_arr[bom_line_id] = actions;
             console.log(self.edit_arr);
