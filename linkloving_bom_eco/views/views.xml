@@ -151,9 +151,9 @@
                                 <field name="effect_mo_line_ids">
                                     <tree>
                                         <field name="production_id"/>
-                                        <!--<field name="sim_stock_move_id"/>-->
-                                        <!--<field name="from_qty"/>-->
-                                        <!--<field name="to_qty"/>-->
+                                        <field name="sim_stock_move_id"/>
+                                        <field name="from_qty"/>
+                                        <field name="to_qty"/>
                                     </tree>
                                 </field>
                             </page>
@@ -162,8 +162,8 @@
                                     <tree>
                                         <field name="purchase_id"/>
                                         <field name="purchase_line_id"/>
-                                        <!--<field name="from_qty"/>-->
-                                        <!--<field name="to_qty"/>-->
+                                        <field name="from_qty"/>
+                                        <field name="to_qty"/>
                                     </tree>
                                 </field>
                             </page>
