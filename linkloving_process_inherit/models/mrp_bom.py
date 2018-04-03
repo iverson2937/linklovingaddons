@@ -454,6 +454,13 @@ class MrpBomLine(models.Model):
     def save_multi_changes(self, args, **kwargs):
         bom_id = kwargs.get('bom_id')
         action_line_obj = self.env['process.action.line']
+        if type(args) == list:
+            abc = {}
+            for arg in args:
+                abc.update({
+                    arg.keys()[0]: arg.values()[0]
+                })
+            args = abc
         for bom_line_id, actions in args.iteritems():
 
             if actions:
