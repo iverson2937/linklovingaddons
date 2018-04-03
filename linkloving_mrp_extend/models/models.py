@@ -424,7 +424,8 @@ class MrpProductionExtend(models.Model):
         return res
 
     def add_one_sim_stock_move(self, move):
-        if move:
+        if move and not self.env["sim.stock.move"].search(
+                [('production_id', '=', self.id), ('product_id', '=', move.product_id.id)]):
             res = self.env['sim.stock.move'].create(self._prepare_sim_stock_move_values(move.product_id.id))
             return res
 
@@ -1632,6 +1633,14 @@ class SimStockMove(models.Model):
 
     remaining_qty = fields.Float(string=u"待领数量", compute='_compute_remaining_qty')
 
+    @api.multi
+    @api.depends('product_id')
+    def name_get(self):
+        result = []
+        for sim in self:
+            name = sim.product_id.display_name
+            result.append((sim.id, name))
+        return result
 
 class ReturnMaterialLine(models.Model):
     _name = 'return.material.line'

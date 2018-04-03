@@ -9,6 +9,40 @@ class ProcurementOrderExtend1(models.Model):
     _inherit = 'procurement.order'
 
     @api.multi
+    def propagate_cancels(self):
+        if self._context.get("eco_vals"):
+            eco_vals = self._context.get("eco_vals")
+            cancelled_procurements = self.env["procurement.order"]
+            for procurement in self:
+                if procurement.rule_id.action == 'buy' and procurement.purchase_line_id:
+                    eco_vals["line_type"] = "purchase_order"
+                    if procurement.purchase_line_id.order_id.state in ['draft', 'purchase', 'done', 'sent',
+                                                                       'to validate']:  # 被处理过的单据不做处理
+                        eco_vals["from_qty"] = procurement.purchase_line_id.product_qty
+                        eco_vals["to_qty"] = procurement.purchase_line_id.product_qty
+                        procurement.create_effect_line(eco_vals)
+                        continue
+                    elif procurement.purchase_line_id.order_id.state in ["make_by_mrp"]:
+                        eco_vals["from_qty"] = procurement.purchase_line_id.product_qty
+                        one_res = super(ProcurementOrderExtend1, procurement).propagate_cancels()
+                        cancelled_procurements += procurement
+                        eco_vals["to_qty"] = procurement.purchase_line_id.product_qty
+                        procurement.create_effect_line(eco_vals)
+                        return one_res
+
+                if procurement.rule_id.action == 'manufacture' and procurement.production_id:
+                    man_order = procurement.production_id
+                    eco_vals["from_qty"] = man_order.product_qty
+                    one_res = super(ProcurementOrderExtend1, procurement).propagate_cancels()
+                    cancelled_procurements += procurement
+                    procurement.create_effect_line(eco_vals)
+                    return one_res
+
+        res = super(ProcurementOrderExtend1, self - cancelled_procurements).propagate_cancels()
+
+        return res
+
+    @api.multi
     def make_po(self):
         res = super(ProcurementOrderExtend1, self).make_po()
         if self._context.get("eco_vals"):
@@ -31,60 +65,76 @@ class ProcurementOrderExtend1(models.Model):
             eco_vals["purchase_id"] = procurement.purchase_id.id or None,
             eco_vals["purchase_line_id"] = procurement.purchase_line_id.id or None,
             eco_vals["production_id"] = procurement.production_id.id or None,
-            eco_vals["to_qty"] = procurement.product_qty
+            # eco_vals["to_qty"] = procurement.product_qty
             self.env["eco.effect.line"].create(eco_vals)
-            # @api.multi
-            # def require_reduced(self):  # 级联减少需求
-            #     propagated_procurements = self.filtered(lambda order: order.state != 'done').propagate_reduced()
-            #     propagated_procurements.propagate_reduced()
-            #
-            # @api.multi
-            # def propagate_reduced(self):
-            #     reduce_man_orders = self.filtered(
-            #         lambda procurement: procurement.rule_id.action == 'manufacture' and procurement.production_id).mapped(
-            #         'production_id')
-            #     if reduce_man_orders:
-            #         reduce_man_orders.require_reduced()
-            #     for procurement in self:
-            #         if procurement.rule_id.action == 'buy' and procurement.purchase_line_id:
-            #             if procurement.purchase_line_id.order_id.state in ['purchase', 'done']:
-            #                 continue
-            #                 # if procurement.purchase_line_id.order_id.state not in ('make_by_mrp', 'draft', 'cancel', 'sent', 'to validate'):
-            #                 #     raise UserError(
-            #                 #         _('Can not cancel a procurement related to a purchase order. Please cancel the purchase order first.') + ('%s' % procurement.id))
-            #         if procurement.purchase_line_id.order_id.state == 'make_by_mrp' and procurement.purchase_line_id:
-            #             price_unit = 0.0
-            #             product_qty = 0.0
-            #             others_procs = procurement.purchase_line_id.procurement_ids.filtered(lambda r: r != procurement)
-            #             for other_proc in others_procs:
-            #                 if other_proc.state not in ['cancel', 'draft']:
-            #                     product_qty += other_proc.product_uom._compute_quantity(other_proc.product_qty,
-            #                                                                             procurement.purchase_line_id.product_uom)
-            #
-            #             precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
-            #             if not float_is_zero(product_qty, precision_digits=precision):
-            #                 seller = procurement.product_id._select_seller(
-            #                         partner_id=procurement.purchase_line_id.partner_id,
-            #                         quantity=product_qty,
-            #                         date=procurement.purchase_line_id.order_id.date_order and procurement.purchase_line_id.order_id.date_order[
-            #                                                                                   :10],
-            #                         uom_id=procurement.purchase_line_id.product_uom)
-            #
-            #                 price_unit = self.env['account.tax']._fix_tax_included_price(seller.price,
-            #                                                                              procurement.purchase_line_id.product_id.supplier_taxes_id,
-            #                                                                              procurement.purchase_line_id.taxes_id) if seller else 0.0
-            #                 if price_unit and seller and procurement.purchase_line_id.order_id.currency_id and seller.currency_id != procurement.purchase_line_id.order_id.currency_id:
-            #                     price_unit = seller.currency_id.compute(price_unit,
-            #                                                             procurement.purchase_line_id.order_id.currency_id)
-            #
-            #                 if seller and seller.product_uom != procurement.purchase_line_id.product_uom:
-            #                     price_unit = seller.product_uom._compute_price(price_unit,
-            #                                                                    procurement.purchase_line_id.product_uom)
-            #
-            #                 procurement.purchase_line_id.product_qty = product_qty
-            #                 procurement.purchase_line_id.price_unit = price_unit
-            #             else:
-            #                 procurement.purchase_line_id.unlink()
+
+    @api.multi
+    def require_reduced(self, reduced_qty, bom_line_id=None, line_data=None):  # 级联减少需求
+        propagated_procurements = self.filtered(lambda order: order.state != 'done')
+        propagated_procurements.propagate_reduced(reduced_qty)
+
+    @api.multi
+    def propagate_reduced(self, reduced_qty, bom_line_id=None, line_data=None):
+        if self._context.get("eco_vals"):
+            eco_vals = self._context.get("eco_vals")
+            for procurement in self:
+                # 减少的数量 ?
+                # actual_qty = procurement.get_actual_require_qty()
+                # factor = procurement.product_uom._compute_quantity(actual_qty,
+                #                                              procurement.product_uom) / procurement.bom_id.product_qty
+
+                # boms, lines = procurement.bom_id.explode(procurement.product_id, factor, picking_type=procurement.bom_id.picking_type_id)
+                if procurement.rule_id.action == 'buy' and procurement.purchase_line_id:
+                    eco_vals["line_type"] = "purchase_order"
+                    if procurement.purchase_line_id.order_id.state in ['draft', 'purchase', 'done', 'sent',
+                                                                       'to validate']:  # 被处理过的单据不做处理
+
+                        eco_vals["from_qty"] = procurement.purchase_line_id.product_qty
+                        eco_vals["to_qty"] = procurement.purchase_line_id.product_qty
+                        procurement.create_effect_line(eco_vals)
+                        continue
+                    elif procurement.purchase_line_id.order_id.state in ["make_by_mrp"]:
+
+                        eco_vals["from_qty"] = procurement.purchase_line_id.product_qty
+                        procurement.po_reduced(reduced_qty)
+                        eco_vals["to_qty"] = procurement.purchase_line_id.product_qty
+                        procurement.create_effect_line(eco_vals)
+
+                if procurement.rule_id.action == 'manufacture' and procurement.production_id:
+                    # actual_qty = procurement.get_actual_require_qty()
+                    # factor = procurement.product_uom._compute_quantity(actual_qty,
+                    #                                              procurement.product_uom) / procurement.bom_id.product_qty
+                    # boms, lines = procurement.bom_id.explode(procurement.product_id, factor, picking_type=procurement.bom_id.picking_type_id)
+                    man_order = procurement.production_id
+                    eco_vals["from_qty"] = man_order.product_qty
+                    procurement.mo_reduced(man_order, reduced_qty)
+                    eco_vals["to_qty"] = man_order.product_qty
+                    procurement.create_effect_line(eco_vals)
+
+    def po_reduced(self, reduced_qty):
+        self.ensure_one()
+        product_qty = self.purchase_line_id.product_qty - reduced_qty
+        precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+        if not float_is_zero(product_qty, precision_digits=precision):
+            seller = self.product_id._select_seller(
+                    partner_id=self.purchase_line_id.partner_id,
+                    quantity=product_qty,
+                    date=self.purchase_line_id.order_id.date_order and self.purchase_line_id.order_id.date_order[
+                                                                       :10],
+                    uom_id=self.purchase_line_id.product_uom)
+            price_unit = self.env['account.tax']._fix_tax_included_price(seller.price,
+                                                                         self.purchase_line_id.product_id.supplier_taxes_id,
+                                                                         self.purchase_line_id.taxes_id) if seller else 0.0
+            if price_unit and seller and self.purchase_line_id.order_id.currency_id and seller.currency_id != self.purchase_line_id.order_id.currency_id:
+                price_unit = seller.currency_id.compute(price_unit,
+                                                        self.purchase_line_id.order_id.currency_id)
+            if seller and seller.product_uom != self.purchase_line_id.product_uom:
+                price_unit = seller.product_uom._compute_price(price_unit,
+                                                               self.purchase_line_id.product_uom)
+            self.purchase_line_id.product_qty = product_qty
+            self.purchase_line_id.price_unit = price_unit
+        else:
+            self.purchase_line_id.unlink()
 
 
 class StockMoveExtend(models.Model):
@@ -231,9 +281,10 @@ class MrpEcoOrder(models.Model):
             new_bom_ecos = self.make_mrp_bom_ecos()
             new_bom_ecos.apply_to_bom()
             new_bom_ecos.apply_bom_update()  # 应用 更新至MO
+            self.state = 'done'
             msg = "应用成功,已生成报告并通知到相关人员"
         elif self.effectivity == 'date':
-            self.state == 'progress'
+            self.state = 'progress'
             msg = "设置成功, 将于指定日期生效"
 
         return {
@@ -511,15 +562,15 @@ class MrpBomEco(models.Model):
                     })
                 elif bom_change.operate_type == 'update':
                     if not bom_change.bom_line_id:
-                        raise UserError(u' %s 未找到对应的BOM明细行', bom_change.product_id.name)
+                        raise UserError(u' %s 未找到对应的BOM明细行' % bom_change.product_id.name)
                     if bom_change.bom_line_id.product_qty != bom_change.new_product_qty:
                         bom_change.bom_line_id.product_qty = bom_change.new_product_qty
                     else:
-                        raise UserError(u'%s 修改前后BOM配比相同', bom_change.product_id.name)
+                        raise UserError(u'%s 修改前后BOM配比相同' % bom_change.product_id.name)
 
                 elif bom_change.operate_type == 'remove':
                     if not bom_change.bom_line_id:
-                        raise UserError(u' %s 未找到对应的BOM明细行', bom_change.product_id.name)
+                        raise UserError(u' %s 未找到对应的BOM明细行' % bom_change.product_id.name)
                     bom_change.bom_line_id.unlink()
             if len(bom_eco.bom_id.bom_line_ids) == 0:
                 raise UserError(u'变更后, %s 明细行为空.' % bom_eco.bom_id.name)
@@ -557,7 +608,7 @@ class MrpBomEco(models.Model):
                 move_obj = self.env["stock.move"]
                 for change in bom_eco.bom_change_ids:
                     context = dict(self._context)
-                    context.update(self.procurement_context(new_effect_order, bom_eco, change, 0))
+
                     if change.operate_type == 'add':  # 新增物料需求, 直接在这个mo上面
                         # add的时候 只有newproduct_id有值
                         bom_line_id, line_data = self.find_line_data_with_bom_line(lines,
@@ -566,7 +617,7 @@ class MrpBomEco(models.Model):
                         to_qty = line_data["qty"]
                         if move_obj:
                             move_obj.adjust_move_procure_method()
-
+                            context.update(self.procurement_context(new_effect_order, bom_eco, change, 0))
                             move_obj.with_context(context).action_confirm()
                             sim_move_id = mo.add_one_sim_stock_move(move_obj)
                             self.create_effect_mo_type(new_effect_order, move_obj, sim_move_id, bom_eco, change, 0,
@@ -577,21 +628,23 @@ class MrpBomEco(models.Model):
                         bom_line_id, line_data = self.find_line_data_with_bom_line(lines,
                                                                                    product_id=change.product_id)
                         move = mo.move_raw_ids.filtered(
-                                lambda x: x.bom_line_id.id == bom_line_id.id)
-                        quantity = line_data['qty']
-                        from_qty = move.product_uom_qty
-                        qty_need_create = quantity - move.product_uom_qty
+                                lambda x: x.bom_line_id.id == bom_line_id.id and x.state != 'cancel')
                         if not move:
                             continue
                         else:
                             move = move.filtered(lambda x: x.state not in ["cancel", "done"]) or move[0]
+                        from_qty = sum(move.mapped("product_uom_qty"))
+                        quantity = line_data['qty']
+                        qty_need_create = quantity - move.product_uom_qty
+
                         if qty_need_create > 0:  # need create new procurement, new po or new mo
                             #  此处有两种处理方式,1.固定生成 MO数量, 2.进行mrp运算,根据库存来生成MO数量
                             vals = move._prepare_procurement_from_move()
                             vals["product_qty"] = qty_need_create
-                            procurement = self.env["procurement.order"].create(vals)
+                            context.update(self.procurement_context(new_effect_order, bom_eco, change, from_qty))
+                            procurement = self.env["procurement.order"].with_context(context).create(vals)
                             if procurement:
-                                procurement.with_context(context).run()
+                                procurement.run()
                             mo._update_raw_move(bom_line_id, line_data)  # 在获取完应该补充的qty之后,再更新mo的rawmove 重要!
                             sim_move_id = mo.sim_stock_move_lines.filtered(
                                 lambda x: x.product_id == bom_line_id.product_id)
@@ -599,21 +652,35 @@ class MrpBomEco(models.Model):
                                                        quantity)
 
                         else:  # 需要 减少
-                            pass
+                            # move = mo.move_raw_ids.filtered(
+                            #     lambda x: x.bom_line_id.id == bom_line_id.id)
+                            bom_line_id, line_data = self.find_line_data_with_bom_line(lines,
+                                                                                       product_id=change.product_id)
+                            sim_move_id = mo.sim_stock_move_lines.filtered(
+                                    lambda x: x.product_id == bom_line_id.product_id)
+                            mo._update_raw_move(bom_line_id, line_data)  # 在获取完应该补充的qty之后,再更新mo的rawmove 重要!
+                            to_qty = line_data["qty"]
+                            self.create_effect_mo_type(new_effect_order, move, sim_move_id, bom_eco, change, from_qty,
+                                                       to_qty)
                             # procurement_order = self.env["procurement.order"].search([('move_dest_id', '=', move.id)])
                             # if procurement_order:
-                            #     procurement_order.require_reduced()
+                            #     context.update(self.procurement_context(new_effect_order, bom_eco, change, from_qty))
+                            #
+                            #     procurement_order.with_context(context).require_reduced(line_data["qty"], bom_line_id=bom_line_id, line_data=line_data)
 
                     elif change.operate_type == 'remove':  # 移除时,筛选出相同产品的,并且可用的move单 取消他们.
                         moves_to_cancel = mo.move_raw_ids.filtered(
                                 lambda x: x.product_id == change.product_id and x.state not in ["done", "cancel"])
-                        moves_to_cancel.action_cancel()  # 取消的对应的move 并且取消 对应的补货单
-                        sim_move_id = mo.sim_stock_move_lines.filtered(lambda x: x.product_id == bom_line_id.product_id)
-                        self.create_effect_mo_type(new_effect_order, moves_to_cancel, sim_move_id, bom_eco, change,
-                                                   moves_to_cancel.product_uom_qty, 0)
-                        procurements = ProcurementOrder.search([('move_dest_id', 'in', moves_to_cancel.ids)])
-                        if procurements:
-                            procurements.with_context(context).cancel()
+                        if moves_to_cancel:
+                            moves_to_cancel.action_cancel()  # 取消的对应的move 并且取消 对应的补货单
+                            sim_move_id = \
+                            mo.sim_stock_move_lines.filtered(lambda x: x.product_id == moves_to_cancel[0].product_id)[0]
+                            self.create_effect_mo_type(new_effect_order, moves_to_cancel, sim_move_id, bom_eco, change,
+                                                       moves_to_cancel.product_uom_qty, 0)
+                            procurements = ProcurementOrder.search([('move_dest_id', 'in', moves_to_cancel.ids)])
+                            if procurements:
+                                context.update(self.procurement_context(new_effect_order, bom_eco, change))
+                                procurements.with_context(context).cancel()
                 mo.is_bom_update = True
                 mo.bom_version = bom_eco.new_version  # 将MO 版本号更新到新的版本
 
