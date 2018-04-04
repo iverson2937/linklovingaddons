@@ -7,6 +7,14 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
 
+class MrpBom(models.Model):
+    _inherit = 'mrp.bom'
+
+    def set_bom_line_product_bom_released(self):
+        self.bom_apply()
+        return super(MrpBom, self).set_bom_line_product_bom_released()
+
+
 class BomUpdateWizard(models.TransientModel):
     _inherit = "bom.update.wizard"
 
@@ -136,6 +144,7 @@ class BomUpdateWizard(models.TransientModel):
                 eco_lines.append(delete_vals)
             for line in eco_lines:
                 bom_id = line.get('bom_id')
+                bom_obj_id = bom_obj.browse(bom_id)
                 product_id = line.get('product_id')
                 operate_type = line.get('operate_type')
                 new_product_qty = line.get('new_product_qty')
@@ -159,6 +168,8 @@ class BomUpdateWizard(models.TransientModel):
                 else:
                     bom_eco_obj.create({
                         'bom_id': bom_id,
+                        'old_version': bom_obj_id.verion,
+                        'new_version': bom_obj_id.verion + 1,
                         'bom_change_ids': [(0, 0, {
                             'bom_id': bom_id,
                             'product_id': product_id,
