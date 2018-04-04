@@ -15,7 +15,7 @@ class BomUpdateWizard(models.TransientModel):
         line_obj = self.env['mrp.bom.line']
         bom_obj = self.env['mrp.bom']
         product_id_obj = self.env['product.product']
-        eco_order_obj = self.env['mrp.eco.order']
+        bom_eco_obj = self.env['mrp.bom.eco']
         eco_line_obj = self.env['mrp.eco.line']
         eco_lines = []
 
@@ -136,6 +136,36 @@ class BomUpdateWizard(models.TransientModel):
                 eco_lines.append(delete_vals)
             for line in eco_lines:
                 bom_id = line.get('bom_id')
+                product_id = line.get('product_id')
+                operate_type = line.get('operate_type')
+                new_product_qty = line.get('new_product_qty')
+                bom_eco_id = bom_eco_obj.search([('state', '!=', 'draft'), ('bom_id', '=', bom_id)])
+                if bom_eco_id:
+                    line_id = bom_eco_id.filtered(
+                        lambda x: x.product_id.id == product_id and x.operate_type == operate_type)
+                    if not line_id:
+                        eco_line_obj.create({
+                            'bom_id': bom_id,
+                            'product_id': product_id,
+                            'operate_type': operate_type,
+                            'new_product_qty': new_product_qty,
+                            'bom_eco_id': bom_eco_id
+                        })
+                    else:
+                        line_id.write({
+                            'new_product_qty': new_product_qty,
+                        })
+
+                else:
+                    bom_eco_obj.create({
+                        'bom_id': bom_id,
+                        'bom_change_ids': (0, 0, {
+                            'bom_id': bom_id,
+                            'product_id': product_id,
+                            'operate_type': operate_type,
+                            'new_product_qty': new_product_qty,
+                        })
+                    })
 
             # eco_order_obj.create({
             #     'eco_line_ids':
