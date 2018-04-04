@@ -149,7 +149,7 @@ class BomUpdateWizard(models.TransientModel):
                             'product_id': product_id,
                             'operate_type': operate_type,
                             'new_product_qty': new_product_qty,
-                            'bom_eco_id': bom_eco_id
+                            'bom_eco_id': bom_eco_id.id
                         })
                     else:
                         line_id.write({
