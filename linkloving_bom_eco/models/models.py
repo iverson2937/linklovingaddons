@@ -48,6 +48,7 @@ class ProcurementOrderExtend1(models.Model):
         if self._context.get("eco_vals"):
             eco_vals = self._context.get("eco_vals")
             eco_vals["line_type"] = "purchase_order"
+            eco_vals["from_qty"] = 0
             self.create_effect_line(eco_vals)
         return res
 
@@ -57,6 +58,7 @@ class ProcurementOrderExtend1(models.Model):
         if self._context.get("eco_vals"):
             eco_vals = self._context.get("eco_vals")
             eco_vals["line_type"] = "mrp_production"
+            eco_vals["from_qty"] = 0
             self.create_effect_line(eco_vals)
         return res
 
@@ -65,7 +67,7 @@ class ProcurementOrderExtend1(models.Model):
             eco_vals["purchase_id"] = procurement.purchase_id.id or None,
             eco_vals["purchase_line_id"] = procurement.purchase_line_id.id or None,
             eco_vals["production_id"] = procurement.production_id.id or None,
-            # eco_vals["to_qty"] = procurement.product_qty
+            eco_vals["to_qty"] = procurement.production_id.product_qty or procurement.purchase_line_id.product_qty
             self.env["eco.effect.line"].create(eco_vals)
 
     @api.multi
@@ -542,6 +544,11 @@ class MrpBomEco(models.Model):
                 bom_eco.bom_id.version = bom_eco.new_version
 
     @api.multi
+    def bom_apply(self):
+        self.apply_to_bom()
+        self.apply_bom_update()  # 应用 更新至MO
+
+    @api.multi
     def apply_to_bom(self):
         """
         将bOM按照表单进行更新, 并增加版本号
@@ -720,7 +727,7 @@ class MrpBomEco(models.Model):
 
         return self.env["eco.effect.line"].create({
             'line_type': 'mrp_production',
-            'production_id': sim_move_id.production_id.id,
+            'production_id': sim_move_id and sim_move_id.production_id.id,
             'bom_eco_id': bom_eco_id.id,
             'eco_order_id': bom_change_line_id.eco_order_id.id,
             'bom_change_line_id': bom_change_line_id.id,

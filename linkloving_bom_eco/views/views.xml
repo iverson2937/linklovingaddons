@@ -95,12 +95,12 @@
             <field name="model">mrp.bom.eco</field>
             <field name="arch" type="xml">
                 <form string="" edit="0" create="0">
-                    <!--<header>-->
+                    <header>
                     <!--<button name="action_change_apply" string="应用" class="oe_highlight" type="object" confirmed="是否将此修改应用到对应的BOM,并根据选项来决定是否更新MO"/>-->
                     <!--&lt;!&ndash;<button name="action_view" string="ccc" class="oe_highlight" type="object"/>&ndash;&gt;-->
                     <!--&lt;!&ndash;<button name="action_view" string="ccc" class="oe_highlight" type="object"/>&ndash;&gt;-->
-                    <!--<field name="state" widget="statusbar" />-->
-                    <!--</header>-->
+                        <field name="state" widget="statusbar"/>
+                    </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
                             <button class="oe_stat_button" name="action_view_bom_effect_order" type="object"
@@ -280,11 +280,35 @@
                 </p>
             </field>
         </record>
+        <record id="mrp_bom_eco_action" model="ir.actions.act_window">
+            <field name="name">单个BOM变更单</field>
+            <field name="res_model">mrp.bom.eco</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p>
+                    Create Engineering Change Orders
+                </p>
+            </field>
+        </record>
+        <menuitem
+                id="menu_mrp_eco"
+                name="变更单"
+                parent="mrp.menu_mrp_bom"
+                sequence="21"/>
+        <menuitem
+                id="menu_mrp_bom_eco"
+                name="单个BOM变更单"
+                action="mrp_bom_eco_action"
+                parent="menu_mrp_eco"
+                sequence="22"/>
+
         <menuitem
                 id="menu_mrp_plm_boms_1"
                 name="物料清单变更单"
                 action="mrp_eco_action_main"
-                parent="mrp.menu_mrp_bom"
+                parent="menu_mrp_eco"
                 sequence="21"/>
+
     </data>
 </openerp>
