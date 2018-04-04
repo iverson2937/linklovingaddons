@@ -17,6 +17,12 @@ class MrpBom(models.Model):
         source_bom_product_ids = source_bom.mapped('bom_line_ids.product_id').ids
         dest_bom_produt_ids = source_bom.mapped('bom_line_ids.product_id').ids
 
+    def get_bom_list(self):
+        pass
+
+
+
+
     def _get_product_type_dict(self):
         return dict(
             self.product_tmpl_id.fields_get(['product_ll_type'])['product_ll_type']['selection'])
