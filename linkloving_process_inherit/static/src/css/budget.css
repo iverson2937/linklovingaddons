@@ -35,3 +35,15 @@
 .table_wrap tr td:nth-child(5){
     border-right: 1px solid #ddd;
 }
+
+.cost_matching_container .btn_wrap{
+    width: 300px;
+    margin: 0 auto;
+}
+.cost_matching_container .btn_wrap .save{
+    background-color: #409eff;
+    color: white;
+}
+.cost_matching_container .diff_color{
+    color: red;
+}

@@ -70,11 +70,12 @@ class MrpBom(models.Model):
         print datas, 'datas'
         return datas
 
-    def get_product_options(self, source_bom_id, dest_bom_id):
+    @api.model
+    def get_product_options(self, **kwargs):
         datas = []
         bom_obj = self.env['mrp.bom']
-        source_id = source_bom_id
-        dest_bom_id = dest_bom_id
+        source_id = kwargs.get('origin_bom_id')
+        dest_bom_id = kwargs.get('target_bom_id')
         source_bom = bom_obj.browse(source_id)
         dest_bom = bom_obj.browse(dest_bom_id)
         source_bom_product_ids = source_bom.mapped('bom_line_ids.product_id').ids
