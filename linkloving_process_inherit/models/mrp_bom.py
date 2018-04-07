@@ -33,12 +33,11 @@ class MrpBom(models.Model):
                 'dest_bom_line': dest_line.id
             })
 
-
     # 搜索bom
     @api.model
-    def get_bom_list(self, **arg):
-        bom_name = arg.get('name')
-        bom_ids = self.env['mrp.bom'].search([('name', 'ilike', bom_name)], limit=10)
+    def get_bom_list(self, **kargs):
+        bom_name = kargs.get('name')
+        bom_ids = self.env['mrp.bom'].search([('product_tmpl_id.name', 'ilike', bom_name)], limit=10)
         bom_list = []
         for bom in bom_ids:
             bom_list.append({
