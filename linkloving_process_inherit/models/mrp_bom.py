@@ -44,28 +44,41 @@ class MrpBom(models.Model):
                     'source_product_name': source_line.product_id.name,
                     'source_qty': source_line.product_qty,
                     'source_action_ids': source_line.parse_action_line_data(no_option=True, no_data=True),
+                    'dest_default_code': '',
+                    'dest_product_name': '',
+                    'dest_qty': '',
+                    'dest_action_ids': '',
+                    'dest_bom_line': '',
                 })
         for d_product in dest_bom_product_ids:
             dest_line = dest_bom.bom_line_ids.filtered(lambda x: x.product_id.id == d_product)
             if d_product not in common_products:
                 datas.append({
+                    'source_default_code': '',
+                    'source_product_name': '',
+                    'source_qty': '',
+                    'source_action_ids': '',
                     'dest_default_code': dest_line.product_id.default_code,
                     'dest_product_name': dest_line.product_id.name,
                     'dest_qty': dest_line.product_qty,
                     'dest_action_ids': dest_line.parse_action_line_data(no_option=True, no_data=True),
                     'dest_bom_line': dest_line.id
                 })
+        print datas, 'datas'
         return datas
+
+    def get_product_options(self, source_bom_id, dest_bom_line):
+
+        pass
+
 
     # 搜索bom
     @api.model
     def get_bom_list(self, arg):
         product_name = arg.get('name')
-        print product_name, 'ssdasd'
         product_tmpl_ids = self.env['product.template'].search(
             [('bom_ids', '!=', False), '|', ('name', 'ilike', product_name), ('default_code', 'ilike', product_name)],
             limit=10)
-        print product_tmpl_ids
         bom_list = []
         for product_tmpl_id in product_tmpl_ids:
             if product_tmpl_id.bom_count > 1:
@@ -75,7 +88,6 @@ class MrpBom(models.Model):
                     'id': product_tmpl_id.bom_ids[0].id,
                     'name': product_tmpl_id.display_name
                 })
-        print bom_list, 'bomsasda'
         return bom_list
 
     def get_bom_line_list(self):
@@ -153,11 +165,8 @@ class MrpBom(models.Model):
         if not line.parse_action_line_data(no_option=True, no_data=True) and line.get_product_action_default():
             is_default = True
             action_process = line.get_product_action_default()
-            print action_process
-            print action_process, 'default'
         else:
             action_process = line.parse_action_line_data(no_option=True)
-            print action_process, 'line'
 
             is_default = False
 
@@ -372,10 +381,8 @@ class MrpBomLine(models.Model):
                   ('product_id', '=', self.product_id.id)]
         temp_id = self.env['bom.cost.category.temp'].search(domain)
         res = []
-        print temp_id, 'temp_id'
         if temp_id:
             res = json.loads(temp_id.action_data)
-            print res, 'res'
         return res
 
     @api.model
