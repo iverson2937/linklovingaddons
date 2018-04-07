@@ -15,13 +15,31 @@ class MrpBom(models.Model):
         source_bom = bom_obj.browse(source_id)
         dest_bom = bom_obj.browse(dest_id)
         source_bom_product_ids = source_bom.mapped('bom_line_ids.product_id').ids
-        dest_bom_produt_ids = source_bom.mapped('bom_line_ids.product_id').ids
+        dest_bom_produt_ids = dest_bom.mapped('bom_line_ids.product_id').ids
+        common_products = set(source_bom_product_ids) & set(dest_bom_produt_ids)
 
-    def get_bom_list(self):
-        pass
+    # 搜索bom
+    def get_bom_list(self, arg):
+        bom_name = arg.get('name')
+        bom_ids = self.env['mrp.bom'].search([('name', 'ilike', bom_name)], limit=10)
+        bom_list = []
+        for bom in bom_ids:
+            bom_list.append({
+                'id': bom.id,
+                'name': bom.display_name
+            })
 
+        return bom_list
 
-
+    def get_bom_line_list(self):
+        line_list = []
+        for line in self.bom_line_ids:
+            line_list.append({
+                'default_code': line.product_id.default_code,
+                'name:': line.product_id.name,
+                'qty': line.qty,
+                'action_ids': line.parse_action_line_data(no_option=True, no_data=True)
+            })
 
     def _get_product_type_dict(self):
         return dict(
