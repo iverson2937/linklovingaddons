@@ -2,6 +2,7 @@
 import json
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 
 class MrpBom(models.Model):
@@ -33,17 +34,44 @@ class MrpBom(models.Model):
                 'dest_bom_line': dest_line.id
             })
 
+        for s_product in source_bom_product_ids:
+            source_line = source_bom.bom_line_ids.filtered(lambda x: x.product_id.id == s_product)
+            if s_product not in common_products:
+                datas.append({
+                    'source_default_code': source_line.product_id.default_code,
+                    'source_product_name': source_line.product_id.name,
+                    'source_qty': source_line.qty,
+                    'source_action_ids': source_line.parse_action_line_data(no_option=True, no_data=True),
+                })
+        for d_product in dest_bom_product_ids:
+            dest_line = dest_bom.bom_line_ids.filtered(lambda x: x.product_id.id == d_product)
+            if d_product not in common_products:
+                datas.append({
+                    'dest_default_code': dest_line.product_id.default_code,
+                    'dest_product_name': dest_line.product_id.name,
+                    'dest_qty': dest_line.qty,
+                    'dest_action_ids': dest_line.parse_action_line_data(no_option=True, no_data=True),
+                    'dest_bom_line': dest_line.id
+                })
+
+
+
     # 搜索bom
     @api.model
     def get_bom_list(self, **kargs):
-        bom_name = kargs.get('name')
-        bom_ids = self.env['mrp.bom'].search([], limit=10)
+        print kargs
+        product_name = kargs.get('name')
+        print product_name, 'osasfd'
+        product_tmpl_ids = self.env['product.template'].search([('name', 'ilike', product_name)], limit=10)
         bom_list = []
-        for bom in bom_ids:
-            bom_list.append({
-                'id': bom.id,
-                'name': bom.display_name
-            })
+        for product_tmpl_id in product_tmpl_ids:
+            if product_tmpl_id.bom_count > 1:
+                raise UserError('%s有超过一个Bom,请核对') % product_tmpl_id.name
+            else:
+                bom_list.append({
+                    'id': product_tmpl_id.bom_ids[0].id,
+                    'name': product_tmpl_id.name
+                })
         print bom_list, 'bomsasda'
         return bom_list
 
