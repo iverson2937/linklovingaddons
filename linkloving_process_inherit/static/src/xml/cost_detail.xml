@@ -164,16 +164,17 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <td colspan="5">
+                            <td class="origin_bom" colspan="5">
                                源BOM:
-                                <select class="origin_bom selectpicker" data-live-search="true">
+                               <select class="selectpicker" data-live-search="true">
                                     <option>1</option>
                                     <option>2</option>
                                     <option>3</option>
                                 </select>
                             </td>
-                            <td colspan="5">
-                               目标BOM: <select  class="target_bom selectpicker" data-live-search="true">
+                            <td class="target_bom" colspan="5">
+                               目标BOM:
+                               <select  class="selectpicker" data-live-search="true">
                                     <option>1</option>
                                     <option>2</option>
                                     <option>3</option>
@@ -181,10 +182,10 @@
                             </td>
                         </tr>
                         <script>
-                            $('.origin_bom').selectpicker({
+                            $('.origin_bom select').selectpicker({
                                 noneSelectedText : '请选择'
                             });
-                            $('.target_bom').selectpicker({
+                            $('.target_bom select').selectpicker({
                                 noneSelectedText : '请选择'
                             });
                         </script>
