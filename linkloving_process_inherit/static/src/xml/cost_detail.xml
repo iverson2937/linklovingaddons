@@ -167,9 +167,7 @@
                             <td class="origin_bom" colspan="5">
                                源BOM:
                                <select class="selectpicker" data-live-search="true">
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
+
                                 </select>
                             </td>
                             <td class="target_bom" colspan="5">
@@ -231,6 +229,12 @@
                 </table>
             </div>
         </div>
+    </t>
+
+    <t t-name="cost_matching_select_templ">
+        <t t-foreach="result" t-as="item">
+            <option t-att-data-bom-id="item.id"><t t-esc="item.name"/></option>
+        </t>
     </t>
 
 </templates>
