@@ -33,7 +33,8 @@ class MrpBom(models.Model):
                 'dest_product_name': dest_line.product_id.name,
                 'dest_qty': dest_line.product_qty,
                 'dest_action_ids': dest_line.parse_action_line_data(no_option=True, no_data=True),
-                'dest_bom_line': dest_line.id
+                'dest_bom_line': dest_line.id,
+                'no_edit': True
             })
 
         for s_product in source_bom_product_ids:
@@ -49,6 +50,7 @@ class MrpBom(models.Model):
                     'dest_qty': '',
                     'dest_action_ids': '',
                     'dest_bom_line': '',
+                    'no_edit': True
                 })
         for d_product in dest_bom_product_ids:
             dest_line = dest_bom.bom_line_ids.filtered(lambda x: x.product_id.id == d_product)
