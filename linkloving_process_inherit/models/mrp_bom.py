@@ -64,7 +64,8 @@ class MrpBom(models.Model):
                     'dest_product_name': dest_line.product_id.name,
                     'dest_qty': dest_line.product_qty,
                     'dest_action_ids': dest_line.parse_action_line_data(no_option=True, no_data=True),
-                    'dest_bom_line': dest_line.id
+                    'dest_bom_line': dest_line.id,
+                    'no_edit': False
                 })
         print datas, 'datas'
         return datas
