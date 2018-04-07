@@ -22,3 +22,16 @@
     font-weight: 100;
     margin-right: 10px;
 }
+.select_container>div{
+    display: inline-block;
+}
+.cost_matching_container{
+    padding: 20px;
+}
+.cost_matching_container .table_wrap{
+    background-color: white;
+    padding: 12px;
+}
+.table_wrap tr td:nth-child(5){
+    border-right: 1px solid #ddd;
+}

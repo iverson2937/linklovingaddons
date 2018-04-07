@@ -12,8 +12,18 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
     var pyeval = require('web.pyeval');
     var QWeb = core.qweb;
     var BomCostReproduce = Widget.extend(ControlPanelMixin, {
-        template: "CostDetail",
+        template: "cost_matching_templ",
+        events:function () {
 
+        },
+
+        init:function (parent, action) {
+            this._super(parent);
+            this._super.apply(this, arguments);
+        },
+        start:function () {
+
+        },
 
     });
 

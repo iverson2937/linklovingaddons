@@ -107,36 +107,36 @@
 
 
 
-<t t-name="action_process_tr">
-    <tr>
-        <td>
-            <input name="rate_2" class="form-control"/>
-        </td>
-        <td>
-            <select  class="form-control">
-                     <t t-foreach="options" t-as="options">
-                          <option t-att-data-id="options.id">
-                              <t t-esc="options.name"/>
-                          </option>
-                        </t>
-        </select>
-        </td>
-        <td><span></span></td>
+    <t t-name="action_process_tr">
+        <tr>
+            <td>
+                <input name="rate_2" class="form-control"/>
+            </td>
+            <td>
+                <select  class="form-control">
+                         <t t-foreach="options" t-as="options">
+                              <option t-att-data-id="options.id">
+                                  <t t-esc="options.name"/>
+                              </option>
+                            </t>
+            </select>
+            </td>
+            <td><span></span></td>
 
-        <td>
-            <input name="rate" class="form-control"/>
-        </td>
-        <td>
-            <span></span>
-        </td>
-        <td>
-             <span class="fa fa-plus-square-o"></span>
-        </td>
-         <td>
-             <span class="fa fa-trash-o"></span>
-        </td>
-    </tr>
-</t>
+            <td>
+                <input name="rate" class="form-control"/>
+            </td>
+            <td>
+                <span></span>
+            </td>
+            <td>
+                 <span class="fa fa-plus-square-o"></span>
+            </td>
+             <td>
+                 <span class="fa fa-trash-o"></span>
+            </td>
+        </tr>
+    </t>
     <t t-name="action_process">
         <t t-if="result">
         <t t-foreach="result" t-as="item">
@@ -155,4 +155,81 @@
             <option t-att-data-id="item.id"><t t-esc="item.name"/></option>
         </t>
     </t>
+
+
+    <!--成本明细匹配-->
+    <t t-name="cost_matching_templ">
+        <div class="cost_matching_container">
+            <div class="table_wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td colspan="5">
+                               源BOM:
+                                <select class="origin_bom selectpicker" data-live-search="true">
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                </select>
+                            </td>
+                            <td colspan="5">
+                               目标BOM: <select  class="target_bom selectpicker" data-live-search="true">
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <script>
+                            $('.origin_bom').selectpicker({
+                                noneSelectedText : '请选择'
+                            });
+                            $('.target_bom').selectpicker({
+                                noneSelectedText : '请选择'
+                            });
+                        </script>
+                        <tr style="background:#ddd;font-weight:bold">
+                            <td></td>
+                            <td>料号</td>
+                            <td>简称</td>
+                            <td>配比</td>
+                            <td>工序动作</td>
+                            <td>料号</td>
+                            <td>简称</td>
+                            <td>配比</td>
+                            <td>工序动作</td>
+                            <td>替代</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>42.DG.104</td>
+                            <td>42.DG.104木盒装</td>
+                            <td>1</td>
+                            <td>双面丝印</td>
+                            <td>42.DG.104</td>
+                            <td>42.DG.104木盒装</td>
+                            <td>1</td>
+                            <td>双面丝印</td>
+                            <td>[15.DG202.]</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>42.DG.104</td>
+                            <td>42.DG.104木盒装</td>
+                            <td>1</td>
+                            <td>双面丝印</td>
+                            <td>42.DG.104</td>
+                            <td>42.DG.104木盒装</td>
+                            <td>1</td>
+                            <td>双面丝印</td>
+                            <td>[15.DG202.]</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </t>
+
 </templates>
