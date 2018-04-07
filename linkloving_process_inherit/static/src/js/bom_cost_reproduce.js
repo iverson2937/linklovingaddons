@@ -13,9 +13,15 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
     var QWeb = core.qweb;
     var BomCostReproduce = Widget.extend(ControlPanelMixin, {
         template: "cost_matching_templ",
-        events:function () {
-
+        events: {
+            'input .origin_bom input': 'origin_bom_search_func',
         },
+
+        origin_bom_search_func: _.debounce (function(ev) {
+            new Model('mrp.bom').call('get_bom_list', [[],{name:$('.origin_bom input').val()}]).then(function (result) {
+                console.log(result);
+            })
+        },1000,true),
 
         init:function (parent, action) {
             this._super(parent);

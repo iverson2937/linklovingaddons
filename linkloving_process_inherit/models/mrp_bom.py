@@ -35,7 +35,8 @@ class MrpBom(models.Model):
 
 
     # 搜索bom
-    def get_bom_list(self, arg):
+    @api.model
+    def get_bom_list(self, **arg):
         bom_name = arg.get('name')
         bom_ids = self.env['mrp.bom'].search([('name', 'ilike', bom_name)], limit=10)
         bom_list = []
