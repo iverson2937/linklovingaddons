@@ -24,7 +24,8 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
             var bom_id = $('.origin_bom select option:selected').attr('data-bom-id');
             new Model('mrp.bom').call('get_bom_line_list', [[parseInt(bom_id)]]).then(function (result) {
                 console.log(result);
-
+                $('.cost_matching_container tbody').html('');
+                $('.cost_matching_container tbody').append(QWeb.render('cost_matching_tbody_templ',{result:result}));
             })
         },
         //源bom下的输入框搜索事件
