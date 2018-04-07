@@ -250,6 +250,16 @@
                         <t t-esc="obj.action_name"/>
                     </t>
                 </td>
+                <t t-if="target==true">
+                    <td><t t-esc="item.dest_default_code"/></td>
+                    <td><t t-esc="item.dest_product_name"/></td>
+                    <td><t t-esc="item.dest_qty"/></td>
+                    <td>
+                        <t t-foreach="item.dest_action_ids" t-as="obj">
+                            <t t-esc="obj.action_name"/>
+                        </t>
+                    </td>
+                </t>
             </tr>
             <t t-set="i" t-value="i + 1"/>
         </t>
