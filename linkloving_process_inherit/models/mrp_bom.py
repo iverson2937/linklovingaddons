@@ -80,10 +80,10 @@ class MrpBom(models.Model):
         line_list = []
         for line in self.bom_line_ids:
             line_list.append({
-                'default_code': line.product_id.default_code,
-                'name:': line.product_id.name,
-                'qty': line.product_qty,
-                'action_ids': line.parse_action_line_data(no_option=True, no_data=True)
+                'source_default_code': line.product_id.default_code,
+                'source_product_name:': line.product_id.name,
+                'source_qty': line.product_qty,
+                'source_action_ids': line.parse_action_line_data(no_option=True, no_data=True)
             })
 
     def _get_product_type_dict(self):
