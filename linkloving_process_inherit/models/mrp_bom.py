@@ -81,12 +81,33 @@ class MrpBom(models.Model):
         dest_bom_product_ids = dest_bom.mapped('bom_line_ids.product_id').ids
         common_products = set(source_bom_product_ids) & set(dest_bom_product_ids)
         for product in source_bom_product_ids:
+            ation_data = source_bom.mapped('bom_line_ids').filtered(
+                lambda x: x.product_id.id == product)
             if product not in common_products:
                 datas.append({
                     'id': product,
+                    'action_ids': ation_data.parse_action_line_data(no_option=True, no_data=True),
                     'name': self.env['product.product'].browse(product).name
                 })
         return datas
+
+    @api.model
+    def save_changes(self, args, **kwargs):
+        source_bom_id = kwargs.get('source_bom_id')
+        # for arg in args:
+        #     product_id = arg.get('product_id')
+        #     ation_datas = self.env['mrp.bom'].brose(source_bom_id).mapped('bom_line_ids').filtered(
+        #         lambda x: x.product_id.id == product_id)
+        #     bom_line_id = arg.get('bom_line_id')
+        #     for action in ation_datas:
+        #         self.env['mrp.action.line'].create({
+        #             'action_id': action.action_id,
+        #             'rate': action.rate,
+        #             'rate_2': action.rate_2,
+        #             'bom_line_id': bom_line_id
+        #         })
+
+        return 'ok'
 
     # 搜索bom
     @api.model
