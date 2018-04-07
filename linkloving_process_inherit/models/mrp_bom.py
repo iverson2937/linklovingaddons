@@ -25,11 +25,11 @@ class MrpBom(models.Model):
             datas.append({
                 'source_default_code': source_line.product_id.default_code,
                 'source_product_name': source_line.product_id.name,
-                'source_qty': source_line.qty,
+                'source_qty': source_line.product_qty,
                 'source_action_ids': source_line.parse_action_line_data(no_option=True, no_data=True),
                 'dest_default_code': dest_line.product_id.default_code,
                 'dest_product_name': dest_line.product_id.name,
-                'dest_qty': dest_line.qty,
+                'dest_qty': dest_line.product_qty,
                 'dest_action_ids': dest_line.parse_action_line_data(no_option=True, no_data=True),
                 'dest_bom_line': dest_line.id
             })
@@ -40,7 +40,7 @@ class MrpBom(models.Model):
                 datas.append({
                     'source_default_code': source_line.product_id.default_code,
                     'source_product_name': source_line.product_id.name,
-                    'source_qty': source_line.qty,
+                    'source_qty': source_line.product_qty,
                     'source_action_ids': source_line.parse_action_line_data(no_option=True, no_data=True),
                 })
         for d_product in dest_bom_product_ids:
@@ -49,7 +49,7 @@ class MrpBom(models.Model):
                 datas.append({
                     'dest_default_code': dest_line.product_id.default_code,
                     'dest_product_name': dest_line.product_id.name,
-                    'dest_qty': dest_line.qty,
+                    'dest_qty': dest_line.product_qty,
                     'dest_action_ids': dest_line.parse_action_line_data(no_option=True, no_data=True),
                     'dest_bom_line': dest_line.id
                 })
@@ -82,7 +82,7 @@ class MrpBom(models.Model):
             line_list.append({
                 'default_code': line.product_id.default_code,
                 'name:': line.product_id.name,
-                'qty': line.qty,
+                'qty': line.product_qty,
                 'action_ids': line.parse_action_line_data(no_option=True, no_data=True)
             })
 
