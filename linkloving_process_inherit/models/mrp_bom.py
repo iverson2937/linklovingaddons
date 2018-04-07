@@ -15,8 +15,24 @@ class MrpBom(models.Model):
         source_bom = bom_obj.browse(source_id)
         dest_bom = bom_obj.browse(dest_id)
         source_bom_product_ids = source_bom.mapped('bom_line_ids.product_id').ids
-        dest_bom_produt_ids = dest_bom.mapped('bom_line_ids.product_id').ids
-        common_products = set(source_bom_product_ids) & set(dest_bom_produt_ids)
+        dest_bom_product_ids = dest_bom.mapped('bom_line_ids.product_id').ids
+        common_products = set(source_bom_product_ids) & set(dest_bom_product_ids)
+        datas = []
+        for product in common_products:
+            source_line = source_bom.bom_line_ids.filtered(lambda x: x.product_id.id == product)
+            dest_line = dest_bom.bom_line_ids.filtered(lambda x: x.product_id.id == product)
+            datas.append({
+                'source_default_code': source_line.product_id.default_code,
+                'source_product_name': source_line.product_id.name,
+                'source_qty': source_line.qty,
+                'source_action_ids': source_line.parse_action_line_data(no_option=True, no_data=True),
+                'dest_default_code': dest_line.product_id.default_code,
+                'dest_product_name': dest_line.product_id.name,
+                'dest_qty': dest_line.qty,
+                'dest_action_ids': dest_line.parse_action_line_data(no_option=True, no_data=True),
+                'dest_bom_line': dest_line.id
+            })
+
 
     # 搜索bom
     def get_bom_list(self, arg):
