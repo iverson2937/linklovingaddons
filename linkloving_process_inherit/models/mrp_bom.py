@@ -61,7 +61,8 @@ class MrpBom(models.Model):
         product_name = arg.get('name')
         print product_name, 'ssdasd'
         product_tmpl_ids = self.env['product.template'].search(
-            ['|', ('name', 'ilike', product_name), ('default_code', 'ilike', product_name)], limit=10)
+            [('bom_ids', '!=', False), '|', ('name', 'ilike', product_name), ('default_code', 'ilike', product_name)],
+            limit=10)
         print product_tmpl_ids
         bom_list = []
         for product_tmpl_id in product_tmpl_ids:
@@ -70,7 +71,7 @@ class MrpBom(models.Model):
             else:
                 bom_list.append({
                     'id': product_tmpl_id.bom_ids[0].id,
-                    'name': product_tmpl_id.name
+                    'name': product_tmpl_id.display_name
                 })
         print bom_list, 'bomsasda'
         return bom_list
