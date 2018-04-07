@@ -16,9 +16,20 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
         events: {
             'input .origin_bom input': 'origin_bom_search_func',
             // 'blur .origin_bom input':'confirm_origin_bom_sel_func',
-            'click .origin_bom ul li':'confirm_origin_bom_sel_func'
+            'click .origin_bom ul li':'confirm_origin_bom_sel_func',
+            'input .target_bom input':'origin_bom_search_func',
+            'click .target_bom ul li':'confirm_target_bom_sel_func'
         },
 
+        //确认目标bom的选择 渲染table表
+        confirm_target_bom_sel_func:function () {
+            var origin_bom_id = $('.target_bom select option:selected').attr('data-bom-id');
+            var target_bom_id = $('.target_bom select option:selected').attr('data-bom-id');
+            new Model('mrp.bom').call('get_diff_bom_data', [{target_bom_id:parseInt(target_bom_id),origin_bom_id:parseInt(origin_bom_id)}]).then(function (result) {
+                console.log(result);
+
+            })
+        },
         //确认源bom的选择 渲染table表
         confirm_origin_bom_sel_func:function () {
             var bom_id = $('.origin_bom select option:selected').attr('data-bom-id');
@@ -28,13 +39,16 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
                 $('.cost_matching_container tbody').append(QWeb.render('cost_matching_tbody_templ',{result:result}));
             })
         },
-        //源bom下的输入框搜索事件
-        origin_bom_search_func: _.debounce (function(ev) {
-            new Model('mrp.bom').call('get_bom_list', [{name: $('.origin_bom input').val()}]).then(function (result) {
+        //源bom、目标bom下的输入框搜索事件
+        origin_bom_search_func: _.debounce (function(e) {
+            var e = e || window.event;
+            var target = e.target || e.srcElement;
+            console.log($(target).parents('td'));
+            new Model('mrp.bom').call('get_bom_list', [{name: $(target).parents('td').find('input').val()}]).then(function (result) {
                 console.log(result);
-                $('.origin_bom select').html('');
-                $.when($('.origin_bom select').append(QWeb.render('cost_matching_select_templ',{result:result}))).then(function () {
-                     $('.origin_bom select').selectpicker('refresh')
+                $(target).parents('td').find('select').html('');
+                $.when($(target).parents('td').find('select').append(QWeb.render('cost_matching_select_templ',{result:result}))).then(function () {
+                     $(target).parents('td').find('select').selectpicker('refresh')
                 })
             })
         },300,true),
