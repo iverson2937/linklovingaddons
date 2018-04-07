@@ -11,7 +11,7 @@ class MrpBom(models.Model):
     manpower_cost = fields.Float(string='工序动作成本', compute='_get_bom_cost')
 
     @api.model
-    def get_diff_bom_date(self, source_id, dest_id):
+    def get_diff_bom_data(self, source_id, dest_id):
         bom_obj = self.env['mrp.bom']
         source_bom = bom_obj.browse(source_id)
         dest_bom = bom_obj.browse(dest_id)
@@ -53,6 +53,7 @@ class MrpBom(models.Model):
                     'dest_action_ids': dest_line.parse_action_line_data(no_option=True, no_data=True),
                     'dest_bom_line': dest_line.id
                 })
+        return datas
 
 
 
