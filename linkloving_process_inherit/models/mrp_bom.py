@@ -37,14 +37,14 @@ class MrpBom(models.Model):
     @api.model
     def get_bom_list(self, **kargs):
         bom_name = kargs.get('name')
-        bom_ids = self.env['mrp.bom'].search([('product_tmpl_id.name', 'ilike', bom_name)], limit=10)
+        bom_ids = self.env['mrp.bom'].search([], limit=10)
         bom_list = []
         for bom in bom_ids:
             bom_list.append({
                 'id': bom.id,
                 'name': bom.display_name
             })
-
+        print bom_list, 'bomsasda'
         return bom_list
 
     def get_bom_line_list(self):
