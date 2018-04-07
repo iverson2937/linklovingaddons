@@ -23,7 +23,7 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
 
         //确认目标bom的选择 渲染table表
         confirm_target_bom_sel_func:function () {
-            var origin_bom_id = $('.target_bom select option:selected').attr('data-bom-id');
+            var origin_bom_id = $('.origin_bom select option:selected').attr('data-bom-id');
             var target_bom_id = $('.target_bom select option:selected').attr('data-bom-id');
             new Model('mrp.bom').call('get_diff_bom_data',[], {target_bom_id:parseInt(target_bom_id),origin_bom_id:parseInt(origin_bom_id)}).then(function (result) {
                 console.log(result);
