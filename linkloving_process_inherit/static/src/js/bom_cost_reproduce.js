@@ -29,7 +29,7 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
         },
         //源bom下的输入框搜索事件
         origin_bom_search_func: _.debounce (function(ev) {
-            new Model('mrp.bom').call('get_bom_list', [[],{name:$('.origin_bom input').val()}]).then(function (result) {
+            new Model('mrp.bom').call('get_bom_list', [{name: $('.origin_bom input').val()}]).then(function (result) {
                 console.log(result);
                 $('.origin_bom select').html('');
                 $.when($('.origin_bom select').append(QWeb.render('cost_matching_select_templ',{result:result}))).then(function () {

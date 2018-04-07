@@ -55,15 +55,14 @@ class MrpBom(models.Model):
                 })
         return datas
 
-
-
     # 搜索bom
     @api.model
-    def get_bom_list(self, **kargs):
-        print kargs
-        product_name = kargs.get('name')
-        print product_name, 'osasfd'
-        product_tmpl_ids = self.env['product.template'].search([('name', 'ilike', product_name)], limit=10)
+    def get_bom_list(self, arg):
+        product_name = arg.get('name')
+        print product_name, 'ssdasd'
+        product_tmpl_ids = self.env['product.template'].search(
+            ['|', ('name', 'ilike', product_name), ('default_code', 'ilike', product_name)], limit=10)
+        print product_tmpl_ids
         bom_list = []
         for product_tmpl_id in product_tmpl_ids:
             if product_tmpl_id.bom_count > 1:
