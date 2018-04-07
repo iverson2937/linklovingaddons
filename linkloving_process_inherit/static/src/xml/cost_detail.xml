@@ -50,15 +50,17 @@
                  </tr>
 
                 <t t-call="add_tr_templ">
+                    <t t-if="result">
                     <t t-set="result" t-value="result"></t>
+                        </t>
                 </t>
             </tbody>
         </table>
-
     </t>
 
 
     <t t-name="add_tr_templ">
+        <t t-if="result">
         <t t-foreach="result" t-as="data">
             <tr>
                 <td class="process_select">
@@ -94,6 +96,7 @@
                 <td class="delete"><i class="fa fa-trash"/></td>
             </tr>
         </t>
+            </t>
     </t>
 
     <t t-name="action_select_option_templ">
@@ -156,7 +159,6 @@
         </t>
     </t>
 
-
     <!--成本明细匹配-->
     <t t-name="cost_matching_templ">
         <div class="cost_matching_container">
@@ -207,6 +209,29 @@
                     <button class="btn cancel">重置</button>
                 </div>
             </div>
+
+            <div class="unlock_condition close_this_container">
+            <div class="modal-backdrop  in"></div>
+            <div class="create_wrap" style="width: 800px">
+                   <div class="add_tr">
+                    <i class="fa fa-plus"/> 新增
+                </div>
+                <!--<div class="top_calc_rule">-->
+                <!--<span>计算规则</span>-->
+                <!--<label><input type="radio" value="by_material" checked="checked" name="calc_rule"/>按物料配比</label>-->
+                <!--<label><input type="radio" value="by_action" name="calc_rule"/>按动作次数</label>-->
+                <!--</div>-->
+                <div id="action_table">
+
+                </div>
+
+                <div class="foot">
+
+                    <button class=" btn btn-primary confirm_sel pull-right" style="margin-left:10px">确定</button>
+                    <button class="btn btn-default alia_cancel pull-right">取消</button>
+                </div>
+            </div>
+        </div>
         </div>
     </t>
 
@@ -226,14 +251,15 @@
                 <td><t t-esc="item.source_qty"/></td>
                 <td>
                     <t t-foreach="item.source_action_ids" t-as="obj">
-                        <t t-esc="obj.action_name"/>
+                          <span><t t-esc="obj.action_name"/></span><span class="pull-right"><t t-esc="obj.rate_2"/>x<t t-esc="obj.rate"/></span>
                     </t>
                 </td>
                 <t t-if="target==true">
                     <td><t t-esc="item.dest_default_code"/></td>
                     <td><t t-esc="item.dest_product_name"/></td>
                     <td><t t-esc="item.dest_qty"/></td>
-                    <td>
+                    <td class="sel_action">
+                        <t t-if="item.dest_action_ids">
                         <t t-if="item.dest_action_ids.length==0">
                             编辑
                         </t>
@@ -242,6 +268,7 @@
                                 <t t-esc="obj.action_name"/>
                             </t>
                         </t>
+                    </t>
                     </td>
                 </t>
                 <td class="replace">
