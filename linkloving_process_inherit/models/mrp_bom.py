@@ -11,7 +11,7 @@ class MrpBom(models.Model):
     manpower_cost = fields.Float(string='工序动作成本', compute='_get_bom_cost')
 
     @api.model
-    def get_diff_bom_data(self,**kwargs):
+    def get_diff_bom_data(self, **kwargs):
         bom_obj = self.env['mrp.bom']
         source_id = kwargs.get("origin_bom_id")
         dest_id = kwargs.get("target_bom_id")
@@ -67,10 +67,23 @@ class MrpBom(models.Model):
         print datas, 'datas'
         return datas
 
-    def get_product_options(self, source_bom_id, dest_bom_line):
-
-        pass
-
+    def get_product_options(self, source_bom_id, dest_bom_id):
+        datas = []
+        bom_obj = self.env['mrp.bom']
+        source_id = source_bom_id
+        dest_bom_id = dest_bom_id
+        source_bom = bom_obj.browse(source_id)
+        dest_bom = bom_obj.browse(dest_bom_id)
+        source_bom_product_ids = source_bom.mapped('bom_line_ids.product_id').ids
+        dest_bom_product_ids = dest_bom.mapped('bom_line_ids.product_id').ids
+        common_products = set(source_bom_product_ids) & set(dest_bom_product_ids)
+        for product in source_bom_product_ids:
+            if product not in common_products:
+                datas.append({
+                    'id': product,
+                    'name': self.env['product.product'].browse(product).name
+                })
+        return datas
 
     # 搜索bom
     @api.model
