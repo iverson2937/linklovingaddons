@@ -23,7 +23,7 @@ class MrpBom(models.Model):
         datas = []
         dest_process_id = dest_bom.process_id.id
         dest_action_options = []
-        process_options=[]
+        process_options = []
         actions = self.env['mrp.process.action'].search(
             ['|', ('process_id', '=', dest_process_id), ('process_id', '=', False)])
         for action in actions:
@@ -33,7 +33,7 @@ class MrpBom(models.Model):
                 'cost': action.cost,
                 'remark': action.remark
             })
-        ps=self.env['mrp.process'].search([('','',)])
+        ps = self.env['mrp.process'].search([('', '',)])
         for product in common_products:
             source_line = source_bom.bom_line_ids.filtered(lambda x: x.product_id.id == product)
             dest_line = dest_bom.bom_line_ids.filtered(lambda x: x.product_id.id == product)
@@ -80,8 +80,7 @@ class MrpBom(models.Model):
                     'dest_bom_line': dest_line.id,
                     'no_edit': False
                 })
-        print datas, 'datas'
-        return datas, process_id
+        return datas
 
     @api.model
     def get_product_options(self, **kwargs):

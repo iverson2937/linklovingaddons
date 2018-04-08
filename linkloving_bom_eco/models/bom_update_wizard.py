@@ -7,16 +7,16 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
 
-class MrpBom(models.Model):
-    _inherit = 'mrp.bom'
+class MrpBomLine(models.Model):
+    _inherit = 'mrp.bom.line'
 
     def set_bom_line_product_bom_released(self):
-        eco_ids = self.eco_ids.filtered(lambda x: x.state != 'done')
+        eco_ids = self.bom_id.eco_ids.filtered(lambda x: x.state != 'done')
         if eco_ids:
             for eco in eco_ids:
                 eco.bom_apply()
 
-        return super(MrpBom, self).set_bom_line_product_bom_released()
+        return super(MrpBomLine, self).set_bom_line_product_bom_released()
 
 
 class BomUpdateWizard(models.TransientModel):
