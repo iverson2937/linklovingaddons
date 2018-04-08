@@ -146,10 +146,13 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
                 actions = actions.concat(self.delete_action_ids[bom_line_id]);
                 console.log(actions);
             }
-            self.update_actions[bom_line_id] = actions;
+            if (bom_line_id) {
+                self.update_actions[bom_line_id] = actions;
+            }
+
+            console.log(self.update_actions);
 
             self.bom_line_action_data[bom_line_id] = actions;
-            console.log(self.bom_line_action_data);
             $('.unlock_condition').hide();
             if ($('.fixed-table-toolbar .save_process_sel').length == 0) {
                 $('.save_process_sel').removeClass('hidden')
@@ -197,8 +200,7 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
                     'dest_bom_line': parseInt($(this).parents('tr').attr('dest_bom_line'))
                 })
             });
-            console.log(self.edit_data);
-            console.log(origin_bom_id);
+            console.log(self.update_actions);
             new Model('mrp.bom').call('save_changes', [], {
                 'copy_actions': self.edit_data,
                 'source_bom_id': origin_bom_id,
@@ -242,7 +244,7 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
                 console.log(result);
                 self.process_id = result.process_id;
                 self.process_options = result.process_options;
-                self.action_options = result.action_options
+                self.action_options = result.action_options;
 
                 $.each(result.datas, function (index, value) {
                     if (value.dest_bom_line) {

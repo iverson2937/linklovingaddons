@@ -116,8 +116,8 @@ class MrpBom(models.Model):
         source_bom_id = kwargs.get('source_bom_id')
         dest_bom_id = kwargs.get('dest_bom_id')
         bom_obj = self.env['mrp.bom']
-        source_bom = bom_obj.browse(source_bom_id)
-        dest_bom = bom_obj.browse(dest_bom_id)
+        source_bom = bom_obj.browse(int(source_bom_id))
+        dest_bom = bom_obj.browse(int(dest_bom_id))
         source_bom_product_ids = source_bom.mapped('bom_line_ids.product_id').ids
         dest_bom_product_ids = dest_bom.mapped('bom_line_ids.product_id').ids
         common_products = set(source_bom_product_ids) & set(dest_bom_product_ids)
@@ -166,8 +166,8 @@ class MrpBom(models.Model):
                 if actions:
                     bom_line = self.env['mrp.bom.line'].browse(int(bom_line_id))
                     for action in actions:
-                        if type(action) == dict and action.get('id'):
-                            process_action_line = action_line_obj.browse(action.get('id'))
+                        if type(action) == dict and action.get('line_id'):
+                            process_action_line = action_line_obj.browse(action.get('line_id'))
                             action_id_new = int(action.get('action_id'))
                             if action_id_new in self.env['mrp.process.action'].search([]).ids:
                                 process_action_line.write({
