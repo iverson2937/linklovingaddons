@@ -642,7 +642,7 @@ class MrpBomLine(models.Model):
             'rate_2': 0,
             'options': options,
             'remark': options[0].get('remark'),
-            'cost': options[0].get('cost'),
+            'cost': options[0].get('remark'),
             'process_id': self.bom_id.process_id.id,
             'process_options': process_options,
 
