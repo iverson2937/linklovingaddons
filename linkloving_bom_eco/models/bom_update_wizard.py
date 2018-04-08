@@ -172,8 +172,8 @@ class BomUpdateWizard(models.TransientModel):
                 else:
                     bom_eco_obj.create({
                         'bom_id': bom_id,
-                        'old_version': bom_obj_id.verion,
-                        'new_version': bom_obj_id.verion + 1,
+                        'old_version': bom_obj_id.version,
+                        'new_version': bom_obj_id.version + 1,
                         'bom_change_ids': [(0, 0, {
                             'bom_id': bom_id,
                             'product_id': product_id,
