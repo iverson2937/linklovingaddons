@@ -259,7 +259,7 @@
                             <td>简称</td>
                             <td>配比</td>
                             <td>工序动作</td>
-                            <td>替代</td>
+                            <td style="width:150px">替代</td>
                         </tr>
                     </thead>
                     <tbody>
