@@ -2,6 +2,7 @@
 import json
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 
 class MrpBom(models.Model):
@@ -10,18 +11,150 @@ class MrpBom(models.Model):
     manpower_cost = fields.Float(string='工序动作成本', compute='_get_bom_cost')
 
     @api.model
-    def get_diff_bom_date(self, source_id, dest_id):
+    def get_diff_bom_data(self, **kwargs):
         bom_obj = self.env['mrp.bom']
+        source_id = kwargs.get("origin_bom_id")
+        dest_id = kwargs.get("target_bom_id")
         source_bom = bom_obj.browse(source_id)
         dest_bom = bom_obj.browse(dest_id)
         source_bom_product_ids = source_bom.mapped('bom_line_ids.product_id').ids
-        dest_bom_produt_ids = source_bom.mapped('bom_line_ids.product_id').ids
+        dest_bom_product_ids = dest_bom.mapped('bom_line_ids.product_id').ids
+        common_products = set(source_bom_product_ids) & set(dest_bom_product_ids)
+        datas = []
+        dest_process_id = dest_bom.process_id.id
+        dest_action_options = []
+        process_options=[]
+        actions = self.env['mrp.process.action'].search(
+            ['|', ('process_id', '=', dest_process_id), ('process_id', '=', False)])
+        for action in actions:
+            dest_action_options.append({
+                'id': action.id,
+                'name': action.name,
+                'cost': action.cost,
+                'remark': action.remark
+            })
+        ps=self.env['mrp.process'].search([('','',)])
+        for product in common_products:
+            source_line = source_bom.bom_line_ids.filtered(lambda x: x.product_id.id == product)
+            dest_line = dest_bom.bom_line_ids.filtered(lambda x: x.product_id.id == product)
+            datas.append({
+                'source_default_code': source_line.product_id.default_code,
+                'source_product_name': source_line.product_id.name,
+                'source_qty': source_line.product_qty,
+                'source_action_ids': source_line.parse_action_line_data(no_option=True, no_data=True),
+                'dest_default_code': dest_line.product_id.default_code,
+                'dest_product_name': dest_line.product_id.name,
+                'dest_qty': dest_line.product_qty,
+                'dest_action_ids': dest_line.parse_action_line_data(no_option=True, no_data=True),
+                'dest_bom_line': dest_line.id,
+                'no_edit': True
+            })
 
-    def get_bom_list(self):
-        pass
+        for s_product in source_bom_product_ids:
+            source_line = source_bom.bom_line_ids.filtered(lambda x: x.product_id.id == s_product)
+            if s_product not in common_products:
+                datas.append({
+                    'source_default_code': source_line.product_id.default_code,
+                    'source_product_name': source_line.product_id.name,
+                    'source_qty': source_line.product_qty,
+                    'source_action_ids': source_line.parse_action_line_data(no_option=True, no_data=True),
+                    'dest_default_code': '',
+                    'dest_product_name': '',
+                    'dest_qty': '',
+                    'dest_action_ids': '',
+                    'dest_bom_line': '',
+                    'no_edit': True
+                })
+        for d_product in dest_bom_product_ids:
+            dest_line = dest_bom.bom_line_ids.filtered(lambda x: x.product_id.id == d_product)
+            if d_product not in common_products:
+                datas.append({
+                    'source_default_code': '',
+                    'source_product_name': '',
+                    'source_qty': '',
+                    'source_action_ids': '',
+                    'dest_default_code': dest_line.product_id.default_code,
+                    'dest_product_name': dest_line.product_id.name,
+                    'dest_qty': dest_line.product_qty,
+                    'dest_action_ids': dest_line.parse_action_line_data(no_option=True, no_data=True),
+                    'dest_bom_line': dest_line.id,
+                    'no_edit': False
+                })
+        print datas, 'datas'
+        return datas, process_id
 
+    @api.model
+    def get_product_options(self, **kwargs):
+        datas = []
+        bom_obj = self.env['mrp.bom']
+        source_id = kwargs.get('origin_bom_id')
+        dest_bom_id = kwargs.get('target_bom_id')
+        source_bom = bom_obj.browse(source_id)
+        dest_bom = bom_obj.browse(dest_bom_id)
+        source_bom_product_ids = source_bom.mapped('bom_line_ids.product_id').ids
+        dest_bom_product_ids = dest_bom.mapped('bom_line_ids.product_id').ids
+        common_products = set(source_bom_product_ids) & set(dest_bom_product_ids)
+        for product in source_bom_product_ids:
+            ation_data = source_bom.mapped('bom_line_ids').filtered(
+                lambda x: x.product_id.id == product)
+            if product not in common_products:
+                datas.append({
+                    'id': product,
+                    'action_ids': ation_data.parse_action_line_data(no_option=True, no_data=True),
+                    'name': self.env['product.product'].browse(product).name
+                })
+        return datas
 
+    @api.model
+    def save_changes(self, **kwargs):
+        print kwargs
+        source_bom_id = kwargs.get('source_bom_id')
+        copy_actions = kwargs.get('copy_actions')
+        print source_bom_id
+        for action in copy_actions:
+            product_id = action.get('product_id')
+            ation_datas = self.env['mrp.bom'].brose(source_bom_id).mapped('bom_line_ids').filtered(
+                lambda x: x.product_id.id == product_id)
+            bom_line_id = action.get('bom_line_id')
+            for action in ation_datas:
+                self.env['mrp.action.line'].create({
+                    'action_id': action.action_id,
+                    'rate': action.rate,
+                    'rate_2': action.rate_2,
+                    'bom_line_id': bom_line_id
+                })
 
+        return 'ok'
+
+    # 搜索bom
+    @api.model
+    def get_bom_list(self, arg):
+        product_name = arg.get('name')
+        product_tmpl_ids = self.env['product.template'].search(
+            [('bom_ids', '!=', False), '|', ('name', 'ilike', product_name), ('default_code', 'ilike', product_name)],
+            limit=10)
+        bom_list = []
+        for product_tmpl_id in product_tmpl_ids:
+            if product_tmpl_id.bom_count > 1:
+                raise UserError('%s有超过一个Bom,请核对') % product_tmpl_id.name
+            else:
+                bom_list.append({
+                    'id': product_tmpl_id.bom_ids[0].id,
+                    'name': product_tmpl_id.display_name
+                })
+        return bom_list
+
+    def get_bom_line_list(self):
+        line_list = []
+        for line in self.bom_line_ids:
+            line_list.append({
+                'source_default_code': line.product_id.default_code,
+                'source_product_name': line.product_id.name,
+                'source_qty': line.product_qty,
+                'no_edit': True,
+                'source_action_ids': line.parse_action_line_data(no_option=True, no_data=True)
+            })
+        return line_list
 
     def _get_product_type_dict(self):
         return dict(
@@ -87,11 +220,8 @@ class MrpBom(models.Model):
         if not line.parse_action_line_data(no_option=True, no_data=True) and line.get_product_action_default():
             is_default = True
             action_process = line.get_product_action_default()
-            print action_process
-            print action_process, 'default'
         else:
             action_process = line.parse_action_line_data(no_option=True)
-            print action_process, 'line'
 
             is_default = False
 
@@ -306,10 +436,8 @@ class MrpBomLine(models.Model):
                   ('product_id', '=', self.product_id.id)]
         temp_id = self.env['bom.cost.category.temp'].search(domain)
         res = []
-        print temp_id, 'temp_id'
         if temp_id:
             res = json.loads(temp_id.action_data)
-            print res, 'res'
         return res
 
     @api.model

@@ -50,15 +50,17 @@
                  </tr>
 
                 <t t-call="add_tr_templ">
+                    <t t-if="result">
                     <t t-set="result" t-value="result"></t>
+                        </t>
                 </t>
             </tbody>
         </table>
-
     </t>
 
 
     <t t-name="add_tr_templ">
+        <t t-if="result">
         <t t-foreach="result" t-as="data">
             <tr>
                 <td class="process_select">
@@ -94,6 +96,7 @@
                 <td class="delete"><i class="fa fa-trash"/></td>
             </tr>
         </t>
+            </t>
     </t>
 
     <t t-name="action_select_option_templ">
@@ -107,36 +110,36 @@
 
 
 
-<t t-name="action_process_tr">
-    <tr>
-        <td>
-            <input name="rate_2" class="form-control"/>
-        </td>
-        <td>
-            <select  class="form-control">
-                     <t t-foreach="options" t-as="options">
-                          <option t-att-data-id="options.id">
-                              <t t-esc="options.name"/>
-                          </option>
-                        </t>
-        </select>
-        </td>
-        <td><span></span></td>
+    <t t-name="action_process_tr">
+        <tr>
+            <td>
+                <input name="rate_2" class="form-control"/>
+            </td>
+            <td>
+                <select  class="form-control">
+                         <t t-foreach="options" t-as="options">
+                              <option t-att-data-id="options.id">
+                                  <t t-esc="options.name"/>
+                              </option>
+                            </t>
+            </select>
+            </td>
+            <td><span></span></td>
 
-        <td>
-            <input name="rate" class="form-control"/>
-        </td>
-        <td>
-            <span></span>
-        </td>
-        <td>
-             <span class="fa fa-plus-square-o"></span>
-        </td>
-         <td>
-             <span class="fa fa-trash-o"></span>
-        </td>
-    </tr>
-</t>
+            <td>
+                <input name="rate" class="form-control"/>
+            </td>
+            <td>
+                <span></span>
+            </td>
+            <td>
+                 <span class="fa fa-plus-square-o"></span>
+            </td>
+             <td>
+                 <span class="fa fa-trash-o"></span>
+            </td>
+        </tr>
+    </t>
     <t t-name="action_process">
         <t t-if="result">
         <t t-foreach="result" t-as="item">
@@ -155,4 +158,135 @@
             <option t-att-data-id="item.id"><t t-esc="item.name"/></option>
         </t>
     </t>
+
+    <!--成本明细匹配-->
+    <t t-name="cost_matching_templ">
+        <div class="cost_matching_container">
+            <div class="table_wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td class="origin_bom" colspan="5">
+                               源BOM:
+                               <select class="selectpicker" data-live-search="true">
+
+                                </select>
+                            </td>
+                            <td class="target_bom" colspan="5">
+                               目标BOM:
+                               <select  class="selectpicker" data-live-search="true">
+
+                                </select>
+                            </td>
+                        </tr>
+                        <script>
+                            $('.origin_bom select').selectpicker({
+                                noneSelectedText : '请选择'
+                            });
+                            $('.target_bom select').selectpicker({
+                                noneSelectedText : '请选择'
+                            });
+                        </script>
+                        <tr style="background:#ddd;font-weight:bold">
+                            <td></td>
+                            <td>料号</td>
+                            <td>简称</td>
+                            <td>配比</td>
+                            <td>工序动作</td>
+                            <td>料号</td>
+                            <td>简称</td>
+                            <td>配比</td>
+                            <td>工序动作</td>
+                            <td>替代</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+                <div class="btn_wrap">
+                    <button class="btn save">更新</button>
+                    <button class="btn cancel">重置</button>
+                </div>
+            </div>
+
+            <div class="unlock_condition close_this_container">
+            <div class="modal-backdrop  in"></div>
+            <div class="create_wrap" style="width: 800px">
+                   <div class="add_tr">
+                    <i class="fa fa-plus"/> 新增
+                </div>
+                <!--<div class="top_calc_rule">-->
+                <!--<span>计算规则</span>-->
+                <!--<label><input type="radio" value="by_material" checked="checked" name="calc_rule"/>按物料配比</label>-->
+                <!--<label><input type="radio" value="by_action" name="calc_rule"/>按动作次数</label>-->
+                <!--</div>-->
+                <div id="action_table">
+
+                </div>
+
+                <div class="foot">
+
+                    <button class=" btn btn-primary confirm_sel pull-right" style="margin-left:10px">确定</button>
+                    <button class="btn btn-default alia_cancel pull-right">取消</button>
+                </div>
+            </div>
+        </div>
+        </div>
+    </t>
+
+    <t t-name="cost_matching_select_templ">
+        <t t-foreach="result" t-as="item">
+            <option t-att-data-bom-id="item.id"><t t-esc="item.name"/></option>
+        </t>
+    </t>
+
+    <t t-name="cost_matching_tbody_templ">
+        <t t-set="i" t-value="1"/>
+        <t t-foreach="result" t-as="item">
+            <tr t-att-dest_bom_line="item.dest_bom_line" t-att-class="item.no_edit?'':'diff_color'">
+                <td><t t-esc="i"/></td>
+                <td><t t-esc="item.source_default_code"/></td>
+                <td><t t-esc="item.source_product_name"/></td>
+                <td><t t-esc="item.source_qty"/></td>
+                <td>
+                    <t t-foreach="item.source_action_ids" t-as="obj">
+                          <span><t t-esc="obj.action_name"/></span><span class="pull-right"><t t-esc="obj.rate_2"/>x<t t-esc="obj.rate"/></span>
+                    </t>
+                </td>
+                <t t-if="target==true">
+                    <td><t t-esc="item.dest_default_code"/></td>
+                    <td><t t-esc="item.dest_product_name"/></td>
+                    <td><t t-esc="item.dest_qty"/></td>
+                    <td class="sel_action">
+                        <t t-if="item.dest_action_ids">
+                        <t t-if="item.dest_action_ids.length==0">
+                            编辑
+                        </t>
+                        <t t-else="">
+                            <t t-foreach="item.dest_action_ids" t-as="obj">
+                                <t t-esc="obj.action_name"/>
+                            </t>
+                        </t>
+                    </t>
+                    </td>
+                </t>
+                <td class="replace">
+                    <t t-if="no_edit==false">
+                        <select class="selectpicker">
+                            
+                        </select>
+                    </t>
+                </td>
+            </tr>
+            <t t-set="i" t-value="i + 1"/>
+        </t>
+    </t>
+
+    <t t-name="replace_options_templ">
+        <t t-foreach="result" t-as="item">
+            <option t-att-data-id="item.id"><t t-esc="item.name"/></option>
+        </t>
+    </t>
+
 </templates>
