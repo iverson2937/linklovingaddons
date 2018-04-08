@@ -35,10 +35,21 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
 
 
             new Model('mrp.bom.line').call('add_action_line_data', [parseInt(bom_line_id)]).then(function (results) {
-                if (results){
-                    $('#action_table tbody').append(QWeb.render('add_tr_templ', {'result': results}));
+                console.log(self.process_options);
+                console.log(self.action_options);
+                console.log(self.process_id);
+                if (results) {
+                    var res = {
+                        'result': results,
+                        'process_options': self.process_options,
+                        'action_options': self.action_options,
+                        'process_id': self.process_id
+                    };
+                    console.log(res);
+                    $('#action_table tbody').append(QWeb.render('add_tr_templ_new', {
+                        'result': res
+                    }));
                 }
-
 
 
             })
@@ -81,7 +92,7 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
                     }
 
                     var res = {
-                        'id': $(trs[i]).find('.action_select select').data('id'),
+                        'line_id': $(trs[i]).find('.action_select select').data('id'),
                         'action_id': action_id,
                         'action_name': $(trs[i]).find('.action_select option:selected').val(),
                         'rate': rate,
@@ -94,13 +105,13 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
             }
 
             var new_div = QWeb.render('action_process', {'result': actions});
-            $("[dest_bom_line ="+bom_line_id+"]").find('.sel_action').html(new_div);
+            $("[dest_bom_line =" + bom_line_id + "]").find('.sel_action').html(new_div);
             // self.table_data[self.index]['process_action_1'] = $('.unlock_condition select option:selected').val();
             // if ($('.unlock_condition .change_time input').val() != '') {
             //     $('.fixed-table-body tr[data-index=' + self.index + ']').find('.adjusttime').html($('.unlock_condition .change_time input').val());
             //     self.table_data[self.index]['adjust_time'] = $('.unlock_condition .change_time input').val()
             // }
-            if (self.delete_action_ids&&self.delete_action_ids[bom_line_id]) {
+            if (self.delete_action_ids && self.delete_action_ids[bom_line_id]) {
                 actions = actions.concat(self.delete_action_ids[bom_line_id]);
             }
 
@@ -111,7 +122,7 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
                 $('.save_process_sel').removeClass('hidden')
             }
         },
-
+        //点击某个bom line 弹窗
         sel_action_func: function (e) {
             var e = e || window.event;
             var target = e.target || e.srcElement;
@@ -125,8 +136,15 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
             console.log($('.unlock_condition'))
             $('.unlock_condition').attr('data-id', dest_bom_line).show();
             $('#action_table').html('');
-            $('#action_table').append(QWeb.render('process_action_table', {
-                result: actions
+            var results = {
+                'result': actions,
+                'process_options': self.process_options,
+                'action_options': self.action_options,
+                'process_id': self.process_id,
+            };
+            console.log(results);
+            $('#action_table').append(QWeb.render('process_action_table_new', {
+                'result': results
             }))
 
 
@@ -183,16 +201,19 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
                 origin_bom_id: parseInt(origin_bom_id)
             }).then(function (result) {
                 console.log(result);
+                self.process_id = result.process_id;
+                self.process_options = result.process_options;
+                self.action_options = result.action_options
 
-                $.each(result, function (index, value) {
+                $.each(result.datas, function (index, value) {
                     if (value.dest_bom_line) {
-                        self.bom_line_action_data[target_bom_id] = value.dest_action_ids;
+                        self.bom_line_action_data[value.dest_bom_line] = value.dest_action_ids;
                     }
 
                 });
                 $('.cost_matching_container tbody').html('');
                 $('.cost_matching_container tbody').append(QWeb.render('cost_matching_tbody_templ', {
-                    result: result,
+                    result: result.datas,
                     target: true
                 }));
             })
@@ -223,7 +244,7 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
 
         init: function (parent, action) {
             this._super(parent);
-            self.delete_action_ids={};
+            self.delete_action_ids = {};
             this._super.apply(this, arguments);
         },
         start: function () {

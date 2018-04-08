@@ -33,7 +33,12 @@ class MrpBom(models.Model):
                 'cost': action.cost,
                 'remark': action.remark
             })
-        ps = self.env['mrp.process'].search([('', '',)])
+        ps = self.env['mrp.process'].search([])
+        for p in ps:
+            process_options.append({
+                'id': p.id,
+                'name': p.name
+            })
         for product in common_products:
             source_line = source_bom.bom_line_ids.filtered(lambda x: x.product_id.id == product)
             dest_line = dest_bom.bom_line_ids.filtered(lambda x: x.product_id.id == product)
@@ -80,7 +85,8 @@ class MrpBom(models.Model):
                     'dest_bom_line': dest_line.id,
                     'no_edit': False
                 })
-        return datas
+        return {'datas': datas, 'process_options': process_options, 'process_id': dest_process_id,
+                'action_options': dest_action_options}
 
     @api.model
     def get_product_options(self, **kwargs):
@@ -109,19 +115,27 @@ class MrpBom(models.Model):
         print kwargs
         source_bom_id = kwargs.get('source_bom_id')
         copy_actions = kwargs.get('copy_actions')
-        print source_bom_id
+        source_action_line_ids = []
         for action in copy_actions:
-            product_id = action.get('product_id')
-            ation_datas = self.env['mrp.bom'].brose(source_bom_id).mapped('bom_line_ids').filtered(
-                lambda x: x.product_id.id == product_id)
-            bom_line_id = action.get('bom_line_id')
-            for action in ation_datas:
-                self.env['mrp.action.line'].create({
-                    'action_id': action.action_id,
-                    'rate': action.rate,
-                    'rate_2': action.rate_2,
-                    'bom_line_id': bom_line_id
-                })
+            product_id = action.get('replace_id')
+            if product_id:
+                source_bom_line = self.env['mrp.bom'].browse(int(source_bom_id)).mapped('bom_line_ids').filtered(
+                    lambda x: x.product_id.id == product_id)
+                if source_bom_line:
+                    source_action_line_ids = source_bom_line[0].action_line_ids
+
+                bom_line_id = action.get('dest_bom_line')
+                print bom_line_id
+                if self.env['mrp.bom.line'].browse(bom_line_id).action_line_ids:
+                    for l in self.env['mrp.bom.line'].browse(bom_line_id).action_line_ids:
+                        l.unlink()
+                for action_line in source_action_line_ids:
+                    self.env['process.action.line'].create({
+                        'action_id': action_line.action_id.id,
+                        'rate': action_line.rate,
+                        'rate_2': action_line.rate_2,
+                        'bom_line_id': int(bom_line_id)
+                    })
 
         return 'ok'
 
