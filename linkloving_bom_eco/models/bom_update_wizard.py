@@ -154,7 +154,7 @@ class BomUpdateWizard(models.TransientModel):
                 new_product_qty = line.get('new_product_qty')
                 bom_eco_id = bom_eco_obj.search([('state', '=', 'draft'), ('bom_id', '=', bom_id)])
                 if bom_eco_id:
-                    line_id = bom_eco_id.filtered(
+                    line_id = bom_eco_id.bom_change_ids.filtered(
                         lambda x: x.product_id.id == product_id and x.operate_type == operate_type)
                     if not line_id:
                         eco_line_obj.create({
