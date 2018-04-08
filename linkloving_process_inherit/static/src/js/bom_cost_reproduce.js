@@ -245,6 +245,7 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
                 self.process_id = result.process_id;
                 self.process_options = result.process_options;
                 self.action_options = result.action_options;
+                self.update_actions = {};
 
                 $.each(result.datas, function (index, value) {
                     if (value.dest_bom_line) {
