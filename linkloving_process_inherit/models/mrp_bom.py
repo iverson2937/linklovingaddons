@@ -106,7 +106,7 @@ class MrpBom(models.Model):
                 datas.append({
                     'id': product,
                     'action_ids': ation_data.parse_action_line_data(no_option=True, no_data=True),
-                    'name': self.env['product.product'].browse(product).name
+                    'name': self.env['product.product'].browse(product).display_name
                 })
         return datas
 
@@ -126,12 +126,12 @@ class MrpBom(models.Model):
 
                 bom_line_id = action.get('dest_bom_line')
                 print bom_line_id
-                if self.env['mrp.bom.line'].browse(bom_line_id).action_line_ids:
-                    for l in self.env['mrp.bom.line'].browse(bom_line_id).action_line_ids:
-                        l.unlink()
+                # if self.env['mrp.bom.line'].browse(bom_line_id).action_line_ids:
+                #     for l in self.env['mrp.bom.line'].browse(bom_line_id).action_line_ids:
+                #         l.unlink()
                 for action_line in source_action_line_ids:
                     self.env['process.action.line'].create({
-                        'action_id': action_line.action_id.id,
+                        'action_id': action_line.action_id,
                         'rate': action_line.rate,
                         'rate_2': action_line.rate_2,
                         'bom_line_id': int(bom_line_id)
