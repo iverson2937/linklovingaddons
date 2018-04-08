@@ -208,6 +208,14 @@ odoo.define('linkloving_process_inherit.bom_cost_reproduce', function (require) 
                 'update_actions': self.update_actions,
             }).then(function (result) {
                 self.update_actions = [];
+                self.do_action({
+                    "type": "ir.actions.client",
+                    "tag": "action_notify",
+                    "params": {
+                        "title": "保存成功",
+                        "text": "保存成功",
+                    }
+                });
                 self.confirm_target_bom_sel_func();
             })
         },
