@@ -19,14 +19,6 @@ class MrpBom(models.Model):
         for line in self.bom_line_ids:
             line.set_bom_line_product_bom_released()
 
-    def set_bom_line_product_bom_released(self):
-        self.bom_id.state = 'release'
-        # line.bom_id.product_tmpl_id.apply_bom_update()
-
-        if self.child_line_ids:
-            for line in self.child_line_ids:
-                line.set_bom_line_product_bom_released()
-
     @api.multi
     def bom_detail(self):
 
@@ -123,6 +115,14 @@ def _get_rec(object, level, qty=1.0, uom=False):
 class MrpBomLine(models.Model):
     _inherit = 'mrp.bom.line'
     is_highlight = fields.Boolean()
+
+    def set_bom_line_product_bom_released(self):
+        self.bom_id.state = 'release'
+        # line.bom_id.product_tmpl_id.apply_bom_update()
+
+        if self.child_line_ids:
+            for line in self.child_line_ids:
+                line.set_bom_line_product_bom_released()
 
     @api.model
     def create(self, vals):
