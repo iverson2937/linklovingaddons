@@ -124,17 +124,16 @@ class MrpBom(models.Model):
                 if source_bom_line:
                     source_action_line_ids = source_bom_line[0].action_line_ids
 
-                bom_line_id = action.get('dest_bom_line')
-                print bom_line_id
-                # if self.env['mrp.bom.line'].browse(bom_line_id).action_line_ids:
-                #     for l in self.env['mrp.bom.line'].browse(bom_line_id).action_line_ids:
-                #         l.unlink()
+                dest_bom_line = action.get('dest_bom_line')
+                if self.env['mrp.bom.line'].browse(dest_bom_line).action_line_ids:
+                    for l in self.env['mrp.bom.line'].browse(dest_bom_line).action_line_ids:
+                        l.unlink()
                 for action_line in source_action_line_ids:
                     self.env['process.action.line'].create({
                         'action_id': action_line.action_id,
                         'rate': action_line.rate,
                         'rate_2': action_line.rate_2,
-                        'bom_line_id': int(bom_line_id)
+                        'bom_line_id': int(dest_bom_line)
                     })
 
         return 'ok'
