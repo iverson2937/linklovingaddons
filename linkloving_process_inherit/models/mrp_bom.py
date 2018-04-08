@@ -114,7 +114,29 @@ class MrpBom(models.Model):
     def save_changes(self, **kwargs):
         print kwargs
         source_bom_id = kwargs.get('source_bom_id')
+        dest_bom_id = kwargs.get('dest_bom_id')
+        bom_obj = self.env['mrp.bom']
+        source_bom = bom_obj.browse(source_bom_id)
+        dest_bom = bom_obj.browse(dest_bom_id)
+        source_bom_product_ids = source_bom.mapped('bom_line_ids.product_id').ids
+        dest_bom_product_ids = dest_bom.mapped('bom_line_ids.product_id').ids
+        common_products = set(source_bom_product_ids) & set(dest_bom_product_ids)
+        # 共同的line copy前提是一致
+        for p in common_products:
+            source_line = source_bom.mapped('bom_line_ids').filtered(lambda x: x.product_id.id == p)
+            dest_line = dest_bom.mapped('bom_line_ids').filtered(lambda x: x.product_id.id == p)
+            if not dest_line.action_line_ids and source_line.action_line_ids:
+                for ac in source_line.action_line_ids:
+                    self.env['process.action.line'].create({
+                        'action_id': ac.action_id.id,
+                        'rate': ac.rate,
+                        'rate_2': ac.rate_2,
+                        'bom_line_id': dest_line.id
+                    })
+
         copy_actions = kwargs.get('copy_actions')
+        update_actions = kwargs.get('update_actions')
+        action_line_obj = self.env['process.action.line']
         source_action_line_ids = []
         for action in copy_actions:
             product_id = action.get('replace_id')
@@ -130,11 +152,55 @@ class MrpBom(models.Model):
                         l.unlink()
                 for action_line in source_action_line_ids:
                     self.env['process.action.line'].create({
-                        'action_id': action_line.action_id,
+                        'action_id': action_line.action_id.id,
                         'rate': action_line.rate,
                         'rate_2': action_line.rate_2,
                         'bom_line_id': int(dest_bom_line)
                     })
+        if update_actions:
+            print update_actions
+            for bom_line_id, actions in update_actions.iteritems():
+                print bom_line_id,
+                print actions
+
+                if actions:
+                    bom_line = self.env['mrp.bom.line'].browse(int(bom_line_id))
+                    for action in actions:
+                        if type(action) == dict and action.get('id'):
+                            process_action_line = action_line_obj.browse(action.get('id'))
+                            action_id_new = int(action.get('action_id'))
+                            if action_id_new in self.env['mrp.process.action'].search([]).ids:
+                                process_action_line.write({
+                                    'rate': action.get('rate'),
+                                    'rate_2': action.get('rate_2'),
+                                    'action_id': action_id_new
+                                })
+                        elif action.get('delete_line_id'):
+                            action_line_obj.browse(int(action.get('delete_line_id'))).unlink()
+                        else:
+                            action_line_obj.create({
+                                'rate': action.get('rate'),
+                                'rate_2': action.get('rate_2'),
+                                'action_id': int(action.get('action_id')),
+                                'bom_line_id': int(bom_line_id)
+                            })
+                    # else:
+                    #     self.env['process.action.line'].browse()
+
+                    action_data = bom_line.parse_action_line_data(no_option=True, no_data=True)
+                    category_id = bom_line.bom_id.product_tmpl_id.categ_id.id
+                    tmp_obj = self.env['bom.cost.category.temp']
+                    product_id = bom_line.product_id.id
+                    temp_id = tmp_obj.search(
+                        [('category_id', '=', category_id), ('product_id', '=', product_id)], limit=1)
+                    if temp_id:
+
+                        temp_id.action_data = json.dumps(action_data)
+                    else:
+                        tmp_obj.create({'category_id': bom_line.bom_id.product_tmpl_id.categ_id.id,
+                                        'product_id': product_id,
+                                        'action_data': json.dumps(action_data)
+                                        })
 
         return 'ok'
 
