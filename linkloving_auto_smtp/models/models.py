@@ -157,8 +157,6 @@ class AutoSmtpMailMail(models.Model):
                     raise UserError('Email 有误' + str(email_one))
 
         return [email_to] if type(email_to) == str else email_to
-<<<<<<< Updated upstream
-=======
 
 
 class EmailSendStatistics(models.Model):
@@ -175,4 +173,3 @@ class EmailAddressee(models.Model):
 
     name = fields.Char(u'邮件标题')
     body = fields.Html(u'Email')
->>>>>>> Stashed changes
